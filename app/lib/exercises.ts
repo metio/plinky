@@ -78,6 +78,14 @@ export const exercises: Exercise[] = [
         tempo: 96,
         beatsPerBar: 4,
     },
+    {
+        id: "c-major-triads",
+        title: "C major triads",
+        description: "Three-note chords up the scale — press all notes of each chord together.",
+        abc: "X:1\nT:C major triads\nM:4/4\nL:1/4\nK:C\n[CEG] [DFA] [EGB] [Fac] |",
+        tempo: 80,
+        beatsPerBar: 4,
+    },
 ];
 
 export function findExercise(id: string | undefined): Exercise | undefined {

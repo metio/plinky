@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { NoteTimingEvent, TuneObject } from "abcjs";
+import type { TuneObject } from "abcjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useNoteMatcher } from "../hooks/useNoteMatcher";
 import { useSynth } from "../hooks/useSynth";
-import { expectedPitches, useNoteMatcher } from "../hooks/useNoteMatcher";
 import type { Exercise } from "../lib/exercises";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { buildSteps, type Step } from "../lib/steps";
 import {
     findHotspots,
     type Hotspot,
@@ -33,13 +34,11 @@ type Result = {
 };
 
 // Paint the notes of each slow stretch red, directly on the rendered score.
-function paintHotspots(events: NoteTimingEvent[], hotspots: Hotspot[]): void {
+function paintHotspots(steps: Step[], hotspots: Hotspot[]): void {
     for (const hotspot of hotspots) {
         for (let i = hotspot.startIndex; i <= hotspot.endIndex; i++) {
-            for (const group of events[i]?.elements ?? []) {
-                for (const element of group) {
-                    element.style.fill = HOTSPOT_COLOR;
-                }
+            for (const element of steps[i]?.elements ?? []) {
+                element.style.fill = HOTSPOT_COLOR;
             }
         }
     }
@@ -60,7 +59,7 @@ function describeHotspots(hotspots: Hotspot[]): string {
 }
 
 export function TempoTrainer({ exercise }: { exercise: Exercise }) {
-    const [events, setEvents] = useState<NoteTimingEvent[]>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
     const [liveBpm, setLiveBpm] = useState<number | null>(null);
     const [result, setResult] = useState<Result | null>(null);
@@ -73,47 +72,43 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
     const synth = useSynth();
 
     const handleRender = useCallback(
-        (tune: TuneObject) => {
-            // Each event's `milliseconds` is its notated onset at the exercise
-            // tempo, the reference the played tempo is measured against.
-            const timed = tune
-                .setupEvents(0, 1000, exercise.tempo)
-                .filter((event) => event.type === "event" && expectedPitches(event).length > 0);
-            setEvents(timed);
-        },
+        // Each step's `timeMs` is its notated onset at the exercise tempo, the
+        // reference the played tempo is measured against.
+        (tune: TuneObject) => setSteps(buildSteps(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
     const handleCorrect = useCallback(
         (index: number, timestamp: number) => {
-            synth.playNote(expectedPitches(events[index])[0]);
+            for (const pitch of steps[index]?.pitches ?? []) {
+                synth.playNote(pitch);
+            }
             timestampsRef.current[index] = timestamp;
             if (index === 0) {
                 setRunState("running");
                 setLiveBpm(null);
                 return;
             }
-            const notatedGap =
-                (events[index]?.milliseconds ?? 0) - (events[index - 1]?.milliseconds ?? 0);
+            const notatedGap = (steps[index]?.timeMs ?? 0) - (steps[index - 1]?.timeMs ?? 0);
             const actualGap = timestamp - timestampsRef.current[index - 1];
             const bpm = instantaneousBpm(exercise.tempo, notatedGap, actualGap);
             smoothedRef.current =
                 liveBpm === null ? bpm : SMOOTHING * bpm + (1 - SMOOTHING) * smoothedRef.current;
             setLiveBpm(Math.round(smoothedRef.current));
         },
-        [synth, events, exercise.tempo, liveBpm],
+        [synth, steps, exercise.tempo, liveBpm],
     );
 
     const handleComplete = useCallback(() => {
-        const notatedMs = events.map((event) => event.milliseconds);
+        const notatedMs = steps.map((step) => step.timeMs);
         const points = tempoSeries(exercise.tempo, notatedMs, timestampsRef.current);
         const med = median(points.map((point) => point.bpm));
         setResult({ points, median: med, hotspots: findHotspots(points, med) });
         setRunState("finished");
-    }, [events, exercise.tempo]);
+    }, [steps, exercise.tempo]);
 
     const active = runState === "armed" || runState === "running";
-    const matcher = useNoteMatcher(events, {
+    const matcher = useNoteMatcher(steps, {
         active,
         onCorrect: handleCorrect,
         onComplete: handleComplete,
@@ -131,9 +126,9 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
     // settled on the final cursor before this runs, so the red overlay sticks.
     useEffect(() => {
         if (result) {
-            paintHotspots(events, result.hotspots);
+            paintHotspots(steps, result.hotspots);
         }
-    }, [result, events]);
+    }, [result, steps]);
 
     const start = useCallback(() => {
         matcher.reset();
@@ -179,7 +174,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     <button
                         type="button"
                         onClick={start}
-                        disabled={events.length === 0}
+                        disabled={steps.length === 0}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                     >
                         {runState === "finished" ? "Go again" : "Start"}
@@ -195,7 +190,10 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                 )}
                 {runState === "armed" && (
                     <span className="text-sm text-indigo-700">
-                        Play <span className="font-mono">{noteName(matcher.nextPitch ?? 0)}</span>{" "}
+                        Play{" "}
+                        <span className="font-mono">
+                            {matcher.nextPitches.map(noteName).join(" ")}
+                        </span>{" "}
                         whenever you are ready.
                     </span>
                 )}
