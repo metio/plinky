@@ -57,7 +57,8 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
     const matcher = useHandsMatcher(hands, { onCorrect: handleCorrect });
 
     const handleNoteOn = useCallback(
-        (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
+        (played: MidiNoteEvent) =>
+            matcher.registerNote(played.note, played.timestamp, played.velocity),
         [matcher],
     );
 

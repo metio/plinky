@@ -19,6 +19,9 @@ export type CorrectInfo = {
     timeMs: number;
     timestamp: number;
     ordinal: number;
+    // Velocity of the note that completed the step (0..127); the on-screen and
+    // computer keyboards send a fixed value, a MIDI piano the real one.
+    velocity: number;
 };
 
 export type HandsMatcherOptions = {
@@ -37,7 +40,7 @@ export type HandsMatcher = {
     handCount: number;
     completedSteps: number;
     totalSteps: number;
-    registerNote: (note: number, timestamp: number) => void;
+    registerNote: (note: number, timestamp: number, velocity?: number) => void;
     reset: () => void;
 };
 
@@ -77,7 +80,7 @@ export function useHandsMatcher(hands: Hand[], options: HandsMatcherOptions = {}
     }, [hands, state]);
 
     const registerNote = useCallback(
-        (note: number, timestamp: number) => {
+        (note: number, timestamp: number, velocity = 80) => {
             if (!active) {
                 return;
             }
@@ -110,6 +113,7 @@ export function useHandsMatcher(hands: Hand[], options: HandsMatcherOptions = {}
                     timeMs: step.timeMs,
                     timestamp: onsetRef.current[event.hand],
                     ordinal: ordinalRef.current++,
+                    velocity,
                 });
                 if (event.complete) {
                     optionsRef.current.onComplete?.(onsetRef.current[event.hand]);

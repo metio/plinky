@@ -10,6 +10,7 @@ import { useSynth } from "../hooks/useSynth";
 import type { Exercise } from "../lib/exercises";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { type DynamicsSummary, summarizeDynamics } from "../lib/dynamics";
 import { type Hit, makeHit, type RhythmSummary, summarize } from "../lib/rhythm";
 import { isBetterRhythm, loadBestRhythm, type RhythmBest, saveBestRhythm } from "../lib/scores";
 import { AbcRenderer } from "./abcRenderer";
@@ -45,12 +46,14 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     );
     const [best, setBest] = useState<RhythmBest | null>(null);
     const [isRecord, setIsRecord] = useState(false);
+    const [dynamics, setDynamics] = useState<DynamicsSummary | null>(null);
 
     // Timing anchors live in refs so the input handlers read current values
     // without being recreated mid-run.
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
     const hitsRef = useRef<{ hand: number; hit: Hit }[]>([]);
+    const velocitiesRef = useRef<number[]>([]);
     const armTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const metronome = useMetronome();
@@ -77,10 +80,12 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                 startRef.current = info.timestamp;
                 baseOffsetRef.current = info.timeMs;
                 hitsRef.current = [];
+                velocitiesRef.current = [info.velocity];
                 setLastHit(null);
                 setRunState("running");
                 return;
             }
+            velocitiesRef.current.push(info.velocity);
             const targetOffset = info.timeMs - baseOffsetRef.current;
             const actualOffset = info.timestamp - startRef.current;
             const hit = makeHit(info.ordinal, actualOffset - targetOffset);
@@ -107,6 +112,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                   }))
                 : [],
         );
+        setDynamics(summarizeDynamics(velocitiesRef.current));
         setRunState("finished");
         setBest((prevBest) => {
             if (result.total > 0 && isBetterRhythm(result, prevBest)) {
@@ -128,7 +134,8 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     });
 
     const handleNoteOn = useCallback(
-        (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
+        (played: MidiNoteEvent) =>
+            matcher.registerNote(played.note, played.timestamp, played.velocity),
         [matcher],
     );
 
@@ -145,9 +152,11 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     const start = useCallback(() => {
         matcher.reset();
         hitsRef.current = [];
+        velocitiesRef.current = [];
         setLastHit(null);
         setSummary(null);
         setHandSummaries([]);
+        setDynamics(null);
         setIsRecord(false);
         setRunState("counting");
         // One bar of clicks doubles as the count-in; the metronome keeps ticking
@@ -267,6 +276,12 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                             {hand.summary.perfect}/{hand.summary.total} perfect)
                         </p>
                     ))}
+                    {dynamics && (
+                        <p className="text-gray-500 dark:text-gray-400">
+                            Dynamics: {dynamics.label} ({dynamics.evenness}% even) — a MIDI piano
+                            scores this from how evenly you strike the keys.
+                        </p>
+                    )}
                 </div>
             )}
 
