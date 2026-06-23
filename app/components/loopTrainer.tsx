@@ -114,6 +114,18 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
         wrongRef.current += 1;
     }, []);
 
+    // Wipe note colours so a previous region's highlights do not linger when the
+    // loop range changes; the matcher then repaints only the new region.
+    const clearHighlights = useCallback(() => {
+        for (const hand of allHands) {
+            for (const step of hand.steps) {
+                for (const element of step.elements) {
+                    element.style.fill = "";
+                }
+            }
+        }
+    }, [allHands]);
+
     const matcher = useHandsMatcher(region, {
         active: running,
         onCorrect: handleCorrect,
@@ -152,6 +164,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
             for (const step of hand.steps) {
                 const bar = barIndex(step.timeMs, exercise.beatsPerBar, exercise.tempo);
                 const onClick = () => {
+                    clearHighlights();
                     if (anchorRef.current === null) {
                         anchorRef.current = bar;
                         setFromBar(bar);
@@ -177,7 +190,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                 cleanup();
             }
         };
-    }, [allHands, running, exercise.beatsPerBar, exercise.tempo]);
+    }, [allHands, running, exercise.beatsPerBar, exercise.tempo, clearHighlights]);
 
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) =>
@@ -199,11 +212,12 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
     }, [matcher]);
 
     const nextSection = useCallback(() => {
+        clearHighlights();
         const size = toBar - fromBar + 1;
         const nextFrom = toBar + 1 >= bars ? 0 : toBar + 1;
         setFromBar(nextFrom);
         setToBar(Math.min(nextFrom + size - 1, bars - 1));
-    }, [fromBar, toBar, bars]);
+    }, [fromBar, toBar, bars, clearHighlights]);
 
     const connected = status === "ready" && devices.length > 0;
     const lastRep = reps[reps.length - 1] ?? null;
@@ -244,7 +258,10 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                     min={0}
                     max={toBar}
                     disabled={running}
-                    onChange={setFromBar}
+                    onChange={(value) => {
+                        clearHighlights();
+                        setFromBar(value);
+                    }}
                 />
                 <Stepper
                     label="To bar"
@@ -252,7 +269,10 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                     min={fromBar}
                     max={Math.max(0, bars - 1)}
                     disabled={running}
-                    onChange={setToBar}
+                    onChange={(value) => {
+                        clearHighlights();
+                        setToBar(value);
+                    }}
                 />
                 <button
                     type="button"
