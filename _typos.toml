@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+
+# A tuplet is a music term (triplets, quintuplets, …), not a misspelling of
+# "tuple".
+[default.extend-words]
+tuplet = "tuplet"
+tuplets = "tuplets"
