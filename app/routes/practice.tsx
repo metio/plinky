@@ -5,17 +5,17 @@ import type { Route } from "./+types/practice";
 import { SightReadingTrainer } from "../components/sightReadingTrainer";
 import { findExercise } from "../lib/exercises";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Plinky - Practice" },
-    { name: "description", content: "Sight-reading practice with your MIDI piano" },
-  ];
+export function meta(_args: Route.MetaArgs) {
+    return [
+        { title: "Plinky - Practice" },
+        { name: "description", content: "Sight-reading practice with your MIDI piano" },
+    ];
 }
 
 export default function PracticeRoute({ params }: Route.ComponentProps) {
-  const exercise = findExercise(params.exerciseId);
-  if (!exercise) {
-    throw new Response("Exercise not found", { status: 404 });
-  }
-  return <SightReadingTrainer exercise={exercise} />;
+    const exercise = findExercise(params.exerciseId);
+    if (!exercise) {
+        throw new Response("Exercise not found", { status: 404 });
+    }
+    return <SightReadingTrainer exercise={exercise} />;
 }

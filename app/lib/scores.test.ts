@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
     ERROR_PENALTY_MS,
     isBetterRhythm,
@@ -13,10 +13,10 @@ import {
     type RhythmBest,
     type TrialResult,
 } from "./scores";
-import type {RhythmSummary} from "./rhythm";
+import type { RhythmSummary } from "./rhythm";
 
 function summary(averageAbsMs: number, perfect: number): RhythmSummary {
-    return {perfect, good: 0, off: 0, total: perfect, averageAbsMs};
+    return { perfect, good: 0, off: 0, total: perfect, averageAbsMs };
 }
 
 function installLocalStorage(): void {
@@ -57,13 +57,23 @@ describe("best-score persistence", () => {
     });
 
     it("round-trips a saved result", () => {
-        const result: TrialResult = {timeMs: 3800, errors: 1, score: 5800, at: "2026-06-22T00:00:00.000Z"};
+        const result: TrialResult = {
+            timeMs: 3800,
+            errors: 1,
+            score: 5800,
+            at: "2026-06-22T00:00:00.000Z",
+        };
         saveBest("c-major-scale", result);
         expect(loadBest("c-major-scale")).toEqual(result);
     });
 
     it("scopes results per exercise id", () => {
-        const result: TrialResult = {timeMs: 1000, errors: 0, score: 1000, at: "2026-06-22T00:00:00.000Z"};
+        const result: TrialResult = {
+            timeMs: 1000,
+            errors: 0,
+            score: 1000,
+            at: "2026-06-22T00:00:00.000Z",
+        };
         saveBest("c-major-scale", result);
         expect(loadBest("c-major-arpeggio")).toBeNull();
     });
@@ -80,13 +90,13 @@ describe("isBetterRhythm", () => {
     });
 
     it("prefers a smaller average timing error", () => {
-        const current: RhythmBest = {...summary(100, 3), at: "x"};
+        const current: RhythmBest = { ...summary(100, 3), at: "x" };
         expect(isBetterRhythm(summary(80, 1), current)).toBe(true);
         expect(isBetterRhythm(summary(140, 8), current)).toBe(false);
     });
 
     it("breaks ties on more perfect notes", () => {
-        const current: RhythmBest = {...summary(100, 3), at: "x"};
+        const current: RhythmBest = { ...summary(100, 3), at: "x" };
         expect(isBetterRhythm(summary(100, 5), current)).toBe(true);
         expect(isBetterRhythm(summary(100, 2), current)).toBe(false);
     });
@@ -102,7 +112,7 @@ describe("rhythm best persistence", () => {
     });
 
     it("round-trips a saved rhythm best under its own key", () => {
-        const best: RhythmBest = {...summary(75, 6), at: "2026-06-22T00:00:00.000Z"};
+        const best: RhythmBest = { ...summary(75, 6), at: "2026-06-22T00:00:00.000Z" };
         saveBestRhythm("twinkle", best);
         expect(loadBestRhythm("twinkle")).toEqual(best);
         // The rhythm key is distinct from the time-trial key.

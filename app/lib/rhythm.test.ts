@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {describe, expect, it} from "vitest";
-import {GOOD_MS, PERFECT_MS, makeHit, rate, summarize} from "./rhythm";
+import { describe, expect, it } from "vitest";
+import { GOOD_MS, PERFECT_MS, makeHit, rate, summarize } from "./rhythm";
 
 describe("rate", () => {
     it("is perfect at and within the perfect window", () => {
@@ -22,8 +22,8 @@ describe("rate", () => {
 
 describe("makeHit", () => {
     it("rates on the absolute delta but keeps the sign", () => {
-        expect(makeHit(3, -200)).toEqual({index: 3, deltaMs: -200, rating: "off"});
-        expect(makeHit(1, 30)).toEqual({index: 1, deltaMs: 30, rating: "perfect"});
+        expect(makeHit(3, -200)).toEqual({ index: 3, deltaMs: -200, rating: "off" });
+        expect(makeHit(1, 30)).toEqual({ index: 1, deltaMs: 30, rating: "perfect" });
     });
 });
 
@@ -40,6 +40,6 @@ describe("summarize", () => {
     });
 
     it("handles an empty run", () => {
-        expect(summarize([])).toEqual({perfect: 0, good: 0, off: 0, total: 0, averageAbsMs: 0});
+        expect(summarize([])).toEqual({ perfect: 0, good: 0, off: 0, total: 0, averageAbsMs: 0 });
     });
 });

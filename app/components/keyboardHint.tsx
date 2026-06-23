@@ -5,7 +5,7 @@ function formatOffset(offset: number): string {
     return offset > 0 ? `+${offset}` : `${offset}`;
 }
 
-export function KeyboardHint({octaveOffset}: {octaveOffset: number}) {
+export function KeyboardHint({ octaveOffset }: { octaveOffset: number }) {
     return (
         <div className="space-y-1 rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
             <p className="font-medium text-gray-700">No piano? Play with your computer keyboard:</p>

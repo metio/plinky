@@ -34,11 +34,11 @@ export function rate(absDeltaMs: number): Rating {
 }
 
 export function makeHit(index: number, deltaMs: number): Hit {
-    return {index, deltaMs, rating: rate(Math.abs(deltaMs))};
+    return { index, deltaMs, rating: rate(Math.abs(deltaMs)) };
 }
 
 export function summarize(hits: Hit[]): RhythmSummary {
-    const counts = {perfect: 0, good: 0, off: 0};
+    const counts = { perfect: 0, good: 0, off: 0 };
     let sumAbs = 0;
     for (const hit of hits) {
         counts[hit.rating] += 1;

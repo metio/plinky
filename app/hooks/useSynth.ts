@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {useCallback} from "react";
-import {getAudioContext, midiToFrequency} from "../lib/audio";
+import { useCallback } from "react";
+import { getAudioContext, midiToFrequency } from "../lib/audio";
 
 export type PlayNoteOptions = {
     velocity?: number; // 0..127
@@ -54,5 +54,5 @@ export function useSynth(): UseSynthResult {
         overtone.stop(now + duration);
     }, []);
 
-    return {playNote};
+    return { playNote };
 }

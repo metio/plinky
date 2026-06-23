@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: 0BSD
 
 /.idea/
+/.ilo.rc
 /node_modules/
 /.react-router/
 /build/
+/coverage/
 
 *storybook.log

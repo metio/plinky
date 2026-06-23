@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["app/routes/*.tsx"],
+  "project": ["app/**/*.{ts,tsx}"],
+  "ignoreDependencies": ["tailwindcss"],
+  "ignoreExportsUsedInFile": true
+}
