@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { m } from "../paraglide/messages.js";
 import { getLocale, locales, setLocale } from "../paraglide/runtime.js";
 
 // Each locale labelled in its own language, so a reader recognizes their own.
@@ -23,6 +24,14 @@ const LANGUAGE_NAMES: Record<string, string> = {
     zh: "中文",
     ja: "日本語",
     ko: "한국어",
+    ro: "Română",
+    cs: "Čeština",
+    sk: "Slovenčina",
+    hu: "Magyar",
+    ru: "Русский",
+    tr: "Türkçe",
+    sr: "Српски",
+    sq: "Shqip",
 };
 
 // Switching the locale persists it (localStorage strategy) and reloads so every
@@ -30,7 +39,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
 export function LanguageSwitcher() {
     return (
         <select
-            aria-label="Language"
+            aria-label={m.settings_language()}
             value={getLocale()}
             onChange={(event) => setLocale(event.target.value as (typeof locales)[number])}
             className="rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Progres",
+  "nav_settings": "Setări",
+  "home_heading": "Exersează pian în browser",
+  "home_intro": "Conectează un pian MIDI sau cântă cu tastatura calculatorului. Alege un exercițiu mai jos sau exersează o melodie."
+}

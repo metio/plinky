@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Haladás",
+  "nav_settings": "Beállítások",
+  "home_heading": "Gyakorolj zongorázni a böngészőben",
+  "home_intro": "Csatlakoztass egy MIDI-zongorát, vagy játssz a számítógép billentyűzetén. Válassz egy gyakorlatot alább, vagy gyakorolj egy dalt."
+}

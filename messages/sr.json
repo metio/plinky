@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Напредак",
+  "nav_settings": "Подешавања",
+  "home_heading": "Вежбајте клавир у прегледачу",
+  "home_intro": "Повежите MIDI клавир или свирајте тастатуром рачунара. Изаберите вежбу испод или вежбајте песму."
+}

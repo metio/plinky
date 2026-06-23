@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "İlerleme",
+  "nav_settings": "Ayarlar",
+  "home_heading": "Tarayıcınızda piyano çalışın",
+  "home_intro": "Bir MIDI piyano bağlayın veya bilgisayar klavyenizle çalın. Aşağıdan bir alıştırma seçin ya da bir parça çalışın."
+}

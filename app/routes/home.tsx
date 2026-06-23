@@ -23,30 +23,19 @@ export function meta(_args: Route.MetaArgs) {
     ];
 }
 
+// Message functions are called at render time so the labels follow the locale.
 const MODES = [
-    { slug: "practice", label: "Practice" },
-    { slug: "time-trial", label: "Time trial" },
-    { slug: "rhythm", label: "Rhythm" },
-    { slug: "tempo", label: "Tempo" },
-    { slug: "loop", label: "Loop" },
+    { slug: "practice", label: m.mode_practice },
+    { slug: "time-trial", label: m.mode_time_trial },
+    { slug: "rhythm", label: m.mode_rhythm },
+    { slug: "tempo", label: m.mode_tempo },
+    { slug: "loop", label: m.mode_loop },
 ];
 
 const PLAY_NOW = [
-    {
-        to: "/sprint",
-        label: "Sight-reading sprint",
-        blurb: "Fresh notes every run — play as many as you can before the timer runs out.",
-    },
-    {
-        to: "/daily",
-        label: "Daily challenge",
-        blurb: "One minute, the same notes for everyone today. Beat your best.",
-    },
-    {
-        to: "/ear",
-        label: "Ear training",
-        blurb: "Hear a note and find it by ear. No reading required.",
-    },
+    { to: "/sprint", label: m.play_sprint, blurb: m.play_sprint_blurb },
+    { to: "/daily", label: m.play_daily, blurb: m.play_daily_blurb },
+    { to: "/ear", label: m.play_ear, blurb: m.play_ear_blurb },
 ];
 
 function downloadAbc(exercise: Exercise): void {
@@ -95,7 +84,7 @@ export default function Home() {
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
-                    Just start playing
+                    {m.home_play_now()}
                 </h2>
                 <div className="grid gap-3 sm:grid-cols-3">
                     {PLAY_NOW.map((mode) => (
@@ -105,10 +94,10 @@ export default function Home() {
                             className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950 dark:hover:bg-indigo-900"
                         >
                             <span className="font-medium text-indigo-700 dark:text-indigo-300">
-                                {mode.label} →
+                                {mode.label()} →
                             </span>
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                {mode.blurb}
+                                {mode.blurb()}
                             </p>
                         </Link>
                     ))}
@@ -118,34 +107,34 @@ export default function Home() {
             <section className="space-y-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
-                        Practice a song
+                        {m.home_practice_a_song()}
                     </h2>
                     <div className="flex gap-4 text-sm">
                         <Link
                             to="/curriculums"
                             className="text-indigo-700 underline dark:text-indigo-300"
                         >
-                            By curriculum
+                            {m.home_by_curriculum()}
                         </Link>
                         <Link
                             to="/import"
                             className="text-indigo-700 underline dark:text-indigo-300"
                         >
-                            Find more songs
+                            {m.home_find_more_songs()}
                         </Link>
                     </div>
                 </div>
 
                 {songs.length === 0 ? (
                     <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                        No songs on this device yet.{" "}
+                        {m.home_empty_prefix()}{" "}
                         <Link
                             to="/import"
                             className="text-indigo-700 underline dark:text-indigo-300"
                         >
-                            Find songs to import
+                            {m.home_find_to_import()}
                         </Link>
-                        , or paste your own below.
+                        {m.home_empty_suffix()}
                     </p>
                 ) : (
                     <ul className="space-y-3">
@@ -157,7 +146,7 @@ export default function Home() {
                                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                                     <h3 className="text-lg font-medium">{exercise.title}</h3>
                                     <span className="font-mono text-xs text-gray-400">
-                                        {exercise.tempo} bpm
+                                        {m.home_bpm({ tempo: exercise.tempo })}
                                     </span>
                                 </div>
                                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -170,7 +159,7 @@ export default function Home() {
                                             to={`/${mode.slug}/${exercise.id}`}
                                             className="rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300"
                                         >
-                                            {mode.label}
+                                            {mode.label()}
                                         </Link>
                                     ))}
                                     <button
@@ -178,21 +167,23 @@ export default function Home() {
                                         onClick={() => share(exercise)}
                                         className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
                                     >
-                                        {copiedId === exercise.id ? "Link copied!" : "Share"}
+                                        {copiedId === exercise.id
+                                            ? m.action_link_copied()
+                                            : m.action_share()}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => downloadAbc(exercise)}
                                         className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
                                     >
-                                        Export
+                                        {m.action_export()}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => remove(exercise.id)}
                                         className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 underline"
                                     >
-                                        Remove
+                                        {m.action_remove()}
                                     </button>
                                 </div>
                             </li>

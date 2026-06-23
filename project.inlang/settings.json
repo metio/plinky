@@ -19,7 +19,15 @@
     "uk",
     "zh",
     "ja",
-    "ko"
+    "ko",
+    "ro",
+    "cs",
+    "sk",
+    "hu",
+    "ru",
+    "tr",
+    "sr",
+    "sq"
   ],
   "modules": [
     "https://cdn.jsdelivr.net/npm/@inlang/plugin-message-format@latest/dist/index.js"

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Pokrok",
+  "nav_settings": "Nastavení",
+  "home_heading": "Cvičte klavír v prohlížeči",
+  "home_intro": "Připojte MIDI klavír nebo hrajte na klávesnici počítače. Vyberte si cvičení níže nebo si procvičte skladbu."
+}
