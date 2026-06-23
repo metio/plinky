@@ -11,10 +11,11 @@ export type SprintOptions = {
     twoHands: boolean;
 };
 
-// C major, no accidentals. Lowercase is the treble octave (around C5), uppercase
-// the bass octave (around C4), an octave below.
-const TREBLE = ["c", "d", "e", "f", "g", "a", "b"];
-const BASS = ["C", "D", "E", "F", "G", "A", "B"];
+// C major five-finger position (C–G), so generated drills fit the computer
+// keyboard's five keys per hand. Lowercase is the treble octave (around C5),
+// uppercase the bass octave (around C4) an octave below.
+const TREBLE = ["c", "d", "e", "f", "g"];
+const BASS = ["C", "D", "E", "F", "G"];
 
 function line(scale: string[], bars: number, beatsPerBar: number, rng: () => number): string {
     const measures: string[] = [];
