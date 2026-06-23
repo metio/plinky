@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { exercises } from "../lib/exercises";
 import { decodeSong } from "../lib/share";
 import { routeMeta } from "../lib/site";
 import { buildExercise, loadUserSongs, saveUserSong } from "../lib/songs";
@@ -11,8 +10,19 @@ import { buildSteps } from "../lib/steps";
 import type { Route } from "./+types/import";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Shared song", "Open a shared Plinky song");
+    return routeMeta("Find songs", "Import Plinky songs from a link or a shared song pack");
 }
+
+// External pages that host Plinky song links; each points back at /import#s=… so
+// opening one adds the song to this device. The catalog lives outside the app so
+// it can grow without bloating it.
+const SONG_SOURCES = [
+    {
+        name: "Plinky song wiki",
+        url: "https://github.com/metio/plinky/wiki",
+        blurb: "Community-maintained scores you can open straight into Plinky.",
+    },
+];
 
 // abcjs is loaded on demand so opening a link does not pull it into the bundle
 // until the song is validated.
@@ -35,66 +45,117 @@ async function isPlayable(abc: string): Promise<boolean> {
 type Outcome = { ok: true; id: string; title: string } | { ok: false; message: string };
 
 export default function ImportRoute() {
+    const [hasLink, setHasLink] = useState(false);
     const [outcome, setOutcome] = useState<Outcome | null>(null);
 
     useEffect(() => {
+        const encoded = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("s");
+        if (!encoded) {
+            return; // No shared song in the URL: show the directory below.
+        }
+        setHasLink(true);
         (async () => {
-            const encoded = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("s");
-            if (!encoded) {
-                setOutcome({ ok: false, message: "This link has no song in it." });
-                return;
-            }
             const abc = decodeSong(encoded);
             if (!abc || !(await isPlayable(abc))) {
                 setOutcome({ ok: false, message: "This link does not contain a playable song." });
                 return;
             }
-            const ids = [...exercises.map((e) => e.id), ...loadUserSongs().map((song) => song.id)];
+            const ids = loadUserSongs().map((song) => song.id);
             const exercise = buildExercise(abc, ids);
             saveUserSong(exercise);
             setOutcome({ ok: true, id: exercise.id, title: exercise.title });
         })();
     }, []);
 
-    return (
-        <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">Shared song</h1>
+    if (hasLink) {
+        return (
+            <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
+                <h1 className="text-2xl font-semibold">Shared song</h1>
 
-            {outcome === null && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">Reading the link…</p>
-            )}
+                {outcome === null && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Reading the link…</p>
+                )}
 
-            {outcome?.ok === false && (
-                <div className="space-y-3">
-                    <p className="text-sm text-red-600">{outcome.message}</p>
-                    <Link to="/" className="text-sm text-indigo-700 dark:text-indigo-300 underline">
-                        Back to exercises
-                    </Link>
-                </div>
-            )}
-
-            {outcome?.ok === true && (
-                <div className="space-y-3">
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Added <span className="font-medium">{outcome.title}</span> to your library
-                        on this device.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                        <Link
-                            to={`/practice/${outcome.id}`}
-                            className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                        >
-                            Practice it
-                        </Link>
+                {outcome?.ok === false && (
+                    <div className="space-y-3">
+                        <p className="text-sm text-red-600">{outcome.message}</p>
                         <Link
                             to="/"
-                            className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
+                            className="text-sm text-indigo-700 underline dark:text-indigo-300"
                         >
-                            All exercises
+                            Back home
                         </Link>
                     </div>
-                </div>
-            )}
+                )}
+
+                {outcome?.ok === true && (
+                    <div className="space-y-3">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Added <span className="font-medium">{outcome.title}</span> to your
+                            library on this device.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            <Link
+                                to={`/practice/${outcome.id}`}
+                                className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                            >
+                                Practice it
+                            </Link>
+                            <Link
+                                to="/"
+                                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                            >
+                                Home
+                            </Link>
+                        </div>
+                    </div>
+                )}
+            </main>
+        );
+    }
+
+    return (
+        <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
+            <header className="space-y-1">
+                <h1 className="text-2xl font-semibold">Find songs</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Plinky keeps your songs on your device rather than bundling a big library. Open
+                    a song link from one of these places — it adds the song here.
+                </p>
+            </header>
+
+            <ul className="space-y-3">
+                {SONG_SOURCES.map((source) => (
+                    <li
+                        key={source.url}
+                        className="rounded-md border border-gray-200 p-4 dark:border-gray-800"
+                    >
+                        <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-medium text-indigo-700 underline dark:text-indigo-300"
+                        >
+                            {source.name} →
+                        </a>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {source.blurb}
+                        </p>
+                    </li>
+                ))}
+            </ul>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+                Have your own notation? Paste it on the{" "}
+                <Link to="/" className="text-indigo-700 underline dark:text-indigo-300">
+                    home page
+                </Link>
+                . Got a song pack or a school's curriculum? Import it in{" "}
+                <Link to="/settings" className="text-indigo-700 underline dark:text-indigo-300">
+                    Settings
+                </Link>
+                .
+            </p>
         </main>
     );
 }

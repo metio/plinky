@@ -5,7 +5,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { exercises } from "../lib/exercises";
 import { buildExercise, saveUserSong } from "../lib/songs";
 import Home from "./home";
 
@@ -23,35 +22,28 @@ function renderHome() {
 }
 
 describe("Home", () => {
-    it("lists every built-in exercise by title", () => {
+    it("always offers the no-song training modes", () => {
         renderHome();
-        for (const exercise of exercises) {
-            expect(screen.getByText(exercise.title)).toBeTruthy();
+        for (const label of ["Sight-reading sprint →", "Daily challenge →", "Ear training →"]) {
+            expect(screen.getByText(label)).toBeTruthy();
         }
     });
 
-    it("links each exercise to every practice mode", () => {
+    it("lists a local song with mode links and a remove control", async () => {
+        saveUserSong(buildExercise("X:1\nT:My Song\nM:4/4\nL:1/4\nK:C\nC D E F |", []));
         renderHome();
+        expect(await screen.findByText("My Song")).toBeTruthy();
         const hrefs = [...document.querySelectorAll("a")].map((anchor) =>
             anchor.getAttribute("href"),
         );
-        const first = exercises[0].id;
-        for (const mode of ["practice", "time-trial", "rhythm", "tempo"]) {
-            expect(hrefs).toContain(`/${mode}/${first}`);
+        for (const mode of ["practice", "time-trial", "rhythm", "tempo", "loop"]) {
+            expect(hrefs).toContain(`/${mode}/my-song`);
         }
-    });
-
-    it("offers an export control for every exercise", () => {
-        renderHome();
-        expect(screen.getAllByText("Export")).toHaveLength(exercises.length);
-    });
-
-    it("lists imported songs with a remove control, but not built-ins", () => {
-        saveUserSong(buildExercise("X:1\nT:My Import\nM:4/4\nL:1/4\nK:C\nC D E F |", []));
-        renderHome();
-        expect(screen.getByText("My Import")).toBeTruthy();
-        // Only the imported song is removable.
         expect(screen.getAllByText("Remove")).toHaveLength(1);
-        expect(screen.getAllByText("Export")).toHaveLength(exercises.length + 1);
+    });
+
+    it("shows an empty state with no songs", async () => {
+        renderHome();
+        expect(await screen.findByText(/No songs on this device yet/)).toBeTruthy();
     });
 });

@@ -112,8 +112,7 @@ describe("persistence", () => {
         expect(loadUserSongs()[0].title).toBe("Renamed");
     });
 
-    it("resolves built-in and imported songs, preferring built-ins", () => {
-        expect(resolveExercise("c-major-scale")?.title).toBe("C major scale");
+    it("resolves a stored song by id", () => {
         saveUserSong(buildExercise(ABC, []));
         expect(resolveExercise("my-tune")?.title).toBe("My Tune");
         expect(resolveExercise("nope")).toBeUndefined();
