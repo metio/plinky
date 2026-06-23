@@ -3,11 +3,12 @@
 
 import { SprintTrainer } from "../components/sprintTrainer";
 import { todayKey } from "../lib/daily";
+import { pageTitle } from "../lib/site";
 import type { Route } from "./+types/daily";
 
 export function meta(_args: Route.MetaArgs) {
     return [
-        { title: "Plinky - Daily challenge" },
+        { title: pageTitle("Daily challenge") },
         { name: "description", content: "Today's shared one-minute sight-reading challenge" },
     ];
 }

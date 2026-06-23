@@ -4,10 +4,12 @@
 
 import { describe, expect, it } from "vitest";
 import Loop from "./loop";
-import Practice from "./practice";
+import Practice, { meta as practiceMeta } from "./practice";
 import Rhythm from "./rhythm";
 import Tempo from "./tempo";
 import TimeTrial from "./time-trial";
+
+type MetaFn = (args: { params: { exerciseId: string } }) => { title?: string }[];
 
 // Each per-exercise route resolves the id and either renders its trainer or
 // throws a 404 Response. Calling the component function directly exercises that
@@ -36,5 +38,20 @@ describe.each(routes)("%s route", (_name, route) => {
         }
         expect(error).toBeInstanceOf(Response);
         expect((error as Response).status).toBe(404);
+    });
+});
+
+describe("page titles", () => {
+    it("names the exercise and mode, ending in the brand", () => {
+        const tags = (practiceMeta as unknown as MetaFn)({
+            params: { exerciseId: "c-major-scale" },
+        });
+        const title = tags.find((tag) => tag.title)?.title;
+        expect(title).toBe("C major scale · Practice · Plinky");
+    });
+
+    it("falls back to the mode for an unknown exercise", () => {
+        const tags = (practiceMeta as unknown as MetaFn)({ params: { exerciseId: "nope" } });
+        expect(tags.find((tag) => tag.title)?.title).toBe("Practice · Plinky");
     });
 });

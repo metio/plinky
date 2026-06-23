@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import { SongImport } from "../components/songImport";
 import { type Exercise, exercises } from "../lib/exercises";
 import { encodeSong } from "../lib/share";
-import { STRUCTURED_DATA } from "../lib/site";
+import { SITE_TITLE, STRUCTURED_DATA } from "../lib/site";
 import { loadUserSongs, removeUserSong, toAbcDocument } from "../lib/songs";
 import type { Route } from "./+types/home";
 
@@ -14,7 +14,7 @@ export function meta(_args: Route.MetaArgs) {
     // React Router renders the "script:ld+json" descriptor as a JSON-LD <script>,
     // serializing it safely — no dangerouslySetInnerHTML needed.
     return [
-        { title: "Plinky" },
+        { title: SITE_TITLE },
         { name: "description", content: "Practice piano with your MIDI keyboard." },
         { "script:ld+json": STRUCTURED_DATA },
     ];

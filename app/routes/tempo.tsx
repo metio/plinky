@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { TempoTrainer } from "../components/tempoTrainer";
+import { pageTitle } from "../lib/site";
 import { resolveExercise } from "../lib/songs";
 import type { Route } from "./+types/tempo";
 
-export function meta(_args: Route.MetaArgs) {
+export function meta({ params }: Route.MetaArgs) {
+    const exercise = resolveExercise(params.exerciseId);
     return [
-        { title: "Plinky - Tempo" },
+        { title: exercise ? pageTitle(exercise.title, "Tempo") : pageTitle("Tempo") },
         { name: "description", content: "Play at your own pace and chart your tempo" },
     ];
 }
