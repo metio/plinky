@@ -1,0 +1,10 @@
+{
+  "id": "jingle-bells",
+  "title": "Jingle Bells",
+  "description": "The chorus of the 1857 carol by James Lord Pierpont.",
+  "abc": "X:1\nT:Jingle Bells\nM:4/4\nL:1/4\nK:C\nE E E2 | E E E2 | E G C D | E4 | F F F F | F E E E | E D D E | D2 G2 |",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": ["public-domain"]
+}
