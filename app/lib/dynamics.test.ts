@@ -20,4 +20,10 @@ describe("summarizeDynamics", () => {
     it("handles an empty passage", () => {
         expect(summarizeDynamics([])).toEqual({ mean: 0, evenness: 100, label: "—" });
     });
+
+    it("labels the intermediate evenness bands", () => {
+        expect(summarizeDynamics([80, 60]).label).toBe("Even");
+        expect(summarizeDynamics([80, 40]).label).toBe("A little uneven");
+        expect(summarizeDynamics([100, 20]).label).toBe("Uneven");
+    });
 });

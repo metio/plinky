@@ -38,4 +38,10 @@ describe("fingerSteps", () => {
         const steps = [{ pitches: [48, 55] }, { pitches: [50, 57] }];
         expect(fingerSteps(steps, "left")).toHaveLength(2);
     });
+
+    it("handles a repeated note without crashing", () => {
+        const fingers = fingerLine([60, 60, 60], "right");
+        expect(fingers).toHaveLength(3);
+        expect(fingers.every((finger) => finger >= 1 && finger <= 5)).toBe(true);
+    });
 });

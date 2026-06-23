@@ -53,4 +53,9 @@ describe("summarizePractice", () => {
         expect(summary.recent[6]).toEqual({ date: "2026-06-23", notes: 7 });
         expect(summary.recent[0].date).toBe("2026-06-17");
     });
+
+    it("returns an empty history for corrupt storage", () => {
+        localStorage.setItem("plinky:history", "not json");
+        expect(loadHistory()).toEqual({});
+    });
 });
