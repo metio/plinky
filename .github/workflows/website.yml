@@ -51,4 +51,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/client
           force_orphan: true
-          cname: plinky.projects.metio.wtf
+          cname: plinky.fun
