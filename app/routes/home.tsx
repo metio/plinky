@@ -145,8 +145,15 @@ export default function Home() {
                             >
                                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                                     <h3 className="text-lg font-medium">{exercise.title}</h3>
-                                    <span className="font-mono text-xs text-gray-400">
-                                        {m.home_bpm({ tempo: exercise.tempo })}
+                                    <span className="flex items-center gap-2">
+                                        {exercise.license && (
+                                            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                                {exercise.license}
+                                            </span>
+                                        )}
+                                        <span className="font-mono text-xs text-gray-400">
+                                            {m.home_bpm({ tempo: exercise.tempo })}
+                                        </span>
                                     </span>
                                 </div>
                                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">

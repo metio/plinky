@@ -1,0 +1,12 @@
+{
+  "id": "g-major-scale",
+  "title": "G major scale",
+  "description": "One octave with an F♯ — your first black key.",
+  "abc": "X:1\nT:G major scale\nM:4/4\nL:1/4\nK:G\nG A B c | d e f g |",
+  "tempo": 90,
+  "beatsPerBar": 4,
+  "license": "0BSD",
+  "curriculums": [
+    "plinky-basics"
+  ]
+}

@@ -14,4 +14,5 @@ export type Exercise = {
     tempo: number; // beats per minute for the metronome and count-in
     beatsPerBar: number; // matches the ABC meter, so the count-in fills one bar
     curriculums?: string[]; // ids of the curriculums this song belongs to, if any
+    license?: string; // SPDX identifier for the song's content, when known
 };

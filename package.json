@@ -3,8 +3,9 @@
   "type": "module",
   "scripts": {
     "messages": "paraglide-js compile --project ./project.inlang --outdir ./app/paraglide --strategy localStorage preferredLanguage baseLocale --emit-ts-declarations",
-    "build": "npm run messages && react-router build",
-    "dev": "npm run messages && react-router dev",
+    "songs": "node dev/build-songs.mjs",
+    "build": "npm run songs && npm run messages && react-router build",
+    "dev": "npm run songs && npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "npm run messages && react-router typegen && tsc",
     "test": "npm run messages && vitest run --project node",

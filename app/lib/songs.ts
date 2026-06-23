@@ -90,6 +90,9 @@ export function submissionUrl(exercise?: Exercise): string {
         if (exercise.description) {
             params.set("description", exercise.description);
         }
+        if (exercise.license) {
+            params.set("license", exercise.license);
+        }
     }
     return `${SUBMIT_ISSUE_URL}?${params.toString()}`;
 }
@@ -190,6 +193,7 @@ export function importSongsPack(json: string): { imported: number; curriculums: 
             tempo: song.tempo ?? parseTempo(song.abc),
             beatsPerBar: song.beatsPerBar ?? parseBeatsPerBar(song.abc),
             ...(song.curriculums ? { curriculums: song.curriculums } : {}),
+            ...(song.license ? { license: song.license } : {}),
         });
     }
     if (typeof localStorage !== "undefined") {
