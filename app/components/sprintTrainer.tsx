@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
+import { useRecordOnFinish } from "../hooks/usePracticeLog";
 import { dailyPhrase } from "../lib/daily";
 import { generatePhrase } from "../lib/generator";
 import { buildHands, type Hand } from "../lib/hands";
@@ -125,6 +126,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
         onComplete: finish,
     });
 
+    useRecordOnFinish(runState === "finished", matcher.completedSteps);
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) =>
             matcher.registerNote(played.note, played.timestamp, played.velocity),

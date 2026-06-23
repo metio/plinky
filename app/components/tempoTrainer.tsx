@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, describeNext, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
+import { useRecordOnFinish } from "../hooks/usePracticeLog";
 import type { Exercise } from "../lib/exercises";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
@@ -136,6 +137,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
         onComplete: handleComplete,
     });
 
+    useRecordOnFinish(runState === "finished", matcher.completedSteps);
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) =>
             matcher.registerNote(played.note, played.timestamp, played.velocity),
