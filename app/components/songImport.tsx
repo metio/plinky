@@ -3,6 +3,7 @@
 
 import abcjs from "abcjs";
 import { useState } from "react";
+import { musicXmlToAbc } from "../lib/musicxml";
 import { buildExercise, parseTempo, saveUserSong } from "../lib/songs";
 import { buildSteps } from "../lib/steps";
 
@@ -54,12 +55,26 @@ export function SongImport({
     };
 
     const readFile = (file: File | undefined) => {
-        if (file) {
-            file.text().then((content) => {
+        if (!file) {
+            return;
+        }
+        file.text().then((content) => {
+            // MusicXML is converted to ABC up front; anything else is treated as
+            // ABC and validated on Add.
+            const isMusicXml =
+                /\.(musicxml|xml)$/i.test(file.name) || content.includes("<score-partwise");
+            if (!isMusicXml) {
                 setText(content);
                 setError(null);
-            });
-        }
+                return;
+            }
+            try {
+                setText(musicXmlToAbc(content));
+                setError(null);
+            } catch (cause) {
+                setError(cause instanceof Error ? cause.message : "Could not read that file.");
+            }
+        });
     };
 
     if (!open) {
@@ -86,9 +101,10 @@ export function SongImport({
             <div className="flex flex-wrap items-center gap-3">
                 <input
                     type="file"
-                    accept=".abc,text/plain"
+                    accept=".abc,.musicxml,.xml,text/plain,application/xml"
                     onChange={(event) => readFile(event.target.files?.[0])}
                     className="text-sm"
+                    title="Upload ABC or MusicXML"
                 />
                 <button
                     type="button"
