@@ -16,6 +16,7 @@ const MODES = [
     { slug: "practice", label: "Practice" },
     { slug: "time-trial", label: "Time trial" },
     { slug: "rhythm", label: "Rhythm" },
+    { slug: "tempo", label: "Tempo" },
 ];
 
 export default function Home() {

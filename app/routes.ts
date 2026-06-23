@@ -8,5 +8,6 @@ export default [
     route("practice/:exerciseId", "routes/practice.tsx"),
     route("time-trial/:exerciseId", "routes/time-trial.tsx"),
     route("rhythm/:exerciseId", "routes/rhythm.tsx"),
+    route("tempo/:exerciseId", "routes/tempo.tsx"),
     route("settings", "routes/settings.tsx"),
 ] satisfies RouteConfig;
