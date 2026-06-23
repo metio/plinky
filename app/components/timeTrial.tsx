@@ -1,18 +1,19 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { TuneObject } from "abcjs";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { NoteTimingEvent, TuneObject } from "abcjs";
+import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useMetronome } from "../hooks/useMetronome";
+import { useNoteMatcher } from "../hooks/useNoteMatcher";
+import { useSynth } from "../hooks/useSynth";
+import type { Exercise } from "../lib/exercises";
+import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { loadBest, saveBest, scoreFor, type TrialResult } from "../lib/scores";
+import { buildSteps, type Step } from "../lib/steps";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { KeyboardHint } from "./keyboardHint";
-import { useMidiConnection, useMidiInput } from "../contexts/midi";
-import { noteName, type MidiNoteEvent } from "../lib/midi";
-import { useMetronome } from "../hooks/useMetronome";
-import { useSynth } from "../hooks/useSynth";
-import { expectedPitches, useNoteMatcher } from "../hooks/useNoteMatcher";
-import { loadBest, saveBest, scoreFor, type TrialResult } from "../lib/scores";
-import type { Exercise } from "../lib/exercises";
 
 type RunState = "idle" | "counting" | "armed" | "running" | "finished";
 
@@ -21,7 +22,7 @@ function formatMs(ms: number): string {
 }
 
 export function TimeTrial({ exercise }: { exercise: Exercise }) {
-    const [events, setEvents] = useState<NoteTimingEvent[]>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
     const [errors, setErrors] = useState(0);
     const [elapsedMs, setElapsedMs] = useState(0);
@@ -34,12 +35,10 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
     const startRef = useRef(0);
     const errorsRef = useRef(0);
 
-    const handleRender = useCallback((tune: TuneObject) => {
-        const timed = tune
-            .setupEvents(0, 1000, 120)
-            .filter((event) => event.type === "event" && expectedPitches(event).length > 0);
-        setEvents(timed);
-    }, []);
+    const handleRender = useCallback(
+        (tune: TuneObject) => setSteps(buildSteps(tune, exercise.tempo)),
+        [exercise.tempo],
+    );
 
     useEffect(() => {
         setBest(loadBest(exercise.id));
@@ -49,7 +48,9 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
 
     const handleCorrect = useCallback(
         (index: number, timestamp: number) => {
-            synth.playNote(expectedPitches(events[index])[0]);
+            for (const pitch of steps[index]?.pitches ?? []) {
+                synth.playNote(pitch);
+            }
             // The clock starts on the first correct note, so reaction time before
             // the run does not count against the player.
             if (index === 0) {
@@ -58,7 +59,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                 setRunState("running");
             }
         },
-        [synth, events],
+        [synth, steps],
     );
 
     const handleWrong = useCallback(() => {
@@ -93,7 +94,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
     const metronome = useMetronome();
 
     const active = runState === "armed" || runState === "running";
-    const matcher = useNoteMatcher(events, {
+    const matcher = useNoteMatcher(steps, {
         active,
         onCorrect: handleCorrect,
         onWrong: handleWrong,
@@ -180,7 +181,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                 <div>
                     <div className="text-xs uppercase tracking-wide text-gray-400">Progress</div>
                     <div className="font-mono text-4xl tabular-nums">
-                        {Math.min(matcher.cursor, events.length)}/{events.length}
+                        {Math.min(matcher.cursor, steps.length)}/{steps.length}
                     </div>
                 </div>
             </div>
@@ -189,7 +190,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                 <button
                     type="button"
                     onClick={start}
-                    disabled={events.length === 0}
+                    disabled={steps.length === 0}
                     className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                 >
                     Start time trial
@@ -206,8 +207,8 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
             {runState === "armed" && (
                 <p className="text-sm font-medium text-indigo-700">
                     Ready — play{" "}
-                    <span className="font-mono">{noteName(matcher.nextPitch ?? 0)}</span> to start
-                    the clock.
+                    <span className="font-mono">{matcher.nextPitches.map(noteName).join(" ")}</span>{" "}
+                    to start the clock.
                 </p>
             )}
 

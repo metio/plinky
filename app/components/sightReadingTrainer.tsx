@@ -1,20 +1,21 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { TuneObject } from "abcjs";
 import { useCallback, useState } from "react";
-import type { NoteTimingEvent, TuneObject } from "abcjs";
+import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useMetronome } from "../hooks/useMetronome";
+import { useNoteMatcher } from "../hooks/useNoteMatcher";
+import { useSynth } from "../hooks/useSynth";
+import type { Exercise } from "../lib/exercises";
+import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { buildSteps, type Step } from "../lib/steps";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { KeyboardHint } from "./keyboardHint";
-import { useMidiConnection, useMidiInput } from "../contexts/midi";
-import { noteName, type MidiNoteEvent } from "../lib/midi";
-import { useMetronome } from "../hooks/useMetronome";
-import { useSynth } from "../hooks/useSynth";
-import { expectedPitches, useNoteMatcher } from "../hooks/useNoteMatcher";
-import type { Exercise } from "../lib/exercises";
 
 export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
-    const [events, setEvents] = useState<NoteTimingEvent[]>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
     const [bpm, setBpm] = useState(exercise.tempo);
     const metronome = useMetronome();
 
@@ -34,23 +35,25 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
         [metronome],
     );
 
-    const handleRender = useCallback((tune: TuneObject) => {
-        // setupEvents must run after the SVG exists so each event's `elements`
-        // point at live nodes; the bpm argument only affects timing we ignore.
-        const timed = tune
-            .setupEvents(0, 1000, 120)
-            .filter((event) => event.type === "event" && expectedPitches(event).length > 0);
-        setEvents(timed);
-    }, []);
+    const handleRender = useCallback(
+        // setupEvents must run after the SVG exists so each step's elements point
+        // at live nodes.
+        (tune: TuneObject) => setSteps(buildSteps(tune, exercise.tempo)),
+        [exercise.tempo],
+    );
 
     const synth = useSynth();
 
     const handleCorrect = useCallback(
-        (index: number) => synth.playNote(expectedPitches(events[index])[0]),
-        [synth, events],
+        (index: number) => {
+            for (const pitch of steps[index]?.pitches ?? []) {
+                synth.playNote(pitch);
+            }
+        },
+        [synth, steps],
     );
 
-    const matcher = useNoteMatcher(events, { onCorrect: handleCorrect });
+    const matcher = useNoteMatcher(steps, { onCorrect: handleCorrect });
 
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
@@ -116,16 +119,16 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
             <div className="flex items-center gap-6">
                 <div className="text-sm">
                     <span className="font-medium">Progress:</span>{" "}
-                    {Math.min(matcher.cursor, events.length)} / {events.length}
+                    {Math.min(matcher.cursor, steps.length)} / {steps.length}
                 </div>
                 {matcher.done ? (
                     <div className="text-sm font-semibold text-green-600">Complete! 🎉</div>
                 ) : (
-                    matcher.nextPitch !== undefined && (
+                    matcher.nextPitches.length > 0 && (
                         <div className="text-sm">
                             <span className="font-medium">Next:</span>{" "}
                             <span className="font-mono text-indigo-700">
-                                {noteName(matcher.nextPitch)}
+                                {matcher.nextPitches.map(noteName).join(" ")}
                             </span>
                         </div>
                     )
