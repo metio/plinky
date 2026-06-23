@@ -12,11 +12,21 @@ function text(parent: Element, selector: string): string | null {
     return parent.querySelector(selector)?.textContent?.trim() ?? null;
 }
 
-// step + octave + alter → an ABC note. ABC's C is middle C (C4); lowercase is the
-// octave above; commas drop an octave, apostrophes raise one. Accidentals prefix
-// the letter (^ sharp, _ flat), so a key signature is never needed.
-function abcNote(step: string, octave: number, alter: number): string {
-    const accidental = alter > 0 ? "^".repeat(alter) : alter < 0 ? "_".repeat(-alter) : "";
+// The ABC accidental for a chromatic alteration: ^ sharp, _ flat, = natural.
+function alterToAccidental(alter: number): string {
+    if (alter > 0) {
+        return "^".repeat(alter);
+    }
+    if (alter < 0) {
+        return "_".repeat(-alter);
+    }
+    return "=";
+}
+
+// step + octave + an explicit accidental prefix → an ABC note. ABC's C is middle
+// C (C4); lowercase is the octave above; commas drop an octave, apostrophes raise
+// one. The output uses K:C, so accidentals are written relative to natural.
+function abcNote(step: string, octave: number, accidental: string): string {
     let letter = step.toUpperCase();
     let octaveMark = "";
     if (octave >= 5) {
@@ -64,6 +74,11 @@ function mergeChord(previous: string, pitch: string): string {
 // flagged <chord/> merges into the previous note on its staff.
 function measureTokens(measure: Element, divisions: number): Map<number, string[]> {
     const byStaff = new Map<number, string[]>();
+    // Active accidental per pitch (letter+octave) within this bar. ABC carries an
+    // accidental to later notes of the same pitch until the bar line, so an
+    // explicit accidental is emitted only when a note's alteration changes — which
+    // crucially writes a natural after a sharp/flat instead of silently repeating it.
+    const active = new Map<string, number>();
     for (const note of measure.querySelectorAll("note")) {
         if (note.querySelector("grace")) {
             continue;
@@ -81,11 +96,13 @@ function measureTokens(measure: Element, divisions: number): Map<number, string[
         if (!pitch) {
             continue;
         }
-        const noteAbc = abcNote(
-            text(pitch, "step") ?? "C",
-            Number(text(pitch, "octave")) || 4,
-            Number(text(pitch, "alter")) || 0,
-        );
+        const step = text(pitch, "step") ?? "C";
+        const octave = Number(text(pitch, "octave")) || 4;
+        const alter = Number(text(pitch, "alter")) || 0;
+        const key = `${step}${octave}`;
+        const accidental = (active.get(key) ?? 0) !== alter ? alterToAccidental(alter) : "";
+        active.set(key, alter);
+        const noteAbc = abcNote(step, octave, accidental);
         if (note.querySelector("chord") && tokens.length > 0) {
             tokens[tokens.length - 1] = mergeChord(tokens[tokens.length - 1], noteAbc);
         } else {
