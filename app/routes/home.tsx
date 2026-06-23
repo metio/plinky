@@ -111,6 +111,12 @@ export default function Home() {
                     </h2>
                     <div className="flex gap-4 text-sm">
                         <Link
+                            to="/tracks"
+                            className="text-indigo-700 underline dark:text-indigo-300"
+                        >
+                            {m.home_tracks()}
+                        </Link>
+                        <Link
                             to="/curriculums"
                             className="text-indigo-700 underline dark:text-indigo-300"
                         >
