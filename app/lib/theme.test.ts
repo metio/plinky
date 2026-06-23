@@ -36,4 +36,20 @@ describe("theme", () => {
         applyTheme("light");
         expect(document.documentElement.classList.contains("dark")).toBe(false);
     });
+
+    it("resolves system to the OS preference", () => {
+        const original = window.matchMedia;
+        window.matchMedia = (() => ({ matches: true })) as unknown as typeof window.matchMedia;
+        expect(resolveTheme("system")).toBe("dark");
+        window.matchMedia = original;
+    });
+
+    it("ignores a storage failure when saving", () => {
+        const original = localStorage.setItem;
+        localStorage.setItem = () => {
+            throw new Error("quota exceeded");
+        };
+        expect(() => saveTheme("dark")).not.toThrow();
+        localStorage.setItem = original;
+    });
 });

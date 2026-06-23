@@ -35,4 +35,12 @@ describe("generatePhrase", () => {
         const abc = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false }, () => 0.99);
         expect(abc).toContain("g g |");
     });
+
+    it("falls back to C major for an unknown key", () => {
+        const abc = generatePhrase(
+            { bars: 1, beatsPerBar: 2, twoHands: false, key: "Z" as never },
+            () => 0,
+        );
+        expect(abc).toContain("K:C");
+    });
 });
