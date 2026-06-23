@@ -38,6 +38,11 @@ export function useSynth(): UseSynthResult {
         const now = ctx.currentTime;
         const duration = options.duration ?? 1.1;
         const peak = ((options.velocity ?? 90) / 127) * 0.32 * (prefs.volume / 100);
+        // Volume 0 means silence; an exponential ramp to 0 is also a RangeError,
+        // so stop before building the graph.
+        if (peak <= 0) {
+            return;
+        }
         const frequency = midiToFrequency(note);
 
         const filter = ctx.createBiquadFilter();

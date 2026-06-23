@@ -31,6 +31,10 @@ function abcNote(step: string, octave: number, alter: number): string {
 // A note's ABC length, relative to the L:1/4 unit (a quarter note). e.g. a half
 // note is "2", an eighth "/2", a dotted quarter "3/2".
 function abcLength(quarters: number): string {
+    // A missing or zero duration has no length suffix; "0" would be invalid ABC.
+    if (quarters <= 0) {
+        return "";
+    }
     for (const denominator of [1, 2, 4, 8, 16]) {
         const numerator = quarters * denominator;
         if (Math.abs(numerator - Math.round(numerator)) < 1e-6) {
