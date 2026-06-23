@@ -7,12 +7,11 @@ import { MidiProvider } from "../contexts/midi";
 import type { Exercise } from "../lib/exercises";
 import { TimeTrial } from "./timeTrial";
 
-// A brisk tempo keeps the one-bar count-in short.
 const exercise: Exercise = {
     id: "time-trial-browser",
     title: "Time trial browser",
     description: "",
-    tempo: 480,
+    tempo: 120,
     beatsPerBar: 4,
     abc: "X:1\nL:1/4\nK:C\nC D E F |",
 };
@@ -25,15 +24,11 @@ afterEach(() => {
     mounted = [];
 });
 
-async function play(note: number) {
-    await act(async () => {
-        window.__plinky?.play(note);
-        await new Promise((resolve) => setTimeout(resolve, 30));
-    });
-}
-
 describe("TimeTrial", () => {
-    it("runs the clock and finishes after the phrase", async () => {
+    it("starts the count-in and ignores input until armed", async () => {
+        // The metronome's audio-clock count-in does not advance in a muted headless
+        // browser, so this covers the start path: counting begins, and a note played
+        // during the count-in is ignored (the run is not yet armed).
         const container = document.createElement("div");
         document.body.appendChild(container);
         mounted.push(container);
@@ -48,10 +43,10 @@ describe("TimeTrial", () => {
         await waitFor(() => expect(start).not.toBeDisabled());
         fireEvent.click(start);
 
-        // The metronome's audio-clock count-in does not advance reliably in a
-        // muted headless browser, so assert the run starts counting rather than
-        // waiting for it to arm.
         expect(await screen.findByText(/Count-in/)).toBeDefined();
-        await play(60); // exercises the note-input path while counting
+        await act(async () => {
+            window.__plinky?.play(60);
+        });
+        expect(screen.getByText(/Progress/).parentElement?.textContent).toContain("0/4");
     });
 });
