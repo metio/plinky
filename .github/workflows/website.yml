@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+name: Publish Website
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/website.yml
+      - app/**
+      - public/**
+      - package.json
+      - package-lock.json
+      - vite.config.ts
+      - react-router.config.ts
+      - tsconfig.json
+permissions:
+  contents: read
+concurrency:
+  # Serialize deploys so two quick merges can't race the gh-pages branch; queue
+  # rather than cancel so an in-flight publish always finishes.
+  group: pages
+  cancel-in-progress: false
+jobs:
+  website:
+    name: Website
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # peaceiris pushes the built site to the gh-pages branch
+    steps:
+      - name: Clone Git Repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build SPA
+        run: npm run build
+      - name: Add SPA fallback
+        # GitHub Pages has no SPA rewrite, so a deep link like
+        # /practice/c-major-scale 404s on refresh. Serving the shell as 404.html
+        # lets the client router take over and render the route.
+        run: cp build/client/index.html build/client/404.html
+      - name: Deploy Website
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/client
+          force_orphan: true
+          cname: plinky.projects.metio.wtf

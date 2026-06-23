@@ -1,0 +1,6 @@
+/.idea/
+/node_modules/
+/.react-router/
+/build/
+
+*storybook.log
