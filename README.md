@@ -48,8 +48,9 @@ each hand's timing separately.
 The exercise library covers scales (C, G, D, F major), arpeggios and triads, the
 A minor pentatonic, familiar melodies like *Twinkle, Twinkle* and *Ode to Joy*,
 and a two-hand warm-up. A guided **learning path** orders them for beginners, and
-a **Progress** page tracks your day streak and notes played. Plinky has a
-light/dark theme and a settings page for sound and volume.
+a **Progress** page tracks your day streak and notes played. The score can
+overlay note names or suggested fingering, and Plinky has a light/dark theme and
+a settings page for sound and volume.
 
 ## Bring your own songs
 
