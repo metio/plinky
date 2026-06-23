@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type Exercise, findExercise } from "./exercises";
+import { type Curriculum, parsePack, serializePack } from "./songPack";
 
 // User-imported songs live in localStorage as ABC-derived Exercises and merge
 // with the built-in set. ABC is the interchange format, so a song round-trips
@@ -9,6 +10,7 @@ import { type Exercise, findExercise } from "./exercises";
 // lives in the import UI, which renders the ABC and runs buildSteps.
 
 const STORAGE_KEY = "plinky:songs";
+const CURRICULUMS_KEY = "plinky:curriculums";
 
 export function parseTitle(abc: string): string {
     return abc.match(/^T:\s*(.+)$/m)?.[1].trim() ?? "";
@@ -115,4 +117,69 @@ export function removeUserSong(id: string): void {
 // Built-in exercises plus any imported song, so the trainers resolve both.
 export function resolveExercise(id: string | undefined): Exercise | undefined {
     return findExercise(id) ?? loadUserSongs().find((song) => song.id === id);
+}
+
+// The curriculums a user has acquired (their human-readable names), accumulated
+// from imported packs so songs can be grouped and a backup round-trips the names.
+export function loadCurriculums(): Curriculum[] {
+    if (typeof localStorage === "undefined") {
+        return [];
+    }
+    try {
+        const parsed = JSON.parse(localStorage.getItem(CURRICULUMS_KEY) ?? "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveCurriculums(curriculums: Curriculum[]): void {
+    if (typeof localStorage === "undefined") {
+        return;
+    }
+    try {
+        localStorage.setItem(CURRICULUMS_KEY, JSON.stringify(curriculums));
+    } catch {
+        // See saveUserSong.
+    }
+}
+
+// A backup of the whole local library as a Plinky song pack.
+export function exportAllPack(): string {
+    return serializePack(loadUserSongs(), loadCurriculums());
+}
+
+// Import a song pack: merge its curriculums and songs into local storage,
+// overwriting any song or curriculum with the same id (so re-importing an
+// updated curriculum refreshes it). Tempo and meter fall back to the ABC when a
+// hand-authored pack omits them. Throws if the pack is not valid.
+export function importSongsPack(json: string): { imported: number; curriculums: number } {
+    const pack = parsePack(json);
+
+    const curriculums = new Map(loadCurriculums().map((entry) => [entry.id, entry]));
+    for (const entry of pack.curriculums) {
+        curriculums.set(entry.id, entry);
+    }
+    saveCurriculums([...curriculums.values()]);
+
+    const songs = new Map(loadUserSongs().map((song) => [song.id, song]));
+    for (const song of pack.songs) {
+        songs.set(song.id, {
+            id: song.id,
+            title: song.title,
+            description: song.description ?? "Imported song",
+            abc: song.abc.trim(),
+            tempo: song.tempo ?? parseTempo(song.abc),
+            beatsPerBar: song.beatsPerBar ?? parseBeatsPerBar(song.abc),
+            ...(song.curriculums ? { curriculums: song.curriculums } : {}),
+        });
+    }
+    if (typeof localStorage !== "undefined") {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([...songs.values()]));
+        } catch {
+            // See saveUserSong.
+        }
+    }
+    return { imported: pack.songs.length, curriculums: pack.curriculums.length };
 }
