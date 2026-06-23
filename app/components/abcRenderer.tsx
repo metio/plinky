@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {useEffect, useRef} from "react";
 import abcjs, {type TuneObject} from "abcjs";
 

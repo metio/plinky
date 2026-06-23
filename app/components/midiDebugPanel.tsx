@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {useMidiConnection} from "../contexts/midi";
 import {noteName} from "../lib/midi";
 import {KeyboardHint} from "./keyboardHint";

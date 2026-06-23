@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
 import {
     ERROR_PENALTY_MS,

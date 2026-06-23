@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import type { Route } from "./+types/rhythm";
 import { RhythmTrainer } from "../components/rhythmTrainer";
 import { findExercise } from "../lib/exercises";

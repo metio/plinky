@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {useCallback, useEffect, useRef, useState} from "react";
 import type {NoteTimingEvent} from "abcjs";
 

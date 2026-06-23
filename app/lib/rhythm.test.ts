@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {describe, expect, it} from "vitest";
 import {GOOD_MS, PERFECT_MS, makeHit, rate, summarize} from "./rhythm";
 

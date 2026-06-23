@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode} from "react";
 import {
     KEY_SEMITONES,

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import type {RhythmSummary} from "./rhythm";
 
 // A wrong note costs this much added time, so the ranking metric rewards both

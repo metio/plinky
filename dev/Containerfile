@@ -1,1 +1,4 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+
 FROM docker.io/library/node:22
