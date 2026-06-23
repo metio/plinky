@@ -1,18 +1,18 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {useCallback, useEffect, useRef, useState} from "react";
-import type {NoteTimingEvent, TuneObject} from "abcjs";
-import {AbcRenderer} from "./abcRenderer";
-import {BeatIndicator} from "./beatIndicator";
-import {KeyboardHint} from "./keyboardHint";
-import {useMidiConnection, useMidiInput} from "../contexts/midi";
-import {noteName, type MidiNoteEvent} from "../lib/midi";
-import {useMetronome} from "../hooks/useMetronome";
-import {useSynth} from "../hooks/useSynth";
-import {expectedPitches, useNoteMatcher} from "../hooks/useNoteMatcher";
-import {loadBest, saveBest, scoreFor, type TrialResult} from "../lib/scores";
-import type {Exercise} from "../lib/exercises";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { NoteTimingEvent, TuneObject } from "abcjs";
+import { AbcRenderer } from "./abcRenderer";
+import { BeatIndicator } from "./beatIndicator";
+import { KeyboardHint } from "./keyboardHint";
+import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { noteName, type MidiNoteEvent } from "../lib/midi";
+import { useMetronome } from "../hooks/useMetronome";
+import { useSynth } from "../hooks/useSynth";
+import { expectedPitches, useNoteMatcher } from "../hooks/useNoteMatcher";
+import { loadBest, saveBest, scoreFor, type TrialResult } from "../lib/scores";
+import type { Exercise } from "../lib/exercises";
 
 type RunState = "idle" | "counting" | "armed" | "running" | "finished";
 
@@ -20,7 +20,7 @@ function formatMs(ms: number): string {
     return `${(ms / 1000).toFixed(2)}s`;
 }
 
-export function TimeTrial({exercise}: {exercise: Exercise}) {
+export function TimeTrial({ exercise }: { exercise: Exercise }) {
     const [events, setEvents] = useState<NoteTimingEvent[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
     const [errors, setErrors] = useState(0);
@@ -105,8 +105,8 @@ export function TimeTrial({exercise}: {exercise: Exercise}) {
         [matcher],
     );
 
-    const {support, status, devices, octaveOffset, requestAccess} = useMidiConnection();
-    useMidiInput({onNoteOn: handleNoteOn});
+    const { support, status, devices, octaveOffset, requestAccess } = useMidiConnection();
+    useMidiInput({ onNoteOn: handleNoteOn });
 
     // Live clock while a run is in progress. The finished view reads the exact
     // recorded time instead, so a late interval tick cannot inflate the result.
@@ -145,7 +145,8 @@ export function TimeTrial({exercise}: {exercise: Exercise}) {
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Time trial · {exercise.title}</h1>
                 <p className="text-sm text-gray-500">
-                    Play the phrase as fast and cleanly as you can. The clock starts on your first note.
+                    Play the phrase as fast and cleanly as you can. The clock starts on your first
+                    note.
                 </p>
             </header>
 
@@ -204,7 +205,8 @@ export function TimeTrial({exercise}: {exercise: Exercise}) {
 
             {runState === "armed" && (
                 <p className="text-sm font-medium text-indigo-700">
-                    Ready — play <span className="font-mono">{noteName(matcher.nextPitch ?? 0)}</span> to start
+                    Ready — play{" "}
+                    <span className="font-mono">{noteName(matcher.nextPitch ?? 0)}</span> to start
                     the clock.
                 </p>
             )}
@@ -236,8 +238,8 @@ export function TimeTrial({exercise}: {exercise: Exercise}) {
 
             {best && (
                 <p className="text-sm text-gray-500">
-                    Best: <span className="font-mono">{formatMs(best.score)}</span>{" "}
-                    ({formatMs(best.timeMs)}, {best.errors} {best.errors === 1 ? "error" : "errors"})
+                    Best: <span className="font-mono">{formatMs(best.score)}</span> (
+                    {formatMs(best.timeMs)}, {best.errors} {best.errors === 1 ? "error" : "errors"})
                 </p>
             )}
 

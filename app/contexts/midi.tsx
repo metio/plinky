@@ -1,7 +1,15 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode} from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+    type ReactNode,
+} from "react";
 import {
     KEY_SEMITONES,
     KEYBOARD_BASE_NOTE,
@@ -40,7 +48,7 @@ const MidiContext = createContext<MidiContextValue | null>(null);
 
 // A single connection shared across the whole app: connecting once persists
 // across route changes, and the computer-keyboard fallback is always live.
-export function MidiProvider({children}: {children: ReactNode}) {
+export function MidiProvider({ children }: { children: ReactNode }) {
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -115,7 +123,14 @@ export function MidiProvider({children}: {children: ReactNode}) {
             if (!parsed) {
                 return;
             }
-            emitNote(parsed.kind, parsed.note, parsed.velocity, parsed.channel, deviceName, event.timeStamp);
+            emitNote(
+                parsed.kind,
+                parsed.note,
+                parsed.velocity,
+                parsed.channel,
+                deviceName,
+                event.timeStamp,
+            );
         },
         [emitNote],
     );
@@ -147,7 +162,7 @@ export function MidiProvider({children}: {children: ReactNode}) {
         setStatus("requesting");
         setError(null);
         navigator
-            .requestMIDIAccess({sysex: false})
+            .requestMIDIAccess({ sysex: false })
             .then((access) => {
                 accessRef.current = access;
                 access.onstatechange = () => refreshDevices();
@@ -173,11 +188,20 @@ export function MidiProvider({children}: {children: ReactNode}) {
 
         const isTextEntry = (target: EventTarget | null): boolean => {
             const el = target as HTMLElement | null;
-            return !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+            return (
+                !!el &&
+                (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)
+            );
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
-            if (event.repeat || event.metaKey || event.ctrlKey || event.altKey || isTextEntry(event.target)) {
+            if (
+                event.repeat ||
+                event.metaKey ||
+                event.ctrlKey ||
+                event.altKey ||
+                isTextEntry(event.target)
+            ) {
                 return;
             }
             const key = event.key.toLowerCase();
@@ -271,7 +295,7 @@ export function useMidiConnection(): MidiContextValue {
 // are read through a ref so the subscription is set up once and always calls
 // the latest callbacks.
 export function useMidiInput(handlers: NoteListener): void {
-    const {subscribe} = useMidiContext();
+    const { subscribe } = useMidiContext();
     const handlersRef = useRef(handlers);
     handlersRef.current = handlers;
 

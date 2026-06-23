@@ -1,19 +1,19 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {useCallback, useEffect, useRef, useState} from "react";
-import type {NoteTimingEvent, TuneObject} from "abcjs";
-import {AbcRenderer} from "./abcRenderer";
-import {BeatIndicator} from "./beatIndicator";
-import {KeyboardHint} from "./keyboardHint";
-import {useMidiConnection, useMidiInput} from "../contexts/midi";
-import {noteName, type MidiNoteEvent} from "../lib/midi";
-import {useMetronome} from "../hooks/useMetronome";
-import {useSynth} from "../hooks/useSynth";
-import {expectedPitches, useNoteMatcher} from "../hooks/useNoteMatcher";
-import {makeHit, summarize, type Hit, type RhythmSummary} from "../lib/rhythm";
-import {isBetterRhythm, loadBestRhythm, saveBestRhythm, type RhythmBest} from "../lib/scores";
-import type {Exercise} from "../lib/exercises";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { NoteTimingEvent, TuneObject } from "abcjs";
+import { AbcRenderer } from "./abcRenderer";
+import { BeatIndicator } from "./beatIndicator";
+import { KeyboardHint } from "./keyboardHint";
+import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { noteName, type MidiNoteEvent } from "../lib/midi";
+import { useMetronome } from "../hooks/useMetronome";
+import { useSynth } from "../hooks/useSynth";
+import { expectedPitches, useNoteMatcher } from "../hooks/useNoteMatcher";
+import { makeHit, summarize, type Hit, type RhythmSummary } from "../lib/rhythm";
+import { isBetterRhythm, loadBestRhythm, saveBestRhythm, type RhythmBest } from "../lib/scores";
+import type { Exercise } from "../lib/exercises";
 
 type RunState = "idle" | "counting" | "armed" | "running" | "finished";
 
@@ -31,7 +31,7 @@ function describeHit(hit: Hit): string {
     return `${hit.rating === "good" ? "Good" : "Off"} · ${Math.abs(Math.round(hit.deltaMs))}ms ${direction}`;
 }
 
-export function RhythmTrainer({exercise}: {exercise: Exercise}) {
+export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     const [events, setEvents] = useState<NoteTimingEvent[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
     const [lastHit, setLastHit] = useState<Hit | null>(null);
@@ -95,7 +95,7 @@ export function RhythmTrainer({exercise}: {exercise: Exercise}) {
         setRunState("finished");
         setBest((prevBest) => {
             if (result.total > 0 && isBetterRhythm(result, prevBest)) {
-                const record: RhythmBest = {...result, at: new Date().toISOString()};
+                const record: RhythmBest = { ...result, at: new Date().toISOString() };
                 saveBestRhythm(exercise.id, record);
                 setIsRecord(true);
                 return record;
@@ -117,8 +117,8 @@ export function RhythmTrainer({exercise}: {exercise: Exercise}) {
         [matcher],
     );
 
-    const {support, status, devices, octaveOffset, requestAccess} = useMidiConnection();
-    useMidiInput({onNoteOn: handleNoteOn});
+    const { support, status, devices, octaveOffset, requestAccess } = useMidiConnection();
+    useMidiInput({ onNoteOn: handleNoteOn });
 
     const stopArmTimer = useCallback(() => {
         if (armTimerRef.current !== null) {
@@ -160,7 +160,8 @@ export function RhythmTrainer({exercise}: {exercise: Exercise}) {
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Rhythm · {exercise.title}</h1>
                 <p className="text-sm text-gray-500">
-                    Play each note in time with the metronome at {exercise.tempo} bpm. One bar counts you in.
+                    Play each note in time with the metronome at {exercise.tempo} bpm. One bar
+                    counts you in.
                 </p>
             </header>
 
@@ -201,11 +202,16 @@ export function RhythmTrainer({exercise}: {exercise: Exercise}) {
                         Stop
                     </button>
                 )}
-                {metronome.running && <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />}
-                {runState === "counting" && <span className="text-sm text-indigo-700">Count-in…</span>}
+                {metronome.running && (
+                    <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />
+                )}
+                {runState === "counting" && (
+                    <span className="text-sm text-indigo-700">Count-in…</span>
+                )}
                 {runState === "armed" && (
                     <span className="text-sm text-indigo-700">
-                        Play <span className="font-mono">{noteName(matcher.nextPitch ?? 0)}</span> on the beat.
+                        Play <span className="font-mono">{noteName(matcher.nextPitch ?? 0)}</span>{" "}
+                        on the beat.
                     </span>
                 )}
             </div>
@@ -235,8 +241,8 @@ export function RhythmTrainer({exercise}: {exercise: Exercise}) {
             {best && (
                 <p className="text-sm text-gray-500">
                     Best: average timing error{" "}
-                    <span className="font-mono">{Math.round(best.averageAbsMs)}ms</span> ({best.perfect}/
-                    {best.total} perfect)
+                    <span className="font-mono">{Math.round(best.averageAbsMs)}ms</span> (
+                    {best.perfect}/{best.total} perfect)
                 </p>
             )}
 

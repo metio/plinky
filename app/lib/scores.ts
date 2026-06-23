@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type {RhythmSummary} from "./rhythm";
+import type { RhythmSummary } from "./rhythm";
 
 // A wrong note costs this much added time, so the ranking metric rewards both
 // speed and accuracy in a single comparable number.
@@ -50,7 +50,7 @@ export function saveBest(exerciseId: string, result: TrialResult): void {
     }
 }
 
-export type RhythmBest = RhythmSummary & {at: string};
+export type RhythmBest = RhythmSummary & { at: string };
 
 function rhythmKey(exerciseId: string): string {
     return `plinky:rhythm:${exerciseId}`;

@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {useMidiConnection} from "../contexts/midi";
-import {noteName} from "../lib/midi";
-import {KeyboardHint} from "./keyboardHint";
+import { useMidiConnection } from "../contexts/midi";
+import { noteName } from "../lib/midi";
+import { KeyboardHint } from "./keyboardHint";
 
 function formatTime(ms: number): string {
     // MIDIMessageEvent timestamps are milliseconds since the page's time
@@ -12,8 +12,17 @@ function formatTime(ms: number): string {
 }
 
 export function MidiDebugPanel() {
-    const {support, status, error, devices, events, heldNotes, octaveOffset, requestAccess, clearEvents} =
-        useMidiConnection();
+    const {
+        support,
+        status,
+        error,
+        devices,
+        events,
+        heldNotes,
+        octaveOffset,
+        requestAccess,
+        clearEvents,
+    } = useMidiConnection();
 
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
@@ -43,15 +52,14 @@ export function MidiDebugPanel() {
                 <span className="text-sm text-gray-500">
                     {support === "unknown" && "Checking browser support…"}
                     {status === "requesting" && "Requesting access…"}
-                    {status === "ready" && `${devices.length} input${devices.length === 1 ? "" : "s"} connected`}
+                    {status === "ready" &&
+                        `${devices.length} input${devices.length === 1 ? "" : "s"} connected`}
                     {status === "denied" && "Access denied."}
                     {status === "error" && (error ?? "Something went wrong.")}
                 </span>
             </div>
 
-            {error && status !== "error" && (
-                <p className="text-sm text-red-600">{error}</p>
-            )}
+            {error && status !== "error" && <p className="text-sm text-red-600">{error}</p>}
 
             <KeyboardHint octaveOffset={octaveOffset} />
 
@@ -67,7 +75,9 @@ export function MidiDebugPanel() {
                             <li key={device.id} className="flex items-center gap-2">
                                 <span
                                     className={`inline-block h-2 w-2 rounded-full ${
-                                        device.state === "connected" ? "bg-green-500" : "bg-gray-300"
+                                        device.state === "connected"
+                                            ? "bg-green-500"
+                                            : "bg-gray-300"
                                     }`}
                                 />
                                 <span className="font-medium">{device.name}</span>
@@ -132,7 +142,9 @@ export function MidiDebugPanel() {
                             {events.map((event) => (
                                 <tr
                                     key={event.id}
-                                    className={event.kind === "noteon" ? "text-gray-900" : "text-gray-400"}
+                                    className={
+                                        event.kind === "noteon" ? "text-gray-900" : "text-gray-400"
+                                    }
                                 >
                                     <td className="py-0.5 pr-4">{formatTime(event.timestamp)}</td>
                                     <td className="py-0.5 pr-4">{event.kind}</td>

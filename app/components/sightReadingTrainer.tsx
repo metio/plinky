@@ -1,19 +1,19 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {useCallback, useState} from "react";
-import type {NoteTimingEvent, TuneObject} from "abcjs";
-import {AbcRenderer} from "./abcRenderer";
-import {BeatIndicator} from "./beatIndicator";
-import {KeyboardHint} from "./keyboardHint";
-import {useMidiConnection, useMidiInput} from "../contexts/midi";
-import {noteName, type MidiNoteEvent} from "../lib/midi";
-import {useMetronome} from "../hooks/useMetronome";
-import {useSynth} from "../hooks/useSynth";
-import {expectedPitches, useNoteMatcher} from "../hooks/useNoteMatcher";
-import type {Exercise} from "../lib/exercises";
+import { useCallback, useState } from "react";
+import type { NoteTimingEvent, TuneObject } from "abcjs";
+import { AbcRenderer } from "./abcRenderer";
+import { BeatIndicator } from "./beatIndicator";
+import { KeyboardHint } from "./keyboardHint";
+import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { noteName, type MidiNoteEvent } from "../lib/midi";
+import { useMetronome } from "../hooks/useMetronome";
+import { useSynth } from "../hooks/useSynth";
+import { expectedPitches, useNoteMatcher } from "../hooks/useNoteMatcher";
+import type { Exercise } from "../lib/exercises";
 
-export function SightReadingTrainer({exercise}: {exercise: Exercise}) {
+export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
     const [events, setEvents] = useState<NoteTimingEvent[]>([]);
     const [bpm, setBpm] = useState(exercise.tempo);
     const metronome = useMetronome();
@@ -50,15 +50,15 @@ export function SightReadingTrainer({exercise}: {exercise: Exercise}) {
         [synth, events],
     );
 
-    const matcher = useNoteMatcher(events, {onCorrect: handleCorrect});
+    const matcher = useNoteMatcher(events, { onCorrect: handleCorrect });
 
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
         [matcher],
     );
 
-    const {support, status, devices, octaveOffset, requestAccess} = useMidiConnection();
-    useMidiInput({onNoteOn: handleNoteOn});
+    const { support, status, devices, octaveOffset, requestAccess } = useMidiConnection();
+    useMidiInput({ onNoteOn: handleNoteOn });
 
     const connected = status === "ready" && devices.length > 0;
 
@@ -124,12 +124,16 @@ export function SightReadingTrainer({exercise}: {exercise: Exercise}) {
                     matcher.nextPitch !== undefined && (
                         <div className="text-sm">
                             <span className="font-medium">Next:</span>{" "}
-                            <span className="font-mono text-indigo-700">{noteName(matcher.nextPitch)}</span>
+                            <span className="font-mono text-indigo-700">
+                                {noteName(matcher.nextPitch)}
+                            </span>
                         </div>
                     )
                 )}
                 {matcher.wrongNote !== null && (
-                    <div className="text-sm font-medium text-red-600">✗ {noteName(matcher.wrongNote)}</div>
+                    <div className="text-sm font-medium text-red-600">
+                        ✗ {noteName(matcher.wrongNote)}
+                    </div>
                 )}
             </div>
 

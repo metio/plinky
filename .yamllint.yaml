@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+extends: default
+# Skip everything git ignores (node_modules, build, coverage) so a local or
+# dev-container run lints only our own YAML.
+ignore-from-file: .gitignore
+rules:
+  # 160 is the style target, but long pinned action values legitimately exceed
+  # it — warn rather than fail.
+  line-length:
+    max: 160
+    level: warning
+  document-start: disable
+  comments:
+    min-spaces-from-content: 1
+  truthy:
+    check-keys: false

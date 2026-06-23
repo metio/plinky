@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+default: true
+MD013: false # line length: tables and links exceed any sane limit
+MD041: false # the README leads with a centered logo image, not a heading
+MD024:
+  siblings_only: true
+MD033: false # inline HTML: the SPDX header comment and the README logo markup

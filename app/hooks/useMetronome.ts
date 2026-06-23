@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import {useCallback, useEffect, useRef, useState} from "react";
-import {getAudioContext} from "../lib/audio";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getAudioContext } from "../lib/audio";
 
 // Lookahead scheduling (after Chris Wilson's "A Tale of Two Clocks"): a coarse
 // timer wakes often and schedules every click that falls inside the next
@@ -34,7 +34,7 @@ export function useMetronome(): UseMetronomeResult {
     const beatsPerBarRef = useRef(4);
     const remainingRef = useRef(Number.POSITIVE_INFINITY); // beats left to schedule
     const onCompleteRef = useRef<(() => void) | null>(null);
-    const queueRef = useRef<{beat: number; time: number}[]>([]);
+    const queueRef = useRef<{ beat: number; time: number }[]>([]);
 
     const [running, setRunning] = useState(false);
     const [beat, setBeat] = useState(0);
@@ -124,7 +124,7 @@ export function useMetronome(): UseMetronomeResult {
 
             const beatInBar = beatIndexRef.current % beatsPerBarRef.current;
             scheduleClick(ctx, nextNoteTimeRef.current, beatInBar === 0);
-            queueRef.current.push({beat: beatInBar, time: nextNoteTimeRef.current});
+            queueRef.current.push({ beat: beatInBar, time: nextNoteTimeRef.current });
 
             nextNoteTimeRef.current += secondsPerBeat;
             beatIndexRef.current += 1;
@@ -187,5 +187,5 @@ export function useMetronome(): UseMetronomeResult {
     // this component, so it must not be closed here.
     useEffect(() => stopTimers, [stopTimers]);
 
-    return {running, beat, startMetronome, countIn, setTempo, stop};
+    return { running, beat, startMetronome, countIn, setTempo, stop };
 }

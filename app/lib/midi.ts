@@ -62,15 +62,30 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     if (!isNoteOn && !isNoteOff) {
         return null;
     }
-    return {kind: isNoteOn ? "noteon" : "noteoff", note, velocity, channel};
+    return { kind: isNoteOn ? "noteon" : "noteoff", note, velocity, channel };
 }
 
 // GarageBand-style "musical typing" layout: the home row plays the white keys
 // of one octave, the row above plays the black keys. Values are semitone
 // offsets from C in the active octave.
 export const KEY_SEMITONES: Record<string, number> = {
-    a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11,
-    k: 12, o: 13, l: 14, p: 15, ";": 16,
+    a: 0,
+    w: 1,
+    s: 2,
+    e: 3,
+    d: 4,
+    f: 5,
+    t: 6,
+    g: 7,
+    y: 8,
+    h: 9,
+    u: 10,
+    j: 11,
+    k: 12,
+    o: 13,
+    l: 14,
+    p: 15,
+    ";": 16,
 };
 
 export const KEYBOARD_DEVICE = "Computer keyboard";

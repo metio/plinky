@@ -4,13 +4,10 @@
 import type { Route } from "./+types/settings";
 import { MidiDebugPanel } from "../components/midiDebugPanel";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Plinky - Settings" },
-    { name: "description", content: "Configure Plinky" },
-  ];
+export function meta(_args: Route.MetaArgs) {
+    return [{ title: "Plinky - Settings" }, { name: "description", content: "Configure Plinky" }];
 }
 
 export default function Settings() {
-  return <MidiDebugPanel />;
+    return <MidiDebugPanel />;
 }

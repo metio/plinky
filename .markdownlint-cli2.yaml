@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+# Rules live in .markdownlint.yaml; this carries the cli2-only ignore so a local
+# or dev-container run does not lint dependencies' bundled Markdown.
+ignores:
+  - node_modules
