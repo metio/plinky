@@ -8,5 +8,7 @@
 /.react-router/
 /build/
 /coverage/
+/.vitest-attachments/
+__screenshots__/
 
 *storybook.log
