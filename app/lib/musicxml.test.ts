@@ -64,4 +64,14 @@ describe("musicXmlToAbc", () => {
         expect(abc).not.toContain("C0");
         expect(abc).toContain("C |");
     });
+
+    it("writes an explicit natural after a sharp of the same pitch in a bar", () => {
+        // ABC carries an accidental through the bar, so the second F needs "=" to
+        // stay natural rather than inheriting the sharp.
+        const sharp = `<note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>1</duration></note>`;
+        const natural = `<note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration></note>`;
+        const abc = musicXmlToAbc(score(sharp + natural));
+        expect(abc).toContain("^F");
+        expect(abc).toContain("=F");
+    });
 });

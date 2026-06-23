@@ -46,4 +46,11 @@ describe("MusicXML import round-trip", () => {
         const result = hands(musicXmlToAbc(score(chord)));
         expect(result[0].steps[0].pitches).toEqual([60, 64, 67]);
     });
+
+    it("plays a natural after a sharp at the right pitch", () => {
+        const sharp = `<note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>1</duration></note>`;
+        const natural = `<note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration></note>`;
+        const result = hands(musicXmlToAbc(score(sharp + natural)));
+        expect(result[0].steps.map((step) => step.pitches)).toEqual([[66], [65]]);
+    });
 });
