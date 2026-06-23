@@ -21,6 +21,10 @@ export function pitchesOf(event: NoteTimingEvent): number[] {
 // repeats and voltas and folds rests into absolute onsets, so chords (one event,
 // many pitches) are the only structural difference from a plain melody.
 export function buildSteps(tune: TuneObject, tempo: number): Step[] {
+    // setupEvents only copies pitch data that the MIDI flattener has already
+    // attached, so prime it first — without setUpAudio every event comes back
+    // with no midiPitches and nothing is playable.
+    tune.setUpAudio({});
     return tune
         .setupEvents(0, 1000, tempo)
         .filter((event) => event.type === "event")

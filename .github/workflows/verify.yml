@@ -21,6 +21,19 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+  browser:
+    name: browser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
   biome:
     name: biome
     runs-on: ubuntu-latest
@@ -84,7 +97,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [build, biome, knip, typos, markdown, yaml, github-actions, reuse]
+    needs: [build, browser, biome, knip, typos, markdown, yaml, github-actions, reuse]
     if: always()
     runs-on: ubuntu-latest
     steps:

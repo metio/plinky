@@ -6,11 +6,12 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "test": "vitest run",
+    "test": "vitest run --project node",
+    "test:browser": "vitest run --project browser",
     "lint": "biome check",
     "format": "biome check --write .",
     "knip": "react-router typegen && knip",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --project node --coverage"
   },
   "dependencies": {
     "@react-router/node": "^8.0.1",
@@ -31,9 +32,11 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitest/browser": "^4.1.9",
+    "@vitest/browser-playwright": "^4.1.9",
     "@vitest/coverage-v8": "^4.1.9",
     "jsdom": "^29.1.1",
     "knip": "^5.0.0",
+    "playwright": "^1.50.0",
     "tailwindcss": "^4.3.1",
     "typescript": "^5.8.3",
     "vite": "^8.0.16",
