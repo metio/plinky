@@ -9,6 +9,7 @@ import { ThemeToggle } from "../components/themeToggle";
 import { useSynth } from "../hooks/useSynth";
 import { loadPrefs, type Prefs, savePrefs } from "../lib/prefs";
 import { routeMeta } from "../lib/site";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
 
 export function meta(_args: Route.MetaArgs) {
@@ -31,38 +32,44 @@ export default function Settings() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Settings</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Preferences are saved on this device.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.nav_settings()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.settings_subtitle()}</p>
             </header>
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
-                    Appearance
+                    {m.settings_appearance()}
                 </h2>
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Theme</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {m.settings_theme()}
+                    </span>
                     <ThemeToggle />
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Language</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {m.settings_language()}
+                    </span>
                     <LanguageSwitcher />
                 </div>
             </section>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">Sound</h2>
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                    {m.settings_sound()}
+                </h2>
                 <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input
                         type="checkbox"
                         checked={prefs.sound}
                         onChange={(event) => update({ ...prefs, sound: event.target.checked })}
                     />
-                    Play note sounds
+                    {m.settings_play_sounds()}
                 </label>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Volume</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {m.settings_volume()}
+                    </span>
                     <input
                         type="range"
                         min={0}
@@ -79,7 +86,7 @@ export default function Settings() {
                         onClick={() => synth.playNote(72)}
                         className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                     >
-                        Test
+                        {m.settings_test()}
                     </button>
                 </div>
             </section>
@@ -88,20 +95,22 @@ export default function Settings() {
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
-                    MIDI device
+                    {m.settings_midi_device()}
                 </h2>
                 <MidiDebugPanel />
             </section>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">Help</h2>
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                    {m.settings_help()}
+                </h2>
                 <a
                     href="https://github.com/metio/plinky/issues"
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm text-indigo-700 underline dark:text-indigo-300"
                 >
-                    Get help or report a bug →
+                    {m.settings_get_help()} →
                 </a>
             </section>
         </main>
