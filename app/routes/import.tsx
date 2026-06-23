@@ -5,16 +5,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { exercises } from "../lib/exercises";
 import { decodeSong } from "../lib/share";
-import { pageTitle } from "../lib/site";
+import { routeMeta } from "../lib/site";
 import { buildExercise, loadUserSongs, saveUserSong } from "../lib/songs";
 import { buildSteps } from "../lib/steps";
 import type { Route } from "./+types/import";
 
 export function meta(_args: Route.MetaArgs) {
-    return [
-        { title: pageTitle("Shared song") },
-        { name: "description", content: "Open a shared Plinky song" },
-    ];
+    return routeMeta("Shared song", "Open a shared Plinky song");
 }
 
 // abcjs is loaded on demand so opening a link does not pull it into the bundle

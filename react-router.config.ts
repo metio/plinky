@@ -4,7 +4,10 @@
 import type { Config } from "@react-router/dev/config";
 
 export default {
-    // Config options...
-    // Server-side render by default, to enable SPA mode set this to `false`
+    // SPA mode: no server, hydrated on the client.
     ssr: false,
+    // Prerender the static routes to their own HTML so each carries its own title
+    // and social-card metadata for crawlers and link unfurlers that do not run
+    // JavaScript. Dynamic per-exercise routes fall back to the SPA shell.
+    prerender: ["/", "/sprint", "/daily", "/ear", "/path", "/progress", "/settings", "/import"],
 } satisfies Config;

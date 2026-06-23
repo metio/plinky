@@ -41,9 +41,10 @@ jobs:
         run: npm run build
       - name: Add SPA fallback
         # GitHub Pages has no SPA rewrite, so a deep link like
-        # /practice/c-major-scale 404s on refresh. Serving the shell as 404.html
-        # lets the client router take over and render the route.
-        run: cp build/client/index.html build/client/404.html
+        # /practice/c-major-scale 404s on refresh. Prerendering emits a generic
+        # shell at __spa-fallback.html; serving it as 404.html lets the client
+        # router take over and render the route (index.html is now home's page).
+        run: cp build/client/__spa-fallback.html build/client/404.html
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
