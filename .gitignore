@@ -3,6 +3,7 @@
 
 /.idea/
 /.ilo.rc
+/.claude/settings.local.json
 /node_modules/
 /.react-router/
 /build/
