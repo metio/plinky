@@ -51,7 +51,8 @@ Import any tune as [ABC notation](https://abcnotation.com) — paste it or uploa
 `.abc` file — and it joins the library, playable in every mode and saved on your
 device. You can also upload **MusicXML** (`.musicxml`/`.xml`) exported from
 MuseScore, Sibelius, Finale, or Dorico; it's converted to ABC on the way in.
-Export any exercise back to `.abc` to share it or practice it elsewhere.
+Export any exercise back to `.abc`, or hit **Share** to copy a link that imports
+the song when opened — no account or sign-up, just send the link.
 
 ## Playing
 
