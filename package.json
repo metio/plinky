@@ -4,6 +4,7 @@
   "scripts": {
     "messages": "paraglide-js compile --project ./project.inlang --outdir ./app/paraglide --strategy localStorage preferredLanguage baseLocale --emit-ts-declarations",
     "songs": "node dev/build-songs.mjs",
+    "exercises": "node dev/gen-exercises.mjs",
     "build": "npm run songs && npm run messages && react-router build",
     "dev": "npm run songs && npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",

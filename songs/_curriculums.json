@@ -3,5 +3,10 @@
     "id": "plinky-basics",
     "name": "Plinky basics",
     "publisher": "Plinky"
+  },
+  {
+    "id": "finger-exercises",
+    "name": "Finger exercises",
+    "publisher": "Plinky"
   }
 ]

@@ -1,0 +1,12 @@
+{
+  "id": "arpeggio-d-minor",
+  "title": "D minor arpeggio",
+  "description": "The triad, up and down.",
+  "abc": "X:1\nT:D minor arpeggio\nM:4/4\nL:1/4\nK:Dm\nD F A d | d A F D |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

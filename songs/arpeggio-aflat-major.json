@@ -1,0 +1,12 @@
+{
+  "id": "arpeggio-aflat-major",
+  "title": "A♭ major arpeggio",
+  "description": "The triad, up and down.",
+  "abc": "X:1\nT:A♭ major arpeggio\nM:4/4\nL:1/4\nK:Ab\nA c e a | a e c A |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

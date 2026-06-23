@@ -53,19 +53,16 @@ body:
     attributes:
       label: License
       description: >
-        How others may use this song. 0BSD and CC0-1.0 are public-domain-style
-        (most reusable); CC-BY needs attribution; SA adds share-alike; NC blocks
+        How others may use this song. CC0-1.0 is public-domain-style (most
+        reusable); CC-BY needs attribution; SA adds share-alike; NC blocks
         commercial use; ND blocks derivatives.
       options:
-        - "0BSD"
         - "CC0-1.0"
         - "CC-BY-4.0"
         - "CC-BY-SA-4.0"
         - "CC-BY-NC-4.0"
         - "CC-BY-ND-4.0"
         - "CC-BY-NC-SA-4.0"
-        - "MIT"
-        - "Apache-2.0"
     validations:
       required: true
   - type: checkboxes

@@ -1,0 +1,12 @@
+{
+  "id": "scale-g-minor",
+  "title": "G minor scale",
+  "description": "One octave, up and down — the foundation of finger technique.",
+  "abc": "X:1\nT:G minor scale\nM:4/4\nL:1/4\nK:Gm\nG A B c | d e f g | g f e d | c B A G |",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

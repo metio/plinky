@@ -1,0 +1,12 @@
+{
+  "id": "arpeggio-bflat-minor",
+  "title": "B♭ minor arpeggio",
+  "description": "The triad, up and down.",
+  "abc": "X:1\nT:B♭ minor arpeggio\nM:4/4\nL:1/4\nK:Bbm\nB d f b | b f d B |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

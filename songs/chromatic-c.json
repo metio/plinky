@@ -1,0 +1,12 @@
+{
+  "id": "chromatic-c",
+  "title": "Chromatic scale (C)",
+  "description": "All twelve semitones, ascending.",
+  "abc": "X:1\nT:Chromatic scale (C)\nM:4/4\nL:1/8\nK:C\nC ^C D ^D E F ^F G | ^G A ^A B c2 z2 |",
+  "tempo": 80,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

@@ -6,10 +6,19 @@ version = 1
 # JSON carries no comment syntax, so these files get their declaration here
 # rather than inline.
 [[annotations]]
-path = ["package.json", "package-lock.json", "tsconfig.json", "renovate.json", "biome.json", "knip.json", "public/manifest.webmanifest", "songs/*.json", "messages/*.json", "project.inlang/settings.json"]
+path = ["package.json", "package-lock.json", "tsconfig.json", "renovate.json", "biome.json", "knip.json", "public/manifest.webmanifest", "messages/*.json", "project.inlang/settings.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
+
+# Catalog songs are transcriptions of public-domain or non-copyrightable music,
+# dedicated to the public domain (CC0). Each song is its own file so its license
+# is tracked individually.
+[[annotations]]
+path = ["songs/*.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "CC0-1.0"
 
 # Generated logo art, the binary favicon, and the social-card image: declared
 # here so the asset files stay untouched.

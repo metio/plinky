@@ -1,0 +1,12 @@
+{
+  "id": "arpeggio-e-minor",
+  "title": "E minor arpeggio",
+  "description": "The triad, up and down.",
+  "abc": "X:1\nT:E minor arpeggio\nM:4/4\nL:1/4\nK:Em\nE G B e | e B G E |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}
