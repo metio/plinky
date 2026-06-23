@@ -1,13 +1,15 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Route } from "./+types/rhythm";
 import { RhythmTrainer } from "../components/rhythmTrainer";
+import { pageTitle } from "../lib/site";
 import { resolveExercise } from "../lib/songs";
+import type { Route } from "./+types/rhythm";
 
-export function meta(_args: Route.MetaArgs) {
+export function meta({ params }: Route.MetaArgs) {
+    const exercise = resolveExercise(params.exerciseId);
     return [
-        { title: "Plinky - Rhythm" },
+        { title: exercise ? pageTitle(exercise.title, "Rhythm") : pageTitle("Rhythm") },
         { name: "description", content: "Play in time with the metronome" },
     ];
 }

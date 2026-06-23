@@ -6,10 +6,11 @@ import { MidiDebugPanel } from "../components/midiDebugPanel";
 import { ThemeToggle } from "../components/themeToggle";
 import { useSynth } from "../hooks/useSynth";
 import { loadPrefs, type Prefs, savePrefs } from "../lib/prefs";
+import { pageTitle } from "../lib/site";
 import type { Route } from "./+types/settings";
 
 export function meta(_args: Route.MetaArgs) {
-    return [{ title: "Plinky - Settings" }, { name: "description", content: "Configure Plinky" }];
+    return [{ title: pageTitle("Settings") }, { name: "description", content: "Configure Plinky" }];
 }
 
 export default function Settings() {

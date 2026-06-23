@@ -5,6 +5,13 @@
 // structured data.
 export const SITE_URL = "https://plinky.projects.metio.wtf";
 export const SITE_TITLE = "Plinky — piano practice in your browser";
+
+// A page title with the most specific part first, ending in the brand, so a
+// bookmark list reads "C major scale · Practice · Plinky" — distinguishable at a
+// glance and aligned with the URL's path segments.
+export function pageTitle(...parts: string[]): string {
+    return [...parts, "Plinky"].join(" · ");
+}
 export const SITE_DESCRIPTION =
     "Practice piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear-training, and loop drills, with your scores kept on your device.";
 

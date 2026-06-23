@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { LoopTrainer } from "../components/loopTrainer";
+import { pageTitle } from "../lib/site";
 import { resolveExercise } from "../lib/songs";
 import type { Route } from "./+types/loop";
 
-export function meta(_args: Route.MetaArgs) {
+export function meta({ params }: Route.MetaArgs) {
+    const exercise = resolveExercise(params.exerciseId);
     return [
-        { title: "Plinky - Loop" },
+        { title: exercise ? pageTitle(exercise.title, "Loop") : pageTitle("Loop") },
         { name: "description", content: "Loop a section of a song until you have learned it" },
     ];
 }

@@ -6,11 +6,12 @@ import { Link } from "react-router";
 import { exercises } from "../lib/exercises";
 import { type PathStep, pathSteps } from "../lib/path";
 import { loadBest, loadBestRhythm } from "../lib/scores";
+import { pageTitle } from "../lib/site";
 import type { Route } from "./+types/path";
 
 export function meta(_args: Route.MetaArgs) {
     return [
-        { title: "Plinky - Learning path" },
+        { title: pageTitle("Learning path") },
         { name: "description", content: "A guided order to work through the exercises" },
     ];
 }

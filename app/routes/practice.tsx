@@ -1,13 +1,15 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Route } from "./+types/practice";
 import { SightReadingTrainer } from "../components/sightReadingTrainer";
+import { pageTitle } from "../lib/site";
 import { resolveExercise } from "../lib/songs";
+import type { Route } from "./+types/practice";
 
-export function meta(_args: Route.MetaArgs) {
+export function meta({ params }: Route.MetaArgs) {
+    const exercise = resolveExercise(params.exerciseId);
     return [
-        { title: "Plinky - Practice" },
+        { title: exercise ? pageTitle(exercise.title, "Practice") : pageTitle("Practice") },
         { name: "description", content: "Sight-reading practice with your MIDI piano" },
     ];
 }
