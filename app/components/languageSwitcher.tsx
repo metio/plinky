@@ -1,38 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { localeNames } from "../lib/locales";
 import { m } from "../paraglide/messages.js";
 import { getLocale, locales, setLocale } from "../paraglide/runtime.js";
-
-// Each locale labelled in its own language, so a reader recognizes their own.
-const LANGUAGE_NAMES: Record<string, string> = {
-    en: "English",
-    de: "Deutsch",
-    nl: "Nederlands",
-    fr: "Français",
-    es: "Español",
-    it: "Italiano",
-    pt: "Português",
-    el: "Ελληνικά",
-    pl: "Polski",
-    nb: "Norsk",
-    da: "Dansk",
-    sv: "Svenska",
-    fi: "Suomi",
-    hr: "Hrvatski",
-    uk: "Українська",
-    zh: "中文",
-    ja: "日本語",
-    ko: "한국어",
-    ro: "Română",
-    cs: "Čeština",
-    sk: "Slovenčina",
-    hu: "Magyar",
-    ru: "Русский",
-    tr: "Türkçe",
-    sr: "Српски",
-    sq: "Shqip",
-};
 
 // Switching the locale persists it (localStorage strategy) and reloads so every
 // string re-renders in the new language.
@@ -46,7 +17,7 @@ export function LanguageSwitcher() {
         >
             {locales.map((locale) => (
                 <option key={locale} value={locale}>
-                    {LANGUAGE_NAMES[locale] ?? locale}
+                    {localeNames[locale] ?? locale}
                 </option>
             ))}
         </select>
