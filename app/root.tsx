@@ -16,7 +16,7 @@ import type { Route } from "./+types/root";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme } from "./lib/theme";
-import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "./lib/site";
+import { SITE_URL } from "./lib/site";
 import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
@@ -86,16 +86,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta name="theme-color" content="#4f46e5" />
-                {/* Social cards (Open Graph + Twitter), site-wide defaults. */}
+                {/* Site-wide social-card fields; each route's meta adds the
+                    per-page og:title / og:description and twitter equivalents. */}
                 <meta property="og:type" content="website" />
                 <meta property="og:site_name" content="Plinky" />
-                <meta property="og:title" content={SITE_TITLE} />
-                <meta property="og:description" content={SITE_DESCRIPTION} />
                 <meta property="og:url" content={SITE_URL} />
                 <meta property="og:image" content={`${SITE_URL}/logo.svg`} />
                 <meta name="twitter:card" content="summary" />
-                <meta name="twitter:title" content={SITE_TITLE} />
-                <meta name="twitter:description" content={SITE_DESCRIPTION} />
                 <meta name="twitter:image" content={`${SITE_URL}/logo.svg`} />
                 <Meta />
                 <Links />

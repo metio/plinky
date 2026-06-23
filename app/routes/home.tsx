@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import { SongImport } from "../components/songImport";
 import { type Exercise, exercises } from "../lib/exercises";
 import { encodeSong } from "../lib/share";
-import { SITE_TITLE, STRUCTURED_DATA } from "../lib/site";
+import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
 import { loadUserSongs, removeUserSong, toAbcDocument } from "../lib/songs";
 import type { Route } from "./+types/home";
 
@@ -15,7 +15,8 @@ export function meta(_args: Route.MetaArgs) {
     // serializing it safely — no dangerouslySetInnerHTML needed.
     return [
         { title: SITE_TITLE },
-        { name: "description", content: "Practice piano with your MIDI keyboard." },
+        { name: "description", content: SITE_DESCRIPTION },
+        ...socialMeta(SITE_TITLE, SITE_DESCRIPTION),
         { "script:ld+json": STRUCTURED_DATA },
     ];
 }

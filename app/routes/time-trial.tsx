@@ -2,16 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { TimeTrial } from "../components/timeTrial";
-import { pageTitle } from "../lib/site";
+import { routeMeta } from "../lib/site";
 import { resolveExercise } from "../lib/songs";
 import type { Route } from "./+types/time-trial";
 
 export function meta({ params }: Route.MetaArgs) {
     const exercise = resolveExercise(params.exerciseId);
-    return [
-        { title: exercise ? pageTitle(exercise.title, "Time trial") : pageTitle("Time trial") },
-        { name: "description", content: "Race through a phrase as fast and cleanly as you can" },
-    ];
+    const headline = exercise ? `${exercise.title} · Time trial` : "Time trial";
+    return routeMeta(headline, "Race through a phrase as fast and cleanly as you can");
 }
 
 export default function TimeTrialRoute({ params }: Route.ComponentProps) {

@@ -2,16 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { RhythmTrainer } from "../components/rhythmTrainer";
-import { pageTitle } from "../lib/site";
+import { routeMeta } from "../lib/site";
 import { resolveExercise } from "../lib/songs";
 import type { Route } from "./+types/rhythm";
 
 export function meta({ params }: Route.MetaArgs) {
     const exercise = resolveExercise(params.exerciseId);
-    return [
-        { title: exercise ? pageTitle(exercise.title, "Rhythm") : pageTitle("Rhythm") },
-        { name: "description", content: "Play in time with the metronome" },
-    ];
+    const headline = exercise ? `${exercise.title} · Rhythm` : "Rhythm";
+    return routeMeta(headline, "Play in time with the metronome");
 }
 
 export default function RhythmRoute({ params }: Route.ComponentProps) {

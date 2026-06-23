@@ -4,14 +4,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
-import { pageTitle } from "../lib/site";
+import { routeMeta } from "../lib/site";
 import type { Route } from "./+types/progress";
 
 export function meta(_args: Route.MetaArgs) {
-    return [
-        { title: pageTitle("Progress") },
-        { name: "description", content: "Your practice history and streak" },
-    ];
+    return routeMeta("Progress", "Your practice history and streak");
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
