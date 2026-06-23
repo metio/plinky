@@ -7,8 +7,10 @@ import {
     isBetterRhythm,
     loadBest,
     loadBestRhythm,
+    loadBestSprint,
     saveBest,
     saveBestRhythm,
+    saveBestSprint,
     scoreFor,
     type RhythmBest,
     type TrialResult,
@@ -122,5 +124,28 @@ describe("rhythm best persistence", () => {
     it("returns null for corrupt stored data", () => {
         localStorage.setItem("plinky:rhythm:twinkle", "not json");
         expect(loadBestRhythm("twinkle")).toBeNull();
+    });
+});
+
+describe("sprint best persistence", () => {
+    beforeEach(() => {
+        installLocalStorage();
+    });
+
+    afterEach(() => {
+        localStorage.clear();
+    });
+
+    it("round-trips a sprint best per configuration", () => {
+        const best = { correct: 42, at: "2026-06-23T00:00:00.000Z" };
+        saveBestSprint("2m-1h", best);
+        expect(loadBestSprint("2m-1h")).toEqual(best);
+        // Each configuration keeps its own high score.
+        expect(loadBestSprint("2m-2h")).toBeNull();
+    });
+
+    it("returns null for corrupt stored data", () => {
+        localStorage.setItem("plinky:sprint:2m-1h", "not json");
+        expect(loadBestSprint("2m-1h")).toBeNull();
     });
 });

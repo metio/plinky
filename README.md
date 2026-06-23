@@ -32,6 +32,9 @@ on your device.
   best.
 - **Tempo** — no metronome; you set the pace. A live readout tracks your tempo,
   and the finished view charts it over the phrase and flags where you slowed down.
+- **Sprint** — a sight-reading drill on freshly generated notes: play as many
+  correctly as you can before the timer runs out, one or two hands. Your best
+  count per length is kept.
 
 Each mode handles single notes, **chords**, and **two-hand grand-staff** pieces —
 each hand advances at its own pace — as well as rests, ties, tuplets, and repeats.

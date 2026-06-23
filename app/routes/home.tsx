@@ -55,6 +55,16 @@ export default function Home() {
                 </p>
             </header>
 
+            <Link
+                to="/sprint"
+                className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100"
+            >
+                <span className="font-medium text-indigo-700">Sight-reading sprint →</span>
+                <p className="mt-1 text-sm text-gray-500">
+                    Fresh notes every run — play as many as you can before the timer runs out.
+                </p>
+            </Link>
+
             <ul className="space-y-3">
                 {all.map((exercise) => (
                     <li key={exercise.id} className="rounded-md border border-gray-200 p-4">
