@@ -126,7 +126,8 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
     });
 
     const handleNoteOn = useCallback(
-        (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
+        (played: MidiNoteEvent) =>
+            matcher.registerNote(played.note, played.timestamp, played.velocity),
         [matcher],
     );
 

@@ -137,7 +137,8 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
     });
 
     const handleNoteOn = useCallback(
-        (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
+        (played: MidiNoteEvent) =>
+            matcher.registerNote(played.note, played.timestamp, played.velocity),
         [matcher],
     );
 
