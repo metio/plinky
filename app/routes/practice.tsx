@@ -3,7 +3,7 @@
 
 import type { Route } from "./+types/practice";
 import { SightReadingTrainer } from "../components/sightReadingTrainer";
-import { findExercise } from "../lib/exercises";
+import { resolveExercise } from "../lib/songs";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -13,7 +13,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function PracticeRoute({ params }: Route.ComponentProps) {
-    const exercise = findExercise(params.exerciseId);
+    const exercise = resolveExercise(params.exerciseId);
     if (!exercise) {
         throw new Response("Exercise not found", { status: 404 });
     }

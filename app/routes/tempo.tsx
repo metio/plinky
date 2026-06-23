@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { TempoTrainer } from "../components/tempoTrainer";
-import { findExercise } from "../lib/exercises";
+import { resolveExercise } from "../lib/songs";
 import type { Route } from "./+types/tempo";
 
 export function meta(_args: Route.MetaArgs) {
@@ -13,7 +13,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function TempoRoute({ params }: Route.ComponentProps) {
-    const exercise = findExercise(params.exerciseId);
+    const exercise = resolveExercise(params.exerciseId);
     if (!exercise) {
         throw new Response("Exercise not found", { status: 404 });
     }

@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
+import { SongImport } from "../components/songImport";
+import { type Exercise, exercises } from "../lib/exercises";
+import { loadUserSongs, removeUserSong, toAbcDocument } from "../lib/songs";
 import type { Route } from "./+types/home";
-import { exercises } from "../lib/exercises";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -19,7 +22,29 @@ const MODES = [
     { slug: "tempo", label: "Tempo" },
 ];
 
+function downloadAbc(exercise: Exercise): void {
+    const blob = new Blob([toAbcDocument(exercise)], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${exercise.id}.abc`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+}
+
 export default function Home() {
+    const [userSongs, setUserSongs] = useState<Exercise[]>([]);
+    const reload = useCallback(() => setUserSongs(loadUserSongs()), []);
+    useEffect(reload, [reload]);
+
+    const userIds = new Set(userSongs.map((song) => song.id));
+    const all = [...exercises, ...userSongs];
+
+    const remove = (id: string) => {
+        removeUserSong(id);
+        reload();
+    };
+
     return (
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
@@ -31,7 +56,7 @@ export default function Home() {
             </header>
 
             <ul className="space-y-3">
-                {exercises.map((exercise) => (
+                {all.map((exercise) => (
                     <li key={exercise.id} className="rounded-md border border-gray-200 p-4">
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <h2 className="text-lg font-medium">{exercise.title}</h2>
@@ -40,7 +65,7 @@ export default function Home() {
                             </span>
                         </div>
                         <p className="mt-1 text-sm text-gray-500">{exercise.description}</p>
-                        <div className="mt-3 flex flex-wrap gap-2">
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
                             {MODES.map((mode) => (
                                 <Link
                                     key={mode.slug}
@@ -50,10 +75,28 @@ export default function Home() {
                                     {mode.label}
                                 </Link>
                             ))}
+                            <button
+                                type="button"
+                                onClick={() => downloadAbc(exercise)}
+                                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline"
+                            >
+                                Export
+                            </button>
+                            {userIds.has(exercise.id) && (
+                                <button
+                                    type="button"
+                                    onClick={() => remove(exercise.id)}
+                                    className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 underline"
+                                >
+                                    Remove
+                                </button>
+                            )}
                         </div>
                     </li>
                 ))}
             </ul>
+
+            <SongImport existingIds={all.map((exercise) => exercise.id)} onAdded={reload} />
         </main>
     );
 }
