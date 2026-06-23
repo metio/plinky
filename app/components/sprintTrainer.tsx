@@ -7,7 +7,7 @@ import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { useRecordOnFinish } from "../hooks/usePracticeLog";
-import { dailyPhrase } from "../lib/daily";
+import { dailyPhrase, dailyShareText } from "../lib/daily";
 import { generatePhrase, SPRINT_KEYS, type SprintKey } from "../lib/generator";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
@@ -44,6 +44,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
     const [result, setResult] = useState<{ correct: number; wrong: number } | null>(null);
     const [best, setBest] = useState<SprintBest | null>(null);
     const [isRecord, setIsRecord] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const startRef = useRef(0);
     const correctRef = useRef(0);
@@ -297,6 +298,47 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                     >
                         Go again
                     </button>
+                    {daily &&
+                        (() => {
+                            const url = `${window.location.origin}/daily`;
+                            const text = dailyShareText(result.correct, url);
+                            const link =
+                                "rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300";
+                            return (
+                                <div className="flex flex-wrap items-center gap-2 pt-1">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        Share your score:
+                                    </span>
+                                    <a
+                                        href={`https://x.com/intent/post?text=${encodeURIComponent(text)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className={link}
+                                    >
+                                        X
+                                    </a>
+                                    <a
+                                        href={`https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className={link}
+                                    >
+                                        Bluesky
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            navigator.clipboard?.writeText(text);
+                                            setCopied(true);
+                                            window.setTimeout(() => setCopied(false), 2000);
+                                        }}
+                                        className={link}
+                                    >
+                                        {copied ? "Copied!" : "Copy"}
+                                    </button>
+                                </div>
+                            );
+                        })()}
                 </div>
             )}
 
