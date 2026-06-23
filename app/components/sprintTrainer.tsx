@@ -8,7 +8,7 @@ import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { useRecordOnFinish } from "../hooks/usePracticeLog";
 import { dailyPhrase } from "../lib/daily";
-import { generatePhrase } from "../lib/generator";
+import { generatePhrase, SPRINT_KEYS, type SprintKey } from "../lib/generator";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { loadBestSprint, saveBestSprint, type SprintBest } from "../lib/scores";
@@ -36,6 +36,7 @@ function formatClock(ms: number): string {
 export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
     const [durationMin, setDurationMin] = useState(2);
     const [twoHands, setTwoHands] = useState(false);
+    const [key, setKey] = useState<SprintKey>("C");
     const [abc, setAbc] = useState<string | null>(null);
     const [allHands, setAllHands] = useState<Hand[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
@@ -51,7 +52,9 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
 
     // The daily challenge is a fixed one-minute, one-hand run keyed by its date.
     const effectiveDuration = daily ? 1 : durationMin;
-    const config = daily ? `daily:${daily.dateKey}` : `${durationMin}m-${twoHands ? "2h" : "1h"}`;
+    const config = daily
+        ? `daily:${daily.dateKey}`
+        : `${durationMin}m-${key}-${twoHands ? "2h" : "1h"}`;
     useEffect(() => {
         setBest(loadBestSprint(config));
     }, [config]);
@@ -147,10 +150,10 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
             setAbc(dailyPhrase(daily.dateKey));
         } else {
             const bars = Math.min(durationMin * BARS_PER_MINUTE, MAX_BARS);
-            setAbc(generatePhrase({ bars, beatsPerBar: BEATS_PER_BAR, twoHands }));
+            setAbc(generatePhrase({ bars, beatsPerBar: BEATS_PER_BAR, twoHands, key }));
         }
         setRunState("armed");
-    }, [daily, effectiveDuration, durationMin, twoHands]);
+    }, [daily, effectiveDuration, durationMin, twoHands, key]);
 
     useEffect(() => stopTimer, [stopTimer]);
 
@@ -220,6 +223,23 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                                 />
                                 Two hands
                             </label>
+                            <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Key
+                            </span>
+                            {SPRINT_KEYS.map((option) => (
+                                <button
+                                    key={option}
+                                    type="button"
+                                    onClick={() => setKey(option)}
+                                    className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+                                        key === option
+                                            ? "bg-indigo-600 text-white"
+                                            : "border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                                    }`}
+                                >
+                                    {option}
+                                </button>
+                            ))}
                         </div>
                     )}
                     <button
@@ -284,7 +304,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                     {daily
                         ? "Today's best: "
-                        : `Best for ${durationMin} min ${twoHands ? "(two hands)" : "(one hand)"}: `}
+                        : `Best in ${key} major, ${durationMin} min ${twoHands ? "(two hands)" : "(one hand)"}: `}
                     <span className="font-mono">{best.correct}</span> correct
                 </p>
             )}

@@ -15,6 +15,13 @@ describe("generatePhrase", () => {
         expect(abc).not.toContain("V:2");
     });
 
+    it("uses the requested key's signature and scale", () => {
+        const abc = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false, key: "G" }, zero);
+        expect(abc).toContain("K:G");
+        // G major's five-finger position starts on G.
+        expect(abc).toContain("G G |");
+    });
+
     it("generates two voices for two-hand play", () => {
         const abc = generatePhrase({ bars: 1, beatsPerBar: 3, twoHands: true }, zero);
         expect(abc).toContain("V:1 clef=treble");
