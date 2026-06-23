@@ -12,10 +12,12 @@ import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
+import { HandSelector, useHandSelection } from "./handSelector";
 import { KeyboardHint } from "./keyboardHint";
 
 export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
-    const [hands, setHands] = useState<Hand[]>([]);
+    const [allHands, setAllHands] = useState<Hand[]>([]);
+    const { hands, choice, setChoice } = useHandSelection(allHands);
     const [bpm, setBpm] = useState(exercise.tempo);
     const metronome = useMetronome();
 
@@ -36,7 +38,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
     );
 
     const handleRender = useCallback(
-        (tune: TuneObject) => setHands(buildHands(tune, exercise.tempo)),
+        (tune: TuneObject) => setAllHands(buildHands(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
@@ -89,6 +91,8 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
             )}
+
+            <HandSelector hands={allHands} value={choice} onChange={setChoice} />
 
             <div className="flex flex-wrap items-center gap-4">
                 <button

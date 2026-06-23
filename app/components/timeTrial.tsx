@@ -13,6 +13,7 @@ import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { loadBest, saveBest, scoreFor, type TrialResult } from "../lib/scores";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
+import { HandSelector, useHandSelection } from "./handSelector";
 import { KeyboardHint } from "./keyboardHint";
 
 type RunState = "idle" | "counting" | "armed" | "running" | "finished";
@@ -22,7 +23,8 @@ function formatMs(ms: number): string {
 }
 
 export function TimeTrial({ exercise }: { exercise: Exercise }) {
-    const [hands, setHands] = useState<Hand[]>([]);
+    const [allHands, setAllHands] = useState<Hand[]>([]);
+    const { hands, choice, setChoice } = useHandSelection(allHands);
     const [runState, setRunState] = useState<RunState>("idle");
     const [errors, setErrors] = useState(0);
     const [elapsedMs, setElapsedMs] = useState(0);
@@ -36,7 +38,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
     const errorsRef = useRef(0);
 
     const handleRender = useCallback(
-        (tune: TuneObject) => setHands(buildHands(tune, exercise.tempo)),
+        (tune: TuneObject) => setAllHands(buildHands(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
@@ -168,6 +170,13 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
             )}
+
+            <HandSelector
+                hands={allHands}
+                value={choice}
+                onChange={setChoice}
+                disabled={runState !== "idle" && runState !== "finished"}
+            />
 
             <div className="flex items-end gap-8">
                 <div>

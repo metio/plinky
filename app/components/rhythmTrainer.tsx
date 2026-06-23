@@ -14,6 +14,7 @@ import { type Hit, makeHit, type RhythmSummary, summarize } from "../lib/rhythm"
 import { isBetterRhythm, loadBestRhythm, type RhythmBest, saveBestRhythm } from "../lib/scores";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
+import { HandSelector, useHandSelection } from "./handSelector";
 import { KeyboardHint } from "./keyboardHint";
 
 type RunState = "idle" | "counting" | "armed" | "running" | "finished";
@@ -33,7 +34,8 @@ function describeHit(hit: Hit): string {
 }
 
 export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
-    const [hands, setHands] = useState<Hand[]>([]);
+    const [allHands, setAllHands] = useState<Hand[]>([]);
+    const { hands, choice, setChoice } = useHandSelection(allHands);
     const [runState, setRunState] = useState<RunState>("idle");
     const [lastHit, setLastHit] = useState<Hit | null>(null);
     const [summary, setSummary] = useState<RhythmSummary | null>(null);
@@ -54,7 +56,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     }, [exercise.id]);
 
     const handleRender = useCallback(
-        (tune: TuneObject) => setHands(buildHands(tune, exercise.tempo)),
+        (tune: TuneObject) => setAllHands(buildHands(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
@@ -178,6 +180,13 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
             )}
+
+            <HandSelector
+                hands={allHands}
+                value={choice}
+                onChange={setChoice}
+                disabled={runState !== "idle" && runState !== "finished"}
+            />
 
             <div className="flex items-center gap-4">
                 {runState === "idle" || runState === "finished" ? (
