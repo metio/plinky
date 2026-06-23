@@ -14,6 +14,7 @@ export default [
     route("daily", "routes/daily.tsx"),
     route("ear", "routes/ear.tsx"),
     route("curriculums", "routes/curriculums.tsx"),
+    route("tracks", "routes/tracks.tsx"),
     route("progress", "routes/progress.tsx"),
     route("import", "routes/import.tsx"),
     route("settings", "routes/settings.tsx"),
