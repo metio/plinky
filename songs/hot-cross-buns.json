@@ -1,0 +1,10 @@
+{
+  "id": "hot-cross-buns",
+  "title": "Hot Cross Buns",
+  "description": "A traditional English rhyme — three notes.",
+  "abc": "X:1\nT:Hot Cross Buns\nM:4/4\nL:1/4\nK:C\nE D C2 | E D C2 | C/2 C/2 C/2 C/2 D/2 D/2 D/2 D/2 | E D C2 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": ["public-domain"]
+}

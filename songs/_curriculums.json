@@ -8,5 +8,10 @@
     "id": "finger-exercises",
     "name": "Finger exercises",
     "publisher": "Plinky"
+  },
+  {
+    "id": "public-domain",
+    "name": "Public-domain classics",
+    "publisher": "Plinky"
   }
 ]
