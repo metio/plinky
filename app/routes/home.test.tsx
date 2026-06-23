@@ -28,7 +28,9 @@ describe("Home", () => {
 
     it("links each exercise to all three practice modes", () => {
         renderHome();
-        const hrefs = [...document.querySelectorAll("a")].map((anchor) => anchor.getAttribute("href"));
+        const hrefs = [...document.querySelectorAll("a")].map((anchor) =>
+            anchor.getAttribute("href"),
+        );
         const first = exercises[0].id;
         expect(hrefs).toContain(`/practice/${first}`);
         expect(hrefs).toContain(`/time-trial/${first}`);

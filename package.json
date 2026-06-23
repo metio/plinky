@@ -9,7 +9,7 @@
     "test": "vitest run",
     "lint": "biome check",
     "format": "biome check --write .",
-    "knip": "knip",
+    "knip": "react-router typegen && knip",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
