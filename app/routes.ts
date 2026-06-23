@@ -10,6 +10,7 @@ export default [
     route("rhythm/:exerciseId", "routes/rhythm.tsx"),
     route("tempo/:exerciseId", "routes/tempo.tsx"),
     route("sprint", "routes/sprint.tsx"),
+    route("daily", "routes/daily.tsx"),
     route("import", "routes/import.tsx"),
     route("settings", "routes/settings.tsx"),
 ] satisfies RouteConfig;

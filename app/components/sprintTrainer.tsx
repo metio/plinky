@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
+import { dailyPhrase } from "../lib/daily";
 import { generatePhrase } from "../lib/generator";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
@@ -31,7 +32,7 @@ function formatClock(ms: number): string {
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function SprintTrainer() {
+export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
     const [durationMin, setDurationMin] = useState(2);
     const [twoHands, setTwoHands] = useState(false);
     const [abc, setAbc] = useState<string | null>(null);
@@ -47,7 +48,9 @@ export function SprintTrainer() {
     const wrongRef = useRef(0);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    const config = `${durationMin}m-${twoHands ? "2h" : "1h"}`;
+    // The daily challenge is a fixed one-minute, one-hand run keyed by its date.
+    const effectiveDuration = daily ? 1 : durationMin;
+    const config = daily ? `daily:${daily.dateKey}` : `${durationMin}m-${twoHands ? "2h" : "1h"}`;
     useEffect(() => {
         setBest(loadBestSprint(config));
     }, [config]);
@@ -94,7 +97,7 @@ export function SprintTrainer() {
             if (info.ordinal === 0) {
                 startRef.current = info.timestamp;
                 setRunState("running");
-                const durationMs = durationMin * 60000;
+                const durationMs = effectiveDuration * 60000;
                 stopTimer();
                 timerRef.current = setInterval(() => {
                     const remaining = durationMs - (performance.now() - startRef.current);
@@ -106,7 +109,7 @@ export function SprintTrainer() {
                 }, 100);
             }
         },
-        [synth, durationMin, stopTimer, finish],
+        [synth, effectiveDuration, stopTimer, finish],
     );
 
     const handleWrong = useCallback(() => {
@@ -136,11 +139,15 @@ export function SprintTrainer() {
         startRef.current = 0;
         setResult(null);
         setIsRecord(false);
-        setRemainingMs(durationMin * 60000);
-        const bars = Math.min(durationMin * BARS_PER_MINUTE, MAX_BARS);
-        setAbc(generatePhrase({ bars, beatsPerBar: BEATS_PER_BAR, twoHands }));
+        setRemainingMs(effectiveDuration * 60000);
+        if (daily) {
+            setAbc(dailyPhrase(daily.dateKey));
+        } else {
+            const bars = Math.min(durationMin * BARS_PER_MINUTE, MAX_BARS);
+            setAbc(generatePhrase({ bars, beatsPerBar: BEATS_PER_BAR, twoHands }));
+        }
         setRunState("armed");
-    }, [durationMin, twoHands]);
+    }, [daily, effectiveDuration, durationMin, twoHands]);
 
     useEffect(() => stopTimer, [stopTimer]);
 
@@ -153,10 +160,13 @@ export function SprintTrainer() {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Sight-reading sprint</h1>
+                <h1 className="text-2xl font-semibold">
+                    {daily ? "Daily challenge" : "Sight-reading sprint"}
+                </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Fresh notes every run. Play as many correctly as you can before the timer runs
-                    out — the clock starts on your first note.
+                    {daily
+                        ? "Everyone plays the same one-minute phrase today. Come back tomorrow for a new one."
+                        : "Fresh notes every run. Play as many correctly as you can before the timer runs out — the clock starts on your first note."}
                 </p>
             </header>
 
@@ -180,39 +190,41 @@ export function SprintTrainer() {
 
             {runState === "idle" && (
                 <div className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Length
-                        </span>
-                        {DURATIONS.map((minutes) => (
-                            <button
-                                key={minutes}
-                                type="button"
-                                onClick={() => setDurationMin(minutes)}
-                                className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-                                    durationMin === minutes
-                                        ? "bg-indigo-600 text-white"
-                                        : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
-                                }`}
-                            >
-                                {minutes} min
-                            </button>
-                        ))}
-                        <label className="ml-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                            <input
-                                type="checkbox"
-                                checked={twoHands}
-                                onChange={(event) => setTwoHands(event.target.checked)}
-                            />
-                            Two hands
-                        </label>
-                    </div>
+                    {!daily && (
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Length
+                            </span>
+                            {DURATIONS.map((minutes) => (
+                                <button
+                                    key={minutes}
+                                    type="button"
+                                    onClick={() => setDurationMin(minutes)}
+                                    className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+                                        durationMin === minutes
+                                            ? "bg-indigo-600 text-white"
+                                            : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+                                    }`}
+                                >
+                                    {minutes} min
+                                </button>
+                            ))}
+                            <label className="ml-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                <input
+                                    type="checkbox"
+                                    checked={twoHands}
+                                    onChange={(event) => setTwoHands(event.target.checked)}
+                                />
+                                Two hands
+                            </label>
+                        </div>
+                    )}
                     <button
                         type="button"
                         onClick={start}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
                     >
-                        Start sprint
+                        {daily ? "Start today's challenge" : "Start sprint"}
                     </button>
                 </div>
             )}
@@ -224,7 +236,9 @@ export function SprintTrainer() {
                             Time left
                         </div>
                         <div className="font-mono text-4xl tabular-nums">
-                            {formatClock(runState === "armed" ? durationMin * 60000 : remainingMs)}
+                            {formatClock(
+                                runState === "armed" ? effectiveDuration * 60000 : remainingMs,
+                            )}
                         </div>
                     </div>
                     <div>
@@ -265,7 +279,9 @@ export function SprintTrainer() {
 
             {best && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Best for {durationMin} min {twoHands ? "(two hands)" : "(one hand)"}:{" "}
+                    {daily
+                        ? "Today's best: "
+                        : `Best for ${durationMin} min ${twoHands ? "(two hands)" : "(one hand)"}: `}
                     <span className="font-mono">{best.correct}</span> correct
                 </p>
             )}
