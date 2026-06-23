@@ -19,7 +19,10 @@ export default defineConfig({
     },
     test: {
         coverage: {
-            provider: "v8",
+            // istanbul instruments at transform time, so coverage is collected
+            // uniformly in both the node and browser projects and merges into one
+            // report — v8 does not instrument browser-run code here.
+            provider: "istanbul",
             include: ["app/**/*.{ts,tsx}"],
             reporter: ["text", "html", "lcov"],
         },
