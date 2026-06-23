@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "進捗",
+  "nav_settings": "設定",
+  "home_heading": "ブラウザでピアノを練習",
+  "home_intro": "MIDIピアノを接続するか、パソコンのキーボードで演奏しましょう。下から練習を選ぶか、曲を練習できます。"
+}

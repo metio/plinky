@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "진행 상황",
+  "nav_settings": "설정",
+  "home_heading": "브라우저에서 피아노 연습",
+  "home_intro": "MIDI 피아노를 연결하거나 컴퓨터 키보드로 연주하세요. 아래에서 연습을 고르거나 곡을 연습해 보세요."
+}

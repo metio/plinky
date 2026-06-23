@@ -6,3 +6,8 @@
 [default.extend-words]
 tuplet = "tuplet"
 tuplets = "tuplets"
+
+# The translation catalogs are intentionally in many languages; typos only knows
+# English and would flag legitimate foreign words. The English base stays checked.
+[files]
+extend-exclude = ["messages/*", "!messages/en.json"]

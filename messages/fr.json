@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Progression",
+  "nav_settings": "Paramètres",
+  "home_heading": "Entraînez-vous au piano dans votre navigateur",
+  "home_intro": "Connectez un piano MIDI ou jouez avec le clavier de votre ordinateur. Choisissez un exercice ci-dessous ou travaillez un morceau."
+}

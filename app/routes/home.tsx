@@ -9,6 +9,7 @@ import { seedStarterSongs } from "../lib/seed";
 import { encodeSong } from "../lib/share";
 import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
 import { loadUserSongs, removeUserSong, toAbcDocument } from "../lib/songs";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/home";
 
 export function meta(_args: Route.MetaArgs) {
@@ -88,11 +89,8 @@ export default function Home() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Practice piano in your browser</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Connect a MIDI piano or play with your computer keyboard. Pick a drill below, or
-                    practice a song.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.home_heading()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.home_intro()}</p>
             </header>
 
             <section className="space-y-3">

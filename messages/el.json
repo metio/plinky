@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Πρόοδος",
+  "nav_settings": "Ρυθμίσεις",
+  "home_heading": "Εξασκηθείτε στο πιάνο μέσα στον browser",
+  "home_intro": "Συνδέστε ένα πιάνο MIDI ή παίξτε με το πληκτρολόγιο του υπολογιστή σας. Διαλέξτε μια άσκηση παρακάτω ή εξασκηθείτε σε ένα κομμάτι."
+}

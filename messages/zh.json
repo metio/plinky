@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "进度",
+  "nav_settings": "设置",
+  "home_heading": "在浏览器中练习钢琴",
+  "home_intro": "连接 MIDI 钢琴，或使用电脑键盘演奏。在下方选择一个练习，或练习一首乐曲。"
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Postępy",
+  "nav_settings": "Ustawienia",
+  "home_heading": "Ćwicz grę na pianinie w przeglądarce",
+  "home_intro": "Podłącz pianino MIDI lub graj na klawiaturze komputera. Wybierz ćwiczenie poniżej lub ćwicz utwór."
+}

@@ -18,6 +18,8 @@ import { MidiProvider } from "./contexts/midi";
 import { seedStarterSongs } from "./lib/seed";
 import { applyTheme, loadTheme } from "./lib/theme";
 import { SITE_URL } from "./lib/site";
+import { m } from "./paraglide/messages.js";
+import { getLocale } from "./paraglide/runtime.js";
 import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
@@ -53,13 +55,13 @@ function Header() {
                         to="/progress"
                         className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                     >
-                        Progress
+                        {m.nav_progress()}
                     </Link>
                     <Link
                         to="/settings"
                         className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                     >
-                        Settings
+                        {m.nav_settings()}
                     </Link>
                 </div>
             </div>
@@ -71,6 +73,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     // Apply the saved theme (following the OS when "system") here in the layout,
     // so even the error page is themed — App's render is skipped on an error.
     useEffect(() => {
+        document.documentElement.lang = getLocale();
         const theme = loadTheme();
         applyTheme(theme);
         if (theme === "system" && typeof matchMedia === "function") {
