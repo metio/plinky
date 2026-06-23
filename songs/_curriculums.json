@@ -3,5 +3,10 @@
     "id": "plinky-basics",
     "name": "Plinky basics",
     "publisher": "Plinky"
+  },
+  {
+    "id": "public-domain",
+    "name": "Public-domain classics",
+    "publisher": "Plinky"
   }
 ]

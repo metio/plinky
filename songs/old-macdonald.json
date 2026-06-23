@@ -1,0 +1,10 @@
+{
+  "id": "old-macdonald",
+  "title": "Old MacDonald Had a Farm",
+  "description": "A children's farmyard song.",
+  "abc": "X:1\nT:Old MacDonald Had a Farm\nM:4/4\nL:1/4\nK:C\nG G G D | E E D2 | B B A A | G4 | G G G D | E E D2 | B B A A | G4 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "0BSD",
+  "curriculums": ["public-domain"]
+}

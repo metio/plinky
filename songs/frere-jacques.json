@@ -1,0 +1,10 @@
+{
+  "id": "frere-jacques",
+  "title": "Frère Jacques",
+  "description": "A French folk round.",
+  "abc": "X:1\nT:Frère Jacques\nM:4/4\nL:1/4\nK:C\nC D E C | C D E C | E F G2 | E F G2 | G/2 A/2 G/2 F/2 E C | G/2 A/2 G/2 F/2 E C | C G, C2 | C G, C2 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "0BSD",
+  "curriculums": ["public-domain"]
+}

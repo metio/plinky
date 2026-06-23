@@ -1,0 +1,10 @@
+{
+  "id": "minuet-in-g",
+  "title": "Minuet in G",
+  "description": "Petzold's minuet (long attributed to J.S. Bach) — opening, both hands.",
+  "abc": "X:1\nT:Minuet in G\nM:3/4\nL:1/4\nV:1 clef=treble\nV:2 clef=bass\nV:1\nK:G\nd B G | A B c | d G G | A B c |\nV:2\nG,3 | C3 | B,3 | C3 |",
+  "tempo": 110,
+  "beatsPerBar": 3,
+  "license": "0BSD",
+  "curriculums": ["public-domain"]
+}

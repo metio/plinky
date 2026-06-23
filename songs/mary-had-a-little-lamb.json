@@ -1,0 +1,10 @@
+{
+  "id": "mary-had-a-little-lamb",
+  "title": "Mary Had a Little Lamb",
+  "description": "A children's nursery rhyme.",
+  "abc": "X:1\nT:Mary Had a Little Lamb\nM:4/4\nL:1/4\nK:C\nE D C D | E E E2 | D D D2 | E G G2 | E D C D | E E E E | D D E D | C4 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "0BSD",
+  "curriculums": ["public-domain"]
+}

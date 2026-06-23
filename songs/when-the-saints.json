@@ -1,0 +1,10 @@
+{
+  "id": "when-the-saints",
+  "title": "When the Saints Go Marching In",
+  "description": "A traditional gospel/jazz standard.",
+  "abc": "X:1\nT:When the Saints Go Marching In\nM:4/4\nL:1/4\nK:C\nz C E F | G4 | z C E F | G4 | z C E F | G2 E2 | C2 E2 | D4 |",
+  "tempo": 110,
+  "beatsPerBar": 4,
+  "license": "0BSD",
+  "curriculums": ["public-domain"]
+}
