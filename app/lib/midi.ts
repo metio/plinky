@@ -65,31 +65,55 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     return { kind: isNoteOn ? "noteon" : "noteoff", note, velocity, channel };
 }
 
-// GarageBand-style "musical typing" layout: the home row plays the white keys
-// of one octave, the row above plays the black keys. Values are semitone
-// offsets from C in the active octave.
-export const KEY_SEMITONES: Record<string, number> = {
-    a: 0,
-    w: 1,
-    s: 2,
-    e: 3,
-    d: 4,
-    f: 5,
-    t: 6,
-    g: 7,
-    y: 8,
-    h: 9,
-    u: 10,
-    j: 11,
-    k: 12,
-    o: 13,
-    l: 14,
-    p: 15,
-    ";": 16,
+// Two-octave "musical typing" layout so both hands can play at once on disjoint
+// keys. The lower octave (left hand) sits on the bottom and home rows, the upper
+// octave (right hand) on the top and number rows; values are semitone offsets
+// from each octave's base C.
+const LEFT_HAND_KEYS: Record<string, number> = {
+    z: 0,
+    s: 1,
+    x: 2,
+    d: 3,
+    c: 4,
+    v: 5,
+    g: 6,
+    b: 7,
+    h: 8,
+    n: 9,
+    j: 10,
+    m: 11,
+};
+const RIGHT_HAND_KEYS: Record<string, number> = {
+    q: 0,
+    "2": 1,
+    w: 2,
+    "3": 3,
+    e: 4,
+    r: 5,
+    "5": 6,
+    t: 7,
+    "6": 8,
+    y: 9,
+    "7": 10,
+    u: 11,
 };
 
 export const KEYBOARD_DEVICE = "Computer keyboard";
-export const KEYBOARD_BASE_NOTE = 60; // C4 at octave offset 0
 export const KEYBOARD_VELOCITY = 80;
 export const MIN_OCTAVE_OFFSET = -3;
 export const MAX_OCTAVE_OFFSET = 3;
+
+const LEFT_HAND_BASE_NOTE = 48; // C3 at octave offset 0
+const RIGHT_HAND_BASE_NOTE = 60; // C4 — one octave above the left hand
+
+// Map a pressed key to its MIDI note for the active octave offset, or null when
+// the key is not part of the layout.
+export function keyToNote(key: string, octaveOffset: number): number | null {
+    if (key in LEFT_HAND_KEYS) {
+        return LEFT_HAND_BASE_NOTE + octaveOffset * 12 + LEFT_HAND_KEYS[key];
+    }
+    if (key in RIGHT_HAND_KEYS) {
+        return RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + RIGHT_HAND_KEYS[key];
+    }
+    return null;
+}

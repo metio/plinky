@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { noteName, parseMidiMessage } from "./midi";
+import { keyToNote, noteName, parseMidiMessage } from "./midi";
 
 describe("noteName", () => {
     it("names middle C and its neighbours", () => {
@@ -10,6 +10,30 @@ describe("noteName", () => {
         expect(noteName(69)).toBe("A4");
         expect(noteName(61)).toBe("C#4");
         expect(noteName(72)).toBe("C5");
+    });
+});
+
+describe("keyToNote", () => {
+    it("maps the right-hand octave up from C4", () => {
+        expect(keyToNote("q", 0)).toBe(60); // C4
+        expect(keyToNote("2", 0)).toBe(61); // C#4
+        expect(keyToNote("u", 0)).toBe(71); // B4
+    });
+
+    it("maps the left-hand octave up from C3, one octave below the right", () => {
+        expect(keyToNote("z", 0)).toBe(48); // C3
+        expect(keyToNote("s", 0)).toBe(49); // C#3
+        expect(keyToNote("m", 0)).toBe(59); // B3
+    });
+
+    it("shifts both hands by the octave offset", () => {
+        expect(keyToNote("q", 1)).toBe(72);
+        expect(keyToNote("z", -1)).toBe(36);
+    });
+
+    it("returns null for keys outside the layout", () => {
+        expect(keyToNote("f", 0)).toBeNull();
+        expect(keyToNote("1", 0)).toBeNull();
     });
 });
 
