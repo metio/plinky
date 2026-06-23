@@ -68,7 +68,7 @@ export default function Home() {
                 </p>
             </header>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
                 <Link
                     to="/sprint"
                     className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950 dark:hover:bg-indigo-900"
@@ -89,6 +89,17 @@ export default function Home() {
                     </span>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         One minute, the same notes for everyone today. Beat your best.
+                    </p>
+                </Link>
+                <Link
+                    to="/ear"
+                    className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950 dark:hover:bg-indigo-900"
+                >
+                    <span className="font-medium text-indigo-700 dark:text-indigo-300">
+                        Ear training →
+                    </span>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Hear a note and find it by ear. No reading required.
                     </p>
                 </Link>
             </div>
