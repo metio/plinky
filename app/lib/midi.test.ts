@@ -14,26 +14,30 @@ describe("noteName", () => {
 });
 
 describe("keyToNote", () => {
-    it("maps the right-hand octave up from C4", () => {
-        expect(keyToNote("q", 0)).toBe(60); // C4
-        expect(keyToNote("2", 0)).toBe(61); // C#4
-        expect(keyToNote("u", 0)).toBe(71); // B4
+    it("maps the left hand to C–G on the home row from C4", () => {
+        expect(keyToNote("a", 0)).toBe(60); // C4
+        expect(keyToNote("s", 0)).toBe(62); // D4
+        expect(keyToNote("g", 0)).toBe(67); // G4
+        expect(keyToNote("w", 0)).toBe(61); // C#4
+        expect(keyToNote("t", 0)).toBe(66); // F#4
     });
 
-    it("maps the left-hand octave up from C3, one octave below the right", () => {
-        expect(keyToNote("z", 0)).toBe(48); // C3
-        expect(keyToNote("s", 0)).toBe(49); // C#3
-        expect(keyToNote("m", 0)).toBe(59); // B3
+    it("maps the right hand to C–G an octave up from C5", () => {
+        expect(keyToNote("h", 0)).toBe(72); // C5
+        expect(keyToNote(";", 0)).toBe(79); // G5
+        expect(keyToNote("u", 0)).toBe(73); // C#5
+        expect(keyToNote("p", 0)).toBe(78); // F#5
     });
 
     it("shifts both hands by the octave offset", () => {
-        expect(keyToNote("q", 1)).toBe(72);
-        expect(keyToNote("z", -1)).toBe(36);
+        expect(keyToNote("a", 1)).toBe(72);
+        expect(keyToNote("h", -1)).toBe(60);
     });
 
-    it("returns null for keys outside the layout", () => {
-        expect(keyToNote("f", 0)).toBeNull();
-        expect(keyToNote("1", 0)).toBeNull();
+    it("returns null for keys outside the five-finger layout", () => {
+        for (const key of ["q", "r", "y", "o", "z", "1"]) {
+            expect(keyToNote(key, 0)).toBeNull();
+        }
     });
 });
 
