@@ -3,6 +3,7 @@
 
 import { useCallback } from "react";
 import { getAudioContext, midiToFrequency } from "../lib/audio";
+import { loadPrefs } from "../lib/prefs";
 
 export type PlayNoteOptions = {
     velocity?: number; // 0..127
@@ -27,15 +28,16 @@ const PARTIALS: { ratio: number; gain: number; type: OscillatorType }[] = [
 
 export function useSynth(): UseSynthResult {
     const playNote = useCallback((note: number, options: PlayNoteOptions = {}) => {
+        const prefs = loadPrefs();
         const ctx = getAudioContext();
-        if (!ctx) {
+        if (!ctx || !prefs.sound) {
             return;
         }
         void ctx.resume();
 
         const now = ctx.currentTime;
         const duration = options.duration ?? 1.1;
-        const peak = ((options.velocity ?? 90) / 127) * 0.32;
+        const peak = ((options.velocity ?? 90) / 127) * 0.32 * (prefs.volume / 100);
         const frequency = midiToFrequency(note);
 
         const filter = ctx.createBiquadFilter();
