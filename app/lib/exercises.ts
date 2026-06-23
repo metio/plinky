@@ -8,6 +8,7 @@ export type Exercise = {
     abc: string;
     tempo: number; // beats per minute for the metronome and count-in
     beatsPerBar: number; // matches the ABC meter, so the count-in fills one bar
+    curriculums?: string[]; // ids of the curriculums this song belongs to, if any
 };
 
 // ABC bodies are monophonic and rest-free, with whole-bar grouping, so each

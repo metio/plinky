@@ -4,6 +4,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
     buildExercise,
+    exportAllPack,
+    importSongsPack,
+    loadCurriculums,
     loadUserSongs,
     parseBeatsPerBar,
     parseTempo,
@@ -114,5 +117,53 @@ describe("persistence", () => {
         saveUserSong(buildExercise(ABC, []));
         expect(resolveExercise("my-tune")?.title).toBe("My Tune");
         expect(resolveExercise("nope")).toBeUndefined();
+    });
+});
+
+describe("song packs", () => {
+    beforeEach(installLocalStorage);
+    afterEach(() => localStorage.clear());
+
+    const PACK = JSON.stringify({
+        format: "plinky-songs",
+        version: 1,
+        curriculums: [{ id: "grade-1", name: "Grade 1" }],
+        songs: [
+            {
+                id: "tune-a",
+                title: "Tune A",
+                abc: "X:1\nM:3/4\nL:1/4\nK:C\nC D E |",
+                curriculums: ["grade-1"],
+            },
+            { id: "tune-b", title: "Tune B", abc: "X:1\nK:C\nG", tempo: 120, beatsPerBar: 2 },
+        ],
+    });
+
+    it("imports songs and curriculums, filling missing tempo/meter from the ABC", () => {
+        expect(importSongsPack(PACK)).toEqual({ imported: 2, curriculums: 1 });
+        const songs = loadUserSongs();
+        expect(songs.map((song) => song.id).sort()).toEqual(["tune-a", "tune-b"]);
+        const a = songs.find((song) => song.id === "tune-a");
+        expect(a?.beatsPerBar).toBe(3); // derived from M:3/4
+        expect(a?.curriculums).toEqual(["grade-1"]);
+        expect(songs.find((song) => song.id === "tune-b")?.tempo).toBe(120); // from the pack
+        expect(loadCurriculums()).toEqual([{ id: "grade-1", name: "Grade 1" }]);
+    });
+
+    it("overwrites a song with the same id on re-import", () => {
+        importSongsPack(PACK);
+        importSongsPack(
+            JSON.stringify({
+                format: "plinky-songs",
+                songs: [{ id: "tune-a", title: "Renamed", abc: "X:1\nK:C\nC" }],
+            }),
+        );
+        expect(loadUserSongs()).toHaveLength(2);
+        expect(loadUserSongs().find((song) => song.id === "tune-a")?.title).toBe("Renamed");
+    });
+
+    it("exports the whole library as a pack that imports back", () => {
+        importSongsPack(PACK);
+        expect(importSongsPack(exportAllPack())).toEqual({ imported: 2, curriculums: 1 });
     });
 });

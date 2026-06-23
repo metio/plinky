@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { MidiDebugPanel } from "../components/midiDebugPanel";
+import { SongBackup } from "../components/songBackup";
 import { ThemeToggle } from "../components/themeToggle";
 import { useSynth } from "../hooks/useSynth";
 import { loadPrefs, type Prefs, savePrefs } from "../lib/prefs";
@@ -77,6 +78,8 @@ export default function Settings() {
                     </button>
                 </div>
             </section>
+
+            <SongBackup />
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
