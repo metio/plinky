@@ -11,12 +11,15 @@ import {
     ScrollRestoration,
 } from "react-router";
 
+import { useEffect } from "react";
 import type { Route } from "./+types/root";
 import { MidiProvider } from "./contexts/midi";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
+    { rel: "manifest", href: "/manifest.webmanifest" },
+    { rel: "apple-touch-icon", href: "/logo.svg" },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
         rel: "preconnect",
@@ -35,6 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta name="theme-color" content="#4f46e5" />
                 <Meta />
                 <Links />
             </head>
@@ -48,6 +52,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+    // Register the offline service worker in production builds only; in dev it
+    // would cache the dev server's assets and serve them stale.
+    useEffect(() => {
+        if (import.meta.env.PROD && "serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").catch(() => {});
+        }
+    }, []);
+
     return (
         <MidiProvider>
             <nav className="border-b border-gray-200 px-6 py-3 font-sans">

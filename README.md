@@ -60,10 +60,14 @@ the song when opened — no account or sign-up, just send the link.
   *Connect MIDI*. Web MIDI is available in Chrome, Edge, and Firefox on desktop
   and Android; Safari and iOS do not expose it, so use the keyboard fallback
   there.
-- **With your computer keyboard** — the home row maps to a playable octave, so
-  you can try every mode without hardware. An octave shift lets you reach notes
-  outside it. (Two-hand pieces span both staves, so a MIDI keyboard is the
+- **With your computer keyboard** — `A S D F G` plays the left hand and
+  `H J K L ;` the right, each a five-finger C–G position, with an octave shift to
+  move around. (Two-hand pieces span both staves, so a MIDI keyboard is the
   comfortable way to play those.)
+- **With the on-screen piano** — tap the keys shown under each exercise; the next
+  note to play is highlighted. Handy on a phone or tablet with no MIDI or keyboard.
+
+Plinky installs from your browser like an app and works offline once loaded.
 
 ## How it works
 
