@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+name: Submit a song
+description: Share an ABC song to be added to the Plinky catalog
+title: "[Song] "
+labels: ["song-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thanks for sharing a song! Paste its ABC notation below. An automated
+        check looks over the basics, then a maintainer reviews it before it joins
+        the catalog. Please only submit music you have the right to share.
+  - type: input
+    id: song-title
+    attributes:
+      label: Song title
+      placeholder: e.g. Ode to Joy
+    validations:
+      required: true
+  - type: textarea
+    id: abc
+    attributes:
+      label: ABC notation
+      description: "The full ABC, including the X:, T:, M:, L:, and K: headers."
+      render: text
+      placeholder: |
+        X:1
+        T:My song
+        M:4/4
+        L:1/4
+        K:C
+        C D E F | G A B c |
+    validations:
+      required: true
+  - type: input
+    id: tempo
+    attributes:
+      label: Tempo (BPM)
+      placeholder: e.g. 90
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: A short note about the song.
+  - type: input
+    id: curriculum
+    attributes:
+      label: Curriculum (optional)
+      description: If this song belongs to a curriculum, name it here.
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Rights
+      options:
+        - label: I have the right to share this song and to license it under 0BSD.
+          required: true

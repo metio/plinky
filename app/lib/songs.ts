@@ -76,6 +76,24 @@ export function toAbcDocument(exercise: Exercise): string {
     return exercise.abc.replace(/^(K:.*)$/m, `Q:1/4=${exercise.tempo}\n$1`);
 }
 
+const SUBMIT_ISSUE_URL = "https://github.com/metio/plinky/issues/new";
+
+// A link that opens the prefilled "submit a song" issue form, so anyone can
+// contribute a song to the catalog using only their own GitHub account — no
+// backend and no shared credentials. The query keys are the form field ids.
+export function submissionUrl(exercise?: Exercise): string {
+    const params = new URLSearchParams({ template: "song-submission.yml" });
+    if (exercise) {
+        params.set("song-title", exercise.title);
+        params.set("abc", toAbcDocument(exercise));
+        params.set("tempo", String(exercise.tempo));
+        if (exercise.description) {
+            params.set("description", exercise.description);
+        }
+    }
+    return `${SUBMIT_ISSUE_URL}?${params.toString()}`;
+}
+
 export function loadUserSongs(): Exercise[] {
     if (typeof localStorage === "undefined") {
         return [];

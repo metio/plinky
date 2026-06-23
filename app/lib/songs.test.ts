@@ -15,6 +15,7 @@ import {
     resolveExercise,
     saveUserSong,
     slugify,
+    submissionUrl,
     toAbcDocument,
 } from "./songs";
 
@@ -173,5 +174,20 @@ describe("song packs", () => {
         };
         expect(() => importSongsPack(PACK)).toThrow(/exceed this device's storage/);
         localStorage.setItem = original;
+    });
+});
+
+describe("submissionUrl", () => {
+    it("builds a prefilled issue-form link from a song", () => {
+        const url = submissionUrl(buildExercise(ABC, []));
+        expect(url).toContain("template=song-submission.yml");
+        expect(url).toContain("song-title=My+Tune");
+        expect(decodeURIComponent(url)).toContain("X:1");
+    });
+
+    it("links to the blank form when given no song", () => {
+        expect(submissionUrl()).toBe(
+            "https://github.com/metio/plinky/issues/new?template=song-submission.yml",
+        );
     });
 });
