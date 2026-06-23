@@ -49,7 +49,9 @@ and a two-hand warm-up.
 
 Import any tune as [ABC notation](https://abcnotation.com) — paste it or upload an
 `.abc` file — and it joins the library, playable in every mode and saved on your
-device. Export any exercise back to `.abc` to share it or practice it elsewhere.
+device. You can also upload **MusicXML** (`.musicxml`/`.xml`) exported from
+MuseScore, Sibelius, Finale, or Dorico; it's converted to ABC on the way in.
+Export any exercise back to `.abc` to share it or practice it elsewhere.
 
 ## Playing
 
