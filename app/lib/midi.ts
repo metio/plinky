@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 // The Web MIDI API types ship in TypeScript's DOM lib. At runtime, though, only
 // Chromium browsers and Firefox expose `requestMIDIAccess`; Safari (macOS and
 // iOS) does not, which is why `support` can settle on "unsupported" even though

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {defineConfig} from "vitest/config";
 
 // Deliberately separate from vite.config.ts: the React Router plugin there is

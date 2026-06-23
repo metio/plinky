@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {describe, expect, it} from "vitest";
 import {noteName, parseMidiMessage} from "./midi";
 

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 function formatOffset(offset: number): string {
     return offset > 0 ? `+${offset}` : `${offset}`;
 }

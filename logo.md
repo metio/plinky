@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: The Plinky Authors
+SPDX-License-Identifier: 0BSD
+-->
+
 Logo ideas for Plinky.play: Since the name has a playful, musical feel, I’m thinking of something simple, colorful, and dynamic to reflect the fun, beginner-friendly nature of the app. Here are a few ideas that could work well for Plinky.play:
 
 1. Key & Play Button

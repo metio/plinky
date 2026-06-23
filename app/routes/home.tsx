@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import { Link } from "react-router";
 import type { Route } from "./+types/home";
 import { exercises } from "../lib/exercises";

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 export function BeatIndicator({beat, beatsPerBar}: {beat: number; beatsPerBar: number}) {
     return (
         <div className="flex items-center gap-1.5">

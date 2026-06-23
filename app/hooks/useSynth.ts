@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
 import {useCallback} from "react";
 import {getAudioContext, midiToFrequency} from "../lib/audio";
 
