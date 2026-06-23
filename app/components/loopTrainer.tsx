@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
-import { buildRegion, regionSpanMs, totalBars } from "../lib/bars";
+import { barIndex, buildRegion, regionSpanMs, totalBars } from "../lib/bars";
 import type { Exercise } from "../lib/exercises";
 import { buildHands, type Hand } from "../lib/hands";
 import { recordPractice } from "../lib/history";
@@ -69,6 +69,9 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
     const lastTsRef = useRef(0);
     const correctRef = useRef(0);
     const wrongRef = useRef(0);
+    // The first bar of a two-tap range selection on the score, or null when the
+    // next tap starts a fresh selection.
+    const anchorRef = useRef<number | null>(null);
 
     const synth = useSynth();
 
@@ -137,6 +140,45 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
         matcher.reset();
     }, [running, matcher.done, matcher.reset, span, exercise.tempo]);
 
+    // Let the player tap notes on the score to set the loop range: the first tap
+    // anchors one end, the next sets the other. Only while idle, so taps during a
+    // run can't move the goalposts.
+    useEffect(() => {
+        if (running) {
+            return;
+        }
+        const cleanups: (() => void)[] = [];
+        for (const hand of allHands) {
+            for (const step of hand.steps) {
+                const bar = barIndex(step.timeMs, exercise.beatsPerBar, exercise.tempo);
+                const onClick = () => {
+                    if (anchorRef.current === null) {
+                        anchorRef.current = bar;
+                        setFromBar(bar);
+                        setToBar(bar);
+                    } else {
+                        setFromBar(Math.min(anchorRef.current, bar));
+                        setToBar(Math.max(anchorRef.current, bar));
+                        anchorRef.current = null;
+                    }
+                };
+                for (const element of step.elements) {
+                    element.style.cursor = "pointer";
+                    element.addEventListener("click", onClick);
+                    cleanups.push(() => {
+                        element.removeEventListener("click", onClick);
+                        element.style.cursor = "";
+                    });
+                }
+            }
+        }
+        return () => {
+            for (const cleanup of cleanups) {
+                cleanup();
+            }
+        };
+    }, [allHands, running, exercise.beatsPerBar, exercise.tempo]);
+
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) =>
             matcher.registerNote(played.note, played.timestamp, played.velocity),
@@ -150,6 +192,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
         correctRef.current = 0;
         wrongRef.current = 0;
         onsetRef.current = 0;
+        anchorRef.current = null;
         setReps([]);
         matcher.reset();
         setRunning(true);
@@ -238,6 +281,13 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                     </button>
                 )}
             </div>
+
+            {!running && bars > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Looping bars {fromBar + 1}–{toBar + 1}. Tap a note on the score to start a
+                    range, then tap another to set its end.
+                </p>
+            )}
 
             {running && (
                 <p className="text-sm text-indigo-700 dark:text-indigo-300">
