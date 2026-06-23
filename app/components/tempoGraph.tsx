@@ -7,40 +7,52 @@ const WIDTH = 600;
 const HEIGHT = 180;
 const PAD = { left: 36, right: 12, top: 12, bottom: 20 };
 
+export type TempoSeries = { label: string; points: TempoPoint[]; color: string };
+
 // A hand-rolled SVG line of bpm over the course of the phrase, with the player's
-// median drawn as a reference and slow stretches shaded behind the curve.
+// median drawn as a reference and slow stretches shaded behind the curve. When
+// per-hand series are given, each hand's tempo is drawn as its own line.
 export function TempoGraph({
     points,
     median,
     hotspots,
+    series,
 }: {
     points: TempoPoint[];
     median: number;
     hotspots: Hotspot[];
+    series?: TempoSeries[];
 }) {
     if (points.length === 0) {
         return null;
     }
 
-    const indices = points.map((point) => point.index);
-    const bpms = points.map((point) => point.bpm);
-    const minX = Math.min(...indices);
-    const maxX = Math.max(...indices);
-    const yPad = Math.max(5, (Math.max(...bpms) - Math.min(...bpms)) * 0.15);
-    const yLo = Math.min(...bpms, median) - yPad;
-    const yHi = Math.max(...bpms, median) + yPad;
+    const lines: TempoSeries[] =
+        series && series.length > 1 ? series : [{ label: "", points, color: "#4f46e5" }];
 
-    const xFor = (index: number) =>
-        PAD.left + ((index - minX) / Math.max(1, maxX - minX)) * (WIDTH - PAD.left - PAD.right);
+    const allBpms = [median, ...lines.flatMap((line) => line.points.map((point) => point.bpm))];
+    const yPad = Math.max(5, (Math.max(...allBpms) - Math.min(...allBpms)) * 0.15);
+    const yLo = Math.min(...allBpms) - yPad;
+    const yHi = Math.max(...allBpms) + yPad;
     const yFor = (bpm: number) =>
         PAD.top + (1 - (bpm - yLo) / Math.max(1, yHi - yLo)) * (HEIGHT - PAD.top - PAD.bottom);
 
-    const curve = points
-        .map(
-            (point, i) =>
-                `${i === 0 ? "M" : "L"}${xFor(point.index).toFixed(1)},${yFor(point.bpm).toFixed(1)}`,
-        )
-        .join(" ");
+    // Each line is normalized across its own note range, so two hands of
+    // different lengths still span the full width.
+    const xForLine = (linePoints: TempoPoint[]) => {
+        const indices = linePoints.map((point) => point.index);
+        const lo = Math.min(...indices);
+        const hi = Math.max(...indices);
+        return (index: number) =>
+            PAD.left + ((index - lo) / Math.max(1, hi - lo)) * (WIDTH - PAD.left - PAD.right);
+    };
+
+    // Hotspot shading uses the combined timeline behind the curves.
+    const combinedIndices = points.map((point) => point.index);
+    const minX = Math.min(...combinedIndices);
+    const maxX = Math.max(...combinedIndices);
+    const xCombined = (index: number) =>
+        PAD.left + ((index - minX) / Math.max(1, maxX - minX)) * (WIDTH - PAD.left - PAD.right);
     const step = (WIDTH - PAD.left - PAD.right) / Math.max(1, maxX - minX);
 
     return (
@@ -53,9 +65,9 @@ export function TempoGraph({
             {hotspots.map((hotspot) => (
                 <rect
                     key={`${hotspot.startIndex}-${hotspot.endIndex}`}
-                    x={xFor(hotspot.startIndex) - step / 2}
+                    x={xCombined(hotspot.startIndex) - step / 2}
                     y={PAD.top}
-                    width={xFor(hotspot.endIndex) - xFor(hotspot.startIndex) + step}
+                    width={xCombined(hotspot.endIndex) - xCombined(hotspot.startIndex) + step}
                     height={HEIGHT - PAD.top - PAD.bottom}
                     fill="#fee2e2"
                 />
@@ -80,16 +92,45 @@ export function TempoGraph({
                 {Math.round(yLo)}
             </text>
 
-            <path d={curve} fill="none" stroke="#4f46e5" strokeWidth="2" />
-            {points.map((point) => (
-                <circle
-                    key={point.index}
-                    cx={xFor(point.index)}
-                    cy={yFor(point.bpm)}
-                    r="2.5"
-                    fill="#4f46e5"
-                />
-            ))}
+            {lines.map((line) => {
+                const xFor = xForLine(line.points);
+                const curve = line.points
+                    .map(
+                        (point, i) =>
+                            `${i === 0 ? "M" : "L"}${xFor(point.index).toFixed(1)},${yFor(point.bpm).toFixed(1)}`,
+                    )
+                    .join(" ");
+                return (
+                    <g key={line.label || "combined"}>
+                        <path d={curve} fill="none" stroke={line.color} strokeWidth="2" />
+                        {line.points.map((point) => (
+                            <circle
+                                key={point.index}
+                                cx={xFor(point.index)}
+                                cy={yFor(point.bpm)}
+                                r="2.5"
+                                fill={line.color}
+                            />
+                        ))}
+                    </g>
+                );
+            })}
+
+            {series && series.length > 1 && (
+                <g>
+                    {series.map((line, i) => (
+                        <text
+                            key={line.label}
+                            x={WIDTH - PAD.right - 80}
+                            y={PAD.top + 12 + i * 14}
+                            fill={line.color}
+                            fontSize="11"
+                        >
+                            ■ {line.label}
+                        </text>
+                    ))}
+                </g>
+            )}
         </svg>
     );
 }

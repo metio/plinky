@@ -32,7 +32,10 @@ type RunState = "idle" | "armed" | "running" | "finished";
 
 type Note = { hand: number; timeMs: number; timestamp: number; elements: HTMLElement[] };
 
-type HandStat = { label: string; median: number; hotspots: Hotspot[] };
+type HandStat = { label: string; median: number; hotspots: Hotspot[]; points: TempoPoint[] };
+
+// Line colours for the per-hand tempo curves, by hand index.
+const HAND_COLORS = ["#4f46e5", "#ea580c"];
 
 type Result = {
     points: TempoPoint[];
@@ -123,6 +126,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                           label: hand.label,
                           median: series.median,
                           hotspots: series.hotspots,
+                          points: series.points,
                       };
                   })
                 : [];
@@ -261,6 +265,11 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                         points={result.points}
                         median={result.median}
                         hotspots={result.hotspots}
+                        series={result.handStats.map((hand, index) => ({
+                            label: `${hand.label} hand`,
+                            points: hand.points,
+                            color: HAND_COLORS[index % HAND_COLORS.length],
+                        }))}
                     />
                 </div>
             )}
