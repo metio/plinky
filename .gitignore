@@ -12,3 +12,6 @@
 __screenshots__/
 
 *storybook.log
+
+# Storybook build output
+storybook-static

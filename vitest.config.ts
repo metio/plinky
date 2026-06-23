@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
@@ -39,6 +40,21 @@ export default defineConfig({
                 test: {
                     name: "browser",
                     include: ["app/**/*.browser.test.{ts,tsx}"],
+                    browser: {
+                        enabled: true,
+                        provider: playwright(),
+                        headless: true,
+                        instances: [{ browser: "chromium" }],
+                    },
+                },
+            },
+            // Every story runs as a browser test, so stories double as tests and
+            // count toward coverage.
+            {
+                plugins: [storybookTest({ configDir: ".storybook" })],
+                test: {
+                    name: "storybook",
+                    setupFiles: [".storybook/vitest.setup.ts"],
                     browser: {
                         enabled: true,
                         provider: playwright(),
