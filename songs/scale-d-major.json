@@ -1,0 +1,12 @@
+{
+  "id": "scale-d-major",
+  "title": "D major scale",
+  "description": "One octave, up and down — the foundation of finger technique.",
+  "abc": "X:1\nT:D major scale\nM:4/4\nL:1/4\nK:D\nD E F G | A B c d | d c B A | G F E D |",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

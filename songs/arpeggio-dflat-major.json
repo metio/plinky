@@ -1,0 +1,12 @@
+{
+  "id": "arpeggio-dflat-major",
+  "title": "D♭ major arpeggio",
+  "description": "The triad, up and down.",
+  "abc": "X:1\nT:D♭ major arpeggio\nM:4/4\nL:1/4\nK:Db\nD F A d | d A F D |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

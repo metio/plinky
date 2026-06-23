@@ -1,0 +1,12 @@
+{
+  "id": "arpeggio-f-major",
+  "title": "F major arpeggio",
+  "description": "The triad, up and down.",
+  "abc": "X:1\nT:F major arpeggio\nM:4/4\nL:1/4\nK:F\nF A c f | f c A F |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

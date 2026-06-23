@@ -1,0 +1,12 @@
+{
+  "id": "thirds-c",
+  "title": "Thirds (C major)",
+  "description": "Each scale step harmonized a third above.",
+  "abc": "X:1\nT:Thirds (C major)\nM:2/4\nL:1/4\nK:C\nC E | D F | E G | F A | G B | A c | B d | c e |",
+  "tempo": 80,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "finger-exercises"
+  ]
+}

@@ -5,7 +5,7 @@
   "abc": "X:1\nT:G major scale\nM:4/4\nL:1/4\nK:G\nG A B c | d e f g |",
   "tempo": 90,
   "beatsPerBar": 4,
-  "license": "0BSD",
+  "license": "CC0-1.0",
   "curriculums": [
     "plinky-basics"
   ]
