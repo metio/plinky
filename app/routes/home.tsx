@@ -21,6 +21,7 @@ const MODES = [
     { slug: "time-trial", label: "Time trial" },
     { slug: "rhythm", label: "Rhythm" },
     { slug: "tempo", label: "Tempo" },
+    { slug: "loop", label: "Loop" },
 ];
 
 function downloadAbc(exercise: Exercise): void {

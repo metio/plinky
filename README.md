@@ -33,6 +33,9 @@ on your device.
 - **Tempo** — no metronome; you set the pace. A live readout tracks your tempo,
   and the finished view charts it over the phrase — a line per hand — and flags
   where you slowed down.
+- **Loop** — pick a few bars and play them on repeat until they stick; each lap
+  is timed (bpm) and scored (accuracy) so you can watch yourself improve, then
+  jump to the next section.
 - **Sprint** — a sight-reading drill on freshly generated notes in C, G, F, or D:
   play as many correctly as you can before the timer runs out, one or two hands.
   Your best count per setting is kept.
