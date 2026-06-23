@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useMetronome } from "./useMetronome";
 
 class FakeParam {
@@ -24,9 +24,14 @@ class FakeNode {
     start() {}
     stop() {}
 }
+// The most recently created context, so a test can drive its audio clock.
+let context: FakeAudioContext;
 class FakeAudioContext {
     currentTime = 0;
     destination = {};
+    constructor() {
+        context = this;
+    }
     resume() {
         return Promise.resolve();
     }
@@ -56,10 +61,27 @@ describe("useMetronome", () => {
         expect(result.current.running).toBe(false);
     });
 
-    it("begins a count-in", () => {
-        const { result } = renderHook(() => useMetronome());
-        act(() => result.current.countIn(240, 4, () => {}, 4));
-        expect(result.current.running).toBe(true);
-        act(() => result.current.stop());
+    it("fires the completion callback after a count-in, then stops", () => {
+        vi.useFakeTimers();
+        try {
+            const onComplete = vi.fn();
+            const { result } = renderHook(() => useMetronome());
+
+            // A one-beat count-in at a brisk tempo; the first scheduler pass (run
+            // inside begin) schedules the single beat and leaves nothing remaining.
+            act(() => result.current.countIn(600, 1, onComplete, 1));
+            expect(result.current.running).toBe(true);
+
+            // Advance the audio clock past the scheduled beat so the next scheduler
+            // tick arms the completion timer, then let that timer fire.
+            context.currentTime = 0.15;
+            act(() => vi.advanceTimersByTime(30));
+            act(() => vi.advanceTimersByTime(120));
+
+            expect(onComplete).toHaveBeenCalledOnce();
+            expect(result.current.running).toBe(false);
+        } finally {
+            vi.useRealTimers();
+        }
     });
 });
