@@ -4,18 +4,18 @@
 import type { TuneObject } from "abcjs";
 import { useCallback, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { type CorrectInfo, describeNext, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useMetronome } from "../hooks/useMetronome";
-import { useNoteMatcher } from "../hooks/useNoteMatcher";
 import { useSynth } from "../hooks/useSynth";
 import type { Exercise } from "../lib/exercises";
+import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
-import { buildSteps, type Step } from "../lib/steps";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { KeyboardHint } from "./keyboardHint";
 
 export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
-    const [steps, setSteps] = useState<Step[]>([]);
+    const [hands, setHands] = useState<Hand[]>([]);
     const [bpm, setBpm] = useState(exercise.tempo);
     const metronome = useMetronome();
 
@@ -36,24 +36,22 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
     );
 
     const handleRender = useCallback(
-        // setupEvents must run after the SVG exists so each step's elements point
-        // at live nodes.
-        (tune: TuneObject) => setSteps(buildSteps(tune, exercise.tempo)),
+        (tune: TuneObject) => setHands(buildHands(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
     const synth = useSynth();
 
     const handleCorrect = useCallback(
-        (index: number) => {
-            for (const pitch of steps[index]?.pitches ?? []) {
+        (info: CorrectInfo) => {
+            for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
         },
-        [synth, steps],
+        [synth],
     );
 
-    const matcher = useNoteMatcher(steps, { onCorrect: handleCorrect });
+    const matcher = useHandsMatcher(hands, { onCorrect: handleCorrect });
 
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) => matcher.registerNote(played.note, played.timestamp),
@@ -118,17 +116,17 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
 
             <div className="flex items-center gap-6">
                 <div className="text-sm">
-                    <span className="font-medium">Progress:</span>{" "}
-                    {Math.min(matcher.cursor, steps.length)} / {steps.length}
+                    <span className="font-medium">Progress:</span> {matcher.completedSteps} /{" "}
+                    {matcher.totalSteps}
                 </div>
                 {matcher.done ? (
                     <div className="text-sm font-semibold text-green-600">Complete! 🎉</div>
                 ) : (
-                    matcher.nextPitches.length > 0 && (
+                    matcher.nextByHand.length > 0 && (
                         <div className="text-sm">
                             <span className="font-medium">Next:</span>{" "}
                             <span className="font-mono text-indigo-700">
-                                {matcher.nextPitches.map(noteName).join(" ")}
+                                {describeNext(matcher.nextByHand, noteName)}
                             </span>
                         </div>
                     )
@@ -149,7 +147,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
             <button
                 type="button"
                 onClick={matcher.reset}
-                disabled={matcher.cursor === 0}
+                disabled={matcher.completedSteps === 0}
                 className="text-sm text-gray-500 underline disabled:opacity-40"
             >
                 Restart

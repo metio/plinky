@@ -4,11 +4,11 @@
 import type { TuneObject } from "abcjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
-import { useNoteMatcher } from "../hooks/useNoteMatcher";
+import { type CorrectInfo, describeNext, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
 import type { Exercise } from "../lib/exercises";
+import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
-import { buildSteps, type Step } from "../lib/steps";
 import {
     findHotspots,
     type Hotspot,
@@ -27,22 +27,13 @@ const SMOOTHING = 0.4;
 
 type RunState = "idle" | "armed" | "running" | "finished";
 
+type Note = { timeMs: number; timestamp: number; elements: HTMLElement[] };
+
 type Result = {
     points: TempoPoint[];
     median: number;
     hotspots: Hotspot[];
 };
-
-// Paint the notes of each slow stretch red, directly on the rendered score.
-function paintHotspots(steps: Step[], hotspots: Hotspot[]): void {
-    for (const hotspot of hotspots) {
-        for (let i = hotspot.startIndex; i <= hotspot.endIndex; i++) {
-            for (const element of steps[i]?.elements ?? []) {
-                element.style.fill = HOTSPOT_COLOR;
-            }
-        }
-    }
-}
 
 function describeHotspots(hotspots: Hotspot[]): string {
     if (hotspots.length === 0) {
@@ -59,56 +50,63 @@ function describeHotspots(hotspots: Hotspot[]): string {
 }
 
 export function TempoTrainer({ exercise }: { exercise: Exercise }) {
-    const [steps, setSteps] = useState<Step[]>([]);
+    const [hands, setHands] = useState<Hand[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
     const [liveBpm, setLiveBpm] = useState<number | null>(null);
     const [result, setResult] = useState<Result | null>(null);
 
-    // Onset timestamps per note index drive the whole analysis; the smoothed
-    // value powers the live readout without re-rendering on a ref change.
-    const timestampsRef = useRef<number[]>([]);
+    // Each correct note recorded in completion order; the smoothed value powers
+    // the live readout without re-rendering on a ref change.
+    const notesRef = useRef<Note[]>([]);
     const smoothedRef = useRef(0);
 
     const synth = useSynth();
 
     const handleRender = useCallback(
-        // Each step's `timeMs` is its notated onset at the exercise tempo, the
-        // reference the played tempo is measured against.
-        (tune: TuneObject) => setSteps(buildSteps(tune, exercise.tempo)),
+        (tune: TuneObject) => setHands(buildHands(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
     const handleCorrect = useCallback(
-        (index: number, timestamp: number) => {
-            for (const pitch of steps[index]?.pitches ?? []) {
+        (info: CorrectInfo) => {
+            for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
-            timestampsRef.current[index] = timestamp;
-            if (index === 0) {
+            notesRef.current[info.ordinal] = {
+                timeMs: info.timeMs,
+                timestamp: info.timestamp,
+                elements: info.elements,
+            };
+            if (info.ordinal === 0) {
                 setRunState("running");
                 setLiveBpm(null);
                 return;
             }
-            const notatedGap = (steps[index]?.timeMs ?? 0) - (steps[index - 1]?.timeMs ?? 0);
-            const actualGap = timestamp - timestampsRef.current[index - 1];
+            const previous = notesRef.current[info.ordinal - 1];
+            const notatedGap = info.timeMs - previous.timeMs;
+            const actualGap = info.timestamp - previous.timestamp;
             const bpm = instantaneousBpm(exercise.tempo, notatedGap, actualGap);
             smoothedRef.current =
                 liveBpm === null ? bpm : SMOOTHING * bpm + (1 - SMOOTHING) * smoothedRef.current;
             setLiveBpm(Math.round(smoothedRef.current));
         },
-        [synth, steps, exercise.tempo, liveBpm],
+        [synth, exercise.tempo, liveBpm],
     );
 
     const handleComplete = useCallback(() => {
-        const notatedMs = steps.map((step) => step.timeMs);
-        const points = tempoSeries(exercise.tempo, notatedMs, timestampsRef.current);
+        const notes = notesRef.current;
+        const points = tempoSeries(
+            exercise.tempo,
+            notes.map((note) => note.timeMs),
+            notes.map((note) => note.timestamp),
+        );
         const med = median(points.map((point) => point.bpm));
         setResult({ points, median: med, hotspots: findHotspots(points, med) });
         setRunState("finished");
-    }, [steps, exercise.tempo]);
+    }, [exercise.tempo]);
 
     const active = runState === "armed" || runState === "running";
-    const matcher = useNoteMatcher(steps, {
+    const matcher = useHandsMatcher(hands, {
         active,
         onCorrect: handleCorrect,
         onComplete: handleComplete,
@@ -123,16 +121,23 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
     useMidiInput({ onNoteOn: handleNoteOn });
 
     // Overlay the hotspots in red once a run finishes. The matcher's own painting
-    // settled on the final cursor before this runs, so the red overlay sticks.
+    // settled on the final cursors before this runs, so the red overlay sticks.
     useEffect(() => {
-        if (result) {
-            paintHotspots(steps, result.hotspots);
+        if (!result) {
+            return;
         }
-    }, [result, steps]);
+        for (const hotspot of result.hotspots) {
+            for (let i = hotspot.startIndex; i <= hotspot.endIndex; i++) {
+                for (const element of notesRef.current[i]?.elements ?? []) {
+                    element.style.fill = HOTSPOT_COLOR;
+                }
+            }
+        }
+    }, [result]);
 
     const start = useCallback(() => {
         matcher.reset();
-        timestampsRef.current = [];
+        notesRef.current = [];
         smoothedRef.current = 0;
         setLiveBpm(null);
         setResult(null);
@@ -174,7 +179,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     <button
                         type="button"
                         onClick={start}
-                        disabled={steps.length === 0}
+                        disabled={matcher.totalSteps === 0}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                     >
                         {runState === "finished" ? "Go again" : "Start"}
@@ -192,7 +197,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     <span className="text-sm text-indigo-700">
                         Play{" "}
                         <span className="font-mono">
-                            {matcher.nextPitches.map(noteName).join(" ")}
+                            {describeNext(matcher.nextByHand, noteName)}
                         </span>{" "}
                         whenever you are ready.
                     </span>

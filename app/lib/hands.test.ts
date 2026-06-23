@@ -2,70 +2,54 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { groupByHand } from "./hands";
+import { groupByHand, type StaffOnset, totalSteps } from "./hands";
 
-// startChars 10/12 are on the top staff, 20/22 on the bottom.
-const staffOf = new Map([
-    [10, 0],
-    [12, 0],
-    [20, 1],
-    [22, 1],
-]);
-
-function event(ms: number, pitches: [number, number][]) {
-    return {
-        milliseconds: ms,
-        midiPitches: pitches.map(([pitch, startChar]) => ({ pitch, startChar })),
-    };
+function onset(
+    staff: number,
+    timeMs: number,
+    pitches: number[],
+    elements: HTMLElement[] = [],
+): StaffOnset {
+    return { staff, timeMs, pitches, elements };
 }
 
 describe("groupByHand", () => {
-    it("splits a merged timeline into per-staff hands", () => {
-        const hands = groupByHand(
-            [
-                event(0, [
-                    [72, 10],
-                    [60, 20],
-                ]),
-                event(500, [[74, 12]]),
-                event(1000, [[64, 22]]),
-            ],
-            staffOf,
-        );
+    it("sequences per-staff onsets into one stream per hand", () => {
+        const hands = groupByHand([
+            onset(0, 0, [72]),
+            onset(1, 0, [60]),
+            onset(0, 500, [74]),
+            onset(1, 1000, [64]),
+        ]);
         expect(hands.map((hand) => hand.staff)).toEqual([0, 1]);
         expect(hands.map((hand) => hand.label)).toEqual(["Right", "Left"]);
-        expect(hands[0].steps).toEqual([
-            { pitches: [72], timeMs: 0 },
-            { pitches: [74], timeMs: 500 },
-        ]);
-        expect(hands[1].steps).toEqual([
-            { pitches: [60], timeMs: 0 },
-            { pitches: [64], timeMs: 1000 },
-        ]);
+        expect(hands[0].steps.map((step) => step.pitches)).toEqual([[72], [74]]);
+        expect(hands[0].steps.map((step) => step.timeMs)).toEqual([0, 500]);
+        expect(hands[1].steps.map((step) => step.pitches)).toEqual([[60], [64]]);
     });
 
-    it("keeps simultaneous same-staff notes together as a chord step", () => {
-        const hands = groupByHand(
-            [
-                event(0, [
-                    [72, 10],
-                    [76, 12],
-                ]),
-            ],
-            staffOf,
-        );
-        expect(hands).toHaveLength(1);
-        expect(hands[0].steps[0].pitches).toEqual([72, 76]);
+    it("keeps a multi-note onset together as a chord step", () => {
+        expect(groupByHand([onset(0, 0, [72, 76])])[0].steps[0].pitches).toEqual([72, 76]);
     });
 
-    it("yields a single hand for a single-staff piece", () => {
-        const hands = groupByHand([event(0, [[72, 10]]), event(500, [[74, 12]])], staffOf);
-        expect(hands).toHaveLength(1);
-        expect(hands[0].staff).toBe(0);
+    it("skips onsets with no pitches", () => {
+        expect(groupByHand([onset(0, 0, [72]), onset(0, 500, [])])[0].steps).toHaveLength(1);
     });
 
-    it("defaults an unknown startChar to the top staff", () => {
-        const hands = groupByHand([event(0, [[72, 999]])], staffOf);
-        expect(hands[0].staff).toBe(0);
+    it("orders hands by staff regardless of onset order", () => {
+        const hands = groupByHand([onset(1, 0, [60]), onset(0, 0, [72])]);
+        expect(hands.map((hand) => hand.staff)).toEqual([0, 1]);
+    });
+
+    it("carries each step's score elements", () => {
+        const element = { style: { fill: "" } } as unknown as HTMLElement;
+        expect(groupByHand([onset(0, 0, [72], [element])])[0].steps[0].elements).toEqual([element]);
+    });
+});
+
+describe("totalSteps", () => {
+    it("sums the steps across every hand", () => {
+        const hands = groupByHand([onset(0, 0, [72]), onset(0, 500, [74]), onset(1, 0, [60])]);
+        expect(totalSteps(hands)).toBe(3);
     });
 });
