@@ -35,6 +35,8 @@ on your device.
 
 Each mode handles single notes, **chords**, and **two-hand grand-staff** pieces —
 each hand advances at its own pace — as well as rests, ties, tuplets, and repeats.
+A grand staff can be practiced one hand at a time, and Rhythm and Tempo report
+each hand's timing separately.
 
 The exercise library covers scales (C, G, D, F major), arpeggios and triads, the
 A minor pentatonic, familiar melodies like *Twinkle, Twinkle* and *Ode to Joy*,
