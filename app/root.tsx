@@ -20,6 +20,23 @@ import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
 
+const SITE_URL = "https://plinky.projects.metio.wtf";
+const SITE_TITLE = "Plinky — piano practice in your browser";
+const SITE_DESCRIPTION =
+    "Practice piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear-training, and loop drills, with your scores kept on your device.";
+
+// Structured data so search engines and assistants understand what Plinky is.
+const STRUCTURED_DATA = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Plinky",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    applicationCategory: "EducationalApplication",
+    operatingSystem: "Any (modern web browser)",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
+
 export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
     { rel: "manifest", href: "/manifest.webmanifest" },
@@ -85,6 +102,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta name="theme-color" content="#4f46e5" />
+                {/* Social cards (Open Graph + Twitter), site-wide defaults. */}
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="Plinky" />
+                <meta property="og:title" content={SITE_TITLE} />
+                <meta property="og:description" content={SITE_DESCRIPTION} />
+                <meta property="og:url" content={SITE_URL} />
+                <meta property="og:image" content={`${SITE_URL}/logo.svg`} />
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:title" content={SITE_TITLE} />
+                <meta name="twitter:description" content={SITE_DESCRIPTION} />
+                <meta name="twitter:image" content={`${SITE_URL}/logo.svg`} />
+                <script
+                    type="application/ld+json"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD for search engines; the content is a compile-time constant with no user input
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
+                />
                 <Meta />
                 <Links />
             </head>
