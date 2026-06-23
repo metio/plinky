@@ -17,3 +17,9 @@ export function dailyPhrase(dateKey: string): string {
         seededRandom(hashString(dateKey)),
     );
 }
+
+// A boast for social media, including a link back to the challenge.
+export function dailyShareText(correct: number, url: string): string {
+    const notes = correct === 1 ? "note" : "notes";
+    return `I played ${correct} ${notes} correctly in today's Plinky daily challenge! 🎹 ${url}`;
+}
