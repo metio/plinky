@@ -1,0 +1,118 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { type Exercise, findExercise } from "./exercises";
+
+// User-imported songs live in localStorage as ABC-derived Exercises and merge
+// with the built-in set. ABC is the interchange format, so a song round-trips
+// through any ABC-aware tool. Validation that the notes are actually playable
+// lives in the import UI, which renders the ABC and runs buildSteps.
+
+const STORAGE_KEY = "plinky:songs";
+
+export function parseTitle(abc: string): string {
+    return abc.match(/^T:\s*(.+)$/m)?.[1].trim() ?? "";
+}
+
+// The meter numerator is how many beats fill a bar. `C` is common (4/4) time and
+// `C|` is cut (2/2) time.
+export function parseBeatsPerBar(abc: string): number {
+    const meter = abc.match(/^M:\s*(.+)$/m)?.[1].trim();
+    if (!meter) {
+        return 4;
+    }
+    if (meter.startsWith("C|")) {
+        return 2;
+    }
+    if (meter.startsWith("C")) {
+        return 4;
+    }
+    return Number(meter.match(/^(\d+)\s*\//)?.[1] ?? 4);
+}
+
+// `Q:` may be a bare number or a note-value tempo such as `1/4=120`.
+export function parseTempo(abc: string): number {
+    const match = abc.match(/^Q:\s*(?:\d+\/\d+\s*=\s*)?(\d+)/m);
+    return match ? Number(match[1]) : 90;
+}
+
+export function slugify(title: string): string {
+    return (
+        title
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "song"
+    );
+}
+
+// Derive an Exercise from ABC, giving it an id unique among the ones passed.
+export function buildExercise(abc: string, existingIds: string[]): Exercise {
+    const title = parseTitle(abc) || "Imported song";
+    const base = slugify(title);
+    const taken = new Set(existingIds);
+    let id = base;
+    for (let n = 2; taken.has(id); n++) {
+        id = `${base}-${n}`;
+    }
+    return {
+        id,
+        title,
+        description: "Imported song",
+        abc: abc.trim(),
+        tempo: parseTempo(abc),
+        beatsPerBar: parseBeatsPerBar(abc),
+    };
+}
+
+// Embed the exercise tempo as a `Q:` header so an export round-trips back at the
+// same speed; built-in tunes carry their tempo outside the ABC otherwise.
+export function toAbcDocument(exercise: Exercise): string {
+    if (/^Q:/m.test(exercise.abc)) {
+        return exercise.abc;
+    }
+    return exercise.abc.replace(/^(K:.*)$/m, `Q:1/4=${exercise.tempo}\n$1`);
+}
+
+export function loadUserSongs(): Exercise[] {
+    if (typeof localStorage === "undefined") {
+        return [];
+    }
+    try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+export function saveUserSong(exercise: Exercise): void {
+    if (typeof localStorage === "undefined") {
+        return;
+    }
+    const songs = loadUserSongs().filter((song) => song.id !== exercise.id);
+    songs.push(exercise);
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+    } catch {
+        // Storage can fail in private mode or over quota; an import is a
+        // convenience, so a failed write is not surfaced.
+    }
+}
+
+export function removeUserSong(id: string): void {
+    if (typeof localStorage === "undefined") {
+        return;
+    }
+    const songs = loadUserSongs().filter((song) => song.id !== id);
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+    } catch {
+        // See saveUserSong.
+    }
+}
+
+// Built-in exercises plus any imported song, so the trainers resolve both.
+export function resolveExercise(id: string | undefined): Exercise | undefined {
+    return findExercise(id) ?? loadUserSongs().find((song) => song.id === id);
+}
