@@ -11,10 +11,9 @@ import {
     type ReactNode,
 } from "react";
 import {
-    KEY_SEMITONES,
-    KEYBOARD_BASE_NOTE,
     KEYBOARD_DEVICE,
     KEYBOARD_VELOCITY,
+    keyToNote,
     MAX_EVENTS,
     MAX_OCTAVE_OFFSET,
     MIN_OCTAVE_OFFSET,
@@ -217,11 +216,10 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            const semitone = KEY_SEMITONES[key];
-            if (semitone === undefined || pressed.has(key)) {
+            const note = keyToNote(key, octaveRef.current);
+            if (note === null || pressed.has(key)) {
                 return;
             }
-            const note = KEYBOARD_BASE_NOTE + octaveRef.current * 12 + semitone;
             if (note < 0 || note > 127) {
                 return;
             }
