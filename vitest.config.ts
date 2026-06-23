@@ -8,7 +8,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
     test: {
         environment: "node",
-        include: ["app/**/*.test.ts"],
+        // Logic tests run in node; component tests opt into jsdom with a
+        // `// @vitest-environment jsdom` docblock.
+        include: ["app/**/*.test.{ts,tsx}"],
         coverage: {
             provider: "v8",
             include: ["app/**/*.{ts,tsx}"],
