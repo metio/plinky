@@ -65,37 +65,30 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     return { kind: isNoteOn ? "noteon" : "noteoff", note, velocity, channel };
 }
 
-// Two-octave "musical typing" layout so both hands can play at once on disjoint
-// keys. The lower octave (left hand) sits on the bottom and home rows, the upper
-// octave (right hand) on the top and number rows; values are semitone offsets
-// from each octave's base C.
+// Five-finger home-row split so both hands rest naturally: the left hand plays
+// C–G on the home row (A S D F G), the right hand the same five notes an octave
+// up on H J K L ;, with each span's three black keys (C♯ D♯ F♯) on the row above
+// (W E T and U I P). Values are semitone offsets from each hand's base C; the
+// other top-row keys produce no note, as on a real keyboard.
 const LEFT_HAND_KEYS: Record<string, number> = {
-    z: 0,
-    s: 1,
-    x: 2,
-    d: 3,
-    c: 4,
-    v: 5,
-    g: 6,
-    b: 7,
-    h: 8,
-    n: 9,
-    j: 10,
-    m: 11,
+    a: 0,
+    w: 1,
+    s: 2,
+    e: 3,
+    d: 4,
+    f: 5,
+    t: 6,
+    g: 7,
 };
 const RIGHT_HAND_KEYS: Record<string, number> = {
-    q: 0,
-    "2": 1,
-    w: 2,
-    "3": 3,
-    e: 4,
-    r: 5,
-    "5": 6,
-    t: 7,
-    "6": 8,
-    y: 9,
-    "7": 10,
-    u: 11,
+    h: 0,
+    u: 1,
+    j: 2,
+    i: 3,
+    k: 4,
+    l: 5,
+    p: 6,
+    ";": 7,
 };
 
 export const KEYBOARD_DEVICE = "Computer keyboard";
@@ -103,8 +96,8 @@ export const KEYBOARD_VELOCITY = 80;
 export const MIN_OCTAVE_OFFSET = -3;
 export const MAX_OCTAVE_OFFSET = 3;
 
-const LEFT_HAND_BASE_NOTE = 48; // C3 at octave offset 0
-const RIGHT_HAND_BASE_NOTE = 60; // C4 — one octave above the left hand
+const LEFT_HAND_BASE_NOTE = 60; // C4 at octave offset 0
+const RIGHT_HAND_BASE_NOTE = 72; // C5 — one octave above the left hand
 
 // Map a pressed key to its MIDI note for the active octave offset, or null when
 // the key is not part of the layout.
