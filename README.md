@@ -28,13 +28,17 @@ on your device.
   clock starts on your first note, wrong notes add a penalty, and your best run
   per exercise is remembered.
 - **Rhythm** — a metronome counts you in and keeps time while you play; each note
-  is rated on how close it lands to the beat, with the tightest run kept as your
-  best.
+  is rated on how close it lands to the beat, the tightest run is kept as your
+  best, and (on a MIDI piano) it reports how evenly you struck the keys.
 - **Tempo** — no metronome; you set the pace. A live readout tracks your tempo,
-  and the finished view charts it over the phrase and flags where you slowed down.
-- **Sprint** — a sight-reading drill on freshly generated notes: play as many
-  correctly as you can before the timer runs out, one or two hands. Your best
-  count per length is kept.
+  and the finished view charts it over the phrase — a line per hand — and flags
+  where you slowed down.
+- **Sprint** — a sight-reading drill on freshly generated notes in C, G, F, or D:
+  play as many correctly as you can before the timer runs out, one or two hands.
+  Your best count per setting is kept.
+- **Daily challenge** — a one-minute sprint whose notes are the same for everyone
+  that day; come back tomorrow for a new one.
+- **Ear training** — hear a note and find it by ear, in any octave.
 
 Each mode handles single notes, **chords**, and **two-hand grand-staff** pieces —
 each hand advances at its own pace — as well as rests, ties, tuplets, and repeats.
@@ -43,7 +47,9 @@ each hand's timing separately.
 
 The exercise library covers scales (C, G, D, F major), arpeggios and triads, the
 A minor pentatonic, familiar melodies like *Twinkle, Twinkle* and *Ode to Joy*,
-and a two-hand warm-up.
+and a two-hand warm-up. A guided **learning path** orders them for beginners, and
+a **Progress** page tracks your day streak and notes played. Plinky has a
+light/dark theme and a settings page for sound and volume.
 
 ## Bring your own songs
 
