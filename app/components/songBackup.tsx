@@ -77,7 +77,11 @@ export function SongBackup() {
                     type="file"
                     accept="application/json,.json"
                     className="hidden"
-                    onChange={(event) => importFile(event.target.files?.[0])}
+                    onChange={(event) => {
+                        importFile(event.target.files?.[0]);
+                        // Clear the value so selecting the same file again re-fires change.
+                        event.target.value = "";
+                    }}
                 />
             </div>
             {status && <p className="text-sm text-gray-700 dark:text-gray-300">{status}</p>}
