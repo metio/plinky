@@ -60,6 +60,18 @@ describe("useHandsMatcher", () => {
         expect(onCorrect).not.toHaveBeenCalled();
         expect(result.current.completedSteps).toBe(0);
     });
+
+    it("does not crash when hands appear after an empty first render", () => {
+        // The score renders empty, then buildHands fills it in. The state reset
+        // runs in an effect, so the render right after the hands grow must not
+        // dereference a hand the state does not have yet.
+        const { result, rerender } = renderHook(
+            ({ hands }) => useHandsMatcher(hands, { active: false }),
+            { initialProps: { hands: [] as Hand[] } },
+        );
+        rerender({ hands: [{ staff: 0, label: "Right", steps: [step([60])] }] });
+        expect(result.current.nextByHand).toEqual([{ label: "Right", pitches: [60] }]);
+    });
 });
 
 describe("describeNext", () => {

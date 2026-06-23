@@ -46,7 +46,9 @@ export type HandsMatcher = {
 
 function paint(hands: Hand[], state: HandsState): void {
     hands.forEach((hand, handIndex) => {
-        const cursor = state.hands[handIndex].cursor;
+        // `state` is reset to match `hands` in an effect, so for one render after
+        // the hands change it can be shorter; treat a missing hand as fresh.
+        const cursor = state.hands[handIndex]?.cursor ?? 0;
         hand.steps.forEach((step, index) => {
             const color = index < cursor ? DONE_COLOR : index === cursor ? EXPECTED_COLOR : null;
             for (const element of step.elements) {
@@ -142,7 +144,9 @@ export function useHandsMatcher(hands: Hand[], options: HandsMatcherOptions = {}
     const done = total > 0 && completedSteps >= total;
     const nextByHand = hands.map((hand, handIndex) => ({
         label: hand.label,
-        pitches: done ? [] : (hand.steps[state.hands[handIndex].cursor]?.pitches ?? []),
+        // See paint: `state` can briefly lag `hands`, so default a missing hand's
+        // cursor to the start rather than dereferencing undefined.
+        pitches: done ? [] : (hand.steps[state.hands[handIndex]?.cursor ?? 0]?.pitches ?? []),
     }));
 
     return {
