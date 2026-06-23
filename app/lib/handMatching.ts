@@ -41,10 +41,15 @@ export function matchHands(
     hands: HandSteps[],
     note: number,
 ): { state: HandsState; event: HandsEvent } {
+    // `state` is reset to match `hands` in an effect, so it can briefly be shorter
+    // than `hands`; treat any missing hand as fresh so a note played in that window
+    // is matched from the start rather than crashing on undefined.
+    const handStates = hands.map((_, index) => state.hands[index] ?? initialMatchState);
+
     // Greedy by expectation: a hand is a candidate when its current step expects
     // the note. The common case is a single candidate.
     const candidates = hands
-        .map((hand, index) => ({ index, step: hand.steps[state.hands[index].cursor] }))
+        .map((hand, index) => ({ index, step: hand.steps[handStates[index].cursor] }))
         .filter((entry) => entry.step?.pitches.includes(note));
 
     if (candidates.length === 0) {
@@ -60,11 +65,11 @@ export function matchHands(
     });
 
     const { state: handState, event } = matchNote(
-        state.hands[chosen.index],
+        handStates[chosen.index],
         hands[chosen.index].steps,
         note,
     );
-    const nextHands = state.hands.map((hand, index) => (index === chosen.index ? handState : hand));
+    const nextHands = handStates.map((hand, index) => (index === chosen.index ? handState : hand));
     const nextState: HandsState = { hands: nextHands, wrongNote: null };
 
     if (event.kind === "correct") {
@@ -79,5 +84,8 @@ export function matchHands(
 
 // The pitches each hand expects next — one entry per hand, for the display.
 export function handsNextPitches(state: HandsState, hands: HandSteps[]): number[][] {
-    return hands.map((hand, index) => hand.steps[state.hands[index].cursor]?.pitches ?? []);
+    return hands.map(
+        (hand, index) =>
+            hand.steps[(state.hands[index] ?? initialMatchState).cursor]?.pitches ?? [],
+    );
 }
