@@ -23,9 +23,9 @@ describe("generatePhrase", () => {
         expect(abc).toContain("C C C |"); // bass
     });
 
-    it("draws notes from the C major scale", () => {
-        // rng 0.99 selects the last degree (B / b).
+    it("stays within the C–G five-finger range", () => {
+        // rng 0.99 selects the last degree of the five-finger position (G / g).
         const abc = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false }, () => 0.99);
-        expect(abc).toContain("b b |");
+        expect(abc).toContain("g g |");
     });
 });
