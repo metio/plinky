@@ -22,6 +22,15 @@ function play(steps: typeof hands, notes: number[]) {
 }
 
 describe("matchHands", () => {
+    it("treats a state shorter than hands as fresh rather than crashing", () => {
+        // The matcher's state is reset to match hands in an effect, so a note can
+        // arrive while state has fewer hands than the score.
+        const empty = { hands: [], wrongNote: null };
+        const result = matchHands(empty, hands, 72);
+        expect(result.event).toEqual({ kind: "correct", hand: 0, index: 0, complete: false });
+        expect(result.state.hands[0].cursor).toBe(1);
+    });
+
     it("advances each hand independently", () => {
         const { state, events } = play(hands, [72, 74]);
         expect(events).toEqual([

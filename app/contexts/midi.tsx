@@ -30,6 +30,17 @@ export type NoteListener = {
     onNoteOff?: (event: MidiNoteEvent) => void;
 };
 
+declare global {
+    interface Window {
+        // Test/dev bridge for injecting notes as if from a MIDI device; attached
+        // by MidiProvider outside production. See its effect below.
+        __plinky?: {
+            play: (note: number, velocity?: number) => void;
+            release: (note: number) => void;
+        };
+    }
+}
+
 type MidiContextValue = {
     support: MidiSupport;
     status: MidiStatus;
@@ -118,6 +129,22 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         },
         [],
     );
+
+    // Lets browser tests — and the console — inject notes as if from a MIDI
+    // device, to drive trainers end to end. Never attached in a production build.
+    useEffect(() => {
+        if (import.meta.env.PROD) {
+            return;
+        }
+        window.__plinky = {
+            play: (note, velocity = 80) =>
+                emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
+            release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
+        };
+        return () => {
+            window.__plinky = undefined;
+        };
+    }, [emitNote]);
 
     const pressKey = useCallback(
         (note: number) =>

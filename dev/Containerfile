@@ -1,7 +1,12 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
 
-FROM docker.io/library/node:22
+# Playwright's own image ships the browsers and their system libraries, and sets
+# PLAYWRIGHT_BROWSERS_PATH, so the browser test project runs locally without a
+# per-run `playwright install --with-deps`. Keep the tag in step with the
+# `playwright` dependency in package.json so the baked browsers match.
+# renovate: datasource=docker depName=mcr.microsoft.com/playwright
+FROM mcr.microsoft.com/playwright:v1.61.0-noble
 
 # A mounted repo is owned by the host user, so git refuses it as "dubious
 # ownership". Trust any working directory, otherwise reuse falls back to walking
