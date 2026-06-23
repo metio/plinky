@@ -93,3 +93,38 @@ export function saveBestRhythm(exerciseId: string, best: RhythmBest): void {
         // See saveBest: a failed write of a convenience value is not surfaced.
     }
 }
+
+// Sight-reading sprint: most notes played correctly in a run, kept per
+// configuration (duration + hands) so each setting has its own high score.
+export type SprintBest = { correct: number; at: string };
+
+function sprintKey(config: string): string {
+    return `plinky:sprint:${config}`;
+}
+
+export function loadBestSprint(config: string): SprintBest | null {
+    if (typeof localStorage === "undefined") {
+        return null;
+    }
+    try {
+        const raw = localStorage.getItem(sprintKey(config));
+        if (!raw) {
+            return null;
+        }
+        const parsed = JSON.parse(raw) as SprintBest;
+        return typeof parsed?.correct === "number" ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
+export function saveBestSprint(config: string, best: SprintBest): void {
+    if (typeof localStorage === "undefined") {
+        return;
+    }
+    try {
+        localStorage.setItem(sprintKey(config), JSON.stringify(best));
+    } catch {
+        // See saveBest.
+    }
+}
