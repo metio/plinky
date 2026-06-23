@@ -68,6 +68,18 @@ export default function Home() {
                 </p>
             </header>
 
+            <Link
+                to="/path"
+                className="block rounded-md border border-indigo-300 bg-indigo-100 p-4 hover:bg-indigo-200 dark:border-indigo-800 dark:bg-indigo-900 dark:hover:bg-indigo-800"
+            >
+                <span className="font-medium text-indigo-800 dark:text-indigo-200">
+                    🎯 Follow the learning path →
+                </span>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                    New here? Work through the exercises in a guided order.
+                </p>
+            </Link>
+
             <div className="grid gap-3 sm:grid-cols-3">
                 <Link
                     to="/sprint"
