@@ -1,0 +1,12 @@
+{
+  "id": "c-major-scale",
+  "title": "C major scale",
+  "description": "One octave, all white keys — the place to start.",
+  "abc": "X:1\nT:C major scale\nM:4/4\nL:1/4\nK:C\nC D E F | G A B c |",
+  "tempo": 90,
+  "beatsPerBar": 4,
+  "license": "0BSD",
+  "curriculums": [
+    "plinky-basics"
+  ]
+}

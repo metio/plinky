@@ -190,4 +190,9 @@ describe("submissionUrl", () => {
             "https://github.com/metio/plinky/issues/new?template=song-submission.yml",
         );
     });
+
+    it("prefills the license when the song has one", () => {
+        const url = submissionUrl({ ...buildExercise(ABC, []), license: "CC-BY-4.0" });
+        expect(url).toContain("license=CC-BY-4.0");
+    });
 });

@@ -25,6 +25,7 @@ export interface PackSong {
     beatsPerBar?: number;
     description?: string;
     curriculums?: string[];
+    license?: string;
 }
 
 export interface SongPack {
@@ -70,6 +71,7 @@ function parseSong(value: unknown): PackSong | null {
         ...(typeof value.tempo === "number" ? { tempo: value.tempo } : {}),
         ...(typeof value.beatsPerBar === "number" ? { beatsPerBar: value.beatsPerBar } : {}),
         ...(typeof value.description === "string" ? { description: value.description } : {}),
+        ...(typeof value.license === "string" ? { license: value.license } : {}),
         ...(curriculums && curriculums.length > 0 ? { curriculums } : {}),
     };
 }

@@ -13,6 +13,7 @@ const song: Exercise = {
     tempo: 90,
     beatsPerBar: 4,
     curriculums: ["grade-1", "warmups"],
+    license: "CC-BY-4.0",
 };
 
 describe("song pack", () => {
@@ -25,6 +26,7 @@ describe("song pack", () => {
         expect(pack.songs).toHaveLength(1);
         expect(pack.songs[0]).toMatchObject({ id: "scale", title: "Scale", tempo: 90 });
         expect(pack.songs[0].curriculums).toEqual(["grade-1", "warmups"]);
+        expect(pack.songs[0].license).toBe("CC-BY-4.0");
         expect(pack.curriculums).toEqual([{ id: "grade-1", name: "Grade 1", publisher: "School" }]);
     });
 
