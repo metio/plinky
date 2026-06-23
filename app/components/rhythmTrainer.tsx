@@ -175,7 +175,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Rhythm · {exercise.title}</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Play each note in time with the metronome at {exercise.tempo} bpm. One bar
                     counts you in.
                 </p>
@@ -193,7 +193,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     type="button"
                     onClick={requestAccess}
                     disabled={support !== "supported" || status === "requesting"}
-                    className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40"
+                    className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
@@ -220,7 +220,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     <button
                         type="button"
                         onClick={abort}
-                        className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+                        className="rounded-md border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Stop
                     </button>
@@ -229,10 +229,10 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />
                 )}
                 {runState === "counting" && (
-                    <span className="text-sm text-indigo-700">Count-in…</span>
+                    <span className="text-sm text-indigo-700 dark:text-indigo-300">Count-in…</span>
                 )}
                 {runState === "armed" && (
-                    <span className="text-sm text-indigo-700">
+                    <span className="text-sm text-indigo-700 dark:text-indigo-300">
                         Play{" "}
                         <span className="font-mono">
                             {describeNext(matcher.nextByHand, noteName)}
@@ -249,20 +249,20 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
             )}
 
             {runState === "finished" && summary && (
-                <div className="space-y-1 rounded-md border border-gray-200 bg-gray-50 p-4 text-sm">
+                <div className="space-y-1 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 text-sm">
                     <p className="text-lg font-semibold">
                         {isRecord ? "New best! 🏆" : `${summary.perfect}/${summary.total} perfect`}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-300">
                         <span className="text-green-600">{summary.perfect} perfect</span> ·{" "}
                         <span className="text-amber-600">{summary.good} good</span> ·{" "}
                         <span className="text-red-600">{summary.off} off</span>
                     </p>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                         Average timing error {Math.round(summary.averageAbsMs)}ms
                     </p>
                     {handSummaries.map((hand) => (
-                        <p key={hand.label} className="text-gray-500">
+                        <p key={hand.label} className="text-gray-500 dark:text-gray-400">
                             {hand.label} hand: {Math.round(hand.summary.averageAbsMs)}ms (
                             {hand.summary.perfect}/{hand.summary.total} perfect)
                         </p>
@@ -271,14 +271,14 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
             )}
 
             {best && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Best: average timing error{" "}
                     <span className="font-mono">{Math.round(best.averageAbsMs)}ms</span> (
                     {best.perfect}/{best.total} perfect)
                 </p>
             )}
 
-            <div className="rounded-md border border-gray-200 p-4">
+            <div className="rounded-md border border-gray-200 dark:border-gray-800 p-4">
                 <AbcRenderer abcTune={exercise.abc} onRender={handleRender} />
             </div>
 

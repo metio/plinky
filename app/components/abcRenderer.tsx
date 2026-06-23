@@ -26,5 +26,7 @@ export function AbcRenderer({
         }
     }, [abcTune, onRender]);
 
-    return <div ref={abcElement} />;
+    // The score keeps a white "paper" background in every theme so the black
+    // notation stays readable in dark mode.
+    return <div ref={abcElement} className="rounded bg-white p-2" />;
 }

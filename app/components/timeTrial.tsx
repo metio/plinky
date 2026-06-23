@@ -148,7 +148,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Time trial · {exercise.title}</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Play the phrase as fast and cleanly as you can. The clock starts on your first
                     note.
                 </p>
@@ -166,7 +166,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                     type="button"
                     onClick={requestAccess}
                     disabled={support !== "supported" || status === "requesting"}
-                    className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40"
+                    className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
@@ -208,14 +208,14 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
             )}
 
             {runState === "counting" && (
-                <div className="flex items-center gap-3 text-sm font-medium text-indigo-700">
+                <div className="flex items-center gap-3 text-sm font-medium text-indigo-700 dark:text-indigo-300">
                     <span>Count-in…</span>
                     <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />
                 </div>
             )}
 
             {runState === "armed" && (
-                <p className="text-sm font-medium text-indigo-700">
+                <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
                     Ready — play{" "}
                     <span className="font-mono">{describeNext(matcher.nextByHand, noteName)}</span>{" "}
                     to start the clock.
@@ -227,13 +227,13 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
             )}
 
             {runState === "finished" && result && (
-                <div className="space-y-2 rounded-md border border-gray-200 bg-gray-50 p-4">
+                <div className="space-y-2 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
                     {isRecord ? (
                         <p className="text-lg font-semibold text-green-600">New record! 🏆</p>
                     ) : (
                         <p className="text-lg font-semibold">Done!</p>
                     )}
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                         {formatMs(result.timeMs)} · {result.errors}{" "}
                         {result.errors === 1 ? "error" : "errors"} · score {formatMs(result.score)}
                     </p>
@@ -248,13 +248,13 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
             )}
 
             {best && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Best: <span className="font-mono">{formatMs(best.score)}</span> (
                     {formatMs(best.timeMs)}, {best.errors} {best.errors === 1 ? "error" : "errors"})
                 </p>
             )}
 
-            <div className="rounded-md border border-gray-200 p-4">
+            <div className="rounded-md border border-gray-200 dark:border-gray-800 p-4">
                 <AbcRenderer abcTune={exercise.abc} onRender={handleRender} />
             </div>
 

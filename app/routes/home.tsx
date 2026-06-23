@@ -62,7 +62,7 @@ export default function Home() {
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Exercises</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Pick an exercise, then choose a mode. Connect a MIDI piano or play with your
                     computer keyboard.
                 </p>
@@ -70,30 +70,37 @@ export default function Home() {
 
             <Link
                 to="/sprint"
-                className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100"
+                className="block rounded-md border border-indigo-200 bg-indigo-50 dark:bg-indigo-950 p-4 hover:bg-indigo-100"
             >
-                <span className="font-medium text-indigo-700">Sight-reading sprint →</span>
-                <p className="mt-1 text-sm text-gray-500">
+                <span className="font-medium text-indigo-700 dark:text-indigo-300">
+                    Sight-reading sprint →
+                </span>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Fresh notes every run — play as many as you can before the timer runs out.
                 </p>
             </Link>
 
             <ul className="space-y-3">
                 {all.map((exercise) => (
-                    <li key={exercise.id} className="rounded-md border border-gray-200 p-4">
+                    <li
+                        key={exercise.id}
+                        className="rounded-md border border-gray-200 dark:border-gray-800 p-4"
+                    >
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <h2 className="text-lg font-medium">{exercise.title}</h2>
                             <span className="font-mono text-xs text-gray-400">
                                 {exercise.tempo} bpm
                             </span>
                         </div>
-                        <p className="mt-1 text-sm text-gray-500">{exercise.description}</p>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {exercise.description}
+                        </p>
                         <div className="mt-3 flex flex-wrap items-center gap-2">
                             {MODES.map((mode) => (
                                 <Link
                                     key={mode.slug}
                                     to={`/${mode.slug}/${exercise.id}`}
-                                    className="rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+                                    className="rounded-md bg-indigo-50 dark:bg-indigo-950 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100"
                                 >
                                     {mode.label}
                                 </Link>
@@ -101,14 +108,14 @@ export default function Home() {
                             <button
                                 type="button"
                                 onClick={() => share(exercise)}
-                                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline"
+                                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 underline"
                             >
                                 {copiedId === exercise.id ? "Link copied!" : "Share"}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => downloadAbc(exercise)}
-                                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline"
+                                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 underline"
                             >
                                 Export
                             </button>
