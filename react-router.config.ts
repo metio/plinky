@@ -9,5 +9,14 @@ export default {
     // Prerender the static routes to their own HTML so each carries its own title
     // and social-card metadata for crawlers and link unfurlers that do not run
     // JavaScript. Dynamic per-exercise routes fall back to the SPA shell.
-    prerender: ["/", "/sprint", "/daily", "/ear", "/path", "/progress", "/settings", "/import"],
+    prerender: [
+        "/",
+        "/sprint",
+        "/daily",
+        "/ear",
+        "/curriculums",
+        "/progress",
+        "/settings",
+        "/import",
+    ],
 } satisfies Config;

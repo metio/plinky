@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type Exercise, findExercise } from "./exercises";
+import type { Exercise } from "./exercises";
 import { type Curriculum, parsePack, serializePack } from "./songPack";
 
-// User-imported songs live in localStorage as ABC-derived Exercises and merge
-// with the built-in set. ABC is the interchange format, so a song round-trips
-// through any ABC-aware tool. Validation that the notes are actually playable
-// lives in the import UI, which renders the ABC and runs buildSteps.
+// Songs live in localStorage as ABC-derived Exercises (seeded from the registry
+// on first run, or imported). ABC is the interchange format, so a song
+// round-trips through any ABC-aware tool. Validation that the notes are actually
+// playable lives in the import UI, which renders the ABC and runs buildSteps.
 
 const STORAGE_KEY = "plinky:songs";
 const CURRICULUMS_KEY = "plinky:curriculums";
@@ -68,7 +68,7 @@ export function buildExercise(abc: string, existingIds: string[]): Exercise {
 }
 
 // Embed the exercise tempo as a `Q:` header so an export round-trips back at the
-// same speed; built-in tunes carry their tempo outside the ABC otherwise.
+// same speed when the ABC carries its tempo outside the notation.
 export function toAbcDocument(exercise: Exercise): string {
     if (/^Q:/m.test(exercise.abc)) {
         return exercise.abc;
@@ -114,9 +114,9 @@ export function removeUserSong(id: string): void {
     }
 }
 
-// Built-in exercises plus any imported song, so the trainers resolve both.
+// The locally stored song with this id, if any — the trainers' single source.
 export function resolveExercise(id: string | undefined): Exercise | undefined {
-    return findExercise(id) ?? loadUserSongs().find((song) => song.id === id);
+    return loadUserSongs().find((song) => song.id === id);
 }
 
 // The curriculums a user has acquired (their human-readable names), accumulated
