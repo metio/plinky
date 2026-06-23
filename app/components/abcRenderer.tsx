@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import abcjs, { type TuneObject } from "abcjs";
+import type { TuneObject } from "abcjs";
 import { useEffect, useRef, useState } from "react";
 import { buildHands } from "../lib/hands";
 
@@ -61,19 +61,31 @@ export function AbcRenderer({
     }, []);
 
     useEffect(() => {
-        if (!abcElement.current) {
+        const element = abcElement.current;
+        if (!element) {
             return;
         }
-        const tunes = abcjs.renderAbc(abcElement.current, abcTune, {
-            add_classes: true,
-            responsive: "resize",
-        });
-        if (tunes[0]) {
-            onRender?.(tunes[0]);
-            if (showNames) {
-                overlayNoteNames(tunes[0]);
+        let cancelled = false;
+        // abcjs is ~0.5 MB, so it is loaded on demand the first time a score
+        // renders rather than in the initial bundle.
+        import("abcjs").then(({ default: abcjs }) => {
+            if (cancelled) {
+                return;
             }
-        }
+            const tunes = abcjs.renderAbc(element, abcTune, {
+                add_classes: true,
+                responsive: "resize",
+            });
+            if (tunes[0]) {
+                onRender?.(tunes[0]);
+                if (showNames) {
+                    overlayNoteNames(tunes[0]);
+                }
+            }
+        });
+        return () => {
+            cancelled = true;
+        };
     }, [abcTune, onRender, showNames]);
 
     const toggle = () => {

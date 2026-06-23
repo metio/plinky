@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import abcjs from "abcjs";
 import { useState } from "react";
 import { musicXmlToAbc } from "../lib/musicxml";
 import { buildExercise, parseTempo, saveUserSong } from "../lib/songs";
@@ -9,7 +8,9 @@ import { buildSteps } from "../lib/steps";
 
 // Render the ABC off-screen and count the steps it yields: anything the trainers
 // can play is accepted, so the generalized matcher decides what is importable.
-function playableSteps(abc: string): number {
+// abcjs is loaded on demand so it stays out of the home page's bundle.
+async function playableSteps(abc: string): Promise<number> {
+    const { default: abcjs } = await import("abcjs");
     const element = document.createElement("div");
     element.style.position = "absolute";
     element.style.visibility = "hidden";
@@ -37,13 +38,13 @@ export function SongImport({
     const [text, setText] = useState("");
     const [error, setError] = useState<string | null>(null);
 
-    const add = () => {
+    const add = async () => {
         const abc = text.trim();
         if (!abc) {
             setError("Paste some ABC notation first.");
             return;
         }
-        if (playableSteps(abc) === 0) {
+        if ((await playableSteps(abc)) === 0) {
             setError("No playable notes found — is this valid ABC?");
             return;
         }

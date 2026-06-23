@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import abcjs from "abcjs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { exercises } from "../lib/exercises";
@@ -17,7 +16,10 @@ export function meta(_args: Route.MetaArgs) {
     ];
 }
 
-function isPlayable(abc: string): boolean {
+// abcjs is loaded on demand so opening a link does not pull it into the bundle
+// until the song is validated.
+async function isPlayable(abc: string): Promise<boolean> {
+    const { default: abcjs } = await import("abcjs");
     const element = document.createElement("div");
     element.style.position = "absolute";
     element.style.visibility = "hidden";
@@ -38,20 +40,22 @@ export default function ImportRoute() {
     const [outcome, setOutcome] = useState<Outcome | null>(null);
 
     useEffect(() => {
-        const encoded = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("s");
-        if (!encoded) {
-            setOutcome({ ok: false, message: "This link has no song in it." });
-            return;
-        }
-        const abc = decodeSong(encoded);
-        if (!abc || !isPlayable(abc)) {
-            setOutcome({ ok: false, message: "This link does not contain a playable song." });
-            return;
-        }
-        const ids = [...exercises.map((e) => e.id), ...loadUserSongs().map((song) => song.id)];
-        const exercise = buildExercise(abc, ids);
-        saveUserSong(exercise);
-        setOutcome({ ok: true, id: exercise.id, title: exercise.title });
+        (async () => {
+            const encoded = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("s");
+            if (!encoded) {
+                setOutcome({ ok: false, message: "This link has no song in it." });
+                return;
+            }
+            const abc = decodeSong(encoded);
+            if (!abc || !(await isPlayable(abc))) {
+                setOutcome({ ok: false, message: "This link does not contain a playable song." });
+                return;
+            }
+            const ids = [...exercises.map((e) => e.id), ...loadUserSongs().map((song) => song.id)];
+            const exercise = buildExercise(abc, ids);
+            saveUserSong(exercise);
+            setOutcome({ ok: true, id: exercise.id, title: exercise.title });
+        })();
     }, []);
 
     return (
