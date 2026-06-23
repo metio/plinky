@@ -20,6 +20,7 @@ import {
 import { AbcRenderer } from "./abcRenderer";
 import { HandSelector, useHandSelection } from "./handSelector";
 import { KeyboardHint } from "./keyboardHint";
+import { PianoKeyboard } from "./pianoKeyboard";
 import { TempoGraph } from "./tempoGraph";
 
 const HOTSPOT_COLOR = "#dc2626"; // red-600 — a note inside a slow stretch
@@ -264,6 +265,8 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
             <div className="rounded-md border border-gray-200 p-4">
                 <AbcRenderer abcTune={exercise.abc} onRender={handleRender} />
             </div>
+
+            <PianoKeyboard expected={matcher.nextByHand.flatMap((hand) => hand.pitches)} />
 
             <KeyboardHint octaveOffset={octaveOffset} />
         </section>

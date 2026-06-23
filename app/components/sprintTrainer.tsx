@@ -12,6 +12,7 @@ import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { loadBestSprint, saveBestSprint, type SprintBest } from "../lib/scores";
 import { AbcRenderer } from "./abcRenderer";
 import { KeyboardHint } from "./keyboardHint";
+import { PianoKeyboard } from "./pianoKeyboard";
 
 // Notation only; the score is correct notes in real time, so the tempo just sets
 // the rendered timing. Enough bars to outlast the longest sprint at a brisk pace.
@@ -272,6 +273,8 @@ export function SprintTrainer() {
                     <AbcRenderer abcTune={abc} onRender={handleRender} />
                 </div>
             )}
+
+            <PianoKeyboard expected={matcher.nextByHand.flatMap((hand) => hand.pitches)} />
 
             <KeyboardHint octaveOffset={octaveOffset} />
         </section>

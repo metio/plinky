@@ -41,6 +41,9 @@ type MidiContextValue = {
     requestAccess: () => void;
     clearEvents: () => void;
     subscribe: (listener: NoteListener) => () => void;
+    // Play a note from the on-screen keyboard through the same funnel as MIDI.
+    pressKey: (note: number) => void;
+    releaseKey: (note: number) => void;
 };
 
 const MidiContext = createContext<MidiContextValue | null>(null);
@@ -114,6 +117,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             }
         },
         [],
+    );
+
+    const pressKey = useCallback(
+        (note: number) =>
+            emitNote("noteon", note, KEYBOARD_VELOCITY, 1, "On-screen keyboard", performance.now()),
+        [emitNote],
+    );
+    const releaseKey = useCallback(
+        (note: number) => emitNote("noteoff", note, 0, 1, "On-screen keyboard", performance.now()),
+        [emitNote],
     );
 
     const makeHandler = useCallback(
@@ -270,6 +283,8 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         requestAccess,
         clearEvents,
         subscribe,
+        pressKey,
+        releaseKey,
     };
 
     return <MidiContext.Provider value={value}>{children}</MidiContext.Provider>;
