@@ -44,7 +44,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx knip
+      - run: npm run knip
   typos:
     name: typos
     runs-on: ubuntu-latest
