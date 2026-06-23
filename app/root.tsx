@@ -92,9 +92,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta property="og:type" content="website" />
                 <meta property="og:site_name" content="Plinky" />
                 <meta property="og:url" content={SITE_URL} />
-                <meta property="og:image" content={`${SITE_URL}/logo.svg`} />
-                <meta name="twitter:card" content="summary" />
-                <meta name="twitter:image" content={`${SITE_URL}/logo.svg`} />
+                <meta property="og:image" content={`${SITE_URL}/og.png`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:image" content={`${SITE_URL}/og.png`} />
                 <Meta />
                 <Links />
             </head>

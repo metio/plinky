@@ -14,7 +14,8 @@
     "coverage": "vitest run --coverage",
     "test:storybook": "vitest run --project storybook",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "og": "node dev/make-og.mjs"
   },
   "dependencies": {
     "@react-router/node": "^8.0.1",
