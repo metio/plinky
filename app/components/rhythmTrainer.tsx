@@ -4,14 +4,14 @@
 import type { TuneObject } from "abcjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { type CorrectInfo, describeNext, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useMetronome } from "../hooks/useMetronome";
-import { useNoteMatcher } from "../hooks/useNoteMatcher";
 import { useSynth } from "../hooks/useSynth";
 import type { Exercise } from "../lib/exercises";
+import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { type Hit, makeHit, type RhythmSummary, summarize } from "../lib/rhythm";
 import { isBetterRhythm, loadBestRhythm, type RhythmBest, saveBestRhythm } from "../lib/scores";
-import { buildSteps, type Step } from "../lib/steps";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { KeyboardHint } from "./keyboardHint";
@@ -33,7 +33,7 @@ function describeHit(hit: Hit): string {
 }
 
 export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
-    const [steps, setSteps] = useState<Step[]>([]);
+    const [hands, setHands] = useState<Hand[]>([]);
     const [runState, setRunState] = useState<RunState>("idle");
     const [lastHit, setLastHit] = useState<Hit | null>(null);
     const [summary, setSummary] = useState<RhythmSummary | null>(null);
@@ -54,36 +54,34 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     }, [exercise.id]);
 
     const handleRender = useCallback(
-        // Build steps at the exercise tempo so each step's `timeMs` is its target
-        // time within the phrase.
-        (tune: TuneObject) => setSteps(buildSteps(tune, exercise.tempo)),
+        (tune: TuneObject) => setHands(buildHands(tune, exercise.tempo)),
         [exercise.tempo],
     );
 
     const synth = useSynth();
 
     const handleCorrect = useCallback(
-        (index: number, timestamp: number) => {
-            for (const pitch of steps[index]?.pitches ?? []) {
+        (info: CorrectInfo) => {
+            for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
-            // The first note anchors the phrase; every later note is scored
-            // against its tempo-derived offset from that anchor.
-            if (index === 0) {
-                startRef.current = timestamp;
-                baseOffsetRef.current = steps[0]?.timeMs ?? 0;
+            // The first note anchors the phrase; every later note is scored against
+            // its tempo-derived offset from that anchor.
+            if (info.ordinal === 0) {
+                startRef.current = info.timestamp;
+                baseOffsetRef.current = info.timeMs;
                 hitsRef.current = [];
                 setLastHit(null);
                 setRunState("running");
                 return;
             }
-            const targetOffset = (steps[index]?.timeMs ?? 0) - baseOffsetRef.current;
-            const actualOffset = timestamp - startRef.current;
-            const hit = makeHit(index, actualOffset - targetOffset);
+            const targetOffset = info.timeMs - baseOffsetRef.current;
+            const actualOffset = info.timestamp - startRef.current;
+            const hit = makeHit(info.ordinal, actualOffset - targetOffset);
             hitsRef.current = [...hitsRef.current, hit];
             setLastHit(hit);
         },
-        [synth, steps],
+        [synth],
     );
 
     const handleComplete = useCallback(() => {
@@ -104,7 +102,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     }, [metronome, exercise.id]);
 
     const active = runState === "armed" || runState === "running";
-    const matcher = useNoteMatcher(steps, {
+    const matcher = useHandsMatcher(hands, {
         active,
         onCorrect: handleCorrect,
         onComplete: handleComplete,
@@ -186,7 +184,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     <button
                         type="button"
                         onClick={start}
-                        disabled={steps.length === 0}
+                        disabled={matcher.totalSteps === 0}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                     >
                         {runState === "finished" ? "Go again" : "Start"}
@@ -210,7 +208,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     <span className="text-sm text-indigo-700">
                         Play{" "}
                         <span className="font-mono">
-                            {matcher.nextPitches.map(noteName).join(" ")}
+                            {describeNext(matcher.nextByHand, noteName)}
                         </span>{" "}
                         on the beat.
                     </span>

@@ -86,6 +86,14 @@ export const exercises: Exercise[] = [
         tempo: 80,
         beatsPerBar: 4,
     },
+    {
+        id: "two-hand-c-major",
+        title: "Two-hand C major",
+        description: "A right-hand melody over a left-hand bass — your first grand staff.",
+        abc: "X:1\nT:Two-hand C major\nM:4/4\nL:1/4\nV:1 clef=treble\nV:2 clef=bass\nV:1\nK:C\nc d e f | g f e d |\nV:2\nC2 G2 | C2 G2 |",
+        tempo: 80,
+        beatsPerBar: 4,
+    },
 ];
 
 export function findExercise(id: string | undefined): Exercise | undefined {
