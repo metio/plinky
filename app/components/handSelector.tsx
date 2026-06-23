@@ -51,7 +51,7 @@ export function HandSelector({
                     className={`rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-40 ${
                         value === option.value
                             ? "bg-indigo-600 text-white"
-                            : "border border-gray-300 text-gray-700"
+                            : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                     }`}
                 >
                     {option.label}

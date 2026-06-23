@@ -27,7 +27,9 @@ describe("PianoKeyboard", () => {
 
     it("highlights the expected note", () => {
         renderKeyboard({ from: 60, to: 67, expected: [60] });
-        expect(screen.getByLabelText("C4").className).toContain("bg-indigo-50");
-        expect(screen.getByLabelText("D4").className).not.toContain("bg-indigo-50");
+        expect(screen.getByLabelText("C4").className).toContain("bg-indigo-50 dark:bg-indigo-950");
+        expect(screen.getByLabelText("D4").className).not.toContain(
+            "bg-indigo-50 dark:bg-indigo-950",
+        );
     });
 });

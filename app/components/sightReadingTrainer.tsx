@@ -70,7 +70,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{exercise.title}</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Play the highlighted note. The cursor advances when you hit the right key.
                 </p>
             </header>
@@ -99,11 +99,11 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                 <button
                     type="button"
                     onClick={toggleMetronome}
-                    className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700"
+                    className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                     {metronome.running ? "Stop metronome" : "Metronome"}
                 </button>
-                <label className="flex items-center gap-2 text-sm text-gray-600">
+                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                     Tempo
                     <input
                         type="range"
@@ -130,7 +130,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                     matcher.nextByHand.length > 0 && (
                         <div className="text-sm">
                             <span className="font-medium">Next:</span>{" "}
-                            <span className="font-mono text-indigo-700">
+                            <span className="font-mono text-indigo-700 dark:text-indigo-300">
                                 {describeNext(matcher.nextByHand, noteName)}
                             </span>
                         </div>
@@ -143,7 +143,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                 )}
             </div>
 
-            <div className="rounded-md border border-gray-200 p-4">
+            <div className="rounded-md border border-gray-200 dark:border-gray-800 p-4">
                 <AbcRenderer abcTune={exercise.abc} onRender={handleRender} />
             </div>
 
@@ -155,7 +155,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                 type="button"
                 onClick={matcher.reset}
                 disabled={matcher.completedSteps === 0}
-                className="text-sm text-gray-500 underline disabled:opacity-40"
+                className="text-sm text-gray-500 dark:text-gray-400 underline disabled:opacity-40"
             >
                 Restart
             </button>

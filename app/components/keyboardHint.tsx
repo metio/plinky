@@ -7,8 +7,10 @@ function formatOffset(offset: number): string {
 
 export function KeyboardHint({ octaveOffset }: { octaveOffset: number }) {
     return (
-        <div className="space-y-1 rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
-            <p className="font-medium text-gray-700">No piano? Play with your computer keyboard:</p>
+        <div className="space-y-1 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-3 text-xs text-gray-600 dark:text-gray-300">
+            <p className="font-medium text-gray-700 dark:text-gray-300">
+                No piano? Play with your computer keyboard:
+            </p>
             <p>
                 <span className="font-medium">Left hand</span> —{" "}
                 <span className="font-mono">A S D F G</span> white keys (C–G),{" "}

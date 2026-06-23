@@ -82,7 +82,7 @@ export function SongImport({
             <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700"
+                className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
                 Import a song
             </button>
@@ -90,13 +90,13 @@ export function SongImport({
     }
 
     return (
-        <div className="space-y-3 rounded-md border border-gray-200 p-4">
+        <div className="space-y-3 rounded-md border border-gray-200 dark:border-gray-800 p-4">
             <textarea
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 rows={6}
                 placeholder={PLACEHOLDER}
-                className="w-full rounded-md border border-gray-300 p-2 font-mono text-sm"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-700 p-2 font-mono text-sm"
             />
             <div className="flex flex-wrap items-center gap-3">
                 <input
@@ -119,7 +119,7 @@ export function SongImport({
                         setOpen(false);
                         setError(null);
                     }}
-                    className="text-sm text-gray-500 underline"
+                    className="text-sm text-gray-500 dark:text-gray-400 underline"
                 >
                     Cancel
                 </button>

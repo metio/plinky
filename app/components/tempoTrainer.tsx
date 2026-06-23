@@ -174,7 +174,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Tempo · {exercise.title}</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Play at your own pace — no metronome. Plinky charts your tempo and flags where
                     you slowed down.
                 </p>
@@ -192,7 +192,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     type="button"
                     onClick={requestAccess}
                     disabled={support !== "supported" || status === "requesting"}
-                    className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40"
+                    className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
@@ -219,13 +219,13 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     <button
                         type="button"
                         onClick={() => setRunState("idle")}
-                        className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+                        className="rounded-md border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                         Stop
                     </button>
                 )}
                 {runState === "armed" && (
-                    <span className="text-sm text-indigo-700">
+                    <span className="text-sm text-indigo-700 dark:text-indigo-300">
                         Play{" "}
                         <span className="font-mono">
                             {describeNext(matcher.nextByHand, noteName)}
@@ -234,21 +234,21 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     </span>
                 )}
                 {runState === "running" && (
-                    <span className="text-lg font-semibold tabular-nums text-indigo-700">
+                    <span className="text-lg font-semibold tabular-nums text-indigo-700 dark:text-indigo-300">
                         ≈ {liveBpm ?? "…"} BPM
                     </span>
                 )}
             </div>
 
             {runState === "finished" && result && (
-                <div className="space-y-3 rounded-md border border-gray-200 bg-gray-50 p-4">
-                    <p className="text-sm text-gray-600">
+                <div className="space-y-3 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                         Median tempo{" "}
                         <span className="font-mono">{Math.round(result.median)} BPM</span> ·{" "}
                         {describeHotspots(result.hotspots)}
                     </p>
                     {result.handStats.map((hand) => (
-                        <p key={hand.label} className="text-sm text-gray-500">
+                        <p key={hand.label} className="text-sm text-gray-500 dark:text-gray-400">
                             {hand.label} hand: median{" "}
                             <span className="font-mono">{Math.round(hand.median)} BPM</span> ·{" "}
                             {describeHotspots(hand.hotspots)}
@@ -262,7 +262,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                 </div>
             )}
 
-            <div className="rounded-md border border-gray-200 p-4">
+            <div className="rounded-md border border-gray-200 dark:border-gray-800 p-4">
                 <AbcRenderer abcTune={exercise.abc} onRender={handleRender} />
             </div>
 

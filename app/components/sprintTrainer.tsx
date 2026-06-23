@@ -154,7 +154,7 @@ export function SprintTrainer() {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">Sight-reading sprint</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Fresh notes every run. Play as many correctly as you can before the timer runs
                     out — the clock starts on your first note.
                 </p>
@@ -172,7 +172,7 @@ export function SprintTrainer() {
                     type="button"
                     onClick={requestAccess}
                     disabled={support !== "supported" || status === "requesting"}
-                    className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40"
+                    className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
                     {status === "requesting" ? "Connecting…" : "Connect MIDI"}
                 </button>
@@ -181,7 +181,9 @@ export function SprintTrainer() {
             {runState === "idle" && (
                 <div className="space-y-4">
                     <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-sm font-medium text-gray-700">Length</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Length
+                        </span>
                         {DURATIONS.map((minutes) => (
                             <button
                                 key={minutes}
@@ -190,13 +192,13 @@ export function SprintTrainer() {
                                 className={`rounded-md px-3 py-1.5 text-sm font-medium ${
                                     durationMin === minutes
                                         ? "bg-indigo-600 text-white"
-                                        : "border border-gray-300 text-gray-700"
+                                        : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                                 }`}
                             >
                                 {minutes} min
                             </button>
                         ))}
-                        <label className="ml-2 flex items-center gap-2 text-sm text-gray-700">
+                        <label className="ml-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                             <input
                                 type="checkbox"
                                 checked={twoHands}
@@ -232,7 +234,7 @@ export function SprintTrainer() {
                         </div>
                     </div>
                     {runState === "armed" && (
-                        <p className="pb-2 text-sm font-medium text-indigo-700">
+                        <p className="pb-2 text-sm font-medium text-indigo-700 dark:text-indigo-300">
                             Play{" "}
                             <span className="font-mono">
                                 {noteName(allHands[0]?.steps[0]?.pitches[0] ?? 0)}
@@ -244,9 +246,9 @@ export function SprintTrainer() {
             )}
 
             {runState === "finished" && result && (
-                <div className="space-y-2 rounded-md border border-gray-200 bg-gray-50 p-4">
+                <div className="space-y-2 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
                     <p className="text-lg font-semibold">{isRecord ? "New best! 🏆" : "Time!"}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                         <span className="font-mono">{result.correct}</span> correct ·{" "}
                         <span className="font-mono">{accuracy}%</span> accuracy ·{" "}
                         <span className="text-red-600">{result.wrong} wrong</span>
@@ -262,14 +264,14 @@ export function SprintTrainer() {
             )}
 
             {best && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Best for {durationMin} min {twoHands ? "(two hands)" : "(one hand)"}:{" "}
                     <span className="font-mono">{best.correct}</span> correct
                 </p>
             )}
 
             {abc && (
-                <div className="rounded-md border border-gray-200 p-4">
+                <div className="rounded-md border border-gray-200 dark:border-gray-800 p-4">
                     <AbcRenderer abcTune={abc} onRender={handleRender} />
                 </div>
             )}

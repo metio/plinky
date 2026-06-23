@@ -58,12 +58,14 @@ export default function ImportRoute() {
         <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
             <h1 className="text-2xl font-semibold">Shared song</h1>
 
-            {outcome === null && <p className="text-sm text-gray-500">Reading the link…</p>}
+            {outcome === null && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">Reading the link…</p>
+            )}
 
             {outcome?.ok === false && (
                 <div className="space-y-3">
                     <p className="text-sm text-red-600">{outcome.message}</p>
-                    <Link to="/" className="text-sm text-indigo-700 underline">
+                    <Link to="/" className="text-sm text-indigo-700 dark:text-indigo-300 underline">
                         Back to exercises
                     </Link>
                 </div>
@@ -71,7 +73,7 @@ export default function ImportRoute() {
 
             {outcome?.ok === true && (
                 <div className="space-y-3">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                         Added <span className="font-medium">{outcome.title}</span> to your library
                         on this device.
                     </p>
@@ -84,7 +86,7 @@ export default function ImportRoute() {
                         </Link>
                         <Link
                             to="/"
-                            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700"
+                            className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
                         >
                             All exercises
                         </Link>

@@ -56,11 +56,11 @@ export function PianoKeyboard({
                         onPointerDown={down(note)}
                         onPointerUp={up(note)}
                         onPointerLeave={leave(note)}
-                        className={`flex-1 rounded-b border border-gray-300 ${
+                        className={`flex-1 rounded-b border border-gray-300 dark:border-gray-700 ${
                             heldNotes.includes(note)
                                 ? "bg-indigo-300"
                                 : expected.includes(note)
-                                  ? "bg-indigo-50"
+                                  ? "bg-indigo-50 dark:bg-indigo-950"
                                   : "bg-white"
                         }`}
                     />

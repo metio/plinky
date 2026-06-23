@@ -28,7 +28,7 @@ export function MidiDebugPanel() {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">MIDI debug</h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                     Connect a digital piano and confirm note events arrive in the browser.
                 </p>
             </header>
@@ -49,7 +49,7 @@ export function MidiDebugPanel() {
                 >
                     {status === "ready" ? "Reconnect" : "Connect MIDI"}
                 </button>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                     {support === "unknown" && "Checking browser support…"}
                     {status === "requesting" && "Requesting access…"}
                     {status === "ready" &&
@@ -64,7 +64,7 @@ export function MidiDebugPanel() {
             <KeyboardHint octaveOffset={octaveOffset} />
 
             <div>
-                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     Inputs
                 </h2>
                 {devices.length === 0 ? (
@@ -91,7 +91,7 @@ export function MidiDebugPanel() {
             </div>
 
             <div>
-                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     Held notes
                 </h2>
                 {heldNotes.length === 0 ? (
@@ -112,14 +112,14 @@ export function MidiDebugPanel() {
 
             <div>
                 <div className="mb-2 flex items-center justify-between">
-                    <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         Event log
                     </h2>
                     <button
                         type="button"
                         onClick={clearEvents}
                         disabled={events.length === 0}
-                        className="text-xs text-gray-500 underline disabled:opacity-40"
+                        className="text-xs text-gray-500 dark:text-gray-400 underline disabled:opacity-40"
                     >
                         Clear
                     </button>
