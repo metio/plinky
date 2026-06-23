@@ -3,46 +3,60 @@
 
 import type { TuneObject } from "abcjs";
 import { useEffect, useRef, useState } from "react";
+import { fingerSteps, type Hand } from "../lib/fingering";
 import { buildHands } from "../lib/hands";
 
+type OverlayMode = "off" | "names" | "fingers";
+
 const PITCH_CLASSES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
-const PREF_KEY = "plinky:note-names";
+const PREF_KEY = "plinky:overlay";
 
 function noteClass(pitch: number): string {
     return PITCH_CLASSES[((pitch % 12) + 12) % 12];
 }
 
-function loadPref(): boolean {
+function loadMode(): OverlayMode {
     try {
-        return localStorage.getItem(PREF_KEY) === "1";
+        const stored = localStorage.getItem(PREF_KEY);
+        return stored === "names" || stored === "fingers" ? stored : "off";
     } catch {
-        return false;
+        return "off";
     }
 }
 
-// Draw the note name under each notehead. getBBox needs layout, so this is a
-// no-op where it is unavailable (e.g. jsdom); labels are appended beside each
-// note element so they inherit its group transform and line up.
-function overlayNoteNames(tune: TuneObject): void {
+function label(element: Element, text: string, color: string): void {
+    try {
+        const box = (element as unknown as SVGGraphicsElement).getBBox();
+        const node = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        node.setAttribute("x", String(box.x + box.width / 2));
+        node.setAttribute("y", String(box.y + box.height + 13));
+        node.setAttribute("text-anchor", "middle");
+        node.setAttribute("font-size", "9");
+        node.setAttribute("fill", color);
+        node.textContent = text;
+        element.parentNode?.appendChild(node);
+    } catch {
+        // getBBox needs layout; skip the overlay where it is unavailable (e.g. jsdom).
+    }
+}
+
+// Annotate the score with either note names (under every notehead) or suggested
+// finger numbers (once per step, on its melody note). Labels are appended beside
+// each note element so they inherit its group transform and line up.
+function overlay(tune: TuneObject, mode: OverlayMode): void {
     for (const hand of buildHands(tune, 100)) {
-        for (const step of hand.steps) {
+        const handType: Hand = hand.label.toLowerCase().includes("left") ? "left" : "right";
+        const fingers = mode === "fingers" ? fingerSteps(hand.steps, handType) : null;
+        hand.steps.forEach((step, index) => {
+            if (fingers) {
+                label(step.elements[0], String(fingers[index]), "#16a34a");
+                return;
+            }
             const name = step.pitches.map(noteClass).join("/");
             for (const element of step.elements) {
-                try {
-                    const box = (element as unknown as SVGGraphicsElement).getBBox();
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("x", String(box.x + box.width / 2));
-                    text.setAttribute("y", String(box.y + box.height + 13));
-                    text.setAttribute("text-anchor", "middle");
-                    text.setAttribute("font-size", "9");
-                    text.setAttribute("fill", "#4f46e5");
-                    text.textContent = name;
-                    element.parentNode?.appendChild(text);
-                } catch {
-                    // No layout engine — skip the overlay.
-                }
+                label(element, name, "#4f46e5");
             }
-        }
+        });
     }
 }
 
@@ -54,10 +68,10 @@ export function AbcRenderer({
     onRender?: (tune: TuneObject) => void;
 }) {
     const abcElement = useRef<HTMLDivElement>(null);
-    const [showNames, setShowNames] = useState(false);
+    const [mode, setMode] = useState<OverlayMode>("off");
 
     useEffect(() => {
-        setShowNames(loadPref());
+        setMode(loadMode());
     }, []);
 
     useEffect(() => {
@@ -78,21 +92,20 @@ export function AbcRenderer({
             });
             if (tunes[0]) {
                 onRender?.(tunes[0]);
-                if (showNames) {
-                    overlayNoteNames(tunes[0]);
+                if (mode !== "off") {
+                    overlay(tunes[0], mode);
                 }
             }
         });
         return () => {
             cancelled = true;
         };
-    }, [abcTune, onRender, showNames]);
+    }, [abcTune, onRender, mode]);
 
-    const toggle = () => {
-        const next = !showNames;
-        setShowNames(next);
+    const changeMode = (next: OverlayMode) => {
+        setMode(next);
         try {
-            localStorage.setItem(PREF_KEY, next ? "1" : "0");
+            localStorage.setItem(PREF_KEY, next);
         } catch {
             // Preference persistence is best-effort.
         }
@@ -101,8 +114,16 @@ export function AbcRenderer({
     return (
         <div className="space-y-2">
             <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                <input type="checkbox" checked={showNames} onChange={toggle} />
-                Show note names
+                Overlay
+                <select
+                    value={mode}
+                    onChange={(event) => changeMode(event.target.value as OverlayMode)}
+                    className="rounded border border-gray-300 bg-transparent px-1 py-0.5 dark:border-gray-700"
+                >
+                    <option value="off">None</option>
+                    <option value="names">Note names</option>
+                    <option value="fingers">Fingering</option>
+                </select>
             </label>
             {/* The score keeps a white "paper" background in every theme so the black
                 notation stays readable in dark mode. */}
