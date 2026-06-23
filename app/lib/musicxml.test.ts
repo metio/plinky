@@ -56,4 +56,12 @@ describe("musicXmlToAbc", () => {
     it("rejects input that is not a score-partwise document", () => {
         expect(() => musicXmlToAbc("not music xml")).toThrow();
     });
+
+    it("omits the length for a note with no duration (never emits C0)", () => {
+        const abc = musicXmlToAbc(
+            score("<note><pitch><step>C</step><octave>4</octave></pitch></note>"),
+        );
+        expect(abc).not.toContain("C0");
+        expect(abc).toContain("C |");
+    });
 });

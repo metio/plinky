@@ -4,7 +4,7 @@
 import type { TuneObject } from "abcjs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
-import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
+import { type CorrectInfo, describeNext, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { barIndex, buildRegion, regionSpanMs, totalBars } from "../lib/bars";
 import type { Exercise } from "../lib/exercises";
@@ -292,10 +292,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
             {running && (
                 <p className="text-sm text-indigo-700 dark:text-indigo-300">
                     Lap {reps.length + 1} — play{" "}
-                    <span className="font-mono">
-                        {noteName(region[0]?.steps[matcher.completedSteps]?.pitches[0] ?? 0)}
-                    </span>
-                    …
+                    <span className="font-mono">{describeNext(matcher.nextByHand, noteName)}</span>…
                 </p>
             )}
 

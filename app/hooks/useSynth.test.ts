@@ -68,4 +68,12 @@ describe("useSynth", () => {
         result.current.playNote(60);
         expect(oscillators).toBe(0);
     });
+
+    it("stays silent — and does not throw — at volume 0", () => {
+        // An exponential gain ramp to 0 is a RangeError, so volume 0 must short-circuit.
+        savePrefs({ sound: true, volume: 0 });
+        const { result } = renderHook(() => useSynth());
+        expect(() => result.current.playNote(60)).not.toThrow();
+        expect(oscillators).toBe(0);
+    });
 });
