@@ -178,7 +178,9 @@ export function importSongsPack(json: string): { imported: number; curriculums: 
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify([...songs.values()]));
         } catch {
-            // See saveUserSong.
+            // Unlike a single convenience save, a mass-import must not claim
+            // success when nothing was stored (e.g. the songs exceed the quota).
+            throw new Error("Could not save the songs — they may exceed this device's storage.");
         }
     }
     return { imported: pack.songs.length, curriculums: pack.curriculums.length };

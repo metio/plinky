@@ -165,4 +165,13 @@ describe("song packs", () => {
         importSongsPack(PACK);
         expect(importSongsPack(exportAllPack())).toEqual({ imported: 2, curriculums: 1 });
     });
+
+    it("surfaces a storage failure instead of reporting a false success", () => {
+        const original = localStorage.setItem;
+        localStorage.setItem = () => {
+            throw new Error("quota exceeded");
+        };
+        expect(() => importSongsPack(PACK)).toThrow(/exceed this device's storage/);
+        localStorage.setItem = original;
+    });
 });
