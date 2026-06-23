@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Fortschritt",
+  "nav_settings": "Einstellungen",
+  "home_heading": "Klavier üben im Browser",
+  "home_intro": "Schließe ein MIDI-Klavier an oder spiele auf deiner Computertastatur. Wähle unten eine Übung oder übe ein Lied."
+}

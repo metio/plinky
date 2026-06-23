@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Framsteg",
+  "nav_settings": "Inställningar",
+  "home_heading": "Öva piano i webbläsaren",
+  "home_intro": "Anslut ett MIDI-piano eller spela med datorns tangentbord. Välj en övning nedan eller öva på en låt."
+}

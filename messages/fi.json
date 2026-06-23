@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Edistyminen",
+  "nav_settings": "Asetukset",
+  "home_heading": "Harjoittele pianonsoittoa selaimessa",
+  "home_intro": "Liitä MIDI-piano tai soita tietokoneen näppäimistöllä. Valitse harjoitus alta tai harjoittele kappaletta."
+}

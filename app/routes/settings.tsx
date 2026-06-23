@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiDebugPanel } from "../components/midiDebugPanel";
 import { SongBackup } from "../components/songBackup";
 import { ThemeToggle } from "../components/themeToggle";
@@ -43,6 +44,10 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-700 dark:text-gray-300">Theme</span>
                     <ThemeToggle />
+                </div>
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Language</span>
+                    <LanguageSwitcher />
                 </div>
             </section>
 
@@ -86,6 +91,18 @@ export default function Settings() {
                     MIDI device
                 </h2>
                 <MidiDebugPanel />
+            </section>
+
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">Help</h2>
+                <a
+                    href="https://github.com/metio/plinky/issues"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-indigo-700 underline dark:text-indigo-300"
+                >
+                    Get help or report a bug →
+                </a>
             </section>
         </main>
     );

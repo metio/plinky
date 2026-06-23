@@ -8,6 +8,13 @@
 /.react-router/
 /build/
 /coverage/
+# Paraglide-generated output and the inlang project cache/metadata (only
+# project.inlang/settings.json is tracked).
+/app/paraglide/
+/project.inlang/cache/
+/project.inlang/.meta.json
+/project.inlang/README.md
+/project.inlang/.gitignore
 /.vitest-attachments/
 __screenshots__/
 

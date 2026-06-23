@@ -1,0 +1,7 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "nav_progress": "Fremskridt",
+  "nav_settings": "Indstillinger",
+  "home_heading": "Øv klaver i din browser",
+  "home_intro": "Tilslut et MIDI-klaver eller spil med dit computertastatur. Vælg en øvelse nedenfor, eller øv en sang."
+}
