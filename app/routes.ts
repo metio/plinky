@@ -9,6 +9,7 @@ export default [
     route("time-trial/:exerciseId", "routes/time-trial.tsx"),
     route("rhythm/:exerciseId", "routes/rhythm.tsx"),
     route("tempo/:exerciseId", "routes/tempo.tsx"),
+    route("loop/:exerciseId", "routes/loop.tsx"),
     route("sprint", "routes/sprint.tsx"),
     route("daily", "routes/daily.tsx"),
     route("ear", "routes/ear.tsx"),
