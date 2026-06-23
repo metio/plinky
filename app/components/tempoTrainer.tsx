@@ -28,12 +28,15 @@ const SMOOTHING = 0.4;
 
 type RunState = "idle" | "armed" | "running" | "finished";
 
-type Note = { timeMs: number; timestamp: number; elements: HTMLElement[] };
+type Note = { hand: number; timeMs: number; timestamp: number; elements: HTMLElement[] };
+
+type HandStat = { label: string; median: number; hotspots: Hotspot[] };
 
 type Result = {
     points: TempoPoint[];
     median: number;
     hotspots: Hotspot[];
+    handStats: HandStat[];
 };
 
 function describeHotspots(hotspots: Hotspot[]): string {
@@ -75,6 +78,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                 synth.playNote(pitch);
             }
             notesRef.current[info.ordinal] = {
+                hand: info.hand,
                 timeMs: info.timeMs,
                 timestamp: info.timestamp,
                 elements: info.elements,
@@ -96,16 +100,33 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
     );
 
     const handleComplete = useCallback(() => {
-        const notes = notesRef.current;
-        const points = tempoSeries(
-            exercise.tempo,
-            notes.map((note) => note.timeMs),
-            notes.map((note) => note.timestamp),
-        );
-        const med = median(points.map((point) => point.bpm));
-        setResult({ points, median: med, hotspots: findHotspots(points, med) });
+        const seriesFor = (notes: Note[]) => {
+            const points = tempoSeries(
+                exercise.tempo,
+                notes.map((note) => note.timeMs),
+                notes.map((note) => note.timestamp),
+            );
+            const med = median(points.map((point) => point.bpm));
+            return { points, median: med, hotspots: findHotspots(points, med) };
+        };
+        const all = notesRef.current;
+        const combined = seriesFor(all);
+        // When both hands played, chart the combined curve but report each hand's
+        // own tempo so a dragging hand stands out.
+        const handStats: HandStat[] =
+            hands.length > 1
+                ? hands.map((hand) => {
+                      const series = seriesFor(all.filter((note) => note.hand === hand.staff));
+                      return {
+                          label: hand.label,
+                          median: series.median,
+                          hotspots: series.hotspots,
+                      };
+                  })
+                : [];
+        setResult({ ...combined, handStats });
         setRunState("finished");
-    }, [exercise.tempo]);
+    }, [exercise.tempo, hands]);
 
     const active = runState === "armed" || runState === "running";
     const matcher = useHandsMatcher(hands, {
@@ -225,6 +246,13 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                         <span className="font-mono">{Math.round(result.median)} BPM</span> ·{" "}
                         {describeHotspots(result.hotspots)}
                     </p>
+                    {result.handStats.map((hand) => (
+                        <p key={hand.label} className="text-sm text-gray-500">
+                            {hand.label} hand: median{" "}
+                            <span className="font-mono">{Math.round(hand.median)} BPM</span> ·{" "}
+                            {describeHotspots(hand.hotspots)}
+                        </p>
+                    ))}
                     <TempoGraph
                         points={result.points}
                         median={result.median}

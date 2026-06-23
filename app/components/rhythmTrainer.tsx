@@ -39,6 +39,9 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     const [runState, setRunState] = useState<RunState>("idle");
     const [lastHit, setLastHit] = useState<Hit | null>(null);
     const [summary, setSummary] = useState<RhythmSummary | null>(null);
+    const [handSummaries, setHandSummaries] = useState<{ label: string; summary: RhythmSummary }[]>(
+        [],
+    );
     const [best, setBest] = useState<RhythmBest | null>(null);
     const [isRecord, setIsRecord] = useState(false);
 
@@ -46,7 +49,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     // without being recreated mid-run.
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
-    const hitsRef = useRef<Hit[]>([]);
+    const hitsRef = useRef<{ hand: number; hit: Hit }[]>([]);
     const armTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const metronome = useMetronome();
@@ -80,7 +83,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
             const targetOffset = info.timeMs - baseOffsetRef.current;
             const actualOffset = info.timestamp - startRef.current;
             const hit = makeHit(info.ordinal, actualOffset - targetOffset);
-            hitsRef.current = [...hitsRef.current, hit];
+            hitsRef.current = [...hitsRef.current, { hand: info.hand, hit }];
             setLastHit(hit);
         },
         [synth],
@@ -88,8 +91,21 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
 
     const handleComplete = useCallback(() => {
         metronome.stop();
-        const result = summarize(hitsRef.current);
+        const entries = hitsRef.current;
+        const result = summarize(entries.map((entry) => entry.hit));
         setSummary(result);
+        // Break the score down per hand when both played, so a dragging left hand
+        // shows up on its own.
+        setHandSummaries(
+            hands.length > 1
+                ? hands.map((hand) => ({
+                      label: hand.label,
+                      summary: summarize(
+                          entries.filter((entry) => entry.hand === hand.staff).map((e) => e.hit),
+                      ),
+                  }))
+                : [],
+        );
         setRunState("finished");
         setBest((prevBest) => {
             if (result.total > 0 && isBetterRhythm(result, prevBest)) {
@@ -101,7 +117,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
             setIsRecord(false);
             return prevBest;
         });
-    }, [metronome, exercise.id]);
+    }, [metronome, exercise.id, hands]);
 
     const active = runState === "armed" || runState === "running";
     const matcher = useHandsMatcher(hands, {
@@ -130,6 +146,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
         hitsRef.current = [];
         setLastHit(null);
         setSummary(null);
+        setHandSummaries([]);
         setIsRecord(false);
         setRunState("counting");
         // One bar of clicks doubles as the count-in; the metronome keeps ticking
@@ -243,6 +260,12 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     <p className="text-gray-500">
                         Average timing error {Math.round(summary.averageAbsMs)}ms
                     </p>
+                    {handSummaries.map((hand) => (
+                        <p key={hand.label} className="text-gray-500">
+                            {hand.label} hand: {Math.round(hand.summary.averageAbsMs)}ms (
+                            {hand.summary.perfect}/{hand.summary.total} perfect)
+                        </p>
+                    ))}
                 </div>
             )}
 
