@@ -84,6 +84,12 @@ export default function App() {
                     <div className="flex items-center gap-4">
                         <ThemeToggle />
                         <Link
+                            to="/progress"
+                            className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        >
+                            Progress
+                        </Link>
+                        <Link
                             to="/settings"
                             className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                         >
