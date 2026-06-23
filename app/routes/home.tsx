@@ -68,17 +68,30 @@ export default function Home() {
                 </p>
             </header>
 
-            <Link
-                to="/sprint"
-                className="block rounded-md border border-indigo-200 bg-indigo-50 dark:bg-indigo-950 p-4 hover:bg-indigo-100"
-            >
-                <span className="font-medium text-indigo-700 dark:text-indigo-300">
-                    Sight-reading sprint →
-                </span>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Fresh notes every run — play as many as you can before the timer runs out.
-                </p>
-            </Link>
+            <div className="grid gap-3 sm:grid-cols-2">
+                <Link
+                    to="/sprint"
+                    className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950 dark:hover:bg-indigo-900"
+                >
+                    <span className="font-medium text-indigo-700 dark:text-indigo-300">
+                        Sight-reading sprint →
+                    </span>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Fresh notes every run — play as many as you can before the timer runs out.
+                    </p>
+                </Link>
+                <Link
+                    to="/daily"
+                    className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950 dark:hover:bg-indigo-900"
+                >
+                    <span className="font-medium text-indigo-700 dark:text-indigo-300">
+                        Daily challenge →
+                    </span>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        One minute, the same notes for everyone today. Beat your best.
+                    </p>
+                </Link>
+            </div>
 
             <ul className="space-y-3">
                 {all.map((exercise) => (
