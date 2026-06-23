@@ -8,7 +8,7 @@ import type { Exercise } from "../lib/exercises";
 import { seedStarterSongs } from "../lib/seed";
 import { encodeSong } from "../lib/share";
 import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
-import { loadUserSongs, removeUserSong, toAbcDocument } from "../lib/songs";
+import { loadUserSongs, removeUserSong, submissionUrl, toAbcDocument } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/home";
 
@@ -187,6 +187,14 @@ export default function Home() {
                                     >
                                         Export
                                     </button>
+                                    <a
+                                        href={submissionUrl(exercise)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
+                                    >
+                                        Submit
+                                    </a>
                                     <button
                                         type="button"
                                         onClick={() => remove(exercise.id)}

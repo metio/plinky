@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { decodeSong } from "../lib/share";
 import { routeMeta } from "../lib/site";
-import { buildExercise, loadUserSongs, saveUserSong } from "../lib/songs";
+import { buildExercise, loadUserSongs, saveUserSong, submissionUrl } from "../lib/songs";
 import { buildSteps } from "../lib/steps";
 import type { Route } from "./+types/import";
 
@@ -155,6 +155,18 @@ export default function ImportRoute() {
                     Settings
                 </Link>
                 .
+            </p>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+                Want to share a song with everyone?{" "}
+                <a
+                    href={submissionUrl()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-indigo-700 underline dark:text-indigo-300"
+                >
+                    Submit it to the catalog →
+                </a>
             </p>
         </main>
     );
