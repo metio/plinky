@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { SongImport } from "../components/songImport";
 import { type Exercise, exercises } from "../lib/exercises";
+import { encodeSong } from "../lib/share";
 import { loadUserSongs, removeUserSong, toAbcDocument } from "../lib/songs";
 import type { Route } from "./+types/home";
 
@@ -34,6 +35,7 @@ function downloadAbc(exercise: Exercise): void {
 
 export default function Home() {
     const [userSongs, setUserSongs] = useState<Exercise[]>([]);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
     const reload = useCallback(() => setUserSongs(loadUserSongs()), []);
     useEffect(reload, [reload]);
 
@@ -43,6 +45,17 @@ export default function Home() {
     const remove = (id: string) => {
         removeUserSong(id);
         reload();
+    };
+
+    // A self-contained link that imports the song on open — no account, no server.
+    const share = (exercise: Exercise) => {
+        const url = `${window.location.origin}/import#s=${encodeSong(toAbcDocument(exercise))}`;
+        navigator.clipboard?.writeText(url);
+        setCopiedId(exercise.id);
+        window.setTimeout(
+            () => setCopiedId((current) => (current === exercise.id ? null : current)),
+            2000,
+        );
     };
 
     return (
@@ -85,6 +98,13 @@ export default function Home() {
                                     {mode.label}
                                 </Link>
                             ))}
+                            <button
+                                type="button"
+                                onClick={() => share(exercise)}
+                                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline"
+                            >
+                                {copiedId === exercise.id ? "Link copied!" : "Share"}
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => downloadAbc(exercise)}
