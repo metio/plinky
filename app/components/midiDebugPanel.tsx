@@ -101,7 +101,7 @@ export function MidiDebugPanel() {
                         {heldNotes.map((note) => (
                             <span
                                 key={note}
-                                className="rounded-md bg-indigo-100 px-2 py-1 font-mono text-sm text-indigo-800"
+                                className="rounded-md bg-indigo-100 px-2 py-1 font-mono text-sm text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100"
                             >
                                 {noteName(note)} ({note})
                             </span>
@@ -143,7 +143,9 @@ export function MidiDebugPanel() {
                                 <tr
                                     key={event.id}
                                     className={
-                                        event.kind === "noteon" ? "text-gray-900" : "text-gray-400"
+                                        event.kind === "noteon"
+                                            ? "text-gray-900 dark:text-gray-100"
+                                            : "text-gray-400"
                                     }
                                 >
                                     <td className="py-0.5 pr-4">{formatTime(event.timestamp)}</td>
