@@ -1,14 +1,16 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
+import { SongCard } from "../components/songCard";
 import { SongImport } from "../components/songImport";
+import { usePlayer } from "../hooks/usePlayer";
 import type { Exercise } from "../lib/exercises";
+import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { seedStarterSongs } from "../lib/seed";
-import { encodeSong } from "../lib/share";
 import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
-import { loadUserSongs, removeUserSong, submissionUrl, toAbcDocument } from "../lib/songs";
+import { loadUserSongs, removeUserSong } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/home";
 
@@ -23,74 +25,52 @@ export function meta(_args: Route.MetaArgs) {
     ];
 }
 
-// Message functions are called at render time so the labels follow the locale.
-const MODES = [
-    { slug: "practice", label: m.mode_practice },
-    { slug: "time-trial", label: m.mode_time_trial },
-    { slug: "rhythm", label: m.mode_rhythm },
-    { slug: "tempo", label: m.mode_tempo },
-    { slug: "loop", label: m.mode_loop },
-];
-
 const PLAY_NOW = [
     { to: "/sprint", label: m.play_sprint, blurb: m.play_sprint_blurb },
     { to: "/daily", label: m.play_daily, blurb: m.play_daily_blurb },
     { to: "/ear", label: m.play_ear, blurb: m.play_ear_blurb },
 ];
 
-// Enough placeholder cards to fill a viewport, so the real list (and everything
-// below it) lands at its final position before the first paint is measured.
-const SKELETON_ROWS = ["a", "b", "c", "d", "e", "f"];
-
-function downloadAbc(exercise: Exercise): void {
-    const blob = new Blob([toAbcDocument(exercise)], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${exercise.id}.abc`;
-    anchor.click();
-    URL.revokeObjectURL(url);
-}
+const NAV_LINK = "text-indigo-700 underline dark:text-indigo-300";
 
 export default function Home() {
     const [songs, setSongs] = useState<Exercise[]>([]);
+    const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [loaded, setLoaded] = useState(false);
-    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const player = usePlayer();
     const reload = useCallback(() => setSongs(loadUserSongs()), []);
 
-    // The song list lives in local storage, unavailable during prerender and on
-    // the first client paint, so it can only appear a tick later. Until then a
+    // The catalog lives in local storage, unavailable during prerender and on the
+    // first client paint, so it can only appear a tick later. Until then a
     // skeleton of the same height stands in, so populating the list does not
     // shove the rest of the page down.
     // seedStarterSongs is a no-op once seeded, so this just reloads on return.
     useEffect(() => {
         seedStarterSongs().then(() => {
             reload();
+            setFavorites(loadFavorites());
             setLoaded(true);
         });
     }, [reload]);
 
+    const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
     const remove = (id: string) => {
         removeUserSong(id);
         reload();
     };
 
-    // A self-contained link that imports the song on open — no account, no server.
-    const share = (exercise: Exercise) => {
-        const url = `${window.location.origin}/import#s=${encodeSong(toAbcDocument(exercise))}`;
-        navigator.clipboard?.writeText(url);
-        setCopiedId(exercise.id);
-        window.setTimeout(
-            () => setCopiedId((current) => (current === exercise.id ? null : current)),
-            2000,
-        );
-    };
+    // The home list is the user's pinned songs, so a large catalog stays out of
+    // the way; the full library lives on /songs.
+    const favoriteSongs = useMemo(
+        () => songs.filter((song) => favorites.has(song.id)),
+        [songs, favorites],
+    );
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.home_heading()}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.home_intro()}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.home_intro()}</p>
             </header>
 
             <section className="space-y-3">
@@ -118,126 +98,52 @@ export default function Home() {
             <section className="space-y-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {m.home_practice_a_song()}
+                        {m.home_favorites_heading()}
                     </h2>
                     <div className="flex gap-4 text-sm">
-                        <Link
-                            to="/tracks"
-                            className="text-indigo-700 underline dark:text-indigo-300"
-                        >
+                        <Link to="/songs" className={NAV_LINK}>
+                            {m.home_browse_all()}
+                        </Link>
+                        <Link to="/tracks" className={NAV_LINK}>
                             {m.home_tracks()}
                         </Link>
-                        <Link
-                            to="/curriculums"
-                            className="text-indigo-700 underline dark:text-indigo-300"
-                        >
+                        <Link to="/curriculums" className={NAV_LINK}>
                             {m.home_by_curriculum()}
-                        </Link>
-                        <Link
-                            to="/import"
-                            className="text-indigo-700 underline dark:text-indigo-300"
-                        >
-                            {m.home_find_more_songs()}
                         </Link>
                     </div>
                 </div>
 
                 {!loaded ? (
-                    <ul className="space-y-3" aria-hidden="true">
-                        {SKELETON_ROWS.map((key) => (
-                            <li
-                                key={key}
-                                className="rounded-md border border-gray-200 p-4 dark:border-gray-800"
-                            >
-                                <div className="h-6 w-1/3 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                                <div className="mt-2 h-4 w-2/3 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                                <div className="mt-3 h-8 w-2/5 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                            </li>
-                        ))}
-                    </ul>
-                ) : songs.length === 0 ? (
-                    <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                        {m.home_empty_prefix()}{" "}
-                        <Link
-                            to="/import"
-                            className="text-indigo-700 underline dark:text-indigo-300"
-                        >
-                            {m.home_find_to_import()}
+                    // Favorites load from local storage a tick after paint. Reserve
+                    // about the height of the empty prompt so resolving the list
+                    // does not shove the import panel below it up or down.
+                    <div className="h-24" aria-hidden="true" />
+                ) : favoriteSongs.length === 0 ? (
+                    <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
+                        {m.home_favorites_empty()}{" "}
+                        <Link to="/songs" className={NAV_LINK}>
+                            {m.home_browse_all()}
                         </Link>
-                        {m.home_empty_suffix()}
                     </p>
                 ) : (
                     <ul className="space-y-3">
-                        {songs.map((exercise) => (
-                            <li
-                                key={exercise.id}
-                                className="rounded-md border border-gray-200 p-4 dark:border-gray-800"
-                            >
-                                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                                    <h3 className="text-lg font-medium">{exercise.title}</h3>
-                                    <span className="flex items-center gap-2">
-                                        {exercise.license && (
-                                            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                                                {exercise.license}
-                                            </span>
-                                        )}
-                                        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
-                                            {m.home_bpm({ tempo: exercise.tempo })}
-                                        </span>
-                                    </span>
-                                </div>
-                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    {exercise.description}
-                                </p>
-                                <div className="mt-3 flex flex-wrap items-center gap-2">
-                                    {MODES.map((mode) => (
-                                        <Link
-                                            key={mode.slug}
-                                            to={`/${mode.slug}/${exercise.id}`}
-                                            className="rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300"
-                                        >
-                                            {mode.label()}
-                                        </Link>
-                                    ))}
-                                    <button
-                                        type="button"
-                                        onClick={() => share(exercise)}
-                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
-                                    >
-                                        {copiedId === exercise.id
-                                            ? m.action_link_copied()
-                                            : m.action_share()}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => downloadAbc(exercise)}
-                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
-                                    >
-                                        {m.action_export()}
-                                    </button>
-                                    <a
-                                        href={submissionUrl(exercise)}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
-                                    >
-                                        {m.action_submit()}
-                                    </a>
-                                    <button
-                                        type="button"
-                                        onClick={() => remove(exercise.id)}
-                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 underline dark:text-red-400"
-                                    >
-                                        {m.action_remove()}
-                                    </button>
-                                </div>
-                            </li>
+                        {favoriteSongs.map((song) => (
+                            <SongCard
+                                key={song.id}
+                                song={song}
+                                favorite={true}
+                                onToggleFavorite={toggle}
+                                onRemove={remove}
+                                playing={player.playingId === song.id}
+                                onPlay={(s) => player.play(s.id, s.abc, s.tempo)}
+                                onStop={player.stop}
+                            />
                         ))}
                     </ul>
                 )}
             </section>
 
-            <SongImport existingIds={songs.map((exercise) => exercise.id)} onAdded={reload} />
+            <SongImport existingIds={songs.map((song) => song.id)} onAdded={reload} />
         </main>
     );
 }

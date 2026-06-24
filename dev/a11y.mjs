@@ -14,7 +14,7 @@ import { chromium } from "playwright";
 const ROOT = "build/client";
 const PORT = Number(process.env.PORT) || 8099;
 const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
-const PAGES = ["/", "/tracks/", "/curriculums/", "/progress/", "/settings/"];
+const PAGES = ["/", "/songs/", "/tracks/", "/curriculums/", "/progress/", "/settings/"];
 const MIME = {
     ".html": "text/html",
     ".js": "text/javascript",
