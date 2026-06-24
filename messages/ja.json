@@ -266,5 +266,13 @@
   "scores_timing": "タイミング",
   "scores_dynamics": "強弱",
   "scores_ghost": "お手本",
-  "scores_you": "あなた"
+  "scores_you": "あなた",
+  "mastery_learned": "習得済み",
+  "mastery_due": "復習が必要",
+  "mastery_due_count": "復習対象 {count} 件",
+  "mastery_mark_learned": "習得済みにする",
+  "mastery_backlog": "バックログに戻す",
+  "mastery_resume": "復習を再開",
+  "settings_mastery": "習得度",
+  "settings_mastery_threshold": "この評価で楽譜を習得済みにする"
 }

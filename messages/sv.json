@@ -266,5 +266,13 @@
   "scores_timing": "Timing",
   "scores_dynamics": "Dynamik",
   "scores_ghost": "Perfekt",
-  "scores_you": "Du"
+  "scores_you": "Du",
+  "mastery_learned": "Inlärd",
+  "mastery_due": "Dags att repetera",
+  "mastery_due_count": "{count} att repetera",
+  "mastery_mark_learned": "Markera som inlärd",
+  "mastery_backlog": "Flytta till eftersläpning",
+  "mastery_resume": "Återuppta repetitioner",
+  "settings_mastery": "Behärskning",
+  "settings_mastery_threshold": "Markera ett stycke som inlärt vid betyg"
 }

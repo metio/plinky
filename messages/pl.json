@@ -266,5 +266,13 @@
   "scores_timing": "Synchronizacja",
   "scores_dynamics": "Dynamika",
   "scores_ghost": "Idealnie",
-  "scores_you": "Ty"
+  "scores_you": "Ty",
+  "mastery_learned": "Opanowano",
+  "mastery_due": "Do powtórki",
+  "mastery_due_count": "{count} do powtórki",
+  "mastery_mark_learned": "Oznacz jako opanowane",
+  "mastery_backlog": "Przenieś do zaległych",
+  "mastery_resume": "Wznów powtórki",
+  "settings_mastery": "Opanowanie",
+  "settings_mastery_threshold": "Oznacz utwór jako opanowany przy ocenie"
 }

@@ -266,5 +266,13 @@
   "scores_timing": "节奏",
   "scores_dynamics": "力度",
   "scores_ghost": "理想",
-  "scores_you": "你"
+  "scores_you": "你",
+  "mastery_learned": "已掌握",
+  "mastery_due": "需复习",
+  "mastery_due_count": "{count} 首待复习",
+  "mastery_mark_learned": "标记为已掌握",
+  "mastery_backlog": "移入待办",
+  "mastery_resume": "恢复复习",
+  "settings_mastery": "掌握度",
+  "settings_mastery_threshold": "达到此评级时标记为已掌握"
 }

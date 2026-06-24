@@ -266,5 +266,13 @@
   "scores_timing": "Ритм",
   "scores_dynamics": "Динаміка",
   "scores_ghost": "Ідеал",
-  "scores_you": "Ти"
+  "scores_you": "Ти",
+  "mastery_learned": "Вивчено",
+  "mastery_due": "Час повторити",
+  "mastery_due_count": "{count} до повторення",
+  "mastery_mark_learned": "Позначити вивченим",
+  "mastery_backlog": "Перенести у відкладені",
+  "mastery_resume": "Відновити повторення",
+  "settings_mastery": "Опанування",
+  "settings_mastery_threshold": "Позначати твір вивченим за оцінкою"
 }

@@ -9,6 +9,17 @@ import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import type { TimelineNote } from "../lib/ghost";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
+import {
+    applyRun,
+    isDue,
+    letterMin,
+    loadMastery,
+    markLearned,
+    type Mastery,
+    saveMastery,
+    setBacklog,
+} from "../lib/mastery";
+import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
 import { m } from "../paraglide/messages.js";
 import { GhostTimeline } from "./ghostTimeline";
@@ -21,7 +32,17 @@ const BUTTON =
 // shared synth, walking OSMD's cursor so the highlight follows; Practice turns the
 // same cursor into a note-by-note matcher driven by MIDI or the keyboard. OSMD
 // needs a real DOM and is large, so it loads and renders on the client only.
-export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
+export function ScoreViewer({
+    id,
+    xml,
+    title,
+    onMastery,
+}: {
+    id: string;
+    xml: string;
+    title: string;
+    onMastery?: () => void;
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
@@ -36,6 +57,11 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
     const [tempo, setTempo] = useState(100);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [timeline, setTimeline] = useState<TimelineNote[]>([]);
+    const [mastery, setMastery] = useState<Mastery | null>(null);
+
+    useEffect(() => {
+        setMastery(loadMastery(id));
+    }, [id]);
 
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
@@ -83,16 +109,36 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
         const hits = timelineRef.current.map((note) =>
             makeHit(note.ordinal, note.playedMs - note.targetMs),
         );
-        setGrade(
-            computeGrade({
-                correct: matcher.total,
-                wrong: matcher.wrong,
-                rhythm: summarize(hits),
-                dynamics: hasDynamics ? summarizeDynamics(velocities.current) : null,
-            }),
-        );
+        const result = computeGrade({
+            correct: matcher.total,
+            wrong: matcher.wrong,
+            rhythm: summarize(hits),
+            dynamics: hasDynamics ? summarizeDynamics(velocities.current) : null,
+        });
+        setGrade(result);
         setTimeline(timelineRef.current);
-    }, [matcher.complete, matcher.total, matcher.wrong]);
+        // Fold the run into spaced-repetition state: a score that clears the
+        // threshold becomes learned and schedules (or reschedules) its review.
+        const threshold = letterMin(loadPrefs().masteryThreshold);
+        const updated = applyRun(loadMastery(id), result.score, threshold, Date.now());
+        saveMastery(id, updated);
+        setMastery(updated);
+        onMastery?.();
+    }, [matcher.complete, matcher.total, matcher.wrong, id, onMastery]);
+
+    const markLearnedNow = () => {
+        const updated = markLearned(loadMastery(id), Date.now());
+        saveMastery(id, updated);
+        setMastery(updated);
+        onMastery?.();
+    };
+    const toggleBacklog = () => {
+        const current = loadMastery(id);
+        const updated = setBacklog(current, !current?.backlog, Date.now());
+        saveMastery(id, updated);
+        setMastery(updated);
+        onMastery?.();
+    };
 
     const stopListen = () => {
         for (const id of timers.current) {
@@ -207,6 +253,36 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
                     />
                     <span className="w-12 font-mono tabular-nums">{m.home_bpm({ tempo })}</span>
                 </label>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+                {mastery?.learned ? (
+                    <>
+                        <span className="font-medium text-green-700 dark:text-green-400">
+                            ✓ {m.mastery_learned()}
+                        </span>
+                        {isDue(mastery, Date.now()) && (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                                {m.mastery_due()}
+                            </span>
+                        )}
+                        <button
+                            type="button"
+                            onClick={toggleBacklog}
+                            className="text-indigo-600 underline dark:text-indigo-400"
+                        >
+                            {mastery.backlog ? m.mastery_resume() : m.mastery_backlog()}
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={markLearnedNow}
+                        className="text-indigo-600 underline dark:text-indigo-400"
+                    >
+                        {m.mastery_mark_learned()}
+                    </button>
+                )}
             </div>
 
             {matcher.practicing && (

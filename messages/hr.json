@@ -266,5 +266,13 @@
   "scores_timing": "Ritam",
   "scores_dynamics": "Dinamika",
   "scores_ghost": "Idealno",
-  "scores_you": "Ti"
+  "scores_you": "Ti",
+  "mastery_learned": "Naučeno",
+  "mastery_due": "Za ponavljanje",
+  "mastery_due_count": "{count} za ponavljanje",
+  "mastery_mark_learned": "Označi kao naučeno",
+  "mastery_backlog": "Premjesti u zaostatak",
+  "mastery_resume": "Nastavi ponavljanja",
+  "settings_mastery": "Ovladanost",
+  "settings_mastery_threshold": "Označi skladbu naučenom pri ocjeni"
 }

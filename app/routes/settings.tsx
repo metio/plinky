@@ -7,6 +7,7 @@ import { MidiDebugPanel } from "../components/midiDebugPanel";
 import { SongBackup } from "../components/songBackup";
 import { ThemeToggle } from "../components/themeToggle";
 import { useSynth } from "../hooks/useSynth";
+import type { Letter } from "../lib/grade";
 import { loadPrefs, type Prefs, savePrefs } from "../lib/prefs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -17,7 +18,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function Settings() {
-    const [prefs, setPrefs] = useState<Prefs>({ sound: true, volume: 80 });
+    const [prefs, setPrefs] = useState<Prefs>({ sound: true, volume: 80, masteryThreshold: "A" });
     const synth = useSynth();
 
     useEffect(() => {
@@ -90,6 +91,28 @@ export default function Settings() {
                         {m.settings_test()}
                     </button>
                 </div>
+            </section>
+
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.settings_mastery()}
+                </h2>
+                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    {m.settings_mastery_threshold()}
+                    <select
+                        value={prefs.masteryThreshold}
+                        onChange={(event) =>
+                            update({ ...prefs, masteryThreshold: event.target.value as Letter })
+                        }
+                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                    >
+                        {(["S", "A", "B", "C", "D"] as Letter[]).map((letter) => (
+                            <option key={letter} value={letter}>
+                                {letter}
+                            </option>
+                        ))}
+                    </select>
+                </label>
             </section>
 
             <SongBackup />
