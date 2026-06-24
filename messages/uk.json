@@ -261,5 +261,8 @@
   "scores_heading": "Ноти",
   "scores_intro": "Фортепіанні ноти суспільного надбання, відображені та відтворені прямо у вашому браузері.",
   "scores_empty": "Нот ще немає.",
-  "scores_tempo": "Темп"
+  "scores_tempo": "Темп",
+  "scores_accuracy": "Точність",
+  "scores_timing": "Ритм",
+  "scores_dynamics": "Динаміка"
 }

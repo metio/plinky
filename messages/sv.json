@@ -261,5 +261,8 @@
   "scores_heading": "Noter",
   "scores_intro": "Pianonoter i public domain, renderade och spelade direkt i din webbläsare.",
   "scores_empty": "Inga noter än.",
-  "scores_tempo": "Tempo"
+  "scores_tempo": "Tempo",
+  "scores_accuracy": "Träffsäkerhet",
+  "scores_timing": "Timing",
+  "scores_dynamics": "Dynamik"
 }
