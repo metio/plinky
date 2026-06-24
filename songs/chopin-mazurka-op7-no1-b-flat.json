@@ -1,0 +1,12 @@
+{
+  "id": "chopin-mazurka-op7-no1-b-flat",
+  "title": "Mazurka in B-flat, Op. 7 No. 1 (theme)",
+  "description": "Frederic Chopin.",
+  "abc": "X:1\nT:Mazurka in B-flat, Op. 7 No. 1\nM:3/4\nL:1/8\nK:Bb\nB2 d3 c | B2 F4 | G2 A3 G | F4 z2 |\nB2 d3 c | B2 F4 | G2 c3 A | B4 z2 |]",
+  "tempo": 120,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

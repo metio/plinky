@@ -1,0 +1,12 @@
+{
+  "id": "praise-my-soul-lauda-anima",
+  "title": "Praise, My Soul, the King of Heaven (Lauda Anima)",
+  "description": "John Goss.",
+  "abc": "X:1\nT:Praise, My Soul, the King of Heaven\nM:4/4\nL:1/4\nK:G\nd2 d B | d2 B2 | A2 G2 | A4 | d2 d B | d2 e2 | d2 c2 | B4 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

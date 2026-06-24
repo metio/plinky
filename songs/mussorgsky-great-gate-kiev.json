@@ -1,0 +1,12 @@
+{
+  "id": "mussorgsky-great-gate-kiev",
+  "title": "The Great Gate of Kiev",
+  "description": "Modest Mussorgsky.",
+  "abc": "X:1\nT:The Great Gate of Kiev\nM:4/4\nL:1/4\nK:Eb\nB B/B/ B/B/ B | A G A2 | B c B A | G2 z2 |\nB B/B/ B/B/ B | A G A2 | B c B A | B2 z2 |\nc2 B2 | A2 G2 | F2 G2 | B,4 |\nE2 G2 | B2 c2 | B2 A2 | G4 |]\n",
+  "tempo": 80,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

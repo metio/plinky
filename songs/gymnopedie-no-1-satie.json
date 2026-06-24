@@ -1,0 +1,12 @@
+{
+  "id": "gymnopedie-no-1-satie",
+  "title": "Gymnopedie No. 1",
+  "description": "Erik Satie.",
+  "abc": "X:1\nT:Gymnopedie No. 1\nM:3/4\nL:1/4\nK:D\nF2 A | E2 ^G | A3 | A3 | F2 A | E2 ^G | A3 | A3 |\nd2 e | f2 g | a3 | a3 | F2 A | E2 ^G | A3 | A3 |\n",
+  "tempo": 66,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

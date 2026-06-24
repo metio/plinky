@@ -1,0 +1,12 @@
+{
+  "id": "bethena-waltz-theme",
+  "title": "Bethena (Theme)",
+  "description": "Scott Joplin.",
+  "abc": "X:1\nT:Bethena (Theme)\nM:3/4\nL:1/8\nK:G\nd2 B2 G2 | B4 d2 | g2 f2 e2 | d4 B2 |\nc2 A2 F2 | A4 c2 | B2 G2 E2 | G6 |",
+  "tempo": 108,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

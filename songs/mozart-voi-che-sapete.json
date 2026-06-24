@@ -1,0 +1,12 @@
+{
+  "id": "mozart-voi-che-sapete",
+  "title": "Voi che sapete (Le nozze di Figaro)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Voi che sapete (Le nozze di Figaro)\nM:2/4\nL:1/8\nK:Bb\nF2 F/G/ A/B/ | c2 c2 | d/c/ B/A/ B/c/ d | c2 z2 |\nF2 F/G/ A/B/ | c2 c2 | d c/B/ A/G/ F | F2 z2 |]",
+  "tempo": 96,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

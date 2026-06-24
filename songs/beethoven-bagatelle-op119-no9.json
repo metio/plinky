@@ -1,0 +1,12 @@
+{
+  "id": "beethoven-bagatelle-op119-no9",
+  "title": "Bagatelle Op. 119 No. 9",
+  "description": "Ludwig van Beethoven.",
+  "abc": "X:1\nT:Bagatelle Op. 119 No. 9\nM:3/4\nL:1/8\nK:Am\nA2 c2 e2 | a4 e2 | f2 e2 d2 | c4 B2 | A2 c2 e2 | a4 g2 | f2 e2 d2 | c4 z2 |]",
+  "tempo": 84,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

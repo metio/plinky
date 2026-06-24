@@ -1,0 +1,12 @@
+{
+  "id": "anitras-dance",
+  "title": "Anitra's Dance (Peer Gynt)",
+  "description": "Edvard Grieg.",
+  "abc": "X:1\nT:Anitra's Dance (Peer Gynt)\nM:3/4\nL:1/8\nK:Am\nA2 c2 e2 | dc B2 A2 | A2 c2 e2 | dc B2 A2 |\n^G2 B2 e2 | f2 e2 ^d2 | e4 z2 | z6 |]",
+  "tempo": 120,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

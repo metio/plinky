@@ -1,0 +1,12 @@
+{
+  "id": "the-mulberry-bush",
+  "title": "Here We Go Round the Mulberry Bush",
+  "description": "Traditional English nursery rhyme, 19th century.",
+  "abc": "X:1\nT:Here We Go Round the Mulberry Bush\nM:6/8\nL:1/8\nK:G\nG2 A B2 G | A2 D D2 z | G2 A B2 G | A2 G G2 z |\nG2 A B2 G | A2 D D2 z | B2 d d2 B | A2 G G2 z |",
+  "tempo": 112,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

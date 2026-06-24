@@ -1,0 +1,12 @@
+{
+  "id": "the-cascades-joplin",
+  "title": "The Cascades (Theme)",
+  "description": "Scott Joplin.",
+  "abc": "X:1\nT:The Cascades (Theme)\nM:2/4\nL:1/8\nK:Bb\nd/f/ | b/a/g/f/ d/f/b/d'/ | c'/b/a/g/ f/d/c/B/ | A/c/f/a/ c'/a/f/c/ | B2 d/f/ |\nb/a/g/f/ d/f/b/d'/ | c'/b/a/g/ f/d/c/A/ | G/B/d/g/ f/d/c/A/ | B2 ||\n",
+  "tempo": 100,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

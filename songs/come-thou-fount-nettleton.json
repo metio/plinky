@@ -1,0 +1,12 @@
+{
+  "id": "come-thou-fount-nettleton",
+  "title": "Come Thou Fount of Every Blessing (Nettleton)",
+  "description": "American tune first published 1813 in Wyeth's Repository; anonymous, well before 1929.",
+  "abc": "X:1\nT:Come Thou Fount (Nettleton)\nM:4/4\nL:1/4\nK:D\nA2 A B | A F D2 | E2 F E | D4 | A2 A B | A F A2 | B2 A F | E4 |\nF2 F A | F2 D2 | E2 F E | D4 | A2 A B | A F A2 | B2 A F | E D4 z |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "schumann-soldiers-march-op68-no2",
+  "title": "Soldier's March (Album for the Young, Op. 68 No. 2)",
+  "description": "Robert Schumann.",
+  "abc": "X:1\nT:Soldier's March (Album for the Young, No. 2)\nM:4/4\nL:1/8\nK:G\nG2 G2 G2 G2 | B2 B2 d2 z2 | d2 d2 c2 B2 | A2 A2 A2 z2 |\nG2 G2 G2 G2 | B2 B2 d2 z2 | d2 c2 B2 A2 | G4 z2 z2 |",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

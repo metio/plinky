@@ -1,0 +1,12 @@
+{
+  "id": "burgmuller-innocence",
+  "title": "Innocence, Op. 100 No. 5",
+  "description": "Friedrich Burgmüller.",
+  "abc": "X:1\nT:Innocence, Op. 100 No. 5\nM:4/4\nL:1/8\nK:F\n| f2 (ef) (gf) (ef) | (gf) (ag) f2 c2 | (de) (fg) (ag) (fe) | (fg) (ag) f2 z2 |\n f2 (ef) (gf) (ef) | (gf) (ag) f2 c2 | (de) (fg) (ag) (fe) | f4 f2 z2 |",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

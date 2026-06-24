@@ -1,0 +1,12 @@
+{
+  "id": "bach-jesu-joy-of-mans-desiring",
+  "title": "Jesu, Joy of Man's Desiring (theme)",
+  "description": "Johann Sebastian Bach.",
+  "abc": "X:1\nT:Jesu, Joy of Man's Desiring (theme)\nM:3/4\nL:1/8\nK:G\nG A B | d B c | d g e | d B G | A c B | A G ^F | G E C | A,2 z |\nG A B | d B c | d e/d/ c/B/ | A B/c/ d | e d c | B A G | A B/A/ G/^F/ | G2 z |]",
+  "tempo": 80,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

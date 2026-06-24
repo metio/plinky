@@ -1,0 +1,12 @@
+{
+  "id": "at-a-georgia-camp-meeting",
+  "title": "At a Georgia Camp Meeting (Theme)",
+  "description": "Kerry Mills.",
+  "abc": "X:1\nT:At a Georgia Camp Meeting (Theme)\nM:2/4\nL:1/8\nK:F\nA/B/ A/F/ A/B/ A/F/ | c2 A2 | G/A/ G/E/ G/A/ G/E/ | B2 G2 |\nA/B/ A/F/ A/B/ A/F/ | c2 f2 | e/d/ c/A/ G/F/ G/A/ | F4 |",
+  "tempo": 100,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

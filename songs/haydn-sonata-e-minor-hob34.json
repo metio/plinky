@@ -1,0 +1,12 @@
+{
+  "id": "haydn-sonata-e-minor-hob34",
+  "title": "Sonata in E minor, Hob.XVI:34 (Presto)",
+  "description": "Joseph Haydn.",
+  "abc": "X:1\nT:Sonata in E minor, Hob.XVI:34 (Presto)\nM:6/8\nL:1/8\nK:Em\nB,2 E E F G | F E D2 z | B,2 E E F G | A G F E2 z |\nc2 B B A G | A2 G F2 E | D2 ^D E2 F | E3 z2 z |",
+  "tempo": 132,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

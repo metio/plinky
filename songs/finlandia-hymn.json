@@ -1,0 +1,12 @@
+{
+  "id": "finlandia-hymn",
+  "title": "Finlandia Hymn",
+  "description": "Jean Sibelius.",
+  "abc": "X:1\nT:Finlandia Hymn\nM:4/4\nL:1/8\nK:F\nA2 A2 A2 G2|F2 F2 F4|G2 G2 A2 G2|F2 F2 F4|\nc2 c2 d2 c2|A2 A2 A4|G2 F2 G2 A2|G2 F2 F4|",
+  "tempo": 72,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

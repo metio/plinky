@@ -1,0 +1,12 @@
+{
+  "id": "mozart-rondo-alla-turca-theme",
+  "title": "Rondo alla Turca (K.331 Theme)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Rondo alla Turca (K.331 Theme)\nM:2/4\nL:1/8\nK:Am\nB/A/G/A/ c2 | d/c/B/c/ e2 | f/e/d/e/ B/d/c/B/ | A2 z2 |\nc/B/A/B/ d/c/B/c/ | e/d/c/d/ f/e/d/e/ | a3/2 b/ c'/b/a/g/ | a2 z2 |]",
+  "tempo": 126,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

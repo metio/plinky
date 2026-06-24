@@ -1,0 +1,12 @@
+{
+  "id": "smetana-vltava-secondary",
+  "title": "Vltava - Wedding Dance",
+  "description": "Bedřich Smetana.",
+  "abc": "X:1\nT:Vltava - Wedding Dance\nM:2/4\nL:1/8\nK:G\nG2 G G | B2 A G | A2 A A | c2 B A |\nG2 G G | B2 d B | A G A B | G2 z2 |]\n",
+  "tempo": 120,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

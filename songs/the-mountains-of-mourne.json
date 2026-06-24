@@ -1,0 +1,12 @@
+{
+  "id": "the-mountains-of-mourne",
+  "title": "The Mountains of Mourne",
+  "description": "Set to traditional air 'Bendemeer's Stream'; French lyrics 1896, composer died 1909.",
+  "abc": "X:1\nT:The Mountains of Mourne\nM:3/4\nL:1/8\nK:G\n| D2 | G2 G2 A2 | B2 d2 B2 | A2 G2 E2 | D4 D2 |\n G2 G2 A2 | B2 d2 e2 | d2 B2 A2 | G4 :|",
+  "tempo": 84,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

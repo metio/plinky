@@ -1,0 +1,12 @@
+{
+  "id": "brahms-waltz-a-flat-op39-15",
+  "title": "Waltz in A-flat, Op. 39 No. 15",
+  "description": "Johannes Brahms.",
+  "abc": "X:1\nT:Waltz in A-flat, Op. 39 No. 15\nM:3/4\nL:1/8\nK:Ab\nEF | A2 A2 c2 | B2 B2 E2 | A2 c2 B2 | A4 EF |\nA2 A2 c2 | B2 B2 G2 | F2 F2 E2 | E4 EF |\nA2 A2 c2 | B2 B2 E2 | A2 c2 e2 | f4 ec |\nB2 B2 d2 | c2 c2 B2 | A4 z2 |]",
+  "tempo": 120,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

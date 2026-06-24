@@ -1,0 +1,12 @@
+{
+  "id": "grieg-butterfly-op43-no1",
+  "title": "Butterfly (Lyric Pieces Op. 43 No. 1)",
+  "description": "Edvard Grieg.",
+  "abc": "X:1\nT:Butterfly (Lyric Pieces Op. 43 No. 1)\nM:2/4\nL:1/16\nK:A\na2gf e2cA | B2GE C4 | a2gf e2cA | B2A2 A4 |\na2gf e2cA | B2GE C4 | e2dc B2GE | A8 |]",
+  "tempo": 132,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

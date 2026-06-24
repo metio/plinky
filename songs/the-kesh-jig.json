@@ -1,0 +1,12 @@
+{
+  "id": "the-kesh-jig",
+  "title": "The Kesh Jig",
+  "description": "Traditional Irish jig, anonymous.",
+  "abc": "X:1\nT:The Kesh Jig\nM:6/8\nL:1/8\nK:G\n|:GAA BAB|dge dBA|GAG GAB|ABA AGE|\nGAA BAB|dge dBd|edd gdB|AGF G3:|\n|:Bdd edd|gdd edB|Bdd edB|ABA AGE|\nBdd edd|gdd edB|edd gdB|AGF G3:|",
+  "tempo": 116,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

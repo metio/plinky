@@ -1,0 +1,12 @@
+{
+  "id": "padstow-farewell-shanty",
+  "title": "Spanish Ladies",
+  "description": "Traditional naval song, anonymous, pre-1800.",
+  "abc": "X:1\nT:Spanish Ladies\nM:3/4\nL:1/8\nK:Dm\nA2|d2 d2 d2|c2 A2 A2|F2 G2 A2|d4 A2|\nd2 e2 f2|e2 d2 c2|d2 A2 F2|G4 A2|\nd2 d2 d2|c2 A2 A2|F2 G2 A2|d4 c2|\nA2 A2 G2|F2 E2 D2|E2 F2 G2|A4 z2|]",
+  "tempo": 96,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

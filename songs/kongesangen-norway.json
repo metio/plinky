@@ -1,0 +1,12 @@
+{
+  "id": "kongesangen-norway",
+  "title": "Per Spelmann (Norwegian folk)",
+  "description": "Traditional Norwegian folk song, anonymous.",
+  "abc": "X:1\nT:Per Spelmann (Norwegian folk)\nM:4/4\nL:1/8\nK:D\nd2 d2 e2 f2|f2 e2 d4|d2 d2 e2 f2|e2 c2 A4|\nf2 f2 g2 a2|a2 g2 f4|e2 f2 e2 d2|c2 e2 d4|",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "santa-lucia",
+  "title": "Santa Lucia",
+  "description": "Teodoro Cottrau.",
+  "abc": "X:1\nT:Santa Lucia\nM:3/4\nL:1/4\nK:F\nA2 A | A3/2 G/ A | c3 | f3 | e3/2 d/ c | d3 | A2 z |\nG2 G | G3/2 F/ G | B3 | A3/2 G/ F | E3/2 F/ G | F3 | F2 z |]",
+  "tempo": 80,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

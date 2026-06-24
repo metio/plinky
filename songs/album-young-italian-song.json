@@ -1,0 +1,12 @@
+{
+  "id": "album-young-italian-song",
+  "title": "Italian Song (Album for the Young)",
+  "description": "Pyotr Ilyich Tchaikovsky.",
+  "abc": "X:1\nT:Italian Song (Album for the Young, Op. 39)\nM:3/4\nL:1/8\nK:D\nA2 A2 A2 | d2 d2 d2 | f2 e2 d2 | e4 z2 | A2 A2 A2 | d2 d2 d2 | f2 e2 d2 | d4 z2 |]",
+  "tempo": 132,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

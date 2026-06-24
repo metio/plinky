@@ -1,0 +1,12 @@
+{
+  "id": "the-rakes-of-mallow",
+  "title": "The Rakes of Mallow",
+  "description": "Traditional Irish tune, 18th century, anonymous.",
+  "abc": "X:1\nT:The Rakes of Mallow\nM:2/4\nL:1/8\nK:G\n|: GB AG | EG D2 | GB AG | EG D2 |\n GB AG | Bd ef | gd ef | gd B2 :|",
+  "tempo": 120,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

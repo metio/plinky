@@ -1,0 +1,12 @@
+{
+  "id": "girls-and-boys-come-out",
+  "title": "Girls and Boys Come Out to Play",
+  "description": "Traditional English nursery rhyme, 18th century.",
+  "abc": "X:1\nT:Girls and Boys Come Out to Play\nM:6/8\nL:1/8\nK:G\nB2 G B2 G | A2 D D2 z | B2 G B2 G | A2 D D2 z |\nc2 c c2 d | B2 B B2 c | A2 A B2 A | G3 G2 z |",
+  "tempo": 108,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

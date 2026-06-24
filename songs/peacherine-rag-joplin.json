@@ -1,0 +1,12 @@
+{
+  "id": "peacherine-rag-joplin",
+  "title": "Peacherine Rag (Theme)",
+  "description": "Scott Joplin.",
+  "abc": "X:1\nT:Peacherine Rag (Theme)\nM:2/4\nL:1/8\nK:Bb\nf/d/ | B/c/d/f/ b/a/g/f/ | d/c/B/d/ f3/2 d/ | c/B/c/d/ e/d/c/A/ | B2 f/d/ |\nB/c/d/f/ b/a/g/f/ | d/c/B/d/ f3/2 a/ | g/f/e/d/ c/B/c/A/ | B2 ||\n",
+  "tempo": 94,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

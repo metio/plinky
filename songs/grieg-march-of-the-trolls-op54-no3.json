@@ -1,0 +1,12 @@
+{
+  "id": "grieg-march-of-the-trolls-op54-no3",
+  "title": "March of the Trolls (Lyric Pieces Op. 54 No. 3)",
+  "description": "Edvard Grieg.",
+  "abc": "X:1\nT:March of the Trolls (Lyric Pieces Op. 54 No. 3)\nM:4/4\nL:1/8\nK:Dm\nd2 d2 e2 d2 | c2 A2 d2 z2 | d2 d2 e2 f2 | e2 c2 d2 z2 |\nd2 d2 e2 d2 | c2 A2 d2 z2 | f2 e2 d2 c2 | d2 A2 d2 z2 |]",
+  "tempo": 132,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

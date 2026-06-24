@@ -1,0 +1,12 @@
+{
+  "id": "handel-see-conquering-hero",
+  "title": "See, the Conqu'ring Hero Comes",
+  "description": "George Frideric Handel.",
+  "abc": "X:1\nT:See, the Conqu'ring Hero Comes\nM:2/4\nL:1/8\nK:G\nB2 BA/G/ | A2 A2 | c2 cB/A/ | B2 B2 |\nd2 dc/B/ | c2 cB/A/ | B2 A2 | G2 z2 |\nd2 d2 | e2 e2 | d2 c2 | B2 A2 | G4 |]",
+  "tempo": 96,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

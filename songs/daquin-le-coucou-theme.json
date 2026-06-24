@@ -1,0 +1,12 @@
+{
+  "id": "daquin-le-coucou-theme",
+  "title": "Le Coucou (The Cuckoo)",
+  "description": "Louis-Claude Daquin.",
+  "abc": "X:1\nT:Le Coucou (The Cuckoo)\nM:2/4\nL:1/8\nK:Em\n|: \"Em\"e2 e2 | e2 B2 | \"Em\"e2 e2 | e2 B2 |\n\"Am\"c2 c2 | c2 A2 | \"B7\"B2 B2 | B2 ^G2 |\n\"Em\"e2 e2 | e2 B2 | \"Em\"g2 g2 | e2 B2 |\n\"B7\"B2 A2 | ^G2 A2 | \"Em\"B2 e2 | e4 :|\n",
+  "tempo": 120,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

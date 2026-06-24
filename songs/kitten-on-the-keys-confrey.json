@@ -1,0 +1,12 @@
+{
+  "id": "kitten-on-the-keys-confrey",
+  "title": "Kitten on the Keys (Theme)",
+  "description": "Zez Confrey.",
+  "abc": "X:1\nT:Kitten on the Keys (Theme)\nM:2/4\nL:1/8\nK:C\ng/e/ | c/e/g/e/ c/e/g/c'/ | b/g/e/g/ d'/b/g/d'/ | c'/g/e/c/ a/f/d/B/ | c2 g/e/ |\nc/e/g/e/ c/e/g/c'/ | b/g/e/g/ d'/b/g/d'/ | c'/b/a/g/ f/e/d/c/ | c2 ||\n",
+  "tempo": 108,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

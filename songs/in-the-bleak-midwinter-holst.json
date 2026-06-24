@@ -1,0 +1,12 @@
+{
+  "id": "in-the-bleak-midwinter-holst",
+  "title": "In the Bleak Midwinter",
+  "description": "Gustav Holst.",
+  "abc": "X:1\nT:In the Bleak Midwinter\nM:4/4\nL:1/4\nK:F\nF F G F | A A B2 | A A G F | C2 z2 |\nF F G F | A A B2 | A G F G | F2 z2 |\nc c d c | A B c2 | d c A B | A2 z2 |\nF F G F | A A B2 | A G F G | F2 z2 |]",
+  "tempo": 76,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

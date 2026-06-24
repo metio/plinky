@@ -1,0 +1,12 @@
+{
+  "id": "fire-down-below",
+  "title": "Fire Down Below",
+  "description": "Traditional pumping shanty, anonymous, 19th century.",
+  "abc": "X:1\nT:Fire Down Below\nM:4/4\nL:1/8\nK:G\nD2|G2B2 d2d2|d2B2 A2G2|A2c2 B2A2|G4 z2D2|\nG2B2 d2d2|e2d2 B2G2|A2B2 A2G2|G4 z2d2|\nd2d2 e2d2|B2G2 A2B2|d2B2 A2G2|E4 z2D2|\nG2A2 B2A2|G2E2 D2D2|G2A2 B2G2|G4 z2|]",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

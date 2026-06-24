@@ -1,0 +1,12 @@
+{
+  "id": "mozart-sonata-facile-k545-theme",
+  "title": "Sonata in C, K.545 (Allegro Theme)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Sonata in C, K.545 (Allegro Theme)\nM:4/4\nL:1/8\nK:C\nc2 e2 G2 (B/c/B/A/) | G2 z2 z4 |\n(d/e/f/) (e/f/g/) e2 c2 | (B/c/d/) (c/d/e/) c2 G2 |\nc2 e2 G2 (B/c/B/A/) | G2 z2 z4 |\nF2 d'2 c'2 (b/a/g/f/) | e2 c2 c2 z2 |]",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

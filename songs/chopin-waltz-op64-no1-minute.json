@@ -1,0 +1,12 @@
+{
+  "id": "chopin-waltz-op64-no1-minute",
+  "title": "Waltz in D-flat, Op. 64 No. 1 (Minute Waltz, theme)",
+  "description": "Frederic Chopin.",
+  "abc": "X:1\nT:Waltz in D-flat, Op. 64 No. 1 (Minute Waltz)\nM:3/4\nL:1/8\nK:Db\n_A4 G2 | _A2 _A2 _A2 | _A4 G2 | _A2 _A2 _A2 |\n_A2 _B2 c2 | _D2 c2 _B2 | _A4 G2 | F4 z2 |]",
+  "tempo": 138,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

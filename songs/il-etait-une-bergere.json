@@ -1,0 +1,12 @@
+{
+  "id": "il-etait-une-bergere",
+  "title": "Il Etait une Bergere",
+  "description": "Traditional French folk song, anonymous, pre-1900.",
+  "abc": "X:1\nT:Il Etait une Bergere\nM:4/4\nL:1/4\nK:C\nC C C C | E E E E | D D E F | E2 z2 |\nE E E E | G G G G | F F G A | G2 z2 |\nC C C C | E E E E | D D E F | E2 z2 |\nC2 G2 | E2 C2 | C4 |]",
+  "tempo": 108,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

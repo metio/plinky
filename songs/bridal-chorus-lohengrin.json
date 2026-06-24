@@ -1,0 +1,12 @@
+{
+  "id": "bridal-chorus-lohengrin",
+  "title": "Bridal Chorus (from Lohengrin)",
+  "description": "Richard Wagner.",
+  "abc": "X:1\nT:Bridal Chorus (from Lohengrin)\nC:Richard Wagner\nM:4/4\nL:1/8\nK:G\nd2 g2 g2 g2 | g4 e2 g2 | f2 e2 d2 c2 | d4 z4 |\nd2 g2 g2 g2 | b4 g2 b2 | a2 g2 f2 g2 | g4 z4 |]",
+  "tempo": 84,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

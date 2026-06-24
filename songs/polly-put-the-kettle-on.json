@@ -1,0 +1,12 @@
+{
+  "id": "polly-put-the-kettle-on",
+  "title": "Polly Put the Kettle On",
+  "description": "Traditional English nursery rhyme, c.1790.",
+  "abc": "X:1\nT:Polly Put the Kettle On\nM:4/4\nL:1/8\nK:C\ne2 c2 e2 c2 | d2 G2 G4 | e2 c2 e2 c2 | d2 G2 c4 |\ne2 c2 e2 c2 | d2 G2 G4 | A2 c2 G2 e2 | d2 d2 c4 |",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

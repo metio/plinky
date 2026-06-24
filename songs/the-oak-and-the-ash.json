@@ -1,0 +1,12 @@
+{
+  "id": "the-oak-and-the-ash",
+  "title": "The Oak and the Ash",
+  "description": "English (Northern) traditional folk song, 17th century.",
+  "abc": "X:1\nT:The Oak and the Ash\nM:3/4\nL:1/8\nK:G\nG2 G2 A2 | B2 c2 d2 | e2 d2 B2 | d4 d2 | e2 d2 B2 | A2 G2 E2 | D2 E2 G2 | G6 |]",
+  "tempo": 92,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

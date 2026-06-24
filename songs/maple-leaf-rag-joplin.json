@@ -1,0 +1,12 @@
+{
+  "id": "maple-leaf-rag-joplin",
+  "title": "Maple Leaf Rag (Opening)",
+  "description": "Scott Joplin.",
+  "abc": "X:1\nT:Maple Leaf Rag (Opening)\nM:2/4\nL:1/8\nK:Ab\n|: a/g/ | f/=e/f/a/ c'/a/f/a/ | d'/c'/d'/f/ a/f/d/f/ | =e/d/e/g/ b/g/e/g/ | c/B/c/e/ g/e/c/B/ |\nA/c/e/A/ c/e/A/c/ | f/a/c'/f/ a/c'/f/a/ | b/a/b/g/ f/d/B/G/ | A/F/E/D/ C2 :|\n",
+  "tempo": 96,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

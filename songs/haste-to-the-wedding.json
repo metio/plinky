@@ -1,0 +1,12 @@
+{
+  "id": "haste-to-the-wedding",
+  "title": "Haste to the Wedding",
+  "description": "Traditional jig, anonymous, 18th century.",
+  "abc": "X:1\nT:Haste to the Wedding\nM:6/8\nL:1/8\nK:D\n|:fg|afd dfd|gfe efg|afd dfd|ecA Afg|\nafd dfd|gfe efg|afd ecA|d3 d:|",
+  "tempo": 116,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

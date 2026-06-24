@@ -1,0 +1,12 @@
+{
+  "id": "schubert-the-trout-die-forelle",
+  "title": "The Trout (Die Forelle)",
+  "description": "Franz Schubert.",
+  "abc": "X:1\nT:The Trout (Die Forelle)\nM:2/4\nL:1/8\nK:Db\nz A | d3/2 d/2 d3/2 d/2 | f e d B | A3/2 G/2 F3/2 A/2 | G F z A |\nd3/2 d/2 d3/2 d/2 | f e d B | A3/2 G/2 F3/2 A/2 | G F z2 |]",
+  "tempo": 112,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

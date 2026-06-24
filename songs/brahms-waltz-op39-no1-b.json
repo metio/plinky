@@ -1,0 +1,12 @@
+{
+  "id": "brahms-waltz-op39-no1-b",
+  "title": "Waltz in B major, Op. 39 No. 1",
+  "description": "Johannes Brahms.",
+  "abc": "X:1\nT:Waltz in B major, Op. 39 No. 1\nM:3/4\nL:1/8\nK:D\nA2 | d2 f2 a2 | b2 a2 f2 | e2 c2 A2 | A4 A2 | d2 f2 a2 | b2 a2 f2 | e2 c2 A2 | d4 |]",
+  "tempo": 126,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

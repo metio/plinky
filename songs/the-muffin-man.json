@@ -1,0 +1,12 @@
+{
+  "id": "the-muffin-man",
+  "title": "The Muffin Man",
+  "description": "Traditional English nursery rhyme, c.1820.",
+  "abc": "X:1\nT:The Muffin Man\nM:4/4\nL:1/4\nK:G\nB G B d | B G2 z | A B A G | A2 z2 |\nB G B d | B G2 z | A G A B | G2 z2 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

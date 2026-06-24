@@ -1,0 +1,12 @@
+{
+  "id": "schumann-volksliedchen-op68-no9",
+  "title": "Little Folk Song (Album for the Young, Op. 68 No. 9)",
+  "description": "Robert Schumann.",
+  "abc": "X:1\nT:Little Folk Song (Album for the Young, No. 9)\nM:2/4\nL:1/8\nK:Dm\nA A d2 | c B A2 | A A B c | d2 z2 |\nA A d2 | c B A2 | G A G F | E2 z2 |",
+  "tempo": 92,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

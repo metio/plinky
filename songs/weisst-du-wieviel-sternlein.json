@@ -1,0 +1,12 @@
+{
+  "id": "weisst-du-wieviel-sternlein",
+  "title": "Weißt du, wieviel Sternlein stehen",
+  "description": "Traditional German melody; Wilhelm Hey text, early 19th century.",
+  "abc": "X:1\nT:Weißt du, wieviel Sternlein stehen\nM:4/4\nL:1/4\nK:G\nD G G G | B A G2 | A B c B | A2 D2 |\nD G G G | B A G2 | A B A G | G2 z2 |\nB B B B | d c B2 | A A A A | c B A2 |\nG B A G | F A G2 |\n",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

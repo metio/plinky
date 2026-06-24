@@ -1,0 +1,12 @@
+{
+  "id": "bach-polonaise-in-g-minor-bwv-anh-119",
+  "title": "Polonaise in G minor (BWV Anh. 119)",
+  "description": "Johann Sebastian Bach.",
+  "abc": "X:1\nT:Polonaise in G minor (BWV Anh. 119)\nM:3/4\nL:1/8\nK:Gm\nG2 D2 G2 | A2 B2 A2 | B2 c2 B2 | A4 z2 | A2 D2 F2 | G2 A2 G2 | A2 B2 A2 | G4 z2 |\nd2 d2 c2 | B2 A2 G2 | F2 G2 A2 | D4 z2 | G2 A2 B2 | c2 B2 A2 | B2 A2 G2 | G4 z2 |]",
+  "tempo": 100,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

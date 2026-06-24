@@ -1,0 +1,12 @@
+{
+  "id": "beethoven-moonlight-sonata-1st",
+  "title": "Moonlight Sonata (1st Movement Theme)",
+  "description": "Ludwig van Beethoven.",
+  "abc": "X:1\nT:Moonlight Sonata (1st Movement Theme)\nM:4/4\nL:1/8\nK:C#m\nG,3/2 ^c/e/ G,/^c/e/ G,/^c/e/ G,/^c/e/ | G,/^c/e/ G,/^c/e/ A,/c/e/ A,/c/e/ | A,/c/^f/ A,/c/^f/ ^G,/B/e/ ^G,/B/e/ | ^G,/^c/e/ ^G,/^c/e/ ^G,/c/^d/ ^F,/B/d/ |]",
+  "tempo": 60,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

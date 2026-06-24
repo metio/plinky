@@ -1,0 +1,12 @@
+{
+  "id": "funiculi-funicula",
+  "title": "Funiculì, Funiculà",
+  "description": "Luigi Denza.",
+  "abc": "X:1\nT:Funiculi, Funicula\nM:6/8\nL:1/8\nK:C\nE3 E2 D | C3 z2 c | B2 A G2 E | G3 z2 G |\nc2 c B2 A | G2 E E2 D | C3 C3 | C3 z3 |]",
+  "tempo": 120,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

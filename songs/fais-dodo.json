@@ -1,0 +1,12 @@
+{
+  "id": "fais-dodo",
+  "title": "Fais Dodo",
+  "description": "Traditional French lullaby, anonymous, pre-1900.",
+  "abc": "X:1\nT:Fais Dodo\nM:4/4\nL:1/4\nK:C\nG G E2 | G G E2 | G E G E | D2 z2 |\nF F D2 | F F D2 | F D F D | C2 z2 |]",
+  "tempo": 80,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

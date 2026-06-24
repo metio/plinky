@@ -1,0 +1,12 @@
+{
+  "id": "the-rights-of-man",
+  "title": "The Rights of Man",
+  "description": "Traditional hornpipe, anonymous.",
+  "abc": "X:1\nT:The Rights of Man\nM:4/4\nL:1/8\nK:Em\n|:B,|E2 EF GFGA|B2 e2 e2 dB|AFDF A2 FA|dAFA BAFB|\nE2 EF GFGA|B2 e2 e2 dB|AFDF ABdc|BGEF E3:|",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "for-the-beauty-of-the-earth-dix",
+  "title": "For the Beauty of the Earth (Dix)",
+  "description": "Conrad Kocher.",
+  "abc": "X:1\nT:For the Beauty of the Earth (Dix)\nM:4/4\nL:1/4\nK:G\nG2 A B | c2 B A | G2 A B | A2 G2 | D2 E F | G2 F E | D2 E F | G4 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "czerny-op599-no1",
+  "title": "Practical Exercise, Op. 599 No. 1",
+  "description": "Carl Czerny.",
+  "abc": "X:1\nT:Practical Exercise, Op. 599 No. 1\nM:4/4\nL:1/4\nK:C\n| c d e f | g f e d | c d e f | g2 z2 |\n c d e f | g f e d | c e d B | c2 z2 |",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

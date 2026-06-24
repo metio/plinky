@@ -1,0 +1,12 @@
+{
+  "id": "god-rest-ye-merry-gentlemen",
+  "title": "God Rest Ye Merry, Gentlemen",
+  "description": "Traditional English carol, pre-19th century.",
+  "abc": "X:1\nT:God Rest Ye Merry, Gentlemen\nM:4/4\nL:1/8\nK:Em\nE2 E2 B,2 E2 | G2 G2 E2 G2 | B2 B2 e2 B2 | A2 G2 F2 E2 |\nD2 D2 A2 D2 | F2 F2 D2 F2 | A2 A2 d2 A2 | G2 F2 E4 |\ne2 e2 d2 c2 | B2 A2 G2 F2 | E2 D2 E2 F2 | G2 A2 B4 |]",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

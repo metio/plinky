@@ -1,0 +1,12 @@
+{
+  "id": "drunken-sailor-x",
+  "title": "Drunken Sailor (placeholder)",
+  "description": "Traditional capstan shanty, anonymous, 19th century.",
+  "abc": "X:1\nT:Leave Her Johnny\nM:4/4\nL:1/8\nK:G\nD2|G2A2 B2A2|G2E2 D2D2|G2A2 B2d2|e4 d2B2|\nd2d2 e2d2|B2A2 G2A2|B2G2 E2D2|G4 z2|]",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

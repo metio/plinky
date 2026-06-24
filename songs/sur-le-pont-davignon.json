@@ -1,0 +1,12 @@
+{
+  "id": "sur-le-pont-davignon",
+  "title": "Sur le Pont d'Avignon",
+  "description": "Traditional French folk song, 15th century melody, anonymous.",
+  "abc": "X:1\nT:Sur le Pont d'Avignon\nM:4/4\nL:1/4\nK:C\nE2 G2 | G F E D | C2 D2 | E3 z |\nE2 G2 | G F E D | C2 D2 | C3 z |\nG2 G2 | A3 G | F2 z2 | F4 |\nF2 F2 | G3 F | E2 z2 | E4 |]",
+  "tempo": 116,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

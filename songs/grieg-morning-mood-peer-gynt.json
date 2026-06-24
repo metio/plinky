@@ -1,0 +1,12 @@
+{
+  "id": "grieg-morning-mood-peer-gynt",
+  "title": "Morning Mood (Peer Gynt Suite)",
+  "description": "Edvard Grieg.",
+  "abc": "X:1\nT:Morning Mood (Peer Gynt Suite)\nM:6/8\nL:1/8\nK:E\nB2 A G2 A | B2 G2 B2 | A2 F E2 F | A2 F2 A2 |\nB2 A G2 A | B2 e e2 d | B2 A G2 A | B6 |\nB2 A G2 A | B2 G2 B2 | A2 F E2 F | A2 F2 A2 |\ne2 e e2 d | B2 A G2 A | B2 A G2 A | B6 |]",
+  "tempo": 76,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

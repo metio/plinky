@@ -1,0 +1,12 @@
+{
+  "id": "while-shepherds-watched-their-flocks",
+  "title": "While Shepherds Watched Their Flocks",
+  "description": "Tune Winchester Old, English, 16th-17th century.",
+  "abc": "X:1\nT:While Shepherds Watched Their Flocks\nM:4/4\nL:1/4\nK:C\nC F F E | F G A2 | G c B A | G F2 z |\nA A G F | E F G2 | A B c d | c c2 z |\nc B A G | A G F2 | F E D C | D E F2 |]",
+  "tempo": 96,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

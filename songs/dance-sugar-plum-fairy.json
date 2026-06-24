@@ -1,0 +1,12 @@
+{
+  "id": "dance-sugar-plum-fairy",
+  "title": "Dance of the Sugar Plum Fairy",
+  "description": "Pyotr Ilyich Tchaikovsky.",
+  "abc": "X:1\nT:Dance of the Sugar Plum Fairy\nM:2/4\nL:1/16\nK:Em\ne2B2 e2B2 | e2g2 fedc | B2g2 B2g2 | B2e2 dcBA |\ne2B2 e2B2 | e2g2 fedc | B2A2 ^G2A2 | B4 z4 |]",
+  "tempo": 108,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

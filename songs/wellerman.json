@@ -1,0 +1,12 @@
+{
+  "id": "wellerman",
+  "title": "Soon May the Wellerman Come",
+  "description": "Traditional New Zealand whaling song, anonymous, 1860s.",
+  "abc": "X:1\nT:Soon May the Wellerman Come\nM:4/4\nL:1/8\nK:Em\nE2|E2E2 E2G2|B2B2 A2G2|A2A2 A2G2|F2E2 E2E2|\nE2E2 E2G2|B2B2 A2G2|A2A2 G2F2|E4 z2B2|\ne2e2 d2B2|d2d2 B2A2|B2A2 G2A2|B2e2 e2B2|\nB2A2 G2A2|B2A2 G2F2|E2E2 F2D2|E4 z2|]",
+  "tempo": 108,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

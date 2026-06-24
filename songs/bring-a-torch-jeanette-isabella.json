@@ -1,0 +1,12 @@
+{
+  "id": "bring-a-torch-jeanette-isabella",
+  "title": "Bring a Torch, Jeanette, Isabella",
+  "description": "17th-century French Provencal carol.",
+  "abc": "X:1\nT:Bring a Torch, Jeanette, Isabella\nM:4/4\nL:1/8\nK:F\nf2 e2 f2 g2 | a2 a2 a4 | g2 f2 g2 a2 | g2 f2 e4 |\nf2 g2 a2 f2 | c2 c2 c4 | f2 g2 a2 g2 | f4 z4 |]",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

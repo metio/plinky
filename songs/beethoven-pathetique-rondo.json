@@ -1,0 +1,12 @@
+{
+  "id": "beethoven-pathetique-rondo",
+  "title": "Pathetique Sonata (Rondo Theme)",
+  "description": "Ludwig van Beethoven.",
+  "abc": "X:1\nT:Pathetique Sonata (Rondo Theme)\nM:2/4\nL:1/8\nK:Cm\nG E/D/ C B, | C D E F | G c B A | G2 z2 | G E/D/ C B, | C D E F | G F E D | C2 z2 |]",
+  "tempo": 100,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

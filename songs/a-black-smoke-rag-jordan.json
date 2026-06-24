@@ -1,0 +1,12 @@
+{
+  "id": "a-black-smoke-rag-jordan",
+  "title": "A Black Smoke (Theme)",
+  "description": "Charley Straight.",
+  "abc": "X:1\nT:A Black Smoke (Theme)\nM:2/4\nL:1/8\nK:C\nE/G/ | c/G/E/G/ c/d/e/c/ | G/c/e/g/ e/c/G/E/ | D/F/A/F/ D/F/A/d/ | c2 E/G/ |\nc/G/E/G/ c/d/e/c/ | G/c/e/g/ e/g/c'/g/ | b/a/g/f/ e/d/c/B/ | c2 ||\n",
+  "tempo": 96,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

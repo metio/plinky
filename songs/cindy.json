@@ -1,0 +1,12 @@
+{
+  "id": "cindy",
+  "title": "Cindy",
+  "description": "Traditional southern Appalachian folk song, 19th century; public domain.",
+  "abc": "X:1\nT:Cindy\nM:2/4\nL:1/8\nK:G\nD/D/ G G/A/ | B/B/ B d | B/A/ G E/D/ | D/D/ D2 |\nD/D/ G G/A/ | B/B/ B d | B/A/ G/A/ B/G/ | A/A/ G2 |]",
+  "tempo": 124,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

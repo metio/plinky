@@ -1,0 +1,12 @@
+{
+  "id": "schubert-impromptu-op90-no3-theme",
+  "title": "Impromptu Op.90 No.3 (theme)",
+  "description": "Franz Schubert.",
+  "abc": "X:1\nT:Impromptu Op.90 No.3 (theme)\nM:4/4\nL:1/8\nK:G\nG2 | B3 c d3 e | d6 B2 | A3 B c3 d | c4 B2 G2 | B3 c d3 e | d6 d2 | e3 d c3 B | A6 |]",
+  "tempo": 76,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

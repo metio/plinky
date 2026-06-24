@@ -1,0 +1,12 @@
+{
+  "id": "chopin-prelude-op28-no4-e-minor",
+  "title": "Prelude in E minor, Op. 28 No. 4 (theme)",
+  "description": "Frederic Chopin.",
+  "abc": "X:1\nT:Prelude in E minor, Op. 28 No. 4\nM:4/4\nL:1/8\nK:Em\nB6 A2 | B6 G2 | B6 ^F2 | G2 E2 z4 |\nE6 ^D2 | E6 B,2 | E4 ^D2 E2 | ^F6 z2 |]",
+  "tempo": 66,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

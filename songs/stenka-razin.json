@@ -1,0 +1,12 @@
+{
+  "id": "stenka-razin",
+  "title": "Stenka Razin (Iz-za ostrova)",
+  "description": "Russian folk song; lyrics 1883 by Sadovnikov, melody traditional.",
+  "abc": "X:1\nT:Stenka Razin (Iz-za ostrova)\nM:4/4\nL:1/8\nK:Am\nA2 A2 c2 e2|d2 c2 B4|G2 G2 B2 d2|c2 B2 A4|\nA2 A2 c2 e2|d2 c2 B4|c2 B2 A2 G2|A6 z2|",
+  "tempo": 84,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}
