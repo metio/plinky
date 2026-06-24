@@ -8,6 +8,7 @@
 /.react-router/
 /build/
 /coverage/
+/.lighthouseci/
 # The registry pack is bundled from songs/ at build time (npm run songs).
 /public/registry/starter.json
 # Paraglide-generated output and the inlang project cache/metadata (only
