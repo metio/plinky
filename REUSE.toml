@@ -11,11 +11,11 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
 
-# Catalog songs are transcriptions of public-domain or non-copyrightable music,
-# dedicated to the public domain (CC0). Each song is its own file so its license
-# is tracked individually.
+# Catalog songs (ABC) and scores (MusicXML) are transcriptions/arrangements of
+# public-domain or non-copyrightable music, dedicated to the public domain (CC0).
+# Each is its own file so its license is tracked individually.
 [[annotations]]
-path = ["songs/*.json"]
+path = ["songs/*.json", "scores/*.musicxml"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "CC0-1.0"

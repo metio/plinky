@@ -104,6 +104,9 @@ export default function Home() {
                         <Link to="/songs" className={NAV_LINK}>
                             {m.home_browse_all()}
                         </Link>
+                        <Link to="/scores" className={NAV_LINK}>
+                            {m.scores_heading()}
+                        </Link>
                         <Link to="/tracks" className={NAV_LINK}>
                             {m.home_tracks()}
                         </Link>

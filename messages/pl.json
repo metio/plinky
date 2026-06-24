@@ -257,5 +257,9 @@
   "songs_count": "Utwory: {count}",
   "songs_empty": "Żaden utwór nie pasuje do wyszukiwania.",
   "songs_favorite": "Dodaj do ulubionych",
-  "songs_unfavorite": "Usuń z ulubionych"
+  "songs_unfavorite": "Usuń z ulubionych",
+  "scores_heading": "Nuty",
+  "scores_intro": "Nuty fortepianowe z domeny publicznej, wyświetlane i odtwarzane bezpośrednio w przeglądarce.",
+  "scores_empty": "Brak nut.",
+  "scores_tempo": "Tempo"
 }

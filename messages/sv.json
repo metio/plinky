@@ -257,5 +257,9 @@
   "songs_count": "{count} låtar",
   "songs_empty": "Inga låtar matchar din sökning.",
   "songs_favorite": "Lägg till i favoriter",
-  "songs_unfavorite": "Ta bort från favoriter"
+  "songs_unfavorite": "Ta bort från favoriter",
+  "scores_heading": "Noter",
+  "scores_intro": "Pianonoter i public domain, renderade och spelade direkt i din webbläsare.",
+  "scores_empty": "Inga noter än.",
+  "scores_tempo": "Tempo"
 }

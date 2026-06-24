@@ -257,5 +257,9 @@
   "songs_count": "{count} sange",
   "songs_empty": "Ingen sange matcher din søgning.",
   "songs_favorite": "Føj til favoritter",
-  "songs_unfavorite": "Fjern fra favoritter"
+  "songs_unfavorite": "Fjern fra favoritter",
+  "scores_heading": "Noder",
+  "scores_intro": "Public domain-klavernoder, gengivet og afspillet direkte i din browser.",
+  "scores_empty": "Ingen noder endnu.",
+  "scores_tempo": "Tempo"
 }

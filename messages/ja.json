@@ -257,5 +257,9 @@
   "songs_count": "{count} 曲",
   "songs_empty": "検索に一致する曲がありません。",
   "songs_favorite": "お気に入りに追加",
-  "songs_unfavorite": "お気に入りから削除"
+  "songs_unfavorite": "お気に入りから削除",
+  "scores_heading": "楽譜",
+  "scores_intro": "パブリックドメインのピアノ楽譜を、ブラウザでそのまま表示・再生できます。",
+  "scores_empty": "まだ楽譜がありません。",
+  "scores_tempo": "テンポ"
 }

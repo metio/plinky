@@ -12,4 +12,4 @@ tuplets = "tuplets"
 # read as misspellings. typos only knows English, so it would flag legitimate
 # foreign words and notation. The English message base stays checked.
 [files]
-extend-exclude = ["messages/*", "!messages/en.json", "songs/*"]
+extend-exclude = ["messages/*", "!messages/en.json", "songs/*", "scores/*"]

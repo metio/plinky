@@ -257,5 +257,9 @@
   "songs_count": "{count} pjesama",
   "songs_empty": "Nijedna pjesma ne odgovara vašoj pretrazi.",
   "songs_favorite": "Dodaj u favorite",
-  "songs_unfavorite": "Ukloni iz favorita"
+  "songs_unfavorite": "Ukloni iz favorita",
+  "scores_heading": "Note",
+  "scores_intro": "Klavirske note u javnoj domeni, prikazane i odsvirane izravno u tvojem pregledniku.",
+  "scores_empty": "Još nema nota.",
+  "scores_tempo": "Tempo"
 }

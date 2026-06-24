@@ -257,5 +257,9 @@
   "songs_count": "곡 {count}개",
   "songs_empty": "검색과 일치하는 곡이 없어요.",
   "songs_favorite": "즐겨찾기에 추가",
-  "songs_unfavorite": "즐겨찾기에서 제거"
+  "songs_unfavorite": "즐겨찾기에서 제거",
+  "scores_heading": "악보",
+  "scores_intro": "퍼블릭 도메인 피아노 악보를 브라우저에서 바로 보고 재생하세요.",
+  "scores_empty": "아직 악보가 없어요.",
+  "scores_tempo": "템포"
 }

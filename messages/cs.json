@@ -257,5 +257,9 @@
   "songs_count": "{count} skladeb",
   "songs_empty": "Žádná skladba neodpovídá vašemu hledání.",
   "songs_favorite": "Přidat k oblíbeným",
-  "songs_unfavorite": "Odebrat z oblíbených"
+  "songs_unfavorite": "Odebrat z oblíbených",
+  "scores_heading": "Noty",
+  "scores_intro": "Klavírní noty z volného díla, zobrazené a přehrané přímo v prohlížeči.",
+  "scores_empty": "Zatím žádné noty.",
+  "scores_tempo": "Tempo"
 }
