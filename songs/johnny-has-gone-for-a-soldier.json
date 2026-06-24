@@ -1,0 +1,12 @@
+{
+  "id": "johnny-has-gone-for-a-soldier",
+  "title": "Johnny Has Gone for a Soldier",
+  "description": "Traditional folk song (Shule Aroon).",
+  "abc": "X:1\nT:Johnny Has Gone for a Soldier\nM:4/4\nL:1/4\nK:Em\nE G B B | A G E2 | E G B d | e3 z | e d B A | G A B2 | A G E D | E3 z |",
+  "tempo": 84,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "saints-go-marching-skip",
+  "title": "Skip to My Lou",
+  "description": "Traditional American folk song.",
+  "abc": "X:1\nT:Skip to My Lou\nM:4/4\nL:1/4\nK:C\nE2 G2|G F E2|D2 F2|F E D2|E2 G2|G F E2|D2 G2|c3 z|]",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

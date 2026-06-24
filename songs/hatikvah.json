@@ -1,0 +1,12 @@
+{
+  "id": "hatikvah",
+  "title": "Hatikvah",
+  "description": "Traditional folk melody (Moldavian/Romanian origin), 19th century, public domain.",
+  "abc": "X:1\nT:Hatikvah\nM:4/4\nL:1/8\nK:Dm\nDE FG A2 A2 | B2 A2 G2 GA | F2 F2 E2 ED | E2 D2 D4 |]",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

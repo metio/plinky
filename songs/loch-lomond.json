@@ -1,0 +1,12 @@
+{
+  "id": "loch-lomond",
+  "title": "Loch Lomond",
+  "description": "Traditional Scottish folk song.",
+  "abc": "X:1\nT:Loch Lomond\nM:4/4\nL:1/8\nK:C\nG2 | c2 c2 c2 d2 | e3 d c2 c2 | A2 G2 E2 D2 | C4 z2 G2 |\nc2 c2 c2 d2 | e3 d c2 e2 | g2 e2 d2 c2 | d4 z2 d2 |\ne3 f g2 e2 | d2 c2 A2 G2 | E2 G2 A2 c2 | d4 z2 d2 |\ne3 f g2 e2 | d2 c2 A2 G2 | E2 D2 E2 D2 | C4 z2 |\n",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "ring-around-the-rosie",
+  "title": "Ring Around the Rosie",
+  "description": "Traditional nursery rhyme.",
+  "abc": "X:1\nT:Ring Around the Rosie\nM:6/8\nL:1/8\nK:G\nG2 G A2 z | B2 B A3 | B2 B A2 G | A3 z3 |\nG2 G A2 z | B2 B A3 | B2 B A2 G | G3 z3 |",
+  "tempo": 96,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

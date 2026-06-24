@@ -1,0 +1,12 @@
+{
+  "id": "la-donna-e-mobile",
+  "title": "La donna è mobile",
+  "description": "Giuseppe Verdi.",
+  "abc": "X:1\nT:La donna e mobile\nM:3/8\nL:1/8\nK:C\nB2 G | G2 G | A2 F | F4 z2 |\nA2 F | F2 F | G2 E | E4 z2 |\n",
+  "tempo": 132,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

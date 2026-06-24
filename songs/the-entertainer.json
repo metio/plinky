@@ -1,0 +1,12 @@
+{
+  "id": "the-entertainer",
+  "title": "The Entertainer",
+  "description": "Scott Joplin.",
+  "abc": "X:1\nT:The Entertainer\nM:2/4\nL:1/8\nK:C\nd^d e c2 d B | G F E F A c | d B d3 d/ z/ |\nd^d e c2 d B | G F E F A c | d B d3 d/ z/ |",
+  "tempo": 88,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

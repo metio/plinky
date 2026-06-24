@@ -1,0 +1,12 @@
+{
+  "id": "rondo-alla-turca",
+  "title": "Rondo alla Turca (Turkish March)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Rondo alla Turca (Turkish March)\nM:2/4\nL:1/8\nK:Am\nB/A/G/A/ c2 | d/c/B/c/ e2 | f/e/d/e/ B/A/G/A/ | c2 c2 |\nB/A/G/A/ c2 | d/c/B/c/ e2 | f/e/d/e/ B/A/G/A/ | c2 c2 |",
+  "tempo": 120,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

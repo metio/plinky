@@ -1,0 +1,12 @@
+{
+  "id": "the-moldau-vltava-theme",
+  "title": "The Moldau (Vltava) - Main Theme",
+  "description": "Bedřich Smetana.",
+  "abc": "X:1\nT:The Moldau (Vltava) - Main Theme\nM:6/8\nL:1/8\nK:Em\nE2 G | A2 B | c2 B | A2 G | A2 G | E2 D | E3 | z3 |\nE2 G | A2 B | c2 B | A2 G | A2 B | c2 d | e3 | z3 |",
+  "tempo": 96,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "merrily-we-roll-along",
+  "title": "Merrily We Roll Along",
+  "description": "Traditional nursery tune.",
+  "abc": "X:1\nT:Merrily We Roll Along\nM:4/4\nL:1/4\nK:C\nE D C D | E E E2 | D D D2 | E G G2 |\nE D C D | E E E E | D D E D | C2 z2 |\n",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "alouette",
+  "title": "Alouette",
+  "description": "Traditional French-Canadian folk song.",
+  "abc": "X:1\nT:Alouette\nM:4/4\nL:1/4\nK:C\nC E G G | A G F E | C E G G | A G F E | E F G c | E F G c | G F E F | E2 z2 |",
+  "tempo": 108,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

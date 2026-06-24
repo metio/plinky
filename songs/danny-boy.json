@@ -1,0 +1,12 @@
+{
+  "id": "danny-boy",
+  "title": "Danny Boy (Londonderry Air)",
+  "description": "Traditional Irish air, melody pre-1855.",
+  "abc": "X:1\nT:Danny Boy (Londonderry Air)\nM:4/4\nL:1/4\nK:C\nz3/2 C/2 | E F G2 | c2 d c | E F G3/2 E/2 | D2 z3/2 D/2 |\nE D C2 | A,3/2 C/2 E G | A3/2 c/2 G E | E D z3/2 C/2 |\nE F G2 | c2 d c | E F G3/2 E/2 | D2 z2 |",
+  "tempo": 72,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "ive-been-working-on-the-railroad",
+  "title": "I've Been Working on the Railroad",
+  "description": "Traditional American folk song, published 1894.",
+  "abc": "X:1\nT:I've Been Working on the Railroad\nM:4/4\nL:1/8\nK:F\nF2 A2 G2 F2 | A2 A2 A4 | G2 G2 G2 A2 | G4 z4 | F2 A2 G2 F2 | A2 A2 A2 c2 | d2 c2 A2 G2 | F6 z2 |",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

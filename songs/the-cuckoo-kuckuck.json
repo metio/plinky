@@ -1,0 +1,12 @@
+{
+  "id": "the-cuckoo-kuckuck",
+  "title": "Kuckuck (The Cuckoo)",
+  "description": "German traditional children's song.",
+  "abc": "X:1\nT:Kuckuck (The Cuckoo)\nM:3/4\nL:1/4\nK:F\nA F2 | A F2 | A B c2 z | G E2 | G E2 | G A B2 z | c c c c | d d d d | c A A A | G G G G | A F2 | A F2 |]",
+  "tempo": 108,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

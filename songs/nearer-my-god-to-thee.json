@@ -1,0 +1,12 @@
+{
+  "id": "nearer-my-god-to-thee",
+  "title": "Nearer, My God, to Thee",
+  "description": "Lowell Mason.",
+  "abc": "X:1\nT:Nearer, My God, to Thee\nM:3/4\nL:1/4\nK:G\nG G A | B2 G | B2 d | B3 | A2 B | c2 B | A2 G | E3 |",
+  "tempo": 72,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

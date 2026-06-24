@@ -1,0 +1,12 @@
+{
+  "id": "scarborough-fair",
+  "title": "Scarborough Fair",
+  "description": "Traditional English ballad.",
+  "abc": "X:1\nT:Scarborough Fair\nM:3/4\nL:1/4\nK:Dm\nA,2 D|F G A|d2 d|c2 A|A3|G2 F|G A G|F D E|F3|F3|]",
+  "tempo": 96,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

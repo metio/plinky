@@ -1,0 +1,12 @@
+{
+  "id": "the-blue-danube",
+  "title": "The Blue Danube",
+  "description": "Johann Strauss II.",
+  "abc": "X:1\nT:The Blue Danube\nM:3/4\nL:1/4\nK:G\nD2 G | B2 z | B2 z | D2 G | B2 z | B2 z | e2 e | d2 d | z3 | c2 c | B2 B | z3 |",
+  "tempo": 96,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

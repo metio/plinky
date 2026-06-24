@@ -1,0 +1,12 @@
+{
+  "id": "marines-hymn",
+  "title": "The Marines' Hymn",
+  "description": "Melody from Offenbach's 'Geneviève de Brabant' (1859), public domain.",
+  "abc": "X:1\nT:The Marines' Hymn\nM:4/4\nL:1/4\nK:C\nc2 c c | c3 G | A2 A B | c2 c2 |\nB2 B B | B3 A | G A B A | G2 z2 |\nc2 c c | c3 G | A2 A B | c2 c2 |\nd2 d d | e3 e | d c B A | G3 z |\n",
+  "tempo": 116,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

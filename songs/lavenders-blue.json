@@ -1,0 +1,12 @@
+{
+  "id": "lavenders-blue",
+  "title": "Lavender's Blue",
+  "description": "Traditional English folk song, 17th century.",
+  "abc": "X:1\nT:Lavender's Blue\nM:3/4\nL:1/4\nK:C\nG E G | c2 c | d c B | A2 z |\nG E G | c c c | d c B | c2 z |\ne d c | d c B | c B A | G2 z |\nG E G | c c c | d c B | c2 z |\n",
+  "tempo": 108,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

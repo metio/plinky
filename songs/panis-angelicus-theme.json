@@ -1,0 +1,12 @@
+{
+  "id": "panis-angelicus-theme",
+  "title": "Panis Angelicus (theme)",
+  "description": "César Franck.",
+  "abc": "X:1\nT:Panis Angelicus (theme)\nM:3/4\nL:1/4\nK:C\nE2 F | G2 G | A G F | E2 z |\nF2 E | F2 G | A G F | G2 z |\nc2 B | A2 G | F E D | E2 z |\nG2 F | E2 D | C2 D | C3 |]",
+  "tempo": 66,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

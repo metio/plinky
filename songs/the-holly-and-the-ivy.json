@@ -1,0 +1,12 @@
+{
+  "id": "the-holly-and-the-ivy",
+  "title": "The Holly and the Ivy",
+  "description": "Traditional English carol.",
+  "abc": "X:1\nT:The Holly and the Ivy\nM:3/4\nL:1/8\nK:G\nG2 | G2 G2 G2 | A2 B2 c2 | B2 A2 G2 | E4 D2 |\nG2 G2 G2 | A2 B2 c2 | B2 A2 G2 | E6 |",
+  "tempo": 96,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}
