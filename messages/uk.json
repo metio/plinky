@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Системна",
   "theme_light": "☀️ Світла",
   "theme_dark": "🌙 Темна",
-  "theme_aria": "Тема: {theme}. Натисніть, щоб змінити."
+  "theme_aria": "Тема: {theme}. Натисніть, щоб змінити.",
+  "action_listen": "▶ Слухати",
+  "action_listen_stop": "■ Зупинити",
+  "home_favorites_heading": "Ваші пісні",
+  "home_favorites_empty": "Позначайте пісні зірочкою, щоб закріпити їх тут для швидкого доступу.",
+  "home_browse_all": "Усі пісні",
+  "songs_heading": "Пісні",
+  "songs_intro": "Усі пісні на цьому пристрої. Шукайте, фільтруйте та позначайте зірочкою ті, над якими працюєте.",
+  "songs_search_placeholder": "Пошук пісень…",
+  "songs_filter_all": "Усі",
+  "songs_filter_favorites": "★ Улюблені",
+  "songs_count": "{count} пісень",
+  "songs_empty": "Жодна пісня не відповідає вашому пошуку.",
+  "songs_favorite": "Додати до улюблених",
+  "songs_unfavorite": "Видалити з улюблених"
 }

@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Sistema",
   "theme_light": "☀️ Claro",
   "theme_dark": "🌙 Escuro",
-  "theme_aria": "Tema: {theme}. Clique para mudar."
+  "theme_aria": "Tema: {theme}. Clique para mudar.",
+  "action_listen": "▶ Ouvir",
+  "action_listen_stop": "■ Parar",
+  "home_favorites_heading": "Suas músicas",
+  "home_favorites_empty": "Marque músicas com estrela para fixá-las aqui e acessá-las rapidamente.",
+  "home_browse_all": "Todas as músicas",
+  "songs_heading": "Músicas",
+  "songs_intro": "Todas as músicas neste dispositivo. Pesquise, filtre e marque com estrela as que está praticando.",
+  "songs_search_placeholder": "Pesquisar músicas…",
+  "songs_filter_all": "Todas",
+  "songs_filter_favorites": "★ Favoritas",
+  "songs_count": "{count} músicas",
+  "songs_empty": "Nenhuma música corresponde à sua pesquisa.",
+  "songs_favorite": "Adicionar aos favoritos",
+  "songs_unfavorite": "Remover dos favoritos"
 }

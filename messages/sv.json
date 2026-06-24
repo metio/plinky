@@ -243,5 +243,19 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Ljust",
   "theme_dark": "🌙 Mörkt",
-  "theme_aria": "Tema: {theme}. Klicka för att ändra."
+  "theme_aria": "Tema: {theme}. Klicka för att ändra.",
+  "action_listen": "▶ Lyssna",
+  "action_listen_stop": "■ Stoppa",
+  "home_favorites_heading": "Dina låtar",
+  "home_favorites_empty": "Stjärnmärk låtar för att fästa dem här för snabb åtkomst.",
+  "home_browse_all": "Alla låtar",
+  "songs_heading": "Låtar",
+  "songs_intro": "Alla låtar på den här enheten. Sök, filtrera och stjärnmärk dem du jobbar med.",
+  "songs_search_placeholder": "Sök låtar…",
+  "songs_filter_all": "Alla",
+  "songs_filter_favorites": "★ Favoriter",
+  "songs_count": "{count} låtar",
+  "songs_empty": "Inga låtar matchar din sökning.",
+  "songs_favorite": "Lägg till i favoriter",
+  "songs_unfavorite": "Ta bort från favoriter"
 }

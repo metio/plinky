@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Sustav",
   "theme_light": "☀️ Svijetla",
   "theme_dark": "🌙 Tamna",
-  "theme_aria": "Tema: {theme}. Klikni za promjenu."
+  "theme_aria": "Tema: {theme}. Klikni za promjenu.",
+  "action_listen": "▶ Slušaj",
+  "action_listen_stop": "■ Zaustavi",
+  "home_favorites_heading": "Vaše pjesme",
+  "home_favorites_empty": "Označite pjesme zvjezdicom da ih prikvačite ovdje za brzi pristup.",
+  "home_browse_all": "Sve pjesme",
+  "songs_heading": "Pjesme",
+  "songs_intro": "Sve pjesme na ovom uređaju. Pretražujte, filtrirajte i označite zvjezdicom one koje vježbate.",
+  "songs_search_placeholder": "Pretraži pjesme…",
+  "songs_filter_all": "Sve",
+  "songs_filter_favorites": "★ Favoriti",
+  "songs_count": "{count} pjesama",
+  "songs_empty": "Nijedna pjesma ne odgovara vašoj pretrazi.",
+  "songs_favorite": "Dodaj u favorite",
+  "songs_unfavorite": "Ukloni iz favorita"
 }

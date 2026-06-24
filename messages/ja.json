@@ -243,5 +243,19 @@
   "theme_system": "🖥️ システム",
   "theme_light": "☀️ ライト",
   "theme_dark": "🌙 ダーク",
-  "theme_aria": "テーマ：{theme}。クリックで変更。"
+  "theme_aria": "テーマ：{theme}。クリックで変更。",
+  "action_listen": "▶ 聴く",
+  "action_listen_stop": "■ 停止",
+  "home_favorites_heading": "あなたの曲",
+  "home_favorites_empty": "曲にスターを付けると、すぐに使えるようここに固定されます。",
+  "home_browse_all": "すべての曲",
+  "songs_heading": "曲",
+  "songs_intro": "このデバイス上のすべての曲。練習中の曲を検索・絞り込み・スター付けできます。",
+  "songs_search_placeholder": "曲を検索…",
+  "songs_filter_all": "すべて",
+  "songs_filter_favorites": "★ お気に入り",
+  "songs_count": "{count} 曲",
+  "songs_empty": "検索に一致する曲がありません。",
+  "songs_favorite": "お気に入りに追加",
+  "songs_unfavorite": "お気に入りから削除"
 }

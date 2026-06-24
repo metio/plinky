@@ -243,5 +243,19 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Lyst",
   "theme_dark": "🌙 Mørkt",
-  "theme_aria": "Tema: {theme}. Klikk for å endre."
+  "theme_aria": "Tema: {theme}. Klikk for å endre.",
+  "action_listen": "▶ Lytt",
+  "action_listen_stop": "■ Stopp",
+  "home_favorites_heading": "Sangene dine",
+  "home_favorites_empty": "Stjernemerk sanger for å feste dem her for rask tilgang.",
+  "home_browse_all": "Alle sanger",
+  "songs_heading": "Sanger",
+  "songs_intro": "Alle sangene på denne enheten. Søk, filtrer og stjernemerk dem du øver på.",
+  "songs_search_placeholder": "Søk i sanger…",
+  "songs_filter_all": "Alle",
+  "songs_filter_favorites": "★ Favoritter",
+  "songs_count": "{count} sanger",
+  "songs_empty": "Ingen sanger samsvarer med søket ditt.",
+  "songs_favorite": "Legg til i favoritter",
+  "songs_unfavorite": "Fjern fra favoritter"
 }

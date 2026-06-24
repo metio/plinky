@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Sistem",
   "theme_light": "☀️ Luminos",
   "theme_dark": "🌙 Întunecat",
-  "theme_aria": "Temă: {theme}. Apasă pentru a schimba."
+  "theme_aria": "Temă: {theme}. Apasă pentru a schimba.",
+  "action_listen": "▶ Ascultă",
+  "action_listen_stop": "■ Oprește",
+  "home_favorites_heading": "Melodiile tale",
+  "home_favorites_empty": "Marchează melodiile cu o stea ca să le fixezi aici pentru acces rapid.",
+  "home_browse_all": "Toate melodiile",
+  "songs_heading": "Melodii",
+  "songs_intro": "Toate melodiile de pe acest dispozitiv. Caută, filtrează și marchează cu o stea cele la care lucrezi.",
+  "songs_search_placeholder": "Caută melodii…",
+  "songs_filter_all": "Toate",
+  "songs_filter_favorites": "★ Favorite",
+  "songs_count": "{count} melodii",
+  "songs_empty": "Nicio melodie nu se potrivește căutării.",
+  "songs_favorite": "Adaugă la favorite",
+  "songs_unfavorite": "Elimină din favorite"
 }
