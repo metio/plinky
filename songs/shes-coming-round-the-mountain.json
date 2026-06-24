@@ -1,0 +1,12 @@
+{
+  "id": "shes-coming-round-the-mountain",
+  "title": "She'll Be Coming 'Round the Mountain",
+  "description": "Traditional American folk song.",
+  "abc": "X:1\nT:She'll Be Coming 'Round the Mountain\nM:4/4\nL:1/4\nK:C\nG,2 C E|G2 G2|A G E C|E2 D2|G,2 C E|G2 G2|A G E D|C4|]",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

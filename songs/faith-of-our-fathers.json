@@ -1,0 +1,12 @@
+{
+  "id": "faith-of-our-fathers",
+  "title": "Faith of Our Fathers",
+  "description": "Hymn, first published 1849.",
+  "abc": "X:1\nT:Faith of Our Fathers\nM:4/4\nL:1/4\nK:G\nG G/A/ B B | A A G2 | B B/c/ d d | c B A2 | B B/c/ d d | c B A G | A A B/A/ G | A3 z |",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

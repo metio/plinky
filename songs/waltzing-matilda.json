@@ -1,0 +1,12 @@
+{
+  "id": "waltzing-matilda",
+  "title": "Waltzing Matilda",
+  "description": "Christina Macpherson.",
+  "abc": "X:1\nT:Waltzing Matilda\nM:4/4\nL:1/4\nK:C\nE G G G | A G E C | D E E E | E3 z |\nE G G G | A G E C | D E F D | C3 z |",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

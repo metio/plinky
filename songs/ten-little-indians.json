@@ -1,0 +1,12 @@
+{
+  "id": "ten-little-indians",
+  "title": "Ten Little Indians",
+  "description": "Traditional children's song.",
+  "abc": "X:1\nT:Ten Little Indians\nM:4/4\nL:1/8\nK:C\nC2 C/C/ C2 E2 | C2 E2 G4 | A2 A/A/ A2 F2 | A2 F2 C4 |\nC2 C/C/ C2 E2 | C2 E2 G4 | A2 F2 E2 D2 | C8 |",
+  "tempo": 112,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

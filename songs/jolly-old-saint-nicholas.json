@@ -1,0 +1,12 @@
+{
+  "id": "jolly-old-saint-nicholas",
+  "title": "Jolly Old Saint Nicholas",
+  "description": "Traditional carol, published 1865.",
+  "abc": "X:1\nT:Jolly Old Saint Nicholas\nM:4/4\nL:1/4\nK:C\nE E E E | G G E2 | D D C D | E2 E2 | E E E E | G G E2 | D D E D | C2 z2 |",
+  "tempo": 104,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "the-first-noel",
+  "title": "The First Noel",
+  "description": "Traditional English carol.",
+  "abc": "X:1\nT:The First Noel\nM:3/4\nL:1/8\nK:D\nA2 | F2 E2 D2 | E2 F2 G2 | A4 B2 | A2 G2 F2 | E2 D2 E2 | F4 E2 | D6 | z4 A2 | F2 E2 D2 | E2 F2 G2 | A4 B2 | A2 G2 F2 | E2 D2 E2 | F4 G2 | A6 | z4 |",
+  "tempo": 84,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

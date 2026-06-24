@@ -1,0 +1,12 @@
+{
+  "id": "michael-row-the-boat-ashore",
+  "title": "Michael Row the Boat Ashore",
+  "description": "Traditional African-American spiritual.",
+  "abc": "X:1\nT:Michael Row the Boat Ashore\nM:4/4\nL:1/4\nK:C\nC E G2 | A2 G2 | E G E C | E2 z2 |\nC E G2 | A2 G2 | E G E C | C2 z2 |\nG2 A2 | c2 A2 | G E C2 | G2 z2 |\nC E G2 | E G E C | C3 z |\n",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

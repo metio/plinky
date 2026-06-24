@@ -1,0 +1,12 @@
+{
+  "id": "god-save-the-king",
+  "title": "God Save the King",
+  "description": "Traditional national anthem, in use since the 1740s.",
+  "abc": "X:1\nT:God Save the King\nM:3/4\nL:1/4\nK:G\nG G A | F2 G | A A B | B2 A |\nG G A | F2 G | A A B | B2 A |\nd2 d | c B A | c2 c | B A G |\nA B c | B A G | F G A | G3 |",
+  "tempo": 88,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

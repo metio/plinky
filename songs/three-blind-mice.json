@@ -1,0 +1,12 @@
+{
+  "id": "three-blind-mice",
+  "title": "Three Blind Mice",
+  "description": "Traditional round.",
+  "abc": "X:1\nT:Three Blind Mice\nM:4/4\nL:1/4\nK:C\nE D C2 | E D C2 | G F F E | G F F E |\nc c B A | B c G2 | c c B A | B c G2 |",
+  "tempo": 108,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

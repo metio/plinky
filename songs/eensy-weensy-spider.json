@@ -1,0 +1,12 @@
+{
+  "id": "eensy-weensy-spider",
+  "title": "Eensy Weensy Spider",
+  "description": "Traditional nursery rhyme, no known author.",
+  "abc": "X:1\nT:Eensy Weensy Spider\nM:4/4\nL:1/4\nK:C\nG | c c c d | e2 e e | d c d e | c2 z e | e f g2 | g f e f | g2 z e | e f g2 | g f e f | g2 z c | c d e2 | e d c d | e2 z G | c c c d | e2 e e | d c d e | c2 z2 |]",
+  "tempo": 104,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

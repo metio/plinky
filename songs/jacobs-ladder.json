@@ -1,0 +1,12 @@
+{
+  "id": "jacobs-ladder",
+  "title": "We Are Climbing Jacob's Ladder",
+  "description": "Traditional African-American spiritual.",
+  "abc": "X:1\nT:We Are Climbing Jacob's Ladder\nM:4/4\nL:1/4\nK:C\nC E G c | c B c2 | G E G c | c B c2 | C E G c | c d e/2d/2 c/2B/2 | A G E C | C4 |",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

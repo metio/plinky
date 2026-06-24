@@ -1,0 +1,12 @@
+{
+  "id": "what-child-is-this",
+  "title": "What Child Is This",
+  "description": "Traditional English melody 'Greensleeves', 16th century.",
+  "abc": "X:1\nT:What Child Is This\nM:4/4\nL:1/8\nK:Em\nE | G2 A2 B3 c | B2 A2 F3 D | E2 F2 G2 E2 | D3 E F2 D2 |\nG2 A2 B3 c | B2 A2 F3 D | E2 F2 G2 E2 | E6 z |",
+  "tempo": 96,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

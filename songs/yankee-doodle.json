@@ -1,0 +1,12 @@
+{
+  "id": "yankee-doodle",
+  "title": "Yankee Doodle",
+  "description": "Traditional American folk song (18th century).",
+  "abc": "X:1\nT:Yankee Doodle\nM:2/4\nL:1/8\nK:G\nG G A B | G B A2 | G G A B | c B A2 |\nG G A B | c B A G | F D E F | G2 G2 |\nd d c c | d B G2 | d d c c | d2 A2 |\nd d c c | d e d c | B G A B | G2 G2 |",
+  "tempo": 112,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

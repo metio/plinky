@@ -1,0 +1,12 @@
+{
+  "id": "pop-goes-the-weasel",
+  "title": "Pop Goes the Weasel",
+  "description": "Traditional English folk song, 19th century.",
+  "abc": "X:1\nT:Pop Goes the Weasel\nM:6/8\nL:1/8\nK:G\nG2 G A2 A | B2 G B2 d | G2 G A2 A | B4 z2 |\nG2 G A2 A | B2 G B3 | d2 B G2 A | B4 z2 |\nc2 c A2 d | B2 G G3 | c2 c A2 d | B4 z2 |\nc2 c A2 d | B2 G G3 | A2 G2 e2 | d3 G3 |]",
+  "tempo": 120,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

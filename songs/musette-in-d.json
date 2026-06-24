@@ -1,0 +1,12 @@
+{
+  "id": "musette-in-d",
+  "title": "Musette in D",
+  "description": "Johann Sebastian Bach.",
+  "abc": "X:1\nT:Musette in D\nM:2/4\nL:1/8\nK:D\nA2 d2 | dcde | d2 A2 | A2 A2 |\nA2 d2 | dcde | d2 A2 | d2 z2 |\nB2 g2 | gfge | f2 e2 | d2 z2 |\nA2 d2 | dcde | d2 A2 | d2 z2 |\n",
+  "tempo": 112,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}
