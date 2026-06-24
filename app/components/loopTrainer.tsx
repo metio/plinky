@@ -11,6 +11,7 @@ import type { Exercise } from "../lib/exercises";
 import { buildHands, type Hand } from "../lib/hands";
 import { recordPractice } from "../lib/history";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { m } from "../paraglide/messages.js";
 import { AbcRenderer } from "./abcRenderer";
 import { KeyboardHint } from "./keyboardHint";
 import { PianoKeyboard } from "./pianoKeyboard";
@@ -226,17 +227,15 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Loop · {exercise.title}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Pick a few bars and play them on repeat until they stick. Each lap is timed and
-                    scored so you can watch yourself speed up and clean up.
-                </p>
+                <h1 className="text-2xl font-semibold">
+                    {m.mode_loop()} · {exercise.title}
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.loop_intro()}</p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — or play with your computer keyboard below.
+                    {m.midi_unsupported_keyboard()}
                 </p>
             )}
 
@@ -247,13 +246,13 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40 dark:bg-gray-800 dark:text-gray-300"
                 >
-                    {status === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
             <div className="flex flex-wrap items-center gap-4">
                 <Stepper
-                    label="From bar"
+                    label={m.loop_from_bar()}
                     value={fromBar}
                     min={0}
                     max={toBar}
@@ -264,7 +263,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                     }}
                 />
                 <Stepper
-                    label="To bar"
+                    label={m.loop_to_bar()}
                     value={toBar}
                     min={fromBar}
                     max={Math.max(0, bars - 1)}
@@ -280,7 +279,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                     disabled={running || bars === 0}
                     className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40 dark:border-gray-700 dark:text-gray-300"
                 >
-                    Next section
+                    {m.loop_next_section()}
                 </button>
                 {running ? (
                     <button
@@ -288,7 +287,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                         onClick={() => setRunning(false)}
                         className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                     >
-                        Stop
+                        {m.loop_stop()}
                     </button>
                 ) : (
                     <button
@@ -297,32 +296,37 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                         disabled={matcher.totalSteps === 0}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                     >
-                        Start looping
+                        {m.loop_start()}
                     </button>
                 )}
             </div>
 
             {!running && bars > 0 && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Looping bars {fromBar + 1}–{toBar + 1}. Tap a note on the score to start a
-                    range, then tap another to set its end.
+                    {m.loop_range_hint({ from: fromBar + 1, to: toBar + 1 })}
                 </p>
             )}
 
             {running && (
                 <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                    Lap {reps.length + 1} — play{" "}
-                    <span className="font-mono">{describeNext(matcher.nextByHand, noteName)}</span>…
+                    {m.loop_lap_prefix({ lap: reps.length + 1 })}
+                    <span className="font-mono">{describeNext(matcher.nextByHand, noteName)}</span>
+                    {m.loop_lap_suffix()}
                 </p>
             )}
 
             {reps.length > 0 && (
                 <div className="space-y-2 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {reps.length} {reps.length === 1 ? "lap" : "laps"} · last{" "}
-                        <span className="font-mono">{lastRep?.bpm || "—"}</span> bpm at{" "}
-                        <span className="font-mono">{lastRep?.accuracy}%</span> · best{" "}
-                        <span className="font-mono">{bestBpm || "—"}</span> bpm
+                        {reps.length === 1
+                            ? m.loop_lap_summary_one({ count: reps.length })
+                            : m.loop_lap_summary_other({ count: reps.length })}
+                        <span className="font-mono">{lastRep?.bpm || "—"}</span>
+                        {m.loop_lap_summary_mid()}
+                        <span className="font-mono">{lastRep?.accuracy}%</span>
+                        {m.loop_lap_summary_best()}
+                        <span className="font-mono">{bestBpm || "—"}</span>
+                        {m.loop_lap_summary_end()}
                     </p>
                     <div className="flex flex-wrap gap-1">
                         {reps.map((rep, index) => (
@@ -330,7 +334,7 @@ export function LoopTrainer({ exercise }: { exercise: Exercise }) {
                                 // biome-ignore lint/suspicious/noArrayIndexKey: laps are an append-only ordered log
                                 key={index}
                                 className="rounded bg-white px-2 py-0.5 font-mono text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                                title={`${rep.correct} correct, ${rep.wrong} wrong`}
+                                title={m.loop_lap_title({ correct: rep.correct, wrong: rep.wrong })}
                             >
                                 {rep.bpm || "—"}bpm·{rep.accuracy}%
                             </span>

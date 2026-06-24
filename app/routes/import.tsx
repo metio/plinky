@@ -7,6 +7,7 @@ import { decodeSong } from "../lib/share";
 import { routeMeta } from "../lib/site";
 import { buildExercise, loadUserSongs, saveUserSong, submissionUrl } from "../lib/songs";
 import { buildSteps } from "../lib/steps";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/import";
 
 export function meta(_args: Route.MetaArgs) {
@@ -18,9 +19,9 @@ export function meta(_args: Route.MetaArgs) {
 // it can grow without bloating it.
 const SONG_SOURCES = [
     {
-        name: "Plinky song wiki",
+        name: m.import_source_wiki_name,
         url: "https://github.com/metio/plinky/wiki",
-        blurb: "Community-maintained scores you can open straight into Plinky.",
+        blurb: m.import_source_wiki_blurb,
     },
 ];
 
@@ -57,7 +58,7 @@ export default function ImportRoute() {
         (async () => {
             const abc = decodeSong(encoded);
             if (!abc || !(await isPlayable(abc))) {
-                setOutcome({ ok: false, message: "This link does not contain a playable song." });
+                setOutcome({ ok: false, message: m.import_invalid() });
                 return;
             }
             const ids = loadUserSongs().map((song) => song.id);
@@ -70,10 +71,12 @@ export default function ImportRoute() {
     if (hasLink) {
         return (
             <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-                <h1 className="text-2xl font-semibold">Shared song</h1>
+                <h1 className="text-2xl font-semibold">{m.import_shared_heading()}</h1>
 
                 {outcome === null && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Reading the link…</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {m.import_reading_link()}
+                    </p>
                 )}
 
                 {outcome?.ok === false && (
@@ -83,7 +86,7 @@ export default function ImportRoute() {
                             to="/"
                             className="text-sm text-indigo-700 underline dark:text-indigo-300"
                         >
-                            Back home
+                            {m.action_back_home()}
                         </Link>
                     </div>
                 )}
@@ -91,21 +94,22 @@ export default function ImportRoute() {
                 {outcome?.ok === true && (
                     <div className="space-y-3">
                         <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Added <span className="font-medium">{outcome.title}</span> to your
-                            library on this device.
+                            {m.import_added_prefix()}{" "}
+                            <span className="font-medium">{outcome.title}</span>{" "}
+                            {m.import_added_suffix()}
                         </p>
                         <div className="flex flex-wrap gap-2">
                             <Link
                                 to={`/practice/${outcome.id}`}
                                 className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
                             >
-                                Practice it
+                                {m.import_practice_it()}
                             </Link>
                             <Link
                                 to="/"
                                 className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                             >
-                                Home
+                                {m.import_home()}
                             </Link>
                         </div>
                     </div>
@@ -117,11 +121,8 @@ export default function ImportRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Find songs</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Plinky keeps your songs on your device rather than bundling a big library. Open
-                    a song link from one of these places — it adds the song here.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.import_heading()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.import_intro()}</p>
             </header>
 
             <ul className="space-y-3">
@@ -136,36 +137,36 @@ export default function ImportRoute() {
                             rel="noreferrer"
                             className="font-medium text-indigo-700 underline dark:text-indigo-300"
                         >
-                            {source.name} →
+                            {source.name()} →
                         </a>
                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {source.blurb}
+                            {source.blurb()}
                         </p>
                     </li>
                 ))}
             </ul>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
-                Have your own notation? Paste it on the{" "}
+                {m.import_own_prefix()}{" "}
                 <Link to="/" className="text-indigo-700 underline dark:text-indigo-300">
-                    home page
+                    {m.import_own_home_link()}
                 </Link>
-                . Got a song pack or a school's curriculum? Import it in{" "}
+                {m.import_own_middle()}{" "}
                 <Link to="/settings" className="text-indigo-700 underline dark:text-indigo-300">
-                    Settings
+                    {m.import_own_settings_link()}
                 </Link>
-                .
+                {m.import_own_suffix()}
             </p>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
-                Want to share a song with everyone?{" "}
+                {m.import_share_prefix()}{" "}
                 <a
                     href={submissionUrl()}
                     target="_blank"
                     rel="noreferrer"
                     className="text-indigo-700 underline dark:text-indigo-300"
                 >
-                    Submit it to the catalog →
+                    {m.import_share_link()}
                 </a>
             </p>
         </main>

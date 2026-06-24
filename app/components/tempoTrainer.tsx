@@ -18,6 +18,7 @@ import {
     type TempoPoint,
     tempoSeries,
 } from "../lib/tempo";
+import { m } from "../paraglide/messages.js";
 import { AbcRenderer } from "./abcRenderer";
 import { HandSelector, useHandSelection } from "./handSelector";
 import { KeyboardHint } from "./keyboardHint";
@@ -46,16 +47,16 @@ type Result = {
 
 function describeHotspots(hotspots: Hotspot[]): string {
     if (hotspots.length === 0) {
-        return "Nice and steady — no big slow-downs.";
+        return m.tempo_steady();
     }
     const ranges = hotspots
         .map((hotspot) =>
             hotspot.startIndex === hotspot.endIndex
-                ? `note ${hotspot.startIndex + 1}`
-                : `notes ${hotspot.startIndex + 1}–${hotspot.endIndex + 1}`,
+                ? m.tempo_note({ n: hotspot.startIndex + 1 })
+                : m.tempo_notes({ from: hotspot.startIndex + 1, to: hotspot.endIndex + 1 }),
         )
         .join(", ");
-    return `You slowed down around ${ranges}.`;
+    return m.tempo_slowed({ ranges });
 }
 
 export function TempoTrainer({ exercise }: { exercise: Exercise }) {
@@ -180,17 +181,15 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Tempo · {exercise.title}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Play at your own pace — no metronome. Plinky charts your tempo and flags where
-                    you slowed down.
-                </p>
+                <h1 className="text-2xl font-semibold">
+                    {m.mode_tempo()} · {exercise.title}
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.tempo_intro()}</p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — or play with your computer keyboard below.
+                    {m.midi_unsupported_keyboard()}
                 </p>
             )}
 
@@ -201,7 +200,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
-                    {status === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
@@ -220,7 +219,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                         disabled={matcher.totalSteps === 0}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                     >
-                        {runState === "finished" ? "Go again" : "Start"}
+                        {runState === "finished" ? m.tempo_go_again() : m.tempo_start()}
                     </button>
                 ) : (
                     <button
@@ -228,21 +227,21 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                         onClick={() => setRunState("idle")}
                         className="rounded-md border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
-                        Stop
+                        {m.tempo_stop()}
                     </button>
                 )}
                 {runState === "armed" && (
                     <span className="text-sm text-indigo-700 dark:text-indigo-300">
-                        Play{" "}
+                        {m.tempo_play_ready_prefix()}
                         <span className="font-mono">
                             {describeNext(matcher.nextByHand, noteName)}
-                        </span>{" "}
-                        whenever you are ready.
+                        </span>
+                        {m.tempo_play_ready_suffix()}
                     </span>
                 )}
                 {runState === "running" && (
                     <span className="text-lg font-semibold tabular-nums text-indigo-700 dark:text-indigo-300">
-                        ≈ {liveBpm ?? "…"} BPM
+                        {m.tempo_live_bpm({ bpm: liveBpm ?? "…" })}
                     </span>
                 )}
             </div>
@@ -250,15 +249,18 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
             {runState === "finished" && result && (
                 <div className="space-y-3 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Median tempo{" "}
-                        <span className="font-mono">{Math.round(result.median)} BPM</span> ·{" "}
-                        {describeHotspots(result.hotspots)}
+                        {m.tempo_median({
+                            bpm: Math.round(result.median),
+                            hotspots: describeHotspots(result.hotspots),
+                        })}
                     </p>
                     {result.handStats.map((hand) => (
                         <p key={hand.label} className="text-sm text-gray-500 dark:text-gray-400">
-                            {hand.label} hand: median{" "}
-                            <span className="font-mono">{Math.round(hand.median)} BPM</span> ·{" "}
-                            {describeHotspots(hand.hotspots)}
+                            {m.tempo_hand_median({
+                                hand: hand.label,
+                                bpm: Math.round(hand.median),
+                                hotspots: describeHotspots(hand.hotspots),
+                            })}
                         </p>
                     ))}
                     <TempoGraph
@@ -266,7 +268,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                         median={result.median}
                         hotspots={result.hotspots}
                         series={result.handStats.map((hand, index) => ({
-                            label: `${hand.label} hand`,
+                            label: m.tempo_hand_series({ hand: hand.label }),
                             points: hand.points,
                             color: HAND_COLORS[index % HAND_COLORS.length]!,
                         }))}

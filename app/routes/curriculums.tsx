@@ -6,6 +6,7 @@ import { Link } from "react-router";
 import { type CurriculumGroup, groupByCurriculum } from "../lib/curriculums";
 import { routeMeta } from "../lib/site";
 import { loadCurriculums, loadUserSongs } from "../lib/songs";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/curriculums";
 
 export function meta(_args: Route.MetaArgs) {
@@ -24,18 +25,15 @@ export default function CurriculumsRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Curriculums</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Your songs, grouped by curriculum. Import a curriculum pack in Settings to add a
-                    teacher's or school's collection.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.curriculums_heading()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.curriculums_intro()}</p>
             </header>
 
             {groups.length === 0 && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    No songs yet.{" "}
+                    {m.curriculums_empty_prefix()}{" "}
                     <Link to="/import" className="text-indigo-700 underline dark:text-indigo-300">
-                        Find songs to import
+                        {m.home_find_to_import()}
                     </Link>
                     .
                 </p>
@@ -44,7 +42,7 @@ export default function CurriculumsRoute() {
             {groups.map((group) => (
                 <section key={group.curriculum?.id ?? "other"} className="space-y-3">
                     <h2 className="text-lg font-medium">
-                        {group.curriculum ? group.curriculum.name : "Other songs"}
+                        {group.curriculum ? group.curriculum.name : m.curriculums_other()}
                         {group.curriculum?.publisher && (
                             <span className="ml-2 text-sm font-normal text-gray-400">
                                 {group.curriculum.publisher}
@@ -60,10 +58,10 @@ export default function CurriculumsRoute() {
                                 <span className="font-medium">{song.title}</span>
                                 <div className="flex gap-2">
                                     <Link to={`/practice/${song.id}`} className={SONG_LINK}>
-                                        Practice
+                                        {m.curriculums_practice()}
                                     </Link>
                                     <Link to={`/loop/${song.id}`} className={SONG_LINK}>
-                                        Loop
+                                        {m.curriculums_loop()}
                                     </Link>
                                 </div>
                             </li>
@@ -73,7 +71,7 @@ export default function CurriculumsRoute() {
             ))}
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                Back home
+                {m.action_back_home()}
             </Link>
         </main>
     );
