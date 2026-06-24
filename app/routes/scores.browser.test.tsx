@@ -59,5 +59,8 @@ describe("Scores", () => {
         // A clean run (no wrong notes) grades 100% accuracy and shows the grade card.
         expect(await screen.findByText("Accuracy")).toBeTruthy();
         expect(screen.getByText("100%")).toBeTruthy();
+        // The ghost-timing timeline plots the run (ghost vs you).
+        expect(screen.getByText("Ideal")).toBeTruthy();
+        expect(screen.getByText("You")).toBeTruthy();
     });
 });

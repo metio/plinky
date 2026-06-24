@@ -264,5 +264,7 @@
   "scores_tempo": "Tempo",
   "scores_accuracy": "Tarkkuus",
   "scores_timing": "Ajoitus",
-  "scores_dynamics": "Dynamiikka"
+  "scores_dynamics": "Dynamiikka",
+  "scores_ghost": "Ihanteellinen",
+  "scores_you": "Sinä"
 }

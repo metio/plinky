@@ -264,5 +264,7 @@
   "scores_tempo": "Tempo",
   "scores_accuracy": "Nøjagtighed",
   "scores_timing": "Timing",
-  "scores_dynamics": "Dynamik"
+  "scores_dynamics": "Dynamik",
+  "scores_ghost": "Ideelt",
+  "scores_you": "Dig"
 }

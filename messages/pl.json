@@ -264,5 +264,7 @@
   "scores_tempo": "Tempo",
   "scores_accuracy": "Dokładność",
   "scores_timing": "Synchronizacja",
-  "scores_dynamics": "Dynamika"
+  "scores_dynamics": "Dynamika",
+  "scores_ghost": "Idealnie",
+  "scores_you": "Ty"
 }

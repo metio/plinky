@@ -264,5 +264,7 @@
   "scores_tempo": "Tempo",
   "scores_accuracy": "Presnosť",
   "scores_timing": "Načasovanie",
-  "scores_dynamics": "Dynamika"
+  "scores_dynamics": "Dynamika",
+  "scores_ghost": "Ideál",
+  "scores_you": "Ty"
 }

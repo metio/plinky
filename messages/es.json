@@ -45,6 +45,8 @@
   "scores_accuracy": "Precisión",
   "scores_timing": "Sincronización",
   "scores_dynamics": "Dinámica",
+  "scores_ghost": "Ideal",
+  "scores_you": "Tú",
   "play_sprint": "Sprint de lectura a primera vista",
   "play_sprint_blurb": "Notas nuevas en cada ronda: toca todas las que puedas antes de que se agote el tiempo.",
   "play_daily": "Reto diario",

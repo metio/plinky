@@ -45,6 +45,8 @@
   "scores_accuracy": "Précision",
   "scores_timing": "Rythme",
   "scores_dynamics": "Nuances",
+  "scores_ghost": "Idéal",
+  "scores_you": "Vous",
   "play_sprint": "Sprint de déchiffrage",
   "play_sprint_blurb": "De nouvelles notes à chaque partie : jouez-en le plus possible avant la fin du chrono.",
   "play_daily": "Défi du jour",

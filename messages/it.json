@@ -45,6 +45,8 @@
   "scores_accuracy": "Precisione",
   "scores_timing": "Tempismo",
   "scores_dynamics": "Dinamica",
+  "scores_ghost": "Ideale",
+  "scores_you": "Tu",
   "play_sprint": "Sprint di lettura a prima vista",
   "play_sprint_blurb": "Note nuove a ogni giro: suonane il più possibile prima che scada il tempo.",
   "play_daily": "Sfida del giorno",
