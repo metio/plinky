@@ -1,18 +1,21 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { MidiProvider } from "../contexts/midi";
 import Scores from "./scores";
 
-// OSMD only renders in a real browser, so this runs in the browser project.
+// OSMD renders only in a real browser, so this runs in the browser project.
 afterEach(cleanup);
 
 function renderScores() {
     return render(
         <MemoryRouter>
-            <Scores />
+            <MidiProvider>
+                <Scores />
+            </MidiProvider>
         </MemoryRouter>,
     );
 }
@@ -22,10 +25,8 @@ describe("Scores", () => {
         renderScores();
         expect(await screen.findByText("Ode to Joy")).toBeTruthy();
         expect(screen.getByText("Twinkle, Twinkle, Little Star")).toBeTruthy();
-        // OSMD draws the selected score as an SVG.
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
 
-        // Selecting another score re-renders the viewer.
         fireEvent.click(screen.getByText("Twinkle, Twinkle, Little Star"));
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
     });
@@ -37,5 +38,24 @@ describe("Scores", () => {
         await waitFor(() => expect(screen.getByText(/Stop/)).toBeTruthy());
         fireEvent.click(screen.getByText(/Stop/));
         await waitFor(() => expect(screen.getByText(/Listen/)).toBeTruthy());
+    });
+
+    it("advances the cursor as the score is played correctly", async () => {
+        renderScores();
+        await screen.findByText("Twinkle, Twinkle, Little Star");
+        fireEvent.click(screen.getByText("Twinkle, Twinkle, Little Star"));
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+
+        fireEvent.click(screen.getByText("Practice"));
+        // Twinkle: C C G G A A G F F E E D D C (MIDI), 14 notes.
+        const twinkle = [60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60];
+        expect(await screen.findByText(/0 \/ 14/)).toBeTruthy();
+        for (const note of twinkle) {
+            await act(async () => {
+                window.__plinky?.play(note);
+                window.__plinky?.release(note);
+            });
+        }
+        await waitFor(() => expect(screen.getByText(/Complete/)).toBeTruthy());
     });
 });
