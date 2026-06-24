@@ -81,7 +81,7 @@ export default function ImportRoute() {
 
                 {outcome?.ok === false && (
                     <div className="space-y-3">
-                        <p className="text-sm text-red-600">{outcome.message}</p>
+                        <p className="text-sm text-red-600 dark:text-red-400">{outcome.message}</p>
                         <Link
                             to="/"
                             className="text-sm text-indigo-700 underline dark:text-indigo-300"

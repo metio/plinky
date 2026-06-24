@@ -79,7 +79,7 @@ function Node({ step, index, accent }: { step: TrackStep; index: number; accent:
         );
     }
     return (
-        <div className={`${base} bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500`}>
+        <div className={`${base} bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400`}>
             {index + 1}
         </div>
     );
@@ -100,8 +100,8 @@ function TrackPath({
     return (
         <div className="flex flex-col">
             <div className="flex items-baseline justify-between gap-2">
-                <h3 className={`font-semibold ${accent.label}`}>{track.name}</h3>
-                <span className="font-mono text-xs text-gray-400">
+                <h2 className={`font-semibold ${accent.label}`}>{track.name}</h2>
+                <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
                     {track.minutes ? m.tracks_minutes_prefix({ minutes: track.minutes }) : ""}
                     {doneCount}/{steps.length}
                 </span>

@@ -15,7 +15,9 @@ export function meta(_args: Route.MetaArgs) {
 function Stat({ label, value }: { label: string; value: string }) {
     return (
         <div className="rounded-md border border-gray-200 p-4 dark:border-gray-800">
-            <div className="text-xs uppercase tracking-wide text-gray-400">{label}</div>
+            <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {label}
+            </div>
             <div className="font-mono text-3xl tabular-nums">{value}</div>
         </div>
     );
@@ -60,7 +62,9 @@ export default function ProgressRoute() {
                                 className="w-full rounded-t bg-indigo-500"
                                 style={{ height: `${Math.round((day.notes / max) * 100)}%` }}
                             />
-                            <span className="text-xs text-gray-400">{day.date.slice(5)}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {day.date.slice(5)}
+                            </span>
                         </div>
                     ))}
                 </div>

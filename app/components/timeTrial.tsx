@@ -183,19 +183,19 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
 
             <div className="flex items-end gap-8">
                 <div>
-                    <div className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         {m.timetrial_time()}
                     </div>
                     <div className="font-mono text-4xl tabular-nums">{formatMs(liveTime)}</div>
                 </div>
                 <div>
-                    <div className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         {m.timetrial_errors()}
                     </div>
                     <div className="font-mono text-4xl tabular-nums">{errors}</div>
                 </div>
                 <div>
-                    <div className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         {m.timetrial_progress()}
                     </div>
                     <div className="font-mono text-4xl tabular-nums">
@@ -231,7 +231,9 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
             )}
 
             {runState === "running" && matcher.wrongNote !== null && (
-                <p className="text-sm font-medium text-red-600">✗ {noteName(matcher.wrongNote)}</p>
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                    ✗ {noteName(matcher.wrongNote)}
+                </p>
             )}
 
             {runState === "finished" && result && (

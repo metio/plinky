@@ -44,7 +44,7 @@ export default function CurriculumsRoute() {
                     <h2 className="text-lg font-medium">
                         {group.curriculum ? group.curriculum.name : m.curriculums_other()}
                         {group.curriculum?.publisher && (
-                            <span className="ml-2 text-sm font-normal text-gray-400">
+                            <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
                                 {group.curriculum.publisher}
                             </span>
                         )}

@@ -60,7 +60,7 @@ export function SongBackup() {
 
     return (
         <section className="space-y-3">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 {m.backup_heading()}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">

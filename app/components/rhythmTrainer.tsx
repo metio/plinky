@@ -26,7 +26,7 @@ type RunState = "idle" | "counting" | "armed" | "running" | "finished";
 const RATING_STYLES: Record<Hit["rating"], string> = {
     perfect: "text-green-600",
     good: "text-amber-600",
-    off: "text-red-600",
+    off: "text-red-600 dark:text-red-400",
 };
 
 function describeHit(hit: Hit): string {
@@ -285,7 +285,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                             {m.rhythm_good_label({ good: summary.good })}
                         </span>{" "}
                         ·{" "}
-                        <span className="text-red-600">
+                        <span className="text-red-600 dark:text-red-400">
                             {m.rhythm_off_label({ off: summary.off })}
                         </span>
                     </p>
