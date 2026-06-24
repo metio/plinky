@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Σύστημα",
   "theme_light": "☀️ Φωτεινό",
   "theme_dark": "🌙 Σκούρο",
-  "theme_aria": "Θέμα: {theme}. Κάντε κλικ για αλλαγή."
+  "theme_aria": "Θέμα: {theme}. Κάντε κλικ για αλλαγή.",
+  "action_listen": "▶ Ακρόαση",
+  "action_listen_stop": "■ Διακοπή",
+  "home_favorites_heading": "Τα κομμάτια σου",
+  "home_favorites_empty": "Σημείωσε κομμάτια με αστέρι για να τα καρφιτσώσεις εδώ για γρήγορη πρόσβαση.",
+  "home_browse_all": "Όλα τα κομμάτια",
+  "songs_heading": "Κομμάτια",
+  "songs_intro": "Όλα τα κομμάτια σε αυτή τη συσκευή. Αναζήτησε, φιλτράρισε και σημείωσε με αστέρι αυτά που δουλεύεις.",
+  "songs_search_placeholder": "Αναζήτηση κομματιών…",
+  "songs_filter_all": "Όλα",
+  "songs_filter_favorites": "★ Αγαπημένα",
+  "songs_count": "{count} κομμάτια",
+  "songs_empty": "Κανένα κομμάτι δεν ταιριάζει με την αναζήτησή σου.",
+  "songs_favorite": "Προσθήκη στα αγαπημένα",
+  "songs_unfavorite": "Αφαίρεση από τα αγαπημένα"
 }

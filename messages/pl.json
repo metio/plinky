@@ -243,5 +243,19 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Jasny",
   "theme_dark": "🌙 Ciemny",
-  "theme_aria": "Motyw: {theme}. Kliknij, aby zmienić."
+  "theme_aria": "Motyw: {theme}. Kliknij, aby zmienić.",
+  "action_listen": "▶ Posłuchaj",
+  "action_listen_stop": "■ Zatrzymaj",
+  "home_favorites_heading": "Twoje utwory",
+  "home_favorites_empty": "Oznacz utwory gwiazdką, aby przypiąć je tutaj dla szybkiego dostępu.",
+  "home_browse_all": "Wszystkie utwory",
+  "songs_heading": "Utwory",
+  "songs_intro": "Wszystkie utwory na tym urządzeniu. Wyszukuj, filtruj i oznaczaj gwiazdką te, nad którymi pracujesz.",
+  "songs_search_placeholder": "Szukaj utworów…",
+  "songs_filter_all": "Wszystkie",
+  "songs_filter_favorites": "★ Ulubione",
+  "songs_count": "Utwory: {count}",
+  "songs_empty": "Żaden utwór nie pasuje do wyszukiwania.",
+  "songs_favorite": "Dodaj do ulubionych",
+  "songs_unfavorite": "Usuń z ulubionych"
 }

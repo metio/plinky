@@ -243,5 +243,19 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Lyst",
   "theme_dark": "🌙 Mørkt",
-  "theme_aria": "Tema: {theme}. Klik for at ændre."
+  "theme_aria": "Tema: {theme}. Klik for at ændre.",
+  "action_listen": "▶ Lyt",
+  "action_listen_stop": "■ Stop",
+  "home_favorites_heading": "Dine sange",
+  "home_favorites_empty": "Stjernemarkér sange for at fastgøre dem her til hurtig adgang.",
+  "home_browse_all": "Alle sange",
+  "songs_heading": "Sange",
+  "songs_intro": "Alle sange på denne enhed. Søg, filtrér og stjernemarkér dem, du øver på.",
+  "songs_search_placeholder": "Søg i sange…",
+  "songs_filter_all": "Alle",
+  "songs_filter_favorites": "★ Favoritter",
+  "songs_count": "{count} sange",
+  "songs_empty": "Ingen sange matcher din søgning.",
+  "songs_favorite": "Føj til favoritter",
+  "songs_unfavorite": "Fjern fra favoritter"
 }

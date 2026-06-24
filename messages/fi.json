@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Järjestelmä",
   "theme_light": "☀️ Vaalea",
   "theme_dark": "🌙 Tumma",
-  "theme_aria": "Teema: {theme}. Vaihda napsauttamalla."
+  "theme_aria": "Teema: {theme}. Vaihda napsauttamalla.",
+  "action_listen": "▶ Kuuntele",
+  "action_listen_stop": "■ Pysäytä",
+  "home_favorites_heading": "Sinun kappaleesi",
+  "home_favorites_empty": "Merkitse kappaleita tähdellä kiinnittääksesi ne tänne nopeaa käyttöä varten.",
+  "home_browse_all": "Kaikki kappaleet",
+  "songs_heading": "Kappaleet",
+  "songs_intro": "Kaikki tämän laitteen kappaleet. Hae, suodata ja merkitse tähdellä ne, joita harjoittelet.",
+  "songs_search_placeholder": "Hae kappaleita…",
+  "songs_filter_all": "Kaikki",
+  "songs_filter_favorites": "★ Suosikit",
+  "songs_count": "{count} kappaletta",
+  "songs_empty": "Hakuasi ei vastaa yksikään kappale.",
+  "songs_favorite": "Lisää suosikkeihin",
+  "songs_unfavorite": "Poista suosikeista"
 }

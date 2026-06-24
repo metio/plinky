@@ -243,5 +243,19 @@
   "theme_system": "🖥️ 시스템",
   "theme_light": "☀️ 라이트",
   "theme_dark": "🌙 다크",
-  "theme_aria": "테마: {theme}. 클릭하여 변경."
+  "theme_aria": "테마: {theme}. 클릭하여 변경.",
+  "action_listen": "▶ 듣기",
+  "action_listen_stop": "■ 멈춤",
+  "home_favorites_heading": "내 곡",
+  "home_favorites_empty": "곡에 별표를 달면 바로 쓸 수 있게 여기에 고정돼요.",
+  "home_browse_all": "모든 곡",
+  "songs_heading": "곡",
+  "songs_intro": "이 기기에 있는 모든 곡. 연습 중인 곡을 검색하고, 거르고, 별표를 달아 보세요.",
+  "songs_search_placeholder": "곡 검색…",
+  "songs_filter_all": "전체",
+  "songs_filter_favorites": "★ 즐겨찾기",
+  "songs_count": "곡 {count}개",
+  "songs_empty": "검색과 일치하는 곡이 없어요.",
+  "songs_favorite": "즐겨찾기에 추가",
+  "songs_unfavorite": "즐겨찾기에서 제거"
 }

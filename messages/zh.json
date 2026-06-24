@@ -243,5 +243,19 @@
   "theme_system": "🖥️ 跟随系统",
   "theme_light": "☀️ 浅色",
   "theme_dark": "🌙 深色",
-  "theme_aria": "主题：{theme}。点击以更改。"
+  "theme_aria": "主题：{theme}。点击以更改。",
+  "action_listen": "▶ 试听",
+  "action_listen_stop": "■ 停止",
+  "home_favorites_heading": "你的乐曲",
+  "home_favorites_empty": "为乐曲加星标，即可固定在此处以便快速访问。",
+  "home_browse_all": "全部乐曲",
+  "songs_heading": "乐曲",
+  "songs_intro": "此设备上的所有乐曲。搜索、筛选并为正在练习的乐曲加星标。",
+  "songs_search_placeholder": "搜索乐曲…",
+  "songs_filter_all": "全部",
+  "songs_filter_favorites": "★ 收藏",
+  "songs_count": "{count} 首乐曲",
+  "songs_empty": "没有乐曲符合你的搜索。",
+  "songs_favorite": "添加到收藏",
+  "songs_unfavorite": "从收藏中移除"
 }

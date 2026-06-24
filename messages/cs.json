@@ -243,5 +243,19 @@
   "theme_system": "🖥️ Systém",
   "theme_light": "☀️ Světlý",
   "theme_dark": "🌙 Tmavý",
-  "theme_aria": "Motiv: {theme}. Kliknutím změníte."
+  "theme_aria": "Motiv: {theme}. Kliknutím změníte.",
+  "action_listen": "▶ Poslechnout",
+  "action_listen_stop": "■ Zastavit",
+  "home_favorites_heading": "Vaše skladby",
+  "home_favorites_empty": "Označte skladby hvězdičkou a připněte si je sem pro rychlý přístup.",
+  "home_browse_all": "Všechny skladby",
+  "songs_heading": "Skladby",
+  "songs_intro": "Všechny skladby na tomto zařízení. Hledejte, filtrujte a označte hvězdičkou ty, na kterých pracujete.",
+  "songs_search_placeholder": "Hledat skladby…",
+  "songs_filter_all": "Vše",
+  "songs_filter_favorites": "★ Oblíbené",
+  "songs_count": "{count} skladeb",
+  "songs_empty": "Žádná skladba neodpovídá vašemu hledání.",
+  "songs_favorite": "Přidat k oblíbeným",
+  "songs_unfavorite": "Odebrat z oblíbených"
 }
