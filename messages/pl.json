@@ -261,5 +261,8 @@
   "scores_heading": "Nuty",
   "scores_intro": "Nuty fortepianowe z domeny publicznej, wyświetlane i odtwarzane bezpośrednio w przeglądarce.",
   "scores_empty": "Brak nut.",
-  "scores_tempo": "Tempo"
+  "scores_tempo": "Tempo",
+  "scores_accuracy": "Dokładność",
+  "scores_timing": "Synchronizacja",
+  "scores_dynamics": "Dynamika"
 }

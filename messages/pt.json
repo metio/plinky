@@ -261,5 +261,8 @@
   "scores_heading": "Partituras",
   "scores_intro": "Partituras de piano de domínio público, renderizadas e tocadas diretamente no seu navegador.",
   "scores_empty": "Ainda não há partituras.",
-  "scores_tempo": "Andamento"
+  "scores_tempo": "Andamento",
+  "scores_accuracy": "Precisão",
+  "scores_timing": "Sincronia",
+  "scores_dynamics": "Dinâmica"
 }

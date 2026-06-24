@@ -4,8 +4,11 @@
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
-import { useScoreMatcher } from "../hooks/useScoreMatcher";
+import { type CorrectInfo, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
+import { summarizeDynamics } from "../lib/dynamics";
+import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
+import { type Hit, makeHit, summarize } from "../lib/rhythm";
 import { m } from "../paraglide/messages.js";
 import { PianoKeyboard } from "./pianoKeyboard";
 
@@ -21,25 +24,63 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     const tempoRef = useRef(100);
+    const hits = useRef<Hit[]>([]);
+    const velocities = useRef<number[]>([]);
+    const startRef = useRef(0);
+    const baseOffsetRef = useRef(0);
     const synth = useSynth();
     const [ready, setReady] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [tempo, setTempo] = useState(100);
+    const [grade, setGrade] = useState<Grade | null>(null);
 
     const matcher = useScoreMatcher(() => osmdRef.current, {
-        onCorrect: (pitches) => {
-            for (const pitch of pitches) {
+        tempo,
+        onCorrect: (info: CorrectInfo) => {
+            for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
+            velocities.current.push(info.velocity);
+            // Grade timing relative to the first note: compare how far each note
+            // landed from its notated offset against where it should have been.
+            if (info.ordinal === 0) {
+                startRef.current = info.timestamp;
+                baseOffsetRef.current = info.timeMs;
+                hits.current = [makeHit(0, 0)];
+                return;
+            }
+            const target = info.timeMs - baseOffsetRef.current;
+            const actual = info.timestamp - startRef.current;
+            hits.current = [...hits.current, makeHit(info.ordinal, actual - target)];
         },
     });
-    useMidiInput({ onNoteOn: (event) => matcher.registerNote(event.note) });
+    useMidiInput({
+        onNoteOn: (event) => matcher.registerNote(event.note, event.timestamp, event.velocity),
+    });
     const { support, status, devices, requestAccess } = useMidiConnection();
     const connected = status === "ready" && devices.length > 0;
 
     useEffect(() => {
         tempoRef.current = tempo;
     }, [tempo]);
+
+    // Grade a run once it completes, from the captured timing and velocity. A run
+    // with no real velocity variation (the computer keyboard) is graded without
+    // dynamics rather than crediting a constant.
+    useEffect(() => {
+        if (!matcher.complete) {
+            return;
+        }
+        const hasDynamics = new Set(velocities.current).size > 1;
+        setGrade(
+            computeGrade({
+                correct: matcher.total,
+                wrong: matcher.wrong,
+                rhythm: summarize(hits.current),
+                dynamics: hasDynamics ? summarizeDynamics(velocities.current) : null,
+            }),
+        );
+    }, [matcher.complete, matcher.total, matcher.wrong]);
 
     const stopListen = () => {
         for (const id of timers.current) {
@@ -116,6 +157,9 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
 
     const practice = () => {
         stopListen();
+        hits.current = [];
+        velocities.current = [];
+        setGrade(null);
         matcher.start();
     };
 
@@ -176,10 +220,22 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
                 </div>
             )}
 
-            {matcher.complete && (
-                <p className="text-sm font-medium text-green-700 dark:text-green-400">
-                    {m.play_complete()}
-                </p>
+            {grade && (
+                <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
+                    <div className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}>
+                        {grade.letter}
+                    </div>
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
+                        <dt className="text-gray-500 dark:text-gray-400">{m.scores_accuracy()}</dt>
+                        <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>
+                        <dt className="text-gray-500 dark:text-gray-400">{m.scores_timing()}</dt>
+                        <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
+                        <dt className="text-gray-500 dark:text-gray-400">{m.scores_dynamics()}</dt>
+                        <dd className="text-right font-mono tabular-nums">
+                            {grade.dynamics === null ? "—" : `${grade.dynamics}%`}
+                        </dd>
+                    </dl>
+                </div>
             )}
 
             {/* Wide scores scroll horizontally, so the region must be focusable

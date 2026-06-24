@@ -261,5 +261,8 @@
   "scores_heading": "楽譜",
   "scores_intro": "パブリックドメインのピアノ楽譜を、ブラウザでそのまま表示・再生できます。",
   "scores_empty": "まだ楽譜がありません。",
-  "scores_tempo": "テンポ"
+  "scores_tempo": "テンポ",
+  "scores_accuracy": "正確さ",
+  "scores_timing": "タイミング",
+  "scores_dynamics": "強弱"
 }

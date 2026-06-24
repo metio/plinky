@@ -261,5 +261,8 @@
   "scores_heading": "乐谱",
   "scores_intro": "公有领域钢琴乐谱，直接在你的浏览器中渲染和播放。",
   "scores_empty": "暂无乐谱。",
-  "scores_tempo": "速度"
+  "scores_tempo": "速度",
+  "scores_accuracy": "准确度",
+  "scores_timing": "节奏",
+  "scores_dynamics": "力度"
 }

@@ -56,6 +56,8 @@ describe("Scores", () => {
                 window.__plinky?.release(note);
             });
         }
-        await waitFor(() => expect(screen.getByText(/Complete/)).toBeTruthy());
+        // A clean run (no wrong notes) grades 100% accuracy and shows the grade card.
+        expect(await screen.findByText("Accuracy")).toBeTruthy();
+        expect(screen.getByText("100%")).toBeTruthy();
     });
 });

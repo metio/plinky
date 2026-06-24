@@ -23,17 +23,30 @@ function advancePastRests(osmd: OpenSheetMusicDisplay): void {
 // play, and once every pitch under it has been played the cursor advances. Wrong
 // notes are ignored so a learner can hunt for the right key. The whole score's
 // pitch range is exposed so the on-screen keyboard can frame it.
+// What a correctly-played position reports: the pitches sounded, its index in the
+// run, the wall-clock time it was played, and its notated onset in ms at `tempo`
+// — enough for free practice (ignore timing) or rhythm grading (compare them).
+export type CorrectInfo = {
+    pitches: number[];
+    ordinal: number;
+    timestamp: number;
+    timeMs: number;
+    velocity: number;
+};
+
 export function useScoreMatcher(
     getOsmd: () => OpenSheetMusicDisplay | null,
-    options: { onCorrect?: (pitches: number[]) => void } = {},
+    options: { onCorrect?: (info: CorrectInfo) => void; tempo?: number } = {},
 ) {
     const [practicing, setPracticing] = useState(false);
     const [expected, setExpected] = useState<number[]>([]);
     const [done, setDone] = useState(0);
     const [total, setTotal] = useState(0);
+    const [wrong, setWrong] = useState(0);
     const [range, setRange] = useState<{ from: number; to: number } | null>(null);
     const [complete, setComplete] = useState(false);
     const hit = useRef<Set<number>>(new Set());
+    const ordinalRef = useRef(0);
     const practicingRef = useRef(false);
     const optionsRef = useRef(options);
     optionsRef.current = options;
@@ -67,9 +80,11 @@ export function useScoreMatcher(
         advancePastRests(osmd);
         osmd.cursor.show();
         hit.current.clear();
+        ordinalRef.current = 0;
         practicingRef.current = true;
         setTotal(count);
         setDone(0);
+        setWrong(0);
         setComplete(false);
         setRange(Number.isFinite(lo) ? { from: lo - 2, to: hi + 2 } : null);
         setExpected(pitchesAtCursor(osmd));
@@ -77,20 +92,32 @@ export function useScoreMatcher(
     }, [getOsmd]);
 
     const registerNote = useCallback(
-        (note: number) => {
+        (note: number, timestamp = performance.now(), velocity = 0) => {
             const osmd = getOsmd();
             if (!practicingRef.current || !osmd || osmd.cursor.iterator.EndReached) {
                 return;
             }
             const expectedNow = pitchesAtCursor(osmd);
             if (!expectedNow.includes(note)) {
+                setWrong((value) => value + 1);
                 return;
             }
             hit.current.add(note);
             if (!expectedNow.every((pitch) => hit.current.has(pitch))) {
                 return;
             }
-            optionsRef.current.onCorrect?.(expectedNow);
+            const timeMs =
+                (osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) *
+                4 *
+                (60000 / (optionsRef.current.tempo ?? 100));
+            optionsRef.current.onCorrect?.({
+                pitches: expectedNow,
+                ordinal: ordinalRef.current,
+                timestamp,
+                timeMs,
+                velocity,
+            });
+            ordinalRef.current += 1;
             hit.current.clear();
             osmd.cursor.next();
             advancePastRests(osmd);
@@ -108,5 +135,5 @@ export function useScoreMatcher(
         [getOsmd],
     );
 
-    return { practicing, expected, done, total, range, complete, start, stop, registerNote };
+    return { practicing, expected, done, total, wrong, range, complete, start, stop, registerNote };
 }

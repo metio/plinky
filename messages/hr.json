@@ -261,5 +261,8 @@
   "scores_heading": "Note",
   "scores_intro": "Klavirske note u javnoj domeni, prikazane i odsvirane izravno u tvojem pregledniku.",
   "scores_empty": "Još nema nota.",
-  "scores_tempo": "Tempo"
+  "scores_tempo": "Tempo",
+  "scores_accuracy": "Preciznost",
+  "scores_timing": "Ritam",
+  "scores_dynamics": "Dinamika"
 }

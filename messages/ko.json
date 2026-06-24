@@ -261,5 +261,8 @@
   "scores_heading": "악보",
   "scores_intro": "퍼블릭 도메인 피아노 악보를 브라우저에서 바로 보고 재생하세요.",
   "scores_empty": "아직 악보가 없어요.",
-  "scores_tempo": "템포"
+  "scores_tempo": "템포",
+  "scores_accuracy": "정확도",
+  "scores_timing": "타이밍",
+  "scores_dynamics": "셈여림"
 }

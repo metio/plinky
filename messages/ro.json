@@ -261,5 +261,8 @@
   "scores_heading": "Partituri",
   "scores_intro": "Partituri de pian din domeniul public, afișate și redate direct în browser.",
   "scores_empty": "Încă nu ai partituri.",
-  "scores_tempo": "Tempo"
+  "scores_tempo": "Tempo",
+  "scores_accuracy": "Acuratețe",
+  "scores_timing": "Sincronizare",
+  "scores_dynamics": "Nuanțe"
 }
