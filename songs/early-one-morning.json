@@ -1,0 +1,12 @@
+{
+  "id": "early-one-morning",
+  "title": "Early One Morning",
+  "description": "English traditional folk song, 19th century or earlier.",
+  "abc": "X:1\nT:Early One Morning\nM:4/4\nL:1/8\nK:G\nG2 | B2 B2 B2 c2 | d2 d2 d3 e | d2 c2 B2 A2 | G4 G2 G2 | A2 A2 A2 B2 | c2 c2 c3 d | c2 B2 A2 G2 | F4 :|",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

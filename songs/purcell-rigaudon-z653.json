@@ -1,0 +1,12 @@
+{
+  "id": "purcell-rigaudon-z653",
+  "title": "Rigaudon, Z.653",
+  "description": "Henry Purcell.",
+  "abc": "X:1\nT:Rigaudon, Z.653\nM:2/2\nL:1/8\nK:C\n|: \"C\"c2 G2 | E2 c2 | \"G\"d2 B2 | G2 d2 |\n\"C\"e2 c2 | \"F\"f2 d2 | \"G7\"e2 d2 | \"C\"c4 :|\n|: \"G\"d2 g2 | \"C\"e2 c2 | \"G\"d2 B2 | \"C\"c2 e2 |\n\"F\"f2 a2 | \"C\"e2 c2 | \"G7\"d2 B2 | \"C\"c4 :|\n",
+  "tempo": 120,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

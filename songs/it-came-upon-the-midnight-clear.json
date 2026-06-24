@@ -1,0 +1,12 @@
+{
+  "id": "it-came-upon-the-midnight-clear",
+  "title": "It Came Upon the Midnight Clear",
+  "description": "Richard Storrs Willis.",
+  "abc": "X:1\nT:It Came Upon the Midnight Clear\nM:4/4\nL:1/4\nK:G\nB, | E E F G | A A2 A | G G F E | E D2 B, |\nE E F G | A A2 A | G G F D | E E2 G |\nB B A G | A B2 e | d d c B | A G2 B |\nA G F E | F A2 F | E E D D | E E2 |]",
+  "tempo": 92,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

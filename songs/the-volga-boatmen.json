@@ -1,0 +1,12 @@
+{
+  "id": "the-volga-boatmen",
+  "title": "Song of the Volga Boatmen",
+  "description": "Traditional Russian folk song, anonymous, 19th century.",
+  "abc": "X:1\nT:Song of the Volga Boatmen\nM:4/4\nL:1/8\nK:Em\nE4 E3 E|G3 F E2 D2|E4 E3 E|B,8|\nE4 E3 E|G3 F E2 D2|E2 G2 F2 D2|E8|\nB3 B B3 c|B2 A2 G2 E2|G3 G A3 G|F8|",
+  "tempo": 66,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

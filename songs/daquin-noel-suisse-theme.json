@@ -1,0 +1,12 @@
+{
+  "id": "daquin-noel-suisse-theme",
+  "title": "Noel Suisse (theme)",
+  "description": "Louis-Claude Daquin.",
+  "abc": "X:1\nT:Noel Suisse (theme)\nM:2/4\nL:1/8\nK:G\n|: \"G\"g2 g2 | g2 d2 | \"C\"e2 c2 | \"G\"d2 B2 |\n\"G\"g2 g2 | a2 g2 | \"D7\"f2 e2 | \"G\"d4 :|\n|: \"C\"e2 e2 | \"G\"d2 d2 | \"D7\"c2 A2 | \"G\"B2 G2 |\n\"G\"g2 f2 | \"C\"e2 d2 | \"D7\"c2 B2 | \"G\"G4 :|\n",
+  "tempo": 96,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

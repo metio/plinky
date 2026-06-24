@@ -1,0 +1,12 @@
+{
+  "id": "the-keel-row",
+  "title": "The Keel Row",
+  "description": "English (Tyneside) traditional folk song, 18th century.",
+  "abc": "X:1\nT:The Keel Row\nM:4/4\nL:1/8\nK:G\nd2 | B2 G2 B2 d2 | B2 G2 B2 d2 | c2 A2 c2 e2 | d2 B2 G2 d2 | B2 G2 B2 d2 | B2 G2 B2 d2 | c2 A2 c2 e2 | d2 B2 G2 :|",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "il-canto-degli-italiani",
+  "title": "Il Canto degli Italiani",
+  "description": "Michele Novaro.",
+  "abc": "X:1\nT:Il Canto degli Italiani\nM:4/4\nL:1/8\nK:Bb\nB,2 | F2 F2 F2 G2 | A2 B2 c2 z2 | A2 A2 A2 B2 | c2 d2 c2 z2 |\nB2 B2 d2 c2 | B2 A2 G2 F2 | F2 E2 E2 F2 | F4 z2 |]",
+  "tempo": 110,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

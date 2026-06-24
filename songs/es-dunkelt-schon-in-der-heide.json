@@ -1,0 +1,12 @@
+{
+  "id": "es-dunkelt-schon-in-der-heide",
+  "title": "Es dunkelt schon in der Heide",
+  "description": "Traditional German folk song.",
+  "abc": "X:1\nT:Es dunkelt schon in der Heide\nM:3/4\nL:1/8\nK:Am\nA2 c2 e2 | a3 g e2 | d2 c2 B2 | A4 z2 |\nA2 c2 e2 | a3 g e2 | d2 c2 B2 | A4 z2 |\ne2 e2 a2 | g3 f e2 | d2 c2 B2 | c4 z2 |\nA2 c2 e2 | a3 g e2 | d2 c2 B2 | A4 z2 |\n",
+  "tempo": 84,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

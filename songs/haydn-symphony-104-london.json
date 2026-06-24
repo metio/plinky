@@ -1,0 +1,12 @@
+{
+  "id": "haydn-symphony-104-london",
+  "title": "Symphony No. 104 'London' (Allegro theme)",
+  "description": "Joseph Haydn.",
+  "abc": "X:1\nT:Symphony No. 104 'London' (Allegro theme)\nM:4/4\nL:1/8\nK:D\nA2 d2 d2 cd | e2 dc d2 z2 |\nA2 f2 f2 ef | g2 fe f2 z2 |",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

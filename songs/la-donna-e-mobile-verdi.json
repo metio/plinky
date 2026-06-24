@@ -1,0 +1,12 @@
+{
+  "id": "la-donna-e-mobile-verdi",
+  "title": "La donna e mobile (from Rigoletto)",
+  "description": "Giuseppe Verdi.",
+  "abc": "X:1\nT:La donna e mobile (from Rigoletto)\nM:3/8\nL:1/8\nK:B\nf3/2 d/ B|d2 d|f3/2 d/ B|d2 d|\ng3/2 e/ c|e2 c|f3/2 d/ B|B2 z|\nc3/2 c/ c|c c f|e3/2 d/ c|d2 B|]",
+  "tempo": 132,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

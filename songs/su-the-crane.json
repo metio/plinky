@@ -1,0 +1,12 @@
+{
+  "id": "su-the-crane",
+  "title": "Polyushko Pole (Meadowland)",
+  "description": "Lev Knipper.",
+  "abc": "X:1\nT:Polyushko Pole (Meadowland)\nM:4/4\nL:1/8\nK:Em\nE2 G2 B2 e2|d2 B2 A2 G2|F2 A2 d2 F2|E6 z2|\nE2 G2 B2 e2|d2 B2 A2 G2|F2 A2 G2 F2|E6 z2|",
+  "tempo": 108,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

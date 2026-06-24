@@ -1,0 +1,12 @@
+{
+  "id": "clementi-sonatina-op36-no3",
+  "title": "Sonatina in C, Op. 36 No. 3 (Spiritoso)",
+  "description": "Muzio Clementi.",
+  "abc": "X:1\nT:Sonatina in C, Op. 36 No. 3\nM:4/4\nL:1/8\nK:C\n| (g4 e4) | (cd) (ef) (ge) (dc) | (g4 e4) | (cd) (ef) g2 z2 |\n (fg) (ag) (fg) (ag) | (fe) (dc) (BA) (GF) | E2 (Gc) (eg) c'2 | c'4 z4 |",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

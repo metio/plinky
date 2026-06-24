@@ -1,0 +1,12 @@
+{
+  "id": "nutcracker-trepak",
+  "title": "Trepak / Russian Dance (The Nutcracker)",
+  "description": "Pyotr Ilyich Tchaikovsky.",
+  "abc": "X:1\nT:Trepak (The Nutcracker)\nM:2/4\nL:1/8\nK:G\ng2 dB | gd B2 | c2 c2 | c2 z2 | g2 dB | gd B2 | A2 A2 | A2 z2 |\ng2 dB | gd B2 | c2 c2 | c2 z2 | edcB | AGFE | D2 G2 | G2 z2 |]",
+  "tempo": 138,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

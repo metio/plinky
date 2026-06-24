@@ -1,0 +1,12 @@
+{
+  "id": "barber-of-seville-largo-rossini",
+  "title": "Largo al factotum (from The Barber of Seville)",
+  "description": "Gioachino Rossini.",
+  "abc": "X:1\nT:Largo al factotum (from The Barber of Seville)\nM:2/4\nL:1/8\nK:C\nG G/G/ E/G/|c2 c/c/|c B/c/ d/c/|c2 z2|\ng g/g/ e/g/|c'2 c'/c'/|c' b/c'/ d'/c'/|c'2 z2|\nc' g e c|G G c E|G c e g|c'2 z2|]",
+  "tempo": 120,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

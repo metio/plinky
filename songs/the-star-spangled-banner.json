@@ -1,0 +1,12 @@
+{
+  "id": "the-star-spangled-banner",
+  "title": "The Star-Spangled Banner",
+  "description": "John Stafford Smith.",
+  "abc": "X:1\nT:The Star-Spangled Banner\nM:3/4\nL:1/8\nK:Bb\nF2 | D3/2 B,/ D F | B3 d | c3/2 B/ A | B2 F2 | D3/2 B,/ D F | B3 d | c3/2 B/ A | B4 |]",
+  "tempo": 88,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

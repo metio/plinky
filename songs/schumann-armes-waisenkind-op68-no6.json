@@ -1,0 +1,12 @@
+{
+  "id": "schumann-armes-waisenkind-op68-no6",
+  "title": "The Poor Orphan (Album for the Young, Op. 68 No. 6)",
+  "description": "Robert Schumann.",
+  "abc": "X:1\nT:The Poor Orphan (Album for the Young, No. 6)\nM:4/4\nL:1/8\nK:Am\nA2 | c2 B2 A2 G2 | A4 A2 c2 | e2 d2 c2 B2 | A4 z2 |]",
+  "tempo": 80,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

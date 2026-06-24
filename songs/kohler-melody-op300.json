@@ -1,0 +1,12 @@
+{
+  "id": "kohler-melody-op300",
+  "title": "Melody, Op. 300",
+  "description": "Louis Köhler.",
+  "abc": "X:1\nT:Melody, Op. 300\nM:4/4\nL:1/4\nK:C\n| e e e c | d d d B | c d e f | g2 z2 |\n e e e c | d d d B | c e d B | c2 z2 |",
+  "tempo": 96,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

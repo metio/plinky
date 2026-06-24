@@ -1,0 +1,12 @@
+{
+  "id": "grieg-watchmans-song-op12-no3",
+  "title": "Watchman's Song (Lyric Pieces Op. 12 No. 3)",
+  "description": "Edvard Grieg.",
+  "abc": "X:1\nT:Watchman's Song (Lyric Pieces Op. 12 No. 3)\nM:4/4\nL:1/8\nK:Eb\nB2 B2 c2 B2 | G4 z2 G2 | A2 A2 B2 A2 | F4 z2 F2 |\nB2 B2 c2 d2 | e4 z2 d2 | c2 B2 A2 G2 | B4 z4 |]",
+  "tempo": 76,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

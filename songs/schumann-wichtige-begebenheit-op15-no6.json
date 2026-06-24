@@ -1,0 +1,12 @@
+{
+  "id": "schumann-wichtige-begebenheit-op15-no6",
+  "title": "An Important Event (Kinderszenen, Op. 15 No. 6)",
+  "description": "Robert Schumann.",
+  "abc": "X:1\nT:An Important Event (Kinderszenen, No. 6)\nM:3/4\nL:1/4\nK:A\n[A2c2e2] e | [Ace] [Ace] e | [d2f2a2] f | [df=g] [dfg] e |\n[A2c2e2] e | [Ace] [Ace] e | f e d | [c2e2a2] z |]",
+  "tempo": 120,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

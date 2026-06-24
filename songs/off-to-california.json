@@ -1,0 +1,12 @@
+{
+  "id": "off-to-california",
+  "title": "Off to California",
+  "description": "Traditional hornpipe, anonymous.",
+  "abc": "X:1\nT:Off to California\nM:4/4\nL:1/8\nK:G\n|:D2|G2 BG dGBG|c2 ec AcFA|G2 BG dGBd|cAFA G2:|\n|:Bd|g2 dg bgdg|e2 ce aece|g2 dg bgag|fagf e2:|",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

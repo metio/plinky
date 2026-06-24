@@ -1,0 +1,12 @@
+{
+  "id": "steal-away",
+  "title": "Steal Away",
+  "description": "Traditional spiritual by Wallace Willis (pre-1865), published before 1929.",
+  "abc": "X:1\nT:Steal Away\nM:4/4\nL:1/8\nK:G\nd4 B2 G2|A2 G2 E4|G2 G2 A2 B2|d6 z2|\nd4 B2 G2|A2 G2 E2 D2|E2 G2 A2 G2|G4 z4|\nB2 d2 d2 B2|A2 G2 E4|G2 A2 B2 d2|B4 G4||",
+  "tempo": 64,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

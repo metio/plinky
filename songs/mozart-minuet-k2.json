@@ -1,0 +1,12 @@
+{
+  "id": "mozart-minuet-k2",
+  "title": "Minuet in F, K. 2",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Minuet in F, K. 2\nM:3/4\nL:1/8\nK:F\nc2 | f2 f2 f2 | g2 a2 g2 | f2 e2 d2 | c4 c2 |\nf2 g2 a2 | b2 a2 g2 | f2 e2 f2 | f4 z2 |]",
+  "tempo": 120,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

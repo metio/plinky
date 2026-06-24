@@ -1,0 +1,12 @@
+{
+  "id": "mozart-sonata-k331-theme",
+  "title": "Sonata in A, K.331 (Theme)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Sonata in A, K.331 (Theme)\nM:6/8\nL:1/8\nK:A\nc3/2 B/ c B A2 c | e2 e d3 | f3/2 e/ f e d2 c | B2 B B3 |\nc3/2 B/ c B A2 c | e2 e d3 | f3/2 e/ f e d2 B | A3 A3 |]",
+  "tempo": 92,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

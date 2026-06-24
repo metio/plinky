@@ -1,0 +1,12 @@
+{
+  "id": "cielito-lindo",
+  "title": "Cielito Lindo",
+  "description": "Quirino Mendoza y Cortés.",
+  "abc": "X:1\nT:Cielito Lindo\nM:3/4\nL:1/4\nK:G\nz2 D | G2 A | B3 | B2 A | A2 G | G2 z |\nz2 D | A2 B | c3 | c2 B | B2 A | A2 z |\nz2 d | d2 d | d3 | c2 B | A2 c | B2 G |]",
+  "tempo": 96,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

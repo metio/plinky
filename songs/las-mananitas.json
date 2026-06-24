@@ -1,0 +1,12 @@
+{
+  "id": "las-mananitas",
+  "title": "Las Mañanitas",
+  "description": "Traditional Mexican song, 19th century origins.",
+  "abc": "X:1\nT:Las Mananitas\nM:3/4\nL:1/4\nK:C\nz E G | c2 c | c B c | d2 z |\nz d c | B2 A | G2 c | E2 z |\nz E G | c2 c | d2 e | d2 c |\nc2 B | c3 |]",
+  "tempo": 100,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

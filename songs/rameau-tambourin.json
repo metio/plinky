@@ -1,0 +1,12 @@
+{
+  "id": "rameau-tambourin",
+  "title": "Tambourin",
+  "description": "Jean-Philippe Rameau.",
+  "abc": "X:1\nT:Tambourin\nM:2/4\nL:1/8\nK:Emin\n|: \"Em\"B,2 E2 | G2 B2 | \"Em\"e2 dc | B2 A2 |\n\"Em\"G2 A2 | B2 e2 | \"B7\"B2 ^d2 | e4 :|\n|: \"Em\"e2 e2 | g2 e2 | \"D\"f2 d2 | a2 f2 |\n\"C\"g2 e2 | \"B7\"f2 d2 | \"Em\"e2 ^d2 | e4 :|\n",
+  "tempo": 132,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

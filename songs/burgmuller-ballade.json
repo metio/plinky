@@ -1,0 +1,12 @@
+{
+  "id": "burgmuller-ballade",
+  "title": "Ballade, Op. 100 No. 15",
+  "description": "Friedrich Burgmüller.",
+  "abc": "X:1\nT:Ballade, Op. 100 No. 15\nM:3/4\nL:1/8\nK:Cm\n| C2 C2 C2 | C2 C2 c2 | B2 z2 z2 | z6 |\n C2 C2 C2 | C2 C2 c2 | B2 z2 z2 | z6 |\n c2 c2 G2 | A2 G2 F2 | E2 z2 z2 | z6 |",
+  "tempo": 138,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

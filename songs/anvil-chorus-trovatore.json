@@ -1,0 +1,12 @@
+{
+  "id": "anvil-chorus-trovatore",
+  "title": "Anvil Chorus (from Il Trovatore)",
+  "description": "Giuseppe Verdi.",
+  "abc": "X:1\nT:Anvil Chorus (from Il Trovatore)\nC:Giuseppe Verdi\nM:4/4\nL:1/8\nK:C\nG2 G2 c2 c2 | e2 e2 c4 | d2 d2 e2 d2 | c4 z4 |\nG2 G2 c2 c2 | e2 e2 g4 | f2 e2 d2 c2 | c4 z4 |]",
+  "tempo": 132,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

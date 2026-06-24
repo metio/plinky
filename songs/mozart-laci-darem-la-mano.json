@@ -1,0 +1,12 @@
+{
+  "id": "mozart-laci-darem-la-mano",
+  "title": "La ci darem la mano (Don Giovanni)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:La ci darem la mano (Don Giovanni)\nM:2/4\nL:1/8\nK:A\nc3/2 B/ c/e/ d/c/ | B/A/ G/F/ E2 | c3/2 B/ c/e/ d/c/ | B2 A2 |\ne3/2 e/ f/e/ d/c/ | B/c/ d/B/ A2 | c3/2 B/ c/e/ d/c/ | B2 A2 |]",
+  "tempo": 80,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

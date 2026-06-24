@@ -1,0 +1,12 @@
+{
+  "id": "schumann-wild-rider-op68-no8",
+  "title": "The Wild Horseman (Album for the Young, Op. 68 No. 8)",
+  "description": "Robert Schumann.",
+  "abc": "X:1\nT:The Wild Horseman (Album for the Young, No. 8)\nM:6/8\nL:1/8\nK:Am\ne2 a a2 c' | b2 g e3 | e2 a a2 c' | b2 g e3 |\nf2 a a2 a | g2 b b3 | f2 a g2 e | a3 a2 z |",
+  "tempo": 132,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

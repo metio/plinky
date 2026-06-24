@@ -1,0 +1,12 @@
+{
+  "id": "telemann-fantasia-tafelmusik-gigue",
+  "title": "Gigue in G (theme)",
+  "description": "Georg Philipp Telemann.",
+  "abc": "X:1\nT:Gigue in G (theme)\nM:6/8\nL:1/8\nK:G\n|: \"G\"G2 B d2 B | \"G\"g2 d B2 G | \"D\"A2 c e2 c | \"D7\"a2 e c2 A |\n\"G\"B2 d g2 d | \"C\"e2 c \"G\"d2 B | \"D7\"c2 A B2 G | \"G\"G3 G3 :|\n",
+  "tempo": 132,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

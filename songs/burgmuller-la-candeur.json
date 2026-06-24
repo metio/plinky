@@ -1,0 +1,12 @@
+{
+  "id": "burgmuller-la-candeur",
+  "title": "La Candeur, Op. 100 No. 1",
+  "description": "Friedrich Burgmüller.",
+  "abc": "X:1\nT:La Candeur, Op. 100 No. 1\nM:4/4\nL:1/8\nK:C\n| c2 (de) (fe) (dc) | (Gc) (eg) c'4 | b2 (ag) (fe) (dc) | G6 z2 |\n c2 (de) (fe) (dc) | (Gc) (eg) c'4 | (ba) (gf) (ed) (cB) | c6 z2 |",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

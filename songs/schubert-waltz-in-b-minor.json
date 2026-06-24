@@ -1,0 +1,12 @@
+{
+  "id": "schubert-waltz-in-b-minor",
+  "title": "Waltz in B minor, D.145",
+  "description": "Franz Schubert.",
+  "abc": "X:1\nT:Waltz in B minor\nM:3/4\nL:1/8\nK:Bm\nF2 | B2 c2 d2 | f4 e2 | d2 c2 B2 | A4 F2 | B2 c2 d2 | f4 e2 | d2 c2 e2 | B4 z2 |]",
+  "tempo": 132,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "burgmuller-progress",
+  "title": "Progress, Op. 100 No. 6",
+  "description": "Friedrich Burgmüller.",
+  "abc": "X:1\nT:Progress, Op. 100 No. 6\nM:4/4\nL:1/8\nK:C\n| (ce) (gc') (eg) (c'e') | (df) (ad') (fa) (d'f') | (eg) (c'e') (ge) (c'g) | (gf) (ed) c2 z2 |\n (ce) (gc') (eg) (c'e') | (df) (ad') (fa) (d'f') | (eg) (c'g) (fd) (gB) | c2 z2 z4 |",
+  "tempo": 126,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

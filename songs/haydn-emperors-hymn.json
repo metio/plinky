@@ -1,0 +1,12 @@
+{
+  "id": "haydn-emperors-hymn",
+  "title": "Emperor's Hymn (Gott erhalte)",
+  "description": "Joseph Haydn.",
+  "abc": "X:1\nT:Emperor's Hymn (Gott erhalte)\nM:4/4\nL:1/4\nK:G\nG A G/F/ E | G A2 B/A/ | G F E D | D2 z2 |\nB c B/A/ G | B c2 d/c/ | B A G A | G2 z2 |",
+  "tempo": 72,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

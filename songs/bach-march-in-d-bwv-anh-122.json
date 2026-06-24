@@ -1,0 +1,12 @@
+{
+  "id": "bach-march-in-d-bwv-anh-122",
+  "title": "March in D (BWV Anh. 122)",
+  "description": "Johann Sebastian Bach.",
+  "abc": "X:1\nT:March in D (BWV Anh. 122)\nM:2/4\nL:1/8\nK:D\nd>e f>g | a2 a2 | b>a g>f | e2 z2 | g>f e>d | c>d e>c | d>e f>e | d2 z2 |\nA>B A>G | F>G A>F | G>A B>A | G2 z2 | f>e d>c | B>A G>F | E>F G>E | D2 z2 |]",
+  "tempo": 112,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

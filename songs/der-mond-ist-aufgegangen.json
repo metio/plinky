@@ -1,0 +1,12 @@
+{
+  "id": "der-mond-ist-aufgegangen",
+  "title": "Der Mond ist aufgegangen",
+  "description": "Johann Abraham Peter Schulz.",
+  "abc": "X:1\nT:Der Mond ist aufgegangen\nM:4/4\nL:1/4\nK:F\nF G A B | A2 G2 | A B c2 | c B A2 |\nc c f e | d c B2 | A B A G | F2 z2 |\nc d c B | A2 G2 | F G A G | F2 z2 |\n",
+  "tempo": 76,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

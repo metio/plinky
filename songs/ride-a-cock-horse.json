@@ -1,0 +1,12 @@
+{
+  "id": "ride-a-cock-horse",
+  "title": "Ride a Cock-Horse",
+  "description": "Traditional English nursery rhyme.",
+  "abc": "X:1\nT:Ride a Cock-Horse\nM:6/8\nL:1/8\nK:F\nF2 F A2 A | c2 A F2 z | G2 G B2 B | A2 G F2 z |\nc2 c c2 c | d2 c A2 z | F2 G A2 G | F3 F2 z |",
+  "tempo": 108,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

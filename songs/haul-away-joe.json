@@ -1,0 +1,12 @@
+{
+  "id": "haul-away-joe",
+  "title": "Haul Away Joe",
+  "description": "Traditional short-haul shanty, anonymous, 19th century.",
+  "abc": "X:1\nT:Haul Away Joe\nM:4/4\nL:1/8\nK:Dm\nA2|d2d2 c2A2|d2c2 A2F2|G2A2 B2A2|A4 z2A2|\nd2d2 c2A2|d2c2 A2F2|G2F2 E2D2|D4 z2A2|\nd2e2 f2f2|e2d2 c2A2|d2c2 A2G2|F4 z2A2|\nd2c2 A2F2|G2A2 B2A2|d2c2 A2G2|F4 z2|]",
+  "tempo": 100,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

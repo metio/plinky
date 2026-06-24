@@ -1,0 +1,12 @@
+{
+  "id": "angels-from-the-realms-of-glory",
+  "title": "Angels from the Realms of Glory",
+  "description": "Henry Smart.",
+  "abc": "X:1\nT:Angels from the Realms of Glory\nM:4/4\nL:1/4\nK:G\nG B d d | c B A2 | c B A G | A2 D2 |\nG B d d | c B A2 | c B A B | G2 z2 |\nd d c B | c2 B2 | d d c B | A2 z2 |\nG B A G | A B c A | G B A D | G2 z2 |]",
+  "tempo": 96,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

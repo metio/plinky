@@ -1,0 +1,12 @@
+{
+  "id": "mozart-papageno-aria",
+  "title": "Der Vogelfänger bin ich ja (Papageno's Aria)",
+  "description": "Wolfgang Amadeus Mozart.",
+  "abc": "X:1\nT:Der Vogelfaenger bin ich ja (Papageno's Aria)\nM:2/4\nL:1/8\nK:G\nB/A/ G/A/ B/c/ d/B/ | g/d/ B/d/ g2 | a/g/ f/e/ f/g/ a/f/ | d/c/ B/A/ G2 |\nB/A/ G/A/ B/c/ d/B/ | g/d/ B/d/ g2 | a/g/ f/g/ a/b/ a/g/ | f/a/ g/f/ g2 |]",
+  "tempo": 112,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

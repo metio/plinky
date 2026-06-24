@@ -1,0 +1,12 @@
+{
+  "id": "jimbos-lullaby-debussy",
+  "title": "Jimbo's Lullaby",
+  "description": "Claude Debussy.",
+  "abc": "X:1\nT:Jimbo's Lullaby\nM:2/4\nL:1/8\nK:Bb\nB,2 C2 | D2 E2 | F4 | F4 | E2 D2 | C2 B,2 | C4 | C4 |\nD2 E2 | F2 G2 | A4 | F4 | E2 D2 | C2 B,2 | B,4 | B,4 |\n",
+  "tempo": 72,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

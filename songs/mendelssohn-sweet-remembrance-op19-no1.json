@@ -1,0 +1,12 @@
+{
+  "id": "mendelssohn-sweet-remembrance-op19-no1",
+  "title": "Sweet Remembrance (Op. 19 No. 1)",
+  "description": "Felix Mendelssohn.",
+  "abc": "X:1\nT:Sweet Remembrance (Op. 19 No. 1)\nM:2/4\nL:1/8\nK:E\ne2 | g2 f/e/f | e2 B2 | c2 B/A/B | A2 e2 | f2 e/d/e | dc B2 | B4 | z2 e2 |\ng2 f/e/f | e2 B2 | c2 B/A/B | A2 G2 | F2 G/F/G | F2 E2 | E4 |]",
+  "tempo": 80,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

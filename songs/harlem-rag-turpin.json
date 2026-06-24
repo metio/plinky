@@ -1,0 +1,12 @@
+{
+  "id": "harlem-rag-turpin",
+  "title": "Harlem Rag (Theme)",
+  "description": "Tom Turpin.",
+  "abc": "X:1\nT:Harlem Rag (Theme)\nM:2/4\nL:1/8\nK:G\nd/B/ | G/B/d/B/ G/B/d/g/ | f/d/B/d/ a/f/d/B/ | c/e/g/e/ c/e/g/c'/ | B2 d/B/ |\nG/B/d/B/ G/B/d/g/ | f/d/B/d/ a/f/d/f/ | g/f/e/d/ c/B/A/G/ | G2 ||\n",
+  "tempo": 94,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "handel-minuet-g-hwv434",
+  "title": "Minuet in G minor (HWV 434)",
+  "description": "George Frideric Handel.",
+  "abc": "X:1\nT:Minuet in G minor (HWV 434)\nM:3/4\nL:1/8\nK:Gm\nd3 e d2 | c4 B2 | A3 B c2 | B4 G2 |\nd3 e d2 | c4 B2 | A2 B2 c2 | d4 z2 |\ng3 f g2 | a4 g2 | f3 e f2 | g4 d2 |\nc3 B c2 | d4 c2 | B2 A2 G2 | G4 z2 |]",
+  "tempo": 100,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

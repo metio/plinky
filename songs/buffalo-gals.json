@@ -1,0 +1,12 @@
+{
+  "id": "buffalo-gals",
+  "title": "Buffalo Gals",
+  "description": "Minstrel/folk song published 1844; public domain.",
+  "abc": "X:1\nT:Buffalo Gals\nM:2/4\nL:1/8\nK:G\nG/G/ G B/B/ | A/G/ A z | G/G/ G B/B/ | A/G/ A z |\nG/G/ G B/B/ | A/G/ B/A/ G | E/F/ G/A/ B/A/ | G G z |]",
+  "tempo": 116,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

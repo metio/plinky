@@ -1,0 +1,12 @@
+{
+  "id": "den-blomstertid-nu-kommer",
+  "title": "Den blomstertid nu kommer",
+  "description": "Swedish summer hymn, melody traditional, published 1695.",
+  "abc": "X:1\nT:Den blomstertid nu kommer\nM:4/4\nL:1/8\nK:F\nF2 G2 A2 A2|A2 G2 F4|G2 A2 B2 A2|G2 F2 G4|\nA2 B2 c2 c2|c2 d2 c4|c2 B2 A2 G2|F6 z2|",
+  "tempo": 80,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

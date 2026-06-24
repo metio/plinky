@@ -1,0 +1,12 @@
+{
+  "id": "haydn-symphony-94-finale",
+  "title": "Symphony No. 94 (Finale theme)",
+  "description": "Joseph Haydn.",
+  "abc": "X:1\nT:Symphony No. 94 (Finale theme)\nM:2/4\nL:1/8\nK:C\nG, C E G | c2 c2 | d c B A | G2 z2 |\nE F G A | G F E D | C D E F | E D C2 |",
+  "tempo": 132,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

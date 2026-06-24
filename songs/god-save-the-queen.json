@@ -1,0 +1,12 @@
+{
+  "id": "god-save-the-queen",
+  "title": "God Save the Queen",
+  "description": "18th-century traditional anthem; melody anonymous.",
+  "abc": "X:1\nT:God Save the Queen\nM:3/4\nL:1/4\nK:G\nG G A | F3/2 G/ A | B B c | B3/2 A/ G | A G F | G2 z |\nd d d | d3/2 c/ B | c c c | c3/2 B/ A | B c d | e/d/ c/B/ A | G3 |]",
+  "tempo": 88,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

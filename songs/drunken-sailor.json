@@ -1,0 +1,12 @@
+{
+  "id": "drunken-sailor",
+  "title": "What Shall We Do with the Drunken Sailor",
+  "description": "Traditional sea shanty, anonymous, pre-1900.",
+  "abc": "X:1\nT:What Shall We Do with the Drunken Sailor\nM:4/4\nL:1/8\nK:Dm\nA2A2 A2GA|B2B2 B2AB|A2A2 G2E2|D2E2 G2A2|\nA2A2 A2GA|B2B2 B2AB|A2G2 E2G2|A4 z4|\nd2d2 d2cd|e4 d2c2|d2c2 A2c2|d4 d4|\nA2A2 A2GA|B2A2 G2E2|D2E2 G2A2|A4 z4|]",
+  "tempo": 120,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

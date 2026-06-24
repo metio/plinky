@@ -1,0 +1,12 @@
+{
+  "id": "album-young-german-song",
+  "title": "German Song (Album for the Young)",
+  "description": "Pyotr Ilyich Tchaikovsky.",
+  "abc": "X:1\nT:German Song (Album for the Young, Op. 39)\nM:3/4\nL:1/8\nK:Eb\nB2 B2 B2 | A2 G2 F2 | G2 G2 A2 | G4 z2 | B2 B2 B2 | A2 G2 F2 | G2 A2 G2 | F4 z2 |]",
+  "tempo": 120,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "the-chrysanthemum-joplin",
+  "title": "The Chrysanthemum (Theme)",
+  "description": "Scott Joplin.",
+  "abc": "X:1\nT:The Chrysanthemum (Theme)\nM:2/4\nL:1/8\nK:Ab\nc/d/ | e/c/A/c/ e/f/g/e/ | c/e/A/c/ e3/2 c/ | d/e/f/g/ a/g/f/e/ | c3 c/d/ |\ne/c/A/c/ e/f/g/e/ | c/e/A/c/ e3/2 g/ | f/e/d/c/ B/c/d/B/ | A3 ||\n",
+  "tempo": 90,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

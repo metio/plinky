@@ -1,0 +1,12 @@
+{
+  "id": "ah-vous-dirai-je-maman",
+  "title": "Ah! Vous Dirai-je, Maman",
+  "description": "Traditional French folk melody, 1761, anonymous.",
+  "abc": "X:1\nT:Ah! Vous Dirai-je, Maman\nM:4/4\nL:1/4\nK:C\nC C G G | A A G2 | F F E E | D D C2 |\nG G F F | E E D2 | G G F F | E E D2 |\nC C G G | A A G2 | F F E E | D D C2 |]",
+  "tempo": 110,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

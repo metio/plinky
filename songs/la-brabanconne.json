@@ -1,0 +1,12 @@
+{
+  "id": "la-brabanconne",
+  "title": "La Brabanconne",
+  "description": "Francois Van Campenhout.",
+  "abc": "X:1\nT:La Brabanconne\nM:4/4\nL:1/8\nK:G\nD2 | G2 A2 B2 c2 | d4 B2 d2 | c2 B2 A2 G2 | A4 z2 D2 | G2 A2 B2 c2 |\nd4 g2 d2 | c2 B2 A2 F2 | G4 z2 |]",
+  "tempo": 96,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

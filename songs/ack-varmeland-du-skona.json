@@ -1,0 +1,12 @@
+{
+  "id": "ack-varmeland-du-skona",
+  "title": "Ack Varmeland du skona",
+  "description": "Traditional Swedish folk song, 19th century, anonymous.",
+  "abc": "X:1\nT:Ack Varmeland du skona\nM:4/4\nL:1/8\nK:G\nB2 A2 G2 D2|G2 A2 B4|c2 B2 A2 G2|A6 z2|\nB2 A2 G2 D2|G2 A2 B4|d2 c2 B2 A2|G6 z2|",
+  "tempo": 76,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

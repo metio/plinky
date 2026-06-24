@@ -1,0 +1,12 @@
+{
+  "id": "rio-grande",
+  "title": "Bound for the Rio Grande",
+  "description": "Traditional capstan shanty, anonymous, 19th century.",
+  "abc": "X:1\nT:Bound for the Rio Grande\nM:4/4\nL:1/8\nK:G\nD2|G2G2 A2B2|d2d2 d2B2|c2c2 B2A2|G4 z2D2|\nG2G2 A2B2|d2e2 d2B2|A2A2 B2A2|G4 z2d2|\ne2e2 d2B2|d2d2 B2G2|A2B2 c2A2|B4 z2d2|\ne2d2 B2G2|A2G2 E2D2|G2A2 B2A2|G4 z2|]",
+  "tempo": 96,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

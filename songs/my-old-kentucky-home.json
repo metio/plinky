@@ -1,0 +1,12 @@
+{
+  "id": "my-old-kentucky-home",
+  "title": "My Old Kentucky Home",
+  "description": "Stephen Foster.",
+  "abc": "X:1\nT:My Old Kentucky Home\nM:4/4\nL:1/8\nK:G\nB2 B2 d2 d2 | d3 c B2 A2 | G2 G2 A2 B2 | A4 z4 |\nB2 B2 d2 d2 | d3 c B2 A2 | G2 A2 B2 A2 | G4 z4 |",
+  "tempo": 88,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

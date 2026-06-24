@@ -1,0 +1,12 @@
+{
+  "id": "go-down-moses",
+  "title": "Go Down, Moses",
+  "description": "Traditional spiritual, published before 1872.",
+  "abc": "X:1\nT:Go Down, Moses\nM:4/4\nL:1/8\nK:Dm\nD3 D F2 A2|c4 A4|d4 c2 A2|A4 G4|\nF2 F2 F2 A2|G2 F2 E4|D3 D F2 A2|c6 A2|\nd4 c2 A2|A4 G4|F2 G2 A2 G2|F4 E4|D8||",
+  "tempo": 72,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

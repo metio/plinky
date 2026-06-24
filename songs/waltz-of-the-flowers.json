@@ -1,0 +1,12 @@
+{
+  "id": "waltz-of-the-flowers",
+  "title": "Waltz of the Flowers",
+  "description": "Pyotr Ilyich Tchaikovsky.",
+  "abc": "X:1\nT:Waltz of the Flowers\nM:3/4\nL:1/8\nK:D\nA2 d2 e2 | f2 e2 d2 | e2 cd e2 | f4 z2 |\nA2 d2 e2 | f2 e2 d2 | e2 cd B2 | A4 z2 |]",
+  "tempo": 132,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

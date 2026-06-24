@@ -1,0 +1,12 @@
+{
+  "id": "can-can-orpheus-offenbach",
+  "title": "Can-Can (from Orpheus in the Underworld)",
+  "description": "Jacques Offenbach.",
+  "abc": "X:1\nT:Can-Can (from Orpheus in the Underworld)\nM:2/4\nL:1/8\nK:D\nA/B/ A/F/ A/F/ A/F/|A/B/ A/F/ A2|G/A/ G/E/ G/E/ G/E/|G/A/ G/E/ G2|\nA/B/ A/F/ A/F/ A/F/|d/c/ B/A/ G/F/ E/D/|E/F/ G/A/ B/c/ d/e/|f/e/ d/c/ B/A/ G/F/|\nE2 A2|d2 z2|]",
+  "tempo": 138,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

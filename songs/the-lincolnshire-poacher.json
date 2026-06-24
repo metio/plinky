@@ -1,0 +1,12 @@
+{
+  "id": "the-lincolnshire-poacher",
+  "title": "The Lincolnshire Poacher",
+  "description": "English (Lincolnshire) traditional folk song, 18th century.",
+  "abc": "X:1\nT:The Lincolnshire Poacher\nM:4/4\nL:1/8\nK:G\nD2 | G2 G2 G2 A2 | B2 B2 B2 c2 | d2 d2 e2 d2 | B2 G2 G2 D2 | G2 G2 G2 A2 | B2 B2 B2 c2 | d2 B2 A2 G2 | A2 G2 G2 :|",
+  "tempo": 116,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

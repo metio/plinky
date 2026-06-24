@@ -1,0 +1,12 @@
+{
+  "id": "kalinka",
+  "title": "Kalinka",
+  "description": "Ivan Larionov.",
+  "abc": "X:1\nT:Kalinka\nM:2/4\nL:1/8\nK:Am\ne2 e2|e d c B|A2 A2|A4|e2 e2|e d c B|A4|A4|\nc2 c2|c B A B|c2 c2|c4|d2 d2|d c B c|d4|d4|",
+  "tempo": 132,
+  "beatsPerBar": 2,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

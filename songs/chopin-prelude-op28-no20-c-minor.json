@@ -1,0 +1,12 @@
+{
+  "id": "chopin-prelude-op28-no20-c-minor",
+  "title": "Prelude in C minor, Op. 28 No. 20",
+  "description": "Frederic Chopin.",
+  "abc": "X:1\nT:Prelude in C minor, Op. 28 No. 20\nM:4/4\nL:1/8\nK:Cm\nc3 G E2 G2 | A2 F2 G2 c2 | G2 E2 F2 G2 | E2 C2 _D2 C2 |\nc3 G E2 G2 | A2 F2 G2 c2 | G2 E2 F2 G2 | C6 z2 |]",
+  "tempo": 60,
+  "beatsPerBar": 4,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

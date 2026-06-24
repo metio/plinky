@@ -1,0 +1,12 @@
+{
+  "id": "es-klappert-die-muehle",
+  "title": "Es klappert die Mühle am rauschenden Bach",
+  "description": "Traditional German folk song, 19th century.",
+  "abc": "X:1\nT:Es klappert die Mühle am rauschenden Bach\nM:6/8\nL:1/8\nK:F\nF2 F A2 F | c2 A F3 | G2 G B2 G | d2 B G3 |\nA2 A c2 A | f2 c A3 | B2 G c2 c | c3 F3 |\nc2 c c2 c | d2 c B3 | c2 c c2 c | d2 c B3 |\nA2 A c2 A | f2 c A3 | G2 B A2 c | F6 |\n",
+  "tempo": 126,
+  "beatsPerBar": 6,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}

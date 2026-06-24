@@ -1,0 +1,12 @@
+{
+  "id": "muss-i-denn",
+  "title": "Muss i denn zum Städtele hinaus",
+  "description": "Friedrich Silcher.",
+  "abc": "X:1\nT:Muss i denn zum Städtele hinaus\nM:3/4\nL:1/8\nK:G\nG2 B2 d2 | d3 e d2 | c2 B2 A2 | A4 z2 |\nF2 A2 c2 | c3 d c2 | B2 A2 G2 | G4 z2 |\nB2 B2 B2 | d3 c B2 | A2 A2 A2 | c3 B A2 |\nG2 B2 d2 | d3 e d2 | c2 A2 F2 | G4 z2 |\n",
+  "tempo": 96,
+  "beatsPerBar": 3,
+  "license": "CC0-1.0",
+  "curriculums": [
+    "public-domain"
+  ]
+}
