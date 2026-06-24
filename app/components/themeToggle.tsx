@@ -19,7 +19,7 @@ export function ThemeToggle() {
     }, []);
 
     const cycle = () => {
-        const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
+        const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length]!;
         setTheme(next);
         saveTheme(next);
         applyTheme(next);

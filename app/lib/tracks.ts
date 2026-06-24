@@ -66,7 +66,7 @@ const MINOR_CIRCLE = [
     "scale-d-minor",
 ];
 
-export const TRACKS: Track[] = [
+export const TRACKS = [
     {
         id: "technique-foundations",
         name: "Technique foundations",
@@ -130,4 +130,4 @@ export const TRACKS: Track[] = [
             "chromatic-c",
         ],
     },
-];
+] satisfies Track[];

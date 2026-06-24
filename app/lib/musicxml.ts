@@ -66,7 +66,7 @@ function mergeChord(previous: string, pitch: string): string {
         return previous;
     }
     const [, body, length] = match;
-    const inner = body.startsWith("[") ? body.slice(1, -1) : body;
+    const inner = body!.startsWith("[") ? body!.slice(1, -1) : body!;
     return `[${inner}${pitch}]${length}`;
 }
 
@@ -104,7 +104,7 @@ function measureTokens(measure: Element, divisions: number): Map<number, string[
         active.set(key, alter);
         const noteAbc = abcNote(step, octave, accidental);
         if (note.querySelector("chord") && tokens.length > 0) {
-            tokens[tokens.length - 1] = mergeChord(tokens[tokens.length - 1], noteAbc);
+            tokens[tokens.length - 1] = mergeChord(tokens[tokens.length - 1]!, noteAbc);
         } else {
             tokens.push(`${noteAbc}${length}`);
         }
@@ -145,7 +145,7 @@ export function musicXmlToAbc(xml: string): string {
     const meter = `M:${beats}/${beatType}`;
 
     if (staves.length === 1) {
-        return `X:1\nT:${title}\n${meter}\nL:1/4\nK:C\n${body(staves[0])}`;
+        return `X:1\nT:${title}\n${meter}\nL:1/4\nK:C\n${body(staves[0]!)}`;
     }
-    return `X:1\nT:${title}\n${meter}\nL:1/4\nV:1 clef=treble\nV:2 clef=bass\nV:1\nK:C\n${body(staves[0])}\nV:2\n${body(staves[1])}`;
+    return `X:1\nT:${title}\n${meter}\nL:1/4\nV:1 clef=treble\nV:2 clef=bass\nV:1\nK:C\n${body(staves[0]!)}\nV:2\n${body(staves[1]!)}`;
 }

@@ -9,4 +9,8 @@ import { defineConfig } from "vite";
 export default defineConfig({
     plugins: [tailwindcss(), reactRouter()],
     resolve: { tsconfigPaths: true },
+    // Target only modern evergreen browsers, so the latest JS syntax ships as
+    // written instead of being down-levelled. The CSS counterpart lives in
+    // .browserslistrc, which Lightning CSS reads.
+    build: { target: "esnext" },
 });

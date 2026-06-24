@@ -13,13 +13,13 @@ const STORAGE_KEY = "plinky:songs";
 const CURRICULUMS_KEY = "plinky:curriculums";
 
 export function parseTitle(abc: string): string {
-    return abc.match(/^T:\s*(.+)$/m)?.[1].trim() ?? "";
+    return abc.match(/^T:\s*(.+)$/m)?.[1]?.trim() ?? "";
 }
 
 // The meter numerator is how many beats fill a bar. `C` is common (4/4) time and
 // `C|` is cut (2/2) time.
 export function parseBeatsPerBar(abc: string): number {
-    const meter = abc.match(/^M:\s*(.+)$/m)?.[1].trim();
+    const meter = abc.match(/^M:\s*(.+)$/m)?.[1]?.trim();
     if (!meter) {
         return 4;
     }

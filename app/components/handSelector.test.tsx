@@ -26,7 +26,7 @@ describe("useHandSelection", () => {
 describe("HandSelector", () => {
     it("renders nothing for a single hand", () => {
         const { container } = render(
-            <HandSelector hands={[twoHands[0]]} value="both" onChange={() => {}} />,
+            <HandSelector hands={[twoHands[0]!]} value="both" onChange={() => {}} />,
         );
         expect(container.firstChild).toBeNull();
     });

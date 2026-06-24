@@ -25,8 +25,8 @@ describe("song pack", () => {
         const pack = parsePack(json);
         expect(pack.songs).toHaveLength(1);
         expect(pack.songs[0]).toMatchObject({ id: "scale", title: "Scale", tempo: 90 });
-        expect(pack.songs[0].curriculums).toEqual(["grade-1", "warmups"]);
-        expect(pack.songs[0].license).toBe("CC-BY-4.0");
+        expect(pack.songs[0]!.curriculums).toEqual(["grade-1", "warmups"]);
+        expect(pack.songs[0]!.license).toBe("CC-BY-4.0");
         expect(pack.curriculums).toEqual([{ id: "grade-1", name: "Grade 1", publisher: "School" }]);
     });
 

@@ -39,7 +39,7 @@ describe("totalBars", () => {
 describe("buildRegion", () => {
     it("keeps only the notes in the bar range", () => {
         const region = buildRegion(hands, 1, 1, beatsPerBar, tempo);
-        expect(region[0].steps.map((s) => s.timeMs)).toEqual([2400, 3000]);
+        expect(region[0]!.steps.map((s) => s.timeMs)).toEqual([2400, 3000]);
     });
 
     it("drops hands with no notes in the range", () => {

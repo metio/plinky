@@ -107,18 +107,19 @@ export function useHandsMatcher(hands: Hand[], options: HandsMatcherOptions = {}
                 }
             }
             if (event.kind === "correct") {
-                const step = hands[event.hand].steps[event.index];
+                const step = hands[event.hand]!.steps[event.index]!;
+                const onset = onsetRef.current[event.hand] ?? timestamp;
                 optionsRef.current.onCorrect?.({
                     hand: event.hand,
                     pitches: step.pitches,
                     elements: step.elements,
                     timeMs: step.timeMs,
-                    timestamp: onsetRef.current[event.hand],
+                    timestamp: onset,
                     ordinal: ordinalRef.current++,
                     velocity,
                 });
                 if (event.complete) {
-                    optionsRef.current.onComplete?.(onsetRef.current[event.hand]);
+                    optionsRef.current.onComplete?.(onset);
                 }
             }
         },
@@ -168,7 +169,7 @@ export function describeNext(nextByHand: NextHand[], noteName: (note: number) =>
         return "";
     }
     if (playing.length === 1) {
-        return playing[0].pitches.map(noteName).join(" ");
+        return playing[0]!.pitches.map(noteName).join(" ");
     }
     return playing
         .map((hand) => `${hand.label}: ${hand.pitches.map(noteName).join(" ")}`)

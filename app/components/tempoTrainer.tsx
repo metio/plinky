@@ -93,7 +93,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                 setLiveBpm(null);
                 return;
             }
-            const previous = notesRef.current[info.ordinal - 1];
+            const previous = notesRef.current[info.ordinal - 1]!;
             const notatedGap = info.timeMs - previous.timeMs;
             const actualGap = info.timestamp - previous.timestamp;
             const bpm = instantaneousBpm(exercise.tempo, notatedGap, actualGap);
@@ -268,7 +268,7 @@ export function TempoTrainer({ exercise }: { exercise: Exercise }) {
                         series={result.handStats.map((hand, index) => ({
                             label: `${hand.label} hand`,
                             points: hand.points,
-                            color: HAND_COLORS[index % HAND_COLORS.length],
+                            color: HAND_COLORS[index % HAND_COLORS.length]!,
                         }))}
                     />
                 </div>

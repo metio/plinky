@@ -110,7 +110,7 @@ describe("persistence", () => {
         saveUserSong(buildExercise(ABC, []));
         saveUserSong({ ...buildExercise(ABC, []), title: "Renamed" });
         expect(loadUserSongs()).toHaveLength(1);
-        expect(loadUserSongs()[0].title).toBe("Renamed");
+        expect(loadUserSongs()[0]!.title).toBe("Renamed");
     });
 
     it("resolves a stored song by id", () => {

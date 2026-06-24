@@ -38,19 +38,19 @@ describe("MusicXML import round-trip", () => {
         const abc = musicXmlToAbc(score(note("C", 4) + note("D", 4) + note("E", 4) + note("F", 4)));
         const result = hands(abc);
         expect(result).toHaveLength(1);
-        expect(result[0].steps.map((step) => step.pitches)).toEqual([[60], [62], [64], [65]]);
+        expect(result[0]!.steps.map((step) => step.pitches)).toEqual([[60], [62], [64], [65]]);
     });
 
     it("a converted chord plays as one step", () => {
         const chord = note("C", 4, 4) + note("E", 4, 4, "<chord/>") + note("G", 4, 4, "<chord/>");
         const result = hands(musicXmlToAbc(score(chord)));
-        expect(result[0].steps[0].pitches).toEqual([60, 64, 67]);
+        expect(result[0]!.steps[0]!.pitches).toEqual([60, 64, 67]);
     });
 
     it("plays a natural after a sharp at the right pitch", () => {
         const sharp = `<note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>1</duration></note>`;
         const natural = `<note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration></note>`;
         const result = hands(musicXmlToAbc(score(sharp + natural)));
-        expect(result[0].steps.map((step) => step.pitches)).toEqual([[66], [65]]);
+        expect(result[0]!.steps.map((step) => step.pitches)).toEqual([[66], [65]]);
     });
 });

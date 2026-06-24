@@ -26,7 +26,7 @@ function transitionCost(p1: number, f1: number, p2: number, f2: number, hand: Ha
     const direction = hand === "right" ? 1 : -1;
     // The pitch change expected if the hand stays in place: for the right hand a
     // higher finger plays a higher note, mirrored for the left.
-    const expected = direction * (SPREAD[f2] - SPREAD[f1]);
+    const expected = direction * (SPREAD[f2]! - SPREAD[f1]!);
     const shift = Math.abs(p2 - p1 - expected);
     let cost = shift;
 
@@ -58,7 +58,7 @@ export function fingerLine(pitches: number[], hand: Hand): number[] {
         return [];
     }
     let paths = FINGERS.map((finger) => ({
-        cost: startCost(pitches[0], finger),
+        cost: startCost(pitches[0]!, finger),
         path: [finger],
     }));
     for (let i = 1; i < pitches.length; i++) {
@@ -67,7 +67,7 @@ export function fingerLine(pitches: number[], hand: Hand): number[] {
             paths.forEach((previous, index) => {
                 const cost =
                     previous.cost +
-                    transitionCost(pitches[i - 1], FINGERS[index], pitches[i], finger, hand);
+                    transitionCost(pitches[i - 1]!, FINGERS[index]!, pitches[i]!, finger, hand);
                 if (cost < best.cost) {
                     best = { cost, path: [...previous.path, finger] };
                 }

@@ -37,15 +37,15 @@ describe("buildSteps", () => {
     it("maps a chord to one step carrying every pitch", () => {
         const result = steps(`${HEADER}[CEG] D |`);
         expect(result).toHaveLength(2);
-        expect(result[0].pitches).toEqual([60, 64, 67]);
+        expect(result[0]!.pitches).toEqual([60, 64, 67]);
     });
 
     it("drops rests but folds their duration into the next onset", () => {
         const result = steps(`${HEADER}C z E F |`);
         expect(result.map((step) => step.pitches[0])).toEqual([60, 64, 65]);
         // The rest's duration survives as a wider gap before the note after it.
-        expect(result[1].timeMs - result[0].timeMs).toBeGreaterThan(
-            result[2].timeMs - result[1].timeMs,
+        expect(result[1]!.timeMs - result[0]!.timeMs).toBeGreaterThan(
+            result[2]!.timeMs - result[1]!.timeMs,
         );
     });
 

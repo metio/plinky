@@ -30,14 +30,14 @@ describe("generated phrases are playable", () => {
         const abc = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
         const result = hands(abc);
         expect(result).toHaveLength(1);
-        expect(result[0].steps).toHaveLength(8);
+        expect(result[0]!.steps).toHaveLength(8);
     });
 
     it("a two-hand phrase splits into a right and left hand", () => {
         const abc = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0);
         const result = hands(abc);
         expect(result.map((hand) => hand.label)).toEqual(["Right", "Left"]);
-        expect(result[0].steps).toHaveLength(4);
-        expect(result[1].steps).toHaveLength(4);
+        expect(result[0]!.steps).toHaveLength(4);
+        expect(result[1]!.steps).toHaveLength(4);
     });
 });
