@@ -13,6 +13,7 @@ export default [
     route("sprint", "routes/sprint.tsx"),
     route("daily", "routes/daily.tsx"),
     route("ear", "routes/ear.tsx"),
+    route("songs", "routes/songs.tsx"),
     route("curriculums", "routes/curriculums.tsx"),
     route("tracks", "routes/tracks.tsx"),
     route("progress", "routes/progress.tsx"),

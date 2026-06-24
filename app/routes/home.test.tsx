@@ -5,6 +5,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { toggleFavorite } from "../lib/favorites";
 import { buildExercise, saveUserSong } from "../lib/songs";
 import Home from "./home";
 
@@ -29,8 +30,9 @@ describe("Home", () => {
         }
     });
 
-    it("lists a local song with mode links and a remove control", async () => {
+    it("lists a favorited song with mode links and a remove control", async () => {
         saveUserSong(buildExercise("X:1\nT:My Song\nM:4/4\nL:1/4\nK:C\nC D E F |", []));
+        toggleFavorite("my-song");
         renderHome();
         expect(await screen.findByText("My Song")).toBeTruthy();
         const hrefs = [...document.querySelectorAll("a")].map((anchor) =>
@@ -42,8 +44,11 @@ describe("Home", () => {
         expect(screen.getAllByText("Remove")).toHaveLength(1);
     });
 
-    it("shows an empty state with no songs", async () => {
+    it("prompts to star songs when none are favorited", async () => {
+        saveUserSong(buildExercise("X:1\nT:My Song\nM:4/4\nL:1/4\nK:C\nC D E F |", []));
         renderHome();
-        expect(await screen.findByText(/No songs on this device yet/)).toBeTruthy();
+        // The song exists but isn't favorited, so home shows the pin prompt, not the song.
+        expect(await screen.findByText(/Star songs to pin them here/)).toBeTruthy();
+        expect(screen.queryByText("My Song")).toBeNull();
     });
 });
