@@ -25,7 +25,18 @@ export default defineConfig({
             // report — v8 does not instrument browser-run code here.
             provider: "istanbul",
             include: ["app/**/*.{ts,tsx}"],
+            // The Paraglide output is generated, and its .d.ts files are not valid
+            // runtime modules for the instrumenter to parse.
+            exclude: ["app/paraglide/**", "**/*.d.ts"],
             reporter: ["text", "html", "lcov"],
+            // Ratchet: CI fails if any metric drops below these. Raise them as
+            // coverage grows; never lower them to make a red build pass.
+            thresholds: {
+                statements: 78,
+                branches: 70,
+                functions: 72,
+                lines: 78,
+            },
         },
         projects: [
             {

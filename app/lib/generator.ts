@@ -32,7 +32,7 @@ function line(scale: string[], bars: number, beatsPerBar: number, rng: () => num
     for (let bar = 0; bar < bars; bar++) {
         const beats: string[] = [];
         for (let beat = 0; beat < beatsPerBar; beat++) {
-            beats.push(scale[Math.floor(rng() * scale.length)]);
+            beats.push(scale[Math.floor(rng() * scale.length)]!);
         }
         measures.push(beats.join(" "));
     }

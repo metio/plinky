@@ -39,8 +39,8 @@ export function tempoSeries(
     const points: TempoPoint[] = [];
     const count = Math.min(notatedMs.length, actualMs.length);
     for (let i = 1; i < count; i++) {
-        const notatedGap = notatedMs[i] - notatedMs[i - 1];
-        const actualGap = actualMs[i] - actualMs[i - 1];
+        const notatedGap = notatedMs[i]! - notatedMs[i - 1]!;
+        const actualGap = actualMs[i]! - actualMs[i - 1]!;
         points.push({ index: i, bpm: instantaneousBpm(referenceTempo, notatedGap, actualGap) });
     }
     return points;
@@ -50,9 +50,9 @@ export function median(values: number[]): number {
     if (values.length === 0) {
         return 0;
     }
-    const sorted = [...values].sort((a, b) => a - b);
+    const sorted = values.toSorted((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
 }
 
 export type HotspotOptions = {
@@ -76,7 +76,7 @@ export function findHotspots(
     const hotspots: Hotspot[] = [];
     let runStart = -1;
     for (let i = 0; i < points.length; i++) {
-        const slow = points[i].bpm < threshold;
+        const slow = points[i]!.bpm < threshold;
         if (slow && runStart === -1) {
             runStart = i;
         }
@@ -84,8 +84,8 @@ export function findHotspots(
             const runEnd = slow ? i : i - 1;
             if (runEnd - runStart + 1 >= minRun) {
                 hotspots.push({
-                    startIndex: points[runStart].index,
-                    endIndex: points[runEnd].index,
+                    startIndex: points[runStart]!.index,
+                    endIndex: points[runEnd]!.index,
                 });
             }
             runStart = -1;

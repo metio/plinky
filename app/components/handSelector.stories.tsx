@@ -23,4 +23,4 @@ export const BothHands: Story = {};
 export const RightSelected: Story = { args: { value: 0 } };
 
 // A single-hand piece needs no choice, so the selector renders nothing.
-export const SingleHand: Story = { args: { hands: [grandStaff[0]] } };
+export const SingleHand: Story = { args: { hands: [grandStaff[0]!] } };

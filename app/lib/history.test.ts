@@ -51,7 +51,7 @@ describe("summarizePractice", () => {
         const summary = summarizePractice({ "2026-06-23": 7 }, NOW);
         expect(summary.recent).toHaveLength(7);
         expect(summary.recent[6]).toEqual({ date: "2026-06-23", notes: 7 });
-        expect(summary.recent[0].date).toBe("2026-06-17");
+        expect(summary.recent[0]!.date).toBe("2026-06-17");
     });
 
     it("returns an empty history for corrupt storage", () => {

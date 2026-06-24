@@ -27,9 +27,9 @@ describe("groupByCurriculum", () => {
             ],
         );
         expect(groups).toHaveLength(2);
-        expect(groups[0].curriculum?.id).toBe("g1");
-        expect(groups[0].songs.map((entry) => entry.id)).toEqual(["a", "b"]);
-        expect(groups[1].songs.map((entry) => entry.id)).toEqual(["b", "c"]);
+        expect(groups[0]!.curriculum?.id).toBe("g1");
+        expect(groups[0]!.songs.map((entry) => entry.id)).toEqual(["a", "b"]);
+        expect(groups[1]!.songs.map((entry) => entry.id)).toEqual(["b", "c"]);
     });
 
     it("collects songs in no known curriculum under a trailing null group", () => {
@@ -37,8 +37,8 @@ describe("groupByCurriculum", () => {
             [song("a", ["g1"]), song("loose"), song("unknown", ["gone"])],
             [{ id: "g1", name: "Grade 1" }],
         );
-        expect(groups[groups.length - 1].curriculum).toBeNull();
-        expect(groups[groups.length - 1].songs.map((entry) => entry.id)).toEqual([
+        expect(groups[groups.length - 1]!.curriculum).toBeNull();
+        expect(groups[groups.length - 1]!.songs.map((entry) => entry.id)).toEqual([
             "loose",
             "unknown",
         ]);

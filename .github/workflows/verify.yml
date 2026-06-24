@@ -34,6 +34,41 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+  coverage:
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Fails when any project's coverage drops below the thresholds pinned in
+      # vitest.config.ts, so the ratchet only moves up.
+      - run: npm run coverage
+  lighthouse:
+    name: lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Prerendered routes are served from build/client; deep links need the SPA
+      # fallback, matching how GitHub Pages serves the site.
+      - run: cp build/client/__spa-fallback.html build/client/404.html
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
+        with:
+          configPath: ./lighthouserc.json
+          temporaryPublicStorage: true
   biome:
     name: biome
     runs-on: ubuntu-latest
@@ -97,7 +132,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [build, browser, biome, knip, typos, markdown, yaml, github-actions, reuse]
+    needs: [build, browser, coverage, lighthouse, biome, knip, typos, markdown, yaml, github-actions, reuse]
     if: always()
     runs-on: ubuntu-latest
     steps:

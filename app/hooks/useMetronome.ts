@@ -83,8 +83,8 @@ export function useMetronome(): UseMetronomeResult {
         const ctx = ctxRef.current;
         if (ctx) {
             let current = -1;
-            while (queueRef.current.length > 0 && queueRef.current[0].time <= ctx.currentTime) {
-                current = queueRef.current[0].beat;
+            while (queueRef.current.length > 0 && queueRef.current[0]!.time <= ctx.currentTime) {
+                current = queueRef.current[0]!.beat;
                 queueRef.current.shift();
             }
             if (current >= 0) {

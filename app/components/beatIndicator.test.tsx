@@ -18,7 +18,7 @@ describe("BeatIndicator", () => {
         const { container } = render(<BeatIndicator beat={2} beatsPerBar={3} />);
         const dots = [...container.querySelectorAll("span")];
         // beat === index + 1, so the second dot is active.
-        expect(dots[1].className).toContain("bg-indigo-600");
-        expect(dots[0].className).toContain("bg-gray-300");
+        expect(dots[1]!.className).toContain("bg-indigo-600");
+        expect(dots[0]!.className).toContain("bg-gray-300");
     });
 });

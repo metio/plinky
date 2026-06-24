@@ -32,16 +32,16 @@ describe("buildHands", () => {
         const result = hands(GRAND_STAFF);
         expect(result.map((hand) => hand.label)).toEqual(["Right", "Left"]);
         // Right hand: c d e f. Left hand: half-note C then G.
-        expect(result[0].steps.map((step) => step.pitches)).toEqual([[72], [74], [76], [77]]);
-        expect(result[1].steps.map((step) => step.pitches)).toEqual([[60], [67]]);
+        expect(result[0]!.steps.map((step) => step.pitches)).toEqual([[72], [74], [76], [77]]);
+        expect(result[1]!.steps.map((step) => step.pitches)).toEqual([[60], [67]]);
         // Each step carries its rendered note elements, for per-hand highlighting.
-        expect(result[0].steps[0].elements.length).toBeGreaterThan(0);
-        expect(result[1].steps[0].elements.length).toBeGreaterThan(0);
+        expect(result[0]!.steps[0]!.elements.length).toBeGreaterThan(0);
+        expect(result[1]!.steps[0]!.elements.length).toBeGreaterThan(0);
     });
 
     it("returns a single hand for a single-staff tune", () => {
         const result = hands("X:1\nM:4/4\nL:1/4\nK:C\nC D E F |");
         expect(result).toHaveLength(1);
-        expect(result[0].steps.map((step) => step.pitches)).toEqual([[60], [62], [64], [65]]);
+        expect(result[0]!.steps.map((step) => step.pitches)).toEqual([[60], [62], [64], [65]]);
     });
 });

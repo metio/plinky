@@ -35,7 +35,7 @@ const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", 
 // MIDI note 60 is middle C (C4), so the octave is offset by one below the raw
 // division by twelve.
 export function noteName(note: number): string {
-    return `${NOTE_NAMES[note % 12]}${Math.floor(note / 12) - 1}`;
+    return `${NOTE_NAMES[note % 12]!}${Math.floor(note / 12) - 1}`;
 }
 
 export type ParsedMessage = {
@@ -52,10 +52,10 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     if (!data || data.length < 2) {
         return null;
     }
-    const type = data[0] & 0xf0;
-    const channel = (data[0] & 0x0f) + 1;
-    const note = data[1];
-    const velocity = data.length > 2 ? data[2] : 0;
+    const type = data[0]! & 0xf0;
+    const channel = (data[0]! & 0x0f) + 1;
+    const note = data[1]!;
+    const velocity = data.length > 2 ? data[2]! : 0;
 
     const isNoteOn = type === 0x90 && velocity > 0;
     const isNoteOff = type === 0x80 || (type === 0x90 && velocity === 0);
@@ -103,10 +103,10 @@ const RIGHT_HAND_BASE_NOTE = 72; // C5 — one octave above the left hand
 // the key is not part of the layout.
 export function keyToNote(key: string, octaveOffset: number): number | null {
     if (key in LEFT_HAND_KEYS) {
-        return LEFT_HAND_BASE_NOTE + octaveOffset * 12 + LEFT_HAND_KEYS[key];
+        return LEFT_HAND_BASE_NOTE + octaveOffset * 12 + LEFT_HAND_KEYS[key]!;
     }
     if (key in RIGHT_HAND_KEYS) {
-        return RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + RIGHT_HAND_KEYS[key];
+        return RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + RIGHT_HAND_KEYS[key]!;
     }
     return null;
 }

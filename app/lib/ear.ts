@@ -8,5 +8,5 @@ export const EAR_NOTES = [60, 62, 64, 65, 67, 69, 71, 72];
 // identical. The rng is injectable for deterministic tests.
 export function nextEarNote(rng: () => number, previous?: number): number {
     const pool = previous === undefined ? EAR_NOTES : EAR_NOTES.filter((note) => note !== previous);
-    return pool[Math.floor(rng() * pool.length)];
+    return pool[Math.floor(rng() * pool.length)]!;
 }

@@ -169,7 +169,7 @@ export default function TracksRoute() {
                     <TrackPath
                         key={track.id}
                         track={track}
-                        accent={ACCENTS[index % ACCENTS.length]}
+                        accent={ACCENTS[index % ACCENTS.length]!}
                         titles={titles}
                     />
                 ))}

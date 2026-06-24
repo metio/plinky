@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+
+# Modern evergreen browsers only. Lightning CSS (via Tailwind) reads this to emit
+# the latest CSS — nesting, oklch(), :has(), container queries — without legacy
+# fallbacks. The JS counterpart is build.target in vite.config.ts.
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Safari versions
+last 2 Edge versions
+last 2 iOS versions
+not dead

@@ -36,7 +36,7 @@ describe("EarTrainer", () => {
 
         fireEvent.click(await screen.findByRole("button", { name: /Start ear training/ }));
         await act(async () => {
-            window.__plinky?.play(EAR_NOTES[0]); // C, the seeded target
+            window.__plinky?.play(EAR_NOTES[0]!); // C, the seeded target
         });
 
         expect(await screen.findByText(/It was/)).toBeDefined();

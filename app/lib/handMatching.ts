@@ -49,7 +49,7 @@ export function matchHands(
     // Greedy by expectation: a hand is a candidate when its current step expects
     // the note. The common case is a single candidate.
     const candidates = hands
-        .map((hand, index) => ({ index, step: hand.steps[handStates[index].cursor] }))
+        .map((hand, index) => ({ index, step: hand.steps[handStates[index]!.cursor] }))
         .filter((entry) => entry.step?.pitches.includes(note));
 
     if (candidates.length === 0) {
@@ -57,23 +57,25 @@ export function matchHands(
     }
 
     const chosen = candidates.reduce((best, candidate) => {
-        const closer = Math.abs(note - register(hands[candidate.index]));
-        const bestCloser = Math.abs(note - register(hands[best.index]));
+        const closer = Math.abs(note - register(hands[candidate.index]!));
+        const bestCloser = Math.abs(note - register(hands[best.index]!));
         return closer < bestCloser || (closer === bestCloser && candidate.index < best.index)
             ? candidate
             : best;
     });
 
     const { state: handState, event } = matchNote(
-        handStates[chosen.index],
-        hands[chosen.index].steps,
+        handStates[chosen.index]!,
+        hands[chosen.index]!.steps,
         note,
     );
     const nextHands = handStates.map((hand, index) => (index === chosen.index ? handState : hand));
     const nextState: HandsState = { hands: nextHands, wrongNote: null };
 
     if (event.kind === "correct") {
-        const complete = hands.every((hand, index) => nextHands[index].cursor >= hand.steps.length);
+        const complete = hands.every(
+            (hand, index) => nextHands[index]!.cursor >= hand.steps.length,
+        );
         return {
             state: nextState,
             event: { kind: "correct", hand: chosen.index, index: event.index, complete },

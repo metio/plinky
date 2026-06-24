@@ -33,7 +33,7 @@ describe("song import/export round-trip", () => {
     it("accepts a chord tune the generalized matcher can play", () => {
         const result = stepsOf("X:1\nT:Chords\nM:4/4\nL:1/4\nK:C\n[CEG] [DFA] |");
         expect(result).toHaveLength(2);
-        expect(result[0].pitches).toEqual([60, 64, 67]);
+        expect(result[0]!.pitches).toEqual([60, 64, 67]);
     });
 
     it("export then re-import preserves the notes", () => {

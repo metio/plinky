@@ -12,7 +12,7 @@ const PITCH_CLASSES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", 
 const PREF_KEY = "plinky:overlay";
 
 function noteClass(pitch: number): string {
-    return PITCH_CLASSES[((pitch % 12) + 12) % 12];
+    return PITCH_CLASSES[((pitch % 12) + 12) % 12]!;
 }
 
 function loadMode(): OverlayMode {
@@ -49,7 +49,10 @@ function overlay(tune: TuneObject, mode: OverlayMode): void {
         const fingers = mode === "fingers" ? fingerSteps(hand.steps, handType) : null;
         hand.steps.forEach((step, index) => {
             if (fingers) {
-                label(step.elements[0], String(fingers[index]), "#16a34a");
+                const target = step.elements[0];
+                if (target) {
+                    label(target, String(fingers[index]), "#16a34a");
+                }
                 return;
             }
             const name = step.pitches.map(noteClass).join("/");

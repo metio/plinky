@@ -28,7 +28,7 @@ describe("matchHands", () => {
         const empty = { hands: [], wrongNote: null };
         const result = matchHands(empty, hands, 72);
         expect(result.event).toEqual({ kind: "correct", hand: 0, index: 0, complete: false });
-        expect(result.state.hands[0].cursor).toBe(1);
+        expect(result.state.hands[0]!.cursor).toBe(1);
     });
 
     it("advances each hand independently", () => {
@@ -37,8 +37,8 @@ describe("matchHands", () => {
             { kind: "correct", hand: 0, index: 0, complete: false },
             { kind: "correct", hand: 0, index: 1, complete: false },
         ]);
-        expect(state.hands[0].cursor).toBe(2);
-        expect(state.hands[1].cursor).toBe(0);
+        expect(state.hands[0]!.cursor).toBe(2);
+        expect(state.hands[1]!.cursor).toBe(0);
     });
 
     it("routes each note to the hand expecting it", () => {
