@@ -12,6 +12,7 @@ import { generatePhrase, SPRINT_KEYS, type SprintKey } from "../lib/generator";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { loadBestSprint, saveBestSprint, type SprintBest } from "../lib/scores";
+import { m } from "../paraglide/messages.js";
 import { AbcRenderer } from "./abcRenderer";
 import { KeyboardHint } from "./keyboardHint";
 import { PianoKeyboard } from "./pianoKeyboard";
@@ -168,19 +169,16 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">
-                    {daily ? "Daily challenge" : "Sight-reading sprint"}
+                    {daily ? m.sprint_daily_title() : m.sprint_title()}
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {daily
-                        ? "Everyone plays the same one-minute phrase today. Come back tomorrow for a new one."
-                        : "Fresh notes every run. Play as many correctly as you can before the timer runs out — the clock starts on your first note."}
+                    {daily ? m.sprint_daily_intro() : m.sprint_intro()}
                 </p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — or play with your computer keyboard below.
+                    {m.midi_unsupported_keyboard()}
                 </p>
             )}
 
@@ -191,7 +189,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
-                    {status === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
@@ -200,7 +198,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                     {!daily && (
                         <div className="flex flex-wrap items-center gap-3">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Length
+                                {m.sprint_length()}
                             </span>
                             {DURATIONS.map((minutes) => (
                                 <button
@@ -213,7 +211,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                                             : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                                     }`}
                                 >
-                                    {minutes} min
+                                    {m.sprint_minutes({ minutes })}
                                 </button>
                             ))}
                             <label className="ml-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
@@ -222,10 +220,10 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                                     checked={twoHands}
                                     onChange={(event) => setTwoHands(event.target.checked)}
                                 />
-                                Two hands
+                                {m.sprint_two_hands()}
                             </label>
                             <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Key
+                                {m.sprint_key()}
                             </span>
                             {SPRINT_KEYS.map((option) => (
                                 <button
@@ -248,7 +246,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                         onClick={start}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
                     >
-                        {daily ? "Start today's challenge" : "Start sprint"}
+                        {daily ? m.sprint_start_daily() : m.sprint_start()}
                     </button>
                 </div>
             )}
@@ -257,7 +255,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                 <div className="flex items-end gap-8">
                     <div>
                         <div className="text-xs uppercase tracking-wide text-gray-400">
-                            Time left
+                            {m.sprint_time_left()}
                         </div>
                         <div className="font-mono text-4xl tabular-nums">
                             {formatClock(
@@ -266,18 +264,20 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                         </div>
                     </div>
                     <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-400">Correct</div>
+                        <div className="text-xs uppercase tracking-wide text-gray-400">
+                            {m.sprint_correct()}
+                        </div>
                         <div className="font-mono text-4xl tabular-nums">
                             {matcher.completedSteps}
                         </div>
                     </div>
                     {runState === "armed" && (
                         <p className="pb-2 text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                            Play{" "}
+                            {m.sprint_play_to_start_prefix()}
                             <span className="font-mono">
                                 {noteName(allHands[0]?.steps[0]?.pitches[0] ?? 0)}
-                            </span>{" "}
-                            to start.
+                            </span>
+                            {m.sprint_play_to_start_suffix()}
                         </p>
                     )}
                 </div>
@@ -285,18 +285,23 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
 
             {runState === "finished" && result && (
                 <div className="space-y-2 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
-                    <p className="text-lg font-semibold">{isRecord ? "New best! 🏆" : "Time!"}</p>
+                    <p className="text-lg font-semibold">
+                        {isRecord ? m.sprint_new_best() : m.sprint_time()}
+                    </p>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                        <span className="font-mono">{result.correct}</span> correct ·{" "}
-                        <span className="font-mono">{accuracy}%</span> accuracy ·{" "}
-                        <span className="text-red-600">{result.wrong} wrong</span>
+                        <span className="font-mono">{result.correct}</span>{" "}
+                        {m.sprint_correct_label()} · <span className="font-mono">{accuracy}%</span>{" "}
+                        {m.sprint_accuracy_label()} ·{" "}
+                        <span className="text-red-600">
+                            {m.sprint_wrong_label({ wrong: result.wrong })}
+                        </span>
                     </p>
                     <button
                         type="button"
                         onClick={start}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
                     >
-                        Go again
+                        {m.sprint_go_again()}
                     </button>
                     {daily &&
                         (() => {
@@ -307,7 +312,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                             return (
                                 <div className="flex flex-wrap items-center gap-2 pt-1">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        Share your score:
+                                        {m.sprint_share_score()}
                                     </span>
                                     <a
                                         href={`https://x.com/intent/post?text=${encodeURIComponent(text)}`}
@@ -334,7 +339,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                                         }}
                                         className={link}
                                     >
-                                        {copied ? "Copied!" : "Copy"}
+                                        {copied ? m.sprint_copied() : m.sprint_copy()}
                                     </button>
                                 </div>
                             );
@@ -345,9 +350,15 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
             {best && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                     {daily
-                        ? "Today's best: "
-                        : `Best in ${key} major, ${durationMin} min ${twoHands ? "(two hands)" : "(one hand)"}: `}
-                    <span className="font-mono">{best.correct}</span> correct
+                        ? m.sprint_best_daily()
+                        : m.sprint_best_config({
+                              key,
+                              minutes: durationMin,
+                              hands: twoHands
+                                  ? m.sprint_best_two_hands()
+                                  : m.sprint_best_one_hand(),
+                          })}
+                    <span className="font-mono">{best.correct}</span> {m.sprint_correct_label()}
                 </p>
             )}
 

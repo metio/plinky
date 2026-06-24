@@ -3,6 +3,7 @@
 
 import { useMidiConnection } from "../contexts/midi";
 import { noteName } from "../lib/midi";
+import { m } from "../paraglide/messages.js";
 import { KeyboardHint } from "./keyboardHint";
 
 function formatTime(ms: number): string {
@@ -27,16 +28,13 @@ export function MidiDebugPanel() {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">MIDI debug</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Connect a digital piano and confirm note events arrive in the browser.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.midi_debug_heading()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.midi_debug_intro()}</p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — Safari (macOS and iOS) is not supported.
+                    {m.midi_debug_unsupported()}
                 </p>
             )}
 
@@ -47,15 +45,17 @@ export function MidiDebugPanel() {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                 >
-                    {status === "ready" ? "Reconnect" : "Connect MIDI"}
+                    {status === "ready" ? m.midi_debug_reconnect() : m.midi_connect()}
                 </button>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {support === "unknown" && "Checking browser support…"}
-                    {status === "requesting" && "Requesting access…"}
+                    {support === "unknown" && m.midi_debug_checking()}
+                    {status === "requesting" && m.midi_debug_requesting()}
                     {status === "ready" &&
-                        `${devices.length} input${devices.length === 1 ? "" : "s"} connected`}
-                    {status === "denied" && "Access denied."}
-                    {status === "error" && (error ?? "Something went wrong.")}
+                        (devices.length === 1
+                            ? m.midi_debug_inputs_connected_one({ count: devices.length })
+                            : m.midi_debug_inputs_connected_other({ count: devices.length }))}
+                    {status === "denied" && m.midi_debug_denied()}
+                    {status === "error" && (error ?? m.midi_debug_error())}
                 </span>
             </div>
 
@@ -65,10 +65,10 @@ export function MidiDebugPanel() {
 
             <div>
                 <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Inputs
+                    {m.midi_debug_inputs()}
                 </h2>
                 {devices.length === 0 ? (
-                    <p className="text-sm text-gray-400">No inputs detected.</p>
+                    <p className="text-sm text-gray-400">{m.midi_debug_no_inputs()}</p>
                 ) : (
                     <ul className="space-y-1 text-sm">
                         {devices.map((device) => (
@@ -92,10 +92,10 @@ export function MidiDebugPanel() {
 
             <div>
                 <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Held notes
+                    {m.midi_debug_held_notes()}
                 </h2>
                 {heldNotes.length === 0 ? (
-                    <p className="text-sm text-gray-400">Press a key…</p>
+                    <p className="text-sm text-gray-400">{m.midi_debug_press_key()}</p>
                 ) : (
                     <div className="flex flex-wrap gap-2">
                         {heldNotes.map((note) => (
@@ -113,7 +113,7 @@ export function MidiDebugPanel() {
             <div>
                 <div className="mb-2 flex items-center justify-between">
                     <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        Event log
+                        {m.midi_debug_event_log()}
                     </h2>
                     <button
                         type="button"
@@ -121,21 +121,21 @@ export function MidiDebugPanel() {
                         disabled={events.length === 0}
                         className="text-xs text-gray-500 dark:text-gray-400 underline disabled:opacity-40"
                     >
-                        Clear
+                        {m.midi_debug_clear()}
                     </button>
                 </div>
                 {events.length === 0 ? (
-                    <p className="text-sm text-gray-400">Waiting for note events…</p>
+                    <p className="text-sm text-gray-400">{m.midi_debug_waiting()}</p>
                 ) : (
                     <table className="w-full font-mono text-xs">
                         <thead className="text-left text-gray-400">
                             <tr>
-                                <th className="py-1 pr-4 font-normal">Time</th>
-                                <th className="py-1 pr-4 font-normal">Type</th>
-                                <th className="py-1 pr-4 font-normal">Note</th>
-                                <th className="py-1 pr-4 font-normal">Vel</th>
-                                <th className="py-1 pr-4 font-normal">Ch</th>
-                                <th className="py-1 font-normal">Device</th>
+                                <th className="py-1 pr-4 font-normal">{m.midi_debug_col_time()}</th>
+                                <th className="py-1 pr-4 font-normal">{m.midi_debug_col_type()}</th>
+                                <th className="py-1 pr-4 font-normal">{m.midi_debug_col_note()}</th>
+                                <th className="py-1 pr-4 font-normal">{m.midi_debug_col_vel()}</th>
+                                <th className="py-1 pr-4 font-normal">{m.midi_debug_col_ch()}</th>
+                                <th className="py-1 font-normal">{m.midi_debug_col_device()}</th>
                             </tr>
                         </thead>
                         <tbody>

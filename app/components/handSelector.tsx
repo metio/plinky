@@ -3,6 +3,7 @@
 
 import { useMemo, useState } from "react";
 import type { Hand } from "../lib/hands";
+import { m } from "../paraglide/messages.js";
 
 // "both" plays every hand; a staff number restricts the run to that one hand,
 // for practicing a grand staff one hand at a time.
@@ -37,8 +38,8 @@ export function HandSelector({
         return null;
     }
     const options: { label: string; value: HandChoice }[] = [
-        { label: "Both hands", value: "both" },
-        ...hands.map((hand) => ({ label: `${hand.label} hand`, value: hand.staff })),
+        { label: m.hands_both(), value: "both" },
+        ...hands.map((hand) => ({ label: m.hands_one({ hand: hand.label }), value: hand.staff })),
     ];
     return (
         <div className="flex flex-wrap gap-2">

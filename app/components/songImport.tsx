@@ -5,6 +5,7 @@ import { useState } from "react";
 import { musicXmlToAbc } from "../lib/musicxml";
 import { buildExercise, parseTempo, saveUserSong } from "../lib/songs";
 import { buildSteps } from "../lib/steps";
+import { m } from "../paraglide/messages.js";
 
 // Render the ABC off-screen and count the steps it yields: anything the trainers
 // can play is accepted, so the generalized matcher decides what is importable.
@@ -25,8 +26,6 @@ async function playableSteps(abc: string): Promise<number> {
     }
 }
 
-const PLACEHOLDER = "Paste ABC notation, e.g.\nX:1\nT:My Tune\nM:4/4\nL:1/4\nK:C\nC D E F |";
-
 export function SongImport({
     existingIds,
     onAdded,
@@ -41,11 +40,11 @@ export function SongImport({
     const add = async () => {
         const abc = text.trim();
         if (!abc) {
-            setError("Paste some ABC notation first.");
+            setError(m.import_paste_first());
             return;
         }
         if ((await playableSteps(abc)) === 0) {
-            setError("No playable notes found — is this valid ABC?");
+            setError(m.import_no_notes());
             return;
         }
         saveUserSong(buildExercise(abc, existingIds));
@@ -73,7 +72,7 @@ export function SongImport({
                 setText(musicXmlToAbc(content));
                 setError(null);
             } catch (cause) {
-                setError(cause instanceof Error ? cause.message : "Could not read that file.");
+                setError(cause instanceof Error ? cause.message : m.import_read_error());
             }
         });
     };
@@ -85,7 +84,7 @@ export function SongImport({
                 onClick={() => setOpen(true)}
                 className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-                Import a song
+                {m.import_song()}
             </button>
         );
     }
@@ -96,7 +95,7 @@ export function SongImport({
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 rows={6}
-                placeholder={PLACEHOLDER}
+                placeholder={m.import_placeholder()}
                 className="w-full rounded-md border border-gray-300 dark:border-gray-700 p-2 font-mono text-sm"
             />
             <div className="flex flex-wrap items-center gap-3">
@@ -105,14 +104,14 @@ export function SongImport({
                     accept=".abc,.musicxml,.xml,text/plain,application/xml"
                     onChange={(event) => readFile(event.target.files?.[0])}
                     className="text-sm"
-                    title="Upload ABC or MusicXML"
+                    title={m.import_upload_title()}
                 />
                 <button
                     type="button"
                     onClick={add}
                     className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
                 >
-                    Add song
+                    {m.import_add_song()}
                 </button>
                 <button
                     type="button"
@@ -122,7 +121,7 @@ export function SongImport({
                     }}
                     className="text-sm text-gray-500 dark:text-gray-400 underline"
                 >
-                    Cancel
+                    {m.import_cancel()}
                 </button>
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}

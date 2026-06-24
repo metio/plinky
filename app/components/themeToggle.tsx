@@ -3,12 +3,13 @@
 
 import { useEffect, useState } from "react";
 import { applyTheme, loadTheme, saveTheme, type Theme } from "../lib/theme";
+import { m } from "../paraglide/messages.js";
 
 const ORDER: Theme[] = ["system", "light", "dark"];
-const LABEL: Record<Theme, string> = {
-    system: "🖥️ System",
-    light: "☀️ Light",
-    dark: "🌙 Dark",
+const LABEL: Record<Theme, () => string> = {
+    system: m.theme_system,
+    light: m.theme_light,
+    dark: m.theme_dark,
 };
 
 export function ThemeToggle() {
@@ -29,10 +30,10 @@ export function ThemeToggle() {
         <button
             type="button"
             onClick={cycle}
-            aria-label={`Theme: ${theme}. Click to change.`}
+            aria-label={m.theme_aria({ theme })}
             className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
         >
-            {LABEL[theme]}
+            {LABEL[theme]()}
         </button>
     );
 }

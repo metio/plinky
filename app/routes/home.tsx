@@ -197,7 +197,7 @@ export default function Home() {
                                         rel="noreferrer"
                                         className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 underline dark:text-gray-300"
                                     >
-                                        Submit
+                                        {m.action_submit()}
                                     </a>
                                     <button
                                         type="button"

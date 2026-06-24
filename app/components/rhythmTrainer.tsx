@@ -14,6 +14,7 @@ import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { type DynamicsSummary, summarizeDynamics } from "../lib/dynamics";
 import { type Hit, makeHit, type RhythmSummary, summarize } from "../lib/rhythm";
 import { isBetterRhythm, loadBestRhythm, type RhythmBest, saveBestRhythm } from "../lib/scores";
+import { m } from "../paraglide/messages.js";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { HandSelector, useHandSelection } from "./handSelector";
@@ -30,10 +31,14 @@ const RATING_STYLES: Record<Hit["rating"], string> = {
 
 function describeHit(hit: Hit): string {
     if (hit.rating === "perfect") {
-        return "Perfect";
+        return m.rhythm_perfect();
     }
-    const direction = hit.deltaMs < 0 ? "early" : "late";
-    return `${hit.rating === "good" ? "Good" : "Off"} · ${Math.abs(Math.round(hit.deltaMs))}ms ${direction}`;
+    const direction = hit.deltaMs < 0 ? m.rhythm_early() : m.rhythm_late();
+    return m.rhythm_hit({
+        rating: hit.rating === "good" ? m.rhythm_good() : m.rhythm_off(),
+        ms: Math.abs(Math.round(hit.deltaMs)),
+        direction,
+    });
 }
 
 export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
@@ -185,17 +190,17 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Rhythm · {exercise.title}</h1>
+                <h1 className="text-2xl font-semibold">
+                    {m.mode_rhythm()} · {exercise.title}
+                </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Play each note in time with the metronome at {exercise.tempo} bpm. One bar
-                    counts you in.
+                    {m.rhythm_intro({ tempo: exercise.tempo })}
                 </p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — or play with your computer keyboard below.
+                    {m.midi_unsupported_keyboard()}
                 </p>
             )}
 
@@ -206,7 +211,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
-                    {status === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
@@ -225,7 +230,7 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                         disabled={matcher.totalSteps === 0}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                     >
-                        {runState === "finished" ? "Go again" : "Start"}
+                        {runState === "finished" ? m.rhythm_go_again() : m.rhythm_start()}
                     </button>
                 ) : (
                     <button
@@ -233,22 +238,24 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
                         onClick={abort}
                         className="rounded-md border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
-                        Stop
+                        {m.rhythm_stop()}
                     </button>
                 )}
                 {metronome.running && (
                     <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />
                 )}
                 {runState === "counting" && (
-                    <span className="text-sm text-indigo-700 dark:text-indigo-300">Count-in…</span>
+                    <span className="text-sm text-indigo-700 dark:text-indigo-300">
+                        {m.rhythm_count_in()}
+                    </span>
                 )}
                 {runState === "armed" && (
                     <span className="text-sm text-indigo-700 dark:text-indigo-300">
-                        Play{" "}
+                        {m.rhythm_play_on_beat_prefix()}
                         <span className="font-mono">
                             {describeNext(matcher.nextByHand, noteName)}
-                        </span>{" "}
-                        on the beat.
+                        </span>
+                        {m.rhythm_play_on_beat_suffix()}
                     </span>
                 )}
             </div>
@@ -262,26 +269,45 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
             {runState === "finished" && summary && (
                 <div className="space-y-1 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 text-sm">
                     <p className="text-lg font-semibold">
-                        {isRecord ? "New best! 🏆" : `${summary.perfect}/${summary.total} perfect`}
+                        {isRecord
+                            ? m.rhythm_new_best()
+                            : m.rhythm_perfect_count({
+                                  perfect: summary.perfect,
+                                  total: summary.total,
+                              })}
                     </p>
                     <p className="text-gray-600 dark:text-gray-300">
-                        <span className="text-green-600">{summary.perfect} perfect</span> ·{" "}
-                        <span className="text-amber-600">{summary.good} good</span> ·{" "}
-                        <span className="text-red-600">{summary.off} off</span>
+                        <span className="text-green-600">
+                            {m.rhythm_perfect_label({ perfect: summary.perfect })}
+                        </span>{" "}
+                        ·{" "}
+                        <span className="text-amber-600">
+                            {m.rhythm_good_label({ good: summary.good })}
+                        </span>{" "}
+                        ·{" "}
+                        <span className="text-red-600">
+                            {m.rhythm_off_label({ off: summary.off })}
+                        </span>
                     </p>
                     <p className="text-gray-500 dark:text-gray-400">
-                        Average timing error {Math.round(summary.averageAbsMs)}ms
+                        {m.rhythm_avg_error({ ms: Math.round(summary.averageAbsMs) })}
                     </p>
                     {handSummaries.map((hand) => (
                         <p key={hand.label} className="text-gray-500 dark:text-gray-400">
-                            {hand.label} hand: {Math.round(hand.summary.averageAbsMs)}ms (
-                            {hand.summary.perfect}/{hand.summary.total} perfect)
+                            {m.rhythm_hand_breakdown({
+                                hand: hand.label,
+                                ms: Math.round(hand.summary.averageAbsMs),
+                                perfect: hand.summary.perfect,
+                                total: hand.summary.total,
+                            })}
                         </p>
                     ))}
                     {dynamics && (
                         <p className="text-gray-500 dark:text-gray-400">
-                            Dynamics: {dynamics.label} ({dynamics.evenness}% even) — a MIDI piano
-                            scores this from how evenly you strike the keys.
+                            {m.rhythm_dynamics({
+                                label: dynamics.label,
+                                evenness: dynamics.evenness,
+                            })}
                         </p>
                     )}
                 </div>
@@ -289,9 +315,11 @@ export function RhythmTrainer({ exercise }: { exercise: Exercise }) {
 
             {best && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Best: average timing error{" "}
-                    <span className="font-mono">{Math.round(best.averageAbsMs)}ms</span> (
-                    {best.perfect}/{best.total} perfect)
+                    {m.rhythm_best({
+                        ms: Math.round(best.averageAbsMs),
+                        perfect: best.perfect,
+                        total: best.total,
+                    })}
                 </p>
             )}
 

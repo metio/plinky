@@ -3,9 +3,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { exportAllPack, importSongsPack, loadUserSongs } from "../lib/songs";
+import { m } from "../paraglide/messages.js";
 
-function plural(count: number, noun: string): string {
-    return `${count} ${noun}${count === 1 ? "" : "s"}`;
+function pluralSongs(count: number): string {
+    return count === 1 ? m.backup_songs_one({ count }) : m.backup_songs_other({ count });
+}
+
+function pluralCurriculums(count: number): string {
+    return count === 1
+        ? m.backup_curriculums_one({ count })
+        : m.backup_curriculums_other({ count });
 }
 
 // Back up and restore the local song library as a Plinky song pack: a "download
@@ -36,25 +43,28 @@ export function SongBackup() {
         }
         try {
             const result = importSongsPack(await file.text());
-            const parts = [`Imported ${plural(result.imported, "song")}`];
+            const parts = [m.backup_imported_songs({ count: pluralSongs(result.imported) })];
             if (result.curriculums > 0) {
-                parts.push(`and ${plural(result.curriculums, "curriculum")}`);
+                parts.push(
+                    m.backup_imported_curriculums({
+                        count: pluralCurriculums(result.curriculums),
+                    }),
+                );
             }
             setStatus(`${parts.join(" ")}.`);
             setCount(loadUserSongs().length);
         } catch (error) {
-            setStatus(error instanceof Error ? error.message : "That file could not be imported.");
+            setStatus(error instanceof Error ? error.message : m.backup_import_error());
         }
     };
 
     return (
         <section className="space-y-3">
             <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
-                Songs &amp; backup
+                {m.backup_heading()}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-                Your songs are saved only on this device — {plural(count, "song")} so far. Download
-                a backup, or import a song pack (such as a curriculum shared by a teacher).
+                {m.backup_intro({ count: pluralSongs(count) })}
             </p>
             <div className="flex flex-wrap gap-2">
                 <button
@@ -63,14 +73,14 @@ export function SongBackup() {
                     disabled={count === 0}
                     className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300"
                 >
-                    Download all songs
+                    {m.backup_download()}
                 </button>
                 <button
                     type="button"
                     onClick={() => fileRef.current?.click()}
                     className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                 >
-                    Import a song pack
+                    {m.backup_import()}
                 </button>
                 <input
                     ref={fileRef}

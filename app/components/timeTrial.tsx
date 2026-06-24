@@ -12,6 +12,7 @@ import type { Exercise } from "../lib/exercises";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { loadBest, saveBest, scoreFor, type TrialResult } from "../lib/scores";
+import { m } from "../paraglide/messages.js";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { HandSelector, useHandSelection } from "./handSelector";
@@ -150,17 +151,15 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Time trial · {exercise.title}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Play the phrase as fast and cleanly as you can. The clock starts on your first
-                    note.
-                </p>
+                <h1 className="text-2xl font-semibold">
+                    {m.mode_time_trial()} · {exercise.title}
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.timetrial_intro()}</p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — or play with your computer keyboard below.
+                    {m.midi_unsupported_keyboard()}
                 </p>
             )}
 
@@ -171,7 +170,7 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 disabled:opacity-40"
                 >
-                    {status === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
@@ -184,15 +183,21 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
 
             <div className="flex items-end gap-8">
                 <div>
-                    <div className="text-xs uppercase tracking-wide text-gray-400">Time</div>
+                    <div className="text-xs uppercase tracking-wide text-gray-400">
+                        {m.timetrial_time()}
+                    </div>
                     <div className="font-mono text-4xl tabular-nums">{formatMs(liveTime)}</div>
                 </div>
                 <div>
-                    <div className="text-xs uppercase tracking-wide text-gray-400">Errors</div>
+                    <div className="text-xs uppercase tracking-wide text-gray-400">
+                        {m.timetrial_errors()}
+                    </div>
                     <div className="font-mono text-4xl tabular-nums">{errors}</div>
                 </div>
                 <div>
-                    <div className="text-xs uppercase tracking-wide text-gray-400">Progress</div>
+                    <div className="text-xs uppercase tracking-wide text-gray-400">
+                        {m.timetrial_progress()}
+                    </div>
                     <div className="font-mono text-4xl tabular-nums">
                         {matcher.completedSteps}/{matcher.totalSteps}
                     </div>
@@ -206,22 +211,22 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
                     disabled={matcher.totalSteps === 0}
                     className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                 >
-                    Start time trial
+                    {m.timetrial_start()}
                 </button>
             )}
 
             {runState === "counting" && (
                 <div className="flex items-center gap-3 text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                    <span>Count-in…</span>
+                    <span>{m.timetrial_count_in()}</span>
                     <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />
                 </div>
             )}
 
             {runState === "armed" && (
                 <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                    Ready — play{" "}
-                    <span className="font-mono">{describeNext(matcher.nextByHand, noteName)}</span>{" "}
-                    to start the clock.
+                    {m.timetrial_ready_prefix()}
+                    <span className="font-mono">{describeNext(matcher.nextByHand, noteName)}</span>
+                    {m.timetrial_ready_suffix()}
                 </p>
             )}
 
@@ -232,28 +237,48 @@ export function TimeTrial({ exercise }: { exercise: Exercise }) {
             {runState === "finished" && result && (
                 <div className="space-y-2 rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4">
                     {isRecord ? (
-                        <p className="text-lg font-semibold text-green-600">New record! 🏆</p>
+                        <p className="text-lg font-semibold text-green-600">
+                            {m.timetrial_new_record()}
+                        </p>
                     ) : (
-                        <p className="text-lg font-semibold">Done!</p>
+                        <p className="text-lg font-semibold">{m.timetrial_done()}</p>
                     )}
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {formatMs(result.timeMs)} · {result.errors}{" "}
-                        {result.errors === 1 ? "error" : "errors"} · score {formatMs(result.score)}
+                        {result.errors === 1
+                            ? m.timetrial_result_one_error({
+                                  time: formatMs(result.timeMs),
+                                  errors: result.errors,
+                                  score: formatMs(result.score),
+                              })
+                            : m.timetrial_result_errors({
+                                  time: formatMs(result.timeMs),
+                                  errors: result.errors,
+                                  score: formatMs(result.score),
+                              })}
                     </p>
                     <button
                         type="button"
                         onClick={start}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
                     >
-                        Try again
+                        {m.timetrial_try_again()}
                     </button>
                 </div>
             )}
 
             {best && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Best: <span className="font-mono">{formatMs(best.score)}</span> (
-                    {formatMs(best.timeMs)}, {best.errors} {best.errors === 1 ? "error" : "errors"})
+                    {m.timetrial_best_prefix()}{" "}
+                    <span className="font-mono">{formatMs(best.score)}</span>
+                    {best.errors === 1
+                        ? m.timetrial_best_one_error({
+                              time: formatMs(best.timeMs),
+                              errors: best.errors,
+                          })
+                        : m.timetrial_best_errors({
+                              time: formatMs(best.timeMs),
+                              errors: best.errors,
+                          })}
                 </p>
             )}
 

@@ -10,6 +10,7 @@ import { useSynth } from "../hooks/useSynth";
 import type { Exercise } from "../lib/exercises";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { m } from "../paraglide/messages.js";
 import { AbcRenderer } from "./abcRenderer";
 import { BeatIndicator } from "./beatIndicator";
 import { HandSelector, useHandSelection } from "./handSelector";
@@ -72,14 +73,13 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{exercise.title}</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Play the highlighted note. The cursor advances when you hit the right key.
+                    {m.play_play_highlighted()}
                 </p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android.
+                    {m.midi_unsupported()}
                 </p>
             )}
 
@@ -90,7 +90,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                     disabled={support !== "supported" || status === "requesting"}
                     className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                 >
-                    {status === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
@@ -102,10 +102,10 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                     onClick={toggleMetronome}
                     className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                    {metronome.running ? "Stop metronome" : "Metronome"}
+                    {metronome.running ? m.play_stop_metronome() : m.play_metronome()}
                 </button>
                 <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    Tempo
+                    {m.play_tempo()}
                     <input
                         type="range"
                         min={40}
@@ -113,7 +113,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                         value={bpm}
                         onChange={(event) => changeTempo(Number(event.target.value))}
                     />
-                    <span className="w-16 font-mono">{bpm} bpm</span>
+                    <span className="w-16 font-mono">{m.home_bpm({ tempo: bpm })}</span>
                 </label>
                 {metronome.running && (
                     <BeatIndicator beat={metronome.beat} beatsPerBar={exercise.beatsPerBar} />
@@ -122,15 +122,15 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
 
             <div className="flex items-center gap-6">
                 <div className="text-sm">
-                    <span className="font-medium">Progress:</span> {matcher.completedSteps} /{" "}
-                    {matcher.totalSteps}
+                    <span className="font-medium">{m.play_progress()}</span>{" "}
+                    {matcher.completedSteps} / {matcher.totalSteps}
                 </div>
                 {matcher.done ? (
-                    <div className="text-sm font-semibold text-green-600">Complete! 🎉</div>
+                    <div className="text-sm font-semibold text-green-600">{m.play_complete()}</div>
                 ) : (
                     matcher.nextByHand.length > 0 && (
                         <div className="text-sm">
-                            <span className="font-medium">Next:</span>{" "}
+                            <span className="font-medium">{m.play_next()}</span>{" "}
                             <span className="font-mono text-indigo-700 dark:text-indigo-300">
                                 {describeNext(matcher.nextByHand, noteName)}
                             </span>
@@ -158,7 +158,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                 disabled={matcher.completedSteps === 0}
                 className="text-sm text-gray-500 dark:text-gray-400 underline disabled:opacity-40"
             >
-                Restart
+                {m.play_restart()}
             </button>
         </section>
     );

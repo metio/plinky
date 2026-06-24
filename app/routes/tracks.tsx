@@ -7,6 +7,7 @@ import { loadBest, loadBestRhythm } from "../lib/scores";
 import { routeMeta } from "../lib/site";
 import { loadUserSongs } from "../lib/songs";
 import { type Track, type TrackStep, TRACKS, trackSteps } from "../lib/tracks";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/tracks";
 
 export function meta(_args: Route.MetaArgs) {
@@ -101,7 +102,7 @@ function TrackPath({
             <div className="flex items-baseline justify-between gap-2">
                 <h3 className={`font-semibold ${accent.label}`}>{track.name}</h3>
                 <span className="font-mono text-xs text-gray-400">
-                    {track.minutes ? `~${track.minutes} min · ` : ""}
+                    {track.minutes ? m.tracks_minutes_prefix({ minutes: track.minutes }) : ""}
                     {doneCount}/{steps.length}
                 </span>
             </div>
@@ -157,11 +158,8 @@ export default function TracksRoute() {
     return (
         <main className="mx-auto max-w-5xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Tracks</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Follow a path downward. Everything stays unlocked — the order is a suggestion
-                    and the markers show what you've already set a score on.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.tracks_heading()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.tracks_intro()}</p>
             </header>
 
             <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -176,7 +174,7 @@ export default function TracksRoute() {
             </div>
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                Back home
+                {m.action_back_home()}
             </Link>
         </main>
     );

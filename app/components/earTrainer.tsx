@@ -6,6 +6,7 @@ import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import { nextEarNote } from "../lib/ear";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { m } from "../paraglide/messages.js";
 import { KeyboardHint } from "./keyboardHint";
 import { PianoKeyboard } from "./pianoKeyboard";
 
@@ -84,17 +85,13 @@ export function EarTrainer() {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">Ear training</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Listen to a note, then find it by ear. Any octave counts — you are matching the
-                    note, not the key.
-                </p>
+                <h1 className="text-2xl font-semibold">{m.ear_heading()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.ear_intro()}</p>
             </header>
 
             {support === "unsupported" && (
                 <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on
-                    desktop or Android — or play with your computer keyboard below.
+                    {m.midi_unsupported_keyboard()}
                 </p>
             )}
 
@@ -105,7 +102,7 @@ export function EarTrainer() {
                     disabled={support !== "supported" || midiStatus === "requesting"}
                     className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-40 dark:bg-gray-800 dark:text-gray-300"
                 >
-                    {midiStatus === "requesting" ? "Connecting…" : "Connect MIDI"}
+                    {midiStatus === "requesting" ? m.midi_connecting() : m.midi_connect()}
                 </button>
             )}
 
@@ -116,7 +113,7 @@ export function EarTrainer() {
                         onClick={start}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
                     >
-                        Start ear training
+                        {m.ear_start()}
                     </button>
                 ) : (
                     <button
@@ -124,13 +121,13 @@ export function EarTrainer() {
                         onClick={() => target !== null && playTarget(target)}
                         className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                     >
-                        🔊 Hear it again
+                        {m.ear_hear_again()}
                     </button>
                 )}
                 {attempts > 0 && (
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                         <span className="font-mono">{correct}</span>/
-                        <span className="font-mono">{attempts}</span> correct ·{" "}
+                        <span className="font-mono">{attempts}</span> {m.sprint_correct_label()} ·{" "}
                         <span className="font-mono">{accuracy}%</span>
                     </span>
                 )}
@@ -138,16 +135,18 @@ export function EarTrainer() {
 
             {status === "listening" && (
                 <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                    Which note did you hear? Play it.
+                    {m.ear_which_note()}
                     {wrong !== null && (
                         <span className="ml-2 text-red-600">
-                            Not {noteName(wrong)} — try again.
+                            {m.ear_not_note({ note: noteName(wrong) })}
                         </span>
                     )}
                 </p>
             )}
             {status === "correct" && target !== null && (
-                <p className="text-sm font-semibold text-green-600">✓ It was {noteName(target)}!</p>
+                <p className="text-sm font-semibold text-green-600">
+                    {m.ear_correct({ note: noteName(target) })}
+                </p>
             )}
 
             <PianoKeyboard expected={[]} />
