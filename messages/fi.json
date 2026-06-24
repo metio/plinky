@@ -257,5 +257,9 @@
   "songs_count": "{count} kappaletta",
   "songs_empty": "Hakuasi ei vastaa yksikään kappale.",
   "songs_favorite": "Lisää suosikkeihin",
-  "songs_unfavorite": "Poista suosikeista"
+  "songs_unfavorite": "Poista suosikeista",
+  "scores_heading": "Nuotit",
+  "scores_intro": "Public domain -pianonuotteja, renderöitynä ja soitettuna suoraan selaimessasi.",
+  "scores_empty": "Ei vielä nuotteja.",
+  "scores_tempo": "Tempo"
 }

@@ -15,6 +15,7 @@ export default {
         "/daily",
         "/ear",
         "/songs",
+        "/scores",
         "/curriculums",
         "/tracks",
         "/progress",

@@ -257,5 +257,9 @@
   "songs_count": "{count} skladieb",
   "songs_empty": "Žiadna skladba nezodpovedá vášmu hľadaniu.",
   "songs_favorite": "Pridať k obľúbeným",
-  "songs_unfavorite": "Odstrániť z obľúbených"
+  "songs_unfavorite": "Odstrániť z obľúbených",
+  "scores_heading": "Noty",
+  "scores_intro": "Klavírne noty z voľného diela, zobrazené a prehrané priamo v prehliadači.",
+  "scores_empty": "Zatiaľ žiadne noty.",
+  "scores_tempo": "Tempo"
 }

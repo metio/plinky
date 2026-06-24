@@ -257,5 +257,9 @@
   "songs_count": "{count} melodii",
   "songs_empty": "Nicio melodie nu se potrivește căutării.",
   "songs_favorite": "Adaugă la favorite",
-  "songs_unfavorite": "Elimină din favorite"
+  "songs_unfavorite": "Elimină din favorite",
+  "scores_heading": "Partituri",
+  "scores_intro": "Partituri de pian din domeniul public, afișate și redate direct în browser.",
+  "scores_empty": "Încă nu ai partituri.",
+  "scores_tempo": "Tempo"
 }

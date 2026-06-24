@@ -257,5 +257,9 @@
   "songs_count": "{count} sanger",
   "songs_empty": "Ingen sanger samsvarer med søket ditt.",
   "songs_favorite": "Legg til i favoritter",
-  "songs_unfavorite": "Fjern fra favoritter"
+  "songs_unfavorite": "Fjern fra favoritter",
+  "scores_heading": "Noter",
+  "scores_intro": "Pianonoter i offentlig eie, gjengitt og spilt rett i nettleseren din.",
+  "scores_empty": "Ingen noter ennå.",
+  "scores_tempo": "Tempo"
 }

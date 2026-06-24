@@ -257,5 +257,9 @@
   "songs_count": "{count} músicas",
   "songs_empty": "Nenhuma música corresponde à sua pesquisa.",
   "songs_favorite": "Adicionar aos favoritos",
-  "songs_unfavorite": "Remover dos favoritos"
+  "songs_unfavorite": "Remover dos favoritos",
+  "scores_heading": "Partituras",
+  "scores_intro": "Partituras de piano de domínio público, renderizadas e tocadas diretamente no seu navegador.",
+  "scores_empty": "Ainda não há partituras.",
+  "scores_tempo": "Andamento"
 }

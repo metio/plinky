@@ -257,5 +257,9 @@
   "songs_count": "{count} 首乐曲",
   "songs_empty": "没有乐曲符合你的搜索。",
   "songs_favorite": "添加到收藏",
-  "songs_unfavorite": "从收藏中移除"
+  "songs_unfavorite": "从收藏中移除",
+  "scores_heading": "乐谱",
+  "scores_intro": "公有领域钢琴乐谱，直接在你的浏览器中渲染和播放。",
+  "scores_empty": "暂无乐谱。",
+  "scores_tempo": "速度"
 }
