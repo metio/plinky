@@ -264,5 +264,7 @@
   "scores_tempo": "テンポ",
   "scores_accuracy": "正確さ",
   "scores_timing": "タイミング",
-  "scores_dynamics": "強弱"
+  "scores_dynamics": "強弱",
+  "scores_ghost": "お手本",
+  "scores_you": "あなた"
 }

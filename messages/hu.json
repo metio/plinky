@@ -45,6 +45,8 @@
   "scores_accuracy": "Pontosság",
   "scores_timing": "Ritmus",
   "scores_dynamics": "Dinamika",
+  "scores_ghost": "Ideális",
+  "scores_you": "Te",
   "play_sprint": "Lapról olvasó sprint",
   "play_sprint_blurb": "Minden futamban új hangok — játssz le minél többet, mielőtt lejár az idő.",
   "play_daily": "Napi kihívás",

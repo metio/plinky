@@ -264,5 +264,7 @@
   "scores_tempo": "速度",
   "scores_accuracy": "准确度",
   "scores_timing": "节奏",
-  "scores_dynamics": "力度"
+  "scores_dynamics": "力度",
+  "scores_ghost": "理想",
+  "scores_you": "你"
 }

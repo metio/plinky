@@ -264,5 +264,7 @@
   "scores_tempo": "Tempo",
   "scores_accuracy": "Acuratețe",
   "scores_timing": "Sincronizare",
-  "scores_dynamics": "Nuanțe"
+  "scores_dynamics": "Nuanțe",
+  "scores_ghost": "Ideal",
+  "scores_you": "Tu"
 }

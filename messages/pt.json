@@ -264,5 +264,7 @@
   "scores_tempo": "Andamento",
   "scores_accuracy": "Precisão",
   "scores_timing": "Sincronia",
-  "scores_dynamics": "Dinâmica"
+  "scores_dynamics": "Dinâmica",
+  "scores_ghost": "Ideal",
+  "scores_you": "Você"
 }

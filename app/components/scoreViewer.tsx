@@ -7,9 +7,11 @@ import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
+import type { TimelineNote } from "../lib/ghost";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
-import { type Hit, makeHit, summarize } from "../lib/rhythm";
+import { makeHit, summarize } from "../lib/rhythm";
 import { m } from "../paraglide/messages.js";
+import { GhostTimeline } from "./ghostTimeline";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 const BUTTON =
@@ -24,7 +26,7 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     const tempoRef = useRef(100);
-    const hits = useRef<Hit[]>([]);
+    const timelineRef = useRef<TimelineNote[]>([]);
     const velocities = useRef<number[]>([]);
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
@@ -33,6 +35,7 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
     const [playing, setPlaying] = useState(false);
     const [tempo, setTempo] = useState(100);
     const [grade, setGrade] = useState<Grade | null>(null);
+    const [timeline, setTimeline] = useState<TimelineNote[]>([]);
 
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
@@ -41,17 +44,22 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
                 synth.playNote(pitch);
             }
             velocities.current.push(info.velocity);
-            // Grade timing relative to the first note: compare how far each note
-            // landed from its notated offset against where it should have been.
+            // Record each note's notated time (the ghost) and when it was actually
+            // played, both relative to the first note, for grading and the timeline.
             if (info.ordinal === 0) {
                 startRef.current = info.timestamp;
                 baseOffsetRef.current = info.timeMs;
-                hits.current = [makeHit(0, 0)];
+                timelineRef.current = [{ ordinal: 0, targetMs: 0, playedMs: 0 }];
                 return;
             }
-            const target = info.timeMs - baseOffsetRef.current;
-            const actual = info.timestamp - startRef.current;
-            hits.current = [...hits.current, makeHit(info.ordinal, actual - target)];
+            timelineRef.current = [
+                ...timelineRef.current,
+                {
+                    ordinal: info.ordinal,
+                    targetMs: info.timeMs - baseOffsetRef.current,
+                    playedMs: info.timestamp - startRef.current,
+                },
+            ];
         },
     });
     useMidiInput({
@@ -72,14 +80,18 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
             return;
         }
         const hasDynamics = new Set(velocities.current).size > 1;
+        const hits = timelineRef.current.map((note) =>
+            makeHit(note.ordinal, note.playedMs - note.targetMs),
+        );
         setGrade(
             computeGrade({
                 correct: matcher.total,
                 wrong: matcher.wrong,
-                rhythm: summarize(hits.current),
+                rhythm: summarize(hits),
                 dynamics: hasDynamics ? summarizeDynamics(velocities.current) : null,
             }),
         );
+        setTimeline(timelineRef.current);
     }, [matcher.complete, matcher.total, matcher.wrong]);
 
     const stopListen = () => {
@@ -157,9 +169,10 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
 
     const practice = () => {
         stopListen();
-        hits.current = [];
+        timelineRef.current = [];
         velocities.current = [];
         setGrade(null);
+        setTimeline([]);
         matcher.start();
     };
 
@@ -221,20 +234,31 @@ export function ScoreViewer({ xml, title }: { xml: string; title: string }) {
             )}
 
             {grade && (
-                <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
-                    <div className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}>
-                        {grade.letter}
+                <div className="space-y-3">
+                    <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
+                        <div
+                            className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}
+                        >
+                            {grade.letter}
+                        </div>
+                        <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
+                            <dt className="text-gray-500 dark:text-gray-400">
+                                {m.scores_accuracy()}
+                            </dt>
+                            <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>
+                            <dt className="text-gray-500 dark:text-gray-400">
+                                {m.scores_timing()}
+                            </dt>
+                            <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
+                            <dt className="text-gray-500 dark:text-gray-400">
+                                {m.scores_dynamics()}
+                            </dt>
+                            <dd className="text-right font-mono tabular-nums">
+                                {grade.dynamics === null ? "—" : `${grade.dynamics}%`}
+                            </dd>
+                        </dl>
                     </div>
-                    <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
-                        <dt className="text-gray-500 dark:text-gray-400">{m.scores_accuracy()}</dt>
-                        <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>
-                        <dt className="text-gray-500 dark:text-gray-400">{m.scores_timing()}</dt>
-                        <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
-                        <dt className="text-gray-500 dark:text-gray-400">{m.scores_dynamics()}</dt>
-                        <dd className="text-right font-mono tabular-nums">
-                            {grade.dynamics === null ? "—" : `${grade.dynamics}%`}
-                        </dd>
-                    </dl>
+                    <GhostTimeline notes={timeline} />
                 </div>
             )}
 

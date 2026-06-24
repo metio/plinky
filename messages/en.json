@@ -45,6 +45,8 @@
   "scores_accuracy": "Accuracy",
   "scores_timing": "Timing",
   "scores_dynamics": "Dynamics",
+  "scores_ghost": "Ideal",
+  "scores_you": "You",
   "play_sprint": "Sight-reading sprint",
   "play_sprint_blurb": "Fresh notes every run — play as many as you can before the timer runs out.",
   "play_daily": "Daily challenge",

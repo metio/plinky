@@ -264,5 +264,7 @@
   "scores_tempo": "Темп",
   "scores_accuracy": "Точність",
   "scores_timing": "Ритм",
-  "scores_dynamics": "Динаміка"
+  "scores_dynamics": "Динаміка",
+  "scores_ghost": "Ідеал",
+  "scores_you": "Ти"
 }

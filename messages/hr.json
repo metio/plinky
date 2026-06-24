@@ -264,5 +264,7 @@
   "scores_tempo": "Tempo",
   "scores_accuracy": "Preciznost",
   "scores_timing": "Ritam",
-  "scores_dynamics": "Dinamika"
+  "scores_dynamics": "Dinamika",
+  "scores_ghost": "Idealno",
+  "scores_you": "Ti"
 }

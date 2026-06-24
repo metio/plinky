@@ -264,5 +264,7 @@
   "scores_tempo": "Τέμπο",
   "scores_accuracy": "Ακρίβεια",
   "scores_timing": "Συγχρονισμός",
-  "scores_dynamics": "Δυναμική"
+  "scores_dynamics": "Δυναμική",
+  "scores_ghost": "Ιδανικό",
+  "scores_you": "Εσύ"
 }

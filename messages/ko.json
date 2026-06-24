@@ -264,5 +264,7 @@
   "scores_tempo": "템포",
   "scores_accuracy": "정확도",
   "scores_timing": "타이밍",
-  "scores_dynamics": "셈여림"
+  "scores_dynamics": "셈여림",
+  "scores_ghost": "이상",
+  "scores_you": "나"
 }
