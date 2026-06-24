@@ -59,9 +59,10 @@ describe("Scores", () => {
                 window.__plinky?.release(note);
             });
         }
-        // A clean run (no wrong notes) grades 100% accuracy and shows the grade card.
+        // A clean run (no wrong notes) grades 100% accuracy and flow.
         expect(await screen.findByText("Accuracy")).toBeTruthy();
-        expect(screen.getByText("100%")).toBeTruthy();
+        expect(screen.getByText("Flow")).toBeTruthy();
+        expect(screen.getAllByText("100%").length).toBeGreaterThan(0);
         // The ghost-timing timeline plots the run (ghost vs you).
         expect(screen.getByText("Ideal")).toBeTruthy();
         expect(screen.getByText("You")).toBeTruthy();

@@ -44,9 +44,13 @@ export function letterMin(letter: Letter): number {
         case "A":
             return 85;
         case "B":
-            return 70;
+            return 75;
         case "C":
-            return 50;
+            return 65;
+        case "D":
+            return 55;
+        case "E":
+            return 40;
         default:
             return 0;
     }

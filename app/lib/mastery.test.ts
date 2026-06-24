@@ -11,7 +11,8 @@ describe("letterMin", () => {
     it("maps a letter to the lowest score that earns it", () => {
         expect(letterMin("S")).toBe(95);
         expect(letterMin("A")).toBe(85);
-        expect(letterMin("D")).toBe(0);
+        expect(letterMin("D")).toBe(55);
+        expect(letterMin("F")).toBe(0);
     });
 });
 

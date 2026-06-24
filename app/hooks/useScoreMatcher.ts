@@ -32,6 +32,9 @@ export type CorrectInfo = {
     timestamp: number;
     timeMs: number;
     velocity: number;
+    // True when the position was cleared with no wrong note since the previous
+    // one — the signal the Flow metric is built from.
+    cleanFirstTry: boolean;
 };
 
 export function useScoreMatcher(
@@ -47,6 +50,7 @@ export function useScoreMatcher(
     const [complete, setComplete] = useState(false);
     const hit = useRef<Set<number>>(new Set());
     const ordinalRef = useRef(0);
+    const sinceWrong = useRef(0);
     const practicingRef = useRef(false);
     const optionsRef = useRef(options);
     optionsRef.current = options;
@@ -81,6 +85,7 @@ export function useScoreMatcher(
         osmd.cursor.show();
         hit.current.clear();
         ordinalRef.current = 0;
+        sinceWrong.current = 0;
         practicingRef.current = true;
         setTotal(count);
         setDone(0);
@@ -100,6 +105,7 @@ export function useScoreMatcher(
             const expectedNow = pitchesAtCursor(osmd);
             if (!expectedNow.includes(note)) {
                 setWrong((value) => value + 1);
+                sinceWrong.current += 1;
                 return;
             }
             hit.current.add(note);
@@ -116,8 +122,10 @@ export function useScoreMatcher(
                 timestamp,
                 timeMs,
                 velocity,
+                cleanFirstTry: sinceWrong.current === 0,
             });
             ordinalRef.current += 1;
+            sinceWrong.current = 0;
             hit.current.clear();
             osmd.cursor.next();
             advancePastRests(osmd);

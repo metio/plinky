@@ -45,6 +45,7 @@
   "scores_accuracy": "Accuracy",
   "scores_timing": "Timing",
   "scores_dynamics": "Dynamics",
+  "scores_flow": "Flow",
   "scores_ghost": "Ideal",
   "scores_you": "You",
   "mastery_learned": "Learned",

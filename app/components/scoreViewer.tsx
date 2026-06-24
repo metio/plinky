@@ -7,6 +7,7 @@ import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
+import { computeFlow } from "../lib/flow";
 import type { TimelineNote } from "../lib/ghost";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
 import {
@@ -49,6 +50,7 @@ export function ScoreViewer({
     const tempoRef = useRef(100);
     const timelineRef = useRef<TimelineNote[]>([]);
     const velocities = useRef<number[]>([]);
+    const cleanRef = useRef<boolean[]>([]);
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
     const synth = useSynth();
@@ -70,6 +72,7 @@ export function ScoreViewer({
                 synth.playNote(pitch);
             }
             velocities.current.push(info.velocity);
+            cleanRef.current.push(info.cleanFirstTry);
             // Record each note's notated time (the ghost) and when it was actually
             // played, both relative to the first note, for grading and the timeline.
             if (info.ordinal === 0) {
@@ -113,6 +116,7 @@ export function ScoreViewer({
             correct: matcher.total,
             wrong: matcher.wrong,
             rhythm: summarize(hits),
+            flow: computeFlow(cleanRef.current),
             dynamics: hasDynamics ? summarizeDynamics(velocities.current) : null,
         });
         setGrade(result);
@@ -217,6 +221,7 @@ export function ScoreViewer({
         stopListen();
         timelineRef.current = [];
         velocities.current = [];
+        cleanRef.current = [];
         setGrade(null);
         setTimeline([]);
         matcher.start();
@@ -326,12 +331,18 @@ export function ScoreViewer({
                                 {m.scores_timing()}
                             </dt>
                             <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
-                            <dt className="text-gray-500 dark:text-gray-400">
-                                {m.scores_dynamics()}
-                            </dt>
-                            <dd className="text-right font-mono tabular-nums">
-                                {grade.dynamics === null ? "—" : `${grade.dynamics}%`}
-                            </dd>
+                            <dt className="text-gray-500 dark:text-gray-400">{m.scores_flow()}</dt>
+                            <dd className="text-right font-mono tabular-nums">{grade.flow}%</dd>
+                            {grade.dynamics !== null && (
+                                <>
+                                    <dt className="text-gray-400 dark:text-gray-500">
+                                        {m.scores_dynamics()}
+                                    </dt>
+                                    <dd className="text-right font-mono tabular-nums text-gray-500 dark:text-gray-400">
+                                        {grade.dynamics}%
+                                    </dd>
+                                </>
+                            )}
                         </dl>
                     </div>
                     <GhostTimeline notes={timeline} />
