@@ -34,8 +34,9 @@ describe("Songs", () => {
         expect(screen.getByText("Alpha")).toBeTruthy();
         expect(screen.getByText("Beta")).toBeTruthy();
 
+        // Lower-case query exercises the case-insensitive match against "Alpha".
         fireEvent.change(screen.getByPlaceholderText("Search songs…"), {
-            target: { value: "alph" },
+            target: { value: "alpha" },
         });
         expect(screen.getByText("Alpha")).toBeTruthy();
         expect(screen.queryByText("Beta")).toBeNull();
