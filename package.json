@@ -18,7 +18,9 @@
     "test:storybook": "npm run messages && vitest run --project storybook",
     "storybook": "npm run messages && storybook dev -p 6006",
     "build-storybook": "npm run messages && storybook build",
-    "og": "node dev/make-og.mjs"
+    "og": "node dev/make-og.mjs",
+    "a11y:light": "npm run build && A11Y_MODE=light node dev/a11y.mjs",
+    "a11y:dark": "npm run build && A11Y_MODE=dark node dev/a11y.mjs"
   },
   "dependencies": {
     "@react-router/node": "^8.0.1",
@@ -44,6 +46,7 @@
     "@vitest/browser": "^4.1.9",
     "@vitest/browser-playwright": "^4.1.9",
     "@vitest/coverage-istanbul": "^4.1.9",
+    "axe-core": "^4.12.1",
     "jsdom": "^29.1.1",
     "knip": "^5.0.0",
     "playwright": "^1.50.0",

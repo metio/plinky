@@ -37,7 +37,7 @@ export default function Settings() {
             </header>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.settings_appearance()}
                 </h2>
                 <div className="flex items-center justify-between">
@@ -55,7 +55,7 @@ export default function Settings() {
             </section>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.settings_sound()}
                 </h2>
                 <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
@@ -72,6 +72,7 @@ export default function Settings() {
                     </span>
                     <input
                         type="range"
+                        aria-label={m.settings_volume()}
                         min={0}
                         max={100}
                         value={prefs.volume}
@@ -94,14 +95,14 @@ export default function Settings() {
             <SongBackup />
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.settings_midi_device()}
                 </h2>
                 <MidiDebugPanel />
             </section>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.settings_help()}
                 </h2>
                 <a

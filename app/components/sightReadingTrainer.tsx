@@ -138,7 +138,7 @@ export function SightReadingTrainer({ exercise }: { exercise: Exercise }) {
                     )
                 )}
                 {matcher.wrongNote !== null && (
-                    <div className="text-sm font-medium text-red-600">
+                    <div className="text-sm font-medium text-red-600 dark:text-red-400">
                         ✗ {noteName(matcher.wrongNote)}
                     </div>
                 )}

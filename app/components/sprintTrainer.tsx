@@ -254,7 +254,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
             {(runState === "armed" || runState === "running") && (
                 <div className="flex items-end gap-8">
                     <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-400">
+                        <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                             {m.sprint_time_left()}
                         </div>
                         <div className="font-mono text-4xl tabular-nums">
@@ -264,7 +264,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                         </div>
                     </div>
                     <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-400">
+                        <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                             {m.sprint_correct()}
                         </div>
                         <div className="font-mono text-4xl tabular-nums">
@@ -292,7 +292,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                         <span className="font-mono">{result.correct}</span>{" "}
                         {m.sprint_correct_label()} · <span className="font-mono">{accuracy}%</span>{" "}
                         {m.sprint_accuracy_label()} ·{" "}
-                        <span className="text-red-600">
+                        <span className="text-red-600 dark:text-red-400">
                             {m.sprint_wrong_label({ wrong: result.wrong })}
                         </span>
                     </p>

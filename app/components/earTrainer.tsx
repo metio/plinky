@@ -137,7 +137,7 @@ export function EarTrainer() {
                 <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
                     {m.ear_which_note()}
                     {wrong !== null && (
-                        <span className="ml-2 text-red-600">
+                        <span className="ml-2 text-red-600 dark:text-red-400">
                             {m.ear_not_note({ note: noteName(wrong) })}
                         </span>
                     )}

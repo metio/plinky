@@ -94,7 +94,7 @@ export default function Home() {
             </header>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.home_play_now()}
                 </h2>
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -107,7 +107,7 @@ export default function Home() {
                             <span className="font-medium text-indigo-700 dark:text-indigo-300">
                                 {mode.label()} →
                             </span>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                                 {mode.blurb()}
                             </p>
                         </Link>
@@ -117,7 +117,7 @@ export default function Home() {
 
             <section className="space-y-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="text-sm font-medium uppercase tracking-wide text-gray-400">
+                    <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         {m.home_practice_a_song()}
                     </h2>
                     <div className="flex gap-4 text-sm">
@@ -177,11 +177,11 @@ export default function Home() {
                                     <h3 className="text-lg font-medium">{exercise.title}</h3>
                                     <span className="flex items-center gap-2">
                                         {exercise.license && (
-                                            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                                                 {exercise.license}
                                             </span>
                                         )}
-                                        <span className="font-mono text-xs text-gray-400">
+                                        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
                                             {m.home_bpm({ tempo: exercise.tempo })}
                                         </span>
                                     </span>
@@ -226,7 +226,7 @@ export default function Home() {
                                     <button
                                         type="button"
                                         onClick={() => remove(exercise.id)}
-                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 underline"
+                                        className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 underline dark:text-red-400"
                                     >
                                         {m.action_remove()}
                                     </button>

@@ -59,7 +59,9 @@ export function MidiDebugPanel() {
                 </span>
             </div>
 
-            {error && status !== "error" && <p className="text-sm text-red-600">{error}</p>}
+            {error && status !== "error" && (
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            )}
 
             <KeyboardHint octaveOffset={octaveOffset} />
 
@@ -68,7 +70,9 @@ export function MidiDebugPanel() {
                     {m.midi_debug_inputs()}
                 </h2>
                 {devices.length === 0 ? (
-                    <p className="text-sm text-gray-400">{m.midi_debug_no_inputs()}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {m.midi_debug_no_inputs()}
+                    </p>
                 ) : (
                     <ul className="space-y-1 text-sm">
                         {devices.map((device) => (
@@ -82,7 +86,9 @@ export function MidiDebugPanel() {
                                 />
                                 <span className="font-medium">{device.name}</span>
                                 {device.manufacturer && (
-                                    <span className="text-gray-400">· {device.manufacturer}</span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                        · {device.manufacturer}
+                                    </span>
                                 )}
                             </li>
                         ))}
@@ -95,7 +101,9 @@ export function MidiDebugPanel() {
                     {m.midi_debug_held_notes()}
                 </h2>
                 {heldNotes.length === 0 ? (
-                    <p className="text-sm text-gray-400">{m.midi_debug_press_key()}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {m.midi_debug_press_key()}
+                    </p>
                 ) : (
                     <div className="flex flex-wrap gap-2">
                         {heldNotes.map((note) => (
@@ -125,10 +133,12 @@ export function MidiDebugPanel() {
                     </button>
                 </div>
                 {events.length === 0 ? (
-                    <p className="text-sm text-gray-400">{m.midi_debug_waiting()}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {m.midi_debug_waiting()}
+                    </p>
                 ) : (
                     <table className="w-full font-mono text-xs">
-                        <thead className="text-left text-gray-400">
+                        <thead className="text-left text-gray-500 dark:text-gray-400">
                             <tr>
                                 <th className="py-1 pr-4 font-normal">{m.midi_debug_col_time()}</th>
                                 <th className="py-1 pr-4 font-normal">{m.midi_debug_col_type()}</th>
@@ -145,7 +155,7 @@ export function MidiDebugPanel() {
                                     className={
                                         event.kind === "noteon"
                                             ? "text-gray-900 dark:text-gray-100"
-                                            : "text-gray-400"
+                                            : "text-gray-500 dark:text-gray-400"
                                     }
                                 >
                                     <td className="py-0.5 pr-4">{formatTime(event.timestamp)}</td>
