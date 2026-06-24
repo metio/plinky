@@ -38,6 +38,10 @@ const PLAY_NOW = [
     { to: "/ear", label: m.play_ear, blurb: m.play_ear_blurb },
 ];
 
+// Enough placeholder cards to fill a viewport, so the real list (and everything
+// below it) lands at its final position before the first paint is measured.
+const SKELETON_ROWS = ["a", "b", "c", "d", "e", "f"];
+
 function downloadAbc(exercise: Exercise): void {
     const blob = new Blob([toAbcDocument(exercise)], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -50,13 +54,20 @@ function downloadAbc(exercise: Exercise): void {
 
 export default function Home() {
     const [songs, setSongs] = useState<Exercise[]>([]);
+    const [loaded, setLoaded] = useState(false);
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const reload = useCallback(() => setSongs(loadUserSongs()), []);
 
-    // Seed the starter songs on first run, then show whatever is on the device.
+    // The song list lives in local storage, unavailable during prerender and on
+    // the first client paint, so it can only appear a tick later. Until then a
+    // skeleton of the same height stands in, so populating the list does not
+    // shove the rest of the page down.
     // seedStarterSongs is a no-op once seeded, so this just reloads on return.
     useEffect(() => {
-        seedStarterSongs().then(reload);
+        seedStarterSongs().then(() => {
+            reload();
+            setLoaded(true);
+        });
     }, [reload]);
 
     const remove = (id: string) => {
@@ -131,7 +142,20 @@ export default function Home() {
                     </div>
                 </div>
 
-                {songs.length === 0 ? (
+                {!loaded ? (
+                    <ul className="space-y-3" aria-hidden="true">
+                        {SKELETON_ROWS.map((key) => (
+                            <li
+                                key={key}
+                                className="rounded-md border border-gray-200 p-4 dark:border-gray-800"
+                            >
+                                <div className="h-6 w-1/3 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+                                <div className="mt-2 h-4 w-2/3 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+                                <div className="mt-3 h-8 w-2/5 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+                            </li>
+                        ))}
+                    </ul>
+                ) : songs.length === 0 ? (
                     <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
                         {m.home_empty_prefix()}{" "}
                         <Link
