@@ -266,5 +266,13 @@
   "scores_timing": "Načasování",
   "scores_dynamics": "Dynamika",
   "scores_ghost": "Ideál",
-  "scores_you": "Ty"
+  "scores_you": "Ty",
+  "mastery_learned": "Naučeno",
+  "mastery_due": "K opakování",
+  "mastery_due_count": "{count} k opakování",
+  "mastery_mark_learned": "Označit jako naučené",
+  "mastery_backlog": "Přesunout do fronty",
+  "mastery_resume": "Obnovit opakování",
+  "settings_mastery": "Zvládnutí",
+  "settings_mastery_threshold": "Označit notu za naučenou při známce"
 }

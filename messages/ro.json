@@ -266,5 +266,13 @@
   "scores_timing": "Sincronizare",
   "scores_dynamics": "Nuanțe",
   "scores_ghost": "Ideal",
-  "scores_you": "Tu"
+  "scores_you": "Tu",
+  "mastery_learned": "Învățat",
+  "mastery_due": "De recapitulat",
+  "mastery_due_count": "{count} de recapitulat",
+  "mastery_mark_learned": "Marchează ca învățat",
+  "mastery_backlog": "Mută în așteptare",
+  "mastery_resume": "Reia recapitulările",
+  "settings_mastery": "Stăpânire",
+  "settings_mastery_threshold": "Marchează o partitură ca învățată la nota"
 }

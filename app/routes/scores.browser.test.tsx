@@ -8,7 +8,10 @@ import { MidiProvider } from "../contexts/midi";
 import Scores from "./scores";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    localStorage.clear();
+});
 
 function renderScores() {
     return render(
@@ -62,5 +65,17 @@ describe("Scores", () => {
         // The ghost-timing timeline plots the run (ghost vs you).
         expect(screen.getByText("Ideal")).toBeTruthy();
         expect(screen.getByText("You")).toBeTruthy();
+    });
+
+    it("marks a score learned and toggles the backlog", async () => {
+        renderScores();
+        await screen.findByText("Twinkle, Twinkle, Little Star");
+        fireEvent.click(screen.getByText("Twinkle, Twinkle, Little Star"));
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+
+        fireEvent.click(screen.getByText("Mark learned"));
+        expect(await screen.findByText("Move to backlog")).toBeTruthy();
+        fireEvent.click(screen.getByText("Move to backlog"));
+        expect(await screen.findByText("Resume reviews")).toBeTruthy();
     });
 });

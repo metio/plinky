@@ -266,5 +266,13 @@
   "scores_timing": "Timing",
   "scores_dynamics": "Dynamik",
   "scores_ghost": "Ideelt",
-  "scores_you": "Dig"
+  "scores_you": "Dig",
+  "mastery_learned": "Lært",
+  "mastery_due": "Klar til gennemgang",
+  "mastery_due_count": "{count} klar til gennemgang",
+  "mastery_mark_learned": "Markér som lært",
+  "mastery_backlog": "Flyt til efterslæb",
+  "mastery_resume": "Genoptag gennemgange",
+  "settings_mastery": "Mestring",
+  "settings_mastery_threshold": "Markér et stykke som lært ved karakter"
 }

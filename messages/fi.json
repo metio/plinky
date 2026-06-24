@@ -266,5 +266,13 @@
   "scores_timing": "Ajoitus",
   "scores_dynamics": "Dynamiikka",
   "scores_ghost": "Ihanteellinen",
-  "scores_you": "Sinä"
+  "scores_you": "Sinä",
+  "mastery_learned": "Opittu",
+  "mastery_due": "Kertaus odottaa",
+  "mastery_due_count": "{count} kerrattavaa",
+  "mastery_mark_learned": "Merkitse opituksi",
+  "mastery_backlog": "Siirrä jonoon",
+  "mastery_resume": "Jatka kertauksia",
+  "settings_mastery": "Hallinta",
+  "settings_mastery_threshold": "Merkitse kappale opituksi arvosanalla"
 }

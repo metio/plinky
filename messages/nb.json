@@ -266,5 +266,13 @@
   "scores_timing": "Timing",
   "scores_dynamics": "Dynamikk",
   "scores_ghost": "Ideelt",
-  "scores_you": "Deg"
+  "scores_you": "Deg",
+  "mastery_learned": "Lært",
+  "mastery_due": "Klar for repetisjon",
+  "mastery_due_count": "{count} klare for repetisjon",
+  "mastery_mark_learned": "Merk som lært",
+  "mastery_backlog": "Flytt til restanselisten",
+  "mastery_resume": "Gjenoppta repetisjoner",
+  "settings_mastery": "Mestring",
+  "settings_mastery_threshold": "Merk et stykke som lært ved karakter"
 }

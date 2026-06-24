@@ -266,5 +266,13 @@
   "scores_timing": "Sincronia",
   "scores_dynamics": "Dinâmica",
   "scores_ghost": "Ideal",
-  "scores_you": "Você"
+  "scores_you": "Você",
+  "mastery_learned": "Aprendida",
+  "mastery_due": "Revisão pendente",
+  "mastery_due_count": "{count} para revisar",
+  "mastery_mark_learned": "Marcar como aprendida",
+  "mastery_backlog": "Devolver à lista",
+  "mastery_resume": "Retomar revisões",
+  "settings_mastery": "Domínio",
+  "settings_mastery_threshold": "Marcar uma partitura como aprendida a partir da nota"
 }
