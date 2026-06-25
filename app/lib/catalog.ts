@@ -33,12 +33,40 @@ type ScoreMeta = { title: string; composer: string; tempo: number; beatsPerBar: 
 const positiveOr = (value: number, fallback: number): number =>
     Number.isFinite(value) && value > 0 ? value : fallback;
 
+const XML_ENTITIES: Record<string, string> = {
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    quot: '"',
+    apos: "'",
+};
+
+// Resolve the XML entities a title or composer may carry, in a single pass so a
+// decoded "&" can't be re-interpreted. This keeps the regex path's text identical
+// to what DOMParser.textContent yields on the client (e.g. "Rock &amp; Roll" →
+// "Rock & Roll"), so a play page's title and JSON-LD match between the two.
+function decodeXmlEntities(text: string): string {
+    return text.replace(
+        /&(?:#x([0-9a-fA-F]+)|#(\d+)|(amp|lt|gt|quot|apos));/g,
+        (_match, hex, dec, named) => {
+            if (hex !== undefined) {
+                return String.fromCodePoint(Number.parseInt(hex, 16));
+            }
+            if (dec !== undefined) {
+                return String.fromCodePoint(Number.parseInt(dec, 10));
+            }
+            return XML_ENTITIES[named] ?? _match;
+        },
+    );
+}
+
 // The static prerender runs in Node, where DOMParser is absent; it derives a play
 // page's title from the bundled (well-formed, generated) MusicXML. A small regex
 // pass covers the few fields needed there. The browser keeps the DOMParser path,
-// which tolerates the messier MusicXML a user might import.
-function readScoreMetaFromText(xml: string): ScoreMeta {
-    const pick = (re: RegExp): string => xml.match(re)?.[1]?.trim() ?? "";
+// which tolerates the messier MusicXML a user might import. Exported for tests so
+// the prerender branch can be exercised without depending on DOMParser's absence.
+export function readScoreMetaFromText(xml: string): ScoreMeta {
+    const pick = (re: RegExp): string => decodeXmlEntities(xml.match(re)?.[1]?.trim() ?? "");
     const title =
         pick(/<work-title>([\s\S]*?)<\/work-title>/) ||
         pick(/<movement-title>([\s\S]*?)<\/movement-title>/) ||
