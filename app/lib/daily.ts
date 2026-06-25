@@ -30,9 +30,9 @@ export function dailyNumber(dateKey: string, epoch: string = DAILY_EPOCH): numbe
 // About how long the day's phrase should take to play. Long enough that accuracy,
 // timing and flow each have real signal — a handful of notes grades almost nothing.
 const DAILY_SECONDS = 45;
-// The phrase is one quarter note per beat, so the tempo doubles as the
-// notes-per-minute rate. This band keeps a beginner reading and reaching at a
-// human pace — slower drags, faster turns sight-reading into a scramble.
+// The tempo is the beat rate; the phrase runs from half notes to eighth pairs
+// around it. This band keeps a beginner reading and reaching at a human pace —
+// slower drags, faster turns sight-reading into a scramble.
 const DAILY_MIN_BPM = 80;
 const DAILY_MAX_BPM = 120;
 const BEATS_PER_BAR = 4;
@@ -51,7 +51,13 @@ export function dailyChallenge(dateKey: string, number: number): DailyChallenge 
     const beats = Math.round((DAILY_SECONDS * tempo) / 60);
     const bars = Math.max(1, Math.round(beats / BEATS_PER_BAR));
     const xml = generatePhrase(
-        { bars, beatsPerBar: BEATS_PER_BAR, twoHands: false, title: `Plinky #${number}` },
+        {
+            bars,
+            beatsPerBar: BEATS_PER_BAR,
+            twoHands: false,
+            title: `Plinky #${number}`,
+            rhythm: "varied",
+        },
         rng,
     );
     return { tempo, xml };
