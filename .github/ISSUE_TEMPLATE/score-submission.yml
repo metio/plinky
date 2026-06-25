@@ -1,16 +1,16 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
 name: Submit a score
-description: Share an ABC score to be added to the Plinky catalog
+description: Share a MusicXML score to be added to the Plinky catalog
 title: "[Score] "
 labels: ["score-submission"]
 body:
   - type: markdown
     attributes:
       value: >
-        Thanks for sharing a score! Paste its ABC notation below. An automated
-        check looks over the basics, then a maintainer reviews it before it joins
-        the catalog. Please only submit music you have the right to share.
+        Thanks for sharing a score! Paste its MusicXML below. An automated check
+        renders it the way Plinky does, then a maintainer reviews it before it
+        joins the catalog. Please only submit music you have the right to share.
   - type: input
     id: score-title
     attributes:
@@ -19,18 +19,25 @@ body:
     validations:
       required: true
   - type: textarea
-    id: abc
+    id: musicxml
     attributes:
-      label: ABC notation
-      description: "The full ABC, including the X:, T:, M:, L:, and K: headers."
-      render: text
+      label: MusicXML
+      description: >
+        The full MusicXML document — a `<score-partwise>` (or `<score-timewise>`)
+        element. Most notation software (MuseScore, Finale, Sibelius, Flat,
+        Soundslice) can export it.
+      render: xml
       placeholder: |
-        X:1
-        T:My score
-        M:4/4
-        L:1/4
-        K:C
-        C D E F | G A B c |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <score-partwise version="4.0">
+          <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+          <part id="P1">
+            <measure number="1">
+              <attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time></attributes>
+              <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+            </measure>
+          </part>
+        </score-partwise>
     validations:
       required: true
   - type: input

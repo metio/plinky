@@ -21,7 +21,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Validate the submitted ABC
+      - name: Validate the submitted MusicXML
         id: validate
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
