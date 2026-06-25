@@ -15,13 +15,21 @@ import {
 import type { Route } from "./+types/root";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
-import { applyTheme, loadTheme } from "./lib/theme";
+import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
 import { SITE_URL } from "./lib/site";
 import { m } from "./paraglide/messages.js";
 import { getLocale } from "./paraglide/runtime.js";
 import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
+
+// Runs before first paint to set the dark class from the saved (or OS) theme.
+// Applying the theme only in the layout's effect would let the prerendered,
+// class-free HTML paint light first and flash for dark-mode users. It mutates
+// the class outside React, which React's hydration leaves untouched.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(
+    THEME_STORAGE_KEY,
+)});if(t!=="light"&&t!=="dark"&&t!=="system"){t="system";}if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark");}}catch(e){}})();`;
 
 export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
@@ -73,14 +81,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
     // so even the error page is themed — App's render is skipped on an error.
     useEffect(() => {
         document.documentElement.lang = getLocale();
-        const theme = loadTheme();
-        applyTheme(theme);
-        if (theme === "system" && typeof matchMedia === "function") {
-            const media = matchMedia("(prefers-color-scheme: dark)");
-            const onChange = () => applyTheme("system");
-            media.addEventListener("change", onChange);
-            return () => media.removeEventListener("change", onChange);
+        applyTheme(loadTheme());
+        if (typeof matchMedia !== "function") {
+            return;
         }
+        // Stay subscribed regardless of the current theme: the user can switch to
+        // "system" after mount, and re-reading the saved theme makes the OS change
+        // a no-op for explicit light/dark and a live update only for "system".
+        const media = matchMedia("(prefers-color-scheme: dark)");
+        const onChange = () => applyTheme(loadTheme());
+        media.addEventListener("change", onChange);
+        return () => media.removeEventListener("change", onChange);
     }, []);
 
     return (
@@ -88,6 +99,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
+                {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained theme bootstrap that must run before paint */}
+                <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
                 <meta name="theme-color" content="#4f46e5" />
                 {/* Site-wide social-card fields; each route's meta adds the
                     per-page og:title / og:description and twitter equivalents. */}

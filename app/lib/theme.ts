@@ -3,7 +3,8 @@
 
 export type Theme = "light" | "dark" | "system";
 
-const KEY = "plinky:theme";
+export const THEME_STORAGE_KEY = "plinky:theme";
+const KEY = THEME_STORAGE_KEY;
 
 export function loadTheme(): Theme {
     try {
