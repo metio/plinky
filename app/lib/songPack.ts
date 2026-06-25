@@ -1,12 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Exercise } from "./exercises";
-
-// The Plinky song-pack exchange format: a JSON document with ABC embedded, used
-// for seeding from a registry, mass-importing a music school's curriculum, and
-// backing up a library. A pack declares any number of curriculums; each song
-// references the ones it belongs to by id, so a song can sit in several.
+// The Plinky song-pack exchange format: a JSON document with MusicXML embedded,
+// used for mass-importing a music school's curriculum and backing up a library. A
+// pack declares any number of curriculums; each song references the ones it
+// belongs to by id, so a song can sit in several.
 
 export interface Curriculum {
     id: string;
@@ -14,13 +12,12 @@ export interface Curriculum {
     publisher?: string;
 }
 
-// A song as it appears in a pack. Only id, title, and abc are required — tempo
-// and beatsPerBar are filled from the ABC on import when a hand-authored pack
-// omits them.
+// A song as it appears in a pack. Only id, title, and xml are required — tempo and
+// beatsPerBar are read from the MusicXML on import when a pack omits them.
 export interface PackSong {
     id: string;
     title: string;
-    abc: string;
+    xml: string;
     tempo?: number;
     beatsPerBar?: number;
     description?: string;
@@ -57,7 +54,7 @@ function parseSong(value: unknown): PackSong | null {
         !isRecord(value) ||
         typeof value.id !== "string" ||
         typeof value.title !== "string" ||
-        typeof value.abc !== "string"
+        typeof value.xml !== "string"
     ) {
         return null;
     }
@@ -67,7 +64,7 @@ function parseSong(value: unknown): PackSong | null {
     return {
         id: value.id,
         title: value.title,
-        abc: value.abc,
+        xml: value.xml,
         ...(typeof value.tempo === "number" ? { tempo: value.tempo } : {}),
         ...(typeof value.beatsPerBar === "number" ? { beatsPerBar: value.beatsPerBar } : {}),
         ...(typeof value.description === "string" ? { description: value.description } : {}),
@@ -78,7 +75,7 @@ function parseSong(value: unknown): PackSong | null {
 
 // Serialize a library to a pack. The curriculums list carries the human-readable
 // names for whatever the songs reference.
-export function serializePack(songs: Exercise[], curriculums: Curriculum[] = []): string {
+export function serializePack(songs: PackSong[], curriculums: Curriculum[] = []): string {
     const pack: SongPack = { format: FORMAT, version: 1, curriculums, songs };
     return JSON.stringify(pack, null, 2);
 }

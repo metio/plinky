@@ -36,8 +36,6 @@ const KEYS: Record<SprintKey, { fifths: number; treble: Position[]; bass: Positi
     D: { fifths: 2, treble: positions("D4 E4 F4 G4 A4"), bass: positions("D3 E3 F3 G3 A3") },
 };
 
-export const SPRINT_KEYS = Object.keys(KEYS) as SprintKey[];
-
 function line(scale: Position[], count: number, fifths: number, rng: () => number): BuiltPitch[] {
     const notes: BuiltPitch[] = [];
     for (let i = 0; i < count; i++) {

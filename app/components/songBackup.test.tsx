@@ -11,8 +11,8 @@ const PACK = JSON.stringify({
     version: 1,
     curriculums: [{ id: "g1", name: "Grade 1" }],
     songs: [
-        { id: "x", title: "X", abc: "X:1\nK:C\nC" },
-        { id: "y", title: "Y", abc: "X:1\nK:C\nD" },
+        { id: "x", title: "X", xml: "<score-partwise><part/></score-partwise>" },
+        { id: "y", title: "Y", xml: "<score-partwise><part/></score-partwise>" },
     ],
 });
 

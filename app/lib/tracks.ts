@@ -73,16 +73,12 @@ export const TRACKS = [
         description: "Build core finger technique from the ground up.",
         kind: "progression",
         songIds: [
-            "five-finger-c",
             "scale-c-major",
             "arpeggio-c-major",
             "scale-g-major",
             "arpeggio-g-major",
             "scale-f-major",
             "arpeggio-f-major",
-            "chromatic-c",
-            "contrary-motion-c",
-            "hanon-1",
         ],
     },
     {
@@ -112,7 +108,7 @@ export const TRACKS = [
         description: "A quick daily loosener.",
         kind: "routine",
         minutes: 5,
-        songIds: ["five-finger-c", "scale-c-major", "arpeggio-c-major"],
+        songIds: ["scale-c-major", "arpeggio-c-major", "scale-g-major"],
     },
     {
         id: "technique-15",
@@ -121,13 +117,12 @@ export const TRACKS = [
         kind: "routine",
         minutes: 15,
         songIds: [
-            "five-finger-c",
             "scale-c-major",
             "scale-g-major",
+            "scale-d-major",
             "arpeggio-c-major",
             "arpeggio-g-major",
-            "hanon-1",
-            "chromatic-c",
+            "arpeggio-d-major",
         ],
     },
 ] satisfies Track[];

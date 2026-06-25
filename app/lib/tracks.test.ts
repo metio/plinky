@@ -4,11 +4,13 @@
 import { describe, expect, it } from "vitest";
 import { TRACKS, trackSteps } from "./tracks";
 
-const modules = import.meta.glob("../../songs/*.json", { eager: true });
+const modules = import.meta.glob("../../scores/*.musicxml", {
+    query: "?raw",
+    import: "default",
+    eager: true,
+});
 const catalogIds = new Set(
-    Object.entries(modules)
-        .filter(([path]) => !path.includes("_curriculums"))
-        .map(([, mod]) => (mod as { default: { id: string } }).default.id),
+    Object.keys(modules).map((path) => (path.split("/").pop() ?? "").replace(/\.musicxml$/, "")),
 );
 
 describe("trackSteps", () => {

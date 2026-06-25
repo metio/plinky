@@ -3,12 +3,15 @@
 
 import { Link } from "react-router";
 import { routeMeta } from "../lib/site";
-import { submissionUrl } from "../lib/songs";
+import { submissionUrl } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/import";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Find songs", "Find Plinky songs to import, or submit your own to the catalog");
+    return routeMeta(
+        "Find songs",
+        "Find Plinky songs to import, or submit your own to the catalog",
+    );
 }
 
 // External pages that host Plinky songs. The catalog lives outside the app so it

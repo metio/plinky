@@ -3,9 +3,9 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { loadCatalog, loadCurriculums } from "../lib/catalog";
 import { type CurriculumGroup, groupByCurriculum } from "../lib/curriculums";
 import { routeMeta } from "../lib/site";
-import { loadCurriculums, loadUserSongs } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/curriculums";
 
@@ -19,7 +19,8 @@ const SONG_LINK =
 export default function CurriculumsRoute() {
     const [groups, setGroups] = useState<CurriculumGroup[]>([]);
     useEffect(() => {
-        setGroups(groupByCurriculum(loadUserSongs(), loadCurriculums()));
+        const userSongs = loadCatalog().filter((song) => !song.bundled);
+        setGroups(groupByCurriculum(userSongs, loadCurriculums()));
     }, []);
 
     return (
@@ -56,14 +57,9 @@ export default function CurriculumsRoute() {
                                 className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-gray-200 p-3 dark:border-gray-800"
                             >
                                 <span className="font-medium">{song.title}</span>
-                                <div className="flex gap-2">
-                                    <Link to={`/practice/${song.id}`} className={SONG_LINK}>
-                                        {m.curriculums_practice()}
-                                    </Link>
-                                    <Link to={`/loop/${song.id}`} className={SONG_LINK}>
-                                        {m.curriculums_loop()}
-                                    </Link>
-                                </div>
+                                <Link to={`/play/${song.id}`} className={SONG_LINK}>
+                                    {m.curriculums_practice()}
+                                </Link>
                             </li>
                         ))}
                     </ul>
