@@ -124,7 +124,7 @@ export function ScoreViewer({
             correct: matcher.total,
             wrong: matcher.wrong,
             rhythm: summarize(hits),
-            flow: computeFlow(notes.map((note) => note.wrongBefore === 0)),
+            flow: computeFlow(notes),
             dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
         });
         setGrade(result);

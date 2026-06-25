@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { fluentNotes } from "./flow";
+
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced
 // into six moments and scored on the three shareable dimensions — Accuracy,
 // Timing, Flow — each landing in one of three bands. The result is a 3×6 grid
@@ -14,6 +16,10 @@ export type RunNote = {
     playedMs: number;
     wrongBefore: number;
 };
+
+// A run note tagged with whether it kept the flow, decided once over the whole run
+// so hesitation is judged against the player's overall pace, not a six-note slice.
+type ScoredNote = RunNote & { fluent: boolean };
 
 // The three dimensions, in the order they appear as grid rows.
 export type Dimension = "accuracy" | "timing" | "flow";
@@ -48,12 +54,12 @@ export function levelFor(value: number): Level {
 
 // Scores one segment's notes on each dimension. An empty segment (a piece with
 // fewer notes than segments, or one abandoned early) scores zero everywhere.
-function metricsFor(notes: RunNote[]): SegmentMetrics {
+function metricsFor(notes: ScoredNote[]): SegmentMetrics {
     if (notes.length === 0) {
         return { accuracy: 0, timing: 0, flow: 0 };
     }
     const wrong = notes.reduce((sum, note) => sum + note.wrongBefore, 0);
-    const clean = notes.filter((note) => note.wrongBefore === 0).length;
+    const fluent = notes.filter((note) => note.fluent).length;
     const timing = notes.reduce((sum, note) => {
         const off = Math.min(1, Math.abs(note.playedMs - note.targetMs) / TIMING_ZERO_MS);
         return sum + (1 - off);
@@ -61,17 +67,19 @@ function metricsFor(notes: RunNote[]): SegmentMetrics {
     return {
         accuracy: notes.length / (notes.length + wrong),
         timing: timing / notes.length,
-        flow: clean / notes.length,
+        flow: fluent / notes.length,
     };
 }
 
 // Splits the run into SEGMENTS contiguous, proportional slices by note order, so
 // the grid reads the same whatever the piece's length or tempo, and scores each.
+// Flow is decided over the whole run first, then carried into the slices.
 export function computeSegments(notes: RunNote[], count = SEGMENTS): SegmentMetrics[] {
-    const buckets: RunNote[][] = Array.from({ length: count }, () => []);
+    const fluent = fluentNotes(notes);
+    const buckets: ScoredNote[][] = Array.from({ length: count }, () => []);
     notes.forEach((note, index) => {
         const slice = Math.min(count - 1, Math.floor((index * count) / notes.length));
-        buckets[slice]?.push(note);
+        buckets[slice]?.push({ ...note, fluent: fluent[index] ?? false });
     });
     return buckets.map(metricsFor);
 }
