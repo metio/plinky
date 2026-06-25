@@ -76,6 +76,7 @@ export function ScoreViewer({
     const baseOffsetRef = useRef(0);
     const synth = useSynth();
     const [ready, setReady] = useState(false);
+    const [loadError, setLoadError] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [tempo, setTempo] = useState(initialTempo ?? 100);
     const [grade, setGrade] = useState<Grade | null>(null);
@@ -188,24 +189,34 @@ export function ScoreViewer({
     useEffect(() => {
         let cancelled = false;
         setReady(false);
+        setLoadError(false);
         stopListen();
         matcher.stop();
-        import("opensheetmusicdisplay").then(({ OpenSheetMusicDisplay }) => {
-            if (cancelled || !containerRef.current) {
-                return;
-            }
-            const osmd = new OpenSheetMusicDisplay(containerRef.current, {
-                autoResize: true,
-                drawingParameters: "compact",
-            });
-            osmdRef.current = osmd;
-            osmd.load(xml).then(() => {
+        import("opensheetmusicdisplay")
+            .then(({ OpenSheetMusicDisplay }) => {
+                if (cancelled || !containerRef.current) {
+                    return;
+                }
+                const osmd = new OpenSheetMusicDisplay(containerRef.current, {
+                    autoResize: true,
+                    drawingParameters: "compact",
+                });
+                osmdRef.current = osmd;
+                return osmd.load(xml).then(() => {
+                    if (!cancelled) {
+                        osmd.render();
+                        setReady(true);
+                    }
+                });
+            })
+            // A failed chunk import or MusicXML that OSMD can't load would otherwise
+            // leave ready false forever — a silently dead viewer with disabled
+            // controls and no explanation. Surface it instead.
+            .catch(() => {
                 if (!cancelled) {
-                    osmd.render();
-                    setReady(true);
+                    setLoadError(true);
                 }
             });
-        });
         return () => {
             cancelled = true;
             for (const id of timers.current) {
@@ -274,6 +285,11 @@ export function ScoreViewer({
                     aria-label={title}
                     className="overflow-x-auto"
                 />
+                {loadError && (
+                    <p className="p-2 text-sm text-red-600 dark:text-red-400">
+                        {m.score_load_error()}
+                    </p>
+                )}
             </div>
 
             <div className="flex flex-wrap items-center gap-3">

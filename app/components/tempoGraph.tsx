@@ -62,16 +62,23 @@ export function TempoGraph({
             role="img"
             aria-label="Tempo over time"
         >
-            {hotspots.map((hotspot) => (
-                <rect
-                    key={`${hotspot.startIndex}-${hotspot.endIndex}`}
-                    x={xCombined(hotspot.startIndex) - step / 2}
-                    y={PAD.top}
-                    width={xCombined(hotspot.endIndex) - xCombined(hotspot.startIndex) + step}
-                    height={HEIGHT - PAD.top - PAD.bottom}
-                    fill="#fee2e2"
-                />
-            ))}
+            {hotspots.map((hotspot) => {
+                // Pad the band a half-step beyond its end notes, but keep it inside
+                // the plot area so a hotspot on the first or last note doesn't bleed
+                // into the axis gutter or past the viewBox edge.
+                const left = Math.max(PAD.left, xCombined(hotspot.startIndex) - step / 2);
+                const right = Math.min(WIDTH - PAD.right, xCombined(hotspot.endIndex) + step / 2);
+                return (
+                    <rect
+                        key={`${hotspot.startIndex}-${hotspot.endIndex}`}
+                        x={left}
+                        y={PAD.top}
+                        width={Math.max(0, right - left)}
+                        height={HEIGHT - PAD.top - PAD.bottom}
+                        fill="#fee2e2"
+                    />
+                );
+            })}
 
             <line
                 x1={PAD.left}

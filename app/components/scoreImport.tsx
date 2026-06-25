@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { buildScore, saveUserScore } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
 
@@ -26,6 +26,9 @@ export function ScoreImport({
     const [open, setOpen] = useState(false);
     const [text, setText] = useState("");
     const [error, setError] = useState<string | null>(null);
+    // Identifies the latest file read so a slower earlier read can't clobber the
+    // textarea after a newer pick has already filled it.
+    const readSeq = useRef(0);
 
     const add = () => {
         const xml = text.trim();
@@ -37,21 +40,32 @@ export function ScoreImport({
             setError(m.import_no_notes());
             return;
         }
-        saveUserScore(buildScore(xml, existingIds));
+        if (!saveUserScore(buildScore(xml, existingIds))) {
+            setError(m.import_save_failed());
+            return;
+        }
         setText("");
         setError(null);
         setOpen(false);
         onAdded();
     };
 
-    const readFile = (file: File | undefined) => {
+    const readFile = async (file: File | undefined) => {
         if (!file) {
             return;
         }
-        file.text().then((content) => {
-            setText(content);
-            setError(null);
-        });
+        const mine = ++readSeq.current;
+        try {
+            const content = await file.text();
+            if (mine === readSeq.current) {
+                setText(content);
+                setError(null);
+            }
+        } catch {
+            if (mine === readSeq.current) {
+                setError(m.import_read_error());
+            }
+        }
     };
 
     if (!open) {
@@ -79,7 +93,11 @@ export function ScoreImport({
                 <input
                     type="file"
                     accept=".musicxml,.xml,application/xml"
-                    onChange={(event) => readFile(event.target.files?.[0])}
+                    onChange={(event) => {
+                        readFile(event.target.files?.[0]);
+                        // Clear the value so choosing the same file again re-fires change.
+                        event.target.value = "";
+                    }}
                     className="text-sm"
                     title={m.import_upload_title()}
                 />
