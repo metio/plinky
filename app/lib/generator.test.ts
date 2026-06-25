@@ -56,3 +56,53 @@ describe("generatePhrase", () => {
         expect(xml).toContain("<fifths>0</fifths>");
     });
 });
+
+// The duration of every note in each measure, so a measure can be checked to fill
+// a barful. Divisions are 2 per quarter, so a 4/4 bar is 8.
+function measureDurations(xml: string): number[][] {
+    return [...xml.matchAll(/<measure [\s\S]*?<\/measure>/g)].map((measure) =>
+        [...measure[0].matchAll(/<duration>(\d+)<\/duration>/g)].map((d) => Number(d[1])),
+    );
+}
+
+describe("generatePhrase varied rhythm", () => {
+    const options = { bars: 4, beatsPerBar: 4, twoHands: false, rhythm: "varied" as const };
+
+    it("declares two divisions per quarter so eighths stay whole numbers", () => {
+        expect(generatePhrase(options, zero)).toContain("<divisions>2</divisions>");
+    });
+
+    it("fills every measure to exactly a barful", () => {
+        for (const measure of measureDurations(
+            generatePhrase(options, seededRandom(hashString("r"))),
+        )) {
+            expect(measure.reduce((sum, d) => sum + d, 0)).toBe(8); // 4 beats × 2 divisions
+        }
+    });
+
+    it("keeps the requested bar count whatever the rhythm", () => {
+        expect(measureDurations(generatePhrase(options, () => 0))).toHaveLength(4);
+        expect(measureDurations(generatePhrase(options, () => 0.3))).toHaveLength(4);
+    });
+
+    it("uses half notes when the roll favours them", () => {
+        // rng→0 takes the half-note branch every beat it can.
+        const xml = generatePhrase(options, () => 0);
+        expect(xml).toContain("<type>half</type>");
+        expect(xml).not.toContain("<type>eighth</type>");
+    });
+
+    it("uses on-beat eighth pairs when the roll favours them", () => {
+        // rng→0.3 misses the half branch but takes the eighth branch.
+        const xml = generatePhrase(options, () => 0.3);
+        expect(xml).toContain("<type>eighth</type>");
+        // Eighths come two at a time, so their count is always even.
+        expect((xml.match(/<type>eighth<\/type>/g) ?? []).length % 2).toBe(0);
+    });
+
+    it("is deterministic for a given seed", () => {
+        const a = generatePhrase(options, seededRandom(hashString("seed")));
+        const b = generatePhrase(options, seededRandom(hashString("seed")));
+        expect(a).toBe(b);
+    });
+});

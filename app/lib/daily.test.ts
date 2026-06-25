@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { DAILY_EPOCH, dailyChallenge, dailyNumber, todayKey } from "./daily";
 
-const noteCount = (xml: string) => (xml.match(/<note>/g) ?? []).length;
+const measureCount = (xml: string) => (xml.match(/<measure /g) ?? []).length;
 
 describe("todayKey", () => {
     it("formats the local date as YYYY-MM-DD", () => {
@@ -33,7 +33,8 @@ describe("dailyChallenge", () => {
         const { xml } = dailyChallenge("2026-06-25", 1);
         expect(xml).toContain("<score-partwise");
         expect(xml).toContain("<work-title>Plinky #1</work-title>");
-        expect(xml).toContain("<type>quarter</type>");
+        expect(xml).toContain("<note>");
+        expect(xml).toContain("<time><beats>4</beats>");
     });
 
     it("keeps the tempo in the beginner-friendly band", () => {
@@ -47,8 +48,9 @@ describe("dailyChallenge", () => {
     it("sizes the phrase to about forty-five seconds of play", () => {
         for (const day of ["2026-06-25", "2026-07-01", "2026-12-31"]) {
             const { tempo, xml } = dailyChallenge(day, 1);
-            // One quarter note per beat, so seconds = notes / tempo × 60.
-            const seconds = (noteCount(xml) / tempo) * 60;
+            // Rhythm varies within each bar, so play time follows the bar count:
+            // seconds = bars × 4 beats / tempo × 60.
+            const seconds = ((measureCount(xml) * 4) / tempo) * 60;
             expect(seconds).toBeGreaterThan(42);
             expect(seconds).toBeLessThan(48);
         }
