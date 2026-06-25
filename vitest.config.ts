@@ -8,15 +8,16 @@ import { defineConfig } from "vitest/config";
 // Deliberately separate from vite.config.ts: the React Router plugin there is
 // incompatible with the test runner. Two projects: most tests run in node (with
 // component tests opting into jsdom via a `// @vitest-environment jsdom`
-// docblock); a small browser project covers code that depends on abcjs, which
-// only populates note pitches under a real browser.
+// docblock); a small browser project covers code that depends on
+// OpenSheetMusicDisplay, which only renders and populates note pitches under a
+// real browser.
 export default defineConfig({
     // Dedupe React so browser-rendered component tests share one instance, and
-    // pre-bundle abcjs / the JSX runtime so a dynamic import does not reload a
-    // test mid-run.
+    // pre-bundle the JSX runtime so a dynamic import does not reload a test
+    // mid-run.
     resolve: { dedupe: ["react", "react-dom"] },
     optimizeDeps: {
-        include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime", "abcjs"],
+        include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
     },
     test: {
         coverage: {
