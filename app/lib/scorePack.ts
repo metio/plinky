@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// The Plinky song-pack exchange format: a JSON document with MusicXML embedded,
+// The Plinky score-pack exchange format: a JSON document with MusicXML embedded,
 // used for mass-importing a music school's curriculum and backing up a library. A
-// pack declares any number of curriculums; each song references the ones it
-// belongs to by id, so a song can sit in several.
+// pack declares any number of curriculums; each score references the ones it
+// belongs to by id, so a score can sit in several.
 
 export interface Curriculum {
     id: string;
@@ -12,9 +12,9 @@ export interface Curriculum {
     publisher?: string;
 }
 
-// A song as it appears in a pack. Only id, title, and xml are required — tempo and
+// A score as it appears in a pack. Only id, title, and xml are required — tempo and
 // beatsPerBar are read from the MusicXML on import when a pack omits them.
-export interface PackSong {
+export interface PackScore {
     id: string;
     title: string;
     xml: string;
@@ -25,14 +25,14 @@ export interface PackSong {
     license?: string;
 }
 
-export interface SongPack {
-    format: "plinky-songs";
+export interface ScorePack {
+    format: "plinky-scores";
     version: 1;
     curriculums: Curriculum[];
-    songs: PackSong[];
+    scores: PackScore[];
 }
 
-const FORMAT = "plinky-songs";
+const FORMAT = "plinky-scores";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
@@ -49,7 +49,7 @@ function parseCurriculum(value: unknown): Curriculum | null {
     };
 }
 
-function parseSong(value: unknown): PackSong | null {
+function parseScore(value: unknown): PackScore | null {
     if (
         !isRecord(value) ||
         typeof value.id !== "string" ||
@@ -74,15 +74,15 @@ function parseSong(value: unknown): PackSong | null {
 }
 
 // Serialize a library to a pack. The curriculums list carries the human-readable
-// names for whatever the songs reference.
-export function serializePack(songs: PackSong[], curriculums: Curriculum[] = []): string {
-    const pack: SongPack = { format: FORMAT, version: 1, curriculums, songs };
+// names for whatever the scores reference.
+export function serializePack(scores: PackScore[], curriculums: Curriculum[] = []): string {
+    const pack: ScorePack = { format: FORMAT, version: 1, curriculums, scores };
     return JSON.stringify(pack, null, 2);
 }
 
-// Parse and validate a pack, dropping malformed songs. Throws a reader-friendly
+// Parse and validate a pack, dropping malformed scores. Throws a reader-friendly
 // error when the document is not a usable Plinky pack.
-export function parsePack(json: string): SongPack {
+export function parsePack(json: string): ScorePack {
     let data: unknown;
     try {
         data = JSON.parse(json);
@@ -90,19 +90,21 @@ export function parsePack(json: string): SongPack {
         throw new Error("That file is not valid JSON.");
     }
     if (!isRecord(data) || data.format !== FORMAT) {
-        throw new Error("That is not a Plinky song pack.");
+        throw new Error("That is not a Plinky score pack.");
     }
-    if (!Array.isArray(data.songs)) {
-        throw new Error("The song pack has no songs.");
+    if (!Array.isArray(data.scores)) {
+        throw new Error("The score pack has no scores.");
     }
-    const songs = data.songs.map(parseSong).filter((song): song is PackSong => song !== null);
-    if (songs.length === 0) {
-        throw new Error("The song pack has no valid songs.");
+    const scores = data.scores
+        .map(parseScore)
+        .filter((score): score is PackScore => score !== null);
+    if (scores.length === 0) {
+        throw new Error("The score pack has no valid scores.");
     }
     const curriculums = Array.isArray(data.curriculums)
         ? data.curriculums
               .map(parseCurriculum)
               .filter((entry): entry is Curriculum => entry !== null)
         : [];
-    return { format: FORMAT, version: 1, curriculums, songs };
+    return { format: FORMAT, version: 1, curriculums, scores };
 }

@@ -169,7 +169,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             <p className="text-gray-600 dark:text-gray-300">
                 {notFound
                     ? "That page or exercise doesn't exist — it may have been removed, or the link is slightly off."
-                    : "This is a bug on our side, not anything you did. Your songs and scores are safe on this device — try heading back or reloading."}
+                    : "This is a bug on our side, not anything you did. Your scores are safe on this device — try heading back or reloading."}
             </p>
 
             <div className="flex flex-wrap gap-2">

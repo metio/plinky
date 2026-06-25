@@ -8,7 +8,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/import";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Find songs", "Add your own MusicXML, or submit a song to the catalog");
+    return routeMeta("Find scores", "Add your own MusicXML, or submit a score to the catalog");
 }
 
 export default function ImportRoute() {

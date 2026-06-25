@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { type PackSong, parsePack, serializePack } from "./songPack";
+import { type PackScore, parsePack, serializePack } from "./scorePack";
 
-const song: PackSong = {
+const score: PackScore = {
     id: "scale",
     title: "Scale",
     xml: "<score-partwise><part/></score-partwise>",
@@ -14,23 +14,23 @@ const song: PackSong = {
     license: "CC-BY-4.0",
 };
 
-describe("song pack", () => {
-    it("round-trips songs and curriculums through serialize/parse", () => {
+describe("score pack", () => {
+    it("round-trips scores and curriculums through serialize/parse", () => {
         const json = serializePack(
-            [song],
+            [score],
             [{ id: "grade-1", name: "Grade 1", publisher: "School" }],
         );
         const pack = parsePack(json);
-        expect(pack.songs).toHaveLength(1);
-        expect(pack.songs[0]).toMatchObject({ id: "scale", title: "Scale", tempo: 90 });
-        expect(pack.songs[0]!.curriculums).toEqual(["grade-1", "warmups"]);
-        expect(pack.songs[0]!.license).toBe("CC-BY-4.0");
+        expect(pack.scores).toHaveLength(1);
+        expect(pack.scores[0]).toMatchObject({ id: "scale", title: "Scale", tempo: 90 });
+        expect(pack.scores[0]!.curriculums).toEqual(["grade-1", "warmups"]);
+        expect(pack.scores[0]!.license).toBe("CC-BY-4.0");
         expect(pack.curriculums).toEqual([{ id: "grade-1", name: "Grade 1", publisher: "School" }]);
     });
 
     it("carries several curriculums in one pack", () => {
         const json = serializePack(
-            [song],
+            [score],
             [
                 { id: "grade-1", name: "Grade 1" },
                 { id: "grade-2", name: "Grade 2" },
@@ -45,25 +45,25 @@ describe("song pack", () => {
     it("rejects non-JSON and non-pack documents", () => {
         expect(() => parsePack("not json")).toThrow(/valid JSON/);
         expect(() => parsePack(JSON.stringify({ format: "something-else" }))).toThrow(
-            /not a Plinky song pack/,
+            /not a Plinky score pack/,
         );
     });
 
-    it("rejects a pack with no usable songs", () => {
-        expect(() => parsePack(JSON.stringify({ format: "plinky-songs", songs: [] }))).toThrow(
-            /no songs|no valid songs/,
+    it("rejects a pack with no usable scores", () => {
+        expect(() => parsePack(JSON.stringify({ format: "plinky-scores", scores: [] }))).toThrow(
+            /no scores|no valid scores/,
         );
-        const malformed = { format: "plinky-songs", songs: [{ id: "x" }] };
-        expect(() => parsePack(JSON.stringify(malformed))).toThrow(/no valid songs/);
+        const malformed = { format: "plinky-scores", scores: [{ id: "x" }] };
+        expect(() => parsePack(JSON.stringify(malformed))).toThrow(/no valid scores/);
     });
 
-    it("drops malformed songs but keeps valid ones", () => {
+    it("drops malformed scores but keeps valid ones", () => {
         const pack = parsePack(
             JSON.stringify({
-                format: "plinky-songs",
-                songs: [{ id: "a", title: "A", xml: "<score-partwise/>" }, { id: "bad" }],
+                format: "plinky-scores",
+                scores: [{ id: "a", title: "A", xml: "<score-partwise/>" }, { id: "bad" }],
             }),
         );
-        expect(pack.songs.map((entry) => entry.id)).toEqual(["a"]);
+        expect(pack.scores.map((entry) => entry.id)).toEqual(["a"]);
     });
 });

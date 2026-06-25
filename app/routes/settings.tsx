@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiDebugPanel } from "../components/midiDebugPanel";
-import { SongBackup } from "../components/songBackup";
+import { ScoreBackup } from "../components/scoreBackup";
 import { ThemeToggle } from "../components/themeToggle";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
@@ -115,7 +115,7 @@ export default function Settings() {
                 </label>
             </section>
 
-            <SongBackup />
+            <ScoreBackup />
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">

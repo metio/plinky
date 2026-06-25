@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { ScoreViewer } from "../components/scoreViewer";
-import { loadBundledSongs, type Song } from "../lib/catalog";
+import { loadBundledScores, type Score } from "../lib/catalog";
 import { dailyNumber, dailyScoreId, todayKey } from "../lib/daily";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -21,18 +21,18 @@ export function meta(_args: Route.MetaArgs) {
 // not the build's. Resolving it on mount (rather than during prerender) keeps the
 // static HTML's date-independent <head> meta while avoiding a stale number baked
 // at build time; the heading shows a placeholder until the real value arrives.
-type Today = { number: number; score: Song | null };
+type Today = { number: number; score: Score | null };
 
 export default function DailyRoute() {
     const [today, setToday] = useState<Today | null>(null);
     useEffect(() => {
         const dateKey = todayKey(new Date());
-        const songs = loadBundledSongs().sort((a, b) => a.id.localeCompare(b.id));
+        const scores = loadBundledScores().sort((a, b) => a.id.localeCompare(b.id));
         const id = dailyScoreId(
-            songs.map((entry) => entry.id),
+            scores.map((entry) => entry.id),
             dateKey,
         );
-        setToday({ number: dailyNumber(dateKey), score: songs.find((s) => s.id === id) ?? null });
+        setToday({ number: dailyNumber(dateKey), score: scores.find((s) => s.id === id) ?? null });
     }, []);
 
     return (

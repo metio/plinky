@@ -30,10 +30,10 @@ describe("trackSteps", () => {
 });
 
 describe("TRACKS", () => {
-    it("every step references a real catalog song", () => {
+    it("every step references a real catalog score", () => {
         for (const track of TRACKS) {
-            for (const songId of track.songIds) {
-                expect(catalogIds.has(songId), `${track.id} → ${songId}`).toBe(true);
+            for (const scoreId of track.scoreIds) {
+                expect(catalogIds.has(scoreId), `${track.id} → ${scoreId}`).toBe(true);
             }
         }
     });

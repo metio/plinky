@@ -4,17 +4,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { ScoreViewer } from "../components/scoreViewer";
-import { loadCatalog, removeUserSong, type Song } from "../lib/catalog";
+import { loadCatalog, removeUserScore, type Score } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, loadAllMastery, type Mastery } from "../lib/mastery";
 import { routeMeta } from "../lib/site";
 import { loadCurriculums } from "../lib/catalog";
-import type { Curriculum } from "../lib/songPack";
+import type { Curriculum } from "../lib/scorePack";
 import { m } from "../paraglide/messages.js";
-import type { Route } from "./+types/songs";
+import type { Route } from "./+types/scores";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Songs", "Every piece on this device — rendered, played, and graded");
+    return routeMeta("Scores", "Every piece on this device — rendered, played, and graded");
 }
 
 const CHIP = "rounded-full border px-3 py-1 text-sm";
@@ -22,8 +22,8 @@ const CHIP_ON = "border-indigo-600 bg-indigo-600 text-white";
 const CHIP_OFF =
     "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
 
-export default function SongsRoute() {
-    const [songs, setSongs] = useState<Song[]>([]);
+export default function ScoresRoute() {
+    const [scores, setScores] = useState<Score[]>([]);
     const [curriculums, setCurriculums] = useState<Curriculum[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [masteryMap, setMasteryMap] = useState<Record<string, Mastery>>({});
@@ -42,7 +42,7 @@ export default function SongsRoute() {
 
     useEffect(() => {
         const loaded = loadCatalog();
-        setSongs(loaded);
+        setScores(loaded);
         setSelectedId((current) => current ?? loaded[0]?.id ?? null);
         setCurriculums(loadCurriculums());
         setFavorites(loadFavorites());
@@ -51,8 +51,8 @@ export default function SongsRoute() {
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
     const remove = (id: string) => {
-        removeUserSong(id);
-        setSongs(loadCatalog());
+        removeUserScore(id);
+        setScores(loadCatalog());
     };
 
     const now = Date.now();
@@ -60,30 +60,30 @@ export default function SongsRoute() {
 
     const matches = useMemo(() => {
         const needle = query.trim().toLowerCase();
-        return songs.filter((song) => {
-            if (curriculum && !song.curriculums?.includes(curriculum)) {
+        return scores.filter((score) => {
+            if (curriculum && !score.curriculums?.includes(curriculum)) {
                 return false;
             }
-            if (favoritesOnly && !favorites.has(song.id)) {
+            if (favoritesOnly && !favorites.has(score.id)) {
                 return false;
             }
             if (!needle) {
                 return true;
             }
             return (
-                song.title.toLowerCase().includes(needle) ||
-                song.composer.toLowerCase().includes(needle)
+                score.title.toLowerCase().includes(needle) ||
+                score.composer.toLowerCase().includes(needle)
             );
         });
-    }, [songs, query, curriculum, favoritesOnly, favorites]);
+    }, [scores, query, curriculum, favoritesOnly, favorites]);
 
-    const selected = songs.find((song) => song.id === selectedId) ?? null;
+    const selected = scores.find((score) => score.id === selectedId) ?? null;
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.songs_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.songs_intro()}</p>
+                <h1 className="text-2xl font-semibold">{m.scores_heading()}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.scores_intro()}</p>
                 {dueCount > 0 && (
                     <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
                         {m.mastery_due_count({ count: dueCount })}
@@ -95,8 +95,8 @@ export default function SongsRoute() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder={m.songs_search_placeholder()}
-                aria-label={m.songs_search_placeholder()}
+                placeholder={m.scores_search_placeholder()}
+                aria-label={m.scores_search_placeholder()}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
             />
 
@@ -106,7 +106,7 @@ export default function SongsRoute() {
                     onClick={() => setCurriculum("")}
                     className={`${CHIP} ${curriculum === "" ? CHIP_ON : CHIP_OFF}`}
                 >
-                    {m.songs_filter_all()}
+                    {m.scores_filter_all()}
                 </button>
                 {curriculums.map((entry) => (
                     <button
@@ -124,47 +124,47 @@ export default function SongsRoute() {
                     aria-pressed={favoritesOnly}
                     className={`${CHIP} ${favoritesOnly ? CHIP_ON : CHIP_OFF}`}
                 >
-                    {m.songs_filter_favorites()}
+                    {m.scores_filter_favorites()}
                 </button>
             </div>
 
             <p className="text-xs text-gray-500 dark:text-gray-400">
-                {m.songs_count({ count: matches.length })}
+                {m.scores_count({ count: matches.length })}
             </p>
 
             {matches.length === 0 ? (
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.songs_empty()}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.scores_empty()}</p>
             ) : (
                 <ul className="flex flex-wrap gap-2">
-                    {matches.map((song) => {
-                        const mastery = masteryMap[song.id];
+                    {matches.map((score) => {
+                        const mastery = masteryMap[score.id];
                         return (
-                            <li key={song.id} className="flex items-center">
+                            <li key={score.id} className="flex items-center">
                                 <button
                                     type="button"
-                                    onClick={() => toggle(song.id)}
-                                    aria-pressed={favorites.has(song.id)}
+                                    onClick={() => toggle(score.id)}
+                                    aria-pressed={favorites.has(score.id)}
                                     aria-label={
-                                        favorites.has(song.id)
-                                            ? m.songs_unfavorite()
-                                            : m.songs_favorite()
+                                        favorites.has(score.id)
+                                            ? m.scores_unfavorite()
+                                            : m.scores_favorite()
                                     }
-                                    className={`mr-1 text-lg leading-none ${favorites.has(song.id) ? "text-amber-600 dark:text-amber-400" : "text-gray-400 hover:text-amber-600"}`}
+                                    className={`mr-1 text-lg leading-none ${favorites.has(score.id) ? "text-amber-600 dark:text-amber-400" : "text-gray-400 hover:text-amber-600"}`}
                                 >
-                                    {favorites.has(song.id) ? "★" : "☆"}
+                                    {favorites.has(score.id) ? "★" : "☆"}
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setSelectedId(song.id)}
-                                    aria-pressed={song.id === selectedId}
+                                    onClick={() => setSelectedId(score.id)}
+                                    aria-pressed={score.id === selectedId}
                                     className={`rounded-md border px-3 py-2 text-left text-sm ${
-                                        song.id === selectedId
+                                        score.id === selectedId
                                             ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950"
                                             : "border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                                     }`}
                                 >
                                     <span className="block font-medium">
-                                        {song.title}
+                                        {score.title}
                                         {mastery?.learned && (
                                             <span className="ml-1 text-green-600 dark:text-green-400">
                                                 ✓
@@ -176,16 +176,16 @@ export default function SongsRoute() {
                                             </span>
                                         )}
                                     </span>
-                                    {song.composer && (
+                                    {score.composer && (
                                         <span className="block text-xs text-gray-600 dark:text-gray-400">
-                                            {song.composer}
+                                            {score.composer}
                                         </span>
                                     )}
                                 </button>
-                                {!song.bundled && (
+                                {!score.bundled && (
                                     <button
                                         type="button"
-                                        onClick={() => remove(song.id)}
+                                        onClick={() => remove(score.id)}
                                         aria-label={m.action_remove()}
                                         className="ml-1 text-sm text-red-600 dark:text-red-400"
                                     >

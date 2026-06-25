@@ -14,68 +14,72 @@ SPDX-License-Identifier: 0BSD
 
 ---
 
-Plug a digital piano into your browser and Plinky guides you through short
-exercises — showing the next note to play, listening over MIDI, and scoring how
-you do. No piano handy? Play along on your computer keyboard instead. Everything
-runs in the browser; nothing is uploaded, and your scores and imported songs stay
-on your device.
+Plug a digital piano into your browser and Plinky guides you through a score —
+showing the next note to play, listening over MIDI, and grading how you do. No
+piano handy? Play along on your computer keyboard instead. Everything runs in the
+browser; nothing is uploaded, and your scores stay on your device.
 
-## Practice modes
+## Practising a score
 
-- **Practice** — a sheet-music phrase with the next note highlighted. Play it and
-  the cursor advances; the note sounds back so you hear what you played.
-- **Time trial** — race through a phrase as fast and cleanly as you can. The
-  clock starts on your first note, wrong notes add a penalty, and your best run
-  per exercise is remembered.
-- **Rhythm** — a metronome counts you in and keeps time while you play; each note
-  is rated on how close it lands to the beat, the tightest run is kept as your
-  best, and (on a MIDI piano) it reports how evenly you struck the keys.
-- **Tempo** — no metronome; you set the pace. A live readout tracks your tempo,
-  and the finished view charts it over the phrase — a line per hand — and flags
-  where you slowed down.
-- **Loop** — pick a few bars and play them on repeat until they stick; each lap
-  is timed (bpm) and scored (accuracy) so you can watch yourself improve, then
-  jump to the next section.
-- **Sprint** — a sight-reading drill on freshly generated notes in C, G, F, or D:
-  play as many correctly as you can before the timer runs out, one or two hands.
-  Your best count per setting is kept.
-- **Daily challenge** — a one-minute sprint whose notes are the same for everyone
-  that day; come back tomorrow for a new one.
+Open any score and Plinky renders it as real notation. **Listen** plays it back so
+you hear it first; **Practice** turns the same cursor into a note-by-note guide —
+play the highlighted note and the cursor advances, sounding back what you played.
+Wrong notes are ignored so you can hunt for the right key, single notes, **chords**,
+and **two-hand grand staffs** all the same.
+
+When you finish, the run is **graded S–F** from three things:
+
+- **Accuracy** — how many notes you found cleanly.
+- **Timing** — how close each note landed to where the notation puts it.
+- **Flow** — whether you kept moving like a musician rather than stopping to hunt.
+
+A **ghost timeline** then plots the ideal onsets against yours so you can see where
+you rushed or dragged, and once you clear a score it enters **spaced repetition** —
+Plinky resurfaces it for review on a widening schedule so it actually sticks.
+
+## Modes
+
+- **Scores** — the catalogue: bundled scales, arpeggios, and familiar tunes like
+  *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import. Search, star, and
+  open one to practise.
+- **Sprint** — a sight-reading drill on freshly generated notes; a new phrase
+  every run, graded the same as any score.
+- **Daily challenge** — one score, the same for everyone that day, that you can
+  share as a "Plinky #N" grid. Come back tomorrow for a new one.
 - **Ear training** — hear a note and find it by ear, in any octave.
+- **Tracks** — ordered, Duolingo-style paths through the catalogue; nothing is
+  locked, the order is a suggestion, and a step is cleared once you've learned it.
+- **Curriculums** — your imported scores grouped by the packs a teacher or school
+  shared with you.
+- **Progress** — your day streak, days practised, and notes played, plus a
+  slow-moving fingerprint of your Accuracy, Timing, and Flow over recent sessions.
 
-Each mode handles single notes, **chords**, and **two-hand grand-staff** pieces —
-each hand advances at its own pace — as well as rests, ties, tuplets, and repeats.
-A grand staff can be practiced one hand at a time, and Rhythm and Tempo report
-each hand's timing separately.
+## Sharing
 
-The exercise library covers scales (C, G, D, F major), arpeggios and triads, the
-A minor pentatonic, familiar melodies like *Twinkle, Twinkle* and *Ode to Joy*,
-and a two-hand warm-up. A guided **learning path** orders them for beginners, and
-a **Progress** page tracks your day streak and notes played. The score can
-overlay note names or suggested fingering, and Plinky has a light/dark theme and
-a settings page for sound and volume.
+Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Timing,
+Flow) across six moments, no numbers — to copy, post, or save as an image. The
+daily challenge shares as **Plinky #N** so everyone compares the same run, and the
+Progress page shares your lifetime fingerprint.
 
-## Bring your own songs
+## Bring your own scores
 
-Import any tune as [ABC notation](https://abcnotation.com) — paste it or upload an
-`.abc` file — and it joins the library, playable in every mode and saved on your
-device. You can also upload **MusicXML** (`.musicxml`/`.xml`) exported from
-MuseScore, Sibelius, Finale, or Dorico; it's converted to ABC on the way in.
-Export any exercise back to `.abc`, or hit **Share** to copy a link that imports
-the song when opened — no account or sign-up, just send the link.
+Upload a **MusicXML** file (`.musicxml`/`.xml`) exported from MuseScore, Sibelius,
+Finale, or Dorico — or paste it — and it joins your catalogue, playable and graded
+like any other, saved on your device. Export your library as a pack to back it up
+or hand it to a student, and **submit a score to the shared catalogue** through a
+prefilled GitHub issue — no account beyond your own, no backend.
 
 ## Playing
 
 - **With a digital piano** — connect it over USB or Bluetooth MIDI and click
   *Connect MIDI*. Web MIDI is available in Chrome, Edge, and Firefox on desktop
-  and Android; Safari and iOS do not expose it, so use the keyboard fallback
-  there.
+  and Android; Safari and iOS do not expose it, so use the keyboard fallback there.
 - **With your computer keyboard** — `A S D F G` plays the left hand and
   `H J K L ;` the right, each a five-finger C–G position, with an octave shift to
   move around. (Two-hand pieces span both staves, so a MIDI keyboard is the
   comfortable way to play those.)
-- **With the on-screen piano** — tap the keys shown under each exercise; the next
-  note to play is highlighted. Handy on a phone or tablet with no MIDI or keyboard.
+- **With the on-screen piano** — tap the keys shown under each score; the next note
+  to play is highlighted. Handy on a phone or tablet with no MIDI or keyboard.
 
 Plinky installs from your browser like an app and works offline once loaded.
 
@@ -83,11 +87,11 @@ Plinky installs from your browser like an app and works offline once loaded.
 
 A single-page app built with [React Router](https://reactrouter.com) in SPA mode.
 [Web MIDI](https://developer.mozilla.org/docs/Web/API/Web_MIDI_API) delivers note
-input, [Web Audio](https://developer.mozilla.org/docs/Web/API/Web_Audio_API)
-drives the metronome and the synthesized playback from one shared audio clock,
-and [abcjs](https://www.abcjs.net) renders the notation. Plinky reads the played
-pitches and their timing back out of abcjs, splitting a grand staff into a left
-and right hand so each can be matched independently.
+input and [Web Audio](https://developer.mozilla.org/docs/Web/API/Web_Audio_API)
+drives playback from one shared audio clock.
+[OpenSheetMusicDisplay](https://opensheetmusicdisplay.org) renders MusicXML, and
+Plinky walks its cursor to match the pitches under each position against what you
+play — the same engine behind every mode.
 
 ## Development
 
@@ -99,10 +103,11 @@ npm run dev      # start the dev server
 npm run typecheck
 npm test
 npm run build    # emit the static site to build/client
+npm run scores   # regenerate the bundled exercise scores
 ```
 
 A pull request runs typecheck, tests, and a production build; merging to `main`
-publishes the built site to <https://plinky.projects.metio.wtf>.
+publishes the built site to <https://plinky.fun>.
 
 ## License
 

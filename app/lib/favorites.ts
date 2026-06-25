@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// The songs a user has starred, kept on the device. The home page shows these
+// The scores a user has starred, kept on the device. The home page shows these
 // rather than the whole catalog, so a large library stays manageable.
 const KEY = "plinky:favorites";
 
@@ -30,7 +30,7 @@ export function isFavorite(id: string): boolean {
     return loadFavorites().has(id);
 }
 
-// Flip a song's starred state and persist, returning the updated set so a caller
+// Flip a score's starred state and persist, returning the updated set so a caller
 // can drive React state from it without a second read.
 export function toggleFavorite(id: string): Set<string> {
     const ids = loadFavorites();

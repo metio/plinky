@@ -3,8 +3,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { SongImport } from "../components/songImport";
-import { loadCatalog, type Song } from "../lib/catalog";
+import { ScoreImport } from "../components/scoreImport";
+import { loadCatalog, type Score } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -30,7 +30,7 @@ const PLAY_NOW = [
 const NAV_LINK = "text-indigo-700 underline dark:text-indigo-300";
 
 export default function Home() {
-    const [songs, setSongs] = useState<Song[]>([]);
+    const [scores, setScores] = useState<Score[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [loaded, setLoaded] = useState(false);
 
@@ -38,16 +38,16 @@ export default function Home() {
     // so it appears a tick after paint; a skeleton of the same height holds the
     // space until then so the import panel below does not jump.
     useEffect(() => {
-        setSongs(loadCatalog());
+        setScores(loadCatalog());
         setFavorites(loadFavorites());
         setLoaded(true);
     }, []);
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
 
-    const favoriteSongs = useMemo(
-        () => songs.filter((song) => favorites.has(song.id)),
-        [songs, favorites],
+    const favoriteScores = useMemo(
+        () => scores.filter((score) => favorites.has(score.id)),
+        [scores, favorites],
     );
 
     return (
@@ -85,7 +85,7 @@ export default function Home() {
                         {m.home_favorites_heading()}
                     </h2>
                     <div className="flex gap-4 text-sm">
-                        <Link to="/songs" className={NAV_LINK}>
+                        <Link to="/scores" className={NAV_LINK}>
                             {m.home_browse_all()}
                         </Link>
                         <Link to="/tracks" className={NAV_LINK}>
@@ -99,30 +99,30 @@ export default function Home() {
 
                 {!loaded ? (
                     <div className="h-24" aria-hidden="true" />
-                ) : favoriteSongs.length === 0 ? (
+                ) : favoriteScores.length === 0 ? (
                     <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
                         {m.home_favorites_empty()}{" "}
-                        <Link to="/songs" className={NAV_LINK}>
+                        <Link to="/scores" className={NAV_LINK}>
                             {m.home_browse_all()}
                         </Link>
                     </p>
                 ) : (
                     <ul className="space-y-2">
-                        {favoriteSongs.map((song) => (
+                        {favoriteScores.map((score) => (
                             <li
-                                key={song.id}
+                                key={score.id}
                                 className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 dark:border-gray-800"
                             >
                                 <Link
-                                    to={`/play/${song.id}`}
+                                    to={`/play/${score.id}`}
                                     className="font-medium text-indigo-700 underline dark:text-indigo-300"
                                 >
-                                    {song.title}
+                                    {score.title}
                                 </Link>
                                 <button
                                     type="button"
-                                    onClick={() => toggle(song.id)}
-                                    aria-label={m.songs_unfavorite()}
+                                    onClick={() => toggle(score.id)}
+                                    aria-label={m.scores_unfavorite()}
                                     className="text-lg leading-none text-amber-600 dark:text-amber-400"
                                 >
                                     ★
@@ -133,9 +133,9 @@ export default function Home() {
                 )}
             </section>
 
-            <SongImport
-                existingIds={songs.map((song) => song.id)}
-                onAdded={() => setSongs(loadCatalog())}
+            <ScoreImport
+                existingIds={scores.map((score) => score.id)}
+                onAdded={() => setScores(loadCatalog())}
             />
         </main>
     );

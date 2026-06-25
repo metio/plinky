@@ -14,25 +14,25 @@ export interface Track {
     description: string;
     kind: TrackKind;
     minutes?: number; // a rough session length, for routines
-    songIds: string[]; // in order
+    scoreIds: string[]; // in order
 }
 
 export type TrackStatus = "done" | "current" | "upcoming";
-export type TrackStep = { songId: string; status: TrackStatus };
+export type TrackStep = { scoreId: string; status: TrackStatus };
 
 // Mark each step done/current/upcoming. The first not-yet-done step is "current"
 // (the suggested next thing); everything else upcoming. No step is ever locked.
-export function trackSteps(songIds: string[], isDone: (id: string) => boolean): TrackStep[] {
+export function trackSteps(scoreIds: string[], isDone: (id: string) => boolean): TrackStep[] {
     let currentAssigned = false;
-    return songIds.map((songId) => {
-        if (isDone(songId)) {
-            return { songId, status: "done" };
+    return scoreIds.map((scoreId) => {
+        if (isDone(scoreId)) {
+            return { scoreId, status: "done" };
         }
         if (!currentAssigned) {
             currentAssigned = true;
-            return { songId, status: "current" };
+            return { scoreId, status: "current" };
         }
-        return { songId, status: "upcoming" };
+        return { scoreId, status: "upcoming" };
     });
 }
 
@@ -72,7 +72,7 @@ export const TRACKS = [
         name: "Technique foundations",
         description: "Build core finger technique from the ground up.",
         kind: "progression",
-        songIds: [
+        scoreIds: [
             "scale-c-major",
             "arpeggio-c-major",
             "scale-g-major",
@@ -86,21 +86,21 @@ export const TRACKS = [
         name: "Major scales — circle of fifths",
         description: "All twelve major scales, around the circle of fifths.",
         kind: "progression",
-        songIds: MAJOR_CIRCLE,
+        scoreIds: MAJOR_CIRCLE,
     },
     {
         id: "minor-scales-circle",
         name: "Minor scales — circle of fifths",
         description: "All twelve natural-minor scales, around the circle of fifths.",
         kind: "progression",
-        songIds: MINOR_CIRCLE,
+        scoreIds: MINOR_CIRCLE,
     },
     {
         id: "major-arpeggios-circle",
         name: "Major arpeggios — circle of fifths",
         description: "Every major arpeggio, around the circle of fifths.",
         kind: "progression",
-        songIds: MAJOR_CIRCLE.map((id) => id.replace("scale-", "arpeggio-")),
+        scoreIds: MAJOR_CIRCLE.map((id) => id.replace("scale-", "arpeggio-")),
     },
     {
         id: "warm-up-5",
@@ -108,7 +108,7 @@ export const TRACKS = [
         description: "A quick daily loosener.",
         kind: "routine",
         minutes: 5,
-        songIds: ["scale-c-major", "arpeggio-c-major", "scale-g-major"],
+        scoreIds: ["scale-c-major", "arpeggio-c-major", "scale-g-major"],
     },
     {
         id: "technique-15",
@@ -116,7 +116,7 @@ export const TRACKS = [
         description: "A fuller technique session.",
         kind: "routine",
         minutes: 15,
-        songIds: [
+        scoreIds: [
             "scale-c-major",
             "scale-g-major",
             "scale-d-major",

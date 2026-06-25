@@ -10,17 +10,17 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/curriculums";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Curriculums", "Your songs, grouped by the curriculums you have imported");
+    return routeMeta("Curriculums", "Your scores, grouped by the curriculums you have imported");
 }
 
-const SONG_LINK =
+const SCORE_LINK =
     "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900";
 
 export default function CurriculumsRoute() {
     const [groups, setGroups] = useState<CurriculumGroup[]>([]);
     useEffect(() => {
-        const userSongs = loadCatalog().filter((song) => !song.bundled);
-        setGroups(groupByCurriculum(userSongs, loadCurriculums()));
+        const userScores = loadCatalog().filter((score) => !score.bundled);
+        setGroups(groupByCurriculum(userScores, loadCurriculums()));
     }, []);
 
     return (
@@ -51,13 +51,13 @@ export default function CurriculumsRoute() {
                         )}
                     </h2>
                     <ul className="space-y-2">
-                        {group.songs.map((song) => (
+                        {group.scores.map((score) => (
                             <li
-                                key={song.id}
+                                key={score.id}
                                 className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-gray-200 p-3 dark:border-gray-800"
                             >
-                                <span className="font-medium">{song.title}</span>
-                                <Link to={`/play/${song.id}`} className={SONG_LINK}>
+                                <span className="font-medium">{score.title}</span>
+                                <Link to={`/play/${score.id}`} className={SCORE_LINK}>
                                     {m.curriculums_practice()}
                                 </Link>
                             </li>

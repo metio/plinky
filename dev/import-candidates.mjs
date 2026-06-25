@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// Imports candidate public-domain songs (produced by the A–Z workflow) into the
+// Imports candidate public-domain scores (produced by the A–Z workflow) into the
 // catalog: drops duplicates of what's already there, renders each ABC with the
-// app's abcjs to confirm it actually plays, and writes a songs/<id>.json (CC0,
+// app's abcjs to confirm it actually plays, and writes a scores/<id>.json (CC0,
 // public-domain curriculum) only for the ones that pass. Usage:
 //   node dev/import-candidates.mjs <candidates.json>
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -27,14 +27,14 @@ const norm = (s) =>
 // Existing catalog: collect ids and normalized titles so we never duplicate.
 const existingIds = new Set();
 const existingTitles = new Set();
-for (const file of readdirSync("songs")) {
+for (const file of readdirSync("scores")) {
     if (!file.endsWith(".json") || file === "_curriculums.json") continue;
-    const song = JSON.parse(readFileSync(join("songs", file), "utf8"));
-    existingIds.add(song.id);
-    existingTitles.add(norm(song.title));
+    const score = JSON.parse(readFileSync(join("scores", file), "utf8"));
+    existingIds.add(score.id);
+    existingTitles.add(norm(score.title));
 }
 
-const candidates = JSON.parse(readFileSync(candidatesPath, "utf8")).songs ?? [];
+const candidates = JSON.parse(readFileSync(candidatesPath, "utf8")).scores ?? [];
 
 // Render once per ABC in a single headless session; count playable note events.
 const browser = await chromium.launch();
@@ -99,7 +99,7 @@ for (const c of candidates) {
             : reason
               ? `${reason}.`.replace(/\.\.$/, ".")
               : "Traditional.";
-    const song = {
+    const score = {
         id,
         title,
         description,
@@ -109,7 +109,7 @@ for (const c of candidates) {
         license: "CC0-1.0",
         curriculums: ["public-domain"],
     };
-    writeFileSync(join("songs", `${id}.json`), `${JSON.stringify(song, null, 2)}\n`);
+    writeFileSync(join("scores", `${id}.json`), `${JSON.stringify(score, null, 2)}\n`);
     written.push(`${title} (${steps} notes)`);
 }
 
