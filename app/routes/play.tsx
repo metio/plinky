@@ -34,7 +34,13 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             </p>
                         )}
                     </header>
-                    <ScoreViewer key={song.id} id={song.id} xml={song.xml} title={song.title} />
+                    <ScoreViewer
+                        key={song.id}
+                        id={song.id}
+                        xml={song.xml}
+                        title={song.title}
+                        initialTempo={song.tempo}
+                    />
                 </>
             )}
             {song === null && (

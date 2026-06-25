@@ -81,15 +81,17 @@ function scoreXml(title, fifths, notes, perBar) {
     const measures = [];
     for (let i = 0; i < notes.length; i += perBar) {
         const number = measures.length + 1;
-        const attributes =
+        // The first measure carries the attributes and an explicit practice tempo,
+        // so the score is self-describing rather than relying on an app default.
+        const lead =
             number === 1
-                ? `<attributes><divisions>1</divisions><key><fifths>${fifths}</fifths></key><time><beats>${perBar}</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>\n`
+                ? `<attributes><divisions>1</divisions><key><fifths>${fifths}</fifths></key><time><beats>${perBar}</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>\n      <sound tempo="90"/>\n      `
                 : "";
         const body = notes
             .slice(i, i + perBar)
             .map((note) => noteXml(note, fifths))
             .join("\n");
-        measures.push(`    <measure number="${number}">\n      ${attributes}${body}\n    </measure>`);
+        measures.push(`    <measure number="${number}">\n      ${lead}${body}\n    </measure>`);
     }
     return `<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">

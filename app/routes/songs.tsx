@@ -204,6 +204,7 @@ export default function SongsRoute() {
                     id={selected.id}
                     xml={selected.xml}
                     title={selected.title}
+                    initialTempo={selected.tempo}
                     onMastery={reloadMastery}
                 />
             )}

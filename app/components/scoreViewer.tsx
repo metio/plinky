@@ -48,11 +48,15 @@ export function ScoreViewer({
     onMastery,
     daily,
     ephemeral,
+    initialTempo,
 }: {
     id: string;
     xml: string;
     title: string;
     onMastery?: () => void;
+    // The piece's own tempo, used as the starting point for Listen and the count —
+    // the component is keyed by piece, so it re-seeds when the piece changes.
+    initialTempo?: number;
     // When set, this run is the day's shared challenge; the share card identifies
     // it as "Plinky #N" rather than by the piece, so everyone compares one grid.
     daily?: number;
@@ -63,14 +67,14 @@ export function ScoreViewer({
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
-    const tempoRef = useRef(100);
+    const tempoRef = useRef(initialTempo ?? 100);
     const notesRef = useRef<PlayedNote[]>([]);
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
     const synth = useSynth();
     const [ready, setReady] = useState(false);
     const [playing, setPlaying] = useState(false);
-    const [tempo, setTempo] = useState(100);
+    const [tempo, setTempo] = useState(initialTempo ?? 100);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [timeline, setTimeline] = useState<TimelineNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);

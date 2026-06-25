@@ -12,6 +12,7 @@
         <clef number="1"><sign>G</sign><line>2</line></clef>
         <clef number="2"><sign>F</sign><line>4</line></clef>
       </attributes>
+      <sound tempo="114"/>
       <note><pitch><step>E</step><octave>4</octave></pitch><duration>2</duration><type>quarter</type><staff>1</staff></note>
       <note><pitch><step>E</step><octave>4</octave></pitch><duration>2</duration><type>quarter</type><staff>1</staff></note>
       <note><pitch><step>F</step><octave>4</octave></pitch><duration>2</duration><type>quarter</type><staff>1</staff></note>
