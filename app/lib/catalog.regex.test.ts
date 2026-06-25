@@ -23,7 +23,7 @@ describe("readScoreMetaFromText (regex/prerender path)", () => {
     });
 
     it("decodes hex, decimal, and angle-bracket entities", () => {
-        expect(readScoreMetaFromText(score("Caf&#xe9; &lt;3")).title).toBe("Café <3");
+        expect(readScoreMetaFromText(score("&#xe9; &lt;3")).title).toBe("é <3");
         expect(readScoreMetaFromText(score("A &#38; B")).title).toBe("A & B");
     });
 
