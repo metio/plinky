@@ -13,6 +13,3 @@ export default meta;
 type Story = StoryObj<typeof SprintTrainer>;
 
 export const Sprint: Story = {};
-export const DailyChallenge: Story = {
-    args: { daily: { dateKey: "2026-06-23" } },
-};

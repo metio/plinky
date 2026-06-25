@@ -2,28 +2,45 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { dailyPhrase, dailyShareText, todayKey } from "./daily";
+import { DAILY_EPOCH, dailyNumber, dailyScoreId, todayKey } from "./daily";
 
-describe("daily challenge", () => {
-    it("formats the date key as YYYY-MM-DD", () => {
+describe("todayKey", () => {
+    it("formats the date as YYYY-MM-DD", () => {
         expect(todayKey(new Date("2026-06-23T15:04:00Z"))).toBe("2026-06-23");
     });
+});
 
-    it("produces the same phrase for the same day", () => {
-        expect(dailyPhrase("2026-06-23")).toBe(dailyPhrase("2026-06-23"));
+describe("dailyNumber", () => {
+    it("starts at one on the epoch day", () => {
+        expect(dailyNumber(DAILY_EPOCH)).toBe(1);
     });
 
-    it("produces different phrases on different days", () => {
-        expect(dailyPhrase("2026-06-23")).not.toBe(dailyPhrase("2026-06-24"));
+    it("counts up one per day", () => {
+        expect(dailyNumber("2026-06-26", "2026-06-25")).toBe(2);
+        expect(dailyNumber("2026-07-05", "2026-06-25")).toBe(11);
+    });
+});
+
+describe("dailyScoreId", () => {
+    const ids = ["a", "b", "c", "d", "e"];
+
+    it("picks the same score for the same day", () => {
+        expect(dailyScoreId(ids, "2026-06-25")).toBe(dailyScoreId(ids, "2026-06-25"));
     });
 
-    it("builds a share message with the score and link", () => {
-        const text = dailyShareText(12, "https://plinky.example/daily");
-        expect(text).toContain("12 notes");
-        expect(text).toContain("https://plinky.example/daily");
+    it("always picks an id from the catalogue", () => {
+        expect(ids).toContain(dailyScoreId(ids, "2026-06-25"));
     });
 
-    it("uses the singular for a single note", () => {
-        expect(dailyShareText(1, "x")).toContain("1 note correctly");
+    it("varies the pick across days", () => {
+        const week = ["2026-06-25", "2026-06-26", "2026-06-27", "2026-06-28", "2026-06-29"].map(
+            (day) => dailyScoreId(ids, day),
+        );
+        // The seed moves the pick around rather than landing on one score forever.
+        expect(new Set(week).size).toBeGreaterThan(1);
+    });
+
+    it("returns null for an empty catalogue", () => {
+        expect(dailyScoreId([], "2026-06-25")).toBeNull();
     });
 });

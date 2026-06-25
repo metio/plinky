@@ -7,7 +7,6 @@ import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { type CorrectInfo, useHandsMatcher } from "../hooks/useHandsMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { useRecordOnFinish } from "../hooks/usePracticeLog";
-import { dailyPhrase, dailyShareText } from "../lib/daily";
 import { generatePhrase, SPRINT_KEYS, type SprintKey } from "../lib/generator";
 import { buildHands, type Hand } from "../lib/hands";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
@@ -34,7 +33,7 @@ function formatClock(ms: number): string {
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
+export function SprintTrainer() {
     const [durationMin, setDurationMin] = useState(2);
     const [twoHands, setTwoHands] = useState(false);
     const [key, setKey] = useState<SprintKey>("C");
@@ -45,18 +44,13 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
     const [result, setResult] = useState<{ correct: number; wrong: number } | null>(null);
     const [best, setBest] = useState<SprintBest | null>(null);
     const [isRecord, setIsRecord] = useState(false);
-    const [copied, setCopied] = useState(false);
 
     const startRef = useRef(0);
     const correctRef = useRef(0);
     const wrongRef = useRef(0);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // The daily challenge is a fixed one-minute, one-hand run keyed by its date.
-    const effectiveDuration = daily ? 1 : durationMin;
-    const config = daily
-        ? `daily:${daily.dateKey}`
-        : `${durationMin}m-${key}-${twoHands ? "2h" : "1h"}`;
+    const config = `${durationMin}m-${key}-${twoHands ? "2h" : "1h"}`;
     useEffect(() => {
         setBest(loadBestSprint(config));
     }, [config]);
@@ -103,7 +97,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
             if (info.ordinal === 0) {
                 startRef.current = info.timestamp;
                 setRunState("running");
-                const durationMs = effectiveDuration * 60000;
+                const durationMs = durationMin * 60000;
                 stopTimer();
                 timerRef.current = setInterval(() => {
                     const remaining = durationMs - (performance.now() - startRef.current);
@@ -115,7 +109,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                 }, 100);
             }
         },
-        [synth, effectiveDuration, stopTimer, finish],
+        [synth, durationMin, stopTimer, finish],
     );
 
     const handleWrong = useCallback(() => {
@@ -147,15 +141,11 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
         startRef.current = 0;
         setResult(null);
         setIsRecord(false);
-        setRemainingMs(effectiveDuration * 60000);
-        if (daily) {
-            setAbc(dailyPhrase(daily.dateKey));
-        } else {
-            const bars = Math.min(durationMin * BARS_PER_MINUTE, MAX_BARS);
-            setAbc(generatePhrase({ bars, beatsPerBar: BEATS_PER_BAR, twoHands, key }));
-        }
+        setRemainingMs(durationMin * 60000);
+        const bars = Math.min(durationMin * BARS_PER_MINUTE, MAX_BARS);
+        setAbc(generatePhrase({ bars, beatsPerBar: BEATS_PER_BAR, twoHands, key }));
         setRunState("armed");
-    }, [daily, effectiveDuration, durationMin, twoHands, key]);
+    }, [durationMin, twoHands, key]);
 
     useEffect(() => stopTimer, [stopTimer]);
 
@@ -168,12 +158,8 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
     return (
         <section className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">
-                    {daily ? m.sprint_daily_title() : m.sprint_title()}
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {daily ? m.sprint_daily_intro() : m.sprint_intro()}
-                </p>
+                <h1 className="text-2xl font-semibold">{m.sprint_title()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.sprint_intro()}</p>
             </header>
 
             {support === "unsupported" && (
@@ -195,58 +181,56 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
 
             {runState === "idle" && (
                 <div className="space-y-4">
-                    {!daily && (
-                        <div className="flex flex-wrap items-center gap-3">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {m.sprint_length()}
-                            </span>
-                            {DURATIONS.map((minutes) => (
-                                <button
-                                    key={minutes}
-                                    type="button"
-                                    onClick={() => setDurationMin(minutes)}
-                                    className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-                                        durationMin === minutes
-                                            ? "bg-indigo-600 text-white"
-                                            : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
-                                    }`}
-                                >
-                                    {m.sprint_minutes({ minutes })}
-                                </button>
-                            ))}
-                            <label className="ml-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                <input
-                                    type="checkbox"
-                                    checked={twoHands}
-                                    onChange={(event) => setTwoHands(event.target.checked)}
-                                />
-                                {m.sprint_two_hands()}
-                            </label>
-                            <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {m.sprint_key()}
-                            </span>
-                            {SPRINT_KEYS.map((option) => (
-                                <button
-                                    key={option}
-                                    type="button"
-                                    onClick={() => setKey(option)}
-                                    className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-                                        key === option
-                                            ? "bg-indigo-600 text-white"
-                                            : "border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                                    }`}
-                                >
-                                    {option}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {m.sprint_length()}
+                        </span>
+                        {DURATIONS.map((minutes) => (
+                            <button
+                                key={minutes}
+                                type="button"
+                                onClick={() => setDurationMin(minutes)}
+                                className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+                                    durationMin === minutes
+                                        ? "bg-indigo-600 text-white"
+                                        : "border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+                                }`}
+                            >
+                                {m.sprint_minutes({ minutes })}
+                            </button>
+                        ))}
+                        <label className="ml-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                            <input
+                                type="checkbox"
+                                checked={twoHands}
+                                onChange={(event) => setTwoHands(event.target.checked)}
+                            />
+                            {m.sprint_two_hands()}
+                        </label>
+                        <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {m.sprint_key()}
+                        </span>
+                        {SPRINT_KEYS.map((option) => (
+                            <button
+                                key={option}
+                                type="button"
+                                onClick={() => setKey(option)}
+                                className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+                                    key === option
+                                        ? "bg-indigo-600 text-white"
+                                        : "border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                                }`}
+                            >
+                                {option}
+                            </button>
+                        ))}
+                    </div>
                     <button
                         type="button"
                         onClick={start}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
                     >
-                        {daily ? m.sprint_start_daily() : m.sprint_start()}
+                        {m.sprint_start()}
                     </button>
                 </div>
             )}
@@ -258,9 +242,7 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                             {m.sprint_time_left()}
                         </div>
                         <div className="font-mono text-4xl tabular-nums">
-                            {formatClock(
-                                runState === "armed" ? effectiveDuration * 60000 : remainingMs,
-                            )}
+                            {formatClock(runState === "armed" ? durationMin * 60000 : remainingMs)}
                         </div>
                     </div>
                     <div>
@@ -303,61 +285,16 @@ export function SprintTrainer({ daily }: { daily?: { dateKey: string } } = {}) {
                     >
                         {m.sprint_go_again()}
                     </button>
-                    {daily &&
-                        (() => {
-                            const url = `${window.location.origin}/daily`;
-                            const text = dailyShareText(result.correct, url);
-                            const link =
-                                "rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300";
-                            return (
-                                <div className="flex flex-wrap items-center gap-2 pt-1">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        {m.sprint_share_score()}
-                                    </span>
-                                    <a
-                                        href={`https://x.com/intent/post?text=${encodeURIComponent(text)}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className={link}
-                                    >
-                                        X
-                                    </a>
-                                    <a
-                                        href={`https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className={link}
-                                    >
-                                        Bluesky
-                                    </a>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            navigator.clipboard?.writeText(text);
-                                            setCopied(true);
-                                            window.setTimeout(() => setCopied(false), 2000);
-                                        }}
-                                        className={link}
-                                    >
-                                        {copied ? m.sprint_copied() : m.sprint_copy()}
-                                    </button>
-                                </div>
-                            );
-                        })()}
                 </div>
             )}
 
             {best && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {daily
-                        ? m.sprint_best_daily()
-                        : m.sprint_best_config({
-                              key,
-                              minutes: durationMin,
-                              hands: twoHands
-                                  ? m.sprint_best_two_hands()
-                                  : m.sprint_best_one_hand(),
-                          })}
+                    {m.sprint_best_config({
+                        key,
+                        minutes: durationMin,
+                        hands: twoHands ? m.sprint_best_two_hands() : m.sprint_best_one_hand(),
+                    })}
                     <span className="font-mono">{best.correct}</span> {m.sprint_correct_label()}
                 </p>
             )}
