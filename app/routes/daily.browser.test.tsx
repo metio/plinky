@@ -39,6 +39,26 @@ describe("Daily", () => {
         expect(screen.getByText("Practice")).toBeTruthy();
     });
 
+    it("renders the score without a spurious horizontal scrollbar", async () => {
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <Daily />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        // OSMD must render within its container: the scrollable region's content is
+        // no wider than the region itself, so no horizontal scrollbar appears.
+        await waitFor(
+            () => {
+                const region = screen.getByRole("img", { name: /Plinky #/ });
+                expect(region.scrollWidth).toBeLessThanOrEqual(region.clientWidth + 1);
+            },
+            { timeout: 8000 },
+        );
+    });
+
     it("locks the tempo so everyone plays the day at one speed", async () => {
         render(
             <MemoryRouter>

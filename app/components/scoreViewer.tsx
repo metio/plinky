@@ -257,20 +257,24 @@ export function ScoreViewer({
     return (
         <div className="space-y-3">
             {/* The score sits at the top — it's what you read while playing, so the
-                controls, keyboard and run summary all fall below it. Wide scores
-                scroll horizontally, so the region must be focusable for keyboard
-                users (axe scrollable-region-focusable) and is named by the title.
-                Horizontal padding would make OSMD — which renders to the element's
-                full width — overflow by the padding and show a spurious scrollbar,
-                so the breathing room is vertical only. */}
-            <div
-                ref={containerRef}
-                // biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally scrollable region needs keyboard access
-                tabIndex={0}
-                role="img"
-                aria-label={title}
-                className="overflow-x-auto rounded-md border border-gray-200 bg-white py-2 dark:border-gray-800"
-            />
+                controls, keyboard and run summary all fall below it. OSMD renders to
+                its container's full offset width, which includes any border or
+                padding on that element; were either on the element OSMD owns, the
+                rendered system would overflow by exactly that amount and show a
+                spurious scrollbar. So the border and breathing room live on the
+                wrapper, and the inner element OSMD measures is clean. Wide scores
+                still scroll horizontally, and that region must be focusable for
+                keyboard users (axe scrollable-region-focusable). */}
+            <div className="rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800">
+                <div
+                    ref={containerRef}
+                    // biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally scrollable region needs keyboard access
+                    tabIndex={0}
+                    role="img"
+                    aria-label={title}
+                    className="overflow-x-auto"
+                />
+            </div>
 
             <div className="flex flex-wrap items-center gap-3">
                 <button
