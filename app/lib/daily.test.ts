@@ -5,8 +5,9 @@ import { describe, expect, it } from "vitest";
 import { DAILY_EPOCH, dailyNumber, dailyScoreId, todayKey } from "./daily";
 
 describe("todayKey", () => {
-    it("formats the date as YYYY-MM-DD", () => {
-        expect(todayKey(new Date("2026-06-23T15:04:00Z"))).toBe("2026-06-23");
+    it("formats the local date as YYYY-MM-DD", () => {
+        // Built from local components so the expectation holds in any runner zone.
+        expect(todayKey(new Date(2026, 5, 23, 15, 4))).toBe("2026-06-23");
     });
 });
 

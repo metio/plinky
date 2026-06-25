@@ -3,9 +3,15 @@
 
 import { hashString, seededRandom } from "./random";
 
-// The UTC date as YYYY-MM-DD, used as the daily challenge's shared seed.
+// The viewer's current calendar day as YYYY-MM-DD, in their own time zone. It
+// seeds the daily challenge and bounds the practice log, so both a new challenge
+// and a streak day roll over at local midnight — the same rule Wordle uses. Two
+// players in different zones can therefore be on different days at the same instant.
 export function todayKey(now: Date): string {
-    return now.toISOString().slice(0, 10);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
 }
 
 const DAY_MS = 86_400_000;

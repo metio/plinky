@@ -7,7 +7,8 @@ import { loadHistory, recordPractice, summarizePractice } from "./history";
 
 afterEach(() => localStorage.clear());
 
-const NOW = new Date("2026-06-23T12:00:00Z");
+// Local-time noon so the derived day key is 2026-06-23 in any runner zone.
+const NOW = new Date(2026, 5, 23, 12, 0);
 
 describe("recordPractice", () => {
     it("accumulates notes for the day", () => {
