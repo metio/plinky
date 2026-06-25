@@ -52,23 +52,36 @@ async function saveImage(grid: Grid, heading: string, boast: string): Promise<vo
     }
 }
 
-// The shareable result of a run: a Wordle-style 3×6 grid (Accuracy / Timing / Flow
-// across six moments) with no numbers, plus buttons to post the emoji grid or save
-// it as an image. The shape is the share — humans pass around patterns, not scores.
-export function ShareCard({ grid, title }: { grid: Grid; title: string }) {
+// A Wordle-style grid (Accuracy / Timing / Flow as rows) with no numbers, plus
+// buttons to post the emoji grid or save it as an image. The shape is the share —
+// humans pass around patterns, not scores. The same card backs both a single run
+// (six moments) and the lifetime fingerprint (recent days), so its labels and the
+// boast it composes come from the caller.
+export function ShareCard({
+    grid,
+    caption,
+    gridLabel,
+    boast,
+    heading,
+}: {
+    grid: Grid;
+    caption: string;
+    gridLabel: string;
+    boast: string;
+    heading: string;
+}) {
     const [copied, setCopied] = useState(false);
-    const boast = m.share_boast({ title });
     const text = shareText(boast, grid, SITE_URL);
+    const columns = grid[0]?.length ?? 0;
 
     return (
         <figure className="space-y-2">
-            <figcaption className="text-sm text-gray-500 dark:text-gray-400">
-                {m.share_heading()}
-            </figcaption>
+            <figcaption className="text-sm text-gray-500 dark:text-gray-400">{caption}</figcaption>
             <div
                 role="img"
-                aria-label={m.share_grid_label()}
-                className="grid w-max grid-cols-6 gap-1"
+                aria-label={gridLabel}
+                className="grid w-max gap-1"
+                style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
             >
                 {grid.flatMap((row, r) =>
                     row.map((level, c) => (
@@ -96,7 +109,7 @@ export function ShareCard({ grid, title }: { grid: Grid; title: string }) {
                     type="button"
                     // A cancelled share or a failed rasterise rejects; saving the card
                     // is best-effort, so swallow it rather than crash the run summary.
-                    onClick={() => saveImage(grid, title, boast).catch(() => {})}
+                    onClick={() => saveImage(grid, heading, boast).catch(() => {})}
                     className={LINK}
                 >
                     {m.share_image()}

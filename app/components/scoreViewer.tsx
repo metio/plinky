@@ -10,6 +10,7 @@ import { summarizeDynamics } from "../lib/dynamics";
 import { computeFlow } from "../lib/flow";
 import type { TimelineNote } from "../lib/ghost";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
+import { recordRun } from "../lib/lifetime";
 import {
     applyRun,
     isDue,
@@ -131,6 +132,8 @@ export function ScoreViewer({
             })),
         );
         setShareGrid(gridFor(notes));
+        // Fold the run's core trio into the lifetime fingerprint shown on /progress.
+        recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const threshold = letterMin(loadPrefs().masteryThreshold);
@@ -355,7 +358,15 @@ export function ScoreViewer({
                         </dl>
                     </div>
                     <GhostTimeline notes={timeline} />
-                    {shareGrid && <ShareCard grid={shareGrid} title={title} />}
+                    {shareGrid && (
+                        <ShareCard
+                            grid={shareGrid}
+                            caption={m.share_heading()}
+                            gridLabel={m.share_grid_label()}
+                            boast={m.share_boast({ title })}
+                            heading={title}
+                        />
+                    )}
                 </div>
             )}
 

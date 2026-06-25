@@ -3,7 +3,10 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { ShareCard } from "../components/shareCard";
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
+import { loadLifetime, progressGrid } from "../lib/lifetime";
+import type { Grid } from "../lib/shareCard";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/progress";
@@ -25,8 +28,10 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export default function ProgressRoute() {
     const [summary, setSummary] = useState<PracticeSummary | null>(null);
+    const [fingerprint, setFingerprint] = useState<Grid | null>(null);
     useEffect(() => {
         setSummary(summarizePractice(loadHistory()));
+        setFingerprint(progressGrid(loadLifetime()));
     }, []);
 
     if (!summary) {
@@ -69,6 +74,16 @@ export default function ProgressRoute() {
                     ))}
                 </div>
             </div>
+
+            {fingerprint && (
+                <ShareCard
+                    grid={fingerprint}
+                    caption={m.progress_share_caption()}
+                    gridLabel={m.progress_grid_label()}
+                    boast={m.progress_share_boast()}
+                    heading={`Plinky ${summary.currentStreak}·${summary.daysPracticed}·${summary.totalNotes}`}
+                />
+            )}
 
             {summary.totalNotes === 0 && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">{m.progress_empty()}</p>
