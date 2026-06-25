@@ -11,6 +11,7 @@
     "test": "npm run messages && vitest run --project node",
     "test:browser": "npm run messages && vitest run --project browser",
     "lint": "biome check",
+    "size": "node dev/check-bundle-size.mjs",
     "format": "biome check --write .",
     "knip": "npm run messages && react-router typegen && knip",
     "coverage": "npm run messages && vitest run --coverage",

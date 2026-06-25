@@ -21,6 +21,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Check bundle size
+        run: npm run size
   browser:
     name: browser
     runs-on: ubuntu-latest
