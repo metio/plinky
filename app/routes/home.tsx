@@ -6,8 +6,9 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreImport } from "../components/scoreImport";
 import { loadCatalog, type Score } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
-import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
+import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, structuredData } from "../lib/site";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/home";
 
 export function meta(_args: Route.MetaArgs) {
@@ -17,7 +18,7 @@ export function meta(_args: Route.MetaArgs) {
         { title: SITE_TITLE },
         { name: "description", content: SITE_DESCRIPTION },
         ...socialMeta(SITE_TITLE, SITE_DESCRIPTION),
-        { "script:ld+json": STRUCTURED_DATA },
+        { "script:ld+json": structuredData(getLocale()) },
     ];
 }
 

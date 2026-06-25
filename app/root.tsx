@@ -17,7 +17,7 @@ import { LocalizedLink as Link } from "./components/localizedLink";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
-import { SITE_URL } from "./lib/site";
+import { ogLocale, SITE_URL } from "./lib/site";
 import { m } from "./paraglide/messages.js";
 import {
     baseLocale,
@@ -105,11 +105,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
     // form, for the self-referential canonical/og:url and the hreflang cluster
     // that ties all language versions of the page together for search engines.
     const { pathname } = useLocation();
+    const locale = getLocale();
     const pageUrl = `${SITE_URL}${pathname}`;
     const canonical = new URL(`${SITE_URL}${deLocalizeHref(pathname)}`);
 
     return (
-        <html lang={getLocale()}>
+        <html lang={locale}>
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -137,6 +138,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta property="og:type" content="website" />
                 <meta property="og:site_name" content="Plinky" />
                 <meta property="og:url" content={pageUrl} />
+                <meta property="og:locale" content={ogLocale(locale)} />
+                {locales
+                    .filter((alternate) => alternate !== locale)
+                    .map((alternate) => (
+                        <meta
+                            key={alternate}
+                            property="og:locale:alternate"
+                            content={ogLocale(alternate)}
+                        />
+                    ))}
                 <meta property="og:image" content={`${SITE_URL}/og.png`} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />

@@ -38,13 +38,63 @@ export const SITE_DESCRIPTION =
     "Practice piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear-training, and loop drills, with your scores kept on your device.";
 
 // schema.org structured data so search engines and assistants understand Plinky.
-export const STRUCTURED_DATA = {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Plinky",
-    description: SITE_DESCRIPTION,
-    url: SITE_URL,
-    applicationCategory: "EducationalApplication",
-    operatingSystem: "Any (modern web browser)",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+// Built per render so inLanguage matches the page's locale.
+export function structuredData(locale: string) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Plinky",
+        description: SITE_DESCRIPTION,
+        url: SITE_URL,
+        inLanguage: locale,
+        applicationCategory: "EducationalApplication",
+        operatingSystem: "Any (modern web browser)",
+        browserRequirements: "Requires JavaScript and a modern web browser",
+        isAccessibleForFree: true,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        screenshot: `${SITE_URL}/og.png`,
+        featureList: [
+            "Sight-reading practice",
+            "Rhythm and tempo training",
+            "Ear training",
+            "MIDI keyboard and computer-keyboard input",
+            "Graded practice with progress tracking",
+        ],
+        publisher: { "@type": "Organization", name: "metio", url: "https://github.com/metio" },
+    };
+}
+
+// Open Graph wants the locale as language_TERRITORY; map each app locale to a
+// representative one so social platforms unfurl in the right language.
+const OG_LOCALE: Record<string, string> = {
+    en: "en_US",
+    de: "de_DE",
+    nl: "nl_NL",
+    fr: "fr_FR",
+    es: "es_ES",
+    it: "it_IT",
+    pt: "pt_PT",
+    el: "el_GR",
+    pl: "pl_PL",
+    nb: "nb_NO",
+    da: "da_DK",
+    sv: "sv_SE",
+    fi: "fi_FI",
+    hr: "hr_HR",
+    uk: "uk_UA",
+    zh: "zh_CN",
+    ja: "ja_JP",
+    ko: "ko_KR",
+    ro: "ro_RO",
+    cs: "cs_CZ",
+    sk: "sk_SK",
+    hu: "hu_HU",
+    ru: "ru_RU",
+    tr: "tr_TR",
+    sr: "sr_RS",
+    sq: "sq_AL",
 };
+
+export function ogLocale(locale: string): string {
+    return OG_LOCALE[locale] ?? "en_US";
+}
