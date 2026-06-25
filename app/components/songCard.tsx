@@ -1,10 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
 import { Link } from "react-router";
 import type { Exercise } from "../lib/exercises";
-import { encodeSong } from "../lib/share";
 import { submissionUrl, toAbcDocument } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 
@@ -54,16 +52,6 @@ export function SongCard({
     onPlay,
     onStop,
 }: Props) {
-    const [copied, setCopied] = useState(false);
-
-    // A self-contained link that imports the song on open — no account, no server.
-    const share = () => {
-        const url = `${window.location.origin}/import#s=${encodeSong(toAbcDocument(song))}`;
-        navigator.clipboard?.writeText(url);
-        setCopied(true);
-        window.setTimeout(() => setCopied(false), 2000);
-    };
-
     return (
         <li className="rounded-md border border-gray-200 p-4 dark:border-gray-800">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -106,9 +94,6 @@ export function SongCard({
                         {mode.label()}
                     </Link>
                 ))}
-                <button type="button" onClick={share} className={PLAIN}>
-                    {copied ? m.action_link_copied() : m.action_share()}
-                </button>
                 <button type="button" onClick={() => downloadAbc(song)} className={PLAIN}>
                     {m.action_export()}
                 </button>
