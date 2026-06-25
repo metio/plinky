@@ -44,4 +44,11 @@ describe("fingerSteps", () => {
         expect(fingers).toHaveLength(3);
         expect(fingers.every((finger) => finger >= 1 && finger <= 5)).toBe(true);
     });
+
+    it("skips empty steps instead of emitting Infinity-driven fingers", () => {
+        const steps = [{ pitches: [60] }, { pitches: [] }, { pitches: [64] }];
+        const fingers = fingerSteps(steps, "right");
+        expect(fingers).toHaveLength(2);
+        expect(fingers.every((finger) => finger >= 1 && finger <= 5)).toBe(true);
+    });
 });

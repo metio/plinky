@@ -81,8 +81,11 @@ export function fingerLine(pitches: number[], hand: Hand): number[] {
 // Finger a hand's steps, using each step's melody note (the highest note for the
 // right hand, the lowest for the left) as the line to finger.
 export function fingerSteps(steps: { pitches: number[] }[], hand: Hand): number[] {
-    const line = steps.map((step) =>
-        hand === "right" ? Math.max(...step.pitches) : Math.min(...step.pitches),
-    );
+    // A step with no pitches has no note to finger; including it would feed
+    // ±Infinity (from an empty Math.max/Math.min) into the cost model and
+    // collapse the whole line to NaN costs.
+    const line = steps
+        .filter((step) => step.pitches.length > 0)
+        .map((step) => (hand === "right" ? Math.max(...step.pitches) : Math.min(...step.pitches)));
     return fingerLine(line, hand);
 }

@@ -73,6 +73,17 @@ describe("grade", () => {
         expect(poor.dynamics).toBe(10);
     });
 
+    it("grades a run with nothing played as a consistent F", () => {
+        const grade = computeGrade({
+            correct: 0,
+            wrong: 0,
+            rhythm: { perfect: 0, good: 0, off: 0, total: 0, averageAbsMs: 0 },
+            flow: 100,
+            dynamics: null,
+        });
+        expect(grade).toMatchObject({ accuracy: 0, timing: 0, flow: 0, score: 0, letter: "F" });
+    });
+
     it("drops dynamics to null when there is no real velocity", () => {
         const grade = computeGrade({
             correct: 10,

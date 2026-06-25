@@ -66,7 +66,19 @@ export type GradeInput = {
 
 export function computeGrade({ correct, wrong, rhythm, flow, dynamics }: GradeInput): Grade {
     const attempts = correct + wrong;
-    const accuracy = attempts > 0 ? (correct / attempts) * 100 : 0;
+    // Nothing played is an F across the board, not a middling score from the
+    // empty-input defaults of the individual dimensions disagreeing.
+    if (attempts === 0) {
+        return {
+            accuracy: 0,
+            timing: 0,
+            flow: 0,
+            dynamics: dynamics ? Math.round(dynamics.evenness) : null,
+            score: 0,
+            letter: "F",
+        };
+    }
+    const accuracy = (correct / attempts) * 100;
 
     // A perfectly-timed note counts full, a "good" one partially, an "off" one
     // not at all.
