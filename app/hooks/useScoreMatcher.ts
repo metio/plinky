@@ -32,9 +32,10 @@ export type CorrectInfo = {
     timestamp: number;
     timeMs: number;
     velocity: number;
-    // True when the position was cleared with no wrong note since the previous
-    // one — the signal the Flow metric is built from.
-    cleanFirstTry: boolean;
+    // How many wrong notes were played at this position before it was cleared —
+    // zero means a clean first try, the signal Flow and per-segment accuracy are
+    // built from.
+    wrongBefore: number;
 };
 
 export function useScoreMatcher(
@@ -122,7 +123,7 @@ export function useScoreMatcher(
                 timestamp,
                 timeMs,
                 velocity,
-                cleanFirstTry: sinceWrong.current === 0,
+                wrongBefore: sinceWrong.current,
             });
             ordinalRef.current += 1;
             sinceWrong.current = 0;
