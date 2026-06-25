@@ -22,9 +22,15 @@ import {
 } from "../lib/mastery";
 import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
+import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
 import { GhostTimeline } from "./ghostTimeline";
 import { PianoKeyboard } from "./pianoKeyboard";
+import { ShareCard } from "./shareCard";
+
+// A cleared note plus the velocity it was played at — the run's raw record, from
+// which the grade, the ghost timeline and the share grid are all derived.
+type PlayedNote = RunNote & { velocity: number };
 
 const BUTTON =
     "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
@@ -48,9 +54,7 @@ export function ScoreViewer({
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     const tempoRef = useRef(100);
-    const timelineRef = useRef<TimelineNote[]>([]);
-    const velocities = useRef<number[]>([]);
-    const cleanRef = useRef<boolean[]>([]);
+    const notesRef = useRef<PlayedNote[]>([]);
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
     const synth = useSynth();
@@ -59,6 +63,7 @@ export function ScoreViewer({
     const [tempo, setTempo] = useState(100);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [timeline, setTimeline] = useState<TimelineNote[]>([]);
+    const [shareGrid, setShareGrid] = useState<Grid | null>(null);
     const [mastery, setMastery] = useState<Mastery | null>(null);
 
     useEffect(() => {
@@ -71,22 +76,20 @@ export function ScoreViewer({
             for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
-            velocities.current.push(info.velocity);
-            cleanRef.current.push(info.cleanFirstTry);
             // Record each note's notated time (the ghost) and when it was actually
-            // played, both relative to the first note, for grading and the timeline.
+            // played, both relative to the first note, for the grade, the timeline
+            // and the share grid.
             if (info.ordinal === 0) {
                 startRef.current = info.timestamp;
                 baseOffsetRef.current = info.timeMs;
-                timelineRef.current = [{ ordinal: 0, targetMs: 0, playedMs: 0 }];
-                return;
             }
-            timelineRef.current = [
-                ...timelineRef.current,
+            notesRef.current = [
+                ...notesRef.current,
                 {
-                    ordinal: info.ordinal,
                     targetMs: info.timeMs - baseOffsetRef.current,
                     playedMs: info.timestamp - startRef.current,
+                    wrongBefore: info.wrongBefore,
+                    velocity: info.velocity,
                 },
             ];
         },
@@ -108,19 +111,26 @@ export function ScoreViewer({
         if (!matcher.complete) {
             return;
         }
-        const hasDynamics = new Set(velocities.current).size > 1;
-        const hits = timelineRef.current.map((note) =>
-            makeHit(note.ordinal, note.playedMs - note.targetMs),
-        );
+        const notes = notesRef.current;
+        const velocities = notes.map((note) => note.velocity);
+        const hasDynamics = new Set(velocities).size > 1;
+        const hits = notes.map((note, index) => makeHit(index, note.playedMs - note.targetMs));
         const result = computeGrade({
             correct: matcher.total,
             wrong: matcher.wrong,
             rhythm: summarize(hits),
-            flow: computeFlow(cleanRef.current),
-            dynamics: hasDynamics ? summarizeDynamics(velocities.current) : null,
+            flow: computeFlow(notes.map((note) => note.wrongBefore === 0)),
+            dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
         });
         setGrade(result);
-        setTimeline(timelineRef.current);
+        setTimeline(
+            notes.map((note, index) => ({
+                ordinal: index,
+                targetMs: note.targetMs,
+                playedMs: note.playedMs,
+            })),
+        );
+        setShareGrid(gridFor(notes));
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const threshold = letterMin(loadPrefs().masteryThreshold);
@@ -219,11 +229,10 @@ export function ScoreViewer({
 
     const practice = () => {
         stopListen();
-        timelineRef.current = [];
-        velocities.current = [];
-        cleanRef.current = [];
+        notesRef.current = [];
         setGrade(null);
         setTimeline([]);
+        setShareGrid(null);
         matcher.start();
     };
 
@@ -346,6 +355,7 @@ export function ScoreViewer({
                         </dl>
                     </div>
                     <GhostTimeline notes={timeline} />
+                    {shareGrid && <ShareCard grid={shareGrid} title={title} />}
                 </div>
             )}
 

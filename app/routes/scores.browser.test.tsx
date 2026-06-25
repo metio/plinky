@@ -66,6 +66,14 @@ describe("Scores", () => {
         // The ghost-timing timeline plots the run (ghost vs you).
         expect(screen.getByText("Ideal")).toBeTruthy();
         expect(screen.getByText("You")).toBeTruthy();
+        // The share card offers the run as a copyable grid.
+        expect(screen.getByText("Share your run")).toBeTruthy();
+        expect(
+            screen.getByLabelText("Accuracy, timing and flow across six moments of the run"),
+        ).toBeTruthy();
+        // Copying the grid confirms with transient feedback.
+        fireEvent.click(screen.getByText("Copy"));
+        expect(await screen.findByText("Copied!")).toBeTruthy();
     });
 
     it("marks a score learned and toggles the backlog", async () => {
