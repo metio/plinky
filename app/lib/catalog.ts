@@ -43,11 +43,13 @@ export function readScoreMeta(xml: string): {
         "Untitled";
     const composer = doc.querySelector('creator[type="composer"]')?.textContent?.trim() || "";
     const beats = Number(doc.querySelector("time > beats")?.textContent);
-    const soundTempo = doc.querySelector("sound[tempo]")?.getAttribute("tempo");
+    const tempo = Number(doc.querySelector("sound[tempo]")?.getAttribute("tempo"));
     return {
         title,
         composer,
-        tempo: soundTempo ? Math.round(Number(soundTempo)) : 90,
+        // A non-numeric tempo attribute (e.g. "andante") would otherwise feed NaN
+        // into the 60000/tempo playback and grading math.
+        tempo: Number.isFinite(tempo) && tempo > 0 ? Math.round(tempo) : 90,
         beatsPerBar: Number.isFinite(beats) && beats > 0 ? beats : 4,
     };
 }
@@ -71,13 +73,50 @@ export function loadBundledScores(): Score[] {
     });
 }
 
+// Coerce a stored entry into a usable Score, or drop it. A missing string title
+// would otherwise throw in the catalogue's localeCompare sort and take down the
+// whole list (home, scores, tracks, play); a non-finite tempo/beatsPerBar would
+// poison the playback and grading math.
+function normalizeUserScore(raw: unknown): Score | null {
+    if (!raw || typeof raw !== "object") {
+        return null;
+    }
+    const value = raw as Record<string, unknown>;
+    if (
+        typeof value.id !== "string" ||
+        typeof value.title !== "string" ||
+        typeof value.xml !== "string"
+    ) {
+        return null;
+    }
+    const positive = (field: unknown, fallback: number): number =>
+        typeof field === "number" && Number.isFinite(field) && field > 0 ? field : fallback;
+    return {
+        id: value.id,
+        title: value.title,
+        xml: value.xml,
+        composer: typeof value.composer === "string" ? value.composer : "",
+        description: typeof value.description === "string" ? value.description : "",
+        tempo: positive(value.tempo, 90),
+        beatsPerBar: positive(value.beatsPerBar, 4),
+        bundled: false,
+        ...(Array.isArray(value.curriculums)
+            ? { curriculums: value.curriculums.filter((c): c is string => typeof c === "string") }
+            : {}),
+        ...(typeof value.license === "string" ? { license: value.license } : {}),
+    };
+}
+
 export function loadUserScores(): Score[] {
     if (typeof localStorage === "undefined") {
         return [];
     }
     try {
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-        return Array.isArray(parsed) ? (parsed as Score[]) : [];
+        if (!Array.isArray(parsed)) {
+            return [];
+        }
+        return parsed.map(normalizeUserScore).filter((score): score is Score => score !== null);
     } catch {
         return [];
     }
@@ -95,8 +134,10 @@ function storeUserScores(scores: Score[]): boolean {
     }
 }
 
-export function saveUserScore(score: Score): void {
-    storeUserScores([...loadUserScores().filter((entry) => entry.id !== score.id), score]);
+// Returns false when the write fails (e.g. storage quota), so callers can tell
+// the user rather than reporting a save that did not happen.
+export function saveUserScore(score: Score): boolean {
+    return storeUserScores([...loadUserScores().filter((entry) => entry.id !== score.id), score]);
 }
 
 export function removeUserScore(id: string): void {

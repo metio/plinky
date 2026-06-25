@@ -59,4 +59,11 @@ describe("summarizePractice", () => {
         localStorage.setItem("plinky:history", "not json");
         expect(loadHistory()).toEqual({});
     });
+
+    it("rejects a stored array so practice is not silently lost", () => {
+        localStorage.setItem("plinky:history", "[1,2,3]");
+        expect(loadHistory()).toEqual({});
+        recordPractice(10, NOW);
+        expect(loadHistory()["2026-06-23"]).toBe(10);
+    });
 });

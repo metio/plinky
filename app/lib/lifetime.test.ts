@@ -57,6 +57,37 @@ describe("recordRun", () => {
     });
 });
 
+describe("loadLifetime", () => {
+    it("orders by date when a run arrives out of order (clock set back)", () => {
+        recordRun(PERFECT, day(5));
+        recordRun(PERFECT, day(3));
+        const days = loadLifetime().days;
+        expect(days.map((entry) => entry.date)).toEqual(["2026-06-03", "2026-06-05"]);
+        // The earlier day seeds fresh rather than blending against the later one.
+        expect(days[0]?.skill).toEqual(PERFECT);
+    });
+
+    it("keeps one snapshot per day even when a day repeats out of order", () => {
+        recordRun(PERFECT, day(5));
+        recordRun(PERFECT, day(3));
+        recordRun(POOR, day(3));
+        const days = loadLifetime().days;
+        expect(days.filter((entry) => entry.date === "2026-06-03")).toHaveLength(1);
+    });
+
+    it("drops days with a malformed skill rather than crashing recordRun", () => {
+        localStorage.setItem(
+            "plinky:lifetime",
+            JSON.stringify({ days: [{ date: "2026-06-01", skill: null }] }),
+        );
+        expect(loadLifetime().days).toEqual([]);
+        // A later run must seed cleanly instead of blending against the bad day.
+        const lifetime = recordRun(PERFECT, day(2));
+        expect(lifetime.days).toHaveLength(1);
+        expect(lifetime.days[0]?.skill).toEqual(PERFECT);
+    });
+});
+
 describe("progressGrid", () => {
     it("is null before any run", () => {
         expect(progressGrid(loadLifetime())).toBeNull();

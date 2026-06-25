@@ -5,7 +5,7 @@ import { todayKey } from "./daily";
 
 const KEY = "plinky:history";
 
-// Notes practiced per day, keyed by UTC date (YYYY-MM-DD).
+// Notes practiced per day, keyed by local calendar date (YYYY-MM-DD), matching todayKey.
 export type History = Record<string, number>;
 
 export type PracticeSummary = {
@@ -18,7 +18,11 @@ export type PracticeSummary = {
 export function loadHistory(): History {
     try {
         const parsed = JSON.parse(localStorage.getItem(KEY) ?? "{}");
-        return parsed && typeof parsed === "object" ? (parsed as History) : {};
+        // An array also satisfies `typeof === "object"`, but assigning date keys
+        // onto one and re-serialising drops them, silently losing practice.
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+            ? (parsed as History)
+            : {};
     } catch {
         return {};
     }

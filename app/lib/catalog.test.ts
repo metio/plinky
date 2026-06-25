@@ -24,6 +24,46 @@ function xml(title = "Test", beats = 4): string {
 
 afterEach(() => localStorage.clear());
 
+describe("loadUserScores robustness", () => {
+    it("defaults a non-numeric sound tempo rather than emitting NaN", () => {
+        const meta = readScoreMeta(
+            '<?xml version="1.0"?><score-partwise><sound tempo="andante"/></score-partwise>',
+        );
+        expect(meta.tempo).toBe(90);
+    });
+
+    it("drops corrupt stored entries so the catalogue sort never throws", () => {
+        localStorage.setItem(
+            "plinky:scores",
+            JSON.stringify([
+                {
+                    id: "ok",
+                    title: "Good",
+                    xml: "<x/>",
+                    tempo: 100,
+                    beatsPerBar: 4,
+                    bundled: false,
+                },
+                { id: "bad", xml: "<x/>" }, // missing title — would break localeCompare
+                "not an object",
+            ]),
+        );
+        expect(loadUserScores()).toHaveLength(1);
+        // The catalogue still sorts without throwing on the dropped entry.
+        expect(() => loadCatalog()).not.toThrow();
+    });
+
+    it("repairs a non-finite stored tempo to the default", () => {
+        localStorage.setItem(
+            "plinky:scores",
+            JSON.stringify([{ id: "x", title: "X", xml: "<x/>", tempo: 0, beatsPerBar: -1 }]),
+        );
+        const score = loadUserScores()[0];
+        expect(score?.tempo).toBe(90);
+        expect(score?.beatsPerBar).toBe(4);
+    });
+});
+
 describe("readScoreMeta", () => {
     it("reads title, composer and meter from the MusicXML", () => {
         const meta = readScoreMeta(xml("Minuet", 3));

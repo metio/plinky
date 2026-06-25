@@ -38,6 +38,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
 }
 
+// Tempo and beats-per-bar feed the 60000/tempo playback and grading math, so a
+// zero, negative, or non-finite value is dropped here and re-derived from the
+// MusicXML on import rather than admitted.
+function isPositiveNumber(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+
 function parseCurriculum(value: unknown): Curriculum | null {
     if (!isRecord(value) || typeof value.id !== "string" || typeof value.name !== "string") {
         return null;
@@ -65,8 +72,8 @@ function parseScore(value: unknown): PackScore | null {
         id: value.id,
         title: value.title,
         xml: value.xml,
-        ...(typeof value.tempo === "number" ? { tempo: value.tempo } : {}),
-        ...(typeof value.beatsPerBar === "number" ? { beatsPerBar: value.beatsPerBar } : {}),
+        ...(isPositiveNumber(value.tempo) ? { tempo: value.tempo } : {}),
+        ...(isPositiveNumber(value.beatsPerBar) ? { beatsPerBar: value.beatsPerBar } : {}),
         ...(typeof value.description === "string" ? { description: value.description } : {}),
         ...(typeof value.license === "string" ? { license: value.license } : {}),
         ...(curriculums && curriculums.length > 0 ? { curriculums } : {}),

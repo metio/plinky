@@ -57,6 +57,21 @@ describe("score pack", () => {
         expect(() => parsePack(JSON.stringify(malformed))).toThrow(/no valid scores/);
     });
 
+    it("drops a non-positive or non-finite tempo so it is re-derived on import", () => {
+        const pack = parsePack(
+            JSON.stringify({
+                format: "plinky-scores",
+                scores: [
+                    { id: "a", title: "A", xml: "<x/>", tempo: 0, beatsPerBar: -4 },
+                    { id: "b", title: "B", xml: "<x/>", tempo: 120, beatsPerBar: 3 },
+                ],
+            }),
+        );
+        expect(pack.scores[0]).not.toHaveProperty("tempo");
+        expect(pack.scores[0]).not.toHaveProperty("beatsPerBar");
+        expect(pack.scores[1]).toMatchObject({ tempo: 120, beatsPerBar: 3 });
+    });
+
     it("drops malformed scores but keeps valid ones", () => {
         const pack = parsePack(
             JSON.stringify({

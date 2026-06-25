@@ -1,8 +1,20 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
+// @vitest-environment jsdom
 
-import { describe, expect, it } from "vitest";
-import { applyRun, isDue, letterMin, markLearned, type Mastery, setBacklog } from "./mastery";
+import { afterEach, describe, expect, it } from "vitest";
+import {
+    applyRun,
+    isDue,
+    letterMin,
+    loadMastery,
+    markLearned,
+    type Mastery,
+    saveMastery,
+    setBacklog,
+} from "./mastery";
+
+afterEach(() => localStorage.clear());
 
 const NOW = 1_000_000_000_000;
 const DAY = 86_400_000;
@@ -82,6 +94,36 @@ describe("isDue", () => {
 
     it("is never due for an unlearned score", () => {
         expect(isDue(applyRun(null, 50, 85, NOW), NOW + DAY)).toBe(false);
+    });
+});
+
+describe("loadMastery", () => {
+    it("round-trips a saved mastery", () => {
+        const mastery: Mastery = {
+            bestScore: 88,
+            learned: true,
+            backlog: false,
+            intervalDays: 3,
+            reviewAt: NOW,
+            updatedAt: NOW,
+        };
+        saveMastery("song-1", mastery);
+        expect(loadMastery("song-1")).toEqual(mastery);
+    });
+
+    it("repairs a legacy entry missing intervalDays so reviews stay finite", () => {
+        // A learned entry from an older schema without intervalDays would drive
+        // applyRun's interval growth to NaN, poisoning reviewAt.
+        localStorage.setItem(
+            "plinky:mastery:song-2",
+            JSON.stringify({ bestScore: 90, learned: true, backlog: false, reviewAt: NOW }),
+        );
+        const loaded = loadMastery("song-2");
+        expect(loaded?.intervalDays).toBe(0);
+        const next = applyRun(loaded, 90, 85, NOW + DAY);
+        expect(Number.isFinite(next.intervalDays)).toBe(true);
+        expect(Number.isFinite(next.reviewAt)).toBe(true);
+        expect(next.intervalDays).toBeGreaterThanOrEqual(1);
     });
 });
 

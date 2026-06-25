@@ -25,6 +25,18 @@ export const PROGRESS_COLUMNS = 6;
 
 const EMPTY: Lifetime = { days: [] };
 
+function isSkill(value: unknown): value is Skill {
+    if (!value || typeof value !== "object") {
+        return false;
+    }
+    const skill = value as Record<string, unknown>;
+    return (
+        Number.isFinite(skill.accuracy) &&
+        Number.isFinite(skill.timing) &&
+        Number.isFinite(skill.flow)
+    );
+}
+
 function ema(previous: number, value: number): number {
     return ALPHA * value + (1 - ALPHA) * previous;
 }
@@ -44,7 +56,15 @@ export function loadLifetime(): Lifetime {
     try {
         const raw = localStorage.getItem(KEY);
         const parsed = raw ? (JSON.parse(raw) as Lifetime) : null;
-        return parsed && Array.isArray(parsed.days) ? parsed : EMPTY;
+        if (!parsed || !Array.isArray(parsed.days)) {
+            return EMPTY;
+        }
+        // Keep only well-formed days: a malformed skill would otherwise crash the
+        // EMA blend in recordRun or yield a NaN progress grid.
+        const days = parsed.days.filter(
+            (day) => day && typeof day.date === "string" && isSkill(day.skill),
+        );
+        return { days };
     } catch {
         return EMPTY;
     }
@@ -56,12 +76,17 @@ export function loadLifetime(): Lifetime {
 export function recordRun(run: Skill, now: Date = new Date()): Lifetime {
     const lifetime = loadLifetime();
     const date = todayKey(now);
-    const last = lifetime.days.at(-1);
-    const skill = last ? blend(last.skill, run) : run;
-    const days =
-        last?.date === date
-            ? [...lifetime.days.slice(0, -1), { date, skill }]
-            : [...lifetime.days, { date, skill }];
+    // Order by date rather than trusting append order: a clock set back or travel
+    // across timezones can produce a run whose day is earlier than the last
+    // stored one, which must update or insert by date, not duplicate the tail.
+    const sorted = [...lifetime.days].sort((a, b) => a.date.localeCompare(b.date));
+    // Blend against the most recent snapshot on or before this day — the same day
+    // when updating within it, otherwise the previous day it builds on.
+    const prior = sorted.filter((day) => day.date <= date).at(-1);
+    const skill = prior ? blend(prior.skill, run) : run;
+    const days = [...sorted.filter((day) => day.date !== date), { date, skill }].sort((a, b) =>
+        a.date.localeCompare(b.date),
+    );
     const next: Lifetime = { days: days.slice(-MAX_DAYS) };
     if (typeof localStorage !== "undefined") {
         try {

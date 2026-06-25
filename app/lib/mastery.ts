@@ -35,6 +35,23 @@ function storageKey(id: string): string {
     return `${PREFIX}${id}`;
 }
 
+// Coerce a parsed (possibly legacy or corrupt) value into a complete Mastery.
+// A missing or non-finite numeric field would otherwise flow into applyRun's
+// interval growth as NaN, poisoning reviewAt and disabling the review schedule.
+function normalizeMastery(raw: unknown): Mastery {
+    const value = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+    const num = (field: unknown, fallback: number): number =>
+        Number.isFinite(field) ? (field as number) : fallback;
+    return {
+        bestScore: num(value.bestScore, EMPTY.bestScore),
+        learned: value.learned === true,
+        backlog: value.backlog === true,
+        intervalDays: num(value.intervalDays, EMPTY.intervalDays),
+        reviewAt: num(value.reviewAt, EMPTY.reviewAt),
+        updatedAt: num(value.updatedAt, EMPTY.updatedAt),
+    };
+}
+
 // The lowest aggregate score that still earns the given letter (mirrors
 // grade.letterFor), so a Settings letter threshold maps to a numeric cutoff.
 export function letterMin(letter: Letter): number {
@@ -62,7 +79,7 @@ export function loadMastery(id: string): Mastery | null {
     }
     try {
         const raw = localStorage.getItem(storageKey(id));
-        return raw ? (JSON.parse(raw) as Mastery) : null;
+        return raw ? normalizeMastery(JSON.parse(raw)) : null;
     } catch {
         return null;
     }
@@ -92,7 +109,10 @@ export function loadAllMastery(): Array<{ id: string; mastery: Mastery }> {
         try {
             const raw = localStorage.getItem(key);
             if (raw) {
-                out.push({ id: key.slice(PREFIX.length), mastery: JSON.parse(raw) as Mastery });
+                out.push({
+                    id: key.slice(PREFIX.length),
+                    mastery: normalizeMastery(JSON.parse(raw)),
+                });
             }
         } catch {
             // Skip a corrupt entry rather than failing the whole list.
