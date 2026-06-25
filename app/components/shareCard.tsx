@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
-import { SITE_URL } from "../lib/site";
 import { type Grid, type Level, shareText, svgCard } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
 
@@ -61,37 +60,43 @@ export function ShareCard({
     grid,
     caption,
     gridLabel,
+    rowLabels,
     boast,
     heading,
 }: {
     grid: Grid;
     caption: string;
     gridLabel: string;
+    // One label per grid row, naming the dimension each row scores so the on-page
+    // card connects its rows to the metrics above. Left out of the shared text and
+    // image, which stay a bare Wordle-style grid.
+    rowLabels: string[];
     boast: string;
     heading: string;
 }) {
     const [copied, setCopied] = useState(false);
-    const text = shareText(boast, grid, SITE_URL);
-    const columns = grid[0]?.length ?? 0;
+    const text = shareText(boast, grid);
 
     return (
         <figure className="space-y-2">
             <figcaption className="text-sm text-gray-500 dark:text-gray-400">{caption}</figcaption>
-            <div
-                role="img"
-                aria-label={gridLabel}
-                className="grid w-max gap-1"
-                style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-            >
-                {grid.flatMap((row, r) =>
-                    row.map((level, c) => (
-                        <span
-                            // biome-ignore lint/suspicious/noArrayIndexKey: the grid is a fixed 3×6 that never reorders, so the row/column position is a stable identity
-                            key={`${r}-${c}`}
-                            className={`h-7 w-7 rounded ${CELL[level]}`}
-                        />
-                    )),
-                )}
+            <div role="img" aria-label={gridLabel} className="w-max space-y-1">
+                {grid.map((row, r) => (
+                    <div key={rowLabels[r] ?? r} className="flex items-center gap-2">
+                        <span className="w-16 text-right text-xs text-gray-500 dark:text-gray-400">
+                            {rowLabels[r]}
+                        </span>
+                        <div className="flex gap-1">
+                            {row.map((level, c) => (
+                                <span
+                                    // biome-ignore lint/suspicious/noArrayIndexKey: a row is a fixed-length band that never reorders, so the column position is a stable identity
+                                    key={c}
+                                    className={`h-7 w-7 rounded ${CELL[level]}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
             <div className="flex flex-wrap items-center gap-2">
                 <button

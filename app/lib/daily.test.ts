@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { DAILY_EPOCH, dailyNumber, dailyScoreId, todayKey } from "./daily";
+import { DAILY_EPOCH, dailyChallenge, dailyNumber, todayKey } from "./daily";
+
+const noteCount = (xml: string) => (xml.match(/<note>/g) ?? []).length;
 
 describe("todayKey", () => {
     it("formats the local date as YYYY-MM-DD", () => {
@@ -22,26 +24,40 @@ describe("dailyNumber", () => {
     });
 });
 
-describe("dailyScoreId", () => {
-    const ids = ["a", "b", "c", "d", "e"];
-
-    it("picks the same score for the same day", () => {
-        expect(dailyScoreId(ids, "2026-06-25")).toBe(dailyScoreId(ids, "2026-06-25"));
+describe("dailyChallenge", () => {
+    it("generates the same phrase and tempo for the same day", () => {
+        expect(dailyChallenge("2026-06-25", 1)).toEqual(dailyChallenge("2026-06-25", 1));
     });
 
-    it("always picks an id from the catalogue", () => {
-        expect(ids).toContain(dailyScoreId(ids, "2026-06-25"));
+    it("emits a playable score-partwise document titled for the day", () => {
+        const { xml } = dailyChallenge("2026-06-25", 1);
+        expect(xml).toContain("<score-partwise");
+        expect(xml).toContain("<work-title>Plinky #1</work-title>");
+        expect(xml).toContain("<type>quarter</type>");
     });
 
-    it("varies the pick across days", () => {
-        const week = ["2026-06-25", "2026-06-26", "2026-06-27", "2026-06-28", "2026-06-29"].map(
-            (day) => dailyScoreId(ids, day),
+    it("keeps the tempo in the beginner-friendly band", () => {
+        for (const day of ["2026-06-25", "2026-07-01", "2026-08-15", "2026-12-31"]) {
+            const { tempo } = dailyChallenge(day, 1);
+            expect(tempo).toBeGreaterThanOrEqual(80);
+            expect(tempo).toBeLessThanOrEqual(120);
+        }
+    });
+
+    it("sizes the phrase to about forty-five seconds of play", () => {
+        for (const day of ["2026-06-25", "2026-07-01", "2026-12-31"]) {
+            const { tempo, xml } = dailyChallenge(day, 1);
+            // One quarter note per beat, so seconds = notes / tempo × 60.
+            const seconds = (noteCount(xml) / tempo) * 60;
+            expect(seconds).toBeGreaterThan(42);
+            expect(seconds).toBeLessThan(48);
+        }
+    });
+
+    it("varies the phrase across days", () => {
+        const week = ["2026-06-25", "2026-06-26", "2026-06-27", "2026-06-28"].map(
+            (day) => dailyChallenge(day, 1).xml,
         );
-        // The seed moves the pick around rather than landing on one score forever.
         expect(new Set(week).size).toBeGreaterThan(1);
-    });
-
-    it("returns null for an empty catalogue", () => {
-        expect(dailyScoreId([], "2026-06-25")).toBeNull();
     });
 });

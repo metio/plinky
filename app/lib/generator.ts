@@ -14,6 +14,8 @@ export type SprintOptions = {
     beatsPerBar: number;
     twoHands: boolean;
     key?: SprintKey;
+    // The work-title written into the score; defaults to "Sprint".
+    title?: string;
 };
 
 type Position = { step: string; octave: number };
@@ -47,11 +49,11 @@ function line(scale: Position[], count: number, fifths: number, rng: () => numbe
 }
 
 export function generatePhrase(options: SprintOptions, rng: () => number = Math.random): string {
-    const { bars, beatsPerBar, twoHands, key = "C" } = options;
+    const { bars, beatsPerBar, twoHands, key = "C", title = "Sprint" } = options;
     const scale = KEYS[key] ?? KEYS.C;
     const count = bars * beatsPerBar;
     return buildScore({
-        title: "Sprint",
+        title,
         fifths: scale.fifths,
         beatsPerBar,
         treble: line(scale.treble, count, scale.fifths, rng),

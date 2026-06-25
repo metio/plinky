@@ -105,13 +105,14 @@ describe("gridEmoji", () => {
 });
 
 describe("shareText", () => {
-    it("stacks the boast, grid and link", () => {
+    it("stacks the boast over the grid with no link", () => {
         const grid = gridFor([clean()]);
-        const text = shareText("My run on Plinky 🎹", grid, "https://plinky.fun");
+        const text = shareText("My run on Plinky 🎹", grid);
         const lines = text.split("\n");
         expect(lines[0]).toBe("My run on Plinky 🎹");
-        expect(lines.at(-1)).toBe("https://plinky.fun");
-        // No digits leak into the share — the grid is the product, not a score.
+        // No link — a shared run is a brag, not an ad — and no digits, since the
+        // grid is the product, not a score.
+        expect(text).not.toMatch(/https?:|plinky\.fun/);
         expect(text).not.toMatch(/\d+%/);
     });
 });

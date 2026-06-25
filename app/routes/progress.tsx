@@ -80,6 +80,7 @@ export default function ProgressRoute() {
                     grid={fingerprint}
                     caption={m.progress_share_caption()}
                     gridLabel={m.progress_grid_label()}
+                    rowLabels={[m.scores_accuracy(), m.scores_timing(), m.scores_flow()]}
                     boast={m.progress_share_boast()}
                     heading={`Plinky ${summary.currentStreak}·${summary.daysPracticed}·${summary.totalNotes}`}
                 />
