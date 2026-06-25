@@ -5,13 +5,20 @@ SPDX-License-Identifier: 0BSD
 
 @import "tailwindcss";
 
+/* Use self-hosted Inter for the sans utility and the document default, keeping
+   the system stack as the fallback while the font loads. */
+@theme {
+    --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 /* Drive the dark: variant from a .dark class on <html> so the theme can be
    toggled; "system" is resolved to the class by the app. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 html,
 body {
-    @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    @apply bg-white font-sans text-gray-900 dark:bg-gray-950 dark:text-gray-100;
 }
 
 html.dark {

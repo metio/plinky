@@ -26,6 +26,13 @@ import {
     locales,
     localizeUrl,
 } from "./paraglide/runtime.js";
+// Self-hosted Inter (variable). The wght CSS covers every weight across the
+// Latin/Cyrillic/Greek subsets via unicode-range, so each locale only downloads
+// the subset it needs; the Latin file is preloaded below. Bundling it removes
+// the render-blocking Google Fonts request.
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import "@fontsource-variable/inter/wght.css";
+import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
@@ -42,15 +49,14 @@ export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
     { rel: "manifest", href: "/manifest.webmanifest" },
     { rel: "apple-touch-icon", href: "/logo.svg" },
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    // Preload the Latin variable font so text paints in Inter without a swap;
+    // the href is the same hashed asset the bundled @font-face resolves to.
     {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
+        rel: "preload",
+        as: "font",
+        type: "font/woff2",
+        href: interLatin,
         crossOrigin: "anonymous",
-    },
-    {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
     },
 ];
 
