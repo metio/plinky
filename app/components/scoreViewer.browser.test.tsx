@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -27,5 +27,21 @@ describe("ScoreViewer", () => {
         expect(
             await screen.findByText(/couldn't be displayed/, undefined, { timeout: 8000 }),
         ).toBeTruthy();
+    });
+
+    it("toggles the metronome on and off without crashing", async () => {
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <ScoreViewer id="x" xml="this is not MusicXML" title="X" beatsPerBar={3} />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        const button = await screen.findByText(/Metronome/);
+        expect(button.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(button);
+        expect(button.getAttribute("aria-pressed")).toBe("true");
+        fireEvent.click(button);
+        expect(button.getAttribute("aria-pressed")).toBe("false");
     });
 });

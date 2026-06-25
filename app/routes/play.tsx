@@ -55,6 +55,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         xml={score.xml}
                         title={score.title}
                         initialTempo={score.tempo}
+                        beatsPerBar={score.beatsPerBar}
                     />
                 </>
             )}

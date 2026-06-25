@@ -4,6 +4,7 @@
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useMetronome } from "../hooks/useMetronome";
 import { type CorrectInfo, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
@@ -48,6 +49,7 @@ export function ScoreViewer({
     daily,
     ephemeral,
     initialTempo,
+    beatsPerBar,
     lockTempo,
 }: {
     id: string;
@@ -57,6 +59,8 @@ export function ScoreViewer({
     // The piece's own tempo, used as the starting point for Listen and the count —
     // the component is keyed by piece, so it re-seeds when the piece changes.
     initialTempo?: number;
+    // The piece's beats per bar, so the metronome accents the downbeat.
+    beatsPerBar?: number;
     // Fix the tempo at initialTempo and hide the slider, so a shared challenge is
     // played at one tempo by everyone rather than dialled to taste.
     lockTempo?: boolean;
@@ -78,7 +82,11 @@ export function ScoreViewer({
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(false);
     const [playing, setPlaying] = useState(false);
+    const [metronomeOn, setMetronomeOn] = useState(false);
     const [tempo, setTempo] = useState(initialTempo ?? 100);
+
+    // A classic metronome at the chosen tempo, on demand — play along with it.
+    useMetronome(metronomeOn, tempo, beatsPerBar ?? 4);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [runNotes, setRunNotes] = useState<RunNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
@@ -308,6 +316,18 @@ export function ScoreViewer({
                     className={BUTTON}
                 >
                     {matcher.practicing ? m.action_listen_stop() : m.curriculums_practice()}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setMetronomeOn((on) => !on)}
+                    aria-pressed={metronomeOn}
+                    className={
+                        metronomeOn
+                            ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                            : BUTTON
+                    }
+                >
+                    {m.action_metronome()}
                 </button>
                 {lockTempo ? (
                     <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
