@@ -3,10 +3,9 @@
   "type": "module",
   "scripts": {
     "messages": "paraglide-js compile --project ./project.inlang --outdir ./app/paraglide --strategy localStorage preferredLanguage baseLocale --emit-ts-declarations",
-    "songs": "node dev/build-songs.mjs",
-    "exercises": "node dev/gen-exercises.mjs",
-    "build": "npm run songs && npm run messages && react-router build",
-    "dev": "npm run songs && npm run messages && react-router dev",
+    "scores": "node dev/gen-exercise-scores.mjs",
+    "build": "npm run messages && react-router build",
+    "dev": "npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "npm run messages && react-router typegen && tsc",
     "test": "npm run messages && vitest run --project node",
@@ -25,7 +24,6 @@
   "dependencies": {
     "@react-router/node": "^8.0.1",
     "@react-router/serve": "^8.0.1",
-    "abcjs": "^6.2.3",
     "isbot": "^5.1.27",
     "opensheetmusicdisplay": "^2.0.0",
     "react": "^19.2.7",

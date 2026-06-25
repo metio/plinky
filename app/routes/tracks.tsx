@@ -3,9 +3,9 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { loadBest, loadBestRhythm } from "../lib/scores";
+import { loadCatalog } from "../lib/catalog";
+import { loadMastery } from "../lib/mastery";
 import { routeMeta } from "../lib/site";
-import { loadUserSongs } from "../lib/songs";
 import { type Track, type TrackStep, TRACKS, trackSteps } from "../lib/tracks";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/tracks";
@@ -59,8 +59,9 @@ type Accent = (typeof ACCENTS)[number];
 // The gentle left/right sway that gives the path its Duolingo-style wind.
 const SWAY = [0, 36, 0, -36];
 
+// A step is cleared once its piece has been learned.
 function done(id: string): boolean {
-    return loadBest(id) !== null || loadBestRhythm(id) !== null;
+    return loadMastery(id)?.learned === true;
 }
 
 function Node({ step, index, accent }: { step: TrackStep; index: number; accent: Accent }) {
@@ -122,7 +123,7 @@ function TrackPath({
                             style={{ transform: `translateX(${SWAY[index % SWAY.length]}px)` }}
                         >
                             {title ? (
-                                <Link to={`/practice/${step.songId}`} aria-label={title}>
+                                <Link to={`/play/${step.songId}`} aria-label={title}>
                                     {node}
                                 </Link>
                             ) : (
@@ -149,7 +150,7 @@ export default function TracksRoute() {
     const [titles, setTitles] = useState<Record<string, string>>({});
     useEffect(() => {
         const byId: Record<string, string> = {};
-        for (const song of loadUserSongs()) {
+        for (const song of loadCatalog()) {
             byId[song.id] = song.title;
         }
         setTitles(byId);

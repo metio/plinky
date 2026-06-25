@@ -9,6 +9,7 @@ import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import { computeFlow } from "../lib/flow";
 import type { TimelineNote } from "../lib/ghost";
+import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
 import { recordRun } from "../lib/lifetime";
 import {
@@ -46,6 +47,7 @@ export function ScoreViewer({
     title,
     onMastery,
     daily,
+    ephemeral,
 }: {
     id: string;
     xml: string;
@@ -54,6 +56,9 @@ export function ScoreViewer({
     // When set, this run is the day's shared challenge; the share card identifies
     // it as "Plinky #N" rather than by the piece, so everyone compares one grid.
     daily?: number;
+    // A throwaway piece, like a freshly generated sprint, that still counts toward
+    // the streak and fingerprint but is never tracked for spaced repetition.
+    ephemeral?: boolean;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
@@ -72,8 +77,8 @@ export function ScoreViewer({
     const [mastery, setMastery] = useState<Mastery | null>(null);
 
     useEffect(() => {
-        setMastery(loadMastery(id));
-    }, [id]);
+        setMastery(ephemeral ? null : loadMastery(id));
+    }, [id, ephemeral]);
 
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
@@ -138,6 +143,11 @@ export function ScoreViewer({
         setShareGrid(gridFor(notes));
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
+        // Count the run's notes toward the practice streak.
+        recordPractice(matcher.total);
+        if (ephemeral) {
+            return;
+        }
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const threshold = letterMin(loadPrefs().masteryThreshold);
@@ -145,7 +155,7 @@ export function ScoreViewer({
         saveMastery(id, updated);
         setMastery(updated);
         onMastery?.();
-    }, [matcher.complete, matcher.total, matcher.wrong, id, onMastery]);
+    }, [matcher.complete, matcher.total, matcher.wrong, id, onMastery, ephemeral]);
 
     const markLearnedNow = () => {
         const updated = markLearned(loadMastery(id), Date.now());
@@ -276,7 +286,7 @@ export function ScoreViewer({
                 </label>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm">
+            <div hidden={ephemeral} className="flex flex-wrap items-center gap-3 text-sm">
                 {mastery?.learned ? (
                     <>
                         <span className="font-medium text-green-700 dark:text-green-400">

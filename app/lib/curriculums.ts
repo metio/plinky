@@ -1,18 +1,18 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Exercise } from "./exercises";
+import type { Song } from "./catalog";
 import type { Curriculum } from "./songPack";
 
 export interface CurriculumGroup {
     curriculum: Curriculum | null; // null collects songs in no known curriculum
-    songs: Exercise[];
+    songs: Song[];
 }
 
 // Group songs by the curriculums they belong to. A song listing several
 // curriculums appears under each; songs in no known curriculum collect under a
 // trailing null group. Only curriculums with at least one song are returned.
-export function groupByCurriculum(songs: Exercise[], curriculums: Curriculum[]): CurriculumGroup[] {
+export function groupByCurriculum(songs: Song[], curriculums: Curriculum[]): CurriculumGroup[] {
     const groups: CurriculumGroup[] = [];
     for (const curriculum of curriculums) {
         const members = songs.filter((song) => song.curriculums?.includes(curriculum.id));

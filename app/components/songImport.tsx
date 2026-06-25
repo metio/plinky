@@ -2,27 +2,17 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
-import { musicXmlToAbc } from "../lib/musicxml";
-import { buildExercise, parseTempo, saveUserSong } from "../lib/songs";
-import { buildSteps } from "../lib/steps";
+import { buildSong, saveUserSong } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
 
-// Render the ABC off-screen and count the steps it yields: anything the trainers
-// can play is accepted, so the generalized matcher decides what is importable.
-// abcjs is loaded on demand so it stays out of the home page's bundle.
-async function playableSteps(abc: string): Promise<number> {
-    const { default: abcjs } = await import("abcjs");
-    const element = document.createElement("div");
-    element.style.position = "absolute";
-    element.style.visibility = "hidden";
-    document.body.appendChild(element);
+// Accept anything that parses as MusicXML with at least one pitched note; OSMD
+// renders whatever it can, so the bar for import is just "has notes".
+function looksPlayable(xml: string): boolean {
     try {
-        const tune = abcjs.renderAbc(element, abc, { add_classes: true })[0];
-        return tune ? buildSteps(tune, parseTempo(abc)).length : 0;
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        return !doc.querySelector("parsererror") && doc.querySelector("note > pitch") !== null;
     } catch {
-        return 0;
-    } finally {
-        element.remove();
+        return false;
     }
 }
 
@@ -37,17 +27,17 @@ export function SongImport({
     const [text, setText] = useState("");
     const [error, setError] = useState<string | null>(null);
 
-    const add = async () => {
-        const abc = text.trim();
-        if (!abc) {
+    const add = () => {
+        const xml = text.trim();
+        if (!xml) {
             setError(m.import_paste_first());
             return;
         }
-        if ((await playableSteps(abc)) === 0) {
+        if (!looksPlayable(xml)) {
             setError(m.import_no_notes());
             return;
         }
-        saveUserSong(buildExercise(abc, existingIds));
+        saveUserSong(buildSong(xml, existingIds));
         setText("");
         setError(null);
         setOpen(false);
@@ -59,21 +49,8 @@ export function SongImport({
             return;
         }
         file.text().then((content) => {
-            // MusicXML is converted to ABC up front; anything else is treated as
-            // ABC and validated on Add.
-            const isMusicXml =
-                /\.(musicxml|xml)$/i.test(file.name) || content.includes("<score-partwise");
-            if (!isMusicXml) {
-                setText(content);
-                setError(null);
-                return;
-            }
-            try {
-                setText(musicXmlToAbc(content));
-                setError(null);
-            } catch (cause) {
-                setError(cause instanceof Error ? cause.message : m.import_read_error());
-            }
+            setText(content);
+            setError(null);
         });
     };
 
@@ -101,7 +78,7 @@ export function SongImport({
             <div className="flex flex-wrap items-center gap-3">
                 <input
                     type="file"
-                    accept=".abc,.musicxml,.xml,text/plain,application/xml"
+                    accept=".musicxml,.xml,application/xml"
                     onChange={(event) => readFile(event.target.files?.[0])}
                     className="text-sm"
                     title={m.import_upload_title()}

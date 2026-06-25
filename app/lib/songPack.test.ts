@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import type { Exercise } from "./exercises";
-import { parsePack, serializePack } from "./songPack";
+import { type PackSong, parsePack, serializePack } from "./songPack";
 
-const song: Exercise = {
+const song: PackSong = {
     id: "scale",
     title: "Scale",
-    description: "",
-    abc: "X:1\nK:C\nC D E F |",
+    xml: "<score-partwise><part/></score-partwise>",
     tempo: 90,
     beatsPerBar: 4,
     curriculums: ["grade-1", "warmups"],
@@ -63,7 +61,7 @@ describe("song pack", () => {
         const pack = parsePack(
             JSON.stringify({
                 format: "plinky-songs",
-                songs: [{ id: "a", title: "A", abc: "X:1\nK:C\nC" }, { id: "bad" }],
+                songs: [{ id: "a", title: "A", xml: "<score-partwise/>" }, { id: "bad" }],
             }),
         );
         expect(pack.songs.map((entry) => entry.id)).toEqual(["a"]);

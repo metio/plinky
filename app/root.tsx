@@ -15,7 +15,6 @@ import {
 import type { Route } from "./+types/root";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
-import { seedStarterSongs } from "./lib/seed";
 import { applyTheme, loadTheme } from "./lib/theme";
 import { SITE_URL } from "./lib/site";
 import { m } from "./paraglide/messages.js";
@@ -117,7 +116,6 @@ export default function App() {
     // Register the offline service worker in production builds only; in dev it
     // would cache the dev server's assets and serve them stale.
     useEffect(() => {
-        void seedStarterSongs();
         if (import.meta.env.PROD && "serviceWorker" in navigator) {
             navigator.serviceWorker.register("/sw.js").catch(() => {});
         }

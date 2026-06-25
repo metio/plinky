@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import type { Exercise } from "./exercises";
+import type { Song } from "./catalog";
 import { groupByCurriculum } from "./curriculums";
 
-function song(id: string, curriculums?: string[]): Exercise {
+function song(id: string, curriculums?: string[]): Song {
     return {
         id,
         title: id,
+        composer: "",
         description: "",
-        abc: "X:1\nK:C\nC",
+        xml: "<score-partwise/>",
         tempo: 90,
         beatsPerBar: 4,
-        curriculums,
+        bundled: false,
+        ...(curriculums ? { curriculums } : {}),
     };
 }
 

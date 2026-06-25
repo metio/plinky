@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef, useState } from "react";
-import { exportAllPack, importSongsPack, loadUserSongs } from "../lib/songs";
+import { exportAllPack, importSongsPack, loadUserSongs } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
 
 function pluralSongs(count: number): string {

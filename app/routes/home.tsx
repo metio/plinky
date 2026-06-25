@@ -1,16 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { SongCard } from "../components/songCard";
 import { SongImport } from "../components/songImport";
-import { usePlayer } from "../hooks/usePlayer";
-import type { Exercise } from "../lib/exercises";
+import { loadCatalog, type Song } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
-import { seedStarterSongs } from "../lib/seed";
 import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, STRUCTURED_DATA } from "../lib/site";
-import { loadUserSongs, removeUserSong } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/home";
 
@@ -34,33 +30,21 @@ const PLAY_NOW = [
 const NAV_LINK = "text-indigo-700 underline dark:text-indigo-300";
 
 export default function Home() {
-    const [songs, setSongs] = useState<Exercise[]>([]);
+    const [songs, setSongs] = useState<Song[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [loaded, setLoaded] = useState(false);
-    const player = usePlayer();
-    const reload = useCallback(() => setSongs(loadUserSongs()), []);
 
-    // The catalog lives in local storage, unavailable during prerender and on the
-    // first client paint, so it can only appear a tick later. Until then a
-    // skeleton of the same height stands in, so populating the list does not
-    // shove the rest of the page down.
-    // seedStarterSongs is a no-op once seeded, so this just reloads on return.
+    // The catalogue reads from local storage and bundled MusicXML on the client,
+    // so it appears a tick after paint; a skeleton of the same height holds the
+    // space until then so the import panel below does not jump.
     useEffect(() => {
-        seedStarterSongs().then(() => {
-            reload();
-            setFavorites(loadFavorites());
-            setLoaded(true);
-        });
-    }, [reload]);
+        setSongs(loadCatalog());
+        setFavorites(loadFavorites());
+        setLoaded(true);
+    }, []);
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
-    const remove = (id: string) => {
-        removeUserSong(id);
-        reload();
-    };
 
-    // The home list is the user's pinned songs, so a large catalog stays out of
-    // the way; the full library lives on /songs.
     const favoriteSongs = useMemo(
         () => songs.filter((song) => favorites.has(song.id)),
         [songs, favorites],
@@ -104,9 +88,6 @@ export default function Home() {
                         <Link to="/songs" className={NAV_LINK}>
                             {m.home_browse_all()}
                         </Link>
-                        <Link to="/scores" className={NAV_LINK}>
-                            {m.scores_heading()}
-                        </Link>
                         <Link to="/tracks" className={NAV_LINK}>
                             {m.home_tracks()}
                         </Link>
@@ -117,9 +98,6 @@ export default function Home() {
                 </div>
 
                 {!loaded ? (
-                    // Favorites load from local storage a tick after paint. Reserve
-                    // about the height of the empty prompt so resolving the list
-                    // does not shove the import panel below it up or down.
                     <div className="h-24" aria-hidden="true" />
                 ) : favoriteSongs.length === 0 ? (
                     <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
@@ -129,24 +107,36 @@ export default function Home() {
                         </Link>
                     </p>
                 ) : (
-                    <ul className="space-y-3">
+                    <ul className="space-y-2">
                         {favoriteSongs.map((song) => (
-                            <SongCard
+                            <li
                                 key={song.id}
-                                song={song}
-                                favorite={true}
-                                onToggleFavorite={toggle}
-                                onRemove={remove}
-                                playing={player.playingId === song.id}
-                                onPlay={(s) => player.play(s.id, s.abc, s.tempo)}
-                                onStop={player.stop}
-                            />
+                                className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 dark:border-gray-800"
+                            >
+                                <Link
+                                    to={`/play/${song.id}`}
+                                    className="font-medium text-indigo-700 underline dark:text-indigo-300"
+                                >
+                                    {song.title}
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => toggle(song.id)}
+                                    aria-label={m.songs_unfavorite()}
+                                    className="text-lg leading-none text-amber-600 dark:text-amber-400"
+                                >
+                                    ★
+                                </button>
+                            </li>
                         ))}
                     </ul>
                 )}
             </section>
 
-            <SongImport existingIds={songs.map((song) => song.id)} onAdded={reload} />
+            <SongImport
+                existingIds={songs.map((song) => song.id)}
+                onAdded={() => setSongs(loadCatalog())}
+            />
         </main>
     );
 }

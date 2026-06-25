@@ -20,7 +20,10 @@ async function renders(xml: string): Promise<boolean> {
     const element = document.createElement("div");
     document.body.appendChild(element);
     containers.push(element);
-    const osmd = new OpenSheetMusicDisplay(element, { autoResize: false, drawingParameters: "compact" });
+    const osmd = new OpenSheetMusicDisplay(element, {
+        autoResize: false,
+        drawingParameters: "compact",
+    });
     await osmd.load(xml);
     osmd.render();
     return element.querySelector("svg") !== null;
