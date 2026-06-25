@@ -83,6 +83,16 @@ describe("MidiProvider", () => {
         expect(result.current.octaveOffset).toBe(1);
     });
 
+    it("releases keys still held when the window loses focus", () => {
+        const { result } = renderHook(() => useMidiConnection(), { wrapper });
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "a" })));
+        expect(result.current.heldNotes).toContain(60);
+        // The keyup would otherwise be delivered to whatever window took focus,
+        // leaving the note stuck; blur must clear it.
+        act(() => window.dispatchEvent(new Event("blur")));
+        expect(result.current.heldNotes).not.toContain(60);
+    });
+
     it("plays from the on-screen keyboard bridge, notifies subscribers, and clears events", () => {
         const { result } = renderHook(() => useMidiConnection(), { wrapper });
         const onNoteOn = vi.fn();

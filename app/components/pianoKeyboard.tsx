@@ -30,7 +30,9 @@ export function PianoKeyboard({
     }
     const whites = notes.filter(isWhite);
     const blacks = notes.filter((note) => !isWhite(note));
-    const whiteWidth = 100 / whites.length;
+    // Guard against a range with no white keys (a degenerate single-black span):
+    // dividing by zero would make every black key's left/width Infinity.
+    const whiteWidth = whites.length ? 100 / whites.length : 0;
 
     const down = (note: number) => (event: React.PointerEvent) => {
         event.preventDefault();
@@ -55,6 +57,7 @@ export function PianoKeyboard({
                         aria-label={noteName(note)}
                         onPointerDown={down(note)}
                         onPointerUp={up(note)}
+                        onPointerCancel={up(note)}
                         onPointerLeave={leave(note)}
                         className={`flex-1 rounded-b border border-gray-300 dark:border-gray-700 ${
                             heldNotes.includes(note)
@@ -68,6 +71,15 @@ export function PianoKeyboard({
             </div>
             {blacks.map((note) => {
                 const whitesBefore = whites.filter((white) => white < note).length;
+                // A black key sits over the gap after its white neighbour. When the
+                // range begins or ends on a black key it has no neighbour on one
+                // side, so clamp it within [0, 100%] rather than letting it hang off
+                // the edge.
+                const width = whiteWidth * 0.6;
+                const left = Math.min(
+                    Math.max(0, whitesBefore * whiteWidth - whiteWidth * 0.3),
+                    100 - width,
+                );
                 return (
                     <button
                         key={note}
@@ -75,6 +87,7 @@ export function PianoKeyboard({
                         aria-label={noteName(note)}
                         onPointerDown={down(note)}
                         onPointerUp={up(note)}
+                        onPointerCancel={up(note)}
                         onPointerLeave={leave(note)}
                         className={`absolute top-0 h-16 rounded-b ${
                             heldNotes.includes(note)
@@ -83,10 +96,7 @@ export function PianoKeyboard({
                                   ? "bg-indigo-400"
                                   : "bg-gray-800"
                         }`}
-                        style={{
-                            left: `${whitesBefore * whiteWidth - whiteWidth * 0.3}%`,
-                            width: `${whiteWidth * 0.6}%`,
-                        }}
+                        style={{ left: `${left}%`, width: `${width}%` }}
                     />
                 );
             })}

@@ -278,11 +278,23 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, event.timeStamp);
         };
 
+        // A keyup is delivered to whichever window has focus, so a key still down
+        // when focus leaves (Alt-Tab, clicking away) would never release and stay
+        // stuck. Release everything held when the window loses focus.
+        const releaseAll = () => {
+            for (const note of pressed.values()) {
+                emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, performance.now());
+            }
+            pressed.clear();
+        };
+
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
+        window.addEventListener("blur", releaseAll);
         return () => {
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup", onKeyUp);
+            window.removeEventListener("blur", releaseAll);
         };
     }, [emitNote]);
 

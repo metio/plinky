@@ -33,7 +33,7 @@ export function useSynth(): UseSynthResult {
         if (!ctx || !prefs.sound) {
             return;
         }
-        void ctx.resume();
+        ctx.resume().catch(() => {});
 
         const now = ctx.currentTime;
         const duration = options.duration ?? 1.1;

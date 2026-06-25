@@ -11,7 +11,16 @@ export function getAudioContext(): AudioContext | null {
         return null;
     }
     if (!sharedContext) {
-        sharedContext = new AudioContext();
+        // Older Safari only exposes webkitAudioContext; construction can also throw
+        // when the browser's context limit is reached. Callers handle a null result.
+        const Ctor =
+            window.AudioContext ??
+            (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        try {
+            sharedContext = Ctor ? new Ctor() : null;
+        } catch {
+            sharedContext = null;
+        }
     }
     return sharedContext;
 }

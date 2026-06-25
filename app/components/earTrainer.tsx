@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import { nextEarNote } from "../lib/ear";
@@ -23,6 +23,18 @@ export function EarTrainer() {
     // Refs keep the input handler reading current values without re-subscribing.
     const targetRef = useRef<number | null>(null);
     const lockRef = useRef(false);
+    // The pending "advance to next round" timer, cancelled on unmount so it can't
+    // fire state updates or play audio after the trainer is gone.
+    const advanceTimer = useRef<number | null>(null);
+
+    useEffect(
+        () => () => {
+            if (advanceTimer.current !== null) {
+                window.clearTimeout(advanceTimer.current);
+            }
+        },
+        [],
+    );
 
     const playTarget = useCallback(
         (note: number) => synth.playNote(note, { duration: 1.4 }),
@@ -62,7 +74,7 @@ export function EarTrainer() {
                 setStatus("correct");
                 lockRef.current = true;
                 const previous = targetRef.current;
-                window.setTimeout(() => nextRound(previous), 800);
+                advanceTimer.current = window.setTimeout(() => nextRound(previous), 800);
             } else {
                 setWrong(played.note);
                 synth.playNote(played.note, { duration: 0.4 });

@@ -32,4 +32,23 @@ describe("PianoKeyboard", () => {
             "bg-indigo-50 dark:bg-indigo-950",
         );
     });
+
+    it("keeps a leading black key inside the keyboard", () => {
+        // A range starting on a black key has no white key before it, so its
+        // center maps to a negative left unless it's clamped into the keyboard.
+        renderKeyboard({ from: 61, to: 67 });
+        const blackKey = screen.getByLabelText("C#4");
+        const left = Number.parseFloat(blackKey.style.left);
+        const width = Number.parseFloat(blackKey.style.width);
+        expect(Number.isFinite(left)).toBe(true);
+        expect(left).toBeGreaterThanOrEqual(0);
+        expect(left + width).toBeLessThanOrEqual(100);
+    });
+
+    it("does not produce non-finite positions for a single black key", () => {
+        renderKeyboard({ from: 61, to: 61 });
+        const blackKey = screen.getByLabelText("C#4");
+        expect(Number.isFinite(Number.parseFloat(blackKey.style.left))).toBe(true);
+        expect(Number.isFinite(Number.parseFloat(blackKey.style.width))).toBe(true);
+    });
 });

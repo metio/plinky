@@ -55,6 +55,11 @@ export function useScoreMatcher(
     const practicingRef = useRef(false);
     const optionsRef = useRef(options);
     optionsRef.current = options;
+    // The tempo is fixed for the duration of a run so that every note's notated
+    // time uses one scale. Reading the live tempo instead would let a mid-run
+    // slider change rebase later notes against the first note's old tempo and
+    // corrupt the timing and flow grades.
+    const runTempoRef = useRef(options.tempo ?? 100);
 
     const stop = useCallback(() => {
         practicingRef.current = false;
@@ -81,12 +86,20 @@ export function useScoreMatcher(
             }
             osmd.cursor.next();
         }
+        // A score with no playable positions (all rests, or empty) has nothing to
+        // match: entering the practicing state would strand the UI at 0/0 forever,
+        // since completion is only reached by clearing a position.
+        if (count === 0) {
+            osmd.cursor.hide();
+            return;
+        }
         osmd.cursor.reset();
         advancePastRests(osmd);
         osmd.cursor.show();
         hit.current.clear();
         ordinalRef.current = 0;
         sinceWrong.current = 0;
+        runTempoRef.current = optionsRef.current.tempo ?? 100;
         practicingRef.current = true;
         setTotal(count);
         setDone(0);
@@ -116,7 +129,7 @@ export function useScoreMatcher(
             const timeMs =
                 (osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) *
                 4 *
-                (60000 / (optionsRef.current.tempo ?? 100));
+                (60000 / runTempoRef.current);
             optionsRef.current.onCorrect?.({
                 pitches: expectedNow,
                 ordinal: ordinalRef.current,
