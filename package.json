@@ -4,7 +4,7 @@
   "scripts": {
     "messages": "node dev/compile-messages.mjs",
     "scores": "node dev/gen-exercise-scores.mjs",
-    "build": "npm run messages && react-router build && node dev/stamp-sw.mjs",
+    "build": "npm run messages && react-router build && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "dev": "npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "npm run messages && react-router typegen && tsc",
