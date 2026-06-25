@@ -5,12 +5,27 @@ import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { resolveScore, type Score } from "../lib/catalog";
-import { routeMeta } from "../lib/site";
+import { musicCompositionData, routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
 
-export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Play", "Practice a piece with your MIDI piano or computer keyboard");
+export function meta({ params }: Route.MetaArgs) {
+    // Bundled scores resolve at prerender (no localStorage), so each one gets its
+    // own title, description, and structured data — making the catalogue's pieces
+    // indexable instead of every play page sharing a generic shell.
+    const score = resolveScore(params.scoreId);
+    if (!score) {
+        return routeMeta("Play", "Practice a piece with your MIDI piano or computer keyboard");
+    }
+    const by = score.composer ? ` by ${score.composer}` : "";
+    return [
+        ...routeMeta(
+            score.title,
+            `Practice "${score.title}"${by} in your browser — sight-read and play it with your MIDI or computer keyboard.`,
+        ),
+        { "script:ld+json": musicCompositionData(score.title, score.composer, getLocale()) },
+    ];
 }
 
 export default function PlayRoute({ params }: Route.ComponentProps) {

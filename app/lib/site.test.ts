@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { ogLocale, pageTitle, routeMeta, structuredData } from "./site";
+import { musicCompositionData, ogLocale, pageTitle, routeMeta, structuredData } from "./site";
 
 describe("pageTitle", () => {
     it("ends with the brand and leads with the specific part", () => {
@@ -41,5 +41,19 @@ describe("structuredData", () => {
         expect(data["@type"]).toBe("WebApplication");
         expect(data.isAccessibleForFree).toBe(true);
         expect(data.offers.price).toBe("0");
+    });
+});
+
+describe("musicCompositionData", () => {
+    it("describes the piece, including the composer when present", () => {
+        const data = musicCompositionData("Ode to Joy", "Beethoven", "de");
+        expect(data["@type"]).toBe("MusicComposition");
+        expect(data.name).toBe("Ode to Joy");
+        expect(data.inLanguage).toBe("de");
+        expect(data.composer).toEqual({ "@type": "Person", name: "Beethoven" });
+    });
+
+    it("omits the composer when unknown", () => {
+        expect(musicCompositionData("Etude", "", "en")).not.toHaveProperty("composer");
     });
 });

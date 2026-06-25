@@ -98,3 +98,16 @@ const OG_LOCALE: Record<string, string> = {
 export function ogLocale(locale: string): string {
     return OG_LOCALE[locale] ?? "en_US";
 }
+
+// schema.org data for a single piece, so a play page is indexable as the work it
+// teaches rather than a generic app screen.
+export function musicCompositionData(title: string, composer: string, locale: string) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "MusicComposition",
+        name: title,
+        inLanguage: locale,
+        isAccessibleForFree: true,
+        ...(composer ? { composer: { "@type": "Person", name: composer } } : {}),
+    };
+}
