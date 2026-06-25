@@ -1,20 +1,20 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
-name: Submit a song
-description: Share an ABC song to be added to the Plinky catalog
-title: "[Song] "
-labels: ["song-submission"]
+name: Submit a score
+description: Share an ABC score to be added to the Plinky catalog
+title: "[Score] "
+labels: ["score-submission"]
 body:
   - type: markdown
     attributes:
       value: >
-        Thanks for sharing a song! Paste its ABC notation below. An automated
+        Thanks for sharing a score! Paste its ABC notation below. An automated
         check looks over the basics, then a maintainer reviews it before it joins
         the catalog. Please only submit music you have the right to share.
   - type: input
-    id: song-title
+    id: score-title
     attributes:
-      label: Song title
+      label: Score title
       placeholder: e.g. Ode to Joy
     validations:
       required: true
@@ -26,7 +26,7 @@ body:
       render: text
       placeholder: |
         X:1
-        T:My song
+        T:My score
         M:4/4
         L:1/4
         K:C
@@ -42,18 +42,18 @@ body:
     id: description
     attributes:
       label: Description
-      placeholder: A short note about the song.
+      placeholder: A short note about the score.
   - type: input
     id: curriculum
     attributes:
       label: Curriculum (optional)
-      description: If this song belongs to a curriculum, name it here.
+      description: If this score belongs to a curriculum, name it here.
   - type: dropdown
     id: license
     attributes:
       label: License
       description: >
-        How others may use this song. CC0-1.0 is public-domain-style (most
+        How others may use this score. CC0-1.0 is public-domain-style (most
         reusable); CC-BY needs attribution; SA adds share-alike; NC blocks
         commercial use; ND blocks derivatives.
       options:
@@ -70,5 +70,5 @@ body:
     attributes:
       label: Rights
       options:
-        - label: I have the right to share this song under the license I selected.
+        - label: I have the right to share this score under the license I selected.
           required: true

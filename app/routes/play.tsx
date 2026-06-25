@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { ScoreViewer } from "../components/scoreViewer";
-import { resolveSong, type Song } from "../lib/catalog";
+import { resolveScore, type Score } from "../lib/catalog";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/play";
@@ -16,38 +16,38 @@ export function meta(_args: Route.MetaArgs) {
 export default function PlayRoute({ params }: Route.ComponentProps) {
     // The catalogue is read from local storage and bundled MusicXML on the client,
     // so the piece resolves a tick after paint: undefined while loading, null when
-    // there is no such song.
-    const [song, setSong] = useState<Song | null | undefined>(undefined);
+    // there is no such score.
+    const [score, setScore] = useState<Score | null | undefined>(undefined);
     useEffect(() => {
-        setSong(resolveSong(params.songId) ?? null);
-    }, [params.songId]);
+        setScore(resolveScore(params.scoreId) ?? null);
+    }, [params.scoreId]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            {song && (
+            {score && (
                 <>
                     <header className="space-y-1">
-                        <h1 className="text-2xl font-semibold">{song.title}</h1>
-                        {song.composer && (
+                        <h1 className="text-2xl font-semibold">{score.title}</h1>
+                        {score.composer && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {song.composer}
+                                {score.composer}
                             </p>
                         )}
                     </header>
                     <ScoreViewer
-                        key={song.id}
-                        id={song.id}
-                        xml={song.xml}
-                        title={song.title}
-                        initialTempo={song.tempo}
+                        key={score.id}
+                        id={score.id}
+                        xml={score.xml}
+                        title={score.title}
+                        initialTempo={score.tempo}
                     />
                 </>
             )}
-            {song === null && (
+            {score === null && (
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.play_not_found()}</p>
             )}
-            <Link to="/songs" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                {m.songs_heading()}
+            <Link to="/scores" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+                {m.scores_heading()}
             </Link>
         </main>
     );

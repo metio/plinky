@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// Validates a song-submission issue: parses the ABC from the form body, checks
+// Validates a score-submission issue: parses the ABC from the form body, checks
 // the headers, then renders it with the same abcjs the app uses (in headless
 // Chromium) and confirms it produces playable notes — i.e. that Plinky can
 // actually use it. Writes `valid` and a markdown `report` to GITHUB_OUTPUT.

@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type Curriculum, parsePack, serializePack } from "./songPack";
+import { type Curriculum, parsePack, serializePack } from "./scorePack";
 
-// The one song catalogue: MusicXML pieces, rendered and practised on OSMD. The
+// The one score catalogue: MusicXML pieces, rendered and practised on OSMD. The
 // bundled public-domain scores ship with the app; user-imported pieces are kept in
 // local storage and layer on top, a stored piece overriding a bundled one by id.
-export type Song = {
+export type Score = {
     id: string;
     title: string;
     composer: string;
@@ -25,12 +25,12 @@ const files = import.meta.glob("../../scores/*.musicxml", {
     eager: true,
 }) as Record<string, string>;
 
-const STORAGE_KEY = "plinky:songs";
+const STORAGE_KEY = "plinky:scores";
 const CURRICULUMS_KEY = "plinky:curriculums";
 
-// Reads the metadata a song needs from its MusicXML. DOMParser is browser-only, so
+// Reads the metadata a score needs from its MusicXML. DOMParser is browser-only, so
 // callers run on the client (in an effect), as the catalogue already does.
-export function readSongMeta(xml: string): {
+export function readScoreMeta(xml: string): {
     title: string;
     composer: string;
     tempo: number;
@@ -58,70 +58,70 @@ export function slugify(title: string): string {
             .toLowerCase()
             .trim()
             .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "") || "song"
+            .replace(/^-+|-+$/g, "") || "score"
     );
 }
 
 // The shipped scores, identical for everyone — the pool the daily challenge draws
 // from, regardless of what a device has imported.
-export function loadBundledSongs(): Song[] {
+export function loadBundledScores(): Score[] {
     return Object.entries(files).map(([path, xml]) => {
         const id = (path.split("/").pop() ?? path).replace(/\.musicxml$/, "");
-        return { id, ...readSongMeta(xml), description: "", xml, bundled: true };
+        return { id, ...readScoreMeta(xml), description: "", xml, bundled: true };
     });
 }
 
-export function loadUserSongs(): Song[] {
+export function loadUserScores(): Score[] {
     if (typeof localStorage === "undefined") {
         return [];
     }
     try {
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-        return Array.isArray(parsed) ? (parsed as Song[]) : [];
+        return Array.isArray(parsed) ? (parsed as Score[]) : [];
     } catch {
         return [];
     }
 }
 
-function storeUserSongs(songs: Song[]): boolean {
+function storeUserScores(scores: Score[]): boolean {
     if (typeof localStorage === "undefined") {
         return false;
     }
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(songs));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
         return true;
     } catch {
         return false;
     }
 }
 
-export function saveUserSong(song: Song): void {
-    storeUserSongs([...loadUserSongs().filter((entry) => entry.id !== song.id), song]);
+export function saveUserScore(score: Score): void {
+    storeUserScores([...loadUserScores().filter((entry) => entry.id !== score.id), score]);
 }
 
-export function removeUserSong(id: string): void {
-    storeUserSongs(loadUserSongs().filter((entry) => entry.id !== id));
+export function removeUserScore(id: string): void {
+    storeUserScores(loadUserScores().filter((entry) => entry.id !== id));
 }
 
 // The whole catalogue: bundled scores plus the user's own, a stored piece shadowing
 // a bundled one of the same id, sorted by title.
-export function loadCatalog(): Song[] {
-    const user = loadUserSongs();
-    const userIds = new Set(user.map((song) => song.id));
-    return [...loadBundledSongs().filter((song) => !userIds.has(song.id)), ...user].sort((a, b) =>
-        a.title.localeCompare(b.title),
+export function loadCatalog(): Score[] {
+    const user = loadUserScores();
+    const userIds = new Set(user.map((score) => score.id));
+    return [...loadBundledScores().filter((score) => !userIds.has(score.id)), ...user].sort(
+        (a, b) => a.title.localeCompare(b.title),
     );
 }
 
-export function resolveSong(id: string | undefined): Song | undefined {
-    return id ? loadCatalog().find((song) => song.id === id) : undefined;
+export function resolveScore(id: string | undefined): Score | undefined {
+    return id ? loadCatalog().find((score) => score.id === id) : undefined;
 }
 
-// Derive a stored song from imported MusicXML, giving it an id unique in the
+// Derive a stored score from imported MusicXML, giving it an id unique in the
 // catalogue so it neither clashes with nor silently overrides another piece.
-export function buildSong(xml: string, takenIds: string[]): Song {
-    const meta = readSongMeta(xml);
-    const base = slugify(meta.title === "Untitled" ? "imported song" : meta.title);
+export function buildScore(xml: string, takenIds: string[]): Score {
+    const meta = readScoreMeta(xml);
+    const base = slugify(meta.title === "Untitled" ? "imported score" : meta.title);
     const taken = new Set(takenIds);
     let id = base;
     for (let n = 2; taken.has(id); n++) {
@@ -149,37 +149,37 @@ function saveCurriculums(curriculums: Curriculum[]): void {
     try {
         localStorage.setItem(CURRICULUMS_KEY, JSON.stringify(curriculums));
     } catch {
-        // Best-effort, like the songs.
+        // Best-effort, like the scores.
     }
 }
 
 const SUBMIT_ISSUE_URL = "https://github.com/metio/plinky/issues/new";
 
-// A link that opens the prefilled "submit a song" issue form, so anyone can
+// A link that opens the prefilled "submit a score" issue form, so anyone can
 // contribute using only their own GitHub account — no backend, no shared key.
-export function submissionUrl(song?: Song): string {
-    const params = new URLSearchParams({ template: "song-submission.yml" });
-    if (song) {
-        params.set("song-title", song.title);
-        params.set("musicxml", song.xml);
-        if (song.description) {
-            params.set("description", song.description);
+export function submissionUrl(score?: Score): string {
+    const params = new URLSearchParams({ template: "score-submission.yml" });
+    if (score) {
+        params.set("score-title", score.title);
+        params.set("musicxml", score.xml);
+        if (score.description) {
+            params.set("description", score.description);
         }
-        if (song.license) {
-            params.set("license", song.license);
+        if (score.license) {
+            params.set("license", score.license);
         }
     }
     return `${SUBMIT_ISSUE_URL}?${params.toString()}`;
 }
 
-// A backup of the user's library (their imported songs and curriculums) as a pack.
+// A backup of the user's library (their imported scores and curriculums) as a pack.
 export function exportAllPack(): string {
-    return serializePack(loadUserSongs(), loadCurriculums());
+    return serializePack(loadUserScores(), loadCurriculums());
 }
 
-// Merge a pack's curriculums and songs into local storage, overwriting by id so a
+// Merge a pack's curriculums and scores into local storage, overwriting by id so a
 // re-imported curriculum refreshes. Throws if the pack is invalid or won't store.
-export function importSongsPack(json: string): { imported: number; curriculums: number } {
+export function importScoresPack(json: string): { imported: number; curriculums: number } {
     const pack = parsePack(json);
 
     const curriculums = new Map(loadCurriculums().map((entry) => [entry.id, entry]));
@@ -188,24 +188,24 @@ export function importSongsPack(json: string): { imported: number; curriculums: 
     }
     saveCurriculums([...curriculums.values()]);
 
-    const songs = new Map(loadUserSongs().map((song) => [song.id, song]));
-    for (const packSong of pack.songs) {
-        const meta = readSongMeta(packSong.xml);
-        songs.set(packSong.id, {
-            id: packSong.id,
-            title: packSong.title || meta.title,
+    const scores = new Map(loadUserScores().map((score) => [score.id, score]));
+    for (const packScore of pack.scores) {
+        const meta = readScoreMeta(packScore.xml);
+        scores.set(packScore.id, {
+            id: packScore.id,
+            title: packScore.title || meta.title,
             composer: meta.composer,
-            description: packSong.description ?? "",
-            xml: packSong.xml,
-            tempo: packSong.tempo ?? meta.tempo,
-            beatsPerBar: packSong.beatsPerBar ?? meta.beatsPerBar,
+            description: packScore.description ?? "",
+            xml: packScore.xml,
+            tempo: packScore.tempo ?? meta.tempo,
+            beatsPerBar: packScore.beatsPerBar ?? meta.beatsPerBar,
             bundled: false,
-            ...(packSong.curriculums ? { curriculums: packSong.curriculums } : {}),
-            ...(packSong.license ? { license: packSong.license } : {}),
+            ...(packScore.curriculums ? { curriculums: packScore.curriculums } : {}),
+            ...(packScore.license ? { license: packScore.license } : {}),
         });
     }
-    if (!storeUserSongs([...songs.values()]) && typeof localStorage !== "undefined") {
-        throw new Error("Could not save the songs — they may exceed this device's storage.");
+    if (!storeUserScores([...scores.values()]) && typeof localStorage !== "undefined") {
+        throw new Error("Could not save the scores — they may exceed this device's storage.");
     }
-    return { imported: pack.songs.length, curriculums: pack.curriculums.length };
+    return { imported: pack.scores.length, curriculums: pack.curriculums.length };
 }

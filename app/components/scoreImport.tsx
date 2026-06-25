@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
-import { buildSong, saveUserSong } from "../lib/catalog";
+import { buildScore, saveUserScore } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
 
 // Accept anything that parses as MusicXML with at least one pitched note; OSMD
@@ -16,7 +16,7 @@ function looksPlayable(xml: string): boolean {
     }
 }
 
-export function SongImport({
+export function ScoreImport({
     existingIds,
     onAdded,
 }: {
@@ -37,7 +37,7 @@ export function SongImport({
             setError(m.import_no_notes());
             return;
         }
-        saveUserSong(buildSong(xml, existingIds));
+        saveUserScore(buildScore(xml, existingIds));
         setText("");
         setError(null);
         setOpen(false);
@@ -61,7 +61,7 @@ export function SongImport({
                 onClick={() => setOpen(true)}
                 className="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-                {m.import_song()}
+                {m.import_score()}
             </button>
         );
     }
@@ -88,7 +88,7 @@ export function SongImport({
                     onClick={add}
                     className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
                 >
-                    {m.import_add_song()}
+                    {m.import_add_score()}
                 </button>
                 <button
                     type="button"

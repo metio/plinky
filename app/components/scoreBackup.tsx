@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef, useState } from "react";
-import { exportAllPack, importSongsPack, loadUserSongs } from "../lib/catalog";
+import { exportAllPack, importScoresPack, loadUserScores } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
 
-function pluralSongs(count: number): string {
-    return count === 1 ? m.backup_songs_one({ count }) : m.backup_songs_other({ count });
+function pluralScores(count: number): string {
+    return count === 1 ? m.backup_scores_one({ count }) : m.backup_scores_other({ count });
 }
 
 function pluralCurriculums(count: number): string {
@@ -15,16 +15,16 @@ function pluralCurriculums(count: number): string {
         : m.backup_curriculums_other({ count });
 }
 
-// Back up and restore the local song library as a Plinky song pack: a "download
+// Back up and restore the local score library as a Plinky score pack: a "download
 // all" export and a mass-import that accepts a pack (e.g. a music school's
-// curriculum). Songs live only on this device, so this is how users keep them.
-export function SongBackup() {
+// curriculum). Scores live only on this device, so this is how users keep them.
+export function ScoreBackup() {
     const [count, setCount] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        setCount(loadUserSongs().length);
+        setCount(loadUserScores().length);
     }, []);
 
     const download = () => {
@@ -32,7 +32,7 @@ export function SongBackup() {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = url;
-        anchor.download = "plinky-songs.json";
+        anchor.download = "plinky-scores.json";
         anchor.click();
         URL.revokeObjectURL(url);
     };
@@ -42,8 +42,8 @@ export function SongBackup() {
             return;
         }
         try {
-            const result = importSongsPack(await file.text());
-            const parts = [m.backup_imported_songs({ count: pluralSongs(result.imported) })];
+            const result = importScoresPack(await file.text());
+            const parts = [m.backup_imported_scores({ count: pluralScores(result.imported) })];
             if (result.curriculums > 0) {
                 parts.push(
                     m.backup_imported_curriculums({
@@ -52,7 +52,7 @@ export function SongBackup() {
                 );
             }
             setStatus(`${parts.join(" ")}.`);
-            setCount(loadUserSongs().length);
+            setCount(loadUserScores().length);
         } catch (error) {
             setStatus(error instanceof Error ? error.message : m.backup_import_error());
         }
@@ -64,7 +64,7 @@ export function SongBackup() {
                 {m.backup_heading()}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-                {m.backup_intro({ count: pluralSongs(count) })}
+                {m.backup_intro({ count: pluralScores(count) })}
             </p>
             <div className="flex flex-wrap gap-2">
                 <button

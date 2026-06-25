@@ -95,7 +95,7 @@ function TrackPath({
     accent: Accent;
     titles: Record<string, string>;
 }) {
-    const steps = trackSteps(track.songIds, done);
+    const steps = trackSteps(track.scoreIds, done);
     const doneCount = steps.filter((step) => step.status === "done").length;
 
     return (
@@ -114,16 +114,16 @@ function TrackPath({
                     className={`absolute top-4 bottom-4 left-1/2 w-1 -translate-x-1/2 rounded ${accent.line}`}
                 />
                 {steps.map((step, index) => {
-                    const title = titles[step.songId];
+                    const title = titles[step.scoreId];
                     const node = <Node step={step} index={index} accent={accent} />;
                     return (
                         <div
-                            key={step.songId}
+                            key={step.scoreId}
                             className="flex flex-col items-center gap-1"
                             style={{ transform: `translateX(${SWAY[index % SWAY.length]}px)` }}
                         >
                             {title ? (
-                                <Link to={`/play/${step.songId}`} aria-label={title}>
+                                <Link to={`/play/${step.scoreId}`} aria-label={title}>
                                     {node}
                                 </Link>
                             ) : (
@@ -136,7 +136,7 @@ function TrackPath({
                                         : "text-gray-500 dark:text-gray-400"
                                 }`}
                             >
-                                {title ?? step.songId}
+                                {title ?? step.scoreId}
                             </span>
                         </div>
                     );
@@ -150,8 +150,8 @@ export default function TracksRoute() {
     const [titles, setTitles] = useState<Record<string, string>>({});
     useEffect(() => {
         const byId: Record<string, string> = {};
-        for (const song of loadCatalog()) {
-            byId[song.id] = song.title;
+        for (const score of loadCatalog()) {
+            byId[score.id] = score.title;
         }
         setTitles(byId);
     }, []);

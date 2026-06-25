@@ -13,7 +13,7 @@ describe("favorites", () => {
         expect(isFavorite("twinkle")).toBe(false);
     });
 
-    it("toggles a song on and off, persisting", () => {
+    it("toggles a score on and off, persisting", () => {
         toggleFavorite("twinkle");
         expect(isFavorite("twinkle")).toBe(true);
         expect([...loadFavorites()]).toEqual(["twinkle"]);

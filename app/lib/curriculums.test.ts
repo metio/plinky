@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import type { Song } from "./catalog";
+import type { Score } from "./catalog";
 import { groupByCurriculum } from "./curriculums";
 
-function song(id: string, curriculums?: string[]): Song {
+function score(id: string, curriculums?: string[]): Score {
     return {
         id,
         title: id,
@@ -20,9 +20,9 @@ function song(id: string, curriculums?: string[]): Song {
 }
 
 describe("groupByCurriculum", () => {
-    it("groups songs under each curriculum they list", () => {
+    it("groups scores under each curriculum they list", () => {
         const groups = groupByCurriculum(
-            [song("a", ["g1"]), song("b", ["g1", "g2"]), song("c", ["g2"])],
+            [score("a", ["g1"]), score("b", ["g1", "g2"]), score("c", ["g2"])],
             [
                 { id: "g1", name: "Grade 1" },
                 { id: "g2", name: "Grade 2" },
@@ -30,25 +30,25 @@ describe("groupByCurriculum", () => {
         );
         expect(groups).toHaveLength(2);
         expect(groups[0]!.curriculum?.id).toBe("g1");
-        expect(groups[0]!.songs.map((entry) => entry.id)).toEqual(["a", "b"]);
-        expect(groups[1]!.songs.map((entry) => entry.id)).toEqual(["b", "c"]);
+        expect(groups[0]!.scores.map((entry) => entry.id)).toEqual(["a", "b"]);
+        expect(groups[1]!.scores.map((entry) => entry.id)).toEqual(["b", "c"]);
     });
 
-    it("collects songs in no known curriculum under a trailing null group", () => {
+    it("collects scores in no known curriculum under a trailing null group", () => {
         const groups = groupByCurriculum(
-            [song("a", ["g1"]), song("loose"), song("unknown", ["gone"])],
+            [score("a", ["g1"]), score("loose"), score("unknown", ["gone"])],
             [{ id: "g1", name: "Grade 1" }],
         );
         expect(groups[groups.length - 1]!.curriculum).toBeNull();
-        expect(groups[groups.length - 1]!.songs.map((entry) => entry.id)).toEqual([
+        expect(groups[groups.length - 1]!.scores.map((entry) => entry.id)).toEqual([
             "loose",
             "unknown",
         ]);
     });
 
-    it("omits curriculums with no songs", () => {
-        expect(groupByCurriculum([song("a", ["g1"])], [{ id: "empty", name: "Empty" }])).toEqual([
-            { curriculum: null, songs: [song("a", ["g1"])] },
+    it("omits curriculums with no scores", () => {
+        expect(groupByCurriculum([score("a", ["g1"])], [{ id: "empty", name: "Empty" }])).toEqual([
+            { curriculum: null, scores: [score("a", ["g1"])] },
         ]);
     });
 });

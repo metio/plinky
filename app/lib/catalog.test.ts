@@ -4,16 +4,16 @@
 
 import { afterEach, describe, expect, it } from "vitest";
 import {
-    buildSong,
+    buildScore,
     exportAllPack,
-    importSongsPack,
-    loadBundledSongs,
+    importScoresPack,
+    loadBundledScores,
     loadCatalog,
-    loadUserSongs,
-    readSongMeta,
-    removeUserSong,
-    resolveSong,
-    saveUserSong,
+    loadUserScores,
+    readScoreMeta,
+    removeUserScore,
+    resolveScore,
+    saveUserScore,
     slugify,
     submissionUrl,
 } from "./catalog";
@@ -24,9 +24,9 @@ function xml(title = "Test", beats = 4): string {
 
 afterEach(() => localStorage.clear());
 
-describe("readSongMeta", () => {
+describe("readScoreMeta", () => {
     it("reads title, composer and meter from the MusicXML", () => {
-        const meta = readSongMeta(xml("Minuet", 3));
+        const meta = readScoreMeta(xml("Minuet", 3));
         expect(meta.title).toBe("Minuet");
         expect(meta.composer).toBe("Bach");
         expect(meta.beatsPerBar).toBe(3);
@@ -38,11 +38,11 @@ describe("readSongMeta", () => {
             "</work>",
             '</work><part><measure><sound tempo="120"/></measure></part>',
         );
-        expect(readSongMeta(withTempo).tempo).toBe(120);
+        expect(readScoreMeta(withTempo).tempo).toBe(120);
     });
 
     it("falls back to Untitled and 4/4 when the metadata is absent", () => {
-        const meta = readSongMeta("<score-partwise><part/></score-partwise>");
+        const meta = readScoreMeta("<score-partwise><part/></score-partwise>");
         expect(meta.title).toBe("Untitled");
         expect(meta.composer).toBe("");
         expect(meta.beatsPerBar).toBe(4);
@@ -50,75 +50,75 @@ describe("readSongMeta", () => {
 });
 
 describe("slugify", () => {
-    it("makes a url-safe id, falling back to 'song'", () => {
+    it("makes a url-safe id, falling back to 'score'", () => {
         expect(slugify("Für Elise!")).toBe("f-r-elise");
-        expect(slugify("   ")).toBe("song");
+        expect(slugify("   ")).toBe("score");
     });
 });
 
-describe("buildSong", () => {
-    it("derives a song with an id unique among the taken ones", () => {
-        const song = buildSong(xml("My Song"), ["my-song"]);
-        expect(song.id).toBe("my-song-2");
-        expect(song.title).toBe("My Song");
-        expect(song.bundled).toBe(false);
+describe("buildScore", () => {
+    it("derives a score with an id unique among the taken ones", () => {
+        const score = buildScore(xml("My Score"), ["my-score"]);
+        expect(score.id).toBe("my-score-2");
+        expect(score.title).toBe("My Score");
+        expect(score.bundled).toBe(false);
     });
 });
 
-describe("user songs", () => {
+describe("user scores", () => {
     it("saves, loads and removes", () => {
-        saveUserSong(buildSong(xml("A"), []));
-        expect(loadUserSongs().map((s) => s.id)).toEqual(["a"]);
-        saveUserSong(buildSong(xml("B"), ["a"]));
-        expect(loadUserSongs()).toHaveLength(2);
-        removeUserSong("a");
-        expect(loadUserSongs().map((s) => s.id)).toEqual(["b"]);
+        saveUserScore(buildScore(xml("A"), []));
+        expect(loadUserScores().map((s) => s.id)).toEqual(["a"]);
+        saveUserScore(buildScore(xml("B"), ["a"]));
+        expect(loadUserScores()).toHaveLength(2);
+        removeUserScore("a");
+        expect(loadUserScores().map((s) => s.id)).toEqual(["b"]);
     });
 });
 
-describe("loadBundledSongs", () => {
+describe("loadBundledScores", () => {
     it("returns the shipped scores, all marked bundled", () => {
-        const bundled = loadBundledSongs();
+        const bundled = loadBundledScores();
         expect(bundled.length).toBeGreaterThan(0);
-        expect(bundled.every((song) => song.bundled)).toBe(true);
+        expect(bundled.every((score) => score.bundled)).toBe(true);
     });
 });
 
 describe("loadCatalog", () => {
-    it("includes bundled and user songs, the user's overriding by id", () => {
-        const first = loadBundledSongs()[0]!;
-        saveUserSong({ ...buildSong(xml("Mine"), []), id: first.id });
+    it("includes bundled and user scores, the user's overriding by id", () => {
+        const first = loadBundledScores()[0]!;
+        saveUserScore({ ...buildScore(xml("Mine"), []), id: first.id });
         const catalog = loadCatalog();
-        const entry = catalog.find((song) => song.id === first.id);
+        const entry = catalog.find((score) => score.id === first.id);
         expect(entry?.title).toBe("Mine");
         expect(entry?.bundled).toBe(false);
         // No duplicate id from the shadowed bundled score.
-        expect(catalog.filter((song) => song.id === first.id)).toHaveLength(1);
+        expect(catalog.filter((score) => score.id === first.id)).toHaveLength(1);
     });
 
-    it("resolves a song by id, or undefined", () => {
-        saveUserSong(buildSong(xml("Solo"), []));
-        expect(resolveSong("solo")?.title).toBe("Solo");
-        expect(resolveSong("nope")).toBeUndefined();
+    it("resolves a score by id, or undefined", () => {
+        saveUserScore(buildScore(xml("Solo"), []));
+        expect(resolveScore("solo")?.title).toBe("Solo");
+        expect(resolveScore("nope")).toBeUndefined();
     });
 });
 
 describe("submissionUrl", () => {
     it("prefills the issue form with the MusicXML", () => {
-        const url = submissionUrl(buildSong(xml("Gift"), []));
-        expect(url).toContain("template=song-submission.yml");
-        expect(url).toContain("song-title=Gift");
+        const url = submissionUrl(buildScore(xml("Gift"), []));
+        expect(url).toContain("template=score-submission.yml");
+        expect(url).toContain("score-title=Gift");
         expect(url).toContain("musicxml=");
     });
 });
 
 describe("pack backup", () => {
     it("round-trips the user library through export and import", () => {
-        saveUserSong(buildSong(xml("Keep"), []));
+        saveUserScore(buildScore(xml("Keep"), []));
         const pack = exportAllPack();
         localStorage.clear();
-        const result = importSongsPack(pack);
+        const result = importScoresPack(pack);
         expect(result.imported).toBe(1);
-        expect(loadUserSongs().map((s) => s.id)).toEqual(["keep"]);
+        expect(loadUserScores().map((s) => s.id)).toEqual(["keep"]);
     });
 });

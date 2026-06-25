@@ -13,8 +13,8 @@ afterEach(() => {
     localStorage.clear();
 });
 
-function renderPlay(songId: string) {
-    const props = { params: { songId } } as unknown as Route.ComponentProps;
+function renderPlay(scoreId: string) {
+    const props = { params: { scoreId } } as unknown as Route.ComponentProps;
     return render(
         <MemoryRouter>
             <MidiProvider>
@@ -31,8 +31,8 @@ describe("Play", () => {
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
     });
 
-    it("reports a missing song", async () => {
-        renderPlay("no-such-song");
-        expect(await screen.findByText("That song isn't on this device.")).toBeTruthy();
+    it("reports a missing score", async () => {
+        renderPlay("no-such-score");
+        expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
     });
 });

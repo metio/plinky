@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
-name: Song submission
+name: Score submission
 on:
   issues:
     types: [opened, edited]
@@ -9,8 +9,8 @@ permissions:
 jobs:
   check:
     name: check
-    # Only act on song submissions; the issue form prefixes the title.
-    if: startsWith(github.event.issue.title, '[Song] ')
+    # Only act on score submissions; the issue form prefixes the title.
+    if: startsWith(github.event.issue.title, '[Score] ')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -34,7 +34,7 @@ jobs:
         with:
           script: |
             const valid = "${{ steps.validate.outputs.valid }}" === "true";
-            const marker = "<!-- plinky-song-check -->";
+            const marker = "<!-- plinky-score-check -->";
             const message = [
               marker,
               process.env.REPORT,
