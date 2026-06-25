@@ -12,8 +12,9 @@ afterEach(() => {
 const PERFECT: Skill = { accuracy: 100, timing: 100, flow: 100 };
 const POOR: Skill = { accuracy: 0, timing: 0, flow: 0 };
 
+// Local-time noon on the nth so the day bucket is 2026-06-0n in any runner zone.
 function day(n: number): Date {
-    return new Date(`2026-06-${String(n).padStart(2, "0")}T12:00:00Z`);
+    return new Date(2026, 5, n, 12, 0);
 }
 
 describe("recordRun", () => {
