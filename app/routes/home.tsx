@@ -138,6 +138,13 @@ export default function Home() {
                 existingIds={scores.map((score) => score.id)}
                 onAdded={() => setScores(loadCatalog())}
             />
+
+            <section className="space-y-2 border-t border-gray-200 pt-6 text-sm text-gray-600 dark:border-gray-800 dark:text-gray-400">
+                <h2 className="font-medium text-gray-700 dark:text-gray-300">
+                    {m.home_about_heading()}
+                </h2>
+                <p>{m.home_about_body()}</p>
+            </section>
         </main>
     );
 }
