@@ -28,14 +28,34 @@ const files = import.meta.glob("../../scores/*.musicxml", {
 const STORAGE_KEY = "plinky:scores";
 const CURRICULUMS_KEY = "plinky:curriculums";
 
-// Reads the metadata a score needs from its MusicXML. DOMParser is browser-only, so
-// callers run on the client (in an effect), as the catalogue already does.
-export function readScoreMeta(xml: string): {
-    title: string;
-    composer: string;
-    tempo: number;
-    beatsPerBar: number;
-} {
+type ScoreMeta = { title: string; composer: string; tempo: number; beatsPerBar: number };
+
+const positiveOr = (value: number, fallback: number): number =>
+    Number.isFinite(value) && value > 0 ? value : fallback;
+
+// The static prerender runs in Node, where DOMParser is absent; it derives a play
+// page's title from the bundled (well-formed, generated) MusicXML. A small regex
+// pass covers the few fields needed there. The browser keeps the DOMParser path,
+// which tolerates the messier MusicXML a user might import.
+function readScoreMetaFromText(xml: string): ScoreMeta {
+    const pick = (re: RegExp): string => xml.match(re)?.[1]?.trim() ?? "";
+    const title =
+        pick(/<work-title>([\s\S]*?)<\/work-title>/) ||
+        pick(/<movement-title>([\s\S]*?)<\/movement-title>/) ||
+        "Untitled";
+    return {
+        title,
+        composer: pick(/<creator\b[^>]*type="composer"[^>]*>([\s\S]*?)<\/creator>/),
+        tempo: Math.round(positiveOr(Number(pick(/<sound\b[^>]*\btempo="([^"]*)"/)), 90)),
+        beatsPerBar: positiveOr(Number(pick(/<beats>([\s\S]*?)<\/beats>/)), 4),
+    };
+}
+
+// Reads the metadata a score needs from its MusicXML.
+export function readScoreMeta(xml: string): ScoreMeta {
+    if (typeof DOMParser === "undefined") {
+        return readScoreMetaFromText(xml);
+    }
     const doc = new DOMParser().parseFromString(xml, "application/xml");
     const title =
         doc.querySelector("work-title")?.textContent?.trim() ||
@@ -43,14 +63,14 @@ export function readScoreMeta(xml: string): {
         "Untitled";
     const composer = doc.querySelector('creator[type="composer"]')?.textContent?.trim() || "";
     const beats = Number(doc.querySelector("time > beats")?.textContent);
+    // A non-numeric tempo attribute (e.g. "andante") would otherwise feed NaN into
+    // the 60000/tempo playback and grading math.
     const tempo = Number(doc.querySelector("sound[tempo]")?.getAttribute("tempo"));
     return {
         title,
         composer,
-        // A non-numeric tempo attribute (e.g. "andante") would otherwise feed NaN
-        // into the 60000/tempo playback and grading math.
-        tempo: Number.isFinite(tempo) && tempo > 0 ? Math.round(tempo) : 90,
-        beatsPerBar: Number.isFinite(beats) && beats > 0 ? beats : 4,
+        tempo: Math.round(positiveOr(tempo, 90)),
+        beatsPerBar: positiveOr(beats, 4),
     };
 }
 
