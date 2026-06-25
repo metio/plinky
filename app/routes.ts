@@ -3,16 +3,22 @@
 
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
+// Every page lives under a /:locale/ prefix so each language prerenders to its
+// own static document and the active locale is read from the URL. The bare "/"
+// is a client-only redirector to the visitor's language.
 export default [
-    index("routes/home.tsx"),
-    route("play/:scoreId", "routes/play.tsx"),
-    route("sprint", "routes/sprint.tsx"),
-    route("daily", "routes/daily.tsx"),
-    route("ear", "routes/ear.tsx"),
-    route("scores", "routes/scores.tsx"),
-    route("curriculums", "routes/curriculums.tsx"),
-    route("tracks", "routes/tracks.tsx"),
-    route("progress", "routes/progress.tsx"),
-    route("import", "routes/import.tsx"),
-    route("settings", "routes/settings.tsx"),
+    index("routes/localeRedirect.tsx"),
+    route(":locale", "routes/localeLayout.tsx", [
+        index("routes/home.tsx"),
+        route("play/:scoreId", "routes/play.tsx"),
+        route("sprint", "routes/sprint.tsx"),
+        route("daily", "routes/daily.tsx"),
+        route("ear", "routes/ear.tsx"),
+        route("scores", "routes/scores.tsx"),
+        route("curriculums", "routes/curriculums.tsx"),
+        route("tracks", "routes/tracks.tsx"),
+        route("progress", "routes/progress.tsx"),
+        route("import", "routes/import.tsx"),
+        route("settings", "routes/settings.tsx"),
+    ]),
 ] satisfies RouteConfig;

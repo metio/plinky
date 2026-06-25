@@ -4,21 +4,28 @@
 import { useEffect } from "react";
 import {
     isRouteErrorResponse,
-    Link,
     Links,
     Meta,
     Outlet,
     Scripts,
     ScrollRestoration,
+    useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { LocalizedLink as Link } from "./components/localizedLink";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
 import { SITE_URL } from "./lib/site";
 import { m } from "./paraglide/messages.js";
-import { getLocale } from "./paraglide/runtime.js";
+import {
+    baseLocale,
+    deLocalizeHref,
+    getLocale,
+    locales,
+    localizeUrl,
+} from "./paraglide/runtime.js";
 import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
@@ -94,19 +101,42 @@ export function Layout({ children }: { children: React.ReactNode }) {
         return () => media.removeEventListener("change", onChange);
     }, []);
 
+    // The locale-prefixed URL of this exact page, plus its canonical (unprefixed)
+    // form, for the self-referential canonical/og:url and the hreflang cluster
+    // that ties all language versions of the page together for search engines.
+    const { pathname } = useLocation();
+    const pageUrl = `${SITE_URL}${pathname}`;
+    const canonical = new URL(`${SITE_URL}${deLocalizeHref(pathname)}`);
+
     return (
-        <html lang="en">
+        <html lang={getLocale()}>
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained theme bootstrap that must run before paint */}
                 <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
                 <meta name="theme-color" content="#4f46e5" />
+                <link rel="canonical" href={pageUrl} />
+                {/* One alternate per language so search engines serve the right
+                    locale and share ranking signals across the cluster. */}
+                {locales.map((locale) => (
+                    <link
+                        key={locale}
+                        rel="alternate"
+                        hrefLang={locale}
+                        href={localizeUrl(canonical, { locale }).href}
+                    />
+                ))}
+                <link
+                    rel="alternate"
+                    hrefLang="x-default"
+                    href={localizeUrl(canonical, { locale: baseLocale }).href}
+                />
                 {/* Site-wide social-card fields; each route's meta adds the
                     per-page og:title / og:description and twitter equivalents. */}
                 <meta property="og:type" content="website" />
                 <meta property="og:site_name" content="Plinky" />
-                <meta property="og:url" content={SITE_URL} />
+                <meta property="og:url" content={pageUrl} />
                 <meta property="og:image" content={`${SITE_URL}/og.png`} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />

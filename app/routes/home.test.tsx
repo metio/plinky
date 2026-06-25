@@ -37,7 +37,8 @@ describe("Home", () => {
         toggleFavorite("my-score");
         renderHome();
         const link = await screen.findByText("My Score");
-        expect(link.getAttribute("href")).toBe("/play/my-score");
+        // Links are localized; the test setup pins the locale to the base.
+        expect(link.getAttribute("href")).toBe("/en/play/my-score");
     });
 
     it("prompts to star scores when none are favorited", async () => {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { LocalizedLink as Link } from "../components/localizedLink";
 import { loadCatalog, loadCurriculums } from "../lib/catalog";
 import { type CurriculumGroup, groupByCurriculum } from "../lib/curriculums";
 import { routeMeta } from "../lib/site";

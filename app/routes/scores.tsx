@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router";
+import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { loadCatalog, removeUserScore, type Score } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";

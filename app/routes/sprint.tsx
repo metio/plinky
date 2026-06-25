@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { generatePhrase } from "../lib/generator";
 import { routeMeta } from "../lib/site";

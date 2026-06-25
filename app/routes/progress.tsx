@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { LocalizedLink as Link } from "../components/localizedLink";
 import { ShareCard } from "../components/shareCard";
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";

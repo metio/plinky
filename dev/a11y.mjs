@@ -14,7 +14,16 @@ import { chromium } from "playwright";
 const ROOT = "build/client";
 const PORT = Number(process.env.PORT) || 8099;
 const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
-const PAGES = ["/", "/scores/", "/tracks/", "/curriculums/", "/progress/", "/settings/"];
+// Pages are prerendered under a /<locale>/ prefix; scan the base locale's set.
+// (The bare "/" is only a client redirect, so it has no content to audit.)
+const PAGES = [
+    "/en/",
+    "/en/scores/",
+    "/en/tracks/",
+    "/en/curriculums/",
+    "/en/progress/",
+    "/en/settings/",
+];
 const MIME = {
     ".html": "text/html",
     ".js": "text/javascript",

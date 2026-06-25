@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { Link } from "react-router";
+import { LocalizedLink as Link } from "../components/localizedLink";
 import { submissionUrl } from "../lib/catalog";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";

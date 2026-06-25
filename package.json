@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "messages": "paraglide-js compile --project ./project.inlang --outdir ./app/paraglide --strategy localStorage preferredLanguage baseLocale --emit-ts-declarations",
+    "messages": "node dev/compile-messages.mjs",
     "scores": "node dev/gen-exercise-scores.mjs",
     "build": "npm run messages && react-router build && node dev/stamp-sw.mjs",
     "dev": "npm run messages && react-router dev",

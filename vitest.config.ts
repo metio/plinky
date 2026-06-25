@@ -49,12 +49,14 @@ export default defineConfig({
                     environment: "node",
                     include: ["app/**/*.test.{ts,tsx}"],
                     exclude: ["app/**/*.browser.test.*"],
+                    setupFiles: ["./app/test-setup.ts"],
                 },
             },
             {
                 test: {
                     name: "browser",
                     include: ["app/**/*.browser.test.{ts,tsx}"],
+                    setupFiles: ["./app/test-setup.ts"],
                     browser: {
                         enabled: true,
                         provider: playwright(),
