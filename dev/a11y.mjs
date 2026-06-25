@@ -6,7 +6,7 @@
 // each prerendered page. Lighthouse only audits light mode, so running both modes
 // here is the only way dark-mode issues (contrast especially) get caught. Exits
 // non-zero on any violation.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { chromium } from "playwright";
@@ -45,6 +45,11 @@ const server = createServer((req, res) => {
         path += "index.html";
     }
     let file = join(ROOT, path);
+    // A directory path without a trailing slash (e.g. /en/scores) would otherwise
+    // readFileSync a directory and throw EISDIR; serve its index.html instead.
+    if (existsSync(file) && statSync(file).isDirectory()) {
+        file = join(file, "index.html");
+    }
     if (!existsSync(file)) {
         file = join(ROOT, "index.html");
     }
