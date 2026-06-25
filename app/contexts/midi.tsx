@@ -73,6 +73,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     const accessRef = useRef<MIDIAccess | null>(null);
     const nextIdRef = useRef(0);
     const subscribersRef = useRef<Set<NoteListener>>(new Set());
+    // The latest held notes, read by the window-blur handler to release them all.
+    const heldNotesRef = useRef(heldNotes);
+    heldNotesRef.current = heldNotes;
 
     const subscribe = useCallback((listener: NoteListener) => {
         subscribersRef.current.add(listener);
@@ -278,14 +281,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, event.timeStamp);
         };
 
-        // A keyup is delivered to whichever window has focus, so a key still down
-        // when focus leaves (Alt-Tab, clicking away) would never release and stay
-        // stuck. Release everything held when the window loses focus.
+        // A keyup (or an on-screen key's pointerup) is delivered only to the focused
+        // window, so a note still held when focus leaves (Alt-Tab, clicking away)
+        // would never release and stay stuck. Release every held note — from the
+        // computer keyboard, the on-screen keyboard, or a device — when focus is lost.
         const releaseAll = () => {
-            for (const note of pressed.values()) {
+            pressed.clear();
+            for (const note of heldNotesRef.current) {
                 emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, performance.now());
             }
-            pressed.clear();
         };
 
         window.addEventListener("keydown", onKeyDown);

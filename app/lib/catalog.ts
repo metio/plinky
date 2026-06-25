@@ -225,7 +225,18 @@ export function loadCurriculums(): Curriculum[] {
     }
     try {
         const parsed = JSON.parse(localStorage.getItem(CURRICULUMS_KEY) ?? "[]");
-        return Array.isArray(parsed) ? (parsed as Curriculum[]) : [];
+        if (!Array.isArray(parsed)) {
+            return [];
+        }
+        // Drop malformed entries: grouping reads each curriculum's id, so a null or
+        // id-less entry from corrupt storage would otherwise crash the route.
+        return parsed.filter(
+            (entry): entry is Curriculum =>
+                !!entry &&
+                typeof entry === "object" &&
+                typeof entry.id === "string" &&
+                typeof entry.name === "string",
+        );
     } catch {
         return [];
     }

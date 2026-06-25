@@ -93,6 +93,16 @@ describe("MidiProvider", () => {
         expect(result.current.heldNotes).not.toContain(60);
     });
 
+    it("releases an on-screen-keyboard note still held on blur", () => {
+        const { result } = renderHook(() => useMidiConnection(), { wrapper });
+        // A pointer held on an on-screen key, then an OS app-switch, never delivers
+        // pointerup; blur must release it too — not just computer-keyboard keys.
+        act(() => result.current.pressKey(67));
+        expect(result.current.heldNotes).toContain(67);
+        act(() => window.dispatchEvent(new Event("blur")));
+        expect(result.current.heldNotes).not.toContain(67);
+    });
+
     it("plays from the on-screen keyboard bridge, notifies subscribers, and clears events", () => {
         const { result } = renderHook(() => useMidiConnection(), { wrapper });
         const onNoteOn = vi.fn();
