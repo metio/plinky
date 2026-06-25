@@ -141,7 +141,9 @@ export default function ScoresRoute() {
             </div>
 
             <p className="text-xs text-gray-500 dark:text-gray-400">
-                {m.scores_count({ count: matches.length })}
+                {matches.length === 1
+                    ? m.scores_count_one({ count: matches.length })
+                    : m.scores_count_other({ count: matches.length })}
             </p>
 
             {matches.length === 0 ? (
