@@ -45,11 +45,15 @@ export function ScoreViewer({
     xml,
     title,
     onMastery,
+    daily,
 }: {
     id: string;
     xml: string;
     title: string;
     onMastery?: () => void;
+    // When set, this run is the day's shared challenge; the share card identifies
+    // it as "Plinky #N" rather than by the piece, so everyone compares one grid.
+    daily?: number;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
@@ -363,8 +367,12 @@ export function ScoreViewer({
                             grid={shareGrid}
                             caption={m.share_heading()}
                             gridLabel={m.share_grid_label()}
-                            boast={m.share_boast({ title })}
-                            heading={title}
+                            boast={
+                                daily != null
+                                    ? m.daily_share_boast({ number: daily })
+                                    : m.share_boast({ title })
+                            }
+                            heading={daily != null ? `Plinky #${daily}` : title}
                         />
                     )}
                 </div>
