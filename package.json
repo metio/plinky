@@ -4,7 +4,7 @@
   "scripts": {
     "messages": "paraglide-js compile --project ./project.inlang --outdir ./app/paraglide --strategy localStorage preferredLanguage baseLocale --emit-ts-declarations",
     "scores": "node dev/gen-exercise-scores.mjs",
-    "build": "npm run messages && react-router build",
+    "build": "npm run messages && react-router build && node dev/stamp-sw.mjs",
     "dev": "npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "npm run messages && react-router typegen && tsc",

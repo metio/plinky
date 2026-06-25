@@ -7,15 +7,22 @@
 //   - hashed build assets under /assets/: cache-first. Their filenames carry a
 //     content hash, so a cached copy can never be stale — a changed file is a
 //     changed URL.
-//   - every other same-origin GET (the song registry, manifest, icons, og image):
+//   - every other same-origin GET (manifest, icons, og image):
 //     stale-while-revalidate. The cached copy is served immediately, while a
 //     background fetch refreshes it for the next visit. Cache-first here would
 //     freeze these un-hashed files at their first-seen version forever, so a
-//     grown song pack or a new icon would never reach returning visitors.
-const CACHE = "plinky-v1";
+//     new icon or manifest would never reach returning visitors.
+//
+// The cache name carries a build hash stamped in at build time (dev/stamp-sw.mjs),
+// so every deploy yields a new cache that the activate handler swaps to, evicting
+// HTML that points at hashed chunks the deploy has since removed.
+const CACHE = "plinky-__BUILD_HASH__";
+
+// The generic shell for routes that were not prerendered to their own document.
+const SPA_FALLBACK = "/__spa-fallback.html";
 
 self.addEventListener("install", (event) => {
-    event.waitUntil(caches.open(CACHE).then((cache) => cache.add("/")));
+    event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(["/", SPA_FALLBACK])));
     self.skipWaiting();
 });
 
@@ -46,13 +53,23 @@ self.addEventListener("fetch", (event) => {
     if (request.mode === "navigate") {
         event.respondWith(
             (async () => {
+                const cache = await caches.open(CACHE);
                 try {
                     const response = await fetch(request);
-                    const cache = await caches.open(CACHE);
-                    cache.put("/", response.clone());
+                    // Cache each route under its own URL: the app prerenders a
+                    // distinct document per route, so collapsing them onto "/"
+                    // would serve the wrong page (and wrong asset preloads) offline.
+                    if (response.ok) {
+                        cache.put(request, response.clone());
+                    }
                     return response;
                 } catch {
-                    return (await caches.match("/")) ?? Response.error();
+                    return (
+                        (await cache.match(request)) ??
+                        (await cache.match(SPA_FALLBACK)) ??
+                        (await cache.match("/")) ??
+                        Response.error()
+                    );
                 }
             })(),
         );
