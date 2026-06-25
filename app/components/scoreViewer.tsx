@@ -8,7 +8,6 @@ import { type CorrectInfo, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import { computeFlow } from "../lib/flow";
-import type { TimelineNote } from "../lib/ghost";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
 import { recordRun } from "../lib/lifetime";
@@ -26,12 +25,12 @@ import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
-import { GhostTimeline } from "./ghostTimeline";
+import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { ShareCard } from "./shareCard";
 
 // A cleared note plus the velocity it was played at — the run's raw record, from
-// which the grade, the ghost timeline and the share grid are all derived.
+// which the grade, the per-note strip and the share grid are all derived.
 type PlayedNote = RunNote & { velocity: number };
 
 const BUTTON =
@@ -49,6 +48,7 @@ export function ScoreViewer({
     daily,
     ephemeral,
     initialTempo,
+    lockTempo,
 }: {
     id: string;
     xml: string;
@@ -57,6 +57,9 @@ export function ScoreViewer({
     // The piece's own tempo, used as the starting point for Listen and the count —
     // the component is keyed by piece, so it re-seeds when the piece changes.
     initialTempo?: number;
+    // Fix the tempo at initialTempo and hide the slider, so a shared challenge is
+    // played at one tempo by everyone rather than dialled to taste.
+    lockTempo?: boolean;
     // When set, this run is the day's shared challenge; the share card identifies
     // it as "Plinky #N" rather than by the piece, so everyone compares one grid.
     daily?: number;
@@ -76,7 +79,7 @@ export function ScoreViewer({
     const [playing, setPlaying] = useState(false);
     const [tempo, setTempo] = useState(initialTempo ?? 100);
     const [grade, setGrade] = useState<Grade | null>(null);
-    const [timeline, setTimeline] = useState<TimelineNote[]>([]);
+    const [runNotes, setRunNotes] = useState<RunNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
     const [mastery, setMastery] = useState<Mastery | null>(null);
 
@@ -90,9 +93,9 @@ export function ScoreViewer({
             for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
-            // Record each note's notated time (the ghost) and when it was actually
-            // played, both relative to the first note, for the grade, the timeline
-            // and the share grid.
+            // Record each note's notated time (the ideal) and when it was actually
+            // played, both relative to the first note, for the grade, the per-note
+            // strip and the share grid.
             if (info.ordinal === 0) {
                 startRef.current = info.timestamp;
                 baseOffsetRef.current = info.timeMs;
@@ -137,13 +140,7 @@ export function ScoreViewer({
             dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
         });
         setGrade(result);
-        setTimeline(
-            notes.map((note, index) => ({
-                ordinal: index,
-                targetMs: note.targetMs,
-                playedMs: note.playedMs,
-            })),
-        );
+        setRunNotes(notes);
         setShareGrid(gridFor(notes));
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
@@ -252,13 +249,29 @@ export function ScoreViewer({
         stopListen();
         notesRef.current = [];
         setGrade(null);
-        setTimeline([]);
+        setRunNotes([]);
         setShareGrid(null);
         matcher.start();
     };
 
     return (
         <div className="space-y-3">
+            {/* The score sits at the top — it's what you read while playing, so the
+                controls, keyboard and run summary all fall below it. Wide scores
+                scroll horizontally, so the region must be focusable for keyboard
+                users (axe scrollable-region-focusable) and is named by the title.
+                Horizontal padding would make OSMD — which renders to the element's
+                full width — overflow by the padding and show a spurious scrollbar,
+                so the breathing room is vertical only. */}
+            <div
+                ref={containerRef}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally scrollable region needs keyboard access
+                tabIndex={0}
+                role="img"
+                aria-label={title}
+                className="overflow-x-auto rounded-md border border-gray-200 bg-white py-2 dark:border-gray-800"
+            />
+
             <div className="flex flex-wrap items-center gap-3">
                 <button
                     type="button"
@@ -276,18 +289,25 @@ export function ScoreViewer({
                 >
                     {matcher.practicing ? m.action_listen_stop() : m.curriculums_practice()}
                 </button>
-                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    {m.scores_tempo()}
-                    <input
-                        type="range"
-                        min={40}
-                        max={180}
-                        value={tempo}
-                        onChange={(event) => setTempo(Number(event.target.value))}
-                        aria-label={m.scores_tempo()}
-                    />
-                    <span className="w-12 font-mono tabular-nums">{m.home_bpm({ tempo })}</span>
-                </label>
+                {lockTempo ? (
+                    <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        {m.scores_tempo()}
+                        <span className="font-mono tabular-nums">{m.home_bpm({ tempo })}</span>
+                    </span>
+                ) : (
+                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        {m.scores_tempo()}
+                        <input
+                            type="range"
+                            min={40}
+                            max={180}
+                            value={tempo}
+                            onChange={(event) => setTempo(Number(event.target.value))}
+                            aria-label={m.scores_tempo()}
+                        />
+                        <span className="w-12 font-mono tabular-nums">{m.home_bpm({ tempo })}</span>
+                    </label>
+                )}
             </div>
 
             <div hidden={ephemeral} className="flex flex-wrap items-center gap-3 text-sm">
@@ -375,12 +395,13 @@ export function ScoreViewer({
                             )}
                         </dl>
                     </div>
-                    <GhostTimeline notes={timeline} />
+                    <PerformanceStrip notes={runNotes} />
                     {shareGrid && (
                         <ShareCard
                             grid={shareGrid}
                             caption={m.share_heading()}
                             gridLabel={m.share_grid_label()}
+                            rowLabels={[m.scores_accuracy(), m.scores_timing(), m.scores_flow()]}
                             boast={
                                 daily != null
                                     ? m.daily_share_boast({ number: daily })
@@ -391,18 +412,6 @@ export function ScoreViewer({
                     )}
                 </div>
             )}
-
-            {/* Wide scores scroll horizontally, so the region must be focusable
-                for keyboard users (axe scrollable-region-focusable) and is named
-                by the piece title. */}
-            <div
-                ref={containerRef}
-                // biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally scrollable region needs keyboard access
-                tabIndex={0}
-                role="img"
-                aria-label={title}
-                className="overflow-x-auto rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800"
-            />
         </div>
     );
 }

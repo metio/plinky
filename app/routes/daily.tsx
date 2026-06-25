@@ -4,8 +4,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { ScoreViewer } from "../components/scoreViewer";
-import { loadBundledScores, type Score } from "../lib/catalog";
-import { dailyNumber, dailyScoreId, todayKey } from "../lib/daily";
+import { dailyChallenge, dailyNumber, todayKey } from "../lib/daily";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/daily";
@@ -17,22 +16,19 @@ export function meta(_args: Route.MetaArgs) {
     );
 }
 
-// Which day it is, and so which piece and number, depends on the viewer's clock —
-// not the build's. Resolving it on mount (rather than during prerender) keeps the
-// static HTML's date-independent <head> meta while avoiding a stale number baked
-// at build time; the heading shows a placeholder until the real value arrives.
-type Today = { number: number; score: Score | null };
+// Which day it is, and so which phrase, number and tempo, depends on the viewer's
+// clock — not the build's. Resolving it on mount (rather than during prerender)
+// keeps the static HTML's date-independent <head> meta while avoiding a stale
+// number baked at build time; the heading shows a placeholder until it arrives.
+type Today = { number: number; tempo: number; xml: string };
 
 export default function DailyRoute() {
     const [today, setToday] = useState<Today | null>(null);
     useEffect(() => {
         const dateKey = todayKey(new Date());
-        const scores = loadBundledScores().sort((a, b) => a.id.localeCompare(b.id));
-        const id = dailyScoreId(
-            scores.map((entry) => entry.id),
-            dateKey,
-        );
-        setToday({ number: dailyNumber(dateKey), score: scores.find((s) => s.id === id) ?? null });
+        const number = dailyNumber(dateKey);
+        const { tempo, xml } = dailyChallenge(dateKey, number);
+        setToday({ number, tempo, xml });
     }, []);
 
     return (
@@ -44,13 +40,16 @@ export default function DailyRoute() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.daily_intro()}</p>
             </header>
 
-            {today?.score && (
+            {today && (
                 <ScoreViewer
-                    key={today.score.id}
-                    id={today.score.id}
-                    xml={today.score.xml}
-                    title={today.score.title}
+                    key={today.number}
+                    id={`daily-${today.number}`}
+                    xml={today.xml}
+                    title={`Plinky #${today.number}`}
                     daily={today.number}
+                    initialTempo={today.tempo}
+                    lockTempo
+                    ephemeral
                 />
             )}
 

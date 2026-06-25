@@ -25,7 +25,7 @@ describe("Daily", () => {
         expect(await screen.findByText(/Plinky #\d+/)).toBeTruthy();
     });
 
-    it("renders today's deterministic score", async () => {
+    it("renders today's generated phrase through the graded viewer", async () => {
         render(
             <MemoryRouter>
                 <MidiProvider>
@@ -33,9 +33,23 @@ describe("Daily", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        // The chosen piece renders through the graded score viewer.
+        // The generated phrase renders through the graded score viewer.
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
         expect(screen.getByText(/Listen/)).toBeTruthy();
         expect(screen.getByText("Practice")).toBeTruthy();
+    });
+
+    it("locks the tempo so everyone plays the day at one speed", async () => {
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <Daily />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        // The tempo is shown but fixed — no slider to dial it to taste.
+        expect(screen.getByText(/\d+ bpm/)).toBeTruthy();
+        expect(document.querySelector('input[type="range"]')).toBeNull();
     });
 });

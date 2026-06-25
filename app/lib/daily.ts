@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { generatePhrase } from "./generator";
 import { hashString, seededRandom } from "./random";
 
 // The viewer's current calendar day as YYYY-MM-DD, in their own time zone. It
@@ -26,13 +27,32 @@ export function dailyNumber(dateKey: string, epoch: string = DAILY_EPOCH): numbe
     return days + 1;
 }
 
-// The score everyone plays on a given day: a date-seeded pick from the catalogue,
-// identical for everyone because the PRNG is fed only the date. Returns null only
-// for an empty catalogue. Callers pass ids in a stable order so the pick is stable.
-export function dailyScoreId(ids: string[], dateKey: string): string | null {
-    if (ids.length === 0) {
-        return null;
-    }
-    const pick = seededRandom(hashString(`score:${dateKey}`))();
-    return ids[Math.floor(pick * ids.length)] ?? null;
+// About how long the day's phrase should take to play. Long enough that accuracy,
+// timing and flow each have real signal — a handful of notes grades almost nothing.
+const DAILY_SECONDS = 45;
+// The phrase is one quarter note per beat, so the tempo doubles as the
+// notes-per-minute rate. This band keeps a beginner reading and reaching at a
+// human pace — slower drags, faster turns sight-reading into a scramble.
+const DAILY_MIN_BPM = 80;
+const DAILY_MAX_BPM = 120;
+const BEATS_PER_BAR = 4;
+
+// The day's challenge: a phrase to play and the tempo to play it at. Both are
+// generated from the date alone — never the device's catalogue — so everyone gets
+// the same challenge regardless of which scores they happen to have, and the pool
+// never runs dry. The bar count is sized so the phrase lasts about DAILY_SECONDS
+// at the chosen tempo, keeping the daily effort steady as the tempo drifts from
+// day to day.
+export type DailyChallenge = { tempo: number; xml: string };
+
+export function dailyChallenge(dateKey: string, number: number): DailyChallenge {
+    const rng = seededRandom(hashString(`daily:${dateKey}`));
+    const tempo = DAILY_MIN_BPM + Math.round(rng() * (DAILY_MAX_BPM - DAILY_MIN_BPM));
+    const beats = Math.round((DAILY_SECONDS * tempo) / 60);
+    const bars = Math.max(1, Math.round(beats / BEATS_PER_BAR));
+    const xml = generatePhrase(
+        { bars, beatsPerBar: BEATS_PER_BAR, twoHands: false, title: `Plinky #${number}` },
+        rng,
+    );
+    return { tempo, xml };
 }

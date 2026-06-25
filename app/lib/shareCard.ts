@@ -99,9 +99,11 @@ export function gridEmoji(grid: Grid): string {
     return grid.map((row) => row.map((level) => EMOJI[level]).join("")).join("\n");
 }
 
-// The clipboard/social text: a one-line boast, the emoji grid, and a link back.
-export function shareText(boast: string, grid: Grid, url: string): string {
-    return `${boast}\n${gridEmoji(grid)}\n${url}`;
+// The clipboard/social text: a one-line boast and the emoji grid, with no link —
+// so a shared run reads as a player's own brag, not an ad. Attribution lives on
+// the image card, where a small footer reads as a credit rather than a promotion.
+export function shareText(boast: string, grid: Grid): string {
+    return `${boast}\n${gridEmoji(grid)}`;
 }
 
 // Image-share colours, matched to the in-app band emoji on a dark card.
