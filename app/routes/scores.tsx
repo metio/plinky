@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { ScoreViewer } from "../components/scoreViewer";
 import { loadCatalog, removeUserScore, type Score } from "../lib/catalog";
@@ -31,6 +31,7 @@ export default function ScoresRoute() {
     const [query, setQuery] = useState("");
     const [curriculum, setCurriculum] = useState(""); // "" = all
     const [favoritesOnly, setFavoritesOnly] = useState(false);
+    const searchRef = useRef<HTMLInputElement>(null);
 
     const reloadMastery = useCallback(() => {
         const map: Record<string, Mastery> = {};
@@ -52,7 +53,14 @@ export default function ScoresRoute() {
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
     const remove = (id: string) => {
         removeUserScore(id);
-        setScores(loadCatalog());
+        const next = loadCatalog();
+        setScores(next);
+        // Don't leave the selection pointing at the removed score: an id later
+        // reused by a re-import would otherwise silently reopen its viewer.
+        setSelectedId((current) => (current === id ? (next[0]?.id ?? null) : current));
+        // The remove button just unmounted; move focus to a stable spot rather
+        // than letting it fall back to the document body.
+        searchRef.current?.focus();
     };
 
     const now = Date.now();
@@ -77,7 +85,10 @@ export default function ScoresRoute() {
         });
     }, [scores, query, curriculum, favoritesOnly, favorites]);
 
-    const selected = scores.find((score) => score.id === selectedId) ?? null;
+    // Resolve the selection within the filtered list so a score hidden by the
+    // search, curriculum, or favorites filter also hides its viewer, instead of
+    // leaving it open below a list that no longer contains (or highlights) it.
+    const selected = matches.find((score) => score.id === selectedId) ?? null;
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -92,6 +103,7 @@ export default function ScoresRoute() {
             </header>
 
             <input
+                ref={searchRef}
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}

@@ -45,6 +45,19 @@ describe("Scores catalogue", () => {
         expect(await screen.findByText("No scores match your search.")).toBeTruthy();
     });
 
+    it("hides the selected viewer when a filter excludes that piece", async () => {
+        renderScores();
+        await screen.findByText("Ode to Joy");
+        // The auto-selected piece's viewer is showing its controls.
+        await waitFor(() => expect(screen.queryByText("Practice")).toBeTruthy(), { timeout: 8000 });
+        fireEvent.change(screen.getByRole("searchbox"), {
+            target: { value: "no-such-piece" },
+        });
+        await screen.findByText("No scores match your search.");
+        // With the selection filtered out, its viewer must not linger below.
+        expect(screen.queryByText("Practice")).toBeNull();
+    });
+
     it("selects a piece when its title is clicked", async () => {
         renderScores();
         const scale = await screen.findByText("C major scale");
