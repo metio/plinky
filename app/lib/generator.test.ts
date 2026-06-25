@@ -3,44 +3,56 @@
 
 import { describe, expect, it } from "vitest";
 import { generatePhrase } from "./generator";
+import { hashString, seededRandom } from "./random";
 
 // rng always 0 picks the first scale degree, so the phrase is deterministic.
 const zero = () => 0;
+const noteCount = (xml: string) => (xml.match(/<note>/g) ?? []).length;
 
 describe("generatePhrase", () => {
-    it("generates a single treble line with bar lines", () => {
-        const abc = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, zero);
-        expect(abc).toContain("M:4/4");
-        expect(abc).toContain("c c c c | c c c c |");
-        expect(abc).not.toContain("V:2");
+    it("emits a titled score-partwise document", () => {
+        const xml = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, zero);
+        expect(xml).toContain("<score-partwise");
+        expect(xml).toContain("<work-title>Sprint</work-title>");
     });
 
-    it("uses the requested key's signature and scale", () => {
-        const abc = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false, key: "G" }, zero);
-        expect(abc).toContain("K:G");
-        // G major's five-finger position starts on G.
-        expect(abc).toContain("G G |");
+    it("writes one quarter note per beat", () => {
+        const xml = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, zero);
+        expect(noteCount(xml)).toBe(8);
+        expect(xml).toContain("<type>quarter</type>");
     });
 
-    it("generates two voices for two-hand play", () => {
-        const abc = generatePhrase({ bars: 1, beatsPerBar: 3, twoHands: true }, zero);
-        expect(abc).toContain("V:1 clef=treble");
-        expect(abc).toContain("V:2 clef=bass");
-        expect(abc).toContain("c c c |"); // treble
-        expect(abc).toContain("C C C |"); // bass
+    it("carries the chosen key's signature", () => {
+        const xml = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false, key: "G" }, zero);
+        expect(xml).toContain("<fifths>1</fifths>");
+        expect(xml).toContain("<step>G</step><octave>4</octave>"); // G major starts on G4
     });
 
-    it("stays within the C–G five-finger range", () => {
-        // rng 0.99 selects the last degree of the five-finger position (G / g).
-        const abc = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false }, () => 0.99);
-        expect(abc).toContain("g g |");
+    it("adds a bass staff and backup for two hands", () => {
+        const xml = generatePhrase({ bars: 1, beatsPerBar: 3, twoHands: true }, zero);
+        expect(xml).toContain("<staves>2</staves>");
+        expect(xml).toContain("<backup>");
+        expect(noteCount(xml)).toBe(6); // three treble + three bass
+    });
+
+    it("is deterministic for a given seed", () => {
+        const options = { bars: 4, beatsPerBar: 4, twoHands: false };
+        const a = generatePhrase(options, seededRandom(hashString("seed")));
+        const b = generatePhrase(options, seededRandom(hashString("seed")));
+        expect(a).toBe(b);
+    });
+
+    it("stays within the five-finger position", () => {
+        // rng→0.99 always picks the top of the scale: G5 in C major.
+        const xml = generatePhrase({ bars: 1, beatsPerBar: 2, twoHands: false }, () => 0.99);
+        expect(xml).toContain("<step>G</step><octave>5</octave>");
     });
 
     it("falls back to C major for an unknown key", () => {
-        const abc = generatePhrase(
+        const xml = generatePhrase(
             { bars: 1, beatsPerBar: 2, twoHands: false, key: "Z" as never },
-            () => 0,
+            zero,
         );
-        expect(abc).toContain("K:C");
+        expect(xml).toContain("<fifths>0</fifths>");
     });
 });
