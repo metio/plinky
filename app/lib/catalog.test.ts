@@ -33,6 +33,14 @@ describe("readSongMeta", () => {
         expect(meta.tempo).toBe(90); // no <sound tempo>, so the default
     });
 
+    it("reads an explicit tempo from <sound>", () => {
+        const withTempo = xml().replace(
+            "</work>",
+            '</work><part><measure><sound tempo="120"/></measure></part>',
+        );
+        expect(readSongMeta(withTempo).tempo).toBe(120);
+    });
+
     it("falls back to Untitled and 4/4 when the metadata is absent", () => {
         const meta = readSongMeta("<score-partwise><part/></score-partwise>");
         expect(meta.title).toBe("Untitled");
