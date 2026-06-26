@@ -12,6 +12,7 @@ const BASE: Prefs = {
     volume: 80,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
+    showFingerings: true,
 };
 
 describe("prefs", () => {
@@ -39,6 +40,12 @@ describe("prefs", () => {
         expect(loadPrefs().handSpan).toEqual({ left: 8, right: 11 });
         savePrefs({ ...BASE, handSpan: { left: null, right: 9 } });
         expect(loadPrefs().handSpan).toEqual({ left: null, right: 9 });
+    });
+
+    it("defaults fingering hints on and round-trips the toggle", () => {
+        expect(loadPrefs().showFingerings).toBe(true);
+        savePrefs({ ...BASE, showFingerings: false });
+        expect(loadPrefs().showFingerings).toBe(false);
     });
 
     it("drops out-of-range or malformed spans to null", () => {

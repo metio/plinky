@@ -24,6 +24,7 @@ export default function Settings() {
         volume: 80,
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
+        showFingerings: true,
     });
     const synth = useSynth();
 
@@ -31,7 +32,10 @@ export default function Settings() {
         setPrefs(loadPrefs());
     }, []);
 
-    const update = (next: Prefs) => {
+    // Merge onto the latest stored prefs so a change here can't clobber one the
+    // Hand size panel saved independently (handSpan isn't an input on this page).
+    const update = (change: Partial<Prefs>) => {
+        const next = { ...loadPrefs(), ...change };
         setPrefs(next);
         savePrefs(next);
     };
@@ -69,7 +73,7 @@ export default function Settings() {
                     <input
                         type="checkbox"
                         checked={prefs.sound}
-                        onChange={(event) => update({ ...prefs, sound: event.target.checked })}
+                        onChange={(event) => update({ sound: event.target.checked })}
                     />
                     {m.settings_play_sounds()}
                 </label>
@@ -85,7 +89,7 @@ export default function Settings() {
                         value={prefs.volume}
                         disabled={!prefs.sound}
                         onChange={(event) =>
-                            update({ ...prefs, volume: Number(event.target.value) })
+                            update({ volume: Number(event.target.value) })
                         }
                     />
                     <span className="w-8 font-mono text-sm tabular-nums">{prefs.volume}</span>
@@ -108,7 +112,7 @@ export default function Settings() {
                     <select
                         value={prefs.masteryThreshold}
                         onChange={(event) =>
-                            update({ ...prefs, masteryThreshold: event.target.value as Letter })
+                            update({ masteryThreshold: event.target.value as Letter })
                         }
                         className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
                     >
@@ -120,6 +124,15 @@ export default function Settings() {
                     </select>
                 </label>
             </section>
+
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input
+                    type="checkbox"
+                    checked={prefs.showFingerings}
+                    onChange={(event) => update({ showFingerings: event.target.checked })}
+                />
+                {m.settings_show_fingerings()}
+            </label>
 
             <HandSize />
 

@@ -61,6 +61,7 @@ describe("useSynth", () => {
             volume: 80,
             masteryThreshold: "A",
             handSpan: { left: null, right: null },
+            showFingerings: true,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -73,6 +74,7 @@ describe("useSynth", () => {
             volume: 80,
             masteryThreshold: "A",
             handSpan: { left: null, right: null },
+            showFingerings: true,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -86,6 +88,7 @@ describe("useSynth", () => {
             volume: 0,
             masteryThreshold: "A",
             handSpan: { left: null, right: null },
+            showFingerings: true,
         });
         const { result } = renderHook(() => useSynth());
         expect(() => result.current.playNote(60)).not.toThrow();

@@ -13,6 +13,9 @@ export type Prefs = {
     volume: number; // 0..100
     masteryThreshold: Letter; // grade a score must reach to count as learned
     handSpan: HandSpan;
+    // Show the suggested finger on the practice keyboard; off lets a learner work
+    // fingerings out unaided, the way they must at a real piano.
+    showFingerings: boolean;
 };
 
 const KEY = "plinky:prefs";
@@ -21,6 +24,7 @@ const DEFAULTS: Prefs = {
     volume: 80,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
+    showFingerings: true,
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 
@@ -50,6 +54,10 @@ export function loadPrefs(): Prefs {
                 ? parsed.masteryThreshold
                 : DEFAULTS.masteryThreshold,
             handSpan: cleanHandSpan(parsed.handSpan),
+            showFingerings:
+                typeof parsed.showFingerings === "boolean"
+                    ? parsed.showFingerings
+                    : DEFAULTS.showFingerings,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan } };

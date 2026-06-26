@@ -84,6 +84,7 @@
   "play_fingering": "Fingering",
   "play_fingering_blurb": "Read a line and choose your own fingering, then see how it compares.",
   "settings_subtitle": "Preferences are saved on this device.",
+  "settings_show_fingerings": "Show fingering hints while practicing",
   "settings_hand_size": "Hand size",
   "settings_hand_size_hint": "Set your reach to personalize the suggested fingering. With one hand, set just that hand.",
   "settings_appearance": "Appearance",

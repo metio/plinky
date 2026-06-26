@@ -369,8 +369,11 @@ export function ScoreViewer({
         // the single staff. With both hands on a grand staff there are two lines on
         // one keyboard, so no single finger fits a key; skip the hint there.
         const osmd = osmdRef.current;
-        const fingerFor: "left" | "right" | null =
-            staffCount < 2 ? "right" : hand === "both" ? null : hand;
+        // No hints when the player has turned them off to work fingerings out alone.
+        let fingerFor: "left" | "right" | null = null;
+        if (osmd && loadPrefs().showFingerings) {
+            fingerFor = staffCount < 2 ? "right" : hand === "both" ? null : hand;
+        }
         if (osmd && fingerFor) {
             const matcherHand: Hand = staffCount < 2 ? "both" : hand;
             const steps = collectSteps(osmd, matcherHand).map((pitches) => ({ pitches }));
