@@ -96,10 +96,8 @@ play — the same engine behind every mode.
 ## Translations
 
 Plinky speaks 26 languages, and contributions are welcome — see
-[TRANSLATING.md](TRANSLATING.md). The easiest way is [Fink](https://fink.inlang.com),
-a free web editor that drafts the missing strings for you and opens a pull request;
-no checkout needed. Untranslated strings fall back to English, so every language
-always works while it catches up.
+[TRANSLATING.md](TRANSLATING.md) for how to add a translation. Untranslated strings
+fall back to English, so every language always works while it catches up.
 
 ## Development
 

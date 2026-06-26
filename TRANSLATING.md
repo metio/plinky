@@ -9,23 +9,16 @@ Plinky speaks 26 languages. Every UI string lives in `messages/<locale>.json`, w
 English (`messages/en.json`) as the source. A string with no translation yet falls
 back to English, so the app always works while a language catches up.
 
-## The easy way — Fink
+## How to translate
 
-[Fink](https://fink.inlang.com) is a free, browser-based editor for these files —
-no checkout, no tooling, nothing to install.
+1. Open `messages/<locale>.json` for the language you want to help with.
+2. Compare it with `messages/en.json` and add the keys it's missing — those are the
+   strings still showing in English. Keep the keys in the same order as `en.json`.
+3. Run `npm run messages` to recompile the typed message functions, then open a pull
+   request.
 
-1. Open Fink and connect the `metio/plinky` repository. It reads the project from
-   `project.inlang/settings.json`, so it works out of the box.
-2. Pick a language. Fink lists every string still missing a translation.
-3. Use **Machine translate** to draft them, then read each one through and fix
-   anything that sounds off.
-4. Fink opens a pull request with your changes.
-
-## By hand
-
-Prefer an editor? Translate the missing keys in `messages/<locale>.json` directly
-(2-space JSON, the same keys as `messages/en.json`) and open a pull request. Run
-`npm run messages` to recompile the typed message functions.
+The files are plain 2-space JSON. Each key maps to its translated string; the same
+key must exist in `en.json`.
 
 ## Please keep
 
