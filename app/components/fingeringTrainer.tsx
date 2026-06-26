@@ -42,6 +42,7 @@ function letterFor(efficiency: number): Letter {
 // fingering. Builds the skill of working fingerings out rather than leaning on the
 // app's suggestions.
 export function FingeringTrainer() {
+    const [hand, setHand] = useState<"left" | "right">("right");
     const [positions, setPositions] = useState<number[][]>([]);
     const [fingers, setFingers] = useState<(number | null)[][]>([]);
     const [active, setActive] = useState(0);
@@ -54,12 +55,12 @@ export function FingeringTrainer() {
     );
 
     const fresh = useCallback(() => {
-        const line = generateDrill();
+        const line = generateDrill(Math.random, 8, hand);
         setPositions(line);
         setFingers(line.map((pos) => pos.map(() => null)));
         setActive(0);
         setResult(null);
-    }, []);
+    }, [hand]);
 
     useEffect(() => {
         fresh();
@@ -99,8 +100,8 @@ export function FingeringTrainer() {
     const complete = fingers.length > 0 && fingers.every((tuple) => tuple.every((f) => f !== null));
     const check = () => {
         if (complete) {
-            const span = loadPrefs().handSpan.right ?? undefined;
-            setResult(scoreFingering(positions, fingers as number[][], "right", span));
+            const span = loadPrefs().handSpan[hand] ?? undefined;
+            setResult(scoreFingering(positions, fingers as number[][], hand, span));
         }
     };
     const reconsider = new Set(result?.reconsider);
@@ -108,9 +109,26 @@ export function FingeringTrainer() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            <header className="space-y-1">
+            <header className="space-y-2">
                 <h1 className="text-2xl font-semibold">{m.fingering_heading()}</h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.fingering_intro()}</p>
+                <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
+                    {(["right", "left"] as const).map((option) => (
+                        <button
+                            key={option}
+                            type="button"
+                            onClick={() => setHand(option)}
+                            aria-pressed={hand === option}
+                            className={
+                                hand === option
+                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                    : "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300"
+                            }
+                        >
+                            {option === "right" ? m.hand_right() : m.hand_left()}
+                        </button>
+                    ))}
+                </fieldset>
             </header>
 
             {/* Each position is a column; a chord stacks its notes, highest on top. */}
@@ -200,7 +218,7 @@ export function FingeringTrainer() {
                                                         positions,
                                                         fingers as number[][],
                                                         index,
-                                                        "right",
+                                                        hand,
                                                     )
                                                 ]()}
                                             </li>

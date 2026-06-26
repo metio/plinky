@@ -1,10 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { Hand } from "./fingering";
+
 // C-major degrees from C4 to C6, the pool a right-hand drill walks. Spanning more
 // than an octave means a five-finger position can't cover it, so the line forces
-// real fingering decisions (position shifts, thumb-passes).
+// real fingering decisions (position shifts, thumb-passes). A left-hand drill is
+// the same shape an octave-pair lower, so it reads in the bass where that hand sits.
 const POOL = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81, 83, 84];
+const LEFT_SHIFT = -24;
 
 // Mostly steps with the odd small leap, biased to keep moving rather than sit.
 const MOVES = [-2, -1, -1, 1, 1, 2, 2, 3];
@@ -17,7 +21,12 @@ const CHORD_CHANCE = 0.4;
 // chord). The top note carries a melodic walk; some positions stack diatonic
 // thirds beneath it into a chord the hand must shape at once. The rng is
 // injectable so a run can be reproduced in tests.
-export function generateDrill(rng: () => number = Math.random, length = 8): number[][] {
+export function generateDrill(
+    rng: () => number = Math.random,
+    length = 8,
+    hand: Hand = "right",
+): number[][] {
+    const shift = hand === "left" ? LEFT_SHIFT : 0;
     let index = Math.floor(rng() * 4); // start in the lower third
     const positions: number[][] = [];
     for (let i = 0; i < length; i++) {
@@ -27,10 +36,12 @@ export function generateDrill(rng: () => number = Math.random, length = 8): numb
         }
         // Stack diatonic thirds below the top note when there's room for them.
         if (index >= 2 && rng() < CHORD_CHANCE) {
-            const tones = [index - 4, index - 2, index].filter((j) => j >= 0).map((j) => POOL[j]!);
+            const tones = [index - 4, index - 2, index]
+                .filter((j) => j >= 0)
+                .map((j) => POOL[j]! + shift);
             positions.push(tones);
         } else {
-            positions.push([POOL[index]!]);
+            positions.push([POOL[index]! + shift]);
         }
     }
     return positions;

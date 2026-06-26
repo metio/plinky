@@ -31,6 +31,15 @@ describe("generateDrill", () => {
     it("is deterministic for a given rng", () => {
         expect(generateDrill(mulberry(42), 8)).toEqual(generateDrill(mulberry(42), 8));
     });
+
+    it("drills the left hand an octave-pair lower, in the bass", () => {
+        const left = generateDrill(mulberry(42), 8, "left").flat();
+        const right = generateDrill(mulberry(42), 8, "right").flat();
+        // The left-hand line sits below middle C; the right-hand one at or above it.
+        expect(Math.max(...left)).toBeLessThanOrEqual(60);
+        expect(Math.min(...right)).toBeGreaterThanOrEqual(60);
+        expect(left.every((pitch) => POOL.has(pitch + 24))).toBe(true);
+    });
 });
 
 // A tiny seeded PRNG so two runs with the same seed produce the same line.

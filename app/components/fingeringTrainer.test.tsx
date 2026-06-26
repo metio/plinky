@@ -40,6 +40,15 @@ describe("FingeringTrainer", () => {
         expect(screen.queryByText("Check fingering")).toBeNull();
     });
 
+    it("switches to a left-hand drill in the bass", () => {
+        mount();
+        const left = screen.getByRole("button", { name: "Left" });
+        fireEvent.click(left);
+        expect(left.getAttribute("aria-pressed")).toBe("true");
+        // The left-hand line reads below middle C — note names in octave 2 or 3.
+        expect(screen.getAllByText(/^[A-G][23]$/).length).toBeGreaterThan(0);
+    });
+
     it("accepts number keys as finger input", () => {
         mount();
         // "3" appears once as the picker button; a keypress assigns it to a note too.
