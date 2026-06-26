@@ -234,30 +234,36 @@ export default function ScoresRoute() {
                 />
             )}
 
-            <section className="space-y-3 border-t border-gray-200 pt-6 dark:border-gray-800">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.library_add()}
-                </h2>
-                <ScoreImport
-                    existingIds={scores.map((score) => score.id)}
-                    onAdded={() => setScores(loadCatalog())}
-                />
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.import_share_prefix()}{" "}
-                    <a
-                        href={submissionUrl()}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-indigo-700 underline dark:text-indigo-300"
-                    >
-                        {m.import_share_link()}
-                    </a>
-                </p>
-            </section>
+            {/* Held back until the catalogue loads so, while the list is still a
+                skeleton, nothing sits below it to be shoved down when it fills in. */}
+            {loaded && (
+                <>
+                    <section className="space-y-3 border-t border-gray-200 pt-6 dark:border-gray-800">
+                        <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                            {m.library_add()}
+                        </h2>
+                        <ScoreImport
+                            existingIds={scores.map((score) => score.id)}
+                            onAdded={() => setScores(loadCatalog())}
+                        />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {m.import_share_prefix()}{" "}
+                            <a
+                                href={submissionUrl()}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-indigo-700 underline dark:text-indigo-300"
+                            >
+                                {m.import_share_link()}
+                            </a>
+                        </p>
+                    </section>
 
-            <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                {m.action_back_home()}
-            </Link>
+                    <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+                        {m.action_back_home()}
+                    </Link>
+                </>
+            )}
         </main>
     );
 }
