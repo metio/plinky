@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -71,5 +71,19 @@ describe("Daily", () => {
         // The tempo is shown but fixed — no slider to dial it to taste.
         expect(screen.getByText(/\d+ BPM/)).toBeTruthy();
         expect(document.querySelector('input[type="range"]')).toBeNull();
+    });
+
+    it("offers a warm-up mode that drills fresh generated phrases", async () => {
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <Daily />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        // The folded-in sprint: switching tabs reveals its controls and a phrase.
+        fireEvent.click(await screen.findByText("Warm up"));
+        expect(screen.getByText("New phrase")).toBeTruthy();
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
     });
 });

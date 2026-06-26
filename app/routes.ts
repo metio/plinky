@@ -11,7 +11,6 @@ export default [
     route(":locale", "routes/localeLayout.tsx", [
         index("routes/home.tsx"),
         route("play/:scoreId", "routes/play.tsx"),
-        route("sprint", "routes/sprint.tsx"),
         route("daily", "routes/daily.tsx"),
         route("ear", "routes/ear.tsx"),
         route("fingering", "routes/fingering.tsx"),

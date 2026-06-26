@@ -23,7 +23,7 @@ function renderHome() {
 describe("Home", () => {
     it("always offers the no-score training modes", () => {
         renderHome();
-        for (const label of ["Sight-reading sprint →", "Daily challenge →", "Ear training →"]) {
+        for (const label of ["Daily challenge →", "Ear training →"]) {
             expect(screen.getByText(label)).toBeTruthy();
         }
     });
