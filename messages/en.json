@@ -122,6 +122,7 @@
   "daily_mode_label": "Today's challenge or warm-up",
   "daily_tab_challenge": "Today's challenge",
   "daily_tab_warmup": "Warm up",
+  "daily_streak": "🔥 {count}-day streak",
   "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Ear training",
   "play_ear_blurb": "Hear a note and find it by ear. No reading required.",

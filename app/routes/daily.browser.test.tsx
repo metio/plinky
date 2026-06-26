@@ -5,6 +5,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { dailyNumber, todayKey } from "../lib/daily";
+import { recordDailyDone } from "../lib/dailyStreak";
 import Daily from "./daily";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
@@ -71,6 +73,19 @@ describe("Daily", () => {
         // The tempo is shown but fixed — no slider to dial it to taste.
         expect(screen.getByText(/\d+ BPM/)).toBeTruthy();
         expect(document.querySelector('input[type="range"]')).toBeNull();
+    });
+
+    it("shows the daily streak once dailies have been completed", async () => {
+        // Today's daily counted, so the live streak reads one day.
+        recordDailyDone(dailyNumber(todayKey(new Date())));
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <Daily />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        expect(await screen.findByText(/day streak/)).toBeTruthy();
     });
 
     it("offers a warm-up mode that drills fresh generated phrases", async () => {
