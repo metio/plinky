@@ -26,6 +26,12 @@ jobs:
   browser:
     name: browser
     runs-on: ubuntu-latest
+    # Run in Playwright's own image — the same one the dev container builds on — so
+    # the browsers and their system libraries are already present. This avoids a
+    # `playwright install --with-deps`, whose apt step breaks when a preconfigured
+    # runner repository (e.g. packages.microsoft.com) returns 403. Keep the tag in
+    # step with the `playwright` dependency in package.json.
+    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Setup Node.js
@@ -34,11 +40,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
   coverage:
     name: coverage
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Setup Node.js
@@ -47,7 +53,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       # Fails when any project's coverage drops below the thresholds pinned in
       # vitest.config.ts, so the ratchet only moves up.
       - run: npm run coverage
@@ -74,6 +79,7 @@ jobs:
   accessibility-light:
     name: accessibility-light
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Setup Node.js
@@ -82,11 +88,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run a11y:light
   accessibility-dark:
     name: accessibility-dark
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Setup Node.js
@@ -95,7 +101,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       # axe-core in both themes is the accessibility gate — Lighthouse audits only
       # light mode, so dark-mode contrast would otherwise go unchecked.
       - run: npm run a11y:dark
