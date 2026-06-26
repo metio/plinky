@@ -14,6 +14,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/localizedLink";
+import { StreakBadge } from "./components/streakBadge";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
@@ -78,9 +79,12 @@ function Header() {
     return (
         <nav className="border-b border-gray-200 px-6 py-3 font-sans dark:border-gray-800">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
-                <Link to="/" aria-label="Plinky home">
-                    <img src="/logo-horizontal.svg" alt="Plinky" className="h-8" />
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link to="/" aria-label="Plinky home">
+                        <img src="/logo-horizontal.svg" alt="Plinky" className="h-8" />
+                    </Link>
+                    <StreakBadge />
+                </div>
                 <div className="flex items-center gap-4">
                     <ThemeToggle />
                     <Link

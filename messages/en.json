@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "nav_progress": "Progress",
+  "streak_label": "{count}-day streak",
   "nav_settings": "Settings",
   "action_remove": "Remove",
   "action_back_home": "Back home",
