@@ -6,7 +6,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { buildScore, saveUserScore } from "../lib/catalog";
-import Scores from "./scores";
+import Library from "./library";
 
 const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 
@@ -20,7 +20,7 @@ function renderScores() {
     return render(
         <MemoryRouter>
             <MidiProvider>
-                <Scores />
+                <Library />
             </MidiProvider>
         </MemoryRouter>,
     );

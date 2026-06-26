@@ -13,13 +13,11 @@ const BASE_PATHS = [
     "/daily",
     "/ear",
     "/fingering",
-    "/scores",
-    "/curriculums",
+    "/library",
     "/tracks",
     "/progress",
     "/grades",
     "/settings",
-    "/import",
 ];
 
 // Prerender a play page for every bundled score so each piece is indexable with

@@ -15,12 +15,10 @@ export default [
         route("daily", "routes/daily.tsx"),
         route("ear", "routes/ear.tsx"),
         route("fingering", "routes/fingering.tsx"),
-        route("scores", "routes/scores.tsx"),
-        route("curriculums", "routes/curriculums.tsx"),
+        route("library", "routes/library.tsx"),
         route("tracks", "routes/tracks.tsx"),
         route("progress", "routes/progress.tsx"),
         route("grades", "routes/grades.tsx"),
-        route("import", "routes/import.tsx"),
         route("settings", "routes/settings.tsx"),
     ]),
 ] satisfies RouteConfig;

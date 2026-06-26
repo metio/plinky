@@ -3,18 +3,24 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { ScoreImport } from "../components/scoreImport";
 import { ScoreViewer } from "../components/scoreViewer";
-import { loadCatalog, removeUserScore, type Score } from "../lib/catalog";
+import {
+    loadCatalog,
+    loadCurriculums,
+    removeUserScore,
+    type Score,
+    submissionUrl,
+} from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, loadAllMastery, type Mastery } from "../lib/mastery";
-import { routeMeta } from "../lib/site";
-import { loadCurriculums } from "../lib/catalog";
 import type { Curriculum } from "../lib/scorePack";
+import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
-import type { Route } from "./+types/scores";
+import type { Route } from "./+types/library";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.scores_heading(), m.meta_scores_description());
+    return routeMeta(m.library_heading(), m.meta_library_description());
 }
 
 const CHIP = "rounded-full border px-3 py-1 text-sm";
@@ -93,8 +99,8 @@ export default function ScoresRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.scores_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.scores_intro()}</p>
+                <h1 className="text-2xl font-semibold">{m.library_heading()}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.library_intro()}</p>
                 {dueCount > 0 && (
                     <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
                         {m.mastery_due_count({ count: dueCount })}
@@ -222,6 +228,27 @@ export default function ScoresRoute() {
                     onMastery={reloadMastery}
                 />
             )}
+
+            <section className="space-y-3 border-t border-gray-200 pt-6 dark:border-gray-800">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.library_add()}
+                </h2>
+                <ScoreImport
+                    existingIds={scores.map((score) => score.id)}
+                    onAdded={() => setScores(loadCatalog())}
+                />
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {m.import_share_prefix()}{" "}
+                    <a
+                        href={submissionUrl()}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-700 underline dark:text-indigo-300"
+                    >
+                        {m.import_share_link()}
+                    </a>
+                </p>
+            </section>
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
                 {m.action_back_home()}

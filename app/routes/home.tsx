@@ -1,12 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useMemo, useState } from "react";
 import { HeroKeyboard } from "../components/heroKeyboard";
 import { LocalizedLink as Link } from "../components/localizedLink";
-import { ScoreImport } from "../components/scoreImport";
-import { loadCatalog, type Score } from "../lib/catalog";
-import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { socialMeta, structuredData } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -30,29 +26,14 @@ const PLAY_NOW = [
     { to: "/fingering", label: m.play_fingering, blurb: m.play_fingering_blurb },
 ];
 
-const NAV_LINK = "text-indigo-700 underline dark:text-indigo-300";
+// The two practice surfaces beyond the quick drills: the whole catalogue, and the
+// guided paths through it.
+const LIBRARY = [
+    { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb },
+    { to: "/tracks", label: m.home_tracks, blurb: m.home_tracks_blurb },
+];
 
 export default function Home() {
-    const [scores, setScores] = useState<Score[]>([]);
-    const [favorites, setFavorites] = useState<Set<string>>(new Set());
-    const [loaded, setLoaded] = useState(false);
-
-    // The catalogue reads from local storage and bundled MusicXML on the client,
-    // so it appears a tick after paint; a skeleton of the same height holds the
-    // space until then so the import panel below does not jump.
-    useEffect(() => {
-        setScores(loadCatalog());
-        setFavorites(loadFavorites());
-        setLoaded(true);
-    }, []);
-
-    const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
-
-    const favoriteScores = useMemo(
-        () => scores.filter((score) => favorites.has(score.id)),
-        [scores, favorites],
-    );
-
     return (
         <main className="mx-auto max-w-3xl space-y-12 p-6 font-sans">
             <section className="space-y-6 pt-2">
@@ -118,63 +99,32 @@ export default function Home() {
             </section>
 
             <section className="space-y-3">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {m.home_favorites_heading()}
-                    </h2>
-                    <div className="flex gap-4 text-sm">
-                        <Link to="/scores" className={NAV_LINK}>
-                            {m.home_browse_all()}
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.home_favorites_heading()}
+                </h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                    {LIBRARY.map((item) => (
+                        <Link
+                            key={item.to}
+                            to={item.to}
+                            className="group flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
+                        >
+                            <span
+                                aria-hidden="true"
+                                className="mt-0.5 h-9 w-6 shrink-0 rounded-b-md border border-gray-300 bg-gradient-to-b from-white to-gray-100 transition group-hover:from-green-100 group-hover:to-green-200 dark:border-gray-600 dark:from-gray-100 dark:to-gray-300"
+                            />
+                            <span className="space-y-1">
+                                <span className="block font-medium text-gray-900 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
+                                    {item.label()} →
+                                </span>
+                                <span className="block text-sm text-gray-600 dark:text-gray-400">
+                                    {item.blurb()}
+                                </span>
+                            </span>
                         </Link>
-                        <Link to="/tracks" className={NAV_LINK}>
-                            {m.home_tracks()}
-                        </Link>
-                        <Link to="/curriculums" className={NAV_LINK}>
-                            {m.home_by_curriculum()}
-                        </Link>
-                    </div>
+                    ))}
                 </div>
-
-                {!loaded ? (
-                    <div className="h-24" aria-hidden="true" />
-                ) : favoriteScores.length === 0 ? (
-                    <p className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
-                        {m.home_favorites_empty()}{" "}
-                        <Link to="/scores" className={NAV_LINK}>
-                            {m.home_browse_all()}
-                        </Link>
-                    </p>
-                ) : (
-                    <ul className="space-y-2">
-                        {favoriteScores.map((score) => (
-                            <li
-                                key={score.id}
-                                className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 dark:border-gray-800"
-                            >
-                                <Link
-                                    to={`/play/${score.id}`}
-                                    className="font-medium text-indigo-700 underline dark:text-indigo-300"
-                                >
-                                    {score.title}
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={() => toggle(score.id)}
-                                    aria-label={m.scores_unfavorite()}
-                                    className="text-lg leading-none text-amber-600 dark:text-amber-400"
-                                >
-                                    ★
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
             </section>
-
-            <ScoreImport
-                existingIds={scores.map((score) => score.id)}
-                onAdded={() => setScores(loadCatalog())}
-            />
         </main>
     );
 }

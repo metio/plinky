@@ -62,8 +62,8 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
             {score === null && (
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.play_not_found()}</p>
             )}
-            <Link to="/scores" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                {m.scores_heading()}
+            <Link to="/library" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+                {m.library_heading()}
             </Link>
         </main>
     );

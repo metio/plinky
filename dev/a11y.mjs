@@ -19,9 +19,8 @@ const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
 const PAGES = [
     "/en/",
     "/en/fingering/",
-    "/en/scores/",
+    "/en/library/",
     "/en/tracks/",
-    "/en/curriculums/",
     "/en/progress/",
     "/en/grades/",
     "/en/settings/",
