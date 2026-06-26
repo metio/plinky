@@ -22,6 +22,6 @@ describe("HeroKeyboard", () => {
         render(<HeroKeyboard />);
         const key = screen.getByLabelText("C4");
         fireEvent.pointerDown(key);
-        expect(key.className).toContain("bg-green-100");
+        expect(key.className).toContain("bg-green-200");
     });
 });
