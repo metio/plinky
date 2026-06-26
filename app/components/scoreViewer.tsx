@@ -29,6 +29,7 @@ import {
     setBacklog,
 } from "../lib/mastery";
 import { loadPrefs } from "../lib/prefs";
+import { ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import { makeHit, summarize } from "../lib/rhythm";
 import { paintPlayedNotes } from "../lib/scoreColor";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
@@ -116,6 +117,10 @@ export function ScoreViewer({
     // line it was computed for, so the keyboard can hint the current note's finger.
     const [fingerPlan, setFingerPlan] = useState<number[] | null>(null);
     const [fingeringHand, setFingeringHand] = useState<"left" | "right" | null>(null);
+    // A previous completed run on this score to race against — the note onset times
+    // — and how far that ghost has reached as the current run's clock elapses.
+    const [ghost, setGhost] = useState<number[] | null>(null);
+    const [ghostDone, setGhostDone] = useState(0);
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
@@ -203,6 +208,21 @@ export function ScoreViewer({
         tempoRef.current = tempo;
     }, [tempo]);
 
+    // Advance the ghost on the live clock while practicing — it starts with the
+    // player's first note (startRef), so the two race from the same moment.
+    useEffect(() => {
+        if (!matcher.practicing || !ghost) {
+            return;
+        }
+        const tick = () => {
+            if (startRef.current > 0) {
+                setGhostDone(ghostReached(ghost, performance.now() - startRef.current));
+            }
+        };
+        const timer = window.setInterval(tick, 50);
+        return () => window.clearInterval(timer);
+    }, [matcher.practicing, ghost]);
+
     // Grade a run once it completes, from the captured timing and velocity. A run
     // with no real velocity variation (the computer keyboard) is graded without
     // dynamics rather than crediting a constant.
@@ -242,6 +262,11 @@ export function ScoreViewer({
         if (ephemeral) {
             return;
         }
+        // Keep the run as this score's ghost to race next time.
+        saveGhost(
+            id,
+            notes.map((note) => note.playedMs),
+        );
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const threshold = letterMin(loadPrefs().masteryThreshold);
@@ -364,6 +389,8 @@ export function ScoreViewer({
         setShareGrid(null);
         setTempoCurve(null);
         setLiveTempo(tempo);
+        setGhost(ephemeral ? null : loadGhost(id));
+        setGhostDone(0);
         runTempoRef.current = tempo;
         // Suggest a fingering for the line being drilled — one hand at a time, or
         // the single staff. With both hands on a grand staff there are two lines on
@@ -568,8 +595,28 @@ export function ScoreViewer({
             {matcher.practicing && (
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                            {m.play_progress()} {matcher.done} / {matcher.total}
+                        <span className="flex items-center gap-3">
+                            <span className="text-gray-600 dark:text-gray-400">
+                                {m.play_progress()} {matcher.done} / {matcher.total}
+                            </span>
+                            {ghost && (
+                                <span
+                                    className={
+                                        matcher.done > ghostDone
+                                            ? "font-medium text-green-700 dark:text-green-400"
+                                            : matcher.done < ghostDone
+                                              ? "font-medium text-red-600 dark:text-red-400"
+                                              : "text-gray-600 dark:text-gray-400"
+                                    }
+                                >
+                                    {m.ghost_race({ ghost: ghostDone })}{" "}
+                                    {matcher.done > ghostDone
+                                        ? m.ghost_ahead()
+                                        : matcher.done < ghostDone
+                                          ? m.ghost_behind()
+                                          : m.ghost_tied()}
+                                </span>
+                            )}
                         </span>
                         {!connected && support === "supported" && (
                             <button

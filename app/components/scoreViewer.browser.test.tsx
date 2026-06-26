@@ -6,6 +6,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { generatePhrase } from "../lib/generator";
+import { saveGhost } from "../lib/recording";
 import { PLAYED_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
 
@@ -96,6 +97,16 @@ describe("ScoreViewer", () => {
                 timeout: 4000,
             },
         );
+    });
+
+    it("shows a ghost to race once a previous run is saved", async () => {
+        // mount() renders with id "t"; a saved ghost for it is loaded on Practice.
+        saveGhost("t", [0, 500, 1000]);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const { container } = mount(phrase, { beatsPerBar: 4 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        fireEvent.click(await screen.findByText(/Practice/));
+        expect(await screen.findByText(/👻/)).toBeTruthy();
     });
 
     it("offers a hands-separate selector only for a grand staff", async () => {
