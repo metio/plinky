@@ -14,6 +14,24 @@ const FINGERS = [1, 2, 3, 4, 5];
 // Nominal spread of the fingers in semitones from the thumb, for a relaxed hand.
 const SPREAD: Record<number, number> = { 1: 0, 2: 2, 3: 4, 4: 5, 5: 7 };
 
+// The thumb-to-pinky reach the default spread assumes. A measured hand span
+// scales the model relative to it: a larger hand spreads wider and tolerates
+// bigger leaps before they cost, a smaller hand the reverse.
+const DEFAULT_SPAN = 9;
+
+// A leap wider than this many semitones is extra costly; scaled with the hand.
+const BASE_LEAP = 7;
+
+function scaledSpread(scale: number): Record<number, number> {
+    return {
+        1: 0,
+        2: SPREAD[2]! * scale,
+        3: SPREAD[3]! * scale,
+        4: SPREAD[4]! * scale,
+        5: SPREAD[5]! * scale,
+    };
+}
+
 function isBlackKey(pitch: number): boolean {
     return [1, 3, 6, 8, 10].includes(((pitch % 12) + 12) % 12);
 }
@@ -22,11 +40,19 @@ function startCost(pitch: number, finger: number): number {
     return finger === 1 && isBlackKey(pitch) ? 2 : 0;
 }
 
-function transitionCost(p1: number, f1: number, p2: number, f2: number, hand: Hand): number {
+function transitionCost(
+    p1: number,
+    f1: number,
+    p2: number,
+    f2: number,
+    hand: Hand,
+    spread: Record<number, number>,
+    leap: number,
+): number {
     const direction = hand === "right" ? 1 : -1;
     // The pitch change expected if the hand stays in place: for the right hand a
     // higher finger plays a higher note, mirrored for the left.
-    const expected = direction * (SPREAD[f2]! - SPREAD[f1]!);
+    const expected = direction * (spread[f2]! - spread[f1]!);
     const shift = Math.abs(p2 - p1 - expected);
     let cost = shift;
 
@@ -46,17 +72,21 @@ function transitionCost(p1: number, f1: number, p2: number, f2: number, hand: Ha
     if (f2 === 1 && isBlackKey(p2)) {
         cost += 3;
     }
-    if (shift > 7) {
+    if (shift > leap) {
         cost += shift; // large leaps are extra costly
     }
     return Math.max(0, cost);
 }
 
-// Finger a single melodic line, returning a finger (1..5) per pitch.
-export function fingerLine(pitches: number[], hand: Hand): number[] {
+// Finger a single melodic line, returning a finger (1..5) per pitch. An optional
+// hand span (semitones) personalizes the cost to the player's reach.
+export function fingerLine(pitches: number[], hand: Hand, span?: number): number[] {
     if (pitches.length === 0) {
         return [];
     }
+    const scale = span && span > 0 ? span / DEFAULT_SPAN : 1;
+    const spread = scale === 1 ? SPREAD : scaledSpread(scale);
+    const leap = BASE_LEAP * scale;
     let paths = FINGERS.map((finger) => ({
         cost: startCost(pitches[0]!, finger),
         path: [finger],
@@ -67,7 +97,15 @@ export function fingerLine(pitches: number[], hand: Hand): number[] {
             paths.forEach((previous, index) => {
                 const cost =
                     previous.cost +
-                    transitionCost(pitches[i - 1]!, FINGERS[index]!, pitches[i]!, finger, hand);
+                    transitionCost(
+                        pitches[i - 1]!,
+                        FINGERS[index]!,
+                        pitches[i]!,
+                        finger,
+                        hand,
+                        spread,
+                        leap,
+                    );
                 if (cost < best.cost) {
                     best = { cost, path: [...previous.path, finger] };
                 }
@@ -80,12 +118,12 @@ export function fingerLine(pitches: number[], hand: Hand): number[] {
 
 // Finger a hand's steps, using each step's melody note (the highest note for the
 // right hand, the lowest for the left) as the line to finger.
-export function fingerSteps(steps: { pitches: number[] }[], hand: Hand): number[] {
+export function fingerSteps(steps: { pitches: number[] }[], hand: Hand, span?: number): number[] {
     // A step with no pitches has no note to finger; including it would feed
     // ±Infinity (from an empty Math.max/Math.min) into the cost model and
     // collapse the whole line to NaN costs.
     const line = steps
         .filter((step) => step.pitches.length > 0)
         .map((step) => (hand === "right" ? Math.max(...step.pitches) : Math.min(...step.pitches)));
-    return fingerLine(line, hand);
+    return fingerLine(line, hand, span);
 }

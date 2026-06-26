@@ -56,14 +56,24 @@ afterEach(() => localStorage.clear());
 
 describe("useSynth", () => {
     it("builds a voice when sound is on", () => {
-        savePrefs({ sound: true, volume: 80, masteryThreshold: "A" });
+        savePrefs({
+            sound: true,
+            volume: 80,
+            masteryThreshold: "A",
+            handSpan: { left: null, right: null },
+        });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
         expect(oscillators).toBeGreaterThan(0);
     });
 
     it("stays silent when sound is off", () => {
-        savePrefs({ sound: false, volume: 80, masteryThreshold: "A" });
+        savePrefs({
+            sound: false,
+            volume: 80,
+            masteryThreshold: "A",
+            handSpan: { left: null, right: null },
+        });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
         expect(oscillators).toBe(0);
@@ -71,7 +81,12 @@ describe("useSynth", () => {
 
     it("stays silent — and does not throw — at volume 0", () => {
         // An exponential gain ramp to 0 is a RangeError, so volume 0 must short-circuit.
-        savePrefs({ sound: true, volume: 0, masteryThreshold: "A" });
+        savePrefs({
+            sound: true,
+            volume: 0,
+            masteryThreshold: "A",
+            handSpan: { left: null, right: null },
+        });
         const { result } = renderHook(() => useSynth());
         expect(() => result.current.playNote(60)).not.toThrow();
         expect(oscillators).toBe(0);

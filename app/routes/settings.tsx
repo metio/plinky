@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { HandSize } from "../components/handSize";
 import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiDebugPanel } from "../components/midiDebugPanel";
 import { ScoreBackup } from "../components/scoreBackup";
@@ -18,7 +19,12 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function Settings() {
-    const [prefs, setPrefs] = useState<Prefs>({ sound: true, volume: 80, masteryThreshold: "A" });
+    const [prefs, setPrefs] = useState<Prefs>({
+        sound: true,
+        volume: 80,
+        masteryThreshold: "A",
+        handSpan: { left: null, right: null },
+    });
     const synth = useSynth();
 
     useEffect(() => {
@@ -114,6 +120,8 @@ export default function Settings() {
                     </select>
                 </label>
             </section>
+
+            <HandSize />
 
             <ScoreBackup />
 

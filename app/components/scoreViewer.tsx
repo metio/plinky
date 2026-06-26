@@ -374,7 +374,9 @@ export function ScoreViewer({
         if (osmd && fingerFor) {
             const matcherHand: Hand = staffCount < 2 ? "both" : hand;
             const steps = collectSteps(osmd, matcherHand).map((pitches) => ({ pitches }));
-            setFingerPlan(fingerSteps(steps, fingerFor));
+            // Personalize the suggestion to the player's measured reach, if set.
+            const span = loadPrefs().handSpan[fingerFor] ?? undefined;
+            setFingerPlan(fingerSteps(steps, fingerFor, span));
             setFingeringHand(fingerFor);
         } else {
             setFingerPlan(null);

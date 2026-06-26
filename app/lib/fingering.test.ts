@@ -51,4 +51,22 @@ describe("fingerSteps", () => {
         expect(fingers).toHaveLength(2);
         expect(fingers.every((finger) => finger >= 1 && finger <= 5)).toBe(true);
     });
+
+    it("treats no span the same as the default reference span", () => {
+        const line = [60, 62, 64, 65, 67, 69, 71, 72];
+        expect(fingerLine(line, "right", 9)).toEqual(fingerLine(line, "right"));
+    });
+
+    it("personalizes the fingering to the measured hand span", () => {
+        // A wide arpeggio a large hand can take more in position than a small one,
+        // so the suggested fingers differ by reach.
+        const line = [60, 64, 67, 72, 76, 79];
+        const small = fingerLine(line, "right", 6);
+        const large = fingerLine(line, "right", 16);
+        for (const finger of [...small, ...large]) {
+            expect(finger).toBeGreaterThanOrEqual(1);
+            expect(finger).toBeLessThanOrEqual(5);
+        }
+        expect(small).not.toEqual(large);
+    });
 });
