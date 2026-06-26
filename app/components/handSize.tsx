@@ -101,7 +101,7 @@ export function HandSize() {
                                         {intervalName(span)}
                                     </span>
                                 ) : (
-                                    <span className="text-gray-400 dark:text-gray-500">
+                                    <span className="text-gray-500 dark:text-gray-400">
                                         {m.hand_size_not_set()}
                                     </span>
                                 )}
