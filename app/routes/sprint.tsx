@@ -13,20 +13,29 @@ export function meta(_args: Route.MetaArgs) {
     return routeMeta("Sight-reading sprint", "Fresh notes every run — sight-read and be graded");
 }
 
-const OPTIONS = { bars: 8, beatsPerBar: 4, twoHands: false };
+const OPTIONS = { bars: 8, beatsPerBar: 4 };
 
 export default function SprintRoute() {
     // A fresh phrase each run; bumping the counter regenerates and remounts the
     // viewer. Generated on the client so the first phrase is not baked at build.
     const [run, setRun] = useState(0);
     const [xml, setXml] = useState<string | null>(null);
+    // Add a bass line so the phrase spans both hands, drillable together or one
+    // hand at a time through the viewer's hands selector.
+    const [twoHands, setTwoHands] = useState(false);
+
+    const regenerate = (hands: boolean) => {
+        setXml(generatePhrase({ ...OPTIONS, twoHands: hands }));
+        setRun((value) => value + 1);
+    };
     useEffect(() => {
-        setXml(generatePhrase(OPTIONS));
+        setXml(generatePhrase({ ...OPTIONS, twoHands: false }));
     }, []);
 
-    const fresh = () => {
-        setXml(generatePhrase(OPTIONS));
-        setRun((value) => value + 1);
+    const toggleHands = () => {
+        const next = !twoHands;
+        setTwoHands(next);
+        regenerate(next);
     };
 
     return (
@@ -36,16 +45,37 @@ export default function SprintRoute() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.sprint_intro()}</p>
             </header>
 
-            <button
-                type="button"
-                onClick={fresh}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-            >
-                {m.sprint_fresh()}
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+                <button
+                    type="button"
+                    onClick={() => regenerate(twoHands)}
+                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                >
+                    {m.sprint_fresh()}
+                </button>
+                <button
+                    type="button"
+                    onClick={toggleHands}
+                    aria-pressed={twoHands}
+                    className={
+                        twoHands
+                            ? "rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                            : "rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                    }
+                >
+                    {m.sprint_two_hands()}
+                </button>
+            </div>
 
             {xml && (
-                <ScoreViewer key={run} id="sprint" xml={xml} title={m.sprint_title()} ephemeral />
+                <ScoreViewer
+                    key={run}
+                    id="sprint"
+                    xml={xml}
+                    title={m.sprint_title()}
+                    beatsPerBar={OPTIONS.beatsPerBar}
+                    ephemeral
+                />
             )}
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">

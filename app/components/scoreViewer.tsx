@@ -5,7 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
-import { type CorrectInfo, useScoreMatcher } from "../hooks/useScoreMatcher";
+import { type CorrectInfo, type Hand, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import { computeFlow } from "../lib/flow";
@@ -90,6 +90,10 @@ export function ScoreViewer({
     const [playing, setPlaying] = useState(false);
     const [metronomeOn, setMetronomeOn] = useState(false);
     const [tempo, setTempo] = useState(initialTempo ?? 100);
+    // Which hand to practice, and the score's staff count — the hands-separate
+    // selector only appears for the grand-staff (two-staff) scores it applies to.
+    const [hand, setHand] = useState<Hand>("both");
+    const [staffCount, setStaffCount] = useState(1);
 
     // A classic metronome at the chosen tempo, on demand — play along with it.
     useMetronome(metronomeOn, tempo, beatsPerBar ?? 4);
@@ -113,6 +117,7 @@ export function ScoreViewer({
 
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
+        hand,
         onCorrect: (info: CorrectInfo) => {
             for (const pitch of info.pitches) {
                 synth.playNote(pitch);
@@ -240,6 +245,10 @@ export function ScoreViewer({
                 return osmd.load(xml).then(() => {
                     if (!cancelled) {
                         osmd.render();
+                        // A grand staff (two staves) can be drilled one hand at a
+                        // time; a single-staff score offers no such choice.
+                        setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
+                        setHand("both");
                         setReady(true);
                     }
                 });
@@ -303,6 +312,12 @@ export function ScoreViewer({
         matcher.start();
     };
 
+    const handLabel: Record<Hand, string> = {
+        both: m.hand_both(),
+        right: m.hand_right(),
+        left: m.hand_left(),
+    };
+
     return (
         <div className="space-y-3">
             {/* The score sits at the top — it's what you read while playing, so the
@@ -359,6 +374,32 @@ export function ScoreViewer({
                 >
                     {m.action_metronome()}
                 </button>
+                {staffCount >= 2 && (
+                    <div
+                        role="group"
+                        aria-label={m.hand_label()}
+                        className="flex items-center gap-1"
+                    >
+                        {(["both", "right", "left"] as const).map((option) => (
+                            <button
+                                key={option}
+                                type="button"
+                                // The hand is fixed once a run starts, so the choice
+                                // is locked while practicing to keep the count honest.
+                                disabled={matcher.practicing}
+                                onClick={() => setHand(option)}
+                                aria-pressed={hand === option}
+                                className={
+                                    hand === option
+                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                                        : BUTTON
+                                }
+                            >
+                                {handLabel[option]}
+                            </button>
+                        ))}
+                    </div>
+                )}
                 {lockTempo ? (
                     <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         {m.scores_tempo()}

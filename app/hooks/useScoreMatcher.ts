@@ -4,17 +4,26 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
 
+// Which hand's staff to match: both together, or one alone for hands-separate
+// practice. On the grand staff our scores build, the treble (right) is staff 0
+// and the bass (left) is staff 1.
+export type Hand = "both" | "right" | "left";
+const STAFF_FOR: Record<Exclude<Hand, "both">, number> = { right: 0, left: 1 };
+
 // The MIDI pitches that sound at the cursor's current position (chords give
-// several; rests and tied continuations give none).
-function pitchesAtCursor(osmd: OpenSheetMusicDisplay): number[] {
+// several; rests and tied continuations give none), narrowed to the chosen hand.
+function pitchesAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): number[] {
     return osmd.cursor
         .NotesUnderCursor()
         .filter((note) => !note.isRest() && note.halfTone > 0)
+        .filter((note) => hand === "both" || note.ParentStaff?.idInMusicSheet === STAFF_FOR[hand])
         .map((note) => note.halfTone + 12);
 }
 
-function advancePastRests(osmd: OpenSheetMusicDisplay): void {
-    while (!osmd.cursor.iterator.EndReached && pitchesAtCursor(osmd).length === 0) {
+// Skip positions with nothing to play for the chosen hand — rests, and the
+// stretches where only the other hand sounds during hands-separate practice.
+function advancePastRests(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): void {
+    while (!osmd.cursor.iterator.EndReached && pitchesAtCursor(osmd, hand).length === 0) {
         osmd.cursor.next();
     }
 }
@@ -40,7 +49,7 @@ export type CorrectInfo = {
 
 export function useScoreMatcher(
     getOsmd: () => OpenSheetMusicDisplay | null,
-    options: { onCorrect?: (info: CorrectInfo) => void; tempo?: number } = {},
+    options: { onCorrect?: (info: CorrectInfo) => void; tempo?: number; hand?: Hand } = {},
 ) {
     const [practicing, setPracticing] = useState(false);
     const [expected, setExpected] = useState<number[]>([]);
@@ -60,6 +69,9 @@ export function useScoreMatcher(
     // slider change rebase later notes against the first note's old tempo and
     // corrupt the timing and flow grades.
     const runTempoRef = useRef(options.tempo ?? 100);
+    // The hand is fixed for the duration of a run, captured at start, so a change
+    // to the selector mid-run can't desync the position count from what's matched.
+    const runHandRef = useRef<Hand>(options.hand ?? "both");
 
     const stop = useCallback(() => {
         practicingRef.current = false;
@@ -72,13 +84,14 @@ export function useScoreMatcher(
         if (!osmd) {
             return;
         }
+        const hand = optionsRef.current.hand ?? "both";
         // Count playable positions and the overall pitch range in one pass.
         osmd.cursor.reset();
         let count = 0;
         let lo = Number.POSITIVE_INFINITY;
         let hi = Number.NEGATIVE_INFINITY;
         while (!osmd.cursor.iterator.EndReached) {
-            const pitches = pitchesAtCursor(osmd);
+            const pitches = pitchesAtCursor(osmd, hand);
             if (pitches.length > 0) {
                 count++;
                 lo = Math.min(lo, ...pitches);
@@ -94,19 +107,20 @@ export function useScoreMatcher(
             return;
         }
         osmd.cursor.reset();
-        advancePastRests(osmd);
+        advancePastRests(osmd, hand);
         osmd.cursor.show();
         hit.current.clear();
         ordinalRef.current = 0;
         sinceWrong.current = 0;
         runTempoRef.current = optionsRef.current.tempo ?? 100;
+        runHandRef.current = hand;
         practicingRef.current = true;
         setTotal(count);
         setDone(0);
         setWrong(0);
         setComplete(false);
         setRange(Number.isFinite(lo) ? { from: lo - 2, to: hi + 2 } : null);
-        setExpected(pitchesAtCursor(osmd));
+        setExpected(pitchesAtCursor(osmd, hand));
         setPracticing(true);
     }, [getOsmd]);
 
@@ -116,7 +130,7 @@ export function useScoreMatcher(
             if (!practicingRef.current || !osmd || osmd.cursor.iterator.EndReached) {
                 return;
             }
-            const expectedNow = pitchesAtCursor(osmd);
+            const expectedNow = pitchesAtCursor(osmd, runHandRef.current);
             if (!expectedNow.includes(note)) {
                 setWrong((value) => value + 1);
                 sinceWrong.current += 1;
@@ -142,7 +156,7 @@ export function useScoreMatcher(
             sinceWrong.current = 0;
             hit.current.clear();
             osmd.cursor.next();
-            advancePastRests(osmd);
+            advancePastRests(osmd, runHandRef.current);
             setDone((value) => value + 1);
             if (osmd.cursor.iterator.EndReached) {
                 osmd.cursor.hide();
@@ -152,7 +166,7 @@ export function useScoreMatcher(
                 setPracticing(false);
                 return;
             }
-            setExpected(pitchesAtCursor(osmd));
+            setExpected(pitchesAtCursor(osmd, runHandRef.current));
         },
         [getOsmd],
     );

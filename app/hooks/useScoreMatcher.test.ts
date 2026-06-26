@@ -9,7 +9,10 @@ import { type CorrectInfo, useScoreMatcher } from "./useScoreMatcher";
 
 // A position is the chord sounding at one cursor step; an empty array is a rest.
 // halfTone is OSMD's pitch index, which the matcher maps to MIDI as halfTone + 12.
-type Position = number[];
+// A bare number is a right-hand (staff 0) note; {midi, staff} pins the staff so
+// hands-separate matching can be exercised.
+type Voice = number | { midi: number; staff: number };
+type Position = Voice[];
 
 function midiToHalfTone(midi: number): number {
     return midi - 12;
@@ -29,10 +32,15 @@ function fakeOsmd(positions: Position[]): { osmd: OpenSheetMusicDisplay; shown: 
         },
         NotesUnderCursor() {
             const chord = positions[index] ?? [];
-            return chord.map((midi) => ({
-                isRest: () => false,
-                halfTone: midiToHalfTone(midi),
-            }));
+            return chord.map((voice) => {
+                const midi = typeof voice === "number" ? voice : voice.midi;
+                const staff = typeof voice === "number" ? 0 : voice.staff;
+                return {
+                    isRest: () => false,
+                    halfTone: midiToHalfTone(midi),
+                    ParentStaff: { idInMusicSheet: staff },
+                };
+            });
         },
         next() {
             index += 1;
@@ -112,6 +120,43 @@ describe("useScoreMatcher", () => {
         expect(result.current.complete).toBe(false);
         expect(result.current.total).toBe(0);
         expect(shown()).toBe(false);
+    });
+
+    it("drills one hand, skipping positions where only the other hand sounds", () => {
+        const positions: Position[] = [
+            [{ midi: 60, staff: 0 }], // right only
+            [{ midi: 48, staff: 1 }], // left only — skipped when drilling the right
+            [
+                { midi: 62, staff: 0 },
+                { midi: 50, staff: 1 },
+            ],
+        ];
+        const { result } = render(positions, { hand: "right" });
+        act(() => result.current.start());
+        expect(result.current.total).toBe(2);
+        expect(result.current.expected).toEqual([60]);
+
+        act(() => result.current.registerNote(60));
+        // The left-only position is skipped; the next right note is the chord's.
+        expect(result.current.expected).toEqual([62]);
+        act(() => result.current.registerNote(62));
+        expect(result.current.complete).toBe(true);
+    });
+
+    it("counts the other hand's note as wrong during hands-separate practice", () => {
+        const positions: Position[] = [
+            [
+                { midi: 60, staff: 0 },
+                { midi: 48, staff: 1 },
+            ],
+        ];
+        const { result } = render(positions, { hand: "left" });
+        act(() => result.current.start());
+        expect(result.current.expected).toEqual([48]);
+        act(() => result.current.registerNote(60)); // right-hand note, not expected
+        expect(result.current.wrong).toBe(1);
+        act(() => result.current.registerNote(48));
+        expect(result.current.complete).toBe(true);
     });
 
     it("freezes the tempo at start so a later change doesn't rescale note times", () => {
