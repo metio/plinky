@@ -29,8 +29,9 @@ function renderScores() {
 describe("Scores catalogue", () => {
     it("lists bundled scores and renders the selected one with OSMD", async () => {
         renderScores();
-        expect(await screen.findByText("Ode to Joy")).toBeTruthy();
-        // The auto-selected first piece renders through the score viewer.
+        // No score is auto-opened (it would shift the page in late); clicking one
+        // renders it through the score viewer.
+        fireEvent.click(await screen.findByText("Ode to Joy"));
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
         expect(screen.getByText(/Listen/)).toBeTruthy();
         expect(screen.getByText("Practice")).toBeTruthy();
@@ -47,8 +48,8 @@ describe("Scores catalogue", () => {
 
     it("hides the selected viewer when a filter excludes that piece", async () => {
         renderScores();
-        await screen.findByText("Ode to Joy");
-        // The auto-selected piece's viewer is showing its controls.
+        // Open a piece, then filter it out — its viewer must not linger below.
+        fireEvent.click(await screen.findByText("Ode to Joy"));
         await waitFor(() => expect(screen.queryByText("Practice")).toBeTruthy(), { timeout: 8000 });
         fireEvent.change(screen.getByRole("searchbox"), {
             target: { value: "no-such-piece" },

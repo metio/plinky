@@ -34,6 +34,7 @@ export default function ScoresRoute() {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [masteryMap, setMasteryMap] = useState<Record<string, Mastery>>({});
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [loaded, setLoaded] = useState(false);
     const [query, setQuery] = useState("");
     const [curriculum, setCurriculum] = useState(""); // "" = all
     const [favoritesOnly, setFavoritesOnly] = useState(false);
@@ -47,13 +48,15 @@ export default function ScoresRoute() {
         setMasteryMap(map);
     }, []);
 
+    // The catalogue loads on the client. The list renders only once it's ready (a
+    // reserved skeleton holds the space meanwhile), and no score is auto-opened —
+    // both kept the heavy viewer and the list from shifting the page in late.
     useEffect(() => {
-        const loaded = loadCatalog();
-        setScores(loaded);
-        setSelectedId((current) => current ?? loaded[0]?.id ?? null);
+        setScores(loadCatalog());
         setCurriculums(loadCurriculums());
         setFavorites(loadFavorites());
         reloadMastery();
+        setLoaded(true);
     }, [reloadMastery]);
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
@@ -152,7 +155,9 @@ export default function ScoresRoute() {
                     : m.scores_count_other({ count: matches.length })}
             </p>
 
-            {matches.length === 0 ? (
+            {!loaded ? (
+                <div className="h-64" aria-hidden="true" />
+            ) : matches.length === 0 ? (
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.scores_empty()}</p>
             ) : (
                 <ul className="flex flex-wrap gap-2">
