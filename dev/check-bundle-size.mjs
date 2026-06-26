@@ -17,8 +17,8 @@ const DIR = "build/client/assets";
 const VENDOR = /opensheetmusicdisplay/;
 
 const BUDGET_TOTAL_KB = 580;
-// Bumped to 268 for the always-loaded header streak badge; still a tight ratchet.
-const BUDGET_APP_KB = 268;
+// Headroom for the always-loaded header badges (streak + grade); still a tight ratchet.
+const BUDGET_APP_KB = 272;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

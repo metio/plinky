@@ -17,6 +17,7 @@ const BASE_PATHS = [
     "/curriculums",
     "/tracks",
     "/progress",
+    "/grades",
     "/settings",
     "/import",
 ];

@@ -14,6 +14,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/localizedLink";
+import { GradeBadge } from "./components/gradeBadge";
 import { StreakBadge } from "./components/streakBadge";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
@@ -84,6 +85,7 @@ function Header() {
                         <img src="/logo-horizontal.svg" alt="Plinky" className="h-8" />
                     </Link>
                     <StreakBadge />
+                    <GradeBadge />
                 </div>
                 <div className="flex items-center gap-4">
                     <ThemeToggle />
@@ -92,6 +94,12 @@ function Header() {
                         className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                     >
                         {m.nav_progress()}
+                    </Link>
+                    <Link
+                        to="/grades"
+                        className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                    >
+                        {m.nav_grades()}
                     </Link>
                     <Link
                         to="/settings"

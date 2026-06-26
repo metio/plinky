@@ -19,6 +19,7 @@ export default [
         route("curriculums", "routes/curriculums.tsx"),
         route("tracks", "routes/tracks.tsx"),
         route("progress", "routes/progress.tsx"),
+        route("grades", "routes/grades.tsx"),
         route("import", "routes/import.tsx"),
         route("settings", "routes/settings.tsx"),
     ]),

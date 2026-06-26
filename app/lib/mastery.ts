@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Letter } from "./grade";
+import { PRACTICE_EVENT } from "./history";
 
 // Spaced-repetition state for one score: the best score so far, whether it is
 // learned, whether it has been shelved to the backlog, and when it is next due
@@ -91,6 +92,10 @@ export function saveMastery(id: string, mastery: Mastery): void {
     }
     try {
         localStorage.setItem(storageKey(id), JSON.stringify(mastery));
+        // Mastery feeds the header's grade badge; nudge it to refresh without a reload.
+        if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event(PRACTICE_EVENT));
+        }
     } catch {
         // Ignore quota or serialization failures — mastery is best-effort.
     }

@@ -23,6 +23,7 @@ const PAGES = [
     "/en/tracks/",
     "/en/curriculums/",
     "/en/progress/",
+    "/en/grades/",
     "/en/settings/",
 ];
 const MIME = {
