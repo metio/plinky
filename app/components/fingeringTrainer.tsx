@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { drillToMusicXml } from "../lib/drillStaff";
 import { generateDrill } from "../lib/fingeringDrill";
 import {
     type FingerReason,
@@ -14,6 +15,7 @@ import { GRADE_COLOR, type Letter } from "../lib/grade";
 import { noteName } from "../lib/midi";
 import { loadPrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
+import { StaffPreview } from "./staffPreview";
 
 const FINGERS = [1, 2, 3, 4, 5];
 
@@ -52,6 +54,13 @@ export function FingeringTrainer() {
     const slots = useMemo<Slot[]>(
         () => positions.flatMap((pos, p) => pos.map((_, note) => ({ pos: p, note }))),
         [positions],
+    );
+
+    // The same drill rendered on a staff, so the player reads real notation rather
+    // than only note names — the skill that transfers to a real score.
+    const staffXml = useMemo(
+        () => (positions.length > 0 ? drillToMusicXml(positions, hand) : null),
+        [positions, hand],
     );
 
     const fresh = useCallback(() => {
@@ -130,6 +139,8 @@ export function FingeringTrainer() {
                     ))}
                 </fieldset>
             </header>
+
+            {staffXml && <StaffPreview xml={staffXml} label={m.fingering_staff_label()} />}
 
             {/* Each position is a column; a chord stacks its notes, highest on top. */}
             <div className="flex flex-wrap items-end gap-2">
