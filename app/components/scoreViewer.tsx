@@ -375,11 +375,7 @@ export function ScoreViewer({
                     {m.action_metronome()}
                 </button>
                 {staffCount >= 2 && (
-                    <div
-                        role="group"
-                        aria-label={m.hand_label()}
-                        className="flex items-center gap-1"
-                    >
+                    <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
                         {(["both", "right", "left"] as const).map((option) => (
                             <button
                                 key={option}
@@ -398,7 +394,7 @@ export function ScoreViewer({
                                 {handLabel[option]}
                             </button>
                         ))}
-                    </div>
+                    </fieldset>
                 )}
                 {lockTempo ? (
                     <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
