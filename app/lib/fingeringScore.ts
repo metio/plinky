@@ -1,7 +1,45 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type Hand, fingerPositions, positionsCost } from "./fingering";
+import { type Hand, fingerPositions, isBlackKey, positionsCost } from "./fingering";
+
+// Why a flagged position is awkward, drawn from the dominant cost penalty — the
+// teaching point behind the suggestion. "general" is the catch-all (e.g. a stretch).
+export type FingerReason = "thumbBlack" | "repeat" | "general";
+
+// The leading voice that carries movement: top note for the right hand, bottom
+// for the left.
+function lead(position: number[], hand: Hand): number {
+    return hand === "right" ? position.length - 1 : 0;
+}
+
+// Identifies the most teachable problem with the player's fingering at one
+// position, so the trainer can say *why*, not just "use this finger".
+export function reasonFor(
+    positions: number[][],
+    fingers: number[][],
+    index: number,
+    hand: Hand,
+): FingerReason {
+    const pitches = positions[index]!;
+    const chosen = fingers[index]!;
+    for (let i = 0; i < pitches.length; i++) {
+        if (chosen[i] === 1 && isBlackKey(pitches[i]!)) {
+            return "thumbBlack";
+        }
+    }
+    if (index > 0) {
+        const here = lead(pitches, hand);
+        const prev = lead(positions[index - 1]!, hand);
+        if (
+            chosen[here] === fingers[index - 1]![prev] &&
+            pitches[here] !== positions[index - 1]![prev]
+        ) {
+            return "repeat";
+        }
+    }
+    return "general";
+}
 
 // A position is worth flagging only if re-fingering it to the suggestion meaningfully
 // lowers the effort — so a different-but-comfortable choice is left alone.

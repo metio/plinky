@@ -40,7 +40,7 @@ function handModel(span?: number): { spread: Record<number, number>; leap: numbe
     return { spread: scale === 1 ? SPREAD : scaledSpread(scale), leap: BASE_LEAP * scale };
 }
 
-function isBlackKey(pitch: number): boolean {
+export function isBlackKey(pitch: number): boolean {
     return [1, 3, 6, 8, 10].includes(((pitch % 12) + 12) % 12);
 }
 

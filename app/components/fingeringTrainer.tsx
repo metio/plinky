@@ -4,13 +4,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { generateDrill } from "../lib/fingeringDrill";
-import { type FingeringResult, scoreFingering } from "../lib/fingeringScore";
+import {
+    type FingerReason,
+    type FingeringResult,
+    reasonFor,
+    scoreFingering,
+} from "../lib/fingeringScore";
 import { GRADE_COLOR, type Letter } from "../lib/grade";
 import { noteName } from "../lib/midi";
 import { loadPrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 
 const FINGERS = [1, 2, 3, 4, 5];
+
+// The plain-language reason behind each flagged position.
+const REASON: Record<FingerReason, () => string> = {
+    thumbBlack: m.fingering_reason_thumbBlack,
+    repeat: m.fingering_reason_repeat,
+    general: m.fingering_reason_general,
+};
 
 // One note awaiting a finger: which position it's in and its index within it.
 type Slot = { pos: number; note: number };
@@ -176,6 +188,26 @@ export function FingeringTrainer() {
                                     ? m.fingering_comfortable()
                                     : m.fingering_reconsider()}
                             </p>
+                            {result.reconsider.length > 0 && (
+                                <ul className="list-disc space-y-0.5 pl-4 text-gray-600 dark:text-gray-400">
+                                    {result.reconsider.map((index) => {
+                                        const pos = positions[index]!;
+                                        return (
+                                            <li key={index}>
+                                                {noteName(pos[pos.length - 1]!)} —{" "}
+                                                {REASON[
+                                                    reasonFor(
+                                                        positions,
+                                                        fingers as number[][],
+                                                        index,
+                                                        "right",
+                                                    )
+                                                ]()}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
                         </div>
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">

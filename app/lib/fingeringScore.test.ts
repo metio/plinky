@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { fingerPositions } from "./fingering";
-import { scoreFingering } from "./fingeringScore";
+import { reasonFor, scoreFingering } from "./fingeringScore";
 
 // A line of single-note positions, plus one with a chord.
 const LINE: number[][] = [[60], [62], [64], [65], [67], [69], [71], [72]];
@@ -43,5 +43,20 @@ describe("scoreFingering", () => {
         const result = scoreFingering([[60, 64, 67]], [[1, 2, 3]], "right");
         expect(result.suggested[0]).not.toEqual([1, 2, 3]);
         expect(result.efficiency).toBeLessThan(1);
+    });
+});
+
+describe("reasonFor", () => {
+    it("names a thumb on a black key", () => {
+        // C#4 (61) is a black key.
+        expect(reasonFor([[61]], [[1]], 0, "right")).toBe("thumbBlack");
+    });
+
+    it("names the same finger repeated across a leap", () => {
+        expect(reasonFor([[60], [64]], [[3], [3]], 1, "right")).toBe("repeat");
+    });
+
+    it("falls back to a general reason otherwise", () => {
+        expect(reasonFor([[60], [62]], [[1], [2]], 1, "right")).toBe("general");
     });
 });
