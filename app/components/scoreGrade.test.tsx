@@ -8,12 +8,9 @@ import { ScoreGrade } from "./scoreGrade";
 
 afterEach(cleanup);
 
-const gentle = `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">${[60, 62, 64]
-    .map(
-        (octaveStep) =>
-            `<note><pitch><step>${["C", "C", "D", "D", "E"][octaveStep % 12] ?? "C"}</step><octave>4</octave></pitch><duration>2</duration></note>`,
-    )
-    .join("")}</measure></part></score-partwise>`;
+const note = (step: string) =>
+    `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>2</duration></note>`;
+const gentle = `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">${note("C")}${note("D")}${note("E")}</measure></part></score-partwise>`;
 
 describe("ScoreGrade", () => {
     it("shows the score's computed grade", () => {

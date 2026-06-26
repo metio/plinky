@@ -3,13 +3,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from "vitest";
-import {
-    categoryOf,
-    gradeOf,
-    MAX_GRADE,
-    parsePositions,
-    rawDifficulty,
-} from "./scoreDifficulty";
+import { categoryOf, gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
 
 // A minimal one-part score builder for the tests.
 const score = (notes: string) =>
@@ -35,7 +29,7 @@ describe("parsePositions", () => {
 
     it("skips rests and survives malformed XML", () => {
         expect(parsePositions("not xml at all")).toEqual({ right: [], left: [] });
-        const withRest = score(note("C", 4) + "<note><rest/><duration>2</duration></note>");
+        const withRest = score(`${note("C", 4)}<note><rest/><duration>2</duration></note>`);
         expect(parsePositions(withRest).right).toEqual([[60]]);
     });
 });
