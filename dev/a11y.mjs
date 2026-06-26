@@ -18,6 +18,7 @@ const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
 // (The bare "/" is only a client redirect, so it has no content to audit.)
 const PAGES = [
     "/en/",
+    "/en/fingering/",
     "/en/scores/",
     "/en/tracks/",
     "/en/curriculums/",

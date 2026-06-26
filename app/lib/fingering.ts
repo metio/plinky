@@ -32,6 +32,14 @@ function scaledSpread(scale: number): Record<number, number> {
     };
 }
 
+// The finger-spread table and leap tolerance for a given reach (or the defaults
+// when no span is measured). Shared by the chooser and the cost scorer so both
+// judge a fingering against the same hand.
+function handModel(span?: number): { spread: Record<number, number>; leap: number } {
+    const scale = span && span > 0 ? span / DEFAULT_SPAN : 1;
+    return { spread: scale === 1 ? SPREAD : scaledSpread(scale), leap: BASE_LEAP * scale };
+}
+
 function isBlackKey(pitch: number): boolean {
     return [1, 3, 6, 8, 10].includes(((pitch % 12) + 12) % 12);
 }
@@ -84,9 +92,7 @@ export function fingerLine(pitches: number[], hand: Hand, span?: number): number
     if (pitches.length === 0) {
         return [];
     }
-    const scale = span && span > 0 ? span / DEFAULT_SPAN : 1;
-    const spread = scale === 1 ? SPREAD : scaledSpread(scale);
-    const leap = BASE_LEAP * scale;
+    const { spread, leap } = handModel(span);
     let paths = FINGERS.map((finger) => ({
         cost: startCost(pitches[0]!, finger),
         path: [finger],
@@ -114,6 +120,34 @@ export function fingerLine(pitches: number[], hand: Hand, span?: number): number
         });
     }
     return paths.reduce((best, candidate) => (candidate.cost < best.cost ? candidate : best)).path;
+}
+
+// The comfort cost of a specific finger assignment for a line — the same effort
+// the chooser minimizes. Lets a trainer score the player's own fingering against
+// the optimum by effort, so a different-but-comfortable choice still scores well.
+export function fingeringCost(
+    pitches: number[],
+    fingers: number[],
+    hand: Hand,
+    span?: number,
+): number {
+    if (pitches.length === 0) {
+        return 0;
+    }
+    const { spread, leap } = handModel(span);
+    let cost = startCost(pitches[0]!, fingers[0]!);
+    for (let i = 1; i < pitches.length; i++) {
+        cost += transitionCost(
+            pitches[i - 1]!,
+            fingers[i - 1]!,
+            pitches[i]!,
+            fingers[i]!,
+            hand,
+            spread,
+            leap,
+        );
+    }
+    return cost;
 }
 
 // Finger a hand's steps, using each step's melody note (the highest note for the

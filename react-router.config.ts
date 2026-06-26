@@ -12,6 +12,7 @@ const BASE_PATHS = [
     "/sprint",
     "/daily",
     "/ear",
+    "/fingering",
     "/scores",
     "/curriculums",
     "/tracks",

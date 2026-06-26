@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { fingerLine, fingerSteps } from "./fingering";
+import { fingerLine, fingeringCost, fingerSteps } from "./fingering";
 
 describe("fingerLine", () => {
     it("plays a right-hand five-finger position 1–5 in place", () => {
@@ -55,6 +55,15 @@ describe("fingerSteps", () => {
     it("treats no span the same as the default reference span", () => {
         const line = [60, 62, 64, 65, 67, 69, 71, 72];
         expect(fingerLine(line, "right", 9)).toEqual(fingerLine(line, "right"));
+    });
+
+    it("scores the chooser's own fingering no worse than any other", () => {
+        const line = [60, 62, 64, 65, 67, 69, 71, 72];
+        const best = fingerLine(line, "right");
+        const bestCost = fingeringCost(line, best, "right");
+        const awkward = fingeringCost(line, [1, 1, 1, 1, 1, 1, 1, 1], "right");
+        expect(bestCost).toBeLessThanOrEqual(awkward);
+        expect(bestCost).toBeGreaterThanOrEqual(0);
     });
 
     it("personalizes the fingering to the measured hand span", () => {
