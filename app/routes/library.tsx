@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreImport } from "../components/scoreImport";
 import { ScoreViewer } from "../components/scoreViewer";
 import {
@@ -206,6 +207,7 @@ export default function ScoresRoute() {
                                             {score.composer}
                                         </span>
                                     )}
+                                    <ScoreGrade id={score.id} xml={score.xml} className="mt-1" />
                                 </button>
                                 {!score.bundled && (
                                     <button

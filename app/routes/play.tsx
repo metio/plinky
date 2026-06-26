@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
 import { resolveScore, type Score } from "../lib/catalog";
 import { musicCompositionData, routeMeta } from "../lib/site";
@@ -41,7 +42,10 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
             {score && (
                 <>
                     <header className="space-y-1">
-                        <h1 className="text-2xl font-semibold">{score.title}</h1>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h1 className="text-2xl font-semibold">{score.title}</h1>
+                            <ScoreGrade id={score.id} xml={score.xml} />
+                        </div>
                         {score.composer && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {score.composer}
