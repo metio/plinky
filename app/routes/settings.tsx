@@ -15,7 +15,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Settings", "Configure Plinky");
+    return routeMeta(m.nav_settings(), m.meta_settings_description());
 }
 
 export default function Settings() {

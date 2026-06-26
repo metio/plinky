@@ -10,10 +10,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/daily";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(
-        "Daily challenge",
-        "Today's piece — the same for everyone — graded and shareable",
-    );
+    return routeMeta(m.meta_daily_title(), m.meta_daily_description());
 }
 
 // Which day it is, and so which phrase, number and tempo, depends on the viewer's

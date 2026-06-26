@@ -14,7 +14,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/scores";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Scores", "Every piece on this device — rendered, played, and graded");
+    return routeMeta(m.scores_heading(), m.meta_scores_description());
 }
 
 const CHIP = "rounded-full border px-3 py-1 text-sm";

@@ -11,7 +11,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/tracks";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Tracks", "Ordered practice paths — graded progressions and timed routines");
+    return routeMeta(m.tracks_heading(), m.meta_tracks_description());
 }
 
 // A distinct accent per parallel track, so the columns read as separate paths.

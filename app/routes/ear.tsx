@@ -3,10 +3,11 @@
 
 import { EarTrainer } from "../components/earTrainer";
 import { routeMeta } from "../lib/site";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/ear";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Ear training", "Train your ear: hear a note and play it back");
+    return routeMeta(m.ear_heading(), m.meta_ear_description());
 }
 
 export default function EarRoute() {

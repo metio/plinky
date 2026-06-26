@@ -3,10 +3,11 @@
 
 import { GradeLadderView } from "../components/gradeLadderView";
 import { routeMeta } from "../lib/site";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/grades";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Grades", "Your grade on plinky's practice ladder, and the next one to reach");
+    return routeMeta(m.grades_heading(), m.meta_grades_description());
 }
 
 export default function GradesRoute() {

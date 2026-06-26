@@ -17,9 +17,10 @@ const DIR = "build/client/assets";
 const VENDOR = /opensheetmusicdisplay/;
 
 // Tracks the app budget plus the fixed OSMD vendor chunk; raised alongside the app one.
-const BUDGET_TOTAL_KB = 585;
-// Headroom for the header badges and the on-staff ghost race; still a tight ratchet.
-const BUDGET_APP_KB = 274;
+const BUDGET_TOTAL_KB = 590;
+// Headroom for the header badges, the on-staff ghost race, and the localizable SEO
+// meta strings across all 26 locales; still a tight ratchet.
+const BUDGET_APP_KB = 278;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

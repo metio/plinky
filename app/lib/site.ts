@@ -4,7 +4,6 @@
 // Site-wide metadata shared between the layout's social tags and the home route's
 // structured data.
 export const SITE_URL = "https://plinky.fun";
-export const SITE_TITLE = "Plinky — piano practice in your browser";
 
 // A page title with the most specific part first, ending in the brand, so a
 // bookmark list reads "C major scale · Practice · Plinky" — distinguishable at a

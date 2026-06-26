@@ -10,7 +10,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/curriculums";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Curriculums", "Your scores, grouped by the curriculums you have imported");
+    return routeMeta(m.curriculums_heading(), m.meta_curriculums_description());
 }
 
 const SCORE_LINK =

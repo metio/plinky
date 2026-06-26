@@ -16,14 +16,13 @@ export function meta({ params }: Route.MetaArgs) {
     // indexable instead of every play page sharing a generic shell.
     const score = resolveScore(params.scoreId);
     if (!score) {
-        return routeMeta("Play", "Practice a piece with your MIDI piano or computer keyboard");
+        return routeMeta(m.meta_play_title(), m.meta_play_description_fallback());
     }
-    const by = score.composer ? ` by ${score.composer}` : "";
+    const description = score.composer
+        ? m.meta_play_description_by({ title: score.title, composer: score.composer })
+        : m.meta_play_description({ title: score.title });
     return [
-        ...routeMeta(
-            score.title,
-            `Practice "${score.title}"${by} in your browser — sight-read and play it with your MIDI or computer keyboard.`,
-        ),
+        ...routeMeta(score.title, description),
         { "script:ld+json": musicCompositionData(score.title, score.composer, getLocale()) },
     ];
 }

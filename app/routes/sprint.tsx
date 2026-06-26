@@ -10,7 +10,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/sprint";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Sight-reading sprint", "Fresh notes every run — sight-read and be graded");
+    return routeMeta(m.sprint_title(), m.meta_sprint_description());
 }
 
 const OPTIONS = { bars: 8, beatsPerBar: 4 };

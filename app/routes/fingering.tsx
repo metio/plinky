@@ -3,13 +3,11 @@
 
 import { FingeringTrainer } from "../components/fingeringTrainer";
 import { routeMeta } from "../lib/site";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/fingering";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(
-        "Fingering trainer",
-        "Choose your own fingering and compare it to a comfortable one",
-    );
+    return routeMeta(m.fingering_heading(), m.meta_fingering_description());
 }
 
 export default function FingeringRoute() {

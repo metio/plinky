@@ -12,7 +12,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/progress";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Progress", "Your practice history and streak");
+    return routeMeta(m.progress_heading(), m.meta_progress_description());
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

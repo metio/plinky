@@ -6,7 +6,7 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreImport } from "../components/scoreImport";
 import { loadCatalog, type Score } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
-import { SITE_DESCRIPTION, SITE_TITLE, socialMeta, structuredData } from "../lib/site";
+import { socialMeta, structuredData } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/home";
@@ -15,9 +15,9 @@ export function meta(_args: Route.MetaArgs) {
     // React Router renders the "script:ld+json" descriptor as a JSON-LD <script>,
     // serializing it safely — no dangerouslySetInnerHTML needed.
     return [
-        { title: SITE_TITLE },
-        { name: "description", content: SITE_DESCRIPTION },
-        ...socialMeta(SITE_TITLE, SITE_DESCRIPTION),
+        { title: m.meta_home_title() },
+        { name: "description", content: m.meta_home_description() },
+        ...socialMeta(m.meta_home_title(), m.meta_home_description()),
         { "script:ld+json": structuredData(getLocale()) },
     ];
 }
