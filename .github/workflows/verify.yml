@@ -6,6 +6,12 @@ on:
     branches: [main]
 permissions:
   contents: read
+# In the Playwright container, localhost resolves to ::1 (IPv6) first, so the
+# prerender's internal server and its own requests can land on different stacks
+# and the fetch is refused. Prefer IPv4 everywhere so both bind and connect on
+# 127.0.0.1; harmless on the non-container runners.
+env:
+  NODE_OPTIONS: --dns-result-order=ipv4first
 jobs:
   build:
     name: build
@@ -34,11 +40,7 @@ jobs:
     container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      # Node and the browsers come from the image; no setup-node needed.
       - run: npm ci
       - run: npm run test:browser
   coverage:
@@ -47,11 +49,7 @@ jobs:
     container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      # Node and the browsers come from the image; no setup-node needed.
       - run: npm ci
       # Fails when any project's coverage drops below the thresholds pinned in
       # vitest.config.ts, so the ratchet only moves up.
@@ -82,11 +80,7 @@ jobs:
     container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      # Node and the browsers come from the image; no setup-node needed.
       - run: npm ci
       - run: npm run a11y:light
   accessibility-dark:
@@ -95,11 +89,7 @@ jobs:
     container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      # Node and the browsers come from the image; no setup-node needed.
       - run: npm ci
       # axe-core in both themes is the accessibility gate — Lighthouse audits only
       # light mode, so dark-mode contrast would otherwise go unchecked.

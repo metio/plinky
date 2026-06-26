@@ -1,4 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>metio/renovate-config"]
+  "extends": ["github>metio/renovate-config"],
+  "packageRules": [
+    {
+      "matchPackageNames": ["playwright", "mcr.microsoft.com/playwright"],
+      "groupName": "playwright",
+      "description": "Bump the Playwright library and the CI/dev image (its baked browsers must match) in one PR."
+    }
+  ]
 }
