@@ -3,6 +3,7 @@
 
 import { useMidiConnection } from "../contexts/midi";
 import { noteName } from "../lib/midi";
+import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
 // Pitch classes of the white keys; everything else is a black key.
 const WHITE_PITCH_CLASSES = [0, 2, 4, 5, 7, 9, 11];
@@ -51,70 +52,72 @@ export function PianoKeyboard({
     };
 
     return (
-        <div className="relative h-28 w-full touch-none select-none">
-            <div className="flex h-full w-full">
-                {whites.map((note) => (
-                    <button
-                        key={note}
-                        type="button"
-                        aria-label={noteName(note)}
-                        onPointerDown={down(note)}
-                        onPointerUp={up(note)}
-                        onPointerCancel={up(note)}
-                        onPointerLeave={leave(note)}
-                        className={`relative flex-1 rounded-b border border-gray-300 dark:border-gray-700 ${
-                            heldNotes.includes(note)
-                                ? "bg-indigo-300"
-                                : expected.includes(note)
-                                  ? "bg-indigo-50 dark:bg-indigo-950"
-                                  : "bg-white"
-                        }`}
-                    >
-                        {fingers[note] ? (
-                            <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                                {fingers[note]}
-                            </span>
-                        ) : null}
-                    </button>
-                ))}
+        <div className={`w-full ${KEYBED_WELL}`}>
+            <div className="relative h-28 w-full touch-none select-none">
+                <div className="flex h-full w-full gap-px">
+                    {whites.map((note) => (
+                        <button
+                            key={note}
+                            type="button"
+                            aria-label={noteName(note)}
+                            onPointerDown={down(note)}
+                            onPointerUp={up(note)}
+                            onPointerCancel={up(note)}
+                            onPointerLeave={leave(note)}
+                            className={`${WHITE_KEY} flex-1 ${
+                                heldNotes.includes(note)
+                                    ? "translate-y-0.5 bg-green-200 shadow-[0_0_14px_-3px] shadow-green-400 dark:bg-green-900"
+                                    : expected.includes(note)
+                                      ? "bg-indigo-50 dark:bg-indigo-950"
+                                      : "bg-white hover:bg-gray-50 dark:bg-gray-100"
+                            }`}
+                        >
+                            {fingers[note] ? (
+                                <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                                    {fingers[note]}
+                                </span>
+                            ) : null}
+                        </button>
+                    ))}
+                </div>
+                {blacks.map((note) => {
+                    const whitesBefore = whites.filter((white) => white < note).length;
+                    // A black key sits over the gap after its white neighbour. When the
+                    // range begins or ends on a black key it has no neighbour on one
+                    // side, so clamp it within [0, 100%] rather than letting it hang off
+                    // the edge.
+                    const width = whiteWidth * 0.6;
+                    const left = Math.min(
+                        Math.max(0, whitesBefore * whiteWidth - whiteWidth * 0.3),
+                        100 - width,
+                    );
+                    return (
+                        <button
+                            key={note}
+                            type="button"
+                            aria-label={noteName(note)}
+                            onPointerDown={down(note)}
+                            onPointerUp={up(note)}
+                            onPointerCancel={up(note)}
+                            onPointerLeave={leave(note)}
+                            className={`${BLACK_KEY} h-2/3 ${
+                                heldNotes.includes(note)
+                                    ? "translate-y-0.5 bg-green-500 shadow-[0_0_14px_-3px] shadow-green-500"
+                                    : expected.includes(note)
+                                      ? "bg-indigo-400"
+                                      : "bg-gray-900 hover:bg-gray-800"
+                            }`}
+                            style={{ left: `${left}%`, width: `${width}%` }}
+                        >
+                            {fingers[note] ? (
+                                <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-semibold text-white">
+                                    {fingers[note]}
+                                </span>
+                            ) : null}
+                        </button>
+                    );
+                })}
             </div>
-            {blacks.map((note) => {
-                const whitesBefore = whites.filter((white) => white < note).length;
-                // A black key sits over the gap after its white neighbour. When the
-                // range begins or ends on a black key it has no neighbour on one
-                // side, so clamp it within [0, 100%] rather than letting it hang off
-                // the edge.
-                const width = whiteWidth * 0.6;
-                const left = Math.min(
-                    Math.max(0, whitesBefore * whiteWidth - whiteWidth * 0.3),
-                    100 - width,
-                );
-                return (
-                    <button
-                        key={note}
-                        type="button"
-                        aria-label={noteName(note)}
-                        onPointerDown={down(note)}
-                        onPointerUp={up(note)}
-                        onPointerCancel={up(note)}
-                        onPointerLeave={leave(note)}
-                        className={`absolute top-0 h-16 rounded-b ${
-                            heldNotes.includes(note)
-                                ? "bg-indigo-500"
-                                : expected.includes(note)
-                                  ? "bg-indigo-400"
-                                  : "bg-gray-800"
-                        }`}
-                        style={{ left: `${left}%`, width: `${width}%` }}
-                    >
-                        {fingers[note] ? (
-                            <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-semibold text-white">
-                                {fingers[note]}
-                            </span>
-                        ) : null}
-                    </button>
-                );
-            })}
         </div>
     );
 }

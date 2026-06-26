@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useSynth } from "../hooks/useSynth";
 import { noteName } from "../lib/midi";
+import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
 // Pitch classes of the white keys; everything else is a black key.
 const WHITE_PITCH_CLASSES = [0, 2, 4, 5, 7, 9, 11];
@@ -54,7 +55,7 @@ export function HeroKeyboard() {
     };
 
     return (
-        <div className="mx-auto w-full max-w-md rounded-2xl bg-gray-200 p-3 shadow-inner dark:bg-gray-900">
+        <div className={`mx-auto w-full max-w-md ${KEYBED_WELL}`}>
             <div className="relative h-36 w-full touch-none select-none">
                 <div className="flex h-full w-full gap-px">
                     {WHITES.map((note, index) => (
@@ -65,7 +66,7 @@ export function HeroKeyboard() {
                             onPointerDown={onDown(note)}
                             onKeyDown={onKey(note)}
                             style={{ animationDelay: `${index * 45}ms` }}
-                            className={`relative flex-1 animate-key-rise rounded-b-lg border border-gray-300 shadow-sm transition-[transform,background-color,box-shadow] duration-150 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 motion-reduce:animate-none dark:border-gray-700 ${
+                            className={`${WHITE_KEY} flex-1 animate-key-rise motion-reduce:animate-none ${
                                 lit.has(note)
                                     ? "translate-y-0.5 bg-green-100 shadow-[0_0_18px_-2px] shadow-green-400 dark:bg-green-900"
                                     : "bg-white hover:bg-gray-50 dark:bg-gray-100 dark:hover:bg-white"
@@ -88,7 +89,7 @@ export function HeroKeyboard() {
                             onPointerDown={onDown(note)}
                             onKeyDown={onKey(note)}
                             style={{ left: `${left}%`, width: `${width}%` }}
-                            className={`absolute top-0 h-2/3 rounded-b-md transition-[transform,background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 ${
+                            className={`${BLACK_KEY} h-2/3 ${
                                 lit.has(note)
                                     ? "translate-y-0.5 bg-violet-500 shadow-[0_0_18px_-2px] shadow-violet-500"
                                     : "bg-gray-900 hover:bg-gray-800"
