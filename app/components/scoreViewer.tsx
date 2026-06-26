@@ -3,6 +3,7 @@
 
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
 import {
@@ -29,7 +30,8 @@ import {
     setBacklog,
 } from "../lib/mastery";
 import { loadPrefs } from "../lib/prefs";
-import { ghostReached, loadGhost, saveGhost } from "../lib/recording";
+import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
+import { SITE_URL } from "../lib/site";
 import { makeHit, summarize } from "../lib/rhythm";
 import { paintPlayedNotes } from "../lib/scoreColor";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
@@ -42,6 +44,7 @@ import {
     tempoSeries,
 } from "../lib/tempo";
 import { m } from "../paraglide/messages.js";
+import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
@@ -69,6 +72,7 @@ export function ScoreViewer({
     initialTempo,
     beatsPerBar,
     lockTempo,
+    canShareGhost,
 }: {
     id: string;
     xml: string;
@@ -88,6 +92,9 @@ export function ScoreViewer({
     // A throwaway piece, like a freshly generated sprint, that still counts toward
     // the streak and fingerprint but is never tracked for spaced repetition.
     ephemeral?: boolean;
+    // Bundled pieces have a stable id every player shares, so their ghost can be
+    // sent to a friend by link and loaded back via a ?ghost= code.
+    canShareGhost?: boolean;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
@@ -121,6 +128,11 @@ export function ScoreViewer({
     // — and how far that ghost has reached as the current run's clock elapses.
     const [ghost, setGhost] = useState<number[] | null>(null);
     const [ghostDone, setGhostDone] = useState(0);
+    // The ghost saved for this score (own last run, or a friend's loaded by link) —
+    // the source for the share link. Mirrors storage so the share button reacts.
+    const [storedGhost, setStoredGhost] = useState<number[] | null>(null);
+    const [sharedFromLink, setSharedFromLink] = useState(false);
+    const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
@@ -145,6 +157,25 @@ export function ScoreViewer({
     useEffect(() => {
         setMastery(ephemeral ? null : loadMastery(id));
     }, [id, ephemeral]);
+
+    const [searchParams] = useSearchParams();
+    // Adopt a ghost handed over by a ?ghost= link so the player can race a friend's
+    // run; otherwise the score's own stored ghost is the one to race and to re-share.
+    useEffect(() => {
+        if (!canShareGhost) {
+            setStoredGhost(null);
+            return;
+        }
+        const shared = decodeGhost(searchParams.get("ghost") ?? "");
+        if (shared) {
+            saveGhost(id, shared);
+            setStoredGhost(shared);
+            setSharedFromLink(true);
+        } else {
+            setStoredGhost(loadGhost(id));
+            setSharedFromLink(false);
+        }
+    }, [id, canShareGhost, searchParams]);
 
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
@@ -262,11 +293,11 @@ export function ScoreViewer({
         if (ephemeral) {
             return;
         }
-        // Keep the run as this score's ghost to race next time.
-        saveGhost(
-            id,
-            notes.map((note) => note.playedMs),
-        );
+        // Keep the run as this score's ghost to race (and share) next time.
+        const onsets = notes.map((note) => note.playedMs);
+        saveGhost(id, onsets);
+        setStoredGhost(onsets);
+        setSharedFromLink(false);
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const threshold = letterMin(loadPrefs().masteryThreshold);
@@ -288,6 +319,24 @@ export function ScoreViewer({
         saveMastery(id, updated);
         setMastery(updated);
         onMastery?.();
+    };
+
+    // Hand the score's ghost to a friend as a link they open to race it.
+    const shareGhost = async () => {
+        if (!storedGhost) {
+            return;
+        }
+        const url = `${SITE_URL}${localizeHref(`/play/${id}`)}?ghost=${encodeGhost(storedGhost)}`;
+        try {
+            if (typeof navigator.share === "function") {
+                await navigator.share({ url, text: m.ghost_share_boast({ title }) });
+            } else {
+                await navigator.clipboard?.writeText(url);
+                setShareStatus("copied");
+            }
+        } catch {
+            // A cancelled share or a blocked clipboard needs no message.
+        }
     };
 
     const stopListen = () => {
@@ -389,7 +438,7 @@ export function ScoreViewer({
         setShareGrid(null);
         setTempoCurve(null);
         setLiveTempo(tempo);
-        setGhost(ephemeral ? null : loadGhost(id));
+        setGhost(ephemeral ? null : (storedGhost ?? loadGhost(id)));
         setGhostDone(0);
         runTempoRef.current = tempo;
         // Suggest a fingering for the line being drilled — one hand at a time, or
@@ -591,6 +640,19 @@ export function ScoreViewer({
                     </button>
                 )}
             </div>
+
+            {canShareGhost && storedGhost && (
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                    {sharedFromLink && (
+                        <span className="text-gray-600 dark:text-gray-400">
+                            {m.ghost_shared_loaded()}
+                        </span>
+                    )}
+                    <button type="button" onClick={shareGhost} className={BUTTON}>
+                        {shareStatus === "copied" ? m.ghost_share_copied() : m.ghost_share()}
+                    </button>
+                </div>
+            )}
 
             {matcher.practicing && (
                 <div className="space-y-2">

@@ -109,6 +109,19 @@ describe("ScoreViewer", () => {
         expect(await screen.findByText(/👻/)).toBeTruthy();
     });
 
+    it("adopts a ghost from a link and offers to pass it on", async () => {
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        render(
+            <MemoryRouter initialEntries={["/play/t?ghost=0.500.1000"]}>
+                <MidiProvider>
+                    <ScoreViewer id="t" xml={phrase} title="T" beatsPerBar={4} canShareGhost />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        expect(await screen.findByText(/racing a shared ghost/i)).toBeTruthy();
+        expect(screen.getByText(/Challenge a friend/)).toBeTruthy();
+    });
+
     it("offers a hands-separate selector only for a grand staff", async () => {
         const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         mount(grand, { beatsPerBar: 4 });

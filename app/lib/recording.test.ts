@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
-import { ghostReached, loadGhost, saveGhost } from "./recording";
+import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "./recording";
 
 afterEach(() => localStorage.clear());
 
@@ -17,6 +17,17 @@ describe("recording", () => {
     it("rejects malformed stored data", () => {
         localStorage.setItem("plinky:ghost:x", JSON.stringify({ not: "an array" }));
         expect(loadGhost("x")).toBeNull();
+    });
+
+    it("encodes a ghost to a compact code and back", () => {
+        expect(encodeGhost([0, 499.6, 1000])).toBe("0.500.1000");
+        expect(decodeGhost("0.500.1000")).toEqual([0, 500, 1000]);
+    });
+
+    it("rejects a malformed or out-of-order shared code", () => {
+        expect(decodeGhost("")).toBeNull();
+        expect(decodeGhost("0.nope.1000")).toBeNull();
+        expect(decodeGhost("0.1000.500")).toBeNull();
     });
 
     it("counts the notes a ghost has reached by an elapsed time", () => {

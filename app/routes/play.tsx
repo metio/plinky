@@ -56,6 +56,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         title={score.title}
                         initialTempo={score.tempo}
                         beatsPerBar={score.beatsPerBar}
+                        canShareGhost
                     />
                 </>
             )}

@@ -31,6 +31,29 @@ export function loadGhost(scoreId: string): number[] | null {
     }
 }
 
+// A ghost packed for a URL — onset ms rounded and joined with dots, so it stays
+// short and needs no escaping. `12.500.1000` rather than a JSON-and-base64 blob.
+export function encodeGhost(onsets: number[]): string {
+    return onsets.map((onset) => Math.round(onset)).join(".");
+}
+
+// Parse a shared ghost, rejecting anything that isn't a run of ascending numbers.
+export function decodeGhost(code: string): number[] | null {
+    if (!code) {
+        return null;
+    }
+    const onsets = code.split(".").map(Number);
+    if (onsets.some((onset) => !Number.isFinite(onset))) {
+        return null;
+    }
+    for (let i = 1; i < onsets.length; i++) {
+        if (onsets[i]! < onsets[i - 1]!) {
+            return null;
+        }
+    }
+    return onsets;
+}
+
 // How many notes the ghost has reached by a given elapsed time. The onsets ascend,
 // so the first one still in the future ends the count.
 export function ghostReached(onsets: number[], elapsedMs: number): number {
