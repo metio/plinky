@@ -14,7 +14,10 @@ export type DailyStreak = { last: number; streak: number; best: number };
 const EMPTY: DailyStreak = { last: 0, streak: 0, best: 0 };
 
 function clean(value: unknown): number {
-    return typeof value === "number" && Number.isFinite(value) && value >= 0 ? Math.floor(value) : 0;
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+        return 0;
+    }
+    return Math.floor(value);
 }
 
 function load(): DailyStreak {
