@@ -16,6 +16,7 @@ import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import { fingerSteps } from "../lib/fingering";
 import { computeFlow } from "../lib/flow";
+import { recordDailyDone } from "../lib/dailyStreak";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
 import { recordRun } from "../lib/lifetime";
@@ -153,6 +154,7 @@ export function ScoreViewer({
     const [grade, setGrade] = useState<Grade | null>(null);
     const [runNotes, setRunNotes] = useState<RunNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
+    const [dailyStreak, setDailyStreak] = useState(0);
     const [tempoCurve, setTempoCurve] = useState<{
         points: TempoPoint[];
         median: number;
@@ -337,6 +339,11 @@ export function ScoreViewer({
         );
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
+        // A finished daily extends the Wordle-style daily streak (before the practice
+        // record fires PRACTICE_EVENT, so listeners read the updated streak).
+        if (daily != null) {
+            setDailyStreak(recordDailyDone(daily).streak);
+        }
         // Count the run's notes toward the practice streak.
         recordPractice(matcher.total);
         if (ephemeral) {
@@ -354,7 +361,7 @@ export function ScoreViewer({
         saveMastery(id, updated);
         setMastery(updated);
         onMastery?.();
-    }, [matcher.complete, matcher.total, matcher.wrong, id, onMastery, ephemeral]);
+    }, [matcher.complete, matcher.total, matcher.wrong, id, onMastery, ephemeral, daily]);
 
     const markLearnedNow = () => {
         const updated = markLearned(loadMastery(id), Date.now());
@@ -803,10 +810,14 @@ export function ScoreViewer({
                             rowLabels={[m.scores_accuracy(), m.scores_timing(), m.scores_flow()]}
                             boast={
                                 daily != null
-                                    ? m.daily_share_boast({ number: daily, grade: grade.letter })
+                                    ? `${m.daily_share_boast({ number: daily, grade: grade.letter })}${dailyStreak > 1 ? ` · 🔥${dailyStreak}` : ""}`
                                     : m.share_boast({ title })
                             }
-                            heading={daily != null ? `🎹 Plinky #${daily} ${grade.letter}` : title}
+                            heading={
+                                daily != null
+                                    ? `🎹 Plinky #${daily} ${grade.letter}${dailyStreak > 1 ? ` · 🔥${dailyStreak}` : ""}`
+                                    : title
+                            }
                         />
                     )}
                 </div>

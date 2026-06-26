@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { dailyChallenge, dailyNumber, todayKey } from "../lib/daily";
+import { currentDailyStreak } from "../lib/dailyStreak";
 import { generatePhrase } from "../lib/generator";
+import { PRACTICE_EVENT } from "../lib/history";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/daily";
@@ -26,6 +28,7 @@ const TAB_OFF = `${TAB} border border-gray-300 text-gray-700 dark:border-gray-70
 
 export default function DailyRoute() {
     const [today, setToday] = useState<Today | null>(null);
+    const [streak, setStreak] = useState(0);
     const [mode, setMode] = useState<"challenge" | "warmup">("challenge");
 
     // Warm-up (the old sprint): a fresh generated phrase each run; bumping the
@@ -39,6 +42,12 @@ export default function DailyRoute() {
         const number = dailyNumber(dateKey);
         const { tempo, xml } = dailyChallenge(dateKey, number);
         setToday({ number, tempo, xml });
+        // The streak refreshes when a run finishes (PRACTICE_EVENT) so completing
+        // today's challenge bumps the count without a reload.
+        const read = () => setStreak(currentDailyStreak(number));
+        read();
+        window.addEventListener(PRACTICE_EVENT, read);
+        return () => window.removeEventListener(PRACTICE_EVENT, read);
     }, []);
 
     const regenerate = (hands: boolean) => {
@@ -64,6 +73,11 @@ export default function DailyRoute() {
                 <h1 className="text-2xl font-semibold">
                     {today ? `🎹 Plinky #${today.number}` : "🎹 Plinky #…"}
                 </h1>
+                {streak > 0 && (
+                    <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                        {m.daily_streak({ count: streak })}
+                    </p>
+                )}
             </header>
 
             <fieldset aria-label={m.daily_mode_label()} className="flex gap-2">
