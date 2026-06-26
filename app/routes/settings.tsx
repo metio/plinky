@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { HandSize } from "../components/handSize";
 import { LanguageSwitcher } from "../components/languageSwitcher";
-import { MidiDebugPanel } from "../components/midiDebugPanel";
+import { MidiConnect } from "../components/midiConnect";
 import { ScoreBackup } from "../components/scoreBackup";
 import { ThemeToggle } from "../components/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
@@ -123,18 +123,25 @@ export default function Settings() {
                         ))}
                     </select>
                 </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {m.settings_mastery_help()}
+                </p>
             </section>
 
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                <input
-                    type="checkbox"
-                    checked={prefs.showFingerings}
-                    onChange={(event) => update({ showFingerings: event.target.checked })}
-                />
-                {m.settings_show_fingerings()}
-            </label>
-
-            <HandSize />
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.settings_fingering()}
+                </h2>
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <input
+                        type="checkbox"
+                        checked={prefs.showFingerings}
+                        onChange={(event) => update({ showFingerings: event.target.checked })}
+                    />
+                    {m.settings_show_fingerings()}
+                </label>
+                <HandSize />
+            </section>
 
             <ScoreBackup />
 
@@ -143,9 +150,9 @@ export default function Settings() {
             {midiSupport !== "unsupported" && (
                 <section className="space-y-3">
                     <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {m.settings_midi_device()}
+                        {m.settings_connect_midi()}
                     </h2>
-                    <MidiDebugPanel />
+                    <MidiConnect />
                 </section>
             )}
 

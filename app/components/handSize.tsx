@@ -77,9 +77,9 @@ export function HandSize() {
     return (
         <section className="space-y-3">
             <div>
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <h3 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.settings_hand_size()}
-                </h2>
+                </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                     {m.settings_hand_size_hint()}
                 </p>
