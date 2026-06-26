@@ -9,22 +9,26 @@ import { useEffect, useRef } from "react";
 // and is large, so it loads on the client only; nothing renders during prerender.
 export function StaffPreview({ xml, label }: { xml: string; label: string }) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
 
     useEffect(() => {
         let cancelled = false;
-        let osmd: OpenSheetMusicDisplay | undefined;
         import("opensheetmusicdisplay")
             .then(({ OpenSheetMusicDisplay }) => {
                 if (cancelled || !containerRef.current) {
                     return;
                 }
-                osmd = new OpenSheetMusicDisplay(containerRef.current, {
+                // Reuse one instance and reload it on each drill. A fresh instance per
+                // render leaves the previous staff in the container and draws the new
+                // one beneath it, so the staves pile up as the drill changes.
+                osmdRef.current ??= new OpenSheetMusicDisplay(containerRef.current, {
                     autoResize: true,
                     drawingParameters: "compact",
                 });
+                const osmd = osmdRef.current;
                 return osmd.load(xml).then(() => {
                     if (!cancelled) {
-                        osmd?.render();
+                        osmd.render();
                     }
                 });
             })
@@ -33,9 +37,11 @@ export function StaffPreview({ xml, label }: { xml: string; label: string }) {
             .catch(() => {});
         return () => {
             cancelled = true;
-            osmd?.clear();
         };
     }, [xml]);
+
+    // Release OSMD (and its resize listener) when the preview unmounts.
+    useEffect(() => () => osmdRef.current?.clear(), []);
 
     return (
         <div
