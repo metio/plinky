@@ -58,9 +58,13 @@ describe("ScoreBackup", () => {
         // The first pick reads slowly; the second resolves first. The status must
         // reflect the newer pick, and the stale read must not clobber it.
         let releaseSlow = () => {};
-        const slow = { name: "a.json", text: () => new Promise<string>((r) => {
-            releaseSlow = () => r(pack(1));
-        }) };
+        const slow = {
+            name: "a.json",
+            text: () =>
+                new Promise<string>((r) => {
+                    releaseSlow = () => r(pack(1));
+                }),
+        };
         const fast = { name: "b.json", text: () => Promise.resolve(pack(3)) };
 
         const input = fileInput(container);
