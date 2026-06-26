@@ -55,6 +55,26 @@ describe("ScoreViewer", () => {
         expect(button.getAttribute("aria-pressed")).toBe("false");
     });
 
+    it("reveals the adaptive toggle only while the metronome is on", async () => {
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <ScoreViewer id="a" xml="this is not MusicXML" title="A" />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        const metronome = await screen.findByText(/Metronome/);
+        expect(screen.queryByText("Adaptive")).toBeNull();
+        fireEvent.click(metronome);
+        const adaptive = screen.getByText("Adaptive");
+        expect(adaptive.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(adaptive);
+        expect(adaptive.getAttribute("aria-pressed")).toBe("true");
+        // Turning the metronome off hides the adaptive control again.
+        fireEvent.click(metronome);
+        expect(screen.queryByText("Adaptive")).toBeNull();
+    });
+
     it("offers a hands-separate selector only for a grand staff", async () => {
         const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         mount(grand, { beatsPerBar: 4 });

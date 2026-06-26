@@ -31,7 +31,14 @@ import {
 import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
-import { findHotspots, type Hotspot, median, type TempoPoint, tempoSeries } from "../lib/tempo";
+import {
+    findHotspots,
+    type Hotspot,
+    instantaneousBpm,
+    median,
+    type TempoPoint,
+    tempoSeries,
+} from "../lib/tempo";
 import { m } from "../paraglide/messages.js";
 import { Bpm } from "./bpm";
 import { PerformanceStrip } from "./performanceStrip";
@@ -95,6 +102,10 @@ export function ScoreViewer({
     const [loadError, setLoadError] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [metronomeOn, setMetronomeOn] = useState(false);
+    // An adaptive metronome follows the player's own tempo, read live from their
+    // note timing, instead of ticking at the fixed slider speed.
+    const [adaptive, setAdaptive] = useState(false);
+    const [liveTempo, setLiveTempo] = useState(initialTempo ?? 100);
     const [tempo, setTempo] = useState(initialTempo ?? 100);
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
@@ -105,8 +116,9 @@ export function ScoreViewer({
     const [fingerPlan, setFingerPlan] = useState<number[] | null>(null);
     const [fingeringHand, setFingeringHand] = useState<"left" | "right" | null>(null);
 
-    // A classic metronome at the chosen tempo, on demand — play along with it.
-    useMetronome(metronomeOn, tempo, beatsPerBar ?? 4);
+    // A metronome on demand: fixed at the chosen tempo, or following the player's
+    // own pace when adaptive.
+    useMetronome(metronomeOn, adaptive ? liveTempo : tempo, beatsPerBar ?? 4);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [runNotes, setRunNotes] = useState<RunNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
@@ -148,6 +160,26 @@ export function ScoreViewer({
                     velocity: info.velocity,
                 },
             ];
+            // Track the player's tempo from the gap to the previous note and ease
+            // the adaptive metronome toward it, so a single rushed note nudges
+            // rather than jerks the pulse. Clamped to the slider's own range.
+            const played = notesRef.current;
+            if (played.length >= 2) {
+                const a = played[played.length - 2];
+                const b = played[played.length - 1];
+                if (a && b) {
+                    const inst = instantaneousBpm(
+                        runTempoRef.current,
+                        b.targetMs - a.targetMs,
+                        b.playedMs - a.playedMs,
+                    );
+                    if (inst > 0 && Number.isFinite(inst)) {
+                        setLiveTempo((prev) =>
+                            Math.round(Math.min(180, Math.max(40, prev * 0.6 + inst * 0.4))),
+                        );
+                    }
+                }
+            }
         },
     });
     useMidiInput({
@@ -319,6 +351,7 @@ export function ScoreViewer({
         setRunNotes([]);
         setShareGrid(null);
         setTempoCurve(null);
+        setLiveTempo(tempo);
         runTempoRef.current = tempo;
         // Suggest a fingering for the line being drilled — one hand at a time, or
         // the single staff. With both hands on a grand staff there are two lines on
@@ -415,6 +448,28 @@ export function ScoreViewer({
                 >
                     {m.action_metronome()}
                 </button>
+                {metronomeOn && (
+                    <span className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setAdaptive((on) => !on)}
+                            aria-pressed={adaptive}
+                            className={
+                                adaptive
+                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                    : BUTTON
+                            }
+                        >
+                            {m.metronome_adaptive()}
+                        </button>
+                        {adaptive && (
+                            <Bpm
+                                tempo={liveTempo}
+                                className="text-sm text-gray-600 dark:text-gray-400"
+                            />
+                        )}
+                    </span>
+                )}
                 {staffCount >= 2 && (
                     <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
                         {(["both", "right", "left"] as const).map((option) => (

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getAudioContext } from "../lib/audio";
 import { loadPrefs } from "../lib/prefs";
 
@@ -10,7 +10,13 @@ import { loadPrefs } from "../lib/prefs";
 // from a short polling loop (the standard Web Audio lookahead pattern), so the
 // pulse stays steady where a bare setInterval would drift. Honours the sound and
 // volume preferences, re-read each beat so muting takes effect immediately.
+// The tempo is read live from a ref when each beat is queued, so an adaptive
+// tempo that drifts with the player adjusts the spacing of the *next* beat
+// without restarting the loop (which would reset the pulse and bunch clicks).
 export function useMetronome(enabled: boolean, bpm: number, beatsPerBar: number): void {
+    const bpmRef = useRef(bpm);
+    bpmRef.current = bpm;
+
     useEffect(() => {
         if (!enabled) {
             return;
@@ -21,7 +27,6 @@ export function useMetronome(enabled: boolean, bpm: number, beatsPerBar: number)
         }
         ctx.resume().catch(() => {});
 
-        const secondsPerBeat = 60 / Math.max(1, bpm);
         const beatsInBar = Math.max(1, beatsPerBar);
         let beat = 0;
         let next = ctx.currentTime + 0.1;
@@ -46,16 +51,17 @@ export function useMetronome(enabled: boolean, bpm: number, beatsPerBar: number)
             osc.stop(time + 0.06);
         };
 
-        // Queue every beat that falls inside the next lookahead window.
+        // Queue every beat that falls inside the next lookahead window, spacing
+        // each from the tempo current at the moment it is queued.
         const schedule = () => {
             while (next < ctx.currentTime + 0.12) {
                 click(next, beat % beatsInBar === 0);
                 beat += 1;
-                next += secondsPerBeat;
+                next += 60 / Math.max(1, bpmRef.current);
             }
         };
         schedule();
         const timer = window.setInterval(schedule, 25);
         return () => window.clearInterval(timer);
-    }, [enabled, bpm, beatsPerBar]);
+    }, [enabled, beatsPerBar]);
 }
