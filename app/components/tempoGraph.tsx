@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Hotspot, TempoPoint } from "../lib/tempo";
+import { m } from "../paraglide/messages.js";
 
 const WIDTH = 600;
 const HEIGHT = 180;
@@ -60,7 +61,7 @@ export function TempoGraph({
             viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
             className="w-full"
             role="img"
-            aria-label="Tempo over time"
+            aria-label={m.tempo_graph_label()}
         >
             {hotspots.map((hotspot) => {
                 // Pad the band a half-step beyond its end notes, but keep it inside
@@ -89,7 +90,7 @@ export function TempoGraph({
                 strokeDasharray="4 4"
             />
             <text x={PAD.left} y={yFor(median) - 4} fill="#9ca3af" fontSize="10">
-                median {Math.round(median)}
+                {m.tempo_graph_median({ bpm: Math.round(median) })}
             </text>
 
             <text x={4} y={yFor(yHi) + 9} fill="#9ca3af" fontSize="10">

@@ -25,11 +25,13 @@ import {
 import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
+import { findHotspots, type Hotspot, median, type TempoPoint, tempoSeries } from "../lib/tempo";
 import { m } from "../paraglide/messages.js";
 import { Bpm } from "./bpm";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { ShareCard } from "./shareCard";
+import { TempoGraph } from "./tempoGraph";
 
 // A cleared note plus the velocity it was played at — the run's raw record, from
 // which the grade, the per-note strip and the share grid are all derived.
@@ -94,7 +96,16 @@ export function ScoreViewer({
     const [grade, setGrade] = useState<Grade | null>(null);
     const [runNotes, setRunNotes] = useState<RunNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
+    const [tempoCurve, setTempoCurve] = useState<{
+        points: TempoPoint[];
+        median: number;
+        hotspots: Hotspot[];
+    } | null>(null);
     const [mastery, setMastery] = useState<Mastery | null>(null);
+    // The tempo a run was matched at, captured when practice starts so the run's
+    // self-paced tempo curve reads against the same reference the matcher used,
+    // even if the slider is moved afterwards.
+    const runTempoRef = useRef(initialTempo ?? 100);
 
     useEffect(() => {
         setMastery(ephemeral ? null : loadMastery(id));
@@ -155,6 +166,17 @@ export function ScoreViewer({
         setGrade(result);
         setRunNotes(notes);
         setShareGrid(gridFor(notes));
+        // Read the player's own tempo back out of the gaps between their notes, so
+        // the results show where they sped up or dragged against their own pace.
+        const points = tempoSeries(
+            runTempoRef.current,
+            notes.map((note) => note.targetMs),
+            notes.map((note) => note.playedMs),
+        );
+        const med = median(points.map((point) => point.bpm));
+        setTempoCurve(
+            points.length > 0 ? { points, median: med, hotspots: findHotspots(points, med) } : null,
+        );
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
         // Count the run's notes toward the practice streak.
@@ -276,6 +298,8 @@ export function ScoreViewer({
         setGrade(null);
         setRunNotes([]);
         setShareGrid(null);
+        setTempoCurve(null);
+        runTempoRef.current = tempo;
         matcher.start();
     };
 
@@ -442,6 +466,18 @@ export function ScoreViewer({
                         </dl>
                     </div>
                     <PerformanceStrip notes={runNotes} />
+                    {tempoCurve && (
+                        <section className="space-y-1">
+                            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                {m.tempo_heading()}
+                            </h3>
+                            <TempoGraph
+                                points={tempoCurve.points}
+                                median={tempoCurve.median}
+                                hotspots={tempoCurve.hotspots}
+                            />
+                        </section>
+                    )}
                     {shareGrid && (
                         <ShareCard
                             grid={shareGrid}
