@@ -88,9 +88,7 @@ export default function Settings() {
                         max={100}
                         value={prefs.volume}
                         disabled={!prefs.sound}
-                        onChange={(event) =>
-                            update({ volume: Number(event.target.value) })
-                        }
+                        onChange={(event) => update({ volume: Number(event.target.value) })}
                     />
                     <span className="w-8 font-mono text-sm tabular-nums">{prefs.volume}</span>
                     <button
