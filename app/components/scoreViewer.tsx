@@ -26,6 +26,7 @@ import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
+import { Bpm } from "./bpm";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { ShareCard } from "./shareCard";
@@ -337,7 +338,7 @@ export function ScoreViewer({
                 {lockTempo ? (
                     <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         {m.scores_tempo()}
-                        <span className="font-mono tabular-nums">{m.home_bpm({ tempo })}</span>
+                        <Bpm tempo={tempo} />
                     </span>
                 ) : (
                     <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -350,7 +351,7 @@ export function ScoreViewer({
                             onChange={(event) => setTempo(Number(event.target.value))}
                             aria-label={m.scores_tempo()}
                         />
-                        <span className="w-12 font-mono tabular-nums">{m.home_bpm({ tempo })}</span>
+                        <Bpm tempo={tempo} className="w-12" />
                     </label>
                 )}
             </div>

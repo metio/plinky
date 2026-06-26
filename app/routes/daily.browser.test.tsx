@@ -69,7 +69,7 @@ describe("Daily", () => {
         );
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
         // The tempo is shown but fixed — no slider to dial it to taste.
-        expect(screen.getByText(/\d+ bpm/)).toBeTruthy();
+        expect(screen.getByText(/\d+ BPM/)).toBeTruthy();
         expect(document.querySelector('input[type="range"]')).toBeNull();
     });
 });
