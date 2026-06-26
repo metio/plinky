@@ -23,7 +23,7 @@ RUN apt-get update \
 # reuse: the licensing linter the CI reuse job runs (fsfe/reuse-action). The
 # Debian package predates REUSE.toml, so install the current release from PyPI.
 # renovate: datasource=pypi depName=reuse
-ARG REUSE_VERSION=5.0.2
+ARG REUSE_VERSION=5.1.1
 RUN pip install --break-system-packages --no-cache-dir "reuse==${REUSE_VERSION}"
 
 # markdownlint-cli2 mirrors the DavidAnson/markdownlint-cli2-action in verify.yml,
