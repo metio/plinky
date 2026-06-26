@@ -147,6 +147,7 @@
   "ghost_ahead": "ahead!",
   "ghost_behind": "behind",
   "ghost_tied": "neck and neck",
+  "ghost_track_label": "Race: you at note {you} of {total}, ghost at note {ghost}",
   "ghost_share": "Challenge a friend 👻",
   "ghost_share_copied": "Link copied!",
   "ghost_share_boast": "Race my run on {title}!",

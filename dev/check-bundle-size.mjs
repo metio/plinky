@@ -18,8 +18,8 @@ const VENDOR = /opensheetmusicdisplay/;
 
 // Tracks the app budget plus the fixed OSMD vendor chunk; raised alongside the app one.
 const BUDGET_TOTAL_KB = 585;
-// Headroom for the always-loaded header badges (streak + grade); still a tight ratchet.
-const BUDGET_APP_KB = 272;
+// Headroom for the header badges and the on-staff ghost race; still a tight ratchet.
+const BUDGET_APP_KB = 274;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

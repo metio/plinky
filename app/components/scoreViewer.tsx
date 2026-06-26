@@ -33,7 +33,14 @@ import { loadPrefs } from "../lib/prefs";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import { SITE_URL } from "../lib/site";
 import { makeHit, summarize } from "../lib/rhythm";
-import { paintPlayedNotes } from "../lib/scoreColor";
+import {
+    collectNoteElements,
+    GHOST_COLOR,
+    NOTE_COLOR,
+    paintElement,
+    paintPlayedNotes,
+    PLAYED_COLOR,
+} from "../lib/scoreColor";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import {
     findHotspots,
@@ -46,6 +53,7 @@ import {
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
+import { GhostTrack } from "./ghostTrack";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { ShareCard } from "./shareCard";
@@ -128,6 +136,11 @@ export function ScoreViewer({
     // — and how far that ghost has reached as the current run's clock elapses.
     const [ghost, setGhost] = useState<number[] | null>(null);
     const [ghostDone, setGhostDone] = useState(0);
+    // The rendered note groups per step, captured when a race starts, and which
+    // step currently wears the ghost's colour — so the marker can move along the
+    // staff and be restored as it leaves each note.
+    const ghostNotesRef = useRef<SVGGElement[][]>([]);
+    const ghostMarkRef = useRef(-1);
     // The ghost saved for this score (own last run, or a friend's loaded by link) —
     // the source for the share link. Mirrors storage so the share button reacts.
     const [storedGhost, setStoredGhost] = useState<number[] | null>(null);
@@ -253,6 +266,42 @@ export function ScoreViewer({
         const timer = window.setInterval(tick, 50);
         return () => window.clearInterval(timer);
     }, [matcher.practicing, ghost]);
+
+    // Move the ghost's colour onto the note it has currently reached, restoring the
+    // one it leaves to green if the player has already played it there, else black.
+    // Captured note groups outlive a render, so this paints the real staff.
+    useEffect(() => {
+        const steps = ghostNotesRef.current;
+        if (steps.length === 0) {
+            return;
+        }
+        const restore = (step: number) => {
+            const base = matcher.done > step ? PLAYED_COLOR : NOTE_COLOR;
+            for (const element of steps[step] ?? []) {
+                paintElement(element, base);
+            }
+        };
+        const previous = ghostMarkRef.current;
+        // Off the staff once the race is over or paused.
+        if (!ghost || !matcher.practicing || matcher.complete) {
+            if (previous >= 0) {
+                restore(previous);
+                ghostMarkRef.current = -1;
+            }
+            return;
+        }
+        const target = Math.min(ghostDone, steps.length - 1);
+        if (target === previous) {
+            return;
+        }
+        if (previous >= 0) {
+            restore(previous);
+        }
+        for (const element of steps[target] ?? []) {
+            paintElement(element, GHOST_COLOR);
+        }
+        ghostMarkRef.current = target;
+    }, [ghostDone, ghost, matcher.practicing, matcher.complete, matcher.done]);
 
     // Grade a run once it completes, from the captured timing and velocity. A run
     // with no real velocity variation (the computer keyboard) is graded without
@@ -438,20 +487,21 @@ export function ScoreViewer({
         setShareGrid(null);
         setTempoCurve(null);
         setLiveTempo(tempo);
-        setGhost(ephemeral ? null : (storedGhost ?? loadGhost(id)));
+        const racing = ephemeral ? null : (storedGhost ?? loadGhost(id));
+        setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;
         // Suggest a fingering for the line being drilled — one hand at a time, or
         // the single staff. With both hands on a grand staff there are two lines on
         // one keyboard, so no single finger fits a key; skip the hint there.
         const osmd = osmdRef.current;
+        const matcherHand: Hand = staffCount < 2 ? "both" : hand;
         // No hints when the player has turned them off to work fingerings out alone.
         let fingerFor: "left" | "right" | null = null;
         if (osmd && loadPrefs().showFingerings) {
             fingerFor = staffCount < 2 ? "right" : hand === "both" ? null : hand;
         }
         if (osmd && fingerFor) {
-            const matcherHand: Hand = staffCount < 2 ? "both" : hand;
             const steps = collectSteps(osmd, matcherHand).map((pitches) => ({ pitches }));
             // Personalize the suggestion to the player's measured reach, if set.
             const span = loadPrefs().handSpan[fingerFor] ?? undefined;
@@ -466,6 +516,10 @@ export function ScoreViewer({
             osmd?.render();
             paintedRef.current = false;
         }
+        // Capture each step's rendered notes (post-render) so the ghost's colour can
+        // mark, and move along, the actual notes on the staff as it races.
+        ghostMarkRef.current = -1;
+        ghostNotesRef.current = racing && osmd ? collectNoteElements(osmd, matcherHand) : [];
         matcher.start();
     };
 
@@ -657,28 +711,8 @@ export function ScoreViewer({
             {matcher.practicing && (
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span className="flex items-center gap-3">
-                            <span className="text-gray-600 dark:text-gray-400">
-                                {m.play_progress()} {matcher.done} / {matcher.total}
-                            </span>
-                            {ghost && (
-                                <span
-                                    className={
-                                        matcher.done > ghostDone
-                                            ? "font-medium text-green-700 dark:text-green-400"
-                                            : matcher.done < ghostDone
-                                              ? "font-medium text-red-600 dark:text-red-400"
-                                              : "text-gray-600 dark:text-gray-400"
-                                    }
-                                >
-                                    {m.ghost_race({ ghost: ghostDone })}{" "}
-                                    {matcher.done > ghostDone
-                                        ? m.ghost_ahead()
-                                        : matcher.done < ghostDone
-                                          ? m.ghost_behind()
-                                          : m.ghost_tied()}
-                                </span>
-                            )}
+                        <span className="text-gray-600 dark:text-gray-400">
+                            {m.play_progress()} {matcher.done} / {matcher.total}
                         </span>
                         {!connected && support === "supported" && (
                             <button
@@ -690,6 +724,9 @@ export function ScoreViewer({
                             </button>
                         )}
                     </div>
+                    {ghost && (
+                        <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
+                    )}
                     <PianoKeyboard
                         expected={matcher.expected}
                         from={matcher.range?.from}

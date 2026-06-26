@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { generatePhrase } from "../lib/generator";
 import { saveGhost } from "../lib/recording";
-import { PLAYED_COLOR } from "../lib/scoreColor";
+import { GHOST_COLOR, PLAYED_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
 
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
@@ -106,7 +106,13 @@ describe("ScoreViewer", () => {
         const { container } = mount(phrase, { beatsPerBar: 4 });
         await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
         fireEvent.click(await screen.findByText(/Practice/));
-        expect(await screen.findByText(/👻/)).toBeTruthy();
+        // The race track appears...
+        expect(await screen.findByRole("img", { name: /race/i })).toBeTruthy();
+        // ...and the ghost colours its current note on the rendered staff.
+        await waitFor(
+            () => expect(container.querySelector(`[fill="${GHOST_COLOR}"]`)).toBeTruthy(),
+            { timeout: 4000 },
+        );
     });
 
     it("adopts a ghost from a link and offers to pass it on", async () => {
