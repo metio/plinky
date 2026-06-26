@@ -4,9 +4,8 @@
       "staticDistDir": "./build/client",
       "url": [
         "http://localhost/en/",
-        "http://localhost/en/scores/",
+        "http://localhost/en/library/",
         "http://localhost/en/tracks/",
-        "http://localhost/en/curriculums/",
         "http://localhost/en/progress/",
         "http://localhost/en/settings/"
       ],
