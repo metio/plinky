@@ -1,0 +1,89 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { fingerPositions } from "./fingering";
+import type { HandSpan } from "./prefs";
+
+// Suggested fingering belongs on the staff, the way printed music carries it —
+// tied to the note you read, not mapped onto a key. This annotates a score's
+// MusicXML with <technical><fingering> per note, computed per hand from the
+// fingering cost model and personalised to the player's reach, for OSMD to print.
+
+const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+function midiOf(note: Element): number | null {
+    const pitch = note.querySelector("pitch");
+    if (!pitch) {
+        return null; // a rest or unpitched note has no finger
+    }
+    const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
+    const semitone = STEP_SEMITONES[step];
+    if (semitone === undefined) {
+        return null;
+    }
+    const octave = Number(pitch.querySelector("octave")?.textContent ?? "4");
+    const alter = Number(pitch.querySelector("alter")?.textContent ?? "0");
+    return (octave + 1) * 12 + semitone + alter;
+}
+
+type Bucket = { pitches: number[][]; notes: Element[][] };
+
+function inject(doc: Document, note: Element, finger: number): void {
+    const notations = doc.createElement("notations");
+    const technical = doc.createElement("technical");
+    const fingering = doc.createElement("fingering");
+    fingering.textContent = String(finger);
+    technical.appendChild(fingering);
+    notations.appendChild(technical);
+    note.appendChild(notations);
+}
+
+export function annotateFingerings(xml: string, span: HandSpan): string {
+    let doc: Document;
+    try {
+        doc = new DOMParser().parseFromString(xml, "application/xml");
+    } catch {
+        return xml;
+    }
+    if (doc.querySelector("parsererror")) {
+        return xml;
+    }
+    // Group each staff's notes into positions (a chord shares one), staff 1 the
+    // right hand and staff 2 the left, keeping a parallel handle on the elements so
+    // each note's finger can be written back onto it.
+    const staves = new Map<string, Bucket>();
+    for (const note of doc.querySelectorAll("note")) {
+        const midi = midiOf(note);
+        if (midi === null) {
+            continue;
+        }
+        const staff = note.querySelector("staff")?.textContent?.trim() === "2" ? "2" : "1";
+        let bucket = staves.get(staff);
+        if (!bucket) {
+            bucket = { pitches: [], notes: [] };
+            staves.set(staff, bucket);
+        }
+        const last = bucket.pitches.length - 1;
+        if (note.querySelector("chord") && last >= 0) {
+            bucket.pitches[last]?.push(midi);
+            bucket.notes[last]?.push(note);
+        } else {
+            bucket.pitches.push([midi]);
+            bucket.notes.push([note]);
+        }
+    }
+
+    for (const [staff, bucket] of staves) {
+        const hand = staff === "2" ? "left" : "right";
+        const fingers = fingerPositions(bucket.pitches, hand, span[hand] ?? undefined);
+        bucket.notes.forEach((position, p) => {
+            position.forEach((note, i) => {
+                const finger = fingers[p]?.[i];
+                if (finger) {
+                    inject(doc, note, finger);
+                }
+            });
+        });
+    }
+    return new XMLSerializer().serializeToString(doc);
+}

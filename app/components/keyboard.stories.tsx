@@ -30,7 +30,3 @@ export const HeldKeys: Story = {
 export const WrongFlash: Story = {
     args: { wrong: { note: 62, seq: 1 } },
 };
-
-export const Fingerings: Story = {
-    args: { fingers: { 60: 1, 62: 2, 64: 3, 65: 4, 67: 5 } },
-};

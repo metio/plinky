@@ -25,7 +25,6 @@ export function Keyboard({
     lit = NONE,
     expected = [],
     wrong = null,
-    fingers = {},
     rise = false,
     well = "mx-auto w-full max-w-xl",
     onPress,
@@ -37,8 +36,6 @@ export function Keyboard({
     expected?: number[];
     // The last wrong note plus a bump counter, so a repeated miss re-flashes.
     wrong?: { note: number; seq: number } | null;
-    // Suggested finger (1–5) per pitch, shown on the key it belongs to.
-    fingers?: Record<number, number>;
     // The landing hero's one-time key-rise on load; off everywhere else.
     rise?: boolean;
     // The keybed's width and centring; defaults to a centred, capped instrument.
@@ -119,13 +116,7 @@ export function Keyboard({
                             onKeyDown={press(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
                             className={`${WHITE_KEY} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
-                        >
-                            {fingers[note] ? (
-                                <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                                    {fingers[note]}
-                                </span>
-                            ) : null}
-                        </button>
+                        />
                     ))}
                 </div>
                 {blacks.map((note) => {
@@ -150,13 +141,7 @@ export function Keyboard({
                             onKeyDown={press(note)}
                             style={{ left: `${left}%`, width: `${width}%` }}
                             className={`${BLACK_KEY} h-2/3 ${blackState(note)}`}
-                        >
-                            {fingers[note] ? (
-                                <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-semibold text-white">
-                                    {fingers[note]}
-                                </span>
-                            ) : null}
-                        </button>
+                        />
                     );
                 })}
             </div>

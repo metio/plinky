@@ -12,13 +12,11 @@ export function PianoKeyboard({
     wrong = null,
     from = 60,
     to = 84,
-    fingers = {},
 }: {
     expected?: number[];
     wrong?: { note: number; seq: number } | null;
     from?: number;
     to?: number;
-    fingers?: Record<number, number>;
 }) {
     const { heldNotes, pressKey, releaseKey } = useMidiConnection();
     return (
@@ -28,7 +26,6 @@ export function PianoKeyboard({
             lit={new Set(heldNotes)}
             expected={expected}
             wrong={wrong}
-            fingers={fingers}
             onPress={pressKey}
             onRelease={releaseKey}
         />

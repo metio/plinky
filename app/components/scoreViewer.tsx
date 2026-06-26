@@ -6,15 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
-import {
-    collectSteps,
-    type CorrectInfo,
-    type Hand,
-    useScoreMatcher,
-} from "../hooks/useScoreMatcher";
+import { type CorrectInfo, type Hand, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
-import { fingerSteps } from "../lib/fingering";
+import { annotateFingerings } from "../lib/fingerScore";
 import { computeFlow } from "../lib/flow";
 import { recordDailyDone } from "../lib/dailyStreak";
 import { recordPractice } from "../lib/history";
@@ -129,10 +124,6 @@ export function ScoreViewer({
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
     const [staffCount, setStaffCount] = useState(1);
-    // Suggested finger (1–5) per playable position for the run, and which hand's
-    // line it was computed for, so the keyboard can hint the current note's finger.
-    const [fingerPlan, setFingerPlan] = useState<number[] | null>(null);
-    const [fingeringHand, setFingeringHand] = useState<"left" | "right" | null>(null);
     // A previous completed run on this score to race against — the note onset times
     // — and how far that ghost has reached as the current run's clock elapses.
     const [ghost, setGhost] = useState<number[] | null>(null);
@@ -413,7 +404,6 @@ export function ScoreViewer({
         let cancelled = false;
         setReady(false);
         setLoadError(false);
-        setFingerPlan(null);
         paintedRef.current = false;
         stopListen();
         matcher.stop();
@@ -427,7 +417,13 @@ export function ScoreViewer({
                     drawingParameters: "compact",
                 });
                 osmdRef.current = osmd;
-                return osmd.load(xml).then(() => {
+                // Print suggested fingering on the staff, personalised to the
+                // player's reach, unless they've turned hints off — so the suggestion
+                // sits on the note being read, not mapped onto a key.
+                const source = loadPrefs().showFingerings
+                    ? annotateFingerings(xml, loadPrefs().handSpan)
+                    : xml;
+                return osmd.load(source).then(() => {
                     if (!cancelled) {
                         osmd.render();
                         // A grand staff (two staves) can be drilled one hand at a
@@ -498,26 +494,11 @@ export function ScoreViewer({
         setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;
-        // Suggest a fingering for the line being drilled — one hand at a time, or
-        // the single staff. With both hands on a grand staff there are two lines on
-        // one keyboard, so no single finger fits a key; skip the hint there.
+        // The hand the matcher and the ghost step through: the whole grand staff
+        // when there's a single staff, otherwise the hand being drilled. (Fingering
+        // is printed on the staff at load time, not computed per run.)
         const osmd = osmdRef.current;
         const matcherHand: Hand = staffCount < 2 ? "both" : hand;
-        // No hints when the player has turned them off to work fingerings out alone.
-        let fingerFor: "left" | "right" | null = null;
-        if (osmd && loadPrefs().showFingerings) {
-            fingerFor = staffCount < 2 ? "right" : hand === "both" ? null : hand;
-        }
-        if (osmd && fingerFor) {
-            const steps = collectSteps(osmd, matcherHand).map((pitches) => ({ pitches }));
-            // Personalize the suggestion to the player's measured reach, if set.
-            const span = loadPrefs().handSpan[fingerFor] ?? undefined;
-            setFingerPlan(fingerSteps(steps, fingerFor, span));
-            setFingeringHand(fingerFor);
-        } else {
-            setFingerPlan(null);
-            setFingeringHand(null);
-        }
         // Re-render to wipe the previous run's note colours before starting afresh.
         if (paintedRef.current) {
             osmd?.render();
@@ -535,21 +516,6 @@ export function ScoreViewer({
         right: m.hand_right(),
         left: m.hand_left(),
     };
-
-    // The finger for the position being played, mapped to its melody note so the
-    // keyboard can badge that key. The right hand fingers the top note of a chord,
-    // the left the bottom — matching how the suggestion was computed.
-    const currentFingers: Record<number, number> = {};
-    if (fingerPlan && fingeringHand && matcher.practicing && matcher.expected.length > 0) {
-        const finger = fingerPlan[matcher.done];
-        if (finger) {
-            const melody =
-                fingeringHand === "left"
-                    ? Math.min(...matcher.expected)
-                    : Math.max(...matcher.expected);
-            currentFingers[melody] = finger;
-        }
-    }
 
     // Reveal the next note by colour per the player's hint setting — always, only
     // once they've slipped at this position, or never. A wrong key flashes red
@@ -753,7 +719,6 @@ export function ScoreViewer({
                         wrong={matcher.lastWrong}
                         from={matcher.range?.from}
                         to={matcher.range?.to}
-                        fingers={currentFingers}
                     />
                 </div>
             )}
