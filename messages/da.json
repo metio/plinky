@@ -52,7 +52,7 @@
   "play_daily": "Daglig udfordring",
   "play_daily_blurb": "Et nyt stykke hver dag, det samme for alle. Spil det, og del dit gitter.",
   "daily_intro": "Dagens stykke – det samme for alle. Spil det, og del så, hvordan dit gitter blev.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Høretræning",
   "play_ear_blurb": "Hør en node og find den efter gehør. Ingen nodelæsning nødvendig.",
   "settings_subtitle": "Indstillinger gemmes på denne enhed.",

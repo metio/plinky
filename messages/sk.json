@@ -52,7 +52,7 @@
   "play_daily": "Denná výzva",
   "play_daily_blurb": "Každý deň nová skladba, pre všetkých rovnaká. Zahrajte ju a zdieľajte svoju mriežku.",
   "daily_intro": "Dnešná skladba — pre všetkých rovnaká. Zahrajte ju a potom zdieľajte, ako vám mriežka vyšla.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Tréning sluchu",
   "play_ear_blurb": "Vypočujte si notu a nájdite ju podľa sluchu. Bez čítania.",
   "settings_subtitle": "Predvoľby sa ukladajú na tomto zariadení.",

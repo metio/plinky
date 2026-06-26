@@ -449,10 +449,10 @@ export function ScoreViewer({
                             rowLabels={[m.scores_accuracy(), m.scores_timing(), m.scores_flow()]}
                             boast={
                                 daily != null
-                                    ? m.daily_share_boast({ number: daily })
+                                    ? m.daily_share_boast({ number: daily, grade: grade.letter })
                                     : m.share_boast({ title })
                             }
-                            heading={daily != null ? `Plinky #${daily}` : title}
+                            heading={daily != null ? `🎹 Plinky #${daily} ${grade.letter}` : title}
                         />
                     )}
                 </div>

@@ -52,7 +52,7 @@
   "play_daily": "오늘의 도전",
   "play_daily_blurb": "매일 새로운 한 곡, 오늘은 모두 같아요. 연주하고 그리드를 공유하세요.",
   "daily_intro": "오늘의 한 곡 — 모두 같아요. 연주한 뒤, 완성된 그리드를 공유하세요.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "청음 훈련",
   "play_ear_blurb": "음을 듣고 귀로 찾으세요. 악보 읽기는 필요 없어요.",
   "settings_subtitle": "설정은 이 기기에 저장돼요.",

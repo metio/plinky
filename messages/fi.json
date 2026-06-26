@@ -52,7 +52,7 @@
   "play_daily": "Päivän haaste",
   "play_daily_blurb": "Uusi kappale joka päivä, sama kaikille. Soita se ja jaa ruudukkosi.",
   "daily_intro": "Tämän päivän kappale — sama kaikille. Soita se ja jaa, miltä ruudukkosi näyttää.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Kuuloharjoittelu",
   "play_ear_blurb": "Kuule nuotti ja löydä se korvakuulolta. Nuotinlukua ei tarvita.",
   "settings_subtitle": "Asetukset tallennetaan tälle laitteelle.",

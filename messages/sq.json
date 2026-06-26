@@ -52,7 +52,7 @@
   "play_daily": "Sfida ditore",
   "play_daily_blurb": "Një pjesë e re çdo ditë, e njëjta për të gjithë. Luaje dhe shpërndaje rrjetën tënde.",
   "daily_intro": "Pjesa e sotme — e njëjta për të gjithë. Luaje, pastaj shpërndaje si doli rrjeta jote.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Stërvitje veshi",
   "play_ear_blurb": "Dëgjo një notë dhe gjeje me vesh. Nuk kërkohet lexim.",
   "settings_subtitle": "Preferencat ruhen në këtë pajisje.",

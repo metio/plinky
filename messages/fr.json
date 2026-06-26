@@ -52,7 +52,7 @@
   "play_daily": "Défi du jour",
   "play_daily_blurb": "Un nouveau morceau chaque jour, le même pour tout le monde. Jouez-le et partagez votre grille.",
   "daily_intro": "Le morceau du jour — le même pour tout le monde. Jouez-le, puis partagez le résultat de votre grille.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Travail de l'oreille",
   "play_ear_blurb": "Écoutez une note et retrouvez-la à l'oreille. Aucune lecture requise.",
   "settings_subtitle": "Les préférences sont enregistrées sur cet appareil.",

@@ -52,7 +52,7 @@
   "play_daily": "Dnevni izazov",
   "play_daily_blurb": "Svaki dan nova skladba, ista za sve. Odsviraj je i podijeli svoju mrežu.",
   "daily_intro": "Današnja skladba — ista za sve. Odsviraj je, pa podijeli kako ti je ispala mreža.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Trening sluha",
   "play_ear_blurb": "Čuj notu i pronađi je po sluhu. Bez čitanja.",
   "settings_subtitle": "Postavke se spremaju na ovom uređaju.",

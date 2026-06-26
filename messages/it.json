@@ -52,7 +52,7 @@
   "play_daily": "Sfida del giorno",
   "play_daily_blurb": "Un brano nuovo ogni giorno, lo stesso per tutti. Suonalo e condividi la tua griglia.",
   "daily_intro": "Il brano di oggi — lo stesso per tutti. Suonalo, poi condividi com'è andata la tua griglia.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Allenamento dell'orecchio",
   "play_ear_blurb": "Ascolta una nota e trovala a orecchio. Non serve leggere lo spartito.",
   "settings_subtitle": "Le preferenze vengono salvate su questo dispositivo.",

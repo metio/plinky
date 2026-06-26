@@ -52,7 +52,7 @@
   "play_daily": "Dagens utfordring",
   "play_daily_blurb": "Et nytt stykke hver dag, likt for alle. Spill det og del rutenettet ditt.",
   "daily_intro": "Dagens stykke – likt for alle. Spill det, og del så hvordan rutenettet ditt ble.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Gehørtrening",
   "play_ear_blurb": "Hør en tone og finn den på gehør. Ingen notelesing nødvendig.",
   "settings_subtitle": "Innstillingene lagres på denne enheten.",

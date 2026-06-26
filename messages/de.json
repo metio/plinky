@@ -52,7 +52,7 @@
   "play_daily": "Tägliche Herausforderung",
   "play_daily_blurb": "Jeden Tag ein neues Stück, für alle dasselbe. Spiele es und teile dein Raster.",
   "daily_intro": "Das heutige Stück – für alle dasselbe. Spiele es und teile dann, wie dein Raster ausgefallen ist.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Gehörbildung",
   "play_ear_blurb": "Höre eine Note und finde sie nach Gehör. Kein Notenlesen nötig.",
   "settings_subtitle": "Einstellungen werden auf diesem Gerät gespeichert.",

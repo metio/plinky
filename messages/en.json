@@ -58,7 +58,7 @@
   "play_daily": "Daily challenge",
   "play_daily_blurb": "A new piece every day, the same for everyone. Play it and share your grid.",
   "daily_intro": "A new piece every day, the same for everyone — a piano take on the daily puzzle. Play today's challenge, get graded, and share your result grid.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Ear training",
   "play_ear_blurb": "Hear a note and find it by ear. No reading required.",
   "settings_subtitle": "Preferences are saved on this device.",

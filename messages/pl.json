@@ -52,7 +52,7 @@
   "play_daily": "Codzienne wyzwanie",
   "play_daily_blurb": "Codziennie nowy utwór, ten sam dla wszystkich. Zagraj go i udostępnij swoją siatkę.",
   "daily_intro": "Dzisiejszy utwór — ten sam dla wszystkich. Zagraj go, a potem udostępnij, jak wyszła twoja siatka.",
-  "daily_share_boast": "Plinky #{number} 🎹",
+  "daily_share_boast": "🎹 Plinky #{number} {grade}",
   "play_ear": "Trening słuchu",
   "play_ear_blurb": "Usłysz nutę i znajdź ją słuchem. Czytanie nut niepotrzebne.",
   "settings_subtitle": "Preferencje są zapisywane na tym urządzeniu.",
