@@ -10,6 +10,20 @@ SPDX-License-Identifier: 0BSD
 @theme {
     --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    /* The landing keyboard's keys rise in on load, left to right via a per-key
+       delay. Transform/opacity only, so it never shifts layout. */
+    --animate-key-rise: key-rise 0.5s ease-out both;
+}
+
+@keyframes key-rise {
+    from {
+        transform: translateY(0.5rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Drive the dark: variant from a .dark class on <html> so the theme can be

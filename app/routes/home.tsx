@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useMemo, useState } from "react";
+import { HeroKeyboard } from "../components/heroKeyboard";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreImport } from "../components/scoreImport";
 import { loadCatalog, type Score } from "../lib/catalog";
@@ -53,29 +54,64 @@ export default function Home() {
     );
 
     return (
-        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.home_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.home_intro()}</p>
-            </header>
+        <main className="mx-auto max-w-3xl space-y-12 p-6 font-sans">
+            <section className="space-y-6 pt-2">
+                <div className="space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">
+                        {m.home_eyebrow()}
+                    </p>
+                    <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                        {m.home_heading()}
+                    </h1>
+                    <p className="max-w-xl text-pretty leading-relaxed text-gray-600 dark:text-gray-300">
+                        {m.home_intro()}
+                    </p>
+                </div>
+
+                {/* Signature: a real keyboard you play right here, resting on a staff
+                    line. The brand gradient glows behind it; the keys are the one
+                    bold, characteristic thing on the page. */}
+                <div className="space-y-2">
+                    <div className="relative">
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -inset-x-6 -top-8 bottom-2 -z-10 bg-gradient-to-r from-indigo-500/15 via-violet-500/15 to-transparent blur-2xl"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="mx-auto mb-2 h-px max-w-md bg-gradient-to-r from-indigo-500 via-violet-500 to-transparent"
+                        />
+                        <HeroKeyboard />
+                    </div>
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                        {m.home_keyboard_hint()}
+                    </p>
+                </div>
+            </section>
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     {m.home_play_now()}
                 </h2>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                     {PLAY_NOW.map((mode) => (
                         <Link
                             key={mode.to}
                             to={mode.to}
-                            className="block rounded-md border border-indigo-200 bg-indigo-50 p-4 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950 dark:hover:bg-indigo-900"
+                            className="group flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
                         >
-                            <span className="font-medium text-indigo-700 dark:text-indigo-300">
-                                {mode.label()} →
+                            <span
+                                aria-hidden="true"
+                                className="mt-0.5 h-9 w-6 shrink-0 rounded-b-md border border-gray-300 bg-gradient-to-b from-white to-gray-100 transition group-hover:from-green-100 group-hover:to-green-200 dark:border-gray-600 dark:from-gray-100 dark:to-gray-300"
+                            />
+                            <span className="space-y-1">
+                                <span className="block font-medium text-gray-900 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
+                                    {mode.label()} →
+                                </span>
+                                <span className="block text-sm text-gray-600 dark:text-gray-400">
+                                    {mode.blurb()}
+                                </span>
                             </span>
-                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                {mode.blurb()}
-                            </p>
                         </Link>
                     ))}
                 </div>
@@ -102,7 +138,7 @@ export default function Home() {
                 {!loaded ? (
                     <div className="h-24" aria-hidden="true" />
                 ) : favoriteScores.length === 0 ? (
-                    <p className="rounded-md border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
+                    <p className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
                         {m.home_favorites_empty()}{" "}
                         <Link to="/scores" className={NAV_LINK}>
                             {m.home_browse_all()}
@@ -113,7 +149,7 @@ export default function Home() {
                         {favoriteScores.map((score) => (
                             <li
                                 key={score.id}
-                                className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 dark:border-gray-800"
+                                className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 dark:border-gray-800"
                             >
                                 <Link
                                     to={`/play/${score.id}`}
