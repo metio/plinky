@@ -155,6 +155,7 @@
   "progress_days_practiced": "Days practiced",
   "progress_notes_played": "Notes played",
   "progress_last_7_days": "Last 7 days",
+  "progress_due_heading": "Due for review",
   "progress_notes_one": "{count} note",
   "progress_notes_other": "{count} notes",
   "progress_empty": "No practice logged yet — finish a run to start your streak.",
