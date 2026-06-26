@@ -161,3 +161,122 @@ export function fingerSteps(steps: { pitches: number[] }[], hand: Hand, span?: n
         .map((step) => (hand === "right" ? Math.max(...step.pitches) : Math.min(...step.pitches)));
     return fingerLine(line, hand, span);
 }
+
+// --- Chord-aware fingering ---------------------------------------------------
+// A "position" is the set of pitches sounding together (one note, or a chord),
+// sorted ascending. Each gets one finger per note. The line API above is the
+// single-note special case; this handles simultaneous notes the trainer needs.
+
+// The candidate finger tuples for a k-note chord, aligned to ascending pitch:
+// ascending fingers for the right hand, descending for the left (whose thumb
+// takes the top note). Fingers within a chord are distinct and never cross.
+function fingerSets(count: number, hand: Hand): number[][] {
+    const sets: number[][] = [];
+    const pick = (start: number, acc: number[]) => {
+        if (acc.length === count) {
+            sets.push(hand === "right" ? acc : [...acc].reverse());
+            return;
+        }
+        for (let finger = start; finger <= 5; finger++) {
+            pick(finger + 1, [...acc, finger]);
+        }
+    };
+    pick(1, []);
+    return sets;
+}
+
+// How awkward one chord shape is: a thumb on a black key, plus how far each
+// adjacent pitch gap departs from the natural spread of the fingers holding it.
+function chordCost(pitches: number[], fingers: number[], spread: Record<number, number>): number {
+    let cost = 0;
+    for (let i = 0; i < pitches.length; i++) {
+        if (fingers[i] === 1 && isBlackKey(pitches[i]!)) {
+            cost += 2;
+        }
+    }
+    for (let i = 1; i < pitches.length; i++) {
+        const interval = pitches[i]! - pitches[i - 1]!;
+        const reach = Math.abs(spread[fingers[i]!]! - spread[fingers[i - 1]!]!);
+        cost += Math.abs(interval - reach);
+    }
+    return cost;
+}
+
+// The voice that leads hand movement between positions: the top note for the
+// right hand, the bottom for the left.
+function anchor(pitches: number[], hand: Hand): number {
+    return hand === "right" ? pitches.length - 1 : 0;
+}
+
+// The comfort cost of fingering a whole sequence of positions a given way — chord
+// shapes plus the movement of the leading voice between them.
+export function positionsCost(
+    positions: number[][],
+    fingers: number[][],
+    hand: Hand,
+    span?: number,
+): number {
+    if (positions.length === 0) {
+        return 0;
+    }
+    const { spread, leap } = handModel(span);
+    let cost = chordCost(positions[0]!, fingers[0]!, spread);
+    for (let i = 1; i < positions.length; i++) {
+        cost += chordCost(positions[i]!, fingers[i]!, spread);
+        const from = anchor(positions[i - 1]!, hand);
+        const to = anchor(positions[i]!, hand);
+        cost += transitionCost(
+            positions[i - 1]![from]!,
+            fingers[i - 1]![from]!,
+            positions[i]![to]!,
+            fingers[i]![to]!,
+            hand,
+            spread,
+            leap,
+        );
+    }
+    return cost;
+}
+
+// The most comfortable fingering for a sequence of positions, via the same DP as
+// the single line but with chord shapes as the per-position states.
+export function fingerPositions(positions: number[][], hand: Hand, span?: number): number[][] {
+    if (positions.length === 0) {
+        return [];
+    }
+    const { spread, leap } = handModel(span);
+    type Path = { fingers: number[]; cost: number; path: number[][] };
+    let paths: Path[] = fingerSets(positions[0]!.length, hand).map((fingers) => ({
+        fingers,
+        cost: chordCost(positions[0]!, fingers, spread),
+        path: [fingers],
+    }));
+    for (let i = 1; i < positions.length; i++) {
+        const pos = positions[i]!;
+        const prevPos = positions[i - 1]!;
+        const from = anchor(prevPos, hand);
+        const to = anchor(pos, hand);
+        paths = fingerSets(pos.length, hand).map((fingers) => {
+            let best: Path = { fingers, cost: Number.POSITIVE_INFINITY, path: [] };
+            for (const previous of paths) {
+                const cost =
+                    previous.cost +
+                    chordCost(pos, fingers, spread) +
+                    transitionCost(
+                        prevPos[from]!,
+                        previous.fingers[from]!,
+                        pos[to]!,
+                        fingers[to]!,
+                        hand,
+                        spread,
+                        leap,
+                    );
+                if (cost < best.cost) {
+                    best = { fingers, cost, path: [...previous.path, fingers] };
+                }
+            }
+            return best;
+        });
+    }
+    return paths.reduce((best, candidate) => (candidate.cost < best.cost ? candidate : best)).path;
+}

@@ -2,7 +2,47 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { fingerLine, fingeringCost, fingerSteps } from "./fingering";
+import {
+    fingerLine,
+    fingeringCost,
+    fingerPositions,
+    fingerSteps,
+    positionsCost,
+} from "./fingering";
+
+describe("fingerPositions", () => {
+    it("matches the single-line chooser when every position is one note", () => {
+        const line = [60, 62, 64, 65, 67];
+        const viaPositions = fingerPositions(
+            line.map((pitch) => [pitch]),
+            "right",
+        ).map((tuple) => tuple[0]);
+        expect(viaPositions).toEqual(fingerLine(line, "right"));
+    });
+
+    it("fingers a chord with distinct, pitch-ordered fingers", () => {
+        const [chord] = fingerPositions([[60, 64, 67]], "right");
+        expect(chord).toHaveLength(3);
+        expect(new Set(chord).size).toBe(3);
+        // Right hand: lower pitch takes the lower-numbered finger.
+        expect(chord![0]).toBeLessThan(chord![1]!);
+        expect(chord![1]).toBeLessThan(chord![2]!);
+    });
+
+    it("orders a left-hand chord with the thumb on top", () => {
+        const [chord] = fingerPositions([[48, 52, 55]], "left");
+        // Ascending pitch → descending finger; the top note is the thumb.
+        expect(chord![0]).toBeGreaterThan(chord![2]!);
+        expect(chord![2]).toBe(1);
+    });
+
+    it("costs the chooser's chord no worse than a cramped one", () => {
+        const best = fingerPositions([[60, 64, 67]], "right");
+        expect(positionsCost([[60, 64, 67]], best, "right")).toBeLessThanOrEqual(
+            positionsCost([[60, 64, 67]], [[1, 2, 3]], "right"),
+        );
+    });
+});
 
 describe("fingerLine", () => {
     it("plays a right-hand five-finger position 1–5 in place", () => {

@@ -25,9 +25,10 @@ describe("FingeringTrainer", () => {
         const check = screen.getByText("Check fingering") as HTMLButtonElement;
         expect(check.disabled).toBe(true);
 
-        // Assigning a finger advances to the next note; eight presses fill the line.
+        // Assigning a finger advances to the next note; chords add notes, so press
+        // well past the line length — extra presses just re-set the last note.
         const one = screen.getByLabelText("Finger 1");
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 30; i++) {
             fireEvent.click(one);
         }
         expect((screen.getByText("Check fingering") as HTMLButtonElement).disabled).toBe(false);
