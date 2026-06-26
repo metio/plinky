@@ -75,3 +75,52 @@ export function rawDifficulty(xml: string): number {
     }
     return (handEffort(right, "right") + handEffort(left, "left")) / notes;
 }
+
+export type Category = "scale" | "arpeggio" | "piece";
+
+// Scales and arpeggios are recognised by their catalogue id prefix; everything
+// else is a piece.
+export function categoryOf(id: string): Category {
+    if (id.startsWith("scale-")) {
+        return "scale";
+    }
+    if (id.startsWith("arpeggio-")) {
+        return "arpeggio";
+    }
+    return "piece";
+}
+
+export const MAX_GRADE = 8;
+
+// The cost breakpoints between grades 1–8, calibrated PER category so each is
+// graded on its own scale — otherwise every finger exercise lands below the
+// easiest piece (scales/arpeggios cost more to finger than a stepwise tune). This
+// is a COARSE first pass against today's beginner catalogue (measured: scales
+// ~0.6–1.1, arpeggios ~1.3–1.8, pieces ~0–0.3); re-tune the numbers once the song
+// library lands and the real difficulty range is known.
+const GRADE_THRESHOLDS: Record<Category, number[]> = {
+    piece: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
+    scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
+    arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
+};
+
+const gradeCache = new Map<string, number>();
+
+// A score's 1–8 grade: its fingering-cost difficulty placed against its category's
+// thresholds. Memoised by id, since a score's notes don't change.
+export function gradeOf(id: string, xml: string): number {
+    const cached = gradeCache.get(id);
+    if (cached !== undefined) {
+        return cached;
+    }
+    const cost = rawDifficulty(xml);
+    let grade = 1;
+    for (const threshold of GRADE_THRESHOLDS[categoryOf(id)]) {
+        if (cost <= threshold) {
+            break;
+        }
+        grade += 1;
+    }
+    gradeCache.set(id, grade);
+    return grade;
+}
