@@ -28,6 +28,23 @@ function advancePastRests(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): voi
     }
 }
 
+// The pitches of every playable position for the chosen hand, in play order —
+// the same sequence the matcher steps through, so a fingering computed from it
+// lines up with the run's progress. Leaves the cursor reset for the caller.
+export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): number[][] {
+    osmd.cursor.reset();
+    const steps: number[][] = [];
+    while (!osmd.cursor.iterator.EndReached) {
+        const pitches = pitchesAtCursor(osmd, hand);
+        if (pitches.length > 0) {
+            steps.push(pitches);
+        }
+        osmd.cursor.next();
+    }
+    osmd.cursor.reset();
+    return steps;
+}
+
 // Drives note-by-note practice of an OSMD score: the cursor marks the position to
 // play, and once every pitch under it has been played the cursor advances. Wrong
 // notes are ignored so a learner can hunt for the right key. The whole score's

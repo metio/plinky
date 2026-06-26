@@ -17,10 +17,13 @@ export function PianoKeyboard({
     expected = [],
     from = 60,
     to = 84,
+    fingers = {},
 }: {
     expected?: number[];
     from?: number;
     to?: number;
+    // Suggested finger (1–5) per pitch, shown on the key it belongs to.
+    fingers?: Record<number, number>;
 }) {
     const { heldNotes, pressKey, releaseKey } = useMidiConnection();
 
@@ -59,14 +62,20 @@ export function PianoKeyboard({
                         onPointerUp={up(note)}
                         onPointerCancel={up(note)}
                         onPointerLeave={leave(note)}
-                        className={`flex-1 rounded-b border border-gray-300 dark:border-gray-700 ${
+                        className={`relative flex-1 rounded-b border border-gray-300 dark:border-gray-700 ${
                             heldNotes.includes(note)
                                 ? "bg-indigo-300"
                                 : expected.includes(note)
                                   ? "bg-indigo-50 dark:bg-indigo-950"
                                   : "bg-white"
                         }`}
-                    />
+                    >
+                        {fingers[note] ? (
+                            <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                                {fingers[note]}
+                            </span>
+                        ) : null}
+                    </button>
                 ))}
             </div>
             {blacks.map((note) => {
@@ -97,7 +106,13 @@ export function PianoKeyboard({
                                   : "bg-gray-800"
                         }`}
                         style={{ left: `${left}%`, width: `${width}%` }}
-                    />
+                    >
+                        {fingers[note] ? (
+                            <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-semibold text-white">
+                                {fingers[note]}
+                            </span>
+                        ) : null}
+                    </button>
                 );
             })}
         </div>

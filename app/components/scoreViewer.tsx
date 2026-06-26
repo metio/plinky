@@ -5,9 +5,15 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
-import { type CorrectInfo, type Hand, useScoreMatcher } from "../hooks/useScoreMatcher";
+import {
+    collectSteps,
+    type CorrectInfo,
+    type Hand,
+    useScoreMatcher,
+} from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
+import { fingerSteps } from "../lib/fingering";
 import { computeFlow } from "../lib/flow";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
@@ -94,6 +100,10 @@ export function ScoreViewer({
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
     const [staffCount, setStaffCount] = useState(1);
+    // Suggested finger (1–5) per playable position for the run, and which hand's
+    // line it was computed for, so the keyboard can hint the current note's finger.
+    const [fingerPlan, setFingerPlan] = useState<number[] | null>(null);
+    const [fingeringHand, setFingeringHand] = useState<"left" | "right" | null>(null);
 
     // A classic metronome at the chosen tempo, on demand — play along with it.
     useMetronome(metronomeOn, tempo, beatsPerBar ?? 4);
@@ -230,6 +240,7 @@ export function ScoreViewer({
         let cancelled = false;
         setReady(false);
         setLoadError(false);
+        setFingerPlan(null);
         stopListen();
         matcher.stop();
         import("opensheetmusicdisplay")
@@ -309,6 +320,21 @@ export function ScoreViewer({
         setShareGrid(null);
         setTempoCurve(null);
         runTempoRef.current = tempo;
+        // Suggest a fingering for the line being drilled — one hand at a time, or
+        // the single staff. With both hands on a grand staff there are two lines on
+        // one keyboard, so no single finger fits a key; skip the hint there.
+        const osmd = osmdRef.current;
+        const fingerFor: "left" | "right" | null =
+            staffCount < 2 ? "right" : hand === "both" ? null : hand;
+        if (osmd && fingerFor) {
+            const matcherHand: Hand = staffCount < 2 ? "both" : hand;
+            const steps = collectSteps(osmd, matcherHand).map((pitches) => ({ pitches }));
+            setFingerPlan(fingerSteps(steps, fingerFor));
+            setFingeringHand(fingerFor);
+        } else {
+            setFingerPlan(null);
+            setFingeringHand(null);
+        }
         matcher.start();
     };
 
@@ -317,6 +343,21 @@ export function ScoreViewer({
         right: m.hand_right(),
         left: m.hand_left(),
     };
+
+    // The finger for the position being played, mapped to its melody note so the
+    // keyboard can badge that key. The right hand fingers the top note of a chord,
+    // the left the bottom — matching how the suggestion was computed.
+    const currentFingers: Record<number, number> = {};
+    if (fingerPlan && fingeringHand && matcher.practicing && matcher.expected.length > 0) {
+        const finger = fingerPlan[matcher.done];
+        if (finger) {
+            const melody =
+                fingeringHand === "left"
+                    ? Math.min(...matcher.expected)
+                    : Math.max(...matcher.expected);
+            currentFingers[melody] = finger;
+        }
+    }
 
     return (
         <div className="space-y-3">
@@ -467,6 +508,7 @@ export function ScoreViewer({
                         expected={matcher.expected}
                         from={matcher.range?.from}
                         to={matcher.range?.to}
+                        fingers={currentFingers}
                     />
                 </div>
             )}

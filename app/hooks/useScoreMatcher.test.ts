@@ -5,7 +5,7 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { type CorrectInfo, useScoreMatcher } from "./useScoreMatcher";
+import { collectSteps, type CorrectInfo, useScoreMatcher } from "./useScoreMatcher";
 
 // A position is the chord sounding at one cursor step; an empty array is a rest.
 // halfTone is OSMD's pitch index, which the matcher maps to MIDI as halfTone + 12.
@@ -65,6 +65,23 @@ function render(positions: Position[], options: Parameters<typeof useScoreMatche
     });
     return { ...view, shown: handle.shown };
 }
+
+describe("collectSteps", () => {
+    it("returns playable positions in order, filtered by hand", () => {
+        const { osmd } = fakeOsmd([
+            [
+                { midi: 60, staff: 0 },
+                { midi: 48, staff: 1 },
+            ],
+            [{ midi: 62, staff: 0 }],
+            [], // rest — never collected
+            [{ midi: 50, staff: 1 }],
+        ]);
+        expect(collectSteps(osmd, "both")).toEqual([[60, 48], [62], [50]]);
+        expect(collectSteps(osmd, "right")).toEqual([[60], [62]]);
+        expect(collectSteps(osmd, "left")).toEqual([[48], [50]]);
+    });
+});
 
 describe("useScoreMatcher", () => {
     it("matches a single-note line to completion", () => {
