@@ -43,6 +43,8 @@
   "share_copy": "Copy",
   "share_copied": "Copied!",
   "share_image": "Save image",
+  "share_share": "Share",
+  "share_on": "Share on {platform}",
   "share_boast": "My {title} run on Plinky 🎹",
   "share_grid_label": "Accuracy, timing and flow across six moments of the run",
   "mastery_learned": "Learned",

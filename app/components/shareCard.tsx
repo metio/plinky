@@ -4,6 +4,25 @@
 import { useEffect, useRef, useState } from "react";
 import { type Grid, type Level, shareText, svgCard } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
+import { type Brand, BrandIcon } from "./brandIcons";
+
+// The platforms offered as one-tap links, each opening its share composer with the
+// run's text prefilled. Instagram and TikTok have no such web link — they are
+// reached through the system share sheet behind the Share button instead.
+const SHARE_TARGETS: { brand: Brand; label: string; href: (text: string) => string }[] = [
+    { brand: "x", label: "X", href: (t) => `https://x.com/intent/post?text=${t}` },
+    {
+        brand: "bluesky",
+        label: "Bluesky",
+        href: (t) => `https://bsky.app/intent/compose?text=${t}`,
+    },
+    {
+        brand: "threads",
+        label: "Threads",
+        href: (t) => `https://www.threads.net/intent/post?text=${t}`,
+    },
+    { brand: "whatsapp", label: "WhatsApp", href: (t) => `https://wa.me/?text=${t}` },
+];
 
 // On-card cell colours, matched to the share emoji (🟩 / 🟨 / ⬜).
 const CELL: Record<Level, string> = {
@@ -79,6 +98,17 @@ export function ShareCard({
     // cleared on unmount, since the run summary can be navigated away within it.
     const copyTimer = useRef(0);
     useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+    // Whether this device can hand a file to the system share sheet — the only web
+    // path to Instagram and TikTok. Resolved after mount: the prerendered HTML is
+    // device-agnostic, so the button reads "Save image" until the client confirms.
+    const [canShareFiles, setCanShareFiles] = useState(false);
+    useEffect(() => {
+        setCanShareFiles(
+            typeof navigator !== "undefined" &&
+                typeof navigator.share === "function" &&
+                typeof navigator.canShare === "function",
+        );
+    }, []);
     const text = shareText(boast, grid);
 
     return (
@@ -122,24 +152,21 @@ export function ShareCard({
                     onClick={() => saveImage(grid, heading, boast).catch(() => {})}
                     className={LINK}
                 >
-                    {m.share_image()}
+                    {canShareFiles ? m.share_share() : m.share_image()}
                 </button>
-                <a
-                    href={`https://x.com/intent/post?text=${encodeURIComponent(text)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={LINK}
-                >
-                    X
-                </a>
-                <a
-                    href={`https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={LINK}
-                >
-                    Bluesky
-                </a>
+                {SHARE_TARGETS.map((target) => (
+                    <a
+                        key={target.brand}
+                        href={target.href(encodeURIComponent(text))}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={m.share_on({ platform: target.label })}
+                        title={m.share_on({ platform: target.label })}
+                        className={`${LINK} inline-flex items-center`}
+                    >
+                        <BrandIcon brand={target.brand} />
+                    </a>
+                ))}
             </div>
         </figure>
     );
