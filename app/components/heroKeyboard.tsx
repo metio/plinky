@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
+import { useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import { Keyboard } from "./keyboard";
 
@@ -31,7 +32,20 @@ export function HeroKeyboard() {
         }, 240);
     };
 
+    // A connected MIDI keyboard plays the hero too — but only if it's already
+    // reconnected from an earlier grant, so a first-time visitor is never prompted
+    // (the provider gates that on the stored permission). Notes outside this octave
+    // simply sound without a key to light.
+    useMidiInput({ onNoteOn: (event) => plink(event.note) });
+
     return (
-        <Keyboard from={FROM} to={TO} lit={lit} rise well="mx-auto w-full max-w-md" onPress={plink} />
+        <Keyboard
+            from={FROM}
+            to={TO}
+            lit={lit}
+            rise
+            well="mx-auto w-full max-w-md"
+            onPress={plink}
+        />
     );
 }

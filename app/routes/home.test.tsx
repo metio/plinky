@@ -5,6 +5,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { MidiProvider } from "../contexts/midi";
 import Home from "./home";
 
 afterEach(() => {
@@ -13,9 +14,12 @@ afterEach(() => {
 });
 
 function renderHome() {
+    // The hero keyboard listens for MIDI, so it needs the provider the app supplies.
     return render(
         <MemoryRouter>
-            <Home />
+            <MidiProvider>
+                <Home />
+            </MidiProvider>
         </MemoryRouter>,
     );
 }

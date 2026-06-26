@@ -217,6 +217,27 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             });
     }, [refreshDevices]);
 
+    // Silently reconnect MIDI when the player has already granted it (through the
+    // Connect button), so a connected keyboard just works across the app — the
+    // landing hero included — without ever prompting on load. While permission is
+    // still "prompt" or "denied", do nothing: requesting would pop the dialog.
+    useEffect(() => {
+        let cancelled = false;
+        navigator.permissions
+            ?.query({ name: "midi" as PermissionName })
+            .then((permission) => {
+                if (!cancelled && permission.state === "granted") {
+                    requestAccess();
+                }
+            })
+            .catch(() => {
+                // No Permissions API, or no "midi" descriptor (Safari, Firefox).
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [requestAccess]);
+
     const clearEvents = useCallback(() => setEvents([]), []);
 
     // Computer-keyboard fallback. The active octave is kept in a ref so the
