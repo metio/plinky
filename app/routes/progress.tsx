@@ -4,8 +4,10 @@
 import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ShareCard } from "../components/shareCard";
+import { loadCatalog } from "../lib/catalog";
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
+import { isDue, loadAllMastery } from "../lib/mastery";
 import type { Grid } from "../lib/shareCard";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -29,9 +31,19 @@ function Stat({ label, value }: { label: string; value: string }) {
 export default function ProgressRoute() {
     const [summary, setSummary] = useState<PracticeSummary | null>(null);
     const [fingerprint, setFingerprint] = useState<Grid | null>(null);
+    const [due, setDue] = useState<{ id: string; title: string }[]>([]);
     useEffect(() => {
         setSummary(summarizePractice(loadHistory()));
         setFingerprint(progressGrid(loadLifetime()));
+        // The review queue, resolved to catalogue titles so each entry links
+        // straight to its practice page — the same isDue rule the library uses.
+        const now = Date.now();
+        const titles = new Map(loadCatalog().map((score) => [score.id, score.title]));
+        setDue(
+            loadAllMastery()
+                .filter(({ id, mastery }) => titles.has(id) && isDue(mastery, now))
+                .map(({ id }) => ({ id, title: titles.get(id) ?? id })),
+        );
     }, []);
 
     if (!summary) {
@@ -51,6 +63,26 @@ export default function ProgressRoute() {
                 <Stat label={m.progress_days_practiced()} value={String(summary.daysPracticed)} />
                 <Stat label={m.progress_notes_played()} value={String(summary.totalNotes)} />
             </div>
+
+            {due.length > 0 && (
+                <section className="space-y-3">
+                    <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {m.progress_due_heading()}
+                    </h2>
+                    <ul className="flex flex-wrap gap-2">
+                        {due.map((score) => (
+                            <li key={score.id}>
+                                <Link
+                                    to={`/play/${score.id}`}
+                                    className="inline-block rounded-md border border-amber-300 px-3 py-1.5 text-sm text-amber-800 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950"
+                                >
+                                    {score.title}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
 
             <div>
                 <h2 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
