@@ -95,7 +95,7 @@ play — the same engine behind every mode.
 
 ## Development
 
-The project builds with Node 22 and npm:
+The project builds with Node.js and npm:
 
 ```sh
 npm install      # install dependencies
