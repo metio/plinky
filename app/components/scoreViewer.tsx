@@ -723,6 +723,11 @@ export function ScoreViewer({
                                 {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
                             </button>
                         )}
+                        {support === "unsupported" && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {m.midi_unsupported_keyboard()}
+                            </span>
+                        )}
                     </div>
                     {ghost && (
                         <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />

@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiDebugPanel } from "../components/midiDebugPanel";
 import { ScoreBackup } from "../components/scoreBackup";
 import { ThemeToggle } from "../components/themeToggle";
+import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
 import { loadPrefs, type Prefs, savePrefs } from "../lib/prefs";
@@ -27,6 +28,7 @@ export default function Settings() {
         showFingerings: true,
     });
     const synth = useSynth();
+    const { support: midiSupport } = useMidiConnection();
 
     useEffect(() => {
         setPrefs(loadPrefs());
@@ -136,12 +138,16 @@ export default function Settings() {
 
             <ScoreBackup />
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_midi_device()}
-                </h2>
-                <MidiDebugPanel />
-            </section>
+            {/* No Web MIDI (Safari, all iOS) means no device to connect — the
+                keyboard is the input there, so the whole panel is hidden. */}
+            {midiSupport !== "unsupported" && (
+                <section className="space-y-3">
+                    <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        {m.settings_midi_device()}
+                    </h2>
+                    <MidiDebugPanel />
+                </section>
+            )}
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
