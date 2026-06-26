@@ -74,6 +74,9 @@ export function ScoreViewer({
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
+    // Tracks playback synchronously, so a second click that lands before the
+    // `playing` state has re-rendered can't start a second cursor loop.
+    const playingRef = useRef(false);
     const tempoRef = useRef(initialTempo ?? 100);
     const notesRef = useRef<PlayedNote[]>([]);
     const startRef = useRef(0);
@@ -189,6 +192,7 @@ export function ScoreViewer({
         if (!matcher.practicing) {
             osmdRef.current?.cursor?.hide();
         }
+        playingRef.current = false;
         setPlaying(false);
     };
 
@@ -237,9 +241,10 @@ export function ScoreViewer({
     // waiting their notated duration at the chosen tempo.
     const listen = () => {
         const osmd = osmdRef.current;
-        if (!osmd) {
+        if (!osmd || playingRef.current) {
             return;
         }
+        playingRef.current = true;
         matcher.stop();
         const cursor: Cursor = osmd.cursor;
         cursor.reset();

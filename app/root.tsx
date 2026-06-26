@@ -37,6 +37,13 @@ import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
 
+// Locales whose UI text is not drawn from Inter's Latin subset: Cyrillic and
+// Greek pages render from a different Inter subset, and CJK pages fall back to
+// system fonts. Preloading the Latin file on those pages competes with the
+// subset (or system font) that actually paints the page's primary text, so the
+// preload is emitted only for the Latin-script locales that benefit from it.
+const NON_LATIN_LOCALES = new Set(["el", "ru", "uk", "sr", "ja", "ko", "zh"]);
+
 // Runs before first paint to set the dark class from the saved (or OS) theme.
 // Applying the theme only in the layout's effect would let the prerendered,
 // class-free HTML paint light first and flash for dark-mode users. It mutates
@@ -50,14 +57,19 @@ export const links: Route.LinksFunction = () => [
     { rel: "manifest", href: "/manifest.webmanifest" },
     { rel: "apple-touch-icon", href: "/logo.svg" },
     // Preload the Latin variable font so text paints in Inter without a swap;
-    // the href is the same hashed asset the bundled @font-face resolves to.
-    {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: interLatin,
-        crossOrigin: "anonymous",
-    },
+    // the href is the same hashed asset the bundled @font-face resolves to. Only
+    // for locales whose text actually comes from this subset (see above).
+    ...(NON_LATIN_LOCALES.has(getLocale())
+        ? []
+        : [
+              {
+                  rel: "preload",
+                  as: "font",
+                  type: "font/woff2",
+                  href: interLatin,
+                  crossOrigin: "anonymous",
+              } as const,
+          ]),
 ];
 
 // The header lives in the layout so it — and the theme — are present on every

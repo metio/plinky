@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type Grid, type Level, shareText, svgCard } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
 
@@ -75,6 +75,10 @@ export function ShareCard({
     heading: string;
 }) {
     const [copied, setCopied] = useState(false);
+    // The "Copied!" label reverts after a moment; the timer is held so it can be
+    // cleared on unmount, since the run summary can be navigated away within it.
+    const copyTimer = useRef(0);
+    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
     const text = shareText(boast, grid);
 
     return (
@@ -104,7 +108,8 @@ export function ShareCard({
                     onClick={() => {
                         navigator.clipboard?.writeText(text).catch(() => {});
                         setCopied(true);
-                        window.setTimeout(() => setCopied(false), 2000);
+                        window.clearTimeout(copyTimer.current);
+                        copyTimer.current = window.setTimeout(() => setCopied(false), 2000);
                     }}
                     className={LINK}
                 >

@@ -22,6 +22,9 @@ export function ScoreBackup() {
     const [count, setCount] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
+    // Identifies the latest pack read so a slower earlier import can't report its
+    // (stale) result over a newer pick that has already landed.
+    const readSeq = useRef(0);
 
     useEffect(() => {
         setCount(loadUserScores().length);
@@ -41,8 +44,12 @@ export function ScoreBackup() {
         if (!file) {
             return;
         }
+        const mine = ++readSeq.current;
         try {
             const result = importScoresPack(await file.text());
+            if (mine !== readSeq.current) {
+                return;
+            }
             const parts = [m.backup_imported_scores({ count: pluralScores(result.imported) })];
             if (result.curriculums > 0) {
                 parts.push(
@@ -54,6 +61,9 @@ export function ScoreBackup() {
             setStatus(`${parts.join(" ")}.`);
             setCount(loadUserScores().length);
         } catch (error) {
+            if (mine !== readSeq.current) {
+                return;
+            }
             setStatus(error instanceof Error ? error.message : m.backup_import_error());
         }
     };
