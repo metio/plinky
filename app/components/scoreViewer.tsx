@@ -30,6 +30,7 @@ import {
 } from "../lib/mastery";
 import { loadPrefs } from "../lib/prefs";
 import { makeHit, summarize } from "../lib/rhythm";
+import { paintPlayedNotes } from "../lib/scoreColor";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import {
     findHotspots,
@@ -132,6 +133,9 @@ export function ScoreViewer({
     // self-paced tempo curve reads against the same reference the matcher used,
     // even if the slider is moved afterwards.
     const runTempoRef = useRef(initialTempo ?? 100);
+    // Whether any note has been coloured on the score, so a fresh run re-renders to
+    // clear last run's progress only when there is something to clear.
+    const paintedRef = useRef(false);
 
     useEffect(() => {
         setMastery(ephemeral ? null : loadMastery(id));
@@ -143,6 +147,13 @@ export function ScoreViewer({
         onCorrect: (info: CorrectInfo) => {
             for (const pitch of info.pitches) {
                 synth.playNote(pitch);
+            }
+            // Colour the notes just cleared — the cursor is still on them, as it
+            // only advances after this callback — so the score shows progress.
+            const osmd = osmdRef.current;
+            if (osmd) {
+                paintPlayedNotes(osmd, info.pitches);
+                paintedRef.current = true;
             }
             // Record each note's notated time (the ideal) and when it was actually
             // played, both relative to the first note, for the grade, the per-note
@@ -273,6 +284,7 @@ export function ScoreViewer({
         setReady(false);
         setLoadError(false);
         setFingerPlan(null);
+        paintedRef.current = false;
         stopListen();
         matcher.stop();
         import("opensheetmusicdisplay")
@@ -367,6 +379,11 @@ export function ScoreViewer({
         } else {
             setFingerPlan(null);
             setFingeringHand(null);
+        }
+        // Re-render to wipe the previous run's note colours before starting afresh.
+        if (paintedRef.current) {
+            osmd?.render();
+            paintedRef.current = false;
         }
         matcher.start();
     };

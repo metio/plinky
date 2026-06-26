@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { generatePhrase } from "../lib/generator";
+import { PLAYED_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
 
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
@@ -73,6 +74,28 @@ describe("ScoreViewer", () => {
         // Turning the metronome off hides the adaptive control again.
         fireEvent.click(metronome);
         expect(screen.queryByText("Adaptive")).toBeNull();
+    });
+
+    it("colours notes on the score as they are played", async () => {
+        // A one-bar phrase whose every note is the first scale degree (C5), so the
+        // same key clears each position in turn.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const { container } = mount(phrase, { beatsPerBar: 4 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        fireEvent.click(await screen.findByText(/Practice/));
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // Played noteheads are recoloured in the rendered SVG — this exercises the
+        // real OSMD graphical-note → SVG path the colouring depends on.
+        await waitFor(
+            () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+            {
+                timeout: 4000,
+            },
+        );
     });
 
     it("offers a hands-separate selector only for a grand staff", async () => {
