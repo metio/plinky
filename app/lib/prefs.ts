@@ -8,6 +8,11 @@ import type { Letter } from "./grade";
 // fingering to the player's reach.
 export type HandSpan = { left: number | null; right: number | null };
 
+// When the practice keyboard reveals the next note to play: always (a guided
+// crutch), only once you've played a wrong note (read first, helped when stuck),
+// or never (pure sight-reading). A wrong key still flashes red regardless.
+export type NoteHints = "always" | "miss" | "never";
+
 export type Prefs = {
     sound: boolean;
     volume: number; // 0..100
@@ -16,6 +21,7 @@ export type Prefs = {
     // Show the suggested finger on the practice keyboard; off lets a learner work
     // fingerings out unaided, the way they must at a real piano.
     showFingerings: boolean;
+    noteHints: NoteHints;
 };
 
 const KEY = "plinky:prefs";
@@ -25,8 +31,10 @@ const DEFAULTS: Prefs = {
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
     showFingerings: true,
+    noteHints: "miss",
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
+const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
 
 function clampVolume(value: number): number {
     return Math.max(0, Math.min(100, Math.round(value)));
@@ -58,6 +66,9 @@ export function loadPrefs(): Prefs {
                 typeof parsed.showFingerings === "boolean"
                     ? parsed.showFingerings
                     : DEFAULTS.showFingerings,
+            noteHints: NOTE_HINTS.includes(parsed.noteHints)
+                ? parsed.noteHints
+                : DEFAULTS.noteHints,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan } };

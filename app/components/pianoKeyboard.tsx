@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useEffect, useState } from "react";
 import { useMidiConnection } from "../contexts/midi";
 import { noteName } from "../lib/midi";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
@@ -16,17 +17,30 @@ function isWhite(note: number): boolean {
 // it works as an input on touch devices, and highlights the note(s) to play next.
 export function PianoKeyboard({
     expected = [],
+    wrong = null,
     from = 60,
     to = 84,
     fingers = {},
 }: {
     expected?: number[];
+    // The most recent wrong note, with a bump counter so the same key re-flashes on
+    // a repeat miss. The key flashes red briefly whatever the note-hint setting.
+    wrong?: { note: number; seq: number } | null;
     from?: number;
     to?: number;
     // Suggested finger (1–5) per pitch, shown on the key it belongs to.
     fingers?: Record<number, number>;
 }) {
     const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const [flash, setFlash] = useState<number | null>(null);
+    useEffect(() => {
+        if (wrong == null) {
+            return;
+        }
+        setFlash(wrong.note);
+        const id = window.setTimeout(() => setFlash(null), 450);
+        return () => window.clearTimeout(id);
+    }, [wrong]);
 
     const notes: number[] = [];
     for (let note = from; note <= to; note++) {
@@ -65,11 +79,13 @@ export function PianoKeyboard({
                             onPointerCancel={up(note)}
                             onPointerLeave={leave(note)}
                             className={`${WHITE_KEY} flex-1 ${
-                                heldNotes.includes(note)
-                                    ? "translate-y-0.5 bg-green-200 shadow-[0_0_14px_-3px] shadow-green-400 dark:bg-green-900"
-                                    : expected.includes(note)
-                                      ? "bg-indigo-50 dark:bg-indigo-950"
-                                      : "bg-white hover:bg-gray-50 dark:bg-gray-100"
+                                flash === note
+                                    ? "bg-red-200 dark:bg-red-900"
+                                    : heldNotes.includes(note)
+                                      ? "translate-y-0.5 bg-green-200 shadow-[0_0_14px_-3px] shadow-green-400 dark:bg-green-900"
+                                      : expected.includes(note)
+                                        ? "bg-indigo-50 dark:bg-indigo-950"
+                                        : "bg-white hover:bg-gray-50 dark:bg-gray-100"
                             }`}
                         >
                             {fingers[note] ? (
@@ -101,11 +117,13 @@ export function PianoKeyboard({
                             onPointerCancel={up(note)}
                             onPointerLeave={leave(note)}
                             className={`${BLACK_KEY} h-2/3 ${
-                                heldNotes.includes(note)
-                                    ? "translate-y-0.5 bg-green-500 shadow-[0_0_14px_-3px] shadow-green-500"
-                                    : expected.includes(note)
-                                      ? "bg-indigo-400"
-                                      : "bg-gray-900 hover:bg-gray-800"
+                                flash === note
+                                    ? "bg-red-500"
+                                    : heldNotes.includes(note)
+                                      ? "translate-y-0.5 bg-green-500 shadow-[0_0_14px_-3px] shadow-green-500"
+                                      : expected.includes(note)
+                                        ? "bg-indigo-400"
+                                        : "bg-gray-900 hover:bg-gray-800"
                             }`}
                             style={{ left: `${left}%`, width: `${width}%` }}
                         >

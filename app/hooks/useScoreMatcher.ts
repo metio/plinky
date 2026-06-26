@@ -73,10 +73,16 @@ export function useScoreMatcher(
     const [done, setDone] = useState(0);
     const [total, setTotal] = useState(0);
     const [wrong, setWrong] = useState(0);
+    // Whether the player has missed at the current position (drives the "reveal on
+    // mistake" hint), and the most recent wrong note with a bump counter so the
+    // keyboard re-flashes it even when the same wrong key is hit twice running.
+    const [missedHere, setMissedHere] = useState(false);
+    const [lastWrong, setLastWrong] = useState<{ note: number; seq: number } | null>(null);
     const [range, setRange] = useState<{ from: number; to: number } | null>(null);
     const [complete, setComplete] = useState(false);
     const hit = useRef<Set<number>>(new Set());
     const ordinalRef = useRef(0);
+    const wrongSeq = useRef(0);
     const sinceWrong = useRef(0);
     const practicingRef = useRef(false);
     const optionsRef = useRef(options);
@@ -135,6 +141,7 @@ export function useScoreMatcher(
         setTotal(count);
         setDone(0);
         setWrong(0);
+        setMissedHere(false);
         setComplete(false);
         setRange(Number.isFinite(lo) ? { from: lo - 2, to: hi + 2 } : null);
         setExpected(pitchesAtCursor(osmd, hand));
@@ -151,6 +158,9 @@ export function useScoreMatcher(
             if (!expectedNow.includes(note)) {
                 setWrong((value) => value + 1);
                 sinceWrong.current += 1;
+                setMissedHere(true);
+                wrongSeq.current += 1;
+                setLastWrong({ note, seq: wrongSeq.current });
                 return;
             }
             hit.current.add(note);
@@ -183,10 +193,26 @@ export function useScoreMatcher(
                 setPracticing(false);
                 return;
             }
+            // Advancing to a new position clears the per-position miss flag, so the
+            // "reveal on mistake" hint hides again until the next slip.
+            setMissedHere(false);
             setExpected(pitchesAtCursor(osmd, runHandRef.current));
         },
         [getOsmd],
     );
 
-    return { practicing, expected, done, total, wrong, range, complete, start, stop, registerNote };
+    return {
+        practicing,
+        expected,
+        done,
+        total,
+        wrong,
+        missedHere,
+        lastWrong,
+        range,
+        complete,
+        start,
+        stop,
+        registerNote,
+    };
 }

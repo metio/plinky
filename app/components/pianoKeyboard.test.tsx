@@ -2,14 +2,19 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 afterEach(cleanup);
 
-function renderKeyboard(props: { expected?: number[]; from?: number; to?: number }) {
+function renderKeyboard(props: {
+    expected?: number[];
+    from?: number;
+    to?: number;
+    wrong?: { note: number; seq: number } | null;
+}) {
     return render(
         <MidiProvider>
             <PianoKeyboard {...props} />
@@ -31,6 +36,12 @@ describe("PianoKeyboard", () => {
         expect(screen.getByLabelText("D4").className).not.toContain(
             "bg-indigo-50 dark:bg-indigo-950",
         );
+    });
+
+    it("flashes a wrongly-played key red", async () => {
+        renderKeyboard({ from: 60, to: 67, wrong: { note: 62, seq: 1 } });
+        // The flash is set in an effect after mount, so wait for it.
+        await waitFor(() => expect(screen.getByLabelText("D4").className).toContain("bg-red-200"));
     });
 
     it("keeps a leading black key inside the keyboard", () => {

@@ -10,7 +10,7 @@ import { ThemeToggle } from "../components/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
-import { loadPrefs, type Prefs, savePrefs } from "../lib/prefs";
+import { loadPrefs, type NoteHints, type Prefs, savePrefs } from "../lib/prefs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
@@ -26,6 +26,7 @@ export default function Settings() {
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
         showFingerings: true,
+        noteHints: "miss",
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();
@@ -140,6 +141,21 @@ export default function Settings() {
                     />
                     {m.settings_show_fingerings()}
                 </label>
+                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    {m.settings_note_hints()}
+                    <select
+                        value={prefs.noteHints}
+                        onChange={(event) => update({ noteHints: event.target.value as NoteHints })}
+                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                    >
+                        <option value="always">{m.note_hints_always()}</option>
+                        <option value="miss">{m.note_hints_miss()}</option>
+                        <option value="never">{m.note_hints_never()}</option>
+                    </select>
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {m.settings_note_hints_help()}
+                </p>
                 <HandSize />
             </section>
 

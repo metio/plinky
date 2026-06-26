@@ -13,6 +13,7 @@ const BASE: Prefs = {
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
     showFingerings: true,
+    noteHints: "miss",
 };
 
 describe("prefs", () => {
@@ -46,6 +47,17 @@ describe("prefs", () => {
         expect(loadPrefs().showFingerings).toBe(true);
         savePrefs({ ...BASE, showFingerings: false });
         expect(loadPrefs().showFingerings).toBe(false);
+    });
+
+    it("defaults note hints to after-a-mistake and round-trips the choice", () => {
+        expect(loadPrefs().noteHints).toBe("miss");
+        savePrefs({ ...BASE, noteHints: "never" });
+        expect(loadPrefs().noteHints).toBe("never");
+    });
+
+    it("rejects an unknown note-hint value", () => {
+        localStorage.setItem("plinky:prefs", JSON.stringify({ noteHints: "bogus" }));
+        expect(loadPrefs().noteHints).toBe("miss");
     });
 
     it("drops out-of-range or malformed spans to null", () => {

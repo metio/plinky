@@ -544,6 +544,15 @@ export function ScoreViewer({
         }
     }
 
+    // Reveal the next note by colour per the player's hint setting — always, only
+    // once they've slipped at this position, or never. A wrong key flashes red
+    // regardless, so a miss is always felt.
+    const noteHints = loadPrefs().noteHints;
+    const hintNotes =
+        noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
+            ? matcher.expected
+            : [];
+
     return (
         <div className="space-y-3">
             {/* The score sits at the top — it's what you read while playing, so the
@@ -733,7 +742,8 @@ export function ScoreViewer({
                         <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
                     )}
                     <PianoKeyboard
-                        expected={matcher.expected}
+                        expected={hintNotes}
+                        wrong={matcher.lastWrong}
                         from={matcher.range?.from}
                         to={matcher.range?.to}
                         fingers={currentFingers}
