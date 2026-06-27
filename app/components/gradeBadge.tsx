@@ -2,19 +2,22 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { currentGrade, loadGradedMastery } from "../lib/gradeProgress";
+import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
 import { PRACTICE_EVENT } from "../lib/history";
 import { loadPrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 
-// The current grade beside the logo, Duolingo-crown style. Derived from how much of
-// each grade's pool the player has mastered under their chosen decay mode, so it
-// resolves after mount (nothing on the server, matching the first client render) and
-// refreshes on the practice event. A crossed-swords mark flags competitive mode —
-// the bragging badge for playing where grades can actually slip. Hidden until grade 1.
+// The current grade beside the logo, Duolingo-crown style, and the way to reach the
+// grades page. Derived from how much of each grade's pool the player has mastered
+// under their chosen decay mode, so it resolves after mount (nothing during prerender,
+// matching the first client render) and refreshes on the practice event. It shows a
+// muted Grade 0 before the first grade is earned — never empty, since it is the only
+// link to /grades. The skill rating rides alongside once there's anything to play, a
+// crossed-swords mark flags competitive mode.
 export function GradeBadge() {
     const [level, setLevel] = useState<number | null>(null);
+    const [skill, setSkill] = useState(0);
     const [competitive, setCompetitive] = useState(false);
 
     useEffect(() => {
@@ -23,7 +26,9 @@ export function GradeBadge() {
             loadGradedMastery().then((items) => {
                 if (!cancelled) {
                     const mode = loadPrefs().decayMode;
-                    setLevel(currentGrade(items, mode, Date.now()));
+                    const now = Date.now();
+                    setLevel(currentGrade(items, mode, now));
+                    setSkill(skillRating(items, mode, now));
                     setCompetitive(mode === "competitive");
                 }
             });
@@ -36,21 +41,35 @@ export function GradeBadge() {
         };
     }, []);
 
-    if (!level) {
+    // Only the pre-mount state is empty; once read, Grade 0 still shows.
+    if (level === null) {
         return null;
     }
 
+    const earned = level > 0;
     return (
         <Link
             to="/grades"
             aria-label={
                 competitive ? m.grade_label_competitive({ level }) : m.grade_label({ level })
             }
-            className="flex items-center gap-1 text-sm font-semibold text-indigo-600 dark:text-indigo-300"
+            className={`flex items-center gap-1 text-sm font-semibold ${
+                earned ? "text-indigo-600 dark:text-indigo-300" : "text-gray-500 dark:text-gray-400"
+            }`}
         >
-            <span aria-hidden="true">🎓</span>
+            <span aria-hidden="true" className={earned ? "" : "grayscale"}>
+                🎓
+            </span>
             <span className="tabular-nums">{level}</span>
             {competitive && <span aria-hidden="true">⚔️</span>}
+            {skill > 0 && (
+                <span
+                    aria-hidden="true"
+                    className="ml-0.5 text-xs font-medium text-gray-500 dark:text-gray-400"
+                >
+                    ⚡{skill}
+                </span>
+            )}
         </Link>
     );
 }

@@ -102,18 +102,6 @@ function Header() {
                         {m.nav_library()}
                     </Link>
                     <Link
-                        to="/progress"
-                        className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-                    >
-                        {m.nav_progress()}
-                    </Link>
-                    <Link
-                        to="/grades"
-                        className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-                    >
-                        {m.nav_grades()}
-                    </Link>
-                    <Link
                         to="/settings"
                         className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                     >

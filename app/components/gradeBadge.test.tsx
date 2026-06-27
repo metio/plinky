@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../lib/gradeProgress";
@@ -50,11 +50,11 @@ const mount = () =>
     );
 
 describe("GradeBadge", () => {
-    it("stays hidden before any grade is earned", async () => {
+    it("shows a Grade 0 before any grade is earned, so /grades stays reachable", async () => {
         loadMock.mockResolvedValue(mastered(1, 4)); // short of Bronze
         mount();
-        await waitFor(() => expect(loadMock).toHaveBeenCalled());
-        expect(screen.queryByRole("link", { name: /grade/i })).toBeNull();
+        const link = await screen.findByRole("link", { name: /grade/i });
+        expect(link.textContent).toContain("0");
     });
 
     it("shows the grade once a grade's Bronze is reached", async () => {
