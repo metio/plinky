@@ -35,7 +35,7 @@ describe("exercise ids", () => {
         expect(parseExerciseId(id)).toEqual(config);
     });
 
-    it("encodes and parses an interval (3rds/6ths) form variant", () => {
+    it("encodes and parses an interval (thirds/sixths) form variant", () => {
         const config = {
             type: "major-scale" as const,
             key: "c",
@@ -97,7 +97,7 @@ describe("generateExercise", () => {
         expect((both.match(/<part id=/g) ?? []).length).toBe(2);
     });
 
-    it("sounds two notes per position in a scale in 3rds (C+E)", () => {
+    it("sounds two notes per position in a scale in thirds (C+E)", () => {
         const xml = generateExercise(parseExerciseId("scale-c-major.1rt")!);
         // The double stop prints the upper note as a <chord/>.
         expect(xml).toContain("<chord/>");

@@ -237,7 +237,7 @@ const shiftOctave = (notes: Note[], by: number): Note[] =>
 const shiftPositions = (positions: Note[][], by: number): Note[][] =>
     positions.map((pos) => shiftOctave(pos, by));
 
-// A scale in 3rds/6ths sounds each note together with the one `steps` scale-degrees
+// A scale in thirds/sixths sounds each note together with the one `steps` scale-degrees
 // above — a double stop. Only the symmetric scales (major, natural and harmonic
 // minor) support it; the upper voice is the same scale offset, so its accidentals
 // follow automatically.
@@ -371,8 +371,8 @@ const SCALE_LABEL: Record<string, string> = {
 export function exerciseTitle(config: ExerciseConfig): string {
     const parts = [`${niceKey(config.key)} ${SCALE_LABEL[config.type]}`];
     const forms: string[] = [];
-    if (config.interval === "thirds") forms.push("in 3rds");
-    if (config.interval === "sixths") forms.push("in 6ths");
+    if (config.interval === "thirds") forms.push("in thirds");
+    if (config.interval === "sixths") forms.push("in sixths");
     if (config.octaves === 2) forms.push("2 octaves");
     if (config.hands === "left") forms.push("left hand");
     if (config.hands === "both") forms.push("both hands");
@@ -399,7 +399,7 @@ const HAND_CODE: Record<Hands, string> = { right: "r", left: "l", both: "b", con
 const CODE_HAND: Record<string, Hands> = { r: "right", l: "left", b: "both", c: "contrary" };
 
 // Inversion (arpeggios) and interval (scales) are mutually exclusive, so they share
-// the slot after the hand: i1/i2 for inversions, t/s for 3rds/6ths.
+// the slot after the hand: i1/i2 for inversions, t/s for thirds/sixths.
 const INTERVAL_CODE: Record<Interval, string> = { single: "", thirds: "t", sixths: "s" };
 const CODE_INTERVAL: Record<string, Interval> = { t: "thirds", s: "sixths" };
 
