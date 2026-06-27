@@ -25,17 +25,18 @@ function renderHome() {
 }
 
 describe("Home", () => {
-    it("always offers the no-score training modes", () => {
+    it("offers the feature cards, and not the daily (it lives in the Today panel)", () => {
         renderHome();
-        for (const label of ["Daily challenge →", "Ear training →"]) {
+        for (const label of ["Compose →", "Ear training →", "Fingering →"]) {
             expect(screen.getByText(label)).toBeTruthy();
         }
+        expect(screen.queryByText("Daily challenge →")).toBeNull();
     });
 
     it("routes into the library and the assignments", () => {
         renderHome();
         // Links are localized; the test setup pins the locale to the base.
-        expect(screen.getByText("All scores →").closest("a")?.getAttribute("href")).toBe(
+        expect(screen.getByText("Library →").closest("a")?.getAttribute("href")).toBe(
             "/en/library",
         );
         expect(screen.getByText("Assignments →").closest("a")?.getAttribute("href")).toBe(
