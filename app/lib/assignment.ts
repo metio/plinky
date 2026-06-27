@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { strFromU8, strToU8, unzlibSync, zlibSync } from "fflate";
+import { packToCode, unpackFromCode } from "./shareCode";
 import type { Track } from "./tracks";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
@@ -175,28 +175,10 @@ function fromCompact(compact: unknown): Assignment {
     });
 }
 
-function bytesToBase64url(bytes: Uint8Array): string {
-    let binary = "";
-    for (const byte of bytes) {
-        binary += String.fromCharCode(byte);
-    }
-    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function base64urlToBytes(code: string): Uint8Array {
-    const binary = atob(code.replace(/-/g, "+").replace(/_/g, "/"));
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
-}
-
-// Pack an assignment into a URL-safe token: compact JSON, zlib-compressed, then
-// base64url — short enough for a ?assignment= link, like the ghost-race codes.
+// Pack an assignment into a URL-safe token: a compact shape through the shared
+// share-code codec, short enough for a ?assignment= link.
 export function encodeAssignmentLink(assignment: Assignment): string {
-    const json = JSON.stringify(toCompact(assignment));
-    return bytesToBase64url(zlibSync(strToU8(json), { level: 9 }));
+    return packToCode(toCompact(assignment));
 }
 
 export function decodeAssignmentLink(code: string): Assignment | null {
@@ -204,7 +186,7 @@ export function decodeAssignmentLink(code: string): Assignment | null {
         return null;
     }
     try {
-        const assignment = fromCompact(JSON.parse(strFromU8(unzlibSync(base64urlToBytes(code)))));
+        const assignment = fromCompact(unpackFromCode(code));
         return assignment.items.length > 0 ? assignment : null;
     } catch {
         return null;
