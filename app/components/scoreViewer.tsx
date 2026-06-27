@@ -62,6 +62,9 @@ type PlayedNote = RunNote & { velocity: number };
 const BUTTON =
     "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
 
+const NUMBER_INPUT =
+    "w-14 rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300";
+
 // Renders a MusicXML score with OpenSheetMusicDisplay. Listen plays it back on the
 // shared synth, walking OSMD's cursor so the highlight follows; Practice turns the
 // same cursor into a note-by-note matcher driven by MIDI or the keyboard. OSMD
@@ -137,6 +140,17 @@ export function ScoreViewer({
             setTempo((current) => Math.min(current + 5, trainerRef.current.target));
         }
     }, []);
+    // Section looping: Listen repeats a bar range over and over so a hard passage
+    // can be drilled — read along, or play along with the metronome. Bars are
+    // 1-based for the player; the cursor walks them 0-based, hence the offset in
+    // listen(). The range is read from a ref during playback so the loop reacts to
+    // the inputs without restarting the cursor loop.
+    const [measureCount, setMeasureCount] = useState(1);
+    const [loopOn, setLoopOn] = useState(false);
+    const [loopFrom, setLoopFrom] = useState(1);
+    const [loopTo, setLoopTo] = useState(1);
+    const loopRef = useRef({ on: false, from: 1, to: 1 });
+    loopRef.current = { on: loopOn, from: loopFrom, to: loopTo };
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -458,6 +472,13 @@ export function ScoreViewer({
                         // time; a single-staff score offers no such choice.
                         setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
                         setHand("both");
+                        // Seed the loop range to the whole piece so the inputs are
+                        // valid before the player narrows them to a passage.
+                        const bars = osmd.Sheet?.SourceMeasures?.length ?? 1;
+                        setMeasureCount(bars);
+                        setLoopFrom(1);
+                        setLoopTo(bars);
+                        setLoopOn(false);
                         setReady(true);
                     }
                 });
@@ -488,11 +509,33 @@ export function ScoreViewer({
         playingRef.current = true;
         matcher.stop();
         const cursor: Cursor = osmd.cursor;
-        cursor.reset();
+        // Walk the cursor to the first voice-entry of a 1-based bar from a clean
+        // reset — OSMD has no direct seek, so the range loop steps to it.
+        const seekToBar = (bar: number) => {
+            cursor.reset();
+            while (!cursor.iterator.EndReached && cursor.iterator.CurrentMeasureIndex < bar - 1) {
+                cursor.next();
+            }
+        };
+        if (loopRef.current.on) {
+            seekToBar(loopRef.current.from);
+        } else {
+            cursor.reset();
+        }
         cursor.show();
         setPlaying(true);
         const tick = () => {
-            if (cursor.iterator.EndReached) {
+            const loop = loopRef.current;
+            // Past the loop's last bar (or the score's end while looping), jump back
+            // to the start bar rather than stopping — and ramp the tempo if the
+            // trainer is on, so each pass drills the passage a little faster.
+            if (
+                loop.on &&
+                (cursor.iterator.EndReached || cursor.iterator.CurrentMeasureIndex > loop.to - 1)
+            ) {
+                bumpTempo();
+                seekToBar(loop.from);
+            } else if (cursor.iterator.EndReached) {
                 stopListen();
                 bumpTempo();
                 return;
@@ -722,6 +765,61 @@ export function ScoreViewer({
                                     aria-label={m.tempo_trainer_target()}
                                 />
                                 <Bpm tempo={trainerTarget} className="w-12" />
+                            </>
+                        )}
+                    </span>
+                )}
+                {ready && measureCount > 1 && (
+                    <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <button
+                            type="button"
+                            onClick={() => setLoopOn((on) => !on)}
+                            aria-pressed={loopOn}
+                            className={
+                                loopOn
+                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                    : BUTTON
+                            }
+                        >
+                            {m.loop_section()}
+                        </button>
+                        {loopOn && (
+                            <>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    max={measureCount}
+                                    value={loopFrom}
+                                    onChange={(event) => {
+                                        const value = Math.min(
+                                            Math.max(Number(event.target.value), 1),
+                                            measureCount,
+                                        );
+                                        setLoopFrom(value);
+                                        // The start can't pass the end — drag the end
+                                        // along so the range never inverts.
+                                        setLoopTo((to) => Math.max(to, value));
+                                    }}
+                                    aria-label={m.loop_from()}
+                                    className={NUMBER_INPUT}
+                                />
+                                <span aria-hidden="true">–</span>
+                                <input
+                                    type="number"
+                                    min={loopFrom}
+                                    max={measureCount}
+                                    value={loopTo}
+                                    onChange={(event) =>
+                                        setLoopTo(
+                                            Math.min(
+                                                Math.max(Number(event.target.value), loopFrom),
+                                                measureCount,
+                                            ),
+                                        )
+                                    }
+                                    aria-label={m.loop_to()}
+                                    className={NUMBER_INPUT}
+                                />
                             </>
                         )}
                     </span>

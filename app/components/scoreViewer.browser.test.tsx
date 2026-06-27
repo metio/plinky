@@ -148,4 +148,39 @@ describe("ScoreViewer", () => {
         expect(screen.queryByText("Right")).toBeNull();
         expect(screen.queryByText("Left")).toBeNull();
     });
+
+    it("reveals the section-loop bar inputs only once looping is on", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const loop = await screen.findByText(/Loop/, undefined, { timeout: 8000 });
+        expect(loop.getAttribute("aria-pressed")).toBe("false");
+        expect(screen.queryByLabelText("Loop from bar")).toBeNull();
+        fireEvent.click(loop);
+        expect(loop.getAttribute("aria-pressed")).toBe("true");
+        // The range seeds to the whole piece — OSMD reported three bars.
+        const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
+        expect(to.value).toBe("3");
+    });
+
+    it("never lets the loop range invert", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await screen.findByText(/Loop/, undefined, { timeout: 8000 }));
+        const from = screen.getByLabelText("Loop from bar") as HTMLInputElement;
+        const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
+        fireEvent.change(to, { target: { value: "2" } });
+        expect(to.value).toBe("2");
+        // Pushing the start past the end drags the end along instead of inverting.
+        fireEvent.change(from, { target: { value: "3" } });
+        expect(from.value).toBe("3");
+        expect(to.value).toBe("3");
+    });
+
+    it("omits the section-loop control for a single-bar score", async () => {
+        const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(single, { beatsPerBar: 4 });
+        const listen = await screen.findByText(/Listen/, undefined, { timeout: 8000 });
+        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
+        expect(screen.queryByText(/Loop/)).toBeNull();
+    });
 });
