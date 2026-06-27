@@ -57,10 +57,12 @@ describe("YouView", () => {
             </MemoryRouter>,
         );
 
-        expect(await screen.findByText("Grade 1")).toBeTruthy();
-        // The retrospective stats merged in from /progress.
-        expect(screen.getByText(/day streak/i)).toBeTruthy();
+        // The gentlest next-grade piece confirms the page resolved.
         expect(await screen.findByRole("link", { name: "Gentle Two" })).toBeTruthy();
+        // Standing (Grade 1 shows in the headline and the roadmap row) and the
+        // retrospective stats merged in from /progress.
+        expect(screen.getAllByText("Grade 1").length).toBeGreaterThan(0);
+        expect(screen.getByText(/day streak/i)).toBeTruthy();
     });
 
     it("guides a brand-new Grade-0 player with the first-steps checklist", async () => {

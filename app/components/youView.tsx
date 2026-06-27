@@ -81,15 +81,19 @@ export function YouView() {
         };
     }, []);
 
+    // Wait for the personal data before painting anything, so the page renders once
+    // fully rather than prerendering a roadmap that shifts as the data lands — the
+    // whole page is client-only mastery/history, and a single paint keeps CLS at zero.
+    if (items === null) {
+        return null;
+    }
+
     const now = Date.now();
     const mode = loadPrefs().decayMode;
-    const resolved = items ?? [];
+    const resolved = items;
     const level = currentGrade(resolved, mode, now);
-    // Read the first-steps state only on the client (after mount), so it doesn't run
-    // against absent localStorage during prerender.
-    const mounted = items !== null;
-    const steps = mounted ? firstSteps() : null;
-    const showOnboarding = level === 0 && steps !== null && !allFirstStepsDone(steps);
+    const steps = firstSteps();
+    const showOnboarding = level === 0 && !allFirstStepsDone(steps);
     const skill = skillRating(resolved, mode, now);
     const reviews = dueReviews(resolved, now);
     const byId = new Map(resolved.map((item) => [item.id, item]));
@@ -155,7 +159,7 @@ export function YouView() {
                 </section>
             )}
 
-            {showOnboarding && steps && (
+            {showOnboarding && (
                 <section className="space-y-3 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
                     <h2 className="font-semibold text-indigo-800 dark:text-indigo-200">
                         {m.grades_start_heading()}
