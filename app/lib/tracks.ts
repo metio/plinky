@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { assignmentToTrack, loadAssignments } from "./assignment";
+
 // A track is an ordered path through the catalog — a graded progression to work
 // up, or a timed routine to play in a session. Unlike a curriculum (an unordered
 // collection), a track carries order and progress. Nothing is ever locked: every
@@ -126,3 +128,9 @@ export const TRACKS = [
         ],
     },
 ] satisfies Track[];
+
+// Every track to show: the built-in progressions and routines, then the player's
+// own imported assignments (teacher-built, or their own) appended after them.
+export function loadTracks(): Track[] {
+    return [...TRACKS, ...loadAssignments().map(assignmentToTrack)];
+}

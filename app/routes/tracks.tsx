@@ -7,7 +7,7 @@ import { loadCatalog } from "../lib/catalog";
 import { loadExerciseManifest } from "../lib/exercises";
 import { loadMastery } from "../lib/mastery";
 import { routeMeta } from "../lib/site";
-import { type Track, type TrackStep, TRACKS, trackSteps } from "../lib/tracks";
+import { type Track, type TrackStep, loadTracks, TRACKS, trackSteps } from "../lib/tracks";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/tracks";
 
@@ -149,7 +149,11 @@ function TrackPath({
 
 export default function TracksRoute() {
     const [titles, setTitles] = useState<Record<string, string>>({});
+    // Built-in tracks render on the prerendered shell; the player's own imported
+    // assignments are read from local storage once mounted and appended.
+    const [tracks, setTracks] = useState<Track[]>(TRACKS);
     useEffect(() => {
+        setTracks(loadTracks());
         // Tracks step through exercises and bundled pieces, so titles come from both.
         loadExerciseManifest().then((exercises) => {
             const byId: Record<string, string> = {};
@@ -171,7 +175,7 @@ export default function TracksRoute() {
             </header>
 
             <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {TRACKS.map((track, index) => (
+                {tracks.map((track, index) => (
                     <TrackPath
                         key={track.id}
                         track={track}
@@ -181,9 +185,14 @@ export default function TracksRoute() {
                 ))}
             </div>
 
-            <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                {m.action_back_home()}
-            </Link>
+            <div className="flex flex-wrap gap-4 text-sm">
+                <Link to="/assignments" className="text-indigo-700 underline dark:text-indigo-300">
+                    {m.assignments_build_link()}
+                </Link>
+                <Link to="/" className="text-indigo-700 underline dark:text-indigo-300">
+                    {m.action_back_home()}
+                </Link>
+            </div>
         </main>
     );
 }

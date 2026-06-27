@@ -30,6 +30,7 @@ const PLAY_NOW = [
 const LIBRARY = [
     { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb },
     { to: "/tracks", label: m.home_tracks, blurb: m.home_tracks_blurb },
+    { to: "/assignments", label: m.home_assignments, blurb: m.home_assignments_blurb },
 ];
 
 export default function Home() {
