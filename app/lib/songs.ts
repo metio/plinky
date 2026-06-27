@@ -28,7 +28,7 @@ const SEEDED_KEY = "plinky:songs-seeded";
 
 let manifestCache: SongMeta[] | null = null;
 
-// The browseable catalogue (metadata only). Cached for the session; returns [] when
+// The browsable catalogue (metadata only). Cached for the session; returns [] when
 // the manifest is absent (e.g., a dev build without an import run) so the rest of
 // the app degrades quietly.
 export async function loadManifest(): Promise<SongMeta[]> {
