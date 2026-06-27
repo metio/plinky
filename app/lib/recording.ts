@@ -67,39 +67,26 @@ function isAscending(onsets: number[]): boolean {
     return true;
 }
 
-// The legacy URL shape: onset ms rounded and joined with dots (`12.500.1000`).
-// Links shared before the compact codec still need to race, so they are parsed too.
-function decodeLegacyGhost(code: string): number[] | null {
-    const onsets = code.split(".").map(Number);
-    if (onsets.some((onset) => !Number.isFinite(onset))) {
-        return null;
-    }
-    return isAscending(onsets) ? onsets : null;
-}
-
 // A ghost packed for a URL — the inter-onset gaps through the shared compress-and-
 // base64url codec, so even a long piece stays within a shareable link length.
 export function encodeGhost(onsets: number[]): string {
     return packToCode(toGaps(onsets));
 }
 
-// Parse a shared ghost: the compact codec first, then the legacy dot-joined shape,
-// rejecting anything that isn't a run of ascending numbers.
+// Parse a shared ghost, rejecting anything that isn't a run of ascending numbers.
 export function decodeGhost(code: string): number[] | null {
     if (!code) {
         return null;
     }
     const unpacked = unpackFromCode(code);
     if (
-        Array.isArray(unpacked) &&
-        unpacked.every((gap) => typeof gap === "number" && Number.isFinite(gap))
+        !Array.isArray(unpacked) ||
+        !unpacked.every((gap) => typeof gap === "number" && Number.isFinite(gap))
     ) {
-        const onsets = fromGaps(unpacked);
-        if (isAscending(onsets)) {
-            return onsets;
-        }
+        return null;
     }
-    return decodeLegacyGhost(code);
+    const onsets = fromGaps(unpacked);
+    return isAscending(onsets) ? onsets : null;
 }
 
 // How many notes the ghost has reached by a given elapsed time. The onsets ascend,

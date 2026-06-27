@@ -4,6 +4,7 @@
 
 import { afterEach, describe, expect, it } from "vitest";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "./recording";
+import { packToCode } from "./shareCode";
 
 afterEach(() => localStorage.clear());
 
@@ -24,14 +25,15 @@ describe("recording", () => {
         expect(decodeGhost(code)).toEqual([0, 500, 1000, 2500]);
     });
 
-    it("still decodes the legacy dot-joined shape", () => {
-        expect(decodeGhost("0.500.1000")).toEqual([0, 500, 1000]);
+    it("rejects an empty or malformed shared code", () => {
+        expect(decodeGhost("")).toBeNull();
+        expect(decodeGhost("not-a-real-code")).toBeNull();
     });
 
-    it("rejects a malformed or out-of-order shared code", () => {
-        expect(decodeGhost("")).toBeNull();
-        expect(decodeGhost("0.nope.1000")).toBeNull();
-        expect(decodeGhost("0.1000.500")).toBeNull();
+    it("rejects a code whose onsets run backwards", () => {
+        // A tampered code packing a negative gap would dip the running time below
+        // the previous onset, which is never a real recording.
+        expect(decodeGhost(packToCode([0, 1000, -600]))).toBeNull();
     });
 
     it("keeps even the longest song's ghost within a shareable link", () => {

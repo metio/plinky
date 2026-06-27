@@ -6,7 +6,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { generatePhrase } from "../lib/generator";
-import { saveGhost } from "../lib/recording";
+import { encodeGhost, saveGhost } from "../lib/recording";
 import { GHOST_COLOR, PLAYED_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
 
@@ -117,8 +117,9 @@ describe("ScoreViewer", () => {
 
     it("adopts a ghost from a link and offers to pass it on", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const code = encodeGhost([0, 500, 1000]);
         render(
-            <MemoryRouter initialEntries={["/play/t?ghost=0.500.1000"]}>
+            <MemoryRouter initialEntries={[`/play/t?ghost=${code}`]}>
                 <MidiProvider>
                     <ScoreViewer id="t" xml={phrase} title="T" beatsPerBar={4} canShareGhost />
                 </MidiProvider>
