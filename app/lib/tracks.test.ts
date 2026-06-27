@@ -12,9 +12,9 @@ const modules = import.meta.glob("../../scores/*.musicxml", {
     import: "default",
     eager: true,
 });
-const exerciseManifest = JSON.parse(
-    readFileSync("public/exercises/manifest.json", "utf8"),
-) as { id: string }[];
+const exerciseManifest = JSON.parse(readFileSync("public/exercises/manifest.json", "utf8")) as {
+    id: string;
+}[];
 const catalogIds = new Set([
     ...Object.keys(modules).map((path) => (path.split("/").pop() ?? "").replace(/\.musicxml$/, "")),
     ...exerciseManifest.map((exercise) => exercise.id),
