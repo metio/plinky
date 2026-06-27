@@ -53,6 +53,7 @@ import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
 import { GhostTrack } from "./ghostTrack";
+import { DownloadIcon, PlayIcon, PrinterIcon, ShareIcon, StopIcon } from "./icons";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { ShareCard } from "./shareCard";
@@ -64,6 +65,10 @@ type PlayedNote = RunNote & { velocity: number };
 
 const BUTTON =
     "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
+// A button carrying an icon and a label, and one carrying only an icon (square).
+const BUTTON_WITH_ICON = `${BUTTON} inline-flex items-center gap-1.5`;
+const ICON_BUTTON =
+    "rounded-md bg-indigo-50 p-2 text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
 
 const NUMBER_INPUT =
     "w-14 rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300";
@@ -700,8 +705,9 @@ export function ScoreViewer({
                     type="button"
                     disabled={!ready}
                     onClick={() => (playing ? stopListen() : listen())}
-                    className={BUTTON}
+                    className={BUTTON_WITH_ICON}
                 >
+                    {playing ? <StopIcon /> : <PlayIcon />}
                     {playing ? m.action_listen_stop() : m.action_listen()}
                 </button>
                 <button
@@ -941,11 +947,23 @@ export function ScoreViewer({
 
             {ready && (
                 <div className="flex flex-wrap items-center gap-3">
-                    <button type="button" onClick={printScore} className={BUTTON}>
-                        {m.action_print()}
+                    <button
+                        type="button"
+                        onClick={printScore}
+                        className={ICON_BUTTON}
+                        aria-label={m.action_print()}
+                        title={m.action_print()}
+                    >
+                        <PrinterIcon />
                     </button>
-                    <button type="button" onClick={exportMidi} className={BUTTON}>
-                        {m.action_export_midi()}
+                    <button
+                        type="button"
+                        onClick={exportMidi}
+                        className={ICON_BUTTON}
+                        aria-label={m.action_export_midi()}
+                        title={m.action_export_midi()}
+                    >
+                        <DownloadIcon />
                     </button>
                 </div>
             )}
@@ -987,7 +1005,8 @@ export function ScoreViewer({
                             {m.ghost_shared_loaded()}
                         </span>
                     )}
-                    <button type="button" onClick={shareGhost} className={BUTTON}>
+                    <button type="button" onClick={shareGhost} className={BUTTON_WITH_ICON}>
+                        <ShareIcon />
                         {shareStatus === "copied" ? m.ghost_share_copied() : m.ghost_share()}
                     </button>
                 </div>

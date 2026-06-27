@@ -82,8 +82,13 @@ describe("ScoreViewer", () => {
         // same key clears each position in turn.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
-        fireEvent.click(await screen.findByText(/Practice/));
+        // Wait for OSMD to be ready via the real signal — the Practice button
+        // enabling — since toolbar icons mean "any svg" is present from the start.
+        const practiceButton = await screen.findByText(/Practice/);
+        await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 8000,
+        });
+        fireEvent.click(practiceButton);
         const key = await screen.findByLabelText("C5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
@@ -104,8 +109,13 @@ describe("ScoreViewer", () => {
         saveGhost("t", [0, 500, 1000]);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
-        fireEvent.click(await screen.findByText(/Practice/));
+        // Wait for OSMD to be ready via the real signal — the Practice button
+        // enabling — since toolbar icons mean "any svg" is present from the start.
+        const practiceButton = await screen.findByText(/Practice/);
+        await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 8000,
+        });
+        fireEvent.click(practiceButton);
         // The race track appears...
         expect(await screen.findByRole("img", { name: /race/i })).toBeTruthy();
         // ...and the ghost colours its current note on the rendered staff.
@@ -232,7 +242,7 @@ describe("ScoreViewer", () => {
             print: vi.fn(),
         };
         const open = vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-        fireEvent.click(screen.getByText(/Print/));
+        fireEvent.click(screen.getByRole("button", { name: /print/i }));
         expect(open).toHaveBeenCalled();
         expect(fakeWindow.print).toHaveBeenCalled();
         expect(written.join("")).toContain("<svg");
@@ -251,7 +261,7 @@ describe("ScoreViewer", () => {
         });
         const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
         const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-        fireEvent.click(screen.getByText(/MIDI/));
+        fireEvent.click(screen.getByRole("button", { name: /export midi/i }));
         expect(exported).not.toBeNull();
         // A Standard MIDI File opens with the "MThd" header chunk.
         const head = new Uint8Array((await exported!.arrayBuffer()).slice(0, 4));
