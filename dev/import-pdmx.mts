@@ -173,6 +173,9 @@ async function main() {
         title: song.title,
         composer: song.composer,
         grade: song.grade,
+        // The raw fingering-cost, so a grade's songs can be ordered easiest-first and
+        // a syllabus can draw the gentlest of a grade rather than a random pick.
+        cost: Number(song.cost.toFixed(3)),
         license: "CC0-1.0",
         tempo: song.tempo,
         beatsPerBar: song.beatsPerBar,

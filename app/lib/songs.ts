@@ -16,6 +16,9 @@ export type SongMeta = {
     title: string;
     composer: string;
     grade: number;
+    // The raw fingering-cost the grade was binned from; lets a grade's songs be
+    // ordered easiest-first and a syllabus draw the gentlest of a grade.
+    cost: number;
     license: string;
     tempo: number;
     beatsPerBar: number;
