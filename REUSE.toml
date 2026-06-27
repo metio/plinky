@@ -20,6 +20,20 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "CC0-1.0"
 
+# The curated song catalogue: public-domain solo-piano pieces imported from the
+# PDMX dataset (CC0), stored as compressed .mxl, plus its generated metadata.
+[[annotations]]
+path = ["public/songs/*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "PDMX contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["public/songs/manifest.json", "public/songs/seed.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "0BSD"
+
 # Generated logo art, the binary favicon, and the social-card image: declared
 # here so the asset files stay untouched.
 [[annotations]]

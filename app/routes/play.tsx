@@ -7,6 +7,7 @@ import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
 import { resolveScore, type Score } from "../lib/catalog";
 import { musicCompositionData, routeMeta } from "../lib/site";
+import { resolveSong } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
@@ -34,7 +35,22 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // there is no such score.
     const [score, setScore] = useState<Score | null | undefined>(undefined);
     useEffect(() => {
-        setScore(resolveScore(params.scoreId) ?? null);
+        const local = resolveScore(params.scoreId);
+        if (local) {
+            setScore(local);
+            return;
+        }
+        // Not a bundled or user score — fall back to the song catalogue, which
+        // fetches the MusicXML on demand.
+        let cancelled = false;
+        resolveSong(params.scoreId).then((song) => {
+            if (!cancelled) {
+                setScore(song);
+            }
+        });
+        return () => {
+            cancelled = true;
+        };
     }, [params.scoreId]);
 
     return (

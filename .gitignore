@@ -25,3 +25,4 @@ __screenshots__/
 
 # Storybook build output
 storybook-static
+/pdmx/

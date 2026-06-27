@@ -39,8 +39,10 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-function isHashedAsset(url) {
-    return url.pathname.startsWith("/assets/");
+function isImmutable(url) {
+    // Hashed build chunks carry a content hash; song files (.mxl) are named by their
+    // content CID. Neither can change at a given URL, so a cached copy never stales.
+    return url.pathname.startsWith("/assets/") || url.pathname.endsWith(".mxl");
 }
 
 self.addEventListener("fetch", (event) => {
@@ -76,7 +78,7 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    if (isHashedAsset(url)) {
+    if (isImmutable(url)) {
         event.respondWith(
             (async () => {
                 const cached = await caches.match(request);

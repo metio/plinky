@@ -5,6 +5,7 @@
     "**/.client/**/*",
     ".react-router/types/**/*"
   ],
+  "exclude": ["dev/import-pdmx.mts", "pdmx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["node", "vite/client"],
