@@ -133,7 +133,7 @@ export function GradeLadderView() {
                                 <span className="tabular-nums">
                                     {m.grades_pool({ mastered, total })}
                                 </span>
-                                <span className="text-gray-400 dark:text-gray-500">
+                                <span className="text-gray-500 dark:text-gray-400">
                                     {next
                                         ? m.grades_to_next({
                                               count: next.remaining,
