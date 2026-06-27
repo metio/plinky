@@ -33,10 +33,12 @@ describe("AssignmentsRoute", () => {
         // The chosen piece moves into the ordered basket.
         expect(screen.getByText(/Twinkle/)).toBeTruthy();
         fireEvent.click(screen.getByText("Save"));
-        // It is confirmed and listed under the player's own assignments.
+        // It is confirmed and listed under the player's own assignments, its piece
+        // shown as a playable step.
         expect(await screen.findByRole("status")).toHaveTextContent(/Saved/);
         expect(screen.getByText("My set")).toBeTruthy();
-        expect(screen.getByText("1 items")).toBeTruthy();
+        const step = screen.getByRole("link", { name: /Twinkle/ });
+        expect(step.getAttribute("href")).toContain("/play/twinkle-twinkle");
     });
 
     it("offers a shared assignment from a link and imports it", async () => {
