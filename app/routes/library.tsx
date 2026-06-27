@@ -50,6 +50,7 @@ export default function LibraryRoute() {
     const [kindFilter, setKindFilter] = useState<Kind | "">(""); // "" = all kinds
     const [gradeFilter, setGradeFilter] = useState(0); // 0 = all grades
     const [favoritesOnly, setFavoritesOnly] = useState(false);
+    const [dueOnly, setDueOnly] = useState(false);
     const [visible, setVisible] = useState(PER_PAGE);
     const searchRef = useRef<HTMLInputElement>(null);
 
@@ -107,7 +108,7 @@ export default function LibraryRoute() {
 
     // A new filter starts from the top of its (possibly long) result set.
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset paging when the filter changes
-    useEffect(() => setVisible(PER_PAGE), [query, kindFilter, gradeFilter, favoritesOnly]);
+    useEffect(() => setVisible(PER_PAGE), [query, kindFilter, gradeFilter, favoritesOnly, dueOnly]);
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
     const remove = (id: string) => {
@@ -121,6 +122,7 @@ export default function LibraryRoute() {
 
     const matches = useMemo(() => {
         const needle = query.trim().toLowerCase();
+        const at = Date.now();
         return [...local, ...exercises, ...songs].filter((item) => {
             if (kindFilter && item.kind !== kindFilter) {
                 return false;
@@ -131,6 +133,12 @@ export default function LibraryRoute() {
             if (favoritesOnly && !favorites.has(item.id)) {
                 return false;
             }
+            if (dueOnly) {
+                const mastery = masteryMap[item.id];
+                if (!mastery || !isDue(mastery, at)) {
+                    return false;
+                }
+            }
             if (!needle) {
                 return true;
             }
@@ -139,7 +147,18 @@ export default function LibraryRoute() {
                 item.composer.toLowerCase().includes(needle)
             );
         });
-    }, [local, exercises, songs, query, kindFilter, gradeFilter, favoritesOnly, favorites]);
+    }, [
+        local,
+        exercises,
+        songs,
+        query,
+        kindFilter,
+        gradeFilter,
+        favoritesOnly,
+        favorites,
+        dueOnly,
+        masteryMap,
+    ]);
 
     const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
 
@@ -229,6 +248,16 @@ export default function LibraryRoute() {
                 >
                     {m.scores_filter_favorites()}
                 </button>
+                {dueCount > 0 && (
+                    <button
+                        type="button"
+                        onClick={() => setDueOnly((on) => !on)}
+                        aria-pressed={dueOnly}
+                        className={`${CHIP} ${dueOnly ? CHIP_ON : CHIP_OFF}`}
+                    >
+                        {m.library_filter_due()}
+                    </button>
+                )}
             </div>
 
             <p className="text-xs text-gray-500 dark:text-gray-400">

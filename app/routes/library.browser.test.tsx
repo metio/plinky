@@ -5,6 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildScore, saveUserScore } from "../lib/catalog";
+import { saveMastery } from "../lib/mastery";
 import Library from "./library";
 
 const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
@@ -64,5 +65,25 @@ describe("Library", () => {
         expect(await screen.findByText("My Tune")).toBeTruthy();
         fireEvent.click(screen.getByLabelText("Remove"));
         await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
+    });
+
+    it("filters to only the pieces due for review", async () => {
+        // Ode to Joy is overdue; Twinkle has no mastery, so it isn't due.
+        saveMastery("ode-to-joy", {
+            bestScore: 90,
+            learned: true,
+            backlog: false,
+            intervalDays: 5,
+            reviewAt: Date.now() - 86_400_000,
+            updatedAt: 0,
+        });
+        renderLibrary();
+        expect(await screen.findByText("Twinkle, Twinkle, Little Star")).toBeTruthy();
+
+        fireEvent.click(screen.getByRole("button", { name: /due now/i }));
+        expect(screen.getByText("Ode to Joy")).toBeTruthy();
+        await waitFor(() =>
+            expect(screen.queryByText("Twinkle, Twinkle, Little Star")).toBeNull(),
+        );
     });
 });

@@ -21,8 +21,14 @@ describe("todayTasks", () => {
             }),
         );
         expect(tasks.map((t) => t.key)).toEqual(["review", "daily", "learn"]);
-        expect(tasks[0]).toEqual({ key: "review", count: 2, to: "/play/a" });
+        // Several due pieces link to the full refresh queue, not just the first.
+        expect(tasks[0]).toEqual({ key: "review", count: 2, to: "/you" });
         expect(tasks[2]).toEqual({ key: "learn", title: "A New Piece", to: "/play/song-x" });
+    });
+
+    it("links a single due piece straight to it", () => {
+        const tasks = todayTasks(input({ dueIds: ["only"], dailyDoneToday: true }));
+        expect(tasks[0]).toEqual({ key: "review", count: 1, to: "/play/only" });
     });
 
     it("drops the daily once it's done", () => {
