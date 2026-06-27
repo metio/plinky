@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { gzipSync, strToU8 } from "fflate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Each test re-imports the module so its manifest/pack caches start fresh.
+// Each test re-imports the module so its manifest/Hanon caches start fresh.
 beforeEach(() => vi.resetModules());
 afterEach(() => vi.restoreAllMocks());
 
@@ -18,32 +17,19 @@ describe("loadExerciseManifest", () => {
 });
 
 describe("resolveExercise", () => {
-    it("resolves an id to a playable score, decompressing the pack", async () => {
-        const xml = '<score-partwise><part id="P1"></part></score-partwise>';
-        const manifest = [
-            { id: "scale-c-major", title: "C major scale", grade: 1, tempo: 90, beatsPerBar: 4 },
-        ];
-        const packGz = gzipSync(strToU8(JSON.stringify({ "scale-c-major": xml })));
-        vi.stubGlobal(
-            "fetch",
-            vi.fn((url: string) =>
-                Promise.resolve(
-                    String(url).endsWith("manifest.json")
-                        ? { ok: true, json: async () => manifest }
-                        : { ok: true, arrayBuffer: async () => new Uint8Array(packGz).buffer },
-                ),
-            ),
-        );
+    it("generates a parametric exercise with no network fetch", async () => {
+        const fetchMock = vi.fn();
+        vi.stubGlobal("fetch", fetchMock);
         const { resolveExercise } = await import("./exercises");
-        const score = await resolveExercise("scale-c-major");
-        expect(score?.title).toBe("C major scale");
-        expect(score?.xml).toBe(xml);
+        const score = await resolveExercise("arpeggio-c-major.2b");
+        expect(score?.xml).toContain("score-partwise");
         expect(score?.bundled).toBe(true);
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it("returns null for an unknown id", async () => {
-        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+    it("returns null for an id that is neither generated nor in the Hanon pack", async () => {
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
         const { resolveExercise } = await import("./exercises");
-        expect(await resolveExercise("nope")).toBeNull();
+        expect(await resolveExercise("not-an-exercise")).toBeNull();
     });
 });

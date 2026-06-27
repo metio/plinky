@@ -34,19 +34,20 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
 
-# The generated finger-exercise catalogue: scales/arpeggios (non-copyrightable,
-# dedicated to the public domain) packed as gzipped MusicXML, plus its metadata.
-[[annotations]]
-path = ["public/exercises/pack.json.gz"]
-precedence = "override"
-SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "CC0-1.0"
-
+# The finger-exercise catalogue. Scales/arpeggios are generated client-side (no
+# shipped files); only the metadata manifest and the Hanon pack are stored — the
+# latter holding public-domain Hanon transcriptions sourced from PDMX (CC0).
 [[annotations]]
 path = ["public/exercises/manifest.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
+
+[[annotations]]
+path = ["public/exercises/hanon.json.gz"]
+precedence = "override"
+SPDX-FileCopyrightText = "PDMX contributors"
+SPDX-License-Identifier = "CC0-1.0"
 
 # Generated logo art, the binary favicon, and the social-card image: declared
 # here so the asset files stay untouched.

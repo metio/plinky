@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { ExerciseForms } from "../components/exerciseForms";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
 import { resolveScore, type Score } from "../lib/catalog";
+import { parseExerciseId } from "../lib/exerciseGen";
 import { resolveExercise } from "../lib/exercises";
 import { musicCompositionData, routeMeta } from "../lib/site";
 import { resolveSong } from "../lib/songs";
@@ -71,6 +73,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             </p>
                         )}
                     </header>
+                    {parseExerciseId(score.id) && (
+                        <ExerciseForms config={parseExerciseId(score.id)!} />
+                    )}
                     <ScoreViewer
                         key={score.id}
                         id={score.id}
