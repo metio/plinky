@@ -7,9 +7,16 @@
 tuplet = "tuplet"
 tuplets = "tuplets"
 
-# The translation catalogs and the song catalog are intentionally in many
-# languages — and the songs also hold ABC notation, whose note runs (BA, ded, …)
-# read as misspellings. typos only knows English, so it would flag legitimate
-# foreign words and notation. The English message base stays checked.
+# The translation catalogs and the song catalogue are intentionally in many
+# languages, and the imported PDMX manifest holds real-world titles/composers plus
+# content-addressed (CID) ids whose letter runs read as misspellings. typos only
+# knows English, so it would flag legitimate foreign words and identifiers. The
+# English message base stays checked.
 [files]
-extend-exclude = ["messages/*", "!messages/en.json", "songs/*", "scores/*"]
+extend-exclude = [
+    "messages/*",
+    "!messages/en.json",
+    "songs/*",
+    "scores/*",
+    "public/songs/*",
+]
