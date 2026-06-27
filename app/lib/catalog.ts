@@ -253,25 +253,6 @@ function saveCurriculums(curriculums: Curriculum[]): void {
     }
 }
 
-const SUBMIT_ISSUE_URL = "https://github.com/metio/plinky/issues/new";
-
-// A link that opens the prefilled "submit a score" issue form, so anyone can
-// contribute using only their own GitHub account — no backend, no shared key.
-export function submissionUrl(score?: Score): string {
-    const params = new URLSearchParams({ template: "score-submission.yml" });
-    if (score) {
-        params.set("score-title", score.title);
-        params.set("musicxml", score.xml);
-        if (score.description) {
-            params.set("description", score.description);
-        }
-        if (score.license) {
-            params.set("license", score.license);
-        }
-    }
-    return `${SUBMIT_ISSUE_URL}?${params.toString()}`;
-}
-
 // A backup of the user's library (their imported scores and curriculums) as a pack.
 export function exportAllPack(): string {
     return serializePack(loadUserScores(), loadCurriculums());

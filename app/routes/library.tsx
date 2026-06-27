@@ -4,8 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { GradeChip } from "../components/scoreGrade";
-import { ScoreImport } from "../components/scoreImport";
-import { loadCatalog, removeUserScore, submissionUrl } from "../lib/catalog";
+import { loadCatalog, removeUserScore } from "../lib/catalog";
 import { loadExerciseManifest } from "../lib/exercises";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, loadAllMastery, type Mastery } from "../lib/mastery";
@@ -154,6 +153,17 @@ export default function LibraryRoute() {
                     </p>
                 )}
             </header>
+
+            {/* The catalogue runs to thousands of songs, so the "it isn't here, add
+                your own" path sits up top where someone who just failed a search can
+                find it, not buried under a long, paginated list. */}
+            <Link
+                to="/library/import"
+                className="flex items-center justify-between gap-2 rounded-md border border-indigo-200 bg-indigo-50/60 px-4 py-2.5 text-sm font-medium text-indigo-800 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-200"
+            >
+                <span>{m.library_cant_find()}</span>
+                <span aria-hidden="true">→</span>
+            </Link>
 
             <input
                 ref={searchRef}
@@ -305,27 +315,6 @@ export default function LibraryRoute() {
                             {m.library_show_more()}
                         </button>
                     )}
-
-                    <section className="space-y-3 border-t border-gray-200 pt-6 dark:border-gray-800">
-                        <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                            {m.library_add()}
-                        </h2>
-                        <ScoreImport
-                            existingIds={local.map((item) => item.id)}
-                            onAdded={reloadLocal}
-                        />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {m.import_share_prefix()}{" "}
-                            <a
-                                href={submissionUrl()}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-indigo-700 underline dark:text-indigo-300"
-                            >
-                                {m.import_share_link()}
-                            </a>
-                        </p>
-                    </section>
 
                     <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
                         {m.action_back_home()}

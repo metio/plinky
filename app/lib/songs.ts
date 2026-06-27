@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { strFromU8, unzipSync } from "fflate";
 import type { Score } from "./catalog";
 import { loadFavorites, toggleFavorite } from "./favorites";
+import { decompressMxl } from "./musicxmlFile";
 
 // The curated PDMX song catalogue. Unlike the bundled exercises (inlined into the
 // JS) and user imports (kept in localStorage), songs are too many to bundle: a
@@ -45,22 +45,14 @@ export async function loadManifest(): Promise<SongMeta[]> {
 }
 
 // Songs are stored as compressed .mxl (a zip holding the MusicXML), so the fetched
-// bytes are decompressed to the XML string OSMD loads. The rootfile inside is named
-// by META-INF/container.xml.
+// bytes are decompressed to the XML string OSMD loads.
 export async function fetchSongXml(id: string): Promise<string | null> {
     try {
         const response = await fetch(`/songs/${id}.mxl`);
         if (!response.ok) {
             return null;
         }
-        const entries = unzipSync(new Uint8Array(await response.arrayBuffer()));
-        const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
-        const root =
-            container.match(/full-path="([^"]+)"/)?.[1] ??
-            Object.keys(entries).find(
-                (name) => name.endsWith(".xml") && !name.startsWith("META-INF"),
-            );
-        return root && entries[root] ? strFromU8(entries[root]) : null;
+        return decompressMxl(new Uint8Array(await response.arrayBuffer()));
     } catch {
         return null;
     }

@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { strFromU8, unzipSync } from "fflate";
 import type { Score } from "./catalog";
 import { exerciseTitle, generateExercise, parseExerciseId } from "./exerciseGen";
+import { decompressMxl } from "./musicxmlFile";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the fly
 // from the id's config (zero storage, every form instantly available). Curated
@@ -38,22 +38,14 @@ export async function loadExerciseManifest(): Promise<ExerciseMeta[]> {
     return manifestCache;
 }
 
-// A study's MusicXML lives in a compressed .mxl; decompress to the rootfile named by
-// META-INF/container.xml.
+// A study's MusicXML lives in a compressed .mxl; decompress it to the score string.
 async function fetchStudyXml(cid: string): Promise<string | null> {
     try {
         const response = await fetch(`/exercises/studies/${cid}.mxl`);
         if (!response.ok) {
             return null;
         }
-        const entries = unzipSync(new Uint8Array(await response.arrayBuffer()));
-        const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
-        const root =
-            container.match(/full-path="([^"]+)"/)?.[1] ??
-            Object.keys(entries).find(
-                (name) => name.endsWith(".xml") && !name.startsWith("META-INF"),
-            );
-        return root && entries[root] ? strFromU8(entries[root]) : null;
+        return decompressMxl(new Uint8Array(await response.arrayBuffer()));
     } catch {
         return null;
     }

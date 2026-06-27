@@ -16,7 +16,6 @@ import {
     resolveScore,
     saveUserScore,
     slugify,
-    submissionUrl,
 } from "./catalog";
 
 function xml(title = "Test", beats = 4): string {
@@ -149,15 +148,6 @@ describe("loadCatalog", () => {
         saveUserScore(buildScore(xml("Solo"), []));
         expect(resolveScore("solo")?.title).toBe("Solo");
         expect(resolveScore("nope")).toBeUndefined();
-    });
-});
-
-describe("submissionUrl", () => {
-    it("prefills the issue form with the MusicXML", () => {
-        const url = submissionUrl(buildScore(xml("Gift"), []));
-        expect(url).toContain("template=score-submission.yml");
-        expect(url).toContain("score-title=Gift");
-        expect(url).toContain("musicxml=");
     });
 });
 

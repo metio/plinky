@@ -13,6 +13,7 @@ const BASE_PATHS = [
     "/ear",
     "/fingering",
     "/library",
+    "/library/import",
     "/tracks",
     "/assignments",
     "/progress",

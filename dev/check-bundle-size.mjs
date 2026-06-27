@@ -19,11 +19,12 @@ const VENDOR = /opensheetmusicdisplay/;
 // The whole client bundle: the fixed OSMD vendor chunk (~310 KB, pinned) plus our
 // own code. Sized to clear vendor + the app budget below with a little headroom, so
 // the app budget is actually reachable and a real regression trips the app line, not
-// this one. Raised for the teacher-mode assignment builder and its share codec.
-const BUDGET_TOTAL_KB = 593;
-// Headroom for the header badges, the on-staff ghost race, the localizable SEO
-// meta strings, and the landing page's playable keyboard; still a tight ratchet.
-const BUDGET_APP_KB = 281;
+// this one.
+const BUDGET_TOTAL_KB = 596;
+// Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
+// strings, the landing page's playable keyboard, and the drag-and-drop score import
+// page; still a tight ratchet.
+const BUDGET_APP_KB = 285;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))
