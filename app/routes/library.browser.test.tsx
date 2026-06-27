@@ -82,8 +82,6 @@ describe("Library", () => {
 
         fireEvent.click(screen.getByRole("button", { name: /due now/i }));
         expect(screen.getByText("Ode to Joy")).toBeTruthy();
-        await waitFor(() =>
-            expect(screen.queryByText("Twinkle, Twinkle, Little Star")).toBeNull(),
-        );
+        await waitFor(() => expect(screen.queryByText("Twinkle, Twinkle, Little Star")).toBeNull());
     });
 });
