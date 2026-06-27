@@ -19,4 +19,5 @@ extend-exclude = [
     "songs/*",
     "scores/*",
     "public/songs/*",
+    "public/exercises/**",
 ]

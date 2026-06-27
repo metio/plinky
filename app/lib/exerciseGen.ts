@@ -20,12 +20,15 @@ export type ExerciseType =
 
 export type Hands = "right" | "left" | "both" | "contrary";
 
+export type Interval = "single" | "thirds" | "sixths";
+
 export type ExerciseConfig = {
     type: ExerciseType;
     key: string; // slug, e.g. "c", "csharp", "bflat"
     octaves: 1 | 2;
     hands: Hands;
     inversion: 0 | 1 | 2; // arpeggios only
+    interval: Interval; // supported scales only
 };
 
 type Note = { letter: string; octave: number; alter: number };
@@ -231,39 +234,68 @@ function arpeggioLine(
 
 const shiftOctave = (notes: Note[], by: number): Note[] =>
     notes.map((n) => ({ ...n, octave: n.octave + by }));
+const shiftPositions = (positions: Note[][], by: number): Note[][] =>
+    positions.map((pos) => shiftOctave(pos, by));
 
-function noteXml(note: Note): string {
-    const alter = note.alter === 0 ? "" : `<alter>${note.alter}</alter>`;
-    return `<note><pitch><step>${note.letter}</step>${alter}<octave>${note.octave}</octave></pitch><duration>1</duration><type>quarter</type></note>`;
+// A scale in 3rds/6ths sounds each note together with the one `steps` scale-degrees
+// above — a double stop. Only the symmetric scales (major, natural and harmonic
+// minor) support it; the upper voice is the same scale offset, so its accidentals
+// follow automatically.
+export const supportsIntervals = (type: ExerciseType): boolean =>
+    type === "major-scale" || type === "natural-minor-scale" || type === "harmonic-minor-scale";
+
+function doubleStops(
+    type: ExerciseType,
+    tonic: string,
+    fifths: number,
+    octaves: number,
+    steps: number,
+): Note[][] {
+    let extended = diatonic(tonic, fifths, octaves + 1, 1);
+    if (type === "harmonic-minor-scale") {
+        extended = raise(extended, tonic, [6]);
+    }
+    const up: Note[][] = [];
+    for (let i = 0; i < octaves * 7 + 1; i++) {
+        up.push([extended[i]!, extended[i + steps]!]);
+    }
+    return up.concat([...up].reverse().slice(1));
 }
 
-function measuresXml(notes: Note[], fifths: number, clef: "G" | "F"): string {
+// A position holds the notes sounded together — one for a single line, two for a
+// double stop. The first prints normally; the rest carry <chord/>.
+function noteXml(note: Note, chord: boolean): string {
+    const alter = note.alter === 0 ? "" : `<alter>${note.alter}</alter>`;
+    return `<note>${chord ? "<chord/>" : ""}<pitch><step>${note.letter}</step>${alter}<octave>${note.octave}</octave></pitch><duration>1</duration><type>quarter</type></note>`;
+}
+
+function measuresXml(positions: Note[][], fifths: number, clef: "G" | "F"): string {
     const perBar = 4;
     const clefXml = clef === "G" ? "<sign>G</sign><line>2</line>" : "<sign>F</sign><line>4</line>";
     const measures: string[] = [];
-    for (let i = 0; i < notes.length; i += perBar) {
+    for (let i = 0; i < positions.length; i += perBar) {
         const number = measures.length + 1;
         const attrs =
             number === 1
                 ? `<attributes><divisions>1</divisions><key><fifths>${fifths}</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef>${clefXml}</clef></attributes><sound tempo="90"/>`
                 : "";
-        const body = notes
+        const body = positions
             .slice(i, i + perBar)
-            .map(noteXml)
+            .map((pos) => pos.map((note, n) => noteXml(note, n > 0)).join(""))
             .join("");
         measures.push(`    <measure number="${number}">${attrs}${body}</measure>`);
     }
     return measures.join("\n");
 }
 
-type Part = { id: string; clef: "G" | "F"; notes: Note[] };
+type Part = { id: string; clef: "G" | "F"; positions: Note[][] };
 
 function scoreXml(title: string, fifths: number, parts: Part[]): string {
     const list = parts
         .map((p) => `<score-part id="${p.id}"><part-name>Piano</part-name></score-part>`)
         .join("");
     const bodies = parts
-        .map((p) => `  <part id="${p.id}">\n${measuresXml(p.notes, fifths, p.clef)}\n  </part>`)
+        .map((p) => `  <part id="${p.id}">\n${measuresXml(p.positions, fifths, p.clef)}\n  </part>`)
         .join("\n");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
@@ -292,26 +324,34 @@ export function generateExercise(config: ExerciseConfig): string {
     const line = isScale(config.type)
         ? scaleLine(config.type, tonic, fx, config.octaves)
         : arpeggioLine(config.type, tonic, fx, config.octaves, config.inversion);
+    // Double stops apply to the supported scales, but not in contrary motion.
+    const useInterval =
+        config.interval !== "single" &&
+        supportsIntervals(config.type) &&
+        config.hands !== "contrary";
+    const main: Note[][] = useInterval
+        ? doubleStops(config.type, tonic, fx, config.octaves, config.interval === "thirds" ? 2 : 5)
+        : line.map((note) => [note]);
     const title = exerciseTitle(config);
     let parts: Part[];
     if (config.hands === "left") {
-        parts = [{ id: "P1", clef: "F", notes: shiftOctave(line, -2) }];
+        parts = [{ id: "P1", clef: "F", positions: shiftPositions(main, -2) }];
     } else if (config.hands === "both") {
         parts = [
-            { id: "P1", clef: "G", notes: line },
-            { id: "P2", clef: "F", notes: shiftOctave(line, -2) },
+            { id: "P1", clef: "G", positions: main },
+            { id: "P2", clef: "F", positions: shiftPositions(main, -2) },
         ];
     } else if (config.hands === "contrary") {
         // Both start on the tonic and mirror: right ascends, left descends.
         const down = isScale(config.type)
             ? turn(diatonic(tonic, fx, config.octaves, -1), diatonic(tonic, fx, config.octaves, -1))
-            : shiftOctave(line, 0);
+            : line;
         parts = [
-            { id: "P1", clef: "G", notes: line },
-            { id: "P2", clef: "F", notes: down },
+            { id: "P1", clef: "G", positions: main },
+            { id: "P2", clef: "F", positions: down.map((note) => [note]) },
         ];
     } else {
-        parts = [{ id: "P1", clef: "G", notes: line }];
+        parts = [{ id: "P1", clef: "G", positions: main }];
     }
     return scoreXml(title, fx, parts);
 }
@@ -331,6 +371,8 @@ const SCALE_LABEL: Record<string, string> = {
 export function exerciseTitle(config: ExerciseConfig): string {
     const parts = [`${niceKey(config.key)} ${SCALE_LABEL[config.type]}`];
     const forms: string[] = [];
+    if (config.interval === "thirds") forms.push("in 3rds");
+    if (config.interval === "sixths") forms.push("in 6ths");
     if (config.octaves === 2) forms.push("2 octaves");
     if (config.hands === "left") forms.push("left hand");
     if (config.hands === "both") forms.push("both hands");
@@ -356,13 +398,22 @@ const TYPE_TO_PARTS: Record<ExerciseType, [string, string]> = {
 const HAND_CODE: Record<Hands, string> = { right: "r", left: "l", both: "b", contrary: "c" };
 const CODE_HAND: Record<string, Hands> = { r: "right", l: "left", b: "both", c: "contrary" };
 
+// Inversion (arpeggios) and interval (scales) are mutually exclusive, so they share
+// the slot after the hand: i1/i2 for inversions, t/s for 3rds/6ths.
+const INTERVAL_CODE: Record<Interval, string> = { single: "", thirds: "t", sixths: "s" };
+const CODE_INTERVAL: Record<string, Interval> = { t: "thirds", s: "sixths" };
+
 export function buildExerciseId(config: ExerciseConfig): string {
     const [kind, mode] = TYPE_TO_PARTS[config.type];
     const base = `${kind}-${config.key}-${mode}`;
-    const canonical = config.octaves === 1 && config.hands === "right" && config.inversion === 0;
+    const canonical =
+        config.octaves === 1 &&
+        config.hands === "right" &&
+        config.inversion === 0 &&
+        config.interval === "single";
     if (canonical) return base;
-    const inv = config.inversion ? `i${config.inversion}` : "";
-    return `${base}.${config.octaves}${HAND_CODE[config.hands]}${inv}`;
+    const extra = config.inversion ? `i${config.inversion}` : INTERVAL_CODE[config.interval];
+    return `${base}.${config.octaves}${HAND_CODE[config.hands]}${extra}`;
 }
 
 export function parseExerciseId(id: string): ExerciseConfig | null {
@@ -402,14 +453,16 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
     let octaves: 1 | 2 = 1;
     let hands: Hands = "right";
     let inversion: 0 | 1 | 2 = 0;
+    let interval: Interval = "single";
     if (formPart) {
-        const match = formPart.match(/^([12])([rlbc])(?:i([12]))?$/);
+        const match = formPart.match(/^([12])([rlbc])(?:i([12])|([ts]))?$/);
         if (!match) return null;
         octaves = Number(match[1]) as 1 | 2;
         hands = CODE_HAND[match[2]!]!;
         inversion = (match[3] ? Number(match[3]) : 0) as 0 | 1 | 2;
+        interval = match[4] ? CODE_INTERVAL[match[4]]! : "single";
     }
-    return { type, key, octaves, hands, inversion };
+    return { type, key, octaves, hands, inversion, interval };
 }
 
 // The browsable tiles: one per (type, key) in its canonical form.
@@ -422,6 +475,7 @@ export const EXERCISE_TILES: ExerciseConfig[] = [
                 octaves: 1 as const,
                 hands: "right" as const,
                 inversion: 0 as const,
+                interval: "single" as const,
             }),
         ),
     ),
@@ -431,6 +485,7 @@ export const EXERCISE_TILES: ExerciseConfig[] = [
         octaves: 1 as const,
         hands: "right" as const,
         inversion: 0 as const,
+        interval: "single" as const,
     })),
     ...MINOR_SLUGS.flatMap((key) =>
         (
@@ -446,6 +501,7 @@ export const EXERCISE_TILES: ExerciseConfig[] = [
             octaves: 1 as const,
             hands: "right" as const,
             inversion: 0 as const,
+            interval: "single" as const,
         })),
     ),
 ];

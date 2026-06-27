@@ -21,16 +21,31 @@ describe("exercise ids", () => {
         }
     });
 
-    it("encodes and parses a form variant", () => {
+    it("encodes and parses an inversion form variant", () => {
         const config = {
             type: "major-arpeggio" as const,
             key: "c",
             octaves: 2 as const,
             hands: "both" as const,
             inversion: 1 as const,
+            interval: "single" as const,
         };
         const id = buildExerciseId(config);
         expect(id).toBe("arpeggio-c-major.2bi1");
+        expect(parseExerciseId(id)).toEqual(config);
+    });
+
+    it("encodes and parses an interval (3rds/6ths) form variant", () => {
+        const config = {
+            type: "major-scale" as const,
+            key: "c",
+            octaves: 2 as const,
+            hands: "right" as const,
+            inversion: 0 as const,
+            interval: "thirds" as const,
+        };
+        const id = buildExerciseId(config);
+        expect(id).toBe("scale-c-major.2rt");
         expect(parseExerciseId(id)).toEqual(config);
     });
 
@@ -70,14 +85,22 @@ describe("generateExercise", () => {
         expect(xml).toContain("<step>G</step><alter>1</alter>");
     });
 
-    it("emits two parts for both hands and contrary motion", () => {
+    it("emits two parts for both hands", () => {
         const both = generateExercise({
             type: "major-scale",
             key: "c",
             octaves: 1,
             hands: "both",
             inversion: 0,
+            interval: "single",
         });
         expect((both.match(/<part id=/g) ?? []).length).toBe(2);
+    });
+
+    it("sounds two notes per position in a scale in 3rds (C+E)", () => {
+        const xml = generateExercise(parseExerciseId("scale-c-major.1rt")!);
+        // The double stop prints the upper note as a <chord/>.
+        expect(xml).toContain("<chord/>");
+        expect(xml).toContain("<step>E</step>");
     });
 });

@@ -1,13 +1,21 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { buildExerciseId, type ExerciseConfig, type Hands, isArpeggio } from "../lib/exerciseGen";
+import {
+    buildExerciseId,
+    type ExerciseConfig,
+    type Hands,
+    type Interval,
+    isArpeggio,
+    supportsIntervals,
+} from "../lib/exerciseGen";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 
-// Form controls for a generated exercise: octaves, hands, and (for arpeggios)
-// inversion. Each option links to the play page for that variant's id, so the
-// exercise regenerates and the URL stays shareable and mastery-tracked.
+// Form controls for a generated exercise: octaves, hands, (for arpeggios) inversion,
+// and (for supported scales) intervals. Each option links to the play page for that
+// variant's id, so the exercise regenerates and the URL stays shareable and
+// mastery-tracked.
 const BTN = "rounded-md border px-3 py-1 text-sm tabular-nums";
 const ON = "border-indigo-600 bg-indigo-600 text-white";
 const OFF =
@@ -40,6 +48,13 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
         [1, m.exercise_inv_first()],
         [2, m.exercise_inv_second()],
     ];
+    const intervals: [Interval, string][] = [
+        ["single", m.exercise_int_single()],
+        ["thirds", m.exercise_int_thirds()],
+        ["sixths", m.exercise_int_sixths()],
+    ];
+    // Double stops don't combine with contrary motion.
+    const showIntervals = supportsIntervals(config.type) && config.hands !== "contrary";
 
     return (
         <div className="space-y-2 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
@@ -72,6 +87,19 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
                             key={inversion}
                             to={to({ inversion })}
                             className={`${BTN} ${config.inversion === inversion ? ON : OFF}`}
+                        >
+                            {label}
+                        </Link>
+                    ))}
+                </Row>
+            )}
+            {showIntervals && (
+                <Row label={m.exercise_intervals()}>
+                    {intervals.map(([interval, label]) => (
+                        <Link
+                            key={interval}
+                            to={to({ interval })}
+                            className={`${BTN} ${config.interval === interval ? ON : OFF}`}
                         >
                             {label}
                         </Link>
