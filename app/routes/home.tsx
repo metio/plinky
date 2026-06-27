@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { HeroKeyboard } from "../components/heroKeyboard";
+import { HomeToday } from "../components/homeToday";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { socialMeta, structuredData } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -69,6 +70,8 @@ export default function Home() {
                     </p>
                 </div>
             </section>
+
+            <HomeToday />
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
