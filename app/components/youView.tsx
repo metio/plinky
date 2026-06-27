@@ -89,13 +89,14 @@ export function YouView() {
     }
 
     const now = Date.now();
-    const mode = loadPrefs().decayMode;
+    const prefs = loadPrefs();
+    const mode = prefs.decayMode;
     const resolved = items;
     const level = currentGrade(resolved, mode, now);
     const steps = firstSteps();
     const showOnboarding = level === 0 && !allFirstStepsDone(steps);
     const skill = skillRating(resolved, mode, now);
-    const reviews = dueReviews(resolved, now);
+    const reviews = dueReviews(resolved, now, prefs.reviewCap);
     const byId = new Map(resolved.map((item) => [item.id, item]));
     const masteredIds = new Set(
         resolved.filter((item) => item.mastery.learned && !item.mastery.backlog).map((i) => i.id),
@@ -273,6 +274,9 @@ export function YouView() {
                     </p>
                 ) : (
                     <>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {m.refresh_why()}
+                        </p>
                         <Link
                             to="/review"
                             className="inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"

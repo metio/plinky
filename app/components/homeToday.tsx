@@ -57,8 +57,8 @@ export function HomeToday() {
                 return;
             }
             const now = Date.now();
-            const mode = loadPrefs().decayMode;
-            const level = currentGrade(items, mode, now);
+            const prefs = loadPrefs();
+            const level = currentGrade(items, prefs.decayMode, now);
             const workingGrade = Math.min(level + 1, MAX_GRADE);
             const mastered = new Set(
                 items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
@@ -67,7 +67,7 @@ export function HomeToday() {
             const dailyDoneToday = loadDailyStreak().last === dailyNumber(todayKey(new Date()));
             setTasks(
                 todayTasks({
-                    dueIds: dueReviews(items, now),
+                    dueIds: dueReviews(items, now, prefs.reviewCap),
                     dailyDoneToday,
                     suggestion: suggestion ? { id: suggestion.id, title: suggestion.title } : null,
                 }),

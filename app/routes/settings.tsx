@@ -11,7 +11,7 @@ import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
 import type { DecayMode } from "../lib/gradeProgress";
-import { loadPrefs, type NoteHints, type Prefs, savePrefs } from "../lib/prefs";
+import { loadPrefs, type NoteHints, type Prefs, REVIEW_CAPS, savePrefs } from "../lib/prefs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
@@ -29,6 +29,7 @@ export default function Settings() {
         showFingerings: true,
         noteHints: "miss",
         decayMode: "gentle",
+        reviewCap: 8,
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();
@@ -150,6 +151,23 @@ export default function Settings() {
                     {prefs.decayMode === "competitive"
                         ? m.settings_decay_competitive_help()
                         : m.settings_decay_gentle_help()}
+                </p>
+                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    {m.settings_review_cap()}
+                    <select
+                        value={prefs.reviewCap}
+                        onChange={(event) => update({ reviewCap: Number(event.target.value) })}
+                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                    >
+                        {REVIEW_CAPS.map((cap) => (
+                            <option key={cap} value={cap}>
+                                {cap}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {m.settings_review_cap_help()}
                 </p>
             </section>
 

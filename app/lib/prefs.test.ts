@@ -15,6 +15,7 @@ const BASE: Prefs = {
     showFingerings: true,
     noteHints: "miss",
     decayMode: "gentle",
+    reviewCap: 8,
 };
 
 describe("prefs", () => {
@@ -42,6 +43,13 @@ describe("prefs", () => {
         expect(loadPrefs().decayMode).toBe("competitive");
         localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, decayMode: "savage" }));
         expect(loadPrefs().decayMode).toBe("gentle");
+    });
+
+    it("round-trips the review cap and rejects an off-list value", () => {
+        savePrefs({ ...BASE, reviewCap: 20 });
+        expect(loadPrefs().reviewCap).toBe(20);
+        localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, reviewCap: 7 }));
+        expect(loadPrefs().reviewCap).toBe(8);
     });
 
     it("round-trips a per-hand span and tolerates one hand unset", () => {

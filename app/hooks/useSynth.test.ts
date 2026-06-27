@@ -64,6 +64,7 @@ describe("useSynth", () => {
             showFingerings: true,
             noteHints: "miss",
             decayMode: "gentle",
+            reviewCap: 8,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -79,6 +80,7 @@ describe("useSynth", () => {
             showFingerings: true,
             noteHints: "miss",
             decayMode: "gentle",
+            reviewCap: 8,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -95,6 +97,7 @@ describe("useSynth", () => {
             showFingerings: true,
             noteHints: "miss",
             decayMode: "gentle",
+            reviewCap: 8,
         });
         const { result } = renderHook(() => useSynth());
         expect(() => result.current.playNote(60)).not.toThrow();

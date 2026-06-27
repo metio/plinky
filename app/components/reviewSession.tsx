@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useScore } from "../hooks/useScore";
 import { dueReviews, loadGradedMastery } from "../lib/gradeProgress";
 import { loadMastery, saveMastery, setBacklog } from "../lib/mastery";
+import { loadPrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 import { ScoreViewer } from "./scoreViewer";
@@ -25,7 +26,7 @@ export function ReviewSession() {
         let cancelled = false;
         loadGradedMastery().then((items) => {
             if (!cancelled) {
-                setQueue(dueReviews(items, Date.now()));
+                setQueue(dueReviews(items, Date.now(), loadPrefs().reviewCap));
             }
         });
         return () => {

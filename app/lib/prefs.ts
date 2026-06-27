@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Letter } from "./grade";
-import type { DecayMode } from "./gradeProgress";
+import { type DecayMode, REVIEW_CAP } from "./gradeProgress";
 
 // A hand's comfortable thumb-to-pinky reach in semitones, or null when unmeasured
 // — people with one hand set only the hand they have. Personalizes the suggested
@@ -26,7 +26,14 @@ export type Prefs = {
     // How a grade decays when its pieces go unreviewed: gentle keeps the grade and
     // only dulls its shine, competitive lets it actually slip — the opt-in challenge.
     decayMode: DecayMode;
+    // Most pieces to surface for review at once, so a long-neglected library doesn't
+    // present an overwhelming wall — a daily dose the player can actually finish.
+    reviewCap: number;
 };
+
+// The review-cap choices, all bounded: there is deliberately no "unlimited", so the
+// queue stays a finishable session rather than a guilt pile.
+export const REVIEW_CAPS = [5, 8, 12, 20];
 
 const KEY = "plinky:prefs";
 const DEFAULTS: Prefs = {
@@ -37,6 +44,7 @@ const DEFAULTS: Prefs = {
     showFingerings: true,
     noteHints: "miss",
     decayMode: "gentle",
+    reviewCap: REVIEW_CAP,
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
@@ -78,6 +86,9 @@ export function loadPrefs(): Prefs {
             decayMode: DECAY_MODES.includes(parsed.decayMode)
                 ? parsed.decayMode
                 : DEFAULTS.decayMode,
+            reviewCap: REVIEW_CAPS.includes(parsed.reviewCap)
+                ? parsed.reviewCap
+                : DEFAULTS.reviewCap,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan } };
