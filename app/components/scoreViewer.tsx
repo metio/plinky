@@ -37,6 +37,8 @@ import {
     paintPlayedNotes,
     PLAYED_COLOR,
 } from "../lib/scoreColor";
+import { buildMidiFile, type MidiNote } from "../lib/midiFile";
+import { buildPrintDocument, fileStem } from "../lib/printScore";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import { transposeMusicXml } from "../lib/transpose";
 import {
@@ -431,6 +433,66 @@ export function ScoreViewer({
         } catch {
             // A cancelled share or a blocked clipboard needs no message.
         }
+    };
+
+    // Open the rendered staff alone in a print window — the browser's print dialog
+    // then prints it or saves it as a PDF, free of the app's controls and chrome.
+    const printScore = () => {
+        const svg = containerRef.current?.querySelector("svg");
+        if (!svg) {
+            return;
+        }
+        const win = window.open("", "_blank");
+        if (!win) {
+            return;
+        }
+        win.document.write(buildPrintDocument(svg.outerHTML, title));
+        win.document.close();
+        win.focus();
+        win.print();
+    };
+
+    // Walk the cursor once to read the piece's notes — the same model Listen plays,
+    // so the export carries whatever is on screen, transposition included — and save
+    // them as a Standard MIDI File at the current tempo.
+    const exportMidi = () => {
+        const osmd = osmdRef.current;
+        if (!osmd) {
+            return;
+        }
+        const cursor = osmd.cursor;
+        const wasVisible = playingRef.current || matcher.practicing;
+        cursor.reset();
+        const notes: MidiNote[] = [];
+        let position = 0;
+        while (!cursor.iterator.EndReached) {
+            let beats = 1;
+            for (const note of cursor.NotesUnderCursor()) {
+                const quarters = note.Length.RealValue * 4;
+                if (!note.isRest() && note.halfTone > 0) {
+                    notes.push({
+                        midi: note.halfTone + 12,
+                        startQuarters: position,
+                        durationQuarters: quarters,
+                    });
+                }
+                beats = Math.max(beats, quarters);
+            }
+            cursor.next();
+            position += beats;
+        }
+        cursor.reset();
+        // Reading the score nudged the cursor; hide it again unless a run owns it.
+        if (!wasVisible) {
+            cursor.hide();
+        }
+        const blob = new Blob([buildMidiFile(notes, { tempo })], { type: "audio/midi" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `${fileStem(title)}.mid`;
+        anchor.click();
+        URL.revokeObjectURL(url);
     };
 
     const stopListen = () => {
@@ -876,6 +938,17 @@ export function ScoreViewer({
                     </span>
                 )}
             </div>
+
+            {ready && (
+                <div className="flex flex-wrap items-center gap-3">
+                    <button type="button" onClick={printScore} className={BUTTON}>
+                        {m.action_print()}
+                    </button>
+                    <button type="button" onClick={exportMidi} className={BUTTON}>
+                        {m.action_export_midi()}
+                    </button>
+                </div>
+            )}
 
             <div hidden={ephemeral} className="flex flex-wrap items-center gap-3 text-sm">
                 {mastery?.learned ? (

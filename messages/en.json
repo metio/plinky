@@ -64,6 +64,8 @@
   "action_listen": "▶ Listen",
   "action_listen_stop": "■ Stop",
   "action_metronome": "🎵 Metronome",
+  "action_print": "🖨 Print",
+  "action_export_midi": "⬇ MIDI",
   "metronome_adaptive": "Adaptive",
   "metronome_subdivision": "Subdivide the beat",
   "tempo_trainer": "Tempo trainer",

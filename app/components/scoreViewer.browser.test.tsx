@@ -3,7 +3,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { generatePhrase } from "../lib/generator";
 import { saveGhost } from "../lib/recording";
@@ -218,5 +218,45 @@ describe("ScoreViewer", () => {
         );
         await screen.findByText(/Listen/, undefined, { timeout: 8000 });
         expect(screen.queryByText("Transpose")).toBeNull();
+    });
+
+    it("opens a print window with the rendered staff", async () => {
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const { container } = mount(phrase, { beatsPerBar: 4 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        const written: string[] = [];
+        const fakeWindow = {
+            document: { write: (html: string) => written.push(html), close: () => {} },
+            focus: () => {},
+            print: vi.fn(),
+        };
+        const open = vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+        fireEvent.click(screen.getByText(/Print/));
+        expect(open).toHaveBeenCalled();
+        expect(fakeWindow.print).toHaveBeenCalled();
+        expect(written.join("")).toContain("<svg");
+        open.mockRestore();
+    });
+
+    it("exports the piece as a downloadable MIDI file", async () => {
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const { container } = mount(phrase, { beatsPerBar: 4 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        // Capture the blob handed to the download anchor without hitting the disk.
+        let exported: Blob | null = null;
+        const create = vi.spyOn(URL, "createObjectURL").mockImplementation((blob) => {
+            exported = blob as Blob;
+            return "blob:midi";
+        });
+        const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+        const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+        fireEvent.click(screen.getByText(/MIDI/));
+        expect(exported).not.toBeNull();
+        // A Standard MIDI File opens with the "MThd" header chunk.
+        const head = new Uint8Array((await exported!.arrayBuffer()).slice(0, 4));
+        expect(String.fromCharCode(...head)).toBe("MThd");
+        create.mockRestore();
+        revoke.mockRestore();
+        click.mockRestore();
     });
 });
