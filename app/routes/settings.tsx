@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { HandSize } from "../components/handSize";
 import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiConnect } from "../components/midiConnect";
-import { ScoreBackup } from "../components/scoreBackup";
 import { ThemeToggle } from "../components/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
@@ -182,8 +181,6 @@ export default function Settings() {
                 </p>
                 <HandSize />
             </section>
-
-            <ScoreBackup />
 
             {/* No Web MIDI (Safari, all iOS) means no device to connect — the
                 keyboard is the input there, so the whole panel is hidden. */}

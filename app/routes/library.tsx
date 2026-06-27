@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { ScoreBackup } from "../components/scoreBackup";
 import { GradeChip } from "../components/scoreGrade";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
 import { loadExerciseManifest } from "../lib/exercises";
@@ -315,6 +316,8 @@ export default function LibraryRoute() {
                             {m.library_show_more()}
                         </button>
                     )}
+
+                    <ScoreBackup />
 
                     <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
                         {m.action_back_home()}
