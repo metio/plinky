@@ -4,12 +4,16 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { FingeringTrainer } from "./fingeringTrainer";
+
+const playNote = vi.fn();
+vi.mock("../hooks/useSynth", () => ({ useSynth: () => ({ playNote }) }));
 
 afterEach(() => {
     cleanup();
     localStorage.clear();
+    playNote.mockClear();
 });
 
 const mount = () =>
@@ -38,6 +42,17 @@ describe("FingeringTrainer", () => {
         expect(screen.getByText(/Smoothness:/)).toBeTruthy();
         expect(screen.getByText("New line")).toBeTruthy();
         expect(screen.queryByText("Check fingering")).toBeNull();
+    });
+
+    it("sounds each chord once it's fully fingered", () => {
+        mount();
+        expect(playNote).not.toHaveBeenCalled();
+        const one = screen.getByLabelText("Finger 1");
+        for (let i = 0; i < 30; i++) {
+            fireEvent.click(one);
+        }
+        // Completing positions plays their notes back through the synth.
+        expect(playNote).toHaveBeenCalled();
     });
 
     it("switches to a left-hand drill in the bass", () => {

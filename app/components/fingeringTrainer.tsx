@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { useSynth } from "../hooks/useSynth";
 import { drillToMusicXml } from "../lib/drillStaff";
 import { generateDrill } from "../lib/fingeringDrill";
 import {
@@ -44,6 +45,7 @@ function letterFor(efficiency: number): Letter {
 // fingering. Builds the skill of working fingerings out rather than leaning on the
 // app's suggestions.
 export function FingeringTrainer() {
+    const synth = useSynth();
     const [hand, setHand] = useState<"left" | "right">("right");
     const [positions, setPositions] = useState<number[][]>([]);
     const [fingers, setFingers] = useState<(number | null)[][]>([]);
@@ -84,14 +86,22 @@ export function FingeringTrainer() {
             if (!slot) {
                 return;
             }
-            setFingers((prev) =>
-                prev.map((tuple, p) =>
-                    p === slot.pos ? tuple.map((f, n) => (n === slot.note ? finger : f)) : tuple,
-                ),
+            const next = fingers.map((tuple, p) =>
+                p === slot.pos ? tuple.map((f, n) => (n === slot.note ? finger : f)) : tuple,
             );
+            setFingers(next);
+            // Once every note of the chord has a finger, sound it — hearing what you
+            // just fingered ties the choice to the music. The synth honours the global
+            // sound preference, so there's no separate toggle to bury.
+            const chord = positions[slot.pos];
+            if (chord && next[slot.pos]?.every((f) => f !== null)) {
+                for (const pitch of chord) {
+                    synth.playNote(pitch);
+                }
+            }
             setActive((index) => Math.min(index + 1, slots.length - 1));
         },
-        [active, slots, result],
+        [active, slots, result, fingers, positions, synth],
     );
 
     // Number keys 1–5 assign a finger to the highlighted note, like the buttons.
