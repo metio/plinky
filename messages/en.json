@@ -74,6 +74,8 @@
   "grades_start_play": "Play a piece from the library",
   "grades_start_hand": "Set your hand size for tailored fingering",
   "grades_start_daily": "Try today's daily challenge",
+  "grades_share_heading": "Share your progress",
+  "milestone_grade_boast": "🎹 I reached Grade {level} on Plinky!",
   "grades_next": "To reach grade {level}:",
   "grades_top": "Top grade reached — bravo!",
   "grades_scales": "Scales learned",

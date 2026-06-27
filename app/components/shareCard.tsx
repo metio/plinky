@@ -1,28 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useRef, useState } from "react";
 import { type Grid, type Level, shareText, svgCard } from "../lib/shareCard";
-import { m } from "../paraglide/messages.js";
-import { type Brand, BrandIcon } from "./brandIcons";
-
-// The platforms offered as one-tap links, each opening its share composer with the
-// run's text prefilled. Instagram and TikTok have no such web link — they are
-// reached through the system share sheet behind the Share button instead.
-const SHARE_TARGETS: { brand: Brand; label: string; href: (text: string) => string }[] = [
-    { brand: "x", label: "X", href: (t) => `https://x.com/intent/post?text=${t}` },
-    {
-        brand: "bluesky",
-        label: "Bluesky",
-        href: (t) => `https://bsky.app/intent/compose?text=${t}`,
-    },
-    {
-        brand: "threads",
-        label: "Threads",
-        href: (t) => `https://www.threads.net/intent/post?text=${t}`,
-    },
-    { brand: "whatsapp", label: "WhatsApp", href: (t) => `https://wa.me/?text=${t}` },
-];
+import { ShareButtons } from "./shareButtons";
 
 // On-card cell colours, matched to the share emoji (🟩 / 🟨 / ⬜).
 const CELL: Record<Level, string> = {
@@ -30,45 +10,6 @@ const CELL: Record<Level, string> = {
     medium: "bg-amber-500",
     weak: "bg-gray-300 dark:bg-gray-700",
 };
-
-const LINK =
-    "rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300";
-
-// Rasterises the pure SVG card to a PNG and either shares it as a file (mobile)
-// or downloads it. The card is self-contained, so the canvas stays untainted and
-// can be exported.
-async function saveImage(grid: Grid, heading: string, boast: string): Promise<void> {
-    const svg = svgCard(grid, heading);
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-    try {
-        const image = new Image();
-        image.src = url;
-        await image.decode();
-        const canvas = document.createElement("canvas");
-        canvas.width = 1080;
-        canvas.height = 1350;
-        canvas.getContext("2d")?.drawImage(image, 0, 0);
-        const png = await new Promise<Blob | null>((resolve) =>
-            canvas.toBlob(resolve, "image/png"),
-        );
-        if (!png) {
-            return;
-        }
-        const file = new File([png], "plinky.png", { type: "image/png" });
-        if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ files: [file], text: boast });
-            return;
-        }
-        const link = URL.createObjectURL(png);
-        const anchor = document.createElement("a");
-        anchor.href = link;
-        anchor.download = "plinky.png";
-        anchor.click();
-        URL.revokeObjectURL(link);
-    } finally {
-        URL.revokeObjectURL(url);
-    }
-}
 
 // A Wordle-style grid (Accuracy / Timing / Flow as rows) with no numbers, plus
 // buttons to post the emoji grid or save it as an image. The shape is the share —
@@ -93,24 +34,6 @@ export function ShareCard({
     boast: string;
     heading: string;
 }) {
-    const [copied, setCopied] = useState(false);
-    // The "Copied!" label reverts after a moment; the timer is held so it can be
-    // cleared on unmount, since the run summary can be navigated away within it.
-    const copyTimer = useRef(0);
-    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
-    // Whether this device can hand a file to the system share sheet — the only web
-    // path to Instagram and TikTok. Resolved after mount: the prerendered HTML is
-    // device-agnostic, so the button reads "Save image" until the client confirms.
-    const [canShareFiles, setCanShareFiles] = useState(false);
-    useEffect(() => {
-        setCanShareFiles(
-            typeof navigator !== "undefined" &&
-                typeof navigator.share === "function" &&
-                typeof navigator.canShare === "function",
-        );
-    }, []);
-    const text = shareText(boast, grid);
-
     return (
         <figure className="space-y-2">
             <figcaption className="text-sm text-gray-500 dark:text-gray-400">{caption}</figcaption>
@@ -132,42 +55,11 @@ export function ShareCard({
                     </div>
                 ))}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => {
-                        navigator.clipboard?.writeText(text).catch(() => {});
-                        setCopied(true);
-                        window.clearTimeout(copyTimer.current);
-                        copyTimer.current = window.setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className={LINK}
-                >
-                    {copied ? m.share_copied() : m.share_copy()}
-                </button>
-                <button
-                    type="button"
-                    // A cancelled share or a failed rasterise rejects; saving the card
-                    // is best-effort, so swallow it rather than crash the run summary.
-                    onClick={() => saveImage(grid, heading, boast).catch(() => {})}
-                    className={LINK}
-                >
-                    {canShareFiles ? m.share_share() : m.share_image()}
-                </button>
-                {SHARE_TARGETS.map((target) => (
-                    <a
-                        key={target.brand}
-                        href={target.href(encodeURIComponent(text))}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={m.share_on({ platform: target.label })}
-                        title={m.share_on({ platform: target.label })}
-                        className={`${LINK} inline-flex items-center`}
-                    >
-                        <BrandIcon brand={target.brand} />
-                    </a>
-                ))}
-            </div>
+            <ShareButtons
+                text={shareText(boast, grid)}
+                imageSvg={svgCard(grid, heading)}
+                imageText={boast}
+            />
         </figure>
     );
 }

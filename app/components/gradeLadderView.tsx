@@ -18,11 +18,13 @@ import {
     type StarTier,
     starTier,
 } from "../lib/gradeProgress";
+import { svgMilestone } from "../lib/milestoneCard";
 import { allFirstStepsDone, type FirstSteps, firstSteps } from "../lib/onboarding";
 import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
+import { ShareButtons } from "./shareButtons";
 
 type EarnedTier = Exclude<StarTier, "none">;
 const STAR: Record<EarnedTier, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
@@ -107,6 +109,22 @@ export function GradeLadderView() {
                     )}
                 </span>
             </div>
+
+            {level >= 1 && (
+                <section className="space-y-2">
+                    <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {m.grades_share_heading()}
+                    </h2>
+                    <ShareButtons
+                        text={m.milestone_grade_boast({ level })}
+                        imageSvg={svgMilestone({
+                            title: m.grades_current({ level }),
+                            detail: skill > 0 ? m.grades_skill({ rating: skill }) : undefined,
+                        })}
+                        imageText={m.milestone_grade_boast({ level })}
+                    />
+                </section>
+            )}
 
             {showOnboarding && steps && (
                 <section className="space-y-3 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
