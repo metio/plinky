@@ -94,12 +94,13 @@ export const MAX_GRADE = 8;
 
 // The cost breakpoints between grades 1–8, calibrated PER category so each is
 // graded on its own scale — otherwise every finger exercise lands below the
-// easiest piece (scales/arpeggios cost more to finger than a stepwise tune). This
-// is a COARSE first pass against today's beginner catalogue (measured: scales
-// ~0.6–1.1, arpeggios ~1.3–1.8, pieces ~0–0.3); re-tune the numbers once the song
-// library lands and the real difficulty range is known.
+// easiest piece (scales/arpeggios cost more to finger than a stepwise tune). The
+// `piece` breakpoints are the octiles of the curated PDMX song corpus (≈3,100
+// pieces), so real pieces spread evenly across grades 1–8; re-derive them with
+// `npm run songs:import` if the corpus changes. Scale/arpeggio remain measured
+// against the beginner exercises (scales ~0.6–1.1, arpeggios ~1.3–1.8).
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    piece: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
+    piece: [0.543, 0.941, 1.569, 2.401, 3.294, 4.339, 6.013],
     scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
     arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
 };

@@ -74,6 +74,22 @@ describe("gradeOf", () => {
         const hard = score([60, 76, 62, 79].map((p) => noteFor(p)).join(""));
         expect(gradeOf("easy-piece", easy)).toBeLessThanOrEqual(gradeOf("hard-piece", hard));
     });
+
+    it("grades a chord with more notes than fingers without crashing", () => {
+        // Real piano music has 6+ note voicings the bundled exercises never do; the
+        // fingering model must still return a grade rather than fail to finger them.
+        const bigChord = score(
+            note("C", 4) +
+                note("E", 4, undefined, true) +
+                note("G", 4, undefined, true) +
+                note("C", 5, undefined, true) +
+                note("E", 5, undefined, true) +
+                note("G", 5, undefined, true),
+        );
+        const grade = gradeOf("big-chord", bigChord);
+        expect(grade).toBeGreaterThanOrEqual(1);
+        expect(grade).toBeLessThanOrEqual(MAX_GRADE);
+    });
 });
 
 // Build a <note> from a MIDI pitch (C major only, enough for the test pitches).

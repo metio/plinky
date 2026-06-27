@@ -171,6 +171,14 @@ export function fingerSteps(steps: { pitches: number[] }[], hand: Hand, span?: n
 // ascending fingers for the right hand, descending for the left (whose thumb
 // takes the top note). Fingers within a chord are distinct and never cross.
 function fingerSets(count: number, hand: Hand): number[][] {
+    // More notes than fingers (a dense or two-hand-on-one-staff voicing real music
+    // has) can't be fingered cleanly; rather than yield no tuple — which would leave
+    // the position unfingered and break the cost walk — spread the five fingers and
+    // double the outer one on the extras. Length stays aligned to the pitches.
+    if (count > 5) {
+        const ascending = Array.from({ length: count }, (_, i) => Math.min(i + 1, 5));
+        return [hand === "right" ? ascending : ascending.map((finger) => 6 - finger)];
+    }
     const sets: number[][] = [];
     const pick = (start: number, acc: number[]) => {
         if (acc.length === count) {

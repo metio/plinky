@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router";
+import { ensureSeeded } from "../lib/songs";
 import { isLocale } from "../paraglide/runtime.js";
 
 // The parent of every localized page. The active locale comes from the URL
@@ -19,6 +20,12 @@ export default function LocaleLayout() {
     useEffect(() => {
         document.documentElement.lang = locale;
     }, [locale]);
+
+    // On first run, seed a few songs per grade into the library so it's useful out
+    // of the box; guarded so it happens once.
+    useEffect(() => {
+        ensureSeeded();
+    }, []);
 
     return <Outlet />;
 }

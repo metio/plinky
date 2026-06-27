@@ -13,4 +13,8 @@ export default defineConfig({
     // written instead of being down-levelled. The CSS counterpart lives in
     // .browserslistrc, which Lightning CSS reads.
     build: { target: "esnext" },
+    // The optional local PDMX corpus (the gitignored input to dev/import-pdmx.mts)
+    // holds ~225k files — far past the OS file-watcher limit. It is never imported
+    // or served, so keep the watcher off it.
+    server: { watch: { ignored: ["**/pdmx/**"] } },
 });

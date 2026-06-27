@@ -4,70 +4,51 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { MidiProvider } from "../contexts/midi";
 import { buildScore, saveUserScore } from "../lib/catalog";
 import Library from "./library";
 
 const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 
-// OSMD renders only in a real browser, so this runs in the browser project.
 afterEach(() => {
     cleanup();
     localStorage.clear();
 });
 
-function renderScores() {
+// Renders in the browser project so the catalogue glob and DOMParser-based grading
+// run as they do in the app; the song manifest fetch 404s here, leaving the bundled
+// exercises, which is what these assertions cover.
+function renderLibrary() {
     return render(
         <MemoryRouter>
-            <MidiProvider>
-                <Library />
-            </MidiProvider>
+            <Library />
         </MemoryRouter>,
     );
 }
 
-describe("Scores catalogue", () => {
-    it("lists bundled scores and renders the selected one with OSMD", async () => {
-        renderScores();
-        // No score is auto-opened (it would shift the page in late); clicking one
-        // renders it through the score viewer.
-        fireEvent.click(await screen.findByText("Ode to Joy"));
-        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
-        expect(screen.getByText(/Listen/)).toBeTruthy();
-        expect(screen.getByText("Practice")).toBeTruthy();
+describe("Library", () => {
+    it("lists bundled scores and links each to its play page", async () => {
+        renderLibrary();
+        const ode = await screen.findByText("Ode to Joy");
+        expect(ode.closest("a")?.getAttribute("href")).toContain("/play/ode-to-joy");
     });
 
     it("filters the list by the search box", async () => {
-        renderScores();
+        renderLibrary();
         await screen.findByText("Ode to Joy");
-        fireEvent.change(screen.getByRole("searchbox"), {
-            target: { value: "no-such-piece" },
-        });
+        fireEvent.change(screen.getByRole("searchbox"), { target: { value: "no-such-piece" } });
         expect(await screen.findByText("No scores match your search.")).toBeTruthy();
     });
 
-    it("hides the selected viewer when a filter excludes that piece", async () => {
-        renderScores();
-        // Open a piece, then filter it out — its viewer must not linger below.
-        fireEvent.click(await screen.findByText("Ode to Joy"));
-        await waitFor(() => expect(screen.queryByText("Practice")).toBeTruthy(), { timeout: 8000 });
-        fireEvent.change(screen.getByRole("searchbox"), {
-            target: { value: "no-such-piece" },
-        });
-        await screen.findByText("No scores match your search.");
-        // With the selection filtered out, its viewer must not linger below.
-        expect(screen.queryByText("Practice")).toBeNull();
-    });
-
-    it("selects a piece when its title is clicked", async () => {
-        renderScores();
-        const scale = await screen.findByText("C major scale");
-        fireEvent.click(scale);
-        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+    it("offers a grade filter", async () => {
+        renderLibrary();
+        await screen.findByText("Ode to Joy");
+        // Grade chips 1–8 narrow the catalogue by difficulty.
+        expect(screen.getByLabelText("Grade 1")).toBeTruthy();
+        expect(screen.getByLabelText("Grade 8")).toBeTruthy();
     });
 
     it("stars and unstars a piece", async () => {
-        renderScores();
+        renderLibrary();
         await screen.findByText("Ode to Joy");
         const star = screen.getAllByLabelText("Add to favorites")[0];
         if (!star) {
@@ -79,7 +60,7 @@ describe("Scores catalogue", () => {
 
     it("removes an imported score from the catalogue", async () => {
         saveUserScore(buildScore(USER_XML, []));
-        renderScores();
+        renderLibrary();
         expect(await screen.findByText("My Tune")).toBeTruthy();
         fireEvent.click(screen.getByLabelText("Remove"));
         await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
