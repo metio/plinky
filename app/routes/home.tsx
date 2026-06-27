@@ -27,8 +27,6 @@ const FEATURES = [
     { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb },
     { to: "/assignments", label: m.home_assignments, blurb: m.home_assignments_blurb },
     { to: "/compose", label: m.play_compose, blurb: m.play_compose_blurb },
-    { to: "/ear", label: m.play_ear, blurb: m.play_ear_blurb },
-    { to: "/fingering", label: m.play_fingering, blurb: m.play_fingering_blurb },
 ];
 
 export default function Home() {

@@ -13,8 +13,6 @@ export default [
         route("play/:scoreId", "routes/play.tsx"),
         route("compose", "routes/compose.tsx"),
         route("daily", "routes/daily.tsx"),
-        route("ear", "routes/ear.tsx"),
-        route("fingering", "routes/fingering.tsx"),
         route("library", "routes/library.tsx"),
         route("library/import", "routes/libraryImport.tsx"),
         route("assignments", "routes/assignments.tsx"),

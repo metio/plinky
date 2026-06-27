@@ -25,12 +25,14 @@ function renderHome() {
 }
 
 describe("Home", () => {
-    it("offers the feature cards, and not the daily (it lives in the Today panel)", () => {
+    it("offers the destination cards, and not the daily (it lives in the Today panel)", () => {
         renderHome();
-        for (const label of ["Compose →", "Ear training →", "Fingering →"]) {
+        for (const label of ["Library →", "Assignments →", "Compose →"]) {
             expect(screen.getByText(label)).toBeTruthy();
         }
+        // The daily is in the Today panel; ear/fingering are now modes on /play.
         expect(screen.queryByText("Daily challenge →")).toBeNull();
+        expect(screen.queryByText("Ear training →")).toBeNull();
     });
 
     it("routes into the library and the assignments", () => {

@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LocalizedLink as Link } from "../components/localizedLink";
 import { useSynth } from "../hooks/useSynth";
 import { drillToMusicXml } from "../lib/drillStaff";
-import { generateDrill } from "../lib/fingeringDrill";
 import {
     type FingerReason,
     type FingeringResult,
@@ -260,56 +258,8 @@ export function FingeringDrill({
     );
 }
 
-const HAND_BUTTON = (selected: boolean) =>
+// The hand-toggle button style, shared with the per-piece fingering mode.
+export const HAND_BUTTON = (selected: boolean) =>
     selected
         ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
         : "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300";
-
-// The standalone fingering drill: a generated eight-note line to work fingerings out
-// on, with a hand choice and a fresh line on demand. Builds the skill of reasoning
-// about fingering rather than leaning on the app's suggestions.
-export function FingeringTrainer() {
-    const [hand, setHand] = useState<"left" | "right">("right");
-    const [seed, setSeed] = useState(0);
-    // A fresh generated line per hand and seed; the seed bump makes "New line" re-roll.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: seed is the re-roll trigger
-    const positions = useMemo(() => generateDrill(Math.random, 8, hand), [hand, seed]);
-
-    return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            <header className="space-y-2">
-                <h1 className="text-2xl font-semibold">{m.fingering_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.fingering_intro()}</p>
-                <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
-                    {(["right", "left"] as const).map((option) => (
-                        <button
-                            key={option}
-                            type="button"
-                            onClick={() => setHand(option)}
-                            aria-pressed={hand === option}
-                            className={HAND_BUTTON(hand === option)}
-                        >
-                            {option === "right" ? m.hand_right() : m.hand_left()}
-                        </button>
-                    ))}
-                </fieldset>
-            </header>
-
-            <FingeringDrill key={`${hand}-${seed}`} positions={positions} hand={hand} />
-
-            <button
-                type="button"
-                onClick={() => setSeed((s) => s + 1)}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-            >
-                {m.fingering_new()}
-            </button>
-
-            <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
-                {m.action_back_home()}
-            </Link>
-        </main>
-    );
-}
-
-export { HAND_BUTTON };
