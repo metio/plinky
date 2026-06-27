@@ -127,21 +127,22 @@ export function skillRating(items: GradedMastery[], mode: DecayMode, now: number
     return Math.round((100 * costs.reduce((sum, cost) => sum + cost, 0)) / costs.length);
 }
 
-// Joins the player's mastery with the catalogue to resolve each touched item's grade
-// and cost. Songs and exercises carry both in their manifests; bundled and imported
-// scores are graded from their MusicXML. Items with no catalogue match are dropped.
-export async function loadGradedMastery(): Promise<GradedMastery[]> {
-    const mastery = loadAllMastery();
-    if (mastery.length === 0) {
-        return [];
-    }
-    const index = new Map<string, { title: string; grade: number; cost: number }>();
+// A catalogue item on the ladder, independent of any mastery — the pool a grade
+// draws from.
+export type GradeCatalogItem = { id: string; title: string; grade: number; cost: number };
+
+// The whole gradeable catalogue, keyed by id: songs and exercises from their
+// manifests (grade + cost precomputed), bundled and imported scores graded from their
+// MusicXML. The pools the grades draw from.
+async function buildCatalogue(): Promise<Map<string, GradeCatalogItem>> {
+    const index = new Map<string, GradeCatalogItem>();
     const [songs, exercises] = await Promise.all([loadManifest(), loadExerciseManifest()]);
     for (const song of songs) {
-        index.set(song.id, { title: song.title, grade: song.grade, cost: song.cost });
+        index.set(song.id, { id: song.id, title: song.title, grade: song.grade, cost: song.cost });
     }
     for (const exercise of exercises) {
         index.set(exercise.id, {
+            id: exercise.id,
             title: exercise.title,
             grade: exercise.grade,
             cost: exercise.cost,
@@ -150,12 +151,28 @@ export async function loadGradedMastery(): Promise<GradedMastery[]> {
     for (const score of [...loadBundledScores(), ...loadUserScores()]) {
         if (!index.has(score.id)) {
             index.set(score.id, {
+                id: score.id,
                 title: score.title,
                 grade: gradeOf(score.id, score.xml),
                 cost: rawDifficulty(score.xml),
             });
         }
     }
+    return index;
+}
+
+export async function loadGradeCatalogue(): Promise<GradeCatalogItem[]> {
+    return [...(await buildCatalogue()).values()];
+}
+
+// Joins the player's mastery with the catalogue to resolve each touched item's grade
+// and cost. Items with no catalogue match are dropped.
+export async function loadGradedMastery(): Promise<GradedMastery[]> {
+    const mastery = loadAllMastery();
+    if (mastery.length === 0) {
+        return [];
+    }
+    const index = await buildCatalogue();
     const out: GradedMastery[] = [];
     for (const { id, mastery: state } of mastery) {
         const meta = index.get(id);
@@ -164,4 +181,44 @@ export async function loadGradedMastery(): Promise<GradedMastery[]> {
         }
     }
     return out;
+}
+
+// The next star above the current mastered count and how many more pieces reach it,
+// or null once Gold is held — the "3 to Silver" nudge.
+export function nextStar(
+    masteredCount: number,
+): { tier: Exclude<StarTier, "none">; remaining: number } | null {
+    if (masteredCount < STAR_THRESHOLDS.bronze) {
+        return { tier: "bronze", remaining: STAR_THRESHOLDS.bronze - masteredCount };
+    }
+    if (masteredCount < STAR_THRESHOLDS.silver) {
+        return { tier: "silver", remaining: STAR_THRESHOLDS.silver - masteredCount };
+    }
+    if (masteredCount < STAR_THRESHOLDS.gold) {
+        return { tier: "gold", remaining: STAR_THRESHOLDS.gold - masteredCount };
+    }
+    return null;
+}
+
+// What to learn next in a grade: its gentlest not-yet-mastered pieces, easiest first
+// by cost, so the climb through a grade stays gradual.
+export function gradeSuggestions(
+    catalogue: GradeCatalogItem[],
+    grade: number,
+    mastered: ReadonlySet<string>,
+    count: number,
+): GradeCatalogItem[] {
+    return catalogue
+        .filter((item) => item.grade === grade && !mastered.has(item.id))
+        .sort((a, b) => a.cost - b.cost)
+        .slice(0, count);
+}
+
+// How many pieces each grade's pool holds, indexed by grade.
+export function poolSizes(catalogue: GradeCatalogItem[]): Map<number, number> {
+    const sizes = new Map<number, number>();
+    for (const item of catalogue) {
+        sizes.set(item.grade, (sizes.get(item.grade) ?? 0) + 1);
+    }
+    return sizes;
 }

@@ -5,10 +5,15 @@ import { useEffect, useState } from "react";
 import {
     currentGrade,
     dueReviews,
+    type GradeCatalogItem,
     type GradedMastery,
     gradeFreshness,
+    gradeSuggestions,
+    loadGradeCatalogue,
     loadGradedMastery,
     masteredInGrade,
+    nextStar,
+    poolSizes,
     skillRating,
     type StarTier,
     starTier,
@@ -25,20 +30,22 @@ const STAR_LABEL: Record<EarnedTier, () => string> = {
     gold: m.grades_star_gold,
 };
 
+const SUGGESTION_COUNT = 4;
+const LINK = "text-indigo-700 underline dark:text-indigo-300";
+
 // The grades roadmap: each of the eight difficulty grades as a pool you master into,
-// the star you've earned in it, how fresh it is, and a capped list of pieces to
-// refresh. Reads the player's graded mastery after mount. The decay mode is gentle
-// until the Settings toggle lands.
+// the star you've earned, how close the next star is, and how fresh it is — plus the
+// gentlest pieces to play next in the grade you're working on, and a capped refresh
+// queue. Reads mastery and the catalogue after mount. Decay is gentle until the
+// Settings toggle lands.
 export function GradeLadderView() {
     const [items, setItems] = useState<GradedMastery[] | null>(null);
+    const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
 
     useEffect(() => {
         let cancelled = false;
-        loadGradedMastery().then((loaded) => {
-            if (!cancelled) {
-                setItems(loaded);
-            }
-        });
+        loadGradedMastery().then((loaded) => !cancelled && setItems(loaded));
+        loadGradeCatalogue().then((loaded) => !cancelled && setCatalogue(loaded));
         return () => {
             cancelled = true;
         };
@@ -50,7 +57,15 @@ export function GradeLadderView() {
     const skill = skillRating(resolved, "gentle", now);
     const reviews = dueReviews(resolved, now);
     const byId = new Map(resolved.map((item) => [item.id, item]));
+    const masteredIds = new Set(
+        resolved.filter((item) => item.mastery.learned && !item.mastery.backlog).map((i) => i.id),
+    );
+    const sizes = poolSizes(catalogue);
     const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
+
+    // The grade you're working on: the one above your current standing, or your first.
+    const workingGrade = Math.min(level + 1, MAX_GRADE);
+    const upNext = gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -73,17 +88,35 @@ export function GradeLadderView() {
                 </span>
             </div>
 
+            {upNext.length > 0 && (
+                <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
+                    <h2 className="text-sm font-medium text-indigo-800 dark:text-indigo-200">
+                        {m.grades_up_next({ grade: workingGrade })}
+                    </h2>
+                    <ul className="space-y-1 text-sm">
+                        {upNext.map((item) => (
+                            <li key={item.id}>
+                                <Link to={`/play/${item.id}`} className={LINK}>
+                                    {item.title}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
+
             <ul className="space-y-2">
                 {grades.map((grade) => {
                     const mastered = masteredInGrade(resolved, grade, "gentle", now);
                     const tier = starTier(mastered);
+                    const next = nextStar(mastered);
                     const { due } = gradeFreshness(resolved, grade, "gentle", now);
-                    const isCurrent = grade === level;
+                    const total = sizes.get(grade) ?? 0;
                     return (
                         <li
                             key={grade}
                             className={`flex items-center justify-between gap-3 rounded-md border p-3 ${
-                                isCurrent
+                                grade === level
                                     ? "border-indigo-300 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-950/40"
                                     : "border-gray-200 dark:border-gray-800"
                             }`}
@@ -98,17 +131,21 @@ export function GradeLadderView() {
                             </span>
                             <span className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <span className="tabular-nums">
-                                    {m.grades_mastered({ count: mastered })}
+                                    {m.grades_pool({ mastered, total })}
                                 </span>
-                                <span
-                                    className={
-                                        due > 0
-                                            ? "text-amber-700 dark:text-amber-400"
-                                            : "text-green-700 dark:text-green-400"
-                                    }
-                                >
-                                    {due > 0 ? m.grades_due({ count: due }) : m.grades_fresh()}
+                                <span className="text-gray-400 dark:text-gray-500">
+                                    {next
+                                        ? m.grades_to_next({
+                                              count: next.remaining,
+                                              tier: STAR_LABEL[next.tier](),
+                                          })
+                                        : m.grades_maxed()}
                                 </span>
+                                {due > 0 && (
+                                    <span className="text-amber-700 dark:text-amber-400">
+                                        {m.grades_due({ count: due })}
+                                    </span>
+                                )}
                             </span>
                         </li>
                     );
@@ -127,10 +164,7 @@ export function GradeLadderView() {
                     <ul className="space-y-1 text-sm">
                         {reviews.map((id) => (
                             <li key={id}>
-                                <Link
-                                    to={`/play/${id}`}
-                                    className="text-indigo-700 underline dark:text-indigo-300"
-                                >
+                                <Link to={`/play/${id}`} className={LINK}>
                                     {byId.get(id)?.title ?? id}
                                 </Link>
                             </li>

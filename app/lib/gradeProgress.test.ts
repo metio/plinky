@@ -4,10 +4,14 @@
 import { describe, expect, it } from "vitest";
 import {
     currentGrade,
+    dueReviews,
+    type GradeCatalogItem,
     type GradedMastery,
     gradeFreshness,
-    dueReviews,
+    gradeSuggestions,
     masteredInGrade,
+    nextStar,
+    poolSizes,
     skillRating,
     starTier,
 } from "./gradeProgress";
@@ -137,5 +141,47 @@ describe("skillRating", () => {
 
     it("is zero with nothing mastered", () => {
         expect(skillRating([], "gentle", NOW)).toBe(0);
+    });
+});
+
+const cat = (id: string, grade: number, cost: number): GradeCatalogItem => ({
+    id,
+    title: id,
+    grade,
+    cost,
+});
+
+describe("nextStar", () => {
+    it("points at the next tier and how many more reach it", () => {
+        expect(nextStar(0)).toEqual({ tier: "bronze", remaining: 5 });
+        expect(nextStar(4)).toEqual({ tier: "bronze", remaining: 1 });
+        expect(nextStar(5)).toEqual({ tier: "silver", remaining: 7 });
+        expect(nextStar(12)).toEqual({ tier: "gold", remaining: 13 });
+    });
+
+    it("is null once Gold is held", () => {
+        expect(nextStar(25)).toBeNull();
+    });
+});
+
+describe("gradeSuggestions", () => {
+    it("offers the gentlest not-yet-mastered pieces of the grade, easiest first", () => {
+        const catalogue = [
+            cat("hard", 3, 3),
+            cat("easy", 3, 1),
+            cat("mid", 3, 2),
+            cat("done", 3, 0.5),
+            cat("other", 4, 1),
+        ];
+        const suggestions = gradeSuggestions(catalogue, 3, new Set(["done"]), 2);
+        expect(suggestions.map((item) => item.id)).toEqual(["easy", "mid"]);
+    });
+});
+
+describe("poolSizes", () => {
+    it("counts each grade's pool", () => {
+        const sizes = poolSizes([cat("a", 1, 1), cat("b", 1, 2), cat("c", 2, 1)]);
+        expect(sizes.get(1)).toBe(2);
+        expect(sizes.get(2)).toBe(1);
     });
 });
