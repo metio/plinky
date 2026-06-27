@@ -27,7 +27,7 @@ describe("resolveExercise", () => {
         expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it("returns null for an id that is neither generated nor in the Hanon pack", async () => {
+    it("returns null for an id that is neither generated nor a study", async () => {
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
         const { resolveExercise } = await import("./exercises");
         expect(await resolveExercise("not-an-exercise")).toBeNull();

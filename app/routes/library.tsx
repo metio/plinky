@@ -25,11 +25,19 @@ const CHIP_OFF =
     "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
 const PER_PAGE = 60;
 
-// A unified row: a bundled demo piece or user import (local), a finger exercise, or
-// a catalogue song. Exercises and songs carry a precomputed grade from their
-// manifest; local scores are graded from their inlined MusicXML. Only user imports
-// are removable; exercises/songs fetch their MusicXML when opened.
-type Item = { id: string; title: string; composer: string; grade: number; removable: boolean };
+// A unified row, tagged by kind so the catalogue can be filtered into songs,
+// generated scales/arpeggios, and curated studies. Exercises and songs carry a
+// precomputed grade from their manifest; local scores are graded from their inlined
+// MusicXML. Only user imports are removable; exercises/songs fetch on open.
+type Kind = "song" | "scale-arpeggio" | "study";
+type Item = {
+    id: string;
+    title: string;
+    composer: string;
+    grade: number;
+    removable: boolean;
+    kind: Kind;
+};
 
 export default function LibraryRoute() {
     const [local, setLocal] = useState<Item[]>([]);
@@ -39,6 +47,7 @@ export default function LibraryRoute() {
     const [masteryMap, setMasteryMap] = useState<Record<string, Mastery>>({});
     const [loaded, setLoaded] = useState(false);
     const [query, setQuery] = useState("");
+    const [kindFilter, setKindFilter] = useState<Kind | "">(""); // "" = all kinds
     const [gradeFilter, setGradeFilter] = useState(0); // 0 = all grades
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const [visible, setVisible] = useState(PER_PAGE);
@@ -60,6 +69,7 @@ export default function LibraryRoute() {
                 composer: score.composer,
                 grade: gradeOf(score.id, score.xml),
                 removable: !score.bundled,
+                kind: "song" as const,
             })),
         );
     }, []);
@@ -75,9 +85,10 @@ export default function LibraryRoute() {
                 exerciseList.map((exercise) => ({
                     id: exercise.id,
                     title: exercise.title,
-                    composer: "",
+                    composer: exercise.composer ?? "",
                     grade: exercise.grade,
                     removable: false,
+                    kind: exercise.kind,
                 })),
             );
             setSongs(
@@ -87,6 +98,7 @@ export default function LibraryRoute() {
                     composer: song.composer,
                     grade: song.grade,
                     removable: false,
+                    kind: "song" as const,
                 })),
             );
             setLoaded(true);
@@ -95,7 +107,7 @@ export default function LibraryRoute() {
 
     // A new filter starts from the top of its (possibly long) result set.
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset paging when the filter changes
-    useEffect(() => setVisible(PER_PAGE), [query, gradeFilter, favoritesOnly]);
+    useEffect(() => setVisible(PER_PAGE), [query, kindFilter, gradeFilter, favoritesOnly]);
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
     const remove = (id: string) => {
@@ -110,6 +122,9 @@ export default function LibraryRoute() {
     const matches = useMemo(() => {
         const needle = query.trim().toLowerCase();
         return [...local, ...exercises, ...songs].filter((item) => {
+            if (kindFilter && item.kind !== kindFilter) {
+                return false;
+            }
             if (gradeFilter && item.grade !== gradeFilter) {
                 return false;
             }
@@ -124,7 +139,7 @@ export default function LibraryRoute() {
                 item.composer.toLowerCase().includes(needle)
             );
         });
-    }, [local, exercises, songs, query, gradeFilter, favoritesOnly, favorites]);
+    }, [local, exercises, songs, query, kindFilter, gradeFilter, favoritesOnly, favorites]);
 
     const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
 
@@ -149,6 +164,32 @@ export default function LibraryRoute() {
                 aria-label={m.scores_search_placeholder()}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
             />
+
+            <div className="flex flex-wrap gap-2">
+                <button
+                    type="button"
+                    onClick={() => setKindFilter("")}
+                    className={`${CHIP} ${kindFilter === "" ? CHIP_ON : CHIP_OFF}`}
+                >
+                    {m.scores_filter_all()}
+                </button>
+                {(
+                    [
+                        ["song", m.library_kind_songs()],
+                        ["scale-arpeggio", m.library_kind_scales()],
+                        ["study", m.library_kind_studies()],
+                    ] as [Kind, string][]
+                ).map(([kind, label]) => (
+                    <button
+                        key={kind}
+                        type="button"
+                        onClick={() => setKindFilter(kind)}
+                        className={`${CHIP} ${kindFilter === kind ? CHIP_ON : CHIP_OFF}`}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
 
             <div className="flex flex-wrap gap-2">
                 <button

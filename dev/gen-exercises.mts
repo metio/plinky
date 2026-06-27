@@ -12,9 +12,9 @@
 // pack is simply empty. Needs a DOM for the grading engine (linkedom under tsx).
 // Run: `npm run exercises`.
 
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { parse } from "csv-parse/sync";
-import { gzipSync, strFromU8, strToU8, unzipSync } from "fflate";
+import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 // @ts-expect-error - the grading engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
@@ -26,14 +26,28 @@ const { EXERCISE_TILES, buildExerciseId, exerciseTitle, generateExercise } = awa
 const OUT = "public/exercises";
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
 
-type Entry = { id: string; title: string; grade: number; cost: number };
+type Kind = "scale-arpeggio" | "study";
+type Entry = {
+    id: string;
+    title: string;
+    grade: number;
+    cost: number;
+    kind: Kind;
+    composer?: string;
+};
 const entries: Entry[] = [];
-const hanonPack: Record<string, string> = {};
+const studyFiles: { cid: string; src: string }[] = [];
 
 for (const tile of EXERCISE_TILES) {
     const id = buildExerciseId(tile);
     const xml = generateExercise(tile);
-    entries.push({ id, title: exerciseTitle(tile), grade: gradeOf(id, xml), cost: rawDifficulty(xml) });
+    entries.push({
+        id,
+        title: exerciseTitle(tile),
+        grade: gradeOf(id, xml),
+        cost: rawDifficulty(xml),
+        kind: "scale-arpeggio",
+    });
 }
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
@@ -49,26 +63,40 @@ function readMusicXml(path: string): string {
     return strFromU8(zip[root]);
 }
 
-function sourceHanon(): void {
+// The classic public-domain study composers (Hanon, Czerny, Burgmüller, …).
+const STUDY_RE = /czerny|burgm|lemoine|duvernoy|cramer|beyer|schmitt|gurlit|k[öo]hler|heller|bertini|streabbog|hanon|virtuoso pianist/i;
+
+// Strip the date noise the PDMX composer/title fields carry — parenthetical lifespans,
+// bare years — so a name reads as a name.
+const cleanText = (value: string): string =>
+    value
+        .replace(/\(.*?\)/g, "")
+        .replace(/\b1[5-9]\d\d\b/g, "")
+        .replace(/[\s,\-–]+$/, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+function sourceStudies(): void {
     if (!existsSync(`${ROOT}/PDMX.csv`)) {
-        console.log("No PDMX corpus found — skipping Hanon.");
+        console.log("No PDMX corpus found — skipping studies.");
         return;
     }
     const lines = readFileSync(`${ROOT}/PDMX.csv`, "utf8").split("\n");
     const header = lines[0]!;
-    const matched = lines.filter((line, i) => i > 0 && /virtuoso pianist|hanon/i.test(line));
+    const matched = lines.filter((line, i) => i > 0 && STUDY_RE.test(line));
     const rows = parse([header, ...matched].join("\n"), {
         columns: true,
         relax_quotes: true,
         skip_empty_lines: true,
     }) as Record<string, string>[];
+    const seen = new Set<string>();
     let found = 0;
     for (const row of rows) {
         const mxl = (row.mxl ?? "").replace(/^\.\//, "");
         const bars = Number(row["song_length.bars"]);
         const notes = Number(row.n_notes);
-        // Keep only individual exercises — most "Virtuoso Pianist" entries are the
-        // whole 60-exercise book (thousands of bars), too big to ship or practise.
+        // Individual études only — most method-book entries are the whole book
+        // (thousands of bars), too big to ship or practise.
         if (
             !(row.license === "publicdomain" || row.license === "cc-zero") ||
             row.tracks !== "0" ||
@@ -80,38 +108,62 @@ function sourceHanon(): void {
         ) {
             continue;
         }
+        const name = cleanText(row.song_name ?? "");
+        const composer = cleanText(row.composer_name || row.artist_name || "");
+        // Drop near-duplicate re-uploads of the same étude.
+        const key = `${name}|${composer}|${bars}|${notes}`;
+        if (seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
         try {
             const xml = readMusicXml(`${ROOT}/${mxl}`);
             const cid = (mxl.split("/").pop() ?? mxl).replace(/\.mxl$/, "");
-            const id = `hanon-${cid}`;
-            const name = (row.song_name ?? "").trim();
-            const title = name && name !== "NA" ? name : "Hanon finger exercise";
-            entries.push({ id, title, grade: gradeOf(id, xml), cost: rawDifficulty(xml) });
-            hanonPack[id] = xml;
+            const id = `study-${cid}`;
+            entries.push({
+                id,
+                title: name && name !== "NA" ? name : "Study",
+                grade: gradeOf(id, xml),
+                cost: rawDifficulty(xml),
+                kind: "study",
+                composer: composer && composer !== "NA" ? composer : "",
+            });
+            studyFiles.push({ cid, src: `${ROOT}/${mxl}` });
             found += 1;
         } catch {
             // Skip an unreadable transcription.
         }
     }
-    console.log(`Sourced ${found} Hanon exercises from PDMX.`);
+    console.log(`Sourced ${found} studies from PDMX.`);
 }
 
-sourceHanon();
+sourceStudies();
 
 // Easiest-first within each grade, so a learner climbs gradually.
 entries.sort((a, b) => a.grade - b.grade || a.cost - b.cost);
-const manifest = entries.map(({ id, title, grade }) => ({ id, title, grade, tempo: 90, beatsPerBar: 4 }));
+const manifest = entries.map(({ id, title, grade, kind, composer }) => ({
+    id,
+    title,
+    grade,
+    kind,
+    ...(composer ? { composer } : {}),
+    tempo: 90,
+    beatsPerBar: 4,
+}));
 
 rmSync(OUT, { recursive: true, force: true });
-mkdirSync(OUT, { recursive: true });
+mkdirSync(`${OUT}/studies`, { recursive: true });
 writeFileSync(`${OUT}/manifest.json`, JSON.stringify(manifest));
-writeFileSync(`${OUT}/hanon.json.gz`, gzipSync(strToU8(JSON.stringify(hanonPack))));
+// Studies ship as individual compressed .mxl, fetched on open like songs.
+for (const { cid, src } of studyFiles) {
+    copyFileSync(src, `${OUT}/studies/${cid}.mxl`);
+}
 
 const histogram = Array.from({ length: 9 }, () => 0);
 for (const entry of entries) {
     histogram[entry.grade] = (histogram[entry.grade] ?? 0) + 1;
 }
-console.log(`Wrote ${entries.length} exercises (${EXERCISE_TILES.length} tiles + ${Object.keys(hanonPack).length} Hanon) to ${OUT}/.`);
+console.log(`Wrote ${entries.length} exercises (${EXERCISE_TILES.length} tiles + ${studyFiles.length} studies) to ${OUT}/.`);
 console.log("Grade histogram:");
 for (let g = 1; g <= 8; g++) {
     console.log(`  grade ${g}: ${histogram[g]}`);

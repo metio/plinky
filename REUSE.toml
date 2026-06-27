@@ -35,8 +35,9 @@ SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
 
 # The finger-exercise catalogue. Scales/arpeggios are generated client-side (no
-# shipped files); only the metadata manifest and the Hanon pack are stored — the
-# latter holding public-domain Hanon transcriptions sourced from PDMX (CC0).
+# shipped files); the metadata manifest plus the curated studies are stored — the
+# latter public-domain études (Hanon, Czerny, Burgmüller, …) sourced from PDMX (CC0),
+# one compressed .mxl each.
 [[annotations]]
 path = ["public/exercises/manifest.json"]
 precedence = "override"
@@ -44,7 +45,7 @@ SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
 
 [[annotations]]
-path = ["public/exercises/hanon.json.gz"]
+path = ["public/exercises/studies/*.mxl"]
 precedence = "override"
 SPDX-FileCopyrightText = "PDMX contributors"
 SPDX-License-Identifier = "CC0-1.0"
