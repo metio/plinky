@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
     applyRun,
     isDue,
+    isLapsed,
     letterMin,
     loadMastery,
     markLearned,
@@ -18,6 +19,42 @@ afterEach(() => localStorage.clear());
 
 const NOW = 1_000_000_000_000;
 const DAY = 86_400_000;
+
+const learned = (overrides: Partial<Mastery> = {}): Mastery => ({
+    bestScore: 80,
+    learned: true,
+    backlog: false,
+    intervalDays: 10,
+    reviewAt: NOW - DAY,
+    updatedAt: NOW,
+    ...overrides,
+});
+
+describe("isLapsed", () => {
+    it("is true once overdue by more than one review interval", () => {
+        // Interval 10 days, due 20 days ago: overdue 20 > grace 10.
+        expect(isLapsed(learned({ intervalDays: 10, reviewAt: NOW - 20 * DAY }), NOW)).toBe(true);
+    });
+
+    it("is false within the grace, even when already due", () => {
+        const recentlyDue = learned({ intervalDays: 10, reviewAt: NOW - 2 * DAY });
+        expect(isDue(recentlyDue, NOW)).toBe(true);
+        expect(isLapsed(recentlyDue, NOW)).toBe(false);
+    });
+
+    it("grants more slack to a long-known piece than a fresh one", () => {
+        // Same 6-day absence: lapses a 1-day-interval piece, spares a 30-day one.
+        const sixDaysOverdue = (intervalDays: number) =>
+            isLapsed(learned({ intervalDays, reviewAt: NOW - 6 * DAY }), NOW);
+        expect(sixDaysOverdue(1)).toBe(true);
+        expect(sixDaysOverdue(30)).toBe(false);
+    });
+
+    it("is false for an unlearned or shelved piece", () => {
+        expect(isLapsed(learned({ learned: false, reviewAt: NOW - 99 * DAY }), NOW)).toBe(false);
+        expect(isLapsed(learned({ backlog: true, reviewAt: NOW - 99 * DAY }), NOW)).toBe(false);
+    });
+});
 
 describe("letterMin", () => {
     it("maps a letter to the lowest score that earns it", () => {

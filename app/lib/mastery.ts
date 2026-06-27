@@ -173,6 +173,23 @@ export function isDue(mastery: Mastery, now: number): boolean {
     return mastery.learned && !mastery.backlog && mastery.reviewAt > 0 && mastery.reviewAt <= now;
 }
 
+// One full review interval of slack past the due date before a neglected score is
+// considered lapsed. The grace scales with maturity, so a long-known piece (wide
+// interval) tolerates a long absence while a freshly-learned one lapses quickly.
+const LAPSE_GRACE = 1;
+
+// A learned score left unreviewed well past its due date — overdue by more than the
+// grace above. Competitive grade-decay stops counting a lapsed score until it is
+// refreshed; gentle decay ignores this. A lapsed score is always also `isDue`.
+export function isLapsed(mastery: Mastery, now: number): boolean {
+    return (
+        mastery.learned &&
+        !mastery.backlog &&
+        mastery.reviewAt > 0 &&
+        now > mastery.reviewAt + LAPSE_GRACE * mastery.intervalDays * DAY_MS
+    );
+}
+
 export function markLearned(current: Mastery | null, now: number): Mastery {
     const base = current ?? EMPTY;
     return {
