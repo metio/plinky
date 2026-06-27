@@ -12,9 +12,9 @@ import { LocalizedLink as Link } from "./localizedLink";
 // grades page. Derived from how much of each grade's pool the player has mastered
 // under their chosen decay mode, so it resolves after mount (nothing during prerender,
 // matching the first client render) and refreshes on the practice event. It shows a
-// muted Grade 0 before the first grade is earned — never empty, since it is the only
-// link to /grades. The skill rating rides alongside once there's anything to play, a
-// crossed-swords mark flags competitive mode.
+// muted Grade 0 before the first grade is earned — never empty, since it is one of the
+// header's links to /you. The skill rating always rides alongside (0 for a fresh
+// device), and a crossed-swords mark flags competitive mode.
 export function GradeBadge() {
     const [level, setLevel] = useState<number | null>(null);
     const [skill, setSkill] = useState(0);
@@ -62,14 +62,12 @@ export function GradeBadge() {
             </span>
             <span className="tabular-nums">{level}</span>
             {competitive && <span aria-hidden="true">⚔️</span>}
-            {skill > 0 && (
-                <span
-                    aria-hidden="true"
-                    className="ml-0.5 text-xs font-medium text-gray-500 dark:text-gray-400"
-                >
-                    ⚡{skill}
-                </span>
-            )}
+            <span
+                aria-hidden="true"
+                className="ml-0.5 text-xs font-medium text-gray-500 dark:text-gray-400"
+            >
+                ⚡{skill}
+            </span>
         </Link>
     );
 }
