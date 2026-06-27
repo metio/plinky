@@ -47,6 +47,8 @@ repetition**, resurfacing for review on a widening schedule so it actually stick
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid, with a **streak** for coming back. A
   **Warm up** tab drills unlimited fresh phrases to prepare for it.
+- **Compose** — improvise freely and Plinky captures every note, sketching it onto
+  a staff to share or export (see below).
 - **Ear training** — hear a note and find it by ear, in any octave.
 - **Fingering** — read a line and choose your own fingering, then see how it scores
   against the most economical one for your hand.
@@ -57,6 +59,17 @@ repetition**, resurfacing for review on a widening schedule so it actually stick
 - **Progress** — your day streak, days practised and notes played, a slow-moving
   fingerprint of your Accuracy, Timing and Flow, and the scores **due for review**.
 
+## Composing
+
+Play whatever you like — on a MIDI piano, your computer keys, or the on-screen
+keyboard — and Plinky records every note and sketches it onto a staff as you go. The
+playback is exactly what you played; the staff is an approximate sketch, snapped to a
+grid so it reads as notation, with simultaneous notes drawn as chords. Play along to
+the **metronome** with a one-bar count-in for a tidier rhythm, set a **checkpoint** to
+keep the good part and retry the tail, then **share the take by link** or download it
+as **MIDI** or **MusicXML**. Open a MIDI or MusicXML file back in to pick up where you
+left off on another device.
+
 ## Sharing
 
 Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Timing,
@@ -66,11 +79,11 @@ same run, and the Progress page shares your lifetime fingerprint.
 
 ## Bring your own scores
 
-Upload a **MusicXML** file (`.musicxml`/`.xml`) exported from MuseScore, Sibelius,
-Finale, or Dorico — or paste it — and it joins your catalogue, playable and graded
-like any other, saved on your device. Export your library as a pack to back it up
-or hand it to a student, and **submit a score to the shared catalogue** through a
-prefilled GitHub issue — no account beyond your own, no backend.
+Drag in a **MusicXML** file (`.musicxml`, `.xml`, or compressed `.mxl`) exported from
+MuseScore, Sibelius, Finale, or Dorico, and it joins your catalogue — playable and
+graded like any other, saved on your device. Preview the staff, set its grade and
+details, then add it. Export your whole library as a pack to back it up or hand it to
+a student.
 
 ## Playing
 
