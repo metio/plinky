@@ -4,8 +4,8 @@
 import { useState } from "react";
 import { EarTrainer } from "../components/earTrainer";
 import { ExerciseForms } from "../components/exerciseForms";
-import { FingeringTrainer } from "../components/fingeringTrainer";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { PieceFingering } from "../components/pieceFingering";
 import { type PlayMode, PlayModeBar } from "../components/playModeBar";
 import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
@@ -75,7 +75,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         </>
                     )}
                     {mode === "ear" && <EarTrainer />}
-                    {mode === "fingering" && <FingeringTrainer />}
+                    {mode === "fingering" && <PieceFingering xml={score.xml} />}
                 </>
             )}
             {score === null && (

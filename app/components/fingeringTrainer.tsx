@@ -40,15 +40,22 @@ function letterFor(efficiency: number): Letter {
     return "D";
 }
 
-// Reads a line — single notes and chords — and asks the player to choose a finger
-// for every note, then scores the choice by playing effort against a comfortable
-// fingering. Builds the skill of working fingerings out rather than leaning on the
-// app's suggestions.
-export function FingeringTrainer() {
+// Choose a finger for every note of a fixed line of positions, then score the choice
+// by playing effort against a comfortable fingering. Self-contained: it owns its
+// fingers/active/result, so the caller just hands it positions and a hand and remounts
+// it (via key) to start a fresh line. Shared by the standalone drill and the per-piece
+// fingering mode.
+export function FingeringDrill({
+    positions,
+    hand,
+}: {
+    positions: number[][];
+    hand: "left" | "right";
+}) {
     const synth = useSynth();
-    const [hand, setHand] = useState<"left" | "right">("right");
-    const [positions, setPositions] = useState<number[][]>([]);
-    const [fingers, setFingers] = useState<(number | null)[][]>([]);
+    const [fingers, setFingers] = useState<(number | null)[][]>(() =>
+        positions.map((pos) => pos.map(() => null)),
+    );
     const [active, setActive] = useState(0);
     const [result, setResult] = useState<FingeringResult | null>(null);
 
@@ -58,24 +65,12 @@ export function FingeringTrainer() {
         [positions],
     );
 
-    // The same drill rendered on a staff, so the player reads real notation rather
-    // than only note names — the skill that transfers to a real score.
+    // The line rendered on a staff, so the player reads real notation rather than only
+    // note names — the skill that transfers to a real score.
     const staffXml = useMemo(
         () => (positions.length > 0 ? drillToMusicXml(positions, hand) : null),
         [positions, hand],
     );
-
-    const fresh = useCallback(() => {
-        const line = generateDrill(Math.random, 8, hand);
-        setPositions(line);
-        setFingers(line.map((pos) => pos.map(() => null)));
-        setActive(0);
-        setResult(null);
-    }, [hand]);
-
-    useEffect(() => {
-        fresh();
-    }, [fresh]);
 
     const assign = useCallback(
         (finger: number) => {
@@ -116,6 +111,10 @@ export function FingeringTrainer() {
         return () => window.removeEventListener("keydown", onKey);
     }, [assign]);
 
+    if (positions.length === 0) {
+        return <p className="text-sm text-gray-500 dark:text-gray-400">{m.fingering_empty()}</p>;
+    }
+
     const complete = fingers.length > 0 && fingers.every((tuple) => tuple.every((f) => f !== null));
     const check = () => {
         if (complete) {
@@ -127,29 +126,7 @@ export function FingeringTrainer() {
     const activeSlot = result ? null : slots[active];
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
-            <header className="space-y-2">
-                <h1 className="text-2xl font-semibold">{m.fingering_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.fingering_intro()}</p>
-                <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
-                    {(["right", "left"] as const).map((option) => (
-                        <button
-                            key={option}
-                            type="button"
-                            onClick={() => setHand(option)}
-                            aria-pressed={hand === option}
-                            className={
-                                hand === option
-                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                                    : "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300"
-                            }
-                        >
-                            {option === "right" ? m.hand_right() : m.hand_left()}
-                        </button>
-                    ))}
-                </fieldset>
-            </header>
-
+        <div className="space-y-5">
             {staffXml && <StaffPreview xml={staffXml} label={m.fingering_staff_label()} />}
 
             {/* Each position is a column; a chord stacks its notes, highest on top. */}
@@ -252,13 +229,6 @@ export function FingeringTrainer() {
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         {m.fingering_legend()}
                     </p>
-                    <button
-                        type="button"
-                        onClick={fresh}
-                        className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-                    >
-                        {m.fingering_new()}
-                    </button>
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -286,6 +256,54 @@ export function FingeringTrainer() {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+const HAND_BUTTON = (selected: boolean) =>
+    selected
+        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+        : "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300";
+
+// The standalone fingering drill: a generated eight-note line to work fingerings out
+// on, with a hand choice and a fresh line on demand. Builds the skill of reasoning
+// about fingering rather than leaning on the app's suggestions.
+export function FingeringTrainer() {
+    const [hand, setHand] = useState<"left" | "right">("right");
+    const [seed, setSeed] = useState(0);
+    // A fresh generated line per hand and seed; the seed bump makes "New line" re-roll.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: seed is the re-roll trigger
+    const positions = useMemo(() => generateDrill(Math.random, 8, hand), [hand, seed]);
+
+    return (
+        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+            <header className="space-y-2">
+                <h1 className="text-2xl font-semibold">{m.fingering_heading()}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.fingering_intro()}</p>
+                <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
+                    {(["right", "left"] as const).map((option) => (
+                        <button
+                            key={option}
+                            type="button"
+                            onClick={() => setHand(option)}
+                            aria-pressed={hand === option}
+                            className={HAND_BUTTON(hand === option)}
+                        >
+                            {option === "right" ? m.hand_right() : m.hand_left()}
+                        </button>
+                    ))}
+                </fieldset>
+            </header>
+
+            <FingeringDrill key={`${hand}-${seed}`} positions={positions} hand={hand} />
+
+            <button
+                type="button"
+                onClick={() => setSeed((s) => s + 1)}
+                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+            >
+                {m.fingering_new()}
+            </button>
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
                 {m.action_back_home()}
@@ -293,3 +311,5 @@ export function FingeringTrainer() {
         </main>
     );
 }
+
+export { HAND_BUTTON };
