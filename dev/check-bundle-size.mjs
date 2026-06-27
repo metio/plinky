@@ -16,8 +16,11 @@ import { gzipSync } from "node:zlib";
 const DIR = "build/client/assets";
 const VENDOR = /opensheetmusicdisplay/;
 
-// Tracks the app budget plus the fixed OSMD vendor chunk; raised alongside the app one.
-const BUDGET_TOTAL_KB = 590;
+// The whole client bundle: the fixed OSMD vendor chunk (~310 KB, pinned) plus our
+// own code. Sized to clear vendor + the app budget below with a little headroom, so
+// the app budget is actually reachable and a real regression trips the app line, not
+// this one. Raised for the teacher-mode assignment builder and its share codec.
+const BUDGET_TOTAL_KB = 593;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO
 // meta strings, and the landing page's playable keyboard; still a tight ratchet.
 const BUDGET_APP_KB = 281;
