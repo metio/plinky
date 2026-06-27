@@ -1,8 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useState } from "react";
+import { EarTrainer } from "../components/earTrainer";
 import { ExerciseForms } from "../components/exerciseForms";
+import { FingeringTrainer } from "../components/fingeringTrainer";
 import { LocalizedLink as Link } from "../components/localizedLink";
+import { type PlayMode, PlayModeBar } from "../components/playModeBar";
 import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
 import { useScore } from "../hooks/useScore";
@@ -34,6 +38,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // Resolves a tick after paint: undefined while loading, null when there is no
     // such score.
     const score = useScore(params.scoreId);
+    const [mode, setMode] = useState<PlayMode>("play");
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -50,18 +55,27 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             </p>
                         )}
                     </header>
-                    {parseExerciseId(score.id) && (
-                        <ExerciseForms config={parseExerciseId(score.id)!} />
+
+                    <PlayModeBar mode={mode} onChange={setMode} />
+
+                    {mode === "play" && (
+                        <>
+                            {parseExerciseId(score.id) && (
+                                <ExerciseForms config={parseExerciseId(score.id)!} />
+                            )}
+                            <ScoreViewer
+                                key={score.id}
+                                id={score.id}
+                                xml={score.xml}
+                                title={score.title}
+                                initialTempo={score.tempo}
+                                beatsPerBar={score.beatsPerBar}
+                                canShareGhost
+                            />
+                        </>
                     )}
-                    <ScoreViewer
-                        key={score.id}
-                        id={score.id}
-                        xml={score.xml}
-                        title={score.title}
-                        initialTempo={score.tempo}
-                        beatsPerBar={score.beatsPerBar}
-                        canShareGhost
-                    />
+                    {mode === "ear" && <EarTrainer />}
+                    {mode === "fingering" && <FingeringTrainer />}
                 </>
             )}
             {score === null && (
