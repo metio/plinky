@@ -24,6 +24,7 @@ import {
     type MidiStatus,
     type MidiSupport,
 } from "../lib/midi";
+import { resetDevice } from "../lib/resetDevice";
 
 export type NoteListener = {
     onNoteOn?: (event: MidiNoteEvent) => void;
@@ -37,6 +38,8 @@ declare global {
         __plinky?: {
             play: (note: number, velocity?: number) => void;
             release: (note: number) => void;
+            // Wipe all local Plinky state and reload — a quick fresh start in dev.
+            reset: () => void;
         };
     }
 }
@@ -143,6 +146,10 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             play: (note, velocity = 80) =>
                 emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
+            reset: () => {
+                resetDevice();
+                window.location.reload();
+            },
         };
         return () => {
             window.__plinky = undefined;

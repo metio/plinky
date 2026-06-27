@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { DangerZone } from "../components/dangerZone";
 import { HandSize } from "../components/handSize";
 import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiConnect } from "../components/midiConnect";
@@ -206,6 +207,8 @@ export default function Settings() {
                     {m.settings_get_help()} →
                 </a>
             </section>
+
+            <DangerZone />
         </main>
     );
 }
