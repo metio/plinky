@@ -183,4 +183,40 @@ describe("ScoreViewer", () => {
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
         expect(screen.queryByText(/Loop/)).toBeNull();
     });
+
+    it("transposes by semitones and re-renders the score in the new key", async () => {
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const { container } = mount(phrase, { beatsPerBar: 4 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        const up = screen.getByLabelText("Transpose up a semitone");
+        fireEvent.click(up);
+        fireEvent.click(up);
+        // The readout reflects the shift...
+        expect(screen.getByText("+2 st")).toBeTruthy();
+        // ...and changing the key reloads OSMD — waiting for the staff to come back
+        // proves the transposed MusicXML still parses and renders.
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        fireEvent.click(screen.getByLabelText("Reset to the written key"));
+        expect(screen.getByText("0 st")).toBeTruthy();
+    });
+
+    it("hides transposition for a locked-tempo challenge so it stays identical for all", async () => {
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <ScoreViewer
+                        id="d"
+                        xml={phrase}
+                        title="D"
+                        beatsPerBar={4}
+                        lockTempo
+                        daily={1}
+                    />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        await screen.findByText(/Listen/, undefined, { timeout: 8000 });
+        expect(screen.queryByText("Transpose")).toBeNull();
+    });
 });

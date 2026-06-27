@@ -38,6 +38,7 @@ import {
     PLAYED_COLOR,
 } from "../lib/scoreColor";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
+import { transposeMusicXml } from "../lib/transpose";
 import {
     findHotspots,
     type Hotspot,
@@ -151,6 +152,10 @@ export function ScoreViewer({
     const [loopTo, setLoopTo] = useState(1);
     const loopRef = useRef({ on: false, from: 1, to: 1 });
     loopRef.current = { on: loopOn, from: loopFrom, to: loopTo };
+    // Transposition shifts the whole piece into a more comfortable key, ±12
+    // semitones. It rewrites the MusicXML before OSMD loads it, so playback, the
+    // printed key and the matcher all follow — the reload effect depends on it.
+    const [transpose, setTranspose] = useState(0);
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -462,9 +467,12 @@ export function ScoreViewer({
                 // Print suggested fingering on the staff, personalised to the
                 // player's reach, unless they've turned hints off — so the suggestion
                 // sits on the note being read, not mapped onto a key.
+                // Transpose first, then annotate, so the printed fingering is
+                // computed for the key actually being played.
+                const transposed = transpose === 0 ? xml : transposeMusicXml(xml, transpose);
                 const source = loadPrefs().showFingerings
-                    ? annotateFingerings(xml, loadPrefs().handSpan)
-                    : xml;
+                    ? annotateFingerings(transposed, loadPrefs().handSpan)
+                    : transposed;
                 return osmd.load(source).then(() => {
                     if (!cancelled) {
                         osmd.render();
@@ -497,7 +505,7 @@ export function ScoreViewer({
                 window.clearTimeout(id);
             }
         };
-    }, [xml]);
+    }, [xml, transpose]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
@@ -821,6 +829,49 @@ export function ScoreViewer({
                                     className={NUMBER_INPUT}
                                 />
                             </>
+                        )}
+                    </span>
+                )}
+                {!lockTempo && (
+                    <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        {m.transpose()}
+                        <button
+                            type="button"
+                            disabled={transpose <= -12}
+                            onClick={() => setTranspose((value) => Math.max(value - 1, -12))}
+                            aria-label={m.transpose_down()}
+                            className={`${BUTTON} tabular-nums`}
+                        >
+                            −
+                        </button>
+                        <span className="w-12 text-center font-mono tabular-nums">
+                            {m.transpose_semitones({
+                                count:
+                                    transpose > 0
+                                        ? `+${transpose}`
+                                        : transpose < 0
+                                          ? `−${-transpose}`
+                                          : "0",
+                            })}
+                        </span>
+                        <button
+                            type="button"
+                            disabled={transpose >= 12}
+                            onClick={() => setTranspose((value) => Math.min(value + 1, 12))}
+                            aria-label={m.transpose_up()}
+                            className={`${BUTTON} tabular-nums`}
+                        >
+                            +
+                        </button>
+                        {transpose !== 0 && (
+                            <button
+                                type="button"
+                                onClick={() => setTranspose(0)}
+                                aria-label={m.transpose_reset()}
+                                className={BUTTON}
+                            >
+                                ↺
+                            </button>
                         )}
                     </span>
                 )}
