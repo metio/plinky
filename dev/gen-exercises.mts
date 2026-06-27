@@ -141,10 +141,13 @@ sourceStudies();
 
 // Easiest-first within each grade, so a learner climbs gradually.
 entries.sort((a, b) => a.grade - b.grade || a.cost - b.cost);
-const manifest = entries.map(({ id, title, grade, kind, composer }) => ({
+const manifest = entries.map(({ id, title, grade, cost, kind, composer }) => ({
     id,
     title,
     grade,
+    // The raw fingering-cost the grade was binned from; lets a grade order its items
+    // easiest-first and feeds the skill rating uniformly across songs and exercises.
+    cost: Number(cost.toFixed(3)),
     kind,
     ...(composer ? { composer } : {}),
     tempo: 90,

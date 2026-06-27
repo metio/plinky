@@ -15,6 +15,9 @@ export type ExerciseMeta = {
     id: string;
     title: string;
     grade: number;
+    // The raw fingering-cost the grade was binned from; orders a grade's items
+    // easiest-first and feeds the skill rating uniformly across songs and exercises.
+    cost: number;
     kind: "scale-arpeggio" | "study";
     composer?: string;
     tempo: number;
