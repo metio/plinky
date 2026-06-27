@@ -20,6 +20,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 const PLAY_NOW = [
+    { to: "/compose", label: m.play_compose, blurb: m.play_compose_blurb },
     { to: "/daily", label: m.play_daily, blurb: m.play_daily_blurb },
     { to: "/ear", label: m.play_ear, blurb: m.play_ear_blurb },
     { to: "/fingering", label: m.play_fingering, blurb: m.play_fingering_blurb },

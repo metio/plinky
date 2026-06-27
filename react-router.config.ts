@@ -9,6 +9,7 @@ import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
 // expands each into one prefixed path per locale (/en/scores, /de/scores, …).
 const BASE_PATHS = [
     "/",
+    "/compose",
     "/daily",
     "/ear",
     "/fingering",
