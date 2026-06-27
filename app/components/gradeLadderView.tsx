@@ -18,6 +18,7 @@ import {
     type StarTier,
     starTier,
 } from "../lib/gradeProgress";
+import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
@@ -52,9 +53,10 @@ export function GradeLadderView() {
     }, []);
 
     const now = Date.now();
+    const mode = loadPrefs().decayMode;
     const resolved = items ?? [];
-    const level = currentGrade(resolved, "gentle", now);
-    const skill = skillRating(resolved, "gentle", now);
+    const level = currentGrade(resolved, mode, now);
+    const skill = skillRating(resolved, mode, now);
     const reviews = dueReviews(resolved, now);
     const byId = new Map(resolved.map((item) => [item.id, item]));
     const masteredIds = new Set(
@@ -83,8 +85,13 @@ export function GradeLadderView() {
                         {level === 0 ? m.grades_not_started() : m.grades_current({ level })}
                     </span>
                 </span>
-                <span className="text-right text-sm text-gray-600 dark:text-gray-400">
-                    {m.grades_skill({ rating: skill })}
+                <span className="flex flex-col items-end gap-0.5 text-right text-sm text-gray-600 dark:text-gray-400">
+                    <span>{m.grades_skill({ rating: skill })}</span>
+                    {mode === "competitive" && (
+                        <span className="font-medium text-amber-700 dark:text-amber-400">
+                            ⚔️ {m.grades_competitive()}
+                        </span>
+                    )}
                 </span>
             </div>
 
@@ -107,10 +114,10 @@ export function GradeLadderView() {
 
             <ul className="space-y-2">
                 {grades.map((grade) => {
-                    const mastered = masteredInGrade(resolved, grade, "gentle", now);
+                    const mastered = masteredInGrade(resolved, grade, mode, now);
                     const tier = starTier(mastered);
                     const next = nextStar(mastered);
-                    const { due } = gradeFreshness(resolved, grade, "gentle", now);
+                    const { due } = gradeFreshness(resolved, grade, mode, now);
                     const total = sizes.get(grade) ?? 0;
                     return (
                         <li

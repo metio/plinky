@@ -14,6 +14,7 @@ const BASE: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    decayMode: "gentle",
 };
 
 describe("prefs", () => {
@@ -34,6 +35,13 @@ describe("prefs", () => {
     it("falls back to defaults for corrupt data", () => {
         localStorage.setItem("plinky:prefs", "not json");
         expect(loadPrefs()).toEqual(BASE);
+    });
+
+    it("round-trips the decay mode and rejects an unknown value", () => {
+        savePrefs({ ...BASE, decayMode: "competitive" });
+        expect(loadPrefs().decayMode).toBe("competitive");
+        localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, decayMode: "savage" }));
+        expect(loadPrefs().decayMode).toBe("gentle");
     });
 
     it("round-trips a per-hand span and tolerates one hand unset", () => {

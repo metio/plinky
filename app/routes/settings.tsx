@@ -10,6 +10,7 @@ import { ThemeToggle } from "../components/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
+import type { DecayMode } from "../lib/gradeProgress";
 import { loadPrefs, type NoteHints, type Prefs, savePrefs } from "../lib/prefs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -27,6 +28,7 @@ export default function Settings() {
         handSpan: { left: null, right: null },
         showFingerings: true,
         noteHints: "miss",
+        decayMode: "gentle",
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();
@@ -126,6 +128,28 @@ export default function Settings() {
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                     {m.settings_mastery_help()}
+                </p>
+            </section>
+
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.settings_grades()}
+                </h2>
+                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    {m.settings_decay()}
+                    <select
+                        value={prefs.decayMode}
+                        onChange={(event) => update({ decayMode: event.target.value as DecayMode })}
+                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                    >
+                        <option value="gentle">{m.settings_decay_gentle()}</option>
+                        <option value="competitive">{m.settings_decay_competitive()}</option>
+                    </select>
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {prefs.decayMode === "competitive"
+                        ? m.settings_decay_competitive_help()
+                        : m.settings_decay_gentle_help()}
                 </p>
             </section>
 

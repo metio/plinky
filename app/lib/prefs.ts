@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Letter } from "./grade";
+import type { DecayMode } from "./gradeProgress";
 
 // A hand's comfortable thumb-to-pinky reach in semitones, or null when unmeasured
 // — people with one hand set only the hand they have. Personalizes the suggested
@@ -22,6 +23,9 @@ export type Prefs = {
     // fingerings out unaided, the way they must at a real piano.
     showFingerings: boolean;
     noteHints: NoteHints;
+    // How a grade decays when its pieces go unreviewed: gentle keeps the grade and
+    // only dulls its shine, competitive lets it actually slip — the opt-in challenge.
+    decayMode: DecayMode;
 };
 
 const KEY = "plinky:prefs";
@@ -32,9 +36,11 @@ const DEFAULTS: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    decayMode: "gentle",
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
+const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
 function clampVolume(value: number): number {
     return Math.max(0, Math.min(100, Math.round(value)));
@@ -69,6 +75,9 @@ export function loadPrefs(): Prefs {
             noteHints: NOTE_HINTS.includes(parsed.noteHints)
                 ? parsed.noteHints
                 : DEFAULTS.noteHints,
+            decayMode: DECAY_MODES.includes(parsed.decayMode)
+                ? parsed.decayMode
+                : DEFAULTS.decayMode,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan } };

@@ -7,6 +7,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../lib/gradeProgress";
 import type { Mastery } from "../lib/mastery";
+import { loadPrefs, savePrefs } from "../lib/prefs";
 import { GradeBadge } from "./gradeBadge";
 
 // Stub the catalogue join so the badge sees exactly the mastery we hand it; the grade
@@ -61,5 +62,12 @@ describe("GradeBadge", () => {
         mount();
         const link = await screen.findByRole("link", { name: /grade/i });
         expect(link.textContent).toContain("1");
+    });
+
+    it("flags competitive mode in its label", async () => {
+        savePrefs({ ...loadPrefs(), decayMode: "competitive" });
+        loadMock.mockResolvedValue(mastered(1, 5));
+        mount();
+        expect(await screen.findByRole("link", { name: /competitive/i })).toBeTruthy();
     });
 });
