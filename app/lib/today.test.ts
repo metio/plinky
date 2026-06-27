@@ -21,8 +21,8 @@ describe("todayTasks", () => {
             }),
         );
         expect(tasks.map((t) => t.key)).toEqual(["review", "daily", "learn"]);
-        // Several due pieces link to the full refresh queue, not just the first.
-        expect(tasks[0]).toEqual({ key: "review", count: 2, to: "/you" });
+        // Several due pieces start the guided review session, not just the first.
+        expect(tasks[0]).toEqual({ key: "review", count: 2, to: "/review" });
         expect(tasks[2]).toEqual({ key: "learn", title: "A New Piece", to: "/play/song-x" });
     });
 

@@ -37,13 +37,15 @@ When you finish, the run is **graded S–F** from three things:
 A **per-note strip** and a **tempo graph** then show where you rushed or dragged, and
 you can **race a ghost** of your previous best — or a friend's run, shared by link —
 with a marker tracking along the staff. Once you clear a score it enters **spaced
-repetition**, resurfacing for review on a widening schedule so it actually sticks.
+repetition**, resurfacing for review on a widening schedule so it actually sticks — a
+one-tap **review session** walks you through everything that's fading, and you can
+**shelve** anything you're not working on right now.
 
 ## Modes
 
 - **Library** — the catalogue: bundled scales, arpeggios, and familiar tunes like
   *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import. Search, star, filter
-  by pack, and see each piece's difficulty grade; open one to practise.
+  by kind, grade, or what's **due now**, and open one to practise.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid, with a **streak** for coming back. A
   **Warm up** tab drills unlimited fresh phrases to prepare for it.
@@ -52,12 +54,10 @@ repetition**, resurfacing for review on a widening schedule so it actually stick
 - **Ear training** — hear a note and find it by ear, in any octave.
 - **Fingering** — read a line and choose your own fingering, then see how it scores
   against the most economical one for your hand.
-- **Grades** — an eight-grade ladder; see the grade you're at and what's left to
-  reach the next.
-- **Tracks** — ordered, Duolingo-style paths through the catalogue; nothing is
-  locked, the order is a suggestion, and a step is cleared once you've learned it.
-- **Progress** — your day streak, days practised and notes played, a slow-moving
-  fingerprint of your Accuracy, Timing and Flow, and the scores **due for review**.
+- **You** — your one progress page: the grade you're at on the eight-grade ladder and
+  what's left to reach the next, your skill rating, your day streak, days practised and
+  notes played, a slow-moving fingerprint of your Accuracy, Timing and Flow, and the
+  pieces **due for review** — with a one-tap review session to refresh them.
 
 ## Composing
 
@@ -75,7 +75,7 @@ left off on another device.
 Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Timing,
 Flow) across six moments, no numbers — to copy, post, or save as an image. The
 daily challenge shares as **Plinky #N** with your streak, so everyone compares the
-same run, and the Progress page shares your lifetime fingerprint.
+same run, and the You page shares your lifetime fingerprint.
 
 ## Bring your own scores
 

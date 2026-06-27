@@ -1,16 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useState } from "react";
 import { ExerciseForms } from "../components/exerciseForms";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
-import { resolveScore, type Score } from "../lib/catalog";
+import { useScore } from "../hooks/useScore";
+import { resolveScore } from "../lib/catalog";
 import { parseExerciseId } from "../lib/exerciseGen";
-import { resolveExercise } from "../lib/exercises";
 import { musicCompositionData, routeMeta } from "../lib/site";
-import { resolveSong } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
@@ -33,30 +31,9 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export default function PlayRoute({ params }: Route.ComponentProps) {
-    // The catalogue is read from local storage and bundled MusicXML on the client,
-    // so the piece resolves a tick after paint: undefined while loading, null when
-    // there is no such score.
-    const [score, setScore] = useState<Score | null | undefined>(undefined);
-    useEffect(() => {
-        const local = resolveScore(params.scoreId);
-        if (local) {
-            setScore(local);
-            return;
-        }
-        // Not a bundled or user score — fall back to the exercise pack, then the
-        // song catalogue, both of which fetch their MusicXML on demand.
-        let cancelled = false;
-        (async () => {
-            const found =
-                (await resolveExercise(params.scoreId)) ?? (await resolveSong(params.scoreId));
-            if (!cancelled) {
-                setScore(found);
-            }
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, [params.scoreId]);
+    // Resolves a tick after paint: undefined while loading, null when there is no
+    // such score.
+    const score = useScore(params.scoreId);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">

@@ -26,9 +26,9 @@ export type TodayInput = {
 export function todayTasks({ dueIds, dailyDoneToday, suggestion }: TodayInput): Task[] {
     const tasks: Task[] = [];
     if (dueIds.length > 0) {
-        // One due piece goes straight to it; several go to the full refresh queue on
-        // the You page, so "Refresh N pieces" doesn't hide the rest behind one song.
-        const to = dueIds.length === 1 ? `/play/${dueIds[0]}` : "/you";
+        // One due piece goes straight to it; several start a guided review session
+        // that walks through them all, so the rest aren't hidden behind one song.
+        const to = dueIds.length === 1 ? `/play/${dueIds[0]}` : "/review";
         tasks.push({ key: "review", count: dueIds.length, to });
     }
     if (!dailyDoneToday) {

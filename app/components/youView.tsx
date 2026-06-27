@@ -272,15 +272,23 @@ export function YouView() {
                         {m.grades_all_fresh()}
                     </p>
                 ) : (
-                    <ul className="space-y-1 text-sm">
-                        {reviews.map((id) => (
-                            <li key={id}>
-                                <Link to={`/play/${id}`} className={LINK}>
-                                    {byId.get(id)?.title ?? id}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                    <>
+                        <Link
+                            to="/review"
+                            className="inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+                        >
+                            {m.review_start({ count: reviews.length })}
+                        </Link>
+                        <ul className="space-y-1 text-sm">
+                            {reviews.map((id) => (
+                                <li key={id}>
+                                    <Link to={`/play/${id}`} className={LINK}>
+                                        {byId.get(id)?.title ?? id}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
                 )}
             </section>
 
