@@ -39,8 +39,8 @@ describe("exercise ids", () => {
         expect(parseExerciseId("QmAbc123")).toBeNull();
     });
 
-    it("has 96 tiles that all round-trip", () => {
-        expect(EXERCISE_TILES).toHaveLength(96);
+    it("has 108 tiles that all round-trip", () => {
+        expect(EXERCISE_TILES).toHaveLength(108);
         for (const tile of EXERCISE_TILES) {
             expect(parseExerciseId(buildExerciseId(tile))).toEqual(tile);
         }
@@ -57,6 +57,12 @@ describe("generateExercise", () => {
     it("spells a dominant 7th with a flat 7th (C7 has B♭)", () => {
         const xml = generateExercise(parseExerciseId("arpeggio-c-dom7")!);
         expect(xml).toContain("<step>B</step><alter>-1</alter>");
+    });
+
+    it("spells a diminished 7th with a double-flat (C°7 has B𝄫)", () => {
+        const xml = generateExercise(parseExerciseId("arpeggio-c-dim7")!);
+        expect(xml).toContain("<step>B</step><alter>-2</alter>");
+        expect(xml).toContain("<step>E</step><alter>-1</alter>");
     });
 
     it("raises the 7th in harmonic minor (A harmonic minor has G♯)", () => {

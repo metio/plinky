@@ -15,7 +15,8 @@ export type ExerciseType =
     | "chromatic-scale"
     | "major-arpeggio"
     | "minor-arpeggio"
-    | "dom7-arpeggio";
+    | "dom7-arpeggio"
+    | "dim7-arpeggio";
 
 export type Hands = "right" | "left" | "both" | "contrary";
 
@@ -202,11 +203,22 @@ function arpeggioLine(
 ): Note[] {
     const scale = diatonic(tonic, fifths, octaves + 1, 1); // +1 so inversions can reach up a chord tone
     const tones: Note[] = [];
+    const flatten = (n: Note, by: number): Note => ({ ...n, alter: n.alter - by });
     for (let o = 0; o < octaves; o++) {
-        tones.push(scale[o * 7]!, scale[o * 7 + 2]!, scale[o * 7 + 4]!);
-        if (type === "dom7-arpeggio") {
-            const seventh = scale[o * 7 + 6]!;
-            tones.push({ ...seventh, alter: seventh.alter - 1 });
+        if (type === "dim7-arpeggio") {
+            // Built from the major scale by stacking minor thirds: the 3rd and 5th
+            // drop a semitone, the diminished 7th two (C°7 = C E♭ G♭ B𝄫).
+            tones.push(
+                scale[o * 7]!,
+                flatten(scale[o * 7 + 2]!, 1),
+                flatten(scale[o * 7 + 4]!, 1),
+                flatten(scale[o * 7 + 6]!, 2),
+            );
+        } else {
+            tones.push(scale[o * 7]!, scale[o * 7 + 2]!, scale[o * 7 + 4]!);
+            if (type === "dom7-arpeggio") {
+                tones.push(flatten(scale[o * 7 + 6]!, 1));
+            }
         }
     }
     tones.push(scale[octaves * 7]!);
@@ -313,6 +325,7 @@ const SCALE_LABEL: Record<string, string> = {
     "major-arpeggio": "major arpeggio",
     "minor-arpeggio": "minor arpeggio",
     "dom7-arpeggio": "dominant 7th arpeggio",
+    "dim7-arpeggio": "diminished 7th arpeggio",
 };
 
 export function exerciseTitle(config: ExerciseConfig): string {
@@ -338,6 +351,7 @@ const TYPE_TO_PARTS: Record<ExerciseType, [string, string]> = {
     "major-arpeggio": ["arpeggio", "major"],
     "minor-arpeggio": ["arpeggio", "minor"],
     "dom7-arpeggio": ["arpeggio", "dom7"],
+    "dim7-arpeggio": ["arpeggio", "dim7"],
 };
 const HAND_CODE: Record<Hands, string> = { right: "r", left: "l", both: "b", contrary: "c" };
 const CODE_HAND: Record<string, Hands> = { r: "right", l: "left", b: "both", c: "contrary" };
@@ -368,7 +382,7 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
     const modes =
         kind === "scale"
             ? ["harmonic-minor", "melodic-minor", "chromatic", "major", "minor"]
-            : ["dom7", "major", "minor"];
+            : ["dom7", "dim7", "major", "minor"];
     const mode = modes.find((m) => rest.endsWith(`-${m}`));
     if (!mode) return null;
     const key = rest.slice(0, -(mode.length + 1));
@@ -401,13 +415,15 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
 // The browsable tiles: one per (type, key) in its canonical form.
 export const EXERCISE_TILES: ExerciseConfig[] = [
     ...MAJOR_SLUGS.flatMap((key) =>
-        (["major-scale", "major-arpeggio", "dom7-arpeggio"] as ExerciseType[]).map((type) => ({
-            type,
-            key,
-            octaves: 1 as const,
-            hands: "right" as const,
-            inversion: 0 as const,
-        })),
+        (["major-scale", "major-arpeggio", "dom7-arpeggio", "dim7-arpeggio"] as ExerciseType[]).map(
+            (type) => ({
+                type,
+                key,
+                octaves: 1 as const,
+                hands: "right" as const,
+                inversion: 0 as const,
+            }),
+        ),
     ),
     ...MAJOR_SLUGS.map((key) => ({
         type: "chromatic-scale" as ExerciseType,
