@@ -20,8 +20,7 @@ const PAGES = [
     "/en/",
     "/en/fingering/",
     "/en/library/",
-    "/en/progress/",
-    "/en/grades/",
+    "/en/you/",
     "/en/settings/",
 ];
 const MIME = {

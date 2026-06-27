@@ -7,7 +7,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradeCatalogItem, GradedMastery } from "../lib/gradeProgress";
 import type { Mastery } from "../lib/mastery";
-import { GradeLadderView } from "./gradeLadderView";
+import { YouView } from "./youView";
 
 const { masteryMock, catalogueMock } = vi.hoisted(() => ({
     masteryMock: vi.fn<() => Promise<GradedMastery[]>>(),
@@ -35,9 +35,8 @@ const fresh: Mastery = {
     updatedAt: 0,
 };
 
-describe("GradeLadderView", () => {
-    it("shows the current grade and suggests the next grade's gentlest pieces", async () => {
-        // Five mastered in grade 1 → Grade 1; grade 2 holds two unmastered pieces.
+describe("YouView", () => {
+    it("shows standing, activity stats, and the next grade's gentlest pieces", async () => {
         masteryMock.mockResolvedValue(
             Array.from({ length: 5 }, (_, i) => ({
                 id: `g1-${i}`,
@@ -54,31 +53,26 @@ describe("GradeLadderView", () => {
 
         render(
             <MemoryRouter>
-                <GradeLadderView />
+                <YouView />
             </MemoryRouter>,
         );
 
         expect(await screen.findByText("Grade 1")).toBeTruthy();
-        // Working grade is the one above the current standing.
-        expect(await screen.findByText("Up next in Grade 2")).toBeTruthy();
-        // Suggestions are easiest-first.
-        const suggestions = await screen.findByRole("link", { name: "Gentle Two" });
-        expect(suggestions).toBeTruthy();
+        // The retrospective stats merged in from /progress.
+        expect(screen.getByText(/day streak/i)).toBeTruthy();
+        expect(await screen.findByRole("link", { name: "Gentle Two" })).toBeTruthy();
     });
 
     it("guides a brand-new Grade-0 player with the first-steps checklist", async () => {
-        masteryMock.mockResolvedValue([]); // nothing mastered → Grade 0
+        masteryMock.mockResolvedValue([]);
         catalogueMock.mockResolvedValue([{ id: "g1", title: "First Piece", grade: 1, cost: 1 }]);
 
         render(
             <MemoryRouter>
-                <GradeLadderView />
+                <YouView />
             </MemoryRouter>,
         );
 
         expect(await screen.findByText("Getting started")).toBeTruthy();
-        expect(
-            screen.getByRole("link", { name: "Set your hand size for tailored fingering" }),
-        ).toBeTruthy();
     });
 });

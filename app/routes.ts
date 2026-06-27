@@ -18,8 +18,7 @@ export default [
         route("library", "routes/library.tsx"),
         route("library/import", "routes/libraryImport.tsx"),
         route("assignments", "routes/assignments.tsx"),
-        route("progress", "routes/progress.tsx"),
-        route("grades", "routes/grades.tsx"),
+        route("you", "routes/you.tsx"),
         route("settings", "routes/settings.tsx"),
     ]),
 ] satisfies RouteConfig;

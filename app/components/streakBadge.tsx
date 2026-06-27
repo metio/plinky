@@ -49,7 +49,7 @@ export function StreakBadge() {
 
     return (
         <Link
-            to="/progress"
+            to="/you"
             aria-label={m.streak_label({ count: streak })}
             className={`flex items-center gap-1 text-sm font-semibold transition-colors ${
                 playedToday ? streakColor(streak) : "text-gray-500 dark:text-gray-400"

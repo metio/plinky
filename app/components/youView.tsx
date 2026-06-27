@@ -18,13 +18,17 @@ import {
     type StarTier,
     starTier,
 } from "../lib/gradeProgress";
+import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
+import { loadLifetime, progressGrid } from "../lib/lifetime";
 import { svgMilestone } from "../lib/milestoneCard";
 import { allFirstStepsDone, type FirstSteps, firstSteps } from "../lib/onboarding";
 import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
+import type { Grid } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 import { ShareButtons } from "./shareButtons";
+import { ShareCard } from "./shareCard";
 
 type EarnedTier = Exclude<StarTier, "none">;
 const STAR: Record<EarnedTier, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
@@ -44,17 +48,32 @@ const FIRST_STEPS: { key: keyof FirstSteps; label: () => string; to: string }[] 
 const SUGGESTION_COUNT = 4;
 const LINK = "text-indigo-700 underline dark:text-indigo-300";
 
-// The grades roadmap: each of the eight difficulty grades as a pool you master into,
-// the star you've earned, how close the next star is, and how fresh it is — plus the
-// gentlest pieces to play next in the grade you're working on, and a capped refresh
-// queue. Reads mastery and the catalogue after mount. Decay is gentle until the
-// Settings toggle lands.
-export function GradeLadderView() {
+function Stat({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="rounded-md border border-gray-200 p-4 dark:border-gray-800">
+            <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {label}
+            </div>
+            <div className="font-mono text-3xl tabular-nums">{value}</div>
+        </div>
+    );
+}
+
+// The "You" page: how good you are at playing, in one place. Standing (grade + skill)
+// and activity (streak, days, notes) up top; what to play next and the grade roadmap;
+// the single refresh queue; then the retrospective — a 7-day chart and the lifetime
+// Accuracy/Timing/Flow fingerprint. Reads mastery, the catalogue and practice history
+// after mount, so the personal data is absent from the prerendered shell.
+export function YouView() {
     const [items, setItems] = useState<GradedMastery[] | null>(null);
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
+    const [summary, setSummary] = useState<PracticeSummary | null>(null);
+    const [fingerprint, setFingerprint] = useState<Grid | null>(null);
 
     useEffect(() => {
         let cancelled = false;
+        setSummary(summarizePractice(loadHistory()));
+        setFingerprint(progressGrid(loadLifetime()));
         loadGradedMastery().then((loaded) => !cancelled && setItems(loaded));
         loadGradeCatalogue().then((loaded) => !cancelled && setCatalogue(loaded));
         return () => {
@@ -79,16 +98,15 @@ export function GradeLadderView() {
     );
     const sizes = poolSizes(catalogue);
     const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
-
-    // The grade you're working on: the one above your current standing, or your first.
     const workingGrade = Math.min(level + 1, MAX_GRADE);
     const upNext = gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT);
+    const max = summary ? Math.max(1, ...summary.recent.map((day) => day.notes)) : 1;
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.grades_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.grades_intro()}</p>
+                <h1 className="text-2xl font-semibold">{m.you_heading()}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.you_intro()}</p>
             </header>
 
             <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 p-4 dark:border-gray-800">
@@ -109,6 +127,17 @@ export function GradeLadderView() {
                     )}
                 </span>
             </div>
+
+            {summary && (
+                <div className="grid grid-cols-3 gap-4">
+                    <Stat label={m.progress_day_streak()} value={`${summary.currentStreak} 🔥`} />
+                    <Stat
+                        label={m.progress_days_practiced()}
+                        value={String(summary.daysPracticed)}
+                    />
+                    <Stat label={m.progress_notes_played()} value={String(summary.totalNotes)} />
+                </div>
+            )}
 
             {level >= 1 && (
                 <section className="space-y-2">
@@ -250,6 +279,50 @@ export function GradeLadderView() {
                     </ul>
                 )}
             </section>
+
+            {summary && (
+                <div>
+                    <h2 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {m.progress_last_7_days()}
+                    </h2>
+                    <div className="flex h-32 items-end gap-2">
+                        {summary.recent.map((day) => (
+                            <div
+                                key={day.date}
+                                className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+                                title={
+                                    day.notes === 1
+                                        ? m.progress_notes_one({ count: day.notes })
+                                        : m.progress_notes_other({ count: day.notes })
+                                }
+                            >
+                                <div
+                                    className="w-full rounded-t bg-indigo-500"
+                                    style={{ height: `${Math.round((day.notes / max) * 100)}%` }}
+                                />
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {day.date.slice(5)}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {fingerprint && (
+                <ShareCard
+                    grid={fingerprint}
+                    caption={m.progress_share_caption()}
+                    gridLabel={m.progress_grid_label()}
+                    rowLabels={[m.scores_accuracy(), m.scores_timing(), m.scores_flow()]}
+                    boast={m.progress_share_boast()}
+                    heading={
+                        summary
+                            ? `Plinky ${summary.currentStreak}·${summary.daysPracticed}·${summary.totalNotes}`
+                            : "Plinky"
+                    }
+                />
+            )}
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
                 {m.action_back_home()}

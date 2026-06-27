@@ -16,8 +16,7 @@ const BASE_PATHS = [
     "/library",
     "/library/import",
     "/assignments",
-    "/progress",
-    "/grades",
+    "/you",
     "/settings",
 ];
 

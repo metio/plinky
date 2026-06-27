@@ -49,7 +49,7 @@ export function GradeBadge() {
     const earned = level > 0;
     return (
         <Link
-            to="/grades"
+            to="/you"
             aria-label={
                 competitive ? m.grade_label_competitive({ level }) : m.grade_label({ level })
             }
