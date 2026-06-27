@@ -34,6 +34,20 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
 
+# The generated finger-exercise catalogue: scales/arpeggios (non-copyrightable,
+# dedicated to the public domain) packed as gzipped MusicXML, plus its metadata.
+[[annotations]]
+path = ["public/exercises/pack.json.gz"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["public/exercises/manifest.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "0BSD"
+
 # Generated logo art, the binary favicon, and the social-card image: declared
 # here so the asset files stay untouched.
 [[annotations]]

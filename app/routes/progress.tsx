@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ShareCard } from "../components/shareCard";
 import { loadCatalog } from "../lib/catalog";
+import { loadExerciseManifest } from "../lib/exercises";
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
 import { isDue, loadAllMastery } from "../lib/mastery";
 import type { Grid } from "../lib/shareCard";
 import { routeMeta } from "../lib/site";
+import { loadManifest } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/progress";
 
@@ -35,15 +37,22 @@ export default function ProgressRoute() {
     useEffect(() => {
         setSummary(summarizePractice(loadHistory()));
         setFingerprint(progressGrid(loadLifetime()));
-        // The review queue, resolved to catalogue titles so each entry links
-        // straight to its practice page — the same isDue rule the library uses.
-        const now = Date.now();
-        const titles = new Map(loadCatalog().map((score) => [score.id, score.title]));
-        setDue(
-            loadAllMastery()
-                .filter(({ id, mastery }) => titles.has(id) && isDue(mastery, now))
-                .map(({ id }) => ({ id, title: titles.get(id) ?? id })),
-        );
+        // The review queue, resolved to titles across every source (local, exercises,
+        // songs) so each entry links straight to its practice page — the same isDue
+        // rule the library uses.
+        Promise.all([loadExerciseManifest(), loadManifest()]).then(([exercises, songs]) => {
+            const now = Date.now();
+            const titles = new Map<string, string>([
+                ...loadCatalog().map((score) => [score.id, score.title] as const),
+                ...exercises.map((exercise) => [exercise.id, exercise.title] as const),
+                ...songs.map((song) => [song.id, song.title] as const),
+            ]);
+            setDue(
+                loadAllMastery()
+                    .filter(({ id, mastery }) => titles.has(id) && isDue(mastery, now))
+                    .map(({ id }) => ({ id, title: titles.get(id) ?? id })),
+            );
+        });
     }, []);
 
     if (!summary) {

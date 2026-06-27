@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "messages": "node dev/compile-messages.mjs",
-    "scores": "node dev/gen-exercise-scores.mjs",
+    "exercises": "tsx dev/gen-exercises.mts",
     "songs:import": "tsx dev/import-pdmx.mts",
     "build": "npm run messages && react-router build && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "dev": "npm run messages && react-router dev",

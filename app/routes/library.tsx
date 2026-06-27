@@ -6,6 +6,7 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { GradeChip } from "../components/scoreGrade";
 import { ScoreImport } from "../components/scoreImport";
 import { loadCatalog, removeUserScore, submissionUrl } from "../lib/catalog";
+import { loadExerciseManifest } from "../lib/exercises";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, loadAllMastery, type Mastery } from "../lib/mastery";
 import { gradeOf, MAX_GRADE } from "../lib/scoreDifficulty";
@@ -24,14 +25,15 @@ const CHIP_OFF =
     "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
 const PER_PAGE = 60;
 
-// A unified row: a bundled exercise, a user import, or a catalogue song. Songs
-// carry a precomputed grade from the manifest; local scores are graded from their
-// inlined MusicXML. Local rows can be removed (user imports) and always resolve
-// offline; songs fetch their MusicXML when opened.
+// A unified row: a bundled demo piece or user import (local), a finger exercise, or
+// a catalogue song. Exercises and songs carry a precomputed grade from their
+// manifest; local scores are graded from their inlined MusicXML. Only user imports
+// are removable; exercises/songs fetch their MusicXML when opened.
 type Item = { id: string; title: string; composer: string; grade: number; removable: boolean };
 
 export default function LibraryRoute() {
     const [local, setLocal] = useState<Item[]>([]);
+    const [exercises, setExercises] = useState<Item[]>([]);
     const [songs, setSongs] = useState<Item[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [masteryMap, setMasteryMap] = useState<Record<string, Mastery>>({});
@@ -66,8 +68,18 @@ export default function LibraryRoute() {
         reloadLocal();
         setFavorites(loadFavorites());
         reloadMastery();
-        // The catalogue manifest loads over the network; local scores render first.
-        loadManifest().then((manifest) => {
+        // The exercise and song manifests load over the network; local scores render
+        // first. Exercises are always present; the song catalogue is the deep library.
+        Promise.all([loadExerciseManifest(), loadManifest()]).then(([exerciseList, manifest]) => {
+            setExercises(
+                exerciseList.map((exercise) => ({
+                    id: exercise.id,
+                    title: exercise.title,
+                    composer: "",
+                    grade: exercise.grade,
+                    removable: false,
+                })),
+            );
             setSongs(
                 manifest.map((song) => ({
                     id: song.id,
@@ -97,7 +109,7 @@ export default function LibraryRoute() {
 
     const matches = useMemo(() => {
         const needle = query.trim().toLowerCase();
-        return [...local, ...songs].filter((item) => {
+        return [...local, ...exercises, ...songs].filter((item) => {
             if (gradeFilter && item.grade !== gradeFilter) {
                 return false;
             }
@@ -112,7 +124,7 @@ export default function LibraryRoute() {
                 item.composer.toLowerCase().includes(needle)
             );
         });
-    }, [local, songs, query, gradeFilter, favoritesOnly, favorites]);
+    }, [local, exercises, songs, query, gradeFilter, favoritesOnly, favorites]);
 
     const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
 

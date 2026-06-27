@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { loadCatalog } from "../lib/catalog";
+import { loadExerciseManifest } from "../lib/exercises";
 import { loadMastery } from "../lib/mastery";
 import { routeMeta } from "../lib/site";
 import { type Track, type TrackStep, TRACKS, trackSteps } from "../lib/tracks";
@@ -149,11 +150,17 @@ function TrackPath({
 export default function TracksRoute() {
     const [titles, setTitles] = useState<Record<string, string>>({});
     useEffect(() => {
-        const byId: Record<string, string> = {};
-        for (const score of loadCatalog()) {
-            byId[score.id] = score.title;
-        }
-        setTitles(byId);
+        // Tracks step through exercises and bundled pieces, so titles come from both.
+        loadExerciseManifest().then((exercises) => {
+            const byId: Record<string, string> = {};
+            for (const score of loadCatalog()) {
+                byId[score.id] = score.title;
+            }
+            for (const exercise of exercises) {
+                byId[exercise.id] = exercise.title;
+            }
+            setTitles(byId);
+        });
     }, []);
 
     return (

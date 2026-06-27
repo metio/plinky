@@ -6,6 +6,7 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
 import { resolveScore, type Score } from "../lib/catalog";
+import { resolveExercise } from "../lib/exercises";
 import { musicCompositionData, routeMeta } from "../lib/site";
 import { resolveSong } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
@@ -40,14 +41,16 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
             setScore(local);
             return;
         }
-        // Not a bundled or user score — fall back to the song catalogue, which
-        // fetches the MusicXML on demand.
+        // Not a bundled or user score — fall back to the exercise pack, then the
+        // song catalogue, both of which fetch their MusicXML on demand.
         let cancelled = false;
-        resolveSong(params.scoreId).then((song) => {
+        (async () => {
+            const found =
+                (await resolveExercise(params.scoreId)) ?? (await resolveSong(params.scoreId));
             if (!cancelled) {
-                setScore(song);
+                setScore(found);
             }
-        });
+        })();
         return () => {
             cancelled = true;
         };

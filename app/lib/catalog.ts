@@ -112,8 +112,8 @@ export function slugify(title: string): string {
     );
 }
 
-// The shipped scores, identical for everyone — the pool the daily challenge draws
-// from, regardless of what a device has imported.
+// The demo pieces inlined into the bundle, identical for everyone. Finger exercises
+// and the song catalogue load as on-demand assets instead, keeping the JS small.
 export function loadBundledScores(): Score[] {
     return Object.entries(files).map(([path, xml]) => {
         const id = (path.split("/").pop() ?? path).replace(/\.musicxml$/, "");
