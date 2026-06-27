@@ -65,6 +65,7 @@
   "action_listen_stop": "■ Stop",
   "action_metronome": "🎵 Metronome",
   "metronome_adaptive": "Adaptive",
+  "metronome_subdivision": "Subdivide the beat",
   "hand_label": "Hands",
   "hand_both": "Both",
   "hand_right": "Right",

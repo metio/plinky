@@ -115,6 +115,9 @@ export function ScoreViewer({
     const [loadError, setLoadError] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [metronomeOn, setMetronomeOn] = useState(false);
+    // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
+    // triplets, 4 = sixteenths.
+    const [subdivision, setSubdivision] = useState(1);
     // An adaptive metronome follows the player's own tempo, read live from their
     // note timing, instead of ticking at the fixed slider speed.
     const [adaptive, setAdaptive] = useState(false);
@@ -141,7 +144,7 @@ export function ScoreViewer({
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
-    useMetronome(metronomeOn, adaptive ? liveTempo : tempo, beatsPerBar ?? 4);
+    useMetronome(metronomeOn, adaptive ? liveTempo : tempo, beatsPerBar ?? 4, subdivision);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [runNotes, setRunNotes] = useState<RunNote[]>([]);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
@@ -602,6 +605,26 @@ export function ScoreViewer({
                                 className="text-sm text-gray-600 dark:text-gray-400"
                             />
                         )}
+                        <fieldset
+                            aria-label={m.metronome_subdivision()}
+                            className="flex items-center gap-1"
+                        >
+                            {[1, 2, 3, 4].map((n) => (
+                                <button
+                                    key={n}
+                                    type="button"
+                                    onClick={() => setSubdivision(n)}
+                                    aria-pressed={subdivision === n}
+                                    className={
+                                        subdivision === n
+                                            ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
+                                            : `${BUTTON} tabular-nums`
+                                    }
+                                >
+                                    {n}
+                                </button>
+                            ))}
+                        </fieldset>
                     </span>
                 )}
                 {staffCount >= 2 && (
