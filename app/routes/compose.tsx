@@ -8,6 +8,7 @@ import { MidiConnect } from "../components/midiConnect";
 import { PianoKeyboard } from "../components/pianoKeyboard";
 import { StaffPreview } from "../components/staffPreview";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
 import {
     type Composition,
@@ -61,9 +62,15 @@ export default function Compose() {
     const [playing, setPlaying] = useState(false);
     const [copied, setCopied] = useState(false);
     const [staffXml, setStaffXml] = useState<string | null>(null);
+    const [metronomeOn, setMetronomeOn] = useState(false);
+    const [countingIn, setCountingIn] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
 
     const { octaveOffset } = useMidiConnection();
     const { playNote } = useSynth();
+    // Click through the count-in and, once armed, through the take, so the player stays
+    // in time and the captured onsets line up with the grid the staff is drawn on.
+    useMetronome(metronomeOn || countingIn, tempo, beatsPerBar);
 
     // Open notes keyed by pitch, with the clock origin and a live mirror of the note
     // list so the input callbacks read the latest state without re-subscribing.
@@ -216,6 +223,62 @@ export default function Compose() {
         downloadBlob(xml, "application/vnd.recordare.musicxml+xml", `${fileStem(title)}.musicxml`);
     }, [notes, tempo, beatsPerBar, title]);
 
+    // Click one bar of lead-in, then anchor the recording clock to the downbeat that
+    // follows and leave the metronome running, so what's played next sits on the grid.
+    // Appends after any existing tail, so a fresh canvas starts the take at beat one.
+    const countIn = useCallback(() => {
+        if (countingIn) {
+            return;
+        }
+        setCountingIn(true);
+        const barMs = beatsPerBar * (60_000 / tempo);
+        window.setTimeout(() => {
+            originRef.current = performance.now() - tailMs(notesRef.current);
+            openRef.current.clear();
+            setCountingIn(false);
+            setMetronomeOn(true);
+        }, barMs);
+    }, [countingIn, beatsPerBar, tempo]);
+
+    // Load a MIDI or MusicXML file dropped or chosen by the player, replacing the take
+    // so they can carry work between devices. The parsers are pulled in on demand so
+    // their bytes don't weigh on the page until a file is actually opened.
+    const openFile = useCallback(
+        async (file: File | undefined) => {
+            setUploadError(null);
+            if (!file) {
+                return;
+            }
+            const bytes = new Uint8Array(await file.arrayBuffer());
+            const isMidi =
+                bytes[0] === 0x4d && bytes[1] === 0x54 && bytes[2] === 0x68 && bytes[3] === 0x64;
+            let loaded: Composition | null = null;
+            if (isMidi) {
+                const { parseMidiFile } = await import("../lib/midiParse");
+                loaded = parseMidiFile(bytes);
+            } else {
+                const [{ readScoreFile }, { parseMusicXml }] = await Promise.all([
+                    import("../lib/musicxmlFile"),
+                    import("../lib/musicxmlParse"),
+                ]);
+                const xml = await readScoreFile(file);
+                loaded = xml ? parseMusicXml(xml) : null;
+            }
+            if (!loaded) {
+                setUploadError(m.compose_open_error());
+                return;
+            }
+            stop();
+            setNotes(loaded.notes);
+            setTempo(loaded.tempo);
+            setBeatsPerBar(loaded.beatsPerBar);
+            setCheckpoint(null);
+            originRef.current = null;
+            openRef.current.clear();
+        },
+        [stop],
+    );
+
     const empty = notes.length === 0;
 
     return (
@@ -295,14 +358,28 @@ export default function Compose() {
                         {m.compose_quantize_label()}
                     </span>
                 </label>
+                <label className="flex items-center gap-2 pb-2">
+                    <input
+                        type="checkbox"
+                        checked={metronomeOn}
+                        onChange={(event) => setMetronomeOn(event.target.checked)}
+                        className="h-4 w-4"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {m.compose_metronome_label()}
+                    </span>
+                </label>
             </section>
 
             <section className="flex flex-wrap gap-2">
+                <button type="button" onClick={countIn} disabled={countingIn} className={PRIMARY}>
+                    {countingIn ? m.compose_counting_in() : m.compose_count_in()}
+                </button>
                 <button
                     type="button"
                     onClick={playing ? stop : play}
                     disabled={empty}
-                    className={PRIMARY}
+                    className={SECONDARY}
                 >
                     {playing ? m.compose_stop() : m.compose_play()}
                 </button>
@@ -344,9 +421,24 @@ export default function Compose() {
                 >
                     {m.compose_download_musicxml()}
                 </button>
+                <label className={`${SECONDARY} cursor-pointer`}>
+                    {m.compose_open_file()}
+                    <input
+                        type="file"
+                        accept=".mid,.midi,.musicxml,.xml,.mxl,audio/midi"
+                        className="sr-only"
+                        onChange={(event) => {
+                            void openFile(event.target.files?.[0]);
+                            event.target.value = "";
+                        }}
+                    />
+                </label>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                     {m.compose_note_count({ count: notes.length })}
                 </span>
+                {uploadError && (
+                    <p className="w-full text-sm text-red-600 dark:text-red-400">{uploadError}</p>
+                )}
             </section>
 
             <section className="space-y-3">

@@ -154,7 +154,9 @@ describe("toMusicXml", () => {
                 if (child.tagName === "backup") {
                     backupSeen = true;
                 }
-                if (child.tagName === "note" && !backupSeen) {
+                // Chord notes sound atop the first and don't advance time, so they
+                // don't count toward the bar's filled duration.
+                if (child.tagName === "note" && !backupSeen && !child.querySelector("chord")) {
                     trebleSum += Number(child.querySelector("duration")?.textContent ?? 0);
                 }
             }
@@ -174,6 +176,24 @@ describe("toMusicXml", () => {
         const doc = parse(toMusicXml(composition([])));
         expect(doc.querySelectorAll("measure").length).toBe(1);
         expect(doc.querySelector("rest")).not.toBeNull();
+    });
+
+    it("renders simultaneous notes on one staff as a block chord", () => {
+        // A C-major triad struck together in the right hand.
+        const comp = composition([
+            note({ pitch: 60, startMs: 0, durationMs: 500 }),
+            note({ pitch: 64, startMs: 0, durationMs: 500 }),
+            note({ pitch: 67, startMs: 0, durationMs: 500 }),
+        ]);
+        const doc = parse(toMusicXml(comp));
+        // Three notes at the onset, the upper two flagged as chord members.
+        const chordNotes = doc.querySelectorAll("note > chord");
+        expect(chordNotes.length).toBe(2);
+        const octaves = [...doc.querySelectorAll("note > pitch")].map(
+            (p) =>
+                `${p.querySelector("step")?.textContent}${p.querySelector("octave")?.textContent}`,
+        );
+        expect(octaves).toEqual(["C4", "E4", "G4"]);
     });
 
     it("spells a black key with a sharp accidental", () => {

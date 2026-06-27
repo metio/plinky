@@ -200,35 +200,28 @@ function splitDuration(cells: number): { cells: number; type: string; dots: numb
     return pieces;
 }
 
-// A contiguous span on one staff's timeline: either a held pitch or a rest, measured
-// in grid cells. Cells tile the whole timeline with no gaps or overlaps.
-type Cell = { pitch: number | null; cells: number };
+// A contiguous span on one staff's timeline: a block chord of one or more pitches, or
+// a rest when empty. Cells tile the whole timeline with no gaps or overlaps.
+type Cell = { pitches: number[]; cells: number };
 
-// Collapses one hand's notes into a single-voice timeline. Overlapping or
-// simultaneous notes are reduced to one representative pitch per onset (the melody
-// on top for the right hand, the bass below for the left), and each note is clipped
-// so it never runs into the next onset — the sketch is monophonic per staff by
-// design. Gaps between notes become rests, and the line is padded with a final rest
-// so every staff spans the same whole number of bars.
-function buildCells(
-    notes: RecordedNote[],
-    gridMs: number,
-    totalCells: number,
-    pick: (a: number, b: number) => number,
-): Cell[] {
-    // One representative pitch per grid slot, and the longest length struck there.
-    const bySlot = new Map<number, { pitch: number; cells: number }>();
+// Collapses one hand's notes into a single-voice timeline of block chords. Notes that
+// land on the same grid slot become one chord sounding for the slot's longest length,
+// and each chord is clipped so it never runs into the next onset — the sketch is
+// homophonic per staff: chords move together, independent voices are not separated.
+// Gaps between onsets become rests, and the line is padded with a final rest so every
+// staff spans the same whole number of bars.
+function buildCells(notes: RecordedNote[], gridMs: number, totalCells: number): Cell[] {
+    // The pitches struck at each grid slot and the longest length any of them held.
+    const bySlot = new Map<number, { pitches: Set<number>; cells: number }>();
     for (const note of notes) {
         const slot = Math.round(note.startMs / gridMs);
         const length = Math.max(1, Math.round(note.durationMs / gridMs));
         const existing = bySlot.get(slot);
         if (!existing) {
-            bySlot.set(slot, { pitch: note.pitch, cells: length });
+            bySlot.set(slot, { pitches: new Set([note.pitch]), cells: length });
         } else {
-            bySlot.set(slot, {
-                pitch: pick(existing.pitch, note.pitch),
-                cells: Math.max(existing.cells, length),
-            });
+            existing.pitches.add(note.pitch);
+            existing.cells = Math.max(existing.cells, length);
         }
     }
     const slots = [...bySlot.keys()].sort((a, b) => a - b);
@@ -238,16 +231,17 @@ function buildCells(
         const slot = slots[i]!;
         const next = i + 1 < slots.length ? slots[i + 1]! : totalCells;
         if (slot > cursor) {
-            cells.push({ pitch: null, cells: slot - cursor });
+            cells.push({ pitches: [], cells: slot - cursor });
             cursor = slot;
         }
         const struck = bySlot.get(slot)!;
         const length = Math.max(1, Math.min(struck.cells, next - slot));
-        cells.push({ pitch: struck.pitch, cells: length });
+        // Ascending pitches so the chord renders bottom-up, the conventional order.
+        cells.push({ pitches: [...struck.pitches].sort((a, b) => a - b), cells: length });
         cursor = slot + length;
     }
     if (cursor < totalCells) {
-        cells.push({ pitch: null, cells: totalCells - cursor });
+        cells.push({ pitches: [], cells: totalCells - cursor });
     }
     return cells;
 }
@@ -267,9 +261,9 @@ function intoBars(cells: Cell[], cellsPerBar: number): BarCell[][] {
             const take = Math.min(room, remaining);
             const crosses = take < remaining;
             bar.push({
-                pitch: cell.pitch,
+                pitches: cell.pitches,
                 cells: take,
-                tiedToNext: crosses && cell.pitch !== null,
+                tiedToNext: crosses && cell.pitches.length > 0,
             });
             filled += take;
             remaining -= take;
@@ -286,40 +280,58 @@ function intoBars(cells: Cell[], cellsPerBar: number): BarCell[][] {
     return bars;
 }
 
+// One pitch of a chord at one rhythmic piece. The chord's notes after the first carry
+// <chord/>, which sounds them together with — and at the duration of — the first.
+function pitchNote(
+    midi: number,
+    piece: { cells: number; type: string; dots: number },
+    staff: number,
+    isChord: boolean,
+    tieBack: boolean,
+    tieForward: boolean,
+): string {
+    const { step, alter, octave } = spell(midi);
+    const chord = isChord ? "<chord/>" : "";
+    const alterTag = alter === 0 ? "" : `<alter>${alter}</alter>`;
+    const pitch = `<pitch><step>${step}</step>${alterTag}<octave>${octave}</octave></pitch>`;
+    const ties = (tieBack ? `<tie type="stop"/>` : "") + (tieForward ? `<tie type="start"/>` : "");
+    const dots = "<dot/>".repeat(piece.dots);
+    const accidental = alter !== 0 ? "<accidental>sharp</accidental>" : "";
+    const tied =
+        tieBack || tieForward
+            ? `<notations>${tieBack ? `<tied type="stop"/>` : ""}${tieForward ? `<tied type="start"/>` : ""}</notations>`
+            : "";
+    return `      <note>${chord}${pitch}<duration>${piece.cells}</duration>${ties}<type>${piece.type}</type>${dots}${accidental}<staff>${staff}</staff>${tied}</note>`;
+}
+
+function restNote(piece: { cells: number; type: string; dots: number }, staff: number): string {
+    const dots = "<dot/>".repeat(piece.dots);
+    return `      <note><rest/><duration>${piece.cells}</duration><type>${piece.type}</type>${dots}<staff>${staff}</staff></note>`;
+}
+
 function noteElements(
     cell: BarCell,
     staff: number,
     holdingIn: boolean,
 ): { xml: string; holdingOut: boolean } {
     const pieces = splitDuration(cell.cells);
+    const isRest = cell.pitches.length === 0;
     const lines: string[] = [];
     let holding = holdingIn;
     for (let i = 0; i < pieces.length; i++) {
         const piece = pieces[i]!;
-        const isRest = cell.pitch === null;
-        // A pitched piece ties forward when more pieces follow it or the cell carries
-        // into the next bar; it ties back whenever the previous piece was holding.
-        const tieForward = !isRest && (i < pieces.length - 1 || cell.tiedToNext);
-        const tieBack = !isRest && holding;
-        const head = isRest
-            ? "<rest/>"
-            : (() => {
-                  const { step, alter, octave } = spell(cell.pitch!);
-                  const alterTag = alter === 0 ? "" : `<alter>${alter}</alter>`;
-                  return `<pitch><step>${step}</step>${alterTag}<octave>${octave}</octave></pitch>`;
-              })();
-        const ties =
-            (tieBack ? `<tie type="stop"/>` : "") + (tieForward ? `<tie type="start"/>` : "");
-        const dots = "<dot/>".repeat(piece.dots);
-        const accidental =
-            !isRest && spell(cell.pitch!).alter !== 0 ? "<accidental>sharp</accidental>" : "";
-        const tiedNotations =
-            tieBack || tieForward
-                ? `<notations>${tieBack ? `<tied type="stop"/>` : ""}${tieForward ? `<tied type="start"/>` : ""}</notations>`
-                : "";
-        lines.push(
-            `      <note>${head}<duration>${piece.cells}</duration>${ties}<type>${piece.type}</type>${dots}${accidental}<staff>${staff}</staff>${tiedNotations}</note>`,
-        );
+        if (isRest) {
+            lines.push(restNote(piece, staff));
+            continue;
+        }
+        // A chord ties forward when more pieces follow it or it carries into the next
+        // bar, and ties back whenever the previous piece was holding. Every note of the
+        // block chord ties identically, since the whole chord moves together.
+        const tieForward = i < pieces.length - 1 || cell.tiedToNext;
+        const tieBack = holding;
+        cell.pitches.forEach((midi, index) => {
+            lines.push(pitchNote(midi, piece, staff, index > 0, tieBack, tieForward));
+        });
         holding = tieForward;
     }
     return { xml: lines.join("\n"), holdingOut: holding };
@@ -361,10 +373,14 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
 
     const treble = snapped.filter((note) => note.pitch >= splitPoint);
     const bass = snapped.filter((note) => note.pitch < splitPoint);
-    const trebleBars = intoBars(buildCells(treble, gridMs, totalCells, Math.max), cellsPerBar);
-    const bassBars = intoBars(buildCells(bass, gridMs, totalCells, Math.min), cellsPerBar);
+    const trebleBars = intoBars(buildCells(treble, gridMs, totalCells), cellsPerBar);
+    const bassBars = intoBars(buildCells(bass, gridMs, totalCells), cellsPerBar);
 
     const attributes = `<attributes><divisions>${DIVISIONS}</divisions><key><fifths>0</fifths></key><time><beats>${beatsPerBar}</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`;
+    // The tempo travels with the file, so notation software — and our own importer —
+    // reopens the sketch at the speed it was played.
+    const bpm = Math.round(composition.tempo);
+    const tempoDirection = `<direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${bpm}</per-minute></metronome></direction-type><sound tempo="${bpm}"/></direction>`;
 
     const measures: string[] = [];
     const barCount = Math.max(trebleBars.length, bassBars.length, 1);
@@ -373,9 +389,9 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
     let bassHolding = false;
     for (let i = 0; i < barCount; i++) {
         const number = i + 1;
-        const head = number === 1 ? `      ${attributes}\n` : "";
+        const head = number === 1 ? `      ${attributes}\n      ${tempoDirection}\n` : "";
         const trebleXml = (
-            trebleBars[i] ?? [{ pitch: null, cells: cellsPerBar, tiedToNext: false }]
+            trebleBars[i] ?? [{ pitches: [], cells: cellsPerBar, tiedToNext: false }]
         )
             .map((cell) => {
                 const { xml, holdingOut } = noteElements(cell, 1, trebleHolding);
@@ -383,7 +399,7 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
                 return xml;
             })
             .join("\n");
-        const bassXml = (bassBars[i] ?? [{ pitch: null, cells: cellsPerBar, tiedToNext: false }])
+        const bassXml = (bassBars[i] ?? [{ pitches: [], cells: cellsPerBar, tiedToNext: false }])
             .map((cell) => {
                 const { xml, holdingOut } = noteElements(cell, 2, bassHolding);
                 bassHolding = holdingOut;

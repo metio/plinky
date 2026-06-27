@@ -90,4 +90,28 @@ describe("Compose", () => {
         expect(await screen.findByText("2 notes")).toBeTruthy();
         await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
     });
+
+    it("loads notes from an opened MIDI file", async () => {
+        const { toMidiNotes } = await import("../lib/composition");
+        const { buildMidiFile } = await import("../lib/midiFile");
+        const bytes = buildMidiFile(
+            toMidiNotes({
+                notes: [
+                    { pitch: 60, startMs: 0, durationMs: 400, velocity: 90 },
+                    { pitch: 64, startMs: 500, durationMs: 400, velocity: 90 },
+                    { pitch: 67, startMs: 1000, durationMs: 400, velocity: 90 },
+                ],
+                tempo: 120,
+                beatsPerBar: 4,
+            }),
+            { tempo: 120 },
+        );
+        const container = mount();
+        const file = new File([bytes], "take.mid", { type: "audio/midi" });
+        const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+        await act(async () => {
+            fireEvent.change(input, { target: { files: [file] } });
+        });
+        expect(await screen.findByText("3 notes")).toBeTruthy();
+    });
 });
