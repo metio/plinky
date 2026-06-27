@@ -18,6 +18,7 @@ import {
     type StarTier,
     starTier,
 } from "../lib/gradeProgress";
+import { allFirstStepsDone, type FirstSteps, firstSteps } from "../lib/onboarding";
 import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import { m } from "../paraglide/messages.js";
@@ -30,6 +31,13 @@ const STAR_LABEL: Record<EarnedTier, () => string> = {
     silver: m.grades_star_silver,
     gold: m.grades_star_gold,
 };
+
+// The Grade-0 first-steps checklist: get a brand-new player moving toward Grade 1.
+const FIRST_STEPS: { key: keyof FirstSteps; label: () => string; to: string }[] = [
+    { key: "played", label: m.grades_start_play, to: "/library" },
+    { key: "handSet", label: m.grades_start_hand, to: "/settings" },
+    { key: "dailyDone", label: m.grades_start_daily, to: "/daily" },
+];
 
 const SUGGESTION_COUNT = 4;
 const LINK = "text-indigo-700 underline dark:text-indigo-300";
@@ -56,6 +64,11 @@ export function GradeLadderView() {
     const mode = loadPrefs().decayMode;
     const resolved = items ?? [];
     const level = currentGrade(resolved, mode, now);
+    // Read the first-steps state only on the client (after mount), so it doesn't run
+    // against absent localStorage during prerender.
+    const mounted = items !== null;
+    const steps = mounted ? firstSteps() : null;
+    const showOnboarding = level === 0 && steps !== null && !allFirstStepsDone(steps);
     const skill = skillRating(resolved, mode, now);
     const reviews = dueReviews(resolved, now);
     const byId = new Map(resolved.map((item) => [item.id, item]));
@@ -94,6 +107,46 @@ export function GradeLadderView() {
                     )}
                 </span>
             </div>
+
+            {showOnboarding && steps && (
+                <section className="space-y-3 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
+                    <h2 className="font-semibold text-indigo-800 dark:text-indigo-200">
+                        {m.grades_start_heading()}
+                    </h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {m.grades_start_intro()}
+                    </p>
+                    <ul className="space-y-1.5 text-sm">
+                        {FIRST_STEPS.map((step) => {
+                            const stepDone = steps[step.key];
+                            return (
+                                <li key={step.key} className="flex items-center gap-2">
+                                    <span
+                                        aria-hidden="true"
+                                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                                            stepDone
+                                                ? "bg-green-600 text-white"
+                                                : "border border-gray-300 text-transparent dark:border-gray-600"
+                                        }`}
+                                    >
+                                        ✓
+                                    </span>
+                                    <Link
+                                        to={step.to}
+                                        className={
+                                            stepDone
+                                                ? "text-gray-500 line-through dark:text-gray-400"
+                                                : LINK
+                                        }
+                                    >
+                                        {step.label()}
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </section>
+            )}
 
             {upNext.length > 0 && (
                 <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">

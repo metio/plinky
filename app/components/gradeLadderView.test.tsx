@@ -23,6 +23,7 @@ afterEach(() => {
     cleanup();
     masteryMock.mockReset();
     catalogueMock.mockReset();
+    localStorage.clear();
 });
 
 const fresh: Mastery = {
@@ -63,5 +64,21 @@ describe("GradeLadderView", () => {
         // Suggestions are easiest-first.
         const suggestions = await screen.findByRole("link", { name: "Gentle Two" });
         expect(suggestions).toBeTruthy();
+    });
+
+    it("guides a brand-new Grade-0 player with the first-steps checklist", async () => {
+        masteryMock.mockResolvedValue([]); // nothing mastered → Grade 0
+        catalogueMock.mockResolvedValue([{ id: "g1", title: "First Piece", grade: 1, cost: 1 }]);
+
+        render(
+            <MemoryRouter>
+                <GradeLadderView />
+            </MemoryRouter>,
+        );
+
+        expect(await screen.findByText("Getting started")).toBeTruthy();
+        expect(
+            screen.getByRole("link", { name: "Set your hand size for tailored fingering" }),
+        ).toBeTruthy();
     });
 });
