@@ -66,6 +66,8 @@
   "action_metronome": "🎵 Metronome",
   "metronome_adaptive": "Adaptive",
   "metronome_subdivision": "Subdivide the beat",
+  "tempo_trainer": "Tempo trainer",
+  "tempo_trainer_target": "Trainer target",
   "hand_label": "Hands",
   "hand_both": "Both",
   "hand_right": "Right",

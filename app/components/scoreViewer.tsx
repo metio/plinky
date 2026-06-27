@@ -123,6 +123,18 @@ export function ScoreViewer({
     const [adaptive, setAdaptive] = useState(false);
     const [liveTempo, setLiveTempo] = useState(initialTempo ?? 100);
     const [tempo, setTempo] = useState(initialTempo ?? 100);
+    // The tempo trainer ramps the tempo up by a step after each completed run, up to
+    // a target — practising a piece from comfortable to performance speed. Read from
+    // a ref at run-end so a completion handler created earlier sees the live setting.
+    const [trainerOn, setTrainerOn] = useState(false);
+    const [trainerTarget, setTrainerTarget] = useState(140);
+    const trainerRef = useRef({ on: false, target: 140 });
+    trainerRef.current = { on: trainerOn, target: trainerTarget };
+    const bumpTempo = () => {
+        if (trainerRef.current.on) {
+            setTempo((current) => Math.min(current + 5, trainerRef.current.target));
+        }
+    };
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -320,6 +332,8 @@ export function ScoreViewer({
         setGrade(result);
         setRunNotes(notes);
         setShareGrid(gridFor(notes));
+        // A finished run nudges the tempo trainer up for the next attempt.
+        bumpTempo();
         // Read the player's own tempo back out of the gaps between their notes, so
         // the results show where they sped up or dragged against their own pace.
         const points = tempoSeries(
@@ -469,6 +483,7 @@ export function ScoreViewer({
         const tick = () => {
             if (cursor.iterator.EndReached) {
                 stopListen();
+                bumpTempo();
                 return;
             }
             let beats = 1;
@@ -667,6 +682,38 @@ export function ScoreViewer({
                         />
                         <Bpm tempo={tempo} className="w-12" />
                     </label>
+                )}
+                {!lockTempo && (
+                    <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <button
+                            type="button"
+                            onClick={() => setTrainerOn((on) => !on)}
+                            aria-pressed={trainerOn}
+                            className={
+                                trainerOn
+                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                    : BUTTON
+                            }
+                        >
+                            {m.tempo_trainer()}
+                        </button>
+                        {trainerOn && (
+                            <>
+                                <span aria-hidden="true">→</span>
+                                <input
+                                    type="range"
+                                    min={40}
+                                    max={180}
+                                    value={trainerTarget}
+                                    onChange={(event) =>
+                                        setTrainerTarget(Number(event.target.value))
+                                    }
+                                    aria-label={m.tempo_trainer_target()}
+                                />
+                                <Bpm tempo={trainerTarget} className="w-12" />
+                            </>
+                        )}
+                    </span>
                 )}
             </div>
 
