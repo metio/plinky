@@ -6,6 +6,7 @@
     "exercises": "tsx dev/gen-exercises.mts",
     "songs:import": "tsx dev/import-pdmx.mts",
     "songs:cost": "tsx dev/backfill-song-cost.mts",
+    "songs:audit": "tsx dev/audit-catalog.mts",
     "build": "npm run messages && react-router build && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "dev": "npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",

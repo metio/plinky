@@ -17,6 +17,7 @@ import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import { parse } from "csv-parse";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
+import { nonPianoReason } from "./scoreInstrument.mts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
@@ -118,6 +119,10 @@ async function main() {
         let cost: number;
         try {
             xml = readMusicXml(src);
+            // Reject drum kits and other solo instruments — this is a piano catalogue.
+            if (nonPianoReason(xml)) {
+                continue;
+            }
             cost = rawDifficulty(xml);
         } catch {
             continue;

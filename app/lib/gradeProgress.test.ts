@@ -176,6 +176,12 @@ describe("gradeSuggestions", () => {
         const suggestions = gradeSuggestions(catalogue, 3, new Set(["done"]), 2);
         expect(suggestions.map((item) => item.id)).toEqual(["easy", "mid"]);
     });
+
+    it("treats an unmeasured cost (0) as hardest, so it isn't suggested first", () => {
+        const catalogue = [cat("zero", 1, 0), cat("real", 1, 2)];
+        const suggestions = gradeSuggestions(catalogue, 1, new Set(), 2);
+        expect(suggestions.map((item) => item.id)).toEqual(["real", "zero"]);
+    });
 });
 
 describe("poolSizes", () => {

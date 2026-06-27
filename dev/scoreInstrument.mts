@@ -1,0 +1,31 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+// Decides whether a MusicXML score belongs in a *piano* catalogue. Shared by the
+// import pipeline (to reject non-piano scores up front) and the catalogue audit (to
+// flag ones that slipped in). Conservative by design: only a confident non-piano
+// signal flags a score, so a real keyboard piece is never dropped.
+
+const KEYBOARD = /piano|keyboard|klavier|clavier|harpsichord|clavichord|celesta|organ/;
+const OTHER_INSTRUMENT =
+    /drum|percussion|cymbal|guitar|\bbass\b|violin|cello|viola|contrabass|flute|trumpet|saxophone|\bsax\b|clarinet|oboe|bassoon|trombone|tuba|\bhorn\b|choir|\bvoice\b|vocal|ukulele|banjo|mandolin|\bharp\b|recorder|piccolo|accordion|\bsynth/;
+
+// Returns the disqualifying reason, or null when the score is a (probable) piano piece.
+export function nonPianoReason(xml: string): string | null {
+    // Unpitched notes / a percussion clef are unambiguous — a drum kit, not a piano.
+    if (/<sign>\s*percussion\s*<\/sign>/i.test(xml) || /<unpitched\b/i.test(xml)) {
+        return "percussion";
+    }
+    const names = [
+        ...xml.matchAll(
+            /<(?:part-name|instrument-name)[^>]*>([^<]*)<\/(?:part-name|instrument-name)>/gi,
+        ),
+    ]
+        .map((match) => match[1]!.trim().toLowerCase())
+        .join(" | ");
+    // A clearly-named other instrument with no keyboard part anywhere.
+    if (!KEYBOARD.test(names) && OTHER_INSTRUMENT.test(names)) {
+        return "named-instrument";
+    }
+    return null;
+}

@@ -208,10 +208,17 @@ export function gradeSuggestions(
     mastered: ReadonlySet<string>,
     count: number,
 ): GradeCatalogItem[] {
-    return catalogue
-        .filter((item) => item.grade === grade && !mastered.has(item.id))
-        .sort((a, b) => a.cost - b.cost)
-        .slice(0, count);
+    return (
+        catalogue
+            .filter((item) => item.grade === grade && !mastered.has(item.id))
+            // A cost of 0 means the difficulty couldn't be measured, not "easiest" — sort
+            // those last so a real, gently-graded piece is suggested first.
+            .sort(
+                (a, b) =>
+                    (a.cost || Number.POSITIVE_INFINITY) - (b.cost || Number.POSITIVE_INFINITY),
+            )
+            .slice(0, count)
+    );
 }
 
 // How many pieces each grade's pool holds, indexed by grade.
