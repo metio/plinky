@@ -32,12 +32,14 @@ describe("Home", () => {
         }
     });
 
-    it("routes into the library and the guided tracks", () => {
+    it("routes into the library and the assignments", () => {
         renderHome();
         // Links are localized; the test setup pins the locale to the base.
         expect(screen.getByText("All scores →").closest("a")?.getAttribute("href")).toBe(
             "/en/library",
         );
-        expect(screen.getByText("Tracks →").closest("a")?.getAttribute("href")).toBe("/en/tracks");
+        expect(screen.getByText("Assignments →").closest("a")?.getAttribute("href")).toBe(
+            "/en/assignments",
+        );
     });
 });

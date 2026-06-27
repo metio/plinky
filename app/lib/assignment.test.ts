@@ -5,7 +5,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
     type Assignment,
-    assignmentToTrack,
     decodeAssignmentLink,
     encodeAssignmentLink,
     loadAssignments,
@@ -127,14 +126,5 @@ describe("storage", () => {
         const loaded = loadAssignments();
         expect(loaded).toHaveLength(1);
         expect(loaded[0]?.name).toBe("Renamed");
-    });
-});
-
-describe("assignmentToTrack", () => {
-    it("maps to an ordered, namespaced track", () => {
-        const track = assignmentToTrack(sample());
-        expect(track.id).toBe("assignment:week-1");
-        expect(track.kind).toBe("progression");
-        expect(track.scoreIds).toEqual(["scale-c-major", "minuet-in-g", "arpeggio-g-major"]);
     });
 });

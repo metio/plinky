@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { packToCode, unpackFromCode } from "./shareCode";
-import type { Track } from "./tracks";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
 // imported scores, or finger exercises) with an optional target tempo and note per
@@ -243,17 +242,4 @@ export function saveAssignment(assignment: Assignment): boolean {
 
 export function removeAssignment(id: string): void {
     storeAssignments(loadAssignments().filter((entry) => entry.id !== id));
-}
-
-// An assignment shown as a track: it steps through its items in order, so it slots
-// into the tracks page beside the built-in progressions. The id is namespaced so it
-// can't collide with a built-in track's id.
-export function assignmentToTrack(assignment: Assignment): Track {
-    return {
-        id: `assignment:${assignment.id}`,
-        name: assignment.name,
-        description: assignment.description ?? "",
-        kind: "progression",
-        scoreIds: assignment.items.map((item) => item.id),
-    };
 }

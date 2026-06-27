@@ -20,7 +20,9 @@ import {
 } from "../lib/assignment";
 import { loadCatalog } from "../lib/catalog";
 import { type ExerciseMeta, loadExerciseManifest } from "../lib/exercises";
+import { loadMastery } from "../lib/mastery";
 import { routeMeta, SITE_URL } from "../lib/site";
+import { trackSteps } from "../lib/tracks";
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import type { Route } from "./+types/assignments";
@@ -39,6 +41,14 @@ const FIELD =
 // A pickable piece for the builder: a catalogue score or a finger exercise, both
 // reduced to the id and title the basket needs.
 type PoolItem = { id: string; title: string };
+
+// A step is cleared once its piece has been learned.
+function done(id: string): boolean {
+    return loadMastery(id)?.learned === true;
+}
+
+const STEP_MARK =
+    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold";
 
 // Trigger a file download of text content the browser keeps on the device.
 function download(filename: string, text: string, type: string): void {
@@ -426,54 +436,85 @@ export default function AssignmentsRoute() {
                     </p>
                 ) : (
                     <ul className="space-y-2">
-                        {assignments.map((assignment) => (
-                            <li
-                                key={assignment.id}
-                                className="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
-                            >
-                                <span className="flex-1">
-                                    <span className="font-medium">{assignment.name}</span>{" "}
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                        {m.assignments_item_count({
-                                            count: assignment.items.length,
-                                        })}
-                                    </span>
-                                </span>
-                                <button
-                                    type="button"
-                                    className={BUTTON}
-                                    onClick={() => onShare(assignment)}
+                        {assignments.map((assignment) => {
+                            const steps = trackSteps(
+                                assignment.items.map((item) => item.id),
+                                done,
+                            );
+                            const doneCount = steps.filter((step) => step.status === "done").length;
+                            return (
+                                <li
+                                    key={assignment.id}
+                                    className="space-y-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
                                 >
-                                    {m.assignments_share()}
-                                </button>
-                                <button
-                                    type="button"
-                                    className={BUTTON}
-                                    onClick={() => onDownload(assignment)}
-                                >
-                                    {m.assignments_download()}
-                                </button>
-                                <button
-                                    type="button"
-                                    className={BUTTON}
-                                    onClick={() => onDelete(assignment)}
-                                    aria-label={m.assignments_delete_label({
-                                        name: assignment.name,
-                                    })}
-                                >
-                                    {m.assignments_remove()}
-                                </button>
-                            </li>
-                        ))}
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="flex-1">
+                                            <span className="font-medium">{assignment.name}</span>{" "}
+                                            <span className="tabular-nums text-gray-500 dark:text-gray-400">
+                                                {doneCount}/{steps.length}
+                                            </span>
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className={BUTTON}
+                                            onClick={() => onShare(assignment)}
+                                        >
+                                            {m.assignments_share()}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={BUTTON}
+                                            onClick={() => onDownload(assignment)}
+                                        >
+                                            {m.assignments_download()}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={BUTTON}
+                                            onClick={() => onDelete(assignment)}
+                                            aria-label={m.assignments_delete_label({
+                                                name: assignment.name,
+                                            })}
+                                        >
+                                            {m.assignments_remove()}
+                                        </button>
+                                    </div>
+                                    <ol className="space-y-1">
+                                        {steps.map((step, index) => (
+                                            <li
+                                                key={step.scoreId}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={`${STEP_MARK} ${
+                                                        step.status === "done"
+                                                            ? "bg-green-600 text-white"
+                                                            : step.status === "current"
+                                                              ? "bg-indigo-600 text-white"
+                                                              : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                                    }`}
+                                                >
+                                                    {step.status === "done" ? "✓" : index + 1}
+                                                </span>
+                                                <Link
+                                                    to={`/play/${step.scoreId}`}
+                                                    className={
+                                                        step.status === "current"
+                                                            ? "font-medium text-indigo-700 dark:text-indigo-300"
+                                                            : "text-gray-700 hover:underline dark:text-gray-300"
+                                                    }
+                                                >
+                                                    {titleOf(step.scoreId)}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </li>
+                            );
+                        })}
                     </ul>
                 )}
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.assignments_appear_on_tracks()}{" "}
-                    <Link to="/tracks" className="text-indigo-700 underline dark:text-indigo-300">
-                        {m.tracks_heading()}
-                    </Link>
-                    .
-                </p>
             </section>
 
             <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">

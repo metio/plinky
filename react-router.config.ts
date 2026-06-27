@@ -15,7 +15,6 @@ const BASE_PATHS = [
     "/fingering",
     "/library",
     "/library/import",
-    "/tracks",
     "/assignments",
     "/progress",
     "/grades",

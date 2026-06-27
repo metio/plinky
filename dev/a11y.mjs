@@ -20,7 +20,6 @@ const PAGES = [
     "/en/",
     "/en/fingering/",
     "/en/library/",
-    "/en/tracks/",
     "/en/progress/",
     "/en/grades/",
     "/en/settings/",

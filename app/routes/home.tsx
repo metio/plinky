@@ -26,11 +26,10 @@ const PLAY_NOW = [
     { to: "/fingering", label: m.play_fingering, blurb: m.play_fingering_blurb },
 ];
 
-// The two practice surfaces beyond the quick drills: the whole catalogue, and the
-// guided paths through it.
+// The practice surfaces beyond the quick drills: the whole catalogue, and the
+// teacher-built assignments to work through.
 const LIBRARY = [
     { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb },
-    { to: "/tracks", label: m.home_tracks, blurb: m.home_tracks_blurb },
     { to: "/assignments", label: m.home_assignments, blurb: m.home_assignments_blurb },
 ];
 
