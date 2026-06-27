@@ -26,3 +26,7 @@ __screenshots__/
 # Storybook build output
 storybook-static
 /pdmx/
+
+# The Hanon exercise pack is a shipped asset; re-include it despite a global *.gz
+# ignore so the build (and deploy) carry it.
+!/public/exercises/hanon.json.gz
