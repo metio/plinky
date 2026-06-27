@@ -1,0 +1,164 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useSynth } from "../hooks/useSynth";
+import { type MidiNoteEvent, noteName } from "../lib/midi";
+import { scoreToBars, windowPositions } from "../lib/scoreToBars";
+import { m } from "../paraglide/messages.js";
+import { KeyboardHint } from "./keyboardHint";
+import { PianoKeyboard } from "./pianoKeyboard";
+
+const WINDOW = 2;
+const STEP_MS = 600;
+
+// Play the open piece's melody by ear: hear a two-bar phrase of the right-hand line,
+// then reproduce it note by note on the keyboard. Reuses the bar window from the
+// fingering mode (the treble staff's top notes) and matches by pitch class, so the
+// ear — not the register — is what's trained.
+export function EarPiece({ xml }: { xml: string }) {
+    const synth = useSynth();
+    const [start, setStart] = useState(0);
+
+    const bars = useMemo(() => scoreToBars(xml, 1), [xml]);
+    const lastStart = Math.max(0, bars.length - WINDOW);
+    const clamped = Math.min(start, lastStart);
+    // The melody: the top note of each position in the window, in play order.
+    const phrase = useMemo(
+        () => windowPositions(bars, clamped, WINDOW).map((pos) => Math.max(...pos)),
+        [bars, clamped],
+    );
+
+    const [index, setIndex] = useState(0);
+    const [correct, setCorrect] = useState(0);
+    const [attempts, setAttempts] = useState(0);
+    const [wrong, setWrong] = useState<number | null>(null);
+
+    const phraseRef = useRef(phrase);
+    phraseRef.current = phrase;
+    const indexRef = useRef(0);
+    indexRef.current = index;
+    const timers = useRef<number[]>([]);
+
+    const stop = useCallback(() => {
+        for (const t of timers.current) {
+            window.clearTimeout(t);
+        }
+        timers.current = [];
+    }, []);
+
+    // A new window (or piece) is a fresh phrase from the top; the cleanup also cancels
+    // pending playback so it can't sound after the phrase or the mode is gone.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: phrase is the reset trigger
+    useEffect(() => {
+        setIndex(0);
+        setCorrect(0);
+        setAttempts(0);
+        setWrong(null);
+        return stop;
+    }, [phrase, stop]);
+
+    const hearPhrase = useCallback(() => {
+        stop();
+        phrase.forEach((note, i) => {
+            timers.current.push(
+                window.setTimeout(() => synth.playNote(note, { duration: 0.6 }), i * STEP_MS),
+            );
+        });
+    }, [phrase, synth, stop]);
+
+    const handleNoteOn = useCallback(
+        (played: MidiNoteEvent) => {
+            const expected = phraseRef.current[indexRef.current];
+            if (expected === undefined) {
+                return;
+            }
+            setAttempts((value) => value + 1);
+            if (played.note % 12 === expected % 12) {
+                synth.playNote(expected);
+                setCorrect((value) => value + 1);
+                setWrong(null);
+                setIndex((value) => value + 1);
+            } else {
+                setWrong(played.note);
+                synth.playNote(played.note, { duration: 0.4 });
+            }
+        },
+        [synth],
+    );
+    useMidiInput({ onNoteOn: handleNoteOn });
+
+    const { octaveOffset } = useMidiConnection();
+    const done = phrase.length > 0 && index >= phrase.length;
+    // Changing the window changes the phrase, which the effect above resets to.
+    const move = (delta: number) => {
+        setStart(Math.max(0, Math.min(lastStart, clamped + delta)));
+    };
+
+    return (
+        <section className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+                <button
+                    type="button"
+                    onClick={hearPhrase}
+                    disabled={phrase.length === 0}
+                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                    {m.ear_piece_hear()}
+                </button>
+                <span className="ml-auto flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => move(-1)}
+                        disabled={clamped <= 0}
+                        aria-label={m.fingering_prev_bars()}
+                        className="rounded-md bg-indigo-50 px-2 py-1.5 text-sm font-medium text-indigo-700 disabled:opacity-40 dark:bg-indigo-950 dark:text-indigo-300"
+                    >
+                        ‹
+                    </button>
+                    <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
+                        {m.fingering_bars({
+                            from: clamped + 1,
+                            to: Math.min(clamped + WINDOW, bars.length),
+                            total: bars.length,
+                        })}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => move(1)}
+                        disabled={clamped >= lastStart}
+                        aria-label={m.fingering_next_bars()}
+                        className="rounded-md bg-indigo-50 px-2 py-1.5 text-sm font-medium text-indigo-700 disabled:opacity-40 dark:bg-indigo-950 dark:text-indigo-300"
+                    >
+                        ›
+                    </button>
+                </span>
+            </div>
+
+            {phrase.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.ear_piece_empty()}</p>
+            ) : done ? (
+                <p className="text-sm font-semibold text-green-600">{m.ear_piece_done()}</p>
+            ) : (
+                <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
+                    {m.ear_piece_progress({ index: index + 1, total: phrase.length })}
+                    {wrong !== null && (
+                        <span className="ml-2 text-red-600 dark:text-red-400">
+                            {m.ear_not_note({ note: noteName(wrong) })}
+                        </span>
+                    )}
+                </p>
+            )}
+            {attempts > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="font-mono">{correct}</span>/
+                    <span className="font-mono">{attempts}</span> {m.sprint_correct_label()}
+                </p>
+            )}
+
+            <PianoKeyboard expected={[]} />
+            <KeyboardHint octaveOffset={octaveOffset} />
+        </section>
+    );
+}

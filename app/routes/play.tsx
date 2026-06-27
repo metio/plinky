@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
-import { EarTrainer } from "../components/earTrainer";
+import { EarPiece } from "../components/earPiece";
 import { ExerciseForms } from "../components/exerciseForms";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { PieceFingering } from "../components/pieceFingering";
@@ -74,7 +74,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             />
                         </>
                     )}
-                    {mode === "ear" && <EarTrainer />}
+                    {mode === "ear" && <EarPiece xml={score.xml} />}
                     {mode === "fingering" && <PieceFingering xml={score.xml} />}
                 </>
             )}
