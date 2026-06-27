@@ -9,15 +9,9 @@ function pluralScores(count: number): string {
     return count === 1 ? m.backup_scores_one({ count }) : m.backup_scores_other({ count });
 }
 
-function pluralCurriculums(count: number): string {
-    return count === 1
-        ? m.backup_curriculums_one({ count })
-        : m.backup_curriculums_other({ count });
-}
-
-// Back up and restore the local score library as a Plinky score pack: a "download
-// all" export and a mass-import that accepts a pack (e.g. a music school's
-// curriculum). Scores live only on this device, so this is how users keep them.
+// Back up and restore the local score library as a Plinky score bundle: a "download
+// all" export and an import that accepts a bundle (a backup, or a set shared by a
+// teacher). Scores live only on this device, so this is how users keep them.
 export function ScoreBackup() {
     const [count, setCount] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
@@ -50,15 +44,7 @@ export function ScoreBackup() {
             if (mine !== readSeq.current) {
                 return;
             }
-            const parts = [m.backup_imported_scores({ count: pluralScores(result.imported) })];
-            if (result.curriculums > 0) {
-                parts.push(
-                    m.backup_imported_curriculums({
-                        count: pluralCurriculums(result.curriculums),
-                    }),
-                );
-            }
-            setStatus(`${parts.join(" ")}.`);
+            setStatus(`${m.backup_imported_scores({ count: pluralScores(result.imported) })}.`);
             setCount(loadUserScores().length);
         } catch (error) {
             if (mine !== readSeq.current) {

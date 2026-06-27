@@ -9,7 +9,6 @@ import { ScoreBackup } from "./scoreBackup";
 const PACK = JSON.stringify({
     format: "plinky-scores",
     version: 1,
-    curriculums: [{ id: "g1", name: "Grade 1" }],
     scores: [
         { id: "x", title: "X", xml: "<score-partwise><part/></score-partwise>" },
         { id: "y", title: "Y", xml: "<score-partwise><part/></score-partwise>" },
@@ -27,12 +26,12 @@ function fileInput(container: HTMLElement): HTMLInputElement {
 afterEach(() => localStorage.clear());
 
 describe("ScoreBackup", () => {
-    it("imports a pack from a file and reports the counts", async () => {
+    it("imports a bundle from a file and reports the count", async () => {
         const { container } = render(<ScoreBackup />);
         fireEvent.change(fileInput(container), {
             target: { files: [new File([PACK], "pack.json", { type: "application/json" })] },
         });
-        expect(await screen.findByText("Imported 2 scores and 1 curriculum.")).toBeTruthy();
+        expect(await screen.findByText("Imported 2 scores.")).toBeTruthy();
     });
 
     it("reports a friendly error for a file that is not a pack", async () => {

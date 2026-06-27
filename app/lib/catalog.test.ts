@@ -9,7 +9,6 @@ import {
     importScoresPack,
     loadBundledScores,
     loadCatalog,
-    loadCurriculums,
     loadUserScores,
     readScoreMeta,
     removeUserScore,
@@ -51,14 +50,6 @@ describe("loadUserScores robustness", () => {
         expect(loadUserScores()).toHaveLength(1);
         // The catalogue still sorts without throwing on the dropped entry.
         expect(() => loadCatalog()).not.toThrow();
-    });
-
-    it("drops malformed stored curriculums so grouping can't crash", () => {
-        localStorage.setItem(
-            "plinky:curriculums",
-            JSON.stringify([{ id: "grade-1", name: "Grade 1" }, null, { id: 7 }, "nope"]),
-        );
-        expect(loadCurriculums()).toEqual([{ id: "grade-1", name: "Grade 1" }]);
     });
 
     it("repairs a non-finite stored tempo to the default", () => {
