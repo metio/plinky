@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
@@ -130,11 +130,13 @@ export function ScoreViewer({
     const [trainerTarget, setTrainerTarget] = useState(140);
     const trainerRef = useRef({ on: false, target: 140 });
     trainerRef.current = { on: trainerOn, target: trainerTarget };
-    const bumpTempo = () => {
+    // Stable so the completion effect can depend on it without re-running; it reads
+    // the trainer setting from a ref, so an empty dependency list is correct.
+    const bumpTempo = useCallback(() => {
         if (trainerRef.current.on) {
             setTempo((current) => Math.min(current + 5, trainerRef.current.target));
         }
-    };
+    }, []);
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -369,7 +371,16 @@ export function ScoreViewer({
         saveMastery(id, updated);
         setMastery(updated);
         onMastery?.();
-    }, [matcher.complete, matcher.total, matcher.wrong, id, onMastery, ephemeral, daily]);
+    }, [
+        matcher.complete,
+        matcher.total,
+        matcher.wrong,
+        id,
+        onMastery,
+        ephemeral,
+        daily,
+        bumpTempo,
+    ]);
 
     const markLearnedNow = () => {
         const updated = markLearned(loadMastery(id), Date.now());
