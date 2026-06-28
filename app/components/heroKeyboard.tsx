@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import { Keyboard } from "./keyboard";
@@ -19,17 +19,30 @@ const TO = 72;
 export function HeroKeyboard() {
     const synth = useSynth();
     const [lit, setLit] = useState<ReadonlySet<number>>(new Set());
+    // Pending un-light timers, cleared on unmount so a press right before the component
+    // goes away can't fire setLit after teardown (which crashes a test that just left).
+    const timers = useRef<number[]>([]);
+    useEffect(
+        () => () => {
+            for (const timer of timers.current) {
+                window.clearTimeout(timer);
+            }
+        },
+        [],
+    );
 
     const plink = (note: number) => {
         synth.playNote(note, { velocity: 100, duration: 1.4 });
         setLit((prev) => new Set(prev).add(note));
-        window.setTimeout(() => {
-            setLit((prev) => {
-                const next = new Set(prev);
-                next.delete(note);
-                return next;
-            });
-        }, 240);
+        timers.current.push(
+            window.setTimeout(() => {
+                setLit((prev) => {
+                    const next = new Set(prev);
+                    next.delete(note);
+                    return next;
+                });
+            }, 240),
+        );
     };
 
     // A connected MIDI keyboard plays the hero too — but only if it's already

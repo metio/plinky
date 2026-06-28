@@ -28,7 +28,7 @@ describe("Play", () => {
     it("renders the requested bundled piece", async () => {
         renderPlay("ode-to-joy");
         expect(await screen.findByText("Ode to Joy")).toBeTruthy();
-        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
     });
 
     it("reports a missing score", async () => {

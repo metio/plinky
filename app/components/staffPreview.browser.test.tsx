@@ -13,7 +13,9 @@ describe("StaffPreview", () => {
         // OSMD only renders in a real browser; this exercises the chord MusicXML.
         const xml = drillToMusicXml([[60, 64, 67], [62], [64], [65]], "right");
         const { container } = render(<StaffPreview xml={xml} label="drill" />);
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
     });
 
     it("replaces the staff on a new drill instead of stacking another below", async () => {
@@ -21,7 +23,7 @@ describe("StaffPreview", () => {
             <StaffPreview xml={drillToMusicXml([[60]], "right")} label="drill" />,
         );
         await waitFor(() => expect(container.querySelectorAll("svg")).toHaveLength(1), {
-            timeout: 8000,
+            timeout: 30000,
         });
         // Switching hand (or asking for a new line) feeds a different drill in.
         rerender(<StaffPreview xml={drillToMusicXml([[48], [50]], "left")} label="drill" />);

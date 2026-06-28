@@ -25,13 +25,15 @@ describe("WindowStaff", () => {
     it("paints the active window's bars with the highlight colour", async () => {
         // OSMD only renders in a real browser; the window covers bars 1–2 of four.
         const { container } = render(<WindowStaff xml={PIECE} from={0} to={2} label="piece" />);
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
         await waitFor(
             () =>
                 expect(
                     container.querySelectorAll(`[fill="${WINDOW_COLOR}"]`).length,
                 ).toBeGreaterThan(0),
-            { timeout: 8000 },
+            { timeout: 30000 },
         );
     });
 });

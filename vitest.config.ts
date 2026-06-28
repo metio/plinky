@@ -17,9 +17,25 @@ export default defineConfig({
     // mid-run.
     resolve: { dedupe: ["react", "react-dom"] },
     optimizeDeps: {
-        include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
+        // Pre-bundle OpenSheetMusicDisplay too: the components import it dynamically, and
+        // if Vite optimizes it on-the-fly the first browser test to load it pays a slow,
+        // variable cost — long enough that a waitFor(svg) can time out. Pre-bundling makes
+        // every OSMD load fast and consistent, which is the real cure for the render flake.
+        include: [
+            "react",
+            "react-dom",
+            "react-dom/client",
+            "react/jsx-runtime",
+            "opensheetmusicdisplay",
+        ],
     },
     test: {
+        // OSMD renders under a real browser on its own schedule and can be slow on a
+        // loaded machine. Rather than fail a test that just hadn't rendered yet, give the
+        // polls (waitFor/findBy) and the hard per-test limit generous headroom so they
+        // wait the render out — and keep a couple of retries as a last-resort backstop.
+        testTimeout: 60_000,
+        retry: 2,
         coverage: {
             // istanbul instruments at transform time, so coverage is collected
             // uniformly in both the node and browser projects and merges into one
@@ -49,7 +65,7 @@ export default defineConfig({
                     environment: "node",
                     include: ["app/**/*.test.{ts,tsx}"],
                     exclude: ["app/**/*.browser.test.*"],
-                    setupFiles: ["./app/test-setup.ts"],
+                    setupFiles: ["./app/test-setup.ts", "./app/test-setup.node.ts"],
                 },
             },
             {

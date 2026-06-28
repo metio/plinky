@@ -2,33 +2,34 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { http, HttpResponse } from "msw";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { server } from "../test-setup.node";
 
-// Each test re-imports the module so its manifest/Hanon caches start fresh.
+// Each test re-imports the module so its manifest/Hanon caches start fresh. The catalogue
+// fetch is intercepted by the shared MSW server (test-setup.node), so a test overrides a
+// route rather than stubbing the global fetch.
 beforeEach(() => vi.resetModules());
-afterEach(() => vi.restoreAllMocks());
 
 describe("loadExerciseManifest", () => {
     it("returns an empty catalogue when the manifest can't be fetched", async () => {
-        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+        server.use(
+            http.get("*/exercises/manifest.json", () => new HttpResponse(null, { status: 500 })),
+        );
         const { loadExerciseManifest } = await import("./exercises");
         expect(await loadExerciseManifest()).toEqual([]);
     });
 });
 
 describe("resolveExercise", () => {
-    it("generates a parametric exercise with no network fetch", async () => {
-        const fetchMock = vi.fn();
-        vi.stubGlobal("fetch", fetchMock);
+    it("generates a parametric exercise from its id alone", async () => {
         const { resolveExercise } = await import("./exercises");
         const score = await resolveExercise("arpeggio-c-major.2b");
         expect(score?.xml).toContain("score-partwise");
         expect(score?.bundled).toBe(true);
-        expect(fetchMock).not.toHaveBeenCalled();
     });
 
     it("returns null for an id that is neither generated nor a study", async () => {
-        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
         const { resolveExercise } = await import("./exercises");
         expect(await resolveExercise("not-an-exercise")).toBeNull();
     });

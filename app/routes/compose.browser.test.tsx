@@ -53,7 +53,7 @@ describe("Compose", () => {
         // The note counter reflects what was captured.
         expect(await screen.findByText("2 notes")).toBeTruthy();
         // OSMD renders the sketch once the debounce fires.
-        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
 
         // Set a checkpoint at two notes, play a third, then reset back to two.
         fireEvent.click(screen.getByRole("button", { name: "Set checkpoint" }));
@@ -88,7 +88,9 @@ describe("Compose", () => {
         );
 
         expect(await screen.findByText("2 notes")).toBeTruthy();
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
     });
 
     it("loads notes from an opened MIDI file", async () => {

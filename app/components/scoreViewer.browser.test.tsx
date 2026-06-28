@@ -37,7 +37,7 @@ describe("ScoreViewer", () => {
         // A score OSMD can't parse must report rather than leave the controls
         // disabled forever with no explanation.
         expect(
-            await screen.findByText(/couldn't be displayed/, undefined, { timeout: 8000 }),
+            await screen.findByText(/couldn't be displayed/, undefined, { timeout: 30000 }),
         ).toBeTruthy();
     });
 
@@ -86,7 +86,7 @@ describe("ScoreViewer", () => {
         // enabling — since toolbar icons mean "any svg" is present from the start.
         const practiceButton = await screen.findByText(/Practice/);
         await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
-            timeout: 8000,
+            timeout: 30000,
         });
         fireEvent.click(practiceButton);
         const key = await screen.findByLabelText("C5");
@@ -99,7 +99,7 @@ describe("ScoreViewer", () => {
         await waitFor(
             () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
             {
-                timeout: 4000,
+                timeout: 30000,
             },
         );
     });
@@ -113,7 +113,7 @@ describe("ScoreViewer", () => {
         // enabling — since toolbar icons mean "any svg" is present from the start.
         const practiceButton = await screen.findByText(/Practice/);
         await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
-            timeout: 8000,
+            timeout: 30000,
         });
         fireEvent.click(practiceButton);
         // The race track appears...
@@ -121,7 +121,7 @@ describe("ScoreViewer", () => {
         // ...and the ghost colours its current note on the rendered staff.
         await waitFor(
             () => expect(container.querySelector(`[fill="${GHOST_COLOR}"]`)).toBeTruthy(),
-            { timeout: 4000 },
+            { timeout: 30000 },
         );
     });
 
@@ -144,7 +144,7 @@ describe("ScoreViewer", () => {
         mount(grand, { beatsPerBar: 4 });
         // The selector appears once OSMD reports two staves; its three options name
         // the hands. This also exercises the OSMD staff API the matcher filters on.
-        expect(await screen.findByText("Right", undefined, { timeout: 8000 })).toBeTruthy();
+        expect(await screen.findByText("Right", undefined, { timeout: 30000 })).toBeTruthy();
         expect(screen.getByText("Left")).toBeTruthy();
         expect(screen.getByText("Both")).toBeTruthy();
     });
@@ -154,7 +154,7 @@ describe("ScoreViewer", () => {
         mount(single, { beatsPerBar: 4 });
         // Wait until the score is interactive (Listen enabled), then confirm the
         // single-staff piece offers no hand choice.
-        const listen = await screen.findByText(/Listen/, undefined, { timeout: 8000 });
+        const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
         expect(screen.queryByText("Right")).toBeNull();
         expect(screen.queryByText("Left")).toBeNull();
@@ -163,7 +163,7 @@ describe("ScoreViewer", () => {
     it("reveals the section-loop bar inputs only once looping is on", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        const loop = await screen.findByText(/Loop/, undefined, { timeout: 8000 });
+        const loop = await screen.findByText(/Loop/, undefined, { timeout: 30000 });
         expect(loop.getAttribute("aria-pressed")).toBe("false");
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
         fireEvent.click(loop);
@@ -176,7 +176,7 @@ describe("ScoreViewer", () => {
     it("never lets the loop range invert", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByText(/Loop/, undefined, { timeout: 8000 }));
+        fireEvent.click(await screen.findByText(/Loop/, undefined, { timeout: 30000 }));
         const from = screen.getByLabelText("Loop from bar") as HTMLInputElement;
         const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
         fireEvent.change(to, { target: { value: "2" } });
@@ -190,7 +190,7 @@ describe("ScoreViewer", () => {
     it("omits the section-loop control for a single-bar score", async () => {
         const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(single, { beatsPerBar: 4 });
-        const listen = await screen.findByText(/Listen/, undefined, { timeout: 8000 });
+        const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
         expect(screen.queryByText(/Loop/)).toBeNull();
     });
@@ -198,7 +198,9 @@ describe("ScoreViewer", () => {
     it("transposes by semitones and re-renders the score in the new key", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
         const up = screen.getByLabelText("Transpose up a semitone");
         fireEvent.click(up);
         fireEvent.click(up);
@@ -206,7 +208,9 @@ describe("ScoreViewer", () => {
         expect(screen.getByText("+2 st")).toBeTruthy();
         // ...and changing the key reloads OSMD — waiting for the staff to come back
         // proves the transposed MusicXML still parses and renders.
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
         fireEvent.click(screen.getByLabelText("Reset to the written key"));
         expect(screen.getByText("0 st")).toBeTruthy();
     });
@@ -227,14 +231,16 @@ describe("ScoreViewer", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        await screen.findByText(/Listen/, undefined, { timeout: 8000 });
+        await screen.findByText(/Listen/, undefined, { timeout: 30000 });
         expect(screen.queryByText("Transpose")).toBeNull();
     });
 
     it("opens a print window with the rendered staff", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
         const written: string[] = [];
         const fakeWindow = {
             document: { write: (html: string) => written.push(html), close: () => {} },
@@ -254,7 +260,9 @@ describe("ScoreViewer", () => {
     it("exports the piece as a downloadable MIDI file", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
+            timeout: 30000,
+        });
         // Capture the blob handed to the download anchor without hitting the disk.
         let exported: Blob | null = null;
         const create = vi.spyOn(URL, "createObjectURL").mockImplementation((blob) => {

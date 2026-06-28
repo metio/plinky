@@ -27,11 +27,11 @@ describe("FocusStrip", () => {
         // bars are too short to overflow the box; real pieces aren't).
         const { container } = render(<FocusStrip xml={PIECE} bar={4} label="now" />);
         const box = container.firstElementChild as HTMLElement;
-        await waitFor(() => expect(box.querySelector("svg")).toBeTruthy(), { timeout: 8000 });
+        await waitFor(() => expect(box.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
         await waitFor(
             () =>
                 expect(box.querySelectorAll(`[fill="${WINDOW_COLOR}"]`).length).toBeGreaterThan(0),
-            { timeout: 8000 },
+            { timeout: 30000 },
         );
     });
 });
