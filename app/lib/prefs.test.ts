@@ -17,6 +17,7 @@ const BASE: Prefs = {
     fingerHints: true,
     decayMode: "gentle",
     reviewCap: 8,
+    barsPerRow: 0,
 };
 
 describe("prefs", () => {

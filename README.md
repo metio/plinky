@@ -26,7 +26,8 @@ you hear it first; **Practice** turns the same cursor into a note-by-note guide 
 read the note, play it, and the cursor advances, sounding back what you played. The
 staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up with
 you instead of making you scroll — and it stays in its own box so the keyboard below
-never hides the notes. A
+never hides the notes. You can also force a **set number of bars per row** for bigger,
+more readable notation on a small screen. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
 Single notes, **chords**, and **two-hand grand staffs** all work the same.

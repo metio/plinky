@@ -31,6 +31,7 @@ export default function Settings() {
         fingerHints: true,
         decayMode: "gentle",
         reviewCap: 8,
+        barsPerRow: 0,
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();

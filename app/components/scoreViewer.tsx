@@ -25,7 +25,7 @@ import {
     saveMastery,
     setBacklog,
 } from "../lib/mastery";
-import { loadPrefs } from "../lib/prefs";
+import { BARS_PER_ROW, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import { SITE_URL } from "../lib/site";
@@ -170,6 +170,8 @@ export function ScoreViewer({
     const saved = useMemo(() => loadSongFingering(id), [id]);
     const hasSaved = Object.keys(saved).length > 0;
     const [showMine, setShowMine] = useState(hasSaved);
+    // Bars forced onto each staff row (0 = fit to width), remembered per device.
+    const [barsPerRow, setBarsPerRow] = useState(() => loadPrefs().barsPerRow);
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -542,6 +544,11 @@ export function ScoreViewer({
                     followCursor: true,
                 });
                 osmdRef.current = osmd;
+                // Force a fixed number of bars per row when the player picks one, for
+                // bigger, more readable notation on a small screen; 0 fits them to width.
+                (
+                    osmd as unknown as { rules: { RenderXMeasuresPerLineAkaSystem: number } }
+                ).rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;
                 // Print suggested fingering on the staff, personalised to the
                 // player's reach, unless they've turned hints off — so the suggestion
                 // sits on the note being read, not mapped onto a key.
@@ -587,7 +594,7 @@ export function ScoreViewer({
                 window.clearTimeout(id);
             }
         };
-    }, [xml, transpose, showMine, saved]);
+    }, [xml, transpose, showMine, saved, barsPerRow]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
@@ -975,6 +982,29 @@ export function ScoreViewer({
                         {m.fingering_show_mine()}
                     </button>
                 )}
+                <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                    {m.bars_per_row()}
+                    <fieldset aria-label={m.bars_per_row()} className="flex items-center gap-1">
+                        {BARS_PER_ROW.map((n) => (
+                            <button
+                                key={n}
+                                type="button"
+                                onClick={() => {
+                                    setBarsPerRow(n);
+                                    savePrefs({ ...loadPrefs(), barsPerRow: n });
+                                }}
+                                aria-pressed={barsPerRow === n}
+                                className={
+                                    barsPerRow === n
+                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
+                                        : `${BUTTON} tabular-nums`
+                                }
+                            >
+                                {n === 0 ? m.bars_per_row_auto() : n}
+                            </button>
+                        ))}
+                    </fieldset>
+                </span>
             </div>
 
             {ready && (
