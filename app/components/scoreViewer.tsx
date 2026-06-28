@@ -64,6 +64,7 @@ import {
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
+import { Button, IconButton } from "./button";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
 import {
@@ -84,12 +85,10 @@ import { TempoGraph } from "./tempoGraph";
 // which the grade, the per-note strip and the share grid are all derived.
 type PlayedNote = RunNote & { velocity: number };
 
+// The small in-fold controls (tempo steppers, toggles) still use this pill class;
+// the transport, icon and share buttons now use the shared Button/IconButton.
 const BUTTON =
     "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
-// A button carrying an icon and a label, and one carrying only an icon (square).
-const BUTTON_WITH_ICON = `${BUTTON} inline-flex items-center gap-1.5`;
-const ICON_BUTTON =
-    "rounded-md bg-indigo-50 p-2 text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
 
 const NUMBER_INPUT =
     "w-14 rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300";
@@ -824,23 +823,23 @@ export function ScoreViewer({
     // the full-screen top bar (so full screen can hoist them out of the score's way).
     const transport = (
         <>
-            <button
-                type="button"
+            <Button
+                variant="secondary"
                 disabled={!ready}
                 onClick={() => (playing ? stopListen() : listen())}
-                className={BUTTON_WITH_ICON}
             >
                 {playing ? <StopIcon /> : <PlayIcon />}
                 {playing ? m.action_listen_stop() : m.action_listen()}
-            </button>
-            <button
-                type="button"
+            </Button>
+            {/* Practice is the screen's primary action, so it carries the dominant
+                filled variant rather than reading as a twin of Listen. */}
+            <Button
+                variant="primary"
                 disabled={!ready}
                 onClick={() => (matcher.practicing ? matcher.stop() : practice())}
-                className={BUTTON}
             >
                 {matcher.practicing ? m.action_listen_stop() : m.action_practice()}
-            </button>
+            </Button>
         </>
     );
 
@@ -862,23 +861,21 @@ export function ScoreViewer({
                                 {matcher.done}/{matcher.total}
                             </span>
                         </Show>
-                        <button
-                            type="button"
+                        <Button
+                            variant="secondary"
                             onClick={() => setHideKeyboard((on) => !on)}
                             aria-pressed={hideKeyboard}
-                            className={`${BUTTON} ml-auto`}
+                            className="ml-auto"
                         >
                             {hideKeyboard ? m.action_show_keyboard() : m.action_hide_keyboard()}
-                        </button>
-                        <button
-                            type="button"
+                        </Button>
+                        <IconButton
+                            variant="primary"
                             onClick={exitFullscreen}
-                            aria-label={m.action_exit_fullscreen()}
-                            title={m.action_exit_fullscreen()}
-                            className="rounded-md bg-indigo-600 p-2 text-white"
+                            label={m.action_exit_fullscreen()}
                         >
                             <MinimizeIcon />
-                        </button>
+                        </IconButton>
                     </div>
                 </FullScreen>
                 {/* The score sits at the top — it's what you read while playing, so the
@@ -929,15 +926,9 @@ export function ScoreViewer({
                 <FullScreen off>
                     <div className="flex flex-wrap items-center gap-3">
                         {transport}
-                        <button
-                            type="button"
-                            onClick={enterFullscreen}
-                            aria-label={m.action_fullscreen()}
-                            title={m.action_fullscreen()}
-                            className={ICON_BUTTON}
-                        >
+                        <IconButton onClick={enterFullscreen} label={m.action_fullscreen()}>
                             <MaximizeIcon />
-                        </button>
+                        </IconButton>
                         <details className="basis-full">
                             <summary className="cursor-pointer text-sm font-medium text-indigo-700 dark:text-indigo-300">
                                 {m.more_options()}
@@ -1303,24 +1294,12 @@ export function ScoreViewer({
                 <FullScreen off>
                     <Show when={ready}>
                         <div className="flex flex-wrap items-center gap-3">
-                            <button
-                                type="button"
-                                onClick={printScore}
-                                className={ICON_BUTTON}
-                                aria-label={m.action_print()}
-                                title={m.action_print()}
-                            >
+                            <IconButton onClick={printScore} label={m.action_print()}>
                                 <PrinterIcon />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={exportMidi}
-                                className={ICON_BUTTON}
-                                aria-label={m.action_export_midi()}
-                                title={m.action_export_midi()}
-                            >
+                            </IconButton>
+                            <IconButton onClick={exportMidi} label={m.action_export_midi()}>
                                 <DownloadIcon />
-                            </button>
+                            </IconButton>
                         </div>
                     </Show>
                 </FullScreen>
@@ -1366,12 +1345,12 @@ export function ScoreViewer({
                                     {m.ghost_shared_loaded()}
                                 </span>
                             </Show>
-                            <button type="button" onClick={shareGhost} className={BUTTON_WITH_ICON}>
+                            <Button variant="secondary" onClick={shareGhost}>
                                 <ShareIcon />
                                 {shareStatus === "copied"
                                     ? m.ghost_share_copied()
                                     : m.ghost_share()}
-                            </button>
+                            </Button>
                         </div>
                     </Show>
                 </FullScreen>
