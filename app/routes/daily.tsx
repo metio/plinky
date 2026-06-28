@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
+import { SegmentedControl } from "../components/segmentedControl";
 import { dailyChallenge, dailyNumber, todayKey } from "../lib/daily";
 import { generatePhrase } from "../lib/generator";
 import { routeMeta } from "../lib/site";
@@ -20,9 +21,6 @@ export function meta(_args: Route.MetaArgs) {
 type Today = { number: number; tempo: number; xml: string };
 
 const WARMUP = { bars: 8, beatsPerBar: 4 };
-const TAB = "rounded-md px-3 py-1.5 text-sm font-medium";
-const TAB_ON = `${TAB} bg-indigo-600 text-white`;
-const TAB_OFF = `${TAB} border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300`;
 
 export default function DailyRoute() {
     const [today, setToday] = useState<Today | null>(null);
@@ -66,24 +64,15 @@ export default function DailyRoute() {
                 </h1>
             </header>
 
-            <fieldset aria-label={m.daily_mode_label()} className="flex gap-2">
-                <button
-                    type="button"
-                    onClick={() => setMode("challenge")}
-                    aria-pressed={mode === "challenge"}
-                    className={mode === "challenge" ? TAB_ON : TAB_OFF}
-                >
-                    {m.daily_tab_challenge()}
-                </button>
-                <button
-                    type="button"
-                    onClick={openWarmup}
-                    aria-pressed={mode === "warmup"}
-                    className={mode === "warmup" ? TAB_ON : TAB_OFF}
-                >
-                    {m.daily_tab_warmup()}
-                </button>
-            </fieldset>
+            <SegmentedControl
+                options={[
+                    { id: "challenge", label: m.daily_tab_challenge() },
+                    { id: "warmup", label: m.daily_tab_warmup() },
+                ]}
+                value={mode}
+                onChange={(next) => (next === "warmup" ? openWarmup() : setMode("challenge"))}
+                label={m.daily_mode_label()}
+            />
 
             {mode === "challenge" ? (
                 <>
