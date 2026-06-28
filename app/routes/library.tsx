@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { IconButton } from "../components/button";
 import { Show } from "../components/conditional";
+import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../components/icons";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreBackup } from "../components/scoreBackup";
 import { GradeChip } from "../components/scoreGrade";
@@ -282,19 +284,23 @@ export default function LibraryRoute() {
                                 const starred = favorites.has(item.id);
                                 return (
                                     <li key={item.id} className="flex items-center gap-2">
-                                        <button
-                                            type="button"
+                                        <IconButton
+                                            variant="ghost"
                                             onClick={() => toggle(item.id)}
                                             aria-pressed={starred}
-                                            aria-label={
+                                            label={
                                                 starred
                                                     ? m.scores_unfavorite()
                                                     : m.scores_favorite()
                                             }
-                                            className={`text-lg leading-none ${starred ? "text-amber-600 dark:text-amber-400" : "text-gray-400 hover:text-amber-600"}`}
+                                            className={
+                                                starred
+                                                    ? "text-amber-500 dark:text-amber-400"
+                                                    : "text-gray-400"
+                                            }
                                         >
-                                            {starred ? "★" : "☆"}
-                                        </button>
+                                            <StarIcon className="h-5 w-5" filled={starred} />
+                                        </IconButton>
                                         <Link
                                             to={`/play/${item.id}`}
                                             className="flex flex-1 items-center gap-2 rounded-md border border-gray-300 px-3 py-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
@@ -303,13 +309,19 @@ export default function LibraryRoute() {
                                                 <span className="block truncate font-medium">
                                                     {item.title}
                                                     {mastery?.learned && (
-                                                        <span className="ml-1 text-green-600 dark:text-green-400">
-                                                            ✓
+                                                        <span className="ml-1 inline-flex items-center text-green-600 dark:text-green-400">
+                                                            <CheckIcon className="h-4 w-4" />
+                                                            <span className="sr-only">
+                                                                {m.mastery_learned()}
+                                                            </span>
                                                         </span>
                                                     )}
                                                     {mastery && isDue(mastery, now) && (
-                                                        <span className="ml-1 text-amber-600 dark:text-amber-400">
-                                                            ●
+                                                        <span className="ml-1 inline-flex items-center text-amber-600 dark:text-amber-400">
+                                                            <ClockIcon className="h-4 w-4" />
+                                                            <span className="sr-only">
+                                                                {m.mastery_due()}
+                                                            </span>
                                                         </span>
                                                     )}
                                                 </span>
@@ -322,14 +334,14 @@ export default function LibraryRoute() {
                                             <GradeChip grade={item.grade} />
                                         </Link>
                                         {item.removable && (
-                                            <button
-                                                type="button"
+                                            <IconButton
+                                                variant="ghost"
                                                 onClick={() => remove(item.id)}
-                                                aria-label={m.action_remove()}
-                                                className="text-sm text-red-600 dark:text-red-400"
+                                                label={m.action_remove()}
+                                                className="text-red-600 dark:text-red-400"
                                             >
-                                                ✕
-                                            </button>
+                                                <CloseIcon className="h-5 w-5" />
+                                            </IconButton>
                                         )}
                                     </li>
                                 );

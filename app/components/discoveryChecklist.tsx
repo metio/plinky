@@ -10,6 +10,7 @@ import {
 } from "../lib/onboarding";
 import { hasSeenHint, markHintSeen } from "../lib/seenHints";
 import { m } from "../paraglide/messages.js";
+import { CheckIcon, CloseIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
 
 // The feature-discovery checklist: an opt-in tour of the app's corners, each step
@@ -70,9 +71,9 @@ export function DiscoveryChecklist() {
                     type="button"
                     onClick={dismiss}
                     aria-label={m.action_dismiss()}
-                    className="shrink-0 font-bold leading-none text-indigo-700 dark:text-indigo-300"
+                    className="shrink-0 p-1 leading-none text-indigo-700 dark:text-indigo-300"
                 >
-                    ✕
+                    <CloseIcon className="h-4 w-4" />
                 </button>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -91,13 +92,13 @@ export function DiscoveryChecklist() {
                         <li key={step.key} className="flex items-center gap-2">
                             <span
                                 aria-hidden="true"
-                                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
                                     stepDone
                                         ? "bg-green-600 text-white"
-                                        : "border border-gray-300 text-transparent dark:border-gray-600"
+                                        : "border border-gray-300 dark:border-gray-600"
                                 }`}
                             >
-                                ✓
+                                {stepDone && <CheckIcon className="h-3.5 w-3.5" />}
                             </span>
                             <span aria-hidden="true">{step.icon}</span>
                             <Link

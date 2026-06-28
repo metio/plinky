@@ -4,6 +4,7 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { hasSeenHint, markHintSeen } from "../lib/seenHints";
 import { m } from "../paraglide/messages.js";
+import { CloseIcon } from "./icons";
 
 // A gentle, once-only tip that points out a feature the first time the player reaches it,
 // then never again — discovery without a forced tour. Starts hidden so the server and
@@ -34,9 +35,9 @@ export function CoachMark({ id, children }: { id: string; children: ReactNode })
                 type="button"
                 onClick={dismiss}
                 aria-label={m.action_dismiss()}
-                className="shrink-0 font-bold leading-none"
+                className="shrink-0 p-1 leading-none"
             >
-                ✕
+                <CloseIcon className="h-4 w-4" />
             </button>
         </div>
     );

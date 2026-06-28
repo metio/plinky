@@ -120,6 +120,75 @@ export function PlugIcon({ className }: IconProps) {
     );
 }
 
+// An X — "close" / "dismiss" / "remove".
+export function CloseIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M6 6l12 12M18 6L6 18" />
+        </Icon>
+    );
+}
+
+// An up arrow — "move up" in an ordered list.
+export function ArrowUpIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M12 19V5M6 11l6-6 6 6" />
+        </Icon>
+    );
+}
+
+// A down arrow — "move down" in an ordered list.
+export function ArrowDownIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M12 5v14M6 13l6 6 6-6" />
+        </Icon>
+    );
+}
+
+// A star — a favourite. Filled when starred, outline when not.
+export function StarIcon({ className, filled = false }: IconProps & { filled?: boolean }) {
+    return (
+        <Icon className={className}>
+            <path
+                d="M12 3.5l2.7 5.47 6.05.88-4.38 4.27 1.03 6.02L12 17.6l-5.4 2.54 1.03-6.02L3.25 9.85l6.05-.88z"
+                fill={filled ? "currentColor" : "none"}
+            />
+        </Icon>
+    );
+}
+
+// An arrow rising out of a tray — "upload" / drop a file to import.
+export function UploadIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            <path d="M12 16V4M8 8l4-4 4 4" />
+        </Icon>
+    );
+}
+
+// A bulleted list — an ordered playlist / assignment.
+export function ListIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M9 6h11M9 12h11M9 18h11" />
+            <path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" />
+        </Icon>
+    );
+}
+
+// A clock — "due for review".
+export function ClockIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <circle cx="12" cy="12" r="8" />
+            <path d="M12 8v4l3 2" />
+        </Icon>
+    );
+}
+
 // --- Navigation icons --------------------------------------------------------
 
 // A house — "home".

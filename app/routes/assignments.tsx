@@ -3,7 +3,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { IconButton } from "../components/button";
 import { Show } from "../components/conditional";
+import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/icons";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import {
     type Assignment,
@@ -351,32 +353,30 @@ export default function AssignmentsRoute() {
                                     })}
                                 />
                                 <span className="flex gap-1">
-                                    <button
-                                        type="button"
-                                        className={BUTTON}
+                                    <IconButton
+                                        variant="secondary"
                                         disabled={index === 0}
                                         onClick={() => moveItem(index, -1)}
-                                        aria-label={m.assignments_move_up()}
+                                        label={m.assignments_move_up()}
                                     >
-                                        ↑
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={BUTTON}
+                                        <ArrowUpIcon className="h-5 w-5" />
+                                    </IconButton>
+                                    <IconButton
+                                        variant="secondary"
                                         disabled={index === items.length - 1}
                                         onClick={() => moveItem(index, 1)}
-                                        aria-label={m.assignments_move_down()}
+                                        label={m.assignments_move_down()}
                                     >
-                                        ↓
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={BUTTON}
+                                        <ArrowDownIcon className="h-5 w-5" />
+                                    </IconButton>
+                                    <IconButton
+                                        variant="ghost"
                                         onClick={() => removeItem(index)}
-                                        aria-label={m.assignments_remove()}
+                                        label={m.assignments_remove()}
+                                        className="text-red-600 dark:text-red-400"
                                     >
-                                        ✕
-                                    </button>
+                                        <CloseIcon className="h-5 w-5" />
+                                    </IconButton>
                                 </span>
                             </li>
                         ))}
@@ -496,7 +496,11 @@ export default function AssignmentsRoute() {
                                                               : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                                                     }`}
                                                 >
-                                                    {step.status === "done" ? "✓" : index + 1}
+                                                    {step.status === "done" ? (
+                                                        <CheckIcon className="h-4 w-4" />
+                                                    ) : (
+                                                        index + 1
+                                                    )}
                                                 </span>
                                                 <Link
                                                     to={`/play/${step.scoreId}`}

@@ -68,6 +68,8 @@ import { Button, IconButton } from "./button";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
 import {
+    CheckIcon,
+    CloseIcon,
     DownloadIcon,
     MaximizeIcon,
     MinimizeIcon,
@@ -1310,8 +1312,8 @@ export function ScoreViewer({
                 >
                     {mastery?.learned ? (
                         <>
-                            <span className="font-medium text-green-700 dark:text-green-400">
-                                ✓ {m.mastery_learned()}
+                            <span className="inline-flex items-center gap-1 font-medium text-green-700 dark:text-green-400">
+                                <CheckIcon className="h-4 w-4" /> {m.mastery_learned()}
                             </span>
                             {isDue(mastery, Date.now()) && (
                                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
@@ -1412,9 +1414,9 @@ export function ScoreViewer({
                                             setRotateDismissed(true);
                                         }}
                                         aria-label={m.action_dismiss()}
-                                        className="shrink-0 font-bold"
+                                        className="shrink-0 p-1"
                                     >
-                                        ✕
+                                        <CloseIcon className="h-4 w-4" />
                                     </button>
                                 </div>
                             </Show>

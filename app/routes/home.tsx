@@ -3,6 +3,7 @@
 
 import { DiscoveryChecklist } from "../components/discoveryChecklist";
 import { HeroKeyboard } from "../components/heroKeyboard";
+import { BookIcon, ListIcon, NotesIcon } from "../components/icons";
 import { HomeToday } from "../components/homeToday";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { socialMeta, structuredData } from "../lib/site";
@@ -25,9 +26,14 @@ export function meta(_args: Route.MetaArgs) {
 // here — it lives in the Today panel above, so it isn't surfaced twice. One full-width
 // card each, with room to actually explain the feature.
 const FEATURES = [
-    { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb },
-    { to: "/assignments", label: m.home_assignments, blurb: m.home_assignments_blurb },
-    { to: "/compose", label: m.play_compose, blurb: m.play_compose_blurb },
+    { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb, Icon: BookIcon },
+    {
+        to: "/assignments",
+        label: m.home_assignments,
+        blurb: m.home_assignments_blurb,
+        Icon: ListIcon,
+    },
+    { to: "/compose", label: m.play_compose, blurb: m.play_compose_blurb, Icon: NotesIcon },
 ];
 
 export default function Home() {
@@ -82,10 +88,7 @@ export default function Home() {
                             to={feature.to}
                             className="group flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
                         >
-                            <span
-                                aria-hidden="true"
-                                className="mt-0.5 h-11 w-7 shrink-0 rounded-b-md border border-gray-300 bg-gradient-to-b from-white to-gray-100 transition group-hover:from-green-100 group-hover:to-green-200 dark:border-gray-600 dark:from-gray-100 dark:to-gray-300"
-                            />
+                            <feature.Icon className="mt-0.5 h-8 w-8 shrink-0 text-indigo-600 group-hover:text-indigo-700 dark:text-indigo-400 dark:group-hover:text-indigo-300" />
                             <span className="space-y-1">
                                 <span className="block text-lg font-medium text-gray-900 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
                                     {feature.label()} →

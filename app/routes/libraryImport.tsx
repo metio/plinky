@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
+import { UploadIcon } from "../components/icons";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { GradeChip } from "../components/scoreGrade";
 import { StaffPreview } from "../components/staffPreview";
@@ -191,9 +192,7 @@ export default function LibraryImportRoute() {
                             event.target.value = "";
                         }}
                     />
-                    <span className="text-2xl" aria-hidden="true">
-                        ⤓
-                    </span>
+                    <UploadIcon className="h-8 w-8 text-gray-500 dark:text-gray-400" />
                     <span className="font-medium text-gray-700 dark:text-gray-300">
                         {m.import_drop_here()}
                     </span>
