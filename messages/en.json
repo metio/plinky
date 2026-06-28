@@ -242,6 +242,8 @@
   "compose_intro": "Play freely on a MIDI keyboard, your computer keys, or the keys below — Plinky records every note and sketches it onto the staff. Count in to play along to the metronome for tidier notation, set a checkpoint to keep the good part and retry the rest, then share your take or download it. Open a MIDI or MusicXML file to pick up where you left off on another device.",
   "compose_staff_label": "A staff sketch of your improvisation",
   "compose_staff_empty": "Play a few notes and they'll appear here.",
+  "compose_recording_idle": "Recording — play anything and every note is captured",
+  "compose_recording_count": "Recording · {count} notes captured",
   "compose_sketch_note": "The audio is exactly what you played; the staff is an approximate sketch, snapped to a grid so it reads as notation.",
   "compose_title_label": "Title",
   "compose_tempo_label": "Tempo",

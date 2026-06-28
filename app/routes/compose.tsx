@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { CoachMark } from "../components/coachMark";
 import { KeyboardHint } from "../components/keyboardHint";
 import { MidiConnect } from "../components/midiConnect";
 import { PianoKeyboard } from "../components/pianoKeyboard";
@@ -289,10 +290,23 @@ export default function Compose() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">{m.compose_heading()}</h1>
-                <p className="text-pretty leading-relaxed text-gray-600 dark:text-gray-300">
-                    {m.compose_intro()}
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h1 className="text-3xl font-bold tracking-tight">{m.compose_heading()}</h1>
+                    {/* Capture is always on, so a live indicator makes that legible —
+                        otherwise a first-timer can't tell their playing is being kept. */}
+                    <span className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="relative flex h-2.5 w-2.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500/70 motion-reduce:hidden" />
+                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+                        </span>
+                        {empty
+                            ? m.compose_recording_idle()
+                            : m.compose_recording_count({ count: notes.length })}
+                    </span>
+                </div>
+                {/* The full how-to as a one-time dismissible note, so it doesn't push the
+                    staff down the page on every visit. */}
+                <CoachMark id="compose-intro">{m.compose_intro()}</CoachMark>
             </header>
 
             <section className="space-y-3">

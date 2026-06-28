@@ -106,12 +106,15 @@ export default function AssignmentsRoute() {
 
     const matches = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) {
-            return [];
-        }
         const chosen = new Set(items.map((item) => item.id));
+        // A blank query browses the catalogue (the first 20 unused pieces) rather than
+        // showing nothing, so a teacher can build an assignment without first guessing
+        // a title to type.
         return pool
-            .filter((entry) => !chosen.has(entry.id) && entry.title.toLowerCase().includes(q))
+            .filter(
+                (entry) =>
+                    !chosen.has(entry.id) && (q === "" || entry.title.toLowerCase().includes(q)),
+            )
             .slice(0, 20);
     }, [pool, query, items]);
 
