@@ -32,13 +32,17 @@ function spaced(count: number): RunNote[] {
 }
 
 describe("levelFor", () => {
-    it("bands a value into strong / medium / weak", () => {
-        expect(levelFor(1)).toBe("strong");
-        expect(levelFor(0.85)).toBe("strong");
-        expect(levelFor(0.84)).toBe("medium");
-        expect(levelFor(0.5)).toBe("medium");
-        expect(levelFor(0.49)).toBe("weak");
-        expect(levelFor(0)).toBe("weak");
+    it("bands a value across five tiers on the grade's A–F scale", () => {
+        expect(levelFor(1)).toBe("best"); // S
+        expect(levelFor(0.85)).toBe("best"); // A
+        expect(levelFor(0.84)).toBe("good"); // B
+        expect(levelFor(0.75)).toBe("good"); // B
+        expect(levelFor(0.74)).toBe("ok"); // C
+        expect(levelFor(0.65)).toBe("ok"); // C
+        expect(levelFor(0.64)).toBe("weak"); // D
+        expect(levelFor(0.55)).toBe("weak"); // D
+        expect(levelFor(0.54)).toBe("none"); // E
+        expect(levelFor(0)).toBe("none"); // F
     });
 });
 
@@ -123,13 +127,13 @@ describe("toGrid / gridFor", () => {
 
     it("maps levels in dimension order: accuracy, timing, flow", () => {
         const segments = [
-            { accuracy: 1, timing: 0.6, flow: 0 },
-            { accuracy: 1, timing: 0.6, flow: 0 },
+            { accuracy: 1, timing: 0.7, flow: 0.3 },
+            { accuracy: 1, timing: 0.7, flow: 0.3 },
         ];
         const grid = toGrid(segments);
-        expect(grid[0]?.[0]).toBe("strong"); // accuracy
-        expect(grid[1]?.[0]).toBe("medium"); // timing
-        expect(grid[2]?.[0]).toBe("weak"); // flow
+        expect(grid[0]?.[0]).toBe("best"); // accuracy 1.0 → A/S
+        expect(grid[1]?.[0]).toBe("ok"); // timing 0.7 → C
+        expect(grid[2]?.[0]).toBe("none"); // flow 0.3 → F
     });
 });
 

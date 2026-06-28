@@ -2,13 +2,17 @@
 // SPDX-License-Identifier: 0BSD
 
 import { fluentNotes } from "./flow";
+import { type Letter, letterFor } from "./grade";
 import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced
 // into six moments and scored on the three shareable dimensions — Accuracy,
-// Timing, Flow — each landing in one of three bands. The result is a 3×6 grid
+// Timing, Flow — each landing in one of five colour bands. The result is a 3×6 grid
 // rendered as an emoji block (text share) or an SVG card (image share). The grid
 // deliberately carries no numbers or labels: the shape is the thing people share.
+// Five bands (not three) so runs produce visibly different grids rather than a wall
+// of one colour, and they are the same A–F scale the run's grade uses, so a green
+// cell means the same "this was an A" as the grade letter does.
 
 // One cleared note of a run, relative to the run's first note: its notated onset
 // (the ideal), when it was actually played, and how many wrong notes preceded it.
@@ -29,7 +33,8 @@ export const DIMENSIONS: Dimension[] = ["accuracy", "timing", "flow"];
 
 export type SegmentMetrics = Record<Dimension, number>; // each 0..1
 
-export type Level = "strong" | "medium" | "weak";
+// Five bands, best → worst, shared by the emoji block, the SVG card and the in-app grid.
+export type Level = "best" | "good" | "ok" | "weak" | "none";
 export type Grid = Level[][]; // [dimension][segment]
 
 // The number of moments a run is split into — the columns of the grid.
@@ -40,19 +45,21 @@ export const SEGMENTS = 6;
 // the tolerance passed through from the run's grade).
 const TIMING_ZERO_MS = 200;
 
-// Band cutoffs: at or above STRONG is a full square, at or above MEDIUM a half,
-// below it an empty one.
-const STRONG = 0.85;
-const MEDIUM = 0.5;
+// The seven grade letters collapsed onto five colour bands. Going through letterFor
+// is the single source of truth: a cell's 0..1 dimension score is banded on exactly
+// the A–F scale the overall grade uses, so the colours can't drift from the grade.
+const LETTER_BAND: Record<Letter, Level> = {
+    S: "best",
+    A: "best",
+    B: "good",
+    C: "ok",
+    D: "weak",
+    E: "none",
+    F: "none",
+};
 
 export function levelFor(value: number): Level {
-    if (value >= STRONG) {
-        return "strong";
-    }
-    if (value >= MEDIUM) {
-        return "medium";
-    }
-    return "weak";
+    return LETTER_BAND[letterFor(value * 100)];
 }
 
 // Scores one segment's notes on each dimension. An empty segment (a piece with
@@ -107,7 +114,14 @@ export function gridFor(notes: RunNote[], tolerance = PRECISE_TOLERANCE): Grid {
     return toGrid(computeSegments(notes, SEGMENTS, tolerance));
 }
 
-const EMOJI: Record<Level, string> = { strong: "🟩", medium: "🟨", weak: "⬜" };
+// A green → red quality ramp, with ⬜ for the bottom band (a Wordle-style "absent").
+const EMOJI: Record<Level, string> = {
+    best: "🟩",
+    good: "🟨",
+    ok: "🟧",
+    weak: "🟥",
+    none: "⬜",
+};
 
 export function gridEmoji(grid: Grid): string {
     return grid.map((row) => row.map((level) => EMOJI[level]).join("")).join("\n");
@@ -122,9 +136,11 @@ export function shareText(boast: string, grid: Grid): string {
 
 // Image-share colours, matched to the in-app band emoji on a dark card.
 const FILL: Record<Level, string> = {
-    strong: "#22c55e",
-    medium: "#f59e0b",
-    weak: "#374151",
+    best: "#22c55e",
+    good: "#eab308",
+    ok: "#f97316",
+    weak: "#ef4444",
+    none: "#374151",
 };
 
 // A 1080×1350 dark portrait card — the shape sized for a social feed. Pure markup

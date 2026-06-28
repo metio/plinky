@@ -4,11 +4,13 @@
 import { type Grid, type Level, shareText, svgCard } from "../lib/shareCard";
 import { ShareButtons } from "./shareButtons";
 
-// On-card cell colours, matched to the share emoji (🟩 / 🟨 / ⬜).
+// On-card cell colours, matched to the share emoji (🟩 / 🟨 / 🟧 / 🟥 / ⬜).
 const CELL: Record<Level, string> = {
-    strong: "bg-green-500",
-    medium: "bg-amber-500",
-    weak: "bg-gray-300 dark:bg-gray-700",
+    best: "bg-green-500",
+    good: "bg-yellow-500",
+    ok: "bg-orange-500",
+    weak: "bg-red-500",
+    none: "bg-gray-300 dark:bg-gray-700",
 };
 
 // A Wordle-style grid (Accuracy / Timing / Flow as rows) with no numbers, plus

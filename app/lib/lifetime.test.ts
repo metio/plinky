@@ -102,7 +102,7 @@ describe("progressGrid", () => {
         expect(grid).toHaveLength(3);
         // No more columns than the display window.
         expect(grid?.[0]?.length).toBe(PROGRESS_COLUMNS);
-        expect(grid?.[0]?.[0]).toBe("strong"); // a perfect streak shows green
+        expect(grid?.[0]?.[0]).toBe("best"); // a perfect streak shows green
     });
 
     it("uses one column per day when fewer than the window", () => {

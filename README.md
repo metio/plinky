@@ -98,9 +98,10 @@ left off on another device.
 ## Sharing
 
 Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Timing,
-Flow) across six moments, no numbers — to copy, post, or save as an image. The
-daily challenge shares as **Plinky #N**, so everyone compares the
-same run, and the You page shares your lifetime fingerprint.
+Flow) across six moments in five colour bands, no numbers — to copy, post, or save as
+an image. The bands are the same A–F scale the run's grade uses, so a green cell means
+the same as a top grade. The daily challenge shares as **Plinky N**, so everyone
+compares the same run, and the You page shares your lifetime fingerprint.
 
 ## Bring your own scores
 

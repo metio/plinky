@@ -10,9 +10,9 @@ import { ShareCard } from "./shareCard";
 afterEach(cleanup);
 
 const GRID: Grid = [
-    ["strong", "medium", "weak"],
-    ["medium", "strong", "medium"],
-    ["weak", "weak", "strong"],
+    ["best", "good", "ok"],
+    ["good", "best", "weak"],
+    ["none", "ok", "best"],
 ];
 
 function renderCard() {
