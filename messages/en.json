@@ -113,6 +113,8 @@
   "loop_section": "Loop",
   "loop_from": "Loop from bar",
   "loop_to": "Loop to bar",
+  "bars_per_row": "Bars/row",
+  "bars_per_row_auto": "Auto",
   "transpose": "Transpose",
   "transpose_down": "Transpose down a semitone",
   "transpose_up": "Transpose up a semitone",

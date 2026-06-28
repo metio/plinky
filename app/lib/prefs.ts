@@ -33,11 +33,18 @@ export type Prefs = {
     // Most pieces to surface for review at once, so a long-neglected library doesn't
     // present an overwhelming wall — a daily dose the player can actually finish.
     reviewCap: number;
+    // How many bars to force onto each staff row, or 0 to let the width decide. Fewer
+    // bars per row means bigger, more readable notation — the lever a phone needs so the
+    // notes aren't crammed too small to play. Stored per device (localStorage).
+    barsPerRow: number;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
 // queue stays a finishable session rather than a guilt pile.
 export const REVIEW_CAPS = [5, 8, 12, 20];
+
+// Bars-per-row choices: 0 = fit to width (the default), or force 2–4 for bigger bars.
+export const BARS_PER_ROW = [0, 2, 3, 4];
 
 const KEY = "plinky:prefs";
 const DEFAULTS: Prefs = {
@@ -50,6 +57,7 @@ const DEFAULTS: Prefs = {
     fingerHints: true,
     decayMode: "gentle",
     reviewCap: REVIEW_CAP,
+    barsPerRow: 0,
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
@@ -96,6 +104,9 @@ export function loadPrefs(): Prefs {
             reviewCap: REVIEW_CAPS.includes(parsed.reviewCap)
                 ? parsed.reviewCap
                 : DEFAULTS.reviewCap,
+            barsPerRow: BARS_PER_ROW.includes(parsed.barsPerRow)
+                ? parsed.barsPerRow
+                : DEFAULTS.barsPerRow,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan } };
