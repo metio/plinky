@@ -54,7 +54,8 @@ one-tap **review session** walks you through everything that's fading, and you c
 - **Any piece, three ways** — open a score and a tab bar switches how you work it:
   **Play** (read, hear, and practise it), **Ear** (hear a two-bar phrase and play it
   back), or **Fingering** (choose a fingering for a two-bar window and see how it
-  scores against the most economical one for your hand).
+  scores against the most economical one for your hand — and it's **saved per piece**,
+  so the fingering you work out is there when you come back).
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, your day streak, days practised and
   notes played, a slow-moving fingerprint of your Accuracy, Timing and Flow, and the

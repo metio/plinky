@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useMemo, useState } from "react";
-import { scoreToBars, staffFor, windowPositions } from "../lib/scoreToBars";
+import {
+    clearSongFingering,
+    type FingerMap,
+    fingerKey,
+    loadSongFingering,
+    setFinger,
+} from "../lib/savedFingering";
+import { scoreToBars, staffFor, windowCells, windowPositions } from "../lib/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
 
@@ -10,18 +17,36 @@ import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
 // and gives enough context to reason about the next move.
 const WINDOW = 2;
 
-// Fingering practice on the open piece: pick a hand, then slide a two-bar window
-// through the score and work out the fingering for each window. Reads the piece into
-// per-bar positions and hands the window to the shared FingeringDrill.
-export function PieceFingering({ xml }: { xml: string }) {
+// Fingering practice on the open piece: pick a hand, slide a two-bar window through the
+// score, and work out the fingering for each window. What you choose is saved per song
+// and pre-filled when you come back, so the work isn't lost.
+export function PieceFingering({ id, xml }: { id: string; xml: string }) {
     const [hand, setHand] = useState<"left" | "right">("right");
     const [start, setStart] = useState(0);
+    const [map, setMap] = useState<FingerMap>(() => loadSongFingering(id));
+    // Bumped on "clear" to remount the drill so it re-reads the (now empty) saved map.
+    const [version, setVersion] = useState(0);
 
     const bars = useMemo(() => scoreToBars(xml, staffFor(hand)), [xml, hand]);
     const lastStart = Math.max(0, bars.length - WINDOW);
     // A hand with fewer bars can leave start past the end; clamp for the render.
     const clamped = Math.min(start, lastStart);
-    const positions = windowPositions(bars, clamped, WINDOW);
+    const positions = useMemo(() => windowPositions(bars, clamped, WINDOW), [bars, clamped]);
+    const cells = useMemo(() => windowCells(bars, clamped, WINDOW), [bars, clamped]);
+
+    // Seed the drill from any fingering saved for these exact score positions.
+    const initialFingers = useMemo(
+        () =>
+            positions.map((chord, i) =>
+                chord.map((_, note) => {
+                    const cell = cells[i]!;
+                    return map[fingerKey(hand, cell.bar, cell.pos, note)] ?? null;
+                }),
+            ),
+        [positions, cells, map, hand],
+    );
+
+    const hasSaved = Object.keys(map).length > 0;
 
     return (
         <div className="space-y-4">
@@ -70,7 +95,35 @@ export function PieceFingering({ xml }: { xml: string }) {
                 </span>
             </div>
 
-            <FingeringDrill key={`${hand}-${clamped}`} positions={positions} hand={hand} />
+            <FingeringDrill
+                key={`${hand}-${clamped}-${version}`}
+                positions={positions}
+                hand={hand}
+                initialFingers={initialFingers}
+                onAssign={(pos, note, finger) => {
+                    const cell = cells[pos];
+                    if (cell) {
+                        setMap(setFinger(id, map, hand, cell.bar, cell.pos, note, finger));
+                    }
+                }}
+            />
+
+            {hasSaved && (
+                <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                    <span>{m.fingering_saved_hint()}</span>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            clearSongFingering(id);
+                            setMap({});
+                            setVersion((v) => v + 1);
+                        }}
+                        className="text-indigo-700 underline dark:text-indigo-300"
+                    >
+                        {m.fingering_clear()}
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

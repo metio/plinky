@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from "vitest";
-import { scoreToBars, staffFor, windowPositions } from "./scoreToBars";
+import { scoreToBars, staffFor, windowCells, windowPositions } from "./scoreToBars";
 
 const note = (step: string, octave: number, staff: number, chord = false) =>
     `<note>${chord ? "<chord/>" : ""}<pitch><step>${step}</step><octave>${octave}</octave></pitch><staff>${staff}</staff></note>`;
@@ -41,5 +41,15 @@ describe("scoreToBars", () => {
         const bars = scoreToBars(XML, 1);
         expect(windowPositions(bars, 0, 2)).toEqual([[60, 64], [67], [62]]);
         expect(windowPositions(bars, 1, 2)).toEqual([[62]]);
+    });
+
+    it("tags each window position with its absolute score cell", () => {
+        const bars = scoreToBars(XML, 1);
+        // Parallel to windowPositions: chord+single in bar 0, then the single in bar 1.
+        expect(windowCells(bars, 0, 2)).toEqual([
+            { bar: 0, pos: 0 },
+            { bar: 0, pos: 1 },
+            { bar: 1, pos: 0 },
+        ]);
     });
 });

@@ -75,7 +75,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         </>
                     )}
                     {mode === "ear" && <EarPiece xml={score.xml} />}
-                    {mode === "fingering" && <PieceFingering xml={score.xml} />}
+                    {mode === "fingering" && <PieceFingering id={score.id} xml={score.xml} />}
                 </>
             )}
             {score === null && (

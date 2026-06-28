@@ -46,13 +46,20 @@ function letterFor(efficiency: number): Letter {
 export function FingeringDrill({
     positions,
     hand,
+    initialFingers,
+    onAssign,
 }: {
     positions: number[][];
     hand: "left" | "right";
+    // Pre-filled fingers (e.g. ones saved for this passage), and a callback fired for
+    // each choice so the caller can persist it. Both optional — the standalone drill
+    // starts blank and saves nothing.
+    initialFingers?: (number | null)[][];
+    onAssign?: (pos: number, note: number, finger: number) => void;
 }) {
     const synth = useSynth();
-    const [fingers, setFingers] = useState<(number | null)[][]>(() =>
-        positions.map((pos) => pos.map(() => null)),
+    const [fingers, setFingers] = useState<(number | null)[][]>(
+        () => initialFingers ?? positions.map((pos) => pos.map(() => null)),
     );
     const [active, setActive] = useState(0);
     const [result, setResult] = useState<FingeringResult | null>(null);
@@ -83,6 +90,7 @@ export function FingeringDrill({
                 p === slot.pos ? tuple.map((f, n) => (n === slot.note ? finger : f)) : tuple,
             );
             setFingers(next);
+            onAssign?.(slot.pos, slot.note, finger);
             // Once every note of the chord has a finger, sound it — hearing what you
             // just fingered ties the choice to the music. The synth honours the global
             // sound preference, so there's no separate toggle to bury.
@@ -94,7 +102,7 @@ export function FingeringDrill({
             }
             setActive((index) => Math.min(index + 1, slots.length - 1));
         },
-        [active, slots, result, fingers, positions, synth],
+        [active, slots, result, fingers, positions, synth, onAssign],
     );
 
     // Number keys 1–5 assign a finger to the highlighted note, like the buttons.

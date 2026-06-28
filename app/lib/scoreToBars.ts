@@ -79,3 +79,19 @@ export function scoreToBars(xml: string, staff: Staff): Bar[] {
 export function windowPositions(bars: Bar[], start: number, size: number): number[][] {
     return bars.slice(Math.max(0, start), Math.max(0, start) + size).flat();
 }
+
+// Where a flattened window position sits in the score: its absolute bar and its index
+// within that bar. Parallel to windowPositions, so saved fingerings can be keyed by
+// score position and survive the window sliding.
+export type Cell = { bar: number; pos: number };
+
+export function windowCells(bars: Bar[], start: number, size: number): Cell[] {
+    const from = Math.max(0, start);
+    const cells: Cell[] = [];
+    for (let bar = from; bar < Math.min(from + size, bars.length); bar++) {
+        for (let pos = 0; pos < bars[bar]!.length; pos++) {
+            cells.push({ bar, pos });
+        }
+    }
+    return cells;
+}
