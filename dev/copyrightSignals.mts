@@ -13,8 +13,12 @@
 
 // Matched as whole words against the lower-cased composer field, so "queen" hits the
 // band but not "Carole Queening", and "lennon" hits John or Julian Lennon.
+// Includes common PDMX misspellings ("lenon", "justin biber") — user uploads routinely
+// mangle artist names, which exact matching otherwise lets slip through. (Bare "biber"
+// is avoided: Heinrich Biber is a public-domain Baroque composer.)
 const ARTISTS = [
-    "beatles", "lennon", "mccartney", "elton john", "queen", "freddie mercury", "oasis",
+    "beatles", "lennon", "lenon", "mccartney", "elton john", "queen", "freddie mercury",
+    "oasis", "justin biber",
     "gallagher", "coldplay", "ed sheeran", "adele", "taylor swift", "justin bieber",
     "bieber", "billie eilish", "bruno mars", "lady gaga", "beyonce", "rihanna",
     "katy perry", "imagine dragons", "maroon 5", "onerepublic", "the weeknd", "weeknd",
