@@ -242,7 +242,9 @@ describe("ScoreViewer", () => {
             print: vi.fn(),
         };
         const open = vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-        fireEvent.click(screen.getByRole("button", { name: /print/i }));
+        // findByRole waits for OSMD to be ready — Print only renders once it is, and a
+        // toolbar icon svg now satisfies the "any svg" wait above too early.
+        fireEvent.click(await screen.findByRole("button", { name: /print/i }));
         expect(open).toHaveBeenCalled();
         expect(fakeWindow.print).toHaveBeenCalled();
         expect(written.join("")).toContain("<svg");
@@ -261,7 +263,8 @@ describe("ScoreViewer", () => {
         });
         const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
         const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-        fireEvent.click(screen.getByRole("button", { name: /export midi/i }));
+        // findByRole waits for OSMD to be ready — Export MIDI only renders once it is.
+        fireEvent.click(await screen.findByRole("button", { name: /export midi/i }));
         expect(exported).not.toBeNull();
         // A Standard MIDI File opens with the "MThd" header chunk.
         const head = new Uint8Array((await exported!.arrayBuffer()).slice(0, 4));
