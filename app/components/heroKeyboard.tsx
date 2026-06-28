@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import { Keyboard } from "./keyboard";
+import { MidiBadge } from "./midiBadge";
 
 // One octave, C4–C5 — enough to be unmistakably a piano, small enough to sit on a
 // phone.
@@ -58,6 +59,7 @@ export function HeroKeyboard() {
             lit={lit}
             rise
             well="mx-auto w-full max-w-md"
+            badge={<MidiBadge />}
             onPress={plink}
         />
     );

@@ -99,3 +99,23 @@ export function ShareIcon({ className }: IconProps) {
         </Icon>
     );
 }
+
+// A tick — "connected / all good". Paired with a green tint, never an x.
+export function CheckIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M5 13l4 4L19 7" />
+        </Icon>
+    );
+}
+
+// A two-prong plug — "a piano you can plug in". Shown muted when none is connected.
+export function PlugIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M9 2v5M15 2v5" />
+            <path d="M7 7h10v3a5 5 0 0 1-10 0z" />
+            <path d="M12 15v4" />
+        </Icon>
+    );
+}

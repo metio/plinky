@@ -3,6 +3,7 @@
 
 import { useMidiConnection } from "../contexts/midi";
 import { Keyboard } from "./keyboard";
+import { MidiBadge } from "./midiBadge";
 
 // The practice-mode keyboard: the shared Keyboard wired to the live input funnel,
 // so a tap feeds the same path as a MIDI device. Held keys light green, the note to
@@ -26,6 +27,7 @@ export function PianoKeyboard({
             lit={new Set(heldNotes)}
             expected={expected}
             wrong={wrong}
+            badge={<MidiBadge />}
             onPress={pressKey}
             onRelease={releaseKey}
         />

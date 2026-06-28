@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type React from "react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { noteName } from "../lib/midi";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
@@ -27,6 +27,7 @@ export function Keyboard({
     wrong = null,
     rise = false,
     well = "mx-auto w-full max-w-xl",
+    badge,
     onPress,
     onRelease,
 }: {
@@ -40,6 +41,10 @@ export function Keyboard({
     rise?: boolean;
     // The keybed's width and centring; defaults to a centred, capped instrument.
     well?: string;
+    // An overlay pinned to the keybed's top-right corner — the MIDI-status badge. A
+    // slot rather than a built-in so the bare Keyboard stays free of the MIDI context
+    // (and rendarable in isolation); the wrappers that have the context pass it in.
+    badge?: ReactNode;
     onPress?: (note: number) => void;
     onRelease?: (note: number) => void;
 }) {
@@ -103,6 +108,7 @@ export function Keyboard({
     return (
         <div className={`${KEYBED_WELL} ${well}`}>
             <div className="relative h-36 w-full touch-none select-none">
+                {badge}
                 <div className="flex h-full w-full gap-px">
                     {whites.map((note, index) => (
                         <button

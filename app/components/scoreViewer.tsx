@@ -190,10 +190,12 @@ export function ScoreViewer({
     const narrowOrShort = useMediaQuery("(max-width: 639px), (max-height: 600px)");
     const portrait = useMediaQuery("(orientation: portrait)");
     const coarsePointer = useMediaQuery("(pointer: coarse)");
-    // A "play full screen" mode that strips everything but the notes and keys. Treated as
-    // compact too, so the focus strip and shorter staff apply inside it.
+    // A "play full screen" mode that strips everything down to one score and the keys.
     const { fullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen(rootRef);
     const compact = narrowOrShort || fullscreen;
+    // In full screen the keyboard can be folded away, handing all the height to the
+    // score — what a player on a real MIDI piano wants.
+    const [hideKeyboard, setHideKeyboard] = useState(false);
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -734,23 +736,60 @@ export function ScoreViewer({
             ? matcher.expected
             : [];
 
+    // Listen and Practice — the two transport actions, shared by the normal toolbar and
+    // the full-screen top bar (so full screen can hoist them out of the score's way).
+    const transport = (
+        <>
+            <button
+                type="button"
+                disabled={!ready}
+                onClick={() => (playing ? stopListen() : listen())}
+                className={BUTTON_WITH_ICON}
+            >
+                {playing ? <StopIcon /> : <PlayIcon />}
+                {playing ? m.action_listen_stop() : m.action_listen()}
+            </button>
+            <button
+                type="button"
+                disabled={!ready}
+                onClick={() => (matcher.practicing ? matcher.stop() : practice())}
+                className={BUTTON}
+            >
+                {matcher.practicing ? m.action_listen_stop() : m.curriculums_practice()}
+            </button>
+        </>
+    );
+
     return (
         <div
             ref={rootRef}
-            className={`space-y-3 ${
-                fullscreen ? "fixed inset-0 z-50 overflow-auto bg-white p-4 dark:bg-gray-950" : ""
-            }`}
+            className={
+                fullscreen
+                    ? "fixed inset-0 z-50 flex flex-col gap-2 bg-white p-3 dark:bg-gray-950"
+                    : "space-y-3"
+            }
         >
             {fullscreen && (
-                <button
-                    type="button"
-                    onClick={exitFullscreen}
-                    aria-label={m.action_exit_fullscreen()}
-                    title={m.action_exit_fullscreen()}
-                    className="fixed right-3 top-3 z-10 rounded-md bg-indigo-600 p-2 text-white shadow-lg"
-                >
-                    <MinimizeIcon />
-                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                    {transport}
+                    <button
+                        type="button"
+                        onClick={() => setHideKeyboard((on) => !on)}
+                        aria-pressed={hideKeyboard}
+                        className={`${BUTTON} ml-auto`}
+                    >
+                        {hideKeyboard ? m.action_show_keyboard() : m.action_hide_keyboard()}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={exitFullscreen}
+                        aria-label={m.action_exit_fullscreen()}
+                        title={m.action_exit_fullscreen()}
+                        className="rounded-md bg-indigo-600 p-2 text-white"
+                    >
+                        <MinimizeIcon />
+                    </button>
+                </div>
             )}
             {/* The score sits at the top — it's what you read while playing, so the
                 controls, keyboard and run summary all fall below it. OSMD renders to
@@ -761,7 +800,11 @@ export function ScoreViewer({
                 wrapper, and the inner element OSMD measures is clean. Wide scores
                 still scroll horizontally, and that region must be focusable for
                 keyboard users (axe scrollable-region-focusable). */}
-            <div className="rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800">
+            <div
+                className={`rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800 ${
+                    fullscreen ? "flex min-h-0 flex-1 flex-col" : ""
+                }`}
+            >
                 <div
                     ref={containerRef}
                     // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard access
@@ -770,10 +813,13 @@ export function ScoreViewer({
                     aria-label={title}
                     // A bounded scroll box so the follow-cursor scrolls the staff inside
                     // it — keeping the controls and on-screen keyboard in view below
-                    // rather than scrolling the whole page out from under them. Shorter on
-                    // a phone (either orientation) so the keys fit; dvh tracks the live
-                    // viewport so the mobile URL bar doesn't clip it.
-                    className={`overflow-auto ${compact ? "max-h-[40dvh]" : "max-h-[70vh]"}`}
+                    // rather than scrolling the whole page out from under them. Full screen
+                    // hands it all the spare height (flex-1); otherwise it's shorter on a
+                    // phone so the keys fit; dvh tracks the live viewport so the mobile URL
+                    // bar doesn't clip it.
+                    className={`overflow-auto ${
+                        fullscreen ? "min-h-0 flex-1" : compact ? "max-h-[40dvh]" : "max-h-[70vh]"
+                    }`}
                 />
                 {loadError && (
                     <p className="p-2 text-sm text-red-600 dark:text-red-400">
@@ -782,25 +828,13 @@ export function ScoreViewer({
                 )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-                <button
-                    type="button"
-                    disabled={!ready}
-                    onClick={() => (playing ? stopListen() : listen())}
-                    className={BUTTON_WITH_ICON}
-                >
-                    {playing ? <StopIcon /> : <PlayIcon />}
-                    {playing ? m.action_listen_stop() : m.action_listen()}
-                </button>
-                <button
-                    type="button"
-                    disabled={!ready}
-                    onClick={() => (matcher.practicing ? matcher.stop() : practice())}
-                    className={BUTTON}
-                >
-                    {matcher.practicing ? m.action_listen_stop() : m.curriculums_practice()}
-                </button>
-                {!fullscreen && (
+            {/* The normal toolbar. In full screen these all give way — transport moves to
+                the top bar and everything past it folds away — so only the score and keys
+                remain. The defaults (tempo from the piece, fingerings on, bars auto) are
+                good, so the collapsed state loses nothing. */}
+            {!fullscreen && (
+                <div className="flex flex-wrap items-center gap-3">
+                    {transport}
                     <button
                         type="button"
                         onClick={enterFullscreen}
@@ -810,12 +844,6 @@ export function ScoreViewer({
                     >
                         <MaximizeIcon />
                     </button>
-                )}
-                {/* Everything past the primary actions folds away — most players never
-                    touch it, and full screen hides it entirely so only the notes and keys
-                    remain. The defaults (tempo from the piece, fingerings on, bars auto)
-                    are good, so closed-by-default loses nothing. */}
-                {!fullscreen && (
                     <details className="basis-full">
                         <summary className="cursor-pointer text-sm font-medium text-indigo-700 dark:text-indigo-300">
                             {m.more_options()}
@@ -1117,8 +1145,8 @@ export function ScoreViewer({
                             </span>
                         </div>
                     </details>
-                )}
-            </div>
+                </div>
+            )}
 
             {ready && !fullscreen && (
                 <div className="flex flex-wrap items-center gap-3">
@@ -1191,7 +1219,7 @@ export function ScoreViewer({
             )}
 
             {matcher.practicing && (
-                <div className="space-y-2">
+                <div className={`space-y-2 ${fullscreen ? "shrink-0" : ""}`}>
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                         <span className="text-gray-600 dark:text-gray-400">
                             {m.play_progress()} {matcher.done} / {matcher.total}
@@ -1232,25 +1260,28 @@ export function ScoreViewer({
                     )}
                     {/* On a phone (portrait or landscape), a compact current-bars strip
                         right above the keys, so the notes to play aren't scrolled off
-                        behind the keyboard; bigger screens rely on the auto-scrolling
+                        behind the keyboard; bigger screens — and full screen, where the
+                        single score already fills the height — rely on the auto-scrolling
                         full score above. */}
-                    {compact && (
+                    {compact && !fullscreen && (
                         <FocusStrip
                             xml={focusXml}
                             bar={matcher.bar}
                             label={m.focus_strip_label()}
                         />
                     )}
-                    <PianoKeyboard
-                        expected={hintNotes}
-                        wrong={matcher.lastWrong}
-                        from={matcher.range?.from}
-                        to={matcher.range?.to}
-                    />
+                    {!(fullscreen && hideKeyboard) && (
+                        <PianoKeyboard
+                            expected={hintNotes}
+                            wrong={matcher.lastWrong}
+                            from={matcher.range?.from}
+                            to={matcher.range?.to}
+                        />
+                    )}
                 </div>
             )}
 
-            {grade && (
+            {grade && !fullscreen && (
                 <div className="space-y-3">
                     <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
                         <div

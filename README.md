@@ -28,8 +28,9 @@ staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**
 sits right above the keys showing the bar you're playing, so the notes you need are
-never out of reach, and a one-tap **full-screen** mode hides everything but the notes and
-keyboard (keeping the screen awake while you play). You can
+never out of reach, and a one-tap **full-screen** mode strips the screen to a single
+score and the keyboard — which you can fold away for more notation if you're playing a
+real piano (and it keeps the screen awake while you play). You can
 also force a **set number of bars per row** for bigger, more readable notation on a
 small screen. A
 wrong key flashes red; whether the correct key then lights up is your call — read
@@ -112,8 +113,13 @@ a student.
   `H J K L ;` the right, each a five-finger C–G position, with an octave shift to
   move around; remap any of these keys to your own layout in **Settings**. (Two-hand
   pieces span both staves, so a MIDI keyboard is the comfortable way to play those.)
-- **With the on-screen piano** — tap the keys shown under each score. Handy on a
-  phone or tablet with no MIDI or keyboard.
+- **With the on-screen piano** — tap the keys shown under each score, which widen
+  or narrow to frame exactly the notes the piece needs. Handy on a phone or tablet
+  with no MIDI or keyboard.
+
+Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
+piano is connected, a quiet plug otherwise — so you can see at a glance whether your
+instrument is hooked up.
 
 Plinky installs from your browser like an app and works offline once loaded.
 
