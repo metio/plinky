@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { fingerPositions } from "./fingering";
-import { reasonFor, scoreFingering } from "./fingeringScore";
+import { fingerQualities, reasonFor, scoreFingering } from "./fingeringScore";
 
 // A line of single-note positions, plus one with a chord.
 const LINE: number[][] = [[60], [62], [64], [65], [67], [69], [71], [72]];
@@ -58,5 +58,21 @@ describe("reasonFor", () => {
 
     it("falls back to a general reason otherwise", () => {
         expect(reasonFor([[60], [62]], [[1], [2]], 1, "right")).toBe("general");
+    });
+});
+
+describe("fingerQualities", () => {
+    it("greens the economical fingering and leaves unfingered notes uncoloured", () => {
+        const best = fingerPositions(LINE, "right");
+        expect(fingerQualities(LINE, best, "right")).toEqual(LINE.map(() => "good"));
+
+        const blank = LINE.map(() => [null]);
+        expect(fingerQualities(LINE, blank, "right").every((q) => q === null)).toBe(true);
+    });
+
+    it("flags a clearly worse fingering as not all good", () => {
+        // Fingering an ascending line all with the thumb is far from economical.
+        const allThumb = LINE.map(() => [1]);
+        expect(fingerQualities(LINE, allThumb, "right").some((q) => q && q !== "good")).toBe(true);
     });
 });

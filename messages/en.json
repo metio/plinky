@@ -355,6 +355,7 @@
   "ear_piece_empty": "No melody in these bars — try the next ones.",
   "ear_not_note": "Not {note} — try again.",
   "fingering_hint": "Pick a finger for the highlighted note — tap below or press 1–5. Click a note to revisit it.",
+  "fingering_color_legend": "As you go: green flows easily, amber works, red is an awkward reach.",
   "fingering_finger": "Finger {finger}",
   "fingering_check": "Check fingering",
   "fingering_smoothness": "Smoothness: {percent}%",

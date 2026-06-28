@@ -58,6 +58,48 @@ function sameFingers(a: number[], b: number[] | undefined): boolean {
     return b !== undefined && a.length === b.length && a.every((finger, i) => finger === b[i]);
 }
 
+// Live, per-position verdict on the player's fingering so far — green when it matches
+// the economical choice, amber when it works but a smoother one exists, red when the
+// move into it is genuinely awkward. Judged in context (the optimum is computed over
+// the whole window) and on the *transition* from the previous note, not the note alone,
+// which is where fingering quality actually lives. Returns null for a position not yet
+// fully fingered (or whose previous note isn't), so colour only appears once it can
+// mean something.
+export type FingerQuality = "good" | "ok" | "bad";
+
+function filled(tuple: (number | null)[] | undefined): tuple is number[] {
+    return tuple !== undefined && tuple.length > 0 && tuple.every((finger) => finger !== null);
+}
+
+export function fingerQualities(
+    positions: number[][],
+    fingers: (number | null)[][],
+    hand: Hand,
+    span?: number,
+): (FingerQuality | null)[] {
+    const suggested = fingerPositions(positions, hand, span);
+    return positions.map((_, i) => {
+        const here = fingers[i];
+        if (!filled(here)) {
+            return null;
+        }
+        if (sameFingers(here, suggested[i])) {
+            return "good";
+        }
+        const previous = fingers[i - 1];
+        if (i === 0 || !filled(previous)) {
+            // No transition to judge — it differs from the optimum but isn't clearly bad.
+            return "ok";
+        }
+        // Marginal cost of this choice given the (fixed) previous finger: how much the
+        // economical finger here would save the move into this position.
+        const pair = [positions[i - 1]!, positions[i]!];
+        const withUser = positionsCost(pair, [previous, here], hand, span);
+        const withSuggested = positionsCost(pair, [previous, suggested[i]!], hand, span);
+        return withUser - withSuggested > IMPROVE_THRESHOLD ? "bad" : "ok";
+    });
+}
+
 // Scores a player's fingering of a sequence of positions (notes and chords) by
 // effort rather than by matching the chooser's path: a choice that costs about
 // the same as the optimum is judged just as good.

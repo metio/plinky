@@ -5,8 +5,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSynth } from "../hooks/useSynth";
 import { drillToMusicXml } from "../lib/drillStaff";
 import {
+    type FingerQuality,
     type FingerReason,
     type FingeringResult,
+    fingerQualities,
     reasonFor,
     scoreFingering,
 } from "../lib/fingeringScore";
@@ -27,6 +29,14 @@ const REASON: Record<FingerReason, () => string> = {
 
 // One note awaiting a finger: which position it's in and its index within it.
 type Slot = { pos: number; note: number };
+
+// Gentle per-position colours for the live feedback — informative, never alarming.
+const QUALITY_STYLE: Record<FingerQuality, string> = {
+    good: "border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-950/40",
+    ok: "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40",
+    bad: "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40",
+};
+const NEUTRAL = "border-gray-200 dark:border-gray-800";
 
 // A self-paced grade for the fingering's smoothness, reusing the run grade's
 // letters and colours so the feedback reads like the rest of the app.
@@ -75,6 +85,13 @@ export function FingeringDrill({
     const staffXml = useMemo(
         () => (positions.length > 0 ? drillToMusicXml(positions, hand) : null),
         [positions, hand],
+    );
+
+    // Per-position verdict that colours each note as it's fingered — live feedback,
+    // recomputed whenever a choice changes.
+    const qualities = useMemo(
+        () => fingerQualities(positions, fingers, hand, loadPrefs().handSpan[hand] ?? undefined),
+        [positions, fingers, hand],
     );
 
     const assign = useCallback(
@@ -128,7 +145,6 @@ export function FingeringDrill({
             setResult(scoreFingering(positions, fingers as number[][], hand, span));
         }
     };
-    const reconsider = new Set(result?.reconsider);
     const activeSlot = result ? null : slots[active];
 
     return (
@@ -143,9 +159,7 @@ export function FingeringDrill({
                         // biome-ignore lint/suspicious/noArrayIndexKey: fixed-length line, position is identity
                         key={p}
                         className={`flex flex-col gap-1 rounded-md border p-1 ${
-                            reconsider.has(p)
-                                ? "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950"
-                                : "border-gray-200 dark:border-gray-800"
+                            qualities[p] ? QUALITY_STYLE[qualities[p]!] : NEUTRAL
                         }`}
                     >
                         {pos
@@ -190,6 +204,8 @@ export function FingeringDrill({
                     </div>
                 ))}
             </div>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400">{m.fingering_color_legend()}</p>
 
             {result ? (
                 <div className="space-y-3">
