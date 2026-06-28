@@ -524,6 +524,17 @@ export function ScoreViewer({
         bumpTempo,
     ]);
 
+    // Finishing a run leaves full-screen play, so the grade, share card and per-note
+    // strip — all hidden while full screen to keep the play surface clean — come into
+    // view. Without this a completed full-screen run looks stuck: the score just ends
+    // with nothing shown. The hook's fullscreenchange sync keeps state honest if the
+    // player has already left on their own.
+    useEffect(() => {
+        if (matcher.complete && fullscreen) {
+            exitFullscreen();
+        }
+    }, [matcher.complete, fullscreen, exitFullscreen]);
+
     const markLearnedNow = () => {
         const updated = markLearned(loadMastery(id), Date.now());
         saveMastery(id, updated);

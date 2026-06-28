@@ -76,6 +76,36 @@ describe("ScoreViewer", () => {
         );
     });
 
+    it("leaves full screen when a run finishes so the grade is shown", async () => {
+        // Drive the in-page overlay state without the real Fullscreen API, which a
+        // headless browser grants only on a trusted gesture; the hook flips its own
+        // `fullscreen` flag regardless, and that's what gates the grade.
+        const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // A one-bar phrase whose every note is C5, so the same key clears each position.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByText(/Practice/);
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        // Enter full-screen play, then start practising from its top-bar transport.
+        fireEvent.click(screen.getByRole("button", { name: "Full screen" }));
+        expect(screen.queryByRole("button", { name: "Full screen" })).toBeNull();
+        fireEvent.click(screen.getByText(/Practice/));
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // Completing the run drops out of full screen and surfaces the results — the
+        // Accuracy readout (grade panel + share-card legend) only renders once the run
+        // is graded and not full screen, and the enter-full-screen button returns.
+        const accuracy = await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
+        expect(accuracy.length).toBeGreaterThan(0);
+        expect(screen.getByRole("button", { name: "Full screen" })).toBeTruthy();
+        reqFs.mockRestore();
+    });
+
     it("reveals the adaptive toggle only while the metronome is on", async () => {
         render(
             <MemoryRouter>
