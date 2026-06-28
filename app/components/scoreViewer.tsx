@@ -123,7 +123,8 @@ export function ScoreViewer({
     // played at one tempo by everyone rather than dialled to taste.
     lockTempo?: boolean;
     // When set, this run is the day's shared challenge; the share card identifies
-    // it as "Plinky #N" rather than by the piece, so everyone compares one grid.
+    // it as "Plinky N" rather than by the piece, so everyone compares one grid. No
+    // "#": some social clients linkify "#N" into a meaningless number hashtag.
     daily?: number;
     // A throwaway piece, like a freshly generated sprint, that still counts toward
     // the practice history and fingerprint but is never tracked for spaced repetition.
@@ -1538,9 +1539,7 @@ export function ScoreViewer({
                                             : m.share_boast({ title })
                                     }
                                     heading={
-                                        daily != null
-                                            ? `🎹 Plinky #${daily} ${grade.letter}`
-                                            : title
+                                        daily != null ? `🎹 Plinky ${daily} ${grade.letter}` : title
                                     }
                                 />
                             )}

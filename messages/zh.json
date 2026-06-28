@@ -52,7 +52,7 @@
   "play_daily": "每日挑战",
   "play_daily_blurb": "每天一首新曲，今天所有人都弹同一首。弹奏并分享你的成绩网格。",
   "daily_intro": "今日曲目——所有人都一样。弹奏后，分享你的成绩网格。",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "听音训练",
   "play_ear_blurb": "听一个音，凭耳朵找到它。无需识谱。",
   "settings_subtitle": "偏好设置保存在此设备上。",

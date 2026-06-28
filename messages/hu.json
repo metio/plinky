@@ -52,7 +52,7 @@
   "play_daily": "Napi kihívás",
   "play_daily_blurb": "Minden nap egy új darab, mindenkinek ugyanaz. Játszd le, és oszd meg a rácsodat.",
   "daily_intro": "A mai darab — mindenkinek ugyanaz. Játszd le, majd oszd meg, hogyan alakult a rácsod.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Hallásfejlesztés",
   "play_ear_blurb": "Hallgass meg egy hangot, és találd meg fülre. Nem kell kottát olvasni.",
   "settings_subtitle": "A beállítások ezen az eszközön mentődnek.",

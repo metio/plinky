@@ -259,7 +259,7 @@
   "daily_mode_label": "Today's challenge or warm-up",
   "daily_tab_challenge": "Today's challenge",
   "daily_tab_warmup": "Warm up",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "settings_subtitle": "Preferences are saved on this device.",
   "settings_show_fingerings": "Show fingering hints while practicing",
   "settings_note_hints": "Show the next note to play",

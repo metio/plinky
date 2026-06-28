@@ -52,7 +52,7 @@
   "play_daily": "デイリーチャレンジ",
   "play_daily_blurb": "毎日新しい1曲、今日はみんな同じ。弾いてグリッドを共有しよう。",
   "daily_intro": "今日の1曲 — みんな同じです。弾いたら、できあがったグリッドを共有しよう。",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "聴音トレーニング",
   "play_ear_blurb": "音を聴いて耳で探します。譜読みは不要です。",
   "settings_subtitle": "設定はこのデバイスに保存されます。",

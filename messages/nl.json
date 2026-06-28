@@ -52,7 +52,7 @@
   "play_daily": "Dagelijkse uitdaging",
   "play_daily_blurb": "Elke dag een nieuw stuk, voor iedereen hetzelfde. Speel het en deel je raster.",
   "daily_intro": "Het stuk van vandaag – voor iedereen hetzelfde. Speel het en deel daarna hoe je raster eruitziet.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Gehoortraining",
   "play_ear_blurb": "Hoor een noot en vind hem op het gehoor. Geen noten lezen nodig.",
   "settings_subtitle": "Voorkeuren worden op dit apparaat opgeslagen.",

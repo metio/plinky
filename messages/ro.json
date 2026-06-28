@@ -52,7 +52,7 @@
   "play_daily": "Provocarea zilei",
   "play_daily_blurb": "O piesă nouă în fiecare zi, aceeași pentru toată lumea. Cânt-o și distribuie-ți grila.",
   "daily_intro": "Piesa de azi — aceeași pentru toată lumea. Cânt-o, apoi distribuie cum ți-a ieșit grila.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Antrenament auditiv",
   "play_ear_blurb": "Ascultă o notă și găsește-o după ureche. Fără citit partituri.",
   "settings_subtitle": "Preferințele sunt salvate pe acest dispozitiv.",

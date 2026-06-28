@@ -52,7 +52,7 @@
   "play_daily": "Reto diario",
   "play_daily_blurb": "Una pieza nueva cada día, la misma para todos. Tócala y comparte tu cuadrícula.",
   "daily_intro": "La pieza de hoy — la misma para todos. Tócala y luego comparte cómo quedó tu cuadrícula.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Entrenamiento auditivo",
   "play_ear_blurb": "Escucha una nota y encuéntrala de oído. No hace falta leer partitura.",
   "settings_subtitle": "Las preferencias se guardan en este dispositivo.",

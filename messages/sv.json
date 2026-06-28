@@ -52,7 +52,7 @@
   "play_daily": "Daglig utmaning",
   "play_daily_blurb": "Ett nytt stycke varje dag, lika för alla. Spela det och dela ditt rutnät.",
   "daily_intro": "Dagens stycke – lika för alla. Spela det och dela sedan hur ditt rutnät blev.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Gehörsträning",
   "play_ear_blurb": "Hör en ton och hitta den på gehör. Ingen notläsning krävs.",
   "settings_subtitle": "Inställningar sparas på den här enheten.",

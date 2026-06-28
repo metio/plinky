@@ -52,7 +52,7 @@
   "play_daily": "Desafio diário",
   "play_daily_blurb": "Uma peça nova todo dia, a mesma para todos. Toque-a e compartilhe sua grade.",
   "daily_intro": "A peça de hoje — a mesma para todos. Toque-a e depois compartilhe como ficou sua grade.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Treino auditivo",
   "play_ear_blurb": "Ouça uma nota e encontre-a de ouvido. Não é preciso ler partitura.",
   "settings_subtitle": "As preferências são salvas neste dispositivo.",

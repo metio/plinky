@@ -52,7 +52,7 @@
   "play_daily": "Günlük meydan okuma",
   "play_daily_blurb": "Her gün yeni bir parça, herkese aynı. Çal ve ızgaranı paylaş.",
   "daily_intro": "Bugünün parçası — herkese aynı. Çal, sonra ızgaranın nasıl çıktığını paylaş.",
-  "daily_share_boast": "🎹 Plinky #{number} {grade}",
+  "daily_share_boast": "🎹 Plinky {number} {grade}",
   "play_ear": "Kulak eğitimi",
   "play_ear_blurb": "Bir notayı dinle ve kulağınla bul. Okuma gerekmez.",
   "settings_subtitle": "Tercihler bu cihazda kaydedilir.",
