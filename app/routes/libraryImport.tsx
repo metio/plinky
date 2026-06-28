@@ -7,6 +7,7 @@ import { GradeChip } from "../components/scoreGrade";
 import { StaffPreview } from "../components/staffPreview";
 import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "../lib/catalog";
 import { readScoreFile } from "../lib/musicxmlFile";
+import { markDiscovered } from "../lib/onboarding";
 import { gradeOf } from "../lib/scoreDifficulty";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -117,6 +118,7 @@ export default function LibraryImportRoute() {
             setError(m.import_save_failed());
             return;
         }
+        markDiscovered("imported");
         setDraft(null);
         setSavedId(score.id);
     };

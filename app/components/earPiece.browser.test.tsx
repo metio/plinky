@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { act, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { EarPiece } from "./earPiece";
@@ -24,9 +25,11 @@ describe("EarPiece", () => {
         document.body.appendChild(container);
         mounted.push(container);
         render(
-            <MidiProvider>
-                <EarPiece xml={XML} />
-            </MidiProvider>,
+            <MemoryRouter>
+                <MidiProvider>
+                    <EarPiece xml={XML} />
+                </MidiProvider>
+            </MemoryRouter>,
             { container },
         );
 

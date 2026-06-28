@@ -4,9 +4,13 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { discoveries } from "../lib/onboarding";
 import { PlayModeBar } from "./playModeBar";
 
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    localStorage.clear();
+});
 
 describe("PlayModeBar", () => {
     it("marks the active mode and reports a switch", () => {
@@ -22,5 +26,16 @@ describe("PlayModeBar", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Fingering" }));
         expect(onChange).toHaveBeenCalledWith("fingering");
+    });
+
+    it("records reaching Ear and Fingering for the discovery checklist", () => {
+        render(<PlayModeBar mode="play" onChange={vi.fn()} />);
+        expect(discoveries().earTried).toBe(false);
+
+        fireEvent.click(screen.getByRole("tab", { name: "Ear" }));
+        expect(discoveries().earTried).toBe(true);
+
+        fireEvent.click(screen.getByRole("tab", { name: "Fingering" }));
+        expect(discoveries().fingeringTried).toBe(true);
     });
 });

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { m } from "../paraglide/messages.js";
+import { LocalizedLink as Link } from "./localizedLink";
 
 function formatOffset(offset: number): string {
     return offset > 0 ? `+${offset}` : `${offset}`;
@@ -35,6 +36,11 @@ export function KeyboardHint({ octaveOffset }: { octaveOffset: number }) {
                     <span className="font-mono">↑ / ↓</span>
                     {m.keyboard_hint_shift()}
                     <span className="font-mono">{formatOffset(octaveOffset)}</span>.
+                </p>
+                <p>
+                    <Link to="/settings" className="text-indigo-700 underline dark:text-indigo-300">
+                        {m.keyboard_hint_customise()}
+                    </Link>
                 </p>
             </div>
         </details>

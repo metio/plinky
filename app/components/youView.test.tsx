@@ -65,7 +65,7 @@ describe("YouView", () => {
         expect(screen.getByText(/day streak/i)).toBeTruthy();
     });
 
-    it("guides a brand-new Grade-0 player with the first-steps checklist", async () => {
+    it("offers a brand-new player the feature-discovery checklist", async () => {
         masteryMock.mockResolvedValue([]);
         catalogueMock.mockResolvedValue([{ id: "g1", title: "First Piece", grade: 1, cost: 1 }]);
 
@@ -75,6 +75,24 @@ describe("YouView", () => {
             </MemoryRouter>,
         );
 
-        expect(await screen.findByText("Getting started")).toBeTruthy();
+        expect(await screen.findByText("Explore Plinky")).toBeTruthy();
+        // A feature step that completes by doing it is listed and links to where you do it.
+        expect(screen.getByRole("link", { name: /Record your own tune/i })).toBeTruthy();
+    });
+
+    it("hides the checklist once it has been dismissed", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([{ id: "g1", title: "First Piece", grade: 1, cost: 1 }]);
+        localStorage.setItem("plinky:seen-hints", JSON.stringify(["discovery-panel"]));
+
+        render(
+            <MemoryRouter>
+                <YouView />
+            </MemoryRouter>,
+        );
+
+        // The roadmap still renders, but the discovery panel is gone.
+        expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
+        expect(screen.queryByText("Explore Plinky")).toBeNull();
     });
 });

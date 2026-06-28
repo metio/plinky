@@ -3,6 +3,7 @@
 
 import type { Letter } from "./grade";
 import { type DecayMode, REVIEW_CAP } from "./gradeProgress";
+import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
 
 // A hand's comfortable thumb-to-pinky reach in semitones, or null when unmeasured
 // — people with one hand set only the hand they have. Personalizes the suggested
@@ -41,6 +42,10 @@ export type Prefs = {
     // bars per row means bigger, more readable notation — the lever a phone needs so the
     // notes aren't crammed too small to play. Stored per device (localStorage).
     barsPerRow: number;
+    // Which computer-keyboard key plays each note, per hand. Defaults to the five-finger
+    // home-row split; a player can remap it (see keyMap), and the keyboard input layer
+    // reads this.
+    keyMap: KeyMap;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -63,6 +68,7 @@ const DEFAULTS: Prefs = {
     decayMode: "gentle",
     reviewCap: REVIEW_CAP,
     barsPerRow: 0,
+    keyMap: DEFAULT_KEY_MAP,
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
@@ -114,15 +120,23 @@ export function loadPrefs(): Prefs {
             barsPerRow: BARS_PER_ROW.includes(parsed.barsPerRow)
                 ? parsed.barsPerRow
                 : DEFAULTS.barsPerRow,
+            keyMap: cleanKeyMap(parsed.keyMap),
         };
     } catch {
-        return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan } };
+        return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan }, keyMap: cleanKeyMap(undefined) };
     }
 }
+
+// Broadcast on the same tab so a long-lived listener (the keyboard input layer) can
+// pick up a preference change made on the Settings route without a reload.
+export const PREFS_CHANGED_EVENT = "plinky:prefs-changed";
 
 export function savePrefs(prefs: Prefs): void {
     try {
         localStorage.setItem(KEY, JSON.stringify({ ...prefs, volume: clampVolume(prefs.volume) }));
+        if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event(PREFS_CHANGED_EVENT));
+        }
     } catch {
         // Preference persistence is best-effort.
     }

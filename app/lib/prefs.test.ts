@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
+import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import { loadPrefs, type Prefs, savePrefs } from "./prefs";
 
 afterEach(() => localStorage.clear());
@@ -19,6 +20,7 @@ const BASE: Prefs = {
     decayMode: "gentle",
     reviewCap: 8,
     barsPerRow: 0,
+    keyMap: DEFAULT_KEY_MAP,
 };
 
 describe("prefs", () => {
@@ -85,5 +87,17 @@ describe("prefs", () => {
             JSON.stringify({ ...BASE, handSpan: { left: 3, right: "wide" } }),
         );
         expect(loadPrefs().handSpan).toEqual({ left: null, right: null });
+    });
+
+    it("defaults the key map and round-trips a customised one", () => {
+        expect(loadPrefs().keyMap).toEqual(DEFAULT_KEY_MAP);
+        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
+        savePrefs({ ...BASE, keyMap: custom });
+        expect(loadPrefs().keyMap.left.z).toBe(0);
+    });
+
+    it("falls back to the default key map when stored data is corrupt", () => {
+        localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, keyMap: { left: "oops" } }));
+        expect(loadPrefs().keyMap).toEqual(DEFAULT_KEY_MAP);
     });
 });

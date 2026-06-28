@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { DangerZone } from "../components/dangerZone";
 import { HandSize } from "../components/handSize";
+import { KeyMapping } from "../components/keyMapping";
 import { LanguageSwitcher } from "../components/languageSwitcher";
 import { MidiConnect } from "../components/midiConnect";
 import { ThemeToggle } from "../components/themeToggle";
@@ -11,6 +12,7 @@ import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
 import type { DecayMode } from "../lib/gradeProgress";
+import { DEFAULT_KEY_MAP } from "../lib/keyMap";
 import { loadPrefs, type NoteHints, type Prefs, REVIEW_CAPS, savePrefs } from "../lib/prefs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -33,6 +35,7 @@ export default function Settings() {
         decayMode: "gentle",
         reviewCap: 8,
         barsPerRow: 0,
+        keyMap: DEFAULT_KEY_MAP,
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();
@@ -202,6 +205,13 @@ export default function Settings() {
                     {m.settings_note_hints_help()}
                 </p>
                 <HandSize />
+            </section>
+
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.settings_keyboard()}
+                </h2>
+                <KeyMapping />
             </section>
 
             {/* No Web MIDI (Safari, all iOS) means no device to connect — the

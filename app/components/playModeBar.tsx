@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { markDiscovered } from "../lib/onboarding";
 import { m } from "../paraglide/messages.js";
 import { CoachMark } from "./coachMark";
 
@@ -28,6 +29,14 @@ export function PlayModeBar({
     mode: PlayMode;
     onChange: (mode: PlayMode) => void;
 }) {
+    const select = (next: PlayMode) => {
+        if (next === "ear") {
+            markDiscovered("earTried");
+        } else if (next === "fingering") {
+            markDiscovered("fingeringTried");
+        }
+        onChange(next);
+    };
     return (
         <div className="space-y-2">
             <div className="sticky top-0 z-10 -mx-6 border-b border-gray-200 bg-white/90 px-6 py-2 backdrop-blur dark:border-gray-800 dark:bg-gray-950/90">
@@ -38,7 +47,7 @@ export function PlayModeBar({
                             type="button"
                             role="tab"
                             aria-selected={mode === tab.id}
-                            onClick={() => onChange(tab.id)}
+                            onClick={() => select(tab.id)}
                             className={mode === tab.id ? ACTIVE : INACTIVE}
                         >
                             {tab.label()}

@@ -21,8 +21,9 @@ import {
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
 import { svgMilestone } from "../lib/milestoneCard";
-import { allFirstStepsDone, type FirstSteps, firstSteps } from "../lib/onboarding";
+import { type DiscoveryId, discoveries, discoveryProgress } from "../lib/onboarding";
 import { loadPrefs } from "../lib/prefs";
+import { hasSeenHint, markHintSeen } from "../lib/seenHints";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import type { Grid } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
@@ -38,12 +39,34 @@ const STAR_LABEL: Record<EarnedTier, () => string> = {
     gold: m.grades_star_gold,
 };
 
-// The Grade-0 first-steps checklist: get a brand-new player moving toward Grade 1.
-const FIRST_STEPS: { key: keyof FirstSteps; label: () => string; to: string }[] = [
-    { key: "played", label: m.grades_start_play, to: "/library" },
-    { key: "handSet", label: m.grades_start_hand, to: "/settings" },
-    { key: "dailyDone", label: m.grades_start_daily, to: "/daily" },
+// The feature-discovery checklist: an opt-in tour of the app's corners, each step
+// completed by doing it and deep-linking to where you do it. Order runs from the first
+// thing a new player does to the more advanced surfaces.
+const DISCOVERY: { key: DiscoveryId; icon: string; label: () => string; to: string }[] = [
+    { key: "played", icon: "🎹", label: m.grades_start_play, to: "/library" },
+    { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
+    { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily" },
+    { key: "earTried", icon: "👂", label: m.discover_ear, to: "/library" },
+    { key: "fingeringTried", icon: "🎯", label: m.discover_fingering, to: "/library" },
+    { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
+    { key: "imported", icon: "📥", label: m.discover_import, to: "/library/import" },
+    { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },
 ];
+
+const DISCOVERY_DISMISSED = "discovery-panel";
+
+// A one-line "what playing at this grade feels like" for each of the eight grades, for
+// the optional "About this grade" disclosure — a go-deeper layer, never a reading gate.
+const GRADE_ABOUT: Record<number, () => string> = {
+    1: m.grade_about_1,
+    2: m.grade_about_2,
+    3: m.grade_about_3,
+    4: m.grade_about_4,
+    5: m.grade_about_5,
+    6: m.grade_about_6,
+    7: m.grade_about_7,
+    8: m.grade_about_8,
+};
 
 const SUGGESTION_COUNT = 4;
 const LINK = "text-indigo-700 underline dark:text-indigo-300";
@@ -69,11 +92,13 @@ export function YouView() {
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
     const [summary, setSummary] = useState<PracticeSummary | null>(null);
     const [fingerprint, setFingerprint] = useState<Grid | null>(null);
+    const [discoveryDismissed, setDiscoveryDismissed] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
         setSummary(summarizePractice(loadHistory()));
         setFingerprint(progressGrid(loadLifetime()));
+        setDiscoveryDismissed(hasSeenHint(DISCOVERY_DISMISSED));
         loadGradedMastery().then((loaded) => !cancelled && setItems(loaded));
         loadGradeCatalogue().then((loaded) => !cancelled && setCatalogue(loaded));
         return () => {
@@ -93,8 +118,13 @@ export function YouView() {
     const mode = prefs.decayMode;
     const resolved = items;
     const level = currentGrade(resolved);
-    const steps = firstSteps();
-    const showOnboarding = level === 0 && !allFirstStepsDone(steps);
+    const discovered = discoveries();
+    const discovery = discoveryProgress(discovered);
+    const showDiscovery = !discovery.allDone && !discoveryDismissed;
+    const dismissDiscovery = () => {
+        markHintSeen(DISCOVERY_DISMISSED);
+        setDiscoveryDismissed(true);
+    };
     const skill = skillRating(resolved, mode, now);
     const reviews = dueReviews(resolved, now, prefs.reviewCap);
     const byId = new Map(resolved.map((item) => [item.id, item]));
@@ -160,17 +190,30 @@ export function YouView() {
                 </section>
             )}
 
-            {showOnboarding && (
+            {showDiscovery && (
                 <section className="space-y-3 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-                    <h2 className="font-semibold text-indigo-800 dark:text-indigo-200">
-                        {m.grades_start_heading()}
-                    </h2>
+                    <div className="flex items-start justify-between gap-2">
+                        <h2 className="font-semibold text-indigo-800 dark:text-indigo-200">
+                            {m.discover_heading()}
+                        </h2>
+                        <button
+                            type="button"
+                            onClick={dismissDiscovery}
+                            aria-label={m.action_dismiss()}
+                            className="shrink-0 font-bold leading-none text-indigo-700 dark:text-indigo-300"
+                        >
+                            ✕
+                        </button>
+                    </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.grades_start_intro()}
+                        {m.discover_intro()}{" "}
+                        <span className="font-medium tabular-nums">
+                            {m.discover_progress({ done: discovery.done, total: discovery.total })}
+                        </span>
                     </p>
                     <ul className="space-y-1.5 text-sm">
-                        {FIRST_STEPS.map((step) => {
-                            const stepDone = steps[step.key];
+                        {DISCOVERY.map((step) => {
+                            const stepDone = discovered[step.key];
                             return (
                                 <li key={step.key} className="flex items-center gap-2">
                                     <span
@@ -183,6 +226,7 @@ export function YouView() {
                                     >
                                         ✓
                                     </span>
+                                    <span aria-hidden="true">{step.icon}</span>
                                     <Link
                                         to={step.to}
                                         className={
@@ -227,38 +271,50 @@ export function YouView() {
                     return (
                         <li
                             key={grade}
-                            className={`flex items-center justify-between gap-3 rounded-md border p-3 ${
+                            className={`space-y-2 rounded-md border p-3 ${
                                 grade === level
                                     ? "border-indigo-300 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-950/40"
                                     : "border-gray-200 dark:border-gray-800"
                             }`}
                         >
-                            <span className="flex items-center gap-2">
-                                <span className="font-semibold">{m.grades_grade({ grade })}</span>
-                                {tier !== "none" && (
-                                    <span role="img" aria-label={STAR_LABEL[tier]()}>
-                                        {STAR[tier]}
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="flex items-center gap-2">
+                                    <span className="font-semibold">
+                                        {m.grades_grade({ grade })}
                                     </span>
-                                )}
-                            </span>
-                            <span className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                                <span className="tabular-nums">
-                                    {m.grades_pool({ mastered, total })}
+                                    {tier !== "none" && (
+                                        <span role="img" aria-label={STAR_LABEL[tier]()}>
+                                            {STAR[tier]}
+                                        </span>
+                                    )}
                                 </span>
-                                <span className="text-gray-500 dark:text-gray-400">
-                                    {next
-                                        ? m.grades_to_next({
-                                              count: next.remaining,
-                                              tier: STAR_LABEL[next.tier](),
-                                          })
-                                        : m.grades_maxed()}
-                                </span>
-                                {due > 0 && (
-                                    <span className="text-amber-700 dark:text-amber-400">
-                                        {m.grades_due({ count: due })}
+                                <span className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                                    <span className="tabular-nums">
+                                        {m.grades_pool({ mastered, total })}
                                     </span>
-                                )}
-                            </span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                        {next
+                                            ? m.grades_to_next({
+                                                  count: next.remaining,
+                                                  tier: STAR_LABEL[next.tier](),
+                                              })
+                                            : m.grades_maxed()}
+                                    </span>
+                                    {due > 0 && (
+                                        <span className="text-amber-700 dark:text-amber-400">
+                                            {m.grades_due({ count: due })}
+                                        </span>
+                                    )}
+                                </span>
+                            </div>
+                            <details className="text-sm">
+                                <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                                    {m.grade_about_heading()}
+                                </summary>
+                                <p className="pt-1 text-gray-600 dark:text-gray-400">
+                                    {GRADE_ABOUT[grade]?.()}
+                                </p>
+                            </details>
                         </li>
                     );
                 })}

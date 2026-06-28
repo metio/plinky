@@ -19,6 +19,7 @@ import {
     toMusicXml,
 } from "../lib/composition";
 import { buildMidiFile } from "../lib/midiFile";
+import { markDiscovered } from "../lib/onboarding";
 import { fileStem } from "../lib/printScore";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -121,6 +122,10 @@ export default function Compose() {
             durationMs,
             velocity: open.velocity,
         };
+        // The first recorded note means the player has tried composing.
+        if (notesRef.current.length === 0) {
+            markDiscovered("composed");
+        }
         // Notes complete in release order, so keep the list sorted by onset — the
         // codec and the staff both assume ascending starts.
         setNotes((prev) => [...prev, recorded].sort((a, b) => a.startMs - b.startMs));

@@ -4,6 +4,7 @@
 
 import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { DEFAULT_KEY_MAP } from "../lib/keyMap";
 import { savePrefs } from "../lib/prefs";
 import { useSynth } from "./useSynth";
 
@@ -68,6 +69,7 @@ describe("useSynth", () => {
             decayMode: "gentle",
             reviewCap: 8,
             barsPerRow: 0,
+            keyMap: DEFAULT_KEY_MAP,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -87,6 +89,7 @@ describe("useSynth", () => {
             decayMode: "gentle",
             reviewCap: 8,
             barsPerRow: 0,
+            keyMap: DEFAULT_KEY_MAP,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -107,6 +110,7 @@ describe("useSynth", () => {
             decayMode: "gentle",
             reviewCap: 8,
             barsPerRow: 0,
+            keyMap: DEFAULT_KEY_MAP,
         });
         const { result } = renderHook(() => useSynth());
         expect(() => result.current.playNote(60)).not.toThrow();

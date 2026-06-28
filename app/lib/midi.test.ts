@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
+import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import { keyToNote, noteName, parseMidiMessage } from "./midi";
 
 describe("noteName", () => {
@@ -38,6 +39,12 @@ describe("keyToNote", () => {
         for (const key of ["q", "r", "y", "o", "z", "1"]) {
             expect(keyToNote(key, 0)).toBeNull();
         }
+    });
+
+    it("honours a custom key map", () => {
+        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
+        expect(keyToNote("z", 0, custom)).toBe(60); // 'z' now plays the left hand's C4
+        expect(keyToNote("a", 0, custom)).toBeNull(); // the default 'a' is no longer bound
     });
 });
 

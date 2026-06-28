@@ -24,6 +24,8 @@ import {
     type MidiStatus,
     type MidiSupport,
 } from "../lib/midi";
+import { DEFAULT_KEY_MAP, type KeyMap } from "../lib/keyMap";
+import { loadPrefs, PREFS_CHANGED_EVENT } from "../lib/prefs";
 import { resetDevice } from "../lib/resetDevice";
 
 export type NoteListener = {
@@ -247,13 +249,20 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
     const clearEvents = useCallback(() => setEvents([]), []);
 
-    // Computer-keyboard fallback. The active octave is kept in a ref so the
-    // listeners stay stable while still reading the latest value.
+    // Computer-keyboard fallback. The active octave and the key→note map are kept in
+    // refs so the listeners stay stable while still reading the latest values; the map
+    // is refreshed when Settings saves a remap, so a new layout takes effect at once.
     const octaveRef = useRef(0);
+    const keyMapRef = useRef<KeyMap>(DEFAULT_KEY_MAP);
     useEffect(() => {
         if (typeof window === "undefined") {
             return;
         }
+        const loadKeyMap = () => {
+            keyMapRef.current = loadPrefs().keyMap;
+        };
+        loadKeyMap();
+        window.addEventListener(PREFS_CHANGED_EVENT, loadKeyMap);
         const pressed = new Map<string, number>();
 
         const isTextEntry = (target: EventTarget | null): boolean => {
@@ -287,7 +296,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            const note = keyToNote(key, octaveRef.current);
+            const note = keyToNote(key, octaveRef.current, keyMapRef.current);
             if (note === null || pressed.has(key)) {
                 return;
             }
@@ -324,6 +333,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         window.addEventListener("keyup", onKeyUp);
         window.addEventListener("blur", releaseAll);
         return () => {
+            window.removeEventListener(PREFS_CHANGED_EVENT, loadKeyMap);
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup", onKeyUp);
             window.removeEventListener("blur", releaseAll);

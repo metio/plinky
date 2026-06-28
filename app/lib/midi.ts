@@ -6,6 +6,8 @@
 // iOS) does not, which is why `support` can settle on "unsupported" even though
 // the type system treats the entry point as always present.
 
+import { DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+
 export type MidiSupport = "unknown" | "unsupported" | "supported";
 
 export type MidiStatus = "idle" | "requesting" | "ready" | "denied" | "error";
@@ -65,32 +67,6 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     return { kind: isNoteOn ? "noteon" : "noteoff", note, velocity, channel };
 }
 
-// Five-finger home-row split so both hands rest naturally: the left hand plays
-// C–G on the home row (A S D F G), the right hand the same five notes an octave
-// up on H J K L ;, with each span's three black keys (C♯ D♯ F♯) on the row above
-// (W E T and U I P). Values are semitone offsets from each hand's base C; the
-// other top-row keys produce no note, as on a real keyboard.
-const LEFT_HAND_KEYS: Record<string, number> = {
-    a: 0,
-    w: 1,
-    s: 2,
-    e: 3,
-    d: 4,
-    f: 5,
-    t: 6,
-    g: 7,
-};
-const RIGHT_HAND_KEYS: Record<string, number> = {
-    h: 0,
-    u: 1,
-    j: 2,
-    i: 3,
-    k: 4,
-    l: 5,
-    p: 6,
-    ";": 7,
-};
-
 export const KEYBOARD_DEVICE = "Computer keyboard";
 export const KEYBOARD_VELOCITY = 80;
 export const MIN_OCTAVE_OFFSET = -3;
@@ -99,14 +75,19 @@ export const MAX_OCTAVE_OFFSET = 3;
 const LEFT_HAND_BASE_NOTE = 60; // C4 at octave offset 0
 const RIGHT_HAND_BASE_NOTE = 72; // C5 — one octave above the left hand
 
-// Map a pressed key to its MIDI note for the active octave offset, or null when
-// the key is not part of the layout.
-export function keyToNote(key: string, octaveOffset: number): number | null {
-    if (key in LEFT_HAND_KEYS) {
-        return LEFT_HAND_BASE_NOTE + octaveOffset * 12 + LEFT_HAND_KEYS[key]!;
+// Map a pressed key to its MIDI note for the active octave offset, or null when the
+// key is not part of the layout. The five-finger home-row split is the default, but a
+// player can rebind keys (see keyMap), so the live mapping is passed in.
+export function keyToNote(
+    key: string,
+    octaveOffset: number,
+    keyMap: KeyMap = DEFAULT_KEY_MAP,
+): number | null {
+    if (key in keyMap.left) {
+        return LEFT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.left[key]!;
     }
-    if (key in RIGHT_HAND_KEYS) {
-        return RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + RIGHT_HAND_KEYS[key]!;
+    if (key in keyMap.right) {
+        return RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.right[key]!;
     }
     return null;
 }
