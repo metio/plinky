@@ -123,8 +123,17 @@ const EMOJI: Record<Level, string> = {
     none: "⬜",
 };
 
+// One glyph per row, in DIMENSIONS order, as a tiny legend on the shared artifacts
+// (a target for accuracy, a stopwatch for timing, notes for flow). Just enough key
+// that a recipient who's never seen Plinky can read the grid, without spelling it out
+// in words or numbers — the in-app card already carries text labels, so this is only
+// for the shared text and image.
+const ROW_BADGES = ["🎯", "⏱️", "🎶"];
+
 export function gridEmoji(grid: Grid): string {
-    return grid.map((row) => row.map((level) => EMOJI[level]).join("")).join("\n");
+    return grid
+        .map((row, r) => `${ROW_BADGES[r] ?? ""} ${row.map((level) => EMOJI[level]).join("")}`)
+        .join("\n");
 }
 
 // The clipboard/social text: a one-line boast and the emoji grid, with no link —
@@ -152,22 +161,33 @@ export function svgCard(grid: Grid, heading: string): string {
     const rows = grid.length;
     const gap = 28;
     const cell = 132;
+    // A gutter on the left holds each row's legend glyph; the gutter + grid centre as
+    // one block, so the card stays balanced.
+    const badgeW = 110;
     const gridW = cols * cell + (cols - 1) * gap;
     const gridH = rows * cell + (rows - 1) * gap;
-    const left = (width - gridW) / 2;
+    const blockLeft = (width - (badgeW + gridW)) / 2;
+    const gridLeft = blockLeft + badgeW;
     const top = (height - gridH) / 2;
     const cells = grid
         .flatMap((row, r) =>
             row.map((level, c) => {
-                const x = left + c * (cell + gap);
+                const x = gridLeft + c * (cell + gap);
                 const y = top + r * (cell + gap);
                 return `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="20" fill="${FILL[level]}"/>`;
             }),
         )
         .join("");
+    const badges = grid
+        .map(
+            (_, r) =>
+                `<text x="${blockLeft + badgeW / 2}" y="${top + r * (cell + gap) + cell / 2}" font-size="76" text-anchor="middle" dominant-baseline="central">${ROW_BADGES[r] ?? ""}</text>`,
+        )
+        .join("");
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\
 <rect width="${width}" height="${height}" fill="#0f172a"/>\
 <text x="${width / 2}" y="${top - 64}" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(heading)}</text>\
+${badges}\
 ${cells}\
 <text x="${width / 2}" y="${top + gridH + 96}" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
 </svg>`;

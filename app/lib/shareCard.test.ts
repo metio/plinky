@@ -138,11 +138,13 @@ describe("toGrid / gridFor", () => {
 });
 
 describe("gridEmoji", () => {
-    it("renders three lines of emoji squares", () => {
+    it("renders three lines of emoji squares, each led by its row legend", () => {
         const text = gridEmoji(gridFor(Array.from({ length: 6 }, clean)));
         const lines = text.split("\n");
         expect(lines).toHaveLength(3);
-        expect(lines[0]).toBe("🟩".repeat(SEGMENTS));
+        expect(lines[0]).toBe(`🎯 ${"🟩".repeat(SEGMENTS)}`); // accuracy row
+        expect(lines[1]?.startsWith("⏱️")).toBe(true); // timing row
+        expect(lines[2]?.startsWith("🎶")).toBe(true); // flow row
     });
 });
 
