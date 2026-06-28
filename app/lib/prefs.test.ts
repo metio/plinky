@@ -21,6 +21,7 @@ const BASE: Prefs = {
     reviewCap: 8,
     barsPerRow: 0,
     keyMap: DEFAULT_KEY_MAP,
+    keyboardOctaves: 2,
 };
 
 describe("prefs", () => {
@@ -99,5 +100,13 @@ describe("prefs", () => {
     it("falls back to the default key map when stored data is corrupt", () => {
         localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, keyMap: { left: "oops" } }));
         expect(loadPrefs().keyMap).toEqual(DEFAULT_KEY_MAP);
+    });
+
+    it("defaults to a two-octave keyboard window and rejects an off-list value", () => {
+        expect(loadPrefs().keyboardOctaves).toBe(2);
+        savePrefs({ ...BASE, keyboardOctaves: 0 });
+        expect(loadPrefs().keyboardOctaves).toBe(0);
+        localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, keyboardOctaves: 7 }));
+        expect(loadPrefs().keyboardOctaves).toBe(2);
     });
 });

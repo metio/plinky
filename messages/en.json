@@ -140,6 +140,8 @@
   "loop_to": "Loop to bar",
   "bars_per_row": "Bars/row",
   "bars_per_row_auto": "Auto",
+  "keyboard_octaves": "Keys",
+  "keyboard_octaves_all": "All",
   "transpose": "Transpose",
   "transpose_down": "Transpose down a semitone",
   "transpose_up": "Transpose up a semitone",

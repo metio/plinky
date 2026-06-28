@@ -46,6 +46,10 @@ export type Prefs = {
     // home-row split; a player can remap it (see keyMap), and the keyboard input layer
     // reads this.
     keyMap: KeyMap;
+    // How many octaves of the on-screen keyboard to show while playing — a window that
+    // follows the notes, so a wide piece's keys stay a playable size — or 0 to frame the
+    // whole piece at once (fixed, never sliding, for players who prefer a stable map).
+    keyboardOctaves: number;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -54,6 +58,10 @@ export const REVIEW_CAPS = [5, 8, 12, 20];
 
 // Bars-per-row choices: 0 = fit to width (the default), or force 2–4 for bigger bars.
 export const BARS_PER_ROW = [0, 2, 3, 4];
+
+// On-screen-keyboard window choices, in octaves: a sliding 1–3-octave window that
+// follows the notes, or 0 for the whole piece framed at once (fixed).
+export const KEYBOARD_OCTAVES = [0, 1, 2, 3];
 
 const KEY = "plinky:prefs";
 const DEFAULTS: Prefs = {
@@ -69,6 +77,7 @@ const DEFAULTS: Prefs = {
     reviewCap: REVIEW_CAP,
     barsPerRow: 0,
     keyMap: DEFAULT_KEY_MAP,
+    keyboardOctaves: 2,
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
@@ -121,6 +130,9 @@ export function loadPrefs(): Prefs {
                 ? parsed.barsPerRow
                 : DEFAULTS.barsPerRow,
             keyMap: cleanKeyMap(parsed.keyMap),
+            keyboardOctaves: KEYBOARD_OCTAVES.includes(parsed.keyboardOctaves)
+                ? parsed.keyboardOctaves
+                : DEFAULTS.keyboardOctaves,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan }, keyMap: cleanKeyMap(undefined) };

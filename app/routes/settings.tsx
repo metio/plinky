@@ -36,6 +36,7 @@ export default function Settings() {
         reviewCap: 8,
         barsPerRow: 0,
         keyMap: DEFAULT_KEY_MAP,
+        keyboardOctaves: 2,
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();

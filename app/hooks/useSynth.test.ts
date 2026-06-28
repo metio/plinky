@@ -70,6 +70,7 @@ describe("useSynth", () => {
             reviewCap: 8,
             barsPerRow: 0,
             keyMap: DEFAULT_KEY_MAP,
+            keyboardOctaves: 2,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -90,6 +91,7 @@ describe("useSynth", () => {
             reviewCap: 8,
             barsPerRow: 0,
             keyMap: DEFAULT_KEY_MAP,
+            keyboardOctaves: 2,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -111,6 +113,7 @@ describe("useSynth", () => {
             reviewCap: 8,
             barsPerRow: 0,
             keyMap: DEFAULT_KEY_MAP,
+            keyboardOctaves: 2,
         });
         const { result } = renderHook(() => useSynth());
         expect(() => result.current.playNote(60)).not.toThrow();

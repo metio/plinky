@@ -113,9 +113,10 @@ a student.
   `H J K L ;` the right, each a five-finger C–G position, with an octave shift to
   move around; remap any of these keys to your own layout in **Settings**. (Two-hand
   pieces span both staves, so a MIDI keyboard is the comfortable way to play those.)
-- **With the on-screen piano** — tap the keys shown under each score, which widen
-  or narrow to frame exactly the notes the piece needs. Handy on a phone or tablet
-  with no MIDI or keyboard.
+- **With the on-screen piano** — tap the keys shown under each score. On a wide-ranging
+  piece the keyboard shows a moving window that follows the notes you're playing, so the
+  keys never shrink to slivers; set its width — **1, 2 or 3 octaves, or the whole piece**
+  fixed — under *More options*. Handy on a phone or tablet with no MIDI or keyboard.
 
 Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your

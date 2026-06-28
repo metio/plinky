@@ -16,6 +16,7 @@ import { computeFlow } from "../lib/flow";
 import { recordDailyDone } from "../lib/dailyStreak";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
+import { nextKeyboardWindow, type Span } from "../lib/keyboardWindow";
 import { recordRun } from "../lib/lifetime";
 import {
     applyRun,
@@ -27,7 +28,7 @@ import {
     saveMastery,
     setBacklog,
 } from "../lib/mastery";
-import { BARS_PER_ROW, loadPrefs, savePrefs } from "../lib/prefs";
+import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import { SITE_URL } from "../lib/site";
@@ -196,6 +197,13 @@ export function ScoreViewer({
     // In full screen the keyboard can be folded away, handing all the height to the
     // score — what a player on a real MIDI piano wants.
     const [hideKeyboard, setHideKeyboard] = useState(false);
+    // The slice of keyboard on show. A wide-ranging piece would shrink every key to a
+    // sliver if framed whole, so the keyboard tracks a bounded window that follows the
+    // notes being played; the player picks its width (or 0 to keep the whole piece in
+    // view, fixed). Changing it re-frames from scratch (clear the remembered window).
+    const [keyWindow, setKeyWindow] = useState<Span | null>(null);
+    const [keyboardOctaves, setKeyboardOctaves] = useState(() => loadPrefs().keyboardOctaves);
+    const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -333,6 +341,15 @@ export function ScoreViewer({
     });
     const { support, status, devices, requestAccess } = useMidiConnection();
     const connected = status === "ready" && devices.length > 0;
+
+    // Slide the keyboard window to keep the notes being played in view, re-framing only
+    // when they leave it. Falls back to the whole range (null window) when not practising,
+    // where PianoKeyboard's own default applies.
+    useEffect(() => {
+        setKeyWindow((prev) =>
+            nextKeyboardWindow(prev, matcher.range, matcher.expected, keyboardSpan),
+        );
+    }, [matcher.range, matcher.expected, keyboardSpan]);
 
     useEffect(() => {
         tempoRef.current = tempo;
@@ -1143,6 +1160,33 @@ export function ScoreViewer({
                                     ))}
                                 </fieldset>
                             </span>
+                            <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                {m.keyboard_octaves()}
+                                <fieldset
+                                    aria-label={m.keyboard_octaves()}
+                                    className="flex items-center gap-1"
+                                >
+                                    {KEYBOARD_OCTAVES.map((n) => (
+                                        <button
+                                            key={n}
+                                            type="button"
+                                            onClick={() => {
+                                                setKeyboardOctaves(n);
+                                                setKeyWindow(null);
+                                                savePrefs({ ...loadPrefs(), keyboardOctaves: n });
+                                            }}
+                                            aria-pressed={keyboardOctaves === n}
+                                            className={
+                                                keyboardOctaves === n
+                                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
+                                                    : `${BUTTON} tabular-nums`
+                                            }
+                                        >
+                                            {n === 0 ? m.keyboard_octaves_all() : n}
+                                        </button>
+                                    ))}
+                                </fieldset>
+                            </span>
                         </div>
                     </details>
                 </div>
@@ -1274,8 +1318,8 @@ export function ScoreViewer({
                         <PianoKeyboard
                             expected={hintNotes}
                             wrong={matcher.lastWrong}
-                            from={matcher.range?.from}
-                            to={matcher.range?.to}
+                            from={keyWindow?.from}
+                            to={keyWindow?.to}
                         />
                     )}
                 </div>
