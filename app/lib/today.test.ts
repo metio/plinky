@@ -31,15 +31,20 @@ describe("todayTasks", () => {
         expect(tasks[0]).toEqual({ key: "review", count: 1, to: "/play/only" });
     });
 
-    it("drops the daily once it's done", () => {
+    it("keeps the daily once done, ticked off after the to-dos", () => {
         const tasks = todayTasks(
             input({ dailyDoneToday: true, suggestion: { id: "s", title: "T" } }),
         );
-        expect(tasks.map((t) => t.key)).toEqual(["learn"]);
+        expect(tasks.map((t) => t.key)).toEqual(["learn", "daily"]);
+        // It's still a link to today's result, marked done.
+        expect(tasks[1]).toEqual({ key: "daily", to: "/daily", done: true });
     });
 
-    it("falls back to browsing when nothing is queued", () => {
+    it("falls back to browsing, with the done daily still reachable", () => {
         const tasks = todayTasks(input({ dailyDoneToday: true }));
-        expect(tasks).toEqual([{ key: "browse", to: "/library" }]);
+        expect(tasks).toEqual([
+            { key: "browse", to: "/library" },
+            { key: "daily", to: "/daily", done: true },
+        ]);
     });
 });

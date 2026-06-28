@@ -7,7 +7,7 @@
 
 export type Task =
     | { key: "review"; count: number; to: string }
-    | { key: "daily"; to: string }
+    | { key: "daily"; to: string; done: boolean }
     | { key: "learn"; title: string; to: string }
     | { key: "browse"; to: string };
 
@@ -31,14 +31,21 @@ export function todayTasks({ dueIds, dailyDoneToday, suggestion }: TodayInput): 
         const to = dueIds.length === 1 ? `/play/${dueIds[0]}` : "/review";
         tasks.push({ key: "review", count: dueIds.length, to });
     }
+    // Not yet done, the daily is an action and sits up in the priority list.
     if (!dailyDoneToday) {
-        tasks.push({ key: "daily", to: "/daily" });
+        tasks.push({ key: "daily", to: "/daily", done: false });
     }
     if (suggestion) {
         tasks.push({ key: "learn", title: suggestion.title, to: `/play/${suggestion.id}` });
     }
     if (tasks.length === 0) {
         tasks.push({ key: "browse", to: "/library" });
+    }
+    // Once done, the daily still belongs here — it's the only route to today's result
+    // and share — but as a ticked-off footer rather than a to-do, so the page is never
+    // stranded behind a vanished link.
+    if (dailyDoneToday) {
+        tasks.push({ key: "daily", to: "/daily", done: true });
     }
     return tasks;
 }

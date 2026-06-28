@@ -30,7 +30,7 @@ function taskLabel(task: Task): string {
         case "review":
             return m.today_review({ count: task.count });
         case "daily":
-            return m.today_daily();
+            return task.done ? m.today_daily_done() : m.today_daily();
         case "learn":
             return m.today_learn({ title: task.title });
         case "browse":
@@ -105,7 +105,7 @@ export function HomeToday() {
                             className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
                         >
                             <span aria-hidden="true" className="text-xl">
-                                {ICON[task.key]}
+                                {task.key === "daily" && task.done ? "✅" : ICON[task.key]}
                             </span>
                             <span className="font-medium text-gray-900 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
                                 {taskLabel(task)} →
