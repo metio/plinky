@@ -21,9 +21,7 @@ import {
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
 import { svgMilestone } from "../lib/milestoneCard";
-import { type DiscoveryId, discoveries, discoveryProgress } from "../lib/onboarding";
 import { loadPrefs } from "../lib/prefs";
-import { hasSeenHint, markHintSeen } from "../lib/seenHints";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import type { Grid } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
@@ -39,22 +37,6 @@ const STAR_LABEL: Record<EarnedTier, () => string> = {
     silver: m.grades_star_silver,
     gold: m.grades_star_gold,
 };
-
-// The feature-discovery checklist: an opt-in tour of the app's corners, each step
-// completed by doing it and deep-linking to where you do it. Order runs from the first
-// thing a new player does to the more advanced surfaces.
-const DISCOVERY: { key: DiscoveryId; icon: string; label: () => string; to: string }[] = [
-    { key: "played", icon: "🎹", label: m.grades_start_play, to: "/library" },
-    { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
-    { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily" },
-    { key: "earTried", icon: "👂", label: m.discover_ear, to: "/library" },
-    { key: "fingeringTried", icon: "🎯", label: m.discover_fingering, to: "/library" },
-    { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
-    { key: "imported", icon: "📥", label: m.discover_import, to: "/library/import" },
-    { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },
-];
-
-const DISCOVERY_DISMISSED = "discovery-panel";
 
 // A one-line "what playing at this grade feels like" for each of the eight grades, for
 // the optional "About this grade" disclosure — a go-deeper layer, never a reading gate.
@@ -93,13 +75,11 @@ export function YouView() {
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
     const [summary, setSummary] = useState<PracticeSummary | null>(null);
     const [fingerprint, setFingerprint] = useState<Grid | null>(null);
-    const [discoveryDismissed, setDiscoveryDismissed] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
         setSummary(summarizePractice(loadHistory()));
         setFingerprint(progressGrid(loadLifetime()));
-        setDiscoveryDismissed(hasSeenHint(DISCOVERY_DISMISSED));
         loadGradedMastery().then((loaded) => !cancelled && setItems(loaded));
         loadGradeCatalogue().then((loaded) => !cancelled && setCatalogue(loaded));
         return () => {
@@ -119,13 +99,6 @@ export function YouView() {
     const mode = prefs.decayMode;
     const resolved = items;
     const level = currentGrade(resolved);
-    const discovered = discoveries();
-    const discovery = discoveryProgress(discovered);
-    const showDiscovery = !discovery.allDone && !discoveryDismissed;
-    const dismissDiscovery = () => {
-        markHintSeen(DISCOVERY_DISMISSED);
-        setDiscoveryDismissed(true);
-    };
     const skill = skillRating(resolved, mode, now);
     const reviews = dueReviews(resolved, now, prefs.reviewCap);
     const byId = new Map(resolved.map((item) => [item.id, item]));
@@ -187,60 +160,6 @@ export function YouView() {
                         })}
                         imageText={m.milestone_grade_boast({ level })}
                     />
-                </section>
-            </Show>
-
-            <Show when={showDiscovery}>
-                <section className="space-y-3 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-                    <div className="flex items-start justify-between gap-2">
-                        <h2 className="font-semibold text-indigo-800 dark:text-indigo-200">
-                            {m.discover_heading()}
-                        </h2>
-                        <button
-                            type="button"
-                            onClick={dismissDiscovery}
-                            aria-label={m.action_dismiss()}
-                            className="shrink-0 font-bold leading-none text-indigo-700 dark:text-indigo-300"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.discover_intro()}{" "}
-                        <span className="font-medium tabular-nums">
-                            {m.discover_progress({ done: discovery.done, total: discovery.total })}
-                        </span>
-                    </p>
-                    <ul className="space-y-1.5 text-sm">
-                        {DISCOVERY.map((step) => {
-                            const stepDone = discovered[step.key];
-                            return (
-                                <li key={step.key} className="flex items-center gap-2">
-                                    <span
-                                        aria-hidden="true"
-                                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                                            stepDone
-                                                ? "bg-green-600 text-white"
-                                                : "border border-gray-300 text-transparent dark:border-gray-600"
-                                        }`}
-                                    >
-                                        ✓
-                                    </span>
-                                    <span aria-hidden="true">{step.icon}</span>
-                                    <Link
-                                        to={step.to}
-                                        className={
-                                            stepDone
-                                                ? "text-gray-500 line-through dark:text-gray-400"
-                                                : LINK
-                                        }
-                                    >
-                                        {step.label()}
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
                 </section>
             </Show>
 

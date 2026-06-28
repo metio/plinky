@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { DiscoveryChecklist } from "../components/discoveryChecklist";
 import { HeroKeyboard } from "../components/heroKeyboard";
 import { HomeToday } from "../components/homeToday";
 import { LocalizedLink as Link } from "../components/localizedLink";
@@ -67,6 +68,8 @@ export default function Home() {
             </section>
 
             <HomeToday />
+
+            <DiscoveryChecklist />
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">

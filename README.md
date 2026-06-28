@@ -78,8 +78,11 @@ one-tap **review session** walks you through everything that's fading, and you c
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
-  carries an optional *About this grade* note, and a new player gets a gentle, dismissible
-  **discovery checklist** that points out the app's corners — never a gate on progress.
+  carries an optional *About this grade* note.
+
+On the **home page**, a new player is welcomed by a gentle, dismissible **discovery
+checklist** that points out the app's corners — a guided tour where you land, never a
+gate on progress.
 
 ## Composing
 
