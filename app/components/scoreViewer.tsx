@@ -53,6 +53,7 @@ import {
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
+import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
 import { DownloadIcon, PlayIcon, PrinterIcon, ShareIcon, StopIcon } from "./icons";
 import { PerformanceStrip } from "./performanceStrip";
@@ -172,6 +173,12 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
     const [barsPerRow, setBarsPerRow] = useState(() => loadPrefs().barsPerRow);
+    // The notation the mobile focus strip shows — transposed to match what's played,
+    // but un-annotated (it's for reading the bar, not the printed fingering).
+    const focusXml = useMemo(
+        () => (transpose === 0 ? xml : transposeMusicXml(xml, transpose)),
+        [xml, transpose],
+    );
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -716,7 +723,7 @@ export function ScoreViewer({
                     // A bounded scroll box so the follow-cursor scrolls the staff inside
                     // it — keeping the controls and on-screen keyboard in view below
                     // rather than scrolling the whole page out from under them.
-                    className="max-h-[70vh] overflow-auto"
+                    className="max-h-[45vh] overflow-auto sm:max-h-[70vh]"
                 />
                 {loadError && (
                     <p className="p-2 text-sm text-red-600 dark:text-red-400">
@@ -1098,6 +1105,16 @@ export function ScoreViewer({
                     {ghost && (
                         <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
                     )}
+                    {/* On a phone, a compact current-bars strip right above the keys, so
+                        the notes to play aren't scrolled off behind the keyboard; desktop
+                        relies on the auto-scrolling full score above. */}
+                    <div className="sm:hidden">
+                        <FocusStrip
+                            xml={focusXml}
+                            bar={matcher.bar}
+                            label={m.focus_strip_label()}
+                        />
+                    </div>
                     <PianoKeyboard
                         expected={hintNotes}
                         wrong={matcher.lastWrong}

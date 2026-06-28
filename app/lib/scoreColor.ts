@@ -100,6 +100,40 @@ export function paintMeasureRange(
     osmd.cursor.hide();
 }
 
+// Scrolls a measure to the vertical centre of its own container — used by the focus
+// strip to slide to the bar being played. Scrolls the container directly (not
+// scrollIntoView, which would also scroll the page). Walks the cursor to the measure to
+// find a rendered note there; leaves the cursor reset and hidden.
+export function scrollMeasureIntoView(
+    osmd: OpenSheetMusicDisplay,
+    measure: number,
+    container: HTMLElement,
+): void {
+    osmd.cursor.show();
+    osmd.cursor.reset();
+    while (!osmd.cursor.iterator.EndReached && osmd.cursor.iterator.CurrentMeasureIndex < measure) {
+        osmd.cursor.next();
+    }
+    for (const gNote of osmd.cursor.GNotesUnderCursor()) {
+        const element = svgOf(gNote);
+        if (element) {
+            const elementRect = element.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const top =
+                elementRect.top -
+                containerRect.top +
+                container.scrollTop -
+                (container.clientHeight - elementRect.height) / 2;
+            // Set scrollTop directly (not scrollTo's smooth, which headless browsers may
+            // drop). The bar only changes a few times a piece, so a jump reads fine.
+            container.scrollTop = Math.max(0, top);
+            break;
+        }
+    }
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+}
+
 // Paints the noteheads at the cursor's current position whose pitch was just
 // played. It mutates the already-rendered SVG directly — colouring per note via
 // NoteheadColor would force a full re-render, which would flicker and lose the

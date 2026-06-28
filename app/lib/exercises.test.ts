@@ -6,7 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Each test re-imports the module so its manifest/Hanon caches start fresh.
 beforeEach(() => vi.resetModules());
-afterEach(() => vi.restoreAllMocks());
+// restoreAllMocks does not undo stubGlobal, so the fetch stub would leak to whatever
+// runs next in the worker; unstub it explicitly to keep the test isolated.
+afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+});
 
 describe("loadExerciseManifest", () => {
     it("returns an empty catalogue when the manifest can't be fetched", async () => {

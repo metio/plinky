@@ -80,6 +80,10 @@ export function useScoreMatcher(
     const [lastWrong, setLastWrong] = useState<{ note: number; seq: number } | null>(null);
     const [range, setRange] = useState<{ from: number; to: number } | null>(null);
     const [complete, setComplete] = useState(false);
+    // The 0-based bar the cursor sits in, so a focus view can show the current bars
+    // without re-deriving the position from the run count (which a hands-separate run
+    // would skew). Read straight from the cursor the matcher already walks.
+    const [bar, setBar] = useState(0);
     const hit = useRef<Set<number>>(new Set());
     const ordinalRef = useRef(0);
     const wrongSeq = useRef(0);
@@ -132,6 +136,7 @@ export function useScoreMatcher(
         osmd.cursor.reset();
         advancePastRests(osmd, hand);
         osmd.cursor.show();
+        setBar(osmd.cursor.iterator.CurrentMeasureIndex);
         hit.current.clear();
         ordinalRef.current = 0;
         sinceWrong.current = 0;
@@ -184,6 +189,7 @@ export function useScoreMatcher(
             hit.current.clear();
             osmd.cursor.next();
             advancePastRests(osmd, runHandRef.current);
+            setBar(osmd.cursor.iterator.CurrentMeasureIndex);
             setDone((value) => value + 1);
             if (osmd.cursor.iterator.EndReached) {
                 osmd.cursor.hide();
@@ -211,6 +217,7 @@ export function useScoreMatcher(
         lastWrong,
         range,
         complete,
+        bar,
         start,
         stop,
         registerNote,
