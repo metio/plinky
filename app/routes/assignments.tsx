@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { Show } from "../components/conditional";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import {
     type Assignment,
@@ -297,7 +298,7 @@ export default function AssignmentsRoute() {
                     onChange={(event) => setQuery(event.target.value)}
                     aria-label={m.assignments_search_placeholder()}
                 />
-                {matches.length > 0 && (
+                <Show when={matches.length > 0}>
                     <ul className="divide-y divide-gray-100 rounded-md border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
                         {matches.map((entry) => (
                             <li
@@ -315,7 +316,7 @@ export default function AssignmentsRoute() {
                             </li>
                         ))}
                     </ul>
-                )}
+                </Show>
 
                 {items.length > 0 ? (
                     <ol className="space-y-2">

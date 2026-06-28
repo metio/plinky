@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { Show } from "../components/conditional";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { dailyChallenge, dailyNumber, todayKey } from "../lib/daily";
@@ -73,11 +74,11 @@ export default function DailyRoute() {
                 <h1 className="text-2xl font-semibold">
                     {today ? `🎹 Plinky #${today.number}` : "🎹 Plinky #…"}
                 </h1>
-                {streak > 0 && (
+                <Show when={streak > 0}>
                     <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
                         {m.daily_streak({ count: streak })}
                     </p>
-                )}
+                </Show>
             </header>
 
             <fieldset aria-label={m.daily_mode_label()} className="flex gap-2">

@@ -10,6 +10,7 @@ import {
     supportsIntervals,
 } from "../lib/exerciseGen";
 import { m } from "../paraglide/messages.js";
+import { Show } from "./conditional";
 import { LocalizedLink as Link } from "./localizedLink";
 
 // Form controls for a generated exercise: octaves, hands, (for arpeggios) inversion,
@@ -80,7 +81,7 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
                     </Link>
                 ))}
             </Row>
-            {isArpeggio(config.type) && (
+            <Show when={isArpeggio(config.type)}>
                 <Row label={m.exercise_inversion()}>
                     {inversions.map(([inversion, label]) => (
                         <Link
@@ -92,8 +93,8 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
                         </Link>
                     ))}
                 </Row>
-            )}
-            {showIntervals && (
+            </Show>
+            <Show when={showIntervals}>
                 <Row label={m.exercise_intervals()}>
                     {intervals.map(([interval, label]) => (
                         <Link
@@ -105,7 +106,7 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
                         </Link>
                     ))}
                 </Row>
-            )}
+            </Show>
         </div>
     );
 }

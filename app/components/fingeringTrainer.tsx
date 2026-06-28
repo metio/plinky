@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Show } from "./conditional";
 import { useSynth } from "../hooks/useSynth";
 import { drillToMusicXml } from "../lib/drillStaff";
 import {
@@ -235,11 +236,11 @@ export function FingeringDrill({
                 ))}
             </div>
 
-            {hints && (
+            <Show when={hints}>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                     {m.fingering_color_legend()}
                 </p>
-            )}
+            </Show>
 
             {result ? (
                 <div className="space-y-3">
@@ -260,7 +261,7 @@ export function FingeringDrill({
                                     ? m.fingering_comfortable()
                                     : m.fingering_reconsider()}
                             </p>
-                            {result.reconsider.length > 0 && (
+                            <Show when={result.reconsider.length > 0}>
                                 <ul className="list-disc space-y-0.5 pl-4 text-gray-600 dark:text-gray-400">
                                     {result.reconsider.map((index) => {
                                         const pos = positions[index]!;
@@ -279,7 +280,7 @@ export function FingeringDrill({
                                         );
                                     })}
                                 </ul>
-                            )}
+                            </Show>
                         </div>
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">

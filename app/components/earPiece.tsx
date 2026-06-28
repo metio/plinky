@@ -7,6 +7,7 @@ import { useSynth } from "../hooks/useSynth";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { scoreToBars, windowPositions } from "../lib/scoreToBars";
 import { m } from "../paraglide/messages.js";
+import { Show } from "./conditional";
 import { KeyboardHint } from "./keyboardHint";
 import { PianoKeyboard } from "./pianoKeyboard";
 
@@ -150,12 +151,12 @@ export function EarPiece({ xml }: { xml: string }) {
                     )}
                 </p>
             )}
-            {attempts > 0 && (
+            <Show when={attempts > 0}>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                     <span className="font-mono">{correct}</span>/
                     <span className="font-mono">{attempts}</span> {m.sprint_correct_label()}
                 </p>
-            )}
+            </Show>
 
             <PianoKeyboard expected={[]} />
             <KeyboardHint octaveOffset={octaveOffset} />

@@ -27,6 +27,7 @@ import { hasSeenHint, markHintSeen } from "../lib/seenHints";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import type { Grid } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
+import { Show } from "./conditional";
 import { LocalizedLink as Link } from "./localizedLink";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
@@ -155,11 +156,11 @@ export function YouView() {
                 </span>
                 <span className="flex flex-col items-end gap-0.5 text-right text-sm text-gray-600 dark:text-gray-400">
                     <span>{m.grades_skill({ rating: skill })}</span>
-                    {mode === "competitive" && (
+                    <Show when={mode === "competitive"}>
                         <span className="font-medium text-amber-700 dark:text-amber-400">
                             ⚔️ {m.grades_competitive()}
                         </span>
-                    )}
+                    </Show>
                 </span>
             </div>
 
@@ -174,7 +175,7 @@ export function YouView() {
                 </div>
             )}
 
-            {level >= 1 && (
+            <Show when={level >= 1}>
                 <section className="space-y-2">
                     <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         {m.grades_share_heading()}
@@ -188,9 +189,9 @@ export function YouView() {
                         imageText={m.milestone_grade_boast({ level })}
                     />
                 </section>
-            )}
+            </Show>
 
-            {showDiscovery && (
+            <Show when={showDiscovery}>
                 <section className="space-y-3 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
                     <div className="flex items-start justify-between gap-2">
                         <h2 className="font-semibold text-indigo-800 dark:text-indigo-200">
@@ -242,9 +243,9 @@ export function YouView() {
                         })}
                     </ul>
                 </section>
-            )}
+            </Show>
 
-            {upNext.length > 0 && (
+            <Show when={upNext.length > 0}>
                 <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
                     <h2 className="text-sm font-medium text-indigo-800 dark:text-indigo-200">
                         {m.grades_up_next({ grade: workingGrade })}
@@ -259,7 +260,7 @@ export function YouView() {
                         ))}
                     </ul>
                 </section>
-            )}
+            </Show>
 
             <ul className="space-y-2">
                 {grades.map((grade) => {
@@ -300,11 +301,11 @@ export function YouView() {
                                               })
                                             : m.grades_maxed()}
                                     </span>
-                                    {due > 0 && (
+                                    <Show when={due > 0}>
                                         <span className="text-amber-700 dark:text-amber-400">
                                             {m.grades_due({ count: due })}
                                         </span>
-                                    )}
+                                    </Show>
                                 </span>
                             </div>
                             <details className="text-sm">

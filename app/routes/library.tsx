@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Show } from "../components/conditional";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreBackup } from "../components/scoreBackup";
 import { GradeChip } from "../components/scoreGrade";
@@ -167,11 +168,11 @@ export default function LibraryRoute() {
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.library_heading()}</h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.library_intro()}</p>
-                {dueCount > 0 && (
+                <Show when={dueCount > 0}>
                     <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
                         {m.mastery_due_count({ count: dueCount })}
                     </p>
-                )}
+                </Show>
             </header>
 
             {/* The catalogue runs to thousands of songs, so the "it isn't here, add
@@ -248,7 +249,7 @@ export default function LibraryRoute() {
                 >
                     {m.scores_filter_favorites()}
                 </button>
-                {dueCount > 0 && (
+                <Show when={dueCount > 0}>
                     <button
                         type="button"
                         onClick={() => setDueOnly((on) => !on)}
@@ -257,7 +258,7 @@ export default function LibraryRoute() {
                     >
                         {m.library_filter_due()}
                     </button>
-                )}
+                </Show>
             </div>
 
             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -336,7 +337,7 @@ export default function LibraryRoute() {
                         </ul>
                     )}
 
-                    {visible < matches.length && (
+                    <Show when={visible < matches.length}>
                         <button
                             type="button"
                             onClick={() => setVisible((count) => count + PER_PAGE)}
@@ -344,7 +345,7 @@ export default function LibraryRoute() {
                         >
                             {m.library_show_more()}
                         </button>
-                    )}
+                    </Show>
 
                     <ScoreBackup />
 

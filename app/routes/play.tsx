@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
+import { Show } from "../components/conditional";
 import { EarPiece } from "../components/earPiece";
 import { ExerciseForms } from "../components/exerciseForms";
 import { LocalizedLink as Link } from "../components/localizedLink";
@@ -58,7 +59,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
 
                     <PlayModeBar mode={mode} onChange={setMode} />
 
-                    {mode === "play" && (
+                    <Show when={mode === "play"}>
                         <>
                             {parseExerciseId(score.id) && (
                                 <ExerciseForms config={parseExerciseId(score.id)!} />
@@ -73,14 +74,14 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 canShareGhost
                             />
                         </>
-                    )}
+                    </Show>
                     {mode === "ear" && <EarPiece xml={score.xml} />}
                     {mode === "fingering" && <PieceFingering id={score.id} xml={score.xml} />}
                 </>
             )}
-            {score === null && (
+            <Show when={score === null}>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.play_not_found()}</p>
-            )}
+            </Show>
             <Link to="/library" className="text-sm text-indigo-700 underline dark:text-indigo-300">
                 {m.library_heading()}
             </Link>
