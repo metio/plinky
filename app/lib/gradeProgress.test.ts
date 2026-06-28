@@ -80,19 +80,30 @@ describe("starTier", () => {
 });
 
 describe("currentGrade", () => {
-    it("is the highest grade with Bronze, requiring every grade below it", () => {
-        const items = [...learnedGrade(1, 5), ...learnedGrade(2, 5), ...learnedGrade(3, 4)];
-        expect(currentGrade(items, "gentle", NOW)).toBe(2);
+    it("is the highest grade with two pieces played at B or better", () => {
+        const items = [...learnedGrade(1, 3), ...learnedGrade(2, 2)];
+        expect(currentGrade(items)).toBe(2);
     });
 
-    it("a gap below caps the climb even if a higher grade qualifies", () => {
-        // Grade 1 short of Bronze, grades 2 and 3 well past it.
-        const items = [...learnedGrade(1, 4), ...learnedGrade(2, 9), ...learnedGrade(3, 9)];
-        expect(currentGrade(items, "gentle", NOW)).toBe(0);
+    it("skips ahead — a higher grade played well counts despite gaps below", () => {
+        // Nothing in grades 1–4, but two Grade 5 pieces played well.
+        expect(currentGrade(learnedGrade(5, 2))).toBe(5);
+    });
+
+    it("needs two — one well-played piece doesn't promote", () => {
+        expect(currentGrade(learnedGrade(3, 1))).toBe(0);
+    });
+
+    it("ignores pieces played below the ability bar", () => {
+        const items = [
+            item("a", 2, 2, fresh({ bestScore: 70 })), // a C, below B
+            item("b", 2, 2, fresh({ bestScore: 80 })),
+        ];
+        expect(currentGrade(items)).toBe(0);
     });
 
     it("is zero before any grade is earned", () => {
-        expect(currentGrade(learnedGrade(1, 4), "gentle", NOW)).toBe(0);
+        expect(currentGrade(learnedGrade(1, 1))).toBe(0);
     });
 });
 

@@ -27,7 +27,7 @@ export function GradeBadge() {
                 if (!cancelled) {
                     const mode = loadPrefs().decayMode;
                     const now = Date.now();
-                    setLevel(currentGrade(items, mode, now));
+                    setLevel(currentGrade(items));
                     setSkill(skillRating(items, mode, now));
                     setCompetitive(mode === "competitive");
                 }

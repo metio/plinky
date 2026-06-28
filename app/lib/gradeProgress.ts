@@ -3,7 +3,8 @@
 
 import { loadBundledScores, loadUserScores } from "./catalog";
 import { loadExerciseManifest } from "./exercises";
-import { isDue, isLapsed, loadAllMastery, type Mastery } from "./mastery";
+import type { Letter } from "./grade";
+import { isDue, isLapsed, letterMin, loadAllMastery, type Mastery } from "./mastery";
 import { gradeOf, MAX_GRADE, rawDifficulty } from "./scoreDifficulty";
 import { loadManifest } from "./songs";
 
@@ -67,16 +68,25 @@ export function starTier(masteredCount: number): StarTier {
     return "none";
 }
 
-// The grade reached: the highest grade for which it — and every grade below it — has
-// at least a Bronze. Requirements only rise, so the first grade short of Bronze caps
-// the climb. Nothing is ever locked; this is just the standing shown.
-export function currentGrade(items: GradedMastery[], mode: DecayMode, now: number): number {
+// Ability over grind: the grade reached is the highest grade where you've played a few
+// pieces *well* (at least B), not where you've ground out a full pool. So a strong player
+// who sight-reads Grade 7 is placed at Grade 7 without first mastering five pieces of
+// every grade below — but a single lucky run can't promote them, since it takes two.
+// Ability is what you can do, so it doesn't decay (the stars and freshness below do).
+export const ABILITY_LETTER: Letter = "B";
+export const ABILITY_PIECES = 2;
+
+// How many pieces of a grade you've played at the ability bar or better.
+export function playedWellInGrade(items: GradedMastery[], grade: number): number {
+    const bar = letterMin(ABILITY_LETTER);
+    return items.filter((item) => item.grade === grade && item.mastery.bestScore >= bar).length;
+}
+
+export function currentGrade(items: GradedMastery[]): number {
     let grade = 0;
     for (let g = 1; g <= MAX_GRADE; g++) {
-        if (masteredInGrade(items, g, mode, now) >= STAR_THRESHOLDS.bronze) {
+        if (playedWellInGrade(items, g) >= ABILITY_PIECES) {
             grade = g;
-        } else {
-            break;
         }
     }
     return grade;

@@ -92,7 +92,7 @@ export function YouView() {
     const prefs = loadPrefs();
     const mode = prefs.decayMode;
     const resolved = items;
-    const level = currentGrade(resolved, mode, now);
+    const level = currentGrade(resolved);
     const steps = firstSteps();
     const showOnboarding = level === 0 && !allFirstStepsDone(steps);
     const skill = skillRating(resolved, mode, now);

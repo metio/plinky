@@ -58,7 +58,7 @@ export function HomeToday() {
             }
             const now = Date.now();
             const prefs = loadPrefs();
-            const level = currentGrade(items, prefs.decayMode, now);
+            const level = currentGrade(items);
             const workingGrade = Math.min(level + 1, MAX_GRADE);
             const mastered = new Set(
                 items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
