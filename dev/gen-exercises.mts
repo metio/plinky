@@ -76,6 +76,9 @@ const cleanText = (value: string): string =>
         .replace(/\s+/g, " ")
         .trim();
 
+const normalizeTitle = (title: string): string =>
+    (title || "").toLowerCase().trim().replace(/\s+/g, " ");
+
 function sourceStudies(): void {
     if (!existsSync(`${ROOT}/PDMX.csv`)) {
         console.log("No PDMX corpus found — skipping studies.");
@@ -90,7 +93,8 @@ function sourceStudies(): void {
         skip_empty_lines: true,
     }) as Record<string, string>[];
     const seen = new Set<string>();
-    let found = 0;
+    type Sourced = { entry: Entry; cid: string; src: string; quality: number };
+    const sourced: Sourced[] = [];
     for (const row of rows) {
         const mxl = (row.mxl ?? "").replace(/^\.\//, "");
         const bars = Number(row["song_length.bars"]);
@@ -110,7 +114,7 @@ function sourceStudies(): void {
         }
         const name = cleanText(row.song_name ?? "");
         const composer = cleanText(row.composer_name || row.artist_name || "");
-        // Drop near-duplicate re-uploads of the same étude.
+        // Drop byte-for-byte re-uploads of the same étude before the costlier read.
         const key = `${name}|${composer}|${bars}|${notes}`;
         if (seen.has(key)) {
             continue;
@@ -120,21 +124,40 @@ function sourceStudies(): void {
             const xml = readMusicXml(`${ROOT}/${mxl}`);
             const cid = (mxl.split("/").pop() ?? mxl).replace(/\.mxl$/, "");
             const id = `study-${cid}`;
-            entries.push({
-                id,
-                title: name && name !== "NA" ? name : "Study",
-                grade: gradeOf(id, xml),
-                cost: rawDifficulty(xml),
-                kind: "study",
-                composer: composer && composer !== "NA" ? composer : "",
+            sourced.push({
+                entry: {
+                    id,
+                    title: name && name !== "NA" ? name : "Study",
+                    grade: gradeOf(id, xml),
+                    cost: rawDifficulty(xml),
+                    kind: "study",
+                    composer: composer && composer !== "NA" ? composer : "",
+                },
+                cid,
+                src: `${ROOT}/${mxl}`,
+                // PDMX crowd-quality, to pick the representative when collapsing by title.
+                quality: (Number(row.rating) || 0) * 1e9 + (Number(row.n_favorites) || 0) * 1e4 + (Number(row.n_views) || 0),
             });
-            studyFiles.push({ cid, src: `${ROOT}/${mxl}` });
-            found += 1;
         } catch {
             // Skip an unreadable transcription.
         }
     }
-    console.log(`Sourced ${found} studies from PDMX.`);
+    // Collapse to one étude per title: PDMX titles are usually the method-book name
+    // ("Études Enfantines Op.37"), so distinct exercises share a title and read as
+    // duplicate rows. Keep the highest-quality representative of each.
+    const best = new Map<string, Sourced>();
+    for (const study of sourced) {
+        const key = normalizeTitle(study.entry.title);
+        const current = best.get(key);
+        if (!current || study.quality > current.quality) {
+            best.set(key, study);
+        }
+    }
+    for (const study of best.values()) {
+        entries.push(study.entry);
+        studyFiles.push({ cid: study.cid, src: study.src });
+    }
+    console.log(`Sourced ${best.size} studies from PDMX (collapsed from ${sourced.length} by title).`);
 }
 
 sourceStudies();

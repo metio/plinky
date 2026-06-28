@@ -33,6 +33,11 @@ type Candidate = {
     title: string;
     composer: string;
     bars: number;
+    // PDMX crowd-quality, kept to pick the best representative when collapsing the
+    // many same-title scores (opus/collection titles) down to one — see dedupeByTitle.
+    rating: number;
+    favorites: number;
+    views: number;
 };
 type Scored = Candidate & { cost: number; tempo: number; beatsPerBar: number; src: string };
 
@@ -78,7 +83,32 @@ function toCandidate(row: Record<string, string>): Candidate {
         title: clean(row.song_name) || clean(row.title) || "Untitled",
         composer: clean(row.composer_name) || clean(row.artist_name),
         bars: Number(row["song_length.bars"]) || 0,
+        rating: Number(row.rating) || 0,
+        favorites: Number(row.n_favorites) || 0,
+        views: Number(row.n_views) || 0,
     };
+}
+
+// PDMX titles are frequently the opus / collection name, so many distinct movements
+// (and some true re-transcriptions) share a title and read as duplicate rows in the
+// library. Keep one per title — the highest-quality by PDMX rating, then favourites,
+// then views, then a fuller piece. (The standalone `npm run songs:dedup` applies the
+// same collapse to an already-imported catalogue without re-grading.)
+const normalizeTitle = (title: string): string =>
+    (title || "").toLowerCase().trim().replace(/\s+/g, " ");
+
+function dedupeByTitle<T extends Candidate>(songs: T[]): T[] {
+    const better = (a: T, b: T): number =>
+        a.rating - b.rating || a.favorites - b.favorites || a.views - b.views || a.bars - b.bars;
+    const best = new Map<string, T>();
+    for (const song of songs) {
+        const key = normalizeTitle(song.title);
+        const current = best.get(key);
+        if (!current || better(song, current) > 0) {
+            best.set(key, song);
+        }
+    }
+    return [...best.values()];
 }
 
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
@@ -147,13 +177,18 @@ async function main() {
         }
     }
 
+    // Collapse same-title scores to one before grading, so duplicate-looking rows never
+    // reach the library and the octiles are balanced over distinct titles.
+    const unique = dedupeByTitle(scored);
+    console.log(`${unique.length} unique titles after collapsing ${scored.length} scored.`);
+
     // Even grades by construction: sort by cost, then split into MAX_GRADE equal bins.
     // The bin boundaries are the cost thresholds to bake into the engine.
-    scored.sort((a, b) => a.cost - b.cost);
-    const n = scored.length;
+    unique.sort((a, b) => a.cost - b.cost);
+    const n = unique.length;
     const boundaries: number[] = [];
     for (let g = 1; g < MAX_GRADE; g++) {
-        boundaries.push(Number((scored[Math.floor((g * n) / MAX_GRADE)]?.cost ?? 0).toFixed(3)));
+        boundaries.push(Number((unique[Math.floor((g * n) / MAX_GRADE)]?.cost ?? 0).toFixed(3)));
     }
     // Grade by the same threshold walk gradeOf uses, so the manifest grade matches
     // the in-app chip exactly once the boundaries are baked into GRADE_THRESHOLDS.
@@ -167,7 +202,7 @@ async function main() {
         }
         return grade;
     };
-    const songs = scored.map((song) => ({ ...song, grade: gradeFor(song.cost) }));
+    const songs = unique.map((song) => ({ ...song, grade: gradeFor(song.cost) }));
 
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of songs) {
