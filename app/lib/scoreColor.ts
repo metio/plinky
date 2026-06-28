@@ -11,6 +11,9 @@ export const PLAYED_COLOR = "#22c55e";
 export const GHOST_COLOR = "#a855f7";
 // The score is always rendered on white, so an unplayed note is plain black.
 export const NOTE_COLOR = "#000000";
+// The active window in a read-only context staff — the bars currently being fingered
+// or heard, indigo to match the app's accent and stand out from the black notes.
+export const WINDOW_COLOR = "#6366f1";
 
 // Which staff (treble = 0, bass = 1) each hand reads from — mirrors the matcher,
 // so the notes collected for the ghost line up with the positions it counts.
@@ -68,6 +71,33 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
     }
     osmd.cursor.reset();
     return steps;
+}
+
+// Paints every note in a half-open range of measures (0-based, matching scoreToBars'
+// bar index) one colour, leaving the rest untouched — used to light up the active
+// window in a read-only context staff. Walks the cursor, so it leaves it reset+hidden.
+export function paintMeasureRange(
+    osmd: OpenSheetMusicDisplay,
+    from: number,
+    to: number,
+    color: string,
+): void {
+    osmd.cursor.show();
+    osmd.cursor.reset();
+    while (!osmd.cursor.iterator.EndReached) {
+        const measure = osmd.cursor.iterator.CurrentMeasureIndex;
+        if (measure >= from && measure < to) {
+            for (const gNote of osmd.cursor.GNotesUnderCursor()) {
+                const element = svgOf(gNote);
+                if (element) {
+                    paintElement(element, color);
+                }
+            }
+        }
+        osmd.cursor.next();
+    }
+    osmd.cursor.reset();
+    osmd.cursor.hide();
 }
 
 // Paints the noteheads at the cursor's current position whose pitch was just

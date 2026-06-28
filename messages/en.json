@@ -365,6 +365,7 @@
   "fingering_reason_repeat": "same finger across a leap",
   "fingering_reason_general": "a comfier finger fits",
   "fingering_staff_label": "The drill on a staff",
+  "window_staff_label": "The whole piece, with the bars you're fingering highlighted",
   "fingering_empty": "Nothing to finger in this passage — try the other hand or the next bars.",
   "fingering_bars": "Bars {from}–{to} of {total}",
   "fingering_prev_bars": "Previous bars",

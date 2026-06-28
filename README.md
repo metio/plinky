@@ -55,7 +55,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   **Play** (read, hear, and practise it), **Ear** (hear a two-bar phrase and play it
   back), or **Fingering** (choose a fingering for a two-bar window; each note lights
   **green/amber/red** as you go to show how the move flows, it's scored against the most
-  economical fingering for your hand, and it's **saved per piece** so the fingering you
+  economical fingering for your hand, the two bars you're on are **highlighted in the
+  full piece** so you keep your place, and it's **saved per piece** so the fingering you
   work out is there when you come back).
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, your day streak, days practised and

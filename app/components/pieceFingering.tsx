@@ -12,6 +12,7 @@ import {
 import { scoreToBars, staffFor, windowCells, windowPositions } from "../lib/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
+import { WindowStaff } from "./windowStaff";
 
 // Two bars at a time keeps the choice small — you don't finger a whole song at once —
 // and gives enough context to reason about the next move.
@@ -94,6 +95,13 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                     </button>
                 </span>
             </div>
+
+            <WindowStaff
+                xml={xml}
+                from={clamped}
+                to={clamped + WINDOW}
+                label={m.window_staff_label()}
+            />
 
             <FingeringDrill
                 key={`${hand}-${clamped}-${version}`}
