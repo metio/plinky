@@ -18,6 +18,7 @@ import { parse } from "csv-parse";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 import { copyrightReason } from "./copyrightSignals.mts";
+import { isPublicDomain } from "./publicDomain.mts";
 import { nonSoloPianoReason } from "./scoreInstrument.mts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
@@ -48,8 +49,13 @@ function passes(row: Record<string, string>): boolean {
     // Note: the strict single-track grand-piano gate (row.tracks === "0") is dropped —
     // nonSoloPianoReason now reads each .mxl and keeps only true solo/duet piano, which
     // admits far more clean candidates than the conservative track filter did.
+    const composer = (row.composer_name || row.artist_name || "").trim();
+    const title = (row.song_name || row.title || "").trim();
     return (
         (row.license === "publicdomain" || row.license === "cc-zero") &&
+        // PDMX's CC0 tag is unreliable — only admit compositions we can show are public
+        // domain. Sheet music of a copyrighted song infringes the composition.
+        isPublicDomain(composer, title) &&
         row["subset:rated_deduplicated"] === "True" &&
         row["subset:no_license_conflict"] === "True" &&
         row.is_draft === "False" &&
