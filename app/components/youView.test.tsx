@@ -62,7 +62,7 @@ describe("YouView", () => {
         // Standing (Grade 1 shows in the headline and the roadmap row) and the
         // retrospective stats merged in from /progress.
         expect(screen.getAllByText("Grade 1").length).toBeGreaterThan(0);
-        expect(screen.getByText(/day streak/i)).toBeTruthy();
+        expect(screen.getByText("Days practiced")).toBeTruthy();
     });
 
     it("offers a brand-new player the feature-discovery checklist", async () => {

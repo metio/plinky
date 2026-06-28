@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
-import { recordDailyDone } from "./dailyStreak";
+import { recordDailyDone } from "./dailyDone";
 import { recordPractice } from "./history";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import { markLearned, saveMastery } from "./mastery";

@@ -76,7 +76,6 @@
   "tracks_minutes_prefix": "~{minutes} min · ",
   "progress_heading": "Progreso",
   "progress_intro": "La práctica se registra en este dispositivo: termina una ronda en cualquier modo para sumar.",
-  "progress_day_streak": "Racha de días",
   "progress_days_practiced": "Días practicados",
   "progress_notes_played": "Notas tocadas",
   "progress_last_7_days": "Últimos 7 días",

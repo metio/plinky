@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { dailyNumber, todayKey } from "../lib/daily";
-import { loadDailyStreak } from "../lib/dailyStreak";
+import { lastDailyDone } from "../lib/dailyDone";
 import {
     currentGrade,
     dueReviews,
@@ -11,7 +11,6 @@ import {
     loadGradeCatalogue,
     loadGradedMastery,
 } from "../lib/gradeProgress";
-import { currentStreak, loadHistory } from "../lib/history";
 import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import { type Task, todayTasks } from "../lib/today";
@@ -38,20 +37,15 @@ function taskLabel(task: Task): string {
     }
 }
 
-// The home page's "open the app, here's what to do" panel: a streak nudge plus a
-// short, prioritised task list (refresh what's fading, the daily, something new) —
-// each a one-tap link straight into practice. Reads local state after mount, so it's
-// absent from the prerendered shell and appears once the client resolves it.
+// The home page's "open the app, here's what to do" panel: a short, prioritised task
+// list (refresh what's fading, the daily, something new) — each a one-tap link
+// straight into practice. Reads local state after mount, so it's absent from the
+// prerendered shell and appears once the client resolves it.
 export function HomeToday() {
     const [tasks, setTasks] = useState<Task[] | null>(null);
-    const [streak, setStreak] = useState(0);
-    const [playedToday, setPlayedToday] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
-        const history = loadHistory();
-        setStreak(currentStreak(history));
-        setPlayedToday((history[todayKey(new Date())] ?? 0) > 0);
         Promise.all([loadGradedMastery(), loadGradeCatalogue()]).then(([items, catalogue]) => {
             if (cancelled) {
                 return;
@@ -64,7 +58,7 @@ export function HomeToday() {
                 items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
             );
             const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
-            const dailyDoneToday = loadDailyStreak().last === dailyNumber(todayKey(new Date()));
+            const dailyDoneToday = lastDailyDone() === dailyNumber(todayKey(new Date()));
             setTasks(
                 todayTasks({
                     dueIds: dueReviews(items, now, prefs.reviewCap),
@@ -84,19 +78,9 @@ export function HomeToday() {
 
     return (
         <section className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50/50 p-5 dark:border-indigo-900 dark:bg-indigo-950/30">
-            <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">
-                    {m.today_heading()}
-                </h2>
-                {streak > 0 && (
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                        🔥{" "}
-                        {playedToday
-                            ? m.today_streak_done({ count: streak })
-                            : m.today_streak_keep({ count: streak })}
-                    </span>
-                )}
-            </div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">
+                {m.today_heading()}
+            </h2>
             <ul className="space-y-2">
                 {tasks.map((task) => (
                     <li key={task.key}>

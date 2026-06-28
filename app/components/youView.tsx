@@ -84,7 +84,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 // The "You" page: how good you are at playing, in one place. Standing (grade + skill)
-// and activity (streak, days, notes) up top; what to play next and the grade roadmap;
+// and activity (days, notes) up top; what to play next and the grade roadmap;
 // the single refresh queue; then the retrospective — a 7-day chart and the lifetime
 // Accuracy/Timing/Flow fingerprint. Reads mastery, the catalogue and practice history
 // after mount, so the personal data is absent from the prerendered shell.
@@ -165,8 +165,7 @@ export function YouView() {
             </div>
 
             {summary && (
-                <div className="grid grid-cols-3 gap-4">
-                    <Stat label={m.progress_day_streak()} value={`${summary.currentStreak} 🔥`} />
+                <div className="grid grid-cols-2 gap-4">
                     <Stat
                         label={m.progress_days_practiced()}
                         value={String(summary.daysPracticed)}
@@ -390,9 +389,7 @@ export function YouView() {
                     rowLabels={[m.scores_accuracy(), m.scores_timing(), m.scores_flow()]}
                     boast={m.progress_share_boast()}
                     heading={
-                        summary
-                            ? `Plinky ${summary.currentStreak}·${summary.daysPracticed}·${summary.totalNotes}`
-                            : "Plinky"
+                        summary ? `Plinky ${summary.daysPracticed}·${summary.totalNotes}` : "Plinky"
                     }
                 />
             )}

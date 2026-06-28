@@ -60,20 +60,18 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                     <PlayModeBar mode={mode} onChange={setMode} />
 
                     <Show when={mode === "play"}>
-                        <>
-                            {parseExerciseId(score.id) && (
-                                <ExerciseForms config={parseExerciseId(score.id)!} />
-                            )}
-                            <ScoreViewer
-                                key={score.id}
-                                id={score.id}
-                                xml={score.xml}
-                                title={score.title}
-                                initialTempo={score.tempo}
-                                beatsPerBar={score.beatsPerBar}
-                                canShareGhost
-                            />
-                        </>
+                        {parseExerciseId(score.id) && (
+                            <ExerciseForms config={parseExerciseId(score.id)!} />
+                        )}
+                        <ScoreViewer
+                            key={score.id}
+                            id={score.id}
+                            xml={score.xml}
+                            title={score.title}
+                            initialTempo={score.tempo}
+                            beatsPerBar={score.beatsPerBar}
+                            canShareGhost
+                        />
                     </Show>
                     {mode === "ear" && <EarPiece xml={score.xml} />}
                     {mode === "fingering" && <PieceFingering id={score.id} xml={score.xml} />}

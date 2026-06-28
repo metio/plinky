@@ -76,7 +76,6 @@
   "tracks_minutes_prefix": "약 {minutes}분 · ",
   "progress_heading": "진행 상황",
   "progress_intro": "연습은 이 기기에 기록돼요 — 어떤 모드든 한 번 끝내면 기록에 더해져요.",
-  "progress_day_streak": "연속 일수",
   "progress_days_practiced": "연습한 날",
   "progress_notes_played": "연주한 음표",
   "progress_last_7_days": "지난 7일",

@@ -14,7 +14,7 @@ import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import { annotateFingerings } from "../lib/fingerScore";
 import { computeFlow } from "../lib/flow";
-import { recordDailyDone } from "../lib/dailyStreak";
+import { recordDailyDone } from "../lib/dailyDone";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
 import { nextKeyboardWindow, type Span } from "../lib/keyboardWindow";
@@ -126,7 +126,7 @@ export function ScoreViewer({
     // it as "Plinky #N" rather than by the piece, so everyone compares one grid.
     daily?: number;
     // A throwaway piece, like a freshly generated sprint, that still counts toward
-    // the streak and fingerprint but is never tracked for spaced repetition.
+    // the practice history and fingerprint but is never tracked for spaced repetition.
     ephemeral?: boolean;
     // Bundled pieces have a stable id every player shares, so their ghost can be
     // sent to a friend by link and loaded back via a ?ghost= code.
@@ -262,7 +262,6 @@ export function ScoreViewer({
     // reads the same windows as the grade and share grid.
     const [runTolerance, setRunTolerance] = useState(PRECISE_TOLERANCE);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
-    const [dailyStreak, setDailyStreak] = useState(0);
     const [tempoCurve, setTempoCurve] = useState<{
         points: TempoPoint[];
         median: number;
@@ -492,12 +491,11 @@ export function ScoreViewer({
         );
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
-        // A finished daily extends the Wordle-style daily streak (before the practice
-        // record fires PRACTICE_EVENT, so listeners read the updated streak).
+        // Mark the day's challenge done so it shows a ✓ — no streak, just "played".
         if (daily != null) {
-            setDailyStreak(recordDailyDone(daily).streak);
+            recordDailyDone(daily);
         }
-        // Count the run's notes toward the practice streak.
+        // Count the run's notes toward the practice history.
         recordPractice(matcher.total);
         if (ephemeral) {
             return;
@@ -1533,12 +1531,15 @@ export function ScoreViewer({
                                     ]}
                                     boast={
                                         daily != null
-                                            ? `${m.daily_share_boast({ number: daily, grade: grade.letter })}${dailyStreak > 1 ? ` · 🔥${dailyStreak}` : ""}`
+                                            ? m.daily_share_boast({
+                                                  number: daily,
+                                                  grade: grade.letter,
+                                              })
                                             : m.share_boast({ title })
                                     }
                                     heading={
                                         daily != null
-                                            ? `🎹 Plinky #${daily} ${grade.letter}${dailyStreak > 1 ? ` · 🔥${dailyStreak}` : ""}`
+                                            ? `🎹 Plinky #${daily} ${grade.letter}`
                                             : title
                                     }
                                 />

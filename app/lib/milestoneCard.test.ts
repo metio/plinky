@@ -22,9 +22,9 @@ describe("svgMilestone", () => {
     });
 
     it("omits the detail line when there is none", () => {
-        const doc = parse(svgMilestone({ title: "100-day streak" }));
+        const doc = parse(svgMilestone({ title: "Grade 5" }));
         const texts = [...doc.querySelectorAll("text")].map((t) => t.textContent);
-        expect(texts).toContain("100-day streak");
+        expect(texts).toContain("Grade 5");
         expect(texts).not.toContain("Skill");
     });
 

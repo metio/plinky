@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { loadDailyStreak } from "./dailyStreak";
+import { lastDailyDone } from "./dailyDone";
 import { loadHistory } from "./history";
 import { isDefaultKeyMap } from "./keyMap";
 import { loadAllMastery } from "./mastery";
@@ -62,7 +62,7 @@ export function discoveries(): Record<DiscoveryId, boolean> {
         played:
             loadAllMastery().length > 0 || Object.values(loadHistory()).some((notes) => notes > 0),
         handSet: span.left !== null || span.right !== null,
-        dailyDone: loadDailyStreak().last > 0,
+        dailyDone: lastDailyDone() > 0,
         earTried: marked.has("earTried"),
         fingeringTried: marked.has("fingeringTried"),
         composed: marked.has("composed"),

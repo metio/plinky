@@ -30,24 +30,6 @@ describe("summarizePractice", () => {
         expect(summary.daysPracticed).toBe(2);
     });
 
-    it("counts a consecutive streak ending today", () => {
-        const summary = summarizePractice(
-            { "2026-06-21": 5, "2026-06-22": 5, "2026-06-23": 5 },
-            NOW,
-        );
-        expect(summary.currentStreak).toBe(3);
-    });
-
-    it("keeps the streak alive when today has no practice yet", () => {
-        const summary = summarizePractice({ "2026-06-21": 5, "2026-06-22": 5 }, NOW);
-        expect(summary.currentStreak).toBe(2);
-    });
-
-    it("breaks the streak after a missed day", () => {
-        const summary = summarizePractice({ "2026-06-20": 5 }, NOW);
-        expect(summary.currentStreak).toBe(0);
-    });
-
     it("returns the last seven days in order", () => {
         const summary = summarizePractice({ "2026-06-23": 7 }, NOW);
         expect(summary.recent).toHaveLength(7);

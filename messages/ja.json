@@ -76,7 +76,6 @@
   "tracks_minutes_prefix": "約{minutes}分 · ",
   "progress_heading": "進捗",
   "progress_intro": "練習はこのデバイスで記録されます — どのモードでも演奏を終えると記録に加わります。",
-  "progress_day_streak": "連続日数",
   "progress_days_practiced": "練習した日数",
   "progress_notes_played": "演奏した音符数",
   "progress_last_7_days": "過去7日間",

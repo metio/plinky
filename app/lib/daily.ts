@@ -5,8 +5,8 @@ import { generatePhrase } from "./generator";
 import { hashString, seededRandom } from "./random";
 
 // The viewer's current calendar day as YYYY-MM-DD, in their own time zone. It
-// seeds the daily challenge and bounds the practice log, so both a new challenge
-// and a streak day roll over at local midnight — the same rule Wordle uses. Two
+// seeds the daily challenge and bounds the practice log, so a new challenge rolls
+// over at local midnight — the same rule Wordle uses. Two
 // players in different zones can therefore be on different days at the same instant.
 export function todayKey(now: Date): string {
     const year = now.getFullYear();

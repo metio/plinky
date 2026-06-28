@@ -76,7 +76,6 @@
   "tracks_minutes_prefix": "~{minutes} min · ",
   "progress_heading": "Progression",
   "progress_intro": "Votre entraînement est suivi sur cet appareil : terminez une partie dans n'importe quel mode pour l'enrichir.",
-  "progress_day_streak": "Jours d'affilée",
   "progress_days_practiced": "Jours d'entraînement",
   "progress_notes_played": "Notes jouées",
   "progress_last_7_days": "7 derniers jours",

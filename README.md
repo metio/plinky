@@ -62,8 +62,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import. Search, star, filter
   by kind, grade, or what's **due now**, and open one to practise.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
-  graded and shareable as a "Plinky #N" grid, with a **streak** for coming back. A
-  **Warm up** tab drills unlimited fresh phrases to prepare for it.
+  graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
+  streak to keep up. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
   a staff to share or export (see below).
 - **Any piece, three ways** — open a score and a tab bar switches how you work it:
@@ -75,8 +75,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   full piece** so you keep your place, and it's **saved per piece** so the fingering you
   work out is there when you come back).
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
-  what's left to reach the next, your skill rating, your day streak, days practised and
-  notes played, a slow-moving fingerprint of your Accuracy, Timing and Flow, and the
+  what's left to reach the next, your skill rating, days practised and notes played, a
+  slow-moving fingerprint of your Accuracy, Timing and Flow, and the
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
   carries an optional *About this grade* note, and a new player gets a gentle, dismissible
   **discovery checklist** that points out the app's corners — never a gate on progress.
@@ -96,7 +96,7 @@ left off on another device.
 
 Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Timing,
 Flow) across six moments, no numbers — to copy, post, or save as an image. The
-daily challenge shares as **Plinky #N** with your streak, so everyone compares the
+daily challenge shares as **Plinky #N**, so everyone compares the
 same run, and the You page shares your lifetime fingerprint.
 
 ## Bring your own scores

@@ -15,7 +15,6 @@ import {
 import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/localizedLink";
 import { GradeBadge } from "./components/gradeBadge";
-import { StreakBadge } from "./components/streakBadge";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
@@ -84,7 +83,6 @@ function Header() {
                     <Link to="/" aria-label="Plinky home">
                         <img src="/logo-horizontal.svg" alt="Plinky" className="h-8" />
                     </Link>
-                    <StreakBadge />
                     <GradeBadge />
                 </div>
                 <div className="flex items-center gap-4">

@@ -76,7 +76,6 @@
   "tracks_minutes_prefix": "约 {minutes} 分钟 · ",
   "progress_heading": "进度",
   "progress_intro": "练习记录保存在此设备上——在任意模式下完成一轮即可计入。",
-  "progress_day_streak": "连续天数",
   "progress_days_practiced": "练习天数",
   "progress_notes_played": "已弹奏音符",
   "progress_last_7_days": "最近 7 天",

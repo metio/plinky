@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: 0BSD
 
 // A milestone share card: a branded 1080×1350 portrait announcing an achievement —
-// a grade reached, a long streak — to rasterise to PNG and share to a feed. Pure
+// a grade reached, a skill rating — to rasterise to PNG and share to a feed. Pure
 // markup so it can be tested and rasterised in the browser without a DOM. No emoji in
 // the SVG: system emoji rasterise unreliably through canvas, so the emoji rides in
 // the share *text* instead, where the platform renders it.
 
 export type MilestoneCard = {
-    // The achievement, large and central — "Grade 5", "100-day streak".
+    // The achievement, large and central — "Grade 5".
     title: string;
     // A supporting stat under it — "Skill 1840". Optional.
     detail?: string;
