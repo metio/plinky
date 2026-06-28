@@ -6,6 +6,8 @@
 [default.extend-words]
 tuplet = "tuplet"
 tuplets = "tuplets"
+# "The Weeknd" is a recording artist in the copyright denylist, not a misspelling.
+weeknd = "weeknd"
 
 # The translation catalogs and the song catalogue are intentionally in many
 # languages, and the imported PDMX manifest holds real-world titles/composers plus

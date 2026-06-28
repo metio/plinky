@@ -11,6 +11,7 @@
 
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { strFromU8, unzipSync } from "fflate";
+import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";
 
 const APPLY = process.argv.includes("--apply");
@@ -41,6 +42,12 @@ for (const song of manifest) {
     if (song.cost === 0) {
         cost0++;
     }
+    // Copyright signal lives in the metadata — no need to open the .mxl.
+    const copyright = copyrightReason(song.composer);
+    if (copyright) {
+        flagged.push({ id: song.id, title: song.title, reason: `copyright (${copyright})` });
+        byReason.copyright = (byReason.copyright ?? 0) + 1;
+    }
     let xml: string;
     try {
         xml = readMusicXml(song.id);
@@ -57,10 +64,10 @@ for (const song of manifest) {
     }
 }
 
-writeFileSync("dev/catalog-nonpiano.json", `${JSON.stringify(flagged, null, 2)}\n`);
+writeFileSync("dev/catalog-flagged.json", `${JSON.stringify(flagged, null, 2)}\n`);
 
 console.log(`Catalogue: ${manifest.length} songs`);
-console.log(`Flagged non-piano / unreadable: ${flagged.length}`);
+console.log(`Flagged (non-piano / copyright / unreadable): ${flagged.length}`);
 console.log("  by reason:", byReason);
 console.log(`cost:0 entries: ${cost0}`);
 console.log(`unreadable .mxl: ${unreadable}`);

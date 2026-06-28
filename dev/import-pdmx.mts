@@ -17,6 +17,7 @@ import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import { parse } from "csv-parse";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
+import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
@@ -114,6 +115,11 @@ async function main() {
     // unfingerable.
     const scored: Scored[] = [];
     for (const candidate of candidates) {
+        // PDMX's CC0 tag can't be trusted — many "covers" are copyrighted. Reject the
+        // ones whose composer names a known copyrighted act before doing any work.
+        if (copyrightReason(candidate.composer)) {
+            continue;
+        }
         const src = `${ROOT}/${candidate.mxl}`;
         let xml: string;
         let cost: number;
