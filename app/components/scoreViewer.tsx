@@ -536,6 +536,10 @@ export function ScoreViewer({
                 const osmd = new OpenSheetMusicDisplay(containerRef.current, {
                     autoResize: true,
                     drawingParameters: "compact",
+                    // Scroll the staff to keep the cursor in view as it advances, so a
+                    // multi-line piece follows along while you play instead of forcing
+                    // you to scroll — critical on a phone where the staff is tall.
+                    followCursor: true,
                 });
                 osmdRef.current = osmd;
                 // Print suggested fingering on the staff, personalised to the
@@ -698,11 +702,14 @@ export function ScoreViewer({
             <div className="rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800">
                 <div
                     ref={containerRef}
-                    // biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally scrollable region needs keyboard access
+                    // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard access
                     tabIndex={0}
                     role="img"
                     aria-label={title}
-                    className="overflow-x-auto"
+                    // A bounded scroll box so the follow-cursor scrolls the staff inside
+                    // it — keeping the controls and on-screen keyboard in view below
+                    // rather than scrolling the whole page out from under them.
+                    className="max-h-[70vh] overflow-auto"
                 />
                 {loadError && (
                     <p className="p-2 text-sm text-red-600 dark:text-red-400">
