@@ -18,7 +18,7 @@ import { parse } from "csv-parse";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 import { copyrightReason } from "./copyrightSignals.mts";
-import { nonPianoReason } from "./scoreInstrument.mts";
+import { nonSoloPianoReason } from "./scoreInstrument.mts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
@@ -45,9 +45,11 @@ const clean = (value: string | undefined): string => {
 function passes(row: Record<string, string>): boolean {
     const bars = Number(row["song_length.bars"]);
     const notes = Number(row.n_notes);
+    // Note: the strict single-track grand-piano gate (row.tracks === "0") is dropped —
+    // nonSoloPianoReason now reads each .mxl and keeps only true solo/duet piano, which
+    // admits far more clean candidates than the conservative track filter did.
     return (
         (row.license === "publicdomain" || row.license === "cc-zero") &&
-        row.tracks === "0" &&
         row["subset:rated_deduplicated"] === "True" &&
         row["subset:no_license_conflict"] === "True" &&
         row.is_draft === "False" &&
@@ -125,8 +127,8 @@ async function main() {
         let cost: number;
         try {
             xml = readMusicXml(src);
-            // Reject drum kits and other solo instruments — this is a piano catalogue.
-            if (nonPianoReason(xml)) {
+            // Keep only true solo/duet piano — drum kits, other instruments, ensembles.
+            if (nonSoloPianoReason(xml)) {
                 continue;
             }
             cost = rawDifficulty(xml);
