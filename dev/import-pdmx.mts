@@ -18,6 +18,7 @@ import { parse } from "csv-parse";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 import { copyrightReason } from "./copyrightSignals.mts";
+import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { isPublicDomain } from "./publicDomain.mts";
 import { nonSoloPianoReason } from "./scoreInstrument.mts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
@@ -182,33 +183,22 @@ async function main() {
     const unique = dedupeByTitle(scored);
     console.log(`${unique.length} unique titles after collapsing ${scored.length} scored.`);
 
-    // Even grades by construction: sort by cost, then split into MAX_GRADE equal bins.
+    // Even grades by construction: split the costs into MAX_GRADE equal octile bins.
     // The bin boundaries are the cost thresholds to bake into the engine.
     unique.sort((a, b) => a.cost - b.cost);
-    const n = unique.length;
-    const boundaries: number[] = [];
-    for (let g = 1; g < MAX_GRADE; g++) {
-        boundaries.push(Number((unique[Math.floor((g * n) / MAX_GRADE)]?.cost ?? 0).toFixed(3)));
-    }
+    const boundaries = octileBoundaries(
+        unique.map((song) => song.cost),
+        MAX_GRADE,
+    );
     // Grade by the same threshold walk gradeOf uses, so the manifest grade matches
     // the in-app chip exactly once the boundaries are baked into GRADE_THRESHOLDS.
-    const gradeFor = (cost: number) => {
-        let grade = 1;
-        for (const boundary of boundaries) {
-            if (cost <= boundary) {
-                break;
-            }
-            grade += 1;
-        }
-        return grade;
-    };
-    const songs = unique.map((song) => ({ ...song, grade: gradeFor(song.cost) }));
+    const songs = unique.map((song) => ({ ...song, grade: gradeForCost(song.cost, boundaries) }));
 
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of songs) {
         histogram[song.grade] = (histogram[song.grade] ?? 0) + 1;
     }
-    console.log(`\nGraded ${n} songs. Octile cost boundaries: [${boundaries.join(", ")}]`);
+    console.log(`\nGraded ${songs.length} songs. Octile cost boundaries: [${boundaries.join(", ")}]`);
     console.log("Grade histogram:");
     for (let g = 1; g <= MAX_GRADE; g++) {
         console.log(`  grade ${g}: ${histogram[g]}`);

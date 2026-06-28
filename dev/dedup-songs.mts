@@ -20,6 +20,7 @@
 import { createReadStream } from "node:fs";
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { parse } from "csv-parse";
+import { gradeForCost, octileBoundaries } from "./grading.mts";
 
 const OUT = "public/songs";
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
@@ -82,25 +83,13 @@ async function main() {
 
     // Re-balance: re-derive the eight even octile cost boundaries over the cleaned set,
     // and re-grade every song so grades 1–8 stay evenly populated after the removals.
-    const boundaries: number[] = [];
-    for (let g = 1; g < MAX_GRADE; g++) {
-        boundaries.push(
-            Number((deduped[Math.floor((g * deduped.length) / MAX_GRADE)]?.cost ?? 0).toFixed(3)),
-        );
-    }
-    const gradeFor = (cost: number): number => {
-        let grade = 1;
-        for (const boundary of boundaries) {
-            if (cost <= boundary) {
-                break;
-            }
-            grade += 1;
-        }
-        return grade;
-    };
+    const boundaries = octileBoundaries(
+        deduped.map((song) => song.cost),
+        MAX_GRADE,
+    );
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of deduped) {
-        song.grade = gradeFor(song.cost);
+        song.grade = gradeForCost(song.cost, boundaries);
         histogram[song.grade] = (histogram[song.grade] ?? 0) + 1;
     }
 
