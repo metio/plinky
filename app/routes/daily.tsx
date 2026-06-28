@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { CoachMark } from "../components/coachMark";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { SegmentedControl } from "../components/segmentedControl";
@@ -76,7 +77,9 @@ export default function DailyRoute() {
 
             {mode === "challenge" ? (
                 <>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{m.daily_intro()}</p>
+                    {/* A one-time explainer, dismissible — so returning daily players
+                        get the score right under the tabs instead of re-reading it. */}
+                    <CoachMark id="daily-intro">{m.daily_intro()}</CoachMark>
                     {today && (
                         <ScoreViewer
                             key={today.number}

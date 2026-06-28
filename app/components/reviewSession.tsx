@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useScore } from "../hooks/useScore";
+import { Button } from "./button";
 import { dueReviews, loadGradedMastery } from "../lib/gradeProgress";
 import { loadMastery, saveMastery, setBacklog } from "../lib/mastery";
 import { loadPrefs } from "../lib/prefs";
@@ -21,6 +22,10 @@ export function ReviewSession() {
     const [index, setIndex] = useState(0);
     const [refreshed, setRefreshed] = useState(0);
     const [shelved, setShelved] = useState(0);
+    // Whether the piece on screen has actually been played this session — only then
+    // does moving on count it as refreshed, so the summary tells the truth and a
+    // skipped piece stays due rather than being silently marked done.
+    const [playedCurrent, setPlayedCurrent] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -71,16 +76,24 @@ export function ReviewSession() {
         );
     }
 
-    const next = () => {
-        setRefreshed((n) => n + 1);
+    const advance = () => {
+        setPlayedCurrent(false);
         setIndex((i) => i + 1);
+    };
+    const next = () => {
+        // Playing the piece already rescheduled its review (via the viewer's run); only
+        // count it as refreshed if it was actually played, otherwise this is a skip.
+        if (playedCurrent) {
+            setRefreshed((n) => n + 1);
+        }
+        advance();
     };
     const shelve = () => {
         if (current) {
             saveMastery(current, setBacklog(loadMastery(current), true, Date.now()));
         }
         setShelved((n) => n + 1);
-        setIndex((i) => i + 1);
+        advance();
     };
 
     return (
@@ -111,25 +124,18 @@ export function ReviewSession() {
                         title={score.title}
                         initialTempo={score.tempo}
                         beatsPerBar={score.beatsPerBar}
+                        onMastery={() => setPlayedCurrent(true)}
                     />
                 </>
             )}
 
             <div className="flex flex-wrap items-center gap-2">
-                <button
-                    type="button"
-                    onClick={next}
-                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-                >
-                    {m.review_next()}
-                </button>
-                <button
-                    type="button"
-                    onClick={shelve}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                >
+                <Button variant={playedCurrent ? "primary" : "secondary"} onClick={next}>
+                    {playedCurrent ? m.review_next() : m.review_skip()}
+                </Button>
+                <Button variant="ghost" onClick={shelve}>
                     {m.review_shelve()}
-                </button>
+                </Button>
                 <Link to="/you" className={`${BACK} ml-auto`}>
                     {m.review_end()}
                 </Link>

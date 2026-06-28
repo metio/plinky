@@ -128,9 +128,12 @@ export function YouView() {
                     </span>
                 </span>
                 <span className="flex flex-col items-end gap-0.5 text-right text-sm text-gray-600 dark:text-gray-400">
-                    <span>{m.grades_skill({ rating: skill })}</span>
+                    <span title={m.grades_skill_help()}>{m.grades_skill({ rating: skill })}</span>
                     <Show when={mode === "competitive"}>
-                        <span className="font-medium text-amber-700 dark:text-amber-400">
+                        <span
+                            title={m.grades_competitive_help()}
+                            className="font-medium text-amber-700 dark:text-amber-400"
+                        >
                             ⚔️ {m.grades_competitive()}
                         </span>
                     </Show>

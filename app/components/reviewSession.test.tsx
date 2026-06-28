@@ -12,7 +12,14 @@ import { ReviewSession } from "./reviewSession";
 // Stub the heavy score viewer (OSMD) and the score resolver, so the test exercises the
 // session flow, not playback.
 vi.mock("./scoreViewer", () => ({
-    ScoreViewer: ({ title }: { title: string }) => <div>viewer:{title}</div>,
+    ScoreViewer: ({ title, onMastery }: { title: string; onMastery?: () => void }) => (
+        <div>
+            viewer:{title}
+            <button type="button" onClick={() => onMastery?.()}>
+                play {title}
+            </button>
+        </div>
+    ),
 }));
 vi.mock("../hooks/useScore", () => ({
     useScore: (id: string) =>
@@ -55,14 +62,27 @@ function renderSession() {
 }
 
 describe("ReviewSession", () => {
-    it("walks through every due piece and finishes", async () => {
+    it("walks through every due piece and finishes (skipping unplayed ones)", async () => {
         masteryMock.mockResolvedValue(queueOf("a", "b"));
         renderSession();
 
         expect(await screen.findByText("Piece 1 of 2")).toBeTruthy();
-        fireEvent.click(screen.getByText("Next →"));
+        // Nothing played yet, so moving on is a Skip, not a refresh.
+        fireEvent.click(screen.getByText("Skip"));
         expect(await screen.findByText("Piece 2 of 2")).toBeTruthy();
-        fireEvent.click(screen.getByText("Next →"));
+        fireEvent.click(screen.getByText("Skip"));
+        expect(await screen.findByText(/review complete/i)).toBeTruthy();
+    });
+
+    it("only counts a piece as refreshed once it has been played", async () => {
+        masteryMock.mockResolvedValue(queueOf("a"));
+        renderSession();
+
+        await screen.findByText("Piece 1 of 1");
+        // Before playing, the advance is a Skip; playing the piece flips it to Next.
+        expect(screen.getByText("Skip")).toBeTruthy();
+        fireEvent.click(screen.getByText("play Title a"));
+        fireEvent.click(await screen.findByText("Next →"));
         expect(await screen.findByText(/review complete/i)).toBeTruthy();
     });
 
