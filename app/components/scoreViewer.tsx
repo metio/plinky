@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
@@ -26,6 +26,7 @@ import {
     setBacklog,
 } from "../lib/mastery";
 import { loadPrefs } from "../lib/prefs";
+import { loadSongFingering } from "../lib/savedFingering";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import { SITE_URL } from "../lib/site";
 import { makeHit, summarize } from "../lib/rhythm";
@@ -163,6 +164,12 @@ export function ScoreViewer({
     // semitones. It rewrites the MusicXML before OSMD loads it, so playback, the
     // printed key and the matcher all follow — the reload effect depends on it.
     const [transpose, setTranspose] = useState(0);
+    // The fingering the player worked out for this piece (Fingering mode). When they
+    // have some, the staff can show theirs instead of the app's suggestion — defaulting
+    // to theirs, since they chose it on purpose.
+    const saved = useMemo(() => loadSongFingering(id), [id]);
+    const hasSaved = Object.keys(saved).length > 0;
+    const [showMine, setShowMine] = useState(hasSaved);
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
@@ -538,7 +545,11 @@ export function ScoreViewer({
                 // computed for the key actually being played.
                 const transposed = transpose === 0 ? xml : transposeMusicXml(xml, transpose);
                 const source = loadPrefs().showFingerings
-                    ? annotateFingerings(transposed, loadPrefs().handSpan)
+                    ? annotateFingerings(
+                          transposed,
+                          loadPrefs().handSpan,
+                          showMine ? saved : undefined,
+                      )
                     : transposed;
                 return osmd.load(source).then(() => {
                     if (!cancelled) {
@@ -572,7 +583,7 @@ export function ScoreViewer({
                 window.clearTimeout(id);
             }
         };
-    }, [xml, transpose]);
+    }, [xml, transpose, showMine, saved]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
@@ -942,6 +953,20 @@ export function ScoreViewer({
                             </button>
                         )}
                     </span>
+                )}
+                {hasSaved && loadPrefs().showFingerings && (
+                    <button
+                        type="button"
+                        onClick={() => setShowMine((on) => !on)}
+                        aria-pressed={showMine}
+                        className={
+                            showMine
+                                ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                : BUTTON
+                        }
+                    >
+                        {m.fingering_show_mine()}
+                    </button>
                 )}
             </div>
 

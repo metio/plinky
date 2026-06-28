@@ -43,4 +43,14 @@ describe("annotateFingerings", () => {
         expect(fingerings(annotateFingerings(withRest, noSpan))).toHaveLength(1);
         expect(annotateFingerings("not xml at all", noSpan)).toBe("not xml at all");
     });
+
+    it("prefers the player's saved fingering where they chose one", () => {
+        const xml = score(note("C", 4, 1) + note("D", 4, 1) + note("E", 4, 1));
+        // Saved finger 5 on bar 0, position 0, note 0 of the right hand.
+        const annotated = annotateFingerings(xml, noSpan, { "right:0:0:0": 5 });
+        const fingers = fingerings(annotated);
+        expect(fingers[0]).toBe("5");
+        // The rest fall back to the suggestion (a sensible 1–5).
+        expect(Number(fingers[1])).toBeGreaterThanOrEqual(1);
+    });
 });

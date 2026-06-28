@@ -3,6 +3,8 @@
 
 import { fingerPositions } from "./fingering";
 import type { HandSpan } from "./prefs";
+import { type FingerMap, fingerKey } from "./savedFingering";
+import { scoreToBars } from "./scoreToBars";
 
 // Suggested fingering belongs on the staff, the way printed music carries it —
 // tied to the note you read, not mapped onto a key. This annotates a score's
@@ -38,7 +40,23 @@ function inject(doc: Document, note: Element, finger: number): void {
     note.appendChild(notations);
 }
 
-export function annotateFingerings(xml: string, span: HandSpan): string {
+// The player's saved fingers for one staff, flattened to match the bucket's positions
+// (scoreToBars groups notes by staff and chord in document order, the same way the
+// bucket below does, so the indices line up). null where they haven't chosen one.
+function savedForStaff(xml: string, saved: FingerMap, hand: "left" | "right"): (number | null)[][] {
+    const flat: (number | null)[][] = [];
+    scoreToBars(xml, hand === "right" ? 1 : 2).forEach((bar, b) => {
+        bar.forEach((pos, p) => {
+            flat.push(pos.map((_, n) => saved[fingerKey(hand, b, p, n)] ?? null));
+        });
+    });
+    return flat;
+}
+
+// Annotates the score's MusicXML with a finger per note for OSMD to print. With a
+// `saved` map, the player's own choices win where they've made them and the suggested
+// fingering fills the rest — so the staff can show "your fingering" for a piece.
+export function annotateFingerings(xml: string, span: HandSpan, saved?: FingerMap): string {
     let doc: Document;
     try {
         doc = new DOMParser().parseFromString(xml, "application/xml");
@@ -76,9 +94,10 @@ export function annotateFingerings(xml: string, span: HandSpan): string {
     for (const [staff, bucket] of staves) {
         const hand = staff === "2" ? "left" : "right";
         const fingers = fingerPositions(bucket.pitches, hand, span[hand] ?? undefined);
+        const mine = saved ? savedForStaff(xml, saved, hand) : null;
         bucket.notes.forEach((position, p) => {
             position.forEach((note, i) => {
-                const finger = fingers[p]?.[i];
+                const finger = mine?.[p]?.[i] ?? fingers[p]?.[i];
                 if (finger) {
                     inject(doc, note, finger);
                 }
