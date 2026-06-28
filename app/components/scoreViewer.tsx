@@ -839,7 +839,7 @@ export function ScoreViewer({
                 onClick={() => (matcher.practicing ? matcher.stop() : practice())}
                 className={BUTTON}
             >
-                {matcher.practicing ? m.action_listen_stop() : m.curriculums_practice()}
+                {matcher.practicing ? m.action_listen_stop() : m.action_practice()}
             </button>
         </>
     );
