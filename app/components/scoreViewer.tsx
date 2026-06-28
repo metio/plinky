@@ -5,6 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useMetronome } from "../hooks/useMetronome";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
@@ -173,6 +174,20 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
     const [barsPerRow, setBarsPerRow] = useState(() => loadPrefs().barsPerRow);
+    // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
+    // alone would read as desktop). Drives the focus strip and a shorter staff box so the
+    // keyboard never buries the notes, in either orientation.
+    const compact = useMediaQuery("(max-width: 639px), (max-height: 600px)");
+    const portrait = useMediaQuery("(orientation: portrait)");
+    const coarsePointer = useMediaQuery("(pointer: coarse)");
+    // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
+    // when it would actually help (portrait, no MIDI). Read after mount to avoid a
+    // hydration mismatch; the portrait layout stays fully usable, so this never forces
+    // an orientation (WCAG 1.3.4).
+    const [rotateDismissed, setRotateDismissed] = useState(false);
+    useEffect(() => {
+        setRotateDismissed(localStorage.getItem("plinky:rotate-hint") === "dismissed");
+    }, []);
     // The notation the mobile focus strip shows — transposed to match what's played,
     // but un-annotated (it's for reading the bar, not the printed fingering).
     const focusXml = useMemo(
@@ -722,8 +737,10 @@ export function ScoreViewer({
                     aria-label={title}
                     // A bounded scroll box so the follow-cursor scrolls the staff inside
                     // it — keeping the controls and on-screen keyboard in view below
-                    // rather than scrolling the whole page out from under them.
-                    className="max-h-[45vh] overflow-auto sm:max-h-[70vh]"
+                    // rather than scrolling the whole page out from under them. Shorter on
+                    // a phone (either orientation) so the keys fit; dvh tracks the live
+                    // viewport so the mobile URL bar doesn't clip it.
+                    className={`overflow-auto ${compact ? "max-h-[40dvh]" : "max-h-[70vh]"}`}
                 />
                 {loadError && (
                     <p className="p-2 text-sm text-red-600 dark:text-red-400">
@@ -1105,16 +1122,33 @@ export function ScoreViewer({
                     {ghost && (
                         <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
                     )}
-                    {/* On a phone, a compact current-bars strip right above the keys, so
-                        the notes to play aren't scrolled off behind the keyboard; desktop
-                        relies on the auto-scrolling full score above. */}
-                    <div className="sm:hidden">
+                    {compact && portrait && coarsePointer && !connected && !rotateDismissed && (
+                        <div className="flex items-center justify-between gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200">
+                            <span>{m.rotate_hint()}</span>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    localStorage.setItem("plinky:rotate-hint", "dismissed");
+                                    setRotateDismissed(true);
+                                }}
+                                aria-label={m.action_dismiss()}
+                                className="shrink-0 font-bold"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    )}
+                    {/* On a phone (portrait or landscape), a compact current-bars strip
+                        right above the keys, so the notes to play aren't scrolled off
+                        behind the keyboard; bigger screens rely on the auto-scrolling
+                        full score above. */}
+                    {compact && (
                         <FocusStrip
                             xml={focusXml}
                             bar={matcher.bar}
                             label={m.focus_strip_label()}
                         />
-                    </div>
+                    )}
                     <PianoKeyboard
                         expected={hintNotes}
                         wrong={matcher.lastWrong}

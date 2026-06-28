@@ -9,6 +9,9 @@ import { ensureSeeded, loadManifest } from "./songs";
 afterEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+    // restoreAllMocks doesn't undo stubGlobal, so the fetch stub would otherwise leak to
+    // whatever runs next in the worker and flake a test that asserts on fetch.
+    vi.unstubAllGlobals();
 });
 
 describe("loadManifest", () => {
