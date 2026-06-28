@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { m } from "../paraglide/messages.js";
+import { CoachMark } from "./coachMark";
 
 // The ways to work a piece. "play" is the score itself (read it, hear it, practise
 // it); "ear" and "fingering" are the focused drills. They share the open piece, so
@@ -28,21 +29,24 @@ export function PlayModeBar({
     onChange: (mode: PlayMode) => void;
 }) {
     return (
-        <div className="sticky top-0 z-10 -mx-6 border-b border-gray-200 bg-white/90 px-6 py-2 backdrop-blur dark:border-gray-800 dark:bg-gray-950/90">
-            <div role="tablist" aria-label={m.mode_label()} className="flex flex-wrap gap-1">
-                {MODES.map((tab) => (
-                    <button
-                        key={tab.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={mode === tab.id}
-                        onClick={() => onChange(tab.id)}
-                        className={mode === tab.id ? ACTIVE : INACTIVE}
-                    >
-                        {tab.label()}
-                    </button>
-                ))}
+        <div className="space-y-2">
+            <div className="sticky top-0 z-10 -mx-6 border-b border-gray-200 bg-white/90 px-6 py-2 backdrop-blur dark:border-gray-800 dark:bg-gray-950/90">
+                <div role="tablist" aria-label={m.mode_label()} className="flex flex-wrap gap-1">
+                    {MODES.map((tab) => (
+                        <button
+                            key={tab.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={mode === tab.id}
+                            onClick={() => onChange(tab.id)}
+                            className={mode === tab.id ? ACTIVE : INACTIVE}
+                        >
+                            {tab.label()}
+                        </button>
+                    ))}
+                </div>
             </div>
+            <CoachMark id="play-modes">{m.coach_play_modes()}</CoachMark>
         </div>
     );
 }
