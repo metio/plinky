@@ -29,3 +29,30 @@ export function nonPianoReason(xml: string): string | null {
     }
     return null;
 }
+
+function instrumentNames(xml: string): string {
+    return [
+        ...xml.matchAll(
+            /<(?:part-name|instrument-name)[^>]*>([^<]*)<\/(?:part-name|instrument-name)>/gi,
+        ),
+    ]
+        .map((match) => match[1]!.trim().toLowerCase())
+        .join(" | ");
+}
+
+// Stricter than nonPianoReason, for curating a SOLO/duet-piano catalogue on a relaxed
+// import: also rejects ensemble scores — any non-keyboard instrument named at all (even
+// alongside a piano), or more than two parts (an arrangement, not a piano solo/duet).
+export function nonSoloPianoReason(xml: string): string | null {
+    const base = nonPianoReason(xml);
+    if (base) {
+        return base;
+    }
+    if (OTHER_INSTRUMENT.test(instrumentNames(xml))) {
+        return "ensemble";
+    }
+    if ((xml.match(/<score-part\b/gi) ?? []).length > 2) {
+        return "multi-part";
+    }
+    return null;
+}
