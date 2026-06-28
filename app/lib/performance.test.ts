@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { performanceNotes, plotPerformance } from "./performance";
+import { type PerfNote, performanceNotes, plotPerformance } from "./performance";
+import { LENIENT_TOLERANCE } from "./rhythm";
 import type { RunNote } from "./shareCard";
 
 // A note dead-on its target with no preceding mistakes.
@@ -21,14 +22,44 @@ describe("performanceNotes", () => {
         expect(note?.hit).toBe(false);
     });
 
-    it("bands timing from the signed offset", () => {
+    it("bands timing from the deviation against the player's own pace", () => {
+        // A steady run (200ms gaps), bumped once by +100ms and once by +300ms; the
+        // overall pace is removed, so only the bumped gaps read as off-time.
         const notes = performanceNotes([
-            clean(),
-            clean({ targetMs: 500, playedMs: 600 }), // 100ms late → good
-            clean({ targetMs: 1000, playedMs: 1300 }), // 300ms off
+            clean({ targetMs: 0, playedMs: 0 }),
+            clean({ targetMs: 200, playedMs: 200 }),
+            clean({ targetMs: 400, playedMs: 500 }), // gap 300 vs 200 → +100, good
+            clean({ targetMs: 600, playedMs: 700 }),
+            clean({ targetMs: 800, playedMs: 1200 }), // gap 500 vs 200 → +300, off
+            clean({ targetMs: 1000, playedMs: 1400 }),
+            clean({ targetMs: 1200, playedMs: 1600 }),
         ]);
-        expect(notes[1]).toMatchObject({ deltaMs: 100, rating: "good" });
-        expect(notes[2]?.rating).toBe("off");
+        expect(notes[2]).toMatchObject({ deltaMs: 100, rating: "good" });
+        expect(notes[4]?.rating).toBe("off");
+    });
+
+    it("reads a steady run at half the notated tempo as on the beat", () => {
+        // Self-paced practice: an even slow run is in time, not chronically late.
+        const notes = performanceNotes(
+            Array.from({ length: 6 }, (_, i) => clean({ targetMs: i * 100, playedMs: i * 200 })),
+        );
+        for (const note of notes) {
+            expect(note.rating).toBe("perfect");
+        }
+    });
+
+    it("widens the timing windows for imprecise input", () => {
+        // One gap stretched 250ms past the player's pace: off on a MIDI run, but
+        // within the widened window for an on-screen / computer-keyboard run.
+        const run = [
+            clean({ targetMs: 0, playedMs: 0 }),
+            clean({ targetMs: 100, playedMs: 100 }),
+            clean({ targetMs: 200, playedMs: 450 }), // gap 350 vs 100 → +250
+            clean({ targetMs: 300, playedMs: 550 }),
+            clean({ targetMs: 400, playedMs: 650 }),
+        ];
+        expect(performanceNotes(run)[2]?.rating).toBe("off");
+        expect(performanceNotes(run, LENIENT_TOLERANCE)[2]?.rating).toBe("good");
     });
 
     it("flags a stall as not fluent", () => {
@@ -60,14 +91,15 @@ describe("plotPerformance", () => {
     });
 
     it("pushes late below and early above, clamped to the strip", () => {
-        const late = plotPerformance(performanceNotes([clean({ playedMs: 5000 })]), 100, 40);
-        const early = plotPerformance(
-            performanceNotes([clean({ targetMs: 5000, playedMs: 0 })]),
-            100,
-            40,
-        );
-        expect(late[0]?.y).toBe(40); // late: bottom edge
-        expect(early[0]?.y).toBe(0); // early: top edge
+        const note = (deltaMs: number): PerfNote => ({
+            ordinal: 0,
+            deltaMs,
+            rating: "off",
+            hit: true,
+            fluent: true,
+        });
+        expect(plotPerformance([note(5000)], 100, 40)[0]?.y).toBe(40); // late: bottom edge
+        expect(plotPerformance([note(-5000)], 100, 40)[0]?.y).toBe(0); // early: top edge
     });
 
     it("handles a single note without dividing by zero", () => {

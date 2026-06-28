@@ -13,6 +13,7 @@ import {
 import {
     KEYBOARD_DEVICE,
     KEYBOARD_VELOCITY,
+    ON_SCREEN_DEVICE,
     keyToNote,
     MAX_EVENTS,
     MAX_OCTAVE_OFFSET,
@@ -160,11 +161,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
     const pressKey = useCallback(
         (note: number) =>
-            emitNote("noteon", note, KEYBOARD_VELOCITY, 1, "On-screen keyboard", performance.now()),
+            emitNote("noteon", note, KEYBOARD_VELOCITY, 1, ON_SCREEN_DEVICE, performance.now()),
         [emitNote],
     );
     const releaseKey = useCallback(
-        (note: number) => emitNote("noteoff", note, 0, 1, "On-screen keyboard", performance.now()),
+        (note: number) => emitNote("noteoff", note, 0, 1, ON_SCREEN_DEVICE, performance.now()),
         [emitNote],
     );
 

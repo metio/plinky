@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { fluentNotes } from "./flow";
-import { rate, type Rating } from "./rhythm";
+import { PRECISE_TOLERANCE, rate, type Rating, timingDeltas } from "./rhythm";
 import type { RunNote } from "./shareCard";
 
 // Tags every note of a finished run on all three graded dimensions at once, so a
@@ -22,15 +22,18 @@ export type PerfNote = {
     fluent: boolean;
 };
 
-export function performanceNotes(notes: RunNote[]): PerfNote[] {
-    // Flow is judged over the whole run, then carried onto each note.
+export function performanceNotes(notes: RunNote[], tolerance = PRECISE_TOLERANCE): PerfNote[] {
+    // Flow and the per-note timing deviation are both judged over the whole run —
+    // the deviation against the player's own pace — then carried onto each note, so
+    // the strip reads against the same reference as the aggregate grade.
     const fluent = fluentNotes(notes);
+    const deltas = timingDeltas(notes);
     return notes.map((note, index) => {
-        const deltaMs = note.playedMs - note.targetMs;
+        const deltaMs = deltas[index] ?? 0;
         return {
             ordinal: index,
             deltaMs,
-            rating: rate(Math.abs(deltaMs)),
+            rating: rate(Math.abs(deltaMs), tolerance),
             hit: note.wrongBefore === 0,
             fluent: fluent[index] ?? true,
         };

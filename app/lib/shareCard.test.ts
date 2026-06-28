@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
+import { LENIENT_TOLERANCE } from "./rhythm";
 import {
     computeSegments,
     gridEmoji,
@@ -17,6 +18,17 @@ import {
 // A note dead-on its target with no preceding mistakes — a perfect note.
 function clean(): RunNote {
     return { targetMs: 0, playedMs: 0, wrongBefore: 0 };
+}
+
+// A run of evenly-spaced notes played dead on the notated tempo — the baseline a
+// drift-corrected timing reads as flawless. Timing is judged per gap, so the notes
+// need real spacing (unlike the all-at-zero `clean`).
+function spaced(count: number): RunNote[] {
+    return Array.from({ length: count }, (_, i) => ({
+        targetMs: i * 100,
+        playedMs: i * 100,
+        wrongBefore: 0,
+    }));
 }
 
 describe("levelFor", () => {
@@ -60,17 +72,43 @@ describe("computeSegments", () => {
         expect(segments[1]?.flow).toBe(1);
     });
 
-    it("ramps timing linearly to zero at 200ms off", () => {
-        // Twelve notes → two per slice. The first slice holds notes 0 and 1: one
-        // 100ms late (→ 0.5) and one dead-on (→ 1.0), averaging 0.75.
-        const notes = Array.from({ length: 12 }, clean);
-        notes[0] = { targetMs: 0, playedMs: 100, wrongBefore: 0 };
+    it("ramps timing linearly to zero at 200ms off the player's pace", () => {
+        // Twelve notes → two per slice. The first slice holds notes 0 and 1: note 1's
+        // gap runs 200ms instead of the steady 100ms (100ms off → 0.5), note 0
+        // anchors (→ 1.0), averaging 0.75.
+        const notes = spaced(12);
+        notes[1] = { targetMs: 100, playedMs: 200, wrongBefore: 0 };
         expect(computeSegments(notes)[0]?.timing).toBeCloseTo(0.75);
     });
 
+    it("reads a steady run at a different tempo as full timing", () => {
+        // Played at half the notated speed but perfectly even — self-paced practice,
+        // so an even slow run is in time, not chronically late.
+        const notes = Array.from({ length: 12 }, (_, i) => ({
+            targetMs: i * 100,
+            playedMs: i * 200,
+            wrongBefore: 0,
+        }));
+        for (const segment of computeSegments(notes)) {
+            expect(segment.timing).toBeCloseTo(1);
+        }
+    });
+
+    it("widens the timing window for imprecise input", () => {
+        // Note 1's gap is 300ms off the pace: weak on a precise run, but stronger
+        // once the window is widened for an on-screen / computer-keyboard run.
+        const notes = spaced(12);
+        notes[1] = { targetMs: 100, playedMs: 400, wrongBefore: 0 };
+        const precise = computeSegments(notes)[0]?.timing ?? 0;
+        const lenient = computeSegments(notes, SEGMENTS, LENIENT_TOLERANCE)[0]?.timing ?? 0;
+        expect(lenient).toBeGreaterThan(precise);
+    });
+
     it("clamps timing at zero beyond the window rather than going negative", () => {
-        const notes = [{ targetMs: 0, playedMs: 5000, wrongBefore: 0 }];
-        expect(computeSegments(notes)[0]?.timing).toBe(0);
+        // Six notes → one per slice; note 3's gap is dropped far off the pace.
+        const notes = spaced(6);
+        notes[3] = { targetMs: 300, playedMs: 60000, wrongBefore: 0 };
+        expect(computeSegments(notes)[3]?.timing).toBe(0);
     });
 });
 

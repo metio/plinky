@@ -3,7 +3,14 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
-import { keyToNote, noteName, parseMidiMessage } from "./midi";
+import {
+    isPreciseInput,
+    KEYBOARD_DEVICE,
+    keyToNote,
+    noteName,
+    ON_SCREEN_DEVICE,
+    parseMidiMessage,
+} from "./midi";
 
 describe("noteName", () => {
     it("names middle C and its neighbours", () => {
@@ -75,5 +82,16 @@ describe("parseMidiMessage", () => {
         expect(parseMidiMessage(new Uint8Array([0xb0, 7, 100]))).toBeNull();
         expect(parseMidiMessage(new Uint8Array([0x90]))).toBeNull();
         expect(parseMidiMessage(null)).toBeNull();
+    });
+});
+
+describe("isPreciseInput", () => {
+    it("treats a real MIDI device as precise", () => {
+        expect(isPreciseInput("Roland FP-30")).toBe(true);
+    });
+
+    it("treats the keyboard fallbacks as imprecise", () => {
+        expect(isPreciseInput(ON_SCREEN_DEVICE)).toBe(false);
+        expect(isPreciseInput(KEYBOARD_DEVICE)).toBe(false);
     });
 });

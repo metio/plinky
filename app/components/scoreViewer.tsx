@@ -32,7 +32,14 @@ import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/pre
 import { loadSongFingering } from "../lib/savedFingering";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import { SITE_URL } from "../lib/site";
-import { makeHit, summarize } from "../lib/rhythm";
+import { isPreciseInput } from "../lib/midi";
+import {
+    LENIENT_TOLERANCE,
+    makeHit,
+    PRECISE_TOLERANCE,
+    summarize,
+    timingDeltas,
+} from "../lib/rhythm";
 import {
     collectNoteElements,
     GHOST_COLOR,
@@ -135,6 +142,11 @@ export function ScoreViewer({
     const notesRef = useRef<PlayedNote[]>([]);
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
+    // Whether any note this run came from an imprecise input (on-screen or computer
+    // keyboard). Those can't tap a true rhythm, so the run's timing is graded with
+    // widened windows rather than flooring a touch player — the primary input — at
+    // zero. Reset when a run starts; read when it is graded.
+    const impreciseRef = useRef(false);
     const synth = useSynth();
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(false);
@@ -245,6 +257,9 @@ export function ScoreViewer({
     useMetronome(metronomeOn, adaptive ? liveTempo : tempo, beatsPerBar ?? 4, subdivision);
     const [grade, setGrade] = useState<Grade | null>(null);
     const [runNotes, setRunNotes] = useState<RunNote[]>([]);
+    // The timing leniency the finished run was graded at, kept so the per-note strip
+    // reads the same windows as the grade and share grid.
+    const [runTolerance, setRunTolerance] = useState(PRECISE_TOLERANCE);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
     const [dailyStreak, setDailyStreak] = useState(0);
     const [tempoCurve, setTempoCurve] = useState<{
@@ -340,7 +355,12 @@ export function ScoreViewer({
         },
     });
     useMidiInput({
-        onNoteOn: (event) => matcher.registerNote(event.note, event.timestamp, event.velocity),
+        onNoteOn: (event) => {
+            if (!isPreciseInput(event.device)) {
+                impreciseRef.current = true;
+            }
+            matcher.registerNote(event.note, event.timestamp, event.velocity);
+        },
     });
     const { support, status, devices, requestAccess } = useMidiConnection();
     const connected = status === "ready" && devices.length > 0;
@@ -432,7 +452,9 @@ export function ScoreViewer({
 
     // Grade a run once it completes, from the captured timing and velocity. A run
     // with no real velocity variation (the computer keyboard) is graded without
-    // dynamics rather than crediting a constant.
+    // dynamics rather than crediting a constant. Timing is judged against the
+    // player's own pace (so a steady run at any tempo reads as in time) with windows
+    // widened for imprecise input (on-screen / computer keyboard).
     useEffect(() => {
         if (!matcher.complete) {
             return;
@@ -440,7 +462,9 @@ export function ScoreViewer({
         const notes = notesRef.current;
         const velocities = notes.map((note) => note.velocity);
         const hasDynamics = new Set(velocities).size > 1;
-        const hits = notes.map((note, index) => makeHit(index, note.playedMs - note.targetMs));
+        const tolerance = impreciseRef.current ? LENIENT_TOLERANCE : PRECISE_TOLERANCE;
+        const deltas = timingDeltas(notes);
+        const hits = deltas.map((delta, index) => makeHit(index, delta, tolerance));
         const result = computeGrade({
             correct: matcher.total,
             wrong: matcher.wrong,
@@ -450,7 +474,8 @@ export function ScoreViewer({
         });
         setGrade(result);
         setRunNotes(notes);
-        setShareGrid(gridFor(notes));
+        setRunTolerance(tolerance);
+        setShareGrid(gridFor(notes, tolerance));
         // A finished run nudges the tempo trainer up for the next attempt.
         bumpTempo();
         // Read the player's own tempo back out of the gaps between their notes, so
@@ -742,6 +767,7 @@ export function ScoreViewer({
     const practice = () => {
         stopListen();
         notesRef.current = [];
+        impreciseRef.current = false;
         setGrade(null);
         setRunNotes([]);
         setShareGrid(null);
@@ -1425,7 +1451,7 @@ export function ScoreViewer({
                             )}
                         </dl>
                     </div>
-                    <PerformanceStrip notes={runNotes} />
+                    <PerformanceStrip notes={runNotes} tolerance={runTolerance} />
                     {tempoCurve && (
                         <section className="space-y-1">
                             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">

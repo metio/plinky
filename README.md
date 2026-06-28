@@ -43,7 +43,10 @@ score along, so one hand's slip never stops the other.
 When you finish, the run is **graded S–F** from three things:
 
 - **Accuracy** — how many notes you found cleanly.
-- **Timing** — how close each note landed to where the notation puts it.
+- **Timing** — how evenly you held the rhythm. Practice is self-paced, so timing is
+  judged against your *own* tempo — a steady run at any speed reads as in time, and
+  only a note that breaks your pace counts as off. Tapping on a phone or computer
+  keyboard can't be as precise as real keys, so those get a wider window.
 - **Flow** — whether you kept moving like a musician rather than stopping to hunt.
 
 A **per-note strip** and a **tempo graph** then show where you rushed or dragged, and

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { fluentNotes } from "./flow";
+import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced
 // into six moments and scored on the three shareable dimensions — Accuracy,
@@ -17,9 +18,10 @@ export type RunNote = {
     wrongBefore: number;
 };
 
-// A run note tagged with whether it kept the flow, decided once over the whole run
-// so hesitation is judged against the player's overall pace, not a six-note slice.
-type ScoredNote = RunNote & { fluent: boolean };
+// A run note tagged with whether it kept the flow and its timing deviation from the
+// player's own pace — both decided once over the whole run, not a six-note slice, so
+// hesitation and rhythm are judged against the player's overall tempo.
+type ScoredNote = RunNote & { fluent: boolean; timingDelta: number };
 
 // The three dimensions, in the order they appear as grid rows.
 export type Dimension = "accuracy" | "timing" | "flow";
@@ -33,8 +35,9 @@ export type Grid = Level[][]; // [dimension][segment]
 // The number of moments a run is split into — the columns of the grid.
 export const SEGMENTS = 6;
 
-// A note this many milliseconds off its target scores zero on timing; dead-on
-// scores one, with a linear ramp between.
+// A note this many milliseconds off the player's own pace scores zero on timing;
+// dead-on scores one, with a linear ramp between. Widened for imprecise input (see
+// the tolerance passed through from the run's grade).
 const TIMING_ZERO_MS = 200;
 
 // Band cutoffs: at or above STRONG is a full square, at or above MEDIUM a half,
@@ -54,14 +57,15 @@ export function levelFor(value: number): Level {
 
 // Scores one segment's notes on each dimension. An empty segment (a piece with
 // fewer notes than segments, or one abandoned early) scores zero everywhere.
-function metricsFor(notes: ScoredNote[]): SegmentMetrics {
+function metricsFor(notes: ScoredNote[], tolerance: number): SegmentMetrics {
     if (notes.length === 0) {
         return { accuracy: 0, timing: 0, flow: 0 };
     }
     const wrong = notes.reduce((sum, note) => sum + note.wrongBefore, 0);
     const fluent = notes.filter((note) => note.fluent).length;
+    const zero = TIMING_ZERO_MS * tolerance;
     const timing = notes.reduce((sum, note) => {
-        const off = Math.min(1, Math.abs(note.playedMs - note.targetMs) / TIMING_ZERO_MS);
+        const off = Math.min(1, Math.abs(note.timingDelta) / zero);
         return sum + (1 - off);
     }, 0);
     return {
@@ -73,15 +77,25 @@ function metricsFor(notes: ScoredNote[]): SegmentMetrics {
 
 // Splits the run into SEGMENTS contiguous, proportional slices by note order, so
 // the grid reads the same whatever the piece's length or tempo, and scores each.
-// Flow is decided over the whole run first, then carried into the slices.
-export function computeSegments(notes: RunNote[], count = SEGMENTS): SegmentMetrics[] {
+// Flow and the timing deviations are decided over the whole run first, then carried
+// into the slices. The tolerance widens the timing window for imprecise input.
+export function computeSegments(
+    notes: RunNote[],
+    count = SEGMENTS,
+    tolerance = PRECISE_TOLERANCE,
+): SegmentMetrics[] {
     const fluent = fluentNotes(notes);
+    const deltas = timingDeltas(notes);
     const buckets: ScoredNote[][] = Array.from({ length: count }, () => []);
     notes.forEach((note, index) => {
         const slice = Math.min(count - 1, Math.floor((index * count) / notes.length));
-        buckets[slice]?.push({ ...note, fluent: fluent[index] ?? false });
+        buckets[slice]?.push({
+            ...note,
+            fluent: fluent[index] ?? false,
+            timingDelta: deltas[index] ?? 0,
+        });
     });
-    return buckets.map(metricsFor);
+    return buckets.map((bucket) => metricsFor(bucket, tolerance));
 }
 
 // One row per dimension, one column per segment.
@@ -89,8 +103,8 @@ export function toGrid(segments: SegmentMetrics[]): Grid {
     return DIMENSIONS.map((dimension) => segments.map((segment) => levelFor(segment[dimension])));
 }
 
-export function gridFor(notes: RunNote[]): Grid {
-    return toGrid(computeSegments(notes));
+export function gridFor(notes: RunNote[], tolerance = PRECISE_TOLERANCE): Grid {
+    return toGrid(computeSegments(notes, SEGMENTS, tolerance));
 }
 
 const EMOJI: Record<Level, string> = { strong: "🟩", medium: "🟨", weak: "⬜" };

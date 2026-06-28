@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { performanceNotes, plotPerformance } from "../lib/performance";
-import type { Rating } from "../lib/rhythm";
+import { PRECISE_TOLERANCE, type Rating } from "../lib/rhythm";
 import type { RunNote } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
 
@@ -21,8 +21,14 @@ const PAD = 16;
 // (low) it landed, its colour the timing band, a red ring marks a wrong key, and a
 // dashed line marks a hesitation. The centre line is dead-on the beat. Needs at
 // least two notes to span the axis.
-export function PerformanceStrip({ notes }: { notes: RunNote[] }) {
-    const perf = performanceNotes(notes);
+export function PerformanceStrip({
+    notes,
+    tolerance = PRECISE_TOLERANCE,
+}: {
+    notes: RunNote[];
+    tolerance?: number;
+}) {
+    const perf = performanceNotes(notes, tolerance);
     if (perf.length < 2) {
         return null;
     }
