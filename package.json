@@ -53,6 +53,7 @@
     "@vitest/coverage-istanbul": "^4.1.9",
     "axe-core": "^4.12.1",
     "csv-parse": "^7.0.0",
+    "fast-check": "^4.8.0",
     "jsdom": "^29.1.1",
     "knip": "^6.0.0",
     "linkedom": "^0.18.12",
