@@ -5,6 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { useFullscreen } from "../hooks/useFullscreen";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useMetronome } from "../hooks/useMetronome";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../hooks/useScoreMatcher";
@@ -56,7 +57,15 @@ import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
-import { DownloadIcon, PlayIcon, PrinterIcon, ShareIcon, StopIcon } from "./icons";
+import {
+    DownloadIcon,
+    MaximizeIcon,
+    MinimizeIcon,
+    PlayIcon,
+    PrinterIcon,
+    ShareIcon,
+    StopIcon,
+} from "./icons";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { ShareCard } from "./shareCard";
@@ -115,6 +124,7 @@ export function ScoreViewer({
     canShareGhost?: boolean;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const rootRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     // Tracks playback synchronously, so a second click that lands before the
@@ -177,9 +187,13 @@ export function ScoreViewer({
     // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
     // alone would read as desktop). Drives the focus strip and a shorter staff box so the
     // keyboard never buries the notes, in either orientation.
-    const compact = useMediaQuery("(max-width: 639px), (max-height: 600px)");
+    const narrowOrShort = useMediaQuery("(max-width: 639px), (max-height: 600px)");
     const portrait = useMediaQuery("(orientation: portrait)");
     const coarsePointer = useMediaQuery("(pointer: coarse)");
+    // A "play full screen" mode that strips everything but the notes and keys. Treated as
+    // compact too, so the focus strip and shorter staff apply inside it.
+    const { fullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen(rootRef);
+    const compact = narrowOrShort || fullscreen;
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -718,7 +732,23 @@ export function ScoreViewer({
             : [];
 
     return (
-        <div className="space-y-3">
+        <div
+            ref={rootRef}
+            className={`space-y-3 ${
+                fullscreen ? "fixed inset-0 z-50 overflow-auto bg-white p-4 dark:bg-gray-950" : ""
+            }`}
+        >
+            {fullscreen && (
+                <button
+                    type="button"
+                    onClick={exitFullscreen}
+                    aria-label={m.action_exit_fullscreen()}
+                    title={m.action_exit_fullscreen()}
+                    className="fixed right-3 top-3 z-10 rounded-md bg-indigo-600 p-2 text-white shadow-lg"
+                >
+                    <MinimizeIcon />
+                </button>
+            )}
             {/* The score sits at the top — it's what you read while playing, so the
                 controls, keyboard and run summary all fall below it. OSMD renders to
                 its container's full offset width, which includes any border or
@@ -1029,9 +1059,18 @@ export function ScoreViewer({
                         ))}
                     </fieldset>
                 </span>
+                <button
+                    type="button"
+                    onClick={enterFullscreen}
+                    aria-label={m.action_fullscreen()}
+                    title={m.action_fullscreen()}
+                    className={ICON_BUTTON}
+                >
+                    <MaximizeIcon />
+                </button>
             </div>
 
-            {ready && (
+            {ready && !fullscreen && (
                 <div className="flex flex-wrap items-center gap-3">
                     <button
                         type="button"
@@ -1054,7 +1093,10 @@ export function ScoreViewer({
                 </div>
             )}
 
-            <div hidden={ephemeral} className="flex flex-wrap items-center gap-3 text-sm">
+            <div
+                hidden={ephemeral || fullscreen}
+                className="flex flex-wrap items-center gap-3 text-sm"
+            >
                 {mastery?.learned ? (
                     <>
                         <span className="font-medium text-green-700 dark:text-green-400">
@@ -1084,7 +1126,7 @@ export function ScoreViewer({
                 )}
             </div>
 
-            {canShareGhost && storedGhost && (
+            {canShareGhost && storedGhost && !fullscreen && (
                 <div className="flex flex-wrap items-center gap-3 text-sm">
                     {sharedFromLink && (
                         <span className="text-gray-600 dark:text-gray-400">

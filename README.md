@@ -28,7 +28,8 @@ staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**
 sits right above the keys showing the bar you're playing, so the notes you need are
-never out of reach. You can
+never out of reach, and a one-tap **full-screen** mode hides everything but the notes and
+keyboard (keeping the screen awake while you play). You can
 also force a **set number of bars per row** for bigger, more readable notation on a
 small screen. A
 wrong key flashes red; whether the correct key then lights up is your call — read
