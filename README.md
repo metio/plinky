@@ -54,7 +54,8 @@ one-tap **review session** walks you through everything that's fading, and you c
 - **Any piece, three ways** — open a score and a tab bar switches how you work it:
   **Play** (read, hear, and practise it), **Ear** (hear a two-bar phrase and play it
   back), or **Fingering** (choose a fingering for a two-bar window; each note lights
-  **green/amber/red** as you go to show how the move flows, it's scored against the most
+  **green/amber/red** as you go — with a symbol too, so it reads without colour, and you
+  can fade it off — to show how the move flows, it's scored against the most
   economical fingering for your hand, the two bars you're on are **highlighted in the
   full piece** so you keep your place, and it's **saved per piece** so the fingering you
   work out is there when you come back).

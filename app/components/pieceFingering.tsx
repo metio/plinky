@@ -9,6 +9,7 @@ import {
     loadSongFingering,
     setFinger,
 } from "../lib/savedFingering";
+import { loadPrefs, savePrefs } from "../lib/prefs";
 import { scoreToBars, staffFor, windowCells, windowPositions } from "../lib/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
@@ -27,6 +28,8 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
     const [map, setMap] = useState<FingerMap>(() => loadSongFingering(id));
     // Bumped on "clear" to remount the drill so it re-reads the (now empty) saved map.
     const [version, setVersion] = useState(0);
+    // Live colour/symbol feedback, remembered across pieces via prefs.
+    const [hints, setHints] = useState(() => loadPrefs().fingerHints);
 
     const bars = useMemo(() => scoreToBars(xml, staffFor(hand)), [xml, hand]);
     const lastStart = Math.max(0, bars.length - WINDOW);
@@ -65,6 +68,20 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                         </button>
                     ))}
                 </fieldset>
+                <button
+                    type="button"
+                    onClick={() =>
+                        setHints((on) => {
+                            const next = !on;
+                            savePrefs({ ...loadPrefs(), fingerHints: next });
+                            return next;
+                        })
+                    }
+                    aria-pressed={hints}
+                    className={HAND_BUTTON(hints)}
+                >
+                    {m.fingering_hints_toggle()}
+                </button>
                 <span className="ml-auto flex items-center gap-2">
                     <button
                         type="button"
@@ -107,6 +124,7 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                 key={`${hand}-${clamped}-${version}`}
                 positions={positions}
                 hand={hand}
+                hints={hints}
                 initialFingers={initialFingers}
                 onAssign={(pos, note, finger) => {
                     const cell = cells[pos];

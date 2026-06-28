@@ -63,6 +63,7 @@ describe("useSynth", () => {
             handSpan: { left: null, right: null },
             showFingerings: true,
             noteHints: "miss",
+            fingerHints: true,
             decayMode: "gentle",
             reviewCap: 8,
         });
@@ -79,6 +80,7 @@ describe("useSynth", () => {
             handSpan: { left: null, right: null },
             showFingerings: true,
             noteHints: "miss",
+            fingerHints: true,
             decayMode: "gentle",
             reviewCap: 8,
         });
@@ -96,6 +98,7 @@ describe("useSynth", () => {
             handSpan: { left: null, right: null },
             showFingerings: true,
             noteHints: "miss",
+            fingerHints: true,
             decayMode: "gentle",
             reviewCap: 8,
         });

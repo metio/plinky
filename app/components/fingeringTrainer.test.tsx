@@ -50,6 +50,19 @@ describe("FingeringDrill", () => {
         expect(playNote).toHaveBeenCalled();
     });
 
+    it("marks a fingered note with a colour-blind-safe quality symbol", () => {
+        render(<FingeringDrill positions={LINE} hand="right" />);
+        fireEvent.click(screen.getByLabelText("Finger 1"));
+        // The verdict carries a text label for assistive tech, not colour alone.
+        expect(screen.getByLabelText(/Comfortable|Works|Awkward reach/)).toBeTruthy();
+    });
+
+    it("hides live feedback when hints are faded off", () => {
+        render(<FingeringDrill positions={LINE} hand="right" hints={false} />);
+        fireEvent.click(screen.getByLabelText("Finger 1"));
+        expect(screen.queryByLabelText(/Comfortable|Works|Awkward reach/)).toBeNull();
+    });
+
     it("says when there is nothing to finger", () => {
         render(<FingeringDrill positions={[]} hand="right" />);
         expect(screen.getByText(/Nothing to finger/)).toBeTruthy();

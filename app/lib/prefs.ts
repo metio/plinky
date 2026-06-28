@@ -23,6 +23,10 @@ export type Prefs = {
     // fingerings out unaided, the way they must at a real piano.
     showFingerings: boolean;
     noteHints: NoteHints;
+    // Live green/amber/red feedback as you finger a passage. On by default, but the
+    // guidance-hypothesis warns constant feedback can stunt self-judgement, so a learner
+    // can fade it off and rely on the post-phrase summary.
+    fingerHints: boolean;
     // How a grade decays when its pieces go unreviewed: gentle keeps the grade and
     // only dulls its shine, competitive lets it actually slip — the opt-in challenge.
     decayMode: DecayMode;
@@ -43,6 +47,7 @@ const DEFAULTS: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    fingerHints: true,
     decayMode: "gentle",
     reviewCap: REVIEW_CAP,
 };
@@ -83,6 +88,8 @@ export function loadPrefs(): Prefs {
             noteHints: NOTE_HINTS.includes(parsed.noteHints)
                 ? parsed.noteHints
                 : DEFAULTS.noteHints,
+            fingerHints:
+                typeof parsed.fingerHints === "boolean" ? parsed.fingerHints : DEFAULTS.fingerHints,
             decayMode: DECAY_MODES.includes(parsed.decayMode)
                 ? parsed.decayMode
                 : DEFAULTS.decayMode,

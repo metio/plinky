@@ -36,6 +36,19 @@ const QUALITY_STYLE: Record<FingerQuality, string> = {
     ok: "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40",
     bad: "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40",
 };
+
+// A glyph per verdict so the feedback doesn't rely on colour alone — readable to a
+// colour-blind player, and a label for assistive tech.
+const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string }> = {
+    good: { glyph: "✓", label: () => m.fingering_quality_good() },
+    ok: { glyph: "≈", label: () => m.fingering_quality_ok() },
+    bad: { glyph: "!", label: () => m.fingering_quality_bad() },
+};
+const QUALITY_TEXT: Record<FingerQuality, string> = {
+    good: "text-green-700 dark:text-green-300",
+    ok: "text-amber-700 dark:text-amber-300",
+    bad: "text-red-700 dark:text-red-300",
+};
 const NEUTRAL = "border-gray-200 dark:border-gray-800";
 
 // A self-paced grade for the fingering's smoothness, reusing the run grade's
@@ -58,6 +71,7 @@ export function FingeringDrill({
     hand,
     initialFingers,
     onAssign,
+    hints = true,
 }: {
     positions: number[][];
     hand: "left" | "right";
@@ -66,6 +80,9 @@ export function FingeringDrill({
     // starts blank and saves nothing.
     initialFingers?: (number | null)[][];
     onAssign?: (pos: number, note: number, finger: number) => void;
+    // Live per-note feedback as you go. Off leaves the line plain until you check it,
+    // for a learner building their own judgement.
+    hints?: boolean;
 }) {
     const synth = useSynth();
     const [fingers, setFingers] = useState<(number | null)[][]>(
@@ -88,10 +105,13 @@ export function FingeringDrill({
     );
 
     // Per-position verdict that colours each note as it's fingered — live feedback,
-    // recomputed whenever a choice changes.
+    // recomputed whenever a choice changes. Empty when hints are faded off.
     const qualities = useMemo(
-        () => fingerQualities(positions, fingers, hand, loadPrefs().handSpan[hand] ?? undefined),
-        [positions, fingers, hand],
+        () =>
+            hints
+                ? fingerQualities(positions, fingers, hand, loadPrefs().handSpan[hand] ?? undefined)
+                : positions.map(() => null),
+        [positions, fingers, hand, hints],
     );
 
     const assign = useCallback(
@@ -162,6 +182,16 @@ export function FingeringDrill({
                             qualities[p] ? QUALITY_STYLE[qualities[p]!] : NEUTRAL
                         }`}
                     >
+                        {qualities[p] && (
+                            <span
+                                role="img"
+                                aria-label={QUALITY_SYMBOL[qualities[p]!].label()}
+                                title={QUALITY_SYMBOL[qualities[p]!].label()}
+                                className={`text-center text-xs font-bold leading-none ${QUALITY_TEXT[qualities[p]!]}`}
+                            >
+                                {QUALITY_SYMBOL[qualities[p]!].glyph}
+                            </span>
+                        )}
                         {pos
                             .map((pitch, note) => ({ pitch, note }))
                             .reverse()
@@ -205,7 +235,11 @@ export function FingeringDrill({
                 ))}
             </div>
 
-            <p className="text-xs text-gray-500 dark:text-gray-400">{m.fingering_color_legend()}</p>
+            {hints && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {m.fingering_color_legend()}
+                </p>
+            )}
 
             {result ? (
                 <div className="space-y-3">
