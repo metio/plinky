@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router";
+import { BottomNav } from "../components/navBar";
 import { ensureSeeded } from "../lib/songs";
 import { isLocale } from "../paraglide/runtime.js";
 
@@ -27,5 +28,13 @@ export default function LocaleLayout() {
         ensureSeeded();
     }, []);
 
-    return <Outlet />;
+    return (
+        <>
+            {/* Room for the fixed mobile tab bar so it never covers the last of a page. */}
+            <div className="pb-20 sm:pb-0">
+                <Outlet />
+            </div>
+            <BottomNav />
+        </>
+    );
 }

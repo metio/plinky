@@ -119,3 +119,57 @@ export function PlugIcon({ className }: IconProps) {
         </Icon>
     );
 }
+
+// --- Navigation icons --------------------------------------------------------
+
+// A house — "home".
+export function HomeIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M3 11l9-7 9 7" />
+            <path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" />
+            <path d="M10 20v-6h4v6" />
+        </Icon>
+    );
+}
+
+// A book — "the library".
+export function BookIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M6 4h11a1 1 0 0 1 1 1v15H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+            <path d="M6 17h12" />
+        </Icon>
+    );
+}
+
+// Concentric rings around a centre — a target, for the daily challenge.
+export function TargetIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <circle cx="12" cy="12" r="8" />
+            <circle cx="12" cy="12" r="3.5" />
+        </Icon>
+    );
+}
+
+// A beamed pair of notes — "compose".
+export function NotesIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M9 17V5l10-2v12" />
+            <circle cx="6.5" cy="17" r="2.5" fill="currentColor" stroke="none" />
+            <circle cx="16.5" cy="15" r="2.5" fill="currentColor" stroke="none" />
+        </Icon>
+    );
+}
+
+// A graduation cap — "you" / your grade.
+export function GradCapIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M2 9l10-4 10 4-10 4z" />
+            <path d="M6 11v5c0 1.3 2.7 2.5 6 2.5s6-1.2 6-2.5v-5" />
+        </Icon>
+    );
+}

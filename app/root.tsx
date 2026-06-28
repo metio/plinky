@@ -15,6 +15,7 @@ import {
 import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/localizedLink";
 import { GradeBadge } from "./components/gradeBadge";
+import { HeaderNav } from "./components/navBar";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
@@ -77,7 +78,7 @@ export const links: Route.LinksFunction = () => [
 // screen, including the error page, giving a way back from anywhere.
 function Header() {
     return (
-        <nav className="border-b border-gray-200 px-6 py-3 font-sans dark:border-gray-800">
+        <header className="border-b border-gray-200 px-6 py-3 font-sans dark:border-gray-800">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Link to="/" aria-label="Plinky home">
@@ -85,10 +86,11 @@ function Header() {
                     </Link>
                     <GradeBadge />
                 </div>
+                {/* On wide screens the destinations sit inline; on phones they move to
+                    the fixed bottom tab bar (BottomNav), so the header stays slim. */}
+                <HeaderNav className="hidden items-center gap-1 sm:flex" />
                 <div className="flex items-center gap-4">
                     <ThemeToggle />
-                    {/* Compose and Library reach from the home tiles (and the logo
-                        always links home), so the header stays slim on mobile. */}
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
@@ -117,7 +119,7 @@ function Header() {
                     </Link>
                 </div>
             </div>
-        </nav>
+        </header>
     );
 }
 
