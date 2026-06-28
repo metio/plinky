@@ -797,277 +797,305 @@ export function ScoreViewer({
                 >
                     {matcher.practicing ? m.action_listen_stop() : m.curriculums_practice()}
                 </button>
-                <button
-                    type="button"
-                    onClick={() => setMetronomeOn((on) => !on)}
-                    aria-pressed={metronomeOn}
-                    className={
-                        metronomeOn
-                            ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                            : BUTTON
-                    }
-                >
-                    {m.action_metronome()}
-                </button>
-                {metronomeOn && (
-                    <span className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setAdaptive((on) => !on)}
-                            aria-pressed={adaptive}
-                            className={
-                                adaptive
-                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                                    : BUTTON
-                            }
-                        >
-                            {m.metronome_adaptive()}
-                        </button>
-                        {adaptive && (
-                            <Bpm
-                                tempo={liveTempo}
-                                className="text-sm text-gray-600 dark:text-gray-400"
-                            />
-                        )}
-                        <fieldset
-                            aria-label={m.metronome_subdivision()}
-                            className="flex items-center gap-1"
-                        >
-                            {[1, 2, 3, 4].map((n) => (
-                                <button
-                                    key={n}
-                                    type="button"
-                                    onClick={() => setSubdivision(n)}
-                                    aria-pressed={subdivision === n}
-                                    className={
-                                        subdivision === n
-                                            ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
-                                            : `${BUTTON} tabular-nums`
-                                    }
-                                >
-                                    {n}
-                                </button>
-                            ))}
-                        </fieldset>
-                    </span>
+                {!fullscreen && (
+                    <button
+                        type="button"
+                        onClick={enterFullscreen}
+                        aria-label={m.action_fullscreen()}
+                        title={m.action_fullscreen()}
+                        className={ICON_BUTTON}
+                    >
+                        <MaximizeIcon />
+                    </button>
                 )}
-                {staffCount >= 2 && (
-                    <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
-                        {(["both", "right", "left"] as const).map((option) => (
+                {/* Everything past the primary actions folds away — most players never
+                    touch it, and full screen hides it entirely so only the notes and keys
+                    remain. The defaults (tempo from the piece, fingerings on, bars auto)
+                    are good, so closed-by-default loses nothing. */}
+                {!fullscreen && (
+                    <details className="basis-full">
+                        <summary className="cursor-pointer text-sm font-medium text-indigo-700 dark:text-indigo-300">
+                            {m.more_options()}
+                        </summary>
+                        <div className="flex flex-wrap items-center gap-3 pt-2">
                             <button
-                                key={option}
                                 type="button"
-                                // The hand is fixed once a run starts, so the choice
-                                // is locked while practicing to keep the count honest.
-                                disabled={matcher.practicing}
-                                onClick={() => setHand(option)}
-                                aria-pressed={hand === option}
+                                onClick={() => setMetronomeOn((on) => !on)}
+                                aria-pressed={metronomeOn}
                                 className={
-                                    hand === option
-                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                                    metronomeOn
+                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
                                         : BUTTON
                                 }
                             >
-                                {handLabel[option]}
+                                {m.action_metronome()}
                             </button>
-                        ))}
-                    </fieldset>
-                )}
-                {lockTempo ? (
-                    <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        {m.scores_tempo()}
-                        <Bpm tempo={tempo} />
-                    </span>
-                ) : (
-                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        {m.scores_tempo()}
-                        <input
-                            type="range"
-                            min={40}
-                            max={180}
-                            value={tempo}
-                            onChange={(event) => setTempo(Number(event.target.value))}
-                            aria-label={m.scores_tempo()}
-                        />
-                        <Bpm tempo={tempo} className="w-12" />
-                    </label>
-                )}
-                {!lockTempo && (
-                    <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <button
-                            type="button"
-                            onClick={() => setTrainerOn((on) => !on)}
-                            aria-pressed={trainerOn}
-                            className={
-                                trainerOn
-                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                                    : BUTTON
-                            }
-                        >
-                            {m.tempo_trainer()}
-                        </button>
-                        {trainerOn && (
-                            <>
-                                <span aria-hidden="true">→</span>
-                                <input
-                                    type="range"
-                                    min={40}
-                                    max={180}
-                                    value={trainerTarget}
-                                    onChange={(event) =>
-                                        setTrainerTarget(Number(event.target.value))
+                            {metronomeOn && (
+                                <span className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setAdaptive((on) => !on)}
+                                        aria-pressed={adaptive}
+                                        className={
+                                            adaptive
+                                                ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                                : BUTTON
+                                        }
+                                    >
+                                        {m.metronome_adaptive()}
+                                    </button>
+                                    {adaptive && (
+                                        <Bpm
+                                            tempo={liveTempo}
+                                            className="text-sm text-gray-600 dark:text-gray-400"
+                                        />
+                                    )}
+                                    <fieldset
+                                        aria-label={m.metronome_subdivision()}
+                                        className="flex items-center gap-1"
+                                    >
+                                        {[1, 2, 3, 4].map((n) => (
+                                            <button
+                                                key={n}
+                                                type="button"
+                                                onClick={() => setSubdivision(n)}
+                                                aria-pressed={subdivision === n}
+                                                className={
+                                                    subdivision === n
+                                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
+                                                        : `${BUTTON} tabular-nums`
+                                                }
+                                            >
+                                                {n}
+                                            </button>
+                                        ))}
+                                    </fieldset>
+                                </span>
+                            )}
+                            {staffCount >= 2 && (
+                                <fieldset
+                                    aria-label={m.hand_label()}
+                                    className="flex items-center gap-1"
+                                >
+                                    {(["both", "right", "left"] as const).map((option) => (
+                                        <button
+                                            key={option}
+                                            type="button"
+                                            // The hand is fixed once a run starts, so the choice
+                                            // is locked while practicing to keep the count honest.
+                                            disabled={matcher.practicing}
+                                            onClick={() => setHand(option)}
+                                            aria-pressed={hand === option}
+                                            className={
+                                                hand === option
+                                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                                                    : BUTTON
+                                            }
+                                        >
+                                            {handLabel[option]}
+                                        </button>
+                                    ))}
+                                </fieldset>
+                            )}
+                            {lockTempo ? (
+                                <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {m.scores_tempo()}
+                                    <Bpm tempo={tempo} />
+                                </span>
+                            ) : (
+                                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {m.scores_tempo()}
+                                    <input
+                                        type="range"
+                                        min={40}
+                                        max={180}
+                                        value={tempo}
+                                        onChange={(event) => setTempo(Number(event.target.value))}
+                                        aria-label={m.scores_tempo()}
+                                    />
+                                    <Bpm tempo={tempo} className="w-12" />
+                                </label>
+                            )}
+                            {!lockTempo && (
+                                <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <button
+                                        type="button"
+                                        onClick={() => setTrainerOn((on) => !on)}
+                                        aria-pressed={trainerOn}
+                                        className={
+                                            trainerOn
+                                                ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                                : BUTTON
+                                        }
+                                    >
+                                        {m.tempo_trainer()}
+                                    </button>
+                                    {trainerOn && (
+                                        <>
+                                            <span aria-hidden="true">→</span>
+                                            <input
+                                                type="range"
+                                                min={40}
+                                                max={180}
+                                                value={trainerTarget}
+                                                onChange={(event) =>
+                                                    setTrainerTarget(Number(event.target.value))
+                                                }
+                                                aria-label={m.tempo_trainer_target()}
+                                            />
+                                            <Bpm tempo={trainerTarget} className="w-12" />
+                                        </>
+                                    )}
+                                </span>
+                            )}
+                            {ready && measureCount > 1 && (
+                                <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <button
+                                        type="button"
+                                        onClick={() => setLoopOn((on) => !on)}
+                                        aria-pressed={loopOn}
+                                        className={
+                                            loopOn
+                                                ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                                : BUTTON
+                                        }
+                                    >
+                                        {m.loop_section()}
+                                    </button>
+                                    {loopOn && (
+                                        <>
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                max={measureCount}
+                                                value={loopFrom}
+                                                onChange={(event) => {
+                                                    const value = Math.min(
+                                                        Math.max(Number(event.target.value), 1),
+                                                        measureCount,
+                                                    );
+                                                    setLoopFrom(value);
+                                                    // The start can't pass the end — drag the end
+                                                    // along so the range never inverts.
+                                                    setLoopTo((to) => Math.max(to, value));
+                                                }}
+                                                aria-label={m.loop_from()}
+                                                className={NUMBER_INPUT}
+                                            />
+                                            <span aria-hidden="true">–</span>
+                                            <input
+                                                type="number"
+                                                min={loopFrom}
+                                                max={measureCount}
+                                                value={loopTo}
+                                                onChange={(event) =>
+                                                    setLoopTo(
+                                                        Math.min(
+                                                            Math.max(
+                                                                Number(event.target.value),
+                                                                loopFrom,
+                                                            ),
+                                                            measureCount,
+                                                        ),
+                                                    )
+                                                }
+                                                aria-label={m.loop_to()}
+                                                className={NUMBER_INPUT}
+                                            />
+                                        </>
+                                    )}
+                                </span>
+                            )}
+                            {!lockTempo && (
+                                <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                    {m.transpose()}
+                                    <button
+                                        type="button"
+                                        disabled={transpose <= -12}
+                                        onClick={() =>
+                                            setTranspose((value) => Math.max(value - 1, -12))
+                                        }
+                                        aria-label={m.transpose_down()}
+                                        className={`${BUTTON} tabular-nums`}
+                                    >
+                                        −
+                                    </button>
+                                    <span className="w-12 text-center font-mono tabular-nums">
+                                        {m.transpose_semitones({
+                                            count:
+                                                transpose > 0
+                                                    ? `+${transpose}`
+                                                    : transpose < 0
+                                                      ? `−${-transpose}`
+                                                      : "0",
+                                        })}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        disabled={transpose >= 12}
+                                        onClick={() =>
+                                            setTranspose((value) => Math.min(value + 1, 12))
+                                        }
+                                        aria-label={m.transpose_up()}
+                                        className={`${BUTTON} tabular-nums`}
+                                    >
+                                        +
+                                    </button>
+                                    {transpose !== 0 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setTranspose(0)}
+                                            aria-label={m.transpose_reset()}
+                                            className={BUTTON}
+                                        >
+                                            ↺
+                                        </button>
+                                    )}
+                                </span>
+                            )}
+                            {hasSaved && loadPrefs().showFingerings && (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMine((on) => !on)}
+                                    aria-pressed={showMine}
+                                    className={
+                                        showMine
+                                            ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                            : BUTTON
                                     }
-                                    aria-label={m.tempo_trainer_target()}
-                                />
-                                <Bpm tempo={trainerTarget} className="w-12" />
-                            </>
-                        )}
-                    </span>
+                                >
+                                    {m.fingering_show_mine()}
+                                </button>
+                            )}
+                            <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                {m.bars_per_row()}
+                                <fieldset
+                                    aria-label={m.bars_per_row()}
+                                    className="flex items-center gap-1"
+                                >
+                                    {BARS_PER_ROW.map((n) => (
+                                        <button
+                                            key={n}
+                                            type="button"
+                                            onClick={() => {
+                                                setBarsPerRow(n);
+                                                savePrefs({ ...loadPrefs(), barsPerRow: n });
+                                            }}
+                                            aria-pressed={barsPerRow === n}
+                                            className={
+                                                barsPerRow === n
+                                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
+                                                    : `${BUTTON} tabular-nums`
+                                            }
+                                        >
+                                            {n === 0 ? m.bars_per_row_auto() : n}
+                                        </button>
+                                    ))}
+                                </fieldset>
+                            </span>
+                        </div>
+                    </details>
                 )}
-                {ready && measureCount > 1 && (
-                    <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <button
-                            type="button"
-                            onClick={() => setLoopOn((on) => !on)}
-                            aria-pressed={loopOn}
-                            className={
-                                loopOn
-                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                                    : BUTTON
-                            }
-                        >
-                            {m.loop_section()}
-                        </button>
-                        {loopOn && (
-                            <>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    max={measureCount}
-                                    value={loopFrom}
-                                    onChange={(event) => {
-                                        const value = Math.min(
-                                            Math.max(Number(event.target.value), 1),
-                                            measureCount,
-                                        );
-                                        setLoopFrom(value);
-                                        // The start can't pass the end — drag the end
-                                        // along so the range never inverts.
-                                        setLoopTo((to) => Math.max(to, value));
-                                    }}
-                                    aria-label={m.loop_from()}
-                                    className={NUMBER_INPUT}
-                                />
-                                <span aria-hidden="true">–</span>
-                                <input
-                                    type="number"
-                                    min={loopFrom}
-                                    max={measureCount}
-                                    value={loopTo}
-                                    onChange={(event) =>
-                                        setLoopTo(
-                                            Math.min(
-                                                Math.max(Number(event.target.value), loopFrom),
-                                                measureCount,
-                                            ),
-                                        )
-                                    }
-                                    aria-label={m.loop_to()}
-                                    className={NUMBER_INPUT}
-                                />
-                            </>
-                        )}
-                    </span>
-                )}
-                {!lockTempo && (
-                    <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                        {m.transpose()}
-                        <button
-                            type="button"
-                            disabled={transpose <= -12}
-                            onClick={() => setTranspose((value) => Math.max(value - 1, -12))}
-                            aria-label={m.transpose_down()}
-                            className={`${BUTTON} tabular-nums`}
-                        >
-                            −
-                        </button>
-                        <span className="w-12 text-center font-mono tabular-nums">
-                            {m.transpose_semitones({
-                                count:
-                                    transpose > 0
-                                        ? `+${transpose}`
-                                        : transpose < 0
-                                          ? `−${-transpose}`
-                                          : "0",
-                            })}
-                        </span>
-                        <button
-                            type="button"
-                            disabled={transpose >= 12}
-                            onClick={() => setTranspose((value) => Math.min(value + 1, 12))}
-                            aria-label={m.transpose_up()}
-                            className={`${BUTTON} tabular-nums`}
-                        >
-                            +
-                        </button>
-                        {transpose !== 0 && (
-                            <button
-                                type="button"
-                                onClick={() => setTranspose(0)}
-                                aria-label={m.transpose_reset()}
-                                className={BUTTON}
-                            >
-                                ↺
-                            </button>
-                        )}
-                    </span>
-                )}
-                {hasSaved && loadPrefs().showFingerings && (
-                    <button
-                        type="button"
-                        onClick={() => setShowMine((on) => !on)}
-                        aria-pressed={showMine}
-                        className={
-                            showMine
-                                ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-                                : BUTTON
-                        }
-                    >
-                        {m.fingering_show_mine()}
-                    </button>
-                )}
-                <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                    {m.bars_per_row()}
-                    <fieldset aria-label={m.bars_per_row()} className="flex items-center gap-1">
-                        {BARS_PER_ROW.map((n) => (
-                            <button
-                                key={n}
-                                type="button"
-                                onClick={() => {
-                                    setBarsPerRow(n);
-                                    savePrefs({ ...loadPrefs(), barsPerRow: n });
-                                }}
-                                aria-pressed={barsPerRow === n}
-                                className={
-                                    barsPerRow === n
-                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
-                                        : `${BUTTON} tabular-nums`
-                                }
-                            >
-                                {n === 0 ? m.bars_per_row_auto() : n}
-                            </button>
-                        ))}
-                    </fieldset>
-                </span>
-                <button
-                    type="button"
-                    onClick={enterFullscreen}
-                    aria-label={m.action_fullscreen()}
-                    title={m.action_fullscreen()}
-                    className={ICON_BUTTON}
-                >
-                    <MaximizeIcon />
-                </button>
             </div>
 
             {ready && !fullscreen && (
