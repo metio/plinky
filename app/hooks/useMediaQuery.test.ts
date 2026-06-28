@@ -3,11 +3,10 @@
 // @vitest-environment jsdom
 
 import { renderHook } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { useMediaQuery } from "./useMediaQuery";
 
-afterEach(() => vi.unstubAllGlobals());
-
+// The global test-setup unstubs globals after each test, so each stub starts clean.
 function stubMatchMedia(matches: boolean): void {
     vi.stubGlobal("matchMedia", () => ({
         matches,
