@@ -3,6 +3,7 @@
 
 import { useMidiConnection } from "../contexts/midi";
 import { m } from "../paraglide/messages.js";
+import { useMidiConnected } from "./conditional";
 import { CheckIcon, PlugIcon } from "./icons";
 
 // A small status dot in the corner of every keyboard: a green tick the moment a MIDI
@@ -11,12 +12,12 @@ import { CheckIcon, PlugIcon } from "./icons";
 // Web MIDI at all (Safari, every iOS), connecting is impossible and the on-screen keys
 // are the instrument, so the badge is hidden rather than showing a permanent failure.
 export function MidiBadge() {
-    const { support, status, devices } = useMidiConnection();
+    const { support } = useMidiConnection();
+    const connected = useMidiConnected();
     if (support === "unsupported") {
         return null;
     }
 
-    const connected = status === "ready" && devices.length > 0;
     const label = connected ? m.midi_badge_connected() : m.midi_badge_disconnected();
     return (
         <span
