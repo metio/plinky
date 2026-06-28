@@ -34,7 +34,9 @@ also force a **set number of bars per row** for bigger, more readable notation o
 small screen. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
-Single notes, **chords**, and **two-hand grand staffs** all work the same.
+Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
+**Keep going** and a missed note no longer freezes you — playing the next one moves the
+score along, so one hand's slip never stops the other.
 
 When you finish, the run is **graded S–F** from three things:
 

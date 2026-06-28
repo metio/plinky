@@ -271,9 +271,12 @@ export function ScoreViewer({
         }
     }, [id, canShareGhost, searchParams]);
 
+    // Keep-going mode, remembered across pieces; captured by the matcher at run start.
+    const [forgiving, setForgiving] = useState(() => loadPrefs().forgiving);
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
         hand,
+        forgiving,
         onCorrect: (info: CorrectInfo) => {
             for (const pitch of info.pitches) {
                 synth.playNote(pitch);
@@ -818,6 +821,25 @@ export function ScoreViewer({
                             {m.more_options()}
                         </summary>
                         <div className="flex flex-wrap items-center gap-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setForgiving((on) => {
+                                        const next = !on;
+                                        savePrefs({ ...loadPrefs(), forgiving: next });
+                                        return next;
+                                    })
+                                }
+                                aria-pressed={forgiving}
+                                title={m.forgiving_hint()}
+                                className={
+                                    forgiving
+                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                        : BUTTON
+                                }
+                            >
+                                {m.forgiving_toggle()}
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => setMetronomeOn((on) => !on)}

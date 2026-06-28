@@ -14,6 +14,7 @@ const BASE: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    forgiving: false,
     fingerHints: true,
     decayMode: "gentle",
     reviewCap: 8,

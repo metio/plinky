@@ -176,6 +176,46 @@ describe("useScoreMatcher", () => {
         expect(result.current.complete).toBe(true);
     });
 
+    it("forgiving mode advances past a slip when you move to the next note", () => {
+        const positions: Position[] = [
+            [
+                { midi: 60, staff: 0 }, // right
+                { midi: 48, staff: 1 }, // left
+            ],
+            [
+                { midi: 62, staff: 0 },
+                { midi: 50, staff: 1 },
+            ],
+        ];
+        const { result } = render(positions, { forgiving: true });
+        act(() => result.current.start());
+        expect(result.current.expected).toEqual([60, 48]);
+
+        // Right hand of the first chord lands; the left hand is fluffed, so a strict run
+        // would freeze here.
+        act(() => result.current.registerNote(60));
+        expect(result.current.done).toBe(0);
+
+        // Playing the next chord's right note means the player has moved on: the first
+        // position is credited with what was played and the cursor advances.
+        act(() => result.current.registerNote(62));
+        expect(result.current.done).toBe(1);
+        expect(result.current.expected).toEqual([62, 50]);
+
+        act(() => result.current.registerNote(50));
+        expect(result.current.complete).toBe(true);
+        expect(result.current.done).toBe(2);
+    });
+
+    it("strict mode does not advance on the next note, so a slip blocks", () => {
+        const positions: Position[] = [[60], [62]];
+        const { result } = render(positions); // strict (default)
+        act(() => result.current.start());
+        act(() => result.current.registerNote(62)); // the next note, played early
+        expect(result.current.wrong).toBe(1);
+        expect(result.current.done).toBe(0);
+    });
+
     it("freezes the tempo at start so a later change doesn't rescale note times", () => {
         const onCorrect = vi.fn();
         const { result, rerender } = render([[60], [62]], { onCorrect, tempo: 100 });

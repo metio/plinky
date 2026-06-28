@@ -23,6 +23,10 @@ export type Prefs = {
     // fingerings out unaided, the way they must at a real piano.
     showFingerings: boolean;
     noteHints: NoteHints;
+    // Keep going past a slip: when on, playing the next note advances the score even if a
+    // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
+    // freezes you mid-piece. Off waits for every note, which builds accuracy.
+    forgiving: boolean;
     // Live green/amber/red feedback as you finger a passage. On by default, but the
     // guidance-hypothesis warns constant feedback can stunt self-judgement, so a learner
     // can fade it off and rely on the post-phrase summary.
@@ -54,6 +58,7 @@ const DEFAULTS: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    forgiving: false,
     fingerHints: true,
     decayMode: "gentle",
     reviewCap: REVIEW_CAP,
@@ -96,6 +101,8 @@ export function loadPrefs(): Prefs {
             noteHints: NOTE_HINTS.includes(parsed.noteHints)
                 ? parsed.noteHints
                 : DEFAULTS.noteHints,
+            forgiving:
+                typeof parsed.forgiving === "boolean" ? parsed.forgiving : DEFAULTS.forgiving,
             fingerHints:
                 typeof parsed.fingerHints === "boolean" ? parsed.fingerHints : DEFAULTS.fingerHints,
             decayMode: DECAY_MODES.includes(parsed.decayMode)

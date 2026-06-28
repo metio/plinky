@@ -66,7 +66,15 @@ export type CorrectInfo = {
 
 export function useScoreMatcher(
     getOsmd: () => OpenSheetMusicDisplay | null,
-    options: { onCorrect?: (info: CorrectInfo) => void; tempo?: number; hand?: Hand } = {},
+    options: {
+        onCorrect?: (info: CorrectInfo) => void;
+        tempo?: number;
+        hand?: Hand;
+        // Forgiving advance: when the player plays a note belonging to the NEXT position,
+        // treat the current one as done (crediting only what they played) and move on, so
+        // a slip — especially the wrong hand in a two-hand piece — never freezes the run.
+        forgiving?: boolean;
+    } = {},
 ) {
     const [practicing, setPracticing] = useState(false);
     const [expected, setExpected] = useState<number[]>([]);
@@ -99,6 +107,11 @@ export function useScoreMatcher(
     // The hand is fixed for the duration of a run, captured at start, so a change
     // to the selector mid-run can't desync the position count from what's matched.
     const runHandRef = useRef<Hand>(options.hand ?? "both");
+    const runForgivingRef = useRef(options.forgiving ?? false);
+    // The full step sequence and the current index into it, so forgiving mode can ask
+    // "does this note belong to the NEXT position?" without disturbing the cursor.
+    const stepsRef = useRef<number[][]>([]);
+    const stepRef = useRef(0);
 
     const stop = useCallback(() => {
         practicingRef.current = false;
@@ -133,6 +146,10 @@ export function useScoreMatcher(
             osmd.cursor.hide();
             return;
         }
+        // The whole sequence, for forgiving look-ahead; collectSteps leaves the cursor
+        // reset, so position it again below.
+        stepsRef.current = collectSteps(osmd, hand);
+        stepRef.current = 0;
         osmd.cursor.reset();
         advancePastRests(osmd, hand);
         osmd.cursor.show();
@@ -142,6 +159,7 @@ export function useScoreMatcher(
         sinceWrong.current = 0;
         runTempoRef.current = optionsRef.current.tempo ?? 100;
         runHandRef.current = hand;
+        runForgivingRef.current = optionsRef.current.forgiving ?? false;
         practicingRef.current = true;
         setTotal(count);
         setDone(0);
@@ -159,50 +177,74 @@ export function useScoreMatcher(
             if (!practicingRef.current || !osmd || osmd.cursor.iterator.EndReached) {
                 return;
             }
+            // Clear the current position: record what was played, step the cursor and
+            // index forward, and set up the next — returns false once the run is complete.
+            const advance = (playedPitches: number[]): boolean => {
+                const timeMs =
+                    (osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) *
+                    4 *
+                    (60000 / runTempoRef.current);
+                optionsRef.current.onCorrect?.({
+                    pitches: playedPitches,
+                    ordinal: ordinalRef.current,
+                    timestamp,
+                    timeMs,
+                    velocity,
+                    wrongBefore: sinceWrong.current,
+                });
+                ordinalRef.current += 1;
+                sinceWrong.current = 0;
+                hit.current.clear();
+                osmd.cursor.next();
+                advancePastRests(osmd, runHandRef.current);
+                stepRef.current += 1;
+                setBar(osmd.cursor.iterator.CurrentMeasureIndex);
+                setDone((value) => value + 1);
+                if (osmd.cursor.iterator.EndReached) {
+                    osmd.cursor.hide();
+                    practicingRef.current = false;
+                    setComplete(true);
+                    setExpected([]);
+                    setPracticing(false);
+                    return false;
+                }
+                // A new position clears the per-position miss flag, so the "reveal on
+                // mistake" hint hides again until the next slip.
+                setMissedHere(false);
+                setExpected(pitchesAtCursor(osmd, runHandRef.current));
+                return true;
+            };
+
             const expectedNow = pitchesAtCursor(osmd, runHandRef.current);
-            if (!expectedNow.includes(note)) {
-                setWrong((value) => value + 1);
-                sinceWrong.current += 1;
-                setMissedHere(true);
-                wrongSeq.current += 1;
-                setLastWrong({ note, seq: wrongSeq.current });
+            if (expectedNow.includes(note)) {
+                hit.current.add(note);
+                if (expectedNow.every((pitch) => hit.current.has(pitch))) {
+                    advance(expectedNow);
+                }
                 return;
             }
-            hit.current.add(note);
-            if (!expectedNow.every((pitch) => hit.current.has(pitch))) {
+            // The note isn't for this position. Forgiving mode: if it starts the NEXT
+            // position the player has moved on — credit what they played here, advance,
+            // and let this note count toward the new position, so one hand's slip never
+            // freezes the other.
+            if (runForgivingRef.current && stepsRef.current[stepRef.current + 1]?.includes(note)) {
+                if (advance([...hit.current])) {
+                    const nextExpected = pitchesAtCursor(osmd, runHandRef.current);
+                    if (nextExpected.includes(note)) {
+                        hit.current.add(note);
+                        if (nextExpected.every((pitch) => hit.current.has(pitch))) {
+                            advance(nextExpected);
+                        }
+                    }
+                }
                 return;
             }
-            const timeMs =
-                (osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) *
-                4 *
-                (60000 / runTempoRef.current);
-            optionsRef.current.onCorrect?.({
-                pitches: expectedNow,
-                ordinal: ordinalRef.current,
-                timestamp,
-                timeMs,
-                velocity,
-                wrongBefore: sinceWrong.current,
-            });
-            ordinalRef.current += 1;
-            sinceWrong.current = 0;
-            hit.current.clear();
-            osmd.cursor.next();
-            advancePastRests(osmd, runHandRef.current);
-            setBar(osmd.cursor.iterator.CurrentMeasureIndex);
-            setDone((value) => value + 1);
-            if (osmd.cursor.iterator.EndReached) {
-                osmd.cursor.hide();
-                practicingRef.current = false;
-                setComplete(true);
-                setExpected([]);
-                setPracticing(false);
-                return;
-            }
-            // Advancing to a new position clears the per-position miss flag, so the
-            // "reveal on mistake" hint hides again until the next slip.
-            setMissedHere(false);
-            setExpected(pitchesAtCursor(osmd, runHandRef.current));
+            // A genuine wrong note.
+            setWrong((value) => value + 1);
+            sinceWrong.current += 1;
+            setMissedHere(true);
+            wrongSeq.current += 1;
+            setLastWrong({ note, seq: wrongSeq.current });
         },
         [getOsmd],
     );
