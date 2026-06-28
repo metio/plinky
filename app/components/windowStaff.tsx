@@ -72,7 +72,7 @@ export function WindowStaff({
             tabIndex={0}
             role="img"
             aria-label={label}
-            className="overflow-x-auto rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800"
+            className="no-scrollbar overflow-x-auto rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800"
         />
     );
 }

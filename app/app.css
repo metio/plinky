@@ -38,3 +38,13 @@ body {
 html.dark {
     color-scheme: dark;
 }
+
+/* Hide the scrollbar on the score scroll boxes while keeping them scrollable — the
+   staff auto-scrolls to follow the cursor and stays keyboard-focusable, so the bar is
+   visual noise. Cross-browser: Firefox/standard + WebKit/Blink. */
+.no-scrollbar {
+    scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}

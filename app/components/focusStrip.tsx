@@ -71,7 +71,7 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
             ref={containerRef}
             role="img"
             aria-label={label}
-            className="max-h-[150px] overflow-auto rounded-md border border-indigo-200 bg-white p-2 dark:border-indigo-900"
+            className="no-scrollbar max-h-[150px] overflow-auto rounded-md border border-indigo-200 bg-white p-2 dark:border-indigo-900"
         />
     );
 }

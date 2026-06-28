@@ -57,6 +57,25 @@ describe("ScoreViewer", () => {
         expect(button.getAttribute("aria-pressed")).toBe("false");
     });
 
+    it("re-renders as a single horizontal line when treadmill is toggled on", async () => {
+        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByText(/Practice/);
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        const treadmill = screen.getByRole("button", { name: "Treadmill" });
+        expect(treadmill.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(treadmill);
+        expect(treadmill.getAttribute("aria-pressed")).toBe("true");
+        // The score reloads with one horizontal staffline; Practice re-enabling proves
+        // the re-render succeeded rather than leaving a dead viewer.
+        await waitFor(
+            () => expect((screen.getByText(/Practice/) as HTMLButtonElement).disabled).toBe(false),
+            { timeout: 30000 },
+        );
+    });
+
     it("reveals the adaptive toggle only while the metronome is on", async () => {
         render(
             <MemoryRouter>

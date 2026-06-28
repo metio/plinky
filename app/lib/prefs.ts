@@ -50,6 +50,10 @@ export type Prefs = {
     // follows the notes, so a wide piece's keys stay a playable size — or 0 to frame the
     // whole piece at once (fixed, never sliding, for players who prefer a stable map).
     keyboardOctaves: number;
+    // Render the piece as one continuous horizontal line that scrolls under a fixed gaze
+    // as you play (a notation "treadmill"), instead of wrapping into stacked rows. Off by
+    // default — the wrapped score is the familiar reading layout.
+    treadmill: boolean;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -78,6 +82,7 @@ const DEFAULTS: Prefs = {
     barsPerRow: 0,
     keyMap: DEFAULT_KEY_MAP,
     keyboardOctaves: 2,
+    treadmill: false,
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
@@ -133,6 +138,8 @@ export function loadPrefs(): Prefs {
             keyboardOctaves: KEYBOARD_OCTAVES.includes(parsed.keyboardOctaves)
                 ? parsed.keyboardOctaves
                 : DEFAULTS.keyboardOctaves,
+            treadmill:
+                typeof parsed.treadmill === "boolean" ? parsed.treadmill : DEFAULTS.treadmill,
         };
     } catch {
         return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan }, keyMap: cleanKeyMap(undefined) };

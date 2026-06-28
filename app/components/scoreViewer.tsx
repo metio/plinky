@@ -204,6 +204,9 @@ export function ScoreViewer({
     const [keyWindow, setKeyWindow] = useState<Span | null>(null);
     const [keyboardOctaves, setKeyboardOctaves] = useState(() => loadPrefs().keyboardOctaves);
     const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
+    // Render the piece as one horizontal line that scrolls under a fixed gaze, instead of
+    // wrapping into rows — the "treadmill" reading mode. Off by default.
+    const [treadmill, setTreadmill] = useState(() => loadPrefs().treadmill);
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -342,6 +345,20 @@ export function ScoreViewer({
     const { support, status, devices, requestAccess } = useMidiConnection();
     const connected = status === "ready" && devices.length > 0;
 
+    // In treadmill mode OSMD's own follow-cursor is off, so the active bar is centred by
+    // hand: scroll its box horizontally to bring the cursor to the middle — the fixed gaze
+    // the music slides under. A no-op when not treadmill or the cursor isn't shown.
+    const centerCursor = useCallback(() => {
+        if (!treadmill) {
+            return;
+        }
+        const el = osmdRef.current?.cursor?.cursorElement;
+        const box = containerRef.current;
+        if (el && box) {
+            box.scrollTo({ left: el.offsetLeft - box.clientWidth / 2, behavior: "smooth" });
+        }
+    }, [treadmill]);
+
     // Slide the keyboard window to keep the notes being played in view, re-framing only
     // when they leave it. Falls back to the whole range (null window) when not practising,
     // where PianoKeyboard's own default applies.
@@ -350,6 +367,13 @@ export function ScoreViewer({
             nextKeyboardWindow(prev, matcher.range, matcher.expected, keyboardSpan),
         );
     }, [matcher.range, matcher.expected, keyboardSpan]);
+
+    // Re-centre the treadmill as the matcher advances through the piece — the cursor
+    // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: done/practicing are the advance signal, not centerCursor inputs
+    useEffect(() => {
+        centerCursor();
+    }, [centerCursor, matcher.done, matcher.practicing]);
 
     useEffect(() => {
         tempoRef.current = tempo;
@@ -598,8 +622,13 @@ export function ScoreViewer({
                     drawingParameters: "compact",
                     // Scroll the staff to keep the cursor in view as it advances, so a
                     // multi-line piece follows along while you play instead of forcing
-                    // you to scroll — critical on a phone where the staff is tall.
-                    followCursor: true,
+                    // you to scroll — critical on a phone where the staff is tall. The
+                    // treadmill drives its own horizontal centring, so OSMD's vertical
+                    // follow is turned off there.
+                    followCursor: !treadmill,
+                    // One continuous horizontal staffline that scrolls right, rather than
+                    // wrapping into rows — the treadmill reading mode.
+                    renderSingleHorizontalStaffline: treadmill,
                 });
                 osmdRef.current = osmd;
                 // Force a fixed number of bars per row when the player picks one, for
@@ -652,7 +681,7 @@ export function ScoreViewer({
                 window.clearTimeout(id);
             }
         };
-    }, [xml, transpose, showMine, saved, barsPerRow]);
+    }, [xml, transpose, showMine, saved, barsPerRow, treadmill]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
@@ -704,6 +733,7 @@ export function ScoreViewer({
                 beats = Math.max(beats, quarters);
             }
             cursor.next();
+            centerCursor();
             timers.current.push(window.setTimeout(tick, beats * (60000 / tempoRef.current)));
         };
         tick();
@@ -789,6 +819,11 @@ export function ScoreViewer({
             {fullscreen && (
                 <div className="flex shrink-0 items-center gap-2">
                     {transport}
+                    {matcher.practicing && (
+                        <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
+                            {matcher.done}/{matcher.total}
+                        </span>
+                    )}
                     <button
                         type="button"
                         onClick={() => setHideKeyboard((on) => !on)}
@@ -834,7 +869,7 @@ export function ScoreViewer({
                     // hands it all the spare height (flex-1); otherwise it's shorter on a
                     // phone so the keys fit; dvh tracks the live viewport so the mobile URL
                     // bar doesn't clip it.
-                    className={`overflow-auto ${
+                    className={`no-scrollbar overflow-auto ${
                         fullscreen ? "min-h-0 flex-1" : compact ? "max-h-[40dvh]" : "max-h-[70vh]"
                     }`}
                 />
@@ -1134,32 +1169,55 @@ export function ScoreViewer({
                                     {m.fingering_show_mine()}
                                 </button>
                             )}
-                            <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                                {m.bars_per_row()}
-                                <fieldset
-                                    aria-label={m.bars_per_row()}
-                                    className="flex items-center gap-1"
-                                >
-                                    {BARS_PER_ROW.map((n) => (
-                                        <button
-                                            key={n}
-                                            type="button"
-                                            onClick={() => {
-                                                setBarsPerRow(n);
-                                                savePrefs({ ...loadPrefs(), barsPerRow: n });
-                                            }}
-                                            aria-pressed={barsPerRow === n}
-                                            className={
-                                                barsPerRow === n
-                                                    ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
-                                                    : `${BUTTON} tabular-nums`
-                                            }
-                                        >
-                                            {n === 0 ? m.bars_per_row_auto() : n}
-                                        </button>
-                                    ))}
-                                </fieldset>
-                            </span>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setTreadmill((on) => {
+                                        const next = !on;
+                                        savePrefs({ ...loadPrefs(), treadmill: next });
+                                        return next;
+                                    })
+                                }
+                                aria-pressed={treadmill}
+                                title={m.treadmill_hint()}
+                                className={
+                                    treadmill
+                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+                                        : BUTTON
+                                }
+                            >
+                                {m.treadmill_toggle()}
+                            </button>
+                            {/* Bars-per-row only shapes the wrapped layout; the treadmill is
+                                a single line, so the control would do nothing there. */}
+                            {!treadmill && (
+                                <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                    {m.bars_per_row()}
+                                    <fieldset
+                                        aria-label={m.bars_per_row()}
+                                        className="flex items-center gap-1"
+                                    >
+                                        {BARS_PER_ROW.map((n) => (
+                                            <button
+                                                key={n}
+                                                type="button"
+                                                onClick={() => {
+                                                    setBarsPerRow(n);
+                                                    savePrefs({ ...loadPrefs(), barsPerRow: n });
+                                                }}
+                                                aria-pressed={barsPerRow === n}
+                                                className={
+                                                    barsPerRow === n
+                                                        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium tabular-nums text-white"
+                                                        : `${BUTTON} tabular-nums`
+                                                }
+                                            >
+                                                {n === 0 ? m.bars_per_row_auto() : n}
+                                            </button>
+                                        ))}
+                                    </fieldset>
+                                </span>
+                            )}
                             <span className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                                 {m.keyboard_octaves()}
                                 <fieldset
@@ -1264,44 +1322,55 @@ export function ScoreViewer({
 
             {matcher.practicing && (
                 <div className={`space-y-2 ${fullscreen ? "shrink-0" : ""}`}>
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                            {m.play_progress()} {matcher.done} / {matcher.total}
-                        </span>
-                        {!connected && support === "supported" && (
-                            <button
-                                type="button"
-                                onClick={requestAccess}
-                                className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white"
-                            >
-                                {status === "requesting" ? m.midi_connecting() : m.midi_connect()}
-                            </button>
-                        )}
-                        {support === "unsupported" && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {m.midi_unsupported_keyboard()}
+                    {/* Full screen keeps only the score and the keys; its progress count
+                        rides in the top bar, so this full-width status row is dropped. */}
+                    {!fullscreen && (
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">
+                                {m.play_progress()} {matcher.done} / {matcher.total}
                             </span>
-                        )}
-                    </div>
-                    {ghost && (
-                        <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
-                    )}
-                    {compact && portrait && coarsePointer && !connected && !rotateDismissed && (
-                        <div className="flex items-center justify-between gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200">
-                            <span>{m.rotate_hint()}</span>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    localStorage.setItem("plinky:rotate-hint", "dismissed");
-                                    setRotateDismissed(true);
-                                }}
-                                aria-label={m.action_dismiss()}
-                                className="shrink-0 font-bold"
-                            >
-                                ✕
-                            </button>
+                            {!connected && support === "supported" && (
+                                <button
+                                    type="button"
+                                    onClick={requestAccess}
+                                    className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white"
+                                >
+                                    {status === "requesting"
+                                        ? m.midi_connecting()
+                                        : m.midi_connect()}
+                                </button>
+                            )}
+                            {support === "unsupported" && (
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {m.midi_unsupported_keyboard()}
+                                </span>
+                            )}
                         </div>
                     )}
+                    {ghost && !fullscreen && (
+                        <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
+                    )}
+                    {compact &&
+                        !fullscreen &&
+                        portrait &&
+                        coarsePointer &&
+                        !connected &&
+                        !rotateDismissed && (
+                            <div className="flex items-center justify-between gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200">
+                                <span>{m.rotate_hint()}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        localStorage.setItem("plinky:rotate-hint", "dismissed");
+                                        setRotateDismissed(true);
+                                    }}
+                                    aria-label={m.action_dismiss()}
+                                    className="shrink-0 font-bold"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        )}
                     {/* On a phone (portrait or landscape), a compact current-bars strip
                         right above the keys, so the notes to play aren't scrolled off
                         behind the keyboard; bigger screens — and full screen, where the

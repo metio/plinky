@@ -22,6 +22,7 @@ const BASE: Prefs = {
     barsPerRow: 0,
     keyMap: DEFAULT_KEY_MAP,
     keyboardOctaves: 2,
+    treadmill: false,
 };
 
 describe("prefs", () => {
@@ -108,5 +109,11 @@ describe("prefs", () => {
         expect(loadPrefs().keyboardOctaves).toBe(0);
         localStorage.setItem("plinky:prefs", JSON.stringify({ ...BASE, keyboardOctaves: 7 }));
         expect(loadPrefs().keyboardOctaves).toBe(2);
+    });
+
+    it("defaults treadmill off and round-trips the toggle", () => {
+        expect(loadPrefs().treadmill).toBe(false);
+        savePrefs({ ...BASE, treadmill: true });
+        expect(loadPrefs().treadmill).toBe(true);
     });
 });

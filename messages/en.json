@@ -142,6 +142,8 @@
   "bars_per_row_auto": "Auto",
   "keyboard_octaves": "Keys",
   "keyboard_octaves_all": "All",
+  "treadmill_toggle": "Treadmill",
+  "treadmill_hint": "Read the piece as one line that scrolls as you play, instead of stacked rows.",
   "transpose": "Transpose",
   "transpose_down": "Transpose down a semitone",
   "transpose_up": "Transpose up a semitone",
