@@ -61,7 +61,9 @@ export default function LibraryRoute() {
     const [loaded, setLoaded] = useState(false);
     const [query, setQuery] = useState("");
     const [kindFilter, setKindFilter] = useState<Kind | "">(""); // "" = all kinds
-    const [gradeFilter, setGradeFilter] = useState(0); // 0 = all grades
+    // A set of selected grades; empty means every grade. Multi-select, so a player can
+    // line up e.g. grades 3 and 4 at once — each chip still means exactly that grade.
+    const [selectedGrades, setSelectedGrades] = useState<Set<number>>(new Set());
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const [dueOnly, setDueOnly] = useState(false);
     const [visible, setVisible] = useState(PER_PAGE);
@@ -121,7 +123,10 @@ export default function LibraryRoute() {
 
     // A new filter starts from the top of its (possibly long) result set.
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset paging when the filter changes
-    useEffect(() => setVisible(PER_PAGE), [query, kindFilter, gradeFilter, favoritesOnly, dueOnly]);
+    useEffect(
+        () => setVisible(PER_PAGE),
+        [query, kindFilter, selectedGrades, favoritesOnly, dueOnly],
+    );
 
     const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
     const remove = (id: string) => {
@@ -140,7 +145,7 @@ export default function LibraryRoute() {
             if (kindFilter && item.kind !== kindFilter) {
                 return false;
             }
-            if (gradeFilter && item.grade !== gradeFilter) {
+            if (selectedGrades.size > 0 && !selectedGrades.has(item.grade)) {
                 return false;
             }
             if (favoritesOnly && !favorites.has(item.id)) {
@@ -166,7 +171,7 @@ export default function LibraryRoute() {
         songs,
         query,
         kindFilter,
-        gradeFilter,
+        selectedGrades,
         favoritesOnly,
         favorites,
         dueOnly,
@@ -233,14 +238,28 @@ export default function LibraryRoute() {
             </FilterGroup>
 
             <FilterGroup label={m.library_group_grade()}>
-                <Chip selected={gradeFilter === 0} onClick={() => setGradeFilter(0)}>
+                <Chip
+                    selected={selectedGrades.size === 0}
+                    onClick={() => setSelectedGrades(new Set())}
+                >
                     {m.scores_filter_all()}
                 </Chip>
                 {grades.map((grade) => (
                     <Chip
                         key={grade}
-                        selected={gradeFilter === grade}
-                        onClick={() => setGradeFilter(grade)}
+                        selected={selectedGrades.has(grade)}
+                        aria-pressed={selectedGrades.has(grade)}
+                        onClick={() =>
+                            setSelectedGrades((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(grade)) {
+                                    next.delete(grade);
+                                } else {
+                                    next.add(grade);
+                                }
+                                return next;
+                            })
+                        }
                         aria-label={m.score_grade({ grade })}
                         className="tabular-nums"
                     >

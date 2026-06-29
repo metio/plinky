@@ -40,12 +40,23 @@ describe("Library", () => {
         expect(await screen.findByText("No scores match your search.")).toBeTruthy();
     });
 
-    it("offers a grade filter", async () => {
+    it("offers a multi-select grade filter", async () => {
         renderLibrary();
         await screen.findByText("Ode to Joy");
         // Grade chips 1–8 narrow the catalogue by difficulty.
-        expect(screen.getByLabelText("Grade 1")).toBeTruthy();
-        expect(screen.getByLabelText("Grade 8")).toBeTruthy();
+        const one = screen.getByLabelText("Grade 1");
+        const two = screen.getByLabelText("Grade 8");
+        expect(one).toBeTruthy();
+        expect(two).toBeTruthy();
+        // Each chip is an independent toggle, so several grades can be lit at once.
+        fireEvent.click(one);
+        fireEvent.click(two);
+        expect(one.getAttribute("aria-pressed")).toBe("true");
+        expect(two.getAttribute("aria-pressed")).toBe("true");
+        // Clicking a lit chip clears just that grade.
+        fireEvent.click(one);
+        expect(one.getAttribute("aria-pressed")).toBe("false");
+        expect(two.getAttribute("aria-pressed")).toBe("true");
     });
 
     it("stars and unstars a piece", async () => {
