@@ -16,6 +16,7 @@ import {
     saveUserScore,
     slugify,
 } from "./catalog";
+import { withDeniedStorage } from "./deniedStorage";
 
 function xml(title = "Test", beats = 4): string {
     return `<?xml version="1.0"?><score-partwise><work><work-title>${title}</work-title></work><identification><creator type="composer">Bach</creator></identification><part id="P1"><measure number="1"><attributes><time><beats>${beats}</beats><beat-type>4</beat-type></time></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
@@ -60,6 +61,24 @@ describe("loadUserScores robustness", () => {
         const score = loadUserScores()[0];
         expect(score?.tempo).toBe(90);
         expect(score?.beatsPerBar).toBe(4);
+    });
+});
+
+describe("user scores under denied storage", () => {
+    it("reads an empty library rather than throwing when storage is blocked", () => {
+        expect(withDeniedStorage(() => loadUserScores())).toEqual([]);
+    });
+
+    it("reports a failed save rather than throwing when storage is blocked", () => {
+        const score = buildScore(xml("Blocked"), []);
+        expect(withDeniedStorage(() => saveUserScore(score))).toBe(false);
+    });
+
+    it("surfaces a clean error, not a SecurityError, when importing into blocked storage", () => {
+        saveUserScore(buildScore(xml("Pack"), []));
+        const pack = exportAllPack();
+        localStorage.clear();
+        expect(() => withDeniedStorage(() => importScoresPack(pack))).toThrow(/Could not save/);
     });
 });
 
