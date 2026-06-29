@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { fluentNotes } from "./flow";
-import { type Letter, letterFor } from "./grade";
 import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced
@@ -11,8 +10,10 @@ import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 // rendered as an emoji block (text share) or an SVG card (image share). The grid
 // deliberately carries no numbers or labels: the shape is the thing people share.
 // Five bands (not three) so runs produce visibly different grids rather than a wall
-// of one colour, and they are the same A–F scale the run's grade uses, so a green
-// cell means the same "this was an A" as the grade letter does.
+// of one colour. The cutoffs are tuned for the share — a good run reads mostly green
+// while a weak run still spreads across orange and red — and the same five colours
+// back every surface (emoji text, image card, in-app grid) so a Plinky share is
+// recognisable wherever it is posted.
 
 // One cleared note of a run, relative to the run's first note: its notated onset
 // (the ideal), when it was actually played, and how many wrong notes preceded it.
@@ -45,21 +46,27 @@ export const SEGMENTS = 6;
 // the tolerance passed through from the run's grade).
 const TIMING_ZERO_MS = 200;
 
-// The seven grade letters collapsed onto five colour bands. Going through letterFor
-// is the single source of truth: a cell's 0..1 dimension score is banded on exactly
-// the A–F scale the overall grade uses, so the colours can't drift from the grade.
-const LETTER_BAND: Record<Letter, Level> = {
-    S: "best",
-    A: "best",
-    B: "good",
-    C: "ok",
-    D: "weak",
-    E: "none",
-    F: "none",
-};
+// Five colour bands tuned for the shared grid rather than the grade letter. A good
+// run reads mostly green, while a weak run still spreads across orange and red
+// instead of collapsing into one gray block — only a near-empty segment falls to the
+// bottom "absent" band. The bands stretch lower than the grade's A–F cutoffs on
+// purpose: a metric like timing clusters low, and a wall of one colour is no fun to
+// share. The same five levels back the emoji text, the image card and the in-app
+// grid, so a Plinky share looks the same wherever it's posted.
+const BANDS: ReadonlyArray<readonly [number, Level]> = [
+    [0.78, "best"],
+    [0.58, "good"],
+    [0.38, "ok"],
+    [0.12, "weak"],
+];
 
 export function levelFor(value: number): Level {
-    return LETTER_BAND[letterFor(value * 100)];
+    for (const [min, level] of BANDS) {
+        if (value >= min) {
+            return level;
+        }
+    }
+    return "none";
 }
 
 // Scores one segment's notes on each dimension. An empty segment (a piece with
@@ -123,17 +130,8 @@ const EMOJI: Record<Level, string> = {
     none: "⬜",
 };
 
-// One glyph per row, in DIMENSIONS order, as a tiny legend on the shared artifacts
-// (a target for accuracy, a stopwatch for timing, notes for flow). Just enough key
-// that a recipient who's never seen Plinky can read the grid, without spelling it out
-// in words or numbers — the in-app card already carries text labels, so this is only
-// for the shared text and image.
-const ROW_BADGES = ["🎯", "⏱️", "🎶"];
-
 export function gridEmoji(grid: Grid): string {
-    return grid
-        .map((row, r) => `${ROW_BADGES[r] ?? ""} ${row.map((level) => EMOJI[level]).join("")}`)
-        .join("\n");
+    return grid.map((row) => row.map((level) => EMOJI[level]).join("")).join("\n");
 }
 
 // The clipboard/social text: a one-line boast and the emoji grid, with no link —
@@ -161,13 +159,9 @@ export function svgCard(grid: Grid, heading: string): string {
     const rows = grid.length;
     const gap = 28;
     const cell = 132;
-    // A gutter on the left holds each row's legend glyph; the gutter + grid centre as
-    // one block, so the card stays balanced.
-    const badgeW = 110;
     const gridW = cols * cell + (cols - 1) * gap;
     const gridH = rows * cell + (rows - 1) * gap;
-    const blockLeft = (width - (badgeW + gridW)) / 2;
-    const gridLeft = blockLeft + badgeW;
+    const gridLeft = (width - gridW) / 2;
     const top = (height - gridH) / 2;
     const cells = grid
         .flatMap((row, r) =>
@@ -178,16 +172,9 @@ export function svgCard(grid: Grid, heading: string): string {
             }),
         )
         .join("");
-    const badges = grid
-        .map(
-            (_, r) =>
-                `<text x="${blockLeft + badgeW / 2}" y="${top + r * (cell + gap) + cell / 2}" font-size="76" text-anchor="middle" dominant-baseline="central">${ROW_BADGES[r] ?? ""}</text>`,
-        )
-        .join("");
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\
 <rect width="${width}" height="${height}" fill="#0f172a"/>\
 <text x="${width / 2}" y="${top - 64}" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(heading)}</text>\
-${badges}\
 ${cells}\
 <text x="${width / 2}" y="${top + gridH + 96}" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
 </svg>`;

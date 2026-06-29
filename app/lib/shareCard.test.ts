@@ -32,17 +32,20 @@ function spaced(count: number): RunNote[] {
 }
 
 describe("levelFor", () => {
-    it("bands a value across five tiers on the grade's A–F scale", () => {
-        expect(levelFor(1)).toBe("best"); // S
-        expect(levelFor(0.85)).toBe("best"); // A
-        expect(levelFor(0.84)).toBe("good"); // B
-        expect(levelFor(0.75)).toBe("good"); // B
-        expect(levelFor(0.74)).toBe("ok"); // C
-        expect(levelFor(0.65)).toBe("ok"); // C
-        expect(levelFor(0.64)).toBe("weak"); // D
-        expect(levelFor(0.55)).toBe("weak"); // D
-        expect(levelFor(0.54)).toBe("none"); // E
-        expect(levelFor(0)).toBe("none"); // F
+    it("bands a value across five tiers, good landing green and weak still coloured", () => {
+        expect(levelFor(1)).toBe("best");
+        expect(levelFor(0.78)).toBe("best");
+        expect(levelFor(0.77)).toBe("good");
+        expect(levelFor(0.58)).toBe("good");
+        expect(levelFor(0.57)).toBe("ok");
+        expect(levelFor(0.38)).toBe("ok");
+        expect(levelFor(0.37)).toBe("weak");
+        // A weak-but-real run (the 31% timing that used to read as a blank gray row)
+        // now lands on red, not the empty band.
+        expect(levelFor(0.31)).toBe("weak");
+        expect(levelFor(0.12)).toBe("weak");
+        expect(levelFor(0.11)).toBe("none");
+        expect(levelFor(0)).toBe("none");
     });
 });
 
@@ -131,20 +134,21 @@ describe("toGrid / gridFor", () => {
             { accuracy: 1, timing: 0.7, flow: 0.3 },
         ];
         const grid = toGrid(segments);
-        expect(grid[0]?.[0]).toBe("best"); // accuracy 1.0 → A/S
-        expect(grid[1]?.[0]).toBe("ok"); // timing 0.7 → C
-        expect(grid[2]?.[0]).toBe("none"); // flow 0.3 → F
+        expect(grid[0]?.[0]).toBe("best"); // accuracy 1.0 → green
+        expect(grid[1]?.[0]).toBe("good"); // timing 0.7 → yellow
+        expect(grid[2]?.[0]).toBe("weak"); // flow 0.3 → red (no longer a blank gray cell)
     });
 });
 
 describe("gridEmoji", () => {
-    it("renders three lines of emoji squares, each led by its row legend", () => {
+    it("renders one line of emoji squares per dimension, with no leading glyph", () => {
         const text = gridEmoji(gridFor(Array.from({ length: 6 }, clean)));
         const lines = text.split("\n");
         expect(lines).toHaveLength(3);
-        expect(lines[0]).toBe(`🎯 ${"🟩".repeat(SEGMENTS)}`); // accuracy row
-        expect(lines[1]?.startsWith("⏱️")).toBe(true); // timing row
-        expect(lines[2]?.startsWith("🎶")).toBe(true); // flow row
+        // A clean run is all green, each row just the six squares — no row badge prefix.
+        for (const line of lines) {
+            expect(line).toBe("🟩".repeat(SEGMENTS));
+        }
     });
 });
 
