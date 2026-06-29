@@ -5,7 +5,7 @@ import { loadBundledScores, loadUserScores } from "./catalog";
 import { loadExerciseManifest } from "./exercises";
 import type { Letter } from "./grade";
 import { isDue, isLapsed, letterMin, loadAllMastery, type Mastery } from "./mastery";
-import { gradeOf, MAX_GRADE, rawDifficulty } from "./scoreDifficulty";
+import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
 import { loadManifest } from "./songs";
 
 // Plinky's progression: each of the 1–MAX_GRADE difficulty grades is a pool of
@@ -159,14 +159,23 @@ async function buildCatalogue(): Promise<Map<string, GradeCatalogItem>> {
         });
     }
     for (const score of [...loadBundledScores(), ...loadUserScores()]) {
-        if (!index.has(score.id)) {
-            index.set(score.id, {
-                id: score.id,
-                title: score.title,
-                grade: gradeOf(score.id, score.xml),
-                cost: rawDifficulty(score.xml),
-            });
+        if (index.has(score.id)) {
+            continue;
         }
+        const { right, left } = parsePositions(score.xml);
+        // A score with no fingerable notes — empty or unreadable — is nothing to
+        // practise, so it stays out of the grade pools. Keeping it out also lets a
+        // cost of 0 mean "measured as gentlest" everywhere, so the easy real pieces
+        // that score 0 lead their grade rather than being mistaken for unmeasured.
+        if (right.length + left.length === 0) {
+            continue;
+        }
+        index.set(score.id, {
+            id: score.id,
+            title: score.title,
+            grade: gradeOf(score.id, score.xml),
+            cost: rawDifficulty(score.xml),
+        });
     }
     return index;
 }
@@ -221,12 +230,10 @@ export function gradeSuggestions(
     return (
         catalogue
             .filter((item) => item.grade === grade && !mastered.has(item.id))
-            // A cost of 0 means the difficulty couldn't be measured, not "easiest" — sort
-            // those last so a real, gently-graded piece is suggested first.
-            .sort(
-                (a, b) =>
-                    (a.cost || Number.POSITIVE_INFINITY) - (b.cost || Number.POSITIVE_INFINITY),
-            )
+            // Easiest first by cost. Unplayable scores are kept out of the catalogue, so
+            // a cost of 0 reliably means "gentlest" rather than "couldn't measure" — the
+            // beginner-friendly pieces that score 0 lead their grade.
+            .sort((a, b) => a.cost - b.cost)
             .slice(0, count)
     );
 }

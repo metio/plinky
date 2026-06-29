@@ -188,10 +188,12 @@ describe("gradeSuggestions", () => {
         expect(suggestions.map((item) => item.id)).toEqual(["easy", "mid"]);
     });
 
-    it("treats an unmeasured cost (0) as hardest, so it isn't suggested first", () => {
+    it("suggests a measured-easy piece (cost 0) first, since unplayable scores are excluded", () => {
+        // Note-less scores never enter the catalogue, so a cost of 0 here is a genuinely
+        // gentle piece — the kind a beginner should meet first, not last.
         const catalogue = [cat("zero", 1, 0), cat("real", 1, 2)];
         const suggestions = gradeSuggestions(catalogue, 1, new Set(), 2);
-        expect(suggestions.map((item) => item.id)).toEqual(["real", "zero"]);
+        expect(suggestions.map((item) => item.id)).toEqual(["zero", "real"]);
     });
 });
 
