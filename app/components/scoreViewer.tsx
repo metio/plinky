@@ -933,6 +933,12 @@ export function ScoreViewer({
         setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;
+        // The first note of the run seeds these (ordinal 0); clear them here so the
+        // ghost tick's `startRef.current > 0` guard holds until that note arrives.
+        // A stale start timestamp from a prior run would make the elapsed time huge
+        // and paint the ghost at the finish from the moment Practice is pressed.
+        startRef.current = 0;
+        baseOffsetRef.current = 0;
         // The hand the matcher and the ghost step through: the whole grand staff
         // when there's a single staff, otherwise the hand being drilled. (Fingering
         // is printed on the staff at load time, not computed per run.)

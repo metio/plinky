@@ -206,6 +206,36 @@ describe("ScoreViewer", () => {
         );
     });
 
+    it("starts the ghost back at the line when a finished run is restarted", async () => {
+        // The ghost races from the player's first note. A prior run's start timestamp
+        // must not survive into the next run: on a restart, before the first note is
+        // played, the ghost belongs at the start line — not painted at the finish
+        // because the stale elapsed time reads as the whole piece already played.
+        saveGhost("t", [0, 500, 1000]);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practiceButton = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        // Run 1: play the four C5 notes to completion, which seeds the run's start clock.
+        fireEvent.click(practiceButton);
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // The grade panel proves the run finished and the start timestamp is now set.
+        await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
+        // Restart: the transport returns to "Practice" once the run is no longer running.
+        fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
+        await screen.findByRole("img", { name: /race/i });
+        // Give the 50ms ghost-advance interval several ticks to act on any stale start.
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        const track = screen.getByRole("img", { name: /race/i });
+        expect(track.getAttribute("aria-label")).toMatch(/ghost at note 0$/);
+    });
+
     it("adopts a ghost from a link and offers to pass it on", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const code = encodeGhost([0, 500, 1000]);
