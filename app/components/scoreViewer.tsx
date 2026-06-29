@@ -15,6 +15,7 @@ import { summarizeDynamics } from "../lib/dynamics";
 import { annotateFingerings } from "../lib/fingerScore";
 import { computeFlow } from "../lib/flow";
 import { recordDailyDone } from "../lib/dailyDone";
+import { type DailyResult, saveDailyResult } from "../lib/dailyResult";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
 import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
@@ -176,6 +177,7 @@ export function ScoreViewer({
     beatsPerBar,
     lockTempo,
     canShareGhost,
+    seededResult,
 }: {
     id: string;
     xml: string;
@@ -199,6 +201,9 @@ export function ScoreViewer({
     // Bundled pieces have a stable id every player shares, so their ghost can be
     // sent to a friend by link and loaded back via a ?ghost= code.
     canShareGhost?: boolean;
+    // A previously finished run to show on open, so re-visiting the day's challenge
+    // surfaces the result instead of a blank slate. Replaced the moment a new run ends.
+    seededResult?: DailyResult | null;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
@@ -325,12 +330,12 @@ export function ScoreViewer({
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
     useMetronome(metronomeOn, adaptive ? liveTempo : tempo, beatsPerBar ?? 4, subdivision);
-    const [grade, setGrade] = useState<Grade | null>(null);
-    const [runNotes, setRunNotes] = useState<RunNote[]>([]);
+    const [grade, setGrade] = useState<Grade | null>(seededResult?.grade ?? null);
+    const [runNotes, setRunNotes] = useState<RunNote[]>(seededResult?.notes ?? []);
     // The timing leniency the finished run was graded at, kept so the per-note strip
     // reads the same windows as the grade and share grid.
-    const [runTolerance, setRunTolerance] = useState(PRECISE_TOLERANCE);
-    const [shareGrid, setShareGrid] = useState<Grid | null>(null);
+    const [runTolerance, setRunTolerance] = useState(seededResult?.tolerance ?? PRECISE_TOLERANCE);
+    const [shareGrid, setShareGrid] = useState<Grid | null>(seededResult?.grid ?? null);
     // An earned-moment card (first S, grade-up, flawless run) shown above the run grid,
     // resolved after the run's mastery is folded in. At most one per run.
     const [milestone, setMilestone] = useState<Milestone | null>(null);
@@ -562,10 +567,11 @@ export function ScoreViewer({
             flow: computeFlow(notes),
             dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
         });
+        const grid = gridFor(notes, tolerance);
         setGrade(result);
         setRunNotes(notes);
         setRunTolerance(tolerance);
-        setShareGrid(gridFor(notes, tolerance));
+        setShareGrid(grid);
         // A finished run nudges the tempo trainer up for the next attempt.
         bumpTempo();
         // Read the player's own tempo back out of the gaps between their notes, so
@@ -581,9 +587,11 @@ export function ScoreViewer({
         );
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
-        // Mark the day's challenge done so it shows a ✓ — no streak, just "played".
+        // Mark the day's challenge done so it shows a ✓ — no streak, just "played" —
+        // and keep its result so re-opening the daily shows it rather than a blank run.
         if (daily != null) {
             recordDailyDone(daily);
+            saveDailyResult(daily, { grade: result, grid, notes, tolerance });
         }
         // Count the run's notes toward the practice history.
         recordPractice(matcher.total);

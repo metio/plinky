@@ -5,6 +5,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { dailyNumber, todayKey } from "../lib/daily";
+import { saveDailyResult } from "../lib/dailyResult";
 import Daily from "./daily";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
@@ -71,6 +73,29 @@ describe("Daily", () => {
         // The tempo is shown but fixed — no slider to dial it to taste.
         expect(screen.getByText(/\d+ BPM/)).toBeTruthy();
         expect(document.querySelector('input[type="range"]')).toBeNull();
+    });
+
+    it("shows the stored result when the day's challenge is re-opened", async () => {
+        // A finished daily persists its result; re-visiting the page must surface it
+        // rather than a blank run, so the home "see your results" link has a result to
+        // land on.
+        const number = dailyNumber(todayKey(new Date()));
+        saveDailyResult(number, {
+            grade: { accuracy: 91, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
+            grid: [["best", "good", "ok", "weak", "none", "best"]],
+            notes: [{ targetMs: 0, playedMs: 10, wrongBefore: 0 }],
+            tolerance: 200,
+        });
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <Daily />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        // The grade panel is seeded from the stored result, so its readouts appear
+        // without playing a note.
+        expect(await screen.findByText("91%")).toBeTruthy();
     });
 
     it("offers a warm-up mode that drills fresh generated phrases", async () => {

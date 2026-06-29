@@ -8,6 +8,7 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { SegmentedControl } from "../components/segmentedControl";
 import { dailyChallenge, dailyNumber, todayKey } from "../lib/daily";
+import { type DailyResult, loadDailyResult } from "../lib/dailyResult";
 import { generatePhrase } from "../lib/generator";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -20,7 +21,7 @@ export function meta(_args: Route.MetaArgs) {
 // Which day it is — and so which phrase, number and tempo — depends on the
 // viewer's clock, not the build's. Resolved on mount so the static HTML's
 // date-independent <head> meta stays valid and no stale number is baked in.
-type Today = { number: number; tempo: number; xml: string };
+type Today = { number: number; tempo: number; xml: string; result: DailyResult | null };
 
 const WARMUP = { bars: 8, beatsPerBar: 4 };
 
@@ -38,7 +39,7 @@ export default function DailyRoute() {
         const dateKey = todayKey(new Date());
         const number = dailyNumber(dateKey);
         const { tempo, xml } = dailyChallenge(dateKey, number);
-        setToday({ number, tempo, xml });
+        setToday({ number, tempo, xml, result: loadDailyResult(number) });
     }, []);
 
     const regenerate = (hands: boolean) => {
@@ -91,6 +92,7 @@ export default function DailyRoute() {
                             initialTempo={today.tempo}
                             lockTempo
                             ephemeral
+                            seededResult={today.result}
                         />
                     )}
                 </>

@@ -63,7 +63,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   by kind, grade, or what's **due now**, and open one to practise.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
-  streak to keep up. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
+  streak to keep up. Once played, re-opening the day's challenge shows your result
+  again. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
   a staff to share or export (see below).
 - **Any piece, three ways** — open a score and a tab bar switches how you work it:
