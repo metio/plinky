@@ -40,7 +40,8 @@ describe("HomeToday", () => {
 
         // The daily and a piece to learn surface as one-tap links.
         expect(await screen.findByText("Today")).toBeTruthy();
-        const learn = await screen.findByRole("link", { name: /Learn First Steps/ });
+        // The title is quoted so a lowercase title doesn't read as a run-on sentence.
+        const learn = await screen.findByRole("link", { name: /Learn “First Steps”/ });
         expect(learn.getAttribute("href")).toContain("/play/g1-easy");
         expect(screen.getByRole("link", { name: /daily challenge/i })).toBeTruthy();
     });

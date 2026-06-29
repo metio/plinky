@@ -196,7 +196,7 @@
   "today_review": "Refresh {count} pieces",
   "today_daily": "Today's daily challenge",
   "today_daily_done": "Daily done — see your result",
-  "today_learn": "Learn {title}",
+  "today_learn": "Learn “{title}”",
   "today_browse": "Browse the library",
   "home_tracks": "Tracks",
   "home_find_to_import": "Find scores to import",
