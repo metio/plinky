@@ -1,0 +1,85 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { describe, expect, it } from "vitest";
+import { attributionFor, licenseInfo, sourceInfo } from "./attribution";
+
+describe("licenseInfo", () => {
+    it("resolves CC0 as a public-domain dedication needing no attribution", () => {
+        const info = licenseInfo("CC0-1.0");
+        expect(info).toMatchObject({
+            id: "CC0-1.0",
+            publicDomain: true,
+            requiresAttribution: false,
+        });
+        expect(info?.url).toContain("creativecommons.org/publicdomain/zero/1.0");
+    });
+
+    it("flags the CC-BY family as requiring attribution and not public domain", () => {
+        for (const id of [
+            "CC-BY-4.0",
+            "CC-BY-SA-4.0",
+            "CC-BY-NC-4.0",
+            "CC-BY-ND-4.0",
+            "CC-BY-NC-SA-4.0",
+        ]) {
+            const info = licenseInfo(id);
+            expect(info, id).not.toBeNull();
+            expect(info?.requiresAttribution, id).toBe(true);
+            expect(info?.publicDomain, id).toBe(false);
+            expect(info?.url, id).toContain("creativecommons.org/licenses/");
+        }
+    });
+
+    it("matches the licence allowlist offered by the submission form", () => {
+        // The score-submission issue form's dropdown must stay in lockstep with
+        // the licences the app can render a badge for.
+        const offered = [
+            "CC0-1.0",
+            "CC-BY-4.0",
+            "CC-BY-SA-4.0",
+            "CC-BY-NC-4.0",
+            "CC-BY-ND-4.0",
+            "CC-BY-NC-SA-4.0",
+        ];
+        for (const id of offered) {
+            expect(licenseInfo(id), id).not.toBeNull();
+        }
+    });
+
+    it("returns null for an unknown or missing id", () => {
+        expect(licenseInfo("MIT")).toBeNull();
+        expect(licenseInfo("")).toBeNull();
+        expect(licenseInfo(undefined)).toBeNull();
+    });
+});
+
+describe("sourceInfo", () => {
+    it("resolves the PDMX source to a label and provenance link", () => {
+        expect(sourceInfo("pdmx")).toMatchObject({ id: "pdmx", label: "PDMX" });
+        expect(sourceInfo("pdmx")?.url).toMatch(/^https:\/\//);
+    });
+
+    it("returns null for an unknown or missing source", () => {
+        expect(sourceInfo("imslp")).toBeNull();
+        expect(sourceInfo(undefined)).toBeNull();
+    });
+});
+
+describe("attributionFor", () => {
+    it("derives composer, licence, and source together", () => {
+        const attribution = attributionFor({
+            composer: "Trad.",
+            license: "CC0-1.0",
+            source: "pdmx",
+        });
+        expect(attribution.composer).toBe("Trad.");
+        expect(attribution.license?.id).toBe("CC0-1.0");
+        expect(attribution.source?.label).toBe("PDMX");
+    });
+
+    it("omits licence and source when absent, keeping an empty composer", () => {
+        const attribution = attributionFor({});
+        expect(attribution).toEqual({ composer: "", license: null, source: null });
+    });
+});

@@ -173,6 +173,9 @@ const manifest = entries.map(({ id, title, grade, cost, kind, composer }) => ({
     cost: Number(cost.toFixed(3)),
     kind,
     ...(composer ? { composer } : {}),
+    // Curated studies are public-domain transcriptions from PDMX; the generated
+    // scales/arpeggios are our own and carry no external licence.
+    ...(kind === "study" ? { license: "CC0-1.0" } : {}),
     tempo: 90,
     beatsPerBar: 4,
 }));

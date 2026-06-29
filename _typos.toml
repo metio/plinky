@@ -10,6 +10,8 @@ tuplets = "tuplets"
 weeknd = "weeknd"
 # Handel — the public-domain composer in the allowlist, not "handle".
 handel = "handel"
+# "ND" is the NoDerivatives token in SPDX licence codes (CC-BY-ND-4.0), not "AND".
+nd = "nd"
 
 # The translation catalogs and the song catalogue are intentionally in many
 # languages, and the imported PDMX manifest holds real-world titles/composers plus

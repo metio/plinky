@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { DEFAULT_SONG_SOURCE } from "./attribution";
 import type { Score } from "./catalog";
 import { exerciseTitle, generateExercise, parseExerciseId } from "./exerciseGen";
 import { decompressMxl } from "./musicxmlFile";
@@ -20,6 +21,9 @@ export type ExerciseMeta = {
     cost: number;
     kind: "scale-arpeggio" | "study";
     composer?: string;
+    // Curated studies are public-domain transcriptions from PDMX (CC0); generated
+    // scales/arpeggios are our own and carry no external licence.
+    license?: string;
     tempo: number;
     beatsPerBar: number;
 };
@@ -68,6 +72,9 @@ export async function resolveExercise(id: string): Promise<Score | null> {
             xml: generateExercise(config),
             tempo: 90,
             beatsPerBar: 4,
+            // Generated from a config at runtime — our own work, dedicated to the
+            // public domain. No external source to credit.
+            license: "CC0-1.0",
             bundled: true,
         };
     }
@@ -87,6 +94,10 @@ export async function resolveExercise(id: string): Promise<Score | null> {
         xml,
         tempo: 90,
         beatsPerBar: 4,
+        // The studies are public-domain études imported from PDMX; default the
+        // credit so it shows even on a manifest predating the license field.
+        license: meta?.license ?? "CC0-1.0",
+        source: DEFAULT_SONG_SOURCE,
         bundled: true,
     };
 }

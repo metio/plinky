@@ -390,6 +390,8 @@
   "import_confirm": "Add to my library",
   "import_choose_different": "Choose a different file",
   "import_back_to_library": "← Back to the library",
+  "attribution_public_domain": "Public domain",
+  "attribution_via": "via",
   "midi_unsupported_keyboard": "This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on desktop or Android — or play with your computer keyboard below.",
   "midi_connect": "Connect MIDI",
   "midi_connecting": "Connecting…",

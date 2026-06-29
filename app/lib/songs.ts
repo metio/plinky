@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { DEFAULT_SONG_SOURCE } from "./attribution";
 import type { Score } from "./catalog";
 import { loadFavorites, toggleFavorite } from "./favorites";
 import { decompressMxl } from "./musicxmlFile";
@@ -20,6 +21,9 @@ export type SongMeta = {
     // ordered easiest-first and a syllabus draw the gentlest of a grade.
     cost: number;
     license: string;
+    // Where the piece was sourced from; defaults to PDMX (the whole shipped
+    // catalogue) when a manifest entry omits it.
+    source?: string;
     tempo: number;
     beatsPerBar: number;
     bars: number;
@@ -82,6 +86,7 @@ export async function resolveSong(id: string): Promise<Score | null> {
         tempo: meta.tempo,
         beatsPerBar: meta.beatsPerBar,
         license: meta.license,
+        source: meta.source ?? DEFAULT_SONG_SOURCE,
         bundled: false,
     };
 }

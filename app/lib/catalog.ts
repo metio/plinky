@@ -15,6 +15,9 @@ export type Score = {
     tempo: number; // beats per minute for the count-in and playback
     beatsPerBar: number;
     license?: string;
+    // Provenance id (e.g. "pdmx") resolved to a credited source link; absent for
+    // bundled demos and generated exercises, which are our own.
+    source?: string;
     bundled: boolean; // true for the shipped scores, which cannot be removed
 };
 

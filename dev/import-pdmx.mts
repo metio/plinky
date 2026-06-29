@@ -221,6 +221,7 @@ async function main() {
         // a syllabus can draw the gentlest of a grade rather than a random pick.
         cost: Number(song.cost.toFixed(3)),
         license: "CC0-1.0",
+        source: "pdmx",
         tempo: song.tempo,
         beatsPerBar: song.beatsPerBar,
         bars: song.bars,

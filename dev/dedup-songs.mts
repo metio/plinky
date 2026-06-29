@@ -26,7 +26,18 @@ const OUT = "public/songs";
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
 const MAX_GRADE = 8;
 
-type Song = { id: string; title: string; grade: number; cost: number; bars: number };
+// The manifest fields dedup reads or re-grades. License and source are carried
+// through verbatim — the type names them so a future rewrite of the survivor set
+// can't silently drop a piece's provenance.
+type Song = {
+    id: string;
+    title: string;
+    grade: number;
+    cost: number;
+    bars: number;
+    license: string;
+    source?: string;
+};
 type Quality = { rating: number; favorites: number; views: number };
 
 const normalizeTitle = (title: string): string =>

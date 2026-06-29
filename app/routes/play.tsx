@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
+import { Attribution } from "../components/attribution";
 import { Show } from "../components/conditional";
 import { EarPiece } from "../components/earPiece";
 import { ExerciseForms } from "../components/exerciseForms";
@@ -69,6 +70,11 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 {score.composer}
                             </p>
                         )}
+                        <Attribution
+                            composer={score.composer}
+                            license={score.license}
+                            source={score.source}
+                        />
                     </header>
 
                     <PlayModeBar mode={mode} onChange={setMode} />
