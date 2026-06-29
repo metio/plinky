@@ -75,9 +75,6 @@ export function letterMin(letter: Letter): number {
 }
 
 export function loadMastery(id: string): Mastery | null {
-    if (typeof localStorage === "undefined") {
-        return null;
-    }
     try {
         const raw = localStorage.getItem(storageKey(id));
         return raw ? normalizeMastery(JSON.parse(raw)) : null;
@@ -87,9 +84,6 @@ export function loadMastery(id: string): Mastery | null {
 }
 
 export function saveMastery(id: string, mastery: Mastery): void {
-    if (typeof localStorage === "undefined") {
-        return;
-    }
     try {
         localStorage.setItem(storageKey(id), JSON.stringify(mastery));
         // Mastery feeds the header's grade badge; nudge it to refresh without a reload.
@@ -102,26 +96,27 @@ export function saveMastery(id: string, mastery: Mastery): void {
 }
 
 export function loadAllMastery(): Array<{ id: string; mastery: Mastery }> {
-    if (typeof localStorage === "undefined") {
-        return [];
-    }
     const out: Array<{ id: string; mastery: Mastery }> = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key?.startsWith(PREFIX)) {
-            continue;
-        }
-        try {
-            const raw = localStorage.getItem(key);
-            if (raw) {
-                out.push({
-                    id: key.slice(PREFIX.length),
-                    mastery: normalizeMastery(JSON.parse(raw)),
-                });
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key?.startsWith(PREFIX)) {
+                continue;
             }
-        } catch {
-            // Skip a corrupt entry rather than failing the whole list.
+            try {
+                const raw = localStorage.getItem(key);
+                if (raw) {
+                    out.push({
+                        id: key.slice(PREFIX.length),
+                        mastery: normalizeMastery(JSON.parse(raw)),
+                    });
+                }
+            } catch {
+                // Skip a corrupt entry rather than failing the whole list.
+            }
         }
+    } catch {
+        // No storage (SSR) or a browser that blocks it — nothing mastered yet.
     }
     return out;
 }

@@ -119,4 +119,11 @@ describe("loadLifetime under denied storage", () => {
         // both of which read the lifetime fingerprint on render.
         expect(withDeniedStorage(() => loadLifetime())).toEqual({ days: [] });
     });
+
+    it("records a run rather than throwing when storage is blocked", () => {
+        // recordRun fires after every run; a blocked write must be swallowed, not crash
+        // the run summary. It still returns the in-memory fingerprint.
+        const result = withDeniedStorage(() => recordRun(PERFECT, day(1)));
+        expect(result.days).toHaveLength(1);
+    });
 });

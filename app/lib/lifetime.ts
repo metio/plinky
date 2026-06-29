@@ -85,12 +85,11 @@ export function recordRun(run: Skill, now: Date = new Date()): Lifetime {
         a.date.localeCompare(b.date),
     );
     const next: Lifetime = { days: days.slice(-MAX_DAYS) };
-    if (typeof localStorage !== "undefined") {
-        try {
-            localStorage.setItem(KEY, JSON.stringify(next));
-        } catch {
-            // The fingerprint is best-effort; a failed write is not surfaced.
-        }
+    try {
+        localStorage.setItem(KEY, JSON.stringify(next));
+    } catch {
+        // The fingerprint is best-effort; a failed write (no storage, blocked storage,
+        // or quota) is not surfaced.
     }
     return next;
 }

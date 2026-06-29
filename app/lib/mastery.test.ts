@@ -3,11 +3,13 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
+import { withDeniedStorage } from "./deniedStorage";
 import {
     applyRun,
     isDue,
     isLapsed,
     letterMin,
+    loadAllMastery,
     loadMastery,
     markLearned,
     type Mastery,
@@ -169,5 +171,18 @@ describe("markLearned", () => {
         const next = markLearned(null, NOW);
         expect(next.learned).toBe(true);
         expect(next.reviewAt).toBe(NOW + DAY);
+    });
+});
+
+describe("mastery under denied storage", () => {
+    it("reads null/empty rather than throwing when storage is blocked", () => {
+        // loadAllMastery feeds the home, You page and header badge; a storage-blocked
+        // browser must read as "nothing mastered", not crash every one of them.
+        expect(withDeniedStorage(() => loadMastery("song-1"))).toBeNull();
+        expect(withDeniedStorage(() => loadAllMastery())).toEqual([]);
+    });
+
+    it("swallows a save when storage is blocked", () => {
+        expect(() => withDeniedStorage(() => saveMastery("song-1", learned()))).not.toThrow();
     });
 });
