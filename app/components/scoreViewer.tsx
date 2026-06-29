@@ -44,6 +44,15 @@ import {
 import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
+import {
+    compositionFromRun,
+    fastestTakeOnsets,
+    loadTakes,
+    removeTake,
+    type RunStep,
+    saveTake,
+    type Take,
+} from "../lib/savedTakes";
 import { SITE_URL } from "../lib/site";
 import { isPreciseInput } from "../lib/midi";
 import {
@@ -84,6 +93,7 @@ import { Button, IconButton } from "./button";
 import { Disclosure, FieldGroup } from "./disclosure";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
+import { TakesList } from "./takesList";
 import {
     CheckIcon,
     CloseIcon,
@@ -237,6 +247,11 @@ export function ScoreViewer({
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(false);
     const [playing, setPlaying] = useState(false);
+    // This score's saved takes, the take currently replaying (if any), and whether
+    // the finished run has already been saved — so its save prompt shows just once.
+    const [takes, setTakes] = useState<Take[]>([]);
+    const [activeReplayId, setActiveReplayId] = useState<string | null>(null);
+    const [runSaved, setRunSaved] = useState(false);
     const [metronomeOn, setMetronomeOn] = useState(false);
     // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
     // triplets, 4 = sixteenths.
@@ -367,6 +382,11 @@ export function ScoreViewer({
     useEffect(() => {
         setMastery(ephemeral ? null : loadMastery(id));
     }, [id, ephemeral]);
+
+    // Load this score's saved takes; a new score swaps in its own.
+    useEffect(() => {
+        setTakes(loadTakes(id));
+    }, [id]);
 
     const [searchParams] = useSearchParams();
     // Adopt a ghost handed over by a ?ghost= link so the player can race a friend's
@@ -781,6 +801,7 @@ export function ScoreViewer({
         }
         playingRef.current = false;
         setPlaying(false);
+        setActiveReplayId(null);
     };
 
     // Reload OSMD whenever the score changes, and stop any playback/practice.
@@ -931,8 +952,91 @@ export function ScoreViewer({
         tick();
     };
 
+    // Save the just-finished run as a take: rebuild a Composition from the captured
+    // steps (their played onsets, pitches and velocity) and store it under this song.
+    const saveCurrentTake = () => {
+        const steps: RunStep[] = notesRef.current.map((note) => ({
+            pitches: note.pitches,
+            startMs: note.playedMs,
+            velocity: note.velocity,
+        }));
+        if (steps.length === 0) {
+            return;
+        }
+        const take: Take = {
+            id: crypto.randomUUID(),
+            createdAt: Date.now(),
+            letter: grade?.letter ?? "",
+            complete: matcher.complete,
+            composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
+        };
+        setTakes(saveTake(id, take));
+        setRunSaved(true);
+    };
+
+    // Replay a saved take onto the staff: walk the cursor as Listen does, but step it
+    // on the take's own recorded onsets so the playback keeps your timing. Rest-only
+    // steps advance without consuming an onset, keeping notes aligned to the take.
+    const replayTake = (take: Take) => {
+        const osmd = osmdRef.current;
+        if (!osmd) {
+            return;
+        }
+        if (playingRef.current) {
+            stopListen();
+        }
+        playingRef.current = true;
+        matcher.stop();
+        setActiveReplayId(take.id);
+        const cursor: Cursor = osmd.cursor;
+        cursor.reset();
+        cursor.show();
+        setPlaying(true);
+        const onsets = [...new Set(take.composition.notes.map((note) => note.startMs))].sort(
+            (a, b) => a - b,
+        );
+        let step = 0;
+        const tick = () => {
+            if (cursor.iterator.EndReached || step >= onsets.length) {
+                stopListen();
+                return;
+            }
+            restoreNotes(listenHighlightRef.current);
+            listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
+            let hasNote = false;
+            for (const note of cursor.NotesUnderCursor()) {
+                const quarters = note.Length.RealValue * 4;
+                if (!note.isRest() && note.halfTone > 0) {
+                    hasNote = true;
+                    synth.playNote(note.halfTone + 12, { duration: quarters });
+                }
+            }
+            cursor.next();
+            centerCursor();
+            if (hasNote) {
+                const current = onsets[step] ?? 0;
+                const next = onsets[step + 1];
+                step++;
+                const delay = next !== undefined ? Math.max(40, next - current) : 500;
+                timers.current.push(window.setTimeout(tick, delay));
+            } else {
+                // A rest under the cursor: advance briskly without spending an onset.
+                timers.current.push(window.setTimeout(tick, 30));
+            }
+        };
+        tick();
+    };
+
+    const deleteTake = (takeId: string) => {
+        if (activeReplayId === takeId) {
+            stopListen();
+        }
+        setTakes(removeTake(id, takeId));
+    };
+
     const practice = () => {
         stopListen();
+        setRunSaved(false);
         notesRef.current = [];
         impreciseRef.current = false;
         gradeFromRunRef.current = false;
@@ -942,7 +1046,11 @@ export function ScoreViewer({
         setMilestone(null);
         setTempoCurve(null);
         setLiveTempo(tempo);
-        const racing = ephemeral ? null : (storedGhost ?? loadGhost(id));
+        // Your fastest complete take is the ghost to chase; falling back to the last
+        // run (or a friend's shared ghost) when you've saved none.
+        const racing = ephemeral
+            ? null
+            : (fastestTakeOnsets(loadTakes(id)) ?? storedGhost ?? loadGhost(id));
         setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;
@@ -1542,6 +1650,21 @@ export function ScoreViewer({
                     {grade && (
                         <div ref={gradePanelRef} className="space-y-3">
                             {milestone && <MilestoneBanner milestone={milestone} />}
+                            {!ephemeral &&
+                                (runSaved ? (
+                                    <p className="text-sm text-green-700 dark:text-green-400">
+                                        {m.takes_saved()}
+                                    </p>
+                                ) : (
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                                            {m.takes_save_prompt()}
+                                        </span>
+                                        <Button variant="primary" onClick={saveCurrentTake}>
+                                            {m.takes_save()}
+                                        </Button>
+                                    </div>
+                                ))}
                             <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
                                 <div
                                     className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}
@@ -1616,6 +1739,19 @@ export function ScoreViewer({
                                 />
                             )}
                         </div>
+                    )}
+                </FullScreen>
+                <FullScreen off>
+                    {takes.length > 0 && (
+                        <TakesList
+                            takes={takes}
+                            title={title}
+                            activeReplayId={activeReplayId}
+                            playing={playing}
+                            onReplay={replayTake}
+                            onStop={stopListen}
+                            onDelete={deleteTake}
+                        />
                     )}
                 </FullScreen>
             </div>

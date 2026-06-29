@@ -136,7 +136,11 @@ describe("compositionFromRun", () => {
     });
 
     it("floors a near-simultaneous pair to a minimum length, never zero", () => {
-        const composition = compositionFromRun([step([60], 0), step([61], 5), step([62], 400)], 120, 4);
+        const composition = compositionFromRun(
+            [step([60], 0), step([61], 5), step([62], 400)],
+            120,
+            4,
+        );
         expect(composition.notes[0]?.durationMs).toBeGreaterThanOrEqual(60);
     });
 

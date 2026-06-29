@@ -67,9 +67,7 @@ export function compositionFromRun(
     const notes: RecordedNote[] = [];
     steps.forEach((step, index) => {
         const next = steps[index + 1];
-        const durationMs = next
-            ? Math.max(MIN_DURATION_MS, next.startMs - step.startMs)
-            : beatMs;
+        const durationMs = next ? Math.max(MIN_DURATION_MS, next.startMs - step.startMs) : beatMs;
         for (const pitch of step.pitches) {
             notes.push({ pitch, startMs: step.startMs, durationMs, velocity: step.velocity });
         }
