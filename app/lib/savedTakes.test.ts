@@ -6,10 +6,12 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { Composition } from "./composition";
 import { withDeniedStorage } from "./deniedStorage";
 import {
+    compositionFromRun,
     fastestTakeOnsets,
     loadTakes,
     MAX_TAKES_PER_SONG,
     removeTake,
+    type RunStep,
     type Take,
     saveTake,
 } from "./savedTakes";
@@ -100,6 +102,46 @@ describe("fastestTakeOnsets", () => {
     it("is null when no complete take exists", () => {
         expect(fastestTakeOnsets([take("1", { complete: false })])).toBeNull();
         expect(fastestTakeOnsets([])).toBeNull();
+    });
+});
+
+describe("compositionFromRun", () => {
+    const step = (pitches: number[], startMs: number, velocity = 90): RunStep => ({
+        pitches,
+        startMs,
+        velocity,
+    });
+
+    it("derives each note's length from the gap to the next onset", () => {
+        const composition = compositionFromRun([step([60], 0), step([62], 300)], 120, 4);
+        expect(composition.notes.map((n) => [n.pitch, n.startMs, n.durationMs])).toEqual([
+            [60, 0, 300],
+            // The last note has no successor, so it's held one beat (120bpm → 500ms).
+            [62, 300, 500],
+        ]);
+    });
+
+    it("expands a chord into notes sharing one onset", () => {
+        const composition = compositionFromRun([step([60, 64, 67], 0), step([72], 400)], 120, 4);
+        const chord = composition.notes.filter((n) => n.startMs === 0);
+        expect(chord.map((n) => n.pitch)).toEqual([60, 64, 67]);
+        expect(new Set(chord.map((n) => n.durationMs))).toEqual(new Set([400]));
+    });
+
+    it("carries the run's velocity and keeps tempo and metre", () => {
+        const composition = compositionFromRun([step([60], 0, 40)], 90, 3);
+        expect(composition.notes[0]?.velocity).toBe(40);
+        expect(composition.tempo).toBe(90);
+        expect(composition.beatsPerBar).toBe(3);
+    });
+
+    it("floors a near-simultaneous pair to a minimum length, never zero", () => {
+        const composition = compositionFromRun([step([60], 0), step([61], 5), step([62], 400)], 120, 4);
+        expect(composition.notes[0]?.durationMs).toBeGreaterThanOrEqual(60);
+    });
+
+    it("is empty for a run with no steps", () => {
+        expect(compositionFromRun([], 120, 4)).toEqual({ notes: [], tempo: 120, beatsPerBar: 4 });
     });
 });
 

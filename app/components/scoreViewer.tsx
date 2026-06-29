@@ -105,9 +105,10 @@ import { BumpValue, Stepper } from "./stepper";
 import { Switch } from "./switch";
 import { TempoGraph } from "./tempoGraph";
 
-// A cleared note plus the velocity it was played at — the run's raw record, from
-// which the grade, the per-note strip and the share grid are all derived.
-type PlayedNote = RunNote & { velocity: number };
+// A cleared note plus the velocity it was played at and the pitches sounded at
+// that step — the run's raw record, from which the grade, the per-note strip and
+// the share grid are derived, and a saved take's notes are reconstructed.
+type PlayedNote = RunNote & { velocity: number; pitches: number[] };
 
 // A typed bar number for the loop range — a number field (not a stepper), because a
 // piece can run to many bars and typing the target beats tapping a stepper there.
@@ -417,6 +418,7 @@ export function ScoreViewer({
                     playedMs: info.timestamp - startRef.current,
                     wrongBefore: info.wrongBefore,
                     velocity: info.velocity,
+                    pitches: [...info.pitches],
                 },
             ];
             // Track the player's tempo from the gap to the previous note and ease

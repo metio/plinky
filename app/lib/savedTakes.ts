@@ -1,7 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type Composition, decodeComposition, encodeComposition } from "./composition";
+import {
+    type Composition,
+    decodeComposition,
+    encodeComposition,
+    type RecordedNote,
+} from "./composition";
 
 // A saved performance of a piece — your own play, kept per song so you can hear it
 // back, download it, and (the fastest one) race it as your ghost. A take IS a
@@ -34,6 +39,43 @@ type StoredTake = {
     complete: boolean;
     code: string;
 };
+
+// One cleared step of a run: the pitches sounded together (a chord shares one
+// onset), the onset relative to the run's first note, and the velocity they were
+// struck at. This is what the play surface captures per matched step.
+export type RunStep = {
+    pitches: number[];
+    startMs: number;
+    velocity: number;
+};
+
+// The shortest note a derived duration may take, so a near-simultaneous pair still
+// renders and exports as a real note rather than collapsing to nothing.
+const MIN_DURATION_MS = 60;
+
+// Reconstruct a Composition from a run's cleared steps. Each pitch in a step
+// becomes a note at that step's onset; its length is the gap to the next onset so
+// the notes connect on the staff and in exports, and the final step is held for a
+// beat. Key-release isn't captured, so this is a faithful-enough reconstruction
+// for playback and download — not a measurement of how long keys were actually held.
+export function compositionFromRun(
+    steps: RunStep[],
+    tempo: number,
+    beatsPerBar: number,
+): Composition {
+    const beatMs = 60_000 / tempo;
+    const notes: RecordedNote[] = [];
+    steps.forEach((step, index) => {
+        const next = steps[index + 1];
+        const durationMs = next
+            ? Math.max(MIN_DURATION_MS, next.startMs - step.startMs)
+            : beatMs;
+        for (const pitch of step.pitches) {
+            notes.push({ pitch, startMs: step.startMs, durationMs, velocity: step.velocity });
+        }
+    });
+    return { notes, tempo, beatsPerBar };
+}
 
 export function loadTakes(songId: string): Take[] {
     try {
