@@ -39,8 +39,10 @@ export function EarPiece({ xml }: { xml: string }) {
 
     const phraseRef = useRef(phrase);
     phraseRef.current = phrase;
-    const indexRef = useRef(0);
-    indexRef.current = index;
+    // The phrase position, advanced synchronously inside handleNoteOn so two note-ons
+    // arriving in one batch read distinct positions rather than both seeing the index
+    // from the last render (which would mark the second, correct note wrong).
+    const posRef = useRef(0);
     const timers = useRef<number[]>([]);
 
     const stop = useCallback(() => {
@@ -54,6 +56,7 @@ export function EarPiece({ xml }: { xml: string }) {
     // pending playback so it can't sound after the phrase or the mode is gone.
     // biome-ignore lint/correctness/useExhaustiveDependencies: phrase is the reset trigger
     useEffect(() => {
+        posRef.current = 0;
         setIndex(0);
         setCorrect(0);
         setAttempts(0);
@@ -72,7 +75,7 @@ export function EarPiece({ xml }: { xml: string }) {
 
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) => {
-            const expected = phraseRef.current[indexRef.current];
+            const expected = phraseRef.current[posRef.current];
             if (expected === undefined) {
                 return;
             }
@@ -81,7 +84,8 @@ export function EarPiece({ xml }: { xml: string }) {
                 synth.playNote(expected);
                 setCorrect((value) => value + 1);
                 setWrong(null);
-                setIndex((value) => value + 1);
+                posRef.current += 1;
+                setIndex(posRef.current);
             } else {
                 setWrong(played.note);
                 synth.playNote(played.note, { duration: 0.4 });

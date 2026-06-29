@@ -40,4 +40,28 @@ describe("EarPiece", () => {
         });
         expect(await screen.findByText(/note 2 of 2/)).toBeTruthy();
     });
+
+    it("credits two correct notes played in one batch rather than flagging the second wrong", async () => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        mounted.push(container);
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <EarPiece xml={XML} />
+                </MidiProvider>
+            </MemoryRouter>,
+            { container },
+        );
+        expect(await screen.findByText(/note 1 of 2/)).toBeTruthy();
+        // Both note-ons land before a re-render. Reading the position from a ref that
+        // advances synchronously is what lets the D be matched against position 2;
+        // off render-synced state both would compare against C and the D read wrong.
+        await act(async () => {
+            window.__plinky?.play(60); // C4 — phrase position 1
+            window.__plinky?.play(62); // D4 — phrase position 2, same batch
+        });
+        expect(await screen.findByText(/Phrase complete/)).toBeTruthy();
+        expect(screen.queryByText(/try again/)).toBeNull();
+    });
 });
