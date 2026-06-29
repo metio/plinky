@@ -75,6 +75,16 @@ describe("gradeOf", () => {
         expect(gradeOf("easy-piece", easy)).toBeLessThanOrEqual(gradeOf("hard-piece", hard));
     });
 
+    it("grades an unmeasurable score at the top, not as the easiest piece", () => {
+        // An empty or unreadable import has no fingerable notes, so its cost is 0.
+        // Bucketing it at grade 1 would pad the beginner pool with a phantom piece;
+        // it belongs out of the way at the ceiling instead.
+        expect(gradeOf("empty-import", score(""))).toBe(MAX_GRADE);
+        const restsOnly = score(`<note><rest/><duration>4</duration></note>`);
+        expect(gradeOf("rests-only-import", restsOnly)).toBe(MAX_GRADE);
+        expect(gradeOf("unreadable-import", "not a score at all")).toBe(MAX_GRADE);
+    });
+
     it("grades a chord with more notes than fingers without crashing", () => {
         // Real piano music has 6+ note voicings the bundled exercises never do; the
         // fingering model must still return a grade rather than fail to finger them.

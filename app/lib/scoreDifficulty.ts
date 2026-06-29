@@ -64,16 +64,23 @@ function handEffort(positions: number[][], hand: "left" | "right"): number {
     return positionsCost(positions, fingerPositions(positions, hand), hand);
 }
 
-// The score's raw playing effort: total fingering cost across both hands, averaged
-// over every note — so length doesn't inflate it and a short hard piece outranks a
-// long easy one.
-export function rawDifficulty(xml: string): number {
-    const { right, left } = parsePositions(xml);
+// The playing effort of already-parsed hands: total fingering cost across both,
+// averaged over every note — so length doesn't inflate it and a short hard piece
+// outranks a long easy one. Returns 0 for no notes, which callers must read as
+// "nothing to measure" rather than "easiest", since a gentle in-hand line also
+// costs ~0.
+function effortOf(right: number[][], left: number[][]): number {
     const notes = right.length + left.length;
     if (notes === 0) {
         return 0;
     }
     return (handEffort(right, "right") + handEffort(left, "left")) / notes;
+}
+
+// The score's raw playing effort, parsed from its MusicXML.
+export function rawDifficulty(xml: string): number {
+    const { right, left } = parsePositions(xml);
+    return effortOf(right, left);
 }
 
 export type Category = "scale" | "arpeggio" | "piece";
@@ -114,7 +121,15 @@ export function gradeOf(id: string, xml: string): number {
     if (cached !== undefined) {
         return cached;
     }
-    const cost = rawDifficulty(xml);
+    const { right, left } = parsePositions(xml);
+    // No fingerable notes means an empty or unreadable score, not the gentlest
+    // piece — a real in-hand line also costs ~0. Grade it at the top so it can't
+    // pad the beginner pools, distinguishing it from a measured-easy cost of 0.
+    if (right.length + left.length === 0) {
+        gradeCache.set(id, MAX_GRADE);
+        return MAX_GRADE;
+    }
+    const cost = effortOf(right, left);
     let grade = 1;
     for (const threshold of GRADE_THRESHOLDS[categoryOf(id)]) {
         if (cost <= threshold) {
