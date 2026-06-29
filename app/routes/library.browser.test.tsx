@@ -70,11 +70,15 @@ describe("Library", () => {
         expect(await screen.findByLabelText("Remove from favorites")).toBeTruthy();
     });
 
-    it("removes an imported score from the catalogue", async () => {
+    it("removes an imported score only after the delete is confirmed", async () => {
         saveUserScore(buildScore(USER_XML, []));
         renderLibrary();
         expect(await screen.findByText("My Tune")).toBeTruthy();
+        // The first click only arms the confirm — the unrecoverable delete shouldn't
+        // fire on a single misclick.
         fireEvent.click(screen.getByLabelText("Remove"));
+        expect(screen.getByText("My Tune")).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Remove?" }));
         await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
     });
 

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, buttonClasses } from "../components/button";
 import { CoachMark } from "../components/coachMark";
+import { ConfirmButton } from "../components/confirmButton";
 import { KeyboardHint } from "../components/keyboardHint";
 import { MidiConnect } from "../components/midiConnect";
 import { PianoKeyboard } from "../components/pianoKeyboard";
@@ -70,6 +71,9 @@ export default function Compose() {
     const [metronomeOn, setMetronomeOn] = useState(false);
     const [countingIn, setCountingIn] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    // A parsed file waiting on confirmation because loading it would replace a
+    // non-empty take; null when there's nothing to confirm.
+    const [pendingReplace, setPendingReplace] = useState<Composition | null>(null);
 
     // The on-screen keyboard mirrors the practice surface: a window of the player's
     // chosen width (Settings → keyboard octaves; 0 = show all) that follows what they
@@ -264,6 +268,20 @@ export default function Compose() {
         }, barMs);
     }, [countingIn, beatsPerBar, tempo]);
 
+    // Swap the canvas over to a loaded composition.
+    const applyLoaded = useCallback(
+        (loaded: Composition) => {
+            stop();
+            setNotes(loaded.notes);
+            setTempo(loaded.tempo);
+            setBeatsPerBar(loaded.beatsPerBar);
+            setCheckpoint(null);
+            originRef.current = null;
+            openRef.current.clear();
+        },
+        [stop],
+    );
+
     // Load a MIDI or MusicXML file dropped or chosen by the player, replacing the take
     // so they can carry work between devices. The parsers are pulled in on demand so
     // their bytes don't weigh on the page until a file is actually opened.
@@ -292,15 +310,16 @@ export default function Compose() {
                 setUploadError(m.compose_open_error());
                 return;
             }
-            stop();
-            setNotes(loaded.notes);
-            setTempo(loaded.tempo);
-            setBeatsPerBar(loaded.beatsPerBar);
-            setCheckpoint(null);
-            originRef.current = null;
-            openRef.current.clear();
+            // Loading replaces the whole take, so an in-progress recording must not be
+            // discarded silently — hold the parsed file and confirm first. An empty
+            // canvas has nothing to lose, so it loads straight away.
+            if (notesRef.current.length > 0) {
+                setPendingReplace(loaded);
+                return;
+            }
+            applyLoaded(loaded);
         },
-        [stop],
+        [applyLoaded],
     );
 
     const empty = notes.length === 0;
@@ -431,9 +450,13 @@ export default function Compose() {
                         ? m.compose_reset_checkpoint()
                         : m.compose_reset_checkpoint_at({ count: checkpoint })}
                 </Button>
-                <Button variant="secondary" onClick={reset} disabled={empty}>
+                <ConfirmButton
+                    onConfirm={reset}
+                    confirmLabel={m.compose_clear_confirm()}
+                    disabled={empty}
+                >
                     {m.compose_clear()}
-                </Button>
+                </ConfirmButton>
             </section>
 
             <section className="flex flex-wrap items-center gap-2">
@@ -463,6 +486,25 @@ export default function Compose() {
                 </span>
                 {uploadError && (
                     <p className="w-full text-sm text-red-600 dark:text-red-400">{uploadError}</p>
+                )}
+                {pendingReplace && (
+                    <div className="flex w-full flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                            {m.compose_replace_confirm()}
+                        </span>
+                        <Button
+                            variant="danger"
+                            onClick={() => {
+                                applyLoaded(pendingReplace);
+                                setPendingReplace(null);
+                            }}
+                        >
+                            {m.compose_replace_yes()}
+                        </Button>
+                        <Button variant="ghost" onClick={() => setPendingReplace(null)}>
+                            {m.action_cancel()}
+                        </Button>
+                    </div>
                 )}
             </section>
 

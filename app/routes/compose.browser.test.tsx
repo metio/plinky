@@ -93,6 +93,48 @@ describe("Compose", () => {
         });
     });
 
+    it("asks before Clear wipes the take", async () => {
+        mount();
+        await strike(60);
+        await strike(64);
+        expect(await screen.findByText("2 notes")).toBeTruthy();
+        // First click only arms — a misclick mustn't destroy the recording.
+        fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+        expect(screen.getByText("2 notes")).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Clear all?" }));
+        expect(await screen.findByText("0 notes")).toBeTruthy();
+    });
+
+    it("confirms before an opened file replaces a non-empty take", async () => {
+        const { toMidiNotes } = await import("../lib/composition");
+        const { buildMidiFile } = await import("../lib/midiFile");
+        const bytes = buildMidiFile(
+            toMidiNotes({
+                notes: [
+                    { pitch: 62, startMs: 0, durationMs: 400, velocity: 90 },
+                    { pitch: 65, startMs: 500, durationMs: 400, velocity: 90 },
+                ],
+                tempo: 120,
+                beatsPerBar: 4,
+            }),
+            { tempo: 120 },
+        );
+        const container = mount();
+        await strike(60);
+        expect(await screen.findByText("1 notes")).toBeTruthy();
+        const file = new File([bytes], "take.mid", { type: "audio/midi" });
+        const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+        await act(async () => {
+            fireEvent.change(input, { target: { files: [file] } });
+        });
+        // The in-progress take is held, not silently overwritten…
+        expect(await screen.findByText(/Replace your current recording/)).toBeTruthy();
+        expect(screen.getByText("1 notes")).toBeTruthy();
+        // …until the player confirms the replace.
+        fireEvent.click(screen.getByRole("button", { name: "Replace" }));
+        expect(await screen.findByText("2 notes")).toBeTruthy();
+    });
+
     it("loads notes from an opened MIDI file", async () => {
         const { toMidiNotes } = await import("../lib/composition");
         const { buildMidiFile } = await import("../lib/midiFile");

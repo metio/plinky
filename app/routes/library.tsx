@@ -3,6 +3,7 @@
 
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, IconButton } from "../components/button";
+import { ConfirmButton } from "../components/confirmButton";
 import { Chip } from "../components/chip";
 import { Show } from "../components/conditional";
 import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../components/icons";
@@ -358,14 +359,15 @@ export default function LibraryRoute() {
                                             <GradeChip grade={item.grade} />
                                         </Link>
                                         {item.removable && (
-                                            <IconButton
+                                            <ConfirmButton
                                                 variant="ghost"
-                                                onClick={() => remove(item.id)}
+                                                onConfirm={() => remove(item.id)}
+                                                confirmLabel={m.action_remove_confirm()}
                                                 label={m.action_remove()}
                                                 className="text-red-600 dark:text-red-400"
                                             >
                                                 <CloseIcon className="h-5 w-5" />
-                                            </IconButton>
+                                            </ConfirmButton>
                                         )}
                                     </li>
                                 );
