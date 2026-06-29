@@ -919,12 +919,17 @@ export function ScoreViewer({
                         // hands it all the spare height (flex-1); otherwise it's shorter on a
                         // phone so the keys fit; dvh tracks the live viewport so the mobile URL
                         // bar doesn't clip it.
+                        // The min-height reserves the staff area before OSMD has
+                        // rendered, so the score growing in on load doesn't shove the
+                        // controls and keyboard below it down the page (a CLS hit that
+                        // Lighthouse amplifies under CPU throttling). The max-height keeps
+                        // it from crowding the keyboard off-screen; taller scores scroll.
                         className={`no-scrollbar overflow-auto ${
                             fullscreen
                                 ? "min-h-0 flex-1"
                                 : compact
-                                  ? "max-h-[40dvh]"
-                                  : "max-h-[70vh]"
+                                  ? "h-[40dvh]"
+                                  : "min-h-[50vh] max-h-[70vh]"
                         }`}
                     />
                     {loadError && (
