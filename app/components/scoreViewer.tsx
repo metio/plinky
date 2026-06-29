@@ -66,7 +66,7 @@ import {
     WINDOW_COLOR,
 } from "../lib/scoreColor";
 import { buildMidiFile, type MidiNote } from "../lib/midiFile";
-import { buildPrintDocument, fileStem } from "../lib/printScore";
+import { buildPrintDocument, fileStem, printViaIframe } from "../lib/printScore";
 import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
 import { transposeMusicXml } from "../lib/transpose";
 import {
@@ -710,11 +710,15 @@ export function ScoreViewer({
         if (!svg) {
             return;
         }
+        const html = buildPrintDocument(svg.outerHTML, title);
         const win = window.open("", "_blank");
         if (!win) {
+            // Pop-up blocked (common on mobile) — fall back to a hidden iframe so
+            // Print still reaches the print dialog rather than silently doing nothing.
+            printViaIframe(html);
             return;
         }
-        win.document.write(buildPrintDocument(svg.outerHTML, title));
+        win.document.write(html);
         win.document.close();
         win.focus();
         win.print();
