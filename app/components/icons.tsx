@@ -79,16 +79,6 @@ export function PrinterIcon({ className }: IconProps) {
     );
 }
 
-export function DownloadIcon({ className }: IconProps) {
-    return (
-        <Icon className={className}>
-            <path d="M12 4v10" />
-            <path d="M8 11l4 4 4-4" />
-            <path d="M5 19h14" />
-        </Icon>
-    );
-}
-
 export function ShareIcon({ className }: IconProps) {
     return (
         <Icon className={className}>

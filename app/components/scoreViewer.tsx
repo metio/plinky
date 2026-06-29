@@ -87,9 +87,9 @@ import { GhostTrack } from "./ghostTrack";
 import {
     CheckIcon,
     CloseIcon,
-    DownloadIcon,
     MaximizeIcon,
     MinimizeIcon,
+    NotesIcon,
     PlayIcon,
     PrinterIcon,
     RotateIcon,
@@ -1041,6 +1041,43 @@ export function ScoreViewer({
                         </IconButton>
                     </div>
                 </FullScreen>
+                {/* Bonus actions sit as quiet icons just above the score — Print and
+                Export (the piece's MIDI, built from its notation) and, until it's
+                learned, a mark-learned shortcut. Coloured but small, so they read as
+                extras rather than the primary Practice action. */}
+                <FullScreen off>
+                    <Show when={ready}>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <IconButton
+                                variant="ghost"
+                                onClick={printScore}
+                                label={m.action_print()}
+                                className="text-indigo-600 dark:text-indigo-400"
+                            >
+                                <PrinterIcon />
+                            </IconButton>
+                            <IconButton
+                                variant="ghost"
+                                onClick={exportMidi}
+                                label={m.action_export_midi()}
+                                className="text-violet-600 dark:text-violet-400"
+                            >
+                                <NotesIcon />
+                            </IconButton>
+                            {!ephemeral && !mastery?.learned && (
+                                <IconButton
+                                    variant="ghost"
+                                    onClick={markLearnedNow}
+                                    label={m.mastery_mark_learned()}
+                                    className="text-green-600 dark:text-green-400"
+                                >
+                                    <CheckIcon />
+                                </IconButton>
+                            )}
+                        </div>
+                    </Show>
+                </FullScreen>
+
                 {/* The score sits at the top — it's what you read while playing, so the
                 controls, keyboard and run summary all fall below it. OSMD renders to
                 its container's full offset width, which includes any border or
@@ -1365,19 +1402,6 @@ export function ScoreViewer({
                             </FieldGroup>
                         </Disclosure>
                     </div>
-                </FullScreen>
-
-                <FullScreen off>
-                    <Show when={ready}>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <IconButton onClick={printScore} label={m.action_print()}>
-                                <PrinterIcon />
-                            </IconButton>
-                            <IconButton onClick={exportMidi} label={m.action_export_midi()}>
-                                <DownloadIcon />
-                            </IconButton>
-                        </div>
-                    </Show>
                 </FullScreen>
 
                 <div

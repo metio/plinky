@@ -188,6 +188,22 @@ describe("ScoreViewer", () => {
         scroll.mockRestore();
     });
 
+    it("marks a piece learned from the header icon and then hides it", async () => {
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        // The mark-learned shortcut sits in the header icon row until the piece is learned.
+        const mark = await screen.findByRole(
+            "button",
+            { name: "Mark learned" },
+            { timeout: 30000 },
+        );
+        fireEvent.click(mark);
+        // Once learned it disappears (the status moves to the mastery line below).
+        await waitFor(() =>
+            expect(screen.queryByRole("button", { name: "Mark learned" })).toBeNull(),
+        );
+    });
+
     it("reveals the adaptive toggle only while the metronome is on", async () => {
         render(
             <MemoryRouter>
