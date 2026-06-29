@@ -1408,7 +1408,9 @@ export function ScoreViewer({
                     hidden={ephemeral || fullscreen}
                     className="flex flex-wrap items-center gap-3 text-sm"
                 >
-                    {mastery?.learned ? (
+                    {/* The mark-learned shortcut lives in the header icon row; here we
+                    only show the earned status and the review/backlog control. */}
+                    {mastery?.learned && (
                         <>
                             <span className="inline-flex items-center gap-1 font-medium text-green-700 dark:text-green-400">
                                 <CheckIcon className="h-4 w-4" /> {m.mastery_learned()}
@@ -1426,14 +1428,6 @@ export function ScoreViewer({
                                 {mastery.backlog ? m.mastery_resume() : m.mastery_backlog()}
                             </button>
                         </>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={markLearnedNow}
-                            className="text-indigo-600 underline dark:text-indigo-400"
-                        >
-                            {m.mastery_mark_learned()}
-                        </button>
                     )}
                 </div>
 
