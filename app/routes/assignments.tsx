@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { IconButton } from "../components/button";
+import { Button, IconButton } from "../components/button";
 import { Show } from "../components/conditional";
 import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/icons";
 import { LocalizedLink as Link } from "../components/localizedLink";
@@ -34,10 +34,6 @@ export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.assignments_heading(), m.meta_assignments_description());
 }
 
-const BUTTON =
-    "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-950 dark:text-indigo-300";
-const PRIMARY =
-    "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50";
 const FIELD =
     "rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300";
 
@@ -264,16 +260,15 @@ export default function AssignmentsRoute() {
                             count: incoming.items.length,
                         })}
                     </p>
-                    <button
-                        type="button"
-                        className={PRIMARY}
+                    <Button
+                        variant="primary"
                         onClick={() => {
                             importAssignment(incoming);
                             setIncoming(null);
                         }}
                     >
                         {m.assignments_import_received()}
-                    </button>
+                    </Button>
                 </section>
             )}
 
@@ -311,13 +306,9 @@ export default function AssignmentsRoute() {
                                 className="flex items-center justify-between gap-2 px-3 py-1.5 text-sm"
                             >
                                 <span className="truncate">{entry.title}</span>
-                                <button
-                                    type="button"
-                                    className={BUTTON}
-                                    onClick={() => addItem(entry.id)}
-                                >
+                                <Button variant="secondary" onClick={() => addItem(entry.id)}>
                                     {m.assignments_add()}
-                                </button>
+                                </Button>
                             </li>
                         ))}
                     </ul>
@@ -391,38 +382,32 @@ export default function AssignmentsRoute() {
                 )}
 
                 <div className="flex flex-wrap gap-2">
-                    <button type="button" className={PRIMARY} disabled={!canSave} onClick={onSave}>
+                    <Button variant="primary" disabled={!canSave} onClick={onSave}>
                         {m.assignments_save()}
-                    </button>
-                    <button
-                        type="button"
-                        className={BUTTON}
+                    </Button>
+                    <Button
+                        variant="secondary"
                         disabled={!canSave}
                         onClick={() => onDownload(draft())}
                     >
                         {m.assignments_download()}
-                    </button>
-                    <button
-                        type="button"
-                        className={BUTTON}
+                    </Button>
+                    <Button
+                        variant="secondary"
                         disabled={!canSave}
                         onClick={() => onShare(draft())}
                     >
                         {m.assignments_share()}
-                    </button>
+                    </Button>
                 </div>
             </section>
 
             <section className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-semibold">{m.assignments_yours_heading()}</h2>
-                    <button
-                        type="button"
-                        className={BUTTON}
-                        onClick={() => fileRef.current?.click()}
-                    >
+                    <Button variant="secondary" onClick={() => fileRef.current?.click()}>
                         {m.assignments_import_file()}
-                    </button>
+                    </Button>
                     <input
                         ref={fileRef}
                         type="file"
@@ -458,30 +443,27 @@ export default function AssignmentsRoute() {
                                                 {doneCount}/{steps.length}
                                             </span>
                                         </span>
-                                        <button
-                                            type="button"
-                                            className={BUTTON}
+                                        <Button
+                                            variant="secondary"
                                             onClick={() => onShare(assignment)}
                                         >
                                             {m.assignments_share()}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className={BUTTON}
+                                        </Button>
+                                        <Button
+                                            variant="secondary"
                                             onClick={() => onDownload(assignment)}
                                         >
                                             {m.assignments_download()}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className={BUTTON}
+                                        </Button>
+                                        <Button
+                                            variant="danger"
                                             onClick={() => onDelete(assignment)}
                                             aria-label={m.assignments_delete_label({
                                                 name: assignment.name,
                                             })}
                                         >
                                             {m.assignments_remove()}
-                                        </button>
+                                        </Button>
                                     </div>
                                     <ol className="space-y-1">
                                         {steps.map((step, index) => (

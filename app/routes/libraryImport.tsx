@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
+import { Button, buttonClasses } from "../components/button";
 import { UploadIcon } from "../components/icons";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { GradeChip } from "../components/scoreGrade";
@@ -52,10 +53,6 @@ type Draft = {
 
 const FIELD =
     "w-full rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
-const PRIMARY =
-    "rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50";
-const SECONDARY =
-    "rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300";
 
 export default function LibraryImportRoute() {
     const [draft, setDraft] = useState<Draft | null>(null);
@@ -156,12 +153,12 @@ export default function LibraryImportRoute() {
                         {m.import_added()}
                     </p>
                     <div className="flex flex-wrap gap-3">
-                        <Link to={`/play/${savedId}`} className={PRIMARY}>
+                        <Link to={`/play/${savedId}`} className={buttonClasses("primary")}>
                             {m.import_play_now()}
                         </Link>
-                        <button type="button" onClick={reset} className={SECONDARY}>
+                        <Button variant="secondary" onClick={reset}>
                             {m.import_add_another()}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
@@ -266,12 +263,12 @@ export default function LibraryImportRoute() {
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                        <button type="button" onClick={confirmAdd} className={PRIMARY}>
+                        <Button variant="primary" onClick={confirmAdd}>
                             {m.import_confirm()}
-                        </button>
-                        <button type="button" onClick={reset} className={SECONDARY}>
+                        </Button>
+                        <Button variant="secondary" onClick={reset}>
                             {m.import_choose_different()}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}

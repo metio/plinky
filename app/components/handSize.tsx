@@ -7,13 +7,11 @@ import { intervalName } from "../lib/intervals";
 import { noteName } from "../lib/midi";
 import { type HandSpan, loadPrefs, savePrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
+import { Button } from "./button";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 type Side = "left" | "right";
 const SIDES: Side[] = ["left", "right"];
-
-const PILL =
-    "rounded-md border border-gray-300 px-3 py-1 text-sm font-medium text-gray-700 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300";
 
 // Lets a player record each hand's comfortable thumb-to-pinky reach so the
 // fingering suggestions fit their hand. Each hand is independent, so someone with
@@ -107,17 +105,16 @@ export function HandSize() {
                                 )}
                             </span>
                             <span className="flex shrink-0 gap-2">
-                                <button type="button" onClick={() => begin(side)} className={PILL}>
+                                <Button variant="secondary" onClick={() => begin(side)}>
                                     {span !== null ? m.hand_size_edit() : m.hand_size_set()}
-                                </button>
+                                </Button>
                                 {span !== null && (
-                                    <button
-                                        type="button"
+                                    <Button
+                                        variant="secondary"
                                         onClick={() => persist({ ...spans, [side]: null })}
-                                        className={PILL}
                                     >
                                         {m.action_remove()}
-                                    </button>
+                                    </Button>
                                 )}
                             </span>
                         </div>
@@ -133,17 +130,12 @@ export function HandSize() {
                     <p className="font-mono text-sm text-gray-800 dark:text-gray-200">{readout}</p>
                     <PianoKeyboard expected={captured} from={48} to={72} />
                     <div className="flex gap-2">
-                        <button
-                            type="button"
-                            onClick={save}
-                            disabled={measured === null}
-                            className="rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white disabled:opacity-50"
-                        >
+                        <Button variant="primary" onClick={save} disabled={measured === null}>
                             {m.action_save()}
-                        </button>
-                        <button type="button" onClick={cancel} className={PILL}>
+                        </Button>
+                        <Button variant="secondary" onClick={cancel}>
                             {m.import_cancel()}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}

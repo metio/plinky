@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { Button, buttonClasses } from "../components/button";
 import { CoachMark } from "../components/coachMark";
 import { KeyboardHint } from "../components/keyboardHint";
 import { MidiConnect } from "../components/midiConnect";
@@ -33,10 +34,6 @@ export function meta(_args: Route.MetaArgs) {
 
 const FIELD =
     "rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
-const PRIMARY =
-    "rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-40";
-const SECONDARY =
-    "rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:border-indigo-300 disabled:opacity-40 dark:border-gray-700 dark:text-gray-300";
 
 // The end of the recorded timeline in milliseconds — the moment the last-released
 // note stops sounding. New notes append after it, so a loaded share keeps growing.
@@ -391,56 +388,44 @@ export default function Compose() {
             </section>
 
             <section className="flex flex-wrap gap-2">
-                <button type="button" onClick={countIn} disabled={countingIn} className={PRIMARY}>
+                <Button variant="primary" onClick={countIn} disabled={countingIn}>
                     {countingIn ? m.compose_counting_in() : m.compose_count_in()}
-                </button>
-                <button
-                    type="button"
-                    onClick={playing ? stop : play}
-                    disabled={empty}
-                    className={SECONDARY}
-                >
+                </Button>
+                <Button variant="secondary" onClick={playing ? stop : play} disabled={empty}>
                     {playing ? m.compose_stop() : m.compose_play()}
-                </button>
-                <button
-                    type="button"
+                </Button>
+                <Button
+                    variant="secondary"
                     onClick={() => setCheckpoint(notes.length)}
                     disabled={empty}
-                    className={SECONDARY}
                 >
                     {m.compose_set_checkpoint()}
-                </button>
-                <button
-                    type="button"
+                </Button>
+                <Button
+                    variant="secondary"
                     onClick={resetToCheckpoint}
                     disabled={checkpoint === null}
-                    className={SECONDARY}
                 >
                     {checkpoint === null
                         ? m.compose_reset_checkpoint()
                         : m.compose_reset_checkpoint_at({ count: checkpoint })}
-                </button>
-                <button type="button" onClick={reset} disabled={empty} className={SECONDARY}>
+                </Button>
+                <Button variant="secondary" onClick={reset} disabled={empty}>
                     {m.compose_clear()}
-                </button>
+                </Button>
             </section>
 
             <section className="flex flex-wrap items-center gap-2">
-                <button type="button" onClick={share} disabled={empty} className={SECONDARY}>
+                <Button variant="secondary" onClick={share} disabled={empty}>
                     {copied ? m.compose_copied() : m.compose_share()}
-                </button>
-                <button type="button" onClick={downloadMidi} disabled={empty} className={SECONDARY}>
+                </Button>
+                <Button variant="secondary" onClick={downloadMidi} disabled={empty}>
                     {m.compose_download_midi()}
-                </button>
-                <button
-                    type="button"
-                    onClick={downloadMusicXml}
-                    disabled={empty}
-                    className={SECONDARY}
-                >
+                </Button>
+                <Button variant="secondary" onClick={downloadMusicXml} disabled={empty}>
                     {m.compose_download_musicxml()}
-                </button>
-                <label className={`${SECONDARY} cursor-pointer`}>
+                </Button>
+                <label className={buttonClasses("secondary", "cursor-pointer")}>
                     {m.compose_open_file()}
                     <input
                         type="file"

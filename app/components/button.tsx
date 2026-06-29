@@ -22,6 +22,13 @@ const VARIANT: Record<ButtonVariant, string> = {
 const BASE =
     "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-50";
 
+// The button look as a bare class string, for the cases that must render a different
+// element than <button> — a react-router <Link> or a file-input <label> styled as a
+// button — so they match the primitive without duplicating its Tailwind.
+export function buttonClasses(variant: ButtonVariant = "secondary", className = ""): string {
+    return `${BASE} ${VARIANT[variant]} ${className}`.trim();
+}
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: ButtonVariant;
 };
@@ -35,7 +42,7 @@ export function Button({
 }: ButtonProps) {
     return (
         // biome-ignore lint/a11y/useButtonType: type is set from a defaulted prop
-        <button type={type} className={`${BASE} ${VARIANT[variant]} ${className}`} {...rest}>
+        <button type={type} className={buttonClasses(variant, className)} {...rest}>
             {children}
         </button>
     );
