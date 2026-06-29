@@ -36,6 +36,8 @@ export function EarPiece({ xml }: { xml: string }) {
     const [correct, setCorrect] = useState(0);
     const [attempts, setAttempts] = useState(0);
     const [wrong, setWrong] = useState<number | null>(null);
+    // The note just uncovered by Reveal, shown until the next note is acted on.
+    const [revealed, setRevealed] = useState<number | null>(null);
 
     const phraseRef = useRef(phrase);
     phraseRef.current = phrase;
@@ -61,6 +63,7 @@ export function EarPiece({ xml }: { xml: string }) {
         setCorrect(0);
         setAttempts(0);
         setWrong(null);
+        setRevealed(null);
         return stop;
     }, [phrase, stop]);
 
@@ -73,27 +76,52 @@ export function EarPiece({ xml }: { xml: string }) {
         });
     }, [phrase, synth, stop]);
 
+    // Move to the next note, clearing the previous note's feedback.
+    const advance = useCallback(() => {
+        posRef.current += 1;
+        setIndex(posRef.current);
+        setWrong(null);
+    }, []);
+
     const handleNoteOn = useCallback(
         (played: MidiNoteEvent) => {
             const expected = phraseRef.current[posRef.current];
             if (expected === undefined) {
                 return;
             }
+            setRevealed(null);
             setAttempts((value) => value + 1);
             if (played.note % 12 === expected % 12) {
                 synth.playNote(expected);
                 setCorrect((value) => value + 1);
-                setWrong(null);
-                posRef.current += 1;
-                setIndex(posRef.current);
+                advance();
             } else {
                 setWrong(played.note);
                 synth.playNote(played.note, { duration: 0.4 });
             }
         },
-        [synth],
+        [synth, advance],
     );
     useMidiInput({ onNoteOn: handleNoteOn });
+
+    // Give up on a note: hear and name the answer, count it as a (missed) attempt, and
+    // move on, so a stuck learner isn't trapped on one note.
+    const reveal = useCallback(() => {
+        const expected = phraseRef.current[posRef.current];
+        if (expected === undefined) {
+            return;
+        }
+        synth.playNote(expected);
+        setRevealed(expected);
+        setAttempts((value) => value + 1);
+        advance();
+    }, [synth, advance]);
+
+    // Move past a note without hearing it and without counting an attempt.
+    const skip = useCallback(() => {
+        setRevealed(null);
+        advance();
+    }, [advance]);
 
     const { octaveOffset } = useMidiConnection();
     const done = phrase.length > 0 && index >= phrase.length;
@@ -107,6 +135,12 @@ export function EarPiece({ xml }: { xml: string }) {
             <div className="flex flex-wrap items-center gap-2">
                 <Button variant="primary" onClick={hearPhrase} disabled={phrase.length === 0}>
                     {m.ear_piece_hear()}
+                </Button>
+                <Button variant="secondary" onClick={reveal} disabled={phrase.length === 0 || done}>
+                    {m.ear_reveal()}
+                </Button>
+                <Button variant="ghost" onClick={skip} disabled={phrase.length === 0 || done}>
+                    {m.ear_skip()}
                 </Button>
                 <span className="ml-auto flex items-center gap-2">
                     <button
@@ -147,6 +181,11 @@ export function EarPiece({ xml }: { xml: string }) {
                     {wrong !== null && (
                         <span className="ml-2 text-red-600 dark:text-red-400">
                             {m.ear_not_note({ note: noteName(wrong) })}
+                        </span>
+                    )}
+                    {revealed !== null && (
+                        <span className="ml-2 text-indigo-600 dark:text-indigo-300">
+                            {m.ear_revealed({ note: noteName(revealed) })}
                         </span>
                     )}
                 </p>
