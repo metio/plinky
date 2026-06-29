@@ -50,6 +50,16 @@ describe("dailyResult", () => {
         localStorage.setItem("plinky:daily-result", JSON.stringify({ number: 5, grade: 1 }));
         expect(loadDailyResult(5)).toBeNull();
     });
+
+    it("rejects a null grade rather than handing back one that crashes on .letter", () => {
+        // typeof null === "object", so a stored null grade slips past a bare object
+        // check and the result page reads grade.letter off null.
+        localStorage.setItem(
+            "plinky:daily-result",
+            JSON.stringify({ number: 5, grade: null, grid: [], notes: [], tolerance: 1 }),
+        );
+        expect(loadDailyResult(5)).toBeNull();
+    });
 });
 
 describe("dailyResult under denied storage", () => {

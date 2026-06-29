@@ -37,6 +37,7 @@ export function loadDailyResult(number: number): DailyResult | null {
         const parsed = JSON.parse(raw);
         if (
             parsed?.number !== number ||
+            !parsed.grade ||
             typeof parsed.grade !== "object" ||
             !Array.isArray(parsed.grid) ||
             !Array.isArray(parsed.notes) ||
