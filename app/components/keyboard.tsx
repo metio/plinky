@@ -80,6 +80,13 @@ export function Keyboard({
         }
     };
     const up = (note: number) => () => onRelease?.(note);
+    // The keyup half of `press`: a key held via Enter/Space must release the note,
+    // or a keyboard-only player leaves it sounding and lit until the window blurs.
+    const release = (note: number) => (event: React.KeyboardEvent) => {
+        if (event.key === "Enter" || event.key === " ") {
+            onRelease?.(note);
+        }
+    };
     // Releasing on leave only while a button is held avoids stuck notes when
     // dragging across keys.
     const leave = (note: number) => (event: React.PointerEvent) => {
@@ -120,6 +127,7 @@ export function Keyboard({
                             onPointerCancel={up(note)}
                             onPointerLeave={leave(note)}
                             onKeyDown={press(note)}
+                            onKeyUp={release(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
                             className={`${WHITE_KEY} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
                         />
@@ -145,6 +153,7 @@ export function Keyboard({
                             onPointerCancel={up(note)}
                             onPointerLeave={leave(note)}
                             onKeyDown={press(note)}
+                            onKeyUp={release(note)}
                             style={{ left: `${left}%`, width: `${width}%` }}
                             className={`${BLACK_KEY} h-2/3 ${blackState(note)}`}
                         />
