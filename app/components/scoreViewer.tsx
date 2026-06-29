@@ -149,6 +149,7 @@ export function ScoreViewer({
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
+    const gradePanelRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     // Tracks playback synchronously, so a second click that lands before the
@@ -402,6 +403,24 @@ export function ScoreViewer({
             nextKeyboardWindow(prev, matcher.range, matcher.expected, keyboardSpan),
         );
     }, [matcher.range, matcher.expected, keyboardSpan]);
+
+    // When a run finishes, bring the result into view: the player's eyes are on the
+    // keyboard, and the grade renders below it (and below the whole score on the way
+    // out of full screen), so it can otherwise land off-screen unnoticed. Honour
+    // reduced-motion, and wait a frame so the post-run layout has settled first.
+    useEffect(() => {
+        if (!grade) {
+            return;
+        }
+        const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const id = requestAnimationFrame(() => {
+            gradePanelRef.current?.scrollIntoView({
+                behavior: smooth ? "smooth" : "auto",
+                block: "center",
+            });
+        });
+        return () => cancelAnimationFrame(id);
+    }, [grade]);
 
     // Re-centre the treadmill as the matcher advances through the piece — the cursor
     // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
@@ -1372,7 +1391,7 @@ export function ScoreViewer({
                 guard; the full-screen branch is the declarative half. */}
                 <FullScreen off>
                     {grade && (
-                        <div className="space-y-3">
+                        <div ref={gradePanelRef} className="space-y-3">
                             <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
                                 <div
                                     className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}
