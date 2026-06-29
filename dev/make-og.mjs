@@ -9,6 +9,12 @@ import { chromium } from "playwright";
 
 const logo = readFileSync("public/logo-stacked.svg", "utf8");
 
+// Mirror the watermark to the canonical SITE_URL so the card never advertises a
+// stale domain. Read it straight from site.ts rather than hardcoding a copy.
+const siteUrl = readFileSync("app/lib/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1];
+if (!siteUrl) throw new Error("could not find SITE_URL in app/lib/site.ts");
+const host = new URL(siteUrl).host;
+
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
   *{margin:0;padding:0;box-sizing:border-box}
   .card{width:1200px;height:630px;display:flex;flex-direction:column;
@@ -21,7 +27,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 </style></head><body><div class="card">
   ${logo}
   <div class="tag">Practice piano in your browser</div>
-  <div class="url">plinky.projects.metio.wtf</div>
+  <div class="url">${host}</div>
 </div></body></html>`;
 
 const browser = await chromium.launch();
