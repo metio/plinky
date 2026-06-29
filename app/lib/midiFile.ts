@@ -46,9 +46,16 @@ export function buildMidiFile(
         const velocity = Math.max(1, Math.min(127, Math.round(note.velocity ?? DEFAULT_VELOCITY)));
         const key = Math.max(0, Math.min(127, Math.round(note.midi)));
         const onTick = Math.round(note.startQuarters * ppq);
-        const offTick = Math.round((note.startQuarters + note.durationQuarters) * ppq);
+        // Every note sounds at least one tick. A note whose duration rounds to zero
+        // would otherwise share its on and off tick, and since note-off sorts before
+        // note-on there, its own off would precede its on and leave it hanging to the
+        // end of the track.
+        const offTick = Math.max(
+            onTick + 1,
+            Math.round((note.startQuarters + note.durationQuarters) * ppq),
+        );
         events.push({ tick: onTick, order: 1, bytes: [0x90, key, velocity] });
-        events.push({ tick: Math.max(offTick, onTick), order: 0, bytes: [0x80, key, 0] });
+        events.push({ tick: offTick, order: 0, bytes: [0x80, key, 0] });
     }
     events.sort((a, b) => a.tick - b.tick || a.order - b.order);
 
