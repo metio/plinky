@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -63,5 +63,43 @@ describe("EarPiece", () => {
         });
         expect(await screen.findByText(/Phrase complete/)).toBeTruthy();
         expect(screen.queryByText(/try again/)).toBeNull();
+    });
+
+    it("reveals the answer and advances when the player is stuck", async () => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        mounted.push(container);
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <EarPiece xml={XML} />
+                </MidiProvider>
+            </MemoryRouter>,
+            { container },
+        );
+        expect(await screen.findByText(/note 1 of 2/)).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Reveal" }));
+        // The answer is named and the phrase moves on rather than stalling.
+        expect(await screen.findByText(/It's C/)).toBeTruthy();
+        expect(await screen.findByText(/note 2 of 2/)).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Reveal" }));
+        expect(await screen.findByText(/Phrase complete/)).toBeTruthy();
+    });
+
+    it("skips past a note without leaving the player stuck", async () => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        mounted.push(container);
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <EarPiece xml={XML} />
+                </MidiProvider>
+            </MemoryRouter>,
+            { container },
+        );
+        expect(await screen.findByText(/note 1 of 2/)).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Skip" }));
+        expect(await screen.findByText(/note 2 of 2/)).toBeTruthy();
     });
 });
