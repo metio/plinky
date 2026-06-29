@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { exportAllPack, importScoresPack, loadUserScores } from "../lib/catalog";
 import { m } from "../paraglide/messages.js";
+import { Button } from "./button";
 
 function pluralScores(count: number): string {
     return count === 1 ? m.backup_scores_one({ count }) : m.backup_scores_other({ count });
@@ -63,21 +64,12 @@ export function ScoreBackup() {
                 {m.backup_intro({ count: pluralScores(count) })}
             </p>
             <div className="flex flex-wrap gap-2">
-                <button
-                    type="button"
-                    onClick={download}
-                    disabled={count === 0}
-                    className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300"
-                >
+                <Button variant="secondary" onClick={download} disabled={count === 0}>
                     {m.backup_download()}
-                </button>
-                <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                >
+                </Button>
+                <Button variant="secondary" onClick={() => fileRef.current?.click()}>
                     {m.backup_import()}
-                </button>
+                </Button>
                 <input
                     ref={fileRef}
                     type="file"

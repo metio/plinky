@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { IconButton } from "../components/button";
+import { Button, IconButton } from "../components/button";
 import { Chip } from "../components/chip";
 import { Show } from "../components/conditional";
 import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../components/icons";
@@ -355,13 +355,12 @@ export default function LibraryRoute() {
                     )}
 
                     <Show when={visible < matches.length}>
-                        <button
-                            type="button"
+                        <Button
+                            variant="secondary"
                             onClick={() => setVisible((count) => count + PER_PAGE)}
-                            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                         >
                             {m.library_show_more()}
-                        </button>
+                        </Button>
                     </Show>
 
                     <ScoreBackup />

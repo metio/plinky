@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { Button } from "../components/button";
 import { DangerZone } from "../components/dangerZone";
 import { HandSize } from "../components/handSize";
 import { KeyMapping } from "../components/keyMapping";
@@ -105,13 +106,9 @@ export default function Settings() {
                         onChange={(event) => update({ volume: Number(event.target.value) })}
                     />
                     <span className="w-8 font-mono text-sm tabular-nums">{prefs.volume}</span>
-                    <button
-                        type="button"
-                        onClick={() => synth.playNote(72)}
-                        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                    >
+                    <Button variant="secondary" onClick={() => synth.playNote(72)}>
                         {m.settings_test()}
-                    </button>
+                    </Button>
                 </div>
             </section>
 

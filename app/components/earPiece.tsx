@@ -7,6 +7,7 @@ import { useSynth } from "../hooks/useSynth";
 import { type MidiNoteEvent, noteName } from "../lib/midi";
 import { scoreToBars, windowPositions } from "../lib/scoreToBars";
 import { m } from "../paraglide/messages.js";
+import { Button } from "./button";
 import { Show } from "./conditional";
 import { KeyboardHint } from "./keyboardHint";
 import { PianoKeyboard } from "./pianoKeyboard";
@@ -100,14 +101,9 @@ export function EarPiece({ xml }: { xml: string }) {
     return (
         <section className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-                <button
-                    type="button"
-                    onClick={hearPhrase}
-                    disabled={phrase.length === 0}
-                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-                >
+                <Button variant="primary" onClick={hearPhrase} disabled={phrase.length === 0}>
                     {m.ear_piece_hear()}
-                </button>
+                </Button>
                 <span className="ml-auto flex items-center gap-2">
                     <button
                         type="button"

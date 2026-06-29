@@ -25,6 +25,7 @@ import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import type { Grid } from "../lib/shareCard";
 import { m } from "../paraglide/messages.js";
+import { buttonClasses } from "./button";
 import { Show } from "./conditional";
 import { LocalizedLink as Link } from "./localizedLink";
 import { ShareButtons } from "./shareButtons";
@@ -255,10 +256,7 @@ export function YouView() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                             {m.refresh_why()}
                         </p>
-                        <Link
-                            to="/review"
-                            className="inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-                        >
+                        <Link to="/review" className={buttonClasses("primary")}>
                             {m.review_start({ count: reviews.length })}
                         </Link>
                         <ul className="space-y-1 text-sm">

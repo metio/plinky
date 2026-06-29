@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { Button } from "../components/button";
 import { CoachMark } from "../components/coachMark";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
@@ -97,25 +98,16 @@ export default function DailyRoute() {
                 <>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{m.sprint_intro()}</p>
                     <div className="flex flex-wrap items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={() => regenerate(twoHands)}
-                            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-                        >
+                        <Button variant="primary" onClick={() => regenerate(twoHands)}>
                             {m.sprint_fresh()}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={toggleHands}
+                        </Button>
+                        <Button
+                            variant={twoHands ? "primary" : "secondary"}
                             aria-pressed={twoHands}
-                            className={
-                                twoHands
-                                    ? "rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-                                    : "rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                            }
+                            onClick={toggleHands}
                         >
                             {m.sprint_two_hands()}
-                        </button>
+                        </Button>
                     </div>
                     {warmupXml && (
                         <ScoreViewer

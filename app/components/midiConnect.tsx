@@ -4,6 +4,7 @@
 import { useMidiConnection } from "../contexts/midi";
 import { noteName } from "../lib/midi";
 import { m } from "../paraglide/messages.js";
+import { Button } from "./button";
 import { KeyboardHint } from "./keyboardHint";
 
 // Connect a MIDI keyboard and confirm it works: the connect button, the inputs it
@@ -16,14 +17,13 @@ export function MidiConnect() {
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-3">
-                <button
-                    type="button"
+                <Button
+                    variant="primary"
                     onClick={requestAccess}
                     disabled={support !== "supported" || status === "requesting"}
-                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                 >
                     {status === "ready" ? m.midi_debug_reconnect() : m.midi_connect()}
-                </button>
+                </Button>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                     {support === "unknown" && m.midi_debug_checking()}
                     {status === "requesting" && m.midi_debug_requesting()}
