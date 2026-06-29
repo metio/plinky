@@ -7,10 +7,14 @@ import { Attribution } from "../components/attribution";
 import { Show } from "../components/conditional";
 import { EarPiece } from "../components/earPiece";
 import { ExerciseForms } from "../components/exerciseForms";
+import { ExportButton } from "../components/exportButton";
+import { MarkLearnedButton } from "../components/markLearnedButton";
 import { PieceFingering } from "../components/pieceFingering";
 import { type PlayMode, PlayModeBar } from "../components/playModeBar";
+import { PrintButton } from "../components/printButton";
 import { ScoreGrade } from "../components/scoreGrade";
 import { ScoreViewer } from "../components/scoreViewer";
+import { TransposeProvider } from "../components/transposeContext";
 import { useScore } from "../hooks/useScore";
 import { resolveScore } from "../lib/catalog";
 import { parseExerciseId } from "../lib/exerciseGen";
@@ -42,6 +46,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // such score.
     const score = useScore(params.scoreId);
     const [mode, setMode] = useState<PlayMode>("play");
+    // Transposition is a page option shared by the score and the title-line Print /
+    // Export buttons, so all three render in the same key.
+    const [transpose, setTranspose] = useState(0);
 
     // A ?mode=ear|fingering link (from the discovery checklist) opens straight into
     // that drill. Applied after mount rather than as the initial state so it doesn't
@@ -59,11 +66,22 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             {score && (
-                <>
+                <TransposeProvider value={{ transpose, setTranspose }}>
                     <header className="space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <h1 className="text-2xl font-semibold">{score.title}</h1>
-                            <ScoreGrade id={score.id} xml={score.xml} />
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h1 className="text-2xl font-semibold">{score.title}</h1>
+                                <ScoreGrade id={score.id} xml={score.xml} />
+                            </div>
+                            {/* The piece's secondary actions, on the title line so a
+                            short title's empty space is used rather than taking a row
+                            of their own; a long title wraps in the left column while
+                            these stay pinned top-right. */}
+                            <div className="flex shrink-0 items-center gap-1">
+                                <PrintButton xml={score.xml} title={score.title} />
+                                <ExportButton xml={score.xml} title={score.title} />
+                                <MarkLearnedButton id={score.id} />
+                            </div>
                         </div>
                         {score.composer && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -95,7 +113,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                     </Show>
                     {mode === "ear" && <EarPiece xml={score.xml} />}
                     {mode === "fingering" && <PieceFingering id={score.id} xml={score.xml} />}
-                </>
+                </TransposeProvider>
             )}
             <Show when={score === null}>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.play_not_found()}</p>

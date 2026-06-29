@@ -188,22 +188,6 @@ describe("ScoreViewer", () => {
         scroll.mockRestore();
     });
 
-    it("marks a piece learned from the header icon and then hides it", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
-        mount(phrase, { beatsPerBar: 4 });
-        // The mark-learned shortcut sits in the header icon row until the piece is learned.
-        const mark = await screen.findByRole(
-            "button",
-            { name: "Mark learned" },
-            { timeout: 30000 },
-        );
-        fireEvent.click(mark);
-        // Once learned it disappears (the status moves to the mastery line below).
-        await waitFor(() =>
-            expect(screen.queryByRole("button", { name: "Mark learned" })).toBeNull(),
-        );
-    });
-
     it("reveals the adaptive toggle only while the metronome is on", async () => {
         render(
             <MemoryRouter>
@@ -434,52 +418,5 @@ describe("ScoreViewer", () => {
         );
         await screen.findByText(/Listen/, undefined, { timeout: 30000 });
         expect(screen.queryByText("Transpose")).toBeNull();
-    });
-
-    it("opens a print window with the rendered staff", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
-        const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
-            timeout: 30000,
-        });
-        const written: string[] = [];
-        const fakeWindow = {
-            document: { write: (html: string) => written.push(html), close: () => {} },
-            focus: () => {},
-            print: vi.fn(),
-        };
-        const open = vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-        // findByRole waits for OSMD to be ready — Print only renders once it is, and a
-        // toolbar icon svg now satisfies the "any svg" wait above too early.
-        fireEvent.click(await screen.findByRole("button", { name: /print/i }));
-        expect(open).toHaveBeenCalled();
-        expect(fakeWindow.print).toHaveBeenCalled();
-        expect(written.join("")).toContain("<svg");
-        open.mockRestore();
-    });
-
-    it("exports the piece as a downloadable MIDI file", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
-        const { container } = mount(phrase, { beatsPerBar: 4 });
-        await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
-            timeout: 30000,
-        });
-        // Capture the blob handed to the download anchor without hitting the disk.
-        let exported: Blob | null = null;
-        const create = vi.spyOn(URL, "createObjectURL").mockImplementation((blob) => {
-            exported = blob as Blob;
-            return "blob:midi";
-        });
-        const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
-        const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-        // findByRole waits for OSMD to be ready — Export MIDI only renders once it is.
-        fireEvent.click(await screen.findByRole("button", { name: /export midi/i }));
-        expect(exported).not.toBeNull();
-        // A Standard MIDI File opens with the "MThd" header chunk.
-        const head = new Uint8Array((await exported!.arrayBuffer()).slice(0, 4));
-        expect(String.fromCharCode(...head)).toBe("MThd");
-        create.mockRestore();
-        revoke.mockRestore();
-        click.mockRestore();
     });
 });

@@ -30,9 +30,10 @@ const BUDGET_TOTAL_KB = 625;
 // cards (first S, grade-up, flawless run); and the safety/usability pass — the
 // shared two-step ConfirmButton on destructive actions, the iframe print fallback,
 // ear-training reveal/skip, and the mode deep-links; and saved takes per song (the
-// list with score-driven replay, MIDI/MusicXML download, and ghost-from-takes);
-// still a tight ratchet.
-const BUDGET_APP_KB = 314;
+// list with score-driven replay, MIDI/MusicXML download, and ghost-from-takes); and
+// the self-contained play-title actions (Print / Export / Mark-learned fed raw data
+// + a transpose context); still a tight ratchet.
+const BUDGET_APP_KB = 315;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))
