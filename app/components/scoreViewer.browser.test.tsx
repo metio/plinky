@@ -82,6 +82,31 @@ describe("ScoreViewer", () => {
         );
     });
 
+    it("replaces the previous render instead of stacking when the layout changes", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const ready = async () =>
+            waitFor(
+                () =>
+                    expect(
+                        (screen.getByRole("button", { name: "Practice" }) as HTMLButtonElement)
+                            .disabled,
+                    ).toBe(false),
+                { timeout: 30000 },
+            );
+        await ready();
+        const score = screen.getByRole("img", { name: "T" });
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        const treadmill = screen.getByRole("switch", { name: "Treadmill" });
+        // Each layout change rebuilds OSMD on the same container; without clearing the
+        // old render its SVG would stay behind, piling up a new staff every toggle.
+        for (let i = 0; i < 3; i++) {
+            fireEvent.click(treadmill);
+            await ready();
+        }
+        expect(score.querySelectorAll("svg")).toHaveLength(1);
+    });
+
     it("leaves full screen when a run finishes so the grade is shown", async () => {
         // Drive the in-page overlay state without the real Fullscreen API, which a
         // headless browser grants only on a trusted gesture; the hook flips its own

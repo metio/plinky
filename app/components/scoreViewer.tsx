@@ -848,6 +848,14 @@ export function ScoreViewer({
             for (const id of timers.current) {
                 window.clearTimeout(id);
             }
+            // A change of layout (bars-per-row, treadmill, transpose) re-runs this
+            // effect, building a fresh OSMD on the same container. OSMD renders into a
+            // new SVG rather than replacing the old one, so without removing the previous
+            // render its SVG stays behind and each switch stacks another copy. clear()
+            // frees OSMD's own state but leaves its <svg> in the DOM, so empty the
+            // container too.
+            osmdRef.current?.clear();
+            containerRef.current?.replaceChildren();
         };
     }, [xml, transpose, showMine, saved, barsPerRow, treadmill]);
 
