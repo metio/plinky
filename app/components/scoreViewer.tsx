@@ -31,16 +31,9 @@ import {
     recordFlawless,
     recordReachedGrade,
 } from "../lib/milestones";
-import {
-    applyRun,
-    isDue,
-    letterMin,
-    loadMastery,
-    markLearned,
-    type Mastery,
-    saveMastery,
-    setBacklog,
-} from "../lib/mastery";
+import { applyRun, isDue, letterMin, loadMastery, setBacklog } from "../lib/mastery";
+import { writeMastery } from "../lib/masteryStore";
+import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
@@ -93,6 +86,7 @@ import { Button, IconButton } from "./button";
 import { Disclosure, FieldGroup } from "./disclosure";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
+import { MarkLearnedButton } from "./markLearnedButton";
 import { TakesList } from "./takesList";
 import {
     CheckIcon,
@@ -370,7 +364,11 @@ export function ScoreViewer({
         median: number;
         hotspots: Hotspot[];
     } | null>(null);
-    const [mastery, setMastery] = useState<Mastery | null>(null);
+    // Mastery comes from the shared store, so a mark-learned anywhere (here, or a
+    // MarkLearnedButton on the page) re-renders every view of it together. Ephemeral
+    // pieces (sprints) aren't tracked, so they read as null.
+    const storedMastery = useMastery(id);
+    const mastery = ephemeral ? null : storedMastery;
     // The tempo a run was matched at, captured when practice starts so the run's
     // self-paced tempo curve reads against the same reference the matcher used,
     // even if the slider is moved afterwards.
@@ -378,10 +376,6 @@ export function ScoreViewer({
     // Whether any note has been coloured on the score, so a fresh run re-renders to
     // clear last run's progress only when there is something to clear.
     const paintedRef = useRef(false);
-
-    useEffect(() => {
-        setMastery(ephemeral ? null : loadMastery(id));
-    }, [id, ephemeral]);
 
     // Load this score's saved takes; a new score swaps in its own.
     useEffect(() => {
@@ -643,8 +637,7 @@ export function ScoreViewer({
         const before = loadMastery(id);
         const threshold = letterMin(loadPrefs().masteryThreshold);
         const updated = applyRun(before, result.score, threshold, Date.now());
-        saveMastery(id, updated);
-        setMastery(updated);
+        writeMastery(id, updated);
         onMastery?.();
 
         // Surface one earned-moment card. Grade-up is the biggest moment so it wins a
@@ -693,17 +686,9 @@ export function ScoreViewer({
         }
     }, [matcher.complete, fullscreen, exitFullscreen]);
 
-    const markLearnedNow = () => {
-        const updated = markLearned(loadMastery(id), Date.now());
-        saveMastery(id, updated);
-        setMastery(updated);
-        onMastery?.();
-    };
     const toggleBacklog = () => {
-        const current = loadMastery(id);
-        const updated = setBacklog(current, !current?.backlog, Date.now());
-        saveMastery(id, updated);
-        setMastery(updated);
+        const updated = setBacklog(mastery, !mastery?.backlog, Date.now());
+        writeMastery(id, updated);
         onMastery?.();
     };
 
@@ -1174,16 +1159,7 @@ export function ScoreViewer({
                             >
                                 <NotesIcon />
                             </IconButton>
-                            {!ephemeral && !mastery?.learned && (
-                                <IconButton
-                                    variant="ghost"
-                                    onClick={markLearnedNow}
-                                    label={m.mastery_mark_learned()}
-                                    className="text-green-600 dark:text-green-400"
-                                >
-                                    <CheckIcon />
-                                </IconButton>
-                            )}
+                            {!ephemeral && <MarkLearnedButton id={id} />}
                         </div>
                     </Show>
                 </FullScreen>
