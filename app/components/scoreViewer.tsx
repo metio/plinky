@@ -212,6 +212,9 @@ export function ScoreViewer({
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const gradePanelRef = useRef<HTMLDivElement>(null);
+    // True only once a run finishes this session, so the result scroll fires on
+    // completion but not when the grade is seeded from a saved result on mount.
+    const gradeFromRunRef = useRef(false);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     // The notes Listen has lit as "now sounding", held so the highlight can be lifted
@@ -476,8 +479,10 @@ export function ScoreViewer({
     // keyboard, and the grade renders below it (and below the whole score on the way
     // out of full screen), so it can otherwise land off-screen unnoticed. Honour
     // reduced-motion, and wait a frame so the post-run layout has settled first.
+    // Re-opening a finished daily seeds the grade on mount; that must not yank the
+    // page down, so scroll only for a run completed in this session.
     useEffect(() => {
-        if (!grade) {
+        if (!grade || !gradeFromRunRef.current) {
             return;
         }
         const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -575,6 +580,7 @@ export function ScoreViewer({
             dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
         });
         const grid = gridFor(notes, tolerance);
+        gradeFromRunRef.current = true;
         setGrade(result);
         setRunNotes(notes);
         setRunTolerance(tolerance);
@@ -923,6 +929,7 @@ export function ScoreViewer({
         stopListen();
         notesRef.current = [];
         impreciseRef.current = false;
+        gradeFromRunRef.current = false;
         setGrade(null);
         setRunNotes([]);
         setShareGrid(null);
