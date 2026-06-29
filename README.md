@@ -22,7 +22,8 @@ the browser; nothing is uploaded, and your scores stay on your device.
 ## Practising a score
 
 Open any score and Plinky renders it as real notation. **Listen** plays it back so
-you hear it first; **Practice** turns the same cursor into a note-by-note guide —
+you hear it first, lighting up each note as it sounds so your eye can follow along;
+**Practice** turns the same cursor into a note-by-note guide —
 read the note, play it, and the cursor advances, sounding back what you played. The
 staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up with
 you instead of making you scroll — and it stays in its own box so the keyboard below

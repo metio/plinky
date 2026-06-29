@@ -56,10 +56,14 @@ import {
 import {
     collectNoteElements,
     GHOST_COLOR,
+    highlightCursorNotes,
     NOTE_COLOR,
+    type PaintedNote,
     paintElement,
     paintPlayedNotes,
     PLAYED_COLOR,
+    restoreNotes,
+    WINDOW_COLOR,
 } from "../lib/scoreColor";
 import { buildMidiFile, type MidiNote } from "../lib/midiFile";
 import { buildPrintDocument, fileStem } from "../lib/printScore";
@@ -210,6 +214,9 @@ export function ScoreViewer({
     const gradePanelRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
+    // The notes Listen has lit as "now sounding", held so the highlight can be lifted
+    // when the cursor moves on and when playback stops.
+    const listenHighlightRef = useRef<PaintedNote[]>([]);
     // Tracks playback synchronously, so a second click that lands before the
     // `playing` state has re-rendered can't start a second cursor loop.
     const playingRef = useRef(false);
@@ -755,6 +762,8 @@ export function ScoreViewer({
             window.clearTimeout(id);
         }
         timers.current = [];
+        restoreNotes(listenHighlightRef.current);
+        listenHighlightRef.current = [];
         if (!matcher.practicing) {
             osmdRef.current?.cursor?.hide();
         }
@@ -883,6 +892,10 @@ export function ScoreViewer({
                 bumpTempo();
                 return;
             }
+            // Light the notes now sounding so the eye can follow the music, lifting the
+            // previous step's highlight first — the cursor box alone is easy to lose.
+            restoreNotes(listenHighlightRef.current);
+            listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
             let beats = 1;
             for (const note of cursor.NotesUnderCursor()) {
                 const quarters = note.Length.RealValue * 4;

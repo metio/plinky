@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { generatePhrase } from "../lib/generator";
 import { encodeGhost, saveGhost } from "../lib/recording";
-import { GHOST_COLOR, PLAYED_COLOR } from "../lib/scoreColor";
+import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
 
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
@@ -193,6 +193,25 @@ describe("ScoreViewer", () => {
         );
         expect(await screen.findByText(/racing a shared ghost/i)).toBeTruthy();
         expect(screen.getByText(/Challenge a friend/)).toBeTruthy();
+    });
+
+    it("lights the note now sounding while listening, so the eye can follow", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
+        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
+        fireEvent.click(listen);
+        // As playback walks the score, exactly the notes under the cursor wear the
+        // active colour — more than the cursor box alone, which is easy to lose.
+        await expect
+            .poll(
+                () =>
+                    Array.from(document.querySelectorAll("g[fill]")).some(
+                        (group) => group.getAttribute("fill") === WINDOW_COLOR,
+                    ),
+                { timeout: 15000 },
+            )
+            .toBe(true);
     });
 
     it("offers a hands-separate selector only for a grand staff", async () => {

@@ -100,6 +100,38 @@ export function paintMeasureRange(
     osmd.cursor.hide();
 }
 
+// One note and the fill it wore before being highlighted, so the highlight can be
+// lifted without assuming the note was plain black (it may already be played-green).
+export type PaintedNote = { element: SVGGElement; fill: string };
+
+// Paints the playable notes at the cursor's current position an "active" colour and
+// returns them with their prior fill, so the caller can restore them as the cursor
+// moves on — the moving highlight that follows Listen playback. Like paintPlayedNotes,
+// it mutates the rendered SVG directly rather than re-rendering, which would lose the
+// cursor every note.
+export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string): PaintedNote[] {
+    const painted: PaintedNote[] = [];
+    for (const gNote of osmd.cursor.GNotesUnderCursor()) {
+        const note = gNote.sourceNote;
+        if (note.isRest() || note.halfTone <= 0) {
+            continue;
+        }
+        const element = svgOf(gNote);
+        if (element) {
+            painted.push({ element, fill: element.getAttribute("fill") ?? NOTE_COLOR });
+            paintElement(element, color);
+        }
+    }
+    return painted;
+}
+
+// Restores notes lifted by highlightCursorNotes to the fill they wore before.
+export function restoreNotes(painted: PaintedNote[]): void {
+    for (const { element, fill } of painted) {
+        paintElement(element, fill);
+    }
+}
+
 // Scrolls a measure to the vertical centre of its own container — used by the focus
 // strip to slide to the bar being played. Scrolls the container directly (not
 // scrollIntoView, which would also scroll the page). Walks the cursor to the measure to
