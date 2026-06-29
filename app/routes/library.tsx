@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconButton } from "../components/button";
+import { Chip } from "../components/chip";
 import { Show } from "../components/conditional";
 import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../components/icons";
 import { LocalizedLink as Link } from "../components/localizedLink";
@@ -22,11 +23,20 @@ export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.library_heading(), m.meta_library_description());
 }
 
-const CHIP = "rounded-full border px-3 py-1 text-sm";
-const CHIP_ON = "border-indigo-600 bg-indigo-600 text-white";
-const CHIP_OFF =
-    "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
 const PER_PAGE = 60;
+
+// A labelled row of filter chips, so the three filter axes (Kind / Grade / Show) read
+// as distinct groups rather than one flat wall of pills.
+function FilterGroup({ label, children }: { label: string; children: ReactNode }) {
+    return (
+        <div className="flex flex-wrap items-center gap-2">
+            <span className="w-12 shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {label}
+            </span>
+            {children}
+        </div>
+    );
+}
 
 // A unified row, tagged by kind so the catalogue can be filtered into songs,
 // generated scales/arpeggios, and curated studies. Exercises and songs carry a
@@ -198,14 +208,13 @@ export default function LibraryRoute() {
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
             />
 
-            <div className="flex flex-wrap gap-2">
-                <button
-                    type="button"
-                    onClick={() => setKindFilter("")}
-                    className={`${CHIP} ${kindFilter === "" ? CHIP_ON : CHIP_OFF}`}
-                >
+            {/* Three labelled groups so the chips read as Kind / Grade / Show rather
+                than one undifferentiated wall, and the toggles (Show) sit apart from the
+                single-select Kind and Grade. */}
+            <FilterGroup label={m.library_group_kind()}>
+                <Chip selected={kindFilter === ""} onClick={() => setKindFilter("")}>
                     {m.scores_filter_all()}
-                </button>
+                </Chip>
                 {(
                     [
                         ["song", m.library_kind_songs()],
@@ -213,55 +222,51 @@ export default function LibraryRoute() {
                         ["study", m.library_kind_studies()],
                     ] as [Kind, string][]
                 ).map(([kind, label]) => (
-                    <button
+                    <Chip
                         key={kind}
-                        type="button"
+                        selected={kindFilter === kind}
                         onClick={() => setKindFilter(kind)}
-                        className={`${CHIP} ${kindFilter === kind ? CHIP_ON : CHIP_OFF}`}
                     >
                         {label}
-                    </button>
+                    </Chip>
                 ))}
-            </div>
+            </FilterGroup>
 
-            <div className="flex flex-wrap gap-2">
-                <button
-                    type="button"
-                    onClick={() => setGradeFilter(0)}
-                    className={`${CHIP} ${gradeFilter === 0 ? CHIP_ON : CHIP_OFF}`}
-                >
+            <FilterGroup label={m.library_group_grade()}>
+                <Chip selected={gradeFilter === 0} onClick={() => setGradeFilter(0)}>
                     {m.scores_filter_all()}
-                </button>
+                </Chip>
                 {grades.map((grade) => (
-                    <button
+                    <Chip
                         key={grade}
-                        type="button"
+                        selected={gradeFilter === grade}
                         onClick={() => setGradeFilter(grade)}
                         aria-label={m.score_grade({ grade })}
-                        className={`${CHIP} tabular-nums ${gradeFilter === grade ? CHIP_ON : CHIP_OFF}`}
+                        className="tabular-nums"
                     >
                         {grade}
-                    </button>
+                    </Chip>
                 ))}
-                <button
-                    type="button"
-                    onClick={() => setFavoritesOnly((on) => !on)}
+            </FilterGroup>
+
+            <FilterGroup label={m.library_group_show()}>
+                <Chip
+                    selected={favoritesOnly}
                     aria-pressed={favoritesOnly}
-                    className={`${CHIP} ${favoritesOnly ? CHIP_ON : CHIP_OFF}`}
+                    onClick={() => setFavoritesOnly((on) => !on)}
                 >
                     {m.scores_filter_favorites()}
-                </button>
+                </Chip>
                 <Show when={dueCount > 0}>
-                    <button
-                        type="button"
-                        onClick={() => setDueOnly((on) => !on)}
+                    <Chip
+                        selected={dueOnly}
                         aria-pressed={dueOnly}
-                        className={`${CHIP} ${dueOnly ? CHIP_ON : CHIP_OFF}`}
+                        onClick={() => setDueOnly((on) => !on)}
                     >
                         {m.library_filter_due()}
-                    </button>
+                    </Chip>
                 </Show>
-            </div>
+            </FilterGroup>
 
             <p className="text-xs text-gray-500 dark:text-gray-400">
                 {matches.length === 1
