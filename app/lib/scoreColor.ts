@@ -51,6 +51,7 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
     osmd.cursor.reset();
     while (!osmd.cursor.iterator.EndReached) {
         const elements: SVGGElement[] = [];
+        let playable = false;
         for (const gNote of osmd.cursor.GNotesUnderCursor()) {
             const note = gNote.sourceNote;
             if (note.isRest() || note.halfTone <= 0) {
@@ -59,12 +60,17 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
             if (hand !== "both" && note.ParentStaff?.idInMusicSheet !== STAFF_FOR[hand]) {
                 continue;
             }
+            // This position counts as a step the moment it holds a playable note,
+            // matching the matcher's collectSteps. The SVG group may be missing (a
+            // note OSMD didn't render a glyph for); push the step regardless so a
+            // bare position can't shift every later ghost marker onto the wrong note.
+            playable = true;
             const element = svgOf(gNote);
             if (element) {
                 elements.push(element);
             }
         }
-        if (elements.length > 0) {
+        if (playable) {
             steps.push(elements);
         }
         osmd.cursor.next();
