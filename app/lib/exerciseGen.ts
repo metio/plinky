@@ -205,31 +205,35 @@ function arpeggioLine(
     inversion: number,
 ): Note[] {
     const scale = diatonic(tonic, fifths, octaves + 1, 1); // +1 so inversions can reach up a chord tone
-    const tones: Note[] = [];
     const flatten = (n: Note, by: number): Note => ({ ...n, alter: n.alter - by });
-    for (let o = 0; o < octaves; o++) {
+    // Build the chord-tone sequence one octave past the run, so an inversion can take
+    // a window starting higher up without re-adding a tone that collides with the next
+    // octave's copy of it.
+    const chordTones: Note[] = [];
+    for (let o = 0; o <= octaves; o++) {
         if (type === "dim7-arpeggio") {
             // Built from the major scale by stacking minor thirds: the 3rd and 5th
             // drop a semitone, the diminished 7th two (C°7 = C E♭ G♭ B𝄫).
-            tones.push(
+            chordTones.push(
                 scale[o * 7]!,
                 flatten(scale[o * 7 + 2]!, 1),
                 flatten(scale[o * 7 + 4]!, 1),
                 flatten(scale[o * 7 + 6]!, 2),
             );
         } else {
-            tones.push(scale[o * 7]!, scale[o * 7 + 2]!, scale[o * 7 + 4]!);
+            chordTones.push(scale[o * 7]!, scale[o * 7 + 2]!, scale[o * 7 + 4]!);
             if (type === "dom7-arpeggio") {
-                tones.push(flatten(scale[o * 7 + 6]!, 1));
+                chordTones.push(flatten(scale[o * 7 + 6]!, 1));
             }
         }
     }
-    tones.push(scale[octaves * 7]!);
-    // Inversion: drop the lowest `inversion` chord tones and re-add them an octave up.
-    const inverted = tones
-        .slice(inversion)
-        .concat(tones.slice(0, inversion).map((n) => ({ ...n, octave: n.octave + 1 })));
-    return turn(inverted, inverted);
+    // The run is `octaves` octaves of chord tones plus the closing tone an octave up;
+    // an inversion starts `inversion` tones higher and ends the same distance up, so
+    // it stays a strictly ascending arpeggio rather than duplicating a note.
+    const tonesPerOctave = type === "dom7-arpeggio" || type === "dim7-arpeggio" ? 4 : 3;
+    const runLength = tonesPerOctave * octaves + 1;
+    const ascending = chordTones.slice(inversion, inversion + runLength);
+    return turn(ascending, ascending);
 }
 
 const shiftOctave = (notes: Note[], by: number): Note[] =>
