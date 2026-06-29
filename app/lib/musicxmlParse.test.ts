@@ -66,6 +66,39 @@ describe("parseMusicXml", () => {
         expect(parsed!.tempo).toBe(96);
     });
 
+    it("keeps earlier notes in time when a later measure restates divisions", () => {
+        // Measure 1 counts in 1 division per quarter; measure 2 switches to 4. Both
+        // notes are written as duration 4, but that means a whole note then a quarter.
+        // Timing each duration against the divisions in force when it's read keeps the
+        // first note four beats long and the second on beat five; scaling everything by
+        // the final divisions would collapse the first note and pull the second early.
+        const xml = `<?xml version="1.0"?>
+            <score-partwise version="3.1">
+                <part-list><score-part id="P1"><part-name>M</part-name></score-part></part-list>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>1</divisions>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration></note>
+                    </measure>
+                    <measure number="2">
+                        <attributes><divisions>4</divisions></attributes>
+                        <note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration></note>
+                    </measure>
+                </part>
+            </score-partwise>`;
+        const parsed = parseMusicXml(xml);
+        expect(parsed).not.toBeNull();
+        // Default tempo 120 → 500ms per quarter. The whole note runs four beats…
+        const c = parsed!.notes.find((n) => n.pitch === 60)!;
+        const e = parsed!.notes.find((n) => n.pitch === 64)!;
+        expect(c.durationMs).toBeCloseTo(2000, 0);
+        // …and the second-measure quarter starts on beat five, not pulled back to beat two.
+        expect(e.startMs).toBeCloseTo(2000, 0);
+    });
+
     it("returns null for non-score XML", () => {
         expect(parseMusicXml("<html><body>nope</body></html>")).toBeNull();
         expect(parseMusicXml("not xml at all <<<")).toBeNull();

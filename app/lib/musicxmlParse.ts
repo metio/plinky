@@ -54,28 +54,40 @@ export function parseMusicXml(xml: string): Composition | null {
     const beats = Number(text(doc.documentElement, "time > beats") ?? DEFAULT_BEATS_PER_BAR);
     const beatsPerBar = beats > 0 ? beats : DEFAULT_BEATS_PER_BAR;
 
-    // Notes accrued in divisions; tied notes are stretched in place via this index.
-    type Building = { midi: number; startDivs: number; durationDivs: number; velocity: number };
+    // Notes accrued in quarter notes — a divisions-independent clock. `divisions` is
+    // the number of duration units per quarter note and a measure may restate it, so
+    // converting each duration to quarters as it's read keeps the notes already placed
+    // at their true time; a single end-of-piece scale would stretch every earlier
+    // section by whatever the final measure happened to declare. Tied notes are
+    // stretched in place via this index.
+    type Building = {
+        midi: number;
+        startQuarters: number;
+        durationQuarters: number;
+        velocity: number;
+    };
     const built: Building[] = [];
     // The note currently extending a tie, per pitch, so its stop half lengthens it.
     const openTies = new Map<number, Building>();
 
-    let cursor = 0; // absolute time in divisions
+    let cursor = 0; // absolute time in quarter notes
     let lastStart = 0; // onset of the previous non-chord note, for chord members
 
     for (const measure of part.querySelectorAll("measure")) {
-        // A measure may restate the divisions in its attributes.
+        // A measure may restate the divisions-per-quarter for the notes that follow.
         const measureDivisions = text(measure, "divisions");
         if (measureDivisions) {
             divisions = Number(measureDivisions) || divisions;
         }
+        // Durations are written in divisions of the quarter note currently in force.
+        const toQuarters = (divs: number) => divs / divisions;
         for (const element of measure.children) {
             if (element.tagName === "backup") {
-                cursor -= Number(text(element, "duration") ?? "0");
+                cursor -= toQuarters(Number(text(element, "duration") ?? "0"));
             } else if (element.tagName === "forward") {
-                cursor += Number(text(element, "duration") ?? "0");
+                cursor += toQuarters(Number(text(element, "duration") ?? "0"));
             } else if (element.tagName === "note") {
-                const durationDivs = Number(text(element, "duration") ?? "0");
+                const durationQuarters = toQuarters(Number(text(element, "duration") ?? "0"));
                 const isChord = element.querySelector("chord") !== null;
                 const start = isChord ? lastStart : cursor;
                 const pitch = element.querySelector("pitch");
@@ -88,7 +100,7 @@ export function parseMusicXml(xml: string): Composition | null {
                         const held = tieStop ? openTies.get(midi) : undefined;
                         if (held) {
                             // Extend the held note through this tied continuation.
-                            held.durationDivs = start + durationDivs - held.startDivs;
+                            held.durationQuarters = start + durationQuarters - held.startQuarters;
                             if (tieStart) {
                                 openTies.set(midi, held);
                             } else {
@@ -97,8 +109,8 @@ export function parseMusicXml(xml: string): Composition | null {
                         } else {
                             const note: Building = {
                                 midi,
-                                startDivs: start,
-                                durationDivs,
+                                startQuarters: start,
+                                durationQuarters,
                                 velocity: DEFAULT_VELOCITY,
                             };
                             built.push(note);
@@ -111,7 +123,7 @@ export function parseMusicXml(xml: string): Composition | null {
                 // Chord members sound atop the previous note and don't move the clock.
                 if (!isChord) {
                     lastStart = cursor;
-                    cursor += durationDivs;
+                    cursor += durationQuarters;
                 }
             }
         }
@@ -121,13 +133,13 @@ export function parseMusicXml(xml: string): Composition | null {
         return null;
     }
 
-    const msPerDiv = 60_000 / tempo / divisions;
-    built.sort((a, b) => a.startDivs - b.startDivs);
-    const origin = built[0]!.startDivs;
+    const msPerQuarter = 60_000 / tempo;
+    built.sort((a, b) => a.startQuarters - b.startQuarters);
+    const origin = built[0]!.startQuarters;
     const notes: RecordedNote[] = built.map((note) => ({
         pitch: note.midi,
-        startMs: (note.startDivs - origin) * msPerDiv,
-        durationMs: Math.max(1, note.durationDivs) * msPerDiv,
+        startMs: (note.startQuarters - origin) * msPerQuarter,
+        durationMs: Math.max(1, note.durationQuarters * msPerQuarter),
         velocity: note.velocity,
     }));
     return { notes, tempo, beatsPerBar };
