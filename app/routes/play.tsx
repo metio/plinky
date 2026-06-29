@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Show } from "../components/conditional";
 import { EarPiece } from "../components/earPiece";
 import { ExerciseForms } from "../components/exerciseForms";
@@ -13,6 +14,7 @@ import { ScoreViewer } from "../components/scoreViewer";
 import { useScore } from "../hooks/useScore";
 import { resolveScore } from "../lib/catalog";
 import { parseExerciseId } from "../lib/exerciseGen";
+import { markDiscovered } from "../lib/onboarding";
 import { musicCompositionData, routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -40,6 +42,19 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // such score.
     const score = useScore(params.scoreId);
     const [mode, setMode] = useState<PlayMode>("play");
+
+    // A ?mode=ear|fingering link (from the discovery checklist) opens straight into
+    // that drill. Applied after mount rather than as the initial state so it doesn't
+    // diverge from the prerendered "play" markup, and it marks the matching discovery
+    // step the same way switching with the mode bar does.
+    const [searchParams] = useSearchParams();
+    useEffect(() => {
+        const requested = searchParams.get("mode");
+        if (requested === "ear" || requested === "fingering") {
+            setMode(requested);
+            markDiscovered(requested === "ear" ? "earTried" : "fingeringTried");
+        }
+    }, [searchParams]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">

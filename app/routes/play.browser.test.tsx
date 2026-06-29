@@ -5,6 +5,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { discoveries } from "../lib/onboarding";
 import Play from "./play";
 import type { Route } from "./+types/play";
 
@@ -34,5 +35,22 @@ describe("Play", () => {
     it("reports a missing score", async () => {
         renderPlay("no-such-score");
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
+    });
+
+    it("opens straight into ear mode from a ?mode=ear deep link and marks it tried", async () => {
+        const props = { params: { scoreId: "twinkle-twinkle" } } as unknown as Route.ComponentProps;
+        render(
+            <MemoryRouter initialEntries={["/play/twinkle-twinkle?mode=ear"]}>
+                <MidiProvider>
+                    <Play {...props} />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        // Ear mode is showing — its "Hear the phrase" control is on screen, not just
+        // the default score viewer — so the discovery link lands on the activity.
+        expect(
+            await screen.findByRole("button", { name: /Hear the phrase/ }, { timeout: 30000 }),
+        ).toBeTruthy();
+        expect(discoveries().earTried).toBe(true);
     });
 });
