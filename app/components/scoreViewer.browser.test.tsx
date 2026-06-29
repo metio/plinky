@@ -5,6 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import type { DailyResult } from "../lib/dailyResult";
 import { generatePhrase } from "../lib/generator";
 import { encodeGhost, saveGhost } from "../lib/recording";
 import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../lib/scoreColor";
@@ -135,6 +136,56 @@ describe("ScoreViewer", () => {
         expect(accuracy.length).toBeGreaterThan(0);
         expect(screen.getByRole("button", { name: "Full screen" })).toBeTruthy();
         reqFs.mockRestore();
+    });
+
+    it("does not scroll to the grade when a saved result is shown on open", async () => {
+        // Re-opening a finished daily seeds the grade on mount; the result-scroll must
+        // not fire then and yank the page down before the player has done anything.
+        const scroll = vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(() => {});
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const seededResult: DailyResult = {
+            grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
+            grid: [["best", "good"]],
+            notes: [],
+            tolerance: 1,
+        };
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <ScoreViewer
+                        id="t"
+                        xml={phrase}
+                        title="T"
+                        beatsPerBar={4}
+                        seededResult={seededResult}
+                    />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        // The seeded grade renders (its Accuracy readout is on screen)…
+        expect(await screen.findAllByText("Accuracy", undefined, { timeout: 30000 })).toBeTruthy();
+        // …but no result-scroll was triggered by merely opening the page.
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        expect(scroll).not.toHaveBeenCalled();
+        scroll.mockRestore();
+    });
+
+    it("scrolls to the grade when a run finishes in this session", async () => {
+        const scroll = vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(() => {});
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        fireEvent.click(practice);
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        await waitFor(() => expect(scroll).toHaveBeenCalled(), { timeout: 30000 });
+        scroll.mockRestore();
     });
 
     it("reveals the adaptive toggle only while the metronome is on", async () => {
