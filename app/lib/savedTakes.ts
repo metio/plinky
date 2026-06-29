@@ -138,9 +138,20 @@ export function removeTake(songId: string, takeId: string): Take[] {
     return next;
 }
 
-// The onset times of the fastest complete take — the ghost to race — or null when
-// there's no complete take. "Fastest" is the shortest span from first note to last,
-// so the quickest clean run sets the pace.
+// A take's note onsets normalised to start at zero — the ghost a friend races when
+// they open its share link, and the shape fastestTakeOnsets returns for your own race.
+export function ghostOnsets(take: Take): number[] {
+    const notes = take.composition.notes;
+    if (notes.length === 0) {
+        return [];
+    }
+    const origin = notes[0]!.startMs;
+    return notes.map((note) => note.startMs - origin);
+}
+
+// The onsets of the fastest complete take — the ghost to race — or null when there's
+// no complete take. "Fastest" is the shortest span from first note to last, so the
+// quickest clean run sets the pace.
 export function fastestTakeOnsets(takes: Take[]): number[] | null {
     const span = (take: Take): number => {
         const notes = take.composition.notes;
@@ -153,7 +164,5 @@ export function fastestTakeOnsets(takes: Take[]): number[] | null {
     if (complete.length === 0) {
         return null;
     }
-    const fastest = complete.reduce((best, take) => (span(take) < span(best) ? take : best));
-    const origin = fastest.composition.notes[0]!.startMs;
-    return fastest.composition.notes.map((note) => note.startMs - origin);
+    return ghostOnsets(complete.reduce((best, take) => (span(take) < span(best) ? take : best)));
 }

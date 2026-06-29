@@ -79,13 +79,13 @@ export function PrinterIcon({ className }: IconProps) {
     );
 }
 
-export function ShareIcon({ className }: IconProps) {
+// A ghost with a scalloped hem — the racing replay of a saved run.
+export function GhostIcon({ className }: IconProps) {
     return (
         <Icon className={className}>
-            <circle cx="6" cy="12" r="2.4" />
-            <circle cx="17" cy="6" r="2.4" />
-            <circle cx="17" cy="18" r="2.4" />
-            <path d="M8.1 10.9l6.8-3.8M8.1 13.1l6.8 3.8" />
+            <path d="M6 20V11a6 6 0 0 1 12 0v9l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5z" />
+            <circle cx="10" cy="11" r="0.6" fill="currentColor" stroke="none" />
+            <circle cx="14" cy="11" r="0.6" fill="currentColor" stroke="none" />
         </Icon>
     );
 }

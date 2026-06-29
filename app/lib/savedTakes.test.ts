@@ -8,6 +8,7 @@ import { withDeniedStorage } from "./deniedStorage";
 import {
     compositionFromRun,
     fastestTakeOnsets,
+    ghostOnsets,
     loadTakes,
     MAX_TAKES_PER_SONG,
     removeTake,
@@ -83,6 +84,18 @@ describe("saveTake / loadTakes", () => {
         );
         // The valid entry has an unreadable code, so it's skipped; no throw.
         expect(loadTakes("song")).toEqual([]);
+    });
+});
+
+describe("ghostOnsets", () => {
+    it("normalises a take's note onsets to start at zero", () => {
+        expect(ghostOnsets(take("1", { composition: comp([200, 600, 1000]) }))).toEqual([
+            0, 400, 800,
+        ]);
+    });
+
+    it("is empty for a take with no notes", () => {
+        expect(ghostOnsets(take("1", { composition: comp([]) }))).toEqual([]);
     });
 });
 

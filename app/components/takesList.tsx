@@ -1,15 +1,18 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { buildMidiFile } from "../lib/midiFile";
+import { useState } from "react";
 import { toMidiNotes, toMusicXml } from "../lib/composition";
+import { buildMidiFile } from "../lib/midiFile";
 import { fileStem } from "../lib/printScore";
-import type { Take } from "../lib/savedTakes";
-import { getLocale } from "../paraglide/runtime.js";
+import { encodeGhost } from "../lib/recording";
+import { ghostOnsets, type Take } from "../lib/savedTakes";
+import { SITE_URL } from "../lib/site";
 import { m } from "../paraglide/messages.js";
+import { getLocale, localizeHref } from "../paraglide/runtime.js";
 import { Button, IconButton } from "./button";
 import { Disclosure } from "./disclosure";
-import { CloseIcon, PlayIcon, StopIcon } from "./icons";
+import { CloseIcon, GhostIcon, PlayIcon, StopIcon } from "./icons";
 
 // A short "3 minutes ago" for when a take was saved, localised without a message
 // per unit by leaning on the platform's relative-time formatter.
@@ -44,6 +47,7 @@ function download(filename: string, data: BlobPart, type: string): void {
 // as MIDI or MusicXML, or delete it. Folded away by default so it never crowds the
 // play surface; shown only when at least one take exists.
 export function TakesList({
+    id,
     takes,
     title,
     activeReplayId,
@@ -52,6 +56,8 @@ export function TakesList({
     onStop,
     onDelete,
 }: {
+    // The song id, so a take's ghost link points back at this piece.
+    id: string;
     takes: Take[];
     title: string;
     // The take currently replaying, if any — its row shows a Stop control.
@@ -65,6 +71,24 @@ export function TakesList({
 }) {
     const now = Date.now();
     const stem = fileStem(title);
+    // The take whose share link was just copied, so its row can confirm it.
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+
+    // Hand a take to a friend as a link they open to race it — any take, not just the
+    // fastest. The native share sheet where available, else the clipboard.
+    const shareGhost = async (take: Take) => {
+        const url = `${SITE_URL}${localizeHref(`/play/${id}`)}?ghost=${encodeGhost(ghostOnsets(take))}`;
+        try {
+            if (typeof navigator.share === "function") {
+                await navigator.share({ url, text: m.ghost_share_boast({ title }) });
+            } else {
+                await navigator.clipboard?.writeText(url);
+                setCopiedId(take.id);
+            }
+        } catch {
+            // A cancelled share or a blocked clipboard needs no message.
+        }
+    };
     return (
         <Disclosure summary={m.takes_heading({ count: takes.length })}>
             <ul className="space-y-2">
@@ -80,6 +104,11 @@ export function TakesList({
                                 {formatAgo(take.createdAt, now, getLocale())}
                                 {!take.complete && ` · ${m.takes_partial()}`}
                             </span>
+                            {copiedId === take.id && (
+                                <span className="text-xs text-fuchsia-600 dark:text-fuchsia-400">
+                                    {m.takes_link_copied()}
+                                </span>
+                            )}
                             <span className="ml-auto flex items-center gap-1">
                                 <IconButton
                                     label={replaying ? m.takes_stop() : m.takes_replay()}
@@ -87,6 +116,13 @@ export function TakesList({
                                     disabled={playing && !replaying}
                                 >
                                     {replaying ? <StopIcon /> : <PlayIcon />}
+                                </IconButton>
+                                <IconButton
+                                    label={m.takes_share_ghost()}
+                                    onClick={() => shareGhost(take)}
+                                    className="text-fuchsia-600 dark:text-fuchsia-400"
+                                >
+                                    <GhostIcon />
                                 </IconButton>
                                 <Button
                                     onClick={() =>

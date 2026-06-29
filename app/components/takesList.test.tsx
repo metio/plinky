@@ -26,6 +26,7 @@ const mk = (id: string, overrides: Partial<Take> = {}): Take => ({
 });
 
 const base = {
+    id: "song",
     title: "Song",
     activeReplayId: null,
     playing: false,
@@ -42,6 +43,13 @@ describe("TakesList", () => {
         render(<TakesList {...base} takes={[mk("1"), mk("2", { letter: "A" })]} />);
         open();
         expect(screen.getAllByRole("button", { name: /replay/i })).toHaveLength(2);
+    });
+
+    it("copies a share link when challenging a friend with a take", async () => {
+        render(<TakesList {...base} takes={[mk("1")]} />);
+        open();
+        fireEvent.click(screen.getByRole("button", { name: /challenge a friend/i }));
+        expect(await screen.findByText(/link copied/i)).toBeTruthy();
     });
 
     it("replays the clicked take", () => {

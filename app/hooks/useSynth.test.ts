@@ -72,6 +72,7 @@ describe("useSynth", () => {
             keyMap: DEFAULT_KEY_MAP,
             keyboardOctaves: 2,
             treadmill: false,
+            raceGhost: true,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -94,6 +95,7 @@ describe("useSynth", () => {
             keyMap: DEFAULT_KEY_MAP,
             keyboardOctaves: 2,
             treadmill: false,
+            raceGhost: true,
         });
         const { result } = renderHook(() => useSynth());
         result.current.playNote(60);
@@ -117,6 +119,7 @@ describe("useSynth", () => {
             keyMap: DEFAULT_KEY_MAP,
             keyboardOctaves: 2,
             treadmill: false,
+            raceGhost: true,
         });
         const { result } = renderHook(() => useSynth());
         expect(() => result.current.playNote(60)).not.toThrow();

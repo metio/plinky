@@ -36,7 +36,7 @@ import { writeMastery } from "../lib/masteryStore";
 import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
-import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
+import { decodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import {
     compositionFromRun,
     fastestTakeOnsets,
@@ -46,7 +46,6 @@ import {
     saveTake,
     type Take,
 } from "../lib/savedTakes";
-import { SITE_URL } from "../lib/site";
 import { isPreciseInput } from "../lib/midi";
 import {
     LENIENT_TOLERANCE,
@@ -78,7 +77,6 @@ import {
     tempoSeries,
 } from "../lib/tempo";
 import { m } from "../paraglide/messages.js";
-import { localizeHref } from "../paraglide/runtime.js";
 import { Bpm } from "./bpm";
 import { Button, IconButton } from "./button";
 import { Disclosure, FieldGroup } from "./disclosure";
@@ -93,7 +91,6 @@ import {
     MinimizeIcon,
     PlayIcon,
     RotateIcon,
-    ShareIcon,
     StopIcon,
 } from "./icons";
 import { PerformanceStrip } from "./performanceStrip";
@@ -316,6 +313,7 @@ export function ScoreViewer({
     // Render the piece as one horizontal line that scrolls under a fixed gaze, instead of
     // wrapping into rows — the "treadmill" reading mode. Off by default.
     const [treadmill, setTreadmill] = useState(() => loadPrefs().treadmill);
+    const [raceGhost, setRaceGhost] = useState(() => loadPrefs().raceGhost);
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -347,7 +345,6 @@ export function ScoreViewer({
     // the source for the share link. Mirrors storage so the share button reacts.
     const [storedGhost, setStoredGhost] = useState<number[] | null>(null);
     const [sharedFromLink, setSharedFromLink] = useState(false);
-    const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
@@ -694,24 +691,6 @@ export function ScoreViewer({
         onMastery?.();
     };
 
-    // Hand the score's ghost to a friend as a link they open to race it.
-    const shareGhost = async () => {
-        if (!storedGhost) {
-            return;
-        }
-        const url = `${SITE_URL}${localizeHref(`/play/${id}`)}?ghost=${encodeGhost(storedGhost)}`;
-        try {
-            if (typeof navigator.share === "function") {
-                await navigator.share({ url, text: m.ghost_share_boast({ title }) });
-            } else {
-                await navigator.clipboard?.writeText(url);
-                setShareStatus("copied");
-            }
-        } catch {
-            // A cancelled share or a blocked clipboard needs no message.
-        }
-    };
-
     const stopListen = () => {
         for (const id of timers.current) {
             window.clearTimeout(id);
@@ -971,9 +950,10 @@ export function ScoreViewer({
         setLiveTempo(tempo);
         // Your fastest complete take is the ghost to chase; falling back to the last
         // run (or a friend's shared ghost) when you've saved none.
-        const racing = ephemeral
-            ? null
-            : (fastestTakeOnsets(loadTakes(id)) ?? storedGhost ?? loadGhost(id));
+        const racing =
+            ephemeral || !raceGhost
+                ? null
+                : (fastestTakeOnsets(loadTakes(id)) ?? storedGhost ?? loadGhost(id));
         setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;
@@ -1224,6 +1204,15 @@ export function ScoreViewer({
                                     label={m.forgiving_toggle()}
                                     title={m.forgiving_hint()}
                                 />
+                                <Switch
+                                    checked={raceGhost}
+                                    onChange={(next) => {
+                                        savePrefs({ ...loadPrefs(), raceGhost: next });
+                                        setRaceGhost(next);
+                                    }}
+                                    label={m.race_ghost_toggle()}
+                                    title={m.race_ghost_hint()}
+                                />
                                 {staffCount >= 2 && (
                                     <Labeled label={m.hand_label()}>
                                         <SegmentedControl
@@ -1428,20 +1417,10 @@ export function ScoreViewer({
                 </div>
 
                 <FullScreen off>
-                    <Show when={canShareGhost && storedGhost}>
-                        <div className="flex flex-wrap items-center gap-3 text-sm">
-                            <Show when={sharedFromLink}>
-                                <span className="text-gray-600 dark:text-gray-400">
-                                    {m.ghost_shared_loaded()}
-                                </span>
-                            </Show>
-                            <Button variant="secondary" onClick={shareGhost}>
-                                <ShareIcon />
-                                {shareStatus === "copied"
-                                    ? m.ghost_share_copied()
-                                    : m.ghost_share()}
-                            </Button>
-                        </div>
+                    <Show when={sharedFromLink}>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {m.ghost_shared_loaded()}
+                        </p>
                     </Show>
                 </FullScreen>
 
@@ -1630,6 +1609,7 @@ export function ScoreViewer({
                 <FullScreen off>
                     {takes.length > 0 && (
                         <TakesList
+                            id={id}
                             takes={takes}
                             title={title}
                             activeReplayId={activeReplayId}

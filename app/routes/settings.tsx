@@ -39,6 +39,7 @@ export default function Settings() {
         keyMap: DEFAULT_KEY_MAP,
         keyboardOctaves: 2,
         treadmill: false,
+        raceGhost: true,
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();

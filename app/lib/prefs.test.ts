@@ -23,6 +23,7 @@ const BASE: Prefs = {
     keyMap: DEFAULT_KEY_MAP,
     keyboardOctaves: 2,
     treadmill: false,
+    raceGhost: true,
 };
 
 describe("prefs", () => {

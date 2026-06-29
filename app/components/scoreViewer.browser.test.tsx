@@ -287,7 +287,7 @@ describe("ScoreViewer", () => {
         expect(track.getAttribute("aria-label")).toMatch(/ghost at note 0$/);
     });
 
-    it("adopts a ghost from a link and offers to pass it on", async () => {
+    it("adopts a ghost handed over by a link", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const code = encodeGhost([0, 500, 1000]);
         render(
@@ -298,7 +298,6 @@ describe("ScoreViewer", () => {
             </MemoryRouter>,
         );
         expect(await screen.findByText(/racing a shared ghost/i)).toBeTruthy();
-        expect(screen.getByText(/Challenge a friend/)).toBeTruthy();
     });
 
     it("lights the note now sounding while listening, so the eye can follow", async () => {

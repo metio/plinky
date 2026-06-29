@@ -80,8 +80,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   work out is there when you come back).
 - **Your takes** — after a run, save it as a take. Each piece keeps your last few:
   **replay** one and it plays back onto the staff in your own timing, **download** it as
-  MIDI or MusicXML, or delete it. Your fastest complete take becomes the **ghost** you
-  race next time.
+  MIDI or MusicXML, **challenge a friend** to race it by link, or delete it. Your fastest
+  complete take is the **ghost** you race next time — racing is on by default and toggles
+  off under the score's practice options.
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the
