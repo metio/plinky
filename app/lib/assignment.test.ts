@@ -128,6 +128,18 @@ describe("storage", () => {
         expect(loaded).toHaveLength(1);
         expect(loaded[0]?.name).toBe("Renamed");
     });
+
+    it("keeps an edited assignment in its place rather than moving it to the end", () => {
+        const items = [{ id: "scale-c-major" }];
+        for (const name of ["First", "Second", "Third"]) {
+            saveAssignment(makeAssignment({ name, items }));
+        }
+        // Re-saving the first must not reorder the list.
+        saveAssignment(makeAssignment({ name: "First", description: "edited", items }));
+        const loaded = loadAssignments();
+        expect(loaded.map((entry) => entry.id)).toEqual(["first", "second", "third"]);
+        expect(loaded[0]?.description).toBe("edited");
+    });
 });
 
 describe("assignment storage under denied storage", () => {
