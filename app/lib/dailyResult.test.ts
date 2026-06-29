@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
+import { withDeniedStorage } from "./deniedStorage";
 import { type DailyResult, loadDailyResult, saveDailyResult } from "./dailyResult";
 
 afterEach(() => localStorage.clear());
@@ -48,5 +49,15 @@ describe("dailyResult", () => {
         expect(loadDailyResult(5)).toBeNull();
         localStorage.setItem("plinky:daily-result", JSON.stringify({ number: 5, grade: 1 }));
         expect(loadDailyResult(5)).toBeNull();
+    });
+});
+
+describe("dailyResult under denied storage", () => {
+    it("loads null rather than throwing when storage is blocked", () => {
+        expect(withDeniedStorage(() => loadDailyResult(1))).toBeNull();
+    });
+
+    it("swallows a save when storage is blocked", () => {
+        expect(() => withDeniedStorage(() => saveDailyResult(1, RESULT))).not.toThrow();
     });
 });

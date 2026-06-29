@@ -17,9 +17,6 @@ export function fingerKey(hand: "left" | "right", bar: number, pos: number, note
 }
 
 export function loadSongFingering(songId: string): FingerMap {
-    if (typeof localStorage === "undefined") {
-        return {};
-    }
     try {
         const parsed = JSON.parse(localStorage.getItem(storageKey(songId)) ?? "{}");
         if (!parsed || typeof parsed !== "object") {
@@ -40,9 +37,6 @@ export function loadSongFingering(songId: string): FingerMap {
 }
 
 function save(songId: string, map: FingerMap): void {
-    if (typeof localStorage === "undefined") {
-        return;
-    }
     try {
         localStorage.setItem(storageKey(songId), JSON.stringify(map));
     } catch {
@@ -68,9 +62,6 @@ export function setFinger(
 
 // Clear every saved finger for a song — the "start this piece's fingering over" action.
 export function clearSongFingering(songId: string): void {
-    if (typeof localStorage === "undefined") {
-        return;
-    }
     try {
         localStorage.removeItem(storageKey(songId));
     } catch {

@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
+import { withDeniedStorage } from "./deniedStorage";
 import { loadLifetime, PROGRESS_COLUMNS, progressGrid, recordRun, type Skill } from "./lifetime";
 
 afterEach(() => {
@@ -109,5 +110,13 @@ describe("progressGrid", () => {
         recordRun(PERFECT, day(1));
         recordRun(PERFECT, day(2));
         expect(progressGrid(loadLifetime())?.[0]).toHaveLength(2);
+    });
+});
+
+describe("loadLifetime under denied storage", () => {
+    it("returns an empty fingerprint rather than throwing when storage is blocked", () => {
+        // A storage-blocked browser must not crash the progress page or run summary,
+        // both of which read the lifetime fingerprint on render.
+        expect(withDeniedStorage(() => loadLifetime())).toEqual({ days: [] });
     });
 });

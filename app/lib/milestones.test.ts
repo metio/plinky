@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
+import { withDeniedStorage } from "./deniedStorage";
 import {
     flawlessDone,
     isFirstS,
@@ -61,5 +62,19 @@ describe("flawlessDone", () => {
         expect(flawlessDone()).toBe(false);
         recordFlawless();
         expect(flawlessDone()).toBe(true);
+    });
+});
+
+describe("milestones under denied storage", () => {
+    it("reads its defaults rather than throwing when storage is blocked", () => {
+        // These run while building a run-summary card; a blocked store must read as
+        // "nothing celebrated yet", not crash the summary.
+        expect(withDeniedStorage(() => reachedGrade())).toBe(0);
+        expect(withDeniedStorage(() => flawlessDone())).toBe(false);
+    });
+
+    it("swallows the record writes when storage is blocked", () => {
+        expect(() => withDeniedStorage(() => recordReachedGrade(3))).not.toThrow();
+        expect(() => withDeniedStorage(() => recordFlawless())).not.toThrow();
     });
 });

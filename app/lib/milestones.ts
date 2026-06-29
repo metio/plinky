@@ -18,11 +18,13 @@ const REACHED_GRADE_KEY = "plinky:reached-grade";
 const FLAWLESS_KEY = "plinky:flawless-done";
 
 export function reachedGrade(): number {
-    if (typeof localStorage === "undefined") {
+    try {
+        const raw = Number(localStorage.getItem(REACHED_GRADE_KEY));
+        return Number.isFinite(raw) ? raw : 0;
+    } catch {
+        // No storage (SSR) or a browser that blocks it — nothing celebrated yet.
         return 0;
     }
-    const raw = Number(localStorage.getItem(REACHED_GRADE_KEY));
-    return Number.isFinite(raw) ? raw : 0;
 }
 
 export function recordReachedGrade(grade: number): void {
@@ -34,10 +36,12 @@ export function recordReachedGrade(grade: number): void {
 }
 
 export function flawlessDone(): boolean {
-    if (typeof localStorage === "undefined") {
+    try {
+        return localStorage.getItem(FLAWLESS_KEY) === "1";
+    } catch {
+        // No storage (SSR) or a browser that blocks it — treat as not yet fired.
         return false;
     }
-    return localStorage.getItem(FLAWLESS_KEY) === "1";
 }
 
 export function recordFlawless(): void {

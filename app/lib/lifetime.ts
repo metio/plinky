@@ -50,9 +50,6 @@ function blend(previous: Skill, run: Skill): Skill {
 }
 
 export function loadLifetime(): Lifetime {
-    if (typeof localStorage === "undefined") {
-        return EMPTY;
-    }
     try {
         const raw = localStorage.getItem(KEY);
         const parsed = raw ? (JSON.parse(raw) as Lifetime) : null;

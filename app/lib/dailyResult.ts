@@ -19,9 +19,6 @@ export type DailyResult = {
 const KEY = "plinky:daily-result";
 
 export function saveDailyResult(number: number, result: DailyResult): void {
-    if (typeof localStorage === "undefined") {
-        return;
-    }
     try {
         localStorage.setItem(KEY, JSON.stringify({ number, ...result }));
     } catch {
@@ -32,9 +29,6 @@ export function saveDailyResult(number: number, result: DailyResult): void {
 // The stored result for the given daily number, or null when the store is empty,
 // holds an earlier day, or is malformed.
 export function loadDailyResult(number: number): DailyResult | null {
-    if (typeof localStorage === "undefined") {
-        return null;
-    }
     try {
         const raw = localStorage.getItem(KEY);
         if (!raw) {

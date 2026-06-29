@@ -193,9 +193,6 @@ export function decodeAssignmentLink(code: string): Assignment | null {
 }
 
 export function loadAssignments(): Assignment[] {
-    if (typeof localStorage === "undefined") {
-        return [];
-    }
     try {
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
         if (!Array.isArray(parsed)) {
@@ -222,9 +219,6 @@ export function loadAssignments(): Assignment[] {
 }
 
 function storeAssignments(assignments: Assignment[]): boolean {
-    if (typeof localStorage === "undefined") {
-        return false;
-    }
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(assignments));
         return true;

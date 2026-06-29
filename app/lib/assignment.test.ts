@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
+import { withDeniedStorage } from "./deniedStorage";
 import {
     type Assignment,
     decodeAssignmentLink,
@@ -126,5 +127,20 @@ describe("storage", () => {
         const loaded = loadAssignments();
         expect(loaded).toHaveLength(1);
         expect(loaded[0]?.name).toBe("Renamed");
+    });
+});
+
+describe("assignment storage under denied storage", () => {
+    it("loads an empty list rather than throwing when storage is blocked", () => {
+        expect(withDeniedStorage(() => loadAssignments())).toEqual([]);
+    });
+
+    it("reports a failed save rather than throwing when storage is blocked", () => {
+        const assignment = makeAssignment({ name: "T", items: [{ id: "a", tempo: 5000 }] });
+        expect(withDeniedStorage(() => saveAssignment(assignment))).toBe(false);
+    });
+
+    it("swallows a remove when storage is blocked", () => {
+        expect(() => withDeniedStorage(() => removeAssignment("a"))).not.toThrow();
     });
 });

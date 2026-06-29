@@ -12,18 +12,20 @@ const PREFIX = "plinky:";
 // Remove all Plinky state from this device and report how many keys were cleared.
 // Other sites' keys are left untouched. Does not reload — the caller decides when.
 export function resetDevice(): number {
-    if (typeof localStorage === "undefined") {
+    try {
+        const keys: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key?.startsWith(PREFIX)) {
+                keys.push(key);
+            }
+        }
+        for (const key of keys) {
+            localStorage.removeItem(key);
+        }
+        return keys.length;
+    } catch {
+        // No storage (SSR) or a browser that blocks it — nothing to clear.
         return 0;
     }
-    const keys: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith(PREFIX)) {
-            keys.push(key);
-        }
-    }
-    for (const key of keys) {
-        localStorage.removeItem(key);
-    }
-    return keys.length;
 }
