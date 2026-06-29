@@ -151,9 +151,6 @@ function normalizeUserScore(raw: unknown): Score | null {
 }
 
 export function loadUserScores(): Score[] {
-    if (typeof localStorage === "undefined") {
-        return [];
-    }
     try {
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
         if (!Array.isArray(parsed)) {
@@ -166,9 +163,6 @@ export function loadUserScores(): Score[] {
 }
 
 function storeUserScores(scores: Score[]): boolean {
-    if (typeof localStorage === "undefined") {
-        return false;
-    }
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
         return true;
@@ -239,7 +233,7 @@ export function importScoresPack(json: string): { imported: number } {
             ...(packScore.license ? { license: packScore.license } : {}),
         });
     }
-    if (!storeUserScores([...scores.values()]) && typeof localStorage !== "undefined") {
+    if (!storeUserScores([...scores.values()])) {
         throw new Error("Could not save the scores — they may exceed this device's storage.");
     }
     return { imported: pack.scores.length };
