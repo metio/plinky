@@ -17,8 +17,19 @@ import { computeFlow } from "../lib/flow";
 import { recordDailyDone } from "../lib/dailyDone";
 import { recordPractice } from "../lib/history";
 import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
+import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
 import { nextKeyboardWindow, type Span } from "../lib/keyboardWindow";
 import { recordRun } from "../lib/lifetime";
+import { svgMilestone } from "../lib/milestoneCard";
+import {
+    flawlessDone,
+    isFirstS,
+    isFlawless,
+    type Milestone,
+    reachedGrade,
+    recordFlawless,
+    recordReachedGrade,
+} from "../lib/milestones";
 import {
     applyRun,
     isDue,
@@ -83,6 +94,7 @@ import {
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { SegmentedControl } from "./segmentedControl";
+import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
 import { BumpValue, Stepper } from "./stepper";
 import { Switch } from "./switch";
@@ -105,6 +117,47 @@ function Labeled({ label, children }: { label: ReactNode; children: ReactNode })
             <span>{label}</span>
             {children}
         </span>
+    );
+}
+
+// A celebratory banner for an earned moment (first S, grade-up, flawless run), with the
+// matching share card to post. Quiet — it sits above the run grid, never interrupts.
+function MilestoneBanner({ milestone }: { milestone: Milestone }) {
+    const heading =
+        milestone.kind === "grade-up"
+            ? m.milestone_grade_heading({ level: milestone.grade })
+            : milestone.kind === "flawless"
+              ? m.milestone_flawless_heading({ title: milestone.songTitle })
+              : m.milestone_first_s_heading({ title: milestone.songTitle });
+    const cardTitle =
+        milestone.kind === "grade-up"
+            ? m.grades_current({ level: milestone.grade })
+            : milestone.kind === "flawless"
+              ? m.milestone_flawless_title()
+              : m.milestone_first_s_title();
+    const detail =
+        milestone.kind === "grade-up"
+            ? milestone.skill > 0
+                ? m.grades_skill({ rating: milestone.skill })
+                : undefined
+            : milestone.songTitle;
+    const boast =
+        milestone.kind === "grade-up"
+            ? m.milestone_grade_boast({ level: milestone.grade })
+            : milestone.kind === "flawless"
+              ? m.milestone_flawless_boast({ title: milestone.songTitle })
+              : m.milestone_first_s_boast({ title: milestone.songTitle });
+    return (
+        <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
+            <h3 className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
+                {heading}
+            </h3>
+            <ShareButtons
+                text={boast}
+                imageSvg={svgMilestone({ title: cardTitle, detail })}
+                imageText={boast}
+            />
+        </section>
     );
 }
 
@@ -278,6 +331,9 @@ export function ScoreViewer({
     // reads the same windows as the grade and share grid.
     const [runTolerance, setRunTolerance] = useState(PRECISE_TOLERANCE);
     const [shareGrid, setShareGrid] = useState<Grid | null>(null);
+    // An earned-moment card (first S, grade-up, flawless run) shown above the run grid,
+    // resolved after the run's mastery is folded in. At most one per run.
+    const [milestone, setMilestone] = useState<Milestone | null>(null);
     const [tempoCurve, setTempoCurve] = useState<{
         points: TempoPoint[];
         median: number;
@@ -541,16 +597,42 @@ export function ScoreViewer({
         setSharedFromLink(false);
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
+        const before = loadMastery(id);
         const threshold = letterMin(loadPrefs().masteryThreshold);
-        const updated = applyRun(loadMastery(id), result.score, threshold, Date.now());
+        const updated = applyRun(before, result.score, threshold, Date.now());
         saveMastery(id, updated);
         setMastery(updated);
         onMastery?.();
+
+        // Surface one earned-moment card. Grade-up is the biggest moment so it wins a
+        // tie; the others it pre-empts can still fire on a later run (a flawless run
+        // keeps its one-time flag; a song's first S is guarded by its best score, so a
+        // grade-up that buries it is a rare, accepted loss). A grade-up is read from the
+        // ladder recomputed across all mastery, so it resolves asynchronously.
+        const firstS = isFirstS(result.score, before?.bestScore ?? 0);
+        const flawlessNow = isFlawless(result.score) && !flawlessDone();
+        const prefs = loadPrefs();
+        // The grade-up check reads the ladder across the whole catalogue, so it resolves
+        // asynchronously; the first-S and flawless checks above are already decided.
+        loadGradedMastery().then((items) => {
+            const reached = currentGrade(items);
+            if (reached > reachedGrade()) {
+                recordReachedGrade(reached);
+                const rating = skillRating(items, prefs.decayMode, Date.now());
+                setMilestone({ kind: "grade-up", grade: reached, skill: rating });
+            } else if (flawlessNow) {
+                recordFlawless();
+                setMilestone({ kind: "flawless", songTitle: title });
+            } else if (firstS) {
+                setMilestone({ kind: "first-s", songTitle: title });
+            }
+        });
     }, [
         matcher.complete,
         matcher.total,
         matcher.wrong,
         id,
+        title,
         onMastery,
         ephemeral,
         daily,
@@ -815,6 +897,7 @@ export function ScoreViewer({
         setGrade(null);
         setRunNotes([]);
         setShareGrid(null);
+        setMilestone(null);
         setTempoCurve(null);
         setLiveTempo(tempo);
         const racing = ephemeral ? null : (storedGhost ?? loadGhost(id));
@@ -1392,6 +1475,7 @@ export function ScoreViewer({
                 <FullScreen off>
                     {grade && (
                         <div ref={gradePanelRef} className="space-y-3">
+                            {milestone && <MilestoneBanner milestone={milestone} />}
                             <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
                                 <div
                                     className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}

@@ -103,6 +103,10 @@ an image. The bands are the same A–F scale the run's grade uses, so a green ce
 the same as a top grade. The daily challenge shares as **Plinky N**, so everyone
 compares the same run, and the You page shares your lifetime fingerprint.
 
+Earned moments also surface their own **milestone card** on the run summary — your
+first S on a piece, reaching a new grade, or a flawless run — to share or save. Each
+appears at most once and never interrupts; it just waits beside your results.
+
 ## Bring your own scores
 
 Drag in a **MusicXML** file (`.musicxml`, `.xml`, or compressed `.mxl`) exported from
