@@ -33,6 +33,17 @@ describe("tempoSeries", () => {
         expect(series.map((p) => p.index)).toEqual([1, 2, 3]);
         expect(series.every((p) => p.bpm === 120)).toBe(true);
     });
+
+    it("skips a chord or out-of-order gap instead of emitting a 0 bpm point", () => {
+        // The third onset repeats the second (a chord), and notated index 3 also
+        // repeats: both gaps are non-positive and would otherwise score 0 bpm.
+        const notated = [0, 600, 600, 1200];
+        const actual = [0, 500, 500, 1000];
+        const series = tempoSeries(100, notated, actual);
+        // Only the two real gaps survive; no 0-bpm point sneaks in.
+        expect(series.map((p) => p.index)).toEqual([1, 3]);
+        expect(series.some((p) => p.bpm === 0)).toBe(false);
+    });
 });
 
 describe("median", () => {

@@ -41,6 +41,12 @@ export function tempoSeries(
     for (let i = 1; i < count; i++) {
         const notatedGap = notatedMs[i]! - notatedMs[i - 1]!;
         const actualGap = actualMs[i]! - actualMs[i - 1]!;
+        // A non-positive gap — two onsets at the same instant (a chord) or out of
+        // order — has no measurable tempo. Skip it rather than emit a 0 bpm point,
+        // which would drag the baseline median down and read as a drag hotspot.
+        if (notatedGap <= 0 || actualGap <= 0) {
+            continue;
+        }
         points.push({ index: i, bpm: instantaneousBpm(referenceTempo, notatedGap, actualGap) });
     }
     return points;
