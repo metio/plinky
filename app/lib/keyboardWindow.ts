@@ -48,3 +48,33 @@ export function nextKeyboardWindow(
     const from = clampFrom(Math.round((lo + hi) / 2 - span / 2), span, range);
     return { from, to: from + span };
 }
+
+// Free play (Compose) has no upcoming notes to frame the window around, so it follows
+// the note you just played instead: it holds while that note sits in the comfortable
+// middle and re-centres when you play near an edge — so tapping the end key climbs you
+// to the next octave rather than trapping you in one window. `reach` bounds the slide
+// (the full reachable keyboard); `span` is the chosen width (Infinity shows it all).
+export function followKeyboardWindow(
+    prev: Span | null,
+    note: number,
+    span: number,
+    reach: Span,
+): Span {
+    if (!Number.isFinite(span) || reach.to - reach.from <= span) {
+        return reach;
+    }
+    const framed = (): Span => {
+        const from = clampFrom(Math.round(note - span / 2), span, reach);
+        return { from, to: from + span };
+    };
+    if (!prev) {
+        return framed();
+    }
+    // The margin by each edge is the "grab zone": a note landing there re-centres the
+    // window so you can walk past the current octave; anywhere comfortably inside holds.
+    const margin = Math.max(2, Math.floor(span / 5));
+    if (note >= prev.from + margin && note <= prev.to - margin) {
+        return prev;
+    }
+    return framed();
+}

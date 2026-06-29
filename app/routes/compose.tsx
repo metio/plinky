@@ -20,8 +20,10 @@ import {
     toMidiNotes,
     toMusicXml,
 } from "../lib/composition";
+import { followKeyboardWindow, type Span } from "../lib/keyboardWindow";
 import { buildMidiFile } from "../lib/midiFile";
 import { markDiscovered } from "../lib/onboarding";
+import { loadPrefs } from "../lib/prefs";
 import { fileStem } from "../lib/printScore";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
@@ -50,6 +52,10 @@ function downloadBlob(data: BlobPart, type: string, filename: string): void {
     URL.revokeObjectURL(url);
 }
 
+// The full 88-key piano (A0–C8): the range the windowed keyboard can slide across, so
+// any note stays reachable in free play however far the player wanders from middle C.
+const COMPOSE_REACH: Span = { from: 21, to: 108 };
+
 export default function Compose() {
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
@@ -64,6 +70,17 @@ export default function Compose() {
     const [metronomeOn, setMetronomeOn] = useState(false);
     const [countingIn, setCountingIn] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
+
+    // The on-screen keyboard mirrors the practice surface: a window of the player's
+    // chosen width (Settings → keyboard octaves; 0 = show all) that follows what they
+    // play, rather than a frozen three octaves. Read once on mount.
+    const [keyboardSpan] = useState(() => {
+        const octaves = loadPrefs().keyboardOctaves;
+        return octaves === 0 ? Number.POSITIVE_INFINITY : octaves * 12;
+    });
+    const [keyWindow, setKeyWindow] = useState<Span>(() =>
+        followKeyboardWindow(null, 60, keyboardSpan, COMPOSE_REACH),
+    );
 
     const { octaveOffset } = useMidiConnection();
     const { playNote } = useSynth();
@@ -103,8 +120,12 @@ export default function Compose() {
             }
             const startMs = event.timestamp - originRef.current;
             openRef.current.set(event.note, { startMs, velocity: event.velocity || 90 });
+            // Slide the on-screen keyboard to keep what's being played in view.
+            setKeyWindow((prev) =>
+                followKeyboardWindow(prev, event.note, keyboardSpan, COMPOSE_REACH),
+            );
         },
-        [],
+        [keyboardSpan],
     );
 
     const handleNoteOff = useCallback((event: { note: number; timestamp: number }) => {
@@ -446,7 +467,7 @@ export default function Compose() {
             </section>
 
             <section className="space-y-3">
-                <PianoKeyboard from={48} to={84} />
+                <PianoKeyboard from={keyWindow.from} to={keyWindow.to} />
                 <KeyboardHint octaveOffset={octaveOffset} />
                 <details className="text-sm">
                     <summary className="cursor-pointer text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
