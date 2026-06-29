@@ -121,7 +121,17 @@ export function decodeComposition(code: string): Composition | null {
         return null;
     }
     const [tempo, beatsPerBar, gaps, durations, pitches, velocities] = unpacked as unknown[];
-    if (typeof tempo !== "number" || typeof beatsPerBar !== "number") {
+    // A share URL is untrusted: a non-finite or non-positive tempo/meter would feed
+    // 60_000 / tempo downstream and poison every onset with Infinity or NaN, so reject
+    // it rather than build an unplayable composition.
+    if (
+        typeof tempo !== "number" ||
+        !Number.isFinite(tempo) ||
+        tempo <= 0 ||
+        typeof beatsPerBar !== "number" ||
+        !Number.isFinite(beatsPerBar) ||
+        beatsPerBar <= 0
+    ) {
         return null;
     }
     if (

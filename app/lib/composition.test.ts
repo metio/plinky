@@ -95,6 +95,13 @@ describe("encode/decode round-trip", () => {
         expect(decoded).toEqual(composition([]));
     });
 
+    it("rejects a share code with a non-positive or non-finite tempo or meter", () => {
+        // An untrusted ?c= must not feed 0/NaN into 60_000 / tempo downstream.
+        expect(decodeComposition(encodeComposition(composition([], 0, 4)))).toBeNull();
+        expect(decodeComposition(encodeComposition(composition([], Number.NaN, 4)))).toBeNull();
+        expect(decodeComposition(encodeComposition(composition([], 120, 0)))).toBeNull();
+    });
+
     it("returns null for a malformed code", () => {
         expect(decodeComposition("not-a-real-code")).toBeNull();
         expect(decodeComposition("")).toBeNull();
