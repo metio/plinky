@@ -52,6 +52,15 @@ describe("buildMidiFile", () => {
         expect([...file.slice(-3)]).toEqual([0xff, 0x2f, 0x00]);
     });
 
+    it("keeps a zero-duration note's note-on before its note-off so it doesn't hang", () => {
+        const file = buildMidiFile([{ midi: 60, startQuarters: 0, durationQuarters: 0 }]);
+        const onAt = [...file].indexOf(0x90);
+        const offAt = [...file].indexOf(0x80);
+        expect(onAt).toBeGreaterThanOrEqual(0);
+        // The off must follow the on; otherwise the note never stops sounding.
+        expect(offAt).toBeGreaterThan(onAt);
+    });
+
     it("uses a variable-length delta when an onset lands past 127 ticks", () => {
         // A note at quarter 1 with ppq 480 starts at tick 480, whose VLQ is 0x83 0x60.
         const file = buildMidiFile([{ midi: 60, startQuarters: 1, durationQuarters: 1 }]);
