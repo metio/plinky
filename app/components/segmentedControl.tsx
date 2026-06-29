@@ -13,12 +13,14 @@ export function SegmentedControl<T extends string>({
     value,
     onChange,
     label,
+    disabled = false,
     className = "",
 }: {
     options: Option<T>[];
     value: T;
     onChange: (id: T) => void;
     label: string;
+    disabled?: boolean;
     className?: string;
 }) {
     return (
@@ -35,8 +37,9 @@ export function SegmentedControl<T extends string>({
                         type="button"
                         role="tab"
                         aria-selected={selected}
+                        disabled={disabled}
                         onClick={() => onChange(option.id)}
-                        className={`inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors ${
+                        className={`inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-50 ${
                             selected
                                 ? "bg-white text-indigo-700 shadow-sm dark:bg-gray-950 dark:text-indigo-300"
                                 : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"

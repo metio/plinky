@@ -129,6 +129,43 @@ export function CloseIcon({ className }: IconProps) {
     );
 }
 
+// A right-pointing chevron — a disclosure marker; rotate it 90° for "open".
+export function ChevronIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M9 6l6 6-6 6" />
+        </Icon>
+    );
+}
+
+// A minus — step a value down.
+export function MinusIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M5 12h14" />
+        </Icon>
+    );
+}
+
+// A plus — step a value up.
+export function PlusIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M12 5v14M5 12h14" />
+        </Icon>
+    );
+}
+
+// A circular arrow returning to start — "reset to default".
+export function RotateIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M3 12a9 9 0 1 0 3-6.7" />
+            <path d="M3 4v4h4" />
+        </Icon>
+    );
+}
+
 // An up arrow — "move up" in an ordered list.
 export function ArrowUpIcon({ className }: IconProps) {
     return (

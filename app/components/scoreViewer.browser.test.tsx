@@ -49,29 +49,35 @@ describe("ScoreViewer", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        const button = await screen.findByText(/Metronome/);
-        expect(button.getAttribute("aria-pressed")).toBe("false");
-        fireEvent.click(button);
-        expect(button.getAttribute("aria-pressed")).toBe("true");
-        fireEvent.click(button);
-        expect(button.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        const toggle = screen.getByRole("switch", { name: "Metronome" });
+        expect(toggle.getAttribute("aria-checked")).toBe("false");
+        fireEvent.click(toggle);
+        expect(toggle.getAttribute("aria-checked")).toBe("true");
+        fireEvent.click(toggle);
+        expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
     it("re-renders as a single horizontal line when treadmill is toggled on", async () => {
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
-        const practice = await screen.findByText(/Practice/);
+        const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
-        const treadmill = screen.getByRole("button", { name: "Treadmill" });
-        expect(treadmill.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        const treadmill = screen.getByRole("switch", { name: "Treadmill" });
+        expect(treadmill.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(treadmill);
-        expect(treadmill.getAttribute("aria-pressed")).toBe("true");
+        expect(treadmill.getAttribute("aria-checked")).toBe("true");
         // The score reloads with one horizontal staffline; Practice re-enabling proves
         // the re-render succeeded rather than leaving a dead viewer.
         await waitFor(
-            () => expect((screen.getByText(/Practice/) as HTMLButtonElement).disabled).toBe(false),
+            () =>
+                expect(
+                    (screen.getByRole("button", { name: "Practice" }) as HTMLButtonElement)
+                        .disabled,
+                ).toBe(false),
             { timeout: 30000 },
         );
     });
@@ -84,14 +90,14 @@ describe("ScoreViewer", () => {
         // A one-bar phrase whose every note is C5, so the same key clears each position.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
-        const practice = await screen.findByText(/Practice/);
+        const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
         // Enter full-screen play, then start practising from its top-bar transport.
         fireEvent.click(screen.getByRole("button", { name: "Full screen" }));
         expect(screen.queryByRole("button", { name: "Full screen" })).toBeNull();
-        fireEvent.click(screen.getByText(/Practice/));
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         const key = await screen.findByLabelText("C5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
@@ -114,16 +120,17 @@ describe("ScoreViewer", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        const metronome = await screen.findByText(/Metronome/);
-        expect(screen.queryByText("Adaptive")).toBeNull();
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        const metronome = screen.getByRole("switch", { name: "Metronome" });
+        expect(screen.queryByRole("switch", { name: "Adaptive" })).toBeNull();
         fireEvent.click(metronome);
-        const adaptive = screen.getByText("Adaptive");
-        expect(adaptive.getAttribute("aria-pressed")).toBe("false");
+        const adaptive = screen.getByRole("switch", { name: "Adaptive" });
+        expect(adaptive.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(adaptive);
-        expect(adaptive.getAttribute("aria-pressed")).toBe("true");
+        expect(adaptive.getAttribute("aria-checked")).toBe("true");
         // Turning the metronome off hides the adaptive control again.
         fireEvent.click(metronome);
-        expect(screen.queryByText("Adaptive")).toBeNull();
+        expect(screen.queryByRole("switch", { name: "Adaptive" })).toBeNull();
     });
 
     it("colours notes on the score as they are played", async () => {
@@ -133,7 +140,7 @@ describe("ScoreViewer", () => {
         const { container } = mount(phrase, { beatsPerBar: 4 });
         // Wait for OSMD to be ready via the real signal — the Practice button
         // enabling — since toolbar icons mean "any svg" is present from the start.
-        const practiceButton = await screen.findByText(/Practice/);
+        const practiceButton = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
@@ -160,7 +167,7 @@ describe("ScoreViewer", () => {
         const { container } = mount(phrase, { beatsPerBar: 4 });
         // Wait for OSMD to be ready via the real signal — the Practice button
         // enabling — since toolbar icons mean "any svg" is present from the start.
-        const practiceButton = await screen.findByText(/Practice/);
+        const practiceButton = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
@@ -212,11 +219,12 @@ describe("ScoreViewer", () => {
     it("reveals the section-loop bar inputs only once looping is on", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        const loop = await screen.findByText(/Loop/, undefined, { timeout: 30000 });
-        expect(loop.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        const loop = await screen.findByRole("switch", { name: "Loop" }, { timeout: 30000 });
+        expect(loop.getAttribute("aria-checked")).toBe("false");
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
         fireEvent.click(loop);
-        expect(loop.getAttribute("aria-pressed")).toBe("true");
+        expect(loop.getAttribute("aria-checked")).toBe("true");
         // The range seeds to the whole piece — OSMD reported three bars.
         const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
         expect(to.value).toBe("3");
@@ -225,7 +233,8 @@ describe("ScoreViewer", () => {
     it("never lets the loop range invert", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByText(/Loop/, undefined, { timeout: 30000 }));
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        fireEvent.click(await screen.findByRole("switch", { name: "Loop" }, { timeout: 30000 }));
         const from = screen.getByLabelText("Loop from bar") as HTMLInputElement;
         const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
         fireEvent.change(to, { target: { value: "2" } });
