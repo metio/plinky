@@ -14,6 +14,7 @@ import {
 } from "../lib/keyMap";
 import { loadPrefs, savePrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
+import { Button } from "./button";
 
 const HAND_LABEL: Record<Hand, () => string> = {
     left: m.keyboard_hint_left,
@@ -118,16 +119,15 @@ export function KeyMapping() {
                         {m.keymap_press()}
                     </span>
                 )}
-                <button
-                    type="button"
+                <Button
+                    variant="secondary"
                     onClick={() => {
                         setArming(null);
                         persist(DEFAULT_KEY_MAP);
                     }}
-                    className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
                 >
                     {m.keymap_reset()}
-                </button>
+                </Button>
             </div>
         </div>
     );

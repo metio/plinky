@@ -1294,15 +1294,11 @@ export function ScoreViewer({
                                 </span>
                                 <Midi supported>
                                     <Show when={!connected}>
-                                        <button
-                                            type="button"
-                                            onClick={requestAccess}
-                                            className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white"
-                                        >
+                                        <Button variant="primary" onClick={requestAccess}>
                                             {status === "requesting"
                                                 ? m.midi_connecting()
                                                 : m.midi_connect()}
-                                        </button>
+                                        </Button>
                                     </Show>
                                 </Midi>
                                 <Midi unsupported>

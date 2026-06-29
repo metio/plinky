@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from "./button";
 import { Show } from "./conditional";
 import { useSynth } from "../hooks/useSynth";
 import { drillToMusicXml } from "../lib/drillStaff";
@@ -302,14 +303,14 @@ export function FingeringDrill({
                                 {finger}
                             </button>
                         ))}
-                        <button
-                            type="button"
+                        <Button
+                            variant="primary"
                             onClick={check}
                             disabled={!complete}
-                            className="ml-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                            className="ml-2"
                         >
                             {m.fingering_check()}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
