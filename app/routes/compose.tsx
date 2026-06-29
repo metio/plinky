@@ -311,12 +311,12 @@ export default function Compose() {
                     {staffXml ? (
                         <StaffPreview xml={staffXml} label={m.compose_staff_label()} />
                     ) : (
-                        <p className="px-2 py-10 text-center text-sm text-gray-400 dark:text-gray-500">
+                        <p className="px-2 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                             {m.compose_staff_empty()}
                         </p>
                     )}
                 </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                     {m.compose_sketch_note()}
                 </p>
             </section>

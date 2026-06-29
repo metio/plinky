@@ -42,8 +42,16 @@ export function Disclosure({
                     open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                 }`}
             >
-                <div className="overflow-hidden">
+                {/* `min-h-0` is mandatory: without it the grid child keeps its implicit
+                    `min-height: auto` and the `0fr` row can't collapse, so the panel
+                    would render at full height — and conditional controls appearing once
+                    the score loads would shift the page (a CLS regression). */}
+                <div className="min-h-0 overflow-hidden">
+                    {/* `inert` while closed keeps the collapsed-but-still-laid-out controls
+                        out of the tab order and the accessibility tree, the way a native
+                        <details> does — so keyboard focus never lands on a hidden control. */}
                     <div
+                        inert={!open}
                         className={`space-y-4 pt-3 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${
                             open ? "translate-y-0 opacity-100 delay-75" : "translate-y-1 opacity-0"
                         }`}

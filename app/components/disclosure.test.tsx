@@ -31,6 +31,18 @@ describe("Disclosure", () => {
             "true",
         );
     });
+
+    it("marks the collapsed panel inert so hidden controls aren't focusable", () => {
+        render(
+            <Disclosure summary="Tune">
+                <button type="button">Inside</button>
+            </Disclosure>,
+        );
+        // Closed: the content lives in an inert subtree, the way native <details> hides it.
+        expect(screen.getByText("Inside").closest("[inert]")).not.toBeNull();
+        fireEvent.click(screen.getByRole("button", { name: /tune/i }));
+        expect(screen.getByText("Inside").closest("[inert]")).toBeNull();
+    });
 });
 
 describe("FieldGroup", () => {

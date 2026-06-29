@@ -1106,56 +1106,63 @@ export function ScoreViewer({
                                 )}
                             </FieldGroup>
 
-                            <FieldGroup label={m.group_notation()}>
-                                {!lockTempo && (
-                                    <span className="flex flex-col gap-1">
-                                        <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                            <span>{m.transpose()}</span>
-                                            <Stepper
-                                                value={m.transpose_semitones({
-                                                    count:
-                                                        transpose > 0
-                                                            ? `+${transpose}`
-                                                            : transpose < 0
-                                                              ? `−${-transpose}`
-                                                              : "0",
-                                                })}
-                                                decrementLabel={m.transpose_down()}
-                                                incrementLabel={m.transpose_up()}
-                                                canDecrement={transpose > -12}
-                                                canIncrement={transpose < 12}
-                                                onDecrement={() =>
-                                                    setTranspose((value) =>
-                                                        Math.max(value - 1, -12),
-                                                    )
-                                                }
-                                                onIncrement={() =>
-                                                    setTranspose((value) => Math.min(value + 1, 12))
-                                                }
-                                            />
-                                            {transpose !== 0 && (
-                                                <IconButton
-                                                    variant="ghost"
-                                                    label={m.transpose_reset()}
-                                                    onClick={() => setTranspose(0)}
-                                                >
-                                                    <RotateIcon className="h-5 w-5" />
-                                                </IconButton>
-                                            )}
+                            {/* Skip the whole group when it would be empty — a locked
+                                challenge has no transpose, and most pieces have no saved
+                                fingering, so the heading would otherwise stand alone. */}
+                            {(!lockTempo || (hasSaved && loadPrefs().showFingerings)) && (
+                                <FieldGroup label={m.group_notation()}>
+                                    {!lockTempo && (
+                                        <span className="flex flex-col gap-1">
+                                            <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                                <span>{m.transpose()}</span>
+                                                <Stepper
+                                                    value={m.transpose_semitones({
+                                                        count:
+                                                            transpose > 0
+                                                                ? `+${transpose}`
+                                                                : transpose < 0
+                                                                  ? `−${-transpose}`
+                                                                  : "0",
+                                                    })}
+                                                    decrementLabel={m.transpose_down()}
+                                                    incrementLabel={m.transpose_up()}
+                                                    canDecrement={transpose > -12}
+                                                    canIncrement={transpose < 12}
+                                                    onDecrement={() =>
+                                                        setTranspose((value) =>
+                                                            Math.max(value - 1, -12),
+                                                        )
+                                                    }
+                                                    onIncrement={() =>
+                                                        setTranspose((value) =>
+                                                            Math.min(value + 1, 12),
+                                                        )
+                                                    }
+                                                />
+                                                {transpose !== 0 && (
+                                                    <IconButton
+                                                        variant="ghost"
+                                                        label={m.transpose_reset()}
+                                                        onClick={() => setTranspose(0)}
+                                                    >
+                                                        <RotateIcon className="h-5 w-5" />
+                                                    </IconButton>
+                                                )}
+                                            </span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                {m.transpose_caption()}
+                                            </span>
                                         </span>
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                                            {m.transpose_caption()}
-                                        </span>
-                                    </span>
-                                )}
-                                {hasSaved && loadPrefs().showFingerings && (
-                                    <Switch
-                                        checked={showMine}
-                                        onChange={setShowMine}
-                                        label={m.fingering_show_mine()}
-                                    />
-                                )}
-                            </FieldGroup>
+                                    )}
+                                    {hasSaved && loadPrefs().showFingerings && (
+                                        <Switch
+                                            checked={showMine}
+                                            onChange={setShowMine}
+                                            label={m.fingering_show_mine()}
+                                        />
+                                    )}
+                                </FieldGroup>
+                            )}
 
                             <FieldGroup label={m.group_layout()}>
                                 <Switch

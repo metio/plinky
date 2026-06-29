@@ -198,11 +198,12 @@ describe("ScoreViewer", () => {
     it("offers a hands-separate selector only for a grand staff", async () => {
         const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         mount(grand, { beatsPerBar: 4 });
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
         // The selector appears once OSMD reports two staves; its three options name
         // the hands. This also exercises the OSMD staff API the matcher filters on.
-        expect(await screen.findByText("Right", undefined, { timeout: 30000 })).toBeTruthy();
-        expect(screen.getByText("Left")).toBeTruthy();
-        expect(screen.getByText("Both")).toBeTruthy();
+        expect(await screen.findByRole("tab", { name: "Right" }, { timeout: 30000 })).toBeTruthy();
+        expect(screen.getByRole("tab", { name: "Left" })).toBeTruthy();
+        expect(screen.getByRole("tab", { name: "Both" })).toBeTruthy();
     });
 
     it("omits the hands selector for a single-staff score", async () => {
@@ -212,8 +213,9 @@ describe("ScoreViewer", () => {
         // single-staff piece offers no hand choice.
         const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
-        expect(screen.queryByText("Right")).toBeNull();
-        expect(screen.queryByText("Left")).toBeNull();
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        expect(screen.queryByRole("tab", { name: "Right" })).toBeNull();
+        expect(screen.queryByRole("tab", { name: "Left" })).toBeNull();
     });
 
     it("reveals the section-loop bar inputs only once looping is on", async () => {

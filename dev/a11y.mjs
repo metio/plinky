@@ -10,18 +10,16 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { chromium } from "playwright";
+import lighthouserc from "../lighthouserc.json" with { type: "json" };
 
 const ROOT = "build/client";
 const PORT = Number(process.env.PORT) || 8099;
 const MODE = process.env.A11Y_MODE === "light" ? "light" : "dark";
-// Pages are prerendered under a /<locale>/ prefix; scan the base locale's set.
-// (The bare "/" is only a client redirect, so it has no content to audit.)
-const PAGES = [
-    "/en/",
-    "/en/library/",
-    "/en/you/",
-    "/en/settings/",
-];
+// One canonical page list, shared with the Lighthouse gate (lighthouserc.json), so the
+// two audits always cover exactly the same set and can't drift — add a page in one
+// place and both pick it up. Strip the host to get each prerendered path; the URLs are
+// already locale-prefixed (the bare "/" is only a client redirect, so it isn't listed).
+const PAGES = lighthouserc.ci.collect.url.map((url) => new URL(url).pathname);
 const MIME = {
     ".html": "text/html",
     ".js": "text/javascript",
