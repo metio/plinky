@@ -230,8 +230,16 @@ function storeAssignments(assignments: Assignment[]): boolean {
 // Upsert by id, so re-saving an edited assignment refreshes it in place. Returns
 // false when the write fails (e.g. storage quota), so a caller can say so.
 export function saveAssignment(assignment: Assignment): boolean {
-    const others = loadAssignments().filter((entry) => entry.id !== assignment.id);
-    return storeAssignments([...others, assignment]);
+    const existing = loadAssignments();
+    const at = existing.findIndex((entry) => entry.id === assignment.id);
+    if (at === -1) {
+        return storeAssignments([...existing, assignment]);
+    }
+    // Overwrite the matching slot so an edit keeps the assignment where it was in
+    // the list rather than jumping to the end.
+    const next = [...existing];
+    next[at] = assignment;
+    return storeAssignments(next);
 }
 
 export function removeAssignment(id: string): void {
