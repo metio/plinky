@@ -62,6 +62,54 @@ describe("exercise ids", () => {
     });
 });
 
+// Pitches in document order from a generated single-hand exercise, as MIDI-ish
+// numbers, read straight from the MusicXML so no DOM is needed.
+function pitchSequence(xml: string): number[] {
+    const STEP: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const out: number[] = [];
+    for (const match of xml.matchAll(/<pitch>(.*?)<\/pitch>/gs)) {
+        const block = match[1]!;
+        const step = block.match(/<step>([A-G])<\/step>/)![1]!;
+        const alter = Number(block.match(/<alter>(-?\d+)<\/alter>/)?.[1] ?? 0);
+        const octave = Number(block.match(/<octave>(\d+)<\/octave>/)![1]!);
+        out.push((octave + 1) * 12 + STEP[step]! + alter);
+    }
+    return out;
+}
+
+describe("arpeggio inversions", () => {
+    for (const octaves of [1, 2] as const) {
+        for (const inversion of [1, 2] as const) {
+            it(`ascends without a duplicate note (${octaves}-octave inversion ${inversion})`, () => {
+                const xml = generateExercise({
+                    type: "major-arpeggio",
+                    key: "c",
+                    octaves,
+                    hands: "right",
+                    inversion,
+                    interval: "single",
+                });
+                const pitches = pitchSequence(xml);
+                // No note repeats back-to-back — the old rotation duplicated the tonic.
+                for (let i = 1; i < pitches.length; i++) {
+                    expect(pitches[i]).not.toBe(pitches[i - 1]);
+                }
+                // It's a single mountain: one apex, climbed strictly, then descended.
+                // The old rotation put the closing tonic mid-run, so the top note
+                // recurred and the line dipped before the real turn.
+                const top = Math.max(...pitches);
+                expect(pitches.filter((p) => p === top)).toHaveLength(1);
+                const apex = pitches.indexOf(top);
+                for (let i = 1; i <= apex; i++) {
+                    expect(pitches[i]!).toBeGreaterThan(pitches[i - 1]!);
+                }
+                // An inversion starts above the tonic, on a higher chord tone.
+                expect(pitches[0]!).toBeGreaterThan(60);
+            });
+        }
+    }
+});
+
 describe("generateExercise", () => {
     it("generates valid MusicXML for the canonical form", () => {
         const xml = generateExercise(parseExerciseId("scale-c-major")!);
