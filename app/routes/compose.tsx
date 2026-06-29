@@ -186,6 +186,9 @@ export default function Compose() {
         }
         timersRef.current = [];
         setPlaying(false);
+        // Also cancel an in-progress count-in: its timeout is tracked above, so it's
+        // cleared here; drop the flag too or the metronome would keep ticking for it.
+        setCountingIn(false);
     }, []);
 
     const play = useCallback(() => {
@@ -260,12 +263,17 @@ export default function Compose() {
         }
         setCountingIn(true);
         const barMs = beatsPerBar * (60_000 / tempo);
-        window.setTimeout(() => {
-            originRef.current = performance.now() - tailMs(notesRef.current);
-            openRef.current.clear();
-            setCountingIn(false);
-            setMetronomeOn(true);
-        }, barMs);
+        // Track the timeout so stop()/reset() and unmount cancel it; otherwise pressing
+        // Clear or leaving mid-count-in still fires it — re-anchoring the clock, turning
+        // the metronome on, and setting state after unmount.
+        timersRef.current.push(
+            window.setTimeout(() => {
+                originRef.current = performance.now() - tailMs(notesRef.current);
+                openRef.current.clear();
+                setCountingIn(false);
+                setMetronomeOn(true);
+            }, barMs),
+        );
     }, [countingIn, beatsPerBar, tempo]);
 
     // Swap the canvas over to a loaded composition.

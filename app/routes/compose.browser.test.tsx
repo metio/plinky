@@ -158,4 +158,17 @@ describe("Compose", () => {
         });
         expect(await screen.findByText("3 notes")).toBeTruthy();
     });
+
+    it("cancels a pending count-in when the take is cleared", async () => {
+        mount();
+        await strike(60);
+        fireEvent.click(screen.getByRole("button", { name: "Count in" }));
+        expect(await screen.findByRole("button", { name: /Counting in/ })).toBeTruthy();
+        // Clearing (two-step) must drop the pending count-in immediately, not leave its
+        // timeout to fire later and re-anchor the clock / turn the metronome on. Read
+        // synchronously: with the bug the flag only clears when the timeout fires ~1s on.
+        fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+        fireEvent.click(screen.getByRole("button", { name: "Clear all?" }));
+        expect(screen.getByRole("button", { name: "Count in" })).toBeTruthy();
+    });
 });
