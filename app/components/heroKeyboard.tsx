@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMidiInput } from "../contexts/midi";
+import { useNoteLabels } from "../hooks/useNoteLabels";
 import { useSynth } from "../hooks/useSynth";
 import { Keyboard } from "./keyboard";
 import { MidiBadge } from "./midiBadge";
@@ -19,6 +20,7 @@ const TO = 72;
 // on load; that and the press are the only motion, both dropped for reduce-motion.
 export function HeroKeyboard() {
     const synth = useSynth();
+    const labels = useNoteLabels();
     const [lit, setLit] = useState<ReadonlySet<number>>(new Set());
     // Pending un-light timers, cleared on unmount so a press right before the component
     // goes away can't fire setLit after teardown (which crashes a test that just left).
@@ -58,6 +60,7 @@ export function HeroKeyboard() {
             to={TO}
             lit={lit}
             rise
+            labels={labels}
             well="mx-auto w-full max-w-md"
             badge={<MidiBadge />}
             onPress={plink}

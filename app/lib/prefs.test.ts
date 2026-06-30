@@ -15,6 +15,7 @@ const BASE: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    noteLabels: "c",
     forgiving: false,
     fingerHints: true,
     decayMode: "gentle",
@@ -82,6 +83,17 @@ describe("prefs", () => {
     it("rejects an unknown note-hint value", () => {
         localStorage.setItem("plinky:prefs", JSON.stringify({ noteHints: "bogus" }));
         expect(loadPrefs().noteHints).toBe("miss");
+    });
+
+    it("defaults note labels to the C landmark and round-trips the choice", () => {
+        expect(loadPrefs().noteLabels).toBe("c");
+        savePrefs({ ...BASE, noteLabels: "all" });
+        expect(loadPrefs().noteLabels).toBe("all");
+    });
+
+    it("rejects an unknown note-label value", () => {
+        localStorage.setItem("plinky:prefs", JSON.stringify({ noteLabels: "bogus" }));
+        expect(loadPrefs().noteLabels).toBe("c");
     });
 
     it("drops out-of-range or malformed spans to null", () => {

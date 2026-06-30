@@ -15,6 +15,12 @@ export type HandSpan = { left: number | null; right: number | null };
 // or never (pure sight-reading). A wrong key still flashes red regardless.
 export type NoteHints = "always" | "miss" | "never";
 
+// Whether the keys carry their note name, for a player still learning where the notes
+// are: every key labelled (all), only the C keys as orientation landmarks (c — the
+// white key left of each two-black-key group), or bare (off) once the map is second
+// nature.
+export type NoteLabels = "all" | "c" | "off";
+
 export type Prefs = {
     sound: boolean;
     volume: number; // 0..100
@@ -24,6 +30,7 @@ export type Prefs = {
     // fingerings out unaided, the way they must at a real piano.
     showFingerings: boolean;
     noteHints: NoteHints;
+    noteLabels: NoteLabels;
     // Keep going past a slip: when on, playing the next note advances the score even if a
     // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
     // freezes you mid-piece. Off waits for every note, which builds accuracy.
@@ -78,6 +85,7 @@ const DEFAULTS: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: true,
     noteHints: "miss",
+    noteLabels: "c",
     forgiving: false,
     fingerHints: true,
     decayMode: "gentle",
@@ -90,6 +98,7 @@ const DEFAULTS: Prefs = {
 };
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
+const NOTE_LABELS: NoteLabels[] = ["all", "c", "off"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
 function clampVolume(value: number): number {
@@ -125,6 +134,9 @@ export function loadPrefs(): Prefs {
             noteHints: NOTE_HINTS.includes(parsed.noteHints)
                 ? parsed.noteHints
                 : DEFAULTS.noteHints,
+            noteLabels: NOTE_LABELS.includes(parsed.noteLabels)
+                ? parsed.noteLabels
+                : DEFAULTS.noteLabels,
             forgiving:
                 typeof parsed.forgiving === "boolean" ? parsed.forgiving : DEFAULTS.forgiving,
             fingerHints:

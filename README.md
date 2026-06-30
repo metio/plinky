@@ -90,9 +90,12 @@ one-tap **review session** walks you through everything that's fading, and you c
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
   carries an optional *About this grade* note.
 
-On the **home page**, a new player is welcomed by a gentle, dismissible **discovery
-checklist** that points out the app's corners — a guided tour where you land, never a
-gate on progress.
+On the **home page**, someone who has never played piano is met by a **New to piano?**
+card that hands them a first short song and a reassurance that reading notation comes
+later — it disappears the moment you've played anything. Alongside it, a gentle,
+dismissible **discovery checklist** points out the app's corners, and the first time you
+open a score a one-time tip explains the three modes and the listen-then-play-slowly
+loop — a guided tour where you land, never a gate on progress.
 
 ## Composing
 
@@ -139,6 +142,11 @@ a student.
   piece the keyboard shows a moving window that follows the notes you're playing, so the
   keys never shrink to slivers; set its width — **1, 2 or 3 octaves, or the whole piece**
   fixed — under *More options*. Handy on a phone or tablet with no MIDI or keyboard.
+
+Still learning where the notes are? The keys can carry their **note names** — every key,
+or just the C keys as orientation landmarks (the white key left of each pair of black
+keys), or none once the map is second nature — set under **Settings**. The C landmarks
+show by default.
 
 Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { BeginnerStart } from "../components/beginnerStart";
 import { DiscoveryChecklist } from "../components/discoveryChecklist";
 import { HeroKeyboard } from "../components/heroKeyboard";
 import { BookIcon, ListIcon, NotesIcon } from "../components/icons";
@@ -72,6 +73,8 @@ export default function Home() {
                     </p>
                 </div>
             </section>
+
+            <BeginnerStart />
 
             <HomeToday />
 

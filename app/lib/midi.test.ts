@@ -10,6 +10,7 @@ import {
     noteName,
     ON_SCREEN_DEVICE,
     parseMidiMessage,
+    pitchClass,
 } from "./midi";
 
 describe("noteName", () => {
@@ -18,6 +19,19 @@ describe("noteName", () => {
         expect(noteName(69)).toBe("A4");
         expect(noteName(61)).toBe("C#4");
         expect(noteName(72)).toBe("C5");
+    });
+});
+
+describe("pitchClass", () => {
+    it("gives the octave-free letter with a typographic sharp", () => {
+        expect(pitchClass(60)).toBe("C");
+        expect(pitchClass(72)).toBe("C");
+        expect(pitchClass(61)).toBe("C♯");
+    });
+
+    it("floor-mods so notes below MIDI 0 still map", () => {
+        expect(pitchClass(-12)).toBe("C");
+        expect(pitchClass(-1)).toBe("B");
     });
 });
 

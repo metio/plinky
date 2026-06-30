@@ -16,6 +16,25 @@ describe("Keyboard", () => {
         expect(screen.getByLabelText("D4")).toBeTruthy();
     });
 
+    it("prints no note names by default", () => {
+        render(<Keyboard from={60} to={64} />);
+        expect(screen.queryByText("C")).toBeNull();
+    });
+
+    it("marks only the C keys in landmark mode", () => {
+        render(<Keyboard from={60} to={72} labels="c" />);
+        // Two Cs across C4–C5 (60 and 72), and nothing on the other letters.
+        expect(screen.getAllByText("C")).toHaveLength(2);
+        expect(screen.queryByText("D")).toBeNull();
+    });
+
+    it("labels every key when asked", () => {
+        render(<Keyboard from={60} to={62} labels="all" />);
+        expect(screen.getByText("C")).toBeTruthy();
+        expect(screen.getByText("C♯")).toBeTruthy();
+        expect(screen.getByText("D")).toBeTruthy();
+    });
+
     it("lights a held key green and highlights the expected one", () => {
         render(<Keyboard from={60} to={67} lit={new Set([60])} expected={[64]} />);
         expect(screen.getByLabelText("C4").className).toContain("bg-green-200");

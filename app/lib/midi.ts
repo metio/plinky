@@ -40,6 +40,14 @@ export function noteName(note: number): string {
     return `${NOTE_NAMES[note % 12]!}${Math.floor(note / 12) - 1}`;
 }
 
+// The note's letter alone (no octave), with a typographic sharp — what a beginner
+// reads off a labelled key to learn where the notes are. The pitch class is taken
+// modulo 12 with a floor-mod so a note below MIDI 0 still maps cleanly.
+const PITCH_CLASSES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+export function pitchClass(note: number): string {
+    return PITCH_CLASSES[((note % 12) + 12) % 12]!;
+}
+
 export type ParsedMessage = {
     kind: MidiNoteEvent["kind"];
     note: number;

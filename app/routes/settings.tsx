@@ -14,7 +14,14 @@ import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../lib/grade";
 import type { DecayMode } from "../lib/gradeProgress";
 import { DEFAULT_KEY_MAP } from "../lib/keyMap";
-import { loadPrefs, type NoteHints, type Prefs, REVIEW_CAPS, savePrefs } from "../lib/prefs";
+import {
+    loadPrefs,
+    type NoteHints,
+    type NoteLabels,
+    type Prefs,
+    REVIEW_CAPS,
+    savePrefs,
+} from "../lib/prefs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
@@ -31,6 +38,7 @@ export default function Settings() {
         handSpan: { left: null, right: null },
         showFingerings: true,
         noteHints: "miss",
+        noteLabels: "c",
         forgiving: false,
         fingerHints: true,
         decayMode: "gentle",
@@ -203,6 +211,23 @@ export default function Settings() {
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                     {m.settings_note_hints_help()}
+                </p>
+                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    {m.settings_note_labels()}
+                    <select
+                        value={prefs.noteLabels}
+                        onChange={(event) =>
+                            update({ noteLabels: event.target.value as NoteLabels })
+                        }
+                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                    >
+                        <option value="all">{m.note_labels_all()}</option>
+                        <option value="c">{m.note_labels_c()}</option>
+                        <option value="off">{m.note_labels_off()}</option>
+                    </select>
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {m.settings_note_labels_help()}
                 </p>
                 <HandSize />
             </section>

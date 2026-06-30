@@ -3,12 +3,26 @@
 
 import type React from "react";
 import { type ReactNode, useEffect, useState } from "react";
-import { noteName } from "../lib/midi";
+import { noteName, pitchClass } from "../lib/midi";
+import type { NoteLabels } from "../lib/prefs";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
 const WHITE_PITCH_CLASSES = [0, 2, 4, 5, 7, 9, 11];
 function isWhite(note: number): boolean {
     return WHITE_PITCH_CLASSES.includes(((note % 12) + 12) % 12);
+}
+
+// The letter to print on a key, or null for none. "all" labels every key; "c" prints
+// only on the C keys, the landmark that orients a beginner (the white key just left of
+// each two-black-key group); "off" prints nothing.
+function keyLabel(note: number, labels: NoteLabels): string | null {
+    if (labels === "all") {
+        return pitchClass(note);
+    }
+    if (labels === "c" && ((note % 12) + 12) % 12 === 0) {
+        return "C";
+    }
+    return null;
 }
 
 const NONE: ReadonlySet<number> = new Set();
@@ -26,6 +40,7 @@ export function Keyboard({
     expected = [],
     wrong = null,
     rise = false,
+    labels = "off",
     well = "mx-auto w-full max-w-xl",
     badge,
     onPress,
@@ -35,6 +50,8 @@ export function Keyboard({
     to: number;
     lit?: ReadonlySet<number>;
     expected?: number[];
+    // Print note names on the keys for a player still learning where the notes are.
+    labels?: NoteLabels;
     // The last wrong note plus a bump counter, so a repeated miss re-flashes.
     wrong?: { note: number; seq: number } | null;
     // The landing hero's one-time key-rise on load; off everywhere else.
@@ -130,7 +147,16 @@ export function Keyboard({
                             onKeyUp={release(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
                             className={`${WHITE_KEY} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
-                        />
+                        >
+                            {keyLabel(note, labels) && (
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-gray-400 dark:text-gray-600"
+                                >
+                                    {keyLabel(note, labels)}
+                                </span>
+                            )}
+                        </button>
                     ))}
                 </div>
                 {blacks.map((note) => {
@@ -156,7 +182,16 @@ export function Keyboard({
                             onKeyUp={release(note)}
                             style={{ left: `${left}%`, width: `${width}%` }}
                             className={`${BLACK_KEY} h-2/3 ${blackState(note)}`}
-                        />
+                        >
+                            {keyLabel(note, labels) && (
+                                <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight text-gray-300"
+                                >
+                                    {keyLabel(note, labels)}
+                                </span>
+                            )}
+                        </button>
                     );
                 })}
             </div>

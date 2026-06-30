@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useMidiConnection } from "../contexts/midi";
+import { useNoteLabels } from "../hooks/useNoteLabels";
 import { Keyboard } from "./keyboard";
 import { MidiBadge } from "./midiBadge";
 
@@ -20,6 +21,7 @@ export function PianoKeyboard({
     to?: number;
 }) {
     const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const labels = useNoteLabels();
     return (
         <Keyboard
             from={from}
@@ -27,6 +29,7 @@ export function PianoKeyboard({
             lit={new Set(heldNotes)}
             expected={expected}
             wrong={wrong}
+            labels={labels}
             badge={<MidiBadge />}
             onPress={pressKey}
             onRelease={releaseKey}
