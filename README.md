@@ -41,7 +41,10 @@ Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn 
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
 score along, so one hand's slip never stops the other.
 
-When you finish, the run is **graded S–F** from three things:
+When you finish, a short **major flourish** plays to mark the moment — a fuller
+arpeggio for a stronger grade, a warm lift for a gentler one, never a downer (it
+follows the sound setting, so muting silences it). The run is then **graded S–F**
+from three things:
 
 - **Accuracy** — how many notes you found cleanly.
 - **Timing** — how evenly you held the rhythm. Practice is self-paced, so timing is
