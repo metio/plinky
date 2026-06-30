@@ -20,13 +20,17 @@ const DISMISSED = "beginner-start";
 // the discovery checklist take over — and the ✕ dismisses it for good for anyone who
 // arrives already knowing their way around.
 export function BeginnerStart() {
-    // Resolves on the client only: both the "have they played" signal and the dismissal
-    // live in localStorage, absent at prerender. Null until then keeps the static shell
-    // (and CLS) stable, then the card appears only for a genuine newcomer.
-    const [show, setShow] = useState<boolean | null>(null);
+    // Shown by default so it is part of the prerendered shell: a true newcomer — the
+    // common first visit, and the state every prerender captures — sees the card in the
+    // first paint, so it never shifts the page in (which would cost CLS). The "have they
+    // played" and dismissal signals live in localStorage, absent at prerender, so a
+    // returning visitor is filtered out on the client after mount instead.
+    const [show, setShow] = useState(true);
 
     useEffect(() => {
-        setShow(!hasSeenHint(DISMISSED) && !discoveries().played);
+        if (hasSeenHint(DISMISSED) || discoveries().played) {
+            setShow(false);
+        }
     }, []);
 
     if (!show) {
