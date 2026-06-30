@@ -83,6 +83,7 @@ import { Disclosure, FieldGroup } from "./disclosure";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "./ghostTrack";
 import { useTranspose } from "./transposeContext";
+import { ShareGhostButton } from "./shareGhostButton";
 import { TakesList } from "./takesList";
 import {
     CheckIcon,
@@ -1607,6 +1608,19 @@ export function ScoreViewer({
                     )}
                 </FullScreen>
                 <FullScreen off>
+                    {/* Challenge a friend with the run you just played, no save needed —
+                    your own ghost, not a friend's loaded by link. */}
+                    {storedGhost && !sharedFromLink && (
+                        <div className="flex justify-end">
+                            <ShareGhostButton
+                                id={id}
+                                title={title}
+                                onsets={storedGhost}
+                                label={m.takes_share_last_run()}
+                                showLabel
+                            />
+                        </div>
+                    )}
                     {takes.length > 0 && (
                         <TakesList
                             id={id}

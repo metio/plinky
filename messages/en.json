@@ -405,6 +405,7 @@
   "takes_save": "Save take",
   "takes_saved": "Take saved",
   "takes_share_ghost": "Challenge a friend with this take",
+  "takes_share_last_run": "Challenge a friend with your last run",
   "takes_link_copied": "Link copied",
   "midi_unsupported_keyboard": "This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on desktop or Android — or play with your computer keyboard below.",
   "midi_connect": "Connect MIDI",

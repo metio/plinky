@@ -20,7 +20,7 @@ const VENDOR = /opensheetmusicdisplay/;
 // own code. Sized to clear vendor + the app budget below with a little headroom, so
 // the app budget is actually reachable and a real regression trips the app line, not
 // this one.
-const BUDGET_TOTAL_KB = 625;
+const BUDGET_TOTAL_KB = 627;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
