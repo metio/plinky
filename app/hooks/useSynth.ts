@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { getAudioContext, midiToFrequency } from "../lib/audio";
 import { loadPrefs } from "../lib/prefs";
 
 export type PlayNoteOptions = {
     velocity?: number; // 0..127
     duration?: number; // seconds
+    delay?: number; // seconds to wait before the strike, for scheduling a chord or arpeggio
 };
 
 export type UseSynthResult = {
@@ -35,7 +36,7 @@ export function useSynth(): UseSynthResult {
         }
         ctx.resume().catch(() => {});
 
-        const now = ctx.currentTime;
+        const now = ctx.currentTime + Math.max(0, options.delay ?? 0);
         const duration = options.duration ?? 1.1;
         const peak = ((options.velocity ?? 90) / 127) * 0.32 * (prefs.volume / 100);
         // Volume 0 means silence; an exponential ramp to 0 is also a RangeError,
@@ -73,5 +74,7 @@ export function useSynth(): UseSynthResult {
         }
     }, []);
 
-    return { playNote };
+    // A stable result so callers can list the synth in an effect's dependencies without
+    // the effect re-firing every render — playNote itself never changes.
+    return useMemo(() => ({ playNote }), [playNote]);
 }

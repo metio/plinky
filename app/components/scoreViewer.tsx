@@ -14,6 +14,7 @@ import { useSynth } from "../hooks/useSynth";
 import { summarizeDynamics } from "../lib/dynamics";
 import { annotateFingerings } from "../lib/fingerScore";
 import { computeFlow } from "../lib/flow";
+import { cadence } from "../lib/cadence";
 import { recordDailyDone } from "../lib/dailyDone";
 import { type DailyResult, saveDailyResult } from "../lib/dailyResult";
 import { recordPractice } from "../lib/history";
@@ -598,6 +599,16 @@ export function ScoreViewer({
         const grid = gridFor(notes, tolerance);
         gradeFromRunRef.current = true;
         setGrade(result);
+        // A short major flourish to celebrate finishing — a fuller arpeggio for a
+        // stronger grade, a gentle lift for a weaker one, never a penalty. playNote
+        // no-ops when sound is muted, so the mute checkbox is the gate.
+        for (const beat of cadence(result.letter)) {
+            synth.playNote(beat.note, {
+                velocity: beat.velocity,
+                duration: beat.duration,
+                delay: beat.at,
+            });
+        }
         setRunNotes(notes);
         setRunTolerance(tolerance);
         setShareGrid(grid);
@@ -673,6 +684,7 @@ export function ScoreViewer({
         ephemeral,
         daily,
         bumpTempo,
+        synth,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
