@@ -1,0 +1,1 @@
+var e=`plinky:seen-hints`;function t(){try{let t=JSON.parse(localStorage.getItem(e)??`[]`);return Array.isArray(t)?t:[]}catch{return[]}}function n(e){return t().includes(e)}function r(n){try{let r=new Set(t());r.add(n),localStorage.setItem(e,JSON.stringify([...r]))}catch{}}export{r as n,n as t};

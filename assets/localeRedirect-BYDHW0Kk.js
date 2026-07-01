@@ -1,0 +1,1 @@
+import{n as e,s as t,t as n}from"./jsx-runtime-u46L84Ye.js";import{a as r}from"./runtime-D5S32tdo.js";var i=n(),a=t(function(){return typeof window>`u`?null:(0,i.jsx)(e,{to:r(`/`),replace:!0})});export{a as default};

@@ -1,0 +1,21 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plinky">
+  <defs>
+    <linearGradient id="plinky-bg" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded-square app-icon background -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#plinky-bg)"/>
+
+  <!-- Three piano keys, vertically centred. The centre key is lit green to
+       mark a note the player has just hit correctly. -->
+  <rect x="12" y="16" width="11" height="32" rx="2.5" fill="#ffffff"/>
+  <rect x="26.5" y="16" width="11" height="32" rx="2.5" fill="#22c55e"/>
+  <rect x="41" y="16" width="11" height="32" rx="2.5" fill="#ffffff"/>
+
+  <!-- Two black keys -->
+  <rect x="21.75" y="16" width="6" height="15" rx="1.5" fill="#1f2937"/>
+  <rect x="36.25" y="16" width="6" height="15" rx="1.5" fill="#1f2937"/>
+</svg>

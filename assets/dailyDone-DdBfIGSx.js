@@ -1,0 +1,1 @@
+var e=`plinky:daily-done`;function t(e){return typeof e!=`number`||!Number.isFinite(e)||e<0?0:Math.floor(e)}function n(){try{return t(JSON.parse(localStorage.getItem(e)??`0`))}catch{return 0}}function r(t){if(!(t<=n()))try{localStorage.setItem(e,JSON.stringify(Math.floor(t)))}catch{}}export{r as n,n as t};

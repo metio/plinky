@@ -1,0 +1,1 @@
+import{X as e,q as t}from"./jsx-runtime-u46L84Ye.js";import{r as n}from"./songs-DDOxQbNE.js";import{Q as r,lt as i}from"./site-D9YYX2W7.js";var a=e(t(),1);function o(e){let[t,o]=(0,a.useState)(void 0);return(0,a.useEffect)(()=>{let t=i(e);if(t){o(t);return}o(void 0);let a=!1;return(async()=>{let t=await r(e)??await n(e);a||o(t)})(),()=>{a=!0}},[e]),t}export{o as t};
