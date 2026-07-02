@@ -60,6 +60,42 @@ describe("ScoreViewer", () => {
         expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
+    it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const score = await screen.findByRole("img", { name: "T" });
+        // Wait for OSMD to render the staff (its glyph groups are what the boxes measure).
+        const svg = await waitFor(
+            () => {
+                const rendered = score.querySelector("svg");
+                if (!rendered || rendered.querySelectorAll("g").length === 0) {
+                    throw new Error("not rendered yet");
+                }
+                return rendered;
+            },
+            { timeout: 30000 },
+        );
+        // Click inside the staff — the bar under (or nearest) the point becomes the loop.
+        const rect = svg.getBoundingClientRect();
+        fireEvent.click(score, {
+            clientX: rect.left + rect.width * 0.3,
+            clientY: rect.top + rect.height * 0.5,
+        });
+        // The click turns the loop on and sets its range…
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        await waitFor(
+            () =>
+                expect(
+                    screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked"),
+                ).toBe("true"),
+            { timeout: 30000 },
+        );
+        // …and fills the selected bar with a red backdrop rect behind the notes.
+        const fills = score.querySelectorAll("rect.plinky-bar-selection");
+        expect(fills.length).toBeGreaterThan(0);
+        expect(fills[0]?.getAttribute("fill")).toBe("#ef4444");
+    });
+
     it("captions each play option, spelling out what its values mean", async () => {
         render(
             <MemoryRouter>

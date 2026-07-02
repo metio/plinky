@@ -5,11 +5,16 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { describe, expect, it } from "vitest";
 import {
+    clearBarSelection,
     highlightCursorNotes,
+    type MeasureBox,
+    measureAtPoint,
     NOTE_COLOR,
+    paintBarSelection,
     paintPlayedNotes,
     PLAYED_COLOR,
     restoreNotes,
+    SELECT_COLOR,
     WINDOW_COLOR,
 } from "./scoreColor";
 
@@ -30,6 +35,85 @@ function gNote(midi: number, withElement = true, rest = false) {
 function fakeOsmd(notes: ReturnType<typeof gNote>[]): OpenSheetMusicDisplay {
     return { cursor: { GNotesUnderCursor: () => notes } } as unknown as OpenSheetMusicDisplay;
 }
+
+describe("measureAtPoint", () => {
+    // Two bars on the top row, two on the row below — a wrapped two-line score.
+    const boxes: MeasureBox[] = [
+        { measure: 0, x: 0, y: 0, width: 100, height: 40 },
+        { measure: 1, x: 100, y: 0, width: 100, height: 40 },
+        { measure: 2, x: 0, y: 100, width: 100, height: 40 },
+        { measure: 3, x: 100, y: 100, width: 100, height: 40 },
+    ];
+
+    it("returns null when nothing has rendered", () => {
+        expect(measureAtPoint([], 50, 20)).toBeNull();
+    });
+
+    it("returns the bar the point lands inside", () => {
+        expect(measureAtPoint(boxes, 50, 20)).toBe(0);
+        expect(measureAtPoint(boxes, 150, 20)).toBe(1);
+        expect(measureAtPoint(boxes, 150, 120)).toBe(3);
+    });
+
+    it("picks the nearest bar when the click lands in a bar's empty space", () => {
+        // Between the notes of bar 1 (past its right edge, still on the top row).
+        expect(measureAtPoint(boxes, 205, 20)).toBe(1);
+    });
+
+    it("keeps the pick on the clicked row, not a nearer bar on the line above", () => {
+        // Horizontally nearest to bar 1 (x 100–200) but clearly on the lower row's band.
+        expect(measureAtPoint(boxes, 150, 118)).toBe(3);
+    });
+});
+
+describe("paintBarSelection / clearBarSelection", () => {
+    const SVG_NS_URL = "http://www.w3.org/2000/svg";
+    const boxes: MeasureBox[] = [
+        { measure: 0, x: 0, y: 0, width: 100, height: 40 },
+        { measure: 1, x: 100, y: 0, width: 100, height: 40 },
+        { measure: 2, x: 200, y: 0, width: 100, height: 40 },
+    ];
+    const makeSvg = () => {
+        const svg = document.createElementNS(SVG_NS_URL, "svg");
+        const note = document.createElementNS(SVG_NS_URL, "g");
+        svg.appendChild(note); // an existing note group to sit in front of the backdrop
+        return { svg, note };
+    };
+
+    it("fills one backdrop rect per bar in the inclusive range", () => {
+        const { svg } = makeSvg();
+        paintBarSelection(svg, boxes, 0, 1);
+        const rects = svg.querySelectorAll("rect.plinky-bar-selection");
+        expect(rects).toHaveLength(2);
+        expect(rects[0]?.getAttribute("fill")).toBe(SELECT_COLOR);
+        // Translucent, and never eating the clicks meant for selecting a bar.
+        expect(rects[0]?.getAttribute("fill-opacity")).toBe("0.2");
+        expect(rects[0]?.getAttribute("pointer-events")).toBe("none");
+    });
+
+    it("draws the backdrop behind the notes", () => {
+        const { svg, note } = makeSvg();
+        paintBarSelection(svg, boxes, 0, 0);
+        // The selection rect is inserted before the existing note group.
+        expect(svg.firstElementChild?.classList.contains("plinky-bar-selection")).toBe(true);
+        expect(svg.lastElementChild).toBe(note);
+    });
+
+    it("replaces a prior selection rather than stacking", () => {
+        const { svg } = makeSvg();
+        paintBarSelection(svg, boxes, 0, 2);
+        paintBarSelection(svg, boxes, 1, 1);
+        expect(svg.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(1);
+    });
+
+    it("clears every backdrop rect", () => {
+        const { svg, note } = makeSvg();
+        paintBarSelection(svg, boxes, 0, 2);
+        clearBarSelection(svg);
+        expect(svg.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(0);
+        expect(svg.firstElementChild).toBe(note); // the note group is untouched
+    });
+});
 
 describe("paintPlayedNotes", () => {
     it("colours the played note's group and glyphs, leaving others untouched", () => {

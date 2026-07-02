@@ -178,7 +178,7 @@
   "metronome_adaptive_caption": "Follows your own tempo as you play instead of ticking at a fixed speed.",
   "metronome_subdivision_caption": "Clicks per beat — 1 on the beat, 2 for eighths, 3 for triplets, 4 for sixteenths.",
   "hand_caption": "Practise one hand at a time on a two-hand piece, or both together.",
-  "loop_caption": "Repeat just a stretch of the piece — set the first and last bar below.",
+  "loop_caption": "Repeat just a stretch of the piece — tap a bar on the score to start and another to end (they turn red), or set the first and last bar below.",
   "fingering_show_mine_caption": "Draw the fingering you saved for this piece onto the staff.",
   "bars_per_row_caption": "Force this many bars onto each row for bigger notation; Auto fits them to your screen.",
   "keyboard_octaves_caption": "How much of the on-screen keyboard to show — a 1–3 octave window that follows the music, or All for the whole piece at once.",

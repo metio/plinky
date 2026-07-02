@@ -14,6 +14,9 @@ export const NOTE_COLOR = "#000000";
 // The active window in a read-only context staff — the bars currently being fingered
 // or heard, indigo to match the app's accent and stand out from the black notes.
 export const WINDOW_COLOR = "#6366f1";
+// The loop selection is filled behind its bars in a bright red so the stretch you're
+// about to drill reads at a glance — the same red the share grid's weakest band uses.
+export const SELECT_COLOR = "#ef4444";
 
 // Which staff (treble = 0, bass = 1) each hand reads from — mirrors the matcher,
 // so the notes collected for the ghost line up with the positions it counts.
@@ -104,6 +107,153 @@ export function paintMeasureRange(
     }
     osmd.cursor.reset();
     osmd.cursor.hide();
+}
+
+// A measure's rendered box in the SVG's own coordinate space, unioned over every note
+// and rest it holds — enough to place a highlight behind the bar and to map a click to
+// it. `measure` is the 0-based index matching scoreToBars / the cursor's measure index.
+export type MeasureBox = { measure: number; x: number; y: number; width: number; height: number };
+
+// The SVG's client rectangle plus the factor from rendered pixels to its own user units,
+// so a click position and the note boxes share one coordinate space. OSMD renders 1:1
+// (no viewBox) in the normal case, where the factor is simply 1.
+function svgScale(svg: SVGSVGElement): { rect: DOMRect; sx: number; sy: number } {
+    const rect = svg.getBoundingClientRect();
+    const box = svg.viewBox.baseVal;
+    return {
+        rect,
+        sx: rect.width > 0 && box.width > 0 ? box.width / rect.width : 1,
+        sy: rect.height > 0 && box.height > 0 ? box.height / rect.height : 1,
+    };
+}
+
+// Converts a viewport (client) point — e.g. a click — into the SVG's own coordinate
+// space, the space the measure boxes live in.
+export function clientPointToSvg(
+    svg: SVGSVGElement,
+    clientX: number,
+    clientY: number,
+): { x: number; y: number } {
+    const { rect, sx, sy } = svgScale(svg);
+    return { x: (clientX - rect.left) * sx, y: (clientY - rect.top) * sy };
+}
+
+// The rendered box of each measure, in the SVG's coordinate space, unioned over its notes
+// and rests. Walks the cursor (leaving it reset+hidden), reading each glyph group's client
+// rect and folding it into that measure's bounds — measured once per render and reused for
+// both the selection overlay and click hit-testing.
+export function collectMeasureBoxes(osmd: OpenSheetMusicDisplay, svg: SVGSVGElement): MeasureBox[] {
+    const { rect: svgRect, sx, sy } = svgScale(svg);
+    const bounds = new Map<number, { minX: number; minY: number; maxX: number; maxY: number }>();
+    // Walking the cursor would otherwise make OSMD scroll the staff to follow it — an
+    // unwanted jump on every render just to measure. Suspend the follow for the walk.
+    const follow = osmd.FollowCursor;
+    osmd.FollowCursor = false;
+    osmd.cursor.show();
+    osmd.cursor.reset();
+    while (!osmd.cursor.iterator.EndReached) {
+        const measure = osmd.cursor.iterator.CurrentMeasureIndex;
+        for (const gNote of osmd.cursor.GNotesUnderCursor()) {
+            const element = svgOf(gNote);
+            if (!element) {
+                continue;
+            }
+            const box = element.getBoundingClientRect();
+            const x1 = (box.left - svgRect.left) * sx;
+            const y1 = (box.top - svgRect.top) * sy;
+            const x2 = (box.right - svgRect.left) * sx;
+            const y2 = (box.bottom - svgRect.top) * sy;
+            const bound = bounds.get(measure);
+            if (!bound) {
+                bounds.set(measure, { minX: x1, minY: y1, maxX: x2, maxY: y2 });
+            } else {
+                bound.minX = Math.min(bound.minX, x1);
+                bound.minY = Math.min(bound.minY, y1);
+                bound.maxX = Math.max(bound.maxX, x2);
+                bound.maxY = Math.max(bound.maxY, y2);
+            }
+        }
+        osmd.cursor.next();
+    }
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    osmd.FollowCursor = follow;
+    return [...bounds.entries()].map(([measure, b]) => ({
+        measure,
+        x: b.minX,
+        y: b.minY,
+        width: b.maxX - b.minX,
+        height: b.maxY - b.minY,
+    }));
+}
+
+// The 0-based measure a point falls in: the box that contains it, or — for a click in a
+// bar's empty space, between its notes or above/below them — the nearest box, weighting
+// vertical distance heavily so the pick stays on the clicked row. Null when there are no
+// boxes (nothing has rendered).
+export function measureAtPoint(boxes: MeasureBox[], x: number, y: number): number | null {
+    if (boxes.length === 0) {
+        return null;
+    }
+    for (const box of boxes) {
+        if (x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height) {
+            return box.measure;
+        }
+    }
+    let best: MeasureBox | null = null;
+    let bestScore = Number.POSITIVE_INFINITY;
+    for (const box of boxes) {
+        const dx = x < box.x ? box.x - x : x > box.x + box.width ? x - (box.x + box.width) : 0;
+        const dy = y < box.y ? box.y - y : y > box.y + box.height ? y - (box.y + box.height) : 0;
+        // Vertical distance dominates so a click lands on a bar in its own row, not one
+        // horizontally closer on the line above or below.
+        const score = dy * 1000 + dx;
+        if (score < bestScore) {
+            bestScore = score;
+            best = box;
+        }
+    }
+    return best ? best.measure : null;
+}
+
+// Fills the chosen inclusive range of 0-based measures with a translucent backdrop rect
+// behind the notes, so the selected bars read as coloured. The rects are tagged and
+// inserted at the back of the SVG; clearBarSelection lifts them. Idempotent — it clears
+// any prior selection first.
+const SELECTION_CLASS = "plinky-bar-selection";
+
+export function clearBarSelection(svg: SVGSVGElement): void {
+    for (const rect of svg.querySelectorAll(`.${SELECTION_CLASS}`)) {
+        rect.remove();
+    }
+}
+
+export function paintBarSelection(
+    svg: SVGSVGElement,
+    boxes: MeasureBox[],
+    from: number,
+    to: number,
+    color: string = SELECT_COLOR,
+): void {
+    clearBarSelection(svg);
+    const pad = 6; // a little breathing room so the fill reads as a bar, not a tight box
+    for (const box of boxes) {
+        if (box.measure < from || box.measure > to) {
+            continue;
+        }
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("class", SELECTION_CLASS);
+        rect.setAttribute("x", String(box.x - pad));
+        rect.setAttribute("y", String(box.y - pad));
+        rect.setAttribute("width", String(box.width + pad * 2));
+        rect.setAttribute("height", String(box.height + pad * 2));
+        rect.setAttribute("rx", "4");
+        rect.setAttribute("fill", color);
+        rect.setAttribute("fill-opacity", "0.2");
+        // The backdrop must never eat clicks meant for selecting a bar.
+        rect.setAttribute("pointer-events", "none");
+        svg.insertBefore(rect, svg.firstChild);
+    }
 }
 
 // One note and the fill it wore before being highlighted, so the highlight can be

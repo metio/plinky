@@ -39,7 +39,10 @@ numbers** on each row's first bar make a passage easy to find (and line up with 
 loop's from/to), or you can turn them off for a cleaner staff. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
-Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
+Single notes, **chords**, and **two-hand grand staffs** all work the same. To drill a
+tricky passage, **tap a bar to start a loop and another to end it** — the chosen bars
+fill **red** so the stretch you're repeating is clear (or set the first and last bar by
+number). Turn on
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
 score along, so one hand's slip never stops the other.
 

@@ -61,11 +61,17 @@ import {
     timingDeltas,
 } from "../lib/rhythm";
 import {
+    clearBarSelection,
+    clientPointToSvg,
+    collectMeasureBoxes,
     collectNoteElements,
     GHOST_COLOR,
     highlightCursorNotes,
+    type MeasureBox,
+    measureAtPoint,
     NOTE_COLOR,
     type PaintedNote,
+    paintBarSelection,
     paintElement,
     paintPlayedNotes,
     PLAYED_COLOR,
@@ -298,6 +304,11 @@ export function ScoreViewer({
     const [loopTo, setLoopTo] = useState(1);
     const loopRef = useRef({ on: false, from: 1, to: 1 });
     loopRef.current = { on: loopOn, from: loopFrom, to: loopTo };
+    // Each bar's rendered box, measured once per render, for placing the loop's red
+    // selection overlay and mapping a click on the score to the bar under it.
+    const measureBoxesRef = useRef<MeasureBox[]>([]);
+    // The first bar of an in-progress click selection; the next click sets the far end.
+    const selectAnchorRef = useRef<number | null>(null);
     // Transposition shifts the whole piece into a more comfortable key, ±12
     // semitones. It rewrites the MusicXML before OSMD loads it, so playback, the
     // printed key and the matcher all follow — the reload effect depends on it.
@@ -532,6 +543,58 @@ export function ScoreViewer({
         }
     }, [treadmill]);
 
+    // Fill the selected loop bars with the red overlay (or clear it when the loop is off),
+    // reading the live range from loopRef so the callback stays stable. Re-run after each
+    // render and whenever the range changes.
+    const paintLoopSelection = useCallback(() => {
+        const svg = containerRef.current?.querySelector("svg");
+        if (!(svg instanceof SVGSVGElement)) {
+            return;
+        }
+        if (loopRef.current.on) {
+            paintBarSelection(
+                svg,
+                measureBoxesRef.current,
+                loopRef.current.from - 1,
+                loopRef.current.to - 1,
+            );
+        } else {
+            clearBarSelection(svg);
+        }
+    }, []);
+
+    // Click a bar to build the loop range: the first click drops the anchor (a one-bar
+    // loop), the next extends to the far end. Only while set-up, not mid-play, and the
+    // number inputs remain the keyboard-accessible way in.
+    const selectBarAt = useCallback(
+        (clientX: number, clientY: number) => {
+            if (matcher.practicing || playingRef.current || measureCount <= 1) {
+                return;
+            }
+            const svg = containerRef.current?.querySelector("svg");
+            if (!(svg instanceof SVGSVGElement) || measureBoxesRef.current.length === 0) {
+                return;
+            }
+            const point = clientPointToSvg(svg, clientX, clientY);
+            const measure = measureAtPoint(measureBoxesRef.current, point.x, point.y);
+            if (measure === null) {
+                return;
+            }
+            const bar = measure + 1;
+            if (selectAnchorRef.current === null) {
+                selectAnchorRef.current = bar;
+                setLoopOn(true);
+                setLoopFrom(bar);
+                setLoopTo(bar);
+            } else {
+                setLoopFrom(Math.min(selectAnchorRef.current, bar));
+                setLoopTo(Math.max(selectAnchorRef.current, bar));
+                selectAnchorRef.current = null;
+            }
+        },
+        [matcher.practicing, measureCount],
+    );
+
     // Slide the keyboard window to keep the notes being played in view, re-framing only
     // when they leave it. Falls back to the whole range (null window) when not practising,
     // where PianoKeyboard's own default applies.
@@ -622,6 +685,14 @@ export function ScoreViewer({
         }
         ghostMarkRef.current = target;
     }, [ghostDone, ghost, matcher.practicing, matcher.complete, matcher.done]);
+
+    // Keep the red loop overlay in step with the range and each fresh render (ready is the
+    // signal that the boxes were just re-measured). paintLoopSelection reads the live range
+    // from a ref, so these are triggers, not closure inputs.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: the loop state and ready are re-paint triggers, not inputs
+    useEffect(() => {
+        paintLoopSelection();
+    }, [loopOn, loopFrom, loopTo, ready, paintLoopSelection]);
 
     // Grade a run once it completes, from the captured timing and velocity. A run
     // with no real velocity variation (the computer keyboard) is graded without
@@ -836,6 +907,13 @@ export function ScoreViewer({
                 return osmd.load(source).then(() => {
                     if (!cancelled) {
                         osmd.render();
+                        // Measure every bar's box off the fresh render, for the loop's
+                        // selection overlay and click-to-select. The cursor is free here
+                        // (nothing is playing), and a fresh render carries no selection.
+                        const svg = containerRef.current?.querySelector("svg");
+                        measureBoxesRef.current =
+                            svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
+                        selectAnchorRef.current = null;
                         // A grand staff (two staves) can be drilled one hand at a
                         // time; a single-staff score offers no such choice.
                         setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
@@ -1151,12 +1229,16 @@ export function ScoreViewer({
                         fullscreen ? "flex min-h-0 flex-1 flex-col" : ""
                     }`}
                 >
+                    {/* Click a bar to build the loop range; the loop from/to number inputs
+                    are the keyboard-accessible equivalent, so no key handler is needed. */}
+                    {/* biome-ignore lint/a11y/useKeyWithClickEvents: the loop from/to number inputs are the keyboard path */}
                     <div
                         ref={containerRef}
                         // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs keyboard access
                         tabIndex={0}
                         role="img"
                         aria-label={title}
+                        onClick={(event) => selectBarAt(event.clientX, event.clientY)}
                         // A bounded scroll box so the follow-cursor scrolls the staff inside
                         // it — keeping the controls and on-screen keyboard in view below
                         // rather than scrolling the whole page out from under them. Full screen
@@ -1169,6 +1251,10 @@ export function ScoreViewer({
                         // Lighthouse amplifies under CPU throttling). The max-height keeps
                         // it from crowding the keyboard off-screen; taller scores scroll.
                         className={`no-scrollbar overflow-auto ${
+                            ready && measureCount > 1 && !playing && !matcher.practicing
+                                ? "cursor-pointer"
+                                : ""
+                        } ${
                             fullscreen
                                 ? "min-h-0 flex-1"
                                 : compact
@@ -1333,7 +1419,10 @@ export function ScoreViewer({
                                     <Option caption={m.loop_caption()}>
                                         <Switch
                                             checked={loopOn}
-                                            onChange={setLoopOn}
+                                            onChange={(next) => {
+                                                selectAnchorRef.current = null;
+                                                setLoopOn(next);
+                                            }}
                                             label={m.loop_section()}
                                         />
                                     </Option>
