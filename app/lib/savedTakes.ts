@@ -7,6 +7,7 @@ import {
     encodeComposition,
     type RecordedNote,
 } from "./composition";
+import { type Grade, parseGrade } from "./grade";
 
 // A saved performance of a piece — your own play, kept per song so you can hear it
 // back, download it, and (the fastest one) race it as your ghost. A take IS a
@@ -21,6 +22,10 @@ export type Take = {
     // True once the player reached the end of the piece (vs stopped partway) — only a
     // complete take is eligible to become the race ghost.
     complete: boolean;
+    // The run's full grade (accuracy/timing/flow/dynamics/score/letter), so past takes
+    // can show their metrics, not just the summary letter. Null for a take saved from a
+    // run that was never graded (stopped before finishing).
+    metrics: Grade | null;
     composition: Composition;
 };
 
@@ -37,6 +42,9 @@ type StoredTake = {
     createdAt: number;
     letter: string;
     complete: boolean;
+    // The grade is small (a handful of numbers), so it rides along as a plain object
+    // rather than through the note codec; null when the run was never graded.
+    metrics: Grade | null;
     code: string;
 };
 
@@ -95,6 +103,9 @@ export function loadTakes(songId: string): Take[] {
                 createdAt: typeof entry.createdAt === "number" ? entry.createdAt : 0,
                 letter: typeof entry.letter === "string" ? entry.letter : "",
                 complete: entry.complete === true,
+                // Older takes predate stored metrics, and the value is untrusted, so an
+                // absent or malformed grade simply reads as null rather than failing the load.
+                metrics: parseGrade(entry.metrics),
                 composition,
             });
         }
@@ -112,6 +123,7 @@ function store(songId: string, takes: Take[]): boolean {
             createdAt: take.createdAt,
             letter: take.letter,
             complete: take.complete,
+            metrics: take.metrics,
             code: encodeComposition(take.composition),
         }));
         localStorage.setItem(storageKey(songId), JSON.stringify(stored));

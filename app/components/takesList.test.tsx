@@ -21,6 +21,7 @@ const mk = (id: string, overrides: Partial<Take> = {}): Take => ({
     createdAt: 0,
     letter: "B",
     complete: true,
+    metrics: null,
     composition,
     ...overrides,
 });
@@ -43,6 +44,36 @@ describe("TakesList", () => {
         render(<TakesList {...base} takes={[mk("1"), mk("2", { letter: "A" })]} />);
         open();
         expect(screen.getAllByRole("button", { name: /replay/i })).toHaveLength(2);
+    });
+
+    it("shows a graded take's accuracy, timing and flow", () => {
+        render(
+            <TakesList
+                {...base}
+                takes={[
+                    mk("1", {
+                        metrics: {
+                            accuracy: 91,
+                            timing: 73,
+                            flow: 88,
+                            dynamics: null,
+                            score: 84,
+                            letter: "B",
+                        },
+                    }),
+                ]}
+            />,
+        );
+        open();
+        expect(screen.getByText(/Accuracy 91%/)).toBeTruthy();
+        expect(screen.getByText(/Timing 73%/)).toBeTruthy();
+        expect(screen.getByText(/Flow 88%/)).toBeTruthy();
+    });
+
+    it("omits the metrics line for a take with no stored grade", () => {
+        render(<TakesList {...base} takes={[mk("1", { metrics: null })]} />);
+        open();
+        expect(screen.queryByText(/Accuracy/)).toBeNull();
     });
 
     it("copies a share link when challenging a friend with a take", async () => {

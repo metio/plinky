@@ -886,6 +886,7 @@ export function ScoreViewer({
             createdAt: Date.now(),
             letter: grade?.letter ?? "",
             complete: matcher.complete,
+            metrics: grade ?? null,
             composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
         };
         setTakes(saveTake(id, take));

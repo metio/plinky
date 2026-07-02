@@ -30,7 +30,20 @@ const take = (id: string, overrides: Partial<Take> = {}): Take => ({
     createdAt: Number(id),
     letter: "B",
     complete: true,
+    metrics: null,
     composition: comp([0, 500, 1000]),
+    ...overrides,
+});
+
+const grade = (
+    overrides: Partial<Take["metrics"] & object> = {},
+): NonNullable<Take["metrics"]> => ({
+    accuracy: 92,
+    timing: 84,
+    flow: 88,
+    dynamics: null,
+    score: 87,
+    letter: "B",
     ...overrides,
 });
 
@@ -47,6 +60,41 @@ describe("saveTake / loadTakes", () => {
         saveTake("song", take("1"));
         saveTake("song", take("2"));
         expect(loadTakes("song").map((t) => t.id)).toEqual(["2", "1"]);
+    });
+
+    it("round-trips a take's full metrics so a past run's grade survives a reload", () => {
+        saveTake("song", take("1", { metrics: grade({ accuracy: 91, timing: 73, flow: 88 }) }));
+        expect(loadTakes("song")[0]?.metrics).toEqual(
+            grade({ accuracy: 91, timing: 73, flow: 88 }),
+        );
+    });
+
+    it("stores no metrics for a take saved from an ungraded run", () => {
+        saveTake("song", take("1", { metrics: null }));
+        expect(loadTakes("song")[0]?.metrics).toBeNull();
+    });
+
+    it("reads a legacy take that predates stored metrics as having none", () => {
+        // Save a normal take, then strip its metrics field to mimic an entry written
+        // before takes stored a grade — it must still load, just without metrics.
+        saveTake("song", take("1", { metrics: grade() }));
+        const raw = JSON.parse(localStorage.getItem("plinky:takes:song") ?? "[]");
+        delete raw[0].metrics;
+        localStorage.setItem("plinky:takes:song", JSON.stringify(raw));
+        const loaded = loadTakes("song");
+        expect(loaded).toHaveLength(1);
+        expect(loaded[0]?.metrics).toBeNull();
+        expect(loaded[0]?.composition.notes).toHaveLength(3);
+    });
+
+    it("drops a malformed metrics blob rather than failing the load", () => {
+        saveTake("song", take("1"));
+        const raw = JSON.parse(localStorage.getItem("plinky:takes:song") ?? "[]");
+        raw[0].metrics = { accuracy: "oops", timing: 10 };
+        localStorage.setItem("plinky:takes:song", JSON.stringify(raw));
+        const loaded = loadTakes("song");
+        expect(loaded).toHaveLength(1);
+        expect(loaded[0]?.metrics).toBeNull();
     });
 
     it("caps the list and drops the oldest", () => {

@@ -84,6 +84,19 @@ export function TakesList({
                                 {formatAgo(take.createdAt, now, getLocale())}
                                 {!take.complete && ` · ${m.takes_partial()}`}
                             </span>
+                            {take.metrics && (
+                                <span className="flex items-center gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                                    <span>
+                                        {m.scores_accuracy()} {take.metrics.accuracy}%
+                                    </span>
+                                    <span>
+                                        {m.scores_timing()} {take.metrics.timing}%
+                                    </span>
+                                    <span>
+                                        {m.scores_flow()} {take.metrics.flow}%
+                                    </span>
+                                </span>
+                            )}
                             <span className="ml-auto flex items-center gap-1">
                                 <IconButton
                                     label={replaying ? m.takes_stop() : m.takes_replay()}

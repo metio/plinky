@@ -34,6 +34,41 @@ export const GRADE_COLOR: Record<Letter, string> = {
     F: "text-red-800 dark:text-red-500",
 };
 
+const LETTERS: readonly Letter[] = ["S", "A", "B", "C", "D", "E", "F"];
+
+function isLetter(value: unknown): value is Letter {
+    return typeof value === "string" && (LETTERS as readonly string[]).includes(value);
+}
+
+// Validates an untrusted value (parsed from storage) as a Grade, returning null for
+// anything of the wrong shape. Every dimension must be a finite number; dynamics is the
+// one nullable field, kept null when a run carried no real velocity.
+export function parseGrade(value: unknown): Grade | null {
+    if (typeof value !== "object" || value === null) {
+        return null;
+    }
+    const grade = value as Record<string, unknown>;
+    const finite = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
+    if (
+        !finite(grade.accuracy) ||
+        !finite(grade.timing) ||
+        !finite(grade.flow) ||
+        !finite(grade.score) ||
+        !isLetter(grade.letter) ||
+        !(grade.dynamics === null || finite(grade.dynamics))
+    ) {
+        return null;
+    }
+    return {
+        accuracy: grade.accuracy,
+        timing: grade.timing,
+        flow: grade.flow,
+        dynamics: grade.dynamics,
+        score: grade.score,
+        letter: grade.letter,
+    };
+}
+
 export function letterFor(score: number): Letter {
     if (score >= 95) {
         return "S";

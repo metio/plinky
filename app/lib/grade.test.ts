@@ -2,9 +2,48 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { computeGrade, letterFor } from "./grade";
+import { computeGrade, type Grade, letterFor, parseGrade } from "./grade";
 
 const PERFECT_RHYTHM = { perfect: 10, good: 0, off: 0, total: 10, averageAbsMs: 0 };
+
+describe("parseGrade", () => {
+    const valid: Grade = {
+        accuracy: 90,
+        timing: 80,
+        flow: 85,
+        dynamics: 70,
+        score: 84,
+        letter: "B",
+    };
+
+    it("accepts a well-formed grade, including a null dynamics", () => {
+        expect(parseGrade(valid)).toEqual(valid);
+        expect(parseGrade({ ...valid, dynamics: null })).toEqual({ ...valid, dynamics: null });
+    });
+
+    it("rejects a non-object", () => {
+        for (const bad of [null, undefined, 42, "grade", []]) {
+            expect(parseGrade(bad)).toBeNull();
+        }
+    });
+
+    it("rejects a grade with a non-numeric or non-finite dimension", () => {
+        expect(parseGrade({ ...valid, accuracy: "90" })).toBeNull();
+        expect(parseGrade({ ...valid, timing: Number.NaN })).toBeNull();
+        expect(parseGrade({ ...valid, flow: Number.POSITIVE_INFINITY })).toBeNull();
+    });
+
+    it("rejects an unknown grade letter", () => {
+        expect(parseGrade({ ...valid, letter: "Z" })).toBeNull();
+        expect(parseGrade({ ...valid, letter: 3 })).toBeNull();
+    });
+
+    it("rejects a missing dimension", () => {
+        const missingFlow: Record<string, unknown> = { ...valid };
+        delete missingFlow.flow;
+        expect(parseGrade(missingFlow)).toBeNull();
+    });
+});
 
 describe("grade", () => {
     it("maps scores to letters with S at the top", () => {
