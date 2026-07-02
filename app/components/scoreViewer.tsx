@@ -295,6 +295,8 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
     const [barsPerRow, setBarsPerRow] = useState(() => loadPrefs().barsPerRow);
+    // Whether to number the first bar of each staff row, remembered per device.
+    const [barNumbers, setBarNumbers] = useState(() => loadPrefs().barNumbers);
     // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
     // alone would read as desktop). Drives the focus strip and a shorter staff box so the
     // keyboard never buries the notes, in either orientation.
@@ -749,11 +751,23 @@ export function ScoreViewer({
                     renderSingleHorizontalStaffline: treadmill,
                 });
                 osmdRef.current = osmd;
+                const rules = (
+                    osmd as unknown as {
+                        rules: {
+                            RenderXMeasuresPerLineAkaSystem: number;
+                            RenderMeasureNumbers: boolean;
+                            RenderMeasureNumbersOnlyAtSystemStart: boolean;
+                        };
+                    }
+                ).rules;
                 // Force a fixed number of bars per row when the player picks one, for
                 // bigger, more readable notation on a small screen; 0 fits them to width.
-                (
-                    osmd as unknown as { rules: { RenderXMeasuresPerLineAkaSystem: number } }
-                ).rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;
+                rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;
+                // Number the first bar of each row when bar numbers are on, so the same
+                // rows are labelled every render; OSMD's default cadence otherwise moves
+                // the numbers around as the score re-flows.
+                rules.RenderMeasureNumbers = barNumbers;
+                rules.RenderMeasureNumbersOnlyAtSystemStart = true;
                 // Print suggested fingering on the staff, personalised to the
                 // player's reach, unless they've turned hints off — so the suggestion
                 // sits on the note being read, not mapped onto a key.
@@ -807,7 +821,7 @@ export function ScoreViewer({
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [xml, transpose, showMine, saved, barsPerRow, treadmill]);
+    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
@@ -1363,6 +1377,15 @@ export function ScoreViewer({
                                     }}
                                     label={m.treadmill_toggle()}
                                     title={m.treadmill_hint()}
+                                />
+                                <Switch
+                                    checked={barNumbers}
+                                    onChange={(next) => {
+                                        savePrefs({ ...loadPrefs(), barNumbers: next });
+                                        setBarNumbers(next);
+                                    }}
+                                    label={m.bar_numbers_toggle()}
+                                    title={m.bar_numbers_hint()}
                                 />
                                 {/* Bars-per-row only shapes the wrapped layout; the treadmill is
                                 a single line, so the control would do nothing there. */}

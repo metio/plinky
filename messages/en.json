@@ -173,6 +173,8 @@
   "keyboard_octaves_all": "All",
   "treadmill_toggle": "Treadmill",
   "treadmill_hint": "Read the piece as one line that scrolls as you play, instead of stacked rows.",
+  "bar_numbers_toggle": "Bar numbers",
+  "bar_numbers_hint": "Number the first bar of each row so a passage is easy to find. Turn off for a cleaner staff.",
   "transpose": "Transpose",
   "transpose_down": "Transpose down a semitone",
   "transpose_up": "Transpose up a semitone",

@@ -34,7 +34,9 @@ score and the keyboard — which you can fold away for more notation if you're p
 real piano (and it keeps the screen awake while you play). You can
 also force a **set number of bars per row** for bigger, more readable notation on a
 small screen, or switch to **treadmill** reading — the piece laid out as one continuous
-line that scrolls under a fixed gaze as you play, so your eyes rest in one place. A
+line that scrolls under a fixed gaze as you play, so your eyes rest in one place. **Bar
+numbers** on each row's first bar make a passage easy to find (and line up with the
+loop's from/to), or you can turn them off for a cleaner staff. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
 Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on

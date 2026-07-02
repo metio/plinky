@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import type { DailyResult } from "../lib/dailyResult";
 import { generatePhrase } from "../lib/generator";
+import { loadPrefs } from "../lib/prefs";
 import { encodeGhost, saveGhost } from "../lib/recording";
 import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
@@ -73,6 +74,33 @@ describe("ScoreViewer", () => {
         expect(treadmill.getAttribute("aria-checked")).toBe("true");
         // The score reloads with one horizontal staffline; Practice re-enabling proves
         // the re-render succeeded rather than leaving a dead viewer.
+        await waitFor(
+            () =>
+                expect(
+                    (screen.getByRole("button", { name: "Practice" }) as HTMLButtonElement)
+                        .disabled,
+                ).toBe(false),
+            { timeout: 30000 },
+        );
+    });
+
+    it("toggles bar numbers, persists the choice, and re-renders the score", async () => {
+        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        const barNumbers = screen.getByRole("switch", { name: "Bar numbers" });
+        // On by default, matching the persisted preference.
+        expect(barNumbers.getAttribute("aria-checked")).toBe("true");
+        expect(loadPrefs().barNumbers).toBe(true);
+        fireEvent.click(barNumbers);
+        expect(barNumbers.getAttribute("aria-checked")).toBe("false");
+        // The choice is remembered per device and the score reloads (Practice re-enabling
+        // proves the render effect re-ran rather than leaving a dead viewer).
+        expect(loadPrefs().barNumbers).toBe(false);
         await waitFor(
             () =>
                 expect(

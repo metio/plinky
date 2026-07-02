@@ -49,6 +49,12 @@ export type Prefs = {
     // bars per row means bigger, more readable notation — the lever a phone needs so the
     // notes aren't crammed too small to play. Stored per device (localStorage).
     barsPerRow: number;
+    // Show a bar number above the first bar of each staff row, so a passage is easy to
+    // point to and matches the loop's from/to inputs. When shown they sit at each row's
+    // start rather than at OSMD's default cadence, which drifts with the layout — the
+    // fix for numbers appearing on different bars every time the score re-flows. Off
+    // clears them for a cleaner staff.
+    barNumbers: boolean;
     // Which computer-keyboard key plays each note, per hand. Defaults to the five-finger
     // home-row split; a player can remap it (see keyMap), and the keyboard input layer
     // reads this.
@@ -91,6 +97,7 @@ const DEFAULTS: Prefs = {
     decayMode: "gentle",
     reviewCap: REVIEW_CAP,
     barsPerRow: 0,
+    barNumbers: true,
     keyMap: DEFAULT_KEY_MAP,
     keyboardOctaves: 2,
     treadmill: false,
@@ -150,6 +157,8 @@ export function loadPrefs(): Prefs {
             barsPerRow: BARS_PER_ROW.includes(parsed.barsPerRow)
                 ? parsed.barsPerRow
                 : DEFAULTS.barsPerRow,
+            barNumbers:
+                typeof parsed.barNumbers === "boolean" ? parsed.barNumbers : DEFAULTS.barNumbers,
             keyMap: cleanKeyMap(parsed.keyMap),
             keyboardOctaves: KEYBOARD_OCTAVES.includes(parsed.keyboardOctaves)
                 ? parsed.keyboardOctaves

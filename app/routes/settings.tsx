@@ -44,6 +44,7 @@ export default function Settings() {
         decayMode: "gentle",
         reviewCap: 8,
         barsPerRow: 0,
+        barNumbers: true,
         keyMap: DEFAULT_KEY_MAP,
         keyboardOctaves: 2,
         treadmill: false,

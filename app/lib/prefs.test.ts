@@ -21,6 +21,7 @@ const BASE: Prefs = {
     decayMode: "gentle",
     reviewCap: 8,
     barsPerRow: 0,
+    barNumbers: true,
     keyMap: DEFAULT_KEY_MAP,
     keyboardOctaves: 2,
     treadmill: false,
@@ -66,6 +67,17 @@ describe("prefs", () => {
         expect(loadPrefs().handSpan).toEqual({ left: 8, right: 11 });
         savePrefs({ ...BASE, handSpan: { left: null, right: 9 } });
         expect(loadPrefs().handSpan).toEqual({ left: null, right: 9 });
+    });
+
+    it("defaults bar numbers on and round-trips the toggle", () => {
+        expect(loadPrefs().barNumbers).toBe(true);
+        savePrefs({ ...BASE, barNumbers: false });
+        expect(loadPrefs().barNumbers).toBe(false);
+    });
+
+    it("falls back to the default when stored bar-numbers is not a boolean", () => {
+        localStorage.setItem("plinky:prefs", JSON.stringify({ barNumbers: "yes" }));
+        expect(loadPrefs().barNumbers).toBe(true);
     });
 
     it("defaults fingering hints on and round-trips the toggle", () => {
