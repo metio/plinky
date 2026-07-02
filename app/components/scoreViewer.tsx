@@ -37,6 +37,7 @@ import { writeMastery } from "../lib/masteryStore";
 import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
+import { toReplayEvents } from "../lib/composition";
 import { decodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import {
     compositionFromRun,
@@ -889,9 +890,12 @@ export function ScoreViewer({
         setRunSaved(true);
     };
 
-    // Replay a saved take onto the staff: walk the cursor as Listen does, but step it
-    // on the take's own recorded onsets so the playback keeps your timing. Rest-only
-    // steps advance without consuming an onset, keeping notes aligned to the take.
+    // Replay a saved take: play it straight from the recorded performance — its own
+    // onsets, pitches, held lengths and velocities — so the playback is the run you
+    // gave, note for note. The staff cursor follows for a visual cue but never gates the
+    // timing: driving playback off the take (not the loaded score's cursor) means a
+    // score whose notation carries ties or rests the run doesn't mirror one-to-one can't
+    // skew it — the earlier coupling made notes bunch up, then drag.
     const replayTake = (take: Take) => {
         const osmd = osmdRef.current;
         if (!osmd) {
@@ -907,37 +911,32 @@ export function ScoreViewer({
         cursor.reset();
         cursor.show();
         setPlaying(true);
-        const onsets = [...new Set(take.composition.notes.map((note) => note.startMs))].sort(
-            (a, b) => a - b,
-        );
+        const events = toReplayEvents(take.composition);
         let step = 0;
         const tick = () => {
-            if (cursor.iterator.EndReached || step >= onsets.length) {
+            if (step >= events.length) {
                 stopListen();
                 return;
             }
             restoreNotes(listenHighlightRef.current);
             listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
-            let hasNote = false;
-            for (const note of cursor.NotesUnderCursor()) {
-                const quarters = note.Length.RealValue * 4;
-                if (!note.isRest() && note.halfTone > 0) {
-                    hasNote = true;
-                    synth.playNote(note.halfTone + 12, { duration: quarters });
-                }
+            const event = events[step]!;
+            for (const note of event.notes) {
+                synth.playNote(note.pitch, {
+                    velocity: note.velocity,
+                    duration: note.durationMs / 1000,
+                });
             }
-            cursor.next();
-            centerCursor();
-            if (hasNote) {
-                const current = onsets[step] ?? 0;
-                const next = onsets[step + 1];
-                step++;
-                const delay = next !== undefined ? Math.max(40, next - current) : 500;
-                timers.current.push(window.setTimeout(tick, delay));
-            } else {
-                // A rest under the cursor: advance briskly without spending an onset.
-                timers.current.push(window.setTimeout(tick, 30));
+            // Advance the visual cursor alongside the audio; when the score runs out
+            // before the take does, the audio simply plays on to the end.
+            if (!cursor.iterator.EndReached) {
+                cursor.next();
+                centerCursor();
             }
+            const next = events[step + 1];
+            step++;
+            const delay = next !== undefined ? Math.max(40, next.atMs - event.atMs) : 500;
+            timers.current.push(window.setTimeout(tick, delay));
         };
         tick();
     };

@@ -5,7 +5,13 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { type Composition, decodeComposition, encodeComposition, toMusicXml } from "./composition";
+import {
+    type Composition,
+    decodeComposition,
+    encodeComposition,
+    toMusicXml,
+    toReplayEvents,
+} from "./composition";
 import { parseMusicXml } from "./musicxmlParse";
 
 // The codec stores integer-rounded times/velocities, so generating integer fields
@@ -66,5 +72,31 @@ describe("composition codec + engraving properties", () => {
     it("engraves a note-less score to an all-rest part that parses to null", () => {
         const empty: Composition = { notes: [], tempo: 120, beatsPerBar: 4 };
         expect(parseMusicXml(toMusicXml(empty))).toBeNull();
+    });
+
+    it("replays every note exactly once, in ascending non-repeating onset order", () => {
+        fc.assert(
+            fc.property(arbComposition, (composition) => {
+                const events = toReplayEvents(composition);
+                // Onsets strictly ascend and never repeat — each is one grouped strike.
+                const onsets = events.map((event) => event.atMs);
+                for (let i = 1; i < onsets.length; i++) {
+                    expect(onsets[i]!).toBeGreaterThan(onsets[i - 1]!);
+                }
+                // No note is dropped or duplicated: the event notes account for the whole
+                // performance, and every note sits under its own recorded onset.
+                const flattened = events.flatMap((event) =>
+                    event.notes.map((n) => ({ ...n, startMs: event.atMs })),
+                );
+                expect(flattened).toHaveLength(composition.notes.length);
+                const key = (n: {
+                    pitch: number;
+                    startMs: number;
+                    durationMs: number;
+                    velocity: number;
+                }) => `${n.startMs}:${n.pitch}:${n.durationMs}:${n.velocity}`;
+                expect(flattened.map(key).sort()).toEqual(composition.notes.map(key).sort());
+            }),
+        );
     });
 });

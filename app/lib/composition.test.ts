@@ -12,6 +12,7 @@ import {
     type RecordedNote,
     toMidiNotes,
     toMusicXml,
+    toReplayEvents,
     truncateTo,
 } from "./composition";
 import { packToCode } from "./shareCode";
@@ -65,6 +66,69 @@ describe("toMidiNotes", () => {
             composition([note({ startMs: 1000, durationMs: 500, pitch: 64 })]),
         );
         expect(midi).toEqual([{ midi: 64, startQuarters: 2, durationQuarters: 1, velocity: 90 }]);
+    });
+});
+
+describe("toReplayEvents", () => {
+    it("turns a run of single notes into one event each, in onset order", () => {
+        const events = toReplayEvents(
+            composition([
+                note({ startMs: 0, pitch: 60 }),
+                note({ startMs: 500, pitch: 62 }),
+                note({ startMs: 900, pitch: 64 }),
+            ]),
+        );
+        expect(events.map((event) => event.atMs)).toEqual([0, 500, 900]);
+        expect(events.map((event) => event.notes.map((n) => n.pitch))).toEqual([[60], [62], [64]]);
+    });
+
+    it("groups notes struck at the same onset into one chord event", () => {
+        const events = toReplayEvents(
+            composition([
+                note({ startMs: 250, pitch: 60 }),
+                note({ startMs: 250, pitch: 64 }),
+                note({ startMs: 250, pitch: 67 }),
+                note({ startMs: 800, pitch: 72 }),
+            ]),
+        );
+        expect(events).toHaveLength(2);
+        expect(events[0]!.atMs).toBe(250);
+        expect(events[0]!.notes.map((n) => n.pitch)).toEqual([60, 64, 67]);
+        expect(events[1]!.notes.map((n) => n.pitch)).toEqual([72]);
+    });
+
+    it("orders events by onset even when the notes arrive out of order", () => {
+        const events = toReplayEvents(
+            composition([
+                note({ startMs: 900, pitch: 64 }),
+                note({ startMs: 0, pitch: 60 }),
+                note({ startMs: 500, pitch: 62 }),
+            ]),
+        );
+        expect(events.map((event) => event.atMs)).toEqual([0, 500, 900]);
+    });
+
+    it("carries each note's exact pitch, held length and velocity", () => {
+        const events = toReplayEvents(
+            composition([note({ startMs: 100, pitch: 67, durationMs: 333, velocity: 51 })]),
+        );
+        expect(events[0]!.notes[0]).toEqual({ pitch: 67, durationMs: 333, velocity: 51 });
+    });
+
+    it("returns no events for an empty performance", () => {
+        expect(toReplayEvents(composition([]))).toEqual([]);
+    });
+
+    it("spaces events by the recorded gaps, not by any notated grid", () => {
+        // Two notes bunched close, then a long pause — the very shape (a quick pair
+        // followed by a wait) that the old cursor-coupled replay flattened, playing the
+        // pair almost together and then stalling. The gaps between events must mirror the
+        // onsets exactly, whatever a score's ties or rests might imply.
+        const events = toReplayEvents(
+            composition([note({ startMs: 0 }), note({ startMs: 120 }), note({ startMs: 2120 })]),
+        );
+        const gaps = events.slice(1).map((event, index) => event.atMs - events[index]!.atMs);
+        expect(gaps).toEqual([120, 2000]);
     });
 });
 

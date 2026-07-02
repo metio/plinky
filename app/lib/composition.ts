@@ -57,6 +57,33 @@ export function truncateTo(composition: Composition, count: number): Composition
     return { ...composition, notes: composition.notes.slice(0, Math.max(0, count)) };
 }
 
+// A performance grouped for playback: notes that share an onset become one event (a
+// chord is struck together), events run in onset order, and each carries its onset in
+// ms from the first note plus every note's exact pitch, held length and velocity.
+// Replay schedules on the gaps between successive events, reproducing the player's own
+// timing straight from the recording — never from a score's notation, whose ties and
+// rests need not line up one-to-one with what was actually played.
+export type ReplayEvent = {
+    atMs: number;
+    notes: { pitch: number; durationMs: number; velocity: number }[];
+};
+
+export function toReplayEvents(composition: Composition): ReplayEvent[] {
+    const byOnset = new Map<number, ReplayEvent["notes"]>();
+    for (const note of composition.notes) {
+        const entry = { pitch: note.pitch, durationMs: note.durationMs, velocity: note.velocity };
+        const group = byOnset.get(note.startMs);
+        if (group) {
+            group.push(entry);
+        } else {
+            byOnset.set(note.startMs, [entry]);
+        }
+    }
+    return [...byOnset.keys()]
+        .sort((a, b) => a - b)
+        .map((atMs) => ({ atMs, notes: byOnset.get(atMs)! }));
+}
+
 // The note list in the quarter-note unit the MIDI writer expects, so a composition
 // exports to a Standard MIDI File that sounds like the recorded performance.
 export function toMidiNotes(composition: Composition): MidiNote[] {
