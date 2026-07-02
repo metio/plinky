@@ -6,7 +6,10 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { Composition } from "./composition";
 import { withDeniedStorage } from "./deniedStorage";
 import {
+    type ActiveHolds,
+    beginHold,
     compositionFromRun,
+    endHold,
     fastestTakeOnsets,
     ghostOnsets,
     loadTakes,
@@ -166,11 +169,67 @@ describe("fastestTakeOnsets", () => {
     });
 });
 
+describe("beginHold / endHold", () => {
+    it("measures how long a key was held from strike to release", () => {
+        const holds: ActiveHolds = new Map();
+        beginHold(holds, 60, 0, 1000);
+        expect(endHold(holds, 60, 1350)).toEqual({ index: 0, heldMs: 350 });
+    });
+
+    it("forgets a key once released, so a stray second release resolves to null", () => {
+        const holds: ActiveHolds = new Map();
+        beginHold(holds, 60, 2, 500);
+        endHold(holds, 60, 700);
+        expect(endHold(holds, 60, 900)).toBeNull();
+    });
+
+    it("resolves an untracked release to null rather than guessing", () => {
+        expect(endHold(new Map(), 64, 100)).toBeNull();
+    });
+
+    it("keeps only the latest strike when a pitch repeats before releasing", () => {
+        const holds: ActiveHolds = new Map();
+        beginHold(holds, 67, 1, 0);
+        beginHold(holds, 67, 4, 500); // same pitch, a new note
+        expect(endHold(holds, 67, 800)).toEqual({ index: 4, heldMs: 300 });
+    });
+});
+
 describe("compositionFromRun", () => {
     const step = (pitches: number[], startMs: number, velocity = 90): RunStep => ({
         pitches,
         startMs,
         velocity,
+    });
+
+    it("uses the real key-hold length when a run captured one", () => {
+        // The gap to the next onset is 300ms, but the key was only held 90ms — a clipped
+        // staccato — so the note keeps its actual length rather than smearing to the gap.
+        const composition = compositionFromRun(
+            [{ pitches: [60], startMs: 0, velocity: 90, heldMs: 90 }, step([62], 300)],
+            120,
+            4,
+        );
+        expect(composition.notes[0]?.durationMs).toBe(90);
+    });
+
+    it("uses the hold length even on the final note, past the onset gaps", () => {
+        const composition = compositionFromRun(
+            [{ pitches: [60], startMs: 0, velocity: 90, heldMs: 1200 }],
+            120,
+            4,
+        );
+        // Held long past the one-beat fallback, so the sustain is preserved.
+        expect(composition.notes[0]?.durationMs).toBe(1200);
+    });
+
+    it("floors a very short hold to the minimum length, never zero", () => {
+        const composition = compositionFromRun(
+            [{ pitches: [60], startMs: 0, velocity: 90, heldMs: 5 }, step([62], 400)],
+            120,
+            4,
+        );
+        expect(composition.notes[0]?.durationMs).toBeGreaterThanOrEqual(60);
     });
 
     it("derives each note's length from the gap to the next onset", () => {

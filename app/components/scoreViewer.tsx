@@ -41,7 +41,10 @@ import { toReplayEvents } from "../lib/composition";
 import { listenStepMs } from "../lib/playback";
 import { decodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import {
+    type ActiveHolds,
+    beginHold,
     compositionFromRun,
+    endHold,
     fastestTakeOnsets,
     loadTakes,
     removeTake,
@@ -109,7 +112,9 @@ import { TempoGraph } from "./tempoGraph";
 // A cleared note plus the velocity it was played at and the pitches sounded at
 // that step — the run's raw record, from which the grade, the per-note strip and
 // the share grid are derived, and a saved take's notes are reconstructed.
-type PlayedNote = RunNote & { velocity: number; pitches: number[] };
+// heldMs is the real key-hold length, filled in from the MIDI note-off once the key is
+// released (absent for imprecise input, which reports no meaningful hold).
+type PlayedNote = RunNote & { velocity: number; pitches: number[]; heldMs?: number };
 
 // A typed bar number for the loop range — a number field (not a stepper), because a
 // piece can run to many bars and typing the target beats tapping a stepper there.
@@ -240,6 +245,9 @@ export function ScoreViewer({
     const playingRef = useRef(false);
     const tempoRef = useRef(initialTempo ?? 100);
     const notesRef = useRef<PlayedNote[]>([]);
+    // Each still-held MIDI pitch mapped to the run note it belongs to and when it was
+    // struck, so its note-off can fill in that note's real hold length.
+    const holdRef = useRef<ActiveHolds>(new Map());
     const startRef = useRef(0);
     const baseOffsetRef = useRef(0);
     // Whether any note this run came from an imprecise input (on-screen or computer
@@ -453,6 +461,12 @@ export function ScoreViewer({
                     pitches: [...info.pitches],
                 },
             ];
+            // Remember which run note each struck pitch belongs to, so its release can
+            // record how long the key was held.
+            const noteIndex = notesRef.current.length - 1;
+            for (const pitch of info.pitches) {
+                beginHold(holdRef.current, pitch, noteIndex, info.timestamp);
+            }
             // Track the player's tempo from the gap to the previous note and ease
             // the adaptive metronome toward it, so a single rushed note nudges
             // rather than jerks the pulse. Clamped to the slider's own range.
@@ -481,6 +495,24 @@ export function ScoreViewer({
                 impreciseRef.current = true;
             }
             matcher.registerNote(event.note, event.timestamp, event.velocity);
+        },
+        // A released key fills in the run note's real hold length. Only a precise device
+        // (a MIDI piano) reports a meaningful hold; on-screen and computer-keyboard input
+        // are left to the smoother onset-gap length so a quick tap doesn't read as staccato.
+        onNoteOff: (event) => {
+            if (!isPreciseInput(event.device)) {
+                return;
+            }
+            const released = endHold(holdRef.current, event.note, event.timestamp);
+            if (!released) {
+                return;
+            }
+            const note = notesRef.current[released.index];
+            if (note) {
+                // A chord's pitches release one by one; keep the longest so the note's
+                // recorded length is how long the chord actually rang.
+                note.heldMs = Math.max(note.heldMs ?? 0, released.heldMs);
+            }
         },
     });
     const { status, requestAccess } = useMidiConnection();
@@ -904,6 +936,7 @@ export function ScoreViewer({
             pitches: note.pitches,
             startMs: note.playedMs,
             velocity: note.velocity,
+            heldMs: note.heldMs,
         }));
         if (steps.length === 0) {
             return;
@@ -982,6 +1015,7 @@ export function ScoreViewer({
         stopListen();
         setRunSaved(false);
         notesRef.current = [];
+        holdRef.current.clear();
         impreciseRef.current = false;
         gradeFromRunRef.current = false;
         setGrade(null);
