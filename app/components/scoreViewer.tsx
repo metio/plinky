@@ -38,6 +38,7 @@ import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
 import { toReplayEvents } from "../lib/composition";
+import { listenStepMs } from "../lib/playback";
 import { decodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import {
     compositionFromRun,
@@ -853,17 +854,18 @@ export function ScoreViewer({
             // previous step's highlight first — the cursor box alone is easy to lose.
             restoreNotes(listenHighlightRef.current);
             listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
-            let beats = 1;
+            const lengths: number[] = [];
             for (const note of cursor.NotesUnderCursor()) {
                 const quarters = note.Length.RealValue * 4;
                 if (!note.isRest() && note.halfTone > 0) {
                     synth.playNote(note.halfTone + 12, { duration: quarters });
                 }
-                beats = Math.max(beats, quarters);
+                // Rests count too, so a written gap dwells its own length.
+                lengths.push(quarters);
             }
             cursor.next();
             centerCursor();
-            timers.current.push(window.setTimeout(tick, beats * (60000 / tempoRef.current)));
+            timers.current.push(window.setTimeout(tick, listenStepMs(lengths, tempoRef.current)));
         };
         tick();
     };
