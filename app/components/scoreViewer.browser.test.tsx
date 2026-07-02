@@ -60,6 +60,23 @@ describe("ScoreViewer", () => {
         expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
+    it("captions each play option, spelling out what its values mean", async () => {
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <ScoreViewer id="c" xml="this is not MusicXML" title="C" beatsPerBar={4} />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        // A plain-language caption sits under the always-present metronome toggle...
+        expect(screen.getByText(/A click on every beat/)).toBeTruthy();
+        // ...and turning it on reveals a control whose caption spells out its numbers,
+        // rather than leaving "1 2 3 4" a mystery.
+        fireEvent.click(screen.getByRole("switch", { name: "Metronome" }));
+        expect(screen.getByText(/2 for eighths/)).toBeTruthy();
+    });
+
     it("re-renders as a single horizontal line when treadmill is toggled on", async () => {
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
@@ -331,7 +348,7 @@ describe("ScoreViewer", () => {
     it("lights the note now sounding while listening, so the eye can follow", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
+        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
         fireEvent.click(listen);
         // As playback walks the score, exactly the notes under the cursor wear the
@@ -363,7 +380,7 @@ describe("ScoreViewer", () => {
         mount(single, { beatsPerBar: 4 });
         // Wait until the score is interactive (Listen enabled), then confirm the
         // single-staff piece offers no hand choice.
-        const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
+        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
         fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         expect(screen.queryByRole("tab", { name: "Right" })).toBeNull();
@@ -402,7 +419,7 @@ describe("ScoreViewer", () => {
     it("omits the section-loop control for a single-bar score", async () => {
         const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(single, { beatsPerBar: 4 });
-        const listen = await screen.findByText(/Listen/, undefined, { timeout: 30000 });
+        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
         await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
         expect(screen.queryByText(/Loop/)).toBeNull();
     });
@@ -443,7 +460,7 @@ describe("ScoreViewer", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        await screen.findByText(/Listen/, undefined, { timeout: 30000 });
+        await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
         expect(screen.queryByText("Transpose")).toBeNull();
     });
 });

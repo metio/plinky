@@ -73,7 +73,7 @@ export function FieldGroup({ label, children }: { label: string; children: React
             <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 {label}
             </h3>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">{children}</div>
+            <div className="flex flex-wrap items-start gap-x-4 gap-y-3">{children}</div>
         </section>
     );
 }

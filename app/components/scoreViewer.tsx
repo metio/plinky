@@ -127,6 +127,19 @@ function Labeled({ label, children }: { label: ReactNode; children: ReactNode })
     );
 }
 
+// A practice-tools control paired with a caption beneath it, so each option explains what
+// it does — and what its different values mean — inline, rather than leaving the help to a
+// tooltip that never shows on touch. Full width, so the options stack one per row with
+// room for the caption to read.
+function Option({ caption, children }: { caption: string; children: ReactNode }) {
+    return (
+        <span className="flex w-full flex-col gap-1">
+            {children}
+            <span className="text-xs text-gray-500 dark:text-gray-400">{caption}</span>
+        </span>
+    );
+}
+
 // A celebratory banner for an earned moment (first S, grade-up, flawless run), with the
 // matching share card to post. Quiet — it sits above the run grid, never interrupts.
 function MilestoneBanner({ milestone }: { milestone: Milestone }) {
@@ -1146,61 +1159,71 @@ export function ScoreViewer({
                                         <Bpm tempo={tempo} />
                                     </Labeled>
                                 ) : (
-                                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <span>{m.scores_tempo()}</span>
-                                        <input
-                                            type="range"
-                                            min={40}
-                                            max={180}
-                                            value={tempo}
-                                            onChange={(event) =>
-                                                setTempo(Number(event.target.value))
-                                            }
-                                            aria-label={m.scores_tempo()}
-                                        />
-                                        <BumpValue
-                                            value={tempo}
-                                            className="w-12 font-semibold text-gray-800 dark:text-gray-200"
-                                        />
-                                    </label>
+                                    <Option caption={m.tempo_caption()}>
+                                        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                            <span>{m.scores_tempo()}</span>
+                                            <input
+                                                type="range"
+                                                min={40}
+                                                max={180}
+                                                value={tempo}
+                                                onChange={(event) =>
+                                                    setTempo(Number(event.target.value))
+                                                }
+                                                aria-label={m.scores_tempo()}
+                                            />
+                                            <BumpValue
+                                                value={tempo}
+                                                className="w-12 font-semibold text-gray-800 dark:text-gray-200"
+                                            />
+                                        </label>
+                                    </Option>
                                 )}
                                 {!lockTempo && (
-                                    <Switch
-                                        checked={trainerOn}
-                                        onChange={setTrainerOn}
-                                        label={m.tempo_trainer()}
-                                    />
+                                    <Option caption={m.tempo_trainer_caption()}>
+                                        <Switch
+                                            checked={trainerOn}
+                                            onChange={setTrainerOn}
+                                            label={m.tempo_trainer()}
+                                        />
+                                    </Option>
                                 )}
                                 {!lockTempo && trainerOn && (
-                                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <span>{m.tempo_trainer_target()}</span>
-                                        <input
-                                            type="range"
-                                            min={40}
-                                            max={180}
-                                            value={trainerTarget}
-                                            onChange={(event) =>
-                                                setTrainerTarget(Number(event.target.value))
-                                            }
-                                            aria-label={m.tempo_trainer_target()}
-                                        />
-                                        <Bpm tempo={trainerTarget} className="w-12" />
-                                    </label>
+                                    <Option caption={m.tempo_trainer_target_caption()}>
+                                        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                            <span>{m.tempo_trainer_target()}</span>
+                                            <input
+                                                type="range"
+                                                min={40}
+                                                max={180}
+                                                value={trainerTarget}
+                                                onChange={(event) =>
+                                                    setTrainerTarget(Number(event.target.value))
+                                                }
+                                                aria-label={m.tempo_trainer_target()}
+                                            />
+                                            <Bpm tempo={trainerTarget} className="w-12" />
+                                        </label>
+                                    </Option>
                                 )}
                             </FieldGroup>
 
                             <FieldGroup label={m.group_metronome()}>
-                                <Switch
-                                    checked={metronomeOn}
-                                    onChange={setMetronomeOn}
-                                    label={m.action_metronome()}
-                                />
-                                {metronomeOn && (
+                                <Option caption={m.metronome_caption()}>
                                     <Switch
-                                        checked={adaptive}
-                                        onChange={setAdaptive}
-                                        label={m.metronome_adaptive()}
+                                        checked={metronomeOn}
+                                        onChange={setMetronomeOn}
+                                        label={m.action_metronome()}
                                     />
+                                </Option>
+                                {metronomeOn && (
+                                    <Option caption={m.metronome_adaptive_caption()}>
+                                        <Switch
+                                            checked={adaptive}
+                                            onChange={setAdaptive}
+                                            label={m.metronome_adaptive()}
+                                        />
+                                    </Option>
                                 )}
                                 {metronomeOn && adaptive && (
                                     <Bpm
@@ -1209,62 +1232,70 @@ export function ScoreViewer({
                                     />
                                 )}
                                 {metronomeOn && (
-                                    <Labeled label={m.metronome_subdivision()}>
-                                        <SegmentedControl
-                                            options={[1, 2, 3, 4].map((n) => ({
-                                                id: String(n),
-                                                label: String(n),
-                                            }))}
-                                            value={String(subdivision)}
-                                            onChange={(id) => setSubdivision(Number(id))}
-                                            label={m.metronome_subdivision()}
-                                        />
-                                    </Labeled>
+                                    <Option caption={m.metronome_subdivision_caption()}>
+                                        <Labeled label={m.metronome_subdivision()}>
+                                            <SegmentedControl
+                                                options={[1, 2, 3, 4].map((n) => ({
+                                                    id: String(n),
+                                                    label: String(n),
+                                                }))}
+                                                value={String(subdivision)}
+                                                onChange={(id) => setSubdivision(Number(id))}
+                                                label={m.metronome_subdivision()}
+                                            />
+                                        </Labeled>
+                                    </Option>
                                 )}
                             </FieldGroup>
 
                             <FieldGroup label={m.group_practice()}>
-                                <Switch
-                                    checked={forgiving}
-                                    onChange={(next) => {
-                                        savePrefs({ ...loadPrefs(), forgiving: next });
-                                        setForgiving(next);
-                                    }}
-                                    label={m.forgiving_toggle()}
-                                    title={m.forgiving_hint()}
-                                />
-                                <Switch
-                                    checked={raceGhost}
-                                    onChange={(next) => {
-                                        savePrefs({ ...loadPrefs(), raceGhost: next });
-                                        setRaceGhost(next);
-                                    }}
-                                    label={m.race_ghost_toggle()}
-                                    title={m.race_ghost_hint()}
-                                />
+                                <Option caption={m.forgiving_hint()}>
+                                    <Switch
+                                        checked={forgiving}
+                                        onChange={(next) => {
+                                            savePrefs({ ...loadPrefs(), forgiving: next });
+                                            setForgiving(next);
+                                        }}
+                                        label={m.forgiving_toggle()}
+                                    />
+                                </Option>
+                                <Option caption={m.race_ghost_hint()}>
+                                    <Switch
+                                        checked={raceGhost}
+                                        onChange={(next) => {
+                                            savePrefs({ ...loadPrefs(), raceGhost: next });
+                                            setRaceGhost(next);
+                                        }}
+                                        label={m.race_ghost_toggle()}
+                                    />
+                                </Option>
                                 {staffCount >= 2 && (
-                                    <Labeled label={m.hand_label()}>
-                                        <SegmentedControl
-                                            options={(["both", "right", "left"] as const).map(
-                                                (option) => ({
-                                                    id: option,
-                                                    label: handLabel[option],
-                                                }),
-                                            )}
-                                            value={hand}
-                                            onChange={setHand}
-                                            label={m.hand_label()}
-                                            // Locked mid-run so the matched note count stays honest.
-                                            disabled={matcher.practicing}
-                                        />
-                                    </Labeled>
+                                    <Option caption={m.hand_caption()}>
+                                        <Labeled label={m.hand_label()}>
+                                            <SegmentedControl
+                                                options={(["both", "right", "left"] as const).map(
+                                                    (option) => ({
+                                                        id: option,
+                                                        label: handLabel[option],
+                                                    }),
+                                                )}
+                                                value={hand}
+                                                onChange={setHand}
+                                                label={m.hand_label()}
+                                                // Locked mid-run so the matched note count stays honest.
+                                                disabled={matcher.practicing}
+                                            />
+                                        </Labeled>
+                                    </Option>
                                 )}
                                 {ready && measureCount > 1 && (
-                                    <Switch
-                                        checked={loopOn}
-                                        onChange={setLoopOn}
-                                        label={m.loop_section()}
-                                    />
+                                    <Option caption={m.loop_caption()}>
+                                        <Switch
+                                            checked={loopOn}
+                                            onChange={setLoopOn}
+                                            label={m.loop_section()}
+                                        />
+                                    </Option>
                                 )}
                                 {ready && measureCount > 1 && loopOn && (
                                     <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
@@ -1359,69 +1390,79 @@ export function ScoreViewer({
                                         </span>
                                     )}
                                     {hasSaved && loadPrefs().showFingerings && (
-                                        <Switch
-                                            checked={showMine}
-                                            onChange={setShowMine}
-                                            label={m.fingering_show_mine()}
-                                        />
+                                        <Option caption={m.fingering_show_mine_caption()}>
+                                            <Switch
+                                                checked={showMine}
+                                                onChange={setShowMine}
+                                                label={m.fingering_show_mine()}
+                                            />
+                                        </Option>
                                     )}
                                 </FieldGroup>
                             )}
 
                             <FieldGroup label={m.group_layout()}>
-                                <Switch
-                                    checked={treadmill}
-                                    onChange={(next) => {
-                                        savePrefs({ ...loadPrefs(), treadmill: next });
-                                        setTreadmill(next);
-                                    }}
-                                    label={m.treadmill_toggle()}
-                                    title={m.treadmill_hint()}
-                                />
-                                <Switch
-                                    checked={barNumbers}
-                                    onChange={(next) => {
-                                        savePrefs({ ...loadPrefs(), barNumbers: next });
-                                        setBarNumbers(next);
-                                    }}
-                                    label={m.bar_numbers_toggle()}
-                                    title={m.bar_numbers_hint()}
-                                />
+                                <Option caption={m.treadmill_hint()}>
+                                    <Switch
+                                        checked={treadmill}
+                                        onChange={(next) => {
+                                            savePrefs({ ...loadPrefs(), treadmill: next });
+                                            setTreadmill(next);
+                                        }}
+                                        label={m.treadmill_toggle()}
+                                    />
+                                </Option>
+                                <Option caption={m.bar_numbers_hint()}>
+                                    <Switch
+                                        checked={barNumbers}
+                                        onChange={(next) => {
+                                            savePrefs({ ...loadPrefs(), barNumbers: next });
+                                            setBarNumbers(next);
+                                        }}
+                                        label={m.bar_numbers_toggle()}
+                                    />
+                                </Option>
                                 {/* Bars-per-row only shapes the wrapped layout; the treadmill is
                                 a single line, so the control would do nothing there. */}
                                 {!treadmill && (
-                                    <Labeled label={m.bars_per_row()}>
+                                    <Option caption={m.bars_per_row_caption()}>
+                                        <Labeled label={m.bars_per_row()}>
+                                            <SegmentedControl
+                                                options={BARS_PER_ROW.map((n) => ({
+                                                    id: String(n),
+                                                    label:
+                                                        n === 0 ? m.bars_per_row_auto() : String(n),
+                                                }))}
+                                                value={String(barsPerRow)}
+                                                onChange={(id) => {
+                                                    const n = Number(id);
+                                                    setBarsPerRow(n);
+                                                    savePrefs({ ...loadPrefs(), barsPerRow: n });
+                                                }}
+                                                label={m.bars_per_row()}
+                                            />
+                                        </Labeled>
+                                    </Option>
+                                )}
+                                <Option caption={m.keyboard_octaves_caption()}>
+                                    <Labeled label={m.keyboard_octaves()}>
                                         <SegmentedControl
-                                            options={BARS_PER_ROW.map((n) => ({
+                                            options={KEYBOARD_OCTAVES.map((n) => ({
                                                 id: String(n),
-                                                label: n === 0 ? m.bars_per_row_auto() : String(n),
+                                                label:
+                                                    n === 0 ? m.keyboard_octaves_all() : String(n),
                                             }))}
-                                            value={String(barsPerRow)}
+                                            value={String(keyboardOctaves)}
                                             onChange={(id) => {
                                                 const n = Number(id);
-                                                setBarsPerRow(n);
-                                                savePrefs({ ...loadPrefs(), barsPerRow: n });
+                                                setKeyboardOctaves(n);
+                                                setKeyWindow(null);
+                                                savePrefs({ ...loadPrefs(), keyboardOctaves: n });
                                             }}
-                                            label={m.bars_per_row()}
+                                            label={m.keyboard_octaves()}
                                         />
                                     </Labeled>
-                                )}
-                                <Labeled label={m.keyboard_octaves()}>
-                                    <SegmentedControl
-                                        options={KEYBOARD_OCTAVES.map((n) => ({
-                                            id: String(n),
-                                            label: n === 0 ? m.keyboard_octaves_all() : String(n),
-                                        }))}
-                                        value={String(keyboardOctaves)}
-                                        onChange={(id) => {
-                                            const n = Number(id);
-                                            setKeyboardOctaves(n);
-                                            setKeyWindow(null);
-                                            savePrefs({ ...loadPrefs(), keyboardOctaves: n });
-                                        }}
-                                        label={m.keyboard_octaves()}
-                                    />
-                                </Labeled>
+                                </Option>
                             </FieldGroup>
                         </Disclosure>
                     </div>
