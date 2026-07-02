@@ -22,16 +22,20 @@ const CHORD = [[60, 64]];
 describe("FingeringDrill", () => {
     it("scores the line only once every note has a finger", () => {
         render(<FingeringDrill positions={LINE} hand="right" />);
-        expect((screen.getByText("Check fingering") as HTMLButtonElement).disabled).toBe(true);
+        expect((screen.getByText("Check finger positions") as HTMLButtonElement).disabled).toBe(
+            true,
+        );
 
         const one = screen.getByLabelText("Finger 1");
         fireEvent.click(one);
         fireEvent.click(one);
-        expect((screen.getByText("Check fingering") as HTMLButtonElement).disabled).toBe(false);
+        expect((screen.getByText("Check finger positions") as HTMLButtonElement).disabled).toBe(
+            false,
+        );
 
-        fireEvent.click(screen.getByText("Check fingering"));
+        fireEvent.click(screen.getByText("Check finger positions"));
         expect(screen.getByText(/Smoothness:/)).toBeTruthy();
-        expect(screen.queryByText("Check fingering")).toBeNull();
+        expect(screen.queryByText("Check finger positions")).toBeNull();
     });
 
     it("accepts number keys as finger input", () => {
