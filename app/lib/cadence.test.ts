@@ -31,6 +31,12 @@ describe("cadence", () => {
         }
     });
 
+    it("holds off at least two seconds before the first strike so it lands after the run settles", () => {
+        for (const letter of ["S", "A", "B", "C", "D", "E", "F"] as Letter[]) {
+            expect(cadence(letter)[0]!.at).toBeGreaterThanOrEqual(2);
+        }
+    });
+
     it("lands the final note longer and louder so the flourish resolves", () => {
         const beats = cadence("S");
         const last = beats[beats.length - 1]!;

@@ -11,12 +11,17 @@ import type { Letter } from "./grade";
 // regardless of the piece's own key.
 export type CadenceNote = {
     note: number; // MIDI note
-    at: number; // seconds from the start of the cadence
+    at: number; // seconds from the moment the run completes
     velocity: number; // 0..127
     duration: number; // seconds
 };
 
 const STEP = 0.11; // gap between successive strikes
+
+// The flourish holds off for a beat after the final note lands, so it reads as a
+// reward arriving once the run has settled rather than a sound firing on top of the
+// player's own last keystroke. Every strike is offset by this lead.
+const LEAD = 2; // seconds before the first strike
 
 // C-major over C5: the arpeggio everything is cut from. The last note rings longer and
 // a touch louder so the flourish lands rather than trails off.
@@ -27,7 +32,7 @@ function build(tones: number[]): CadenceNote[] {
     const last = tones.length - 1;
     return tones.map((note, index) => ({
         note,
-        at: index * STEP,
+        at: LEAD + index * STEP,
         velocity: index === last ? 96 : 82,
         duration: index === last ? 1.1 : 0.5,
     }));
