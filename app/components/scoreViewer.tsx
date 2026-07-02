@@ -645,7 +645,13 @@ export function ScoreViewer({
             flow: computeFlow(notes),
             dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
         });
-        const grid = gridFor(notes, tolerance);
+        // Speed is scored against the piece's own tempo, not the practice-tempo dial, so
+        // a slow run reads slow however the slider was set. With no intrinsic tempo the
+        // scale is 1, leaving Speed to measure how evenly the notated rhythm was kept.
+        const intendedTempo = initialTempo ?? runTempoRef.current;
+        const grid = gridFor(notes, {
+            tempoScale: intendedTempo > 0 ? runTempoRef.current / intendedTempo : 1,
+        });
         gradeFromRunRef.current = true;
         setGrade(result);
         // A short major flourish to celebrate finishing — a fuller arpeggio for a
@@ -732,6 +738,7 @@ export function ScoreViewer({
         onMastery,
         ephemeral,
         daily,
+        initialTempo,
         bumpTempo,
         synth,
     ]);
@@ -1700,8 +1707,8 @@ export function ScoreViewer({
                                     gridLabel={m.share_grid_label()}
                                     rowLabels={[
                                         m.scores_accuracy(),
+                                        m.scores_speed(),
                                         m.scores_timing(),
-                                        m.scores_flow(),
                                     ]}
                                     boast={
                                         daily != null

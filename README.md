@@ -119,11 +119,15 @@ left off on another device.
 
 ## Sharing
 
-Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Timing,
-Flow) across six moments in five colour bands, no numbers — to copy, post, or save as
-an image. The bands are the same A–F scale the run's grade uses, so a green cell means
-the same as a top grade. The daily challenge shares as **Plinky N**, so everyone
-compares the same run, and the You page shares your lifetime fingerprint.
+Every graded run can become a **Wordle-style grid** — three rows (Accuracy, Speed,
+Timing) across six moments in five colour bands, no numbers — to copy, post, or save as
+an image. Unlike the practice grade, which stays gently self-paced, the shared card is an
+honest snapshot: **Speed** scores how close you played to the piece's own tempo, so a
+slow, careful run (a mouse plodding across the on-screen keys) shows a red Speed row even
+with every note right — the difference between a strong and a weak performance reads at a
+glance. The daily challenge shares as **Plinky N**, so everyone compares the same run,
+and the You page shares your lifetime fingerprint of the practice grade (Accuracy, Timing
+and Flow).
 
 Earned moments also surface their own **milestone card** on the run summary — your
 first S on a piece, reaching a new grade, or a flawless run — to share or save. Each

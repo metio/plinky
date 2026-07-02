@@ -100,11 +100,14 @@ export function progressGrid(lifetime: Lifetime): Grid | null {
     if (recent.length === 0) {
         return null;
     }
+    // The fingerprint is a lifetime view of the practice grade, so it keeps that trio —
+    // Accuracy, Timing, Flow — rather than the share card's performance dimensions.
     return toGrid(
         recent.map((day) => ({
             accuracy: day.skill.accuracy / 100,
             timing: day.skill.timing / 100,
             flow: day.skill.flow / 100,
         })),
+        ["accuracy", "timing", "flow"],
     );
 }
