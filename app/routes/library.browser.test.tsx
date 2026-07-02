@@ -10,6 +10,11 @@ import Library from "./library";
 
 const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 
+// A single unbreakable word wider than a phone so a row that fails to truncate would
+// push the whole page — and the fixed bottom nav — past the viewport edge.
+const LONG_TITLE = "Supercalifragilisticexpialidociousandthensomemoreletters";
+const LONG_TITLE_XML = `<?xml version="1.0"?><score-partwise><work><work-title>${LONG_TITLE}</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+
 afterEach(() => {
     cleanup();
     localStorage.clear();
@@ -80,6 +85,22 @@ describe("Library", () => {
         expect(screen.getByText("My Tune")).toBeTruthy();
         fireEvent.click(screen.getByRole("button", { name: "Remove?" }));
         await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
+    });
+
+    it("gives a long title the shrink-and-truncate contract so it can't widen the row", async () => {
+        saveUserScore(buildScore(LONG_TITLE_XML, []));
+        renderLibrary();
+        const title = await screen.findByText(LONG_TITLE);
+        // The title clips with an ellipsis…
+        expect(title.className).toContain("truncate");
+        // …which only takes effect if every flex ancestor up to the row link is allowed
+        // to shrink below its content. Without min-w-0 on the link, an unbreakable title
+        // pushes the row — and the fixed bottom nav — past the viewport edge.
+        const titleBlock = title.parentElement as HTMLElement;
+        expect(titleBlock.className).toContain("min-w-0");
+        const row = title.closest("a") as HTMLElement;
+        expect(row.className).toContain("min-w-0");
+        expect(row.className).toContain("flex-1");
     });
 
     it("filters to only the pieces due for review", async () => {

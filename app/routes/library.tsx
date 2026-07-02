@@ -328,7 +328,11 @@ export default function LibraryRoute() {
                                         </IconButton>
                                         <Link
                                             to={`/play/${item.id}`}
-                                            className="flex flex-1 items-center gap-2 rounded-md border border-gray-300 px-3 py-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            // min-w-0 lets this flex child shrink below its
+                                            // content so a long title truncates instead of
+                                            // pushing the row — and the whole page — wider than
+                                            // the viewport (which would clip the fixed bottom nav).
+                                            className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-gray-300 px-3 py-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                                         >
                                             <span className="min-w-0 flex-1">
                                                 <span className="block truncate font-medium">
