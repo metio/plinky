@@ -24,7 +24,7 @@ describe("PlayModeBar", () => {
             "false",
         );
 
-        fireEvent.click(screen.getByRole("tab", { name: "Fingering" }));
+        fireEvent.click(screen.getByRole("tab", { name: "Finger Position" }));
         expect(onChange).toHaveBeenCalledWith("fingering");
     });
 
@@ -35,7 +35,7 @@ describe("PlayModeBar", () => {
         fireEvent.click(screen.getByRole("tab", { name: "Ear" }));
         expect(discoveries().earTried).toBe(true);
 
-        fireEvent.click(screen.getByRole("tab", { name: "Fingering" }));
+        fireEvent.click(screen.getByRole("tab", { name: "Finger Position" }));
         expect(discoveries().fingeringTried).toBe(true);
     });
 });

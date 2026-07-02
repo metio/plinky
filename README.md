@@ -41,9 +41,10 @@ Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn 
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
 score along, so one hand's slip never stops the other.
 
-When you finish, a short **major flourish** plays to mark the moment — a fuller
-arpeggio for a stronger grade, a warm lift for a gentler one, never a downer (it
-follows the sound setting, so muting silences it). The run is then **graded S–F**
+When you finish, a short **major flourish** plays to mark the moment — landing a
+beat after your last note so it reads as a reward rather than a sound on top of your
+playing. A fuller arpeggio marks a stronger grade, a warm lift a gentler one, never a
+downer (it follows the sound setting, so muting silences it). The run is then **graded S–F**
 from three things:
 
 - **Accuracy** — how many notes you found cleanly.
@@ -75,12 +76,12 @@ one-tap **review session** walks you through everything that's fading, and you c
   a staff to share or export (see below).
 - **Any piece, three ways** — open a score and a tab bar switches how you work it:
   **Play** (read, hear, and practise it), **Ear** (hear a two-bar phrase and play it
-  back), or **Fingering** (choose a fingering for a two-bar window; each note lights
-  **green/amber/red** as you go — with a symbol too, so it reads without colour, and you
-  can fade it off — to show how the move flows, it's scored against the most
-  economical fingering for your hand, the two bars you're on are **highlighted in the
-  full piece** so you keep your place, and it's **saved per piece** so the fingering you
-  work out is there when you come back).
+  back), or **Finger Position** (choose the finger positions for a two-bar window; each
+  note lights **green/amber/red** as you go — with a symbol too, so it reads without
+  colour, and you can fade it off — to show how the move flows, it's scored against the
+  most economical finger positions for your hand, the two bars you're on are
+  **highlighted in the full piece** so you keep your place, and it's **saved per piece**
+  so the positions you work out are there when you come back).
 - **Your takes** — after a run, save it as a take. Each piece keeps your last few:
   **replay** one and it plays back onto the staff in your own timing, **download** it as
   MIDI or MusicXML, **challenge a friend** to race it by link, or delete it. You can also
