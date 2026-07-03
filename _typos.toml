@@ -19,7 +19,9 @@ nd = "nd"
 # languages, and the imported PDMX manifest holds real-world titles/composers plus
 # content-addressed (CID) ids whose letter runs read as misspellings. typos only
 # knows English, so it would flag legitimate foreign words and identifiers. The
-# English message base stays checked.
+# English message base stays checked. The LICENSES texts are verbatim legal
+# documents (the CC 2.5/3.0 deeds even carry an official "MERCHANTIBILITY" typo) and
+# must not be altered.
 [files]
 extend-exclude = [
     "messages/*",
@@ -28,4 +30,5 @@ extend-exclude = [
     "scores/*",
     "public/songs/*",
     "public/exercises/**",
+    "LICENSES/*",
 ]

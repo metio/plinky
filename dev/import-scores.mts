@@ -41,6 +41,14 @@ type SourceConfig = {
     // chorales need dev/chorale2piano.py, which reduces their four SATB voices to a
     // two-staff piano grand staff.
     convertScript?: string;
+    // Set when the .mxl were produced by an out-of-band step that needs a heavier
+    // toolchain than this importer's container (Mutopia: LilyPond, in dev/mutopia.*).
+    // The importer then ingests sources/<id>/_mxl/*.mxl directly — no clone, no convert.
+    preconverted?: boolean;
+    // Per-piece licence for sources whose licence varies by piece (Mutopia): the
+    // harvester encodes a bucket token in each filename (mutopia-<bucket>-…) and this
+    // maps it to the SPDX id. Falls back to `license` when a filename has no known bucket.
+    bucketLicense?: Record<string, string>;
     // Which MusicXML title field holds the song title: a cycle/collection puts it in
     // the movement-title (work-title = the set), a keyboard sonata in the work-title
     // (movement-title = a tempo marking like "Allegro").
@@ -81,6 +89,30 @@ const CONFIGS: Record<string, SourceConfig> = {
         convert: true,
         convertScript: "dev/chorale2piano.py",
         titleField: "work",
+        reorderComposer: true,
+    },
+    // Public-domain solo-keyboard pieces from the Mutopia Project, converted from
+    // LilyPond to two-staff piano MusicXML by dev/mutopia-harvest.py (run separately in
+    // dev/mutopia.Containerfile, since LilyPond is too heavy for the lean importer image).
+    mutopia: {
+        repos: [],
+        preconverted: true,
+        license: "CC0-1.0",
+        // Mutopia's licence is per-piece; dev/mutopia-harvest.py tags each filename.
+        bucketLicense: {
+            cc0: "CC0-1.0",
+            by40: "CC-BY-4.0",
+            by30: "CC-BY-3.0",
+            by25: "CC-BY-2.5",
+            bysa40: "CC-BY-SA-4.0",
+            bysa30: "CC-BY-SA-3.0",
+            bysa25: "CC-BY-SA-2.5",
+        },
+        gate: nonSoloPianoReason,
+        titleField: "work",
+        // Most Mutopia composers are "First Last", but a few are "Last, First";
+        // reorderName only rewrites the comma form, so this fixes those and leaves
+        // the rest untouched.
         reorderComposer: true,
     },
 };
@@ -175,6 +207,15 @@ async function main() {
     // ingest only from the dirs we manage, so a stray checkout can't leak in.
     await mkdir(`${SOURCES_DIR}/${key}`, { recursive: true });
     const files: string[] = [];
+    if (cfg.preconverted) {
+        const dir = `${SOURCES_DIR}/${key}/_mxl`;
+        files.push(
+            ...execSync(`find ${dir} -name '*.mxl'`, { encoding: "utf8", maxBuffer: 64 << 20 })
+                .trim()
+                .split("\n")
+                .filter(Boolean),
+        );
+    }
     for (const repoUrl of cfg.repos) {
         const repoName = (repoUrl.split("/").pop() ?? repoUrl).replace(/\.git$/, "");
         const repoDir = `${SOURCES_DIR}/${key}/${repoName}`;
@@ -246,13 +287,17 @@ async function main() {
         }
         takenIds.add(id);
         takenKeys.add(dupeKey);
+        // Per-piece licence when the source encodes a bucket in the filename (Mutopia);
+        // otherwise the source's single licence.
+        const bucket = cfg.bucketLicense && id.match(/^[a-z-]+-([a-z0-9]+)-/)?.[1];
+        const license = (bucket && cfg.bucketLicense?.[bucket]) || cfg.license;
         added.push({
             id,
             title,
             composer,
             grade: 0,
             cost,
-            license: cfg.license,
+            license,
             source: key,
             tempo: tempoOf(xml),
             beatsPerBar: beatsOf(xml),
