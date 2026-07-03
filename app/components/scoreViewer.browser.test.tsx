@@ -21,6 +21,23 @@ const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
         </MemoryRouter>,
     );
 
+// The inline /play view offers a single primary action, Practice; it's enabled once the
+// score is interactive, so it's the readiness gate the score-loaded tests wait on.
+const awaitReady = async () => {
+    const practice = await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
+    await expect.poll(() => (practice as HTMLButtonElement).disabled).toBe(false);
+    return practice;
+};
+
+// Listen lives only in the full-screen top bar now, reachable once play begins. Enter the
+// play surface (Practice always goes full screen), then hand off to Listen, which stops the
+// just-started run and plays the score back.
+const enterAndListen = async () => {
+    vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+    fireEvent.click(await awaitReady());
+    fireEvent.click(screen.getByRole("button", { name: "Listen" }));
+};
+
 // OSMD renders only in a real browser, so this runs in the browser project.
 afterEach(() => {
     cleanup();
@@ -66,11 +83,7 @@ describe("ScoreViewer", () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        const listen = await screen.findByRole("button", { name: "Listen" });
-        await waitFor(() => expect((listen as HTMLButtonElement).disabled).toBe(false), {
-            timeout: 30000,
-        });
-        fireEvent.click(listen); // small screen → enters full screen
+        fireEvent.click(await awaitReady()); // Practice enters full screen on every device
         // Follow-the-note is on by default; flipping it takes effect without a reload.
         const follow = await screen.findByRole("button", { name: "Follow the note" });
         expect(follow.getAttribute("aria-pressed")).toBe("true");
@@ -273,6 +286,32 @@ describe("ScoreViewer", () => {
         reqFs.mockRestore();
     });
 
+    it("enters full screen to play even on a large screen, where Listen lives", async () => {
+        // Force a roomy desktop viewport (no media query matches), the case that used to
+        // stay inline. The play surface holds Listen and the in-play toggles, so a large
+        // screen enters full screen to play just as a phone does.
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: false,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            media: query,
+        }));
+        const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        await awaitReady();
+        // At rest the /play view is a single action: Listen is not inline, it waits in the
+        // full-screen top bar, and there's no exit control until play begins.
+        expect(screen.queryByRole("button", { name: "Listen" })).toBeNull();
+        expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
+        // Practice enters full screen on the large screen too, surfacing the exit control
+        // and Listen alongside it.
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
+        expect(screen.getByRole("button", { name: "Listen" })).toBeTruthy();
+        reqFs.mockRestore();
+    });
+
     it("does not scroll to the grade when a saved result is shown on open", async () => {
         // Re-opening a finished daily seeds the grade on mount; the result-scroll must
         // not fire then and yank the page down before the player has done anything.
@@ -415,14 +454,9 @@ describe("ScoreViewer", () => {
     });
 
     it("shows a ghost to race once a previous run is saved", async () => {
-        // Desktop-sized, so playing stays inline — the race track lives on the normal
-        // surface (hidden in full screen, where the top bar shows the note count instead).
-        vi.stubGlobal("matchMedia", (query: string) => ({
-            matches: false,
-            addEventListener: () => {},
-            removeEventListener: () => {},
-            media: query,
-        }));
+        // Playing goes full screen on every device now, and the race track rides along
+        // there — so a saved ghost surfaces its race track once Practice begins.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // mount() renders with id "t"; a saved ghost for it is loaded on Practice.
         saveGhost("t", [0, 500, 1000]);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
@@ -444,13 +478,8 @@ describe("ScoreViewer", () => {
     });
 
     it("starts the ghost back at the line when a finished run is restarted", async () => {
-        // Desktop-sized so playing stays inline and the race track is on screen.
-        vi.stubGlobal("matchMedia", (query: string) => ({
-            matches: false,
-            addEventListener: () => {},
-            removeEventListener: () => {},
-            media: query,
-        }));
+        // Playing goes full screen, where the race track rides along.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // The ghost races from the player's first note. A prior run's start timestamp
         // must not survive into the next run: on a restart, before the first note is
         // played, the ghost belongs at the start line — not painted at the finish
@@ -496,9 +525,7 @@ describe("ScoreViewer", () => {
     it("lights the note now sounding while listening, so the eye can follow", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
-        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
-        fireEvent.click(listen);
+        await enterAndListen();
         // As playback walks the score, exactly the notes under the cursor wear the
         // active colour — more than the cursor box alone, which is easy to lose.
         await expect
@@ -518,15 +545,12 @@ describe("ScoreViewer", () => {
         // (the shorter note), not linger for the longest, or the second hand's notes queue
         // up behind a held whole note. Here the run reaching the notes proves the grand
         // staff drives playback end to end; lib/playback pins the interval arithmetic.
-        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         const phrase = generatePhrase(
             { bars: 2, beatsPerBar: 4, twoHands: true, rhythm: "varied" },
             () => 0.5,
         );
         mount(phrase, { beatsPerBar: 4 });
-        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
-        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
-        fireEvent.click(listen);
+        await enterAndListen();
         // Playback lights the notes now sounding on both staves as the cursor walks.
         await expect
             .poll(
@@ -553,10 +577,9 @@ describe("ScoreViewer", () => {
     it("omits the hands selector for a single-staff score", async () => {
         const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(single, { beatsPerBar: 4 });
-        // Wait until the score is interactive (Listen enabled), then confirm the
-        // single-staff piece offers no hand choice.
-        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
-        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
+        // Wait until the score is interactive, then confirm the single-staff piece offers
+        // no hand choice.
+        await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         expect(screen.queryByRole("tab", { name: "Right" })).toBeNull();
         expect(screen.queryByRole("tab", { name: "Left" })).toBeNull();
@@ -594,8 +617,7 @@ describe("ScoreViewer", () => {
     it("omits the section-loop control for a single-bar score", async () => {
         const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(single, { beatsPerBar: 4 });
-        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
-        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
+        await awaitReady();
         expect(screen.queryByText(/Loop/)).toBeNull();
     });
 
@@ -635,7 +657,7 @@ describe("ScoreViewer", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
+        await awaitReady();
         expect(screen.queryByText("Transpose")).toBeNull();
     });
 });

@@ -35,9 +35,9 @@ describe("Daily", () => {
                 </MidiProvider>
             </MemoryRouter>,
         );
-        // The generated phrase renders through the graded score viewer.
+        // The generated phrase renders through the graded score viewer, which leads with
+        // its single primary action (Practice); Listen waits in the full-screen top bar.
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
-        expect(screen.getByText(/Listen/)).toBeTruthy();
         expect(screen.getByText("Practice")).toBeTruthy();
     });
 

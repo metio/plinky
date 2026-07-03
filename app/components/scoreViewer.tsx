@@ -1004,7 +1004,7 @@ export function ScoreViewer({
         if (!osmd || playingRef.current || keepUpActiveRef.current) {
             return;
         }
-        playFullScreenIfSmall();
+        enterPlayFullscreen();
         playingRef.current = true;
         matcher.stop();
         const cursor: Cursor = osmd.cursor;
@@ -1081,7 +1081,7 @@ export function ScoreViewer({
         if (!osmd || playingRef.current || keepUpActiveRef.current) {
             return;
         }
-        playFullScreenIfSmall();
+        enterPlayFullscreen();
         matcher.stop();
         if (paintedRef.current) {
             osmd.render();
@@ -1269,17 +1269,19 @@ export function ScoreViewer({
         setTakes(removeTake(id, takeId));
     };
 
-    // On a phone-sized screen, playing goes full screen so the score and keyboard both
-    // fit — the URL bar reclaimed for the music. Desktop, where they already fit, stays
-    // inline (browser full screen is an F11 away).
-    const playFullScreenIfSmall = () => {
-        if (narrowOrShort && !fullscreen) {
+    // Playing goes full screen on every device. The play surface holds controls that live
+    // only there — Listen, the finger-number and follow-the-note toggles, the on-staff
+    // exit — so the run needs the room whatever the screen size, and a large display is no
+    // exception. On a phone it also reclaims the browser chrome (the URL bar) that the
+    // keyboard would otherwise crowd out.
+    const enterPlayFullscreen = () => {
+        if (!fullscreen) {
             enterFullscreen();
         }
     };
 
     const practice = () => {
-        playFullScreenIfSmall();
+        enterPlayFullscreen();
         stopListen();
         setRunSaved(false);
         notesRef.current = [];
@@ -1353,39 +1355,40 @@ export function ScoreViewer({
         });
     })();
 
-    // Listen and Practice — the two transport actions, shared by the normal toolbar and
-    // the full-screen top bar (so full screen can hoist them out of the score's way).
-    const transport = (
-        <>
-            <Button
-                variant="secondary"
-                disabled={!ready || keepUpRunning}
-                onClick={() => (playing ? stopListen() : listen())}
-            >
-                {playing ? <StopIcon /> : <PlayIcon />}
-                {playing ? m.action_listen_stop() : m.action_listen()}
-            </Button>
-            {/* Practice is the screen's primary action, so it carries the dominant
-                filled variant rather than reading as a twin of Listen. With "keep up" on it
-                starts a tempo-locked play-along instead of the self-paced run. */}
-            <Button
-                variant="primary"
-                disabled={!ready}
-                onClick={() => {
-                    if (matcher.practicing) {
-                        matcher.stop();
-                    } else if (keepUpRunning) {
-                        stopKeepUp();
-                    } else if (enforceTempo) {
-                        playAlong();
-                    } else {
-                        practice();
-                    }
-                }}
-            >
-                {matcher.practicing || keepUpRunning ? m.action_listen_stop() : m.action_practice()}
-            </Button>
-        </>
+    // Listen lives only in the full-screen top bar. Playing enters full screen on every
+    // device, so that is the one place it's reachable — which keeps the inline /play view to
+    // a single primary action (Practice), the piece's front door.
+    const listenButton = (
+        <Button
+            variant="secondary"
+            disabled={!ready || keepUpRunning}
+            onClick={() => (playing ? stopListen() : listen())}
+        >
+            {playing ? <StopIcon /> : <PlayIcon />}
+            {playing ? m.action_listen_stop() : m.action_listen()}
+        </Button>
+    );
+    // Practice is the screen's primary action, so it carries the dominant filled variant.
+    // It enters full screen first, then starts the run; with "keep up" on it starts a
+    // tempo-locked play-along instead of the self-paced run.
+    const practiceButton = (
+        <Button
+            variant="primary"
+            disabled={!ready}
+            onClick={() => {
+                if (matcher.practicing) {
+                    matcher.stop();
+                } else if (keepUpRunning) {
+                    stopKeepUp();
+                } else if (enforceTempo) {
+                    playAlong();
+                } else {
+                    practice();
+                }
+            }}
+        >
+            {matcher.practicing || keepUpRunning ? m.action_listen_stop() : m.action_practice()}
+        </Button>
     );
 
     return (
@@ -1400,7 +1403,8 @@ export function ScoreViewer({
             >
                 <FullScreen>
                     <div className="flex shrink-0 items-center gap-2">
-                        {transport}
+                        {listenButton}
+                        {practiceButton}
                         <Show when={matcher.practicing}>
                             <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
                                 {matcher.done}/{matcher.total}
@@ -1467,12 +1471,12 @@ export function ScoreViewer({
                         </IconButton>
                     </div>
                 </FullScreen>
-                {/* Inline, the primary action sits above the score so it's the first thing
-                in reach — you can start playing without scrolling past a tall staff. In
-                full screen the transport lives in the top bar instead (above), so this is
-                hidden to avoid a duplicate. */}
+                {/* Inline, a single primary action sits above the score so it's the first
+                thing in reach — Practice enters full screen and starts the run. Listen and
+                the rest of the transport live in the full-screen top bar (above), reachable
+                once play begins, so the resting /play view stays uncluttered. */}
                 <FullScreen off>
-                    <div className="flex flex-wrap items-center gap-3">{transport}</div>
+                    <div className="flex flex-wrap items-center gap-3">{practiceButton}</div>
                 </FullScreen>
                 {/* OSMD renders to its container's full offset width, which includes any
                 border or padding on that element; were either on the element OSMD owns, the
@@ -1927,15 +1931,12 @@ export function ScoreViewer({
                                 </Midi>
                             </div>
                         </FullScreen>
-                        <FullScreen off>
-                            <Show when={ghost}>
-                                <GhostTrack
-                                    you={matcher.done}
-                                    ghost={ghostDone}
-                                    total={matcher.total}
-                                />
-                            </Show>
-                        </FullScreen>
+                        {/* The race track rides along in full screen too — a thin bar below
+                        the score — so racing a ghost survives the move to always-full-screen
+                        play; without it the race would be invisible whenever you play. */}
+                        <Show when={ghost}>
+                            <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
+                        </Show>
                         <FullScreen off>
                             <Show
                                 when={

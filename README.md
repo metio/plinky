@@ -21,20 +21,22 @@ the browser; nothing is uploaded, and your scores stay on your device.
 
 ## Practising a score
 
-Open any score and Plinky renders it as real notation. **Listen** plays it back so
-you hear it first, lighting up each note as it sounds so your eye can follow along;
-**Practice** turns the same cursor into a note-by-note guide —
-read the note, play it, and the cursor advances, sounding back what you played. The
+Open any score and Plinky renders it as real notation, led by a single action:
+**Practice**. Pressing it drops into **full screen** — the score and keyboard to
+themselves, the screen kept awake (and on a phone the browser's URL bar reclaimed for
+the music) — and starts a note-by-note guide: read the note, play it, and the cursor
+advances, sounding back what you played. Full screen is where the rest of the play
+controls live, so it's the same generous surface on a phone or a wide desktop alike.
+There you'll also find **Listen**, which plays the piece back so you hear it first,
+lighting up each note as it sounds so your eye can follow along. The
 staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up with
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**
 sits right above the keys showing the bar you're playing, so the notes you need are
-never out of reach. On a phone, playing (Practice or Listen) drops into **full screen**
-automatically — the score and keyboard to themselves, the browser's URL bar reclaimed
-for the music, the screen kept awake — with an **(X)** to leave and, right there while
-you play, toggles to **follow the note** (auto-scroll on/off), show the **finger-position
+never out of reach. An **(X)** leaves full screen, and right there while
+you play are toggles to **follow the note** (auto-scroll on/off), show the **finger-position
 numbers**, **restart** the run, or fold the keyboard away for more notation if you're at
-a real piano. (Desktop keeps the inline view, where they already fit.) You can
+a real piano. You can
 also force a **set number of bars per row** for bigger, more readable notation on a
 small screen, or switch to **treadmill** reading — the piece laid out as one continuous
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. **Bar
