@@ -29,9 +29,12 @@ staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**
 sits right above the keys showing the bar you're playing, so the notes you need are
-never out of reach, and a one-tap **full-screen** mode strips the screen to a single
-score and the keyboard — which you can fold away for more notation if you're playing a
-real piano (and it keeps the screen awake while you play). You can
+never out of reach. On a phone, playing (Practice or Listen) drops into **full screen**
+automatically — the score and keyboard to themselves, the browser's URL bar reclaimed
+for the music, the screen kept awake — with an **(X)** to leave and, right there while
+you play, toggles to **follow the note** (auto-scroll on/off), show the **finger-position
+numbers**, **restart** the run, or fold the keyboard away for more notation if you're at
+a real piano. (Desktop keeps the inline view, where they already fit.) You can
 also force a **set number of bars per row** for bigger, more readable notation on a
 small screen, or switch to **treadmill** reading — the piece laid out as one continuous
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. **Bar

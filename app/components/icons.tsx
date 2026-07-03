@@ -45,30 +45,6 @@ export function StopIcon({ className }: IconProps) {
     );
 }
 
-// Four corner brackets pointing outward — "go full screen".
-export function MaximizeIcon({ className }: IconProps) {
-    return (
-        <Icon className={className}>
-            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-            <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-            <path d="M21 16v3a2 2 0 0 1-2 2h-3" />
-            <path d="M3 16v3a2 2 0 0 0 2 2h3" />
-        </Icon>
-    );
-}
-
-// Four corner brackets pointing inward — "leave full screen".
-export function MinimizeIcon({ className }: IconProps) {
-    return (
-        <Icon className={className}>
-            <path d="M8 3v3a2 2 0 0 1-2 2H3" />
-            <path d="M21 8h-3a2 2 0 0 1-2-2V3" />
-            <path d="M3 16h3a2 2 0 0 1 2 2v3" />
-            <path d="M16 21v-3a2 2 0 0 1 2-2h3" />
-        </Icon>
-    );
-}
-
 export function PrinterIcon({ className }: IconProps) {
     return (
         <Icon className={className}>
@@ -266,6 +242,27 @@ export function GradCapIcon({ className }: IconProps) {
         <Icon className={className}>
             <path d="M2 9l10-4 10 4-10 4z" />
             <path d="M6 11v5c0 1.3 2.7 2.5 6 2.5s6-1.2 6-2.5v-5" />
+        </Icon>
+    );
+}
+
+// A raised hand — the fingering-numbers toggle.
+export function HandIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10" />
+            <path d="M11 10V4.5a1.5 1.5 0 0 1 3 0V10" />
+            <path d="M14 10V6a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1a6 6 0 0 1-4.3-1.8L4 13.5a1.5 1.5 0 0 1 2.2-2L8 13V8a1.5 1.5 0 0 1 3 0" />
+        </Icon>
+    );
+}
+
+// An eye — the follow-the-note (auto-scroll) toggle.
+export function EyeIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+            <circle cx="12" cy="12" r="3" />
         </Icon>
     );
 }

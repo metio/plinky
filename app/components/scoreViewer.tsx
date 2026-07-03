@@ -97,15 +97,7 @@ import { GhostTrack } from "./ghostTrack";
 import { useTranspose } from "./transposeContext";
 import { ShareGhostButton } from "./shareGhostButton";
 import { TakesList } from "./takesList";
-import {
-    CheckIcon,
-    CloseIcon,
-    MaximizeIcon,
-    MinimizeIcon,
-    PlayIcon,
-    RotateIcon,
-    StopIcon,
-} from "./icons";
+import { CheckIcon, CloseIcon, EyeIcon, HandIcon, PlayIcon, RotateIcon, StopIcon } from "./icons";
 import { PerformanceStrip } from "./performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { SegmentedControl } from "./segmentedControl";
@@ -352,6 +344,16 @@ export function ScoreViewer({
     // wrapping into rows — the "treadmill" reading mode. Off by default.
     const [treadmill, setTreadmill] = useState(() => loadPrefs().treadmill);
     const [raceGhost, setRaceGhost] = useState(() => loadPrefs().raceGhost);
+    // Print the suggested fingering numbers on the staff. Seeded from the saved default
+    // (off), flipped live by the in-play toggle; drives the render, so a change reloads the
+    // annotated score.
+    const [showFingerings, setShowFingerings] = useState(() => loadPrefs().showFingerings);
+    // Whether the staff scrolls to keep the played note in view. On by default; the
+    // treadmill drives its own centring, so OSMD's follow is off there. Applied straight to
+    // OSMD (no reload), so the ref carries the live value into the render's constructor.
+    const [scrollFollow, setScrollFollow] = useState(true);
+    const scrollFollowRef = useRef(true);
+    scrollFollowRef.current = scrollFollow;
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -868,7 +870,7 @@ export function ScoreViewer({
                     // you to scroll — critical on a phone where the staff is tall. The
                     // treadmill drives its own horizontal centring, so OSMD's vertical
                     // follow is turned off there.
-                    followCursor: !treadmill,
+                    followCursor: scrollFollowRef.current && !treadmill,
                     // One continuous horizontal staffline that scrolls right, rather than
                     // wrapping into rows — the treadmill reading mode.
                     renderSingleHorizontalStaffline: treadmill,
@@ -897,7 +899,7 @@ export function ScoreViewer({
                 // Transpose first, then annotate, so the printed fingering is
                 // computed for the key actually being played.
                 const transposed = transpose === 0 ? xml : transposeMusicXml(xml, transpose);
-                const source = loadPrefs().showFingerings
+                const source = showFingerings
                     ? annotateFingerings(
                           transposed,
                           loadPrefs().handSpan,
@@ -951,7 +953,7 @@ export function ScoreViewer({
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill]);
+    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill, showFingerings]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
@@ -960,6 +962,7 @@ export function ScoreViewer({
         if (!osmd || playingRef.current) {
             return;
         }
+        playFullScreenIfSmall();
         playingRef.current = true;
         matcher.stop();
         const cursor: Cursor = osmd.cursor;
@@ -1096,7 +1099,17 @@ export function ScoreViewer({
         setTakes(removeTake(id, takeId));
     };
 
+    // On a phone-sized screen, playing goes full screen so the score and keyboard both
+    // fit — the URL bar reclaimed for the music. Desktop, where they already fit, stays
+    // inline (browser full screen is an F11 away).
+    const playFullScreenIfSmall = () => {
+        if (narrowOrShort && !fullscreen) {
+            enterFullscreen();
+        }
+    };
+
     const practice = () => {
+        playFullScreenIfSmall();
         stopListen();
         setRunSaved(false);
         notesRef.current = [];
@@ -1198,6 +1211,45 @@ export function ScoreViewer({
                                 {matcher.done}/{matcher.total}
                             </span>
                         </Show>
+                        {/* Restart the run — a practice-only action, so it's absent while
+                        just listening. */}
+                        <Show when={matcher.practicing}>
+                            <IconButton onClick={practice} label={m.action_restart()}>
+                                <RotateIcon />
+                            </IconButton>
+                        </Show>
+                        {/* Show/hide the fingering numbers on the staff without leaving the
+                        music — seeded from the setting, flipped here for this session. */}
+                        <IconButton
+                            onClick={() => setShowFingerings((on) => !on)}
+                            aria-pressed={showFingerings}
+                            label={m.action_finger_numbers()}
+                            className={showFingerings ? "text-indigo-600 dark:text-indigo-400" : ""}
+                        >
+                            <HandIcon />
+                        </IconButton>
+                        {/* Turn the follow-the-note scrolling off to read at your own pace,
+                        or on to let the staff keep up. Moot in treadmill, which scrolls
+                        itself. */}
+                        <Show when={!treadmill}>
+                            <IconButton
+                                onClick={() => {
+                                    const next = !scrollFollow;
+                                    setScrollFollow(next);
+                                    const osmd = osmdRef.current;
+                                    if (osmd) {
+                                        osmd.FollowCursor = next;
+                                    }
+                                }}
+                                aria-pressed={scrollFollow}
+                                label={m.action_scroll_follow()}
+                                className={
+                                    scrollFollow ? "text-indigo-600 dark:text-indigo-400" : ""
+                                }
+                            >
+                                <EyeIcon />
+                            </IconButton>
+                        </Show>
                         <Button
                             variant="secondary"
                             onClick={() => setHideKeyboard((on) => !on)}
@@ -1211,7 +1263,7 @@ export function ScoreViewer({
                             onClick={exitFullscreen}
                             label={m.action_exit_fullscreen()}
                         >
-                            <MinimizeIcon />
+                            <CloseIcon />
                         </IconButton>
                     </div>
                 </FullScreen>
@@ -1276,9 +1328,6 @@ export function ScoreViewer({
                 <FullScreen off>
                     <div className="flex flex-wrap items-center gap-3">
                         {transport}
-                        <IconButton onClick={enterFullscreen} label={m.action_fullscreen()}>
-                            <MaximizeIcon />
-                        </IconButton>
                         <Disclosure summary={m.more_options()}>
                             <FieldGroup label={m.group_tempo()}>
                                 {lockTempo ? (
@@ -1474,7 +1523,7 @@ export function ScoreViewer({
                             {/* Skip the whole group when it would be empty — a locked
                                 challenge has no transpose, and most pieces have no saved
                                 fingering, so the heading would otherwise stand alone. */}
-                            {(!lockTempo || (hasSaved && loadPrefs().showFingerings)) && (
+                            {(!lockTempo || (hasSaved && showFingerings)) && (
                                 <FieldGroup label={m.group_notation()}>
                                     {!lockTempo && (
                                         <span className="flex flex-col gap-1">
@@ -1519,7 +1568,7 @@ export function ScoreViewer({
                                             </span>
                                         </span>
                                     )}
-                                    {hasSaved && loadPrefs().showFingerings && (
+                                    {hasSaved && showFingerings && (
                                         <Option caption={m.fingering_show_mine_caption()}>
                                             <Switch
                                                 checked={showMine}

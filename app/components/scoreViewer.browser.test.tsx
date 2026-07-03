@@ -60,6 +60,36 @@ describe("ScoreViewer", () => {
         expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
+    it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
+        // The browser viewport is phone-sized, so playing auto-enters full screen where
+        // the toggles live; stub the Fullscreen API the headless browser withholds.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const listen = await screen.findByRole("button", { name: "Listen" });
+        await waitFor(() => expect((listen as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        fireEvent.click(listen); // small screen → enters full screen
+        // Follow-the-note is on by default; flipping it takes effect without a reload.
+        const follow = await screen.findByRole("button", { name: "Follow the note" });
+        expect(follow.getAttribute("aria-pressed")).toBe("true");
+        fireEvent.click(follow);
+        expect(follow.getAttribute("aria-pressed")).toBe("false");
+        // Fingering numbers are off by default (the flipped setting); the toggle turns
+        // them on for the session.
+        const fingers = screen.getByRole("button", { name: "Finger position numbers" });
+        expect(fingers.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(fingers);
+        await waitFor(() =>
+            expect(
+                screen
+                    .getByRole("button", { name: "Finger position numbers" })
+                    .getAttribute("aria-pressed"),
+            ).toBe("true"),
+        );
+    });
+
     it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
@@ -189,10 +219,16 @@ describe("ScoreViewer", () => {
         expect(score.querySelectorAll("svg")).toHaveLength(1);
     });
 
-    it("leaves full screen when a run finishes so the grade is shown", async () => {
-        // Drive the in-page overlay state without the real Fullscreen API, which a
-        // headless browser grants only on a trusted gesture; the hook flips its own
-        // `fullscreen` flag regardless, and that's what gates the grade.
+    it("auto-enters full screen to play on a small screen and leaves it when the run finishes", async () => {
+        // Force a phone-sized viewport so playing auto-enters full screen, and stub the
+        // Fullscreen API a headless browser grants only on a trusted gesture — the hook
+        // flips its own `fullscreen` flag regardless, and that's what gates the grade.
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: /max-(width|height)/.test(query),
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            media: query,
+        }));
         const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // A one-bar phrase whose every note is C5, so the same key clears each position.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
@@ -201,21 +237,20 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
-        // Enter full-screen play, then start practising from its top-bar transport.
-        fireEvent.click(screen.getByRole("button", { name: "Full screen" }));
-        expect(screen.queryByRole("button", { name: "Full screen" })).toBeNull();
-        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        // Playing on a small screen enters full screen and starts the run in one tap; the
+        // exit (X) appears, and the grade's Accuracy readout is hidden while full screen.
+        fireEvent.click(practice);
+        expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
         const key = await screen.findByLabelText("C5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
         }
         // Completing the run drops out of full screen and surfaces the results — the
-        // Accuracy readout (grade panel + share-card legend) only renders once the run
-        // is graded and not full screen, and the enter-full-screen button returns.
+        // Accuracy readout renders only once the run is graded and not full screen.
         const accuracy = await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
         expect(accuracy.length).toBeGreaterThan(0);
-        expect(screen.getByRole("button", { name: "Full screen" })).toBeTruthy();
+        expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
         reqFs.mockRestore();
     });
 
@@ -318,6 +353,14 @@ describe("ScoreViewer", () => {
     });
 
     it("shows a ghost to race once a previous run is saved", async () => {
+        // Desktop-sized, so playing stays inline — the race track lives on the normal
+        // surface (hidden in full screen, where the top bar shows the note count instead).
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: false,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            media: query,
+        }));
         // mount() renders with id "t"; a saved ghost for it is loaded on Practice.
         saveGhost("t", [0, 500, 1000]);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
@@ -339,6 +382,13 @@ describe("ScoreViewer", () => {
     });
 
     it("starts the ghost back at the line when a finished run is restarted", async () => {
+        // Desktop-sized so playing stays inline and the race track is on screen.
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: false,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            media: query,
+        }));
         // The ghost races from the player's first note. A prior run's start timestamp
         // must not survive into the next run: on a restart, before the first note is
         // played, the ghost belongs at the start line — not painted at the finish
