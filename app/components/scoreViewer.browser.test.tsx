@@ -512,6 +512,33 @@ describe("ScoreViewer", () => {
             .toBe(true);
     });
 
+    it("plays a grand staff back, sounding both hands", async () => {
+        // A two-hand phrase feeds both staves' notes into one playback step. When the
+        // hands hold notes of different lengths the step must advance at the next onset
+        // (the shorter note), not linger for the longest, or the second hand's notes queue
+        // up behind a held whole note. Here the run reaching the notes proves the grand
+        // staff drives playback end to end; lib/playback pins the interval arithmetic.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase(
+            { bars: 2, beatsPerBar: 4, twoHands: true, rhythm: "varied" },
+            () => 0.5,
+        );
+        mount(phrase, { beatsPerBar: 4 });
+        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
+        await expect.poll(() => (listen as HTMLButtonElement).disabled).toBe(false);
+        fireEvent.click(listen);
+        // Playback lights the notes now sounding on both staves as the cursor walks.
+        await expect
+            .poll(
+                () =>
+                    Array.from(document.querySelectorAll("g[fill]")).some(
+                        (group) => group.getAttribute("fill") === WINDOW_COLOR,
+                    ),
+                { timeout: 15000 },
+            )
+            .toBe(true);
+    });
+
     it("offers a hands-separate selector only for a grand staff", async () => {
         const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         mount(grand, { beatsPerBar: 4 });

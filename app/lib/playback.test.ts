@@ -21,8 +21,21 @@ describe("listenStepMs", () => {
         expect(listenStepMs([0.5], 120)).toBe(listenStepMs([1], 120) / 2);
     });
 
-    it("holds for the longest note of a chord", () => {
-        expect(listenStepMs([1, 2, 0.5], 120)).toBe(1000);
+    it("advances at the next onset when hands hold notes of different lengths", () => {
+        // A left-hand whole note (4 beats) sounding with a right-hand quarter (1 beat):
+        // the next note lands one beat later, when the quarter ends, not four beats later
+        // when the whole note ends. Dwelling for the longest here would stall the cursor on
+        // the whole note and delay every following right-hand quarter — the reported bug.
+        expect(listenStepMs([4, 1], 120)).toBe(500);
+        // The order of the voices under the cursor doesn't matter.
+        expect(listenStepMs([1, 4], 120)).toBe(500);
+        // A whole note over four sixteenths advances a sixteenth at a time.
+        expect(listenStepMs([4, 0.25], 120)).toBe(125);
+    });
+
+    it("dwells for the shared length of a true chord", () => {
+        // Same-length pitches struck together (one hand's chord) advance as one note.
+        expect(listenStepMs([1, 1, 1], 120)).toBe(500);
     });
 
     it("never returns less than the minimum step, even for a very short note at speed", () => {
