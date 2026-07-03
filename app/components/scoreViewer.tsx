@@ -1935,7 +1935,11 @@ export function ScoreViewer({
                         the score — so racing a ghost survives the move to always-full-screen
                         play; without it the race would be invisible whenever you play. */}
                         <Show when={ghost}>
-                            <GhostTrack you={matcher.done} ghost={ghostDone} total={matcher.total} />
+                            <GhostTrack
+                                you={matcher.done}
+                                ghost={ghostDone}
+                                total={matcher.total}
+                            />
                         </Show>
                         <FullScreen off>
                             <Show
