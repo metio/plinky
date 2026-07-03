@@ -4,13 +4,14 @@
 import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 
 // Compiles a finished run into a Wordle-style share artifact: the run is sliced into six
-// moments and scored on the three shareable dimensions — Accuracy, Speed, Timing — each
-// landing in one of five colour bands. The result is a 3×6 grid rendered as an emoji
-// block (text share) or an SVG card (image share). The grid deliberately carries no
-// numbers or labels: the shape is the thing people share. Five bands (not three) so runs
-// produce visibly different grids rather than a wall of one colour.
+// moments, each scored on Accuracy, Speed and Timing, and those three are collapsed into
+// one combined cell — so a moment reads as a single "how well did you play it" square.
+// The grid runs one row per hand: a single row for a single-staff piece, two (right then
+// left) once both hands are in play, so a lagging hand shows as a redder row against the
+// other. Each cell lands in one of five colour bands. Rendered as an emoji block (text
+// share) or an SVG card (image share); the grid deliberately carries no numbers.
 //
-// These are deliberately NOT the gentle, self-paced dimensions the practice grade uses.
+// The scoring is deliberately NOT the gentle, self-paced grade the practice letter uses.
 // The grade forgives a slow, careful run so practice stays encouraging; the share card is
 // an honest snapshot meant to separate a strong performance from a weak one at a glance,
 // so it rewards playing at the piece's own tempo (Speed) — which a slow mouse-on-a-screen
@@ -19,11 +20,13 @@ import { PRECISE_TOLERANCE, timingDeltas } from "./rhythm";
 // share is recognisable wherever it is posted.
 
 // One cleared note of a run, relative to the run's first note: its notated onset
-// (the ideal), when it was actually played, and how many wrong notes preceded it.
+// (the ideal), when it was actually played, how many wrong notes preceded it, and the
+// staves it sat on (0 = treble/right, 1 = bass/left) so the run can be scored per hand.
 export type RunNote = {
     targetMs: number;
     playedMs: number;
     wrongBefore: number;
+    staves?: number[];
 };
 
 // A run note tagged with how close to the piece's tempo it was played and its timing
@@ -31,10 +34,9 @@ export type RunNote = {
 // six-note slice, so pace and rhythm are judged across the whole performance.
 type ScoredNote = RunNote & { speed: number; timingDelta: number };
 
-// The three dimensions, in the order they appear as grid rows.
-export type Dimension = "accuracy" | "speed" | "timing";
-export const DIMENSIONS: Dimension[] = ["accuracy", "speed", "timing"];
-
+// The three scored dimensions of a segment, collapsed into one combined cell for the
+// shared grid.
+type Dimension = "accuracy" | "speed" | "timing";
 export type SegmentMetrics = Record<Dimension, number>; // each 0..1
 
 // How much a run's timing window is relative to the shared reference, and how the run's
@@ -153,8 +155,7 @@ export function computeSegments(
 }
 
 // One row per named dimension, one column per segment. Generic over the dimension set so
-// the per-run share card (Accuracy / Speed / Timing) and the lifetime fingerprint on the
-// You page (its own trio) can each render through the same banding.
+// the lifetime fingerprint on the You page renders its own trio through the same banding.
 export function toGrid<K extends string>(
     segments: ReadonlyArray<Record<K, number>>,
     dimensions: readonly K[],
@@ -162,8 +163,37 @@ export function toGrid<K extends string>(
     return dimensions.map((dimension) => segments.map((segment) => levelFor(segment[dimension])));
 }
 
-export function gridFor(notes: RunNote[], options: ShareOptions = {}): Grid {
-    return toGrid(computeSegments(notes, SEGMENTS, options), DIMENSIONS);
+// A segment's three dimensions collapsed to one score, so the shared grid reads as a
+// single "how well did you play this moment" cell per column rather than three. The
+// weakest dimension wins: a moment is only as good as its worst aspect, so a crawl (low
+// Speed) or a slip (low Accuracy) drags the cell down even when the others are perfect —
+// the averaging alternative floors every clean run near green and hides the difference.
+function combined(metrics: SegmentMetrics): number {
+    return Math.min(metrics.accuracy, metrics.speed, metrics.timing);
+}
+
+// The staves a run touched, top to bottom (treble/right = 0 before bass/left = 1) — one
+// grid row per hand actually played. A note with no staves recorded counts as the top.
+export function handsPlayed(notes: RunNote[]): number[] {
+    const staves = new Set<number>();
+    for (const note of notes) {
+        for (const staff of note.staves ?? [0]) {
+            staves.add(staff);
+        }
+    }
+    return staves.size > 0 ? [...staves].sort((a, b) => a - b) : [0];
+}
+
+// The shared grid: one row per hand the run touched — just one for a single-staff piece,
+// two (right then left) for a grand staff — each a run of six combined-score cells. A
+// moment that sounds on both staves counts toward both hands' rows.
+export function handGrid(notes: RunNote[], options: ShareOptions = {}): Grid {
+    return handsPlayed(notes).map((staff) => {
+        const handNotes = notes.filter((note) => (note.staves ?? [0]).includes(staff));
+        return computeSegments(handNotes, SEGMENTS, options).map((segment) =>
+            levelFor(combined(segment)),
+        );
+    });
 }
 
 // A green → red quality ramp, with ⬜ for the bottom band (a Wordle-style "absent").

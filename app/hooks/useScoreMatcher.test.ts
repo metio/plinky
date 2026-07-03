@@ -123,6 +123,27 @@ describe("useScoreMatcher", () => {
         expect((onCorrect.mock.calls[0]![0] as CorrectInfo).wrongBefore).toBe(1);
     });
 
+    it("reports the staves each cleared position sits on, for per-hand scoring", () => {
+        const onCorrect = vi.fn();
+        // A grand-staff chord (both hands) then a right-hand-only note.
+        const { result } = render(
+            [
+                [
+                    { midi: 60, staff: 0 },
+                    { midi: 48, staff: 1 },
+                ],
+                [{ midi: 62, staff: 0 }],
+            ],
+            { onCorrect },
+        );
+        act(() => result.current.start());
+        act(() => result.current.registerNote(60));
+        act(() => result.current.registerNote(48));
+        act(() => result.current.registerNote(62));
+        expect((onCorrect.mock.calls[0]![0] as CorrectInfo).staves).toEqual([0, 1]);
+        expect((onCorrect.mock.calls[1]![0] as CorrectInfo).staves).toEqual([0]);
+    });
+
     it("skips leading rests so the first expected position has notes", () => {
         const { result } = render([[], [60]]);
         act(() => result.current.start());

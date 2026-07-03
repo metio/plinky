@@ -78,7 +78,7 @@ import {
     restoreNotes,
     WINDOW_COLOR,
 } from "../lib/scoreColor";
-import { type Grid, gridFor, type RunNote } from "../lib/shareCard";
+import { type Grid, handGrid, handsPlayed, type RunNote } from "../lib/shareCard";
 import { transposeMusicXml } from "../lib/transpose";
 import {
     findHotspots,
@@ -472,6 +472,7 @@ export function ScoreViewer({
                     wrongBefore: info.wrongBefore,
                     velocity: info.velocity,
                     pitches: [...info.pitches],
+                    staves: info.staves,
                 },
             ];
             // Remember which run note each struck pitch belongs to, so its release can
@@ -722,7 +723,7 @@ export function ScoreViewer({
         // a slow run reads slow however the slider was set. With no intrinsic tempo the
         // scale is 1, leaving Speed to measure how evenly the notated rhythm was kept.
         const intendedTempo = initialTempo ?? runTempoRef.current;
-        const grid = gridFor(notes, {
+        const grid = handGrid(notes, {
             tempoScale: intendedTempo > 0 ? runTempoRef.current / intendedTempo : 1,
         });
         gradeFromRunRef.current = true;
@@ -1847,11 +1848,13 @@ export function ScoreViewer({
                                     grid={shareGrid}
                                     caption={m.share_heading()}
                                     gridLabel={m.share_grid_label()}
-                                    rowLabels={[
-                                        m.scores_accuracy(),
-                                        m.scores_speed(),
-                                        m.scores_timing(),
-                                    ]}
+                                    rowLabels={
+                                        handsPlayed(runNotes).length > 1
+                                            ? handsPlayed(runNotes).map((staff) =>
+                                                  staff === 0 ? m.hand_right() : m.hand_left(),
+                                              )
+                                            : [m.share_row_you()]
+                                    }
                                     boast={
                                         daily != null
                                             ? m.daily_share_boast({

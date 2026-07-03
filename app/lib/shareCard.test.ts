@@ -6,7 +6,8 @@ import { LENIENT_TOLERANCE } from "./rhythm";
 import {
     computeSegments,
     gridEmoji,
-    gridFor,
+    handGrid,
+    handsPlayed,
     levelFor,
     type RunNote,
     SEGMENTS,
@@ -23,22 +24,24 @@ function clean(): RunNote {
 
 // A run of evenly-spaced notes played dead on the notated tempo — flawless on timing and
 // at-tempo on speed. Notes need real spacing (unlike the all-at-zero `clean`) so the
-// per-gap timing and speed have something to measure.
-function spaced(count: number): RunNote[] {
+// per-gap timing and speed have something to measure. `staff` tags which hand they're on.
+function spaced(count: number, staff = 0): RunNote[] {
     return Array.from({ length: count }, (_, i) => ({
         targetMs: i * 100,
         playedMs: i * 100,
         wrongBefore: 0,
+        staves: [staff],
     }));
 }
 
 // The same phrase played `factor` times slower than notated (a mouse-plodder at factor 2
 // takes twice as long) — steady, but off the piece's tempo.
-function slow(count: number, factor: number): RunNote[] {
+function slow(count: number, factor: number, staff = 0): RunNote[] {
     return Array.from({ length: count }, (_, i) => ({
         targetMs: i * 100,
         playedMs: i * 100 * factor,
         wrongBefore: 0,
+        staves: [staff],
     }));
 }
 
@@ -152,47 +155,71 @@ describe("computeSegments", () => {
     });
 });
 
-describe("toGrid / gridFor", () => {
-    it("has one row per dimension and one column per segment", () => {
-        const grid = gridFor(spaced(6));
-        expect(grid).toHaveLength(3);
-        for (const row of grid) {
-            expect(row).toHaveLength(SEGMENTS);
-        }
-    });
-
-    it("maps levels in dimension order: accuracy, speed, timing", () => {
-        const segments = [
-            { accuracy: 1, speed: 0.7, timing: 0.3 },
-            { accuracy: 1, speed: 0.7, timing: 0.3 },
-        ];
-        const grid = toGrid(segments, ["accuracy", "speed", "timing"]);
+describe("toGrid (lifetime fingerprint)", () => {
+    it("maps levels in the given dimension order", () => {
+        const grid = toGrid(
+            [{ accuracy: 1, timing: 0.7, flow: 0.3 }],
+            ["accuracy", "timing", "flow"],
+        );
         expect(grid[0]?.[0]).toBe("best"); // accuracy 1.0 → green
-        expect(grid[1]?.[0]).toBe("good"); // speed 0.7 → yellow
-        expect(grid[2]?.[0]).toBe("weak"); // timing 0.3 → red
+        expect(grid[1]?.[0]).toBe("good"); // timing 0.7 → yellow
+        expect(grid[2]?.[0]).toBe("weak"); // flow 0.3 → red
     });
 
     it("is generic over the dimension set", () => {
-        const grid = toGrid([{ a: 1, b: 0 }], ["a", "b"]);
-        expect(grid).toEqual([["best"], ["none"]]);
+        expect(toGrid([{ a: 1, b: 0 }], ["a", "b"])).toEqual([["best"], ["none"]]);
     });
 });
 
-describe("gridEmoji", () => {
-    it("renders one line of emoji squares per dimension, with no leading glyph", () => {
-        const text = gridEmoji(gridFor(spaced(6)));
-        const lines = text.split("\n");
-        expect(lines).toHaveLength(3);
-        for (const line of lines) {
-            expect(line).toBe("🟩".repeat(SEGMENTS));
-        }
+describe("handsPlayed", () => {
+    it("is the single top hand for a single-staff run", () => {
+        expect(handsPlayed(spaced(6))).toEqual([0]);
+    });
+
+    it("is both hands, right (0) before left (1), for a grand-staff run", () => {
+        expect(handsPlayed([...spaced(3, 1), ...spaced(3, 0)])).toEqual([0, 1]);
+    });
+
+    it("defaults to the top hand when no staff was recorded", () => {
+        expect(handsPlayed([{ targetMs: 0, playedMs: 0, wrongBefore: 0 }])).toEqual([0]);
+    });
+});
+
+describe("handGrid", () => {
+    it("is one row of six cells for a single-hand run", () => {
+        const grid = handGrid(spaced(6));
+        expect(grid).toHaveLength(1);
+        expect(grid[0]).toHaveLength(SEGMENTS);
+    });
+
+    it("collapses the three dimensions to the weakest, so a slow run reads red", () => {
+        // Right notes, steady, but a third of the tempo: Speed 0.33 drags the cell down
+        // even though Accuracy and Timing are perfect — averaging would leave it green.
+        expect(handGrid(slow(12, 3))[0]?.[0]).toBe("weak");
+        expect(handGrid(spaced(12))[0]?.[0]).toBe("best");
+    });
+
+    it("splits a two-hand run into a row per hand and exposes the lagging one", () => {
+        // Right hand at tempo, left hand crawling — the left row goes red while the right
+        // stays green: the whole point of per-hand grading.
+        const grid = handGrid([...spaced(6, 0), ...slow(6, 3, 1)]);
+        expect(grid).toHaveLength(2);
+        expect(grid[0]?.every((cell) => cell === "best")).toBe(true); // right, at tempo
+        expect(grid[1]?.every((cell) => cell === "weak")).toBe(true); // left, slow
+    });
+
+    it("counts a both-staves moment toward both hands' rows", () => {
+        const both = [
+            { targetMs: 0, playedMs: 0, wrongBefore: 0, staves: [0, 1] },
+            { targetMs: 100, playedMs: 100, wrongBefore: 0, staves: [0, 1] },
+        ];
+        expect(handGrid(both)).toHaveLength(2);
     });
 });
 
 describe("shareText", () => {
     it("stacks the boast over the grid with no link", () => {
-        const grid = gridFor([clean()]);
-        const text = shareText("My run on Plinky 🎹", grid);
+        const text = shareText("My run on Plinky 🎹", handGrid(spaced(6)));
         const lines = text.split("\n");
         expect(lines[0]).toBe("My run on Plinky 🎹");
         expect(text).not.toMatch(/https?:|plinky\.fun/);
@@ -206,51 +233,44 @@ describe("shareText", () => {
 // cross-OS font/anti-aliasing flakiness that dogs pixel diffing. A snapshot change here
 // means the shared card visibly changed; review it, don't blindly update it.
 describe("coloured blocks (visual regression)", () => {
-    it("paints an at-tempo run all green", () => {
-        expect(gridEmoji(gridFor(spaced(12)))).toMatchInlineSnapshot(`
+    it("paints an at-tempo single-hand run one green row", () => {
+        expect(gridEmoji(handGrid(spaced(12)))).toMatchInlineSnapshot(`"🟩🟩🟩🟩🟩🟩"`);
+    });
+
+    it("reads a slow-but-accurate run as one red row (the weakest aspect wins)", () => {
+        expect(gridEmoji(handGrid(slow(12, 3)))).toMatchInlineSnapshot(`"🟥🟥🟥🟥🟥🟥"`);
+    });
+
+    it("shows a lagging left hand as a red second row under a green right", () => {
+        expect(gridEmoji(handGrid([...spaced(6, 0), ...slow(6, 3, 1)]))).toMatchInlineSnapshot(`
           "🟩🟩🟩🟩🟩🟩
-          🟩🟩🟩🟩🟩🟩
-          🟩🟩🟩🟩🟩🟩"
+          🟥🟥🟥🟥🟥🟥"
         `);
     });
 
-    it("flags the speed row red for a slow-but-accurate run, notes and timing still green", () => {
-        // The discrimination the rebalance exists for: right notes, steady, but a third of
-        // the tempo — Accuracy and Timing stay green while Speed goes red.
-        expect(gridEmoji(gridFor(slow(12, 3)))).toMatchInlineSnapshot(`
-          "🟩🟩🟩🟩🟩🟩
-          🟥🟥🟥🟥🟥🟥
-          🟩🟩🟩🟩🟩🟩"
-        `);
+    it("reads an abandoned run as one empty row", () => {
+        expect(gridEmoji(handGrid([]))).toMatchInlineSnapshot(`"⬜⬜⬜⬜⬜⬜"`);
     });
 
-    it("reads an abandoned run as empty blocks", () => {
-        expect(gridEmoji(gridFor([]))).toMatchInlineSnapshot(`
-          "⬜⬜⬜⬜⬜⬜
-          ⬜⬜⬜⬜⬜⬜
-          ⬜⬜⬜⬜⬜⬜"
-        `);
-    });
-
-    it("renders the same blocks as coloured SVG rects — 12 green, 6 red for the slow run", () => {
-        const svg = svgCard(gridFor(slow(12, 3)), "Test");
-        // Accuracy + Timing rows are green (#22c55e), the Speed row red (#ef4444).
-        expect((svg.match(/#22c55e/g) ?? []).length).toBe(12);
-        expect((svg.match(/#ef4444/g) ?? []).length).toBe(6);
+    it("renders the two-hand blocks as coloured SVG rects — 6 green, 6 red", () => {
+        const svg = svgCard(handGrid([...spaced(6, 0), ...slow(6, 3, 1)]), "Test");
+        expect((svg.match(/#22c55e/g) ?? []).length).toBe(6); // right row green
+        expect((svg.match(/#ef4444/g) ?? []).length).toBe(6); // left row red
     });
 });
 
 describe("svgCard", () => {
     it("is well-formed SVG sized for a portrait social card", () => {
-        const svg = svgCard(gridFor(spaced(6)), "Für Elise");
+        const svg = svgCard(handGrid(spaced(6)), "Für Elise");
         expect(svg.startsWith("<svg")).toBe(true);
         expect(svg).toContain('width="1080"');
         expect(svg).toContain('height="1350"');
-        expect(svg.match(/<rect/g)).toHaveLength(3 * SEGMENTS + 1);
+        // One row of six cells for a single hand, plus the background rect.
+        expect(svg.match(/<rect/g)).toHaveLength(SEGMENTS + 1);
     });
 
     it("escapes the heading so a title cannot break the markup", () => {
-        const svg = svgCard(gridFor([clean()]), 'A & B <"x">');
+        const svg = svgCard(handGrid(spaced(1)), 'A & B <"x">');
         expect(svg).toContain("A &amp; B &lt;&quot;x&quot;&gt;");
         expect(svg).not.toContain('<"x">');
     });

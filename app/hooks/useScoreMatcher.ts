@@ -20,6 +20,24 @@ function pitchesAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): numb
         .map((note) => note.halfTone + 12);
 }
 
+// The staves the notes at the cursor's current position sit on (treble/right = 0,
+// bass/left = 1), narrowed to the chosen hand — so a cleared position can be attributed
+// to a hand. A position that sounds on both staves reports both.
+function stavesAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): number[] {
+    const staves = new Set<number>();
+    for (const note of osmd.cursor.NotesUnderCursor()) {
+        if (note.isRest() || note.halfTone <= 0) {
+            continue;
+        }
+        const staff = note.ParentStaff?.idInMusicSheet;
+        if (staff === undefined || (hand !== "both" && staff !== STAFF_FOR[hand])) {
+            continue;
+        }
+        staves.add(staff);
+    }
+    return [...staves].sort((a, b) => a - b);
+}
+
 // Skip positions with nothing to play for the chosen hand — rests, and the
 // stretches where only the other hand sounds during hands-separate practice.
 function advancePastRests(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): void {
@@ -62,6 +80,9 @@ export type CorrectInfo = {
     // zero means a clean first try, the signal Flow and per-segment accuracy are
     // built from.
     wrongBefore: number;
+    // The staves this position sits on (0 = treble/right, 1 = bass/left), so a run can be
+    // scored per hand. Both when a chord spans the grand staff.
+    staves: number[];
 };
 
 export function useScoreMatcher(
@@ -191,6 +212,7 @@ export function useScoreMatcher(
                     timeMs,
                     velocity,
                     wrongBefore: sinceWrong.current,
+                    staves: stavesAtCursor(osmd, runHandRef.current),
                 });
                 ordinalRef.current += 1;
                 sinceWrong.current = 0;
