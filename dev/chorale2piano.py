@@ -19,7 +19,7 @@ import re
 import sys
 from pathlib import Path
 
-from music21 import clef, converter, instrument, layout, metadata, stream
+from music21 import clef, converter, instrument, layout, metadata, stream, tempo
 
 
 def slug(text: str) -> str:
@@ -63,7 +63,7 @@ def pick(parts, needle, fallback_index):
     return parts[fallback_index] if fallback_index < len(parts) else None
 
 
-def staff_from(upper, lower, which_clef):
+def staff_from(upper, lower, which_clef, keep_tempo=True):
     """Chordify two voices into one PartStaff with the given clef, named Piano."""
     merged = stream.Score([upper, lower]).chordify()
     # Drop the inherited SATB instruments (Voice/Bass/Alto/…) so only Piano remains —
@@ -71,6 +71,11 @@ def staff_from(upper, lower, which_clef):
     # the score as a vocal ensemble.
     for inst in list(merged.recurse().getElementsByClass(instrument.Instrument)):
         merged.remove(inst, recurse=True)
+    # Both staves inherit the tempo mark from chordify; keep it only on the upper staff
+    # so the grand staff shows one metronome marking, not one stacked per staff.
+    if not keep_tempo:
+        for mark in list(merged.recurse().getElementsByClass(tempo.TempoIndication)):
+            merged.remove(mark, recurse=True)
     ps = stream.PartStaff()
     ps.insert(0, instrument.Piano())
     measures = list(merged.getElementsByClass(stream.Measure))
@@ -96,7 +101,7 @@ def reduce_chorale(krn, title):
     bass = pick(parts, "bass", 0)
 
     treble = staff_from(sop, alto, clef.TrebleClef())
-    lower = staff_from(ten, bass, clef.BassClef())
+    lower = staff_from(ten, bass, clef.BassClef(), keep_tempo=False)
 
     piano = stream.Score()
     piano.insert(0, treble)

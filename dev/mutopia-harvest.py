@@ -24,7 +24,7 @@ import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-from music21 import clef, converter, instrument, key, layout, metadata, stream
+from music21 import clef, converter, instrument, key, layout, metadata, stream, tempo
 
 # Solo keyboard, played on a piano. Reject anything with a second player, pedals, or a
 # non-keyboard instrument named alongside.
@@ -105,9 +105,21 @@ def to_piano(midi_path, title, composer, ksig):
         ps = stream.PartStaff()
         ps.insert(0, instrument.Piano())
         measures = list(part.getElementsByClass(stream.Measure)) or [part]
+        # MIDI carries no clef, so music21 guesses one per part from pitch range — and
+        # for a piece sitting in the treble it guesses treble for BOTH hands. Drop those
+        # guesses and impose the piano convention: treble on top, bass below.
+        for m in measures:
+            for guessed in list(m.getElementsByClass(clef.Clef)):
+                m.remove(guessed)
         if ksig:
             measures[0].insert(0, key.KeySignature(ksig.sharps))
         measures[0].insert(0, clefs[idx] if len(parts) == 2 else clef.TrebleClef())
+        # MIDI's tempo is propagated to every part; keep it on the top staff only so the
+        # grand staff shows one tempo marking, not one stacked per staff.
+        if idx > 0:
+            for m in measures:
+                for mark in list(m.getElementsByClass(tempo.TempoIndication)):
+                    m.remove(mark)
         for m in measures:
             ps.append(m)
         if ksig:
