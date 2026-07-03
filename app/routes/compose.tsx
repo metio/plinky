@@ -354,6 +354,40 @@ export default function Compose() {
                 <CoachMark id="compose-intro">{m.compose_intro()}</CoachMark>
             </header>
 
+            {/* The recording controls lead — the primary action is the first thing in
+            reach, above the sketch it produces, so you can start without scrolling. */}
+            <section className="flex flex-wrap gap-2">
+                <Button variant="primary" onClick={countIn} disabled={countingIn}>
+                    {countingIn ? m.compose_counting_in() : m.compose_count_in()}
+                </Button>
+                <Button variant="secondary" onClick={playing ? stop : play} disabled={empty}>
+                    {playing ? m.compose_stop() : m.compose_play()}
+                </Button>
+                <Button
+                    variant="secondary"
+                    onClick={() => setCheckpoint(notes.length)}
+                    disabled={empty}
+                >
+                    {m.compose_set_checkpoint()}
+                </Button>
+                <Button
+                    variant="secondary"
+                    onClick={resetToCheckpoint}
+                    disabled={checkpoint === null}
+                >
+                    {checkpoint === null
+                        ? m.compose_reset_checkpoint()
+                        : m.compose_reset_checkpoint_at({ count: checkpoint })}
+                </Button>
+                <ConfirmButton
+                    onConfirm={reset}
+                    confirmLabel={m.compose_clear_confirm()}
+                    disabled={empty}
+                >
+                    {m.compose_clear()}
+                </ConfirmButton>
+            </section>
+
             <section className="space-y-3">
                 <div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
                     {staffXml ? (
@@ -433,38 +467,6 @@ export default function Compose() {
                         {m.compose_metronome_label()}
                     </span>
                 </label>
-            </section>
-
-            <section className="flex flex-wrap gap-2">
-                <Button variant="primary" onClick={countIn} disabled={countingIn}>
-                    {countingIn ? m.compose_counting_in() : m.compose_count_in()}
-                </Button>
-                <Button variant="secondary" onClick={playing ? stop : play} disabled={empty}>
-                    {playing ? m.compose_stop() : m.compose_play()}
-                </Button>
-                <Button
-                    variant="secondary"
-                    onClick={() => setCheckpoint(notes.length)}
-                    disabled={empty}
-                >
-                    {m.compose_set_checkpoint()}
-                </Button>
-                <Button
-                    variant="secondary"
-                    onClick={resetToCheckpoint}
-                    disabled={checkpoint === null}
-                >
-                    {checkpoint === null
-                        ? m.compose_reset_checkpoint()
-                        : m.compose_reset_checkpoint_at({ count: checkpoint })}
-                </Button>
-                <ConfirmButton
-                    onConfirm={reset}
-                    confirmLabel={m.compose_clear_confirm()}
-                    disabled={empty}
-                >
-                    {m.compose_clear()}
-                </ConfirmButton>
             </section>
 
             <section className="flex flex-wrap items-center gap-2">

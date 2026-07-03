@@ -1267,10 +1267,15 @@ export function ScoreViewer({
                         </IconButton>
                     </div>
                 </FullScreen>
-                {/* The score sits at the top — it's what you read while playing, so the
-                controls, keyboard and run summary all fall below it. OSMD renders to
-                its container's full offset width, which includes any border or
-                padding on that element; were either on the element OSMD owns, the
+                {/* Inline, the primary action sits above the score so it's the first thing
+                in reach — you can start playing without scrolling past a tall staff. In
+                full screen the transport lives in the top bar instead (above), so this is
+                hidden to avoid a duplicate. */}
+                <FullScreen off>
+                    <div className="flex flex-wrap items-center gap-3">{transport}</div>
+                </FullScreen>
+                {/* OSMD renders to its container's full offset width, which includes any
+                border or padding on that element; were either on the element OSMD owns, the
                 rendered system would overflow by exactly that amount and show a
                 spurious scrollbar. So the border and breathing room live on the
                 wrapper, and the inner element OSMD measures is clean. Wide scores
@@ -1321,13 +1326,12 @@ export function ScoreViewer({
                     )}
                 </div>
 
-                {/* The normal toolbar. In full screen these all give way — transport moves to
-                the top bar and everything past it folds away — so only the score and keys
-                remain. The defaults (tempo from the piece, fingerings on, bars auto) are
-                good, so the collapsed state loses nothing. */}
+                {/* The practice-tools fold sits below the score (the transport is above it).
+                In full screen it gives way entirely — only the score and keys remain. The
+                defaults (tempo from the piece, fingerings off, bars auto) are good, so the
+                collapsed state loses nothing. */}
                 <FullScreen off>
                     <div className="flex flex-wrap items-center gap-3">
-                        {transport}
                         <Disclosure summary={m.more_options()}>
                             <FieldGroup label={m.group_tempo()}>
                                 {lockTempo ? (
