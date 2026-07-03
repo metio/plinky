@@ -18,6 +18,9 @@ export type LicenseInfo = {
     // A public-domain dedication rather than a permissions licence — shown as
     // "Public domain" rather than a bare licence code.
     publicDomain: boolean;
+    // False for the NonCommercial (NC) variants: a paid tier must exclude these
+    // pieces. The single source of truth for that gate — no separate manifest flag.
+    commercialUse: boolean;
 };
 
 const DEED = "https://creativecommons.org/";
@@ -30,36 +33,42 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         url: `${DEED}publicdomain/zero/1.0/`,
         requiresAttribution: false,
         publicDomain: true,
+        commercialUse: true,
     },
     "CC-BY-4.0": {
         label: "CC BY 4.0",
         url: `${DEED}licenses/by/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
+        commercialUse: true,
     },
     "CC-BY-SA-4.0": {
         label: "CC BY-SA 4.0",
         url: `${DEED}licenses/by-sa/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
+        commercialUse: true,
     },
     "CC-BY-NC-4.0": {
         label: "CC BY-NC 4.0",
         url: `${DEED}licenses/by-nc/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
+        commercialUse: false,
     },
     "CC-BY-ND-4.0": {
         label: "CC BY-ND 4.0",
         url: `${DEED}licenses/by-nd/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
+        commercialUse: true,
     },
     "CC-BY-NC-SA-4.0": {
         label: "CC BY-NC-SA 4.0",
         url: `${DEED}licenses/by-nc-sa/4.0/`,
         requiresAttribution: true,
         publicDomain: false,
+        commercialUse: false,
     },
 };
 
@@ -67,6 +76,9 @@ export type SourceInfo = {
     id: string;
     label: string;
     url: string;
+    // The person to credit for the engraving, when the source's licence requires
+    // attribution to someone other than the composer (e.g. a modern editor).
+    credit?: string;
 };
 
 // Where catalogue pieces are sourced from. A song carries a `source` id; the
@@ -76,6 +88,13 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
     "openscore-lieder": {
         label: "OpenScore Lieder",
         url: "https://github.com/OpenScore/Lieder",
+    },
+    // The KernScores keyboard corpora, engraved by Craig Stuart Sapp and licensed
+    // CC-BY-NC-SA — so the editor is credited and the pieces are non-commercial.
+    kern: {
+        label: "KernScores",
+        url: "https://github.com/craigsapp",
+        credit: "Craig Stuart Sapp",
     },
 };
 

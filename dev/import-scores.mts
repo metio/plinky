@@ -4,16 +4,16 @@
 // Imports curated open score corpora into the catalogue alongside the PDMX base.
 // Unlike PDMX (a 30 GB local dataset of user uploads whose CC0 tags can't be trusted),
 // these are small, curated, provably-licensed repos — so their licence is taken from
-// the source config, not re-derived per composer. Each corpus already ships MusicXML
-// (.mxl), so no format conversion is needed here.
+// the source config, not re-derived per composer.
 //
 // Composable and idempotent per source: a run replaces ONLY its own source's manifest
 // entries and .mxl files, never another source's, so `scores:import openscore-lieder`
 // can run repeatedly and alongside `songs:import` (PDMX). It writes provisional grades;
 // run `npm run songs:bake` afterwards to finalise the octile boundaries + seed.
 //
-// Usage: `npm run scores:import [source-id]` (defaults to openscore-lieder). The corpus
-// is cloned into sources/<id> (gitignored) on first run.
+// Usage: `npm run scores:import [source-id]` (defaults to openscore-lieder). Each repo is
+// cloned into sources/<id>/<repo> (gitignored) on first run. Humdrum (**kern) corpora
+// are converted to MusicXML by dev/krn2mxl.py (music21) before ingesting.
 //
 // Needs a DOM for the cost engine, so it installs linkedom's DOMParser as the global.
 
@@ -23,7 +23,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
-import { nonPianoVocalReason } from "./scoreInstrument.mts";
+import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
@@ -32,19 +32,43 @@ const OUT = "public/songs";
 const SOURCES_DIR = "sources";
 
 type SourceConfig = {
-    repo: string; // cloned to sources/<id> when the checkout is missing
+    repos: string[]; // git URLs, each cloned to sources/<id>/<repo> when missing
     license: string; // the SPDX id every score from this source carries
     gate: (xml: string) => string | null; // instrument filter for this repertoire
+    // Humdrum **kern corpora ship .krn, converted to .mxl via music21 before ingest.
+    convert?: boolean;
+    // Which MusicXML title field holds the song title: a cycle/collection puts it in
+    // the movement-title (work-title = the set), a keyboard sonata in the work-title
+    // (movement-title = a tempo marking like "Allegro").
+    titleField?: "movement" | "work";
+    // KernScores names composers "Last, First"; flip to "First Last" for display.
+    reorderComposer?: boolean;
 };
 
-// The corpora we trust for licensing (curated public-domain projects). OpenScore Lieder
-// is 19th-century art song — a vocal line over a piano part — so it uses the piano-or-
-// vocal gate rather than the strict solo-piano one.
+// The corpora we trust for licensing (curated projects). OpenScore Lieder is 19th-century
+// art song (voice over piano) → the piano-or-vocal gate. The KernScores keyboard corpora
+// are solo/duet piano → the strict solo-piano gate; they are CC-BY-NC-SA (see
+// attribution.ts), and only the repos carrying an explicit CC licence are listed (the
+// rights-reserved ones — Beethoven, Scriabin, Chopin, Hummel — are deliberately omitted).
 const CONFIGS: Record<string, SourceConfig> = {
     "openscore-lieder": {
-        repo: "https://github.com/OpenScore/Lieder.git",
+        repos: ["https://github.com/OpenScore/Lieder.git"],
         license: "CC0-1.0",
         gate: nonPianoVocalReason,
+        titleField: "movement",
+    },
+    kern: {
+        repos: [
+            "https://github.com/craigsapp/scarlatti-keyboard-sonatas.git",
+            "https://github.com/craigsapp/mozart-piano-sonatas.git",
+            "https://github.com/craigsapp/haydn-piano-sonatas.git",
+            "https://github.com/craigsapp/joplin.git",
+        ],
+        license: "CC-BY-NC-SA-4.0",
+        gate: nonSoloPianoReason,
+        convert: true,
+        titleField: "work",
+        reorderComposer: true,
     },
 };
 
@@ -88,15 +112,27 @@ function readMxl(path: string): string {
 const tagText = (xml: string, tag: string): string =>
     xml.match(new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`, "i"))?.[1] ?? "";
 
-// Prefer the movement-title (the individual song) over the work-title (which, for a
-// cycle or published collection, names the whole set — shared across every song in it).
-function titleOf(xml: string): string {
-    return clean(tagText(xml, "movement-title")) || clean(tagText(xml, "work-title")) || "Untitled";
+function titleOf(xml: string, field: "movement" | "work"): string {
+    const work = clean(tagText(xml, "work-title"));
+    const movement = clean(tagText(xml, "movement-title"));
+    if (field === "work") {
+        // Keyboard works: the work-title names the piece. A numbered movement is
+        // appended so a multi-movement sonata's movements stay distinct entries; an
+        // unnumbered piece's movement-title is just a tempo marking, so it's dropped.
+        const numbered = clean(tagText(xml, "movement-number")) !== "";
+        const label = numbered && movement ? `${work} — ${movement.replace(/\.$/, "")}` : work;
+        return label || movement || "Untitled";
+    }
+    return movement || work || "Untitled";
 }
 
-function composerOf(xml: string): string {
+// "Last, First" → "First Last"; leaves an already-plain name untouched.
+const reorderName = (name: string): string => name.replace(/^([^,]+),\s*(.+)$/, "$2 $1");
+
+function composerOf(xml: string, reorder: boolean): string {
     const typed = xml.match(/<creator\b[^>]*\btype="composer"[^>]*>([^<]*)<\/creator>/i)?.[1];
-    return clean(typed) || clean(tagText(xml, "creator"));
+    const composer = clean(typed) || clean(tagText(xml, "creator"));
+    return reorder ? reorderName(composer) : composer;
 }
 
 function tempoOf(xml: string): number {
@@ -107,8 +143,8 @@ function beatsOf(xml: string): number {
     const beats = Number(xml.match(/<beats>(\d+)<\/beats>/)?.[1]);
     return Number.isFinite(beats) && beats >= 1 && beats <= 16 ? beats : 4;
 }
-// Bars = measures per part: the file repeats every bar once per part (voice + piano),
-// so divide the raw measure count by the number of parts.
+// Bars = measures per part: the measure count repeats once per part (a voice + a piano,
+// or a piano's two staves), so divide the raw count by the number of parts.
 function barsOf(xml: string): number {
     const measures = (xml.match(/<measure\b/g) ?? []).length;
     const parts = Math.max(1, (xml.match(/<part\s+id=/g) ?? []).length);
@@ -122,12 +158,33 @@ async function main() {
         throw new Error(`unknown source "${key}"; known: ${Object.keys(CONFIGS).join(", ")}`);
     }
 
-    const dir = `${SOURCES_DIR}/${key}`;
-    if (!existsSync(dir)) {
-        console.log(`Cloning ${cfg.repo} → ${dir} …`);
-        await mkdir(SOURCES_DIR, { recursive: true });
-        execSync(`git clone --depth 1 ${cfg.repo} ${dir}`, { stdio: "inherit" });
+    // Clone each repo (and, for kern, convert its .krn to .mxl) — gathering the .mxl to
+    // ingest only from the dirs we manage, so a stray checkout can't leak in.
+    await mkdir(`${SOURCES_DIR}/${key}`, { recursive: true });
+    const files: string[] = [];
+    for (const repoUrl of cfg.repos) {
+        const repoName = (repoUrl.split("/").pop() ?? repoUrl).replace(/\.git$/, "");
+        const repoDir = `${SOURCES_DIR}/${key}/${repoName}`;
+        if (!existsSync(repoDir)) {
+            console.log(`Cloning ${repoUrl} → ${repoDir} …`);
+            execSync(`git clone --depth 1 ${repoUrl} ${repoDir}`, { stdio: "inherit" });
+        }
+        let searchDir = repoDir;
+        if (cfg.convert) {
+            searchDir = `${repoDir}/_mxl`;
+            console.log(`Converting ${repoName} .krn → .mxl …`);
+            execSync(`python3 dev/krn2mxl.py ${repoDir} ${searchDir} ${repoName}`, {
+                stdio: "inherit",
+            });
+        }
+        files.push(
+            ...execSync(`find ${searchDir} -name '*.mxl'`, { encoding: "utf8", maxBuffer: 64 << 20 })
+                .trim()
+                .split("\n")
+                .filter(Boolean),
+        );
     }
+    console.log(`${files.length} .mxl to consider for "${key}".`);
 
     const manifestPath = `${OUT}/manifest.json`;
     const existing: SongMeta[] = existsSync(manifestPath)
@@ -144,12 +201,6 @@ async function main() {
     const takenKeys = new Set(kept.map((song) => songKey(song.composer, song.title)));
     const takenIds = new Set(kept.map((song) => song.id));
 
-    const files = execSync(`find ${dir} -name '*.mxl'`, { encoding: "utf8", maxBuffer: 64 << 20 })
-        .trim()
-        .split("\n")
-        .filter(Boolean);
-    console.log(`${files.length} .mxl found in ${dir}.`);
-
     const added: (SongMeta & { src: string })[] = [];
     const dropped = { gate: 0, dup: 0, unreadable: 0 };
     for (const file of files) {
@@ -165,8 +216,8 @@ async function main() {
             continue;
         }
         const id = (file.split("/").pop() ?? file).replace(/\.mxl$/, "");
-        const title = titleOf(xml);
-        const composer = composerOf(xml);
+        const title = titleOf(xml, cfg.titleField ?? "movement");
+        const composer = composerOf(xml, cfg.reorderComposer ?? false);
         const dupeKey = songKey(composer, title);
         if (takenIds.has(id) || takenKeys.has(dupeKey)) {
             dropped.dup++;

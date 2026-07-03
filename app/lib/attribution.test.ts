@@ -47,6 +47,15 @@ describe("licenseInfo", () => {
         }
     });
 
+    it("marks the NonCommercial variants as not permitting commercial use", () => {
+        // The single source of truth a future paid tier reads to exclude a piece.
+        expect(licenseInfo("CC-BY-NC-4.0")?.commercialUse).toBe(false);
+        expect(licenseInfo("CC-BY-NC-SA-4.0")?.commercialUse).toBe(false);
+        for (const id of ["CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0"]) {
+            expect(licenseInfo(id)?.commercialUse, id).toBe(true);
+        }
+    });
+
     it("returns null for an unknown or missing id", () => {
         expect(licenseInfo("MIT")).toBeNull();
         expect(licenseInfo("")).toBeNull();
@@ -58,6 +67,16 @@ describe("sourceInfo", () => {
     it("resolves the PDMX source to a label and provenance link", () => {
         expect(sourceInfo("pdmx")).toMatchObject({ id: "pdmx", label: "PDMX" });
         expect(sourceInfo("pdmx")?.url).toMatch(/^https:\/\//);
+    });
+
+    it("carries an engraver credit for a source whose licence needs one", () => {
+        expect(sourceInfo("kern")).toMatchObject({
+            id: "kern",
+            label: "KernScores",
+            credit: "Craig Stuart Sapp",
+        });
+        // CC0 sources need no separate credit.
+        expect(sourceInfo("pdmx")?.credit).toBeUndefined();
     });
 
     it("returns null for an unknown or missing source", () => {

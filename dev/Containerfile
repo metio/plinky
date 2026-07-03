@@ -26,6 +26,13 @@ RUN apt-get update \
 ARG REUSE_VERSION=6.2.0
 RUN pip install --break-system-packages --no-cache-dir "reuse==${REUSE_VERSION}"
 
+# music21: converts Humdrum **kern scores to MusicXML for `npm run scores:import kern`
+# (the KernScores corpora ship .krn, not MusicXML). Pure Python — no MuseScore needed
+# for kern parsing.
+# renovate: datasource=pypi depName=music21
+ARG MUSIC21_VERSION=10.5.0
+RUN pip install --break-system-packages --no-cache-dir "music21==${MUSIC21_VERSION}"
+
 # markdownlint-cli2 mirrors the DavidAnson/markdownlint-cli2-action in verify.yml,
 # so `markdownlint-cli2 '**/*.md'` reproduces the CI markdown gate locally against
 # .markdownlint.yaml.

@@ -427,6 +427,7 @@
   "import_back_to_library": "← Back to the library",
   "attribution_public_domain": "Public domain",
   "attribution_via": "via",
+  "attribution_edited_by": "ed.",
   "takes_heading": "Your takes ({count})",
   "takes_partial": "partial",
   "takes_replay": "Replay this take",

@@ -42,6 +42,9 @@ export function Attribution({
                     <a href={sourceDetail.url} target="_blank" rel="noreferrer" className={link}>
                         {sourceDetail.label}
                     </a>
+                    {sourceDetail.credit
+                        ? ` (${m.attribution_edited_by()} ${sourceDetail.credit})`
+                        : ""}
                 </span>
             )}
         </p>
