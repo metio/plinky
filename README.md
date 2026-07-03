@@ -84,7 +84,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import. Search, star, filter
   by kind, grade, or what's **due now**, and open one to practise. Each piece credits
   its **licence and source** — the public-domain catalogue is drawn from
-  [PDMX](https://github.com/pnlong/PDMX) — linked from the play page.
+  [PDMX](https://github.com/pnlong/PDMX) and the CC0
+  [OpenScore Lieder](https://github.com/OpenScore/Lieder) corpus — linked from
+  the play page.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
   streak to keep up. Once played, re-opening the day's challenge shows your result
