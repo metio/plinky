@@ -36,7 +36,7 @@ export default function Settings() {
         volume: 80,
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
-        showFingerings: true,
+        showFingerings: false,
         noteHints: "miss",
         noteLabels: "c",
         forgiving: false,

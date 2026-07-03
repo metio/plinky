@@ -26,8 +26,10 @@ export type Prefs = {
     volume: number; // 0..100
     masteryThreshold: Letter; // grade a score must reach to count as learned
     handSpan: HandSpan;
-    // Show the suggested finger on the practice keyboard; off lets a learner work
-    // fingerings out unaided, the way they must at a real piano.
+    // Print the suggested fingering numbers on the staff. Off by default for a cleaner
+    // score — a player turns them on (in Settings, or with the in-play toggle) when they
+    // want the hint, the way they'd read fingering off printed sheet music only when
+    // stuck.
     showFingerings: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
@@ -89,7 +91,7 @@ const DEFAULTS: Prefs = {
     volume: 80,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
-    showFingerings: true,
+    showFingerings: false,
     noteHints: "miss",
     noteLabels: "c",
     forgiving: false,

@@ -13,7 +13,7 @@ const BASE: Prefs = {
     volume: 80,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
-    showFingerings: true,
+    showFingerings: false,
     noteHints: "miss",
     noteLabels: "c",
     forgiving: false,
@@ -80,10 +80,10 @@ describe("prefs", () => {
         expect(loadPrefs().barNumbers).toBe(true);
     });
 
-    it("defaults fingering hints on and round-trips the toggle", () => {
-        expect(loadPrefs().showFingerings).toBe(true);
-        savePrefs({ ...BASE, showFingerings: false });
+    it("defaults fingering numbers off and round-trips the toggle", () => {
         expect(loadPrefs().showFingerings).toBe(false);
+        savePrefs({ ...BASE, showFingerings: true });
+        expect(loadPrefs().showFingerings).toBe(true);
     });
 
     it("defaults note hints to after-a-mistake and round-trips the choice", () => {
