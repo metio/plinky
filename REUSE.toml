@@ -36,6 +36,7 @@ path = [
     "public/songs/mozart-piano-sonatas-*.mxl",
     "public/songs/haydn-piano-sonatas-*.mxl",
     "public/songs/joplin-*.mxl",
+    "public/songs/bach-370-chorales-*.mxl",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "Craig Stuart Sapp"

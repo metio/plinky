@@ -96,6 +96,13 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
         url: "https://github.com/craigsapp",
         credit: "Craig Stuart Sapp",
     },
+    // Bach's 370 four-part chorales, reduced to a two-staff piano grand staff — same
+    // KernScores editor and CC-BY-NC-SA licence as the other kern corpora.
+    "bach-chorales": {
+        label: "KernScores",
+        url: "https://github.com/craigsapp/bach-370-chorales",
+        credit: "Craig Stuart Sapp",
+    },
 };
 
 // The default source for catalogue songs: the whole shipped catalogue is imported

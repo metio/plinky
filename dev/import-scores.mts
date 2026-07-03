@@ -37,6 +37,10 @@ type SourceConfig = {
     gate: (xml: string) => string | null; // instrument filter for this repertoire
     // Humdrum **kern corpora ship .krn, converted to .mxl via music21 before ingest.
     convert?: boolean;
+    // Which converter runs the .krn → .mxl step (default dev/krn2mxl.py). The Bach
+    // chorales need dev/chorale2piano.py, which reduces their four SATB voices to a
+    // two-staff piano grand staff.
+    convertScript?: string;
     // Which MusicXML title field holds the song title: a cycle/collection puts it in
     // the movement-title (work-title = the set), a keyboard sonata in the work-title
     // (movement-title = a tempo marking like "Allegro").
@@ -67,6 +71,15 @@ const CONFIGS: Record<string, SourceConfig> = {
         license: "CC-BY-NC-SA-4.0",
         gate: nonSoloPianoReason,
         convert: true,
+        titleField: "work",
+        reorderComposer: true,
+    },
+    "bach-chorales": {
+        repos: ["https://github.com/craigsapp/bach-370-chorales.git"],
+        license: "CC-BY-NC-SA-4.0",
+        gate: nonSoloPianoReason,
+        convert: true,
+        convertScript: "dev/chorale2piano.py",
         titleField: "work",
         reorderComposer: true,
     },
@@ -172,8 +185,9 @@ async function main() {
         let searchDir = repoDir;
         if (cfg.convert) {
             searchDir = `${repoDir}/_mxl`;
-            console.log(`Converting ${repoName} .krn → .mxl …`);
-            execSync(`python3 dev/krn2mxl.py ${repoDir} ${searchDir} ${repoName}`, {
+            const script = cfg.convertScript ?? "dev/krn2mxl.py";
+            console.log(`Converting ${repoName} .krn → .mxl (${script}) …`);
+            execSync(`python3 ${script} ${repoDir} ${searchDir} ${repoName}`, {
                 stdio: "inherit",
             });
         }
