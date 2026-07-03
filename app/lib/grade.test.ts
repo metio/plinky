@@ -2,9 +2,30 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { computeGrade, type Grade, letterFor, parseGrade } from "./grade";
+import { computeGrade, type Grade, letterFor, parseGrade, scoreKeepUp } from "./grade";
 
 const PERFECT_RHYTHM = { perfect: 10, good: 0, off: 0, total: 10, averageAbsMs: 0 };
+
+describe("scoreKeepUp", () => {
+    it("counts the notes played in time and grades the ratio", () => {
+        expect(scoreKeepUp([true, true, true, true])).toEqual({ inTime: 4, total: 4, letter: "S" });
+        expect(scoreKeepUp([true, false, true, false])).toEqual({
+            inTime: 2,
+            total: 4,
+            letter: "E", // 50% → the E band (>= 40)
+        });
+    });
+
+    it("grades a mostly-kept-up run in the middle of the ladder", () => {
+        // 8 of 10 in time → 80% → B.
+        const hits = [...Array(8).fill(true), false, false];
+        expect(scoreKeepUp(hits)).toEqual({ inTime: 8, total: 10, letter: "B" });
+    });
+
+    it("is F for an empty run rather than dividing by zero", () => {
+        expect(scoreKeepUp([])).toEqual({ inTime: 0, total: 0, letter: "F" });
+    });
+});
 
 describe("parseGrade", () => {
     const valid: Grade = {

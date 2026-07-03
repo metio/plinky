@@ -91,6 +91,18 @@ export function letterFor(score: number): Letter {
     return "F";
 }
 
+// The result of a tempo-enforced play-along run: how many notes were played in time (the
+// clock waits for no one, so a note not cleared before it passes is a miss) out of the
+// total, graded on that ratio against the same A–F ladder as a self-paced run.
+export type KeepUpResult = { inTime: number; total: number; letter: Letter };
+
+export function scoreKeepUp(hits: readonly boolean[]): KeepUpResult {
+    const inTime = hits.filter(Boolean).length;
+    const total = hits.length;
+    const percent = total > 0 ? (100 * inTime) / total : 0;
+    return { inTime, total, letter: letterFor(percent) };
+}
+
 export type GradeInput = {
     correct: number;
     wrong: number;

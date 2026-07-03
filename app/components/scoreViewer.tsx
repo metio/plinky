@@ -18,7 +18,13 @@ import { cadence } from "../lib/cadence";
 import { recordDailyDone } from "../lib/dailyDone";
 import { type DailyResult, saveDailyResult } from "../lib/dailyResult";
 import { recordPractice } from "../lib/history";
-import { computeGrade, GRADE_COLOR, type Grade } from "../lib/grade";
+import {
+    computeGrade,
+    GRADE_COLOR,
+    type Grade,
+    type KeepUpResult,
+    scoreKeepUp,
+} from "../lib/grade";
 import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
 import { nextKeyboardWindow, type Span } from "../lib/keyboardWindow";
 import { recordRun } from "../lib/lifetime";
@@ -76,6 +82,7 @@ import {
     paintPlayedNotes,
     PLAYED_COLOR,
     restoreNotes,
+    SELECT_COLOR,
     WINDOW_COLOR,
 } from "../lib/scoreColor";
 import { type Grid, handGrid, handsPlayed, laggingHand, type RunNote } from "../lib/shareCard";
@@ -257,6 +264,23 @@ export function ScoreViewer({
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(false);
     const [playing, setPlaying] = useState(false);
+    // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
+    // on the clock rather than waiting for you, so a note not cleared before it passes is a
+    // miss. `guideNotes` sounds the notes as they pass for a follow-along; off, it's a
+    // read-at-tempo test. Session toggles (not persisted), off by default.
+    const [enforceTempo, setEnforceTempo] = useState(false);
+    const [guideNotes, setGuideNotes] = useState(true);
+    // Live during a play-along run, then the result once it finishes.
+    const [keepUpRunning, setKeepUpRunning] = useState(false);
+    const [keepUpProgress, setKeepUpProgress] = useState({ inTime: 0, done: 0 });
+    const [keepUpResult, setKeepUpResult] = useState<KeepUpResult | null>(null);
+    const keepUpActiveRef = useRef(false);
+    const keepUpHitsRef = useRef<boolean[]>([]);
+    // The pitches expected at the currently-open step, which of them have been played, and
+    // the step's rendered note groups (to paint green on a hit, red on a miss).
+    const keepUpExpectedRef = useRef<number[]>([]);
+    const keepUpStruckRef = useRef<Set<number>>(new Set());
+    const keepUpNotesRef = useRef<SVGGElement[]>([]);
     // This score's saved takes, the take currently replaying (if any), and whether
     // the finished run has already been saved — so its save prompt shows just once.
     const [takes, setTakes] = useState<Take[]>([]);
@@ -388,7 +412,14 @@ export function ScoreViewer({
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
-    useMetronome(metronomeOn, adaptive ? liveTempo : tempo, beatsPerBar ?? 4, subdivision);
+    // Keep-up mode always ticks (a count-in then the beat you're racing), whatever the
+    // metronome toggle; a self-paced run honours the toggle.
+    useMetronome(
+        metronomeOn || keepUpRunning,
+        keepUpRunning ? tempo : adaptive ? liveTempo : tempo,
+        beatsPerBar ?? 4,
+        keepUpRunning ? 1 : subdivision,
+    );
     const [grade, setGrade] = useState<Grade | null>(seededResult?.grade ?? null);
     const [runNotes, setRunNotes] = useState<RunNote[]>(seededResult?.notes ?? []);
     // The timing leniency the finished run was graded at, kept so the per-note strip
@@ -505,6 +536,12 @@ export function ScoreViewer({
     });
     useMidiInput({
         onNoteOn: (event) => {
+            // A play-along run owns the input: notes are caught against the clock, not fed
+            // to the self-paced matcher.
+            if (keepUpActiveRef.current) {
+                registerKeepUp(event.note);
+                return;
+            }
             if (!isPreciseInput(event.device)) {
                 impreciseRef.current = true;
             }
@@ -945,6 +982,10 @@ export function ScoreViewer({
             for (const id of timers.current) {
                 window.clearTimeout(id);
             }
+            // A re-render (a layout change) clears the timers above, which would strand a
+            // play-along run with the input still routed to it; end it cleanly.
+            keepUpActiveRef.current = false;
+            keepUpExpectedRef.current = [];
             // A change of layout (bars-per-row, treadmill, transpose) re-runs this
             // effect, building a fresh OSMD on the same container. OSMD renders into a
             // new SVG rather than replacing the old one, so without removing the previous
@@ -960,7 +1001,7 @@ export function ScoreViewer({
     // waiting their notated duration at the chosen tempo.
     const listen = () => {
         const osmd = osmdRef.current;
-        if (!osmd || playingRef.current) {
+        if (!osmd || playingRef.current || keepUpActiveRef.current) {
             return;
         }
         playFullScreenIfSmall();
@@ -1016,6 +1057,134 @@ export function ScoreViewer({
             timers.current.push(window.setTimeout(tick, listenStepMs(lengths, tempoRef.current)));
         };
         tick();
+    };
+
+    // Stop a play-along run early — the timers, the metronome and the cursor all wind down.
+    const stopKeepUp = () => {
+        for (const id of timers.current) {
+            window.clearTimeout(id);
+        }
+        timers.current = [];
+        keepUpActiveRef.current = false;
+        keepUpExpectedRef.current = [];
+        setKeepUpRunning(false);
+        osmdRef.current?.cursor?.hide();
+    };
+
+    // Tempo-enforced play-along: the cursor advances on the clock at a fixed tempo, not
+    // when you play. Each step is a beat to catch — clear its notes before the cursor moves
+    // on (a hit, painted green) or it passes as a miss (painted red). The notes sound as a
+    // guide when the toggle is on. A one-bar metronome count-in leads it in; it runs to the
+    // end and grades how many beats you kept up with.
+    const playAlong = () => {
+        const osmd = osmdRef.current;
+        if (!osmd || playingRef.current || keepUpActiveRef.current) {
+            return;
+        }
+        playFullScreenIfSmall();
+        matcher.stop();
+        if (paintedRef.current) {
+            osmd.render();
+            paintedRef.current = false;
+        }
+        const cursor: Cursor = osmd.cursor;
+        cursor.reset();
+        cursor.show();
+        keepUpActiveRef.current = true;
+        keepUpHitsRef.current = [];
+        keepUpExpectedRef.current = [];
+        keepUpStruckRef.current = new Set();
+        keepUpNotesRef.current = [];
+        setKeepUpResult(null);
+        setKeepUpProgress({ inTime: 0, done: 0 });
+        setKeepUpRunning(true);
+
+        // Resolve the step that just closed: a hit if every expected pitch was struck in
+        // time, otherwise a miss — painting the notes green or red to trail your run.
+        const closeStep = () => {
+            if (keepUpExpectedRef.current.length === 0) {
+                return;
+            }
+            const struck = keepUpStruckRef.current;
+            const hit = keepUpExpectedRef.current.every((pitch) => struck.has(pitch));
+            keepUpHitsRef.current.push(hit);
+            for (const element of keepUpNotesRef.current) {
+                paintElement(element, hit ? PLAYED_COLOR : SELECT_COLOR);
+            }
+            setKeepUpProgress((prev) => ({
+                inTime: prev.inTime + (hit ? 1 : 0),
+                done: prev.done + 1,
+            }));
+        };
+
+        // Open the step now under the cursor: record its expected pitches, highlight its
+        // notes as "play now", and sound them if the guide is on.
+        const openStep = () => {
+            const expected: number[] = [];
+            for (const note of cursor.NotesUnderCursor()) {
+                if (!note.isRest() && note.halfTone > 0) {
+                    expected.push(note.halfTone + 12);
+                    if (guideNotes) {
+                        synth.playNote(note.halfTone + 12, { duration: note.Length.RealValue * 4 });
+                    }
+                }
+            }
+            keepUpExpectedRef.current = expected;
+            keepUpStruckRef.current = new Set();
+            keepUpNotesRef.current = highlightCursorNotes(osmd, WINDOW_COLOR).map(
+                (painted) => painted.element,
+            );
+        };
+
+        const finish = () => {
+            keepUpActiveRef.current = false;
+            keepUpExpectedRef.current = [];
+            setKeepUpRunning(false);
+            cursor.hide();
+            setKeepUpResult(scoreKeepUp(keepUpHitsRef.current));
+            // Leave full screen so the result (hidden while full screen) comes into view —
+            // a no-op on desktop, which never entered it.
+            exitFullscreen();
+        };
+
+        const tick = () => {
+            closeStep();
+            if (cursor.iterator.EndReached) {
+                finish();
+                return;
+            }
+            const lengths: number[] = [];
+            for (const note of cursor.NotesUnderCursor()) {
+                lengths.push(note.Length.RealValue * 4);
+            }
+            openStep();
+            cursor.next();
+            centerCursor();
+            timers.current.push(window.setTimeout(tick, listenStepMs(lengths, tempoRef.current)));
+        };
+
+        // A one-bar count-in on the metronome (already ticking) before the first note.
+        const beatMs = 60000 / tempoRef.current;
+        timers.current.push(window.setTimeout(tick, beatMs * (beatsPerBar ?? 4)));
+    };
+
+    // In play-along, a struck pitch that the open step expects counts toward catching it;
+    // once all are in, the step goes green early. The note sounds so a MIDI player hears
+    // their own playing over the guide.
+    const registerKeepUp = (note: number) => {
+        if (!keepUpActiveRef.current) {
+            return;
+        }
+        synth.playNote(note);
+        if (!keepUpExpectedRef.current.includes(note)) {
+            return;
+        }
+        keepUpStruckRef.current.add(note);
+        if (keepUpExpectedRef.current.every((pitch) => keepUpStruckRef.current.has(pitch))) {
+            for (const element of keepUpNotesRef.current) {
+                paintElement(element, PLAYED_COLOR);
+            }
+        }
     };
 
     // Save the just-finished run as a take: rebuild a Composition from the captured
@@ -1122,6 +1291,7 @@ export function ScoreViewer({
         setShareGrid(null);
         setMilestone(null);
         setTempoCurve(null);
+        setKeepUpResult(null);
         setLiveTempo(tempo);
         // Your fastest complete take is the ghost to chase; falling back to the last
         // run (or a friend's shared ghost) when you've saved none.
@@ -1189,20 +1359,31 @@ export function ScoreViewer({
         <>
             <Button
                 variant="secondary"
-                disabled={!ready}
+                disabled={!ready || keepUpRunning}
                 onClick={() => (playing ? stopListen() : listen())}
             >
                 {playing ? <StopIcon /> : <PlayIcon />}
                 {playing ? m.action_listen_stop() : m.action_listen()}
             </Button>
             {/* Practice is the screen's primary action, so it carries the dominant
-                filled variant rather than reading as a twin of Listen. */}
+                filled variant rather than reading as a twin of Listen. With "keep up" on it
+                starts a tempo-locked play-along instead of the self-paced run. */}
             <Button
                 variant="primary"
                 disabled={!ready}
-                onClick={() => (matcher.practicing ? matcher.stop() : practice())}
+                onClick={() => {
+                    if (matcher.practicing) {
+                        matcher.stop();
+                    } else if (keepUpRunning) {
+                        stopKeepUp();
+                    } else if (enforceTempo) {
+                        playAlong();
+                    } else {
+                        practice();
+                    }
+                }}
             >
-                {matcher.practicing ? m.action_listen_stop() : m.action_practice()}
+                {matcher.practicing || keepUpRunning ? m.action_listen_stop() : m.action_practice()}
             </Button>
         </>
     );
@@ -1223,6 +1404,11 @@ export function ScoreViewer({
                         <Show when={matcher.practicing}>
                             <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
                                 {matcher.done}/{matcher.total}
+                            </span>
+                        </Show>
+                        <Show when={keepUpRunning}>
+                            <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
+                                {keepUpProgress.inTime}/{keepUpProgress.done}
                             </span>
                         </Show>
                         {/* Restart the run — a practice-only action, so it's absent while
@@ -1443,6 +1629,22 @@ export function ScoreViewer({
                             </FieldGroup>
 
                             <FieldGroup label={m.group_practice()}>
+                                <Option caption={m.keep_up_hint()}>
+                                    <Switch
+                                        checked={enforceTempo}
+                                        onChange={setEnforceTempo}
+                                        label={m.keep_up_toggle()}
+                                    />
+                                </Option>
+                                {enforceTempo && (
+                                    <Option caption={m.guide_notes_hint()}>
+                                        <Switch
+                                            checked={guideNotes}
+                                            onChange={setGuideNotes}
+                                            label={m.guide_notes_toggle()}
+                                        />
+                                    </Option>
+                                )}
                                 <Option caption={m.forgiving_hint()}>
                                     <Switch
                                         checked={forgiving}
@@ -1785,6 +1987,25 @@ export function ScoreViewer({
                     </div>
                 </Show>
 
+                {/* The play-along result — how many beats you kept up with — shown when a
+                tempo-locked run finishes, in place of the self-paced grade panel. */}
+                <FullScreen off>
+                    {keepUpResult && (
+                        <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
+                            <div
+                                className={`text-5xl font-bold leading-none ${GRADE_COLOR[keepUpResult.letter]}`}
+                            >
+                                {keepUpResult.letter}
+                            </div>
+                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                                {m.keep_up_result({
+                                    inTime: keepUpResult.inTime,
+                                    total: keepUpResult.total,
+                                })}
+                            </p>
+                        </div>
+                    )}
+                </FullScreen>
                 {/* The grade narrows the type for the readouts below, so it stays an `&&`
                 guard; the full-screen branch is the declarative half. */}
                 <FullScreen off>

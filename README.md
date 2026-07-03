@@ -49,6 +49,12 @@ number). Turn on
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
 score along, so one hand's slip never stops the other.
 
+Practice is self-paced by default, but flip on **Keep up** and it becomes tempo-locked:
+after a one-bar count-in, the cursor advances on the beat whether or not you're ready, and
+any note you don't catch before it passes is a miss (Synthesia / Guitar-Hero style). The
+notes sound as a guide so you can follow along by ear — or turn that off to read them at
+tempo yourself. At the end it tells you how many you kept up with.
+
 When you finish, a short **major flourish** plays to mark the moment — landing a
 beat after your last note so it reads as a reward rather than a sound on top of your
 playing. A fuller arpeggio marks a stronger grade, a warm lift a gentler one, never a

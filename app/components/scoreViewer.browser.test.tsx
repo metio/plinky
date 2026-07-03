@@ -90,6 +90,25 @@ describe("ScoreViewer", () => {
         );
     });
 
+    it("runs a tempo-locked play-along and reports how many notes you kept up with", async () => {
+        // Small viewport → play-along auto-enters full screen; stub the withheld API.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        // Turn on Keep up, then start — with no notes played every beat is a miss, but the
+        // clock-driven run still counts in, runs to the end, and reports the tally.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        expect(
+            await screen.findByText(/kept up with 0 of/i, undefined, { timeout: 30000 }),
+        ).toBeTruthy();
+    });
+
     it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
