@@ -20,22 +20,38 @@
 // 1 January of the 71st year. From 2026, a death in 1955 or earlier is clear.
 const DEATH_CUTOFF = 1955;
 
+// PDMX composer fields carry accents inconsistently ("Fauré" / "Faure", "Händel" /
+// "Handel", "Dvořák" / "Dvorak"), so fold diacritics away before matching and write the
+// patterns in their plain-ASCII form.
+const fold = (value: string): string =>
+    value
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .toLowerCase();
+
 const TRADITIONAL =
-    /\btrad\b|tradition|anonym|anonimo|\bfolk\b|spiritual|kinderlied|volkslied|\bhymn\b|\bcarol\b|nursery|children'?s song|public[ -]?domain|\bsacred\b|gregorian|plainchant|\bchant\b|shanty|wiegenlied|weihnacht|\bnoel\b|\bnoël\b/i;
+    /\btrad\b|tradition|anonym|anonimo|\bfolk\b|spiritual|kinderlied|volkslied|\bhymn\b|\bcarol\b|nursery|children'?s song|public[ -]?domain|\bsacred\b|gregorian|plainchant|\bchant\b|shanty|wiegenlied|weihnacht|\bnoel\b/;
 
-// Well-known public-domain composers (died > 70 years ago). Not exhaustive — the death
-// range catches the rest where the dates are given.
-const PD_COMPOSERS =
-    /\b(bach|mozart|beethoven|chopin|schubert|brahms|haendel|handel|vivaldi|haydn|tchaikov|tschaikow|debussy|satie|grieg|schumann|liszt|rossini|mendelssohn|clementi|czerny|scarlatti|purcell|joplin|sousa|pachelbel|telemann|elgar|dvorak|dvořák|verdi|wagner|bizet|saint-?sa[eë]ns|faur[eé]|alb[eé]niz|granados|mussorgsky|moussorgsky|rimsky|borodin|burgm[uü]ller|gurlitt|kuhlau|diabelli|hanon|gounod|offenbach|paganini|carcassi|giuliani|t[aá]rrega|ravel|gershwin|mascagni|puccini|smetana|sibelius|holst|nielsen|janacek|janáček|scriabin|rachmanin|gade|macdowell|nevin|streabbog|spindler|reinecke|kirchner|lemoine|couppey|bertini|loeschhorn|duvernoy|k[oö]hler|wohlfahrt|schytte|gillock|heller|\bfield\b|\bsor\b|albinoni|corelli|couperin|rameau|lully|tartini|boccherini|cherubini|hummel|weber|paderewski|albeniz|grieg|massenet|delibes|chaminade|moszkowski|sinding|sgambati|raff|thalberg|moscheles|cramer)\b/i;
+// Well-known public-domain composers (died > 70 years ago), matched as complete surnames
+// (both word boundaries) so a stem never bleeds into an unrelated word: "bach" must not
+// match "Bacharach" or a title's "bachelor", "clementi" must not match "clementine".
+// Not exhaustive — the death range catches the rest where dates are given.
+const PD_SURNAMES =
+    /\b(bach|mozart|beethoven|chopin|schubert|brahms|haendel|handel|vivaldi|haydn|debussy|satie|grieg|schumann|liszt|rossini|mendelssohn|clementi|czerny|scarlatti|purcell|joplin|sousa|pachelbel|telemann|elgar|dvorak|verdi|wagner|bizet|saint-?saens|faure|albeniz|granados|rimsky|borodin|burgmuller|gurlitt|kuhlau|diabelli|hanon|gounod|offenbach|paganini|carcassi|giuliani|tarrega|ravel|gershwin|mascagni|puccini|smetana|sibelius|holst|nielsen|janacek|scriabin|macdowell|streabbog|spindler|reinecke|kirchner|lemoine|couppey|bertini|loeschhorn|duvernoy|kohler|wohlfahrt|schytte|gillock|heller|albinoni|corelli|couperin|rameau|lully|tartini|boccherini|cherubini|hummel|weber|paderewski|massenet|delibes|chaminade|moszkowski|sinding|sgambati|thalberg|moscheles|cramer|dowland|sullivan|carolan|frescobaldi|buxtehude|palestrina|monteverdi|praetorius|froberger|sweelinck|cimarosa|paisiello|gottschalk|rebikov|guilmant|widor|vierne|dandrieu|daquin|marcello|kjerulf|oesten|goedicke|gedike|maykapar|sor|field|byrd|gade|raff|nevin)\b/;
 
-// True when the composition is confidently public domain. Reads the composer field
-// (and the title, for "traditional"/"anonymous" markers that land there).
+// A handful of composers whose PDMX field truncates or continues the surname
+// ("Tchaikovsky", "Rachmaninoff", "Mussorgsky"): match the stem with a trailing \w* so a
+// suffixed form still matches. Distinctive enough that a false positive is implausible.
+const PD_STEMS = /\b(tchaikov|tschaikow|rachmanin|mussorg|moussorg)\w*/;
+
+// True when the composition is confidently public domain. Composer-name patterns read
+// ONLY the composer field (a title word like "bachelor" must never admit a song); the
+// traditional/anonymous markers may land in either field, so those read both.
 export function isPublicDomain(composer: string, title = ""): boolean {
-    const text = `${composer} ${title}`.trim();
     if (composer.trim() === "") {
         return false; // no attribution — can't confirm anything
     }
-    if (TRADITIONAL.test(text)) {
+    if (TRADITIONAL.test(fold(`${composer} ${title}`))) {
         return true;
     }
     // A "(birth–death)" range: the second year is the death year.
@@ -43,5 +59,6 @@ export function isPublicDomain(composer: string, title = ""): boolean {
     if (range && Number(range[1]) <= DEATH_CUTOFF) {
         return true;
     }
-    return PD_COMPOSERS.test(composer);
+    const name = fold(composer);
+    return PD_SURNAMES.test(name) || PD_STEMS.test(name);
 }

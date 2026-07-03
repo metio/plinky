@@ -63,7 +63,9 @@ export default defineConfig({
                 test: {
                     name: "node",
                     environment: "node",
-                    include: ["app/**/*.test.{ts,tsx}"],
+                    // dev/ holds the catalogue build tooling (import filters, grading);
+                    // its pure logic is unit-tested here even though it never ships.
+                    include: ["app/**/*.test.{ts,tsx}", "dev/**/*.test.mts"],
                     exclude: ["app/**/*.browser.test.*"],
                     setupFiles: ["./app/test-setup.ts", "./app/test-setup.node.ts"],
                 },

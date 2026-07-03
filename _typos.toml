@@ -10,6 +10,8 @@ tuplets = "tuplets"
 weeknd = "weeknd"
 # Handel — the public-domain composer in the allowlist, not "handle".
 handel = "handel"
+# O'Carolan — Turlough O'Carolan, the public-domain composer in the allowlist.
+carolan = "carolan"
 # "ND" is the NoDerivatives token in SPDX licence codes (CC-BY-ND-4.0), not "AND".
 nd = "nd"
 
