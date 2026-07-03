@@ -286,6 +286,49 @@ describe("ScoreViewer", () => {
         scroll.mockRestore();
     });
 
+    it("names the lagging hand in the grade panel after a two-hand run", async () => {
+        // Seed a finished two-hand result: the right hand at tempo, the left crawling —
+        // the panel reads that gap off the recorded per-note staves.
+        const rightAtTempo = Array.from({ length: 6 }, (_, i) => ({
+            targetMs: i * 100,
+            playedMs: i * 100,
+            wrongBefore: 0,
+            staves: [0],
+        }));
+        const leftSlow = Array.from({ length: 6 }, (_, i) => ({
+            targetMs: i * 100,
+            playedMs: i * 300,
+            wrongBefore: 0,
+            staves: [1],
+        }));
+        const seededResult: DailyResult = {
+            grade: { accuracy: 80, timing: 80, flow: 80, dynamics: null, score: 80, letter: "B" },
+            grid: [
+                ["best", "best"],
+                ["weak", "weak"],
+            ],
+            notes: [...rightAtTempo, ...leftSlow],
+            tolerance: 1,
+        };
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
+        render(
+            <MemoryRouter>
+                <MidiProvider>
+                    <ScoreViewer
+                        id="t"
+                        xml={phrase}
+                        title="T"
+                        beatsPerBar={4}
+                        seededResult={seededResult}
+                    />
+                </MidiProvider>
+            </MemoryRouter>,
+        );
+        expect(
+            await screen.findByText(/left hand lagged/i, undefined, { timeout: 30000 }),
+        ).toBeTruthy();
+    });
+
     it("scrolls to the grade when a run finishes in this session", async () => {
         const scroll = vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(() => {});
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);

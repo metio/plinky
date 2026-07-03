@@ -196,6 +196,45 @@ export function handGrid(notes: RunNote[], options: ShareOptions = {}): Grid {
     });
 }
 
+// Each hand's overall combined score (0..1), measured over all its notes at once rather
+// than per segment — so a short hand isn't dragged down by the empty slices a six-column
+// grid would leave it. Same top-to-bottom hand order as the grid.
+export function handScores(
+    notes: RunNote[],
+    options: ShareOptions = {},
+): { staff: number; overall: number }[] {
+    return handsPlayed(notes).map((staff) => {
+        const handNotes = notes.filter((note) => (note.staves ?? [0]).includes(staff));
+        const [whole] = computeSegments(handNotes, 1, options);
+        return { staff, overall: whole ? combined(whole) : 0 };
+    });
+}
+
+// How much one hand may trail the other before it reads as lagging rather than even —
+// about one colour band, so a real gap is called out but a hair's difference isn't.
+const HAND_GAP = 0.12;
+
+// The verdict on a two-hand run: which hand trailed the other, or that they kept pace.
+// Null for a single-hand run, where there's nothing to compare.
+export type HandVerdict = "even" | "right" | "left" | null;
+
+export function laggingHand(notes: RunNote[], options: ShareOptions = {}): HandVerdict {
+    const scores = handScores(notes, options);
+    const right = scores.find((score) => score.staff === 0);
+    const left = scores.find((score) => score.staff === 1);
+    if (!right || !left) {
+        return null;
+    }
+    const gap = right.overall - left.overall;
+    if (gap > HAND_GAP) {
+        return "left";
+    }
+    if (gap < -HAND_GAP) {
+        return "right";
+    }
+    return "even";
+}
+
 // A green → red quality ramp, with ⬜ for the bottom band (a Wordle-style "absent").
 const EMOJI: Record<Level, string> = {
     best: "🟩",

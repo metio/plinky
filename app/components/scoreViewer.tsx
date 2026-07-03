@@ -78,7 +78,7 @@ import {
     restoreNotes,
     WINDOW_COLOR,
 } from "../lib/scoreColor";
-import { type Grid, handGrid, handsPlayed, type RunNote } from "../lib/shareCard";
+import { type Grid, handGrid, handsPlayed, laggingHand, type RunNote } from "../lib/shareCard";
 import { transposeMusicXml } from "../lib/transpose";
 import {
     findHotspots,
@@ -1170,6 +1170,19 @@ export function ScoreViewer({
             ? matcher.expected
             : [];
 
+    // Which hand trailed the other on a two-hand run (null on a single-hand one), read at
+    // the same tempo scale as the shared grid so the readout matches its rows. Only
+    // meaningful once a run is graded.
+    const handVerdict = (() => {
+        if (!grade) {
+            return null;
+        }
+        const intended = initialTempo ?? runTempoRef.current;
+        return laggingHand(runNotes, {
+            tempoScale: intended > 0 ? runTempoRef.current / intended : 1,
+        });
+    })();
+
     // Listen and Practice — the two transport actions, shared by the normal toolbar and
     // the full-screen top bar (so full screen can hoist them out of the score's way).
     const transport = (
@@ -1842,6 +1855,15 @@ export function ScoreViewer({
                                         hotspots={tempoCurve.hotspots}
                                     />
                                 </section>
+                            )}
+                            {handVerdict && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {handVerdict === "even"
+                                        ? m.hands_even()
+                                        : handVerdict === "left"
+                                          ? m.hand_left_lagged()
+                                          : m.hand_right_lagged()}
+                                </p>
                             )}
                             {shareGrid && (
                                 <ShareCard

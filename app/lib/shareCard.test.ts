@@ -7,7 +7,9 @@ import {
     computeSegments,
     gridEmoji,
     handGrid,
+    handScores,
     handsPlayed,
+    laggingHand,
     levelFor,
     type RunNote,
     SEGMENTS,
@@ -214,6 +216,31 @@ describe("handGrid", () => {
             { targetMs: 100, playedMs: 100, wrongBefore: 0, staves: [0, 1] },
         ];
         expect(handGrid(both)).toHaveLength(2);
+    });
+});
+
+describe("handScores / laggingHand", () => {
+    it("scores each hand over all its notes, not per empty segment", () => {
+        // A three-note single hand at tempo — no empty-segment zeros dragging it down.
+        const scores = handScores(spaced(3));
+        expect(scores).toHaveLength(1);
+        expect(scores[0]?.overall).toBeCloseTo(1);
+    });
+
+    it("has nothing to compare on a single-hand run", () => {
+        expect(laggingHand(spaced(8))).toBeNull();
+    });
+
+    it("calls the two hands even when they kept pace", () => {
+        expect(laggingHand([...spaced(6, 0), ...spaced(6, 1)])).toBe("even");
+    });
+
+    it("flags the left hand when it trails the right", () => {
+        expect(laggingHand([...spaced(6, 0), ...slow(6, 3, 1)])).toBe("left");
+    });
+
+    it("flags the right hand when it trails the left", () => {
+        expect(laggingHand([...slow(6, 3, 0), ...spaced(6, 1)])).toBe("right");
     });
 });
 

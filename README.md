@@ -62,8 +62,9 @@ from three things:
   keyboard can't be as precise as real keys, so those get a wider window.
 - **Flow** — whether you kept moving like a musician rather than stopping to hunt.
 
-A **per-note strip** and a **tempo graph** then show where you rushed or dragged, and
-you can **race a ghost** of your previous best — or a friend's run, shared by link —
+A **per-note strip** and a **tempo graph** then show where you rushed or dragged, and on
+a two-hand piece a line calls out **which hand lagged** (or that they kept pace). You
+can **race a ghost** of your previous best — or a friend's run, shared by link —
 with a marker tracking along the staff. Once you clear a score it enters **spaced
 repetition**, resurfacing for review on a widening schedule so it actually sticks — a
 one-tap **review session** walks you through everything that's fading, and you can
