@@ -20,7 +20,7 @@ const VENDOR = /opensheetmusicdisplay/;
 // own code. Sized to clear vendor + the app budget below with a little headroom, so
 // the app budget is actually reachable and a real regression trips the app line, not
 // this one.
-const BUDGET_TOTAL_KB = 634;
+const BUDGET_TOTAL_KB = 635;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -38,8 +38,9 @@ const BUDGET_TOTAL_KB = 634;
 // captions that explain each practice-tool control and its values inline; and the
 // click-to-select loop range with its red bar overlay (measure hit-testing + SVG
 // backdrop rects); and the auto-full-screen play surface — the in-play restart /
-// finger-numbers / follow-the-note toggles and their icons; still a tight ratchet.
-const BUDGET_APP_KB = 323;
+// finger-numbers / follow-the-note toggles and their icons; and the per-hand share grid
+// with its lagging-hand grade-panel readout; still a tight ratchet.
+const BUDGET_APP_KB = 324;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))
