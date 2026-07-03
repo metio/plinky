@@ -10,6 +10,12 @@ const KEYBOARD = /piano|keyboard|klavier|clavier|harpsichord|clavichord|celesta|
 const OTHER_INSTRUMENT =
     /drum|percussion|cymbal|guitar|\bbass\b|violin|cello|viola|contrabass|flute|trumpet|saxophone|\bsax\b|clarinet|oboe|bassoon|trombone|tuba|\bhorn\b|choir|\bvoice\b|vocal|ukulele|banjo|mandolin|\bharp\b|recorder|piccolo|accordion|\bsynth/;
 
+// Non-keyboard melodic/percussion instruments, for the piano-OR-vocal gate below.
+// "bass" alone stays out (it's a voice part in art song); a real double bass reads as
+// "contrabass" / "double bass".
+const INSTRUMENTAL =
+    /drum|percussion|cymbal|guitar|violin|cello|viola|contrabass|double.?bass|flute|trumpet|saxophone|\bsax\b|clarinet|oboe|bassoon|trombone|tuba|\bhorn\b|ukulele|banjo|mandolin|\bharp\b|recorder|piccolo|accordion|\bsynth|string|brass|orchestr/;
+
 // Returns the disqualifying reason, or null when the score is a (probable) piano piece.
 export function nonPianoReason(xml: string): string | null {
     // Unpitched notes / a percussion clef are unambiguous — a drum kit, not a piano.
@@ -53,6 +59,35 @@ export function nonSoloPianoReason(xml: string): string | null {
     }
     if ((xml.match(/<score-part\b/gi) ?? []).length > 2) {
         return "multi-part";
+    }
+    return null;
+}
+
+// For a piano-OR-vocal catalogue (art song: a vocal line over a keyboard part). Keeps a
+// score only when a keyboard part is present and every other part is vocal — so
+// voice+piano Lieder and accompanied choir stay, while a-cappella choir (no keyboard)
+// and any instrumental ensemble (a violin, flute, drums, … alongside the piano) are
+// dropped. Each part is classified in isolation so "Piano (or Harp)" reads as keyboard,
+// not as a harp.
+export function nonPianoVocalReason(xml: string): string | null {
+    if (/<sign>\s*percussion\s*<\/sign>/i.test(xml) || /<unpitched\b/i.test(xml)) {
+        return "percussion";
+    }
+    const names = [
+        ...xml.matchAll(
+            /<(?:part-name|instrument-name)[^>]*>([^<]*)<\/(?:part-name|instrument-name)>/gi,
+        ),
+    ].map((match) => match[1]!.trim().toLowerCase());
+    let hasKeyboard = false;
+    for (const name of names) {
+        if (KEYBOARD.test(name)) {
+            hasKeyboard = true;
+        } else if (INSTRUMENTAL.test(name)) {
+            return "ensemble";
+        }
+    }
+    if (!hasKeyboard) {
+        return "no-keyboard";
     }
     return null;
 }

@@ -5,6 +5,7 @@
     "messages": "node dev/compile-messages.mjs",
     "exercises": "tsx dev/gen-exercises.mts",
     "songs:import": "tsx dev/import-pdmx.mts",
+    "scores:import": "tsx dev/import-scores.mts",
     "songs:dedup": "tsx dev/dedup-songs.mts",
     "songs:bake": "tsx dev/bake-grades.mts",
     "songs:cost": "tsx dev/backfill-song-cost.mts",

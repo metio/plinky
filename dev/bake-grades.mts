@@ -44,13 +44,19 @@ async function main() {
         MAX_GRADE,
     );
 
-    // The freshly-graded catalogue these boundaries imply.
-    const bakedSongs = songs.map((song) => ({ ...song, grade: gradeForCost(song.cost, boundaries) }));
-    const bakedExercises = exercises.map((exercise) =>
-        exercise.kind === "study"
-            ? { ...exercise, grade: gradeForCost(exercise.cost, boundaries) }
-            : exercise,
-    );
+    // The freshly-graded catalogue these boundaries imply. Re-grading can move a piece
+    // across a grade boundary, so re-establish the shipped order both manifests are
+    // pinned to: songs easiest-first (grade follows cost), exercises by grade then cost.
+    const bakedSongs = songs
+        .map((song) => ({ ...song, grade: gradeForCost(song.cost, boundaries) }))
+        .sort((a, b) => a.cost - b.cost);
+    const bakedExercises = exercises
+        .map((exercise) =>
+            exercise.kind === "study"
+                ? { ...exercise, grade: gradeForCost(exercise.cost, boundaries) }
+                : exercise,
+        )
+        .sort((a, b) => a.grade - b.grade || a.cost - b.cost);
     const bakedSeed: string[] = [];
     for (let g = 1; g <= MAX_GRADE; g++) {
         bakedSeed.push(
@@ -72,16 +78,16 @@ async function main() {
                 `GRADE_THRESHOLDS.piece is [${currentPiece.join(", ")}] but the songs' octiles are [${boundaries.join(", ")}]`,
             );
         }
-        const songDrift = songs.filter((song, i) => song.grade !== bakedSongs[i]!.grade).length;
-        if (songDrift > 0) {
-            problems.push(`${songDrift} song grade(s) disagree with the boundaries`);
+        // Compare the whole serialized result: this catches a stale grade AND a stale
+        // order (re-grading can change which grade a piece sits in, hence its position).
+        if (JSON.stringify(songs) !== JSON.stringify(bakedSongs)) {
+            problems.push("public/songs/manifest.json is stale (grades or order)");
         }
-        const studyDrift = exercises.filter((ex, i) => ex.grade !== bakedExercises[i]!.grade).length;
-        if (studyDrift > 0) {
-            problems.push(`${studyDrift} study grade(s) disagree with the boundaries`);
+        if (JSON.stringify(exercises) !== JSON.stringify(bakedExercises)) {
+            problems.push("public/exercises/manifest.json is stale (grades or order)");
         }
-        if (seed.length !== bakedSeed.length || seed.some((id, i) => id !== bakedSeed[i])) {
-            problems.push("seed.json is stale");
+        if (JSON.stringify(seed) !== JSON.stringify(bakedSeed)) {
+            problems.push("public/songs/seed.json is stale");
         }
         if (problems.length > 0) {
             console.error("Catalogue grades are not baked:");

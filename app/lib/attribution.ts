@@ -73,6 +73,10 @@ export type SourceInfo = {
 // label and provenance link are looked up here so the data stays compact.
 const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
     pdmx: { label: "PDMX", url: "https://github.com/pnlong/PDMX" },
+    "openscore-lieder": {
+        label: "OpenScore Lieder",
+        url: "https://github.com/OpenScore/Lieder",
+    },
 };
 
 // The default source for catalogue songs: the whole shipped catalogue is imported
