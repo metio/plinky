@@ -28,6 +28,52 @@ precedence = "override"
 SPDX-FileCopyrightText = "PDMX contributors"
 SPDX-License-Identifier = "CC0-1.0"
 
+# Solo-keyboard pieces converted from the Mutopia Project's LilyPond sources. Mutopia's
+# licence varies per piece, so dev/mutopia-harvest.py tags each filename with its licence
+# bucket (mutopia-<bucket>-…) and each bucket is annotated with its SPDX id here. All
+# override the PDMX credit above for their filenames.
+[[annotations]]
+path = ["public/songs/mutopia-cc0-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["public/songs/mutopia-by40-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["public/songs/mutopia-by30-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = ["public/songs/mutopia-by25-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC-BY-2.5"
+
+[[annotations]]
+path = ["public/songs/mutopia-bysa40-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = ["public/songs/mutopia-bysa30-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+[[annotations]]
+path = ["public/songs/mutopia-bysa25-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Mutopia Project contributors"
+SPDX-License-Identifier = "CC-BY-SA-2.5"
+
 # The KernScores keyboard corpora (craigsapp/*) — engraved by Craig Stuart Sapp and
 # licensed CC-BY-NC-SA, so they override the CC0 default above for their filenames.
 [[annotations]]

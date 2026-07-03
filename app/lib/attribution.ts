@@ -42,9 +42,37 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         publicDomain: false,
         commercialUse: true,
     },
+    "CC-BY-3.0": {
+        label: "CC BY 3.0",
+        url: `${DEED}licenses/by/3.0/`,
+        requiresAttribution: true,
+        publicDomain: false,
+        commercialUse: true,
+    },
+    "CC-BY-2.5": {
+        label: "CC BY 2.5",
+        url: `${DEED}licenses/by/2.5/`,
+        requiresAttribution: true,
+        publicDomain: false,
+        commercialUse: true,
+    },
     "CC-BY-SA-4.0": {
         label: "CC BY-SA 4.0",
         url: `${DEED}licenses/by-sa/4.0/`,
+        requiresAttribution: true,
+        publicDomain: false,
+        commercialUse: true,
+    },
+    "CC-BY-SA-3.0": {
+        label: "CC BY-SA 3.0",
+        url: `${DEED}licenses/by-sa/3.0/`,
+        requiresAttribution: true,
+        publicDomain: false,
+        commercialUse: true,
+    },
+    "CC-BY-SA-2.5": {
+        label: "CC BY-SA 2.5",
+        url: `${DEED}licenses/by-sa/2.5/`,
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
@@ -103,6 +131,9 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
         url: "https://github.com/craigsapp/bach-370-chorales",
         credit: "Craig Stuart Sapp",
     },
+    // Public-domain solo-keyboard pieces from the Mutopia Project (CC0, no credit
+    // required), converted from their LilyPond sources.
+    mutopia: { label: "Mutopia Project", url: "https://www.mutopiaproject.org" },
 };
 
 // The default source for catalogue songs: the whole shipped catalogue is imported

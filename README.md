@@ -85,10 +85,12 @@ one-tap **review session** walks you through everything that's fading, and you c
   by kind, grade, or what's **due now**, and open one to practise. Each piece credits
   its **licence and source** — the catalogue is drawn from
   [PDMX](https://github.com/pnlong/PDMX) and the CC0
-  [OpenScore Lieder](https://github.com/OpenScore/Lieder) corpus, plus the
+  [OpenScore Lieder](https://github.com/OpenScore/Lieder) corpus, the
   CC-BY-NC-SA [KernScores](https://github.com/craigsapp) corpora (Scarlatti, Mozart,
   Haydn and Joplin, and Bach's 370 chorales reduced to a two-staff piano grand staff),
-  each credited to its editor — linked from the play page.
+  and solo-keyboard pieces from the [Mutopia Project](https://www.mutopiaproject.org)
+  (public-domain, CC-BY and CC-BY-SA), each credited under its own licence — linked
+  from the play page.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
   streak to keep up. Once played, re-opening the day's challenge shows your result
