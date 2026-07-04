@@ -3,12 +3,13 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import type { DecayMode, GradedMastery } from "./gradeProgress";
+import type { DecayMode } from "../../core/review";
+import type { GradedMastery } from "./gradeProgress";
+import { REVIEW_CAP } from "../../core/review";
 import {
     currentGrade,
     dueReviews,
     masteredInGrade,
-    REVIEW_CAP,
     skillRating,
     STAR_THRESHOLDS,
     starTier,

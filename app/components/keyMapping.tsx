@@ -12,7 +12,7 @@ import {
     rebind,
     SEMITONES,
 } from "../../core/keyMap";
-import { loadPrefs, savePrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { Button } from "./button";
 
@@ -36,19 +36,27 @@ function keyCap(key: string | null): string {
 // layout immediately. Off by default visually — most players use a piano, touch, or the
 // stock layout — but one tap away for anyone who wants their own keys.
 export function KeyMapping() {
+    const prefsStore = usePrefsStore();
     const [map, setMap] = useState<KeyMap>(DEFAULT_KEY_MAP);
     // The slot currently listening for a key, or null when idle.
     const [arming, setArming] = useState<{ hand: Hand; semitone: number } | null>(null);
 
     useEffect(() => {
-        setMap(loadPrefs().keyMap);
-    }, []);
+        setMap(prefsStore.load().keyMap);
+    }, [prefsStore.load]);
 
-    const persist = useCallback((next: KeyMap) => {
-        setMap(next);
-        // Merge onto the latest stored prefs so a change elsewhere on the page isn't lost.
-        savePrefs({ ...loadPrefs(), keyMap: next });
-    }, []);
+    const persist = useCallback(
+        (next: KeyMap) => {
+            setMap(next);
+            // Merge onto the latest stored prefs so a change elsewhere on the page isn't lost.
+            prefsStore.save({ ...prefsStore.load(), keyMap: next });
+        },
+        [
+            // Merge onto the latest stored prefs so a change elsewhere on the page isn't lost.
+            prefsStore.save,
+            prefsStore.load,
+        ],
+    );
 
     // While a cap is armed, capture the next keystroke before it reaches the keyboard
     // input layer (capture phase + stopPropagation), so arming a cap can't sound a note.

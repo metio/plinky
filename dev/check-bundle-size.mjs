@@ -20,7 +20,7 @@ const VENDOR = /opensheetmusicdisplay/;
 // own code. Sized to clear vendor + the app budget below with a little headroom, so
 // the app budget is actually reachable and a real regression trips the app line, not
 // this one.
-const BUDGET_TOTAL_KB = 637;
+const BUDGET_TOTAL_KB = 640;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -42,8 +42,11 @@ const BUDGET_TOTAL_KB = 637;
 // with its lagging-hand grade-panel readout; and the tempo-locked "keep up" play-along —
 // the clock-driven runner, its hit/miss painting and result; and the ServicesProvider
 // DI backbone (the injected-capabilities context every feature reads its integration
-// points from); still a tight ratchet.
-const BUDGET_APP_KB = 327;
+// points from) — whose entry-level import edge also re-shaped Rollup's chunk graph,
+// splitting two large shared chunks into ~10 small ones (fflate and the storage
+// helpers each on their own): the same code gzips ~3 KB worse across more chunk
+// boundaries, traded for finer caching granularity; still a tight ratchet.
+const BUDGET_APP_KB = 330;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

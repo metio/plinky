@@ -5,7 +5,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
-import { loadPrefs } from "../lib/prefs";
+import { browserStore } from "../adapters/browserStore";
+import { createPrefsStore } from "../stores/prefsStore";
+
+// Reads and writes go through a store over the same backing localStorage the
+// component under test uses, so seeding and asserting see one source of truth.
+const prefsStore = createPrefsStore(browserStore);
 import { HandSize } from "./handSize";
 
 afterEach(() => {
@@ -36,7 +41,7 @@ describe("HandSize", () => {
         fireEvent.click(screen.getByText("Save"));
         // Only the right hand remains unset, and the left span is stored.
         expect(screen.getAllByText("Not set")).toHaveLength(1);
-        expect(loadPrefs().handSpan).toEqual({ left: 9, right: null });
+        expect(prefsStore.load().handSpan).toEqual({ left: 9, right: null });
     });
 
     it("clears a measured hand back to unset", () => {
@@ -45,10 +50,10 @@ describe("HandSize", () => {
         tap("C4");
         tap("A4");
         fireEvent.click(screen.getByText("Save"));
-        expect(loadPrefs().handSpan).toEqual({ left: null, right: 9 });
+        expect(prefsStore.load().handSpan).toEqual({ left: null, right: 9 });
 
         fireEvent.click(screen.getByText("Remove"));
         expect(screen.getAllByText("Not set")).toHaveLength(2);
-        expect(loadPrefs().handSpan).toEqual({ left: null, right: null });
+        expect(prefsStore.load().handSpan).toEqual({ left: null, right: null });
     });
 });

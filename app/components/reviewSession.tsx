@@ -6,7 +6,7 @@ import { useScore } from "../hooks/useScore";
 import { Button } from "./button";
 import { dueReviews, loadGradedMastery } from "../lib/gradeProgress";
 import { loadMastery, saveMastery, setBacklog } from "../lib/mastery";
-import { loadPrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 import { ScoreViewer } from "./scoreViewer";
@@ -18,6 +18,7 @@ const BACK = "text-sm text-indigo-700 underline dark:text-indigo-300";
 // mount so it stays stable even as playing a piece pushes its next-review date out
 // and removes it from the live due set.
 export function ReviewSession() {
+    const prefsStore = usePrefsStore();
     const [queue, setQueue] = useState<string[] | null>(null);
     const [index, setIndex] = useState(0);
     const [refreshed, setRefreshed] = useState(0);
@@ -31,13 +32,13 @@ export function ReviewSession() {
         let cancelled = false;
         loadGradedMastery().then((items) => {
             if (!cancelled) {
-                setQueue(dueReviews(items, Date.now(), loadPrefs().reviewCap));
+                setQueue(dueReviews(items, Date.now(), prefsStore.load().reviewCap));
             }
         });
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [prefsStore.load]);
 
     const current = queue?.[index];
     const score = useScore(current ?? "");

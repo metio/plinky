@@ -26,7 +26,7 @@ import {
     type MidiSupport,
 } from "../../core/midi";
 import { DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
-import { loadPrefs, PREFS_CHANGED_EVENT } from "../lib/prefs";
+import { usePrefsStore } from "./services";
 import { resetDevice } from "../lib/resetDevice";
 
 export type NoteListener = {
@@ -255,15 +255,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // is refreshed when Settings saves a remap, so a new layout takes effect at once.
     const octaveRef = useRef(0);
     const keyMapRef = useRef<KeyMap>(DEFAULT_KEY_MAP);
+    const prefsStore = usePrefsStore();
     useEffect(() => {
         if (typeof window === "undefined") {
             return;
         }
         const loadKeyMap = () => {
-            keyMapRef.current = loadPrefs().keyMap;
+            keyMapRef.current = prefsStore.load().keyMap;
         };
         loadKeyMap();
-        window.addEventListener(PREFS_CHANGED_EVENT, loadKeyMap);
+        const unsubscribePrefs = prefsStore.subscribe(loadKeyMap);
         const pressed = new Map<string, number>();
 
         const isTextEntry = (target: EventTarget | null): boolean => {
@@ -334,12 +335,12 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         window.addEventListener("keyup", onKeyUp);
         window.addEventListener("blur", releaseAll);
         return () => {
-            window.removeEventListener(PREFS_CHANGED_EVENT, loadKeyMap);
+            unsubscribePrefs();
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup", onKeyUp);
             window.removeEventListener("blur", releaseAll);
         };
-    }, [emitNote]);
+    }, [emitNote, prefsStore]);
 
     useEffect(() => {
         return () => {

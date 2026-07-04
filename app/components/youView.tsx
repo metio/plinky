@@ -21,7 +21,7 @@ import {
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
 import { svgMilestone } from "../../core/milestoneCard";
-import { loadPrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import type { Grid } from "../../core/shareCard";
 import { m } from "../paraglide/messages.js";
@@ -72,6 +72,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 // Accuracy/Timing/Flow fingerprint. Reads mastery, the catalogue and practice history
 // after mount, so the personal data is absent from the prerendered shell.
 export function YouView() {
+    const prefsStore = usePrefsStore();
     const [items, setItems] = useState<GradedMastery[] | null>(null);
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
     const [summary, setSummary] = useState<PracticeSummary | null>(null);
@@ -96,7 +97,7 @@ export function YouView() {
     }
 
     const now = Date.now();
-    const prefs = loadPrefs();
+    const prefs = prefsStore.load();
     const mode = prefs.decayMode;
     const resolved = items;
     const level = currentGrade(resolved);

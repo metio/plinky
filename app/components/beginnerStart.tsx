@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { usePrefsStore } from "../contexts/services";
 import { FIRST_SONG_ID } from "../lib/catalog";
 import { discoveries } from "../lib/onboarding";
 import { hasSeenHint, markHintSeen } from "../lib/seenHints";
@@ -28,11 +29,12 @@ export function BeginnerStart() {
     // returning visitor is filtered out on the client after mount instead.
     const [show, setShow] = useState(true);
 
+    const prefsStore = usePrefsStore();
     useEffect(() => {
-        if (hasSeenHint(DISMISSED) || discoveries().played) {
+        if (hasSeenHint(DISMISSED) || discoveries(prefsStore.load()).played) {
             setShow(false);
         }
-    }, []);
+    }, [prefsStore]);
 
     if (!show) {
         return null;

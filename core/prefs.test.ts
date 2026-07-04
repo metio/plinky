@@ -1,0 +1,123 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { describe, expect, it } from "vitest";
+import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
+import { parsePrefs, type Prefs } from "./prefs";
+
+const BASE: Prefs = {
+    sound: true,
+    volume: 80,
+    masteryThreshold: "A",
+    handSpan: { left: null, right: null },
+    showFingerings: false,
+    noteHints: "miss",
+    noteLabels: "c",
+    forgiving: false,
+    fingerHints: true,
+    decayMode: "gentle",
+    reviewCap: 8,
+    barsPerRow: 0,
+    barNumbers: true,
+    keyMap: DEFAULT_KEY_MAP,
+    keyboardOctaves: 2,
+    treadmill: false,
+    raceGhost: true,
+};
+
+const stored = (patch: object) => JSON.stringify({ ...BASE, ...patch });
+
+describe("parsePrefs", () => {
+    it("defaults to sound on at volume 80 with no hand spans", () => {
+        expect(parsePrefs(null)).toEqual(BASE);
+    });
+
+    it("round-trips stored preferences", () => {
+        expect(parsePrefs(stored({ sound: false, volume: 40 }))).toEqual({
+            ...BASE,
+            sound: false,
+            volume: 40,
+        });
+    });
+
+    it("clamps the volume to 0..100", () => {
+        expect(parsePrefs(stored({ volume: 250 })).volume).toBe(100);
+        expect(parsePrefs(stored({ volume: -3 })).volume).toBe(0);
+    });
+
+    it("falls back to defaults for corrupt data", () => {
+        expect(parsePrefs("not json")).toEqual(BASE);
+    });
+
+    it("keeps a valid decay mode and rejects an unknown value", () => {
+        expect(parsePrefs(stored({ decayMode: "competitive" })).decayMode).toBe("competitive");
+        expect(parsePrefs(stored({ decayMode: "savage" })).decayMode).toBe("gentle");
+    });
+
+    it("keeps a listed review cap and rejects an off-list value", () => {
+        expect(parsePrefs(stored({ reviewCap: 20 })).reviewCap).toBe(20);
+        expect(parsePrefs(stored({ reviewCap: 7 })).reviewCap).toBe(8);
+    });
+
+    it("keeps a per-hand span and tolerates one hand unset", () => {
+        expect(parsePrefs(stored({ handSpan: { left: 8, right: 11 } })).handSpan).toEqual({
+            left: 8,
+            right: 11,
+        });
+        expect(parsePrefs(stored({ handSpan: { left: null, right: 9 } })).handSpan).toEqual({
+            left: null,
+            right: 9,
+        });
+    });
+
+    it("drops out-of-range or malformed spans to null", () => {
+        expect(parsePrefs(stored({ handSpan: { left: 3, right: "wide" } })).handSpan).toEqual({
+            left: null,
+            right: null,
+        });
+    });
+
+    it("defaults bar numbers on and rejects a non-boolean", () => {
+        expect(parsePrefs(null).barNumbers).toBe(true);
+        expect(parsePrefs(JSON.stringify({ barNumbers: "yes" })).barNumbers).toBe(true);
+        expect(parsePrefs(stored({ barNumbers: false })).barNumbers).toBe(false);
+    });
+
+    it("defaults fingering numbers off and keeps the stored toggle", () => {
+        expect(parsePrefs(null).showFingerings).toBe(false);
+        expect(parsePrefs(stored({ showFingerings: true })).showFingerings).toBe(true);
+    });
+
+    it("defaults note hints to after-a-mistake and rejects an unknown value", () => {
+        expect(parsePrefs(null).noteHints).toBe("miss");
+        expect(parsePrefs(stored({ noteHints: "never" })).noteHints).toBe("never");
+        expect(parsePrefs(JSON.stringify({ noteHints: "bogus" })).noteHints).toBe("miss");
+    });
+
+    it("defaults note labels to the C landmark and rejects an unknown value", () => {
+        expect(parsePrefs(null).noteLabels).toBe("c");
+        expect(parsePrefs(stored({ noteLabels: "all" })).noteLabels).toBe("all");
+        expect(parsePrefs(JSON.stringify({ noteLabels: "bogus" })).noteLabels).toBe("c");
+    });
+
+    it("defaults the key map and keeps a customised one", () => {
+        expect(parsePrefs(null).keyMap).toEqual(DEFAULT_KEY_MAP);
+        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
+        expect(parsePrefs(stored({ keyMap: custom })).keyMap.left.z).toBe(0);
+    });
+
+    it("falls back to the default key map when stored data is corrupt", () => {
+        expect(parsePrefs(stored({ keyMap: { left: "oops" } })).keyMap).toEqual(DEFAULT_KEY_MAP);
+    });
+
+    it("defaults to a two-octave keyboard window and rejects an off-list value", () => {
+        expect(parsePrefs(null).keyboardOctaves).toBe(2);
+        expect(parsePrefs(stored({ keyboardOctaves: 0 })).keyboardOctaves).toBe(0);
+        expect(parsePrefs(stored({ keyboardOctaves: 7 })).keyboardOctaves).toBe(2);
+    });
+
+    it("defaults treadmill off and keeps the stored toggle", () => {
+        expect(parsePrefs(null).treadmill).toBe(false);
+        expect(parsePrefs(stored({ treadmill: true })).treadmill).toBe(true);
+    });
+});

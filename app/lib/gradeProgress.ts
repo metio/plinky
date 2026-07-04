@@ -4,6 +4,7 @@
 import { loadBundledScores, loadUserScores } from "./catalog";
 import { loadExerciseManifest } from "./exercises";
 import type { Letter } from "../../core/grade";
+import { type DecayMode, REVIEW_CAP } from "../../core/review";
 import { isDue, isLapsed, letterMin, loadAllMastery, type Mastery } from "./mastery";
 import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
 import { loadManifest } from "./songs";
@@ -16,14 +17,10 @@ import { loadManifest } from "./songs";
 // never destructive: gentle counts everything learned, competitive stops counting a
 // lapsed piece until it is refreshed — switching back restores it.
 
-export type DecayMode = "gentle" | "competitive";
 export type StarTier = "none" | "bronze" | "silver" | "gold";
 
 // Mastered counts that earn each star tier within a single grade.
 export const STAR_THRESHOLDS = { bronze: 5, silver: 12, gold: 25 } as const;
-
-// The most refresh reviews to surface in a day, so maintenance never piles up.
-export const REVIEW_CAP = 8;
 
 // How many of your hardest mastered pieces the skill rating averages.
 const SKILL_TOP = 10;

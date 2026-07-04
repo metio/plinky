@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
+import { usePrefsStore } from "../contexts/services";
 import { PRACTICE_EVENT } from "../lib/history";
-import { loadPrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 
@@ -19,13 +19,14 @@ export function GradeBadge() {
     const [level, setLevel] = useState<number | null>(null);
     const [skill, setSkill] = useState(0);
     const [competitive, setCompetitive] = useState(false);
+    const prefsStore = usePrefsStore();
 
     useEffect(() => {
         let cancelled = false;
         const read = () => {
             loadGradedMastery().then((items) => {
                 if (!cancelled) {
-                    const mode = loadPrefs().decayMode;
+                    const mode = prefsStore.load().decayMode;
                     const now = Date.now();
                     setLevel(currentGrade(items));
                     setSkill(skillRating(items, mode, now));
@@ -39,7 +40,7 @@ export function GradeBadge() {
             cancelled = true;
             window.removeEventListener(PRACTICE_EVENT, read);
         };
-    }, []);
+    }, [prefsStore]);
 
     // Only the pre-mount state is empty; once read, Grade 0 still shows.
     if (level === null) {

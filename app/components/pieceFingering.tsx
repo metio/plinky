@@ -9,7 +9,7 @@ import {
     loadSongFingering,
     setFinger,
 } from "../lib/savedFingering";
-import { loadPrefs, savePrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { scoreToBars, staffFor, windowCells, windowPositions } from "../../core/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
@@ -23,13 +23,14 @@ const WINDOW = 2;
 // score, and work out the fingering for each window. What you choose is saved per song
 // and pre-filled when you come back, so the work isn't lost.
 export function PieceFingering({ id, xml }: { id: string; xml: string }) {
+    const prefsStore = usePrefsStore();
     const [hand, setHand] = useState<"left" | "right">("right");
     const [start, setStart] = useState(0);
     const [map, setMap] = useState<FingerMap>(() => loadSongFingering(id));
     // Bumped on "clear" to remount the drill so it re-reads the (now empty) saved map.
     const [version, setVersion] = useState(0);
     // Live colour/symbol feedback, remembered across pieces via prefs.
-    const [hints, setHints] = useState(() => loadPrefs().fingerHints);
+    const [hints, setHints] = useState(() => prefsStore.load().fingerHints);
 
     const bars = useMemo(() => scoreToBars(xml, staffFor(hand)), [xml, hand]);
     const lastStart = Math.max(0, bars.length - WINDOW);
@@ -73,7 +74,7 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                     onClick={() =>
                         setHints((on) => {
                             const next = !on;
-                            savePrefs({ ...loadPrefs(), fingerHints: next });
+                            prefsStore.save({ ...prefsStore.load(), fingerHints: next });
                             return next;
                         })
                     }

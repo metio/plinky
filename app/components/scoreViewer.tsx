@@ -42,7 +42,8 @@ import {
 import { applyRun, isDue, letterMin, loadMastery, setBacklog } from "../lib/mastery";
 import { writeMastery } from "../lib/masteryStore";
 import { useMastery } from "../hooks/useMastery";
-import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
+import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../core/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { loadSongFingering } from "../lib/savedFingering";
 import { toReplayEvents } from "../../core/composition";
 import { listenStepMs } from "../../core/playback";
@@ -343,9 +344,10 @@ export function ScoreViewer({
     const hasSaved = Object.keys(saved).length > 0;
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
-    const [barsPerRow, setBarsPerRow] = useState(() => loadPrefs().barsPerRow);
+    const prefsStore = usePrefsStore();
+    const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
     // Whether to number the first bar of each staff row, remembered per device.
-    const [barNumbers, setBarNumbers] = useState(() => loadPrefs().barNumbers);
+    const [barNumbers, setBarNumbers] = useState(() => prefsStore.load().barNumbers);
     // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
     // alone would read as desktop). Drives the focus strip and a shorter staff box so the
     // keyboard never buries the notes, in either orientation.
@@ -363,16 +365,16 @@ export function ScoreViewer({
     // notes being played; the player picks its width (or 0 to keep the whole piece in
     // view, fixed). Changing it re-frames from scratch (clear the remembered window).
     const [keyWindow, setKeyWindow] = useState<Span | null>(null);
-    const [keyboardOctaves, setKeyboardOctaves] = useState(() => loadPrefs().keyboardOctaves);
+    const [keyboardOctaves, setKeyboardOctaves] = useState(() => prefsStore.load().keyboardOctaves);
     const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
     // Render the piece as one horizontal line that scrolls under a fixed gaze, instead of
     // wrapping into rows — the "treadmill" reading mode. Off by default.
-    const [treadmill, setTreadmill] = useState(() => loadPrefs().treadmill);
-    const [raceGhost, setRaceGhost] = useState(() => loadPrefs().raceGhost);
+    const [treadmill, setTreadmill] = useState(() => prefsStore.load().treadmill);
+    const [raceGhost, setRaceGhost] = useState(() => prefsStore.load().raceGhost);
     // Print the suggested fingering numbers on the staff. Seeded from the saved default
     // (off), flipped live by the in-play toggle; drives the render, so a change reloads the
     // annotated score.
-    const [showFingerings, setShowFingerings] = useState(() => loadPrefs().showFingerings);
+    const [showFingerings, setShowFingerings] = useState(() => prefsStore.load().showFingerings);
     // Whether the staff scrolls to keep the played note in view. On by default; the
     // treadmill drives its own centring, so OSMD's follow is off there. Applied straight to
     // OSMD (no reload), so the ref carries the live value into the render's constructor.
@@ -473,7 +475,7 @@ export function ScoreViewer({
     }, [id, canShareGhost, searchParams]);
 
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
-    const [forgiving, setForgiving] = useState(() => loadPrefs().forgiving);
+    const [forgiving, setForgiving] = useState(() => prefsStore.load().forgiving);
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
         hand,
@@ -813,7 +815,7 @@ export function ScoreViewer({
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const before = loadMastery(id);
-        const threshold = letterMin(loadPrefs().masteryThreshold);
+        const threshold = letterMin(prefsStore.load().masteryThreshold);
         const updated = applyRun(before, result.score, threshold, Date.now());
         writeMastery(id, updated);
         onMastery?.();
@@ -825,7 +827,7 @@ export function ScoreViewer({
         // ladder recomputed across all mastery, so it resolves asynchronously.
         const firstS = isFirstS(result.score, before?.bestScore ?? 0);
         const flawlessNow = isFlawless(result.score) && !flawlessDone();
-        const prefs = loadPrefs();
+        const prefs = prefsStore.load();
         // The grade-up check reads the ladder across the whole catalogue, so it resolves
         // asynchronously; the first-S and flawless checks above are already decided.
         loadGradedMastery().then((items) => {
@@ -853,6 +855,7 @@ export function ScoreViewer({
         initialTempo,
         bumpTempo,
         synth,
+        prefsStore.load,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
@@ -941,7 +944,7 @@ export function ScoreViewer({
                 const source = showFingerings
                     ? annotateFingerings(
                           transposed,
-                          loadPrefs().handSpan,
+                          prefsStore.load().handSpan,
                           showMine ? saved : undefined,
                       )
                     : transposed;
@@ -1337,7 +1340,7 @@ export function ScoreViewer({
     // Reveal the next note by colour per the player's hint setting — always, only
     // once they've slipped at this position, or never. A wrong key flashes red
     // regardless, so a miss is always felt.
-    const noteHints = loadPrefs().noteHints;
+    const noteHints = prefsStore.load().noteHints;
     const hintNotes =
         noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
             ? matcher.expected
@@ -1654,7 +1657,10 @@ export function ScoreViewer({
                                     <Switch
                                         checked={forgiving}
                                         onChange={(next) => {
-                                            savePrefs({ ...loadPrefs(), forgiving: next });
+                                            prefsStore.save({
+                                                ...prefsStore.load(),
+                                                forgiving: next,
+                                            });
                                             setForgiving(next);
                                         }}
                                         label={m.forgiving_toggle()}
@@ -1664,7 +1670,10 @@ export function ScoreViewer({
                                     <Switch
                                         checked={raceGhost}
                                         onChange={(next) => {
-                                            savePrefs({ ...loadPrefs(), raceGhost: next });
+                                            prefsStore.save({
+                                                ...prefsStore.load(),
+                                                raceGhost: next,
+                                            });
                                             setRaceGhost(next);
                                         }}
                                         label={m.race_ghost_toggle()}
@@ -1810,7 +1819,10 @@ export function ScoreViewer({
                                     <Switch
                                         checked={treadmill}
                                         onChange={(next) => {
-                                            savePrefs({ ...loadPrefs(), treadmill: next });
+                                            prefsStore.save({
+                                                ...prefsStore.load(),
+                                                treadmill: next,
+                                            });
                                             setTreadmill(next);
                                         }}
                                         label={m.treadmill_toggle()}
@@ -1820,7 +1832,10 @@ export function ScoreViewer({
                                     <Switch
                                         checked={barNumbers}
                                         onChange={(next) => {
-                                            savePrefs({ ...loadPrefs(), barNumbers: next });
+                                            prefsStore.save({
+                                                ...prefsStore.load(),
+                                                barNumbers: next,
+                                            });
                                             setBarNumbers(next);
                                         }}
                                         label={m.bar_numbers_toggle()}
@@ -1841,7 +1856,10 @@ export function ScoreViewer({
                                                 onChange={(id) => {
                                                     const n = Number(id);
                                                     setBarsPerRow(n);
-                                                    savePrefs({ ...loadPrefs(), barsPerRow: n });
+                                                    prefsStore.save({
+                                                        ...prefsStore.load(),
+                                                        barsPerRow: n,
+                                                    });
                                                 }}
                                                 label={m.bars_per_row()}
                                             />
@@ -1861,7 +1879,10 @@ export function ScoreViewer({
                                                 const n = Number(id);
                                                 setKeyboardOctaves(n);
                                                 setKeyWindow(null);
-                                                savePrefs({ ...loadPrefs(), keyboardOctaves: n });
+                                                prefsStore.save({
+                                                    ...prefsStore.load(),
+                                                    keyboardOctaves: n,
+                                                });
                                             }}
                                             label={m.keyboard_octaves()}
                                         />

@@ -16,7 +16,7 @@ import {
 } from "../../core/fingeringScore";
 import { GRADE_COLOR, type Letter } from "../../core/grade";
 import { noteName } from "../../core/midi";
-import { loadPrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { StaffPreview } from "./staffPreview";
 
@@ -86,6 +86,7 @@ export function FingeringDrill({
     // for a learner building their own judgement.
     hints?: boolean;
 }) {
+    const prefsStore = usePrefsStore();
     const synth = useSynth();
     const [fingers, setFingers] = useState<(number | null)[][]>(
         () => initialFingers ?? positions.map((pos) => pos.map(() => null)),
@@ -111,9 +112,14 @@ export function FingeringDrill({
     const qualities = useMemo(
         () =>
             hints
-                ? fingerQualities(positions, fingers, hand, loadPrefs().handSpan[hand] ?? undefined)
+                ? fingerQualities(
+                      positions,
+                      fingers,
+                      hand,
+                      prefsStore.load().handSpan[hand] ?? undefined,
+                  )
                 : positions.map(() => null),
-        [positions, fingers, hand, hints],
+        [positions, fingers, hand, hints, prefsStore.load],
     );
 
     const assign = useCallback(
@@ -163,7 +169,7 @@ export function FingeringDrill({
     const complete = fingers.length > 0 && fingers.every((tuple) => tuple.every((f) => f !== null));
     const check = () => {
         if (complete) {
-            const span = loadPrefs().handSpan[hand] ?? undefined;
+            const span = prefsStore.load().handSpan[hand] ?? undefined;
             setResult(scoreFingering(positions, fingers as number[][], hand, span));
         }
     };

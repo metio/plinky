@@ -7,7 +7,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import type { DailyResult } from "../lib/dailyResult";
 import { generatePhrase } from "../../core/generator";
-import { loadPrefs } from "../lib/prefs";
+import { browserStore } from "../adapters/browserStore";
+import { createPrefsStore } from "../stores/prefsStore";
+
+// Reads and writes go through a store over the same backing localStorage the
+// component under test uses, so seeding and asserting see one source of truth.
+const prefsStore = createPrefsStore(browserStore);
 import { encodeGhost, saveGhost } from "../lib/recording";
 import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../lib/scoreColor";
 import { ScoreViewer } from "./scoreViewer";
@@ -210,12 +215,12 @@ describe("ScoreViewer", () => {
         const barNumbers = screen.getByRole("switch", { name: "Bar numbers" });
         // On by default, matching the persisted preference.
         expect(barNumbers.getAttribute("aria-checked")).toBe("true");
-        expect(loadPrefs().barNumbers).toBe(true);
+        expect(prefsStore.load().barNumbers).toBe(true);
         fireEvent.click(barNumbers);
         expect(barNumbers.getAttribute("aria-checked")).toBe("false");
         // The choice is remembered per device and the score reloads (Practice re-enabling
         // proves the render effect re-ran rather than leaving a dead viewer).
-        expect(loadPrefs().barNumbers).toBe(false);
+        expect(prefsStore.load().barNumbers).toBe(false);
         await waitFor(
             () =>
                 expect(

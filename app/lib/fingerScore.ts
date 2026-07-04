@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { fingerPositions } from "../../core/fingering";
-import type { HandSpan } from "./prefs";
+import type { HandSpan } from "../../core/prefs";
 import { type FingerMap, fingerKey } from "./savedFingering";
 import { scoreToBars } from "../../core/scoreToBars";
 

@@ -5,7 +5,12 @@
 import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP } from "../../core/keyMap";
-import { savePrefs } from "../lib/prefs";
+import { browserStore } from "../adapters/browserStore";
+import { createPrefsStore } from "../stores/prefsStore";
+
+// Reads and writes go through a store over the same backing localStorage the
+// component under test uses, so seeding and asserting see one source of truth.
+const prefsStore = createPrefsStore(browserStore);
 import { useSynth } from "./useSynth";
 
 let oscillators = 0;
@@ -57,7 +62,7 @@ afterEach(() => localStorage.clear());
 
 describe("useSynth", () => {
     it("builds a voice when sound is on", () => {
-        savePrefs({
+        prefsStore.save({
             sound: true,
             volume: 80,
             masteryThreshold: "A",
@@ -82,7 +87,7 @@ describe("useSynth", () => {
     });
 
     it("stays silent when sound is off", () => {
-        savePrefs({
+        prefsStore.save({
             sound: false,
             volume: 80,
             masteryThreshold: "A",
@@ -108,7 +113,7 @@ describe("useSynth", () => {
 
     it("stays silent — and does not throw — at volume 0", () => {
         // An exponential gain ramp to 0 is a RangeError, so volume 0 must short-circuit.
-        savePrefs({
+        prefsStore.save({
             sound: true,
             volume: 0,
             masteryThreshold: "A",

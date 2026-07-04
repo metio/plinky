@@ -11,7 +11,7 @@ import {
     loadGradeCatalogue,
     loadGradedMastery,
 } from "../lib/gradeProgress";
-import { loadPrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import { type Task, todayTasks } from "../../core/today";
 import { m } from "../paraglide/messages.js";
@@ -42,6 +42,7 @@ function taskLabel(task: Task): string {
 // straight into practice. Reads local state after mount, so it's absent from the
 // prerendered shell and appears once the client resolves it.
 export function HomeToday() {
+    const prefsStore = usePrefsStore();
     const [tasks, setTasks] = useState<Task[] | null>(null);
 
     useEffect(() => {
@@ -51,7 +52,7 @@ export function HomeToday() {
                 return;
             }
             const now = Date.now();
-            const prefs = loadPrefs();
+            const prefs = prefsStore.load();
             const level = currentGrade(items);
             const workingGrade = Math.min(level + 1, MAX_GRADE);
             const mastered = new Set(
@@ -70,7 +71,7 @@ export function HomeToday() {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [prefsStore.load]);
 
     if (tasks === null) {
         return null;

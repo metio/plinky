@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { usePrefsStore } from "../contexts/services";
 import { FIRST_SONG_ID } from "../lib/catalog";
 import {
     type DiscoveryId,
@@ -49,14 +50,15 @@ export function DiscoveryChecklist() {
         dismissed: boolean;
     } | null>(null);
 
+    const prefsStore = usePrefsStore();
     useEffect(() => {
-        const done = discoveries();
+        const done = discoveries(prefsStore.load());
         setState({
             done,
             progress: discoveryProgress(done),
             dismissed: hasSeenHint(DISCOVERY_DISMISSED),
         });
-    }, []);
+    }, [prefsStore]);
 
     if (!state || state.dismissed || state.progress.allDone) {
         return null;

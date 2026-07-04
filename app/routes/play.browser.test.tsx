@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { DEFAULT_PREFS } from "../../core/prefs";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -58,6 +59,6 @@ describe("Play", () => {
         expect(
             await screen.findByRole("button", { name: /Hear the phrase/ }, { timeout: 30000 }),
         ).toBeTruthy();
-        expect(discoveries().earTried).toBe(true);
+        expect(discoveries(DEFAULT_PREFS).earTried).toBe(true);
     });
 });

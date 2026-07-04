@@ -1,10 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import type { Letter } from "../../core/grade";
-import { type DecayMode, REVIEW_CAP } from "./gradeProgress";
-import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
+import type { Letter } from "./grade";
+import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import { type DecayMode, REVIEW_CAP } from "./review";
 
 // A hand's comfortable thumb-to-pinky reach in semitones, or null when unmeasured
 // — people with one hand set only the hand they have. Personalizes the suggested
@@ -50,7 +49,7 @@ export type Prefs = {
     reviewCap: number;
     // How many bars to force onto each staff row, or 0 to let the width decide. Fewer
     // bars per row means bigger, more readable notation — the lever a phone needs so the
-    // notes aren't crammed too small to play. Stored per device (localStorage).
+    // notes aren't crammed too small to play. Stored per device.
     barsPerRow: number;
     // Show a bar number above the first bar of each staff row, so a passage is easy to
     // point to and matches the loop's from/to inputs. When shown they sit at each row's
@@ -86,32 +85,12 @@ export const BARS_PER_ROW = [0, 2, 3, 4];
 // follows the notes, or 0 for the whole piece framed at once (fixed).
 export const KEYBOARD_OCTAVES = [0, 1, 2, 3];
 
-const KEY = "plinky:prefs";
-const DEFAULTS: Prefs = {
-    sound: true,
-    volume: 80,
-    masteryThreshold: "A",
-    handSpan: { left: null, right: null },
-    showFingerings: false,
-    noteHints: "miss",
-    noteLabels: "c",
-    forgiving: false,
-    fingerHints: true,
-    decayMode: "gentle",
-    reviewCap: REVIEW_CAP,
-    barsPerRow: 0,
-    barNumbers: true,
-    keyMap: DEFAULT_KEY_MAP,
-    keyboardOctaves: 2,
-    treadmill: false,
-    raceGhost: true,
-};
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
 const NOTE_LABELS: NoteLabels[] = ["all", "c", "off"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
-function clampVolume(value: number): number {
+export function clampVolume(value: number): number {
     return Math.max(0, Math.min(100, Math.round(value)));
 }
 
@@ -126,67 +105,77 @@ function cleanHandSpan(value: unknown): HandSpan {
     return { left: cleanSpan(span.left), right: cleanSpan(span.right) };
 }
 
-export function loadPrefs(): Prefs {
+function defaults(): Prefs {
+    return {
+        sound: true,
+        volume: 80,
+        masteryThreshold: "A",
+        handSpan: { left: null, right: null },
+        showFingerings: false,
+        noteHints: "miss",
+        noteLabels: "c",
+        forgiving: false,
+        fingerHints: true,
+        decayMode: "gentle",
+        reviewCap: REVIEW_CAP,
+        barsPerRow: 0,
+        barNumbers: true,
+        keyMap: cleanKeyMap(undefined),
+        keyboardOctaves: 2,
+        treadmill: false,
+        raceGhost: true,
+    };
+}
+
+// A stable defaults object for render snapshots (server render, first hydration):
+// the same reference every time, so a subscription snapshot never loops. Frozen —
+// callers copy before changing, as they do with any loaded prefs.
+export const DEFAULT_PREFS: Readonly<Prefs> = Object.freeze({
+    ...defaults(),
+    handSpan: Object.freeze({ left: null, right: null }),
+    keyMap: Object.freeze(DEFAULT_KEY_MAP) as KeyMap,
+});
+
+// Parses a raw stored string (or null for nothing stored) into full, valid Prefs.
+// Every field is coerced or dropped to its default, so a corrupt or stale store can
+// never leak an out-of-range value into the app.
+export function parsePrefs(raw: string | null): Prefs {
+    const base = defaults();
     try {
-        const parsed = JSON.parse(browserStore.get(KEY) ?? "{}");
+        const parsed = JSON.parse(raw ?? "{}");
         return {
-            sound: typeof parsed.sound === "boolean" ? parsed.sound : DEFAULTS.sound,
-            volume:
-                typeof parsed.volume === "number" ? clampVolume(parsed.volume) : DEFAULTS.volume,
+            sound: typeof parsed.sound === "boolean" ? parsed.sound : base.sound,
+            volume: typeof parsed.volume === "number" ? clampVolume(parsed.volume) : base.volume,
             masteryThreshold: LETTERS.includes(parsed.masteryThreshold)
                 ? parsed.masteryThreshold
-                : DEFAULTS.masteryThreshold,
+                : base.masteryThreshold,
             handSpan: cleanHandSpan(parsed.handSpan),
             showFingerings:
                 typeof parsed.showFingerings === "boolean"
                     ? parsed.showFingerings
-                    : DEFAULTS.showFingerings,
-            noteHints: NOTE_HINTS.includes(parsed.noteHints)
-                ? parsed.noteHints
-                : DEFAULTS.noteHints,
+                    : base.showFingerings,
+            noteHints: NOTE_HINTS.includes(parsed.noteHints) ? parsed.noteHints : base.noteHints,
             noteLabels: NOTE_LABELS.includes(parsed.noteLabels)
                 ? parsed.noteLabels
-                : DEFAULTS.noteLabels,
-            forgiving:
-                typeof parsed.forgiving === "boolean" ? parsed.forgiving : DEFAULTS.forgiving,
+                : base.noteLabels,
+            forgiving: typeof parsed.forgiving === "boolean" ? parsed.forgiving : base.forgiving,
             fingerHints:
-                typeof parsed.fingerHints === "boolean" ? parsed.fingerHints : DEFAULTS.fingerHints,
-            decayMode: DECAY_MODES.includes(parsed.decayMode)
-                ? parsed.decayMode
-                : DEFAULTS.decayMode,
-            reviewCap: REVIEW_CAPS.includes(parsed.reviewCap)
-                ? parsed.reviewCap
-                : DEFAULTS.reviewCap,
+                typeof parsed.fingerHints === "boolean" ? parsed.fingerHints : base.fingerHints,
+            decayMode: DECAY_MODES.includes(parsed.decayMode) ? parsed.decayMode : base.decayMode,
+            reviewCap: REVIEW_CAPS.includes(parsed.reviewCap) ? parsed.reviewCap : base.reviewCap,
             barsPerRow: BARS_PER_ROW.includes(parsed.barsPerRow)
                 ? parsed.barsPerRow
-                : DEFAULTS.barsPerRow,
+                : base.barsPerRow,
             barNumbers:
-                typeof parsed.barNumbers === "boolean" ? parsed.barNumbers : DEFAULTS.barNumbers,
+                typeof parsed.barNumbers === "boolean" ? parsed.barNumbers : base.barNumbers,
             keyMap: cleanKeyMap(parsed.keyMap),
             keyboardOctaves: KEYBOARD_OCTAVES.includes(parsed.keyboardOctaves)
                 ? parsed.keyboardOctaves
-                : DEFAULTS.keyboardOctaves,
-            treadmill:
-                typeof parsed.treadmill === "boolean" ? parsed.treadmill : DEFAULTS.treadmill,
-            raceGhost:
-                typeof parsed.raceGhost === "boolean" ? parsed.raceGhost : DEFAULTS.raceGhost,
+                : base.keyboardOctaves,
+            treadmill: typeof parsed.treadmill === "boolean" ? parsed.treadmill : base.treadmill,
+            raceGhost: typeof parsed.raceGhost === "boolean" ? parsed.raceGhost : base.raceGhost,
         };
     } catch {
-        return { ...DEFAULTS, handSpan: { ...DEFAULTS.handSpan }, keyMap: cleanKeyMap(undefined) };
-    }
-}
-
-// Broadcast on the same tab so a long-lived listener (the keyboard input layer) can
-// pick up a preference change made on the Settings route without a reload.
-export const PREFS_CHANGED_EVENT = "plinky:prefs-changed";
-
-export function savePrefs(prefs: Prefs): void {
-    try {
-        browserStore.set(KEY, JSON.stringify({ ...prefs, volume: clampVolume(prefs.volume) }));
-        if (typeof window !== "undefined") {
-            window.dispatchEvent(new Event(PREFS_CHANGED_EVENT));
-        }
-    } catch {
-        // Preference persistence is best-effort.
+        return base;
     }
 }

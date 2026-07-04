@@ -24,7 +24,7 @@ import {
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { buildMidiFile } from "../../core/midiFile";
 import { markDiscovered } from "../lib/onboarding";
-import { loadPrefs } from "../lib/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { fileStem } from "../lib/printScore";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -58,6 +58,7 @@ function downloadBlob(data: BlobPart, type: string, filename: string): void {
 const COMPOSE_REACH: Span = { from: 21, to: 108 };
 
 export default function Compose() {
+    const prefsStore = usePrefsStore();
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
     const [tempo, setTempo] = useState(120);
@@ -79,7 +80,7 @@ export default function Compose() {
     // chosen width (Settings → keyboard octaves; 0 = show all) that follows what they
     // play, rather than a frozen three octaves. Read once on mount.
     const [keyboardSpan] = useState(() => {
-        const octaves = loadPrefs().keyboardOctaves;
+        const octaves = prefsStore.load().keyboardOctaves;
         return octaves === 0 ? Number.POSITIVE_INFINITY : octaves * 12;
     });
     const [keyWindow, setKeyWindow] = useState<Span>(() =>

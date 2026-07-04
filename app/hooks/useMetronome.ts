@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef } from "react";
+import { usePrefsStore } from "../contexts/services";
 import { getAudioContext } from "../lib/audio";
-import { loadPrefs } from "../lib/prefs";
 
 type Tick = "accent" | "beat" | "sub";
 
@@ -24,6 +24,7 @@ export function useMetronome(
 ): void {
     const bpmRef = useRef(bpm);
     bpmRef.current = bpm;
+    const prefsStore = usePrefsStore();
 
     useEffect(() => {
         if (!enabled) {
@@ -41,7 +42,7 @@ export function useMetronome(
         let next = ctx.currentTime + 0.1;
 
         const click = (time: number, kind: Tick) => {
-            const prefs = loadPrefs();
+            const prefs = prefsStore.load();
             const level = kind === "accent" ? 0.3 : kind === "beat" ? 0.18 : 0.08;
             const peak = level * (prefs.volume / 100);
             if (!prefs.sound || peak <= 0) {
@@ -75,5 +76,5 @@ export function useMetronome(
         schedule();
         const timer = window.setInterval(schedule, 25);
         return () => window.clearInterval(timer);
-    }, [enabled, beatsPerBar, subdivision]);
+    }, [enabled, beatsPerBar, subdivision, prefsStore]);
 }

@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { useMidiInput } from "../contexts/midi";
 import { intervalName } from "../../core/intervals";
 import { noteName } from "../../core/midi";
-import { type HandSpan, loadPrefs, savePrefs } from "../lib/prefs";
+import type { HandSpan } from "../../core/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { Button } from "./button";
 import { PianoKeyboard } from "./pianoKeyboard";
@@ -19,13 +20,14 @@ const SIDES: Side[] = ["left", "right"];
 // funnel as practice — a tap on the on-screen keys or a real MIDI piano both land
 // as note events — so the two furthest keys the player reaches give the span.
 export function HandSize() {
+    const prefsStore = usePrefsStore();
     const [spans, setSpans] = useState<HandSpan>({ left: null, right: null });
     const [active, setActive] = useState<Side | null>(null);
     const [captured, setCaptured] = useState<number[]>([]);
 
     useEffect(() => {
-        setSpans(loadPrefs().handSpan);
-    }, []);
+        setSpans(prefsStore.load().handSpan);
+    }, [prefsStore.load]);
 
     useMidiInput({
         onNoteOn: (event) => {
@@ -50,12 +52,12 @@ export function HandSize() {
         setCaptured([]);
     };
     const persist = (next: HandSpan) => {
-        savePrefs({ ...loadPrefs(), handSpan: next });
+        prefsStore.save({ ...prefsStore.load(), handSpan: next });
         setSpans(next);
     };
     const save = () => {
         if (active && measured !== null) {
-            persist({ ...loadPrefs().handSpan, [active]: measured });
+            persist({ ...prefsStore.load().handSpan, [active]: measured });
             cancel();
         }
     };

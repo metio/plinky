@@ -12,16 +12,10 @@ import { ThemeToggle } from "../components/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../../core/grade";
-import type { DecayMode } from "../lib/gradeProgress";
+import type { DecayMode } from "../../core/review";
 import { DEFAULT_KEY_MAP } from "../../core/keyMap";
-import {
-    loadPrefs,
-    type NoteHints,
-    type NoteLabels,
-    type Prefs,
-    REVIEW_CAPS,
-    savePrefs,
-} from "../lib/prefs";
+import { type NoteHints, type NoteLabels, type Prefs, REVIEW_CAPS } from "../../core/prefs";
+import { usePrefsStore } from "../contexts/services";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
@@ -31,6 +25,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function Settings() {
+    const prefsStore = usePrefsStore();
     const [prefs, setPrefs] = useState<Prefs>({
         sound: true,
         volume: 80,
@@ -54,15 +49,15 @@ export default function Settings() {
     const { support: midiSupport } = useMidiConnection();
 
     useEffect(() => {
-        setPrefs(loadPrefs());
-    }, []);
+        setPrefs(prefsStore.load());
+    }, [prefsStore.load]);
 
     // Merge onto the latest stored prefs so a change here can't clobber one the
     // Hand size panel saved independently (handSpan isn't an input on this page).
     const update = (change: Partial<Prefs>) => {
-        const next = { ...loadPrefs(), ...change };
+        const next = { ...prefsStore.load(), ...change };
         setPrefs(next);
-        savePrefs(next);
+        prefsStore.save(next);
     };
 
     return (

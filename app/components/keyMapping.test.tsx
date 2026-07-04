@@ -4,7 +4,12 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { loadPrefs } from "../lib/prefs";
+import { browserStore } from "../adapters/browserStore";
+import { createPrefsStore } from "../stores/prefsStore";
+
+// Reads and writes go through a store over the same backing localStorage the
+// component under test uses, so seeding and asserting see one source of truth.
+const prefsStore = createPrefsStore(browserStore);
 import { KeyMapping } from "./keyMapping";
 
 afterEach(() => {
@@ -32,7 +37,7 @@ describe("KeyMapping", () => {
 
         expect(cap.getAttribute("aria-pressed")).toBe("false");
         expect(cap.textContent).toContain("Z");
-        expect(loadPrefs().keyMap.left.z).toBe(0);
+        expect(prefsStore.load().keyMap.left.z).toBe(0);
     });
 
     it("cancels an armed rebind on Escape without changing the binding", () => {
@@ -43,17 +48,17 @@ describe("KeyMapping", () => {
         fireEvent.keyDown(window, { key: "Escape" });
 
         expect(cap.getAttribute("aria-pressed")).toBe("false");
-        expect(loadPrefs().keyMap.left.a).toBe(0);
+        expect(prefsStore.load().keyMap.left.a).toBe(0);
     });
 
     it("restores the default layout on reset", () => {
         render(<KeyMapping />);
         fireEvent.click(screen.getByRole("button", { name: /Rebind C, Left hand/i }));
         fireEvent.keyDown(window, { key: "z" });
-        expect(loadPrefs().keyMap.left.z).toBe(0);
+        expect(prefsStore.load().keyMap.left.z).toBe(0);
 
         fireEvent.click(screen.getByRole("button", { name: "Reset to default" }));
-        expect(loadPrefs().keyMap.left.a).toBe(0);
-        expect("z" in loadPrefs().keyMap.left).toBe(false);
+        expect(prefsStore.load().keyMap.left.a).toBe(0);
+        expect("z" in prefsStore.load().keyMap.left).toBe(false);
     });
 });

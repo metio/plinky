@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { Prefs } from "../../core/prefs";
 import { browserStore } from "../adapters/browserStore";
 import { lastDailyDone } from "./dailyDone";
 import { loadHistory } from "./history";
 import { isDefaultKeyMap } from "../../core/keyMap";
 import { loadAllMastery } from "./mastery";
-import { loadPrefs } from "./prefs";
 
 // The feature-discovery checklist: a gentle, opt-in nudge to meet the app's corners,
 // never a gate on progression. Some steps are read from real state (you've played,
@@ -53,10 +53,10 @@ export function markDiscovered(id: DiscoveryId): void {
     }
 }
 
-// Which discovery steps are done: the derived ones from real state, the rest from the
-// marked set.
-export function discoveries(): Record<DiscoveryId, boolean> {
-    const prefs = loadPrefs();
+// Which discovery steps are done: the derived ones from real state, the rest from
+// the marked set. The caller passes the current prefs — this module only derives,
+// it does not reach into the preference store.
+export function discoveries(prefs: Prefs): Record<DiscoveryId, boolean> {
     const span = prefs.handSpan;
     const marked = loadMarked();
     return {

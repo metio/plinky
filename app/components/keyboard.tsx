@@ -4,7 +4,7 @@
 import type React from "react";
 import { type ReactNode, useEffect, useState } from "react";
 import { noteName, pitchClass } from "../../core/midi";
-import type { NoteLabels } from "../lib/prefs";
+import type { NoteLabels } from "../../core/prefs";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 
 const WHITE_PITCH_CLASSES = [0, 2, 4, 5, 7, 9, 11];
