@@ -220,12 +220,16 @@ npm install      # install dependencies
 npm run dev      # start the dev server
 npm run typecheck
 npm test
+npm run arch     # check the layered-architecture rules
 npm run build    # emit the static site to build/client
 npm run scores   # regenerate the bundled exercise scores
 ```
 
-A pull request runs typecheck, tests, and a production build; merging to `main`
-publishes the built site to <https://plinky.fun>.
+The codebase is a stack of layers — a pure `core/` domain under an app of ports,
+adapters, stores and components — described in [ARCHITECTURE.md](ARCHITECTURE.md)
+and enforced by `npm run arch`. A pull request runs typecheck, tests, the
+architecture check, and a production build; merging to `main` publishes the built
+site to <https://plinky.fun>.
 
 ## License
 

@@ -18,5 +18,8 @@ export function resetDevice(): number {
     for (const key of keys) {
         browserStore.remove(key);
     }
-    return keys.length;
+    // Count what is actually gone rather than what was attempted, so a store that
+    // refuses removals cannot make the reset claim a success it did not deliver.
+    const remaining = browserStore.keys().filter((key) => key.startsWith(PREFIX)).length;
+    return keys.length - remaining;
 }

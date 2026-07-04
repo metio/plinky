@@ -85,5 +85,7 @@ the narrow hook (`useStore()`) so a component declares exactly what it depends o
 It reads the import graph, so it enforces the *edges*: no cycles, `core` importing nothing
 above it, `ports` staying implementation-free, each layer pointing down. It cannot see a
 reference to a global (`localStorage`, `document`, `fetch`) because that is not an import —
-`core`'s freedom from browser globals is enforced instead by compiling it against a DOM-free
-`lib`, and by keeping the platform confined to `app/adapters/`.
+those are checked by `dev/check-globals.mjs` (part of `npm run arch`), which pins each
+confined global to the one adapter allowed to touch it. A few `core/` modules still parse
+XML through `DOMParser`; they move behind a MusicXML-parser port, at which point that
+global joins the confined list.

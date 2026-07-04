@@ -44,6 +44,17 @@ describe("prefsStore", () => {
         expect(onChange).toHaveBeenCalledTimes(1);
     });
 
+    it("reports a refused write and keeps subscribers quiet", () => {
+        const kv = memoryStore();
+        const refusing = { ...kv, set: () => false };
+        const store = createPrefsStore(refusing);
+        const onChange = vi.fn();
+        store.subscribe(onChange);
+        expect(store.save({ ...store.load(), sound: false })).toBe(false);
+        expect(onChange).not.toHaveBeenCalled();
+        expect(store.load().sound).toBe(true);
+    });
+
     it("sees a change written to the backing store by someone else", () => {
         const kv = memoryStore();
         const store = createPrefsStore(kv);

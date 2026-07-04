@@ -159,9 +159,9 @@ function store(songId: string, takes: Take[]): boolean {
             metrics: take.metrics,
             code: encodeComposition(take.composition),
         }));
-        browserStore.set(storageKey(songId), JSON.stringify(stored));
-        return true;
+        return browserStore.set(storageKey(songId), JSON.stringify(stored));
     } catch {
+        // A take that cannot be encoded never reaches the store.
         return false;
     }
 }

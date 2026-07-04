@@ -33,6 +33,7 @@ export type SongMeta = {
 const MANIFEST_URL = "/songs/manifest.json";
 const SEED_URL = "/songs/seed.json";
 const SEEDED_KEY = "plinky:songs-seeded";
+const PROBE_KEY = "plinky:songs-seeded-probe";
 
 let manifestCache: SongMeta[] | null = null;
 
@@ -94,11 +95,18 @@ export async function resolveSong(id: string): Promise<Score | null> {
 
 // On first run, star the seed songs (a few per grade) so the library spans grades
 // 1–8 and the home page has something to show without the player hunting first.
-// Guarded so it runs once.
+// Guarded so it runs once. The flag is written only after a successful seeding, so
+// a first visit that cannot reach the seed (offline install) retries next load.
 export async function ensureSeeded(): Promise<void> {
     if (browserStore.get(SEEDED_KEY)) {
         return;
     }
+    // Blocked storage would make the favorites unwritable AND the flag unlatchable,
+    // repeating the fetch on every page load — probe before doing any network work.
+    if (!browserStore.set(PROBE_KEY, "1")) {
+        return;
+    }
+    browserStore.remove(PROBE_KEY);
     try {
         const response = await fetch(SEED_URL);
         const seed = response.ok ? ((await response.json()) as string[]) : [];

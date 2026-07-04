@@ -32,9 +32,9 @@ function keyCap(key: string | null): string {
 
 // Remap which computer key plays each note, per hand. Each note is a cap showing its
 // current key; clicking it arms the cap, and the next key pressed becomes its binding.
-// Saving dispatches a prefs-changed event, so the keyboard input layer picks up the new
-// layout immediately. Off by default visually — most players use a piano, touch, or the
-// stock layout — but one tap away for anyone who wants their own keys.
+// Saving notifies the prefs store's subscribers, so the keyboard input layer picks up
+// the new layout immediately. Off by default visually — most players use a piano,
+// touch, or the stock layout — but one tap away for anyone who wants their own keys.
 export function KeyMapping() {
     const prefsStore = usePrefsStore();
     const [map, setMap] = useState<KeyMap>(DEFAULT_KEY_MAP);
@@ -51,11 +51,7 @@ export function KeyMapping() {
             // Merge onto the latest stored prefs so a change elsewhere on the page isn't lost.
             prefsStore.save({ ...prefsStore.load(), keyMap: next });
         },
-        [
-            // Merge onto the latest stored prefs so a change elsewhere on the page isn't lost.
-            prefsStore.save,
-            prefsStore.load,
-        ],
+        [prefsStore.save, prefsStore.load],
     );
 
     // While a cap is armed, capture the next keystroke before it reaches the keyboard

@@ -42,10 +42,10 @@ const BUDGET_TOTAL_KB = 640;
 // with its lagging-hand grade-panel readout; and the tempo-locked "keep up" play-along —
 // the clock-driven runner, its hit/miss painting and result; and the ServicesProvider
 // DI backbone (the injected-capabilities context every feature reads its integration
-// points from) — whose entry-level import edge also re-shaped Rollup's chunk graph,
-// splitting two large shared chunks into ~10 small ones (fflate and the storage
-// helpers each on their own): the same code gzips ~3 KB worse across more chunk
-// boundaries, traded for finer caching granularity; still a tight ratchet.
+// points from) — whose entry-level import edge makes Rollup emit many small shared
+// chunks (fflate and the storage helpers each on their own); the extra chunk
+// boundaries cost ~3 KB of gzip, traded for finer caching granularity; still a
+// tight ratchet.
 const BUDGET_APP_KB = 330;
 
 const chunks = readdirSync(DIR)

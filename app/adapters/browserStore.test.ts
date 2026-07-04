@@ -21,8 +21,7 @@ describe("browserStore", () => {
 
     // The one denied-storage guard: when merely touching localStorage throws
     // (Firefox with site-data off, a sandboxed iframe), every operation degrades
-    // instead of crashing the caller — the invariant every storage helper used to
-    // re-implement, now held in exactly one place.
+    // instead of crashing the caller — the single guard the whole app relies on.
     it("degrades to empty results when storage is blocked, never throwing", () => {
         withDeniedStorage(() => {
             expect(() => browserStore.set("plinky:x", "1")).not.toThrow();

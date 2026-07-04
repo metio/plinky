@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// The architecture contract, enforced. Plinky is built as a stack of layers whose
+// The architecture contract, enforced. The app is built as a stack of layers whose
 // dependencies point strictly downward:
 //
 //   routes → components/features → components/ui → core
@@ -11,13 +11,13 @@
 //              └────────┴───────┴────────┘            dev/ and the build config
 //                                                     depend down on core too)
 //
-// core/ is pure domain — no React, no OSMD, no browser globals, no I/O. Side effects
-// live behind ports (interfaces) implemented by adapters, so the units that use them
-// stay testable with fakes. These rules catch a dependency that would flow the wrong
-// way; the layers that don't exist yet leave their rules dormant until their folder
-// lands, at which point the rule starts guarding it. Browser-global purity of core/
-// (localStorage/document/window/fetch) is enforced separately by a DOM-free tsconfig,
-// not here — dependency-cruiser only sees imports, not global references.
+// core/ is pure domain — no React, no OSMD, no I/O. Side effects live behind ports
+// (interfaces) implemented by adapters, so the units that use them stay testable
+// with fakes. These rules catch a dependency that would flow the wrong way; a rule
+// whose folder does not exist yet lies dormant until the folder lands, at which
+// point it starts guarding. Browser globals (localStorage & friends) are not
+// imports, so dependency-cruiser cannot see them — dev/check-globals.mjs confines
+// those to their adapters.
 
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
@@ -111,8 +111,9 @@ module.exports = {
             name: "dev-depends-on-core",
             comment:
                 "Build/import scripts under dev/ may only reach down into core/ (pure, shared music " +
-                "tooling), never sideways into the app UI layers. Currently they still import app/lib/; " +
-                "this becomes an error once core/ exists and they are repointed.",
+                "tooling), never sideways into the app UI layers. Severity stays warn while " +
+                "scoreDifficulty (DOM-coupled XML parsing) remains in app/lib; it becomes error when " +
+                "that module's pure half lands in core/.",
             severity: "warn",
             from: { path: "^dev/" },
             to: { path: ["^app/"] },

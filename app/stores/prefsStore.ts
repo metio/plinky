@@ -14,7 +14,10 @@ export type PrefsStore = {
     // external change) actually alters the stored value, which is what lets a React
     // subscription use it as a snapshot without re-render loops.
     load(): Prefs;
-    save(prefs: Prefs): void;
+    // Persist and notify subscribers; returns whether the write actually landed.
+    // A refused write (blocked storage, quota) notifies no one — subscribers only
+    // hear about changes that are real.
+    save(prefs: Prefs): boolean;
     subscribe(onChange: () => void): () => void;
 };
 
@@ -44,8 +47,14 @@ export function createPrefsStore(kv: KeyValueStore): PrefsStore {
     return {
         load,
         save(prefs) {
-            kv.set(KEY, JSON.stringify({ ...prefs, volume: clampVolume(prefs.volume) }));
-            notify();
+            const stored = kv.set(
+                KEY,
+                JSON.stringify({ ...prefs, volume: clampVolume(prefs.volume) }),
+            );
+            if (stored) {
+                notify();
+            }
+            return stored;
         },
         subscribe(onChange) {
             listeners.add(onChange);

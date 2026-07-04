@@ -35,4 +35,27 @@ describe("ServicesProvider", () => {
         const { getByRole } = render(<Probe />);
         expect(getByRole("status").textContent).toBe("hi");
     });
+
+    it("keeps one service set across re-renders even for an inline services literal", () => {
+        const fake = memoryStore();
+        const seen: unknown[] = [];
+        function Collector() {
+            seen.push(useStore());
+            return null;
+        }
+        const { rerender } = render(
+            <ServicesProvider services={{ store: fake }}>
+                <Collector />
+            </ServicesProvider>,
+        );
+        // A fresh prop object with the same override must not rebuild the set —
+        // a rebuilt set would orphan every subscriber of the previous instance.
+        rerender(
+            <ServicesProvider services={{ store: fake }}>
+                <Collector />
+            </ServicesProvider>,
+        );
+        expect(seen).toHaveLength(2);
+        expect(seen[1]).toBe(seen[0]);
+    });
 });

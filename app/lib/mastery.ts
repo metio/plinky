@@ -86,9 +86,13 @@ export function loadMastery(id: string): Mastery | null {
 }
 
 export function saveMastery(id: string, mastery: Mastery): void {
-    browserStore.set(storageKey(id), JSON.stringify(mastery));
-    // Mastery feeds the header's grade badge; nudge it to refresh without a reload.
-    if (typeof window !== "undefined") {
+    // Mastery feeds the header's grade badge; nudge it to refresh without a reload —
+    // but only when the write actually landed, so listeners never recompute against
+    // a state that was never stored.
+    if (
+        browserStore.set(storageKey(id), JSON.stringify(mastery)) &&
+        typeof window !== "undefined"
+    ) {
         window.dispatchEvent(new Event(PRACTICE_EVENT));
     }
 }

@@ -198,8 +198,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body>
-                <Header />
-                {children}
+                {/* Services wrap the header too — GradeBadge reads the injected prefs
+                    store, and a provider that only wrapped the routed tree would leave
+                    the header on the default services, silently ignoring any override. */}
+                <ServicesProvider>
+                    <Header />
+                    {children}
+                </ServicesProvider>
                 <ScrollRestoration />
                 <Scripts />
             </body>
@@ -217,11 +222,9 @@ export default function App() {
     }, []);
 
     return (
-        <ServicesProvider>
-            <MidiProvider>
-                <Outlet />
-            </MidiProvider>
-        </ServicesProvider>
+        <MidiProvider>
+            <Outlet />
+        </MidiProvider>
     );
 }
 

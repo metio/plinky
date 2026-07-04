@@ -8,7 +8,7 @@
 // for the global directly. This is what keeps core/ pure and the app testable with
 // fakes. Add a global here as each port lands (audio, MIDI, …).
 
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 // Each confined global maps to the files allowed to name it. Test files are always
@@ -34,24 +34,53 @@ function walk(dir) {
 }
 
 // Strip comments and string literals so a global named only in prose or a message key
-// does not count as a use.
+// does not count as a use. One combined pass, ordered so each construct is consumed
+// whole from its opening character: handling strings and comments in a single
+// alternation keeps a `//` inside a string (an https:// URL) from being taken for a
+// comment — which would swallow the string's closing quote and let the stripper eat
+// real code on the following lines. Quoted strings must not cross a newline (matching
+// the language), so an unterminated quote can never swallow the next line either.
+// Template literals keep their `${…}` interpolations: only the literal text between
+// them is blanked, because an interpolation is code that may name a confined global.
 function code(src) {
-    return src
-        .replace(/\/\*[\s\S]*?\*\//g, "")
-        .replace(/\/\/[^\n]*/g, "")
-        .replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`/g, '""');
+    return src.replace(
+        /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\$]|\\.|\$(?!\{))*(?:\$\{(?:[^{}]|\{[^{}]*\})*\}(?:[^`\\$]|\\.|\$(?!\{))*)*`/g,
+        (match) => {
+            if (match.startsWith("/")) {
+                return "";
+            }
+            if (match.startsWith("`")) {
+                // Keep each interpolation's inner code; blank the literal text around it.
+                const inner = [...match.matchAll(/\$\{((?:[^{}]|\{[^{}]*\})*)\}/g)]
+                    .map((hit) => hit[1])
+                    .join(";");
+                return `(${inner})`;
+            }
+            return '""';
+        },
+    );
 }
 
 const violations = [];
 const sources = [...walk("app"), ...walk("core")];
+// Read and strip each source once, then test every confined global against the
+// cached result — the file pass dominates the cost, not the per-global regexes.
+const stripped = new Map(sources.map((file) => [file, code(readFileSync(file, "utf8"))]));
 for (const global of Object.keys(CONFINED)) {
     const allowed = new Set(CONFINED[global]);
+    // A stale allowlist entry would silently pre-authorize whatever file is later
+    // created at that path, so a path that no longer exists fails the run.
+    for (const path of allowed) {
+        if (!existsSync(path)) {
+            violations.push(`allowlist entry for \`${global}\` does not exist: ${path}`);
+        }
+    }
     const re = new RegExp(`\\b${global}\\b`);
-    for (const file of sources) {
+    for (const [file, source] of stripped) {
         if (allowed.has(file)) {
             continue;
         }
-        if (re.test(code(readFileSync(file, "utf8")))) {
+        if (re.test(source)) {
             violations.push(`${file} references \`${global}\` directly — use the port/adapter instead`);
         }
     }

@@ -39,7 +39,9 @@ const DEFAULT_SERVICES: AppServices = build();
 const ServicesContext = createContext<AppServices>(DEFAULT_SERVICES);
 
 // Wraps a subtree with a set of services, overriding only the ones given. The app
-// root supplies the real adapters; a test supplies fakes (e.g. `{ store: memoryStore() }`).
+// root supplies the real adapters; a test supplies fakes — hoist the fake to a
+// variable (`const store = memoryStore()`) rather than constructing it inline in the
+// prop, so its state survives the parent's re-renders.
 export function ServicesProvider({
     services,
     children,
@@ -47,7 +49,16 @@ export function ServicesProvider({
     services?: Partial<AppServices>;
     children: ReactNode;
 }) {
-    const value = useMemo(() => (services ? build(services) : DEFAULT_SERVICES), [services]);
+    // Keyed on the individual overrides, not the prop object's identity: an inline
+    // `services={{ store }}` literal is a fresh object every render, and rebuilding
+    // the set each time would mint a new prefs store whose subscribers miss saves
+    // made through the previous instance.
+    const store = services?.store;
+    const prefs = services?.prefs;
+    const value = useMemo(
+        () => (store || prefs ? build({ store, prefs }) : DEFAULT_SERVICES),
+        [store, prefs],
+    );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
 
