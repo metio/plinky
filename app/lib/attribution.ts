@@ -148,6 +148,13 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
         url: "https://github.com/DCMLab",
         credit: "the DCMLab corpus editors",
     },
+    // Public-domain choral editions from CPDL (ChoralWiki), reduced to piano. Only the
+    // CC0/CC-BY/CC-BY-SA/PD editions are harvested; the CC variants credit the editor.
+    cpdl: {
+        label: "CPDL",
+        url: "https://www.cpdl.org",
+        credit: "the CPDL editors",
+    },
 };
 
 // The default source for catalogue songs: the whole shipped catalogue is imported

@@ -92,8 +92,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   (public-domain, CC-BY and CC-BY-SA), and the CC-BY-NC-SA
   [ASAP dataset](https://github.com/fosfrancesco/asap-dataset) and
   [DCMLab](https://github.com/DCMLab) corpora of solo-piano classical scores
-  (Beethoven, Chopin, Schumann, Grieg, Liszt, Tchaikovsky and more) — each credited
-  under its own licence, linked from the play page.
+  (Beethoven, Chopin, Schumann, Grieg, Liszt, Tchaikovsky and more), and public-domain
+  choral works from [CPDL](https://www.cpdl.org) (Palestrina, Victoria, Byrd, Tallis…)
+  reduced to a two-staff piano grand staff — each credited under its own licence, linked
+  from the play page.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
   streak to keep up. Once played, re-opening the day's challenge shows your result
