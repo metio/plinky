@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { FIRST_SONG_ID } from "../lib/catalog";
 import { discoveries } from "../lib/onboarding";
 import { hasSeenHint, markHintSeen } from "../lib/seenHints";
 import { m } from "../paraglide/messages.js";
@@ -11,7 +12,7 @@ import { LocalizedLink as Link } from "./localizedLink";
 // The first song a true beginner is handed: a Grade 1 piece in Play mode, where the
 // labelled keys (note labels default to the C landmark) let someone who has never
 // touched a piano find their way.
-const FIRST_SONG = "/play/twinkle-twinkle";
+const FIRST_SONG = `/play/${FIRST_SONG_ID}`;
 const DISMISSED = "beginner-start";
 
 // A zero-knowledge front door on the home page: for someone who has never played, it

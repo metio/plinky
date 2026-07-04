@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { attributionFor, licenseInfo, sourceInfo } from "./attribution";
+import { attributionFor, licenseDir, licenseInfo, sourceInfo } from "./attribution";
 
 describe("licenseInfo", () => {
     it("resolves CC0 as a public-domain dedication needing no attribution", () => {
@@ -100,5 +100,19 @@ describe("attributionFor", () => {
     it("omits licence and source when absent, keeping an empty composer", () => {
         const attribution = attributionFor({});
         expect(attribution).toEqual({ composer: "", license: null, source: null });
+    });
+});
+
+describe("licenseDir", () => {
+    it("maps an SPDX id to its lowercased storage directory", () => {
+        expect(licenseDir("CC0-1.0")).toBe("cc0-1.0");
+        expect(licenseDir("CC-BY-4.0")).toBe("cc-by-4.0");
+        expect(licenseDir("CC-BY-SA-3.0")).toBe("cc-by-sa-3.0");
+        expect(licenseDir("CC-BY-NC-SA-4.0")).toBe("cc-by-nc-sa-4.0");
+    });
+
+    it("falls back to CC0 for an absent licence, so a file always has a home", () => {
+        expect(licenseDir(undefined)).toBe("cc0-1.0");
+        expect(licenseDir("")).toBe("cc0-1.0");
     });
 });

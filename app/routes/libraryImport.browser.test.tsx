@@ -4,7 +4,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { loadUserScores } from "../lib/catalog";
+import { loadBundledScores, loadUserScores } from "../lib/catalog";
 import { generatePhrase } from "../lib/generator";
 import LibraryImportRoute from "./libraryImport";
 
@@ -41,6 +41,18 @@ describe("LibraryImportRoute", () => {
         await waitFor(() =>
             expect(loadUserScores().some((score) => score.title === "My Étude")).toBe(true),
         );
+    });
+
+    it("flags an import whose fingerprint matches a piece already in the catalogue", async () => {
+        // Dropping a bundled piece's own MusicXML fingerprints to that piece's id, so the
+        // import warns it is a duplicate rather than storing a second copy.
+        const bundled = loadBundledScores()[0];
+        if (!bundled) {
+            throw new Error("no bundled scores");
+        }
+        mount();
+        drop(fileInput(), new File([bundled.xml], "dup.musicxml", { type: "application/xml" }));
+        expect(await screen.findByText(/already in your library/)).toBeTruthy();
     });
 
     it("rejects a file with no playable notes", async () => {

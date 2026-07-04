@@ -123,6 +123,11 @@ export function loadBundledScores(): Score[] {
     });
 }
 
+// The bundled piece a true beginner starts on — a Grade 1 demo, resolved by title so links
+// to it track its content-fingerprint id instead of a hard-coded filename.
+export const FIRST_SONG_ID =
+    loadBundledScores().find((score) => score.title.toLowerCase().includes("twinkle"))?.id ?? "";
+
 // Coerce a stored entry into a usable Score, or drop it. A missing string title
 // would otherwise throw in the catalogue's localeCompare sort and take down the
 // whole list (home, scores, tracks, play); a non-finite tempo/beatsPerBar would

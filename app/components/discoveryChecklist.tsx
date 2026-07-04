@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { FIRST_SONG_ID } from "../lib/catalog";
 import {
     type DiscoveryId,
     type DiscoveryProgress,
@@ -23,12 +24,12 @@ const DISCOVERY: { key: DiscoveryId; icon: string; label: () => string; to: stri
     { key: "played", icon: "🎹", label: m.grades_start_play, to: "/library" },
     { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
     { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily" },
-    { key: "earTried", icon: "👂", label: m.discover_ear, to: "/play/twinkle-twinkle?mode=ear" },
+    { key: "earTried", icon: "👂", label: m.discover_ear, to: `/play/${FIRST_SONG_ID}?mode=ear` },
     {
         key: "fingeringTried",
         icon: "🎯",
         label: m.discover_fingering,
-        to: "/play/twinkle-twinkle?mode=fingering",
+        to: `/play/${FIRST_SONG_ID}?mode=fingering`,
     },
     { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
     { key: "imported", icon: "📥", label: m.discover_import, to: "/library/import" },
