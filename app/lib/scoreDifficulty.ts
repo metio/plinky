@@ -107,7 +107,7 @@ export const MAX_GRADE = 8;
 // `npm run songs:import` if the corpus changes. Scale/arpeggio remain measured
 // against the beginner exercises (scales ~0.6–1.1, arpeggios ~1.3–1.8).
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    piece: [1.316, 1.915, 2.45, 3.002, 3.542, 4.165, 5.471],
+    piece: [1.316, 1.912, 2.445, 3, 3.539, 4.162, 5.47],
     scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
     arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
 };

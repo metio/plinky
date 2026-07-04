@@ -31,6 +31,22 @@ describe("isPublicDomain", () => {
         expect(isPublicDomain("Modest Mussorgsky")).toBe(true);
     });
 
+    it("admits the vetted public-domain composers whose surnames are on the allowlist", () => {
+        // All died on or before the life+70 cutoff; surnames distinctive enough not to
+        // collide with any copyrighted act in the corpus.
+        for (const composer of [
+            "Béla Bartók", // 1945
+            "Gustav Mahler", // 1911
+            "Kurt Weill", // 1950
+            "Carlos Gardel", // 1935
+            "George Butterworth", // 1916
+            "Johan Halvorsen", // 1935
+            "Rabindranath Tagore", // 1941
+        ]) {
+            expect(isPublicDomain(composer), composer).toBe(true);
+        }
+    });
+
     it("admits a composer given a (birth–death) range on or before the cutoff", () => {
         expect(isPublicDomain("Carl Czerny (1791-1857)")).toBe(true);
         expect(isPublicDomain("Some Composer (1685–1750)")).toBe(true);
@@ -52,6 +68,14 @@ describe("isPublicDomain", () => {
             "Toby Fox",
             "Hans Zimmer",
             "Burt Bacharach", // must not match the "bach" surname
+            // Died 1957 — not life+70 public domain until 2028, so kept OFF the allowlist
+            // despite being a canonical classical name.
+            "Jean Sibelius",
+            "Jean Sibelius (1865-1957)",
+            // Copyrighted namesakes / co-writers a bare PD surname would wrongly admit,
+            // which is why "gonzaga" and "waller" are kept off the allowlist.
+            "Luiz Gonzaga", // d. 1989 — not the PD Chiquinha Gonzaga
+            "Luiz Gonzaga e Humberto Teixeira", // "Asa Branca"
         ]) {
             expect(isPublicDomain(composer), composer).toBe(false);
         }

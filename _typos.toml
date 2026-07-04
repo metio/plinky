@@ -12,6 +12,8 @@ weeknd = "weeknd"
 handel = "handel"
 # O'Carolan — Turlough O'Carolan, the public-domain composer in the allowlist.
 carolan = "carolan"
+# Weill — Kurt Weill, the public-domain composer in the allowlist, not "will".
+weill = "weill"
 # "ND" is the NoDerivatives token in SPDX licence codes (CC-BY-ND-4.0), not "AND".
 nd = "nd"
 
