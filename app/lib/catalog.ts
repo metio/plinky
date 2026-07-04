@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { parsePack, serializePack } from "./scorePack";
+import { songId } from "./songId";
 
 // The one score catalogue: MusicXML pieces, rendered and practised on OSMD. The
 // bundled public-domain scores ship with the app; user-imported pieces are kept in
@@ -116,9 +117,9 @@ export function slugify(title: string): string {
 // The demo pieces inlined into the bundle, identical for everyone. Finger exercises
 // and the song catalogue load as on-demand assets instead, keeping the JS small.
 export function loadBundledScores(): Score[] {
-    return Object.entries(files).map(([path, xml]) => {
-        const id = (path.split("/").pop() ?? path).replace(/\.musicxml$/, "");
-        return { id, ...readScoreMeta(xml), description: "", xml, bundled: true };
+    return Object.entries(files).map(([_path, xml]) => {
+        // Same content-fingerprint id scheme as every other piece.
+        return { id: songId(xml), ...readScoreMeta(xml), description: "", xml, bundled: true };
     });
 }
 

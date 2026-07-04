@@ -4,9 +4,14 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildScore, saveUserScore } from "../lib/catalog";
+import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
 import { saveMastery } from "../lib/mastery";
 import Library from "./library";
+
+// Bundled scores are keyed by their content-fingerprint id, so look one up by title.
+const bundledId = (titleFragment: string): string =>
+    loadBundledScores().find((score) => score.title.toLowerCase().includes(titleFragment))?.id ??
+    "";
 
 const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune</work-title></work><part id="P1"><measure number="1"><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 
@@ -35,7 +40,9 @@ describe("Library", () => {
     it("lists bundled scores and links each to its play page", async () => {
         renderLibrary();
         const ode = await screen.findByText("Ode to Joy");
-        expect(ode.closest("a")?.getAttribute("href")).toContain("/play/ode-to-joy");
+        expect(ode.closest("a")?.getAttribute("href")).toContain(
+            `/play/${bundledId("ode to joy")}`,
+        );
     });
 
     it("filters the list by the search box", async () => {
@@ -105,7 +112,7 @@ describe("Library", () => {
 
     it("filters to only the pieces due for review", async () => {
         // Ode to Joy is overdue; Twinkle has no mastery, so it isn't due.
-        saveMastery("ode-to-joy", {
+        saveMastery(bundledId("ode to joy"), {
             bestScore: 90,
             learned: true,
             backlog: false,

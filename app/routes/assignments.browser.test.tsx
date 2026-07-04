@@ -5,7 +5,13 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { encodeAssignmentLink, makeAssignment } from "../lib/assignment";
+import { loadBundledScores } from "../lib/catalog";
 import AssignmentsRoute from "./assignments";
+
+// Bundled scores are keyed by their content-fingerprint id, so look one up by title.
+const bundledId = (titleFragment: string): string =>
+    loadBundledScores().find((score) => score.title.toLowerCase().includes(titleFragment))?.id ??
+    "";
 
 const mount = (entry = "/assignments") =>
     render(
@@ -38,7 +44,7 @@ describe("AssignmentsRoute", () => {
         expect(await screen.findByRole("status")).toHaveTextContent(/Saved/);
         expect(screen.getByText("My set")).toBeTruthy();
         const step = screen.getByRole("link", { name: /Twinkle/ });
-        expect(step.getAttribute("href")).toContain("/play/twinkle-twinkle");
+        expect(step.getAttribute("href")).toContain(`/play/${bundledId("twinkle")}`);
     });
 
     it("offers a shared assignment from a link and imports it", async () => {

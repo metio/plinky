@@ -22,14 +22,40 @@ describe("loadExerciseManifest", () => {
 });
 
 describe("resolveExercise", () => {
-    it("generates a parametric exercise from its id alone", async () => {
+    it("rebuilds a scale/arpeggio from the config in its manifest entry", async () => {
+        // The id is a content fingerprint, so the app resolves it via the manifest, which
+        // carries the config the generated exercise is rebuilt from.
+        server.use(
+            http.get("*/exercises/manifest.json", () =>
+                HttpResponse.json([
+                    {
+                        id: "fingerprint123",
+                        title: "C major arpeggio",
+                        grade: 1,
+                        cost: 1,
+                        kind: "scale-arpeggio",
+                        config: {
+                            type: "major-arpeggio",
+                            key: "c",
+                            octaves: 2,
+                            hands: "both",
+                            inversion: 0,
+                            interval: "single",
+                        },
+                        tempo: 90,
+                        beatsPerBar: 4,
+                    },
+                ]),
+            ),
+        );
         const { resolveExercise } = await import("./exercises");
-        const score = await resolveExercise("arpeggio-c-major.2b");
+        const score = await resolveExercise("fingerprint123");
         expect(score?.xml).toContain("score-partwise");
         expect(score?.bundled).toBe(true);
     });
 
-    it("returns null for an id that is neither generated nor a study", async () => {
+    it("returns null for an id that is not in the exercise manifest", async () => {
+        server.use(http.get("*/exercises/manifest.json", () => HttpResponse.json([])));
         const { resolveExercise } = await import("./exercises");
         expect(await resolveExercise("not-an-exercise")).toBeNull();
     });

@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
+import { songId } from "./app/lib/songId";
 
 // The static routes, in canonical (unprefixed) form. generateStaticLocalizedUrls
 // expands each into one prefixed path per locale (/en/scores, /de/scores, …).
@@ -19,12 +20,12 @@ const BASE_PATHS = [
     "/settings",
 ];
 
-// Prerender a play page for every bundled score so each piece is indexable with
-// its own title and structured data. The id is the filename stem, matching
-// loadBundledScores in app/lib/catalog.ts. User-imported scores stay client-only.
+// Prerender a play page for every bundled score so each piece is indexable with its own
+// title and structured data. The id is the content fingerprint, matching loadBundledScores
+// in app/lib/catalog.ts. User-imported scores stay client-only.
 const BUNDLED_PLAY_PATHS = readdirSync("scores")
     .filter((name) => name.endsWith(".musicxml"))
-    .map((name) => `/play/${name.replace(/\.musicxml$/, "")}`);
+    .map((name) => `/play/${songId(readFileSync(`scores/${name}`, "utf8"))}`);
 
 export default {
     // SPA mode: no server, hydrated on the client.

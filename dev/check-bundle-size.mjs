@@ -41,7 +41,7 @@ const BUDGET_TOTAL_KB = 636;
 // finger-numbers / follow-the-note toggles and their icons; and the per-hand share grid
 // with its lagging-hand grade-panel readout; and the tempo-locked "keep up" play-along —
 // the clock-driven runner, its hit/miss painting and result; still a tight ratchet.
-const BUDGET_APP_KB = 325;
+const BUDGET_APP_KB = 326;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

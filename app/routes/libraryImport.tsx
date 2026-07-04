@@ -11,6 +11,8 @@ import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "
 import { readScoreFile } from "../lib/musicxmlFile";
 import { markDiscovered } from "../lib/onboarding";
 import { gradeOf } from "../lib/scoreDifficulty";
+import { songId } from "../lib/songId";
+import { loadManifest } from "../lib/songs";
 import { routeMeta } from "../lib/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/libraryImport";
@@ -28,15 +30,6 @@ function looksPlayable(xml: string): boolean {
     } catch {
         return false;
     }
-}
-
-function uniqueId(base: string, taken: Iterable<string>): string {
-    const used = new Set(taken);
-    let id = base;
-    for (let n = 2; used.has(id); n++) {
-        id = `${base}-${n}`;
-    }
-    return id;
 }
 
 // What a dropped file becomes once read and parsed: the MusicXML plus the editable
@@ -59,10 +52,12 @@ export default function LibraryImportRoute() {
     const [error, setError] = useState<string | null>(null);
     const [dragOver, setDragOver] = useState(false);
     const [savedId, setSavedId] = useState<string | null>(null);
+    const [duplicate, setDuplicate] = useState(false);
 
     const handleFile = async (file: File | undefined) => {
         setError(null);
         setSavedId(null);
+        setDuplicate(false);
         if (!file) {
             return;
         }
@@ -75,6 +70,11 @@ export default function LibraryImportRoute() {
             setError(m.import_no_notes());
             return;
         }
+        // The fingerprint identifies the piece by its notes: if it is already bundled, in
+        // the song catalogue, or previously imported, flag it as a duplicate.
+        const id = songId(xml);
+        const known = new Set(loadCatalog().map((entry) => entry.id));
+        setDuplicate(known.has(id) || (await loadManifest()).some((song) => song.id === id));
         const meta = readScoreMeta(xml);
         setDraft({
             xml,
@@ -100,10 +100,9 @@ export default function LibraryImportRoute() {
         const title = draft.title.trim() || m.import_untitled();
         const tempo = Number(draft.tempo);
         const score: Score = {
-            id: uniqueId(
-                slugify(title),
-                loadCatalog().map((entry) => entry.id),
-            ),
+            // The id is the content fingerprint, so re-importing the same file (or one the
+            // catalogue already has) resolves to the same piece rather than a duplicate.
+            id: songId(draft.xml),
             title,
             composer: draft.composer.trim(),
             description: draft.description.trim(),
@@ -200,6 +199,9 @@ export default function LibraryImportRoute() {
             )}
 
             {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+            {duplicate && (
+                <p className="text-sm text-amber-700 dark:text-amber-400">{m.import_duplicate()}</p>
+            )}
 
             {draft && (
                 <div className="space-y-4">

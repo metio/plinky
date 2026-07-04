@@ -21,6 +21,8 @@ import { copyrightReason } from "./copyrightSignals.mts";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { isPublicDomain } from "./publicDomain.mts";
 import { nonSoloPianoReason } from "./scoreInstrument.mts";
+import { songId } from "../app/lib/songId.ts";
+import { licenseDir } from "../app/lib/attribution.ts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
@@ -172,7 +174,9 @@ async function main() {
         } catch {
             continue;
         }
-        scored.push({ ...candidate, cost, tempo: tempoOf(xml), beatsPerBar: beatsOf(xml), src });
+        // The id is a content fingerprint, not the source CID — stable across re-imports
+        // and identical for identical music (which then collapses to one entry).
+        scored.push({ ...candidate, id: songId(xml), cost, tempo: tempoOf(xml), beatsPerBar: beatsOf(xml), src });
         if (scored.length % 500 === 0) {
             console.log(`  graded ${scored.length} …`);
         }
@@ -180,7 +184,10 @@ async function main() {
 
     // Collapse same-title scores to one before grading, so duplicate-looking rows never
     // reach the library and the octiles are balanced over distinct titles.
-    const unique = dedupeByTitle(scored);
+    // Collapse by title, then by content fingerprint — two different-titled rows with the
+    // same notes share an id, so keep the first to avoid a duplicate id in the manifest.
+    const idSeen = new Set<string>();
+    const unique = dedupeByTitle(scored).filter((song) => !idSeen.has(song.id) && idSeen.add(song.id));
     console.log(`${unique.length} unique titles after collapsing ${scored.length} scored.`);
 
     // Even grades by construction: split the costs into MAX_GRADE equal octile bins.
@@ -205,11 +212,13 @@ async function main() {
     }
 
     await rm(OUT, { recursive: true, force: true });
-    await mkdir(OUT, { recursive: true });
-    // Store the compressed .mxl as-is (≈30× smaller than the decompressed XML); the
-    // app decompresses it on open.
+    // Store the compressed .mxl grouped by licence (public/songs/<licence>/<id>.mxl) — all
+    // PDMX are CC0 — so REUSE annotates each licence with one glob and the id stays a bare
+    // fingerprint. The app decompresses on open.
+    const dir = `${OUT}/${licenseDir("CC0-1.0")}`;
+    await mkdir(dir, { recursive: true });
     for (const song of songs) {
-        await copyFile(song.src, `${OUT}/${song.id}.mxl`);
+        await copyFile(song.src, `${dir}/${song.id}.mxl`);
     }
 
     const manifest = songs.map((song) => ({

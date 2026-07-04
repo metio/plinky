@@ -16,6 +16,8 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSyn
 import { parse } from "csv-parse/sync";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
+import { songId } from "../app/lib/songId.ts";
+import type { ExerciseConfig } from "../app/lib/exerciseGen.ts";
 // @ts-expect-error - the grading engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { gradeOf, rawDifficulty } = await import("../app/lib/scoreDifficulty.ts");
@@ -33,20 +35,23 @@ type Entry = {
     grade: number;
     cost: number;
     kind: Kind;
+    config?: ExerciseConfig;
     composer?: string;
 };
 const entries: Entry[] = [];
-const studyFiles: { cid: string; src: string }[] = [];
+const studyFiles: { id: string; src: string }[] = [];
 
 for (const tile of EXERCISE_TILES) {
-    const id = buildExerciseId(tile);
     const xml = generateExercise(tile);
+    // The id is the content fingerprint (the one scheme); the config is stored so the app
+    // can rebuild the exercise from the id.
     entries.push({
-        id,
+        id: songId(xml),
         title: exerciseTitle(tile),
-        grade: gradeOf(id, xml),
+        grade: gradeOf(buildExerciseId(tile), xml),
         cost: rawDifficulty(xml),
         kind: "scale-arpeggio",
+        config: tile,
     });
 }
 
@@ -122,8 +127,7 @@ function sourceStudies(): void {
         seen.add(key);
         try {
             const xml = readMusicXml(`${ROOT}/${mxl}`);
-            const cid = (mxl.split("/").pop() ?? mxl).replace(/\.mxl$/, "");
-            const id = `study-${cid}`;
+            const id = songId(xml);
             sourced.push({
                 entry: {
                     id,
@@ -133,7 +137,7 @@ function sourceStudies(): void {
                     kind: "study",
                     composer: composer && composer !== "NA" ? composer : "",
                 },
-                cid,
+                cid: id,
                 src: `${ROOT}/${mxl}`,
                 // PDMX crowd-quality, to pick the representative when collapsing by title.
                 quality: (Number(row.rating) || 0) * 1e9 + (Number(row.n_favorites) || 0) * 1e4 + (Number(row.n_views) || 0),
@@ -155,7 +159,7 @@ function sourceStudies(): void {
     }
     for (const study of best.values()) {
         entries.push(study.entry);
-        studyFiles.push({ cid: study.cid, src: study.src });
+        studyFiles.push({ id: study.cid, src: study.src });
     }
     console.log(`Sourced ${best.size} studies from PDMX (collapsed from ${sourced.length} by title).`);
 }
@@ -164,7 +168,7 @@ sourceStudies();
 
 // Easiest-first within each grade, so a learner climbs gradually.
 entries.sort((a, b) => a.grade - b.grade || a.cost - b.cost);
-const manifest = entries.map(({ id, title, grade, cost, kind, composer }) => ({
+const manifest = entries.map(({ id, title, grade, cost, kind, composer, config }) => ({
     id,
     title,
     grade,
@@ -172,6 +176,8 @@ const manifest = entries.map(({ id, title, grade, cost, kind, composer }) => ({
     // easiest-first and feeds the skill rating uniformly across songs and exercises.
     cost: Number(cost.toFixed(3)),
     kind,
+    // A generated scale/arpeggio stores its config so the app rebuilds it from the id.
+    ...(config ? { config } : {}),
     ...(composer ? { composer } : {}),
     // Curated studies are public-domain transcriptions from PDMX; the generated
     // scales/arpeggios are our own and carry no external licence.
@@ -183,9 +189,10 @@ const manifest = entries.map(({ id, title, grade, cost, kind, composer }) => ({
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(`${OUT}/studies`, { recursive: true });
 writeFileSync(`${OUT}/manifest.json`, JSON.stringify(manifest));
-// Studies ship as individual compressed .mxl, fetched on open like songs.
-for (const { cid, src } of studyFiles) {
-    copyFileSync(src, `${OUT}/studies/${cid}.mxl`);
+// Studies ship as individual compressed .mxl, fetched on open like songs — named by the
+// same content-fingerprint id.
+for (const { id, src } of studyFiles) {
+    copyFileSync(src, `${OUT}/studies/${id}.mxl`);
 }
 
 const histogram = Array.from({ length: 9 }, () => 0);

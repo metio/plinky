@@ -24,6 +24,8 @@ import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
+import { songId } from "../app/lib/songId.ts";
+import { licenseDir } from "../app/lib/attribution.ts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
@@ -294,7 +296,7 @@ async function main() {
     const kept = existing.filter((song) => (song.source ?? "pdmx") !== key);
     for (const song of existing) {
         if ((song.source ?? "pdmx") === key) {
-            await rm(`${OUT}/${song.id}.mxl`, { force: true });
+            await rm(`${OUT}/${licenseDir(song.license)}/${song.id}.mxl`, { force: true });
         }
     }
     const takenKeys = new Set(kept.map((song) => songKey(song.composer, song.title)));
@@ -314,9 +316,17 @@ async function main() {
             dropped.gate++;
             continue;
         }
-        const id = (file.split("/").pop() ?? file).replace(/\.mxl$/, "");
         const title = titleOf(xml, cfg.titleField ?? "movement");
         const composer = composerOf(xml, cfg.reorderComposer ?? false);
+        // Per-piece licence when the source encodes a bucket in its filename (Mutopia,
+        // CPDL); otherwise the source's single licence. Read from the SOURCE filename — the
+        // catalogue id is a content fingerprint that carries no licence.
+        const sourceName = file.split("/").pop() ?? file;
+        const bucket = cfg.bucketLicense && sourceName.match(/^[a-z-]+-([a-z0-9]+)-/)?.[1];
+        const license = (bucket && cfg.bucketLicense?.[bucket]) || cfg.license;
+        // The id is a content fingerprint: stable across re-imports, identical for
+        // identical music (which then collapses to one entry).
+        const id = songId(xml);
         const dupeKey = songKey(composer, title);
         if (takenIds.has(id) || takenKeys.has(dupeKey)) {
             dropped.dup++;
@@ -331,10 +341,6 @@ async function main() {
         }
         takenIds.add(id);
         takenKeys.add(dupeKey);
-        // Per-piece licence when the source encodes a bucket in the filename (Mutopia);
-        // otherwise the source's single licence.
-        const bucket = cfg.bucketLicense && id.match(/^[a-z-]+-([a-z0-9]+)-/)?.[1];
-        const license = (bucket && cfg.bucketLicense?.[bucket]) || cfg.license;
         added.push({
             id,
             title,
@@ -354,7 +360,9 @@ async function main() {
     );
 
     for (const song of added) {
-        await copyFile(song.src, `${OUT}/${song.id}.mxl`);
+        const dir = `${OUT}/${licenseDir(song.license)}`;
+        await mkdir(dir, { recursive: true });
+        await copyFile(song.src, `${dir}/${song.id}.mxl`);
     }
 
     // Merge and provisionally grade over the whole catalogue's costs; songs:bake will

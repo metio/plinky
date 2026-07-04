@@ -505,6 +505,7 @@
   "keymap_reset": "Reset to default",
   "keymap_rebind": "Rebind {note}, {hand}",
   "import_cancel": "Cancel",
+  "import_duplicate": "This piece is already in your library — importing it again just points to the same one.",
   "import_no_notes": "No playable notes found — is this valid MusicXML?",
   "import_read_error": "That file could not be read — try choosing it again.",
   "import_save_failed": "Could not save the score — it may exceed this device's storage.",

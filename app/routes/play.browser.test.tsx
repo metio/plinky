@@ -5,9 +5,15 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { loadBundledScores } from "../lib/catalog";
 import { discoveries } from "../lib/onboarding";
 import Play from "./play";
 import type { Route } from "./+types/play";
+
+// Bundled scores are keyed by their content-fingerprint id, so look one up by title.
+const bundledId = (titleFragment: string): string =>
+    loadBundledScores().find((score) => score.title.toLowerCase().includes(titleFragment))?.id ??
+    "";
 
 afterEach(() => {
     cleanup();
@@ -27,7 +33,7 @@ function renderPlay(scoreId: string) {
 
 describe("Play", () => {
     it("renders the requested bundled piece", async () => {
-        renderPlay("ode-to-joy");
+        renderPlay(bundledId("ode to joy"));
         expect(await screen.findByText("Ode to Joy")).toBeTruthy();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
     });
@@ -38,9 +44,10 @@ describe("Play", () => {
     });
 
     it("opens straight into ear mode from a ?mode=ear deep link and marks it tried", async () => {
-        const props = { params: { scoreId: "twinkle-twinkle" } } as unknown as Route.ComponentProps;
+        const id = bundledId("twinkle");
+        const props = { params: { scoreId: id } } as unknown as Route.ComponentProps;
         render(
-            <MemoryRouter initialEntries={["/play/twinkle-twinkle?mode=ear"]}>
+            <MemoryRouter initialEntries={[`/play/${id}?mode=ear`]}>
                 <MidiProvider>
                     <Play {...props} />
                 </MidiProvider>

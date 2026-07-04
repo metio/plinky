@@ -3,7 +3,7 @@
 
 import { DEFAULT_SONG_SOURCE } from "./attribution";
 import type { Score } from "./catalog";
-import { exerciseTitle, generateExercise, parseExerciseId } from "./exerciseGen";
+import { type ExerciseConfig, exerciseTitle, generateExercise } from "./exerciseGen";
 import { decompressMxl } from "./musicxmlFile";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the fly
@@ -20,6 +20,9 @@ export type ExerciseMeta = {
     // easiest-first and feeds the skill rating uniformly across songs and exercises.
     cost: number;
     kind: "scale-arpeggio" | "study";
+    // A generated scale/arpeggio carries its config so it can be regenerated from the id
+    // (the id is a content fingerprint now, not a parseable "scale-c-major" slug).
+    config?: ExerciseConfig;
     composer?: string;
     // Curated studies are public-domain transcriptions from PDMX (CC0); generated
     // scales/arpeggios are our own and carry no external licence.
@@ -45,10 +48,11 @@ export async function loadExerciseManifest(): Promise<ExerciseMeta[]> {
     return manifestCache;
 }
 
-// A study's MusicXML lives in a compressed .mxl; decompress it to the score string.
-async function fetchStudyXml(cid: string): Promise<string | null> {
+// A study's MusicXML lives in a compressed .mxl named by its fingerprint id; decompress
+// the fetched bytes to the score string.
+async function fetchStudyXml(id: string): Promise<string | null> {
     try {
-        const response = await fetch(`/exercises/studies/${cid}.mxl`);
+        const response = await fetch(`/exercises/studies/${id}.mxl`);
         if (!response.ok) {
             return null;
         }
@@ -58,45 +62,45 @@ async function fetchStudyXml(cid: string): Promise<string | null> {
     }
 }
 
-// Resolve an exercise id to a playable Score. Generated scales/arpeggios are built
-// synchronously from the config; study ids (study-<cid>) fetch their .mxl. The play
-// flow falls back to this for ids that are neither bundled, user, nor song scores.
+// Resolve an exercise id to a playable Score. Every playable piece shares one id scheme (a
+// content fingerprint), so this looks the id up in the manifest: a generated scale/arpeggio
+// is rebuilt from its stored config; a study fetches its .mxl. Returns null for ids that are
+// not exercises, so the play flow falls through to bundled, user or song scores.
 export async function resolveExercise(id: string): Promise<Score | null> {
-    const config = parseExerciseId(id);
-    if (config) {
+    const meta = (await loadExerciseManifest()).find((exercise) => exercise.id === id);
+    if (!meta) {
+        return null;
+    }
+    if (meta.kind === "scale-arpeggio" && meta.config) {
         return {
             id,
-            title: exerciseTitle(config),
+            title: exerciseTitle(meta.config),
             composer: "",
             description: "",
-            xml: generateExercise(config),
-            tempo: 90,
-            beatsPerBar: 4,
-            // Generated from a config at runtime — our own work, dedicated to the
-            // public domain. No external source to credit.
+            xml: generateExercise(meta.config),
+            tempo: meta.tempo,
+            beatsPerBar: meta.beatsPerBar,
+            // Generated from a config at runtime — our own work, dedicated to the public
+            // domain. No external source to credit.
             license: "CC0-1.0",
             bundled: true,
         };
     }
-    if (!id.startsWith("study-")) {
-        return null;
-    }
-    const xml = await fetchStudyXml(id.slice("study-".length));
+    const xml = await fetchStudyXml(id);
     if (xml === null) {
         return null;
     }
-    const meta = (await loadExerciseManifest()).find((exercise) => exercise.id === id);
     return {
         id,
-        title: meta?.title ?? "Study",
-        composer: meta?.composer ?? "",
+        title: meta.title,
+        composer: meta.composer ?? "",
         description: "",
         xml,
-        tempo: 90,
-        beatsPerBar: 4,
-        // The studies are public-domain études imported from PDMX; default the
-        // credit so it shows even on a manifest predating the license field.
-        license: meta?.license ?? "CC0-1.0",
+        tempo: meta.tempo,
+        beatsPerBar: meta.beatsPerBar,
+        // The studies are public-domain études imported from PDMX; default the credit so
+        // it shows even on a manifest predating the license field.
+        license: meta.license ?? "CC0-1.0",
         source: DEFAULT_SONG_SOURCE,
         bundled: true,
     };

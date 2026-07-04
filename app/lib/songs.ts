@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { DEFAULT_SONG_SOURCE } from "./attribution";
+import { DEFAULT_SONG_SOURCE, licenseDir } from "./attribution";
 import type { Score } from "./catalog";
 import { loadFavorites, toggleFavorite } from "./favorites";
 import { decompressMxl } from "./musicxmlFile";
@@ -53,9 +53,9 @@ export async function loadManifest(): Promise<SongMeta[]> {
 
 // Songs are stored as compressed .mxl (a zip holding the MusicXML), so the fetched
 // bytes are decompressed to the XML string OSMD loads.
-export async function fetchSongXml(id: string): Promise<string | null> {
+export async function fetchSongXml(id: string, license?: string): Promise<string | null> {
     try {
-        const response = await fetch(`/songs/${id}.mxl`);
+        const response = await fetch(`/songs/${licenseDir(license)}/${id}.mxl`);
         if (!response.ok) {
             return null;
         }
@@ -73,7 +73,7 @@ export async function resolveSong(id: string): Promise<Score | null> {
     if (!meta) {
         return null;
     }
-    const xml = await fetchSongXml(id);
+    const xml = await fetchSongXml(id, meta.license);
     if (xml === null) {
         return null;
     }

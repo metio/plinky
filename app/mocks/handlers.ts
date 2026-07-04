@@ -11,7 +11,7 @@ import { http, HttpResponse } from "msw";
 export const handlers = [
     http.get("*/songs/manifest.json", () => HttpResponse.json([])),
     http.get("*/songs/seed.json", () => HttpResponse.json([])),
-    http.get("*/songs/:id.mxl", () => new HttpResponse(null, { status: 404 })),
+    http.get("*/songs/:dir/:id.mxl", () => new HttpResponse(null, { status: 404 })),
     http.get("*/exercises/manifest.json", () => HttpResponse.json([])),
     http.get("*/exercises/studies/:cid.mxl", () => new HttpResponse(null, { status: 404 })),
 ];

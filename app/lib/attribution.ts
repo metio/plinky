@@ -161,6 +161,13 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
 // from PDMX, so a song without an explicit `source` is from there.
 export const DEFAULT_SONG_SOURCE = "pdmx";
 
+// Catalogue .mxl are stored grouped by licence — public/songs/<licence-dir>/<id>.mxl —
+// so REUSE annotates each group with one static glob while the id itself stays a pure
+// content fingerprint (no licence baked in). The dir is the SPDX id lowercased.
+export function licenseDir(license: string | undefined): string {
+    return (license || "cc0-1.0").toLowerCase();
+}
+
 export function licenseInfo(id: string | undefined): LicenseInfo | null {
     if (!id) {
         return null;

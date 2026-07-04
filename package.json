@@ -27,7 +27,9 @@
     "build-storybook": "npm run messages && storybook build",
     "og": "node dev/make-og.mjs",
     "a11y:light": "npm run build && A11Y_MODE=light node dev/a11y.mjs",
-    "a11y:dark": "npm run build && A11Y_MODE=dark node dev/a11y.mjs"
+    "a11y:dark": "npm run build && A11Y_MODE=dark node dev/a11y.mjs",
+    "songs:reid": "tsx dev/reid-songs.mts",
+    "exercises:reid": "tsx dev/reid-exercises.mts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
