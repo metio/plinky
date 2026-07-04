@@ -126,6 +126,19 @@ const CONFIGS: Record<string, SourceConfig> = {
         gate: nonSoloPianoReason,
         titleField: "work",
     },
+    // Solo-piano corpora from DCMLab (CC-BY-NC-SA). Their MuseScore .mscx carry embedded
+    // title/composer AND Roman-numeral analysis; dev/dcml-harvest.py converts each to
+    // MusicXML with MuseScore, strips the <harmony> analysis, and composes a distinct
+    // title (set + opus + movement) into <movement-title>, writing .mxl into
+    // sources/dcml/_mxl (run separately in dev/musescore.Containerfile). Ingested as a
+    // preconverted source; the composed title is read from the movement field.
+    dcml: {
+        repos: [],
+        preconverted: true,
+        license: "CC-BY-NC-SA-4.0",
+        gate: nonSoloPianoReason,
+        titleField: "movement",
+    },
 };
 
 type SongMeta = {
