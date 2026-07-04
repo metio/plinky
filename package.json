@@ -10,7 +10,7 @@
     "songs:bake": "tsx dev/bake-grades.mts",
     "songs:cost": "tsx dev/backfill-song-cost.mts",
     "songs:audit": "tsx dev/audit-catalog.mts",
-    "build": "npm run messages && react-router build && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
+    "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "dev": "npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "npm run messages && react-router typegen && tsc",
