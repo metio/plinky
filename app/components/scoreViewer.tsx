@@ -71,20 +71,22 @@ import {
     clientPointToSvg,
     collectMeasureBoxes,
     collectNoteElements,
-    GHOST_COLOR,
     highlightCursorNotes,
-    type MeasureBox,
-    measureAtPoint,
-    NOTE_COLOR,
     type PaintedNote,
     paintBarSelection,
     paintElement,
     paintPlayedNotes,
-    PLAYED_COLOR,
     restoreNotes,
+} from "../lib/scoreColor";
+import {
+    GHOST_COLOR,
+    type MeasureBox,
+    measureAtPoint,
+    NOTE_COLOR,
+    PLAYED_COLOR,
     SELECT_COLOR,
     WINDOW_COLOR,
-} from "../lib/scoreColor";
+} from "../../core/scoreCanvas";
 import { type Grid, handGrid, handsPlayed, laggingHand, type RunNote } from "../../core/shareCard";
 import { transposeMusicXml } from "../../core/transpose";
 import {

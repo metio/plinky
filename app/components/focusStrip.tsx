@@ -3,12 +3,8 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
-import {
-    NOTE_COLOR,
-    paintMeasureRange,
-    scrollMeasureIntoView,
-    WINDOW_COLOR,
-} from "../lib/scoreColor";
+import { NOTE_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
+import { paintMeasureRange, scrollMeasureIntoView } from "../lib/scoreColor";
 
 // A compact, always-visible strip of the piece pinned just above the on-screen keyboard
 // while practising: it shows the bar you're playing (and its neighbour) big and lit, and

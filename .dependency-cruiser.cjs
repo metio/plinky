@@ -119,6 +119,20 @@ module.exports = {
             to: { path: ["^app/"] },
         },
         {
+            name: "osmd-stays-at-the-surface",
+            comment:
+                "OpenSheetMusicDisplay is the concrete score renderer — a stateful engine the " +
+                "rendering surface (components, hooks, the scoreColor painting utilities, and a " +
+                "future renderer adapter) drives directly. The domain and state layers never " +
+                "touch it: pure score logic works on parsed documents and step models instead.",
+            severity: "error",
+            from: {
+                path: "^(core/|app/(stores|ports|contexts)/)",
+                pathNot: "\\.(test|stories)\\.[jt]sx?$",
+            },
+            to: { path: "node_modules/opensheetmusicdisplay/" },
+        },
+        {
             name: "no-orphans",
             comment:
                 "A module nothing imports. knip is the blocking dead-code gate (it understands the " +

@@ -3,7 +3,8 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
-import { NOTE_COLOR, paintMeasureRange, WINDOW_COLOR } from "../lib/scoreColor";
+import { NOTE_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
+import { paintMeasureRange } from "../lib/scoreColor";
 
 // A read-only staff of the whole piece with the active window of bars lit up, so a
 // drill that works on a two-bar slice still shows where that slice sits in the music.

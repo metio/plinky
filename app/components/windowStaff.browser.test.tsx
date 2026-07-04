@@ -3,7 +3,7 @@
 
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { WINDOW_COLOR } from "../lib/scoreColor";
+import { WINDOW_COLOR } from "../../core/scoreCanvas";
 import { WindowStaff } from "./windowStaff";
 
 afterEach(cleanup);

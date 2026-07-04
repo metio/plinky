@@ -7,16 +7,18 @@ import { describe, expect, it } from "vitest";
 import {
     clearBarSelection,
     highlightCursorNotes,
-    type MeasureBox,
-    measureAtPoint,
-    NOTE_COLOR,
     paintBarSelection,
     paintPlayedNotes,
-    PLAYED_COLOR,
     restoreNotes,
+} from "./scoreColor";
+import {
+    NOTE_COLOR,
+    PLAYED_COLOR,
     SELECT_COLOR,
     WINDOW_COLOR,
-} from "./scoreColor";
+    measureAtPoint,
+    type MeasureBox,
+} from "../../core/scoreCanvas";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 

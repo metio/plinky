@@ -10,7 +10,7 @@ import type { DailyResult } from "../lib/dailyResult";
 import { generatePhrase } from "../../core/generator";
 
 import { encodeGhost, saveGhost } from "../lib/recording";
-import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../lib/scoreColor";
+import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { ScoreViewer } from "./scoreViewer";
 
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
