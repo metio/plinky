@@ -3,7 +3,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { SongMeta } from "./songs";
+import type { SongMeta } from "../stores/songSource";
 
 // Guards the shipped song catalogue's contract: every song carries a difficulty cost,
 // and the catalogue is ordered easiest-first. The library renders songs in manifest

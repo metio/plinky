@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: 0BSD
 
 import { loadBundledScores, loadUserScores } from "./catalog";
-import { loadExerciseManifest } from "./exercises";
 import type { Letter } from "../../core/grade";
 import { type DecayMode, REVIEW_CAP } from "../../core/review";
 import { isDue, isLapsed, letterMin, type Mastery } from "../../core/mastery";
 import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
-import { loadManifest } from "./songs";
 
 // Plinky's progression: each of the 1–MAX_GRADE difficulty grades is a pool of
 // catalogue items, and you climb by *mastering* items of a grade — not by any single
@@ -138,12 +136,23 @@ export function skillRating(items: GradedMastery[], mode: DecayMode, now: number
 // draws from.
 export type GradeCatalogItem = { id: string; title: string; grade: number; cost: number };
 
+// Where the fetched manifests come from — structurally the song/exercise
+// sources, taken as a parameter so the caller decides which services back the
+// catalogue.
+export type CatalogSources = {
+    songs: { manifest(): Promise<GradeCatalogItem[]> };
+    exercises: { manifest(): Promise<GradeCatalogItem[]> };
+};
+
 // The whole gradeable catalogue, keyed by id: songs and exercises from their
 // manifests (grade + cost precomputed), bundled and imported scores graded from their
 // MusicXML. The pools the grades draw from.
-async function buildCatalogue(): Promise<Map<string, GradeCatalogItem>> {
+async function buildCatalogue(sources: CatalogSources): Promise<Map<string, GradeCatalogItem>> {
     const index = new Map<string, GradeCatalogItem>();
-    const [songs, exercises] = await Promise.all([loadManifest(), loadExerciseManifest()]);
+    const [songs, exercises] = await Promise.all([
+        sources.songs.manifest(),
+        sources.exercises.manifest(),
+    ]);
     for (const song of songs) {
         index.set(song.id, { id: song.id, title: song.title, grade: song.grade, cost: song.cost });
     }
@@ -177,8 +186,8 @@ async function buildCatalogue(): Promise<Map<string, GradeCatalogItem>> {
     return index;
 }
 
-export async function loadGradeCatalogue(): Promise<GradeCatalogItem[]> {
-    return [...(await buildCatalogue()).values()];
+export async function loadGradeCatalogue(sources: CatalogSources): Promise<GradeCatalogItem[]> {
+    return [...(await buildCatalogue(sources)).values()];
 }
 
 // Where the per-piece mastery entries come from — structurally the mastery store's
@@ -187,12 +196,15 @@ export type MasterySource = { loadAll(): Array<{ id: string; value: Mastery }> }
 
 // Joins the player's mastery with the catalogue to resolve each touched item's grade
 // and cost. Items with no catalogue match are dropped.
-export async function loadGradedMastery(source: MasterySource): Promise<GradedMastery[]> {
+export async function loadGradedMastery(
+    source: MasterySource,
+    sources: CatalogSources,
+): Promise<GradedMastery[]> {
     const mastery = source.loadAll();
     if (mastery.length === 0) {
         return [];
     }
-    const index = await buildCatalogue();
+    const index = await buildCatalogue(sources);
     const out: GradedMastery[] = [];
     for (const { id, value: state } of mastery) {
         const meta = index.get(id);

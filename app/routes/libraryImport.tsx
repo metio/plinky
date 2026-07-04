@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useXmlCodec } from "../contexts/services";
+import { useSongSource, useXmlCodec } from "../contexts/services";
 import { useState } from "react";
 import { Button, buttonClasses } from "../components/button";
 import { UploadIcon } from "../components/icons";
@@ -13,7 +13,6 @@ import { readScoreFile } from "../../core/musicxmlFile";
 import { markDiscovered } from "../lib/onboarding";
 import { gradeOf } from "../lib/scoreDifficulty";
 import { songId } from "../../core/songId";
-import { loadManifest } from "../lib/songs";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { XmlCodec } from "../../core/xml";
@@ -46,6 +45,7 @@ const FIELD =
 
 export default function LibraryImportRoute() {
     const xmlCodec = useXmlCodec();
+    const songs = useSongSource();
     const [draft, setDraft] = useState<Draft | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [dragOver, setDragOver] = useState(false);
@@ -72,7 +72,7 @@ export default function LibraryImportRoute() {
         // the song catalogue, or previously imported, flag it as a duplicate.
         const id = songId(xml);
         const known = new Set(loadCatalog().map((entry) => entry.id));
-        setDuplicate(known.has(id) || (await loadManifest()).some((song) => song.id === id));
+        setDuplicate(known.has(id) || (await songs.manifest()).some((song) => song.id === id));
         const meta = readScoreMeta(xml);
         setDraft({
             xml,

@@ -41,7 +41,7 @@ import {
 import { applyRun, isDue, letterMin, setBacklog } from "../../core/mastery";
 import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../core/prefs";
-import { useHistoryStore, useMasteryStore, usePrefsStore, useXmlCodec } from "../contexts/services";
+import { useServices, useXmlCodec } from "../contexts/services";
 import { loadSongFingering } from "../lib/savedFingering";
 import { toReplayEvents } from "../../core/composition";
 import { listenStepMs } from "../../core/playback";
@@ -344,10 +344,9 @@ export function ScoreViewer({
     const hasSaved = Object.keys(saved).length > 0;
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
-    const prefsStore = usePrefsStore();
+    const services = useServices();
+    const { prefs: prefsStore, mastery: masteryStore, history: historyStore } = services;
     const xmlCodec = useXmlCodec();
-    const masteryStore = useMasteryStore();
-    const historyStore = useHistoryStore();
     const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
     // Whether to number the first bar of each staff row, remembered per device.
     const [barNumbers, setBarNumbers] = useState(() => prefsStore.load().barNumbers);
@@ -833,7 +832,7 @@ export function ScoreViewer({
         const prefs = prefsStore.load();
         // The grade-up check reads the ladder across the whole catalogue, so it resolves
         // asynchronously; the first-S and flawless checks above are already decided.
-        loadGradedMastery(masteryStore).then((items) => {
+        loadGradedMastery(masteryStore, services).then((items) => {
             const reached = currentGrade(items);
             if (reached > reachedGrade()) {
                 recordReachedGrade(reached);
@@ -861,6 +860,7 @@ export function ScoreViewer({
         prefsStore.load,
         masteryStore,
         historyStore,
+        services,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note

@@ -22,8 +22,8 @@ import {
     slugifyName,
 } from "../lib/assignment";
 import { loadCatalog } from "../lib/catalog";
-import { type ExerciseMeta, loadExerciseManifest } from "../lib/exercises";
-import { useMasteryStore } from "../contexts/services";
+import type { ExerciseMeta } from "../stores/exerciseSource";
+import { useExerciseSource, useMasteryStore } from "../contexts/services";
 import type { MasteryStore } from "../stores/masteryStore";
 import { routeMeta, SITE_URL } from "../../core/site";
 import { trackSteps } from "../../core/tracks";
@@ -63,6 +63,7 @@ function download(filename: string, text: string, type: string): void {
 
 export default function AssignmentsRoute() {
     const masteryStore = useMasteryStore();
+    const exercises = useExerciseSource();
     const [searchParams] = useSearchParams();
     const [pool, setPool] = useState<PoolItem[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -78,7 +79,7 @@ export default function AssignmentsRoute() {
 
     useEffect(() => {
         setAssignments(loadAssignments());
-        loadExerciseManifest().then((exercises: ExerciseMeta[]) => {
+        exercises.manifest().then((exercises: ExerciseMeta[]) => {
             const fromCatalog = loadCatalog().map((score) => ({
                 id: score.id,
                 title: score.title,
@@ -89,7 +90,7 @@ export default function AssignmentsRoute() {
             }));
             setPool([...fromCatalog, ...fromExercises]);
         });
-    }, []);
+    }, [exercises.manifest]);
 
     // A shared assignment arriving by link is offered for import rather than saved
     // silently, so the player chooses to add a stranger's list to their own.

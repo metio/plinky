@@ -8,7 +8,10 @@ import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import { httpFetcher } from "../adapters/httpFetcher";
+import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
+import { createSongSource, type SongSource } from "../stores/songSource";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 
@@ -32,6 +35,10 @@ export type AppServices = {
     audio: AudioEngine;
     // How MusicXML strings become walkable documents and back (see XmlCodec).
     xml: XmlCodec;
+    // The fetched halves of the catalogue: the song manifest + on-demand .mxl,
+    // and the exercise manifest + generated/fetched pieces.
+    songs: SongSource;
+    exercises: ExerciseSource;
 };
 
 // Assembles a full service set from a partial override. Derived services follow the
@@ -47,6 +54,8 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
         history: overrides.history ?? createHistoryStore(store),
         audio: overrides.audio ?? webAudioEngine,
         xml: overrides.xml ?? domXmlCodec,
+        songs: overrides.songs ?? createSongSource(httpFetcher, store),
+        exercises: overrides.exercises ?? createExerciseSource(httpFetcher),
     };
 }
 
@@ -77,12 +86,14 @@ export function ServicesProvider({
     const history = services?.history;
     const audio = services?.audio;
     const xml = services?.xml;
+    const songs = services?.songs;
+    const exercises = services?.exercises;
     const value = useMemo(
         () =>
-            store || prefs || mastery || history || audio || xml
-                ? build({ store, prefs, mastery, history, audio, xml })
+            store || prefs || mastery || history || audio || xml || songs || exercises
+                ? build({ store, prefs, mastery, history, audio, xml, songs, exercises })
                 : DEFAULT_SERVICES,
-        [store, prefs, mastery, history, audio, xml],
+        [store, prefs, mastery, history, audio, xml, songs, exercises],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
@@ -115,4 +126,12 @@ export function useAudioEngine(): AudioEngine {
 
 export function useXmlCodec(): XmlCodec {
     return useServices().xml;
+}
+
+export function useSongSource(): SongSource {
+    return useServices().songs;
+}
+
+export function useExerciseSource(): ExerciseSource {
+    return useServices().exercises;
 }

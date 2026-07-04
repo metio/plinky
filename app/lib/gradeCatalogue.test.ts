@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { httpFetcher } from "../adapters/httpFetcher";
+import { memoryStore } from "../adapters/memoryStore";
+import { createExerciseSource } from "../stores/exerciseSource";
+import { createSongSource } from "../stores/songSource";
 import { afterEach, describe, expect, it } from "vitest";
 import { saveUserScore, type Score } from "./catalog";
 import { loadGradeCatalogue } from "./gradeProgress";
@@ -25,11 +29,16 @@ const scoreXml = (notes: string) =>
     `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">${notes}</measure></part></score-partwise>`;
 const NOTE = `<note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration></note>`;
 
+const sources = {
+    songs: createSongSource(httpFetcher, memoryStore()),
+    exercises: createExerciseSource(httpFetcher),
+};
+
 describe("loadGradeCatalogue", () => {
     it("keeps a playable import but drops a note-less one", async () => {
         saveUserScore(userScore("playable-import-xyz", scoreXml(NOTE + NOTE)));
         saveUserScore(userScore("empty-import-xyz", scoreXml("")));
-        const ids = new Set((await loadGradeCatalogue()).map((item) => item.id));
+        const ids = new Set((await loadGradeCatalogue(sources)).map((item) => item.id));
         // A score with notes is a real practice target…
         expect(ids.has("playable-import-xyz")).toBe(true);
         // …while one with no fingerable notes is nothing to practise and is left out.

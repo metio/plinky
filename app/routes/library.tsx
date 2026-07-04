@@ -11,13 +11,11 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreBackup } from "../components/scoreBackup";
 import { GradeChip } from "../components/scoreGrade";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
-import { loadExerciseManifest } from "../lib/exercises";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, type Mastery } from "../../core/mastery";
-import { useMasteryStore } from "../contexts/services";
+import { useServices } from "../contexts/services";
 import { gradeOf, MAX_GRADE } from "../lib/scoreDifficulty";
 import { routeMeta } from "../../core/site";
-import { loadManifest } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
 
@@ -55,7 +53,8 @@ type Item = {
 };
 
 export default function LibraryRoute() {
-    const masteryStore = useMasteryStore();
+    const services = useServices();
+    const masteryStore = services.mastery;
     const [local, setLocal] = useState<Item[]>([]);
     const [exercises, setExercises] = useState<Item[]>([]);
     const [songs, setSongs] = useState<Item[]>([]);
@@ -99,30 +98,32 @@ export default function LibraryRoute() {
         reloadMastery();
         // The exercise and song manifests load over the network; local scores render
         // first. Exercises are always present; the song catalogue is the deep library.
-        Promise.all([loadExerciseManifest(), loadManifest()]).then(([exerciseList, manifest]) => {
-            setExercises(
-                exerciseList.map((exercise) => ({
-                    id: exercise.id,
-                    title: exercise.title,
-                    composer: exercise.composer ?? "",
-                    grade: exercise.grade,
-                    removable: false,
-                    kind: exercise.kind,
-                })),
-            );
-            setSongs(
-                manifest.map((song) => ({
-                    id: song.id,
-                    title: song.title,
-                    composer: song.composer,
-                    grade: song.grade,
-                    removable: false,
-                    kind: "song" as const,
-                })),
-            );
-            setLoaded(true);
-        });
-    }, [reloadLocal, reloadMastery]);
+        Promise.all([services.exercises.manifest(), services.songs.manifest()]).then(
+            ([exerciseList, manifest]) => {
+                setExercises(
+                    exerciseList.map((exercise) => ({
+                        id: exercise.id,
+                        title: exercise.title,
+                        composer: exercise.composer ?? "",
+                        grade: exercise.grade,
+                        removable: false,
+                        kind: exercise.kind,
+                    })),
+                );
+                setSongs(
+                    manifest.map((song) => ({
+                        id: song.id,
+                        title: song.title,
+                        composer: song.composer,
+                        grade: song.grade,
+                        removable: false,
+                        kind: "song" as const,
+                    })),
+                );
+                setLoaded(true);
+            },
+        );
+    }, [reloadLocal, reloadMastery, services.songs.manifest, services.exercises.manifest]);
 
     // A new filter starts from the top of its (possibly long) result set.
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset paging when the filter changes

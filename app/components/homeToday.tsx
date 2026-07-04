@@ -11,7 +11,7 @@ import {
     loadGradeCatalogue,
     loadGradedMastery,
 } from "../lib/gradeProgress";
-import { useMasteryStore, usePrefsStore } from "../contexts/services";
+import { usePrefsStore, useServices } from "../contexts/services";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import { type Task, todayTasks } from "../../core/today";
 import { m } from "../paraglide/messages.js";
@@ -43,41 +43,39 @@ function taskLabel(task: Task): string {
 // prerendered shell and appears once the client resolves it.
 export function HomeToday() {
     const prefsStore = usePrefsStore();
-    const masteryStore = useMasteryStore();
+    const services = useServices();
     const [tasks, setTasks] = useState<Task[] | null>(null);
 
     useEffect(() => {
         let cancelled = false;
-        Promise.all([loadGradedMastery(masteryStore), loadGradeCatalogue()]).then(
-            ([items, catalogue]) => {
-                if (cancelled) {
-                    return;
-                }
-                const now = Date.now();
-                const prefs = prefsStore.load();
-                const level = currentGrade(items);
-                const workingGrade = Math.min(level + 1, MAX_GRADE);
-                const mastered = new Set(
-                    items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
-                );
-                const suggestion =
-                    gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
-                const dailyDoneToday = lastDailyDone() === dailyNumber(todayKey(new Date()));
-                setTasks(
-                    todayTasks({
-                        dueIds: dueReviews(items, now, prefs.reviewCap),
-                        dailyDoneToday,
-                        suggestion: suggestion
-                            ? { id: suggestion.id, title: suggestion.title }
-                            : null,
-                    }),
-                );
-            },
-        );
+        Promise.all([
+            loadGradedMastery(services.mastery, services),
+            loadGradeCatalogue(services),
+        ]).then(([items, catalogue]) => {
+            if (cancelled) {
+                return;
+            }
+            const now = Date.now();
+            const prefs = prefsStore.load();
+            const level = currentGrade(items);
+            const workingGrade = Math.min(level + 1, MAX_GRADE);
+            const mastered = new Set(
+                items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
+            );
+            const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
+            const dailyDoneToday = lastDailyDone() === dailyNumber(todayKey(new Date()));
+            setTasks(
+                todayTasks({
+                    dueIds: dueReviews(items, now, prefs.reviewCap),
+                    dailyDoneToday,
+                    suggestion: suggestion ? { id: suggestion.id, title: suggestion.title } : null,
+                }),
+            );
+        });
         return () => {
             cancelled = true;
         };
-    }, [prefsStore.load, masteryStore]);
+    }, [prefsStore.load, services]);
 
     if (tasks === null) {
         return null;
