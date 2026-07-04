@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { annotateFingerings } from "../lib/fingerScore";
-import { usePrefsStore } from "../contexts/services";
+import { usePrefsStore, useXmlCodec } from "../contexts/services";
 import { buildPrintDocument, printViaIframe } from "../lib/printScore";
 import { transposeMusicXml } from "../../core/transpose";
 import { m } from "../paraglide/messages.js";
@@ -16,12 +16,13 @@ import { useTranspose } from "./transposeContext";
 // borrowing the ScoreViewer's, so any page can place it and Print works in any mode.
 export function PrintButton({ xml, title }: { xml: string; title: string }) {
     const prefsStore = usePrefsStore();
+    const xmlCodec = useXmlCodec();
     const transpose = useTranspose()?.transpose ?? 0;
     const print = async () => {
         const prefs = prefsStore.load();
-        const transposed = transpose === 0 ? xml : transposeMusicXml(xml, transpose);
+        const transposed = transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
         const source = prefs.showFingerings
-            ? annotateFingerings(transposed, prefs.handSpan)
+            ? annotateFingerings(xmlCodec, transposed, prefs.handSpan)
             : transposed;
         // An off-screen host OSMD renders into; removed once the markup is captured.
         const host = document.createElement("div");

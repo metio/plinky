@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useXmlCodec } from "../contexts/services";
 import { useState } from "react";
 import { Button, buttonClasses } from "../components/button";
 import { UploadIcon } from "../components/icons";
@@ -15,6 +16,7 @@ import { songId } from "../../core/songId";
 import { loadManifest } from "../lib/songs";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
+import type { XmlCodec } from "../../core/xml";
 import type { Route } from "./+types/libraryImport";
 
 export function meta(_args: Route.MetaArgs) {
@@ -23,13 +25,8 @@ export function meta(_args: Route.MetaArgs) {
 
 // Accept anything that parses as MusicXML with at least one pitched note; OSMD
 // renders whatever it can, so the bar for import is just "has notes".
-function looksPlayable(xml: string): boolean {
-    try {
-        const doc = new DOMParser().parseFromString(xml, "application/xml");
-        return !doc.querySelector("parsererror") && doc.querySelector("note > pitch") !== null;
-    } catch {
-        return false;
-    }
+function looksPlayable(codec: XmlCodec, xml: string): boolean {
+    return codec.parse(xml)?.querySelector("note > pitch") != null;
 }
 
 // What a dropped file becomes once read and parsed: the MusicXML plus the editable
@@ -48,6 +45,7 @@ const FIELD =
     "w-full rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
 
 export default function LibraryImportRoute() {
+    const xmlCodec = useXmlCodec();
     const [draft, setDraft] = useState<Draft | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [dragOver, setDragOver] = useState(false);
@@ -66,7 +64,7 @@ export default function LibraryImportRoute() {
             setError(m.import_read_error());
             return;
         }
-        if (!looksPlayable(xml)) {
+        if (!looksPlayable(xmlCodec, xml)) {
             setError(m.import_no_notes());
             return;
         }

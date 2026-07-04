@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useXmlCodec } from "../contexts/services";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
@@ -20,10 +21,11 @@ const STEP_MS = 600;
 // fingering mode (the treble staff's top notes) and matches by pitch class, so the
 // ear — not the register — is what's trained.
 export function EarPiece({ xml }: { xml: string }) {
+    const xmlCodec = useXmlCodec();
     const synth = useSynth();
     const [start, setStart] = useState(0);
 
-    const bars = useMemo(() => scoreToBars(xml, 1), [xml]);
+    const bars = useMemo(() => scoreToBars(xmlCodec, xml, 1), [xmlCodec, xml]);
     const lastStart = Math.max(0, bars.length - WINDOW);
     const clamped = Math.min(start, lastStart);
     // The melody: the top note of each position in the window, in play order.

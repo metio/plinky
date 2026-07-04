@@ -3,6 +3,10 @@
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
+import { webAudioEngine } from "../adapters/webAudioEngine";
+import type { AudioEngine } from "../ports/audioEngine";
+import type { XmlCodec } from "../../core/xml";
+import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
@@ -24,6 +28,10 @@ export type AppServices = {
     prefs: PrefsStore;
     mastery: MasteryStore;
     history: HistoryStore;
+    // Where sound comes out (see AudioEngine).
+    audio: AudioEngine;
+    // How MusicXML strings become walkable documents and back (see XmlCodec).
+    xml: XmlCodec;
 };
 
 // Assembles a full service set from a partial override. Derived services follow the
@@ -37,6 +45,8 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
         prefs: overrides.prefs ?? createPrefsStore(store),
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
+        audio: overrides.audio ?? webAudioEngine,
+        xml: overrides.xml ?? domXmlCodec,
     };
 }
 
@@ -65,12 +75,14 @@ export function ServicesProvider({
     const prefs = services?.prefs;
     const mastery = services?.mastery;
     const history = services?.history;
+    const audio = services?.audio;
+    const xml = services?.xml;
     const value = useMemo(
         () =>
-            store || prefs || mastery || history
-                ? build({ store, prefs, mastery, history })
+            store || prefs || mastery || history || audio || xml
+                ? build({ store, prefs, mastery, history, audio, xml })
                 : DEFAULT_SERVICES,
-        [store, prefs, mastery, history],
+        [store, prefs, mastery, history, audio, xml],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
@@ -95,4 +107,12 @@ export function useMasteryStore(): MasteryStore {
 
 export function useHistoryStore(): HistoryStore {
     return useServices().history;
+}
+
+export function useAudioEngine(): AudioEngine {
+    return useServices().audio;
+}
+
+export function useXmlCodec(): XmlCodec {
+    return useServices().xml;
 }

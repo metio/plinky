@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { XmlCodec } from "./xml";
 import type { Composition, RecordedNote } from "./composition";
 
 // Reads MusicXML back into a composition, the inverse of the toMusicXml sketch, so a
@@ -32,14 +33,9 @@ function midiOf(pitch: Element): number | null {
 // Parses MusicXML text into a composition, or null if it holds no readable score. The
 // document's first tempo and time signature set the grid; everything is timed in
 // milliseconds from the first note so it drops straight into the recorded timeline.
-export function parseMusicXml(xml: string): Composition | null {
-    let doc: Document;
-    try {
-        doc = new DOMParser().parseFromString(xml, "application/xml");
-    } catch {
-        return null;
-    }
-    if (doc.querySelector("parsererror") || !doc.querySelector("score-partwise")) {
+export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null {
+    const doc = codec.parse(xml);
+    if (!doc || !doc.querySelector("score-partwise")) {
         return null;
     }
     const part = doc.querySelector("part");

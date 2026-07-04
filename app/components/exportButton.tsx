@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useXmlCodec } from "../contexts/services";
 import { toMidiNotes } from "../../core/composition";
 import { buildMidiFile } from "../../core/midiFile";
 import { parseMusicXml } from "../../core/musicxmlParse";
@@ -15,10 +16,11 @@ import { useTranspose } from "./transposeContext";
 // the page's current transposition — no ScoreViewer or rendered cursor needed, so
 // any page can place it. A score that can't be parsed just doesn't export.
 export function ExportButton({ xml, title }: { xml: string; title: string }) {
+    const xmlCodec = useXmlCodec();
     const transpose = useTranspose()?.transpose ?? 0;
     const exportMidi = () => {
-        const source = transpose === 0 ? xml : transposeMusicXml(xml, transpose);
-        const composition = parseMusicXml(source);
+        const source = transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
+        const composition = parseMusicXml(xmlCodec, source);
         if (!composition) {
             return;
         }

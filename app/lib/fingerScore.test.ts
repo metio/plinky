@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import { annotateFingerings } from "./fingerScore";
 
@@ -22,6 +23,7 @@ function fingerings(xml: string): string[] {
 describe("annotateFingerings", () => {
     it("writes a 1–5 fingering onto every pitched note", () => {
         const annotated = annotateFingerings(
+            domXmlCodec,
             score(note("C", 4) + note("D", 4) + note("E", 4)),
             noSpan,
         );
@@ -34,20 +36,24 @@ describe("annotateFingerings", () => {
     });
 
     it("fingers each staff independently", () => {
-        const annotated = annotateFingerings(score(note("C", 4, 1) + note("C", 2, 2)), noSpan);
+        const annotated = annotateFingerings(
+            domXmlCodec,
+            score(note("C", 4, 1) + note("C", 2, 2)),
+            noSpan,
+        );
         expect(fingerings(annotated)).toHaveLength(2);
     });
 
     it("skips rests and leaves malformed XML untouched", () => {
         const withRest = score(`${note("C", 4)}<note><rest/><duration>2</duration></note>`);
-        expect(fingerings(annotateFingerings(withRest, noSpan))).toHaveLength(1);
-        expect(annotateFingerings("not xml at all", noSpan)).toBe("not xml at all");
+        expect(fingerings(annotateFingerings(domXmlCodec, withRest, noSpan))).toHaveLength(1);
+        expect(annotateFingerings(domXmlCodec, "not xml at all", noSpan)).toBe("not xml at all");
     });
 
     it("prefers the player's saved fingering where they chose one", () => {
         const xml = score(note("C", 4, 1) + note("D", 4, 1) + note("E", 4, 1));
         // Saved finger 5 on bar 0, position 0, note 0 of the right hand.
-        const annotated = annotateFingerings(xml, noSpan, { "right:0:0:0": 5 });
+        const annotated = annotateFingerings(domXmlCodec, xml, noSpan, { "right:0:0:0": 5 });
         const fingers = fingerings(annotated);
         expect(fingers[0]).toBe("5");
         // The rest fall back to the suggestion (a sensible 1–5).

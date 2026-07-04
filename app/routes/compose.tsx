@@ -24,7 +24,7 @@ import {
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { buildMidiFile } from "../../core/midiFile";
 import { markDiscovered } from "../lib/onboarding";
-import { usePrefsStore } from "../contexts/services";
+import { usePrefsStore, useXmlCodec } from "../contexts/services";
 import { fileStem } from "../lib/printScore";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -59,6 +59,7 @@ const COMPOSE_REACH: Span = { from: 21, to: 108 };
 
 export default function Compose() {
     const prefsStore = usePrefsStore();
+    const xmlCodec = useXmlCodec();
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
     const [tempo, setTempo] = useState(120);
@@ -313,7 +314,7 @@ export default function Compose() {
                     import("../../core/musicxmlParse"),
                 ]);
                 const xml = await readScoreFile(file);
-                loaded = xml ? parseMusicXml(xml) : null;
+                loaded = xml ? parseMusicXml(xmlCodec, xml) : null;
             }
             if (!loaded) {
                 setUploadError(m.compose_open_error());
@@ -328,7 +329,7 @@ export default function Compose() {
             }
             applyLoaded(loaded);
         },
-        [applyLoaded],
+        [applyLoaded, xmlCodec],
     );
 
     const empty = notes.length === 0;

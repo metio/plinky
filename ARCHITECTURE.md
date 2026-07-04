@@ -86,6 +86,7 @@ It reads the import graph, so it enforces the *edges*: no cycles, `core` importi
 above it, `ports` staying implementation-free, each layer pointing down. It cannot see a
 reference to a global (`localStorage`, `document`, `fetch`) because that is not an import —
 those are checked by `dev/check-globals.mjs` (part of `npm run arch`), which pins each
-confined global to the one adapter allowed to touch it. A few `core/` modules still parse
-XML through `DOMParser`; they move behind a MusicXML-parser port, at which point that
-global joins the confined list.
+confined global to the adapter allowed to touch it: `localStorage` to the browser store,
+`DOMParser`/`XMLSerializer` to the XML codec. Core notation functions take the codec as a
+parameter, so they run identically in the browser, in Node tooling (a linkedom-backed
+codec), and in tests.

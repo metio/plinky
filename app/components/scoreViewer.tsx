@@ -41,7 +41,7 @@ import {
 import { applyRun, isDue, letterMin, setBacklog } from "../../core/mastery";
 import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../core/prefs";
-import { useHistoryStore, useMasteryStore, usePrefsStore } from "../contexts/services";
+import { useHistoryStore, useMasteryStore, usePrefsStore, useXmlCodec } from "../contexts/services";
 import { loadSongFingering } from "../lib/savedFingering";
 import { toReplayEvents } from "../../core/composition";
 import { listenStepMs } from "../../core/playback";
@@ -343,6 +343,7 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
     const prefsStore = usePrefsStore();
+    const xmlCodec = useXmlCodec();
     const masteryStore = useMasteryStore();
     const historyStore = useHistoryStore();
     const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
@@ -392,8 +393,8 @@ export function ScoreViewer({
     // The notation the mobile focus strip shows — transposed to match what's played,
     // but un-annotated (it's for reading the bar, not the printed fingering).
     const focusXml = useMemo(
-        () => (transpose === 0 ? xml : transposeMusicXml(xml, transpose)),
-        [xml, transpose],
+        () => (transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose)),
+        [xml, transpose, xmlCodec],
     );
     // Which hand to practice, and the score's staff count — the hands-separate
     // selector only appears for the grand-staff (two-staff) scores it applies to.
@@ -942,9 +943,11 @@ export function ScoreViewer({
                 // sits on the note being read, not mapped onto a key.
                 // Transpose first, then annotate, so the printed fingering is
                 // computed for the key actually being played.
-                const transposed = transpose === 0 ? xml : transposeMusicXml(xml, transpose);
+                const transposed =
+                    transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
                 const source = showFingerings
                     ? annotateFingerings(
+                          xmlCodec,
                           transposed,
                           prefsStore.load().handSpan,
                           showMine ? saved : undefined,

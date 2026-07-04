@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { XmlCodec } from "./xml";
 // Transposes a score's MusicXML up or down by a number of semitones, client-side,
 // so a piece can be practised in a more comfortable key. Every <pitch> is respelled
 // and every key signature shifts with it, the way a transposing edition is printed —
@@ -71,17 +72,12 @@ function setAlter(doc: Document, pitch: Element, alter: number): void {
     pitch.querySelector("octave")?.before(element);
 }
 
-export function transposeMusicXml(xml: string, semitones: number): string {
+export function transposeMusicXml(codec: XmlCodec, xml: string, semitones: number): string {
     if (semitones === 0) {
         return xml;
     }
-    let doc: Document;
-    try {
-        doc = new DOMParser().parseFromString(xml, "application/xml");
-    } catch {
-        return xml;
-    }
-    if (doc.querySelector("parsererror")) {
+    const doc = codec.parse(xml);
+    if (!doc) {
         return xml;
     }
 
@@ -137,5 +133,5 @@ export function transposeMusicXml(xml: string, semitones: number): string {
         }
     }
 
-    return new XMLSerializer().serializeToString(doc);
+    return codec.serialize(doc);
 }

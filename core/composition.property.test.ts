@@ -3,6 +3,7 @@
 
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
@@ -63,7 +64,7 @@ describe("composition codec + engraving properties", () => {
     it("engraves MusicXML that always parses back", () => {
         fc.assert(
             fc.property(arbPlayable, (composition) => {
-                expect(parseMusicXml(toMusicXml(composition))).not.toBeNull();
+                expect(parseMusicXml(domXmlCodec, toMusicXml(composition))).not.toBeNull();
             }),
             { numRuns: 50 },
         );
@@ -71,7 +72,7 @@ describe("composition codec + engraving properties", () => {
 
     it("engraves a note-less score to an all-rest part that parses to null", () => {
         const empty: Composition = { notes: [], tempo: 120, beatsPerBar: 4 };
-        expect(parseMusicXml(toMusicXml(empty))).toBeNull();
+        expect(parseMusicXml(domXmlCodec, toMusicXml(empty))).toBeNull();
     });
 
     it("replays every note exactly once, in ascending non-repeating onset order", () => {

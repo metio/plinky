@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { XmlCodec } from "./xml";
 // Turns a piece's MusicXML into per-bar chord positions for one hand, so a passage
 // can be fingered (or reproduced by ear). Each bar is a list of positions in play
 // order; each position is the MIDI pitches sounding together — a single note, or a
@@ -34,14 +35,9 @@ function midiOf(note: Element): number | null {
 // Parse the first part's measures into bars of positions for the given staff. A note
 // marked <chord/> joins the position before it; rests and the other staff are skipped.
 // Returns an empty array for unreadable XML, so callers can fall back gracefully.
-export function scoreToBars(xml: string, staff: Staff): Bar[] {
-    let doc: Document;
-    try {
-        doc = new DOMParser().parseFromString(xml, "application/xml");
-    } catch {
-        return [];
-    }
-    if (doc.getElementsByTagName("parsererror").length > 0) {
+export function scoreToBars(codec: XmlCodec, xml: string, staff: Staff): Bar[] {
+    const doc = codec.parse(xml);
+    if (!doc) {
         return [];
     }
     const part = doc.getElementsByTagName("part")[0];

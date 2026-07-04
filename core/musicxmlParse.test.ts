@@ -3,6 +3,7 @@
 
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import type { Composition } from "./composition";
 import { toMusicXml } from "./composition";
@@ -19,7 +20,7 @@ describe("parseMusicXml", () => {
             tempo: 120,
             beatsPerBar: 4,
         };
-        const parsed = parseMusicXml(toMusicXml(composition));
+        const parsed = parseMusicXml(domXmlCodec, toMusicXml(composition));
         expect(parsed).not.toBeNull();
         expect(parsed!.tempo).toBe(120);
         expect(parsed!.beatsPerBar).toBe(4);
@@ -38,7 +39,7 @@ describe("parseMusicXml", () => {
             tempo: 120,
             beatsPerBar: 4,
         };
-        const parsed = parseMusicXml(toMusicXml(composition));
+        const parsed = parseMusicXml(domXmlCodec, toMusicXml(composition));
         const atZero = parsed!.notes.filter((n) => Math.round(n.startMs) === 0);
         expect(atZero.map((n) => n.pitch).sort((a, b) => a - b)).toEqual([60, 64, 67]);
     });
@@ -50,7 +51,7 @@ describe("parseMusicXml", () => {
             tempo: 120,
             beatsPerBar: 4,
         };
-        const parsed = parseMusicXml(toMusicXml(composition));
+        const parsed = parseMusicXml(domXmlCodec, toMusicXml(composition));
         expect(parsed!.notes.length).toBe(1);
         expect(parsed!.notes[0]!.durationMs).toBeCloseTo(4000, 0);
     });
@@ -61,7 +62,7 @@ describe("parseMusicXml", () => {
             tempo: 96,
             beatsPerBar: 3,
         };
-        const parsed = parseMusicXml(toMusicXml(composition));
+        const parsed = parseMusicXml(domXmlCodec, toMusicXml(composition));
         expect(parsed!.beatsPerBar).toBe(3);
         expect(parsed!.tempo).toBe(96);
     });
@@ -89,7 +90,7 @@ describe("parseMusicXml", () => {
                     </measure>
                 </part>
             </score-partwise>`;
-        const parsed = parseMusicXml(xml);
+        const parsed = parseMusicXml(domXmlCodec, xml);
         expect(parsed).not.toBeNull();
         // Default tempo 120 → 500ms per quarter. The whole note runs four beats…
         const c = parsed!.notes.find((n) => n.pitch === 60)!;
@@ -100,7 +101,7 @@ describe("parseMusicXml", () => {
     });
 
     it("returns null for non-score XML", () => {
-        expect(parseMusicXml("<html><body>nope</body></html>")).toBeNull();
-        expect(parseMusicXml("not xml at all <<<")).toBeNull();
+        expect(parseMusicXml(domXmlCodec, "<html><body>nope</body></html>")).toBeNull();
+        expect(parseMusicXml(domXmlCodec, "not xml at all <<<")).toBeNull();
     });
 });

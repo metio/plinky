@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useMemo } from "react";
-import { usePrefsStore } from "../contexts/services";
-import { getAudioContext, midiToFrequency } from "../lib/audio";
+import { useAudioEngine, usePrefsStore } from "../contexts/services";
 
 export type PlayNoteOptions = {
     velocity?: number; // 0..127
@@ -15,70 +14,34 @@ export type UseSynthResult = {
     playNote: (note: number, options?: PlayNoteOptions) => void;
 };
 
-// A piano-like voice synthesized in the Web Audio graph (no sample assets, so it
-// stays small and works offline): a stack of harmonic partials whose higher
-// overtones are quieter and slightly inharmonic, shaped by a hammer-strike
-// envelope (near-instant attack, fast initial decay, longer release) and a
-// low-pass filter that closes over time so the tone darkens as it rings out.
-const PARTIALS: { ratio: number; gain: number; type: OscillatorType }[] = [
-    { ratio: 1, gain: 1, type: "triangle" },
-    { ratio: 2, gain: 0.45, type: "sine" },
-    { ratio: 3, gain: 0.2, type: "sine" },
-    { ratio: 4, gain: 0.1, type: "sine" },
-];
-
+// Decides what a note press should sound like — loudness from velocity and the
+// volume preference, silence when muted — and hands the strike to the injected
+// audio engine. The synthesis itself lives behind the engine seam, so this hook
+// tests against a fake that records strikes.
 export function useSynth(): UseSynthResult {
     const prefsStore = usePrefsStore();
+    const audio = useAudioEngine();
     const playNote = useCallback(
         (note: number, options: PlayNoteOptions = {}) => {
             const prefs = prefsStore.load();
-            const ctx = getAudioContext();
-            if (!ctx || !prefs.sound) {
+            if (!prefs.sound) {
                 return;
             }
-            ctx.resume().catch(() => {});
-
-            const now = ctx.currentTime + Math.max(0, options.delay ?? 0);
-            const duration = options.duration ?? 1.1;
-            const peak = ((options.velocity ?? 90) / 127) * 0.32 * (prefs.volume / 100);
-            // Volume 0 means silence; an exponential ramp to 0 is also a RangeError,
-            // so stop before building the graph.
-            if (peak <= 0) {
+            const gain = ((options.velocity ?? 90) / 127) * 0.32 * (prefs.volume / 100);
+            // Volume 0 means silence; the engine's exponential ramps cannot target 0
+            // either, so a silent strike never reaches it.
+            if (gain <= 0) {
                 return;
             }
-            const frequency = midiToFrequency(note);
-
-            const filter = ctx.createBiquadFilter();
-            filter.type = "lowpass";
-            filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
-            filter.frequency.exponentialRampToValueAtTime(
-                Math.max(frequency * 2, 400),
-                now + duration,
-            );
-            filter.connect(ctx.destination);
-
-            const envelope = ctx.createGain();
-            // Exponential ramps cannot reach zero, so the envelope rides just above it.
-            envelope.gain.setValueAtTime(0.0001, now);
-            envelope.gain.exponentialRampToValueAtTime(peak, now + 0.006);
-            envelope.gain.exponentialRampToValueAtTime(peak * 0.5, now + 0.18);
-            envelope.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-            envelope.connect(filter);
-
-            for (const { ratio, gain, type } of PARTIALS) {
-                const oscillator = ctx.createOscillator();
-                oscillator.type = type;
-                oscillator.frequency.value = frequency * ratio;
-                oscillator.detune.value = (ratio - 1) * 2; // mild inharmonicity for warmth
-                const partialGain = ctx.createGain();
-                partialGain.gain.value = gain;
-                oscillator.connect(partialGain);
-                partialGain.connect(envelope);
-                oscillator.start(now);
-                oscillator.stop(now + duration);
-            }
+            audio.resume();
+            audio.strike({
+                note,
+                gain,
+                duration: options.duration ?? 1.1,
+                delay: Math.max(0, options.delay ?? 0),
+            });
         },
-        [prefsStore],
+        [prefsStore, audio],
     );
 
     // A stable result so callers can list the synth in an effect's dependencies without

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import { scoreToBars, staffFor, windowCells, windowPositions } from "./scoreToBars";
 
@@ -19,13 +20,13 @@ const XML = `<score-partwise><part id="P1">
 
 describe("scoreToBars", () => {
     it("reads the treble hand into bars of positions, grouping chords", () => {
-        const bars = scoreToBars(XML, 1);
+        const bars = scoreToBars(domXmlCodec, XML, 1);
         // Bar 1: a C4+E4 chord, then a single G4. Bar 2: a single D4 (rest skipped).
         expect(bars).toEqual([[[60, 64], [67]], [[62]]]);
     });
 
     it("reads the bass hand from the other staff", () => {
-        expect(scoreToBars(XML, 2)).toEqual([[[48]], []]);
+        expect(scoreToBars(domXmlCodec, XML, 2)).toEqual([[[48]], []]);
     });
 
     it("maps hands to the grand-staff split", () => {
@@ -34,17 +35,17 @@ describe("scoreToBars", () => {
     });
 
     it("returns nothing for unreadable XML", () => {
-        expect(scoreToBars("not xml at all <", 1)).toEqual([]);
+        expect(scoreToBars(domXmlCodec, "not xml at all <", 1)).toEqual([]);
     });
 
     it("flattens a bar window in play order, clamped to range", () => {
-        const bars = scoreToBars(XML, 1);
+        const bars = scoreToBars(domXmlCodec, XML, 1);
         expect(windowPositions(bars, 0, 2)).toEqual([[60, 64], [67], [62]]);
         expect(windowPositions(bars, 1, 2)).toEqual([[62]]);
     });
 
     it("tags each window position with its absolute score cell", () => {
-        const bars = scoreToBars(XML, 1);
+        const bars = scoreToBars(domXmlCodec, XML, 1);
         // Parallel to windowPositions: chord+single in bar 0, then the single in bar 1.
         expect(windowCells(bars, 0, 2)).toEqual([
             { bar: 0, pos: 0 },

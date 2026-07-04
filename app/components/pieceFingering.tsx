@@ -9,7 +9,7 @@ import {
     loadSongFingering,
     setFinger,
 } from "../lib/savedFingering";
-import { usePrefsStore } from "../contexts/services";
+import { usePrefsStore, useXmlCodec } from "../contexts/services";
 import { scoreToBars, staffFor, windowCells, windowPositions } from "../../core/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
@@ -24,6 +24,7 @@ const WINDOW = 2;
 // and pre-filled when you come back, so the work isn't lost.
 export function PieceFingering({ id, xml }: { id: string; xml: string }) {
     const prefsStore = usePrefsStore();
+    const xmlCodec = useXmlCodec();
     const [hand, setHand] = useState<"left" | "right">("right");
     const [start, setStart] = useState(0);
     const [map, setMap] = useState<FingerMap>(() => loadSongFingering(id));
@@ -32,7 +33,7 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
     // Live colour/symbol feedback, remembered across pieces via prefs.
     const [hints, setHints] = useState(() => prefsStore.load().fingerHints);
 
-    const bars = useMemo(() => scoreToBars(xml, staffFor(hand)), [xml, hand]);
+    const bars = useMemo(() => scoreToBars(xmlCodec, xml, staffFor(hand)), [xmlCodec, xml, hand]);
     const lastStart = Math.max(0, bars.length - WINDOW);
     // A hand with fewer bars can leave start past the end; clamp for the render.
     const clamped = Math.min(start, lastStart);
