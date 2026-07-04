@@ -13,10 +13,10 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { LocalizedLink as Link } from "./components/localizedLink";
-import { GradeBadge } from "./components/gradeBadge";
-import { HeaderNav } from "./components/navBar";
-import { ThemeToggle } from "./components/themeToggle";
+import { LocalizedLink as Link } from "./components/ui/localizedLink";
+import { GradeBadge } from "./components/features/gradeBadge";
+import { HeaderNav } from "./components/ui/navBar";
+import { ThemeToggle } from "./components/features/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";

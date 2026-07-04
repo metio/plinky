@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button, IconButton } from "../components/button";
-import { ConfirmButton } from "../components/confirmButton";
-import { Chip } from "../components/chip";
-import { Show } from "../components/conditional";
-import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../components/icons";
-import { LocalizedLink as Link } from "../components/localizedLink";
-import { ScoreBackup } from "../components/scoreBackup";
-import { GradeChip } from "../components/scoreGrade";
+import { Button, IconButton } from "../components/ui/button";
+import { ConfirmButton } from "../components/ui/confirmButton";
+import { Chip } from "../components/ui/chip";
+import { Show } from "../components/features/conditional";
+import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../components/ui/icons";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
+import { ScoreBackup } from "../components/features/scoreBackup";
+import { GradeChip } from "../components/features/scoreGrade";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, type Mastery } from "../../core/mastery";

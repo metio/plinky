@@ -3,10 +3,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { Button, IconButton } from "../components/button";
-import { Show } from "../components/conditional";
-import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/icons";
-import { LocalizedLink as Link } from "../components/localizedLink";
+import { Button, IconButton } from "../components/ui/button";
+import { Show } from "../components/features/conditional";
+import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/ui/icons";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import {
     type Assignment,
     type AssignmentItem,

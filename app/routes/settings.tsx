@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { Button } from "../components/button";
-import { DangerZone } from "../components/dangerZone";
-import { HandSize } from "../components/handSize";
-import { KeyMapping } from "../components/keyMapping";
-import { LanguageSwitcher } from "../components/languageSwitcher";
-import { MidiConnect } from "../components/midiConnect";
-import { ThemeToggle } from "../components/themeToggle";
+import { Button } from "../components/ui/button";
+import { DangerZone } from "../components/features/dangerZone";
+import { HandSize } from "../components/features/handSize";
+import { KeyMapping } from "../components/features/keyMapping";
+import { LanguageSwitcher } from "../components/ui/languageSwitcher";
+import { MidiConnect } from "../components/features/midiConnect";
+import { ThemeToggle } from "../components/features/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../../core/grade";

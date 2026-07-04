@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { BeginnerStart } from "../components/beginnerStart";
-import { DiscoveryChecklist } from "../components/discoveryChecklist";
-import { HeroKeyboard } from "../components/heroKeyboard";
-import { BookIcon, ListIcon, NotesIcon } from "../components/icons";
-import { HomeToday } from "../components/homeToday";
-import { LocalizedLink as Link } from "../components/localizedLink";
+import { BeginnerStart } from "../components/features/beginnerStart";
+import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
+import { HeroKeyboard } from "../components/features/heroKeyboard";
+import { BookIcon, ListIcon, NotesIcon } from "../components/ui/icons";
+import { HomeToday } from "../components/features/homeToday";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { socialMeta, structuredData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";

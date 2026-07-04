@@ -3,7 +3,7 @@
 
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router";
-import { BottomNav } from "../components/navBar";
+import { BottomNav } from "../components/ui/navBar";
 import { useSongSource } from "../contexts/services";
 import { isLocale } from "../paraglide/runtime.js";
 

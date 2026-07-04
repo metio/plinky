@@ -10,7 +10,7 @@ rule that holds the whole thing together: **dependencies point strictly downward
 layer may import from the layers below it and never from a layer above. `dependency-cruiser`
 enforces this on every push (`npm run arch`); the contract lives in `.dependency-cruiser.cjs`.
 
-```
+```text
 routes ──▶ components/features ──▶ components/ui ──▶ core
               │                       │
               ▼                       ▼
@@ -30,17 +30,24 @@ import scripts and the build config (`react-router.config.ts`) depend down on it
 same music tooling the app runs.
 
 **`app/ports/`** — the injection seams: TypeScript interfaces describing a side-effecting
-capability (`KeyValueStore`, `AudioEngine`, `MidiAccess`, `Fetcher`, a MusicXML parser, the
-score renderer) with no implementation. A unit that needs a side effect depends on the
-*interface*, so a test can hand it a fake.
+capability (`KeyValueStore`, `AudioEngine`, `Fetcher`, the MusicXML `XmlCodec`) with no
+implementation. A unit that needs a side effect depends on the *interface*, so a test can
+hand it a fake. OpenSheetMusicDisplay is the exception — a stateful rendering engine the
+surface drives directly rather than through a fake-able port — so it is *fenced* to the
+component/hook layer by a dependency rule instead.
 
 **`app/adapters/`** — the concrete browser implementations of the ports (`browserStore` over
-`localStorage`, the Web Audio synth, Web MIDI, `fetch`, OSMD) and their test fakes
-(`memoryStore`, …). This is the only layer that talks to the platform.
+`localStorage`, the `webAudioEngine`, the `domXmlCodec`, the `httpFetcher`) and their test
+fakes (`memoryStore`, `fakeAudioEngine`, …). This is the only layer that talks to the platform.
 
 **`app/stores/`** — single sources of truth for persistent state (preferences, mastery,
-history, …), built over the storage port and exposed as `useSyncExternalStore` snapshots so
-every view of a value reads the same place and re-renders together when it changes.
+history, …) and the fetched catalogue sources, built over the ports and exposed as
+`useSyncExternalStore` snapshots so every view of a value reads the same place and re-renders
+together when it changes.
+
+**`app/lib/`** — the transitional middle: modules not yet sorted into a formal layer (the
+remaining storage helpers, the OSMD-coupled score painting, the DOM-based difficulty parse).
+It shrinks branch by branch as its pieces move down into `core` or become stores and adapters.
 
 **`app/hooks/`** — the React glue that binds stores and adapters into the component lifecycle.
 

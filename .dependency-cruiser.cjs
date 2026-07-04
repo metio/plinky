@@ -93,8 +93,8 @@ module.exports = {
             comment:
                 "app/components/ui/ are pure presentational primitives: props in, elements out. They " +
                 "may compose core + other ui + react, but never stores, adapters, contexts, effectful " +
-                "hooks or the legacy lib/. Tightened to error once the ui/features split lands.",
-            severity: "warn",
+                "hooks or the legacy lib/.",
+            severity: "error",
             from: { path: "^app/components/ui/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
             to: {
                 path: [

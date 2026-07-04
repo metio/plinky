@@ -3,11 +3,11 @@
 
 import { useSongSource, useXmlCodec } from "../contexts/services";
 import { useState } from "react";
-import { Button, buttonClasses } from "../components/button";
-import { UploadIcon } from "../components/icons";
-import { LocalizedLink as Link } from "../components/localizedLink";
-import { GradeChip } from "../components/scoreGrade";
-import { StaffPreview } from "../components/staffPreview";
+import { Button, buttonClasses } from "../components/ui/button";
+import { UploadIcon } from "../components/ui/icons";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
+import { GradeChip } from "../components/features/scoreGrade";
+import { StaffPreview } from "../components/features/staffPreview";
 import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "../lib/catalog";
 import { readScoreFile } from "../../core/musicxmlFile";
 import { markDiscovered } from "../lib/onboarding";

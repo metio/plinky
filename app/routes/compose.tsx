@@ -3,13 +3,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { Button, buttonClasses } from "../components/button";
-import { CoachMark } from "../components/coachMark";
-import { ConfirmButton } from "../components/confirmButton";
-import { KeyboardHint } from "../components/keyboardHint";
-import { MidiConnect } from "../components/midiConnect";
-import { PianoKeyboard } from "../components/pianoKeyboard";
-import { StaffPreview } from "../components/staffPreview";
+import { Button, buttonClasses } from "../components/ui/button";
+import { CoachMark } from "../components/features/coachMark";
+import { ConfirmButton } from "../components/ui/confirmButton";
+import { KeyboardHint } from "../components/ui/keyboardHint";
+import { MidiConnect } from "../components/features/midiConnect";
+import { PianoKeyboard } from "../components/features/pianoKeyboard";
+import { StaffPreview } from "../components/features/staffPreview";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";

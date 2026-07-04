@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { Button } from "../components/button";
-import { CoachMark } from "../components/coachMark";
-import { LocalizedLink as Link } from "../components/localizedLink";
-import { ScoreViewer } from "../components/scoreViewer";
-import { SegmentedControl } from "../components/segmentedControl";
+import { Button } from "../components/ui/button";
+import { CoachMark } from "../components/features/coachMark";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
+import { ScoreViewer } from "../components/features/scoreViewer";
+import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
 import { type DailyResult, loadDailyResult } from "../lib/dailyResult";
 import { generatePhrase } from "../../core/generator";
