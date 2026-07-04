@@ -1,23 +1,17 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
-// @vitest-environment jsdom
 
-import { afterEach, describe, expect, it } from "vitest";
-import { withDeniedStorage } from "./deniedStorage";
+import { describe, expect, it } from "vitest";
 import {
     applyRun,
     isDue,
     isLapsed,
     letterMin,
-    loadAllMastery,
-    loadMastery,
     markLearned,
     type Mastery,
-    saveMastery,
+    normalizeMastery,
     setBacklog,
 } from "./mastery";
-
-afterEach(() => localStorage.clear());
 
 const NOW = 1_000_000_000_000;
 const DAY = 86_400_000;
@@ -136,29 +130,17 @@ describe("isDue", () => {
     });
 });
 
-describe("loadMastery", () => {
-    it("round-trips a saved mastery", () => {
-        const mastery: Mastery = {
-            bestScore: 88,
-            learned: true,
-            backlog: false,
-            intervalDays: 3,
-            reviewAt: NOW,
-            updatedAt: NOW,
-        };
-        saveMastery("song-1", mastery);
-        expect(loadMastery("song-1")).toEqual(mastery);
-    });
-
+describe("normalizeMastery", () => {
     it("repairs a legacy entry missing intervalDays so reviews stay finite", () => {
         // A learned entry from an older schema without intervalDays would drive
         // applyRun's interval growth to NaN, poisoning reviewAt.
-        localStorage.setItem(
-            "plinky:mastery:song-2",
-            JSON.stringify({ bestScore: 90, learned: true, backlog: false, reviewAt: NOW }),
-        );
-        const loaded = loadMastery("song-2");
-        expect(loaded?.intervalDays).toBe(0);
+        const loaded = normalizeMastery({
+            bestScore: 90,
+            learned: true,
+            backlog: false,
+            reviewAt: NOW,
+        });
+        expect(loaded.intervalDays).toBe(0);
         const next = applyRun(loaded, 90, 85, NOW + DAY);
         expect(Number.isFinite(next.intervalDays)).toBe(true);
         expect(Number.isFinite(next.reviewAt)).toBe(true);
@@ -171,18 +153,5 @@ describe("markLearned", () => {
         const next = markLearned(null, NOW);
         expect(next.learned).toBe(true);
         expect(next.reviewAt).toBe(NOW + DAY);
-    });
-});
-
-describe("mastery under denied storage", () => {
-    it("reads null/empty rather than throwing when storage is blocked", () => {
-        // loadAllMastery feeds the home, You page and header badge; a storage-blocked
-        // browser must read as "nothing mastered", not crash every one of them.
-        expect(withDeniedStorage(() => loadMastery("song-1"))).toBeNull();
-        expect(withDeniedStorage(() => loadAllMastery())).toEqual([]);
-    });
-
-    it("swallows a save when storage is blocked", () => {
-        expect(() => withDeniedStorage(() => saveMastery("song-1", learned()))).not.toThrow();
     });
 });

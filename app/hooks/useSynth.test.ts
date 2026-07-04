@@ -2,15 +2,11 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { testPrefsStore } from "../testing/stores";
 import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP } from "../../core/keyMap";
-import { browserStore } from "../adapters/browserStore";
-import { createPrefsStore } from "../stores/prefsStore";
 
-// Reads and writes go through a store over the same backing localStorage the
-// component under test uses, so seeding and asserting see one source of truth.
-const prefsStore = createPrefsStore(browserStore);
 import { useSynth } from "./useSynth";
 
 let oscillators = 0;
@@ -62,7 +58,7 @@ afterEach(() => localStorage.clear());
 
 describe("useSynth", () => {
     it("builds a voice when sound is on", () => {
-        prefsStore.save({
+        testPrefsStore.save({
             sound: true,
             volume: 80,
             masteryThreshold: "A",
@@ -87,7 +83,7 @@ describe("useSynth", () => {
     });
 
     it("stays silent when sound is off", () => {
-        prefsStore.save({
+        testPrefsStore.save({
             sound: false,
             volume: 80,
             masteryThreshold: "A",
@@ -113,7 +109,7 @@ describe("useSynth", () => {
 
     it("stays silent — and does not throw — at volume 0", () => {
         // An exponential gain ramp to 0 is a RangeError, so volume 0 must short-circuit.
-        prefsStore.save({
+        testPrefsStore.save({
             sound: true,
             volume: 0,
             masteryThreshold: "A",

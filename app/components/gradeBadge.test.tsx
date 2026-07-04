@@ -2,17 +2,13 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { testPrefsStore } from "../testing/stores";
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../lib/gradeProgress";
-import type { Mastery } from "../lib/mastery";
-import { browserStore } from "../adapters/browserStore";
-import { createPrefsStore } from "../stores/prefsStore";
+import type { Mastery } from "../../core/mastery";
 
-// Reads and writes go through a store over the same backing localStorage the
-// component under test uses, so seeding and asserting see one source of truth.
-const prefsStore = createPrefsStore(browserStore);
 import { GradeBadge } from "./gradeBadge";
 
 // Stub the catalogue join so the badge sees exactly the mastery we hand it; the grade
@@ -70,7 +66,7 @@ describe("GradeBadge", () => {
     });
 
     it("flags competitive mode in its label", async () => {
-        prefsStore.save({ ...prefsStore.load(), decayMode: "competitive" });
+        testPrefsStore.save({ ...testPrefsStore.load(), decayMode: "competitive" });
         loadMock.mockResolvedValue(mastered(1, 5));
         mount();
         expect(await screen.findByRole("link", { name: /competitive/i })).toBeTruthy();

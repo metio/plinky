@@ -23,7 +23,8 @@ import {
 } from "../lib/assignment";
 import { loadCatalog } from "../lib/catalog";
 import { type ExerciseMeta, loadExerciseManifest } from "../lib/exercises";
-import { loadMastery } from "../lib/mastery";
+import { useMasteryStore } from "../contexts/services";
+import type { MasteryStore } from "../stores/masteryStore";
 import { routeMeta, SITE_URL } from "../../core/site";
 import { trackSteps } from "../../core/tracks";
 import { m } from "../paraglide/messages.js";
@@ -42,8 +43,8 @@ const FIELD =
 type PoolItem = { id: string; title: string };
 
 // A step is cleared once its piece has been learned.
-function done(id: string): boolean {
-    return loadMastery(id)?.learned === true;
+function done(id: string, mastery: MasteryStore): boolean {
+    return mastery.load(id)?.learned === true;
 }
 
 const STEP_MARK =
@@ -61,6 +62,7 @@ function download(filename: string, text: string, type: string): void {
 }
 
 export default function AssignmentsRoute() {
+    const masteryStore = useMasteryStore();
     const [searchParams] = useSearchParams();
     const [pool, setPool] = useState<PoolItem[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -428,7 +430,7 @@ export default function AssignmentsRoute() {
                         {assignments.map((assignment) => {
                             const steps = trackSteps(
                                 assignment.items.map((item) => item.id),
-                                done,
+                                (id) => done(id, masteryStore),
                             );
                             const doneCount = steps.filter((step) => step.status === "done").length;
                             return (

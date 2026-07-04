@@ -59,6 +59,8 @@ describe("Play", () => {
         expect(
             await screen.findByRole("button", { name: /Hear the phrase/ }, { timeout: 30000 }),
         ).toBeTruthy();
-        expect(discoveries(DEFAULT_PREFS).earTried).toBe(true);
+        expect(discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).earTried).toBe(
+            true,
+        );
     });
 });

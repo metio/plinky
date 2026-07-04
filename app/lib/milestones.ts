@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
-import { letterMin } from "./mastery";
+import { letterMin } from "../../core/mastery";
 
 // Earned moments that surface a shareable card on the run summary. Each fires at most
 // once: a grade-up is gated by the highest grade ever reached, the first flawless run

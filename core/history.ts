@@ -1,14 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import { todayKey } from "../../core/daily";
-
-const KEY = "plinky:history";
-
-// Fired when a run is recorded, so persistent UI (the home Today panel) can refresh
-// without a reload — the practice happens deep in a route, the panel in the layout.
-export const PRACTICE_EVENT = "plinky:practice";
+import { todayKey } from "./daily";
 
 // Notes practiced per day, keyed by local calendar date (YYYY-MM-DD), matching todayKey.
 export type History = Record<string, number>;
@@ -19,11 +12,12 @@ export type PracticeSummary = {
     recent: { date: string; notes: number }[];
 };
 
-export function loadHistory(): History {
+// Turns a raw stored string (or null for nothing stored) into a valid History.
+// An array also satisfies `typeof === "object"`, but assigning date keys onto one
+// and re-serialising drops them, silently losing practice — so it reads as empty.
+export function parseHistory(raw: string | null): History {
     try {
-        const parsed = JSON.parse(browserStore.get(KEY) ?? "{}");
-        // An array also satisfies `typeof === "object"`, but assigning date keys
-        // onto one and re-serialising drops them, silently losing practice.
+        const parsed = JSON.parse(raw ?? "{}");
         return parsed && typeof parsed === "object" && !Array.isArray(parsed)
             ? (parsed as History)
             : {};
@@ -32,22 +26,14 @@ export function loadHistory(): History {
     }
 }
 
-export function recordPractice(notes: number, now: Date = new Date()): void {
+// Folds a finished run's note count onto today's tally. Zero or negative counts
+// leave the history untouched — an aborted run records nothing.
+export function foldPractice(history: History, notes: number, now: Date): History {
     if (notes <= 0) {
-        return;
+        return history;
     }
-    try {
-        const history = loadHistory();
-        const key = todayKey(now);
-        history[key] = (history[key] ?? 0) + notes;
-        browserStore.set(KEY, JSON.stringify(history));
-        // Let persistent UI (the home Today panel) refresh without a reload.
-        if (typeof window !== "undefined") {
-            window.dispatchEvent(new Event(PRACTICE_EVENT));
-        }
-    } catch {
-        // Practice history is a convenience; a failed write is not surfaced.
-    }
+    const key = todayKey(now);
+    return { ...history, [key]: (history[key] ?? 0) + notes };
 }
 
 function shiftDay(dateKey: string, delta: number): string {

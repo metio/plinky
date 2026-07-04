@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { testMasteryStore } from "../testing/stores";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
-import { saveMastery } from "../lib/mastery";
+
 import Library from "./library";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
@@ -112,7 +113,7 @@ describe("Library", () => {
 
     it("filters to only the pieces due for review", async () => {
         // Ode to Joy is overdue; Twinkle has no mastery, so it isn't due.
-        saveMastery(bundledId("ode to joy"), {
+        testMasteryStore.save(bundledId("ode to joy"), {
             bestScore: 90,
             learned: true,
             backlog: false,

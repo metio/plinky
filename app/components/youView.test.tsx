@@ -6,7 +6,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradeCatalogItem, GradedMastery } from "../lib/gradeProgress";
-import type { Mastery } from "../lib/mastery";
+import type { Mastery } from "../../core/mastery";
 import { YouView } from "./youView";
 
 const { masteryMock, catalogueMock } = vi.hoisted(() => ({

@@ -18,10 +18,10 @@ import {
     type StarTier,
     starTier,
 } from "../lib/gradeProgress";
-import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
+import { type PracticeSummary, summarizePractice } from "../../core/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
 import { svgMilestone } from "../../core/milestoneCard";
-import { usePrefsStore } from "../contexts/services";
+import { useHistoryStore, useMasteryStore, usePrefsStore } from "../contexts/services";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
 import type { Grid } from "../../core/shareCard";
 import { m } from "../paraglide/messages.js";
@@ -73,6 +73,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 // after mount, so the personal data is absent from the prerendered shell.
 export function YouView() {
     const prefsStore = usePrefsStore();
+    const masteryStore = useMasteryStore();
+    const historyStore = useHistoryStore();
     const [items, setItems] = useState<GradedMastery[] | null>(null);
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
     const [summary, setSummary] = useState<PracticeSummary | null>(null);
@@ -80,14 +82,14 @@ export function YouView() {
 
     useEffect(() => {
         let cancelled = false;
-        setSummary(summarizePractice(loadHistory()));
+        setSummary(summarizePractice(historyStore.load()));
         setFingerprint(progressGrid(loadLifetime()));
-        loadGradedMastery().then((loaded) => !cancelled && setItems(loaded));
+        loadGradedMastery(masteryStore).then((loaded) => !cancelled && setItems(loaded));
         loadGradeCatalogue().then((loaded) => !cancelled && setCatalogue(loaded));
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [masteryStore, historyStore.load]);
 
     // Wait for the personal data before painting anything, so the page renders once
     // fully rather than prerendering a roadmap that shifts as the data lands — the

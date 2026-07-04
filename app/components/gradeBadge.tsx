@@ -3,8 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
-import { usePrefsStore } from "../contexts/services";
-import { PRACTICE_EVENT } from "../lib/history";
+import { useMasteryStore, usePrefsStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 
@@ -20,11 +19,12 @@ export function GradeBadge() {
     const [skill, setSkill] = useState(0);
     const [competitive, setCompetitive] = useState(false);
     const prefsStore = usePrefsStore();
+    const masteryStore = useMasteryStore();
 
     useEffect(() => {
         let cancelled = false;
         const read = () => {
-            loadGradedMastery().then((items) => {
+            loadGradedMastery(masteryStore).then((items) => {
                 if (!cancelled) {
                     const mode = prefsStore.load().decayMode;
                     const now = Date.now();
@@ -35,12 +35,16 @@ export function GradeBadge() {
             });
         };
         read();
-        window.addEventListener(PRACTICE_EVENT, read);
+        // A finished run saves mastery through the store; both the grade and the
+        // decay-mode mark also shift when preferences change.
+        const unsubscribeMastery = masteryStore.subscribe(read);
+        const unsubscribePrefs = prefsStore.subscribe(read);
         return () => {
             cancelled = true;
-            window.removeEventListener(PRACTICE_EVENT, read);
+            unsubscribeMastery();
+            unsubscribePrefs();
         };
-    }, [prefsStore]);
+    }, [prefsStore, masteryStore]);
 
     // Only the pre-mount state is empty; once read, Grade 0 still shows.
     if (level === null) {

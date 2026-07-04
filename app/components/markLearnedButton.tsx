@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { markLearned } from "../../core/mastery";
+import { useMasteryStore } from "../contexts/services";
 import { useMastery } from "../hooks/useMastery";
-import { markLearned } from "../lib/mastery";
-import { writeMastery } from "../lib/masteryStore";
 import { m } from "../paraglide/messages.js";
 import { IconButton } from "./button";
 import { CheckIcon } from "./icons";
@@ -14,6 +14,7 @@ import { CheckIcon } from "./icons";
 // in step. Needs only the score id, so any page can place it without wiring up the
 // ScoreViewer.
 export function MarkLearnedButton({ id }: { id: string }) {
+    const masteryStore = useMasteryStore();
     const mastery = useMastery(id);
     if (mastery?.learned) {
         return null;
@@ -21,7 +22,7 @@ export function MarkLearnedButton({ id }: { id: string }) {
     return (
         <IconButton
             variant="ghost"
-            onClick={() => writeMastery(id, markLearned(mastery, Date.now()))}
+            onClick={() => masteryStore.save(id, markLearned(mastery, Date.now()))}
             label={m.mastery_mark_learned()}
             className="text-green-600 dark:text-green-400"
         >

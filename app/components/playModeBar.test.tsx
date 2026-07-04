@@ -31,12 +31,18 @@ describe("PlayModeBar", () => {
 
     it("records reaching Ear and Fingering for the discovery checklist", () => {
         render(<PlayModeBar mode="play" onChange={vi.fn()} />);
-        expect(discoveries(DEFAULT_PREFS).earTried).toBe(false);
+        expect(discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).earTried).toBe(
+            false,
+        );
 
         fireEvent.click(screen.getByRole("tab", { name: "Ear" }));
-        expect(discoveries(DEFAULT_PREFS).earTried).toBe(true);
+        expect(discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).earTried).toBe(
+            true,
+        );
 
         fireEvent.click(screen.getByRole("tab", { name: "Finger Position" }));
-        expect(discoveries(DEFAULT_PREFS).fingeringTried).toBe(true);
+        expect(
+            discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).fingeringTried,
+        ).toBe(true);
     });
 });

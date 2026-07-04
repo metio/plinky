@@ -1,12 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { History } from "../../core/history";
 import type { Prefs } from "../../core/prefs";
 import { browserStore } from "../adapters/browserStore";
 import { lastDailyDone } from "./dailyDone";
-import { loadHistory } from "./history";
 import { isDefaultKeyMap } from "../../core/keyMap";
-import { loadAllMastery } from "./mastery";
 
 // The feature-discovery checklist: a gentle, opt-in nudge to meet the app's corners,
 // never a gate on progression. Some steps are read from real state (you've played,
@@ -53,15 +52,23 @@ export function markDiscovered(id: DiscoveryId): void {
     }
 }
 
-// Which discovery steps are done: the derived ones from real state, the rest from
-// the marked set. The caller passes the current prefs — this module only derives,
-// it does not reach into the preference store.
-export function discoveries(prefs: Prefs): Record<DiscoveryId, boolean> {
+// What the derived discovery steps are computed from. The caller loads these from
+// its stores and hands the data in — this module only derives.
+export type DiscoveryState = {
+    prefs: Prefs;
+    // Whether any piece carries mastery state (any entry at all counts as playing).
+    masteredCount: number;
+    history: History;
+};
+
+// Which discovery steps are done: the derived ones from the given state, the rest
+// from the marked set.
+export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean> {
+    const { prefs, masteredCount, history } = state;
     const span = prefs.handSpan;
     const marked = loadMarked();
     return {
-        played:
-            loadAllMastery().length > 0 || Object.values(loadHistory()).some((notes) => notes > 0),
+        played: masteredCount > 0 || Object.values(history).some((notes) => notes > 0),
         handSet: span.left !== null || span.right !== null,
         dailyDone: lastDailyDone() > 0,
         earTried: marked.has("earTried"),

@@ -1,25 +1,34 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
-// @vitest-environment jsdom
 
-import { afterEach, describe, expect, it } from "vitest";
-import { loadHistory, recordPractice, summarizePractice } from "./history";
-
-afterEach(() => localStorage.clear());
+import { describe, expect, it } from "vitest";
+import { foldPractice, parseHistory, summarizePractice } from "./history";
 
 // Local-time noon so the derived day key is 2026-06-23 in any runner zone.
 const NOW = new Date(2026, 5, 23, 12, 0);
 
-describe("recordPractice", () => {
+describe("foldPractice", () => {
     it("accumulates notes for the day", () => {
-        recordPractice(10, NOW);
-        recordPractice(5, NOW);
-        expect(loadHistory()["2026-06-23"]).toBe(15);
+        const once = foldPractice({}, 10, NOW);
+        const twice = foldPractice(once, 5, NOW);
+        expect(twice["2026-06-23"]).toBe(15);
     });
 
     it("ignores non-positive counts", () => {
-        recordPractice(0, NOW);
-        expect(loadHistory()).toEqual({});
+        const history = {};
+        expect(foldPractice(history, 0, NOW)).toBe(history);
+        expect(foldPractice(history, -3, NOW)).toBe(history);
+    });
+});
+
+describe("parseHistory", () => {
+    it("returns an empty history for nothing stored or corrupt data", () => {
+        expect(parseHistory(null)).toEqual({});
+        expect(parseHistory("not json")).toEqual({});
+    });
+
+    it("rejects a stored array so practice is not silently lost", () => {
+        expect(parseHistory("[1,2,3]")).toEqual({});
     });
 });
 
@@ -35,17 +44,5 @@ describe("summarizePractice", () => {
         expect(summary.recent).toHaveLength(7);
         expect(summary.recent[6]).toEqual({ date: "2026-06-23", notes: 7 });
         expect(summary.recent[0]!.date).toBe("2026-06-17");
-    });
-
-    it("returns an empty history for corrupt storage", () => {
-        localStorage.setItem("plinky:history", "not json");
-        expect(loadHistory()).toEqual({});
-    });
-
-    it("rejects a stored array so practice is not silently lost", () => {
-        localStorage.setItem("plinky:history", "[1,2,3]");
-        expect(loadHistory()).toEqual({});
-        recordPractice(10, NOW);
-        expect(loadHistory()["2026-06-23"]).toBe(10);
     });
 });

@@ -4,6 +4,8 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
+import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 
 // The app's injected integration points, gathered in one place. Every external
@@ -17,18 +19,24 @@ import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 export type AppServices = {
     // Where persistent state is read and written (see KeyValueStore).
     store: KeyValueStore;
-    // The single source of truth for preferences, built over `store`.
+    // The single sources of truth for each family of persistent state, built over
+    // `store`.
     prefs: PrefsStore;
+    mastery: MasteryStore;
+    history: HistoryStore;
 };
 
 // Assembles a full service set from a partial override. Derived services follow the
-// pieces they are built on: overriding just `store` gives a prefs store over that
-// store, so a test that hands in a memoryStore gets consistent persistence throughout.
+// pieces they are built on: overriding just `store` gives every state store over
+// that store, so a test that hands in a memoryStore gets consistent persistence
+// throughout.
 function build(overrides: Partial<AppServices> = {}): AppServices {
     const store = overrides.store ?? browserStore;
     return {
         store,
         prefs: overrides.prefs ?? createPrefsStore(store),
+        mastery: overrides.mastery ?? createMasteryStore(store),
+        history: overrides.history ?? createHistoryStore(store),
     };
 }
 
@@ -51,13 +59,18 @@ export function ServicesProvider({
 }) {
     // Keyed on the individual overrides, not the prop object's identity: an inline
     // `services={{ store }}` literal is a fresh object every render, and rebuilding
-    // the set each time would mint a new prefs store whose subscribers miss saves
-    // made through the previous instance.
+    // the set each time would mint new stores whose subscribers miss saves made
+    // through the previous instances.
     const store = services?.store;
     const prefs = services?.prefs;
+    const mastery = services?.mastery;
+    const history = services?.history;
     const value = useMemo(
-        () => (store || prefs ? build({ store, prefs }) : DEFAULT_SERVICES),
-        [store, prefs],
+        () =>
+            store || prefs || mastery || history
+                ? build({ store, prefs, mastery, history })
+                : DEFAULT_SERVICES,
+        [store, prefs, mastery, history],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
@@ -74,4 +87,12 @@ export function useStore(): KeyValueStore {
 
 export function usePrefsStore(): PrefsStore {
     return useServices().prefs;
+}
+
+export function useMasteryStore(): MasteryStore {
+    return useServices().mastery;
+}
+
+export function useHistoryStore(): HistoryStore {
+    return useServices().history;
 }

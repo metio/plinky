@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { usePrefsStore } from "../contexts/services";
+import { useHistoryStore, useMasteryStore, usePrefsStore } from "../contexts/services";
 import { FIRST_SONG_ID } from "../lib/catalog";
 import { discoveries } from "../lib/onboarding";
 import { hasSeenHint, markHintSeen } from "../lib/seenHints";
@@ -30,11 +30,20 @@ export function BeginnerStart() {
     const [show, setShow] = useState(true);
 
     const prefsStore = usePrefsStore();
+    const masteryStore = useMasteryStore();
+    const historyStore = useHistoryStore();
     useEffect(() => {
-        if (hasSeenHint(DISMISSED) || discoveries(prefsStore.load()).played) {
+        if (
+            hasSeenHint(DISMISSED) ||
+            discoveries({
+                prefs: prefsStore.load(),
+                masteredCount: masteryStore.loadAll().length,
+                history: historyStore.load(),
+            }).played
+        ) {
             setShow(false);
         }
-    }, [prefsStore]);
+    }, [prefsStore, masteryStore, historyStore]);
 
     if (!show) {
         return null;

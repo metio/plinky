@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { testMasteryStore } from "../testing/stores";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { markLearned } from "../lib/mastery";
-import { writeMastery } from "../lib/masteryStore";
+import { markLearned } from "../../core/mastery";
+
 import { MarkLearnedButton } from "./markLearnedButton";
 
 afterEach(() => {
@@ -21,7 +22,7 @@ describe("MarkLearnedButton", () => {
     });
 
     it("renders nothing for an already-learned piece", () => {
-        writeMastery("btn-learned", markLearned(null, Date.now()));
+        testMasteryStore.save("btn-learned", markLearned(null, Date.now()));
         const { container } = render(<MarkLearnedButton id="btn-learned" />);
         expect(container.firstChild).toBeNull();
     });

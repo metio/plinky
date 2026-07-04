@@ -5,7 +5,7 @@ import { loadBundledScores, loadUserScores } from "./catalog";
 import { loadExerciseManifest } from "./exercises";
 import type { Letter } from "../../core/grade";
 import { type DecayMode, REVIEW_CAP } from "../../core/review";
-import { isDue, isLapsed, letterMin, loadAllMastery, type Mastery } from "./mastery";
+import { isDue, isLapsed, letterMin, type Mastery } from "../../core/mastery";
 import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
 import { loadManifest } from "./songs";
 
@@ -181,16 +181,20 @@ export async function loadGradeCatalogue(): Promise<GradeCatalogItem[]> {
     return [...(await buildCatalogue()).values()];
 }
 
+// Where the per-piece mastery entries come from — structurally the mastery store's
+// loadAll, taken as a parameter so the caller decides which store backs the join.
+export type MasterySource = { loadAll(): Array<{ id: string; value: Mastery }> };
+
 // Joins the player's mastery with the catalogue to resolve each touched item's grade
 // and cost. Items with no catalogue match are dropped.
-export async function loadGradedMastery(): Promise<GradedMastery[]> {
-    const mastery = loadAllMastery();
+export async function loadGradedMastery(source: MasterySource): Promise<GradedMastery[]> {
+    const mastery = source.loadAll();
     if (mastery.length === 0) {
         return [];
     }
     const index = await buildCatalogue();
     const out: GradedMastery[] = [];
-    for (const { id, mastery: state } of mastery) {
+    for (const { id, value: state } of mastery) {
         const meta = index.get(id);
         if (meta) {
             out.push({ id, title: meta.title, grade: meta.grade, cost: meta.cost, mastery: state });

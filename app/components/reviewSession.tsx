@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useScore } from "../hooks/useScore";
 import { Button } from "./button";
 import { dueReviews, loadGradedMastery } from "../lib/gradeProgress";
-import { loadMastery, saveMastery, setBacklog } from "../lib/mastery";
-import { usePrefsStore } from "../contexts/services";
+import { setBacklog } from "../../core/mastery";
+import { useMasteryStore, usePrefsStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 import { ScoreViewer } from "./scoreViewer";
@@ -19,6 +19,7 @@ const BACK = "text-sm text-indigo-700 underline dark:text-indigo-300";
 // and removes it from the live due set.
 export function ReviewSession() {
     const prefsStore = usePrefsStore();
+    const masteryStore = useMasteryStore();
     const [queue, setQueue] = useState<string[] | null>(null);
     const [index, setIndex] = useState(0);
     const [refreshed, setRefreshed] = useState(0);
@@ -30,7 +31,7 @@ export function ReviewSession() {
 
     useEffect(() => {
         let cancelled = false;
-        loadGradedMastery().then((items) => {
+        loadGradedMastery(masteryStore).then((items) => {
             if (!cancelled) {
                 setQueue(dueReviews(items, Date.now(), prefsStore.load().reviewCap));
             }
@@ -38,7 +39,7 @@ export function ReviewSession() {
         return () => {
             cancelled = true;
         };
-    }, [prefsStore.load]);
+    }, [prefsStore.load, masteryStore]);
 
     const current = queue?.[index];
     const score = useScore(current ?? "");
@@ -91,7 +92,7 @@ export function ReviewSession() {
     };
     const shelve = () => {
         if (current) {
-            saveMastery(current, setBacklog(loadMastery(current), true, Date.now()));
+            masteryStore.save(current, setBacklog(masteryStore.load(current), true, Date.now()));
         }
         setShelved((n) => n + 1);
         advance();

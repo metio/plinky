@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Letter } from "../../core/grade";
-import { browserStore } from "../adapters/browserStore";
-import { PRACTICE_EVENT } from "./history";
+import type { Letter } from "./grade";
 
 // Spaced-repetition state for one score: the best score so far, whether it is
 // learned, whether it has been shelved to the backlog, and when it is next due
@@ -18,7 +16,6 @@ export type Mastery = {
     updatedAt: number;
 };
 
-const PREFIX = "plinky:mastery:";
 const DAY_MS = 86_400_000;
 const FIRST_INTERVAL_DAYS = 1;
 const GROWTH = 2.3;
@@ -33,14 +30,10 @@ const EMPTY: Mastery = {
     updatedAt: 0,
 };
 
-function storageKey(id: string): string {
-    return `${PREFIX}${id}`;
-}
-
 // Coerce a parsed (possibly legacy or corrupt) value into a complete Mastery.
 // A missing or non-finite numeric field would otherwise flow into applyRun's
 // interval growth as NaN, poisoning reviewAt and disabling the review schedule.
-function normalizeMastery(raw: unknown): Mastery {
+export function normalizeMastery(raw: unknown): Mastery {
     const value = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
     const num = (field: unknown, fallback: number): number =>
         Number.isFinite(field) ? (field as number) : fallback;
@@ -73,49 +66,6 @@ export function letterMin(letter: Letter): number {
         default:
             return 0;
     }
-}
-
-export function loadMastery(id: string): Mastery | null {
-    try {
-        const raw = browserStore.get(storageKey(id));
-        return raw ? normalizeMastery(JSON.parse(raw)) : null;
-    } catch {
-        // Skip a corrupt entry rather than crashing the caller.
-        return null;
-    }
-}
-
-export function saveMastery(id: string, mastery: Mastery): void {
-    // Mastery feeds the header's grade badge; nudge it to refresh without a reload —
-    // but only when the write actually landed, so listeners never recompute against
-    // a state that was never stored.
-    if (
-        browserStore.set(storageKey(id), JSON.stringify(mastery)) &&
-        typeof window !== "undefined"
-    ) {
-        window.dispatchEvent(new Event(PRACTICE_EVENT));
-    }
-}
-
-export function loadAllMastery(): Array<{ id: string; mastery: Mastery }> {
-    const out: Array<{ id: string; mastery: Mastery }> = [];
-    for (const key of browserStore.keys()) {
-        if (!key.startsWith(PREFIX)) {
-            continue;
-        }
-        try {
-            const raw = browserStore.get(key);
-            if (raw) {
-                out.push({
-                    id: key.slice(PREFIX.length),
-                    mastery: normalizeMastery(JSON.parse(raw)),
-                });
-            }
-        } catch {
-            // Skip a corrupt entry rather than failing the whole list.
-        }
-    }
-    return out;
 }
 
 // Folds a finished run's score into the mastery state: always tracks the best

@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { testMasteryStore } from "../testing/stores";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../lib/gradeProgress";
-import { loadMastery, type Mastery, saveMastery } from "../lib/mastery";
+import type { Mastery } from "../../core/mastery";
+
 import { ReviewSession } from "./reviewSession";
 
 // Stub the heavy score viewer (OSMD) and the score resolver, so the test exercises the
@@ -87,14 +89,14 @@ describe("ReviewSession", () => {
     });
 
     it("shelves the current piece out of the review", async () => {
-        saveMastery("a", due);
+        testMasteryStore.save("a", due);
         masteryMock.mockResolvedValue(queueOf("a", "b"));
         renderSession();
 
         await screen.findByText("Piece 1 of 2");
         fireEvent.click(screen.getByText("Shelve"));
 
-        expect(loadMastery("a")?.backlog).toBe(true);
+        expect(testMasteryStore.load("a")?.backlog).toBe(true);
         expect(await screen.findByText("Piece 2 of 2")).toBeTruthy();
     });
 

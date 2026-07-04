@@ -18,7 +18,6 @@ import { computeFlow } from "../../core/flow";
 import { cadence } from "../../core/cadence";
 import { recordDailyDone } from "../lib/dailyDone";
 import { type DailyResult, saveDailyResult } from "../lib/dailyResult";
-import { recordPractice } from "../lib/history";
 import {
     computeGrade,
     GRADE_COLOR,
@@ -39,11 +38,10 @@ import {
     recordFlawless,
     recordReachedGrade,
 } from "../lib/milestones";
-import { applyRun, isDue, letterMin, loadMastery, setBacklog } from "../lib/mastery";
-import { writeMastery } from "../lib/masteryStore";
+import { applyRun, isDue, letterMin, setBacklog } from "../../core/mastery";
 import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../core/prefs";
-import { usePrefsStore } from "../contexts/services";
+import { useHistoryStore, useMasteryStore, usePrefsStore } from "../contexts/services";
 import { loadSongFingering } from "../lib/savedFingering";
 import { toReplayEvents } from "../../core/composition";
 import { listenStepMs } from "../../core/playback";
@@ -345,6 +343,8 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
     const prefsStore = usePrefsStore();
+    const masteryStore = useMasteryStore();
+    const historyStore = useHistoryStore();
     const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
     // Whether to number the first bar of each staff row, remembered per device.
     const [barNumbers, setBarNumbers] = useState(() => prefsStore.load().barNumbers);
@@ -803,7 +803,7 @@ export function ScoreViewer({
             saveDailyResult(daily, { grade: result, grid, notes, tolerance });
         }
         // Count the run's notes toward the practice history.
-        recordPractice(matcher.total);
+        historyStore.record(matcher.total);
         if (ephemeral) {
             return;
         }
@@ -814,10 +814,10 @@ export function ScoreViewer({
         setSharedFromLink(false);
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
-        const before = loadMastery(id);
+        const before = masteryStore.load(id);
         const threshold = letterMin(prefsStore.load().masteryThreshold);
         const updated = applyRun(before, result.score, threshold, Date.now());
-        writeMastery(id, updated);
+        masteryStore.save(id, updated);
         onMastery?.();
 
         // Surface one earned-moment card. Grade-up is the biggest moment so it wins a
@@ -830,7 +830,7 @@ export function ScoreViewer({
         const prefs = prefsStore.load();
         // The grade-up check reads the ladder across the whole catalogue, so it resolves
         // asynchronously; the first-S and flawless checks above are already decided.
-        loadGradedMastery().then((items) => {
+        loadGradedMastery(masteryStore).then((items) => {
             const reached = currentGrade(items);
             if (reached > reachedGrade()) {
                 recordReachedGrade(reached);
@@ -856,6 +856,8 @@ export function ScoreViewer({
         bumpTempo,
         synth,
         prefsStore.load,
+        masteryStore,
+        historyStore,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
@@ -871,7 +873,7 @@ export function ScoreViewer({
 
     const toggleBacklog = () => {
         const updated = setBacklog(mastery, !mastery?.backlog, Date.now());
-        writeMastery(id, updated);
+        masteryStore.save(id, updated);
         onMastery?.();
     };
 

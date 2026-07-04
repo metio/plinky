@@ -13,7 +13,8 @@ import { GradeChip } from "../components/scoreGrade";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
 import { loadExerciseManifest } from "../lib/exercises";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
-import { isDue, loadAllMastery, type Mastery } from "../lib/mastery";
+import { isDue, type Mastery } from "../../core/mastery";
+import { useMasteryStore } from "../contexts/services";
 import { gradeOf, MAX_GRADE } from "../lib/scoreDifficulty";
 import { routeMeta } from "../../core/site";
 import { loadManifest } from "../lib/songs";
@@ -54,6 +55,7 @@ type Item = {
 };
 
 export default function LibraryRoute() {
+    const masteryStore = useMasteryStore();
     const [local, setLocal] = useState<Item[]>([]);
     const [exercises, setExercises] = useState<Item[]>([]);
     const [songs, setSongs] = useState<Item[]>([]);
@@ -72,11 +74,11 @@ export default function LibraryRoute() {
 
     const reloadMastery = useCallback(() => {
         const map: Record<string, Mastery> = {};
-        for (const { id, mastery } of loadAllMastery()) {
-            map[id] = mastery;
+        for (const { id, value } of masteryStore.loadAll()) {
+            map[id] = value;
         }
         setMasteryMap(map);
-    }, []);
+    }, [masteryStore]);
 
     const reloadLocal = useCallback(() => {
         setLocal(

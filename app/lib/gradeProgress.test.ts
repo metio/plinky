@@ -15,7 +15,7 @@ import {
     skillRating,
     starTier,
 } from "./gradeProgress";
-import type { Mastery } from "./mastery";
+import type { Mastery } from "../../core/mastery";
 
 const NOW = 1_700_000_000_000;
 const DAY = 86_400_000;
