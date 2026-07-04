@@ -141,6 +141,13 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
         url: "https://github.com/fosfrancesco/asap-dataset",
         credit: "the ASAP Dataset authors",
     },
+    // Solo-piano corpora from DCMLab (Digital and Cognitive Musicology Lab, EPFL),
+    // CC-BY-NC-SA — non-commercial, and the corpus editors are credited.
+    dcml: {
+        label: "DCMLab",
+        url: "https://github.com/DCMLab",
+        credit: "the DCMLab corpus editors",
+    },
 };
 
 // The default source for catalogue songs: the whole shipped catalogue is imported
