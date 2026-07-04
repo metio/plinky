@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { todayKey } from "../../core/daily";
 import { type Grid, toGrid } from "../../core/shareCard";
 
@@ -51,7 +52,7 @@ function blend(previous: Skill, run: Skill): Skill {
 
 export function loadLifetime(): Lifetime {
     try {
-        const raw = localStorage.getItem(KEY);
+        const raw = browserStore.get(KEY);
         const parsed = raw ? (JSON.parse(raw) as Lifetime) : null;
         if (!parsed || !Array.isArray(parsed.days)) {
             return EMPTY;
@@ -86,7 +87,7 @@ export function recordRun(run: Skill, now: Date = new Date()): Lifetime {
     );
     const next: Lifetime = { days: days.slice(-MAX_DAYS) };
     try {
-        localStorage.setItem(KEY, JSON.stringify(next));
+        browserStore.set(KEY, JSON.stringify(next));
     } catch {
         // The fingerprint is best-effort; a failed write (no storage, blocked storage,
         // or quota) is not surfaced.

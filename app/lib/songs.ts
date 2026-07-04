@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
+import { browserStore } from "../adapters/browserStore";
 import type { Score } from "./catalog";
 import { loadFavorites, toggleFavorite } from "./favorites";
 import { decompressMxl } from "../../core/musicxmlFile";
@@ -95,7 +96,7 @@ export async function resolveSong(id: string): Promise<Score | null> {
 // 1–8 and the home page has something to show without the player hunting first.
 // Guarded so it runs once.
 export async function ensureSeeded(): Promise<void> {
-    if (typeof localStorage === "undefined" || localStorage.getItem(SEEDED_KEY)) {
+    if (browserStore.get(SEEDED_KEY)) {
         return;
     }
     try {
@@ -107,7 +108,7 @@ export async function ensureSeeded(): Promise<void> {
                 toggleFavorite(id);
             }
         }
-        localStorage.setItem(SEEDED_KEY, "1");
+        browserStore.set(SEEDED_KEY, "1");
     } catch {
         // No seed shipped (dev build) — nothing to add.
     }

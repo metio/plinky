@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import type { Grade } from "../../core/grade";
 import type { Grid, RunNote } from "../../core/shareCard";
 
@@ -20,7 +21,7 @@ const KEY = "plinky:daily-result";
 
 export function saveDailyResult(number: number, result: DailyResult): void {
     try {
-        localStorage.setItem(KEY, JSON.stringify({ number, ...result }));
+        browserStore.set(KEY, JSON.stringify({ number, ...result }));
     } catch {
         // Best-effort — a missing cached result just shows a fresh challenge.
     }
@@ -30,7 +31,7 @@ export function saveDailyResult(number: number, result: DailyResult): void {
 // holds an earlier day, or is malformed.
 export function loadDailyResult(number: number): DailyResult | null {
     try {
-        const raw = localStorage.getItem(KEY);
+        const raw = browserStore.get(KEY);
         if (!raw) {
             return null;
         }

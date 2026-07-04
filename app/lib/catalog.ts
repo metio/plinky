@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
 
@@ -161,7 +162,7 @@ function normalizeUserScore(raw: unknown): Score | null {
 
 export function loadUserScores(): Score[] {
     try {
-        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+        const parsed = JSON.parse(browserStore.get(STORAGE_KEY) ?? "[]");
         if (!Array.isArray(parsed)) {
             return [];
         }
@@ -173,9 +174,9 @@ export function loadUserScores(): Score[] {
 
 function storeUserScores(scores: Score[]): boolean {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
-        return true;
+        return browserStore.set(STORAGE_KEY, JSON.stringify(scores));
     } catch {
+        // A score that cannot be serialized never reaches the store.
         return false;
     }
 }

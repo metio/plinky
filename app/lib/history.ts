@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { todayKey } from "../../core/daily";
 
 const KEY = "plinky:history";
@@ -20,7 +21,7 @@ export type PracticeSummary = {
 
 export function loadHistory(): History {
     try {
-        const parsed = JSON.parse(localStorage.getItem(KEY) ?? "{}");
+        const parsed = JSON.parse(browserStore.get(KEY) ?? "{}");
         // An array also satisfies `typeof === "object"`, but assigning date keys
         // onto one and re-serialising drops them, silently losing practice.
         return parsed && typeof parsed === "object" && !Array.isArray(parsed)
@@ -39,7 +40,7 @@ export function recordPractice(notes: number, now: Date = new Date()): void {
         const history = loadHistory();
         const key = todayKey(now);
         history[key] = (history[key] ?? 0) + notes;
-        localStorage.setItem(KEY, JSON.stringify(history));
+        browserStore.set(KEY, JSON.stringify(history));
         // Let persistent UI (the home Today panel) refresh without a reload.
         if (typeof window !== "undefined") {
             window.dispatchEvent(new Event(PRACTICE_EVENT));

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -384,7 +385,7 @@ export function ScoreViewer({
     // an orientation (WCAG 1.3.4).
     const [rotateDismissed, setRotateDismissed] = useState(false);
     useEffect(() => {
-        setRotateDismissed(localStorage.getItem("plinky:rotate-hint") === "dismissed");
+        setRotateDismissed(browserStore.get("plinky:rotate-hint") === "dismissed");
     }, []);
     // The notation the mobile focus strip shows — transposed to match what's played,
     // but un-annotated (it's for reading the bar, not the printed fingering).
@@ -1956,7 +1957,7 @@ export function ScoreViewer({
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            localStorage.setItem("plinky:rotate-hint", "dismissed");
+                                            browserStore.set("plinky:rotate-hint", "dismissed");
                                             setRotateDismissed(true);
                                         }}
                                         aria-label={m.action_dismiss()}

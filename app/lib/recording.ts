@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { packToCode, unpackFromCode } from "../../core/shareCode";
 
 // A "ghost": the note onset times of a completed run on a score, each in ms from
@@ -12,7 +13,7 @@ const key = (scoreId: string) => `plinky:ghost:${scoreId}`;
 
 export function saveGhost(scoreId: string, onsets: number[]): void {
     try {
-        localStorage.setItem(key(scoreId), JSON.stringify(onsets));
+        browserStore.set(key(scoreId), JSON.stringify(onsets));
     } catch {
         // A ghost is a convenience; a failed write is not surfaced.
     }
@@ -20,7 +21,7 @@ export function saveGhost(scoreId: string, onsets: number[]): void {
 
 export function loadGhost(scoreId: string): number[] | null {
     try {
-        const raw = localStorage.getItem(key(scoreId));
+        const raw = browserStore.get(key(scoreId));
         if (!raw) {
             return null;
         }

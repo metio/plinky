@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { lastDailyDone } from "./dailyDone";
 import { loadHistory } from "./history";
 import { isDefaultKeyMap } from "../../core/keyMap";
@@ -28,7 +29,7 @@ const KEY = "plinky:discovered";
 
 function loadMarked(): Set<DiscoveryId> {
     try {
-        const parsed = JSON.parse(localStorage.getItem(KEY) ?? "[]");
+        const parsed = JSON.parse(browserStore.get(KEY) ?? "[]");
         return new Set(Array.isArray(parsed) ? (parsed as DiscoveryId[]) : []);
     } catch {
         return new Set();
@@ -45,7 +46,7 @@ export function markDiscovered(id: DiscoveryId): void {
         const marked = loadMarked();
         if (!marked.has(id)) {
             marked.add(id);
-            localStorage.setItem(KEY, JSON.stringify([...marked]));
+            browserStore.set(KEY, JSON.stringify([...marked]));
         }
     } catch {
         // Best-effort — a checklist item un-ticking is harmless.

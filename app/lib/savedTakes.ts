@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import {
     type Composition,
     decodeComposition,
@@ -117,7 +118,7 @@ export function compositionFromRun(
 
 export function loadTakes(songId: string): Take[] {
     try {
-        const parsed = JSON.parse(localStorage.getItem(storageKey(songId)) ?? "[]");
+        const parsed = JSON.parse(browserStore.get(storageKey(songId)) ?? "[]");
         if (!Array.isArray(parsed)) {
             return [];
         }
@@ -158,7 +159,7 @@ function store(songId: string, takes: Take[]): boolean {
             metrics: take.metrics,
             code: encodeComposition(take.composition),
         }));
-        localStorage.setItem(storageKey(songId), JSON.stringify(stored));
+        browserStore.set(storageKey(songId), JSON.stringify(stored));
         return true;
     } catch {
         return false;

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 export type Theme = "light" | "dark" | "system";
 
 export const THEME_STORAGE_KEY = "plinky:theme";
@@ -8,7 +9,7 @@ const KEY = THEME_STORAGE_KEY;
 
 export function loadTheme(): Theme {
     try {
-        const stored = localStorage.getItem(KEY);
+        const stored = browserStore.get(KEY);
         return stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
     } catch {
         return "system";
@@ -17,7 +18,7 @@ export function loadTheme(): Theme {
 
 export function saveTheme(theme: Theme): void {
     try {
-        localStorage.setItem(KEY, theme);
+        browserStore.set(KEY, theme);
     } catch {
         // Persisting the theme is best-effort; a private-mode failure is harmless.
     }

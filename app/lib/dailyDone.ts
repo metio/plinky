@@ -6,6 +6,7 @@
 // streak: Plinky doesn't count consecutive days or punish a missed one, so there is
 // no pressure to return every day to "keep" anything.
 
+import { browserStore } from "../adapters/browserStore";
 const KEY = "plinky:daily-done";
 
 function clean(value: unknown): number {
@@ -18,7 +19,7 @@ function clean(value: unknown): number {
 // The number of the last daily completed, or 0 if none.
 export function lastDailyDone(): number {
     try {
-        return clean(JSON.parse(localStorage.getItem(KEY) ?? "0"));
+        return clean(JSON.parse(browserStore.get(KEY) ?? "0"));
     } catch {
         return 0;
     }
@@ -31,7 +32,7 @@ export function recordDailyDone(number: number): void {
         return;
     }
     try {
-        localStorage.setItem(KEY, JSON.stringify(Math.floor(number)));
+        browserStore.set(KEY, JSON.stringify(Math.floor(number)));
     } catch {
         // Best-effort: a blocked localStorage just means no ✓ persists.
     }

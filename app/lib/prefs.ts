@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import type { Letter } from "../../core/grade";
 import { type DecayMode, REVIEW_CAP } from "./gradeProgress";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
@@ -127,7 +128,7 @@ function cleanHandSpan(value: unknown): HandSpan {
 
 export function loadPrefs(): Prefs {
     try {
-        const parsed = JSON.parse(localStorage.getItem(KEY) ?? "{}");
+        const parsed = JSON.parse(browserStore.get(KEY) ?? "{}");
         return {
             sound: typeof parsed.sound === "boolean" ? parsed.sound : DEFAULTS.sound,
             volume:
@@ -181,7 +182,7 @@ export const PREFS_CHANGED_EVENT = "plinky:prefs-changed";
 
 export function savePrefs(prefs: Prefs): void {
     try {
-        localStorage.setItem(KEY, JSON.stringify({ ...prefs, volume: clampVolume(prefs.volume) }));
+        browserStore.set(KEY, JSON.stringify({ ...prefs, volume: clampVolume(prefs.volume) }));
         if (typeof window !== "undefined") {
             window.dispatchEvent(new Event(PREFS_CHANGED_EVENT));
         }

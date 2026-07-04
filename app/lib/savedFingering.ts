@@ -8,6 +8,8 @@
 // survives sliding the practice window around.
 
 // "left|right:bar:pos:note" → finger (1–5).
+
+import { browserStore } from "../adapters/browserStore";
 export type FingerMap = Record<string, number>;
 
 const storageKey = (songId: string) => `plinky:fingering:${songId}`;
@@ -18,7 +20,7 @@ export function fingerKey(hand: "left" | "right", bar: number, pos: number, note
 
 export function loadSongFingering(songId: string): FingerMap {
     try {
-        const parsed = JSON.parse(localStorage.getItem(storageKey(songId)) ?? "{}");
+        const parsed = JSON.parse(browserStore.get(storageKey(songId)) ?? "{}");
         if (!parsed || typeof parsed !== "object") {
             return {};
         }
@@ -38,7 +40,7 @@ export function loadSongFingering(songId: string): FingerMap {
 
 function save(songId: string, map: FingerMap): void {
     try {
-        localStorage.setItem(storageKey(songId), JSON.stringify(map));
+        browserStore.set(storageKey(songId), JSON.stringify(map));
     } catch {
         // Best-effort, like the rest of the local state.
     }
@@ -63,7 +65,7 @@ export function setFinger(
 // Clear every saved finger for a song — the "start this piece's fingering over" action.
 export function clearSongFingering(songId: string): void {
     try {
-        localStorage.removeItem(storageKey(songId));
+        browserStore.remove(storageKey(songId));
     } catch {
         // Best-effort.
     }

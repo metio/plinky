@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { packToCode, unpackFromCode } from "../../core/shareCode";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
@@ -194,7 +195,7 @@ export function decodeAssignmentLink(code: string): Assignment | null {
 
 export function loadAssignments(): Assignment[] {
     try {
-        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+        const parsed = JSON.parse(browserStore.get(STORAGE_KEY) ?? "[]");
         if (!Array.isArray(parsed)) {
             return [];
         }
@@ -220,9 +221,9 @@ export function loadAssignments(): Assignment[] {
 
 function storeAssignments(assignments: Assignment[]): boolean {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(assignments));
-        return true;
+        return browserStore.set(STORAGE_KEY, JSON.stringify(assignments));
     } catch {
+        // A value that cannot be serialized never reaches the store.
         return false;
     }
 }

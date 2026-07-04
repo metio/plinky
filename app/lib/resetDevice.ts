@@ -7,25 +7,16 @@
 // reloads so first-run seeding runs again. Handy for trying flows from scratch in dev,
 // and for a player who wants to start over.
 
+import { browserStore } from "../adapters/browserStore";
+
 const PREFIX = "plinky:";
 
 // Remove all Plinky state from this device and report how many keys were cleared.
 // Other sites' keys are left untouched. Does not reload — the caller decides when.
 export function resetDevice(): number {
-    try {
-        const keys: string[] = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key?.startsWith(PREFIX)) {
-                keys.push(key);
-            }
-        }
-        for (const key of keys) {
-            localStorage.removeItem(key);
-        }
-        return keys.length;
-    } catch {
-        // No storage (SSR) or a browser that blocks it — nothing to clear.
-        return 0;
+    const keys = browserStore.keys().filter((key) => key.startsWith(PREFIX));
+    for (const key of keys) {
+        browserStore.remove(key);
     }
+    return keys.length;
 }

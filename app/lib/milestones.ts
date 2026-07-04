@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { browserStore } from "../adapters/browserStore";
 import { letterMin } from "./mastery";
 
 // Earned moments that surface a shareable card on the run summary. Each fires at most
@@ -19,7 +20,7 @@ const FLAWLESS_KEY = "plinky:flawless-done";
 
 export function reachedGrade(): number {
     try {
-        const raw = Number(localStorage.getItem(REACHED_GRADE_KEY));
+        const raw = Number(browserStore.get(REACHED_GRADE_KEY));
         return Number.isFinite(raw) ? raw : 0;
     } catch {
         // No storage (SSR) or a browser that blocks it — nothing celebrated yet.
@@ -29,7 +30,7 @@ export function reachedGrade(): number {
 
 export function recordReachedGrade(grade: number): void {
     try {
-        localStorage.setItem(REACHED_GRADE_KEY, String(Math.max(reachedGrade(), grade)));
+        browserStore.set(REACHED_GRADE_KEY, String(Math.max(reachedGrade(), grade)));
     } catch {
         // Best-effort — a milestone showing twice is harmless.
     }
@@ -37,7 +38,7 @@ export function recordReachedGrade(grade: number): void {
 
 export function flawlessDone(): boolean {
     try {
-        return localStorage.getItem(FLAWLESS_KEY) === "1";
+        return browserStore.get(FLAWLESS_KEY) === "1";
     } catch {
         // No storage (SSR) or a browser that blocks it — treat as not yet fired.
         return false;
@@ -46,7 +47,7 @@ export function flawlessDone(): boolean {
 
 export function recordFlawless(): void {
     try {
-        localStorage.setItem(FLAWLESS_KEY, "1");
+        browserStore.set(FLAWLESS_KEY, "1");
     } catch {
         // Best-effort.
     }

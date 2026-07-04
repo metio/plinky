@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Letter } from "../../core/grade";
+import { browserStore } from "../adapters/browserStore";
 import { PRACTICE_EVENT } from "./history";
 
 // Spaced-repetition state for one score: the best score so far, whether it is
@@ -76,47 +77,39 @@ export function letterMin(letter: Letter): number {
 
 export function loadMastery(id: string): Mastery | null {
     try {
-        const raw = localStorage.getItem(storageKey(id));
+        const raw = browserStore.get(storageKey(id));
         return raw ? normalizeMastery(JSON.parse(raw)) : null;
     } catch {
+        // Skip a corrupt entry rather than crashing the caller.
         return null;
     }
 }
 
 export function saveMastery(id: string, mastery: Mastery): void {
-    try {
-        localStorage.setItem(storageKey(id), JSON.stringify(mastery));
-        // Mastery feeds the header's grade badge; nudge it to refresh without a reload.
-        if (typeof window !== "undefined") {
-            window.dispatchEvent(new Event(PRACTICE_EVENT));
-        }
-    } catch {
-        // Ignore quota or serialization failures — mastery is best-effort.
+    browserStore.set(storageKey(id), JSON.stringify(mastery));
+    // Mastery feeds the header's grade badge; nudge it to refresh without a reload.
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(PRACTICE_EVENT));
     }
 }
 
 export function loadAllMastery(): Array<{ id: string; mastery: Mastery }> {
     const out: Array<{ id: string; mastery: Mastery }> = [];
-    try {
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (!key?.startsWith(PREFIX)) {
-                continue;
-            }
-            try {
-                const raw = localStorage.getItem(key);
-                if (raw) {
-                    out.push({
-                        id: key.slice(PREFIX.length),
-                        mastery: normalizeMastery(JSON.parse(raw)),
-                    });
-                }
-            } catch {
-                // Skip a corrupt entry rather than failing the whole list.
-            }
+    for (const key of browserStore.keys()) {
+        if (!key.startsWith(PREFIX)) {
+            continue;
         }
-    } catch {
-        // No storage (SSR) or a browser that blocks it — nothing mastered yet.
+        try {
+            const raw = browserStore.get(key);
+            if (raw) {
+                out.push({
+                    id: key.slice(PREFIX.length),
+                    mastery: normalizeMastery(JSON.parse(raw)),
+                });
+            }
+        } catch {
+            // Skip a corrupt entry rather than failing the whole list.
+        }
     }
     return out;
 }
