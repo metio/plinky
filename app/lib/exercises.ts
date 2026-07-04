@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { DEFAULT_SONG_SOURCE } from "./attribution";
+import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
 import type { Score } from "./catalog";
-import { type ExerciseConfig, exerciseTitle, generateExercise } from "./exerciseGen";
-import { decompressMxl } from "./musicxmlFile";
+import { type ExerciseConfig, exerciseTitle, generateExercise } from "../../core/exerciseGen";
+import { decompressMxl } from "../../core/musicxmlFile";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the fly
 // from the id's config (zero storage, every form instantly available). Curated

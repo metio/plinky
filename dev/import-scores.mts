@@ -24,8 +24,8 @@ import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
-import { songId } from "../app/lib/songId.ts";
-import { licenseDir } from "../app/lib/attribution.ts";
+import { songId } from "../core/songId.ts";
+import { licenseDir } from "../core/attribution.ts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");

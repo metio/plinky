@@ -20,13 +20,13 @@ import {
     type RecordedNote,
     toMidiNotes,
     toMusicXml,
-} from "../lib/composition";
-import { followKeyboardWindow, type Span } from "../lib/keyboardWindow";
-import { buildMidiFile } from "../lib/midiFile";
+} from "../../core/composition";
+import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
+import { buildMidiFile } from "../../core/midiFile";
 import { markDiscovered } from "../lib/onboarding";
 import { loadPrefs } from "../lib/prefs";
 import { fileStem } from "../lib/printScore";
-import { routeMeta } from "../lib/site";
+import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import type { Route } from "./+types/compose";
@@ -304,12 +304,12 @@ export default function Compose() {
                 bytes[0] === 0x4d && bytes[1] === 0x54 && bytes[2] === 0x68 && bytes[3] === 0x64;
             let loaded: Composition | null = null;
             if (isMidi) {
-                const { parseMidiFile } = await import("../lib/midiParse");
+                const { parseMidiFile } = await import("../../core/midiParse");
                 loaded = parseMidiFile(bytes);
             } else {
                 const [{ readScoreFile }, { parseMusicXml }] = await Promise.all([
-                    import("../lib/musicxmlFile"),
-                    import("../lib/musicxmlParse"),
+                    import("../../core/musicxmlFile"),
+                    import("../../core/musicxmlParse"),
                 ]);
                 const xml = await readScoreFile(file);
                 loaded = xml ? parseMusicXml(xml) : null;

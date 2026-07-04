@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it } from "vitest";
 import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "./recording";
-import { packToCode } from "./shareCode";
+import { packToCode } from "../../core/shareCode";
 
 afterEach(() => localStorage.clear());
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { ReviewSession } from "../components/reviewSession";
-import { routeMeta } from "../lib/site";
+import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/review";
 

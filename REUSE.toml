@@ -24,7 +24,7 @@ SPDX-License-Identifier = "CC0-1.0"
 # OpenScore Lieder, KernScores, Mutopia, ASAP, DCMLab, CPDL), stored as compressed .mxl.
 # Each id is a content fingerprint that carries no licence, so the files are grouped into a
 # subdirectory per SPDX licence and annotated one glob each. The per-piece source and
-# editor credit shown to users comes from the manifest (app/lib/attribution.ts), not here.
+# editor credit shown to users comes from the manifest (core/attribution.ts), not here.
 [[annotations]]
 path = ["public/songs/cc0-1.0/*.mxl"]
 precedence = "override"

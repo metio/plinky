@@ -6,7 +6,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import type { DailyResult } from "../lib/dailyResult";
-import { generatePhrase } from "../lib/generator";
+import { generatePhrase } from "../../core/generator";
 import { loadPrefs } from "../lib/prefs";
 import { encodeGhost, saveGhost } from "../lib/recording";
 import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../lib/scoreColor";

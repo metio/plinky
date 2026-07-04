@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Letter } from "./grade";
+import type { Letter } from "../../core/grade";
 import { PRACTICE_EVENT } from "./history";
 
 // Spaced-repetition state for one score: the best score so far, whether it is

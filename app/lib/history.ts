@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { todayKey } from "./daily";
+import { todayKey } from "../../core/daily";
 
 const KEY = "plinky:history";
 

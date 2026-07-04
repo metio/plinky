@@ -4,7 +4,7 @@
 
 import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { DEFAULT_KEY_MAP } from "../lib/keyMap";
+import { DEFAULT_KEY_MAP } from "../../core/keyMap";
 import { savePrefs } from "../lib/prefs";
 import { useSynth } from "./useSynth";
 

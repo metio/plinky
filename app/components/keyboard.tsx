@@ -3,7 +3,7 @@
 
 import type React from "react";
 import { type ReactNode, useEffect, useState } from "react";
-import { noteName, pitchClass } from "../lib/midi";
+import { noteName, pitchClass } from "../../core/midi";
 import type { NoteLabels } from "../lib/prefs";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
 

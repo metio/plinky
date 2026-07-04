@@ -8,12 +8,12 @@ import { LocalizedLink as Link } from "../components/localizedLink";
 import { GradeChip } from "../components/scoreGrade";
 import { StaffPreview } from "../components/staffPreview";
 import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "../lib/catalog";
-import { readScoreFile } from "../lib/musicxmlFile";
+import { readScoreFile } from "../../core/musicxmlFile";
 import { markDiscovered } from "../lib/onboarding";
 import { gradeOf } from "../lib/scoreDifficulty";
-import { songId } from "../lib/songId";
+import { songId } from "../../core/songId";
 import { loadManifest } from "../lib/songs";
-import { routeMeta } from "../lib/site";
+import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/libraryImport";
 

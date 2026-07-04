@@ -4,7 +4,7 @@
 
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import type { Grid } from "../lib/shareCard";
+import type { Grid } from "../../core/shareCard";
 import { ShareCard } from "./shareCard";
 
 afterEach(cleanup);

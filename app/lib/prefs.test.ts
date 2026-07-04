@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
-import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
+import { DEFAULT_KEY_MAP, rebind } from "../../core/keyMap";
 import { loadPrefs, type Prefs, savePrefs } from "./prefs";
 
 afterEach(() => localStorage.clear());

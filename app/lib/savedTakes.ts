@@ -6,8 +6,8 @@ import {
     decodeComposition,
     encodeComposition,
     type RecordedNote,
-} from "./composition";
-import { type Grade, parseGrade } from "./grade";
+} from "../../core/composition";
+import { type Grade, parseGrade } from "../../core/grade";
 
 // A saved performance of a piece — your own play, kept per song so you can hear it
 // back, download it, and (the fastest one) race it as your ghost. A take IS a

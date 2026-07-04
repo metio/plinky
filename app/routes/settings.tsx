@@ -11,9 +11,9 @@ import { MidiConnect } from "../components/midiConnect";
 import { ThemeToggle } from "../components/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
-import type { Letter } from "../lib/grade";
+import type { Letter } from "../../core/grade";
 import type { DecayMode } from "../lib/gradeProgress";
-import { DEFAULT_KEY_MAP } from "../lib/keyMap";
+import { DEFAULT_KEY_MAP } from "../../core/keyMap";
 import {
     loadPrefs,
     type NoteHints,
@@ -22,7 +22,7 @@ import {
     REVIEW_CAPS,
     savePrefs,
 } from "../lib/prefs";
-import { routeMeta } from "../lib/site";
+import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
 

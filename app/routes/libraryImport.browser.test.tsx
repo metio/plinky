@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { loadBundledScores, loadUserScores } from "../lib/catalog";
-import { generatePhrase } from "../lib/generator";
+import { generatePhrase } from "../../core/generator";
 import LibraryImportRoute from "./libraryImport";
 
 const mount = () =>

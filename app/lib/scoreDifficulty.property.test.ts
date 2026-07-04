@@ -5,7 +5,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { type Composition, toMusicXml } from "./composition";
+import { type Composition, toMusicXml } from "../../core/composition";
 import { gradeOf, MAX_GRADE, rawDifficulty } from "./scoreDifficulty";
 
 const arbNote = fc.record({

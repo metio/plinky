@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { fingerPositions } from "./fingering";
+import { fingerPositions } from "../../core/fingering";
 import type { HandSpan } from "./prefs";
 import { type FingerMap, fingerKey } from "./savedFingering";
-import { scoreToBars } from "./scoreToBars";
+import { scoreToBars } from "../../core/scoreToBars";
 
 // Suggested fingering belongs on the staff, the way printed music carries it —
 // tied to the note you read, not mapped onto a key. This annotates a score's

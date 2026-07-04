@@ -10,7 +10,7 @@ import {
     setFinger,
 } from "../lib/savedFingering";
 import { loadPrefs, savePrefs } from "../lib/prefs";
-import { scoreToBars, staffFor, windowCells, windowPositions } from "../lib/scoreToBars";
+import { scoreToBars, staffFor, windowCells, windowPositions } from "../../core/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
 import { WindowStaff } from "./windowStaff";

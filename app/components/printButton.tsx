@@ -4,7 +4,7 @@
 import { annotateFingerings } from "../lib/fingerScore";
 import { loadPrefs } from "../lib/prefs";
 import { buildPrintDocument, printViaIframe } from "../lib/printScore";
-import { transposeMusicXml } from "../lib/transpose";
+import { transposeMusicXml } from "../../core/transpose";
 import { m } from "../paraglide/messages.js";
 import { IconButton } from "./button";
 import { PrinterIcon } from "./icons";

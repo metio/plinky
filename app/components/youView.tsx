@@ -20,10 +20,10 @@ import {
 } from "../lib/gradeProgress";
 import { loadHistory, type PracticeSummary, summarizePractice } from "../lib/history";
 import { loadLifetime, progressGrid } from "../lib/lifetime";
-import { svgMilestone } from "../lib/milestoneCard";
+import { svgMilestone } from "../../core/milestoneCard";
 import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
-import type { Grid } from "../lib/shareCard";
+import type { Grid } from "../../core/shareCard";
 import { m } from "../paraglide/messages.js";
 import { buttonClasses } from "./button";
 import { Show } from "./conditional";

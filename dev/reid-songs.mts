@@ -10,8 +10,8 @@
 import { readFileSync } from "node:fs";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { strFromU8, unzipSync } from "fflate";
-import { licenseDir } from "../app/lib/attribution.ts";
-import { songId } from "../app/lib/songId.ts";
+import { licenseDir } from "../core/attribution.ts";
+import { songId } from "../core/songId.ts";
 
 const OUT = "public/songs";
 

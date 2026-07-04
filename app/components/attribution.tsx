@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { attributionFor } from "../lib/attribution";
+import { attributionFor } from "../../core/attribution";
 import { m } from "../paraglide/messages.js";
 
 // A subtle provenance line for a catalogue piece: its licence (linking to the

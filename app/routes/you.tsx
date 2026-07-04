@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { YouView } from "../components/youView";
-import { routeMeta } from "../lib/site";
+import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/you";
 

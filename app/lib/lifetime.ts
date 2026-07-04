@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { todayKey } from "./daily";
-import { type Grid, toGrid } from "./shareCard";
+import { todayKey } from "../../core/daily";
+import { type Grid, toGrid } from "../../core/shareCard";
 
 // A slow-moving skill fingerprint: the player's Accuracy, Timing and Flow tracked
 // across their practice days, each smoothed with an exponential moving average so

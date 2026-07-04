@@ -41,7 +41,7 @@ export default defineConfig({
             // uniformly in both the node and browser projects and merges into one
             // report — v8 does not instrument browser-run code here.
             provider: "istanbul",
-            include: ["app/**/*.{ts,tsx}"],
+            include: ["app/**/*.{ts,tsx}", "core/**/*.ts"],
             // The Paraglide output is generated, and its .d.ts files are not valid
             // runtime modules for the instrumenter to parse.
             exclude: ["app/paraglide/**", "**/*.d.ts"],
@@ -63,17 +63,21 @@ export default defineConfig({
                 test: {
                     name: "node",
                     environment: "node",
-                    // dev/ holds the catalogue build tooling (import filters, grading);
-                    // its pure logic is unit-tested here even though it never ships.
-                    include: ["app/**/*.test.{ts,tsx}", "dev/**/*.test.mts"],
-                    exclude: ["app/**/*.browser.test.*"],
+                    // core/ is the pure domain layer and dev/ the catalogue build tooling
+                    // (import filters, grading); both are unit-tested here alongside app/.
+                    include: [
+                        "app/**/*.test.{ts,tsx}",
+                        "core/**/*.test.{ts,tsx}",
+                        "dev/**/*.test.mts",
+                    ],
+                    exclude: ["app/**/*.browser.test.*", "core/**/*.browser.test.*"],
                     setupFiles: ["./app/test-setup.ts", "./app/test-setup.node.ts"],
                 },
             },
             {
                 test: {
                     name: "browser",
-                    include: ["app/**/*.browser.test.{ts,tsx}"],
+                    include: ["app/**/*.browser.test.{ts,tsx}", "core/**/*.browser.test.{ts,tsx}"],
                     setupFiles: ["./app/test-setup.ts"],
                     browser: {
                         enabled: true,

@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
-import type { Composition } from "./composition";
+import type { Composition } from "../../core/composition";
 import { withDeniedStorage } from "./deniedStorage";
 import {
     type ActiveHolds,

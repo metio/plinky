@@ -7,7 +7,7 @@ import { HeroKeyboard } from "../components/heroKeyboard";
 import { BookIcon, ListIcon, NotesIcon } from "../components/icons";
 import { HomeToday } from "../components/homeToday";
 import { LocalizedLink as Link } from "../components/localizedLink";
-import { socialMeta, structuredData } from "../lib/site";
+import { socialMeta, structuredData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/home";

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { packToCode, unpackFromCode } from "./shareCode";
+import { packToCode, unpackFromCode } from "../../core/shareCode";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
 // imported scores, or finger exercises) with an optional target tempo and note per

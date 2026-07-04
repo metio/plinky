@@ -4,7 +4,7 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { collectSteps } from "../hooks/useScoreMatcher";
-import { generatePhrase } from "./generator";
+import { generatePhrase } from "../../core/generator";
 import { collectNoteElements } from "./scoreColor";
 
 // OSMD renders only in a real browser, so this runs in the browser project.

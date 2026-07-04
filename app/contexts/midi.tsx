@@ -24,8 +24,8 @@ import {
     type MidiNoteEvent,
     type MidiStatus,
     type MidiSupport,
-} from "../lib/midi";
-import { DEFAULT_KEY_MAP, type KeyMap } from "../lib/keyMap";
+} from "../../core/midi";
+import { DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
 import { loadPrefs, PREFS_CHANGED_EVENT } from "../lib/prefs";
 import { resetDevice } from "../lib/resetDevice";
 

@@ -4,7 +4,7 @@
 
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { MidiDevice } from "../lib/midi";
+import type { MidiDevice } from "../../core/midi";
 import { MidiBadge } from "./midiBadge";
 
 const { connectionMock } = vi.hoisted(() => ({ connectionMock: vi.fn() }));

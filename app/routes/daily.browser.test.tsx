@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
-import { dailyNumber, todayKey } from "../lib/daily";
+import { dailyNumber, todayKey } from "../../core/daily";
 import { saveDailyResult } from "../lib/dailyResult";
 import Daily from "./daily";
 

@@ -4,7 +4,7 @@
 import type { Preview } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 import { MidiProvider } from "../app/contexts/midi";
-import { localeNames } from "../app/lib/locales";
+import { localeNames } from "../core/locales";
 import { locales, overwriteGetLocale } from "../app/paraglide/runtime.js";
 import "../app/app.css";
 

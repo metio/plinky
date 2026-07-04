@@ -11,8 +11,8 @@ const logo = readFileSync("public/logo-stacked.svg", "utf8");
 
 // Mirror the watermark to the canonical SITE_URL so the card never advertises a
 // stale domain. Read it straight from site.ts rather than hardcoding a copy.
-const siteUrl = readFileSync("app/lib/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1];
-if (!siteUrl) throw new Error("could not find SITE_URL in app/lib/site.ts");
+const siteUrl = readFileSync("core/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1];
+if (!siteUrl) throw new Error("could not find SITE_URL in core/site.ts");
 const host = new URL(siteUrl).host;
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>

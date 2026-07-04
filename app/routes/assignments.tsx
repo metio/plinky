@@ -24,8 +24,8 @@ import {
 import { loadCatalog } from "../lib/catalog";
 import { type ExerciseMeta, loadExerciseManifest } from "../lib/exercises";
 import { loadMastery } from "../lib/mastery";
-import { routeMeta, SITE_URL } from "../lib/site";
-import { trackSteps } from "../lib/tracks";
+import { routeMeta, SITE_URL } from "../../core/site";
+import { trackSteps } from "../../core/tracks";
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import type { Route } from "./+types/assignments";

@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { performanceNotes, plotPerformance } from "../lib/performance";
-import { PRECISE_TOLERANCE, type Rating } from "../lib/rhythm";
-import type { RunNote } from "../lib/shareCard";
+import { performanceNotes, plotPerformance } from "../../core/performance";
+import { PRECISE_TOLERANCE, type Rating } from "../../core/rhythm";
+import type { RunNote } from "../../core/shareCard";
 import { m } from "../paraglide/messages.js";
 
 // Each note's timing band, matched to the share emoji and the run grade.

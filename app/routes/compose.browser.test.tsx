@@ -66,7 +66,7 @@ describe("Compose", () => {
 
     it("loads a shared composition from the url", async () => {
         // ?c= is produced by encodeComposition; render under that search param.
-        const { encodeComposition } = await import("../lib/composition");
+        const { encodeComposition } = await import("../../core/composition");
         const code = encodeComposition({
             notes: [
                 { pitch: 60, startMs: 0, durationMs: 400, velocity: 90 },
@@ -106,8 +106,8 @@ describe("Compose", () => {
     });
 
     it("confirms before an opened file replaces a non-empty take", async () => {
-        const { toMidiNotes } = await import("../lib/composition");
-        const { buildMidiFile } = await import("../lib/midiFile");
+        const { toMidiNotes } = await import("../../core/composition");
+        const { buildMidiFile } = await import("../../core/midiFile");
         const bytes = buildMidiFile(
             toMidiNotes({
                 notes: [
@@ -136,8 +136,8 @@ describe("Compose", () => {
     });
 
     it("loads notes from an opened MIDI file", async () => {
-        const { toMidiNotes } = await import("../lib/composition");
-        const { buildMidiFile } = await import("../lib/midiFile");
+        const { toMidiNotes } = await import("../../core/composition");
+        const { buildMidiFile } = await import("../../core/midiFile");
         const bytes = buildMidiFile(
             toMidiNotes({
                 notes: [

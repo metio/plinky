@@ -17,7 +17,7 @@ const locales = new Set(settings.locales);
 const baseLocale = settings.baseLocale;
 
 // Single source of truth for the origin: read it from site.ts rather than duplicate.
-const SITE_URL = readFileSync("app/lib/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)[1];
+const SITE_URL = readFileSync("core/site.ts", "utf8").match(/SITE_URL\s*=\s*"([^"]+)"/)[1];
 
 // Collect the directory of every prerendered index.html (the bare-root redirect
 // shell at "" is excluded — it carries no indexable content).

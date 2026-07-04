@@ -3,7 +3,7 @@
 
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { drillToMusicXml } from "../lib/drillStaff";
+import { drillToMusicXml } from "../../core/drillStaff";
 import { StaffPreview } from "./staffPreview";
 
 afterEach(cleanup);

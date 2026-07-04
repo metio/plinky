@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Grade } from "./grade";
-import type { Grid, RunNote } from "./shareCard";
+import type { Grade } from "../../core/grade";
+import type { Grid, RunNote } from "../../core/shareCard";
 
 // The finished daily run, kept so re-opening the day's challenge shows the result
 // rather than a blank slate — the home "see your results" link has somewhere to lead.

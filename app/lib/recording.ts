@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { packToCode, unpackFromCode } from "./shareCode";
+import { packToCode, unpackFromCode } from "../../core/shareCode";
 
 // A "ghost": the note onset times of a completed run on a score, each in ms from
 // the run's first note, ascending. Replaying the clock against these lets a later

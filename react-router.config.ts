@@ -4,7 +4,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
-import { songId } from "./app/lib/songId";
+import { songId } from "./core/songId";
 
 // The static routes, in canonical (unprefixed) form. generateStaticLocalizedUrls
 // expands each into one prefixed path per locale (/en/scores, /de/scores, …).

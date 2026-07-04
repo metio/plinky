@@ -4,7 +4,7 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { toMusicXml } from "../lib/composition";
+import { toMusicXml } from "../../core/composition";
 import { ExportButton } from "./exportButton";
 
 const xml = toMusicXml({

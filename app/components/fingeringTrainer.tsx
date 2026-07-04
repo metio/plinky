@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "./button";
 import { Show } from "./conditional";
 import { useSynth } from "../hooks/useSynth";
-import { drillToMusicXml } from "../lib/drillStaff";
+import { drillToMusicXml } from "../../core/drillStaff";
 import {
     type FingerQuality,
     type FingerReason,
@@ -13,9 +13,9 @@ import {
     fingerQualities,
     reasonFor,
     scoreFingering,
-} from "../lib/fingeringScore";
-import { GRADE_COLOR, type Letter } from "../lib/grade";
-import { noteName } from "../lib/midi";
+} from "../../core/fingeringScore";
+import { GRADE_COLOR, type Letter } from "../../core/grade";
+import { noteName } from "../../core/midi";
 import { loadPrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 import { StaffPreview } from "./staffPreview";

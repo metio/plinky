@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useMidiConnection } from "../contexts/midi";
-import { noteName } from "../lib/midi";
+import { noteName } from "../../core/midi";
 import { m } from "../paraglide/messages.js";
 import { Button } from "./button";
 import { KeyboardHint } from "./keyboardHint";

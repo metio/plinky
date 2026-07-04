@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { useMidiInput } from "../contexts/midi";
-import { intervalName } from "../lib/intervals";
-import { noteName } from "../lib/midi";
+import { intervalName } from "../../core/intervals";
+import { noteName } from "../../core/midi";
 import { type HandSpan, loadPrefs, savePrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 import { Button } from "./button";

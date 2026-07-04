@@ -3,7 +3,7 @@
 
 import { loadBundledScores, loadUserScores } from "./catalog";
 import { loadExerciseManifest } from "./exercises";
-import type { Letter } from "./grade";
+import type { Letter } from "../../core/grade";
 import { isDue, isLapsed, letterMin, loadAllMastery, type Mastery } from "./mastery";
 import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
 import { loadManifest } from "./songs";

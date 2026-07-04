@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { dailyNumber, todayKey } from "../lib/daily";
+import { dailyNumber, todayKey } from "../../core/daily";
 import { lastDailyDone } from "../lib/dailyDone";
 import {
     currentGrade,
@@ -13,7 +13,7 @@ import {
 } from "../lib/gradeProgress";
 import { loadPrefs } from "../lib/prefs";
 import { MAX_GRADE } from "../lib/scoreDifficulty";
-import { type Task, todayTasks } from "../lib/today";
+import { type Task, todayTasks } from "../../core/today";
 import { m } from "../paraglide/messages.js";
 import { LocalizedLink as Link } from "./localizedLink";
 

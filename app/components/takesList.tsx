@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { toMidiNotes, toMusicXml } from "../lib/composition";
-import { buildMidiFile } from "../lib/midiFile";
+import { toMidiNotes, toMusicXml } from "../../core/composition";
+import { buildMidiFile } from "../../core/midiFile";
 import { fileStem } from "../lib/printScore";
 import { ghostOnsets, type Take } from "../lib/savedTakes";
 import { m } from "../paraglide/messages.js";

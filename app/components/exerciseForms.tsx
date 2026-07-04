@@ -8,7 +8,7 @@ import {
     type Interval,
     isArpeggio,
     supportsIntervals,
-} from "../lib/exerciseGen";
+} from "../../core/exerciseGen";
 import { m } from "../paraglide/messages.js";
 import { Show } from "./conditional";
 import { LocalizedLink as Link } from "./localizedLink";

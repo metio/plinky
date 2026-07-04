@@ -3,7 +3,7 @@
 
 import { lastDailyDone } from "./dailyDone";
 import { loadHistory } from "./history";
-import { isDefaultKeyMap } from "./keyMap";
+import { isDefaultKeyMap } from "../../core/keyMap";
 import { loadAllMastery } from "./mastery";
 import { loadPrefs } from "./prefs";
 

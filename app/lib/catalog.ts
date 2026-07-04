@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { parsePack, serializePack } from "./scorePack";
-import { songId } from "./songId";
+import { parsePack, serializePack } from "../../core/scorePack";
+import { songId } from "../../core/songId";
 
 // The one score catalogue: MusicXML pieces, rendered and practised on OSMD. The
 // bundled public-domain scores ship with the app; user-imported pieces are kept in

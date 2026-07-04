@@ -4,8 +4,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { useSynth } from "../hooks/useSynth";
-import { type MidiNoteEvent, noteName } from "../lib/midi";
-import { scoreToBars, windowPositions } from "../lib/scoreToBars";
+import { type MidiNoteEvent, noteName } from "../../core/midi";
+import { scoreToBars, windowPositions } from "../../core/scoreToBars";
 import { m } from "../paraglide/messages.js";
 import { Button } from "./button";
 import { Show } from "./conditional";

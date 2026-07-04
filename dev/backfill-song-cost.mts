@@ -12,7 +12,7 @@ import { DOMParser } from "linkedom";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty } = await import("../app/lib/scoreDifficulty.ts");
-const { decompressMxl } = await import("../app/lib/musicxmlFile.ts");
+const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
 const DIR = "public/songs";
 

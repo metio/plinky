@@ -17,7 +17,7 @@
     "test": "npm run messages && vitest run --project node",
     "test:browser": "npm run messages && vitest run --project browser",
     "lint": "biome check",
-    "arch": "depcruise app dev react-router.config.ts",
+    "arch": "depcruise core app dev react-router.config.ts",
     "size": "node dev/check-bundle-size.mjs",
     "nav": "node dev/nav-graph.mjs",
     "format": "biome check --write .",

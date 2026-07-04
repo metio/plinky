@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { DEFAULT_SONG_SOURCE, licenseDir } from "./attribution";
+import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import type { Score } from "./catalog";
 import { loadFavorites, toggleFavorite } from "./favorites";
-import { decompressMxl } from "./musicxmlFile";
+import { decompressMxl } from "../../core/musicxmlFile";
 
 // The curated PDMX song catalogue. Unlike the bundled exercises (inlined into the
 // JS) and user imports (kept in localStorage), songs are too many to bundle: a

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { fingerPositions, positionsCost } from "./fingering";
+import { fingerPositions, positionsCost } from "../../core/fingering";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
 // piano-ergonomics engine behind the fingering trainer. Each hand's notes are

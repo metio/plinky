@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type Grid, type Level, shareText, svgCard } from "../lib/shareCard";
+import { type Grid, type Level, shareText, svgCard } from "../../core/shareCard";
 import { ShareButtons } from "./shareButtons";
 
 // On-card cell colours, matched to the share emoji (🟩 / 🟨 / 🟧 / 🟥 / ⬜).

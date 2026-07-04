@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { encodeGhost } from "../lib/recording";
-import { SITE_URL } from "../lib/site";
+import { SITE_URL } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { localizeHref } from "../paraglide/runtime.js";
 import { Button, IconButton } from "./button";

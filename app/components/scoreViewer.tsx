@@ -11,10 +11,10 @@ import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useMetronome } from "../hooks/useMetronome";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../hooks/useScoreMatcher";
 import { useSynth } from "../hooks/useSynth";
-import { summarizeDynamics } from "../lib/dynamics";
+import { summarizeDynamics } from "../../core/dynamics";
 import { annotateFingerings } from "../lib/fingerScore";
-import { computeFlow } from "../lib/flow";
-import { cadence } from "../lib/cadence";
+import { computeFlow } from "../../core/flow";
+import { cadence } from "../../core/cadence";
 import { recordDailyDone } from "../lib/dailyDone";
 import { type DailyResult, saveDailyResult } from "../lib/dailyResult";
 import { recordPractice } from "../lib/history";
@@ -24,11 +24,11 @@ import {
     type Grade,
     type KeepUpResult,
     scoreKeepUp,
-} from "../lib/grade";
+} from "../../core/grade";
 import { currentGrade, loadGradedMastery, skillRating } from "../lib/gradeProgress";
-import { nextKeyboardWindow, type Span } from "../lib/keyboardWindow";
+import { nextKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { recordRun } from "../lib/lifetime";
-import { svgMilestone } from "../lib/milestoneCard";
+import { svgMilestone } from "../../core/milestoneCard";
 import {
     flawlessDone,
     isFirstS,
@@ -43,8 +43,8 @@ import { writeMastery } from "../lib/masteryStore";
 import { useMastery } from "../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES, loadPrefs, savePrefs } from "../lib/prefs";
 import { loadSongFingering } from "../lib/savedFingering";
-import { toReplayEvents } from "../lib/composition";
-import { listenStepMs } from "../lib/playback";
+import { toReplayEvents } from "../../core/composition";
+import { listenStepMs } from "../../core/playback";
 import { decodeGhost, ghostReached, loadGhost, saveGhost } from "../lib/recording";
 import {
     type ActiveHolds,
@@ -58,14 +58,14 @@ import {
     saveTake,
     type Take,
 } from "../lib/savedTakes";
-import { isPreciseInput } from "../lib/midi";
+import { isPreciseInput } from "../../core/midi";
 import {
     LENIENT_TOLERANCE,
     makeHit,
     PRECISE_TOLERANCE,
     summarize,
     timingDeltas,
-} from "../lib/rhythm";
+} from "../../core/rhythm";
 import {
     clearBarSelection,
     clientPointToSvg,
@@ -85,8 +85,8 @@ import {
     SELECT_COLOR,
     WINDOW_COLOR,
 } from "../lib/scoreColor";
-import { type Grid, handGrid, handsPlayed, laggingHand, type RunNote } from "../lib/shareCard";
-import { transposeMusicXml } from "../lib/transpose";
+import { type Grid, handGrid, handsPlayed, laggingHand, type RunNote } from "../../core/shareCard";
+import { transposeMusicXml } from "../../core/transpose";
 import {
     findHotspots,
     type Hotspot,
@@ -94,7 +94,7 @@ import {
     median,
     type TempoPoint,
     tempoSeries,
-} from "../lib/tempo";
+} from "../../core/tempo";
 import { m } from "../paraglide/messages.js";
 import { Bpm } from "./bpm";
 import { Button, IconButton } from "./button";

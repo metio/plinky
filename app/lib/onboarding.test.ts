@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { recordDailyDone } from "./dailyDone";
 import { recordPractice } from "./history";
-import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
+import { DEFAULT_KEY_MAP, rebind } from "../../core/keyMap";
 import { markLearned, saveMastery } from "./mastery";
 import { discoveries, discoveryProgress, markDiscovered } from "./onboarding";
 import { loadPrefs, savePrefs } from "./prefs";

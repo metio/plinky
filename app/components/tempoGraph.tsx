@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Hotspot, TempoPoint } from "../lib/tempo";
+import type { Hotspot, TempoPoint } from "../../core/tempo";
 import { m } from "../paraglide/messages.js";
 
 const WIDTH = 600;

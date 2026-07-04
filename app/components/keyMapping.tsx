@@ -11,7 +11,7 @@ import {
     NOTE_LABELS,
     rebind,
     SEMITONES,
-} from "../lib/keyMap";
+} from "../../core/keyMap";
 import { loadPrefs, savePrefs } from "../lib/prefs";
 import { m } from "../paraglide/messages.js";
 import { Button } from "./button";

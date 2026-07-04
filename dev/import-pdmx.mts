@@ -21,8 +21,8 @@ import { copyrightReason } from "./copyrightSignals.mts";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { isPublicDomain } from "./publicDomain.mts";
 import { nonSoloPianoReason } from "./scoreInstrument.mts";
-import { songId } from "../app/lib/songId.ts";
-import { licenseDir } from "../app/lib/attribution.ts";
+import { songId } from "../core/songId.ts";
+import { licenseDir } from "../core/attribution.ts";
 // @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");

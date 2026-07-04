@@ -19,7 +19,7 @@ import { HeaderNav } from "./components/navBar";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
-import { ogLocale, SITE_URL } from "./lib/site";
+import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
 import {
     baseLocale,

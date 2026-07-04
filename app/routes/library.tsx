@@ -15,7 +15,7 @@ import { loadExerciseManifest } from "../lib/exercises";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, loadAllMastery, type Mastery } from "../lib/mastery";
 import { gradeOf, MAX_GRADE } from "../lib/scoreDifficulty";
-import { routeMeta } from "../lib/site";
+import { routeMeta } from "../../core/site";
 import { loadManifest } from "../lib/songs";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 // Emits the finger-exercise metadata the app browses. The exercises themselves are
-// generated client-side from their config (app/lib/exerciseGen.ts) — this just
+// generated client-side from their config (core/exerciseGen.ts) — this just
 // precomputes the grade of each of the 96 canonical tiles so the library can filter
 // by grade without parsing MusicXML per row, ordered easiest-first within a grade.
 //
@@ -16,13 +16,13 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSyn
 import { parse } from "csv-parse/sync";
 import { strFromU8, unzipSync } from "fflate";
 import { DOMParser } from "linkedom";
-import { songId } from "../app/lib/songId.ts";
-import type { ExerciseConfig } from "../app/lib/exerciseGen.ts";
+import { songId } from "../core/songId.ts";
+import type { ExerciseConfig } from "../core/exerciseGen.ts";
 // @ts-expect-error - the grading engine calls the global DOMParser, as in the browser
 globalThis.DOMParser = DOMParser;
 const { gradeOf, rawDifficulty } = await import("../app/lib/scoreDifficulty.ts");
 const { EXERCISE_TILES, buildExerciseId, exerciseTitle, generateExercise } = await import(
-    "../app/lib/exerciseGen.ts"
+    "../core/exerciseGen.ts"
 );
 
 const OUT = "public/exercises";

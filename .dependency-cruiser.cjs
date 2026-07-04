@@ -35,9 +35,10 @@ module.exports = {
             name: "core-stays-pure",
             comment:
                 "core/ is the pure domain layer: it may depend on nothing but itself. No React, no " +
-                "OpenSheetMusicDisplay, and no reaching up into app/. Extract the pure half instead.",
+                "OpenSheetMusicDisplay, and no reaching up into app/. Extract the pure half instead. " +
+                "Tests are exempt — a browser test may render a pure module through OSMD to verify it.",
             severity: "error",
-            from: { path: "^core/" },
+            from: { path: "^core/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
             to: {
                 path: [
                     "^app/",
@@ -54,7 +55,7 @@ module.exports = {
                 "app/ports/ holds interfaces only — it may import core types but nothing that " +
                 "implements or consumes a port (adapters, stores, hooks, components, routes, react).",
             severity: "error",
-            from: { path: "^app/ports/" },
+            from: { path: "^app/ports/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
             to: {
                 path: [
                     "^app/adapters/",
@@ -73,7 +74,7 @@ module.exports = {
                 "app/adapters/ implements ports over core; it must not reach up into stores, hooks, " +
                 "components or routes.",
             severity: "error",
-            from: { path: "^app/adapters/" },
+            from: { path: "^app/adapters/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
             to: {
                 path: ["^app/stores/", "^app/hooks/", "^app/components/", "^app/routes/"],
             },
@@ -84,7 +85,7 @@ module.exports = {
                 "app/stores/ is the single-source-of-truth state layer over core + ports; it must not " +
                 "import React glue (hooks), components or routes.",
             severity: "error",
-            from: { path: "^app/stores/" },
+            from: { path: "^app/stores/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
             to: { path: ["^app/hooks/", "^app/components/", "^app/routes/"] },
         },
         {
@@ -94,7 +95,7 @@ module.exports = {
                 "may compose core + other ui + react, but never stores, adapters, contexts, effectful " +
                 "hooks or the legacy lib/. Tightened to error once the ui/features split lands.",
             severity: "warn",
-            from: { path: "^app/components/ui/" },
+            from: { path: "^app/components/ui/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
             to: {
                 path: [
                     "^app/stores/",

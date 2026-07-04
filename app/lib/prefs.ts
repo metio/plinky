@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Letter } from "./grade";
+import type { Letter } from "../../core/grade";
 import { type DecayMode, REVIEW_CAP } from "./gradeProgress";
-import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
 
 // A hand's comfortable thumb-to-pinky reach in semitones, or null when unmeasured
 // — people with one hand set only the hand they have. Personalizes the suggested

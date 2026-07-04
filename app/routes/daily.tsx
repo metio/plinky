@@ -7,10 +7,10 @@ import { CoachMark } from "../components/coachMark";
 import { LocalizedLink as Link } from "../components/localizedLink";
 import { ScoreViewer } from "../components/scoreViewer";
 import { SegmentedControl } from "../components/segmentedControl";
-import { dailyChallenge, dailyNumber, todayKey } from "../lib/daily";
+import { dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
 import { type DailyResult, loadDailyResult } from "../lib/dailyResult";
-import { generatePhrase } from "../lib/generator";
-import { routeMeta } from "../lib/site";
+import { generatePhrase } from "../../core/generator";
+import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/daily";
 

@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { toMidiNotes } from "../lib/composition";
-import { buildMidiFile } from "../lib/midiFile";
-import { parseMusicXml } from "../lib/musicxmlParse";
+import { toMidiNotes } from "../../core/composition";
+import { buildMidiFile } from "../../core/midiFile";
+import { parseMusicXml } from "../../core/musicxmlParse";
 import { fileStem } from "../lib/printScore";
-import { transposeMusicXml } from "../lib/transpose";
+import { transposeMusicXml } from "../../core/transpose";
 import { m } from "../paraglide/messages.js";
 import { IconButton } from "./button";
 import { NotesIcon } from "./icons";
