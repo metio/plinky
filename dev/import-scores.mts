@@ -139,6 +139,26 @@ const CONFIGS: Record<string, SourceConfig> = {
         gate: nonSoloPianoReason,
         titleField: "movement",
     },
+    // Public-domain choral editions from CPDL (ChoralWiki), reduced to a two-staff piano
+    // grand staff by dev/cpdl-harvest.py (run separately — it scrapes + needs music21).
+    // Only CC0/CC-BY/CC-BY-SA/PD editions are harvested; the licence varies per edition,
+    // so the harvester encodes each one's SPDX bucket in the filename (like Mutopia).
+    cpdl: {
+        repos: [],
+        preconverted: true,
+        license: "CC0-1.0",
+        bucketLicense: {
+            cc0: "CC0-1.0",
+            by40: "CC-BY-4.0",
+            by30: "CC-BY-3.0",
+            by25: "CC-BY-2.5",
+            bysa40: "CC-BY-SA-4.0",
+            bysa30: "CC-BY-SA-3.0",
+            bysa25: "CC-BY-SA-2.5",
+        },
+        gate: nonSoloPianoReason,
+        titleField: "work",
+    },
 };
 
 type SongMeta = {

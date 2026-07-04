@@ -104,6 +104,51 @@ precedence = "override"
 SPDX-FileCopyrightText = "The DCMLab corpus editors"
 SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
 
+# CPDL (ChoralWiki) choral editions reduced to piano. The licence varies per edition, so
+# dev/cpdl-harvest.py encodes each one's SPDX bucket in the filename; each bucket overrides
+# the CC0 default for its files.
+[[annotations]]
+path = ["public/songs/cpdl-cc0-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["public/songs/cpdl-by40-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["public/songs/cpdl-by30-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = ["public/songs/cpdl-by25-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC-BY-2.5"
+
+[[annotations]]
+path = ["public/songs/cpdl-bysa40-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = ["public/songs/cpdl-bysa30-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+[[annotations]]
+path = ["public/songs/cpdl-bysa25-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The CPDL editors"
+SPDX-License-Identifier = "CC-BY-SA-2.5"
+
 [[annotations]]
 path = ["public/songs/manifest.json", "public/songs/seed.json"]
 precedence = "override"
