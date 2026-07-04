@@ -115,6 +115,17 @@ const CONFIGS: Record<string, SourceConfig> = {
         // the rest untouched.
         reorderComposer: true,
     },
+    // Solo-piano classical scores from the ASAP dataset (CC-BY-NC-SA-4.0). ASAP ships
+    // plain .musicxml with no embedded title/composer; dev/asap-preconvert.mts injects
+    // those from its metadata.csv and writes .mxl into sources/asap/_mxl, so this ingests
+    // it as a preconverted source. The composer names are already "First Last".
+    asap: {
+        repos: [],
+        preconverted: true,
+        license: "CC-BY-NC-SA-4.0",
+        gate: nonSoloPianoReason,
+        titleField: "work",
+    },
 };
 
 type SongMeta = {

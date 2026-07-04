@@ -88,6 +88,14 @@ precedence = "override"
 SPDX-FileCopyrightText = "Craig Stuart Sapp"
 SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
 
+# The ASAP dataset (fosfrancesco/asap-dataset) — solo-piano classical scores licensed
+# CC-BY-NC-SA, overriding the CC0 default for their filenames.
+[[annotations]]
+path = ["public/songs/asap-*.mxl"]
+precedence = "override"
+SPDX-FileCopyrightText = "The ASAP Dataset authors"
+SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
+
 [[annotations]]
 path = ["public/songs/manifest.json", "public/songs/seed.json"]
 precedence = "override"
