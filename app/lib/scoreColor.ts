@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import type { Hand } from "../hooks/useScoreMatcher";
+import { type Hand, STAFF_FOR } from "../../core/matcher";
 import { type MeasureBox, NOTE_COLOR, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
-
-// Which staff (treble = 0, bass = 1) each hand reads from — mirrors the matcher,
-// so the notes collected for the ghost line up with the positions it counts.
-const STAFF_FOR: Record<Exclude<Hand, "both">, number> = { right: 0, left: 1 };
 
 // OSMD's graphical notes expose their rendered SVG group only on the VexFlow
 // subclass; the cursor hands back the base type, so reach the accessor by shape.

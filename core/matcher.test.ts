@@ -1,0 +1,147 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { describe, expect, it } from "vitest";
+import {
+    type ClearedEvent,
+    currentBar,
+    expectedPitches,
+    type MatchStep,
+    matchNote,
+    startMatch,
+    stepRange,
+} from "./matcher";
+
+const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep => ({
+    pitches,
+    staves: [0],
+    whole: 0,
+    bar: 0,
+    ...overrides,
+});
+
+const cleared = (events: ReturnType<typeof matchNote>["events"]): ClearedEvent[] =>
+    events.filter((event): event is ClearedEvent => event.kind === "cleared");
+
+describe("startMatch", () => {
+    it("is complete immediately for an empty score", () => {
+        expect(startMatch([]).complete).toBe(true);
+    });
+
+    it("expects the first step's pitches", () => {
+        const state = startMatch([step([60]), step([62])]);
+        expect(expectedPitches(state)).toEqual([60]);
+    });
+});
+
+describe("matchNote", () => {
+    it("clears single-note positions in order and completes", () => {
+        let state = startMatch([step([60]), step([62])]);
+        let result = matchNote(state, 60);
+        expect(cleared(result.events)).toHaveLength(1);
+        expect(cleared(result.events)[0]?.ordinal).toBe(0);
+        state = result.state;
+        expect(expectedPitches(state)).toEqual([62]);
+        result = matchNote(state, 62);
+        expect(result.state.complete).toBe(true);
+        expect(cleared(result.events)[0]?.ordinal).toBe(1);
+    });
+
+    it("assembles a chord pitch by pitch in any order", () => {
+        let state = startMatch([step([60, 64, 67])]);
+        let result = matchNote(state, 67);
+        expect(result.events).toEqual([{ kind: "hit", note: 67 }]);
+        state = result.state;
+        result = matchNote(state, 60);
+        expect(result.events).toEqual([{ kind: "hit", note: 60 }]);
+        state = result.state;
+        result = matchNote(state, 64);
+        expect(cleared(result.events)[0]?.playedPitches).toEqual([60, 64, 67]);
+        expect(result.state.complete).toBe(true);
+    });
+
+    it("does not clear a chord from a repeated pitch", () => {
+        let state = startMatch([step([60, 64])]);
+        state = matchNote(state, 60).state;
+        const result = matchNote(state, 60);
+        expect(cleared(result.events)).toHaveLength(0);
+        expect(result.state.complete).toBe(false);
+    });
+
+    it("counts a wrong note and reports it, without advancing", () => {
+        const state = startMatch([step([60])]);
+        const result = matchNote(state, 61);
+        expect(result.events).toEqual([{ kind: "wrong", note: 61 }]);
+        expect(result.state.wrong).toBe(1);
+        expect(expectedPitches(result.state)).toEqual([60]);
+    });
+
+    it("reports how many wrong notes came before each clear, resetting per position", () => {
+        let state = startMatch([step([60]), step([62])]);
+        state = matchNote(state, 59).state;
+        state = matchNote(state, 61).state;
+        let result = matchNote(state, 60);
+        expect(cleared(result.events)[0]?.wrongBefore).toBe(2);
+        result = matchNote(result.state, 62);
+        expect(cleared(result.events)[0]?.wrongBefore).toBe(0);
+    });
+
+    it("treats a next-position note as wrong when not forgiving", () => {
+        const state = startMatch([step([60]), step([62])]);
+        const result = matchNote(state, 62, false);
+        expect(result.events).toEqual([{ kind: "wrong", note: 62 }]);
+        expect(expectedPitches(result.state)).toEqual([60]);
+    });
+
+    it("forgiving: skips ahead crediting only what was played, and clears a single-note next", () => {
+        let state = startMatch([step([60, 64]), step([62]), step([65])]);
+        state = matchNote(state, 60, true).state; // half the chord
+        const result = matchNote(state, 62, true); // the NEXT position's note
+        const clears = cleared(result.events);
+        expect(clears).toHaveLength(2);
+        // The forgiven position credits only the pitch actually played…
+        expect(clears[0]?.playedPitches).toEqual([60]);
+        expect(clears[0]?.ordinal).toBe(0);
+        // …and the note itself completes the single-note next position.
+        expect(clears[1]?.playedPitches).toEqual([62]);
+        expect(clears[1]?.ordinal).toBe(1);
+        expect(expectedPitches(result.state)).toEqual([65]);
+    });
+
+    it("forgiving: a note starting a multi-pitch next position carries into its chord", () => {
+        let state = startMatch([step([60]), step([62, 65])]);
+        const result = matchNote(state, 62, true);
+        expect(cleared(result.events)).toHaveLength(1); // only the forgiven position
+        state = result.state;
+        expect(state.hit).toEqual([62]); // the note counts toward the new chord
+        const finish = matchNote(state, 65, true);
+        expect(cleared(finish.events)[0]?.playedPitches).toEqual([62, 65]);
+        expect(finish.state.complete).toBe(true);
+    });
+
+    it("ignores input once complete", () => {
+        let state = startMatch([step([60])]);
+        state = matchNote(state, 60).state;
+        expect(state.complete).toBe(true);
+        const result = matchNote(state, 62);
+        expect(result.events).toEqual([]);
+        expect(result.state).toBe(state);
+    });
+});
+
+describe("helpers", () => {
+    it("currentBar follows the position and rests on the final bar once complete", () => {
+        const steps = [step([60], { bar: 0 }), step([62], { bar: 3 })];
+        let state = startMatch(steps);
+        expect(currentBar(state)).toBe(0);
+        state = matchNote(state, 60).state;
+        expect(currentBar(state)).toBe(3);
+        state = matchNote(state, 62).state;
+        expect(currentBar(state)).toBe(3);
+    });
+
+    it("stepRange pads the pitch extremes by a whole tone each side", () => {
+        expect(stepRange([step([60, 72]), step([55])])).toEqual({ from: 53, to: 74 });
+        expect(stepRange([])).toBeNull();
+    });
+});
