@@ -18,6 +18,7 @@ import { GradeBadge } from "./components/gradeBadge";
 import { HeaderNav } from "./components/navBar";
 import { ThemeToggle } from "./components/themeToggle";
 import { MidiProvider } from "./contexts/midi";
+import { ServicesProvider } from "./contexts/services";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
 import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
@@ -216,9 +217,11 @@ export default function App() {
     }, []);
 
     return (
-        <MidiProvider>
-            <Outlet />
-        </MidiProvider>
+        <ServicesProvider>
+            <MidiProvider>
+                <Outlet />
+            </MidiProvider>
+        </ServicesProvider>
     );
 }
 

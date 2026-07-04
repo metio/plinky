@@ -64,9 +64,21 @@ fake, and one place to read each piece of shared state — so the parts stay swa
 whole stays reasonable as it grows.
 
 Declarative composition is the idiom (see `app/components/conditional.tsx`): conditions and
-injected capabilities are named components (`Show`, `Midi`, `Media`, `AppServices`) that read
-from context, so a screen reads like a description of what it is rather than a tangle of
+injected capabilities are named components (`Show`, `Midi`, `Media`, `ServicesProvider`) that
+read from context, so a screen reads like a description of what it is rather than a tangle of
 flags and prop-drilling.
+
+## Injecting capabilities: the provider pattern
+
+Every external integration a component needs — persistence, audio, MIDI, the score renderer,
+the network — is handed to it through a context, never reached for directly. A wrapper high in
+the tree holds the real integration (`ServicesProvider` in `app/contexts/services.tsx`, the
+`MidiProvider` beside it); the component that performs the work receives its capability and
+stays **oblivious to which implementation it got** — the browser adapter in production, a fake
+in a test. So a feature renders in a test by wrapping it in a provider carrying fakes
+(`<ServicesProvider services={{ store: memoryStore() }}>`) — no jsdom globals to stub, no
+module to mock. The `AppServices` set grows one field per port as each lands; call sites prefer
+the narrow hook (`useStore()`) so a component declares exactly what it depends on.
 
 ## What `dependency-cruiser` does and does not catch
 
