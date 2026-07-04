@@ -144,6 +144,20 @@ jobs:
       # Pure source analysis (no dependencies), so it skips the install step: a new
       # feature can't bury a page deeper than the navigation-depth budget.
       - run: npm run nav
+  arch:
+    name: arch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Enforce the layered architecture: dependencies point strictly downward and
+      # no cycles form. The contract lives in .dependency-cruiser.cjs.
+      - run: npm run arch
   typos:
     name: typos
     runs-on: ubuntu-latest
@@ -183,7 +197,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [build, browser, coverage, lighthouse, accessibility-light, accessibility-dark, biome, knip, bake-check, nav, typos, markdown, yaml, github-actions, reuse]
+    needs: [build, browser, coverage, lighthouse, accessibility-light, accessibility-dark, biome, knip, bake-check, nav, arch, typos, markdown, yaml, github-actions, reuse]
     if: always()
     runs-on: ubuntu-latest
     steps:
