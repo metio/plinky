@@ -26,7 +26,7 @@ export type NewsItem = {
 };
 
 // True only for a well-formed https URL. Rejects http, data:, javascript:, and
-// anything unparseable — the one gate that keeps editor-supplied URLs safe to put
+// anything unparsable — the one gate that keeps editor-supplied URLs safe to put
 // in an <img src> / <a href>.
 export function isHttpsUrl(value: unknown): value is string {
     if (typeof value !== "string") {

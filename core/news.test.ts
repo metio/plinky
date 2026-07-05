@@ -16,7 +16,7 @@ describe("isHttpsUrl", () => {
         expect(isHttpsUrl("https://example.com/a.png")).toBe(true);
     });
 
-    it("rejects http, data, javascript, and unparseable URLs", () => {
+    it("rejects http, data, javascript, and unparsable URLs", () => {
         expect(isHttpsUrl("http://example.com")).toBe(false);
         expect(isHttpsUrl("data:image/png;base64,AAAA")).toBe(false);
         expect(isHttpsUrl("javascript:alert(1)")).toBe(false);
