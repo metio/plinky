@@ -16,11 +16,12 @@ import { gzipSync } from "node:zlib";
 const DIR = "build/client/assets";
 const VENDOR = /opensheetmusicdisplay/;
 
-// The whole client bundle: the fixed OSMD vendor chunk (~310 KB, pinned) plus our
-// own code. Sized to clear vendor + the app budget below with a little headroom, so
-// the app budget is actually reachable and a real regression trips the app line, not
-// this one.
-const BUDGET_TOTAL_KB = 875;
+// The client bundle a SINGLE visitor downloads: the fixed OSMD vendor chunk
+// (~310 KB, pinned) plus our own code. CI measures a per-locale build
+// (`PLINKY_LOCALE=en npm run build`), because the deploy ships one tree-shaken
+// bundle per language (dev/build-locales.mjs) — a German visitor never downloads
+// Korean. So this tracks real per-visitor weight, not the summed all-locales output.
+const BUDGET_TOTAL_KB = 545;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -46,15 +47,11 @@ const BUDGET_TOTAL_KB = 875;
 // chunks (fflate and the storage helpers each on their own); the extra chunk
 // boundaries cost ~3 KB of gzip, traded for finer caching granularity.
 //
-// The large step from a ~330 KB ratchet is the full 26-locale translation: Paraglide
-// compiles each string with every language inlined into one runtime-branched function,
-// and this single shared SPA bundle resolves the locale at runtime, so every visitor
-// downloads all 26 languages of every used message (~+224 KB gzip). That is the honest
-// cost of one shared bundle. Per-locale JS builds (each prerendered /<locale>/ page
-// shipping only its own strings via experimentalStaticLocale) are the planned follow-up
-// that brings this back down — at which point this ratchet lowers again toward base +
-// one locale.
-const BUDGET_APP_KB = 560;
+// This ratchet was ~560 KB while the app shipped one shared bundle carrying all 26
+// languages to every visitor. Per-locale builds (dev/build-locales.mjs) tree-shake
+// each bundle down to its own language, so a single visitor's app code dropped to
+// ~216 KB — the budget follows. Keep it tight; a real regression trips this line.
+const BUDGET_APP_KB = 235;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

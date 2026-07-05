@@ -39,3 +39,6 @@ __pycache__/
 .env.local
 .env
 !.env.example
+
+# Transient merge accumulator for the per-locale build (dev/build-locales.mjs)
+.build-merge/
