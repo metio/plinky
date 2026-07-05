@@ -30,6 +30,19 @@ describe("songSource.manifest", () => {
         expect(fetches).toBe(1);
     });
 
+    it("shares one request across concurrent first-render callers", async () => {
+        let fetches = 0;
+        const source = sourceOver(() => {
+            fetches++;
+            return Promise.resolve(Response.json([{ id: "s1" }]));
+        });
+        // Both callers hit an empty cache before the first fetch resolves; they must
+        // await the same in-flight request, not each start their own.
+        const [a, b] = await Promise.all([source.manifest(), source.manifest()]);
+        expect(fetches).toBe(1);
+        expect(a).toEqual(b);
+    });
+
     it("retries after a failure instead of caching an empty catalogue for the session", async () => {
         let calls = 0;
         const source = sourceOver(() => {
