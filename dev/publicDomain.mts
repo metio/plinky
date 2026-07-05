@@ -37,12 +37,20 @@ const TRADITIONAL =
 // match "Bacharach" or a title's "bachelor", "clementi" must not match "clementine".
 // Not exhaustive — the death range catches the rest where dates are given.
 const PD_SURNAMES =
-    /\b(bach|mozart|beethoven|chopin|schubert|brahms|haendel|handel|vivaldi|haydn|debussy|satie|grieg|schumann|liszt|rossini|mendelssohn|clementi|czerny|scarlatti|purcell|joplin|sousa|pachelbel|telemann|elgar|dvorak|verdi|wagner|bizet|saint-?saens|faure|albeniz|granados|rimsky|borodin|burgmuller|gurlitt|kuhlau|diabelli|hanon|gounod|offenbach|paganini|carcassi|giuliani|tarrega|ravel|gershwin|mascagni|puccini|smetana|holst|nielsen|janacek|scriabin|macdowell|streabbog|spindler|reinecke|kirchner|lemoine|couppey|bertini|loeschhorn|duvernoy|kohler|wohlfahrt|schytte|gillock|heller|albinoni|corelli|couperin|rameau|lully|tartini|boccherini|cherubini|hummel|weber|paderewski|massenet|delibes|chaminade|moszkowski|sinding|sgambati|thalberg|moscheles|cramer|dowland|sullivan|carolan|frescobaldi|buxtehude|palestrina|monteverdi|praetorius|froberger|sweelinck|cimarosa|paisiello|gottschalk|rebikov|guilmant|widor|vierne|dandrieu|daquin|marcello|kjerulf|oesten|goedicke|gedike|maykapar|sor|field|byrd|gade|raff|nevin|bartok|mahler|weill|gardel|butterworth|halvorsen|tagore)\b/;
-// Deliberately NOT listed, despite the composer themselves being public domain: a bare
-// surname would admit copyrighted namesakes or co-written works. "gonzaga" would match
+    /\b(bach|mozart|beethoven|chopin|schubert|brahms|haendel|handel|vivaldi|haydn|debussy|satie|grieg|schumann|liszt|rossini|mendelssohn|clementi|czerny|scarlatti|purcell|joplin|sousa|pachelbel|telemann|elgar|dvorak|verdi|wagner|bizet|saint-?saens|faure|albeniz|granados|rimsky|borodin|burgmuller|gurlitt|kuhlau|diabelli|hanon|gounod|offenbach|paganini|carcassi|giuliani|tarrega|ravel|gershwin|mascagni|puccini|smetana|holst|nielsen|janacek|scriabin|macdowell|streabbog|spindler|reinecke|kirchner|lemoine|couppey|bertini|loeschhorn|duvernoy|kohler|wohlfahrt|schytte|gillock|heller|albinoni|corelli|couperin|rameau|lully|tartini|boccherini|cherubini|hummel|weber|paderewski|massenet|delibes|chaminade|moszkowski|sinding|sgambati|thalberg|moscheles|cramer|dowland|sullivan|carolan|frescobaldi|buxtehude|palestrina|monteverdi|praetorius|froberger|sweelinck|cimarosa|paisiello|gottschalk|rebikov|guilmant|widor|vierne|dandrieu|daquin|marcello|kjerulf|oesten|goedicke|gedike|maykapar|sor|field|byrd|gade|raff|nevin|bartok|mahler|weill|gardel|butterworth|halvorsen|tagore|ponce|tosti|lavallee)\b/;
+// Deliberately NOT listed as a bare surname, despite the composer themselves being public
+// domain: it would admit copyrighted namesakes or co-written works. "gonzaga" would match
 // Luiz Gonzaga (d. 1989, e.g. "Asa Branca") alongside the PD Chiquinha Gonzaga; "waller"
 // would admit Fats Waller's co-authored songs ("Ain't Misbehavin'", co-written by Harry
-// Brooks, d. 1970) that his own 1943 death does not clear.
+// Brooks, d. 1970) that his own 1943 death does not clear. "foster" would admit David
+// Foster (b. 1949) and "adam" is far too common a token — both are instead matched by
+// full name in PD_FULLNAMES.
+
+// Public-domain composers whose surname is too common — or collides with a copyrighted
+// namesake — to admit on its own, so the full name is required. Stephen Foster (d. 1864)
+// must not open the door to David Foster; Adolphe Adam (d. 1856) needs more than the bare
+// token "adam".
+const PD_FULLNAMES = /\b(stephen foster|adolphe adam)\b/;
 
 // A handful of composers whose PDMX field truncates or continues the surname
 // ("Tchaikovsky", "Rachmaninoff", "Mussorgsky"): match the stem with a trailing \w* so a
@@ -65,5 +73,5 @@ export function isPublicDomain(composer: string, title = ""): boolean {
         return true;
     }
     const name = fold(composer);
-    return PD_SURNAMES.test(name) || PD_STEMS.test(name);
+    return PD_SURNAMES.test(name) || PD_FULLNAMES.test(name) || PD_STEMS.test(name);
 }
