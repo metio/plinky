@@ -249,7 +249,14 @@ npm test
 npm run arch     # check the layered-architecture rules
 npm run build    # emit the static site to build/client
 npm run scores   # regenerate the bundled exercise scores
+npm run mutation # measure test quality with Stryker (see below)
 ```
+
+`npm run mutation` runs [Stryker](https://stryker-mutator.io) over the pure
+`core/` layer: it rewrites the code with small faults and reruns the tests, so a
+surviving mutant marks an assertion the suite is missing — a gap that line
+coverage can't reveal. It is a slow, manual quality check, not part of the CI
+gate; the score is ratcheted in `stryker.config.mjs`.
 
 The codebase is a stack of layers — a pure `core/` domain under an app of ports,
 adapters, stores and components — described in [ARCHITECTURE.md](ARCHITECTURE.md)
