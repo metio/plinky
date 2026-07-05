@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import {
     type Composition,
     decodeComposition,
@@ -117,36 +118,31 @@ export function compositionFromRun(
 }
 
 export function loadTakes(songId: string): Take[] {
-    try {
-        const parsed = JSON.parse(browserStore.get(storageKey(songId)) ?? "[]");
-        if (!Array.isArray(parsed)) {
-            return [];
-        }
-        const takes: Take[] = [];
-        for (const entry of parsed) {
-            if (!entry || typeof entry.id !== "string" || typeof entry.code !== "string") {
-                continue;
-            }
-            const composition = decodeComposition(entry.code);
-            if (!composition) {
-                continue;
-            }
-            takes.push({
-                id: entry.id,
-                createdAt: typeof entry.createdAt === "number" ? entry.createdAt : 0,
-                letter: typeof entry.letter === "string" ? entry.letter : "",
-                complete: entry.complete === true,
-                // Older takes predate stored metrics, and the value is untrusted, so an
-                // absent or malformed grade simply reads as null rather than failing the load.
-                metrics: parseGrade(entry.metrics),
-                composition,
-            });
-        }
-        return takes;
-    } catch {
-        // No storage (SSR), blocked storage, or corrupt data — no takes to show.
+    const parsed = readJson(browserStore, storageKey(songId));
+    if (!Array.isArray(parsed)) {
         return [];
     }
+    const takes: Take[] = [];
+    for (const entry of parsed) {
+        if (!entry || typeof entry.id !== "string" || typeof entry.code !== "string") {
+            continue;
+        }
+        const composition = decodeComposition(entry.code);
+        if (!composition) {
+            continue;
+        }
+        takes.push({
+            id: entry.id,
+            createdAt: typeof entry.createdAt === "number" ? entry.createdAt : 0,
+            letter: typeof entry.letter === "string" ? entry.letter : "",
+            complete: entry.complete === true,
+            // Older takes predate stored metrics, and the value is untrusted, so an
+            // absent or malformed grade simply reads as null rather than failing the load.
+            metrics: parseGrade(entry.metrics),
+            composition,
+        });
+    }
+    return takes;
 }
 
 function store(songId: string, takes: Take[]): boolean {
@@ -159,7 +155,7 @@ function store(songId: string, takes: Take[]): boolean {
             metrics: take.metrics,
             code: encodeComposition(take.composition),
         }));
-        return browserStore.set(storageKey(songId), JSON.stringify(stored));
+        return writeJson(browserStore, storageKey(songId), stored);
     } catch {
         // A take that cannot be encoded never reaches the store.
         return false;

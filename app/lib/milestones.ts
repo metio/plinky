@@ -19,38 +19,20 @@ const REACHED_GRADE_KEY = "plinky:reached-grade";
 const FLAWLESS_KEY = "plinky:flawless-done";
 
 export function reachedGrade(): number {
-    try {
-        const raw = Number(browserStore.get(REACHED_GRADE_KEY));
-        return Number.isFinite(raw) ? raw : 0;
-    } catch {
-        // No storage (SSR) or a browser that blocks it — nothing celebrated yet.
-        return 0;
-    }
+    const raw = Number(browserStore.get(REACHED_GRADE_KEY));
+    return Number.isFinite(raw) ? raw : 0;
 }
 
 export function recordReachedGrade(grade: number): void {
-    try {
-        browserStore.set(REACHED_GRADE_KEY, String(Math.max(reachedGrade(), grade)));
-    } catch {
-        // Best-effort — a milestone showing twice is harmless.
-    }
+    browserStore.set(REACHED_GRADE_KEY, String(Math.max(reachedGrade(), grade)));
 }
 
 export function flawlessDone(): boolean {
-    try {
-        return browserStore.get(FLAWLESS_KEY) === "1";
-    } catch {
-        // No storage (SSR) or a browser that blocks it — treat as not yet fired.
-        return false;
-    }
+    return browserStore.get(FLAWLESS_KEY) === "1";
 }
 
 export function recordFlawless(): void {
-    try {
-        browserStore.set(FLAWLESS_KEY, "1");
-    } catch {
-        // Best-effort.
-    }
+    browserStore.set(FLAWLESS_KEY, "1");
 }
 
 // A run scores S the moment its aggregate clears the S cutoff (95); it is the song's

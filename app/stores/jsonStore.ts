@@ -10,6 +10,22 @@ import type { KeyValueStore } from "../ports/keyValueStore";
 // mastery, …) is a thin instantiation, so a caching or notification bug is fixed
 // here once instead of once per store.
 
+// The parsed value stored under `key`, or null when absent or corrupt — corrupt
+// data reads as missing rather than crashing the caller. The caller validates the
+// shape, so this is where the storage helpers get their read half without each
+// re-implementing the get-and-parse guard.
+export function readJson(kv: KeyValueStore, key: string): unknown {
+    const raw = kv.get(key);
+    if (raw === null) {
+        return null;
+    }
+    try {
+        return JSON.parse(raw);
+    } catch {
+        return null;
+    }
+}
+
 // Persist `value` as JSON; false when it cannot be serialized or the store
 // refuses the write, so a caller that must know can react.
 export function writeJson(kv: KeyValueStore, key: string, value: unknown): boolean {

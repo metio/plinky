@@ -10,6 +10,7 @@
 // "left|right:bar:pos:note" → finger (1–5).
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 export type FingerMap = Record<string, number>;
 
 const storageKey = (songId: string) => `plinky:fingering:${songId}`;
@@ -19,31 +20,23 @@ export function fingerKey(hand: "left" | "right", bar: number, pos: number, note
 }
 
 export function loadSongFingering(songId: string): FingerMap {
-    try {
-        const parsed = JSON.parse(browserStore.get(storageKey(songId)) ?? "{}");
-        if (!parsed || typeof parsed !== "object") {
-            return {};
-        }
-        // Keep only valid finger numbers, so a corrupt store can't feed nonsense into
-        // the drill or the score's fingering display.
-        const clean: FingerMap = {};
-        for (const [key, value] of Object.entries(parsed)) {
-            if (typeof value === "number" && value >= 1 && value <= 5) {
-                clean[key] = value;
-            }
-        }
-        return clean;
-    } catch {
+    const parsed = readJson(browserStore, storageKey(songId));
+    if (!parsed || typeof parsed !== "object") {
         return {};
     }
+    // Keep only valid finger numbers, so a corrupt store can't feed nonsense into
+    // the drill or the score's fingering display.
+    const clean: FingerMap = {};
+    for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value === "number" && value >= 1 && value <= 5) {
+            clean[key] = value;
+        }
+    }
+    return clean;
 }
 
 function save(songId: string, map: FingerMap): void {
-    try {
-        browserStore.set(storageKey(songId), JSON.stringify(map));
-    } catch {
-        // Best-effort, like the rest of the local state.
-    }
+    writeJson(browserStore, storageKey(songId), map);
 }
 
 // Record one finger choice and persist the whole map. Returns the updated map so the

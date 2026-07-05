@@ -5,15 +5,12 @@
 // at most once. A plain per-device set under one key — cleared by the Settings reset.
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 const KEY = "plinky:seen-hints";
 
 function load(): string[] {
-    try {
-        const parsed = JSON.parse(browserStore.get(KEY) ?? "[]");
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
+    const parsed = readJson(browserStore, KEY);
+    return Array.isArray(parsed) ? parsed : [];
 }
 
 export function hasSeenHint(id: string): boolean {
@@ -21,11 +18,7 @@ export function hasSeenHint(id: string): boolean {
 }
 
 export function markHintSeen(id: string): void {
-    try {
-        const seen = new Set(load());
-        seen.add(id);
-        browserStore.set(KEY, JSON.stringify([...seen]));
-    } catch {
-        // Best-effort — a hint showing twice is harmless.
-    }
+    const seen = new Set(load());
+    seen.add(id);
+    writeJson(browserStore, KEY, [...seen]);
 }

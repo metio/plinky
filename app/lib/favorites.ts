@@ -5,27 +5,18 @@
 // rather than the whole catalog, so a large library stays manageable.
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 const KEY = "plinky:favorites";
 
 export function loadFavorites(): Set<string> {
-    try {
-        const parsed = JSON.parse(browserStore.get(KEY) ?? "[]");
-        return new Set(
-            Array.isArray(parsed)
-                ? parsed.filter((id): id is string => typeof id === "string")
-                : [],
-        );
-    } catch {
-        return new Set();
-    }
+    const parsed = readJson(browserStore, KEY);
+    return new Set(
+        Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [],
+    );
 }
 
 function saveFavorites(ids: Set<string>): void {
-    try {
-        browserStore.set(KEY, JSON.stringify([...ids]));
-    } catch {
-        // Persistence is best-effort; a private-mode failure is harmless.
-    }
+    writeJson(browserStore, KEY, [...ids]);
 }
 
 export function isFavorite(id: string): boolean {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import type { Grade } from "../../core/grade";
 import type { Grid, RunNote } from "../../core/shareCard";
 
@@ -20,39 +21,28 @@ export type DailyResult = {
 const KEY = "plinky:daily-result";
 
 export function saveDailyResult(number: number, result: DailyResult): void {
-    try {
-        browserStore.set(KEY, JSON.stringify({ number, ...result }));
-    } catch {
-        // Best-effort — a missing cached result just shows a fresh challenge.
-    }
+    writeJson(browserStore, KEY, { number, ...result });
 }
 
 // The stored result for the given daily number, or null when the store is empty,
 // holds an earlier day, or is malformed.
 export function loadDailyResult(number: number): DailyResult | null {
-    try {
-        const raw = browserStore.get(KEY);
-        if (!raw) {
-            return null;
-        }
-        const parsed = JSON.parse(raw);
-        if (
-            parsed?.number !== number ||
-            !parsed.grade ||
-            typeof parsed.grade !== "object" ||
-            !Array.isArray(parsed.grid) ||
-            !Array.isArray(parsed.notes) ||
-            !Number.isFinite(parsed.tolerance)
-        ) {
-            return null;
-        }
-        return {
-            grade: parsed.grade,
-            grid: parsed.grid,
-            notes: parsed.notes,
-            tolerance: parsed.tolerance,
-        };
-    } catch {
+    const parsed = readJson(browserStore, KEY) as Record<string, unknown> | null;
+    if (
+        !parsed ||
+        parsed.number !== number ||
+        !parsed.grade ||
+        typeof parsed.grade !== "object" ||
+        !Array.isArray(parsed.grid) ||
+        !Array.isArray(parsed.notes) ||
+        !Number.isFinite(parsed.tolerance)
+    ) {
         return null;
     }
+    return {
+        grade: parsed.grade as DailyResult["grade"],
+        grid: parsed.grid as DailyResult["grid"],
+        notes: parsed.notes as DailyResult["notes"],
+        tolerance: parsed.tolerance as number,
+    };
 }

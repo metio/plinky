@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
 
@@ -161,24 +162,15 @@ function normalizeUserScore(raw: unknown): Score | null {
 }
 
 export function loadUserScores(): Score[] {
-    try {
-        const parsed = JSON.parse(browserStore.get(STORAGE_KEY) ?? "[]");
-        if (!Array.isArray(parsed)) {
-            return [];
-        }
-        return parsed.map(normalizeUserScore).filter((score): score is Score => score !== null);
-    } catch {
+    const parsed = readJson(browserStore, STORAGE_KEY);
+    if (!Array.isArray(parsed)) {
         return [];
     }
+    return parsed.map(normalizeUserScore).filter((score): score is Score => score !== null);
 }
 
 function storeUserScores(scores: Score[]): boolean {
-    try {
-        return browserStore.set(STORAGE_KEY, JSON.stringify(scores));
-    } catch {
-        // A score that cannot be serialized never reaches the store.
-        return false;
-    }
+    return writeJson(browserStore, STORAGE_KEY, scores);
 }
 
 // Returns false when the write fails (e.g. storage quota), so callers can tell

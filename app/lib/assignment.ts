@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import { packToCode, unpackFromCode } from "../../core/shareCode";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
@@ -194,38 +195,28 @@ export function decodeAssignmentLink(code: string): Assignment | null {
 }
 
 export function loadAssignments(): Assignment[] {
-    try {
-        const parsed = JSON.parse(browserStore.get(STORAGE_KEY) ?? "[]");
-        if (!Array.isArray(parsed)) {
-            return [];
-        }
-        return parsed
-            .map((entry) => {
-                if (!isRecord(entry) || !Array.isArray(entry.items)) {
-                    return null;
-                }
-                const assignment = makeAssignment({
-                    id: typeof entry.id === "string" ? entry.id : undefined,
-                    name: typeof entry.name === "string" ? entry.name : undefined,
-                    description:
-                        typeof entry.description === "string" ? entry.description : undefined,
-                    items: entry.items,
-                });
-                return assignment.items.length > 0 ? assignment : null;
-            })
-            .filter((entry): entry is Assignment => entry !== null);
-    } catch {
+    const parsed = readJson(browserStore, STORAGE_KEY);
+    if (!Array.isArray(parsed)) {
         return [];
     }
+    return parsed
+        .map((entry) => {
+            if (!isRecord(entry) || !Array.isArray(entry.items)) {
+                return null;
+            }
+            const assignment = makeAssignment({
+                id: typeof entry.id === "string" ? entry.id : undefined,
+                name: typeof entry.name === "string" ? entry.name : undefined,
+                description: typeof entry.description === "string" ? entry.description : undefined,
+                items: entry.items,
+            });
+            return assignment.items.length > 0 ? assignment : null;
+        })
+        .filter((entry): entry is Assignment => entry !== null);
 }
 
 function storeAssignments(assignments: Assignment[]): boolean {
-    try {
-        return browserStore.set(STORAGE_KEY, JSON.stringify(assignments));
-    } catch {
-        // A value that cannot be serialized never reaches the store.
-        return false;
-    }
+    return writeJson(browserStore, STORAGE_KEY, assignments);
 }
 
 // Upsert by id, so re-saving an edited assignment refreshes it in place. Returns

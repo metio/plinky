@@ -8,20 +8,12 @@ export const THEME_STORAGE_KEY = "plinky:theme";
 const KEY = THEME_STORAGE_KEY;
 
 export function loadTheme(): Theme {
-    try {
-        const stored = browserStore.get(KEY);
-        return stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
-    } catch {
-        return "system";
-    }
+    const stored = browserStore.get(KEY);
+    return stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
 }
 
 export function saveTheme(theme: Theme): void {
-    try {
-        browserStore.set(KEY, theme);
-    } catch {
-        // Persisting the theme is best-effort; a private-mode failure is harmless.
-    }
+    browserStore.set(KEY, theme);
 }
 
 // Resolve "system" to the effective light/dark using the OS preference.

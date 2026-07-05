@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import { todayKey } from "../../core/daily";
 import { type Grid, toGrid } from "../../core/shareCard";
 
@@ -51,21 +52,16 @@ function blend(previous: Skill, run: Skill): Skill {
 }
 
 export function loadLifetime(): Lifetime {
-    try {
-        const raw = browserStore.get(KEY);
-        const parsed = raw ? (JSON.parse(raw) as Lifetime) : null;
-        if (!parsed || !Array.isArray(parsed.days)) {
-            return EMPTY;
-        }
-        // Keep only well-formed days: a malformed skill would otherwise crash the
-        // EMA blend in recordRun or yield a NaN progress grid.
-        const days = parsed.days.filter(
-            (day) => day && typeof day.date === "string" && isSkill(day.skill),
-        );
-        return { days };
-    } catch {
+    const parsed = readJson(browserStore, KEY) as Lifetime | null;
+    if (!parsed || !Array.isArray(parsed.days)) {
         return EMPTY;
     }
+    // Keep only well-formed days: a malformed skill would otherwise crash the
+    // EMA blend in recordRun or yield a NaN progress grid.
+    const days = parsed.days.filter(
+        (day) => day && typeof day.date === "string" && isSkill(day.skill),
+    );
+    return { days };
 }
 
 // Folds a finished run into the fingerprint: the first run seeds the average, each
@@ -86,12 +82,7 @@ export function recordRun(run: Skill, now: Date = new Date()): Lifetime {
         a.date.localeCompare(b.date),
     );
     const next: Lifetime = { days: days.slice(-MAX_DAYS) };
-    try {
-        browserStore.set(KEY, JSON.stringify(next));
-    } catch {
-        // The fingerprint is best-effort; a failed write (no storage, blocked storage,
-        // or quota) is not surfaced.
-    }
+    writeJson(browserStore, KEY, next);
     return next;
 }
 

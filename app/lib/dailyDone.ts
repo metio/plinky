@@ -7,6 +7,7 @@
 // no pressure to return every day to "keep" anything.
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 const KEY = "plinky:daily-done";
 
 function clean(value: unknown): number {
@@ -18,11 +19,7 @@ function clean(value: unknown): number {
 
 // The number of the last daily completed, or 0 if none.
 export function lastDailyDone(): number {
-    try {
-        return clean(JSON.parse(browserStore.get(KEY) ?? "0"));
-    } catch {
-        return 0;
-    }
+    return clean(readJson(browserStore, KEY));
 }
 
 // Record completing daily #number. Only ever moves forward, so replaying an older
@@ -31,9 +28,5 @@ export function recordDailyDone(number: number): void {
     if (number <= lastDailyDone()) {
         return;
     }
-    try {
-        browserStore.set(KEY, JSON.stringify(Math.floor(number)));
-    } catch {
-        // Best-effort: a blocked localStorage just means no ✓ persists.
-    }
+    writeJson(browserStore, KEY, Math.floor(number));
 }

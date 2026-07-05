@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import { packToCode, unpackFromCode } from "../../core/shareCode";
 
 // A "ghost": the note onset times of a completed run on a score, each in ms from
@@ -12,26 +13,12 @@ import { packToCode, unpackFromCode } from "../../core/shareCode";
 const key = (scoreId: string) => `plinky:ghost:${scoreId}`;
 
 export function saveGhost(scoreId: string, onsets: number[]): void {
-    try {
-        browserStore.set(key(scoreId), JSON.stringify(onsets));
-    } catch {
-        // A ghost is a convenience; a failed write is not surfaced.
-    }
+    writeJson(browserStore, key(scoreId), onsets);
 }
 
 export function loadGhost(scoreId: string): number[] | null {
-    try {
-        const raw = browserStore.get(key(scoreId));
-        if (!raw) {
-            return null;
-        }
-        const value = JSON.parse(raw);
-        return Array.isArray(value) && value.every((onset) => typeof onset === "number")
-            ? value
-            : null;
-    } catch {
-        return null;
-    }
+    const value = readJson(browserStore, key(scoreId));
+    return Array.isArray(value) && value.every((onset) => typeof onset === "number") ? value : null;
 }
 
 // The onsets ascend, so the gaps between them are small non-negative numbers that

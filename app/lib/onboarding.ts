@@ -4,6 +4,7 @@
 import type { History } from "../../core/history";
 import type { Prefs } from "../../core/prefs";
 import { browserStore } from "../adapters/browserStore";
+import { readJson, writeJson } from "../stores/jsonStore";
 import { lastDailyDone } from "./dailyDone";
 import { isDefaultKeyMap } from "../../core/keyMap";
 
@@ -27,12 +28,8 @@ const MARKABLE: DiscoveryId[] = ["earTried", "fingeringTried", "composed", "impo
 const KEY = "plinky:discovered";
 
 function loadMarked(): Set<DiscoveryId> {
-    try {
-        const parsed = JSON.parse(browserStore.get(KEY) ?? "[]");
-        return new Set(Array.isArray(parsed) ? (parsed as DiscoveryId[]) : []);
-    } catch {
-        return new Set();
-    }
+    const parsed = readJson(browserStore, KEY);
+    return new Set(Array.isArray(parsed) ? (parsed as DiscoveryId[]) : []);
 }
 
 // Record that the player has reached a markable feature. A no-op for derived steps,
@@ -41,14 +38,10 @@ export function markDiscovered(id: DiscoveryId): void {
     if (!MARKABLE.includes(id)) {
         return;
     }
-    try {
-        const marked = loadMarked();
-        if (!marked.has(id)) {
-            marked.add(id);
-            browserStore.set(KEY, JSON.stringify([...marked]));
-        }
-    } catch {
-        // Best-effort — a checklist item un-ticking is harmless.
+    const marked = loadMarked();
+    if (!marked.has(id)) {
+        marked.add(id);
+        writeJson(browserStore, KEY, [...marked]);
     }
 }
 
