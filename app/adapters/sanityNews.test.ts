@@ -18,21 +18,33 @@ const item = {
     linkUrl: "https://example.com/news",
 };
 
-function jsonResponse(body: unknown, ok = true): Response {
-    return new Response(JSON.stringify(body), { status: ok ? 200 : 500 });
+// The default query returns a { enabled, item } envelope: the master switch plus
+// the shown news item.
+function jsonResponse(result: unknown, ok = true): Response {
+    return new Response(JSON.stringify({ result }), { status: ok ? 200 : 500 });
 }
 
 describe("createSanityNews", () => {
     it("maps a Sanity query result into a NewsItem", async () => {
-        const source = createSanityNews(async () => jsonResponse({ result: item }), config);
+        const source = createSanityNews(async () => jsonResponse({ enabled: true, item }), config);
         expect(await source.fetchActive()).toEqual(item);
+    });
+
+    it("shows news when no settings document exists (master switch absent)", async () => {
+        const source = createSanityNews(async () => jsonResponse({ enabled: null, item }), config);
+        expect(await source.fetchActive()).toEqual(item);
+    });
+
+    it("hides news when the master switch is off, even with a valid item", async () => {
+        const source = createSanityNews(async () => jsonResponse({ enabled: false, item }), config);
+        expect(await source.fetchActive()).toBeNull();
     });
 
     it("builds the apicdn query URL from the config", async () => {
         let requested = "";
         const fetcher = async (url: string) => {
             requested = url;
-            return jsonResponse({ result: item });
+            return jsonResponse({ enabled: true, item });
         };
         await createSanityNews(fetcher, config).fetchActive();
         expect(requested).toContain(
@@ -44,22 +56,31 @@ describe("createSanityNews", () => {
         let called = false;
         const fetcher = async () => {
             called = true;
-            return jsonResponse({ result: item });
+            return jsonResponse({ enabled: true, item });
         };
         expect(await createSanityNews(fetcher, null).fetchActive()).toBeNull();
         expect(called).toBe(false);
     });
 
     it("returns null on a non-OK response", async () => {
-        const source = createSanityNews(async () => jsonResponse({ result: item }, false), config);
+        const source = createSanityNews(
+            async () => jsonResponse({ enabled: true, item }, false),
+            config,
+        );
         expect(await source.fetchActive()).toBeNull();
     });
 
-    it("returns null on an unsafe or empty result", async () => {
+    it("returns null on an unsafe or empty item", async () => {
         const httpImage = { ...item, imageUrl: "http://cdn.sanity.io/pic.png" };
-        const unsafe = createSanityNews(async () => jsonResponse({ result: httpImage }), config);
+        const unsafe = createSanityNews(
+            async () => jsonResponse({ enabled: true, item: httpImage }),
+            config,
+        );
         expect(await unsafe.fetchActive()).toBeNull();
-        const empty = createSanityNews(async () => jsonResponse({ result: null }), config);
+        const empty = createSanityNews(
+            async () => jsonResponse({ enabled: true, item: null }),
+            config,
+        );
         expect(await empty.fetchActive()).toBeNull();
     });
 

@@ -228,12 +228,14 @@ so anyone can change it live, with no redeploy: the running app fetches the curr
 item from a [Sanity](https://www.sanity.io) project at load time.
 
 To connect it, copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`
-and `VITE_SANITY_DATASET`. Add a `news` document type in Sanity with an `image`
-(plus `alt` text), a `link` URL, an optional `headline`, and a `show` boolean; the
-editor uploads a picture and publishes, and the banner appears. Only `https` image
-and link URLs are shown, and a missing or unreachable source simply shows nothing —
-the banner never blocks or breaks the page. Leave the variables unset and no banner
-appears and no network call is made.
+and `VITE_SANITY_DATASET`. In Sanity, add a `news` document type with an `image`
+(plus `alt` text), a `link` URL, an optional `headline`, and a `show` boolean, and a
+singleton `siteSettings` document with a `newsEnabled` boolean — the master switch
+for the whole board. The editor uploads a picture and publishes, and the banner
+appears; flipping `newsEnabled` off (or a single item's `show` off) hides it again,
+all without a redeploy. Only `https` image and link URLs are shown, and a missing or
+unreachable source simply shows nothing — the banner never blocks or breaks the
+page. Leave the variables unset and no banner appears and no network call is made.
 
 ## Development
 

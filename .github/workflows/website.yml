@@ -8,6 +8,8 @@ on:
     paths:
       - .github/workflows/website.yml
       - app/**
+      - core/**
+      - messages/**
       - public/**
       - package.json
       - package-lock.json
@@ -39,6 +41,13 @@ jobs:
         run: npm ci
       - name: Build SPA
         run: npm run build
+        env:
+          # Optional home-page news banner (Sanity). These are public identifiers
+          # baked into the client bundle, so they are repository *Variables*, not
+          # secrets. Unset → no banner, no network call. Set them under
+          # Settings → Secrets and variables → Actions → Variables.
+          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
+          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
       - name: Add SPA fallback
         # GitHub Pages has no SPA rewrite, so a deep link like
         # /practice/c-major-scale 404s on refresh. Prerendering emits a generic

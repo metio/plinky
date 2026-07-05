@@ -10,10 +10,13 @@ import type { NewsSource } from "../ports/news";
 // git, no redeploy. Uses the injected network seam, so a test drives it with a
 // canned Response instead of the real CDN.
 //
-// The expected Sanity document (type "news"): an image field `image`, an `alt`
-// string, a `link` URL, an optional `headline`, and a boolean `show`. The default
-// query returns the most recently updated shown one, projecting the asset to a
-// direct https CDN URL.
+// The expected Sanity content: a singleton `siteSettings` document with a
+// `newsEnabled` boolean (the master switch for the whole board), and `news`
+// documents each with an image field `image`, an `alt` string, a `link` URL, an
+// optional `headline`, and a boolean `show`. The default query returns the
+// most-recently-updated shown item together with the master switch, projecting
+// the image asset to a direct https CDN URL. News is hidden when the switch is
+// explicitly off, so the board works with just a shown item and no settings doc.
 
 export type SanityConfig = {
     projectId: string;
@@ -26,9 +29,10 @@ export type SanityConfig = {
 };
 
 const DEFAULT_QUERY =
-    '*[_type == "news" && show == true] | order(_updatedAt desc)[0]{' +
+    '{"enabled": *[_type == "siteSettings"][0].newsEnabled, ' +
+    '"item": *[_type == "news" && show == true] | order(_updatedAt desc)[0]{' +
     '"id": _id, "imageUrl": image.asset->url, "imageAlt": coalesce(alt, ""), ' +
-    '"linkUrl": link, headline, aspect}';
+    '"linkUrl": link, headline, aspect}}';
 
 // The Sanity config from build-time env, or null when the project isn't wired
 // yet — in which case the source stays silent and never touches the network.
@@ -73,7 +77,17 @@ export function createSanityNews(
                 }
                 const body: unknown = await response.json();
                 const result = (body as { result?: unknown } | null)?.result;
-                return parseNews(result);
+                if (typeof result !== "object" || result === null) {
+                    return null;
+                }
+                const { enabled, item } = result as { enabled?: unknown; item?: unknown };
+                // The siteSettings master switch: the board is hidden only when
+                // `newsEnabled` is explicitly false, so it works with just a shown
+                // item even before any settings document exists.
+                if (enabled === false) {
+                    return null;
+                }
+                return parseNews(item);
             } catch {
                 // A network failure, a non-JSON body, or a malformed result all
                 // mean no news — never a thrown error into the render.
