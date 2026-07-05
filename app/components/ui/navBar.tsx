@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router";
 import { m } from "../../paraglide/messages.js";
 import { localizeHref } from "../../paraglide/runtime.js";
-import { BookIcon, GradCapIcon, HomeIcon, NotesIcon, TargetIcon } from "./icons";
+import { BookIcon, CalendarIcon, GradCapIcon, HomeIcon, NotesIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
 
 // The app's primary destinations. Before this, every section was reachable only as a
@@ -19,7 +19,7 @@ const DESTINATIONS: {
 }[] = [
     { to: "/", label: m.nav_home, Icon: HomeIcon },
     { to: "/library", label: m.nav_library, Icon: BookIcon },
-    { to: "/daily", label: m.nav_daily, Icon: TargetIcon },
+    { to: "/daily", label: m.nav_daily, Icon: CalendarIcon },
     { to: "/compose", label: m.nav_compose, Icon: NotesIcon },
     { to: "/you", label: m.nav_you, Icon: GradCapIcon },
 ];

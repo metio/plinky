@@ -215,12 +215,14 @@ export function BookIcon({ className }: IconProps) {
     );
 }
 
-// Concentric rings around a centre — a target, for the daily challenge.
-export function TargetIcon({ className }: IconProps) {
+// A wall calendar — a page with a bound top and a marked day, for the daily challenge.
+export function CalendarIcon({ className }: IconProps) {
     return (
         <Icon className={className}>
-            <circle cx="12" cy="12" r="8" />
-            <circle cx="12" cy="12" r="3.5" />
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M3 9h18" />
+            <path d="M8 3v4M16 3v4" />
+            <circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none" />
         </Icon>
     );
 }

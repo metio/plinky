@@ -18,7 +18,7 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 
 const ICON: Record<Task["key"], string> = {
     review: "🔁",
-    daily: "🎯",
+    daily: "📅",
     learn: "🎹",
     browse: "📚",
 };
