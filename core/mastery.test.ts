@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
+import { type Letter, letterFor } from "./grade";
 import {
     applyRun,
     isDue,
@@ -16,6 +17,26 @@ import {
 
 const NOW = 1_000_000_000_000;
 const DAY = 86_400_000;
+
+// The letter ladder lives in two places — grade.letterFor maps a score to a letter,
+// mastery.letterMin the reverse boundary — and the grade panel, milestones and mastery
+// threshold all trust them to agree. These pin that so the two can't drift apart.
+describe("letter cutoffs stay consistent between grade and mastery", () => {
+    const LETTERS: Letter[] = ["S", "A", "B", "C", "D", "E", "F"];
+
+    it("scores exactly at a letter's minimum earn that letter", () => {
+        for (const letter of LETTERS) {
+            expect(letterFor(letterMin(letter))).toBe(letter);
+        }
+    });
+
+    it("a point below a boundary drops to a lower letter", () => {
+        // F has no boundary below it (its minimum is 0).
+        for (const letter of LETTERS.filter((l) => l !== "F")) {
+            expect(letterFor(letterMin(letter) - 1)).not.toBe(letter);
+        }
+    });
+});
 
 const learned = (overrides: Partial<Mastery> = {}): Mastery => ({
     bestScore: 80,
