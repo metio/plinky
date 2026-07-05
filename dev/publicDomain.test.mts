@@ -42,9 +42,20 @@ describe("isPublicDomain", () => {
             "George Butterworth", // 1916
             "Johan Halvorsen", // 1935
             "Rabindranath Tagore", // 1941
+            "Manuel M. Ponce", // 1948
+            "Francesco Paolo Tosti", // 1916
+            "Calixa Lavallée", // 1891
         ]) {
             expect(isPublicDomain(composer), composer).toBe(true);
         }
+    });
+
+    it("admits full-name public-domain composers whose bare surname is unsafe", () => {
+        // Matched by full name so the common token never opens the door to a copyrighted
+        // namesake (David Foster, b. 1949) or a too-common surname.
+        expect(isPublicDomain("Stephen Foster")).toBe(true); // 1864
+        expect(isPublicDomain("Adolphe Adam", "O Holy Night")).toBe(true); // 1856
+        expect(isPublicDomain("David Foster", "The Prayer")).toBe(false);
     });
 
     it("admits a composer given a (birth–death) range on or before the cutoff", () => {
