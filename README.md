@@ -17,7 +17,10 @@ SPDX-License-Identifier: 0BSD
 Plug a digital piano into your browser and Plinky guides you through a score — you
 read the notation, play it over MIDI, and it grades how you do. No piano handy? Play
 along on your computer keyboard or the on-screen piano instead. Everything runs in
-the browser; nothing is uploaded, and your scores stay on your device.
+the browser; nothing is uploaded, and your scores stay on your device. And if that
+device's storage ever fills up or gets blocked, Plinky says so — a banner warns that
+progress isn't being saved, and saving a take tells you when it didn't land instead
+of pretending it did.
 
 ## Practising a score
 
