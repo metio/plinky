@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useSongSource, useXmlCodec } from "../contexts/services";
+import { useOnboardingStore, useSongSource, useXmlCodec } from "../contexts/services";
 import { useState } from "react";
 import { Button, buttonClasses } from "../components/ui/button";
 import { UploadIcon } from "../components/ui/icons";
@@ -10,7 +10,7 @@ import { GradeChip } from "../components/features/scoreGrade";
 import { StaffPreview } from "../components/features/staffPreview";
 import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "../lib/catalog";
 import { readScoreFile } from "../../core/musicxmlFile";
-import { markDiscovered } from "../lib/onboarding";
+
 import { gradeOf } from "../../core/scoreDifficulty";
 import { songId } from "../../core/songId";
 import { routeMeta } from "../../core/site";
@@ -44,6 +44,7 @@ const FIELD =
     "w-full rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
 
 export default function LibraryImportRoute() {
+    const onboarding = useOnboardingStore();
     const xmlCodec = useXmlCodec();
     const songs = useSongSource();
     const [draft, setDraft] = useState<Draft | null>(null);
@@ -113,7 +114,7 @@ export default function LibraryImportRoute() {
             setError(m.import_save_failed());
             return;
         }
-        markDiscovered("imported");
+        onboarding.markDiscovered("imported");
         setDraft(null);
         setSavedId(score.id);
     };

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: 0BSD
 
 import { generatePhrase } from "./generator";
+import type { Grade } from "./grade";
 import { hashString, seededRandom } from "./random";
+import type { Grid, RunNote } from "./shareCard";
 
 // The viewer's current calendar day as YYYY-MM-DD, in their own time zone. It
 // seeds the daily challenge and bounds the practice log, so a new challenge rolls
@@ -62,3 +64,14 @@ export function dailyChallenge(dateKey: string, number: number): DailyChallenge 
     );
     return { tempo, xml };
 }
+
+// The finished daily run, kept so re-opening the day's challenge shows the result
+// rather than a blank slate — the home "see your results" link has somewhere to lead.
+// Only the latest day is worth holding: the daily is the same for everyone that day,
+// so a result tagged with an earlier number is simply ignored on read.
+export type DailyResult = {
+    grade: Grade;
+    grid: Grid;
+    notes: RunNote[];
+    tolerance: number;
+};

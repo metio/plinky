@@ -2,15 +2,21 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { useHistoryStore, useMasteryStore, usePrefsStore } from "../../contexts/services";
-import { FIRST_SONG_ID } from "../../lib/catalog";
+import {
+    useDailyStore,
+    useHintsStore,
+    useHistoryStore,
+    useMasteryStore,
+    useOnboardingStore,
+    usePrefsStore,
+} from "../../contexts/services";
 import {
     type DiscoveryId,
     type DiscoveryProgress,
     discoveries,
     discoveryProgress,
-} from "../../lib/onboarding";
-import { hasSeenHint, markHintSeen } from "../../lib/seenHints";
+} from "../../../core/onboarding";
+import { FIRST_SONG_ID } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { CheckIcon, CloseIcon } from "../ui/icons";
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -53,25 +59,30 @@ export function DiscoveryChecklist() {
     const prefsStore = usePrefsStore();
     const masteryStore = useMasteryStore();
     const historyStore = useHistoryStore();
+    const daily = useDailyStore();
+    const onboarding = useOnboardingStore();
+    const hints = useHintsStore();
     useEffect(() => {
         const done = discoveries({
             prefs: prefsStore.load(),
             masteredCount: masteryStore.loadAll().length,
             history: historyStore.load(),
+            lastDaily: daily.lastDone(),
+            marked: onboarding.marked(),
         });
         setState({
             done,
             progress: discoveryProgress(done),
-            dismissed: hasSeenHint(DISCOVERY_DISMISSED),
+            dismissed: hints.seen(DISCOVERY_DISMISSED),
         });
-    }, [prefsStore, masteryStore, historyStore]);
+    }, [prefsStore, masteryStore, historyStore, daily, onboarding, hints]);
 
     if (!state || state.dismissed || state.progress.allDone) {
         return null;
     }
 
     const dismiss = () => {
-        markHintSeen(DISCOVERY_DISMISSED);
+        hints.markSeen(DISCOVERY_DISMISSED);
         setState((prev) => (prev ? { ...prev, dismissed: true } : prev));
     };
 

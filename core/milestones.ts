@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import { letterMin } from "../../core/mastery";
+import { letterMin } from "./mastery";
 
 // Earned moments that surface a shareable card on the run summary. Each fires at most
 // once: a grade-up is gated by the highest grade ever reached, the first flawless run
@@ -12,28 +11,6 @@ export type Milestone =
     | { kind: "first-s"; songTitle: string }
     | { kind: "grade-up"; grade: number; skill: number }
     | { kind: "flawless"; songTitle: string };
-
-// The highest grade we've already celebrated, so reaching it again is silent.
-const REACHED_GRADE_KEY = "plinky:reached-grade";
-// Whether the one-time flawless-run card has fired.
-const FLAWLESS_KEY = "plinky:flawless-done";
-
-export function reachedGrade(): number {
-    const raw = Number(browserStore.get(REACHED_GRADE_KEY));
-    return Number.isFinite(raw) ? raw : 0;
-}
-
-export function recordReachedGrade(grade: number): void {
-    browserStore.set(REACHED_GRADE_KEY, String(Math.max(reachedGrade(), grade)));
-}
-
-export function flawlessDone(): boolean {
-    return browserStore.get(FLAWLESS_KEY) === "1";
-}
-
-export function recordFlawless(): void {
-    browserStore.set(FLAWLESS_KEY, "1");
-}
 
 // A run scores S the moment its aggregate clears the S cutoff (95); it is the song's
 // first S only if its previous best sat below that line.

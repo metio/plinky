@@ -15,10 +15,11 @@ import { PrintButton } from "../components/features/printButton";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { TransposeProvider } from "../components/features/transposeContext";
+import { useOnboardingStore } from "../contexts/services";
 import { useScore } from "../hooks/useScore";
 import { resolveScore } from "../lib/catalog";
 import { parseExerciseId } from "../../core/exerciseGen";
-import { markDiscovered } from "../lib/onboarding";
+
 import { musicCompositionData, routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -42,6 +43,7 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export default function PlayRoute({ params }: Route.ComponentProps) {
+    const onboarding = useOnboardingStore();
     // Resolves a tick after paint: undefined while loading, null when there is no
     // such score.
     const score = useScore(params.scoreId);
@@ -59,9 +61,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
         const requested = searchParams.get("mode");
         if (requested === "ear" || requested === "fingering") {
             setMode(requested);
-            markDiscovered(requested === "ear" ? "earTried" : "fingeringTried");
+            onboarding.markDiscovered(requested === "ear" ? "earTried" : "fingeringTried");
         }
-    }, [searchParams]);
+    }, [searchParams, onboarding]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">

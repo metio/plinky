@@ -3,9 +3,9 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { DEFAULT_PREFS } from "../../../core/prefs";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { discoveries } from "../../lib/onboarding";
+import { browserStore } from "../../adapters/browserStore";
+import { createOnboardingStore } from "../../stores/onboardingStore";
 import { PlayModeBar } from "./playModeBar";
 
 afterEach(() => {
@@ -30,19 +30,16 @@ describe("PlayModeBar", () => {
     });
 
     it("records reaching Ear and Fingering for the discovery checklist", () => {
+        // The bar renders on the default services (real browser storage in jsdom), so
+        // a fresh store over the same backing reads what the clicks marked.
+        const marked = () => createOnboardingStore(browserStore).marked();
         render(<PlayModeBar mode="play" onChange={vi.fn()} />);
-        expect(discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).earTried).toBe(
-            false,
-        );
+        expect(marked().has("earTried")).toBe(false);
 
         fireEvent.click(screen.getByRole("tab", { name: "Ear" }));
-        expect(discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).earTried).toBe(
-            true,
-        );
+        expect(marked().has("earTried")).toBe(true);
 
         fireEvent.click(screen.getByRole("tab", { name: "Finger Position" }));
-        expect(
-            discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).fingeringTried,
-        ).toBe(true);
+        expect(marked().has("fingeringTried")).toBe(true);
     });
 });

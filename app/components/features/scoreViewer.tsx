@@ -15,8 +15,7 @@ import { summarizeDynamics } from "../../../core/dynamics";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { computeFlow } from "../../../core/flow";
 import { cadence } from "../../../core/cadence";
-import { recordDailyDone } from "../../lib/dailyDone";
-import { type DailyResult, saveDailyResult } from "../../lib/dailyResult";
+import type { DailyResult } from "../../../core/daily";
 import {
     computeGrade,
     GRADE_COLOR,
@@ -28,15 +27,7 @@ import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradePro
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { recordRun } from "../../lib/lifetime";
 import { svgMilestone } from "../../../core/milestoneCard";
-import {
-    flawlessDone,
-    isFirstS,
-    isFlawless,
-    type Milestone,
-    reachedGrade,
-    recordFlawless,
-    recordReachedGrade,
-} from "../../lib/milestones";
+import { isFirstS, isFlawless, type Milestone } from "../../../core/milestones";
 import { applyRun, isDue, letterMin, setBacklog } from "../../../core/mastery";
 import { useMastery } from "../../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
@@ -815,8 +806,8 @@ export function ScoreViewer({
         // Mark the day's challenge done so it shows a ✓ — no streak, just "played" —
         // and keep its result so re-opening the daily shows it rather than a blank run.
         if (daily != null) {
-            recordDailyDone(daily);
-            saveDailyResult(daily, { grade: result, grid, notes, tolerance });
+            services.daily.recordDone(daily);
+            services.daily.saveResult(daily, { grade: result, grid, notes, tolerance });
         }
         // Count the run's notes toward the practice history.
         historyStore.record(matcher.total);
@@ -842,18 +833,18 @@ export function ScoreViewer({
         // grade-up that buries it is a rare, accepted loss). A grade-up is read from the
         // ladder recomputed across all mastery, so it resolves asynchronously.
         const firstS = isFirstS(result.score, before?.bestScore ?? 0);
-        const flawlessNow = isFlawless(result.score) && !flawlessDone();
+        const flawlessNow = isFlawless(result.score) && !services.milestones.flawlessDone();
         const prefs = prefsStore.load();
         // The grade-up check reads the ladder across the whole catalogue, so it resolves
         // asynchronously; the first-S and flawless checks above are already decided.
         loadGradedMastery(masteryStore, services).then((items) => {
             const reached = currentGrade(items);
-            if (reached > reachedGrade()) {
-                recordReachedGrade(reached);
+            if (reached > services.milestones.reachedGrade()) {
+                services.milestones.recordReachedGrade(reached);
                 const rating = skillRating(items, prefs.decayMode, Date.now());
                 setMilestone({ kind: "grade-up", grade: reached, skill: rating });
             } else if (flawlessNow) {
-                recordFlawless();
+                services.milestones.recordFlawless();
                 setMilestone({ kind: "flawless", songTitle: title });
             } else if (firstS) {
                 setMilestone({ kind: "first-s", songTitle: title });

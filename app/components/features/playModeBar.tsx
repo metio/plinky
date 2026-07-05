@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { markDiscovered } from "../../lib/onboarding";
+import { useOnboardingStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { CoachMark } from "./coachMark";
 import { SegmentedControl } from "../ui/segmentedControl";
@@ -26,11 +26,12 @@ export function PlayModeBar({
     mode: PlayMode;
     onChange: (mode: PlayMode) => void;
 }) {
+    const onboarding = useOnboardingStore();
     const select = (next: PlayMode) => {
         if (next === "ear") {
-            markDiscovered("earTried");
+            onboarding.markDiscovered("earTried");
         } else if (next === "fingering") {
-            markDiscovered("fingeringTried");
+            onboarding.markDiscovered("fingeringTried");
         }
         onChange(next);
     };

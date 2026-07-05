@@ -18,10 +18,11 @@ import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { StorageBanner } from "./components/features/storageBanner";
 import { ThemeToggle } from "./components/features/themeToggle";
-import { storageHealth } from "./adapters/browserStore";
+import { browserStore, storageHealth } from "./adapters/browserStore";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
-import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
+import { applyTheme } from "./lib/theme";
+import { createThemeStore, THEME_STORAGE_KEY } from "./stores/themeStore";
 import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
 import {
@@ -49,13 +50,20 @@ const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
 // preload is emitted only for the Latin-script locales that benefit from it.
 const NON_LATIN_LOCALES = new Set(["el", "ru", "uk", "sr", "ja", "ko", "zh"]);
 
+// The layout renders outside the services provider (it IS the provider's
+// parent), so it reads the theme through its own store instance over the real
+// adapter — the composition root wiring its own defaults. Reads only; the
+// toggle writes through the injected store and applies the class itself.
+const themeStore = createThemeStore(browserStore);
+
 // Runs before first paint to set the dark class from the saved (or OS) theme.
 // Applying the theme only in the layout's effect would let the prerendered,
 // class-free HTML paint light first and flash for dark-mode users. It mutates
-// the class outside React, which React's hydration leaves untouched.
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(
+// the class outside React, which React's hydration leaves untouched. The store
+// keeps the value as JSON, so the raw string carries quotes to strip.
+const THEME_INIT_SCRIPT = `(function(){try{var t=JSON.parse(localStorage.getItem(${JSON.stringify(
     THEME_STORAGE_KEY,
-)});if(t!=="light"&&t!=="dark"&&t!=="system"){t="system";}if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark");}}catch(e){}})();`;
+)}));if(t!=="light"&&t!=="dark"&&t!=="system"){t="system";}if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark");}}catch(e){}})();`;
 
 export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
@@ -131,7 +139,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     // so even the error page is themed — App's render is skipped on an error.
     useEffect(() => {
         document.documentElement.lang = getLocale();
-        applyTheme(loadTheme());
+        applyTheme(themeStore.load());
         if (typeof matchMedia !== "function") {
             return;
         }
@@ -139,7 +147,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         // "system" after mount, and re-reading the saved theme makes the OS change
         // a no-op for explicit light/dark and a live update only for "system".
         const media = matchMedia("(prefers-color-scheme: dark)");
-        const onChange = () => applyTheme(loadTheme());
+        const onChange = () => applyTheme(themeStore.load());
         media.addEventListener("change", onChange);
         return () => media.removeEventListener("change", onChange);
     }, []);

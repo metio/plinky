@@ -1,12 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { History } from "../../core/history";
-import type { Prefs } from "../../core/prefs";
-import { browserStore } from "../adapters/browserStore";
-import { readJson, writeJson } from "../stores/jsonStore";
-import { lastDailyDone } from "./dailyDone";
-import { isDefaultKeyMap } from "../../core/keyMap";
+import type { History } from "./history";
+import { isDefaultKeyMap } from "./keyMap";
+import type { Prefs } from "./prefs";
 
 // The feature-discovery checklist: a gentle, opt-in nudge to meet the app's corners,
 // never a gate on progression. Some steps are read from real state (you've played,
@@ -23,47 +20,35 @@ export type DiscoveryId =
     | "keysCustomized";
 
 // The steps marked by doing them — features that record no lasting state of their own.
-const MARKABLE: DiscoveryId[] = ["earTried", "fingeringTried", "composed", "imported"];
+export const MARKABLE: readonly DiscoveryId[] = [
+    "earTried",
+    "fingeringTried",
+    "composed",
+    "imported",
+];
 
-const KEY = "plinky:discovered";
-
-function loadMarked(): Set<DiscoveryId> {
-    const parsed = readJson(browserStore, KEY);
-    return new Set(Array.isArray(parsed) ? (parsed as DiscoveryId[]) : []);
-}
-
-// Record that the player has reached a markable feature. A no-op for derived steps,
-// whose completion is read from real state instead.
-export function markDiscovered(id: DiscoveryId): void {
-    if (!MARKABLE.includes(id)) {
-        return;
-    }
-    const marked = loadMarked();
-    if (!marked.has(id)) {
-        marked.add(id);
-        writeJson(browserStore, KEY, [...marked]);
-    }
-}
-
-// What the derived discovery steps are computed from. The caller loads these from
-// its stores and hands the data in — this module only derives.
+// What the discovery steps are computed from. The caller loads these from its
+// stores and hands the data in — this module only derives.
 export type DiscoveryState = {
     prefs: Prefs;
     // Whether any piece carries mastery state (any entry at all counts as playing).
     masteredCount: number;
     history: History;
+    // The number of the last daily completed, 0 for none.
+    lastDaily: number;
+    // The markable steps already reached.
+    marked: ReadonlySet<DiscoveryId>;
 };
 
 // Which discovery steps are done: the derived ones from the given state, the rest
 // from the marked set.
 export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean> {
-    const { prefs, masteredCount, history } = state;
+    const { prefs, masteredCount, history, lastDaily, marked } = state;
     const span = prefs.handSpan;
-    const marked = loadMarked();
     return {
         played: masteredCount > 0 || Object.values(history).some((notes) => notes > 0),
         handSet: span.left !== null || span.right !== null,
-        dailyDone: lastDailyDone() > 0,
+        dailyDone: lastDaily > 0,
         earTried: marked.has("earTried"),
         fingeringTried: marked.has("fingeringTried"),
         composed: marked.has("composed"),

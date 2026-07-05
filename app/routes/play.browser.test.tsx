@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: 0BSD
 
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import { DEFAULT_PREFS } from "../../core/prefs";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { loadBundledScores } from "../lib/catalog";
-import { discoveries } from "../lib/onboarding";
+import { browserStore } from "../adapters/browserStore";
+import { createOnboardingStore } from "../stores/onboardingStore";
 import Play from "./play";
 import type { Route } from "./+types/play";
 
@@ -59,8 +59,6 @@ describe("Play", () => {
         expect(
             await screen.findByRole("button", { name: /Hear the phrase/ }, { timeout: 30000 }),
         ).toBeTruthy();
-        expect(discoveries({ prefs: DEFAULT_PREFS, masteredCount: 0, history: {} }).earTried).toBe(
-            true,
-        );
+        expect(createOnboardingStore(browserStore).marked().has("earTried")).toBe(true);
     });
 });

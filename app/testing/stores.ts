@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { browserStore } from "../adapters/browserStore";
-import { createHistoryStore } from "../stores/historyStore";
 import { createMasteryStore } from "../stores/masteryStore";
 import { createPrefsStore } from "../stores/prefsStore";
 
@@ -12,4 +11,3 @@ import { createPrefsStore } from "../stores/prefsStore";
 // a component's own store instance sees these writes on its next render.
 export const testPrefsStore = createPrefsStore(browserStore);
 export const testMasteryStore = createMasteryStore(browserStore);
-export const testHistoryStore = createHistoryStore(browserStore);

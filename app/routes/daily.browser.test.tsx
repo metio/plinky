@@ -6,7 +6,8 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { dailyNumber, todayKey } from "../../core/daily";
-import { saveDailyResult } from "../lib/dailyResult";
+import { browserStore } from "../adapters/browserStore";
+import { createDailyStore } from "../stores/dailyStore";
 import Daily from "./daily";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
@@ -80,7 +81,7 @@ describe("Daily", () => {
         // rather than a blank run, so the home "see your results" link has a result to
         // land on.
         const number = dailyNumber(todayKey(new Date()));
-        saveDailyResult(number, {
+        createDailyStore(browserStore).saveResult(number, {
             grade: { accuracy: 91, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
             grid: [["best", "good", "ok", "weak", "none", "best"]],
             notes: [{ targetMs: 0, playedMs: 10, wrongBefore: 0 }],

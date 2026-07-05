@@ -20,7 +20,7 @@ describe("ThemeToggle", () => {
 
         fireEvent.click(button);
         expect(button.textContent).toContain("Light");
-        expect(localStorage.getItem("plinky:theme")).toBe("light");
+        expect(localStorage.getItem("plinky:theme")).toBe('"light"');
 
         fireEvent.click(button);
         expect(button.textContent).toContain("Dark");

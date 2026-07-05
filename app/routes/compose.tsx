@@ -23,8 +23,8 @@ import {
 } from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { buildMidiFile } from "../../core/midiFile";
-import { markDiscovered } from "../lib/onboarding";
-import { usePrefsStore, useXmlCodec } from "../contexts/services";
+
+import { useOnboardingStore, usePrefsStore, useXmlCodec } from "../contexts/services";
 import { fileStem } from "../lib/printScore";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -58,6 +58,7 @@ function downloadBlob(data: BlobPart, type: string, filename: string): void {
 const COMPOSE_REACH: Span = { from: 21, to: 108 };
 
 export default function Compose() {
+    const onboarding = useOnboardingStore();
     const prefsStore = usePrefsStore();
     const xmlCodec = useXmlCodec();
     const [searchParams] = useSearchParams();
@@ -134,27 +135,30 @@ export default function Compose() {
         [keyboardSpan],
     );
 
-    const handleNoteOff = useCallback((event: { note: number; timestamp: number }) => {
-        const open = openRef.current.get(event.note);
-        if (!open || originRef.current === null) {
-            return;
-        }
-        openRef.current.delete(event.note);
-        const durationMs = Math.max(1, event.timestamp - originRef.current - open.startMs);
-        const recorded: RecordedNote = {
-            pitch: event.note,
-            startMs: open.startMs,
-            durationMs,
-            velocity: open.velocity,
-        };
-        // The first recorded note means the player has tried composing.
-        if (notesRef.current.length === 0) {
-            markDiscovered("composed");
-        }
-        // Notes complete in release order, so keep the list sorted by onset — the
-        // codec and the staff both assume ascending starts.
-        setNotes((prev) => [...prev, recorded].sort((a, b) => a.startMs - b.startMs));
-    }, []);
+    const handleNoteOff = useCallback(
+        (event: { note: number; timestamp: number }) => {
+            const open = openRef.current.get(event.note);
+            if (!open || originRef.current === null) {
+                return;
+            }
+            openRef.current.delete(event.note);
+            const durationMs = Math.max(1, event.timestamp - originRef.current - open.startMs);
+            const recorded: RecordedNote = {
+                pitch: event.note,
+                startMs: open.startMs,
+                durationMs,
+                velocity: open.velocity,
+            };
+            // The first recorded note means the player has tried composing.
+            if (notesRef.current.length === 0) {
+                onboarding.markDiscovered("composed");
+            }
+            // Notes complete in release order, so keep the list sorted by onset — the
+            // codec and the staff both assume ascending starts.
+            setNotes((prev) => [...prev, recorded].sort((a, b) => a.startMs - b.startMs));
+        },
+        [onboarding.markDiscovered],
+    );
 
     useMidiInput({ onNoteOn: handleNoteOn, onNoteOff: handleNoteOff });
 

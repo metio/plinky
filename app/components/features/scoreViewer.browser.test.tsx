@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../../contexts/midi";
-import type { DailyResult } from "../../lib/dailyResult";
+import type { DailyResult } from "../../../core/daily";
 import { generatePhrase } from "../../../core/generator";
 
 import { encodeGhost, saveGhost } from "../../lib/recording";

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type ReactNode, useEffect, useState } from "react";
-import { hasSeenHint, markHintSeen } from "../../lib/seenHints";
+import { useHintsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { CloseIcon } from "../ui/icons";
 
@@ -11,18 +11,19 @@ import { CloseIcon } from "../ui/icons";
 // first client render agree; appears after mount only if this hint hasn't been seen.
 // Dismissing (or its first showing) marks it seen for good.
 export function CoachMark({ id, children }: { id: string; children: ReactNode }) {
+    const hints = useHintsStore();
     const [show, setShow] = useState(false);
     useEffect(() => {
-        if (!hasSeenHint(id)) {
+        if (!hints.seen(id)) {
             setShow(true);
         }
-    }, [id]);
+    }, [id, hints]);
 
     if (!show) {
         return null;
     }
     const dismiss = () => {
-        markHintSeen(id);
+        hints.markSeen(id);
         setShow(false);
     };
     return (

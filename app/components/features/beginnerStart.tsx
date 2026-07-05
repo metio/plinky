@@ -2,10 +2,16 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
-import { useHistoryStore, useMasteryStore, usePrefsStore } from "../../contexts/services";
+import {
+    useDailyStore,
+    useHintsStore,
+    useHistoryStore,
+    useMasteryStore,
+    useOnboardingStore,
+    usePrefsStore,
+} from "../../contexts/services";
+import { discoveries } from "../../../core/onboarding";
 import { FIRST_SONG_ID } from "../../lib/catalog";
-import { discoveries } from "../../lib/onboarding";
-import { hasSeenHint, markHintSeen } from "../../lib/seenHints";
 import { m } from "../../paraglide/messages.js";
 import { CloseIcon } from "../ui/icons";
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -32,25 +38,30 @@ export function BeginnerStart() {
     const prefsStore = usePrefsStore();
     const masteryStore = useMasteryStore();
     const historyStore = useHistoryStore();
+    const daily = useDailyStore();
+    const onboarding = useOnboardingStore();
+    const hints = useHintsStore();
     useEffect(() => {
         if (
-            hasSeenHint(DISMISSED) ||
+            hints.seen(DISMISSED) ||
             discoveries({
                 prefs: prefsStore.load(),
                 masteredCount: masteryStore.loadAll().length,
                 history: historyStore.load(),
+                lastDaily: daily.lastDone(),
+                marked: onboarding.marked(),
             }).played
         ) {
             setShow(false);
         }
-    }, [prefsStore, masteryStore, historyStore]);
+    }, [prefsStore, masteryStore, historyStore, daily, onboarding, hints]);
 
     if (!show) {
         return null;
     }
 
     const dismiss = () => {
-        markHintSeen(DISMISSED);
+        hints.markSeen(DISMISSED);
         setShow(false);
     };
 

@@ -10,7 +10,12 @@ import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
+import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
+import { createHintsStore, type HintsStore } from "../stores/hintsStore";
+import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
+import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
+import { createThemeStore, type ThemeStore } from "../stores/themeStore";
 import { createFavoritesStore, type FavoritesStore } from "../stores/favoritesStore";
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
 import { createSongSource, type SongSource } from "../stores/songSource";
@@ -34,6 +39,11 @@ export type AppServices = {
     mastery: MasteryStore;
     history: HistoryStore;
     favorites: FavoritesStore;
+    theme: ThemeStore;
+    hints: HintsStore;
+    onboarding: OnboardingStore;
+    daily: DailyStore;
+    milestones: MilestonesStore;
     // How the network is reached (see Fetcher). The catalogue sources derive
     // from it, so overriding just this redirects every fetch.
     fetcher: Fetcher;
@@ -63,6 +73,11 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
         favorites,
+        theme: overrides.theme ?? createThemeStore(store),
+        hints: overrides.hints ?? createHintsStore(store),
+        onboarding: overrides.onboarding ?? createOnboardingStore(store),
+        daily: overrides.daily ?? createDailyStore(store),
+        milestones: overrides.milestones ?? createMilestonesStore(store),
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
         xml: overrides.xml ?? domXmlCodec,
@@ -97,6 +112,11 @@ export function ServicesProvider({
     const mastery = services?.mastery;
     const history = services?.history;
     const favorites = services?.favorites;
+    const theme = services?.theme;
+    const hints = services?.hints;
+    const onboarding = services?.onboarding;
+    const daily = services?.daily;
+    const milestones = services?.milestones;
     const fetcher = services?.fetcher;
     const audio = services?.audio;
     const xml = services?.xml;
@@ -109,6 +129,11 @@ export function ServicesProvider({
             mastery ||
             history ||
             favorites ||
+            theme ||
+            hints ||
+            onboarding ||
+            daily ||
+            milestones ||
             fetcher ||
             audio ||
             xml ||
@@ -120,6 +145,11 @@ export function ServicesProvider({
                       mastery,
                       history,
                       favorites,
+                      theme,
+                      hints,
+                      onboarding,
+                      daily,
+                      milestones,
                       fetcher,
                       audio,
                       xml,
@@ -127,7 +157,23 @@ export function ServicesProvider({
                       exercises,
                   })
                 : DEFAULT_SERVICES,
-        [store, prefs, mastery, history, favorites, fetcher, audio, xml, songs, exercises],
+        [
+            store,
+            prefs,
+            mastery,
+            history,
+            favorites,
+            theme,
+            hints,
+            onboarding,
+            daily,
+            milestones,
+            fetcher,
+            audio,
+            xml,
+            songs,
+            exercises,
+        ],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
@@ -156,6 +202,22 @@ export function useHistoryStore(): HistoryStore {
 
 export function useFavoritesStore(): FavoritesStore {
     return useServices().favorites;
+}
+
+export function useThemeStore(): ThemeStore {
+    return useServices().theme;
+}
+
+export function useHintsStore(): HintsStore {
+    return useServices().hints;
+}
+
+export function useOnboardingStore(): OnboardingStore {
+    return useServices().onboarding;
+}
+
+export function useDailyStore(): DailyStore {
+    return useServices().daily;
 }
 
 export function useAudioEngine(): AudioEngine {

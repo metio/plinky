@@ -7,8 +7,8 @@ import { CoachMark } from "../components/features/coachMark";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
-import { dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
-import { type DailyResult, loadDailyResult } from "../lib/dailyResult";
+import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
+import { useDailyStore } from "../contexts/services";
 import { generatePhrase } from "../../core/generator";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -26,6 +26,7 @@ type Today = { number: number; tempo: number; xml: string; result: DailyResult |
 const WARMUP = { bars: 8, beatsPerBar: 4 };
 
 export default function DailyRoute() {
+    const daily = useDailyStore();
     const [today, setToday] = useState<Today | null>(null);
     const [mode, setMode] = useState<"challenge" | "warmup">("challenge");
 
@@ -39,8 +40,8 @@ export default function DailyRoute() {
         const dateKey = todayKey(new Date());
         const number = dailyNumber(dateKey);
         const { tempo, xml } = dailyChallenge(dateKey, number);
-        setToday({ number, tempo, xml, result: loadDailyResult(number) });
-    }, []);
+        setToday({ number, tempo, xml, result: daily.loadResult(number) });
+    }, [daily]);
 
     const regenerate = (hands: boolean) => {
         setWarmupXml(generatePhrase({ ...WARMUP, twoHands: hands }));

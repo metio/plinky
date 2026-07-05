@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { dailyNumber, todayKey } from "../../../core/daily";
-import { lastDailyDone } from "../../lib/dailyDone";
 import {
     currentGrade,
     dueReviews,
@@ -63,7 +62,7 @@ export function HomeToday() {
                 items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
             );
             const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
-            const dailyDoneToday = lastDailyDone() === dailyNumber(todayKey(new Date()));
+            const dailyDoneToday = services.daily.lastDone() === dailyNumber(todayKey(new Date()));
             setTasks(
                 todayTasks({
                     dueIds: dueReviews(items, now, prefs.reviewCap),
