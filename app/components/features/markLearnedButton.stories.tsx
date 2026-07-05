@@ -11,8 +11,8 @@ import { MarkLearnedButton } from "./markLearnedButton";
 // A feature component running entirely on injected fakes: the story hands it a
 // mastery store over an in-memory backing, so each state is just differently
 // seeded data — no browser storage, no setup beyond the provider. Clicking the
-// button writes through the injected store and the component hides itself, the
-// same single-source-of-truth round trip the app performs.
+// button writes through the injected store and the control flips its own colour and
+// pressed state, the same single-source-of-truth round trip the app performs.
 const meta: Meta<typeof MarkLearnedButton> = {
     title: "Features/MarkLearnedButton",
     component: MarkLearnedButton,
@@ -39,7 +39,7 @@ export const AlreadyLearned: Story = {
         return (
             <ServicesProvider services={{ mastery }}>
                 <p className="text-sm text-gray-500">
-                    A learned piece renders no button — the control removes itself:
+                    A learned piece shows a filled green check, pressed — click to un-mark it:
                 </p>
                 <MarkLearnedButton id="story-piece" />
             </ServicesProvider>

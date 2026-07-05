@@ -11,6 +11,7 @@ import {
     type Mastery,
     normalizeMastery,
     setBacklog,
+    unmarkLearned,
 } from "./mastery";
 
 const NOW = 1_000_000_000_000;
@@ -153,5 +154,23 @@ describe("markLearned", () => {
         const next = markLearned(null, NOW);
         expect(next.learned).toBe(true);
         expect(next.reviewAt).toBe(NOW + DAY);
+    });
+});
+
+describe("unmarkLearned", () => {
+    it("clears the learned flag and its review schedule but keeps the best score", () => {
+        const before = learned({ bestScore: 88, intervalDays: 12, reviewAt: NOW + 12 * DAY });
+        const next = unmarkLearned(before, NOW);
+        expect(next.learned).toBe(false);
+        expect(next.reviewAt).toBe(0);
+        expect(next.intervalDays).toBe(0);
+        expect(next.bestScore).toBe(88);
+        expect(isDue(next, NOW + 100 * DAY)).toBe(false);
+    });
+
+    it("is a safe no-op shape on a missing mastery", () => {
+        const next = unmarkLearned(null, NOW);
+        expect(next.learned).toBe(false);
+        expect(next.updatedAt).toBe(NOW);
     });
 });

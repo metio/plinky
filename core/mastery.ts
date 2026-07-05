@@ -144,6 +144,14 @@ export function markLearned(current: Mastery | null, now: number): Mastery {
     };
 }
 
+// The inverse of markLearned: clears the learned flag and its review schedule, so a
+// piece marked by hand can be un-marked. bestScore stays — it records the best run
+// played, not a claim of mastery — and a later passing run re-learns it via applyRun.
+export function unmarkLearned(current: Mastery | null, now: number): Mastery {
+    const base = current ?? EMPTY;
+    return { ...base, learned: false, intervalDays: 0, reviewAt: 0, updatedAt: now };
+}
+
 export function setBacklog(current: Mastery | null, backlog: boolean, now: number): Mastery {
     const base = current ?? EMPTY;
     return { ...base, backlog, updatedAt: now };
