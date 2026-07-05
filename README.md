@@ -35,7 +35,9 @@ lighting up each note as it sounds so your eye can follow along. Listen and Prac
 **hand off to each other** — let the computer play a tricky passage then take over
 mid-phrase, or play a while and hand it back — and your place is kept, even if you
 step out of full screen and come back to it; the **restart** control (or finishing
-the run) returns you to the top. The
+the run) returns you to the top. The notes keep their colour as you switch, so the
+score tells the story of how it was played — **blue** where the computer played,
+**green** where you did. The
 staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up with
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**
