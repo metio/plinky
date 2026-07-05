@@ -17,6 +17,11 @@ export function NewsBanner() {
     const item = useNews();
     const hints = useHintsStore();
     const [dismissed, setDismissed] = useState(false);
+    // The picture's own width/height ratio, learned once it loads, so the box
+    // matches the image exactly — the whole picture shows with no crop and no
+    // letterbox bars. Until then the box reserves an approximate ratio so the
+    // image does not shift the page as its bytes arrive.
+    const [loadedRatio, setLoadedRatio] = useState<number | undefined>(undefined);
 
     if (!item) {
         return null;
@@ -26,7 +31,7 @@ export function NewsBanner() {
         return null;
     }
 
-    const aspect = item.aspect && item.aspect > 0 ? item.aspect : 16 / 9;
+    const aspect = loadedRatio ?? (item.aspect && item.aspect > 0 ? item.aspect : 16 / 9);
     const dismiss = () => {
         hints.markSeen(dismissKey);
         setDismissed(true);
@@ -51,8 +56,9 @@ export function NewsBanner() {
                 rel="noopener noreferrer"
                 className="group block"
             >
-                {/* The reserved aspect box keeps the picture from shifting the page
-                    as it loads — the space is claimed before the bytes arrive. */}
+                {/* The box takes the image's own ratio once known (approximate
+                    until then), and object-contain shows the whole picture — no
+                    edges cropped. */}
                 <div
                     style={{ aspectRatio: String(aspect) }}
                     className="w-full bg-gray-100 dark:bg-gray-800"
@@ -61,7 +67,13 @@ export function NewsBanner() {
                         src={item.imageUrl}
                         alt={item.imageAlt}
                         loading="lazy"
-                        className="h-full w-full object-cover"
+                        onLoad={(event) => {
+                            const { naturalWidth, naturalHeight } = event.currentTarget;
+                            if (naturalWidth > 0 && naturalHeight > 0) {
+                                setLoadedRatio(naturalWidth / naturalHeight);
+                            }
+                        }}
+                        className="h-full w-full object-contain"
                     />
                 </div>
                 {item.headline && (
