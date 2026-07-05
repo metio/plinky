@@ -5,6 +5,7 @@ import { useXmlCodec } from "../../contexts/services";
 import { toMidiNotes } from "../../../core/composition";
 import { buildMidiFile } from "../../../core/midiFile";
 import { parseMusicXml } from "../../../core/musicxmlParse";
+import { downloadBlob } from "../../lib/download";
 import { fileStem } from "../../lib/printScore";
 import { transposeMusicXml } from "../../../core/transpose";
 import { m } from "../../paraglide/messages.js";
@@ -24,16 +25,11 @@ export function ExportButton({ xml, title }: { xml: string; title: string }) {
         if (!composition) {
             return;
         }
-        const blob = new Blob(
-            [buildMidiFile(toMidiNotes(composition), { tempo: composition.tempo })],
-            { type: "audio/midi" },
+        downloadBlob(
+            buildMidiFile(toMidiNotes(composition), { tempo: composition.tempo }),
+            "audio/midi",
+            `${fileStem(title)}.mid`,
         );
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = `${fileStem(title)}.mid`;
-        anchor.click();
-        URL.revokeObjectURL(url);
     };
     return (
         <IconButton

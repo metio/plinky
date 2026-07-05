@@ -95,10 +95,17 @@ export function ShareButtons({
             <button
                 type="button"
                 onClick={() => {
-                    navigator.clipboard?.writeText(text).catch(() => {});
-                    setCopied(true);
-                    window.clearTimeout(copyTimer.current);
-                    copyTimer.current = window.setTimeout(() => setCopied(false), 2000);
+                    // Confirm "Copied!" only once the write actually lands — optional
+                    // chaining short-circuits the whole chain when the Clipboard API is
+                    // absent, and the catch covers a denied or failed write.
+                    navigator.clipboard
+                        ?.writeText(text)
+                        .then(() => {
+                            setCopied(true);
+                            window.clearTimeout(copyTimer.current);
+                            copyTimer.current = window.setTimeout(() => setCopied(false), 2000);
+                        })
+                        .catch(() => {});
                 }}
                 className={LINK}
             >

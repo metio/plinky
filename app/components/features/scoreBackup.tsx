@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { exportAllPack, importScoresPack, loadUserScores } from "../../lib/catalog";
+import { downloadBlob } from "../../lib/download";
 import { useStore, useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -29,13 +30,7 @@ export function ScoreBackup() {
     }, [store]);
 
     const download = () => {
-        const blob = new Blob([exportAllPack(store)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = "plinky-scores.json";
-        anchor.click();
-        URL.revokeObjectURL(url);
+        downloadBlob(exportAllPack(store), "application/json", "plinky-scores.json");
     };
 
     const importFile = async (file: File | undefined) => {

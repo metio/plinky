@@ -153,6 +153,17 @@ export function FingeringDrill({
     // Number keys 1–5 assign a finger to the highlighted note, like the buttons.
     useEffect(() => {
         const onKey = (event: KeyboardEvent) => {
+            // Ignore digits typed into a text field elsewhere on the page — a global
+            // listener would otherwise assign a finger while someone edits an input.
+            const target = event.target as HTMLElement | null;
+            if (
+                target &&
+                (target.tagName === "INPUT" ||
+                    target.tagName === "TEXTAREA" ||
+                    target.isContentEditable)
+            ) {
+                return;
+            }
             const finger = Number(event.key);
             if (finger >= 1 && finger <= 5) {
                 assign(finger);

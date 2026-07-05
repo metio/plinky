@@ -30,7 +30,12 @@ export function EarPiece({ xml }: { xml: string }) {
     const clamped = Math.min(start, lastStart);
     // The melody: the top note of each position in the window, in play order.
     const phrase = useMemo(
-        () => windowPositions(bars, clamped, WINDOW).map((pos) => Math.max(...pos)),
+        // The top note of each position; skip any empty position so Math.max can't
+        // yield -Infinity and hand the ear trainer a note that doesn't exist.
+        () =>
+            windowPositions(bars, clamped, WINDOW)
+                .filter((pos) => pos.length > 0)
+                .map((pos) => Math.max(...pos)),
         [bars, clamped],
     );
 

@@ -4,6 +4,8 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import { memoryStore } from "../../adapters/memoryStore";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { DangerZone } from "./dangerZone";
 
 afterEach(cleanup);
@@ -19,5 +21,16 @@ describe("DangerZone", () => {
 
         fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
         expect(screen.queryByRole("button", { name: /yes, erase/i })).toBeNull();
+    });
+
+    it("reports a failed wipe instead of reloading when storage refuses removals", () => {
+        // A store that keeps a Plinky key however hard it is told to delete it — the
+        // reset must surface the failure rather than reload into stale data.
+        const refusing = { ...memoryStore({ "plinky:scores": "[]" }), remove: () => {} };
+        renderWithServices(<DangerZone />, { store: refusing });
+
+        fireEvent.click(screen.getByRole("button", { name: /reset this device/i }));
+        fireEvent.click(screen.getByRole("button", { name: /yes, erase/i }));
+        expect(screen.getByRole("alert")).toBeTruthy();
     });
 });

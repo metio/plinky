@@ -354,6 +354,7 @@
   "settings_reset_confirm": "Erase everything on this device?",
   "settings_reset_yes": "Yes, erase it",
   "settings_reset_cancel": "Cancel",
+  "settings_reset_failed": "Some data couldn't be erased — your device storage may be full or blocked. Nothing was reloaded; try again.",
   "action_practice": "Practice",
   "tracks_heading": "Tracks",
   "tracks_intro": "Ordered practice paths through the catalogue — scales, arpeggios, and pieces in a sensible sequence. Follow a path downward; everything stays unlocked, so the order is just a suggestion and the markers show what you've already set a score on.",

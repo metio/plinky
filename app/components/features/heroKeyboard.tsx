@@ -37,15 +37,17 @@ export function HeroKeyboard() {
     const plink = (note: number) => {
         synth.playNote(note, { velocity: 100, duration: 1.4 });
         setLit((prev) => new Set(prev).add(note));
-        timers.current.push(
-            window.setTimeout(() => {
-                setLit((prev) => {
-                    const next = new Set(prev);
-                    next.delete(note);
-                    return next;
-                });
-            }, 240),
-        );
+        const id = window.setTimeout(() => {
+            setLit((prev) => {
+                const next = new Set(prev);
+                next.delete(note);
+                return next;
+            });
+            // Drop the fired timer so the pending list can't grow without bound over a
+            // long session on the landing page; the unmount cleanup clears the rest.
+            timers.current = timers.current.filter((pending) => pending !== id);
+        }, 240);
+        timers.current.push(id);
     };
 
     // A connected MIDI keyboard plays the hero too — but only if it's already
