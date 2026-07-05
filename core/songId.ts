@@ -13,7 +13,8 @@
 // build, but the browser computes an uploaded file's id to place it and to detect that it
 // duplicates a catalogue piece.
 
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+import { STEP_SEMITONES } from "./pitch";
+
 // Base62 (digits + letters): URL- and filename-safe, no leading `-`/`_` edge cases.
 const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const ID_LENGTH = 12;

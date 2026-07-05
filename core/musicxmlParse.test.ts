@@ -29,6 +29,19 @@ describe("parseMusicXml", () => {
         expect(parsed!.notes.map((n) => Math.round(n.startMs))).toEqual([0, 500, 1000]);
     });
 
+    it("skips a note whose octave or alter isn't a number rather than emitting a NaN pitch", () => {
+        // A garbled <octave> would compute to a NaN MIDI number that slips past a null
+        // check; the good note around it must still read.
+        const xml = `<score-partwise><part id="P1"><measure number="1">
+            <attributes><divisions>1</divisions></attributes>
+            <note><pitch><step>C</step><octave>x</octave></pitch><duration>1</duration></note>
+            <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration></note>
+        </measure></part></score-partwise>`;
+        const parsed = parseMusicXml(domXmlCodec, xml);
+        expect(parsed!.notes.map((n) => n.pitch)).toEqual([62]);
+        expect(parsed!.notes.every((n) => Number.isFinite(n.pitch))).toBe(true);
+    });
+
     it("reads a block chord back as simultaneous notes", () => {
         const composition: Composition = {
             notes: [

@@ -29,6 +29,22 @@ describe("decompressMxl", () => {
         expect(decompressMxl(mxl("score.xml", false))).toBe(XML);
     });
 
+    it("scans for the score when the container names a rootfile that isn't in the zip", () => {
+        // The container points at score.xml, but the zip actually holds real.xml.
+        const files = {
+            "real.xml": strToU8(XML),
+            "META-INF/container.xml": strToU8(
+                '<container><rootfiles><rootfile full-path="score.xml"/></rootfiles></container>',
+            ),
+        };
+        expect(decompressMxl(new Uint8Array(zipSync(files)))).toBe(XML);
+    });
+
+    it("accepts a .musicxml rootfile, not only .xml", () => {
+        const files = { "score.musicxml": strToU8(XML) };
+        expect(decompressMxl(new Uint8Array(zipSync(files)))).toBe(XML);
+    });
+
     it("returns null for bytes that aren't a zip", () => {
         expect(decompressMxl(strToU8("not a zip"))).toBeNull();
     });

@@ -97,16 +97,24 @@ export function buildScore(spec: ScoreSpec): string {
     const trebleMeasures = intoMeasures(spec.treble, spec.beatsPerBar);
     const bassMeasures = spec.bass ? intoMeasures(spec.bass, spec.beatsPerBar) : null;
     const backup = spec.beatsPerBar * DIVISIONS;
-    const measures = trebleMeasures.map((trebleNotes, index) => {
+    // Span the longer hand so a bass line that outlasts the treble isn't truncated.
+    const measureCount = Math.max(trebleMeasures.length, bassMeasures?.length ?? 0);
+    const measures = Array.from({ length: measureCount }, (_, index) => {
         const number = index + 1;
         const attributes = number === 1 ? `      ${attributesXml(spec)}\n` : "";
+        const trebleNotes = trebleMeasures[index] ?? [];
         const treble = trebleNotes
             .map((note) => noteXml(note, bassMeasures ? 1 : undefined))
             .join("\n");
         let body = `${attributes}${treble}`;
         if (bassMeasures) {
             const bass = (bassMeasures[index] ?? []).map((note) => noteXml(note, 2)).join("\n");
-            body += `\n      <backup><duration>${backup}</duration></backup>\n${bass}`;
+            // The backup rewinds the cursor over the treble notes so the bass staff starts
+            // at the same beat. An empty treble measure leaves the cursor at the bar start,
+            // so no backup is needed — and emitting one there would rewind before the bar.
+            const rewind =
+                trebleNotes.length > 0 ? `\n      <backup><duration>${backup}</duration></backup>` : "";
+            body += `${rewind}\n${bass}`;
         }
         return `    <measure number="${number}">\n${body}\n    </measure>`;
     });

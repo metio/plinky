@@ -15,11 +15,16 @@ export function decompressMxl(bytes: Uint8Array): string | null {
     try {
         const entries = unzipSync(bytes);
         const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
-        const root =
-            container.match(/full-path="([^"]+)"/)?.[1] ??
-            Object.keys(entries).find(
-                (name) => name.endsWith(".xml") && !name.startsWith("META-INF"),
-            );
+        // Prefer the rootfile container.xml names, but fall back to scanning the zip when
+        // it's missing or points at an absent entry (a mislabelled or hand-zipped .mxl),
+        // and accept a .musicxml rootfile as well as .xml.
+        const named = container.match(/full-path="([^"]+)"/)?.[1];
+        const scanned = Object.keys(entries).find(
+            (name) =>
+                !name.startsWith("META-INF") &&
+                (name.endsWith(".xml") || name.endsWith(".musicxml")),
+        );
+        const root = named && entries[named] ? named : scanned;
         return root && entries[root] ? strFromU8(entries[root]) : null;
     } catch {
         return null;
