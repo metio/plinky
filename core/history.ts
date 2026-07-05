@@ -15,12 +15,21 @@ export type PracticeSummary = {
 // Turns a raw stored string (or null for nothing stored) into a valid History.
 // An array also satisfies `typeof === "object"`, but assigning date keys onto one
 // and re-serialising drops them, silently losing practice — so it reads as empty.
+// Only finite-number values are kept: a corrupt entry whose value is a string would
+// otherwise turn `count + notes` into string concatenation and every total to gibberish.
 export function parseHistory(raw: string | null): History {
     try {
         const parsed = JSON.parse(raw ?? "{}");
-        return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-            ? (parsed as History)
-            : {};
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+            return {};
+        }
+        const history: History = {};
+        for (const [key, value] of Object.entries(parsed)) {
+            if (typeof value === "number" && Number.isFinite(value)) {
+                history[key] = value;
+            }
+        }
+        return history;
     } catch {
         return {};
     }

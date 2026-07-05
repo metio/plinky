@@ -65,18 +65,25 @@ export function createSongSource(
     favorites: FavoritesStore,
 ): SongSource {
     let manifestCache: SongMeta[] | null = null;
+    let manifestInFlight: Promise<SongMeta[]> | null = null;
 
-    const manifest = async (): Promise<SongMeta[]> => {
+    const manifest = (): Promise<SongMeta[]> => {
         if (manifestCache) {
-            return manifestCache;
+            return Promise.resolve(manifestCache);
         }
-        // Only a completed fetch is cached; a failure answers empty for this
-        // call and the next call tries the network again.
-        const fetched = await fetchManifest<SongMeta>(fetchUrl, MANIFEST_URL);
-        if (fetched) {
-            manifestCache = fetched;
+        // Concurrent first-render callers share one request rather than each firing the
+        // fetch. Only a completed fetch is cached; a failure clears the in-flight promise
+        // so the next call tries the network again.
+        if (!manifestInFlight) {
+            manifestInFlight = fetchManifest<SongMeta>(fetchUrl, MANIFEST_URL).then((fetched) => {
+                manifestInFlight = null;
+                if (fetched) {
+                    manifestCache = fetched;
+                }
+                return fetched ?? [];
+            });
         }
-        return fetched ?? [];
+        return manifestInFlight;
     };
 
     const fetchXml = async (id: string, license?: string): Promise<string | null> => {

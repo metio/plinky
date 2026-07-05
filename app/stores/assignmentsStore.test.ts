@@ -26,7 +26,7 @@ describe("assignmentsStore", () => {
         expect(store.list().map((entry) => entry.id)).toEqual([assignment.id]);
         // A second instance over the same backing store reads the same truth.
         expect(createAssignmentsStore(kv).list()).toHaveLength(1);
-        store.remove(assignment.id);
+        expect(store.remove(assignment.id)).toBe(true);
         expect(store.list()).toEqual([]);
     });
 
@@ -87,8 +87,9 @@ describe("assignmentsStore", () => {
         const kv = memoryStore();
         createAssignmentsStore(kv).save(sample());
         const store = createAssignmentsStore({ ...kv, set: () => false });
-        store.remove(sample().id);
-        // Storage still holds it; the storage banner carries the failure signal.
+        // The refused write is reported so a caller can react, and storage still holds
+        // the assignment — the storage banner carries the aggregate failure signal.
+        expect(store.remove(sample().id)).toBe(false);
         expect(createAssignmentsStore(kv).list()).toHaveLength(1);
     });
 

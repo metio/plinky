@@ -30,6 +30,12 @@ describe("parseHistory", () => {
     it("rejects a stored array so practice is not silently lost", () => {
         expect(parseHistory("[1,2,3]")).toEqual({});
     });
+
+    it("keeps only finite-number values so a corrupt entry can't concatenate totals", () => {
+        expect(
+            parseHistory('{"2026-06-21":30,"2026-06-22":"oops","2026-06-23":null,"2026-06-24":15}'),
+        ).toEqual({ "2026-06-21": 30, "2026-06-24": 15 });
+    });
 });
 
 describe("summarizePractice", () => {

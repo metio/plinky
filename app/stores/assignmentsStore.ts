@@ -15,7 +15,7 @@ export type AssignmentsStore = {
     // Upsert by id, so re-saving an edited assignment refreshes it in place.
     // False when the write fails (e.g. storage quota), so a caller can say so.
     save(assignment: Assignment): boolean;
-    remove(id: string): void;
+    remove(id: string): boolean;
     subscribe(onChange: () => void): () => void;
 };
 
@@ -68,7 +68,7 @@ export function createAssignmentsStore(kv: KeyValueStore): AssignmentsStore {
             return store.save(next);
         },
         remove(id) {
-            store.save(store.load().filter((entry) => entry.id !== id));
+            return store.save(store.load().filter((entry) => entry.id !== id));
         },
         subscribe: store.subscribe,
     };

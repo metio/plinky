@@ -46,18 +46,27 @@ export type ExerciseSource = {
 
 export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
     let manifestCache: ExerciseMeta[] | null = null;
+    let manifestInFlight: Promise<ExerciseMeta[]> | null = null;
 
-    const manifest = async (): Promise<ExerciseMeta[]> => {
+    const manifest = (): Promise<ExerciseMeta[]> => {
         if (manifestCache) {
-            return manifestCache;
+            return Promise.resolve(manifestCache);
         }
-        // Only a completed fetch is cached; a failure answers empty for this
-        // call and the next call tries the network again.
-        const fetched = await fetchManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL);
-        if (fetched) {
-            manifestCache = fetched;
+        // Concurrent first-render callers share one request rather than each firing the
+        // fetch. Only a completed fetch is cached; a failure clears the in-flight promise
+        // so the next call tries the network again.
+        if (!manifestInFlight) {
+            manifestInFlight = fetchManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL).then(
+                (fetched) => {
+                    manifestInFlight = null;
+                    if (fetched) {
+                        manifestCache = fetched;
+                    }
+                    return fetched ?? [];
+                },
+            );
         }
-        return fetched ?? [];
+        return manifestInFlight;
     };
 
     // A study's MusicXML lives in a compressed .mxl named by its fingerprint id;
