@@ -38,6 +38,22 @@ export default {
     // (concurrency 1), which entry.server relies on to pin getLocale per page.
     prerender() {
         const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS];
-        return ["/", ...generateStaticLocalizedUrls(paths).map((url) => url.pathname)];
+        const localized = generateStaticLocalizedUrls(paths).map((url) => url.pathname);
+        // A per-locale build (PLINKY_LOCALE=de) pins getLocale to its language, so
+        // it can only render its own pages correctly — prerender just those. The
+        // bare "/" redirect detects the visitor's language at runtime and must NOT
+        // be pinned, so it comes from the default (all-locales) build alone, which
+        // also supplies the SPA fallback for non-prerendered dynamic routes.
+        const pinned = process.env.PLINKY_LOCALE;
+        if (pinned) {
+            return localized.filter((path) => path.startsWith(`/${pinned}/`));
+        }
+        // The default (all-locales) build in the per-locale pipeline only needs to
+        // supply "/" and the SPA fallback; the localized pages come from the pinned
+        // builds. A plain `npm run build` (local dev/preview) prerenders everything.
+        if (process.env.PLINKY_ROOT_ONLY) {
+            return ["/"];
+        }
+        return ["/", ...localized];
     },
 } satisfies Config;

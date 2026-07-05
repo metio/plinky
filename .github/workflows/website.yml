@@ -40,7 +40,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build SPA
-        run: npm run build
+        # Per-locale build: one bundle per language, tree-shaken to that language,
+        # merged into build/client (dev/build-locales.mjs). A visitor to /de/…
+        # downloads only German.
+        run: npm run build:locales
         env:
           # Optional home-page news banner (Sanity). These are public identifiers
           # baked into the client bundle, so they are repository *Variables*, not
