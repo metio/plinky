@@ -68,11 +68,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      # Lighthouse measures per-visitor script weight, so build one locale.
+      # Lighthouse measures per-visitor script weight, so build one locale. A
+      # pinned build has no "/" route, so it emits no __spa-fallback.html; every
+      # audited URL is a prerendered /en/ page, so no 404 fallback is needed.
       - run: PLINKY_LOCALE=en npm run build
-      # Prerendered routes are served from build/client; deep links need the SPA
-      # fallback, matching how GitHub Pages serves the site.
-      - run: cp build/client/__spa-fallback.html build/client/404.html
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
         with:

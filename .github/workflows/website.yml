@@ -24,38 +24,101 @@ concurrency:
   group: pages
   cancel-in-progress: false
 jobs:
-  website:
-    name: Website
+  # Per-locale build: each language builds in parallel, tree-shaken to its own
+  # strings, then one job merges them so a visitor to /de/… downloads only German.
+  # The locale set is read from the inlang project so a new language needs no
+  # workflow edit.
+  setup:
+    name: Locales
+    runs-on: ubuntu-latest
+    outputs:
+      locales: ${{ steps.list.outputs.locales }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - id: list
+        run: echo "locales=$(node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
+
+  build-root:
+    name: Build root (all locales)
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build root
+        # Supplies "/" (a runtime language-detect redirect, so it can't be pinned
+        # to one locale) and the SPA fallback, plus the public assets and the
+        # root-redirect chunks.
+        run: npm run build:client
+        env:
+          PLINKY_ROOT_ONLY: "1"
+          # Optional home-page news banner (Sanity). Public identifiers baked into
+          # the client bundle, so they are repository *Variables*, not secrets.
+          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
+          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: site-root
+          path: build/client
+          retention-days: 1
+
+  build-locale:
+    name: Build ${{ matrix.locale }}
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        locale: ${{ fromJSON(needs.setup.outputs.locales) }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build ${{ matrix.locale }}
+        # Tree-shaken to this one language; prerenders only its /<locale>/ pages.
+        run: npm run build:client
+        env:
+          PLINKY_LOCALE: ${{ matrix.locale }}
+          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
+          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: site-${{ matrix.locale }}
+          # Only this locale's pages + chunks; the public assets come from site-root.
+          path: |
+            build/client/${{ matrix.locale }}
+            build/client/assets
+          retention-days: 1
+
+  deploy:
+    name: Merge & deploy
+    needs: [build-root, build-locale]
     runs-on: ubuntu-latest
     permissions:
       contents: write # peaceiris pushes the built site to the gh-pages branch
     steps:
-      - name: Clone Git Repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 24
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Build SPA
-        # Per-locale build: one bundle per language, tree-shaken to that language,
-        # merged into build/client (dev/build-locales.mjs). A visitor to /de/…
-        # downloads only German.
-        run: npm run build:locales
-        env:
-          # Optional home-page news banner (Sanity). These are public identifiers
-          # baked into the client bundle, so they are repository *Variables*, not
-          # secrets. Unset → no banner, no network call. Set them under
-          # Settings → Secrets and variables → Actions → Variables.
-          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
-          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: artifacts
+      - name: Merge locale bundles
+        run: node dev/merge-locale-artifacts.mjs artifacts
+      - name: Stamp service worker + sitemap
+        # No npm install: both scripts use only Node built-ins + settings.json.
+        run: node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs
       - name: Add SPA fallback
-        # GitHub Pages has no SPA rewrite, so a deep link like
-        # /practice/c-major-scale 404s on refresh. Prerendering emits a generic
-        # shell at __spa-fallback.html; serving it as 404.html lets the client
-        # router take over and render the route (index.html is now home's page).
+        # GitHub Pages has no SPA rewrite, so a deep link 404s on refresh. Serving
+        # the prerendered shell as 404.html lets the client router take over.
         run: cp build/client/__spa-fallback.html build/client/404.html
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
