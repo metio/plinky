@@ -14,7 +14,7 @@ import {
     STAR_THRESHOLDS,
     starTier,
 } from "./gradeProgress";
-import { MAX_GRADE } from "./scoreDifficulty";
+import { MAX_GRADE } from "../../core/scoreDifficulty";
 
 const arbMastery = fc.record({
     bestScore: fc.integer({ min: 0, max: 100 }),

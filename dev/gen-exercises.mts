@@ -9,18 +9,17 @@
 // It also sources Hanon (The Virtuoso Pianist) from the local PDMX corpus when
 // present (a gitignored build input): those are real transcriptions, not generated,
 // so their MusicXML ships in a small gzipped pack. If PDMX or Hanon is absent, the
-// pack is simply empty. Needs a DOM for the grading engine (linkedom under tsx).
+// pack is simply empty.
 // Run: `npm run exercises`.
 
+import { gradeOf, rawDifficulty } from "../core/scoreDifficulty.ts";
+import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { parse } from "csv-parse/sync";
 import { strFromU8, unzipSync } from "fflate";
-import { DOMParser } from "linkedom";
 import { songId } from "../core/songId.ts";
 import type { ExerciseConfig } from "../core/exerciseGen.ts";
-// @ts-expect-error - the grading engine calls the global DOMParser, as in the browser
-globalThis.DOMParser = DOMParser;
-const { gradeOf, rawDifficulty } = await import("../app/lib/scoreDifficulty.ts");
+
 const { EXERCISE_TILES, buildExerciseId, exerciseTitle, generateExercise } = await import(
     "../core/exerciseGen.ts"
 );
@@ -48,8 +47,8 @@ for (const tile of EXERCISE_TILES) {
     entries.push({
         id: songId(xml),
         title: exerciseTitle(tile),
-        grade: gradeOf(buildExerciseId(tile), xml),
-        cost: rawDifficulty(xml),
+        grade: gradeOf(linkedomXmlCodec, buildExerciseId(tile), xml),
+        cost: rawDifficulty(linkedomXmlCodec, xml),
         kind: "scale-arpeggio",
         config: tile,
     });
@@ -132,8 +131,8 @@ function sourceStudies(): void {
                 entry: {
                     id,
                     title: name && name !== "NA" ? name : "Study",
-                    grade: gradeOf(id, xml),
-                    cost: rawDifficulty(xml),
+                    grade: gradeOf(linkedomXmlCodec, id, xml),
+                    cost: rawDifficulty(linkedomXmlCodec, xml),
                     kind: "study",
                     composer: composer && composer !== "NA" ? composer : "",
                 },

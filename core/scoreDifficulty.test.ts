@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import { categoryOf, gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
 
@@ -13,7 +14,7 @@ const note = (step: string, octave: number, staff?: number, chord = false) =>
 
 describe("parsePositions", () => {
     it("reads a single-staff line into right-hand positions", () => {
-        const { right, left } = parsePositions(score(note("C", 4) + note("E", 4) + note("G", 4)));
+        const { right, left } = parsePositions(domXmlCodec, score(note("C", 4) + note("E", 4) + note("G", 4)));
         expect(right).toEqual([[60], [64], [67]]);
         expect(left).toEqual([]);
     });
@@ -22,28 +23,28 @@ describe("parsePositions", () => {
         const xml = score(
             note("C", 4, 1) + note("E", 4, 1, true) + note("G", 4, 1, true) + note("C", 2, 2),
         );
-        const { right, left } = parsePositions(xml);
+        const { right, left } = parsePositions(domXmlCodec, xml);
         expect(right).toEqual([[60, 64, 67]]);
         expect(left).toEqual([[36]]);
     });
 
     it("skips rests and survives malformed XML", () => {
-        expect(parsePositions("not xml at all")).toEqual({ right: [], left: [] });
+        expect(parsePositions(domXmlCodec, "not xml at all")).toEqual({ right: [], left: [] });
         const withRest = score(`${note("C", 4)}<note><rest/><duration>2</duration></note>`);
-        expect(parsePositions(withRest).right).toEqual([[60]]);
+        expect(parsePositions(domXmlCodec, withRest).right).toEqual([[60]]);
     });
 });
 
 describe("rawDifficulty", () => {
     it("is zero for an empty or unreadable score", () => {
-        expect(rawDifficulty("garbage")).toBe(0);
-        expect(rawDifficulty(score(""))).toBe(0);
+        expect(rawDifficulty(domXmlCodec, "garbage")).toBe(0);
+        expect(rawDifficulty(domXmlCodec, score(""))).toBe(0);
     });
 
     it("costs a comfortable five-finger line less than a wide, leaping one", () => {
         const inHand = score([60, 62, 64, 65, 67].map((p) => noteFor(p)).join(""));
         const leaping = score([60, 72, 64, 76, 67].map((p) => noteFor(p)).join(""));
-        expect(rawDifficulty(inHand)).toBeLessThan(rawDifficulty(leaping));
+        expect(rawDifficulty(domXmlCodec, inHand)).toBeLessThan(rawDifficulty(domXmlCodec, leaping));
     });
 });
 
@@ -58,13 +59,13 @@ describe("categoryOf", () => {
 describe("gradeOf", () => {
     it("grades a gentle stepwise tune at the bottom of its scale", () => {
         const gentle = score([60, 62, 64, 65, 67].map((p) => noteFor(p)).join(""));
-        expect(gradeOf("gentle-piece", gentle)).toBe(1);
+        expect(gradeOf(domXmlCodec, "gentle-piece", gentle)).toBe(1);
     });
 
     it("always returns a grade within 1..MAX_GRADE", () => {
         // A relentless wide-leap line is the hardest a piece can be.
         const brutal = score([36, 84, 40, 80, 45, 76, 48].map((p) => noteFor(p)).join(""));
-        const grade = gradeOf("brutal-piece", brutal);
+        const grade = gradeOf(domXmlCodec, "brutal-piece", brutal);
         expect(grade).toBeGreaterThanOrEqual(1);
         expect(grade).toBeLessThanOrEqual(MAX_GRADE);
     });
@@ -72,17 +73,17 @@ describe("gradeOf", () => {
     it("grades a harder line at least as high as an easier one in the same category", () => {
         const easy = score([60, 62, 64].map((p) => noteFor(p)).join(""));
         const hard = score([60, 76, 62, 79].map((p) => noteFor(p)).join(""));
-        expect(gradeOf("easy-piece", easy)).toBeLessThanOrEqual(gradeOf("hard-piece", hard));
+        expect(gradeOf(domXmlCodec, "easy-piece", easy)).toBeLessThanOrEqual(gradeOf(domXmlCodec, "hard-piece", hard));
     });
 
     it("grades an unmeasurable score at the top, not as the easiest piece", () => {
         // An empty or unreadable import has no fingerable notes, so its cost is 0.
         // Bucketing it at grade 1 would pad the beginner pool with a phantom piece;
         // it belongs out of the way at the ceiling instead.
-        expect(gradeOf("empty-import", score(""))).toBe(MAX_GRADE);
+        expect(gradeOf(domXmlCodec, "empty-import", score(""))).toBe(MAX_GRADE);
         const restsOnly = score(`<note><rest/><duration>4</duration></note>`);
-        expect(gradeOf("rests-only-import", restsOnly)).toBe(MAX_GRADE);
-        expect(gradeOf("unreadable-import", "not a score at all")).toBe(MAX_GRADE);
+        expect(gradeOf(domXmlCodec, "rests-only-import", restsOnly)).toBe(MAX_GRADE);
+        expect(gradeOf(domXmlCodec, "unreadable-import", "not a score at all")).toBe(MAX_GRADE);
     });
 
     it("grades a chord with more notes than fingers without crashing", () => {
@@ -96,7 +97,7 @@ describe("gradeOf", () => {
                 note("E", 5, undefined, true) +
                 note("G", 5, undefined, true),
         );
-        const grade = gradeOf("big-chord", bigChord);
+        const grade = gradeOf(domXmlCodec, "big-chord", bigChord);
         expect(grade).toBeGreaterThanOrEqual(1);
         expect(grade).toBeLessThanOrEqual(MAX_GRADE);
     });

@@ -7,11 +7,10 @@
 // already ship, so it needs no source data and runs in seconds. The import itself now
 // writes `cost` too, so this is a one-off to populate the existing manifest.
 
+import { rawDifficulty } from "../core/scoreDifficulty.ts";
+import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { readFile, writeFile } from "node:fs/promises";
-import { DOMParser } from "linkedom";
-// @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
-globalThis.DOMParser = DOMParser;
-const { rawDifficulty } = await import("../app/lib/scoreDifficulty.ts");
+
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
 
 const DIR = "public/songs";
@@ -34,7 +33,7 @@ let done = 0;
 for (const song of manifest) {
     const bytes = await readFile(`${DIR}/${song.id}.mxl`);
     const xml = decompressMxl(new Uint8Array(bytes));
-    const cost = xml ? Number(rawDifficulty(xml).toFixed(3)) : 0;
+    const cost = xml ? Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3)) : 0;
     // Keep the field order the import writes, so a re-import yields an identical file.
     enriched.push({
         id: song.id,

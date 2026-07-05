@@ -11,7 +11,7 @@ import { StaffPreview } from "../components/features/staffPreview";
 import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "../lib/catalog";
 import { readScoreFile } from "../../core/musicxmlFile";
 import { markDiscovered } from "../lib/onboarding";
-import { gradeOf } from "../lib/scoreDifficulty";
+import { gradeOf } from "../../core/scoreDifficulty";
 import { songId } from "../../core/songId";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -81,7 +81,7 @@ export default function LibraryImportRoute() {
             tempo: String(meta.tempo),
             description: "",
             beatsPerBar: meta.beatsPerBar,
-            grade: gradeOf(slugify(meta.title), xml),
+            grade: gradeOf(xmlCodec, slugify(meta.title), xml),
         });
     };
 

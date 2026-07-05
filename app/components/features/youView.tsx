@@ -22,7 +22,7 @@ import { type PracticeSummary, summarizePractice } from "../../../core/history";
 import { loadLifetime, progressGrid } from "../../lib/lifetime";
 import { svgMilestone } from "../../../core/milestoneCard";
 import { usePrefsStore, useServices } from "../../contexts/services";
-import { MAX_GRADE } from "../../lib/scoreDifficulty";
+import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import type { Grid } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
 import { buttonClasses } from "../ui/button";

@@ -111,10 +111,9 @@ module.exports = {
             name: "dev-depends-on-core",
             comment:
                 "Build/import scripts under dev/ may only reach down into core/ (pure, shared music " +
-                "tooling), never sideways into the app UI layers. Severity stays warn while " +
-                "scoreDifficulty (DOM-coupled XML parsing) remains in app/lib; it becomes error when " +
-                "that module's pure half lands in core/.",
-            severity: "warn",
+                "tooling), never sideways into the app UI layers — the app is the consumer of the " +
+                "catalogue dev builds, not a dependency of it.",
+            severity: "error",
             from: { path: "^dev/" },
             to: { path: ["^app/"] },
         },

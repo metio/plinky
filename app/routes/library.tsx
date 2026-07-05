@@ -14,7 +14,7 @@ import { loadCatalog, removeUserScore } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, type Mastery } from "../../core/mastery";
 import { useServices } from "../contexts/services";
-import { gradeOf, MAX_GRADE } from "../lib/scoreDifficulty";
+import { gradeOf, MAX_GRADE } from "../../core/scoreDifficulty";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
@@ -85,12 +85,12 @@ export default function LibraryRoute() {
                 id: score.id,
                 title: score.title,
                 composer: score.composer,
-                grade: gradeOf(score.id, score.xml),
+                grade: gradeOf(services.xml, score.id, score.xml),
                 removable: !score.bundled,
                 kind: "song" as const,
             })),
         );
-    }, []);
+    }, [services.xml]);
 
     useEffect(() => {
         reloadLocal();

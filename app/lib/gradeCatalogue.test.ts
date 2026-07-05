@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../adapters/domXmlCodec";
 import { httpFetcher } from "../adapters/httpFetcher";
 import { memoryStore } from "../adapters/memoryStore";
 import { createExerciseSource } from "../stores/exerciseSource";
@@ -32,6 +33,7 @@ const NOTE = `<note><pitch><step>C</step><octave>4</octave></pitch><duration>2</
 const sources = {
     songs: createSongSource(httpFetcher, memoryStore()),
     exercises: createExerciseSource(httpFetcher),
+    xml: domXmlCodec,
 };
 
 describe("loadGradeCatalogue", () => {

@@ -2,6 +2,6 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": ["app/routes/*.tsx"],
   "project": ["app/**/*.{ts,tsx}", "core/**/*.ts"],
-  "ignoreDependencies": ["tailwindcss", "axe-core"],
+  "ignoreDependencies": ["tailwindcss", "axe-core", "linkedom"],
   "ignoreExportsUsedInFile": true
 }

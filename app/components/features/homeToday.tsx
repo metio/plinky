@@ -12,7 +12,7 @@ import {
     loadGradedMastery,
 } from "../../lib/gradeProgress";
 import { usePrefsStore, useServices } from "../../contexts/services";
-import { MAX_GRADE } from "../../lib/scoreDifficulty";
+import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { type Task, todayTasks } from "../../../core/today";
 import { m } from "../../paraglide/messages.js";
 import { LocalizedLink as Link } from "../ui/localizedLink";

@@ -15,20 +15,18 @@
 // cloned into sources/<id>/<repo> (gitignored) on first run. Humdrum (**kern) corpora
 // are converted to MusicXML by dev/krn2mxl.py (music21) before ingesting.
 //
-// Needs a DOM for the cost engine, so it installs linkedom's DOMParser as the global.
 
+import { rawDifficulty, MAX_GRADE } from "../core/scoreDifficulty.ts";
+import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { strFromU8, unzipSync } from "fflate";
-import { DOMParser } from "linkedom";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir } from "../core/attribution.ts";
-// @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
-globalThis.DOMParser = DOMParser;
-const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
+
 
 const OUT = "public/songs";
 const SOURCES_DIR = "sources";
@@ -334,7 +332,7 @@ async function main() {
         }
         let cost: number;
         try {
-            cost = rawDifficulty(xml);
+            cost = rawDifficulty(linkedomXmlCodec, xml);
         } catch {
             dropped.unreadable++;
             continue;

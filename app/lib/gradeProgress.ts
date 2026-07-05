@@ -3,9 +3,10 @@
 
 import { loadBundledScores, loadUserScores } from "./catalog";
 import type { Letter } from "../../core/grade";
+import type { XmlCodec } from "../../core/xml";
 import { type DecayMode, REVIEW_CAP } from "../../core/review";
 import { isDue, isLapsed, letterMin, type Mastery } from "../../core/mastery";
-import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
+import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "../../core/scoreDifficulty";
 
 // Plinky's progression: each of the 1–MAX_GRADE difficulty grades is a pool of
 // catalogue items, and you climb by *mastering* items of a grade — not by any single
@@ -142,6 +143,8 @@ export type GradeCatalogItem = { id: string; title: string; grade: number; cost:
 export type CatalogSources = {
     songs: { manifest(): Promise<GradeCatalogItem[]> };
     exercises: { manifest(): Promise<GradeCatalogItem[]> };
+    // Grading a bundled or imported score parses its MusicXML through this codec.
+    xml: XmlCodec;
 };
 
 // The whole gradeable catalogue, keyed by id: songs and exercises from their
@@ -168,7 +171,7 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
         if (index.has(score.id)) {
             continue;
         }
-        const { right, left } = parsePositions(score.xml);
+        const { right, left } = parsePositions(sources.xml, score.xml);
         // A score with no fingerable notes — empty or unreadable — is nothing to
         // practise, so it stays out of the grade pools. Keeping it out also lets a
         // cost of 0 mean "measured as gentlest" everywhere, so the easy real pieces
@@ -179,8 +182,8 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
         index.set(score.id, {
             id: score.id,
             title: score.title,
-            grade: gradeOf(score.id, score.xml),
-            cost: rawDifficulty(score.xml),
+            grade: gradeOf(sources.xml, score.id, score.xml),
+            cost: rawDifficulty(sources.xml, score.xml),
         });
     }
     return index;

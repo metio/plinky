@@ -6,26 +6,23 @@
 // shipped), grades every candidate by raw fingering-cost, splits them into eight
 // equal difficulty bins (so grades 1–8 are evenly populated), and writes
 // public/songs/<id>.mxl plus a metadata manifest and a seed list. It also prints the
-// bin boundaries — bake those into GRADE_THRESHOLDS.piece (app/lib/scoreDifficulty.ts)
+// bin boundaries — bake those into GRADE_THRESHOLDS.piece (core/scoreDifficulty.ts)
 // so the in-app grade chip matches the manifest. Run locally: `npm run songs:import`.
 //
-// Needs a DOM for the cost engine, so it runs under tsx with linkedom's DOMParser
-// installed as the global the engine expects.
 
+import { rawDifficulty, MAX_GRADE } from "../core/scoreDifficulty.ts";
+import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
 import { createReadStream, readFileSync } from "node:fs";
 import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import { parse } from "csv-parse";
 import { strFromU8, unzipSync } from "fflate";
-import { DOMParser } from "linkedom";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { isPublicDomain } from "./publicDomain.mts";
 import { nonSoloPianoReason } from "./scoreInstrument.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir } from "../core/attribution.ts";
-// @ts-expect-error - the cost engine calls the global DOMParser, as in the browser
-globalThis.DOMParser = DOMParser;
-const { rawDifficulty, MAX_GRADE } = await import("../app/lib/scoreDifficulty.ts");
+
 
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
 const OUT = "public/songs";
@@ -170,7 +167,7 @@ async function main() {
             if (nonSoloPianoReason(xml)) {
                 continue;
             }
-            cost = rawDifficulty(xml);
+            cost = rawDifficulty(linkedomXmlCodec, xml);
         } catch {
             continue;
         }
@@ -252,7 +249,7 @@ async function main() {
     console.log(
         `\nWrote ${songs.length} scores + manifest.json + seed.json (${seed.length}) to ${OUT}/.`,
     );
-    console.log("→ Bake the boundaries above into GRADE_THRESHOLDS.piece in scoreDifficulty.ts.");
+    console.log("→ Bake the boundaries above into GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts.");
 }
 
 main().catch((error) => {

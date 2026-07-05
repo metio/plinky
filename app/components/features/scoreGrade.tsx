@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { gradeOf } from "../../lib/scoreDifficulty";
+import { gradeOf } from "../../../core/scoreDifficulty";
+import { useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 
 // The computed 1–8 grade of a score, as a small chip — so a learner can pick
@@ -36,5 +37,6 @@ export function ScoreGrade({
     xml: string;
     className?: string;
 }) {
-    return <GradeChip grade={gradeOf(id, xml)} className={className} />;
+    const xmlCodec = useXmlCodec();
+    return <GradeChip grade={gradeOf(xmlCodec, id, xml)} className={className} />;
 }

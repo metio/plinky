@@ -3,9 +3,10 @@
 
 // @vitest-environment jsdom
 
+import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { type Composition, toMusicXml } from "../../core/composition";
+import { type Composition, toMusicXml } from "./composition";
 import { gradeOf, MAX_GRADE, rawDifficulty } from "./scoreDifficulty";
 
 const arbNote = fc.record({
@@ -37,7 +38,7 @@ describe("scoreDifficulty invariants", () => {
     it("measures a finite, non-negative raw difficulty for any score", () => {
         fc.assert(
             fc.property(arbXml, (xml) => {
-                const cost = rawDifficulty(xml);
+                const cost = rawDifficulty(domXmlCodec, xml);
                 expect(Number.isFinite(cost)).toBe(true);
                 expect(cost).toBeGreaterThanOrEqual(0);
             }),
@@ -48,7 +49,7 @@ describe("scoreDifficulty invariants", () => {
     it("places every score on the 1..MAX_GRADE ladder", () => {
         fc.assert(
             fc.property(fc.constantFrom("scale-", "arpeggio-", "piece-"), arbXml, (prefix, xml) => {
-                const grade = gradeOf(`${prefix}${nextId++}`, xml);
+                const grade = gradeOf(domXmlCodec, `${prefix}${nextId++}`, xml);
                 expect(Number.isInteger(grade)).toBe(true);
                 expect(grade).toBeGreaterThanOrEqual(1);
                 expect(grade).toBeLessThanOrEqual(MAX_GRADE);
