@@ -29,7 +29,9 @@ class Reader {
     }
 
     u32(): number {
-        return (this.u8() << 24) | (this.u16() << 8) | this.u8();
+        // Coerced unsigned: a chunk length with the high bit set would otherwise read
+        // negative and, added to `pos`, yield an `end` behind the cursor.
+        return ((this.u8() << 24) | (this.u16() << 8) | this.u8()) >>> 0;
     }
 
     bytesOf(length: number): Uint8Array {
@@ -96,7 +98,11 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
             // Note-ons waiting for their matching note-off, keyed by channel and pitch.
             const open = new Map<number, Pending[]>();
 
-            while (reader.pos < end) {
+            // A track's declared length is untrusted: a corrupt or truncated file can
+            // claim far more bytes than the buffer holds. Reading past the end returns
+            // undefined rather than throwing, so the `!reader.done` bound is what stops
+            // the loop grinding through billions of phantom bytes.
+            while (reader.pos < end && !reader.done) {
                 tick += reader.varLen();
                 let status = reader.u8();
                 if (status < 0x80) {
