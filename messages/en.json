@@ -502,7 +502,7 @@
   "keyboard_hint_shift": " shift both hands an octave — current offset ",
   "keyboard_hint_customise": "Set your own keys →",
   "settings_keyboard": "Computer keyboard",
-  "keymap_help": "No piano? These keys play the notes. Click a note, then press the key you want it on.",
+  "keymap_help": "No piano? These keys play the notes. Tap a note, then press the key you'd like it on — or keep the standard layout with Reset.",
   "keymap_press": "Press a key…",
   "keymap_reset": "Reset to default",
   "keymap_rebind": "Rebind {note}, {hand}",

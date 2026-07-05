@@ -20,11 +20,15 @@ export type DiscoveryId =
     | "keysCustomized";
 
 // The steps marked by doing them — features that record no lasting state of their own.
+// keysCustomized is here too so it can be reached by engaging with the key editor:
+// changing a key already shows in the saved map, but a player happy with the standard
+// layout leaves no such trace, so opening the editor and touching it counts as well.
 export const MARKABLE: readonly DiscoveryId[] = [
     "earTried",
     "fingeringTried",
     "composed",
     "imported",
+    "keysCustomized",
 ];
 
 // What the discovery steps are computed from. The caller loads these from its
@@ -53,7 +57,10 @@ export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean>
         fingeringTried: marked.has("fingeringTried"),
         composed: marked.has("composed"),
         imported: marked.has("imported"),
-        keysCustomized: !isDefaultKeyMap(prefs.keyMap),
+        // Done once you've made the keys your own, or engaged with the editor and kept
+        // the standard layout — so a player who likes the defaults isn't stuck on a step
+        // that a non-default binding is otherwise the only way to reach.
+        keysCustomized: marked.has("keysCustomized") || !isDefaultKeyMap(prefs.keyMap),
     };
 }
 

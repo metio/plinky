@@ -12,7 +12,7 @@ import {
     rebind,
     SEMITONES,
 } from "../../../core/keyMap";
-import { usePrefsStore } from "../../contexts/services";
+import { useOnboardingStore, usePrefsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 
@@ -37,9 +37,15 @@ function keyCap(key: string | null): string {
 // touch, or the stock layout — but one tap away for anyone who wants their own keys.
 export function KeyMapping() {
     const prefsStore = usePrefsStore();
+    const onboarding = useOnboardingStore();
     const [map, setMap] = useState<KeyMap>(DEFAULT_KEY_MAP);
     // The slot currently listening for a key, or null when idle.
     const [arming, setArming] = useState<{ hand: Hand; semitone: number } | null>(null);
+
+    // Engaging with the editor — arming a cap to rebind, or resetting to the standard
+    // layout — ticks off the "set up your keys" discovery step, so a player content with
+    // the defaults completes it too, not only one who lands on a non-default binding.
+    const markEngaged = () => onboarding.markDiscovered("keysCustomized");
 
     useEffect(() => {
         setMap(prefsStore.load().keyMap);
@@ -93,7 +99,10 @@ export function KeyMapping() {
                                 <button
                                     key={semitone}
                                     type="button"
-                                    onClick={() => setArming(armed ? null : { hand, semitone })}
+                                    onClick={() => {
+                                        markEngaged();
+                                        setArming(armed ? null : { hand, semitone });
+                                    }}
                                     aria-label={m.keymap_rebind({
                                         note: NOTE_LABELS[semitone]!,
                                         hand: HAND_LABEL[hand](),
@@ -126,6 +135,7 @@ export function KeyMapping() {
                 <Button
                     variant="secondary"
                     onClick={() => {
+                        markEngaged();
                         setArming(null);
                         persist(DEFAULT_KEY_MAP);
                     }}

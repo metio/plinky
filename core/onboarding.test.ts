@@ -50,6 +50,13 @@ describe("discoveries", () => {
         const prefs = { ...DEFAULT_PREFS, keyMap: rebind(DEFAULT_KEY_MAP, "right", 0, "q") };
         expect(discoveries({ ...fresh(), prefs }).keysCustomized).toBe(true);
     });
+
+    it("marks the keys step from the marked set too, so keeping the defaults still finishes it", () => {
+        // The map is untouched (the default), so the only path left is engaging with the
+        // editor, which marks the step.
+        const done = discoveries({ ...fresh(), marked: new Set(["keysCustomized"]) });
+        expect(done.keysCustomized).toBe(true);
+    });
 });
 
 describe("discoveryProgress", () => {
