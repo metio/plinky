@@ -245,6 +245,12 @@ export function ScoreViewer({
     // True only once a run finishes this session, so the result scroll fires on
     // completion but not when the grade is seeded from a saved result on mount.
     const gradeFromRunRef = useRef(false);
+    // Latches a completed run's grading so its side effects (history, lifetime,
+    // ghost, mastery, daily, cadence) land exactly once. The completion effect
+    // depends on inputs — like an onMastery callback the parent re-creates each
+    // render — whose identity can churn while `matcher.complete` stays true; a
+    // re-fire without this latch would double-count the run. Reset at run start.
+    const gradedRef = useRef(false);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const timers = useRef<number[]>([]);
     // The notes Listen has lit as "now sounding", held so the highlight can be lifted
@@ -767,9 +773,10 @@ export function ScoreViewer({
     // player's own pace (so a steady run at any tempo reads as in time) with windows
     // widened for imprecise input (on-screen / computer keyboard).
     useEffect(() => {
-        if (!matcher.complete) {
+        if (!matcher.complete || gradedRef.current) {
             return;
         }
+        gradedRef.current = true;
         const notes = notesRef.current;
         const velocities = notes.map((note) => note.velocity);
         const hasDynamics = new Set(velocities).size > 1;
@@ -1369,6 +1376,7 @@ export function ScoreViewer({
         holdRef.current.clear();
         impreciseRef.current = false;
         gradeFromRunRef.current = false;
+        gradedRef.current = false;
         setGrade(null);
         setRunNotes([]);
         setShareGrid(null);

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { testPrefsStore } from "../../testing/stores";
+import { useState } from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -301,6 +302,57 @@ describe("ScoreViewer", () => {
         expect(accuracy.length).toBeGreaterThan(0);
         expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
         reqFs.mockRestore();
+    });
+
+    it("grades a completed run once even when the parent re-creates onMastery each render", async () => {
+        // A review session passes a fresh inline onMastery on every render, and calling it
+        // back flips parent state — which re-creates the callback. Without a per-run latch
+        // the identity churn re-fires the completion effect while the run is still complete,
+        // double-counting the run (history, lifetime, ghost, mastery, cadence). This harness
+        // reproduces that churn: onMastery both records a call and forces a re-render.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const onMastery = vi.fn();
+        // Built once so the xml prop stays referentially stable across the harness's
+        // re-renders; a fresh string would reload OSMD mid-run and derail the test.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        function Harness() {
+            const [, setPlayed] = useState(false);
+            return (
+                <ScoreViewer
+                    id="t"
+                    xml={phrase}
+                    title="T"
+                    beatsPerBar={4}
+                    onMastery={() => {
+                        onMastery();
+                        setPlayed(true);
+                    }}
+                />
+            );
+        }
+        render(
+            <MemoryRouter>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Harness />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        const practice = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        fireEvent.click(practice);
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // Once the grade panel is up the completion effect has settled; a re-fire would
+        // already have called onMastery a second time.
+        await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
+        expect(onMastery).toHaveBeenCalledTimes(1);
     });
 
     it("enters full screen to play even on a large screen, where Listen lives", async () => {
