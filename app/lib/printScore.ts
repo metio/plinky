@@ -39,11 +39,6 @@ export function printViaIframe(html: string): void {
 }
 
 // A title reduced to a safe, lowercase file stem for a download — spaces and
-// punctuation collapse to single hyphens, so "Für Elise!" becomes "f-r-elise".
-export function fileStem(title: string): string {
-    const stem = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-    return stem || "score";
-}
+// punctuation collapse to single hyphens, so "Für Elise!" becomes "f-r-elise". The
+// same reduction a URL slug needs, so both share one implementation.
+export { slugify as fileStem } from "./slug";

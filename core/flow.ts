@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { median } from "./stats";
+
 // Flow measures continuity — did the player keep moving like a musician rather
 // than stopping to hunt for keys? A note keeps the flow when it was cleared first
 // try (no wrong note before it) AND reached without a disproportionate pause. Flow
@@ -14,19 +16,6 @@ export type FlowNote = { targetMs: number; playedMs: number; wrongBefore: number
 // A note reached after this many times its expected share of the run's pace counts
 // as a hesitation — a stop to find the key, not a musical breath.
 const HESITATION_FACTOR = 3;
-
-function median(values: number[]): number {
-    if (values.length === 0) {
-        return 0;
-    }
-    const sorted = [...values].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    const high = sorted[mid] ?? 0;
-    if (sorted.length % 2 !== 0) {
-        return high;
-    }
-    return ((sorted[mid - 1] ?? high) + high) / 2;
-}
 
 // Per-note continuity. Each gap is divided by the notated gap it should fill, so
 // an intentionally long note is not mistaken for a stall; a note whose ratio far
