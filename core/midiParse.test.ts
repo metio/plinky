@@ -58,4 +58,57 @@ describe("parseMidiFile", () => {
         expect(parseMidiFile(new Uint8Array([1, 2, 3, 4]))).toBeNull();
         expect(parseMidiFile(new Uint8Array())).toBeNull();
     });
+
+    // A format-0, one-track header: "MThd", length 6, format 0, one track, 96 ticks
+    // per quarter — the frame the hand-built tracks below hang their events on.
+    const HEADER = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, 0, 96];
+    // Wraps raw track-event bytes in an "MTrk" chunk with the given declared length,
+    // so a test can lie about the length independently of the bytes it supplies.
+    const track = (declaredLength: number, events: number[]) => [
+        0x4d,
+        0x54,
+        0x72,
+        0x6b,
+        (declaredLength >>> 24) & 0xff,
+        (declaredLength >>> 16) & 0xff,
+        (declaredLength >>> 8) & 0xff,
+        declaredLength & 0xff,
+        ...events,
+    ];
+    const file = (...bytes: number[]) => new Uint8Array(bytes);
+    // note-on C4, 96 ticks later note-off C4, end-of-track.
+    const ONE_NOTE = [0x00, 0x90, 0x3c, 0x40, 0x60, 0x80, 0x3c, 0x00, 0x00, 0xff, 0x2f, 0x00];
+
+    it("recovers real notes from a track whose declared length overruns the buffer", () => {
+        // A corrupt or truncated file can claim a track is hundreds of megabytes when
+        // only a handful of bytes follow. Bounding the read to the buffer keeps it from
+        // grinding through phantom bytes (a frozen tab) while still reading what is there.
+        const parsed = parseMidiFile(file(...HEADER, ...track(0x10000000, ONE_NOTE)));
+        expect(parsed!.notes.map((n) => n.pitch)).toEqual([60]);
+    });
+
+    it("returns null rather than hanging on a truncated track", () => {
+        // The header promises a track but the body is cut off mid-event.
+        const parsed = parseMidiFile(file(...HEADER, ...track(0xffffffff, [0x00, 0x90])));
+        expect(parsed).toBeNull();
+    });
+
+    it("ignores SMPTE timing it cannot interpret as ticks-per-quarter", () => {
+        const smpteHeader = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, 0xe8, 0x08];
+        expect(parseMidiFile(file(...smpteHeader, ...track(ONE_NOTE.length, ONE_NOTE)))).toBeNull();
+    });
+
+    it("reads notes that share a status byte via running status", () => {
+        // Two note-ons then two note-offs, each second event omitting its status byte and
+        // inheriting the previous one — what any DAW writes to save space.
+        const events = [
+            0x00, 0x90, 0x3c, 0x40, // note-on C4
+            0x00, 0x40, 0x40, //       running status: note-on E4
+            0x60, 0x80, 0x3c, 0x00, // note-off C4
+            0x00, 0x40, 0x00, //       running status: note-off E4
+            0x00, 0xff, 0x2f, 0x00, // end of track
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes.map((n) => n.pitch).sort()).toEqual([60, 64]);
+    });
 });
