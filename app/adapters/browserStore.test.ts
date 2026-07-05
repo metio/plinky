@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { withDeniedStorage } from "../lib/deniedStorage";
+import { withDeniedStorage } from "../testing/deniedStorage";
 import { browserStore, storageHealth } from "./browserStore";
 
 afterEach(() => {

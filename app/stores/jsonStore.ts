@@ -98,7 +98,7 @@ export function createJsonStore<T>(
     // Turns the raw stored string (or null for nothing stored) into a full,
     // valid value — the store never hands out unvalidated data.
     parse: (raw: string | null) => T,
-    // Optional shape adjustment on the way in (clamping, trimming).
+    // Optional shape adjustment on the way out to storage (clamping, trimming).
     serialize: (value: T) => unknown = (value) => value,
 ): JsonStore<T> {
     const bus = createBus((changed) => changed === key);

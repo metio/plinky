@@ -83,6 +83,15 @@ describe("assignmentsStore", () => {
         expect(onChange).toHaveBeenCalledTimes(2);
     });
 
+    it("keeps the assignment when its removal cannot be written", () => {
+        const kv = memoryStore();
+        createAssignmentsStore(kv).save(sample());
+        const store = createAssignmentsStore({ ...kv, set: () => false });
+        store.remove(sample().id);
+        // Storage still holds it; the storage banner carries the failure signal.
+        expect(createAssignmentsStore(kv).list()).toHaveLength(1);
+    });
+
     it("reports a refused write and keeps the list unchanged", () => {
         const store = createAssignmentsStore({ ...memoryStore(), set: () => false });
         expect(store.save(sample())).toBe(false);

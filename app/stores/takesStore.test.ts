@@ -47,6 +47,16 @@ describe("takesStore", () => {
         expect(loaded.map((t) => t.id)).not.toContain("1");
     });
 
+    it("replaces a re-saved take in place instead of duplicating its id", () => {
+        const takes = createTakesStore(memoryStore());
+        takes.save("song", take("1", { letter: "C" }));
+        takes.save("song", take("2"));
+        takes.save("song", take("1", { letter: "S" }));
+        const loaded = takes.list("song");
+        expect(loaded.map((t) => t.id)).toEqual(["1", "2"]);
+        expect(loaded[0]?.letter).toBe("S");
+    });
+
     it("keeps each song's takes separate", () => {
         const takes = createTakesStore(memoryStore());
         takes.save("a", take("1"));

@@ -26,11 +26,13 @@ function decodeXmlEntities(text: string): string {
     return text.replace(
         /&(?:#x([0-9a-fA-F]+)|#(\d+)|(amp|lt|gt|quot|apos));/g,
         (_match, hex, dec, named) => {
-            if (hex !== undefined) {
-                return String.fromCodePoint(Number.parseInt(hex, 16));
-            }
-            if (dec !== undefined) {
-                return String.fromCodePoint(Number.parseInt(dec, 10));
+            if (hex !== undefined || dec !== undefined) {
+                // An out-of-range reference (&#x110000;…) must not throw out of a
+                // metadata read; it renders as the replacement character instead.
+                const code = hex !== undefined
+                    ? Number.parseInt(hex, 16)
+                    : Number.parseInt(dec as string, 10);
+                return code <= 0x10ffff ? String.fromCodePoint(code) : "\ufffd";
             }
             return XML_ENTITIES[named] ?? _match;
         },
@@ -50,7 +52,7 @@ export function readScoreMetaFromText(xml: string): ScoreMeta {
         "Untitled";
     return {
         title,
-        composer: pick(/<creator\b[^>]*type="composer"[^>]*>([\s\S]*?)<\/creator>/),
+        composer: pick(/<creator\b[^>]{0,500}type="composer"[^>]{0,500}>([\s\S]*?)<\/creator>/),
         tempo: Math.round(positiveOr(Number(pick(/<sound\b[^>]*\btempo="([^"]*)"/)), 90)),
         beatsPerBar: positiveOr(Number(pick(/<beats>([\s\S]*?)<\/beats>/)), 4),
     };

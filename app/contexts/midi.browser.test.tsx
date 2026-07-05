@@ -92,7 +92,8 @@ describe("MidiProvider over the fake seam in a real browser", () => {
         await waitFor(() => expect(screen.getByLabelText("held").textContent).toBe(""));
 
         input.emit([0xb0, 64, 127]); // a control change is not a note — ignored
-        expect(screen.getByLabelText("held").textContent).toBe("");
+        input.emit([0x90, 62, 80]); // a real note after it still lands alone
+        await waitFor(() => expect(screen.getByLabelText("held").textContent).toBe("62"));
     });
 });
 

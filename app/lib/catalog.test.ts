@@ -16,7 +16,7 @@ import {
 import { browserStore } from "../adapters/browserStore";
 import { memoryStore } from "../adapters/memoryStore";
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { withDeniedStorage } from "./deniedStorage";
+import { withDeniedStorage } from "../testing/deniedStorage";
 import type { XmlCodec } from "../../core/xml";
 
 function xml(title = "Test", beats = 4): string {

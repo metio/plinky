@@ -79,6 +79,13 @@ describe("readScoreMetaFromText (regex/prerender path)", () => {
         expect(readScoreMetaFromText(score("a &amp;lt; b")).title).toBe("a &lt; b");
     });
 
+    it("renders an out-of-range character reference as the replacement character", () => {
+        // A reference past the Unicode range would throw out of String.fromCodePoint
+        // and kill the import handler; it must degrade instead.
+        expect(readScoreMetaFromText(score("bad &#x110000; ref")).title).toBe("bad \ufffd ref");
+        expect(readScoreMetaFromText(score("bad &#1114112; ref")).title).toBe("bad \ufffd ref");
+    });
+
     it("reads tempo and meter, falling back when absent", () => {
         expect(readScoreMetaFromText(score("X", "", 3, 120))).toMatchObject({
             tempo: 120,

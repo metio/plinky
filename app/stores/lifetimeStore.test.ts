@@ -56,6 +56,15 @@ describe("lifetimeStore.recordRun", () => {
         expect(days[0]?.skill).toEqual(PERFECT);
     });
 
+    it("keeps one snapshot per day even when a day repeats out of order", () => {
+        const store = createLifetimeStore(memoryStore());
+        store.recordRun(PERFECT, day(5));
+        store.recordRun(PERFECT, day(3));
+        store.recordRun(POOR, day(3));
+        const days = store.load().days;
+        expect(days.filter((entry) => entry.date === "2026-06-03")).toHaveLength(1);
+    });
+
     it("persists through the injected store and notifies subscribers", () => {
         const kv = memoryStore();
         const store = createLifetimeStore(kv);

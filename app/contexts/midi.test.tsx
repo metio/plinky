@@ -5,6 +5,7 @@
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { type FakeMidi, fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
+import { memoryStore } from "../adapters/memoryStore";
 import { ServicesProvider } from "./services";
 import { MidiProvider, useMidiConnection } from "./midi";
 
@@ -12,8 +13,10 @@ import { MidiProvider, useMidiConnection } from "./midi";
 // permission resume, request, hot-plug, messages — runs against the fake with
 // no navigator stubbing.
 const wrapperWith = (midi: FakeMidi) => {
+    // A fresh memory store too, so the keymap/prefs reads stay isolated per test.
+    const store = memoryStore();
     return ({ children }: { children: React.ReactNode }) => (
-        <ServicesProvider services={{ midi }}>
+        <ServicesProvider services={{ midi, store }}>
             <MidiProvider>{children}</MidiProvider>
         </ServicesProvider>
     );

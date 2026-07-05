@@ -30,24 +30,26 @@ import scripts and the build config (`react-router.config.ts`) depend down on it
 same music tooling the app runs.
 
 **`app/ports/`** — the injection seams: TypeScript interfaces describing a side-effecting
-capability (`KeyValueStore`, `AudioEngine`, `Fetcher`, the MusicXML `XmlCodec`) with no
-implementation. A unit that needs a side effect depends on the *interface*, so a test can
+capability (`KeyValueStore`, `AudioEngine`, `Fetcher`, `MidiAccessPort`, the MusicXML
+`XmlCodec`) with no implementation. A unit that needs a side effect depends on the *interface*, so a test can
 hand it a fake. OpenSheetMusicDisplay is the exception — a stateful rendering engine the
 surface drives directly rather than through a fake-able port — so it is *fenced* to the
 component/hook layer by a dependency rule instead.
 
 **`app/adapters/`** — the concrete browser implementations of the ports (`browserStore` over
-`localStorage`, the `webAudioEngine`, the `domXmlCodec`, the `httpFetcher`) and their test
-fakes (`memoryStore`, `fakeAudioEngine`, …). This is the only layer that talks to the platform.
+`localStorage`, the `webAudioEngine`, the `domXmlCodec`, the `httpFetcher`, the `webMidi`
+access) and their test fakes (`memoryStore`, `fakeAudioEngine`, `fakeMidi`, …). This is the
+only layer that talks to the platform.
 
 **`app/stores/`** — single sources of truth for persistent state (preferences, mastery,
 history, …) and the fetched catalogue sources, built over the ports and exposed as
 `useSyncExternalStore` snapshots so every view of a value reads the same place and re-renders
 together when it changes.
 
-**`app/lib/`** — the transitional middle: modules not yet sorted into a formal layer (the
-remaining storage helpers, the OSMD-coupled score painting, the DOM-based difficulty parse).
-It shrinks branch by branch as its pieces move down into `core` or become stores and adapters.
+**`app/lib/`** — the residual middle, now singleton-free: the storage-backed catalogue
+(parametric over the injected store, holding the app's one Vite `import.meta.glob`), the
+OSMD-coupled score painting, and a few helpers that compose stores with core logic. What
+needs a capability takes it as a parameter.
 
 **`app/hooks/`** — the React glue that binds stores and adapters into the component lifecycle.
 
@@ -56,11 +58,13 @@ in, elements out. They compose `core` and each other, nothing below-and-sideways
 and tested in isolation.
 
 **`app/components/features/`** — containers that compose the primitives with hooks and
-stores, receiving the render-variable ports (audio, MIDI, renderer) from an `AppServices`
-context rather than importing singletons.
+stores, receiving their capabilities (state stores, audio, MIDI, the network) from the
+`AppServices` context rather than importing singletons.
 
-**`app/routes/`** — the composition root: it assembles features into pages and wires the
-concrete adapters into the services context.
+**`app/routes/`** — pages assembled from features. The concrete adapters are wired in by
+the composition roots — the services context (`app/contexts/services.tsx`) and the app root
+(`app/root.tsx`); the play route's static `meta()` is the one documented exception, since the
+router calls it outside the React tree.
 
 ## Why this shape
 
@@ -70,7 +74,7 @@ Pure logic that can be tested without mocks, side effects isolated behind a seam
 fake, and one place to read each piece of shared state — so the parts stay swappable and the
 whole stays reasonable as it grows.
 
-Declarative composition is the idiom (see `app/components/conditional.tsx`): conditions and
+Declarative composition is the idiom (see `app/components/features/conditional.tsx`): conditions and
 injected capabilities are named components (`Show`, `Midi`, `Media`, `ServicesProvider`) that
 read from context, so a screen reads like a description of what it is rather than a tangle of
 flags and prop-drilling.
@@ -94,6 +98,7 @@ above it, `ports` staying implementation-free, each layer pointing down. It cann
 reference to a global (`localStorage`, `document`, `fetch`) because that is not an import —
 those are checked by `dev/check-globals.mjs` (part of `npm run arch`), which pins each
 confined global to the adapter allowed to touch it: `localStorage` to the browser store,
-`DOMParser`/`XMLSerializer` to the XML codec. Core notation functions take the codec as a
-parameter, so they run identically in the browser, in Node tooling (a linkedom-backed
-codec), and in tests.
+`DOMParser`/`XMLSerializer` to the XML codec, `requestMIDIAccess` to the Web MIDI adapter,
+`AudioContext` to the audio engine. Core notation functions take the codec as a parameter,
+so they run identically in the browser, in Node tooling (a linkedom-backed codec), and in
+tests.

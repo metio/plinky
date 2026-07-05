@@ -3,7 +3,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it } from "vitest";
-import { withDeniedStorage } from "./deniedStorage";
+import { withDeniedStorage } from "../testing/deniedStorage";
 import { browserStore } from "../adapters/browserStore";
 import { resetDevice } from "./resetDevice";
 

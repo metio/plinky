@@ -5,12 +5,18 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { fakeMidi } from "../adapters/fakeMidi";
+import { ServicesProvider } from "../contexts/services";
 import { dailyNumber, todayKey } from "../../core/daily";
 import { browserStore } from "../adapters/browserStore";
 import { createDailyStore } from "../stores/dailyStore";
 import Daily from "./daily";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
+// The browser context arrives with MIDI pre-granted; without a fake seam the
+// provider would silently open a REAL Web MIDI connection under every test.
+const midiFake = { midi: fakeMidi() };
+
 afterEach(() => {
     cleanup();
     localStorage.clear();
@@ -20,9 +26,11 @@ describe("Daily", () => {
     it("heads the page with the running challenge number", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <Daily />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Daily />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         expect(await screen.findByText(/Plinky #\d+/)).toBeTruthy();
@@ -31,9 +39,11 @@ describe("Daily", () => {
     it("renders today's generated phrase through the graded viewer", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <Daily />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Daily />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         // The generated phrase renders through the graded score viewer, which leads with
@@ -45,9 +55,11 @@ describe("Daily", () => {
     it("renders the score without a spurious horizontal scrollbar", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <Daily />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Daily />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
@@ -65,9 +77,11 @@ describe("Daily", () => {
     it("locks the tempo so everyone plays the day at one speed", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <Daily />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Daily />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
@@ -89,9 +103,11 @@ describe("Daily", () => {
         });
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <Daily />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Daily />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         // The grade panel is seeded from the stored result, so its readouts appear
@@ -102,9 +118,11 @@ describe("Daily", () => {
     it("offers a warm-up mode that drills fresh generated phrases", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <Daily />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Daily />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         // The folded-in sprint: switching tabs reveals its controls and a phrase.

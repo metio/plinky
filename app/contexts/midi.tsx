@@ -187,7 +187,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
             midiBytes: (data, timestamp = performance.now()) =>
                 makeHandler("Test bridge")(new Uint8Array(data), timestamp),
-            midiState: () => bridgeStateRef.current,
+            midiState: () => ({
+                ...bridgeStateRef.current,
+                devices: [...bridgeStateRef.current.devices],
+                heldNotes: [...bridgeStateRef.current.heldNotes],
+            }),
             reset: () => {
                 resetDevice(store);
                 window.location.reload();
@@ -226,22 +230,35 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         setDevices(list);
     }, [makeHandler]);
 
+    // Each request gets a sequence number; only the latest may wire itself in.
+    // A stale resolve (an earlier click, or one landing after unmount) closes its
+    // connection instead — otherwise two live connections would double every note.
+    const requestSeqRef = useRef(0);
     const requestAccess = useCallback(() => {
         if (!midi.supported()) {
             setStatus("error");
             setError("Web MIDI API is not available in this browser.");
             return;
         }
+        const seq = ++requestSeqRef.current;
         setStatus("requesting");
         setError(null);
         midi.request()
             .then((connection) => {
+                if (seq !== requestSeqRef.current) {
+                    connection.close();
+                    return;
+                }
+                connectionRef.current?.close();
                 connectionRef.current = connection;
                 connection.onStateChange(() => refreshDevices());
                 setStatus("ready");
                 refreshDevices();
             })
             .catch((err: unknown) => {
+                if (seq !== requestSeqRef.current) {
+                    return;
+                }
                 setStatus("denied");
                 setError(err instanceof Error ? err.message : String(err));
             });
@@ -359,6 +376,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         return () => {
+            requestSeqRef.current++;
             connectionRef.current?.close();
         };
     }, []);

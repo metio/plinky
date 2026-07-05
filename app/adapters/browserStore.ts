@@ -59,7 +59,13 @@ export const browserStore: KeyValueStore = {
         return stored;
     },
     remove: (key) => {
-        guarded((store) => store.removeItem(key), undefined);
+        const removed = guarded((store) => {
+            store.removeItem(key);
+            return true;
+        }, false);
+        if (!removed) {
+            markWriteFailed();
+        }
     },
     keys: () => guarded((store) => Object.keys(store), []),
 };

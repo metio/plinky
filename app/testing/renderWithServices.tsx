@@ -12,7 +12,9 @@ import { type AppServices, createServices, ServicesProvider } from "../contexts/
 // so a test seeds and asserts against the same source of truth — the payoff of
 // components receiving their capabilities injected.
 export function renderWithServices(ui: ReactElement, overrides: Partial<AppServices> = {}) {
-    const services = createServices({ store: overrides.store ?? memoryStore(), ...overrides });
+    // The store is resolved after the spread, so even an explicit `store:
+    // undefined` in the overrides cannot fall back to the real browser adapter.
+    const services = createServices({ ...overrides, store: overrides.store ?? memoryStore() });
     const view = render(<ServicesProvider services={services}>{ui}</ServicesProvider>);
     return {
         ...view,

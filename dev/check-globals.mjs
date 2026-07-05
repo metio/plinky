@@ -14,10 +14,11 @@ import { join } from "node:path";
 // Each confined global maps to the files allowed to name it. Test files are always
 // allowed — they exercise the real thing on purpose.
 const CONFINED = {
-    localStorage: ["app/adapters/browserStore.ts", "app/lib/deniedStorage.ts"],
+    localStorage: ["app/adapters/browserStore.ts", "app/testing/deniedStorage.ts"],
     DOMParser: ["app/adapters/domXmlCodec.ts"],
     XMLSerializer: ["app/adapters/domXmlCodec.ts"],
     requestMIDIAccess: ["app/adapters/webMidi.ts"],
+    AudioContext: ["app/adapters/webAudioEngine.ts"],
 };
 
 function walk(dir) {

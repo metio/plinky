@@ -5,7 +5,13 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../../contexts/midi";
+import { fakeMidi } from "../../adapters/fakeMidi";
+import { ServicesProvider } from "../../contexts/services";
 import { EarPiece } from "./earPiece";
+
+// The browser context arrives with MIDI pre-granted; without a fake seam the
+// provider would silently open a REAL Web MIDI connection under every test.
+const midiFake = { midi: fakeMidi() };
 
 const note = (n: number, step: string) =>
     `<measure number="${n}"><note><pitch><step>${step}</step><octave>4</octave></pitch><staff>1</staff></note></measure>`;
@@ -26,9 +32,11 @@ describe("EarPiece", () => {
         mounted.push(container);
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <EarPiece xml={XML} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <EarPiece xml={XML} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
             { container },
         );
@@ -47,9 +55,11 @@ describe("EarPiece", () => {
         mounted.push(container);
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <EarPiece xml={XML} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <EarPiece xml={XML} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
             { container },
         );
@@ -71,9 +81,11 @@ describe("EarPiece", () => {
         mounted.push(container);
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <EarPiece xml={XML} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <EarPiece xml={XML} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
             { container },
         );
@@ -92,9 +104,11 @@ describe("EarPiece", () => {
         mounted.push(container);
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <EarPiece xml={XML} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <EarPiece xml={XML} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
             { container },
         );

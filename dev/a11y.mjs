@@ -64,7 +64,7 @@ for (const path of PAGES) {
     const page = await ctx.newPage();
     await page.addInitScript((mode) => {
         try {
-            localStorage.setItem("plinky:theme", mode);
+            localStorage.setItem("plinky:theme", JSON.stringify(mode));
         } catch {}
     }, MODE);
     await page.goto(`http://localhost:${PORT}${path}`, { waitUntil: "networkidle" });

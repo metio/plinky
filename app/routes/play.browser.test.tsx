@@ -5,6 +5,8 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { fakeMidi } from "../adapters/fakeMidi";
+import { ServicesProvider } from "../contexts/services";
 import { loadBundledScores } from "../lib/catalog";
 import { browserStore } from "../adapters/browserStore";
 import { createOnboardingStore } from "../stores/onboardingStore";
@@ -12,6 +14,10 @@ import Play from "./play";
 import type { Route } from "./+types/play";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
+// The browser context arrives with MIDI pre-granted; without a fake seam the
+// provider would silently open a REAL Web MIDI connection under every test.
+const midiFake = { midi: fakeMidi() };
+
 const bundledId = (titleFragment: string): string =>
     loadBundledScores().find((score) => score.title.toLowerCase().includes(titleFragment))?.id ??
     "";
@@ -25,9 +31,11 @@ function renderPlay(scoreId: string) {
     const props = { params: { scoreId } } as unknown as Route.ComponentProps;
     return render(
         <MemoryRouter>
-            <MidiProvider>
-                <Play {...props} />
-            </MidiProvider>
+            <ServicesProvider services={midiFake}>
+                <MidiProvider>
+                    <Play {...props} />
+                </MidiProvider>
+            </ServicesProvider>
         </MemoryRouter>,
     );
 }
@@ -49,9 +57,11 @@ describe("Play", () => {
         const props = { params: { scoreId: id } } as unknown as Route.ComponentProps;
         render(
             <MemoryRouter initialEntries={[`/play/${id}?mode=ear`]}>
-                <MidiProvider>
-                    <Play {...props} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Play {...props} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         // Ear mode is showing — its "Hear the phrase" control is on screen, not just

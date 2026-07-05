@@ -22,7 +22,7 @@ import { browserStore, storageHealth } from "./adapters/browserStore";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme } from "./lib/theme";
-import { createThemeStore, THEME_STORAGE_KEY } from "./stores/themeStore";
+import { createThemeStore, themeBootstrapScript } from "./stores/themeStore";
 import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
 import {
@@ -59,11 +59,8 @@ const themeStore = createThemeStore(browserStore);
 // Runs before first paint to set the dark class from the saved (or OS) theme.
 // Applying the theme only in the layout's effect would let the prerendered,
 // class-free HTML paint light first and flash for dark-mode users. It mutates
-// the class outside React, which React's hydration leaves untouched. The store
-// keeps the value as JSON, so the raw string carries quotes to strip.
-const THEME_INIT_SCRIPT = `(function(){try{var t=JSON.parse(localStorage.getItem(${JSON.stringify(
-    THEME_STORAGE_KEY,
-)}));if(t!=="light"&&t!=="dark"&&t!=="system"){t="system";}if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark");}}catch(e){}})();`;
+// the class outside React, which React's hydration leaves untouched.
+const THEME_INIT_SCRIPT = themeBootstrapScript();
 
 export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },

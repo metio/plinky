@@ -6,6 +6,8 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../../contexts/midi";
+import { fakeMidi } from "../../adapters/fakeMidi";
+import { ServicesProvider } from "../../contexts/services";
 import type { DailyResult } from "../../../core/daily";
 import { generatePhrase } from "../../../core/generator";
 
@@ -15,12 +17,18 @@ import { createGhostStore } from "../../stores/ghostStore";
 import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../../../core/scoreCanvas";
 import { ScoreViewer } from "./scoreViewer";
 
+// The browser context arrives with MIDI pre-granted; without a fake seam the
+// provider would silently open a REAL Web MIDI connection under every test.
+const midiFake = { midi: fakeMidi() };
+
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
     render(
         <MemoryRouter>
-            <MidiProvider>
-                <ScoreViewer id="t" xml={xml} title="T" {...props} />
-            </MidiProvider>
+            <ServicesProvider services={midiFake}>
+                <MidiProvider>
+                    <ScoreViewer id="t" xml={xml} title="T" {...props} />
+                </MidiProvider>
+            </ServicesProvider>
         </MemoryRouter>,
     );
 
@@ -51,9 +59,11 @@ describe("ScoreViewer", () => {
     it("surfaces an error instead of a silently dead viewer when OSMD can't load", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer id="broken" xml="this is not MusicXML" title="Broken" />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer id="broken" xml="this is not MusicXML" title="Broken" />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         // A score OSMD can't parse must report rather than leave the controls
@@ -66,9 +76,11 @@ describe("ScoreViewer", () => {
     it("toggles the metronome on and off without crashing", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer id="x" xml="this is not MusicXML" title="X" beatsPerBar={3} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer id="x" xml="this is not MusicXML" title="X" beatsPerBar={3} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
@@ -164,9 +176,11 @@ describe("ScoreViewer", () => {
     it("captions each play option, spelling out what its values mean", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer id="c" xml="this is not MusicXML" title="C" beatsPerBar={4} />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer id="c" xml="this is not MusicXML" title="C" beatsPerBar={4} />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
@@ -328,15 +342,17 @@ describe("ScoreViewer", () => {
         };
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer
-                        id="t"
-                        xml={phrase}
-                        title="T"
-                        beatsPerBar={4}
-                        seededResult={seededResult}
-                    />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer
+                            id="t"
+                            xml={phrase}
+                            title="T"
+                            beatsPerBar={4}
+                            seededResult={seededResult}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         // The seeded grade renders (its Accuracy readout is on screen)…
@@ -374,15 +390,17 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer
-                        id="t"
-                        xml={phrase}
-                        title="T"
-                        beatsPerBar={4}
-                        seededResult={seededResult}
-                    />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer
+                            id="t"
+                            xml={phrase}
+                            title="T"
+                            beatsPerBar={4}
+                            seededResult={seededResult}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         expect(
@@ -411,9 +429,11 @@ describe("ScoreViewer", () => {
     it("reveals the adaptive toggle only while the metronome is on", async () => {
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer id="a" xml="this is not MusicXML" title="A" />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer id="a" xml="this is not MusicXML" title="A" />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
@@ -517,9 +537,11 @@ describe("ScoreViewer", () => {
         const code = encodeGhost([0, 500, 1000]);
         render(
             <MemoryRouter initialEntries={[`/play/t?ghost=${code}`]}>
-                <MidiProvider>
-                    <ScoreViewer id="t" xml={phrase} title="T" beatsPerBar={4} canShareGhost />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer id="t" xml={phrase} title="T" beatsPerBar={4} canShareGhost />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         expect(await screen.findByText(/racing a shared ghost/i)).toBeTruthy();
@@ -648,16 +670,18 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         render(
             <MemoryRouter>
-                <MidiProvider>
-                    <ScoreViewer
-                        id="d"
-                        xml={phrase}
-                        title="D"
-                        beatsPerBar={4}
-                        lockTempo
-                        daily={1}
-                    />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer
+                            id="d"
+                            xml={phrase}
+                            title="D"
+                            beatsPerBar={4}
+                            lockTempo
+                            daily={1}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
         );
         await awaitReady();

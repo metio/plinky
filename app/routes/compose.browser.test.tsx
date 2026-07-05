@@ -5,9 +5,15 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { fakeMidi } from "../adapters/fakeMidi";
+import { ServicesProvider } from "../contexts/services";
 import Compose from "./compose";
 
 let mounted: HTMLElement[] = [];
+
+// The browser context arrives with MIDI pre-granted; without a fake seam the
+// provider would silently open a REAL Web MIDI connection under every test.
+const midiFake = { midi: fakeMidi() };
 
 afterEach(() => {
     for (const element of mounted) {
@@ -23,9 +29,11 @@ function mount() {
     mounted.push(container);
     render(
         <MemoryRouter>
-            <MidiProvider>
-                <Compose />
-            </MidiProvider>
+            <ServicesProvider services={midiFake}>
+                <MidiProvider>
+                    <Compose />
+                </MidiProvider>
+            </ServicesProvider>
         </MemoryRouter>,
         { container },
     );
@@ -80,9 +88,11 @@ describe("Compose", () => {
         mounted.push(container);
         render(
             <MemoryRouter initialEntries={[`/compose?c=${code}`]}>
-                <MidiProvider>
-                    <Compose />
-                </MidiProvider>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <Compose />
+                    </MidiProvider>
+                </ServicesProvider>
             </MemoryRouter>,
             { container },
         );

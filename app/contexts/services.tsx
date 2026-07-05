@@ -30,8 +30,8 @@ import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
 
 // The app's injected integration points, gathered in one place. Every external
-// capability the UI depends on — persistence, the state stores over it, audio, XML
-// parsing and the fetched catalogue halves — is handed to the tree through
+// capability the UI depends on — persistence, the state stores over it, audio,
+// MIDI, XML parsing, the network and the fetched catalogue halves — is handed to the tree through
 // this context, so a component that uses one never reaches for a global or a
 // singleton. It receives its capability and stays oblivious to which implementation
 // it got: the real browser adapter in production, a fake in a test. That is what lets

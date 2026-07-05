@@ -15,6 +15,9 @@ import type {
 export type FakeMidiInput = MidiInput & {
     // Deliver raw MIDI bytes to whatever handler the app registered.
     emit(data: number[], timestamp?: number): void;
+    // Drop the registered handler, the way the real adapter's close() detaches
+    // onmidimessage — an emit after severing reaches nobody.
+    sever(): void;
 };
 
 export function fakeMidiInput(
@@ -32,6 +35,9 @@ export function fakeMidiInput(
         },
         emit(data, timestamp = 0) {
             handler?.(new Uint8Array(data), timestamp);
+        },
+        sever() {
+            handler = null;
         },
     };
 }
@@ -64,6 +70,11 @@ export function fakeMidi(
         close() {
             closed = true;
             onStateChange = null;
+            // Mirror the real adapter: closing detaches every input handler, so
+            // a test catches code that keeps processing after teardown.
+            for (const input of inputs) {
+                input.sever();
+            }
         },
         stateChange() {
             onStateChange?.();
