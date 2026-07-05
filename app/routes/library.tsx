@@ -30,7 +30,10 @@ const PER_PAGE = 60;
 function FilterGroup({ label, children }: { label: string; children: ReactNode }) {
     return (
         <div className="flex flex-wrap items-center gap-2">
-            <span className="w-12 shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            {/* A minimum, not a fixed, width: the label column aligns across the
+                groups for short labels but grows for a longer translation (e.g.
+                German "Anzeigen") instead of overflowing into the first chip. */}
+            <span className="min-w-12 shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 {label}
             </span>
             {children}
