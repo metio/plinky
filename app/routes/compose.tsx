@@ -11,6 +11,7 @@ import { MidiConnect } from "../components/features/midiConnect";
 import { PianoKeyboard } from "../components/features/pianoKeyboard";
 import { StaffPreview } from "../components/features/staffPreview";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
+import { downloadBlob } from "../lib/download";
 import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
 import {
@@ -42,15 +43,6 @@ const FIELD =
 // note stops sounding. New notes append after it, so a loaded share keeps growing.
 function tailMs(notes: RecordedNote[]): number {
     return notes.reduce((end, note) => Math.max(end, note.startMs + note.durationMs), 0);
-}
-
-function downloadBlob(data: BlobPart, type: string, filename: string): void {
-    const url = URL.createObjectURL(new Blob([data], { type }));
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.click();
-    URL.revokeObjectURL(url);
 }
 
 // The full 88-key piano (A0–C8): the range the windowed keyboard can slide across, so
@@ -305,20 +297,29 @@ export default function Compose() {
             if (!file) {
                 return;
             }
-            const bytes = new Uint8Array(await file.arrayBuffer());
-            const isMidi =
-                bytes[0] === 0x4d && bytes[1] === 0x54 && bytes[2] === 0x68 && bytes[3] === 0x64;
             let loaded: Composition | null = null;
-            if (isMidi) {
-                const { parseMidiFile } = await import("../../core/midiParse");
-                loaded = parseMidiFile(bytes);
-            } else {
-                const [{ readScoreFile }, { parseMusicXml }] = await Promise.all([
-                    import("../../core/musicxmlFile"),
-                    import("../../core/musicxmlParse"),
-                ]);
-                const xml = await readScoreFile(file);
-                loaded = xml ? parseMusicXml(xmlCodec, xml) : null;
+            try {
+                const bytes = new Uint8Array(await file.arrayBuffer());
+                const isMidi =
+                    bytes[0] === 0x4d &&
+                    bytes[1] === 0x54 &&
+                    bytes[2] === 0x68 &&
+                    bytes[3] === 0x64;
+                if (isMidi) {
+                    const { parseMidiFile } = await import("../../core/midiParse");
+                    loaded = parseMidiFile(bytes);
+                } else {
+                    const [{ readScoreFile }, { parseMusicXml }] = await Promise.all([
+                        import("../../core/musicxmlFile"),
+                        import("../../core/musicxmlParse"),
+                    ]);
+                    const xml = await readScoreFile(file);
+                    loaded = xml ? parseMusicXml(xmlCodec, xml) : null;
+                }
+            } catch {
+                // Reading the bytes or a lazily-loaded parser throwing must surface the
+                // same error as an unreadable file, not reject unhandled through `void`.
+                loaded = null;
             }
             if (!loaded) {
                 setUploadError(m.compose_open_error());

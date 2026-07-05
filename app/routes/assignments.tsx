@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, IconButton } from "../components/ui/button";
+import { downloadBlob } from "../lib/download";
 import { Show } from "../components/features/conditional";
 import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/ui/icons";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
@@ -51,17 +52,6 @@ function done(id: string, mastery: MasteryStore): boolean {
 
 const STEP_MARK =
     "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold";
-
-// Trigger a file download of text content the browser keeps on the device.
-function download(filename: string, text: string, type: string): void {
-    const blob = new Blob([text], { type });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.click();
-    URL.revokeObjectURL(url);
-}
 
 export default function AssignmentsRoute() {
     const store = useStore();
@@ -188,10 +178,10 @@ export default function AssignmentsRoute() {
     };
 
     const onDownload = (assignment: Assignment) =>
-        download(
-            `${slugifyName(assignment.name)}.json`,
+        downloadBlob(
             serializeAssignment(assignment),
             "application/json",
+            `${slugifyName(assignment.name)}.json`,
         );
 
     const onShare = async (assignment: Assignment) => {

@@ -9,7 +9,7 @@
 
 import type { KeyValueStore } from "../ports/keyValueStore";
 
-const PREFIX = "plinky:";
+export const PREFIX = "plinky:";
 
 // Remove all Plinky state from this device and report how many keys were cleared.
 // Other sites' keys are left untouched. Does not reload — the caller decides when.

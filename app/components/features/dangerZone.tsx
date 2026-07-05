@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useStore } from "../../contexts/services";
-import { resetDevice } from "../../lib/resetDevice";
+import { PREFIX, resetDevice } from "../../lib/resetDevice";
 import { m } from "../../paraglide/messages.js";
 
 const OUTLINE =
@@ -18,9 +18,16 @@ const CANCEL =
 export function DangerZone() {
     const store = useStore();
     const [confirming, setConfirming] = useState(false);
+    const [failed, setFailed] = useState(false);
 
     const reset = () => {
         resetDevice(store);
+        // A refused removal leaves Plinky keys behind. Reloading would hide that the
+        // wipe never took, so report it and let the player try again instead.
+        if (store.keys().some((key) => key.startsWith(PREFIX))) {
+            setFailed(true);
+            return;
+        }
         window.location.reload();
     };
 
@@ -46,6 +53,11 @@ export function DangerZone() {
                 <button type="button" onClick={() => setConfirming(true)} className={OUTLINE}>
                     {m.settings_reset()}
                 </button>
+            )}
+            {failed && (
+                <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-300">
+                    {m.settings_reset_failed()}
+                </p>
             )}
         </section>
     );

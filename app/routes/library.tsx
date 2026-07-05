@@ -149,7 +149,15 @@ export default function LibraryRoute() {
     const matches = useMemo(() => {
         const needle = query.trim().toLowerCase();
         const at = Date.now();
+        // An imported score can share a fingerprint id with a catalogue piece (import
+        // only warns, it still saves). Keep the first occurrence so the combined list
+        // has no duplicate id — which would collide as a React key and render twice.
+        const seen = new Set<string>();
         return [...local, ...exercises, ...songs].filter((item) => {
+            if (seen.has(item.id)) {
+                return false;
+            }
+            seen.add(item.id);
             if (kindFilter && item.kind !== kindFilter) {
                 return false;
             }

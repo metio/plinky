@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { toMidiNotes, toMusicXml } from "../../../core/composition";
+import { downloadBlob } from "../../lib/download";
 import { buildMidiFile } from "../../../core/midiFile";
 import { fileStem } from "../../lib/printScore";
 import { ghostOnsets, type Take } from "../../../core/takes";
@@ -30,15 +31,6 @@ export function formatAgo(fromMs: number, nowMs: number, locale: string): string
         return rtf.format(hours, "hour");
     }
     return rtf.format(Math.round(hours / 24), "day");
-}
-
-function download(filename: string, data: BlobPart, type: string): void {
-    const url = URL.createObjectURL(new Blob([data], { type }));
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.click();
-    URL.revokeObjectURL(url);
 }
 
 // Your saved performances of a piece: replay one onto the staff above, download it
@@ -113,12 +105,12 @@ export function TakesList({
                                 />
                                 <Button
                                     onClick={() =>
-                                        download(
-                                            `${stem}-take.mid`,
+                                        downloadBlob(
                                             buildMidiFile(toMidiNotes(take.composition), {
                                                 tempo: take.composition.tempo,
                                             }),
                                             "audio/midi",
+                                            `${stem}-take.mid`,
                                         )
                                     }
                                 >
@@ -126,10 +118,10 @@ export function TakesList({
                                 </Button>
                                 <Button
                                     onClick={() =>
-                                        download(
-                                            `${stem}-take.musicxml`,
+                                        downloadBlob(
                                             toMusicXml(take.composition),
                                             "application/xml",
+                                            `${stem}-take.musicxml`,
                                         )
                                     }
                                 >
