@@ -27,6 +27,7 @@ import {
 } from "../../core/midi";
 import { DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
 import { usePrefsStore } from "./services";
+import type { MidiConnection } from "../ports/midiAccess";
 import { useServices } from "./services";
 import { resetDevice } from "../lib/resetDevice";
 
@@ -42,6 +43,18 @@ declare global {
         __plinky?: {
             play: (note: number, velocity?: number) => void;
             release: (note: number) => void;
+            // Raw MIDI bytes through the same parse-and-emit pipeline a real
+            // device feeds, so a browser test exercises the full path.
+            midiBytes: (data: number[], timestamp?: number) => void;
+            // A snapshot of the connection state, for asserting from a page test.
+            midiState: () => {
+                support: MidiSupport;
+                status: MidiStatus;
+                error: string | null;
+                devices: MidiDevice[];
+                heldNotes: number[];
+                octaveOffset: number;
+            };
             // Wipe all local Plinky state and reload — a quick fresh start in dev.
             reset: () => void;
         };
@@ -69,9 +82,10 @@ const MidiContext = createContext<MidiContextValue | null>(null);
 // A single connection shared across the whole app: connecting once persists
 // across route changes, and the computer-keyboard fallback is always live.
 export function MidiProvider({ children }: { children: ReactNode }) {
-    // The dev reset bridge wipes state through the injected store — the provider
-    // renders inside ServicesProvider, so an override reaches it too.
-    const { store } = useServices();
+    // Injected capabilities: the MIDI seam itself, and the store the dev reset
+    // bridge wipes — the provider renders inside ServicesProvider, so overrides
+    // (a fake MIDI in tests) reach it too.
+    const { midi, store } = useServices();
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -80,7 +94,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     const [heldNotes, setHeldNotes] = useState<number[]>([]);
     const [octaveOffset, setOctaveOffset] = useState(0);
 
-    const accessRef = useRef<MIDIAccess | null>(null);
+    const connectionRef = useRef<MidiConnection | null>(null);
     const nextIdRef = useRef(0);
     const subscribersRef = useRef<Set<NoteListener>>(new Set());
     // The latest held notes, read by the window-blur handler to release them all.
@@ -95,12 +109,8 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
-        setSupport(
-            typeof navigator !== "undefined" && typeof navigator.requestMIDIAccess === "function"
-                ? "supported"
-                : "unsupported",
-        );
-    }, []);
+        setSupport(midi.supported() ? "supported" : "unsupported");
+    }, [midi]);
 
     // The single funnel for every note, whether from a MIDI device or the
     // keyboard fallback, so both update shared state and reach all subscribers.
@@ -143,6 +153,28 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [],
     );
 
+    const makeHandler = useCallback(
+        (deviceName: string) => (data: Uint8Array, timestamp: number) => {
+            const parsed = parseMidiMessage(data);
+            if (!parsed) {
+                return;
+            }
+            emitNote(
+                parsed.kind,
+                parsed.note,
+                parsed.velocity,
+                parsed.channel,
+                deviceName,
+                timestamp,
+            );
+        },
+        [emitNote],
+    );
+
+    // The bridge reads state through a ref so it needs no re-attachment per render.
+    const bridgeStateRef = useRef({ support, status, error, devices, heldNotes, octaveOffset });
+    bridgeStateRef.current = { support, status, error, devices, heldNotes, octaveOffset };
+
     // Lets browser tests — and the console — inject notes as if from a MIDI
     // device, to drive trainers end to end. Never attached in a production build.
     useEffect(() => {
@@ -153,6 +185,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             play: (note, velocity = 80) =>
                 emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
+            midiBytes: (data, timestamp = performance.now()) =>
+                makeHandler("Test bridge")(new Uint8Array(data), timestamp),
+            midiState: () => bridgeStateRef.current,
             reset: () => {
                 resetDevice(store);
                 window.location.reload();
@@ -161,7 +196,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         return () => {
             window.__plinky = undefined;
         };
-    }, [emitNote, store]);
+    }, [emitNote, store, makeHandler]);
 
     const pressKey = useCallback(
         (note: number) =>
@@ -173,55 +208,36 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [emitNote],
     );
 
-    const makeHandler = useCallback(
-        (deviceName: string) => (event: MIDIMessageEvent) => {
-            const parsed = parseMidiMessage(event.data);
-            if (!parsed) {
-                return;
-            }
-            emitNote(
-                parsed.kind,
-                parsed.note,
-                parsed.velocity,
-                parsed.channel,
-                deviceName,
-                event.timeStamp,
-            );
-        },
-        [emitNote],
-    );
-
     const refreshDevices = useCallback(() => {
-        const access = accessRef.current;
-        if (!access) {
+        const connection = connectionRef.current;
+        if (!connection) {
             return;
         }
         const list: MidiDevice[] = [];
-        for (const input of access.inputs.values()) {
+        for (const input of connection.inputs()) {
             list.push({
                 id: input.id,
-                name: input.name ?? "Unknown device",
-                manufacturer: input.manufacturer ?? "",
+                name: input.name,
+                manufacturer: input.manufacturer,
                 state: input.state,
             });
-            input.onmidimessage = makeHandler(input.name ?? "Unknown device");
+            input.onMessage(makeHandler(input.name));
         }
         setDevices(list);
     }, [makeHandler]);
 
     const requestAccess = useCallback(() => {
-        if (typeof navigator === "undefined" || typeof navigator.requestMIDIAccess !== "function") {
+        if (!midi.supported()) {
             setStatus("error");
             setError("Web MIDI API is not available in this browser.");
             return;
         }
         setStatus("requesting");
         setError(null);
-        navigator
-            .requestMIDIAccess({ sysex: false })
-            .then((access) => {
-                accessRef.current = access;
-                access.onstatechange = () => refreshDevices();
+        midi.request()
+            .then((connection) => {
+                connectionRef.current = connection;
+                connection.onStateChange(() => refreshDevices());
                 setStatus("ready");
                 refreshDevices();
             })
@@ -229,7 +245,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 setStatus("denied");
                 setError(err instanceof Error ? err.message : String(err));
             });
-    }, [refreshDevices]);
+    }, [midi, refreshDevices]);
 
     // Silently reconnect MIDI when the player has already granted it (through the
     // Connect button), so a connected keyboard just works across the app — the
@@ -237,20 +253,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // still "prompt" or "denied", do nothing: requesting would pop the dialog.
     useEffect(() => {
         let cancelled = false;
-        navigator.permissions
-            ?.query({ name: "midi" as PermissionName })
-            .then((permission) => {
-                if (!cancelled && permission.state === "granted") {
-                    requestAccess();
-                }
-            })
-            .catch(() => {
-                // No Permissions API, or no "midi" descriptor (Safari, Firefox).
-            });
+        midi.permissionState().then((state) => {
+            if (!cancelled && state === "granted") {
+                requestAccess();
+            }
+        });
         return () => {
             cancelled = true;
         };
-    }, [requestAccess]);
+    }, [midi, requestAccess]);
 
     const clearEvents = useCallback(() => setEvents([]), []);
 
@@ -348,14 +359,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         return () => {
-            const access = accessRef.current;
-            if (!access) {
-                return;
-            }
-            access.onstatechange = null;
-            for (const input of access.inputs.values()) {
-                input.onmidimessage = null;
-            }
+            connectionRef.current?.close();
         };
     }, []);
 

@@ -4,6 +4,8 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import { webAudioEngine } from "../adapters/webAudioEngine";
+import { webMidi } from "../adapters/webMidi";
+import type { MidiAccessPort } from "../ports/midiAccess";
 import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
@@ -59,6 +61,8 @@ export type AppServices = {
     fetcher: Fetcher;
     // Where sound comes out (see AudioEngine).
     audio: AudioEngine;
+    // Where MIDI comes from (see MidiAccessPort).
+    midi: MidiAccessPort;
     // How MusicXML strings become walkable documents and back (see XmlCodec).
     xml: XmlCodec;
     // The fetched halves of the catalogue: the song manifest + on-demand .mxl,
@@ -96,6 +100,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         assignments: overrides.assignments ?? createAssignmentsStore(store),
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
+        midi: overrides.midi ?? webMidi,
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
@@ -140,6 +145,7 @@ export function ServicesProvider({
     const assignments = services?.assignments;
     const fetcher = services?.fetcher;
     const audio = services?.audio;
+    const midi = services?.midi;
     const xml = services?.xml;
     const songs = services?.songs;
     const exercises = services?.exercises;
@@ -162,6 +168,7 @@ export function ServicesProvider({
             assignments ||
             fetcher ||
             audio ||
+            midi ||
             xml ||
             songs ||
             exercises
@@ -183,6 +190,7 @@ export function ServicesProvider({
                       assignments,
                       fetcher,
                       audio,
+                      midi,
                       xml,
                       songs,
                       exercises,
@@ -206,6 +214,7 @@ export function ServicesProvider({
             assignments,
             fetcher,
             audio,
+            midi,
             xml,
             songs,
             exercises,

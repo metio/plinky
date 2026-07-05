@@ -17,6 +17,7 @@ const CONFINED = {
     localStorage: ["app/adapters/browserStore.ts", "app/lib/deniedStorage.ts"],
     DOMParser: ["app/adapters/domXmlCodec.ts"],
     XMLSerializer: ["app/adapters/domXmlCodec.ts"],
+    requestMIDIAccess: ["app/adapters/webMidi.ts"],
 };
 
 function walk(dir) {

@@ -81,7 +81,12 @@ export default defineConfig({
                     setupFiles: ["./app/test-setup.ts"],
                     browser: {
                         enabled: true,
-                        provider: playwright(),
+                        // MIDI arrives pre-granted, so the real Web MIDI adapter's
+                        // permission and silent-resume paths run for real. Chromium
+                        // gates even sysex-free access behind the sysex grant.
+                        provider: playwright({
+                            contextOptions: { permissions: ["midi", "midi-sysex"] },
+                        }),
                         headless: true,
                         instances: [{ browser: "chromium" }],
                     },
