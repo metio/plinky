@@ -215,7 +215,7 @@ export function YouView() {
                                         </span>
                                     )}
                                 </span>
-                                <span className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                                <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                                     <span className="tabular-nums">
                                         {m.grades_pool({ mastered, total })}
                                     </span>

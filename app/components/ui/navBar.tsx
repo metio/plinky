@@ -44,13 +44,13 @@ export function BottomNav() {
     return (
         <nav
             aria-label={m.nav_primary_label()}
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden dark:border-gray-800 dark:bg-gray-950/95"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-gray-800 dark:bg-gray-950/95"
         >
             <ul className="mx-auto flex max-w-3xl">
                 {DESTINATIONS.map(({ to, label, Icon }) => {
                     const active = isActive(to);
                     return (
-                        <li key={to} className="flex-1">
+                        <li key={to} className="min-w-0 flex-1">
                             <Link
                                 to={to}
                                 aria-current={active ? "page" : undefined}
@@ -61,7 +61,7 @@ export function BottomNav() {
                                 }`}
                             >
                                 <Icon className="h-6 w-6" />
-                                {label()}
+                                <span className="max-w-full truncate">{label()}</span>
                             </Link>
                         </li>
                     );

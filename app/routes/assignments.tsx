@@ -410,7 +410,7 @@ export default function AssignmentsRoute() {
             </section>
 
             <section className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                     <h2 className="font-semibold">{m.assignments_yours_heading()}</h2>
                     <Button variant="secondary" onClick={() => fileRef.current?.click()}>
                         {m.assignments_import_file()}

@@ -32,7 +32,7 @@ export default function LocaleLayout() {
     return (
         <>
             {/* Room for the fixed mobile tab bar so it never covers the last of a page. */}
-            <div className="pb-20 sm:pb-0">
+            <div className="pb-20 md:pb-0">
                 <Outlet />
             </div>
             <BottomNav />

@@ -96,7 +96,7 @@ function Header() {
                 </div>
                 {/* On wide screens the destinations sit inline; on phones they move to
                     the fixed bottom tab bar (BottomNav), so the header stays slim. */}
-                <HeaderNav className="hidden items-center gap-1 sm:flex" />
+                <HeaderNav className="hidden items-center gap-1 md:flex" />
                 <div className="flex items-center gap-4">
                     <ThemeToggle />
                     <Link
