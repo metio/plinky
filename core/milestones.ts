@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { Grade } from "./grade";
 import { letterMin } from "./mastery";
 
 // Earned moments that surface a shareable card on the run summary. Each fires at most
@@ -18,8 +19,10 @@ export function isFirstS(score: number, previousBest: number): boolean {
     return score >= letterMin("S") && previousBest < letterMin("S");
 }
 
-// A flawless run is a perfect aggregate — all three of accuracy, timing and flow at
-// 100 — which only a clean, in-time, unbroken performance reaches.
-export function isFlawless(score: number): boolean {
-    return score >= 100;
+// A flawless run has all three of accuracy, timing and flow at 100 — a clean,
+// in-time, unbroken performance. The rounded aggregate score is too loose: a
+// 100/100/99 run rounds up to a score of 100 while a note was still out of time,
+// so the milestone reads the three dimensions the letter is built from directly.
+export function isFlawless(grade: Pick<Grade, "accuracy" | "timing" | "flow">): boolean {
+    return grade.accuracy === 100 && grade.timing === 100 && grade.flow === 100;
 }
