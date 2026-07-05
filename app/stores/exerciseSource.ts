@@ -6,6 +6,7 @@ import { type ExerciseConfig, exerciseTitle, generateExercise } from "../../core
 import { decompressMxl } from "../../core/musicxmlFile";
 import type { Score } from "../lib/catalog";
 import type { Fetcher } from "../ports/fetcher";
+import { fetchManifest } from "./manifest";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the
 // fly from the id's config (zero storage, every form instantly available).
@@ -50,13 +51,13 @@ export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
         if (manifestCache) {
             return manifestCache;
         }
-        try {
-            const response = await fetchUrl(MANIFEST_URL);
-            manifestCache = response.ok ? ((await response.json()) as ExerciseMeta[]) : [];
-        } catch {
-            manifestCache = [];
+        // Only a completed fetch is cached; a failure answers empty for this
+        // call and the next call tries the network again.
+        const fetched = await fetchManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL);
+        if (fetched) {
+            manifestCache = fetched;
         }
-        return manifestCache;
+        return fetched ?? [];
     };
 
     // A study's MusicXML lives in a compressed .mxl named by its fingerprint id;

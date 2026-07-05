@@ -31,6 +31,29 @@ describe("songSource.manifest", () => {
         await source.manifest();
         expect(fetches).toBe(1);
     });
+
+    it("retries after a failure instead of caching an empty catalogue for the session", async () => {
+        let calls = 0;
+        const source = createSongSource(() => {
+            calls++;
+            return calls === 1
+                ? Promise.reject(new TypeError("network down"))
+                : Promise.resolve(Response.json([{ id: "s1" }]));
+        }, memoryStore());
+        expect(await source.manifest()).toEqual([]);
+        expect((await source.manifest())[0]?.id).toBe("s1");
+        // The recovered manifest is cached like any completed one.
+        await source.manifest();
+        expect(calls).toBe(2);
+    });
+
+    it("drops manifest rows without a usable id", async () => {
+        const source = createSongSource(
+            () => Promise.resolve(Response.json([{ id: "ok" }, null, "junk"])),
+            memoryStore(),
+        );
+        expect((await source.manifest()).map((song) => song.id)).toEqual(["ok"]);
+    });
 });
 
 describe("songSource.ensureSeeded", () => {

@@ -7,6 +7,7 @@ import type { Score } from "../lib/catalog";
 import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import type { Fetcher } from "../ports/fetcher";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import { fetchManifest } from "./manifest";
 
 // The curated song catalogue. Unlike the bundled exercises (inlined into the
 // JS) and user imports (kept in the browser store), songs are too many to
@@ -39,9 +40,10 @@ const SEEDED_KEY = "plinky:songs-seeded";
 const PROBE_KEY = "plinky:songs-seeded-probe";
 
 export type SongSource = {
-    // The browsable catalogue (metadata only). Cached for the session; [] when
-    // the manifest is absent (e.g., a dev build without an import run) so the
-    // rest of the app degrades quietly.
+    // The browsable catalogue (metadata only). A completed fetch is cached for
+    // the session; a failed or absent manifest (offline moment, a dev build
+    // without an import run) answers [] for that call only, so the app degrades
+    // quietly now and recovers on the next ask.
     manifest(): Promise<SongMeta[]>;
     // A song's MusicXML, decompressed from its .mxl; null when unknown or
     // unfetchable.
@@ -61,13 +63,13 @@ export function createSongSource(fetchUrl: Fetcher, kv: KeyValueStore): SongSour
         if (manifestCache) {
             return manifestCache;
         }
-        try {
-            const response = await fetchUrl(MANIFEST_URL);
-            manifestCache = response.ok ? ((await response.json()) as SongMeta[]) : [];
-        } catch {
-            manifestCache = [];
+        // Only a completed fetch is cached; a failure answers empty for this
+        // call and the next call tries the network again.
+        const fetched = await fetchManifest<SongMeta>(fetchUrl, MANIFEST_URL);
+        if (fetched) {
+            manifestCache = fetched;
         }
-        return manifestCache;
+        return fetched ?? [];
     };
 
     const fetchXml = async (id: string, license?: string): Promise<string | null> => {
