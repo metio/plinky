@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { fingerPositions, positionsCost } from "./fingering";
+import { STEP_SEMITONES } from "./pitch";
 import type { XmlCodec } from "./xml";
 
 // How hard a score is to *play*, derived from the fingering cost model — the same
@@ -11,8 +12,6 @@ import type { XmlCodec } from "./xml";
 // finger exercise sits at the top of its own scale rather than at the bottom of
 // the pieces' scale. The score is read through the injected XML codec, so this
 // runs identically in the browser, in the import tooling, and in tests.
-
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
 function midiOf(note: Element): number | null {
     const pitch = note.querySelector("pitch");
@@ -26,7 +25,10 @@ function midiOf(note: Element): number | null {
     }
     const octave = Number(pitch.querySelector("octave")?.textContent ?? "4");
     const alter = Number(pitch.querySelector("alter")?.textContent ?? "0");
-    return (octave + 1) * 12 + semitone + alter;
+    const midi = (octave + 1) * 12 + semitone + alter;
+    // A non-numeric <octave> or <alter> yields NaN; skip it rather than fingering
+    // a note that has no real pitch.
+    return Number.isFinite(midi) ? midi : null;
 }
 
 // Split a score's notes into the two hands' position sequences (a position is a

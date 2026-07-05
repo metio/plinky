@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { STEP_SEMITONES } from "./pitch";
 import type { XmlCodec } from "./xml";
 // Transposes a score's MusicXML up or down by a number of semitones, client-side,
 // so a piece can be practised in a more comfortable key. Every <pitch> is respelled
 // and every key signature shifts with it, the way a transposing edition is printed —
 // not just nudged chromatically. OSMD then renders, plays and matches the new key.
 
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const LETTERS = ["C", "D", "E", "F", "G", "A", "B"];
 const LETTER_INDEX: Record<string, number> = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
 

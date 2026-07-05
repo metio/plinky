@@ -1,14 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { STEP_SEMITONES } from "./pitch";
 import type { XmlCodec } from "./xml";
 // Turns a piece's MusicXML into per-bar chord positions for one hand, so a passage
 // can be fingered (or reproduced by ear). Each bar is a list of positions in play
 // order; each position is the MIDI pitches sounding together — a single note, or a
 // chord. Reads one hand's staff (treble for the right, bass for the left), the way a
 // pianist reads each hand separately.
-
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
 export type Bar = number[][];
 // 1 = treble (right hand), 2 = bass (left hand) — the conventional grand-staff split.
@@ -29,7 +28,10 @@ function midiOf(note: Element): number | null {
         return null;
     }
     const alter = Number(pitch.getElementsByTagName("alter")[0]?.textContent ?? "0");
-    return (Number(octaveText) + 1) * 12 + STEP_SEMITONES[step]! + alter;
+    const midi = (Number(octaveText) + 1) * 12 + STEP_SEMITONES[step]! + alter;
+    // A non-numeric <octave> or <alter> yields NaN, which would slip past the null
+    // check and place a phantom position; treat it as an unreadable note.
+    return Number.isFinite(midi) ? midi : null;
 }
 
 // Parse the first part's measures into bars of positions for the given staff. A note

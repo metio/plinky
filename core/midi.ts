@@ -35,9 +35,10 @@ export const MAX_EVENTS = 100;
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 // MIDI note 60 is middle C (C4), so the octave is offset by one below the raw
-// division by twelve.
+// division by twelve. The pitch class is taken with a floor-mod so a note below
+// MIDI 0 still names a real letter rather than indexing off the end of the array.
 export function noteName(note: number): string {
-    return `${NOTE_NAMES[note % 12]!}${Math.floor(note / 12) - 1}`;
+    return `${NOTE_NAMES[((note % 12) + 12) % 12]!}${Math.floor(note / 12) - 1}`;
 }
 
 // The note's letter alone (no octave), with a typographic sharp — what a beginner

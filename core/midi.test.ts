@@ -20,6 +20,11 @@ describe("noteName", () => {
         expect(noteName(61)).toBe("C#4");
         expect(noteName(72)).toBe("C5");
     });
+
+    it("names a note below MIDI 0 with a floor-mod instead of indexing off the array", () => {
+        expect(noteName(-1)).toBe("B-2");
+        expect(noteName(-12)).toBe("C-2");
+    });
 });
 
 describe("pitchClass", () => {

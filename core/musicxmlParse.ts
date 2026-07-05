@@ -3,6 +3,7 @@
 
 import type { XmlCodec } from "./xml";
 import type { Composition, RecordedNote } from "./composition";
+import { STEP_SEMITONES } from "./pitch";
 
 // Reads MusicXML back into a composition, the inverse of the toMusicXml sketch, so a
 // score downloaded on one device — or exported from notation software — can be loaded
@@ -11,7 +12,6 @@ import type { Composition, RecordedNote } from "./composition";
 // jumps that stack two staves into one measure, and merges tied notes into one held
 // sound.
 
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const DEFAULT_TEMPO = 120;
 const DEFAULT_BEATS_PER_BAR = 4;
 const DEFAULT_VELOCITY = 90;
@@ -27,7 +27,10 @@ function midiOf(pitch: Element): number | null {
         return null;
     }
     const alter = Number(text(pitch, "alter") ?? "0");
-    return (Number(octave) + 1) * 12 + STEP_SEMITONES[step]! + alter;
+    const midi = (Number(octave) + 1) * 12 + STEP_SEMITONES[step]! + alter;
+    // A non-numeric <octave> or <alter> yields NaN, which would slip through a later
+    // `!== null` check and poison the timeline; treat it as an unreadable pitch.
+    return Number.isFinite(midi) ? midi : null;
 }
 
 // Parses MusicXML text into a composition, or null if it holds no readable score. The
