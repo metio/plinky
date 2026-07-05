@@ -14,7 +14,7 @@ import { generatePhrase } from "../../../core/generator";
 import { encodeGhost } from "../../../core/ghost";
 import { browserStore } from "../../adapters/browserStore";
 import { createGhostStore } from "../../stores/ghostStore";
-import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../../../core/scoreCanvas";
+import { GHOST_COLOR, LISTENED_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../../../core/scoreCanvas";
 import { ScoreViewer } from "./scoreViewer";
 
 // The browser context arrives with MIDI pre-granted; without a fake seam the
@@ -610,6 +610,44 @@ describe("ScoreViewer", () => {
                 { timeout: 15000 },
             )
             .toBe(true);
+    });
+
+    it("leaves a blue trail on the notes Listen has played", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        await enterAndListen();
+        // As playback advances, the notes it has moved past wear the persistent listened
+        // colour — a trail showing which stretches the computer played.
+        await expect
+            .poll(
+                () =>
+                    Array.from(document.querySelectorAll("g[fill]")).some(
+                        (group) => group.getAttribute("fill") === LISTENED_COLOR,
+                    ),
+                { timeout: 15000 },
+            )
+            .toBe(true);
+    });
+
+    it("keeps the notes you practised coloured when you hand off to Listen", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // Four C5 notes; play two so they turn green.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const { container } = mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady());
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 2; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        await waitFor(
+            () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+            { timeout: 30000 },
+        );
+        // Handing off to Listen doesn't wipe the score — the notes you played stay green,
+        // so the record of how the piece was played survives the switch.
+        fireEvent.click(screen.getByRole("button", { name: "Listen" }));
+        expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy();
     });
 
     it("plays a grand staff back, sounding both hands", async () => {

@@ -15,6 +15,10 @@ export const NOTE_COLOR = "#000000";
 // The active window in a read-only context staff — the bars currently being fingered
 // or heard, indigo to match the app's accent and stand out from the black notes.
 export const WINDOW_COLOR = "#6366f1";
+// The trail Listen leaves on the notes it has sounded — blue, so a glance at the score
+// shows which stretches the computer played (blue) versus which you practised (green),
+// distinct from the indigo "now sounding" head and the green of a played note.
+export const LISTENED_COLOR = "#3b82f6";
 // The loop selection is filled behind its bars in a bright red so the stretch you're
 // about to drill reads at a glance — the same red the share grid's weakest band uses.
 export const SELECT_COLOR = "#ef4444";

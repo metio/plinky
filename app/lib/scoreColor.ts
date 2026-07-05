@@ -241,6 +241,16 @@ export function restoreNotes(painted: PaintedNote[]): void {
     }
 }
 
+// Leaves a persistent trail on notes the highlight is moving off: paints them `color`
+// only where they were untouched (plain black), keeping any prior mark — a practised
+// green — so the trail records where the piece was heard without erasing where it was
+// played. Used by Listen to lay down its blue trail as the cursor advances.
+export function trailNotes(painted: PaintedNote[], color: string): void {
+    for (const { element, fill } of painted) {
+        paintElement(element, fill === NOTE_COLOR ? color : fill);
+    }
+}
+
 // Scrolls a measure to the vertical centre of its own container — used by the focus
 // strip to slide to the bar being played. Scrolls the container directly (not
 // scrollIntoView, which would also scroll the page). Walks the cursor to the measure to

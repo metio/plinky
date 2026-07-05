@@ -64,9 +64,11 @@ import {
     paintElement,
     paintPlayedNotes,
     restoreNotes,
+    trailNotes,
 } from "../../lib/scoreColor";
 import {
     GHOST_COLOR,
+    LISTENED_COLOR,
     type MeasureBox,
     measureAtPoint,
     NOTE_COLOR,
@@ -1107,9 +1109,11 @@ export function ScoreViewer({
                 bumpTempo();
                 return;
             }
-            // Light the notes now sounding so the eye can follow the music, lifting the
-            // previous step's highlight first — the cursor box alone is easy to lose.
-            restoreNotes(listenHighlightRef.current);
+            // Light the notes now sounding so the eye can follow the music, leaving a
+            // blue trail on the ones just heard — the cursor box alone is easy to lose,
+            // and the trail records which stretches the computer played once it moves on.
+            trailNotes(listenHighlightRef.current, LISTENED_COLOR);
+            paintedRef.current = true;
             listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
             const lengths: number[] = [];
             for (const note of cursor.NotesUnderCursor()) {
@@ -1396,8 +1400,10 @@ export function ScoreViewer({
         // is printed on the staff at load time, not computed per run.)
         const osmd = osmdRef.current;
         const matcherHand: Hand = staffCount < 2 ? "both" : hand;
-        // Re-render to wipe the previous run's note colours before starting afresh.
-        if (paintedRef.current) {
+        // A fresh run from the top wipes the previous run's colours for a clean slate; a
+        // resumed run (taking over from Listen) keeps them, so the blue Listen trail and
+        // any earlier green survive and the score shows how the whole piece was played.
+        if (!partial && paintedRef.current) {
             osmd?.render();
             paintedRef.current = false;
         }
