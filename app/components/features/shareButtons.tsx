@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { m } from "../../paraglide/messages.js";
-import { type Brand, BrandIcon } from "./brandIcons";
+import { type Brand, BrandIcon } from "../ui/brandIcons";
 
 // The platforms offered as one-tap links, each opening its share composer with the
 // text prefilled. Instagram and TikTok have no such web link — they are reached

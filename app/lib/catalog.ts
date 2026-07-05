@@ -9,20 +9,11 @@ import { songId } from "../../core/songId";
 // The one score catalogue: MusicXML pieces, rendered and practised on OSMD. The
 // bundled public-domain scores ship with the app; user-imported pieces are kept in
 // local storage and layer on top, a stored piece overriding a bundled one by id.
-export type Score = {
-    id: string;
-    title: string;
-    composer: string;
-    description: string;
-    xml: string;
-    tempo: number; // beats per minute for the count-in and playback
-    beatsPerBar: number;
-    license?: string;
-    // Provenance id (e.g. "pdmx") resolved to a credited source link; absent for
-    // bundled demos and generated exercises, which are our own.
-    source?: string;
-    bundled: boolean; // true for the shipped scores, which cannot be removed
-};
+// The Score shape itself lives in core; re-exported here for the many callers
+// that take the catalogue and its type from one import.
+import type { Score } from "../../core/score";
+
+export type { Score } from "../../core/score";
 
 const files = import.meta.glob("../../scores/*.musicxml", {
     query: "?raw",

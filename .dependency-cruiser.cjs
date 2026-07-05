@@ -83,10 +83,11 @@ module.exports = {
             name: "stores-point-down",
             comment:
                 "app/stores/ is the single-source-of-truth state layer over core + ports; it must not " +
-                "import React glue (hooks), components or routes.",
+                "import React glue (hooks), components, routes, or the transitional lib/ helpers — " +
+                "what a store needs from lib is a sign that piece belongs in core or a store.",
             severity: "error",
             from: { path: "^app/stores/", pathNot: "\\.(test|stories)\\.[jt]sx?$" },
-            to: { path: ["^app/hooks/", "^app/components/", "^app/routes/"] },
+            to: { path: ["^app/hooks/", "^app/components/", "^app/routes/", "^app/lib/"] },
         },
         {
             name: "ui-is-pure",

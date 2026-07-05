@@ -3,7 +3,7 @@
 
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import { decompressMxl } from "../../core/musicxmlFile";
-import type { Score } from "../lib/catalog";
+import type { Score } from "../../core/score";
 import type { Fetcher } from "../ports/fetcher";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { FavoritesStore } from "./favoritesStore";

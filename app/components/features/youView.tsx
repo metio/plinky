@@ -18,18 +18,18 @@ import {
     type StarTier,
     starTier,
 } from "../../lib/gradeProgress";
-import { type PracticeSummary, summarizePractice } from "../../../core/history";
 import { loadLifetime, progressGrid } from "../../lib/lifetime";
 import { svgMilestone } from "../../../core/milestoneCard";
 import { usePrefsStore, useServices } from "../../contexts/services";
+import { usePracticeSummary } from "../../hooks/usePracticeSummary";
 import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import type { Grid } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
 import { buttonClasses } from "../ui/button";
 import { Show } from "./conditional";
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { ShareButtons } from "../ui/shareButtons";
-import { ShareCard } from "../ui/shareCard";
+import { ShareButtons } from "./shareButtons";
+import { ShareCard } from "./shareCard";
 
 type EarnedTier = Exclude<StarTier, "none">;
 const STAR: Record<EarnedTier, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
@@ -76,12 +76,12 @@ export function YouView() {
     const services = useServices();
     const [items, setItems] = useState<GradedMastery[] | null>(null);
     const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
-    const [summary, setSummary] = useState<PracticeSummary | null>(null);
+    // Subscribed, not sampled: a run finished elsewhere updates the summary live.
+    const summary = usePracticeSummary();
     const [fingerprint, setFingerprint] = useState<Grid | null>(null);
 
     useEffect(() => {
         let cancelled = false;
-        setSummary(summarizePractice(services.history.load()));
         setFingerprint(progressGrid(loadLifetime()));
         loadGradedMastery(services.mastery, services).then(
             (loaded) => !cancelled && setItems(loaded),

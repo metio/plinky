@@ -8,6 +8,7 @@ import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
 import { createFavoritesStore, type FavoritesStore } from "../stores/favoritesStore";
@@ -33,6 +34,9 @@ export type AppServices = {
     mastery: MasteryStore;
     history: HistoryStore;
     favorites: FavoritesStore;
+    // How the network is reached (see Fetcher). The catalogue sources derive
+    // from it, so overriding just this redirects every fetch.
+    fetcher: Fetcher;
     // Where sound comes out (see AudioEngine).
     audio: AudioEngine;
     // How MusicXML strings become walkable documents and back (see XmlCodec).
@@ -52,16 +56,18 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
     // The song source seeds first-run favorites, so it takes the same favorites
     // store the UI subscribes to — seeding lands where the library reads.
     const favorites = overrides.favorites ?? createFavoritesStore(store);
+    const fetcher = overrides.fetcher ?? httpFetcher;
     return {
         store,
         prefs: overrides.prefs ?? createPrefsStore(store),
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
         favorites,
+        fetcher,
         audio: overrides.audio ?? webAudioEngine,
         xml: overrides.xml ?? domXmlCodec,
-        songs: overrides.songs ?? createSongSource(httpFetcher, store, favorites),
-        exercises: overrides.exercises ?? createExerciseSource(httpFetcher),
+        songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
+        exercises: overrides.exercises ?? createExerciseSource(fetcher),
     };
 }
 
@@ -91,16 +97,37 @@ export function ServicesProvider({
     const mastery = services?.mastery;
     const history = services?.history;
     const favorites = services?.favorites;
+    const fetcher = services?.fetcher;
     const audio = services?.audio;
     const xml = services?.xml;
     const songs = services?.songs;
     const exercises = services?.exercises;
     const value = useMemo(
         () =>
-            store || prefs || mastery || history || favorites || audio || xml || songs || exercises
-                ? build({ store, prefs, mastery, history, favorites, audio, xml, songs, exercises })
+            store ||
+            prefs ||
+            mastery ||
+            history ||
+            favorites ||
+            fetcher ||
+            audio ||
+            xml ||
+            songs ||
+            exercises
+                ? build({
+                      store,
+                      prefs,
+                      mastery,
+                      history,
+                      favorites,
+                      fetcher,
+                      audio,
+                      xml,
+                      songs,
+                      exercises,
+                  })
                 : DEFAULT_SERVICES,
-        [store, prefs, mastery, history, favorites, audio, xml, songs, exercises],
+        [store, prefs, mastery, history, favorites, fetcher, audio, xml, songs, exercises],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }

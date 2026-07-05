@@ -123,8 +123,8 @@ import {
 import { PerformanceStrip } from "../ui/performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { SegmentedControl } from "../ui/segmentedControl";
-import { ShareButtons } from "../ui/shareButtons";
-import { ShareCard } from "../ui/shareCard";
+import { ShareButtons } from "./shareButtons";
+import { ShareCard } from "./shareCard";
 import { BumpValue, Stepper } from "../ui/stepper";
 import { Switch } from "../ui/switch";
 import { TempoGraph } from "../ui/tempoGraph";

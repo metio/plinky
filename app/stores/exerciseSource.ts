@@ -4,7 +4,7 @@
 import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
 import { type ExerciseConfig, exerciseTitle, generateExercise } from "../../core/exerciseGen";
 import { decompressMxl } from "../../core/musicxmlFile";
-import type { Score } from "../lib/catalog";
+import type { Score } from "../../core/score";
 import type { Fetcher } from "../ports/fetcher";
 import { fetchManifest } from "./manifest";
 
