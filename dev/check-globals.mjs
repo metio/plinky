@@ -15,9 +15,7 @@ import { join } from "node:path";
 // allowed — they exercise the real thing on purpose.
 const CONFINED = {
     localStorage: ["app/adapters/browserStore.ts", "app/lib/deniedStorage.ts"],
-    // catalog still parses score metadata directly; it moves behind the codec
-    // with the data layer, at which point only the adapter remains.
-    DOMParser: ["app/adapters/domXmlCodec.ts", "app/lib/catalog.ts"],
+    DOMParser: ["app/adapters/domXmlCodec.ts"],
     XMLSerializer: ["app/adapters/domXmlCodec.ts"],
 };
 

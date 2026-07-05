@@ -6,6 +6,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { browserStore } from "../adapters/browserStore";
+import { domXmlCodec } from "../adapters/domXmlCodec";
 import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
 
 import Library from "./library";
@@ -85,7 +86,7 @@ describe("Library", () => {
     });
 
     it("removes an imported score only after the delete is confirmed", async () => {
-        saveUserScore(browserStore, buildScore(USER_XML, []));
+        saveUserScore(browserStore, buildScore(domXmlCodec, USER_XML, []));
         renderLibrary();
         expect(await screen.findByText("My Tune")).toBeTruthy();
         // The first click only arms the confirm — the unrecoverable delete shouldn't
@@ -97,7 +98,7 @@ describe("Library", () => {
     });
 
     it("gives a long title the shrink-and-truncate contract so it can't widen the row", async () => {
-        saveUserScore(browserStore, buildScore(LONG_TITLE_XML, []));
+        saveUserScore(browserStore, buildScore(domXmlCodec, LONG_TITLE_XML, []));
         renderLibrary();
         const title = await screen.findByText(LONG_TITLE);
         // The title clips with an ellipsis…

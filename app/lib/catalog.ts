@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { KeyValueStore } from "../ports/keyValueStore";
+import { readScoreMeta, readScoreMetaFromText } from "../../core/scoreMeta";
+import type { XmlCodec } from "../../core/xml";
 import { readJson, writeJson } from "../stores/jsonStore";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
@@ -23,80 +25,6 @@ const files = import.meta.glob("../../scores/*.musicxml", {
 
 const STORAGE_KEY = "plinky:scores";
 
-type ScoreMeta = { title: string; composer: string; tempo: number; beatsPerBar: number };
-
-const positiveOr = (value: number, fallback: number): number =>
-    Number.isFinite(value) && value > 0 ? value : fallback;
-
-const XML_ENTITIES: Record<string, string> = {
-    amp: "&",
-    lt: "<",
-    gt: ">",
-    quot: '"',
-    apos: "'",
-};
-
-// Resolve the XML entities a title or composer may carry, in a single pass so a
-// decoded "&" can't be re-interpreted. This keeps the regex path's text identical
-// to what DOMParser.textContent yields on the client (e.g. "Rock &amp; Roll" →
-// "Rock & Roll"), so a play page's title and JSON-LD match between the two.
-function decodeXmlEntities(text: string): string {
-    return text.replace(
-        /&(?:#x([0-9a-fA-F]+)|#(\d+)|(amp|lt|gt|quot|apos));/g,
-        (_match, hex, dec, named) => {
-            if (hex !== undefined) {
-                return String.fromCodePoint(Number.parseInt(hex, 16));
-            }
-            if (dec !== undefined) {
-                return String.fromCodePoint(Number.parseInt(dec, 10));
-            }
-            return XML_ENTITIES[named] ?? _match;
-        },
-    );
-}
-
-// The static prerender runs in Node, where DOMParser is absent; it derives a play
-// page's title from the bundled (well-formed, generated) MusicXML. A small regex
-// pass covers the few fields needed there. The browser keeps the DOMParser path,
-// which tolerates the messier MusicXML a user might import. Exported for tests so
-// the prerender branch can be exercised without depending on DOMParser's absence.
-export function readScoreMetaFromText(xml: string): ScoreMeta {
-    const pick = (re: RegExp): string => decodeXmlEntities(xml.match(re)?.[1]?.trim() ?? "");
-    const title =
-        pick(/<work-title>([\s\S]*?)<\/work-title>/) ||
-        pick(/<movement-title>([\s\S]*?)<\/movement-title>/) ||
-        "Untitled";
-    return {
-        title,
-        composer: pick(/<creator\b[^>]*type="composer"[^>]*>([\s\S]*?)<\/creator>/),
-        tempo: Math.round(positiveOr(Number(pick(/<sound\b[^>]*\btempo="([^"]*)"/)), 90)),
-        beatsPerBar: positiveOr(Number(pick(/<beats>([\s\S]*?)<\/beats>/)), 4),
-    };
-}
-
-// Reads the metadata a score needs from its MusicXML.
-export function readScoreMeta(xml: string): ScoreMeta {
-    if (typeof DOMParser === "undefined") {
-        return readScoreMetaFromText(xml);
-    }
-    const doc = new DOMParser().parseFromString(xml, "application/xml");
-    const title =
-        doc.querySelector("work-title")?.textContent?.trim() ||
-        doc.querySelector("movement-title")?.textContent?.trim() ||
-        "Untitled";
-    const composer = doc.querySelector('creator[type="composer"]')?.textContent?.trim() || "";
-    const beats = Number(doc.querySelector("time > beats")?.textContent);
-    // A non-numeric tempo attribute (e.g. "andante") would otherwise feed NaN into
-    // the 60000/tempo playback and grading math.
-    const tempo = Number(doc.querySelector("sound[tempo]")?.getAttribute("tempo"));
-    return {
-        title,
-        composer,
-        tempo: Math.round(positiveOr(tempo, 90)),
-        beatsPerBar: positiveOr(beats, 4),
-    };
-}
-
 export function slugify(title: string): string {
     return (
         title
@@ -111,8 +39,16 @@ export function slugify(title: string): string {
 // and the song catalogue load as on-demand assets instead, keeping the JS small.
 export function loadBundledScores(): Score[] {
     return Object.entries(files).map(([_path, xml]) => {
-        // Same content-fingerprint id scheme as every other piece.
-        return { id: songId(xml), ...readScoreMeta(xml), description: "", xml, bundled: true };
+        // Same content-fingerprint id scheme as every other piece. The bundled
+        // MusicXML is our own generated output, so the pure text pass reads it —
+        // no parser, which also keeps FIRST_SONG_ID's module-load derivation pure.
+        return {
+            id: songId(xml),
+            ...readScoreMetaFromText(xml),
+            description: "",
+            xml,
+            bundled: true,
+        };
     });
 }
 
@@ -196,8 +132,8 @@ export function resolveScore(kv: KeyValueStore, id: string | undefined): Score |
 
 // Derive a stored score from imported MusicXML, giving it an id unique in the
 // catalogue so it neither clashes with nor silently overrides another piece.
-export function buildScore(xml: string, takenIds: string[]): Score {
-    const meta = readScoreMeta(xml);
+export function buildScore(codec: XmlCodec, xml: string, takenIds: string[]): Score {
+    const meta = readScoreMeta(codec, xml);
     const base = slugify(meta.title === "Untitled" ? "imported score" : meta.title);
     const taken = new Set(takenIds);
     let id = base;
@@ -214,12 +150,16 @@ export function exportAllPack(kv: KeyValueStore): string {
 
 // Merge a bundle's scores into local storage, overwriting by id so a re-imported
 // score refreshes. Throws if the bundle is invalid or won't store.
-export function importScoresPack(kv: KeyValueStore, json: string): { imported: number } {
+export function importScoresPack(
+    kv: KeyValueStore,
+    codec: XmlCodec,
+    json: string,
+): { imported: number } {
     const pack = parsePack(json);
 
     const scores = new Map(loadUserScores(kv).map((score) => [score.id, score]));
     for (const packScore of pack.scores) {
-        const meta = readScoreMeta(packScore.xml);
+        const meta = readScoreMeta(codec, packScore.xml);
         scores.set(packScore.id, {
             id: packScore.id,
             title: packScore.title || meta.title,

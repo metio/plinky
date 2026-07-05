@@ -8,7 +8,8 @@ import { UploadIcon } from "../components/ui/icons";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { GradeChip } from "../components/features/scoreGrade";
 import { StaffPreview } from "../components/features/staffPreview";
-import { loadCatalog, type Score, readScoreMeta, saveUserScore, slugify } from "../lib/catalog";
+import { loadCatalog, type Score, saveUserScore, slugify } from "../lib/catalog";
+import { readScoreMeta } from "../../core/scoreMeta";
 import { readScoreFile } from "../../core/musicxmlFile";
 
 import { gradeOf } from "../../core/scoreDifficulty";
@@ -75,7 +76,7 @@ export default function LibraryImportRoute() {
         const id = songId(xml);
         const known = new Set(loadCatalog(store).map((entry) => entry.id));
         setDuplicate(known.has(id) || (await songs.manifest()).some((song) => song.id === id));
-        const meta = readScoreMeta(xml);
+        const meta = readScoreMeta(xmlCodec, xml);
         setDraft({
             xml,
             title: meta.title === "Untitled" ? "" : meta.title,

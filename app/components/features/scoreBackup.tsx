@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { exportAllPack, importScoresPack, loadUserScores } from "../../lib/catalog";
-import { useStore } from "../../contexts/services";
+import { useStore, useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 
@@ -16,6 +16,7 @@ function pluralScores(count: number): string {
 // teacher). Scores live only on this device, so this is how users keep them.
 export function ScoreBackup() {
     const store = useStore();
+    const xmlCodec = useXmlCodec();
     const [count, setCount] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -43,7 +44,7 @@ export function ScoreBackup() {
         }
         const mine = ++readSeq.current;
         try {
-            const result = importScoresPack(store, await file.text());
+            const result = importScoresPack(store, xmlCodec, await file.text());
             if (mine !== readSeq.current) {
                 return;
             }

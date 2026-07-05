@@ -8,7 +8,6 @@ import {
     loadBundledScores,
     loadCatalog,
     loadUserScores,
-    readScoreMeta,
     removeUserScore,
     resolveScore,
     saveUserScore,
@@ -18,10 +17,15 @@ import { browserStore } from "../adapters/browserStore";
 import { memoryStore } from "../adapters/memoryStore";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { withDeniedStorage } from "./deniedStorage";
+import type { XmlCodec } from "../../core/xml";
 
 function xml(title = "Test", beats = 4): string {
     return `<?xml version="1.0"?><score-partwise><work><work-title>${title}</work-title></work><identification><creator type="composer">Bach</creator></identification><part id="P1"><measure number="1"><attributes><time><beats>${beats}</beats><beat-type>4</beat-type></time></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 }
+
+// Without a DOM in the node project, the codec answers null and readScoreMeta
+// takes its text pass — the same route the static prerender uses.
+const codec: XmlCodec = { parse: () => null, serialize: () => "" };
 
 // A fresh in-memory store per test — the catalogue takes its persistence injected.
 let kv: KeyValueStore;
@@ -30,13 +34,6 @@ beforeEach(() => {
 });
 
 describe("loadUserScores robustness", () => {
-    it("defaults a non-numeric sound tempo rather than emitting NaN", () => {
-        const meta = readScoreMeta(
-            '<?xml version="1.0"?><score-partwise><sound tempo="andante"/></score-partwise>',
-        );
-        expect(meta.tempo).toBe(90);
-    });
-
     it("drops corrupt stored entries so the catalogue sort never throws", () => {
         kv.set(
             "plinky:scores",
@@ -75,41 +72,16 @@ describe("user scores under denied storage", () => {
     });
 
     it("reports a failed save rather than throwing when storage is blocked", () => {
-        const score = buildScore(xml("Blocked"), []);
+        const score = buildScore(codec, xml("Blocked"), []);
         expect(withDeniedStorage(() => saveUserScore(browserStore, score))).toBe(false);
     });
 
     it("surfaces a clean error, not a SecurityError, when importing into blocked storage", () => {
-        saveUserScore(kv, buildScore(xml("Pack"), []));
+        saveUserScore(kv, buildScore(codec, xml("Pack"), []));
         const pack = exportAllPack(kv);
-        expect(() => withDeniedStorage(() => importScoresPack(browserStore, pack))).toThrow(
+        expect(() => withDeniedStorage(() => importScoresPack(browserStore, codec, pack))).toThrow(
             /Could not save/,
         );
-    });
-});
-
-describe("readScoreMeta", () => {
-    it("reads title, composer and meter from the MusicXML", () => {
-        const meta = readScoreMeta(xml("Minuet", 3));
-        expect(meta.title).toBe("Minuet");
-        expect(meta.composer).toBe("Bach");
-        expect(meta.beatsPerBar).toBe(3);
-        expect(meta.tempo).toBe(90); // no <sound tempo>, so the default
-    });
-
-    it("reads an explicit tempo from <sound>", () => {
-        const withTempo = xml().replace(
-            "</work>",
-            '</work><part><measure><sound tempo="120"/></measure></part>',
-        );
-        expect(readScoreMeta(withTempo).tempo).toBe(120);
-    });
-
-    it("falls back to Untitled and 4/4 when the metadata is absent", () => {
-        const meta = readScoreMeta("<score-partwise><part/></score-partwise>");
-        expect(meta.title).toBe("Untitled");
-        expect(meta.composer).toBe("");
-        expect(meta.beatsPerBar).toBe(4);
     });
 });
 
@@ -122,7 +94,7 @@ describe("slugify", () => {
 
 describe("buildScore", () => {
     it("derives a score with an id unique among the taken ones", () => {
-        const score = buildScore(xml("My Score"), ["my-score"]);
+        const score = buildScore(codec, xml("My Score"), ["my-score"]);
         expect(score.id).toBe("my-score-2");
         expect(score.title).toBe("My Score");
         expect(score.bundled).toBe(false);
@@ -131,9 +103,9 @@ describe("buildScore", () => {
 
 describe("user scores", () => {
     it("saves, loads and removes", () => {
-        saveUserScore(kv, buildScore(xml("A"), []));
+        saveUserScore(kv, buildScore(codec, xml("A"), []));
         expect(loadUserScores(kv).map((s) => s.id)).toEqual(["a"]);
-        saveUserScore(kv, buildScore(xml("B"), ["a"]));
+        saveUserScore(kv, buildScore(codec, xml("B"), ["a"]));
         expect(loadUserScores(kv)).toHaveLength(2);
         removeUserScore(kv, "a");
         expect(loadUserScores(kv).map((s) => s.id)).toEqual(["b"]);
@@ -151,7 +123,7 @@ describe("loadBundledScores", () => {
 describe("loadCatalog", () => {
     it("includes bundled and user scores, the user's overriding by id", () => {
         const first = loadBundledScores()[0]!;
-        saveUserScore(kv, { ...buildScore(xml("Mine"), []), id: first.id });
+        saveUserScore(kv, { ...buildScore(codec, xml("Mine"), []), id: first.id });
         const catalog = loadCatalog(kv);
         const entry = catalog.find((score) => score.id === first.id);
         expect(entry?.title).toBe("Mine");
@@ -161,7 +133,7 @@ describe("loadCatalog", () => {
     });
 
     it("resolves a score by id, or undefined", () => {
-        saveUserScore(kv, buildScore(xml("Solo"), []));
+        saveUserScore(kv, buildScore(codec, xml("Solo"), []));
         expect(resolveScore(kv, "solo")?.title).toBe("Solo");
         expect(resolveScore(kv, "nope")).toBeUndefined();
     });
@@ -169,10 +141,10 @@ describe("loadCatalog", () => {
 
 describe("pack backup", () => {
     it("round-trips the user library through export and import", () => {
-        saveUserScore(kv, buildScore(xml("Keep"), []));
+        saveUserScore(kv, buildScore(codec, xml("Keep"), []));
         const pack = exportAllPack(kv);
         const other = memoryStore();
-        const result = importScoresPack(other, pack);
+        const result = importScoresPack(other, codec, pack);
         expect(result.imported).toBe(1);
         expect(loadUserScores(other).map((s) => s.id)).toEqual(["keep"]);
     });
