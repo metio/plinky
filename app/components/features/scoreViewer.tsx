@@ -865,7 +865,7 @@ export function ScoreViewer({
         // grade-up that buries it is a rare, accepted loss). A grade-up is read from the
         // ladder recomputed across all mastery, so it resolves asynchronously.
         const firstS = isFirstS(result.score, before?.bestScore ?? 0);
-        const flawlessNow = isFlawless(result.score) && !services.milestones.flawlessDone();
+        const flawlessNow = isFlawless(result) && !services.milestones.flawlessDone();
         const prefs = prefsStore.load();
         // The grade-up check reads the ladder across the whole catalogue, so it resolves
         // asynchronously; the first-S and flawless checks above are already decided.
