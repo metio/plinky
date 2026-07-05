@@ -162,21 +162,29 @@ function store(songId: string, takes: Take[]): boolean {
     }
 }
 
+// A mutation's outcome: the list as storage now actually holds it, plus whether
+// the write landed — so a caller can render the truth and say when it didn't.
+export type TakesResult = { takes: Take[]; stored: boolean };
+
 // Add a take, newest first, keeping at most MAX_TAKES_PER_SONG (oldest dropped).
-// Returns the resulting list so the caller can render it without re-reading.
-export function saveTake(songId: string, take: Take): Take[] {
+// A failed write leaves storage as it was, so the result then re-reads the real
+// list (without the new take) rather than an optimistic one the next reload
+// would contradict.
+export function saveTake(songId: string, take: Take): TakesResult {
     const next = [take, ...loadTakes(songId).filter((other) => other.id !== take.id)].slice(
         0,
         MAX_TAKES_PER_SONG,
     );
-    store(songId, next);
-    return next;
+    const stored = store(songId, next);
+    return { takes: stored ? next : loadTakes(songId), stored };
 }
 
-export function removeTake(songId: string, takeId: string): Take[] {
+// Remove a take by id. On a failed rewrite the take is still in storage, and the
+// returned list says so instead of pretending it is gone.
+export function removeTake(songId: string, takeId: string): TakesResult {
     const next = loadTakes(songId).filter((take) => take.id !== takeId);
-    store(songId, next);
-    return next;
+    const stored = store(songId, next);
+    return { takes: stored ? next : loadTakes(songId), stored };
 }
 
 // A take's note onsets normalised to start at zero — the ghost a friend races when

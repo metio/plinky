@@ -18,13 +18,46 @@ function guarded<T>(run: (store: Storage) => T, fallback: T): T {
     }
 }
 
+// One latch for "this device is not persisting writes": flips on the first
+// refused write (quota exceeded, storage denied) and stays on. The layout's
+// storage banner subscribes to it, so a failure anywhere surfaces once instead
+// of every save site growing its own warning. Individual callers still get the
+// boolean verdict per write; this is the aggregate signal.
+let writeFailed = false;
+const healthListeners = new Set<() => void>();
+
+export const storageHealth = {
+    failed: (): boolean => writeFailed,
+    subscribe(onChange: () => void): () => void {
+        healthListeners.add(onChange);
+        return () => {
+            healthListeners.delete(onChange);
+        };
+    },
+};
+
+function markWriteFailed(): void {
+    if (writeFailed) {
+        return;
+    }
+    writeFailed = true;
+    for (const listener of [...healthListeners]) {
+        listener();
+    }
+}
+
 export const browserStore: KeyValueStore = {
     get: (key) => guarded((store) => store.getItem(key), null),
-    set: (key, value) =>
-        guarded((store) => {
+    set: (key, value) => {
+        const stored = guarded((store) => {
             store.setItem(key, value);
             return true;
-        }, false),
+        }, false);
+        if (!stored) {
+            markWriteFailed();
+        }
+        return stored;
+    },
     remove: (key) => {
         guarded((store) => store.removeItem(key), undefined);
     },

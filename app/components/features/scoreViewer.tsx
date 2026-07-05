@@ -297,11 +297,12 @@ export function ScoreViewer({
     const keepUpExpectedRef = useRef<number[]>([]);
     const keepUpStruckRef = useRef<Set<number>>(new Set());
     const keepUpNotesRef = useRef<SVGGElement[]>([]);
-    // This score's saved takes, the take currently replaying (if any), and whether
-    // the finished run has already been saved — so its save prompt shows just once.
+    // This score's saved takes, the take currently replaying (if any), and how the
+    // finished run's save went — "saved" and "failed" both retire the save prompt,
+    // but only a landed write may claim success.
     const [takes, setTakes] = useState<Take[]>([]);
     const [activeReplayId, setActiveReplayId] = useState<string | null>(null);
-    const [runSaved, setRunSaved] = useState(false);
+    const [runSaved, setRunSaved] = useState<"idle" | "saved" | "failed">("idle");
     const [metronomeOn, setMetronomeOn] = useState(false);
     // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
     // triplets, 4 = sixteenths.
@@ -1232,8 +1233,9 @@ export function ScoreViewer({
             metrics: grade ?? null,
             composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
         };
-        setTakes(saveTake(id, take));
-        setRunSaved(true);
+        const saved = saveTake(id, take);
+        setTakes(saved.takes);
+        setRunSaved(saved.stored ? "saved" : "failed");
     };
 
     // Replay a saved take: play it straight from the recorded performance — its own
@@ -1291,7 +1293,9 @@ export function ScoreViewer({
         if (activeReplayId === takeId) {
             stopListen();
         }
-        setTakes(removeTake(id, takeId));
+        // The returned list is what storage really holds — a refused rewrite keeps
+        // the take, and the list keeps showing it instead of resurrecting it later.
+        setTakes(removeTake(id, takeId).takes);
     };
 
     // Playing goes full screen on every device. The play surface holds controls that live
@@ -1308,7 +1312,7 @@ export function ScoreViewer({
     const practice = () => {
         enterPlayFullscreen();
         stopListen();
-        setRunSaved(false);
+        setRunSaved("idle");
         notesRef.current = [];
         holdRef.current.clear();
         impreciseRef.current = false;
@@ -2061,9 +2065,13 @@ export function ScoreViewer({
                         <div ref={gradePanelRef} className="space-y-3">
                             {milestone && <MilestoneBanner milestone={milestone} />}
                             {!ephemeral &&
-                                (runSaved ? (
+                                (runSaved === "saved" ? (
                                     <p className="text-sm text-green-700 dark:text-green-400">
                                         {m.takes_saved()}
+                                    </p>
+                                ) : runSaved === "failed" ? (
+                                    <p className="text-sm text-red-700 dark:text-red-400">
+                                        {m.takes_save_failed()}
                                     </p>
                                 ) : (
                                     <div className="flex flex-wrap items-center gap-3">

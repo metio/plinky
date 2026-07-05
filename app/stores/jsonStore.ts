@@ -44,17 +44,27 @@ type Listener = () => void;
 // event key means the whole store was cleared, which any key may be part of.
 function createBus(matches: (key: string) => boolean) {
     const listeners = new Set<Listener>();
+    // One broken subscriber must not silence the rest — every listener hears
+    // about a change, whatever its peers do. Applies to both delivery paths:
+    // the same-tab notify loop and the cross-tab storage handler.
+    const safely = (listener: Listener) => {
+        try {
+            listener();
+        } catch {
+            // The subscriber's failure is its own; delivery continues.
+        }
+    };
     return {
         notify() {
             for (const listener of [...listeners]) {
-                listener();
+                safely(listener);
             }
         },
         subscribe(onChange: Listener): () => void {
             listeners.add(onChange);
             const onStorage = (event: StorageEvent) => {
                 if (event.key === null || matches(event.key)) {
-                    onChange();
+                    safely(onChange);
                 }
             };
             if (typeof window !== "undefined") {
@@ -105,14 +115,47 @@ export function createJsonStore<T>(
             return cached;
         },
         save(value) {
-            const stored = writeJson(kv, key, serialize(value));
+            const raw = toRaw(serialize(value));
+            if (raw === null) {
+                return false;
+            }
+            // A value identical to what's stored needs no write and no
+            // announcement — an idempotent save must not wake every subscriber.
+            if (raw === kv.get(key)) {
+                return true;
+            }
+            const stored = setRaw(kv, key, raw);
             if (stored) {
+                // Prime the snapshot from the just-written raw so the next
+                // load() is a cache hit rather than a reparse.
+                cached = parse(raw);
+                cachedRaw = raw;
                 bus.notify();
             }
             return stored;
         },
         subscribe: bus.subscribe,
     };
+}
+
+// The serialized form of `value`, or null when it cannot be represented as a
+// JSON string (a cycle, a bare undefined).
+function toRaw(value: unknown): string | null {
+    try {
+        const raw = JSON.stringify(value);
+        return typeof raw === "string" ? raw : null;
+    } catch {
+        return null;
+    }
+}
+
+// Write an already-serialized string, false when the store refuses.
+function setRaw(kv: KeyValueStore, key: string, raw: string): boolean {
+    try {
+        return kv.set(key, raw);
+    } catch {
+        return false;
+    }
 }
 
 // A family of values under a common key prefix — one entry per catalogue piece.
@@ -159,13 +202,27 @@ export function createKeyedJsonStore<T>(
     return {
         load,
         save(id, value) {
-            const stored = writeJson(kv, prefix + id, value);
+            const raw = toRaw(value);
+            if (raw === null) {
+                return false;
+            }
+            // Same dedupe as the single-value store: an identical entry means
+            // no write, no cache churn, and no subscriber wakeup.
+            if (raw === kv.get(prefix + id)) {
+                return true;
+            }
+            const stored = setRaw(kv, prefix + id, raw);
             if (stored) {
+                cache.delete(id);
                 bus.notify();
             }
             return stored;
         },
         remove(id) {
+            // Removing what isn't there changes nothing, so nobody is told.
+            if (kv.get(prefix + id) === null) {
+                return;
+            }
             kv.remove(prefix + id);
             cache.delete(id);
             bus.notify();

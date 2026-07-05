@@ -131,7 +131,9 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                 onAssign={(pos, note, finger) => {
                     const cell = cells[pos];
                     if (cell) {
-                        setMap(setFinger(id, map, hand, cell.bar, cell.pos, note, finger));
+                        // Render from the updated map either way; a refused write
+                        // surfaces through the layout's storage banner.
+                        setMap(setFinger(id, map, hand, cell.bar, cell.pos, note, finger).map);
                     }
                 }}
             />

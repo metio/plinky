@@ -35,12 +35,14 @@ export function loadSongFingering(songId: string): FingerMap {
     return clean;
 }
 
-function save(songId: string, map: FingerMap): void {
-    writeJson(browserStore, storageKey(songId), map);
+function save(songId: string, map: FingerMap): boolean {
+    return writeJson(browserStore, storageKey(songId), map);
 }
 
-// Record one finger choice and persist the whole map. Returns the updated map so the
-// caller can keep rendering from it without re-reading storage.
+// Record one finger choice and persist the whole map. Returns the updated map so
+// the caller can keep rendering from it without re-reading storage, plus whether
+// the write landed — an unpersisted map still renders this session but is gone
+// after a reload, and the storage banner tells the player so.
 export function setFinger(
     songId: string,
     map: FingerMap,
@@ -49,10 +51,9 @@ export function setFinger(
     pos: number,
     note: number,
     finger: number,
-): FingerMap {
+): { map: FingerMap; stored: boolean } {
     const next = { ...map, [fingerKey(hand, bar, pos, note)]: finger };
-    save(songId, next);
-    return next;
+    return { map: next, stored: save(songId, next) };
 }
 
 // Clear every saved finger for a song — the "start this piece's fingering over" action.

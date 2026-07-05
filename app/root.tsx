@@ -16,7 +16,9 @@ import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
+import { StorageBanner } from "./components/features/storageBanner";
 import { ThemeToggle } from "./components/features/themeToggle";
+import { storageHealth } from "./adapters/browserStore";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme, loadTheme, THEME_STORAGE_KEY } from "./lib/theme";
@@ -203,6 +205,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     the header on the default services, silently ignoring any override. */}
                 <ServicesProvider>
                     <Header />
+                    {/* The layout is the composition root: it hands the banner the
+                        adapter's health signal so the banner itself stays oblivious
+                        to where the signal comes from. */}
+                    <StorageBanner health={storageHealth} />
                     {children}
                 </ServicesProvider>
                 <ScrollRestoration />

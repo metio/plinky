@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Composition } from "../../core/composition";
 import { withDeniedStorage } from "./deniedStorage";
 import {
@@ -121,8 +121,40 @@ describe("saveTake / loadTakes", () => {
     it("removes a take by id", () => {
         saveTake("song", take("1"));
         saveTake("song", take("2"));
-        expect(removeTake("song", "1").map((t) => t.id)).toEqual(["2"]);
+        const result = removeTake("song", "1");
+        expect(result.stored).toBe(true);
+        expect(result.takes.map((t) => t.id)).toEqual(["2"]);
         expect(loadTakes("song").map((t) => t.id)).toEqual(["2"]);
+    });
+
+    it("reports a landed save", () => {
+        expect(saveTake("song", take("1")).stored).toBe(true);
+    });
+
+    it("hands back the stored list, not the optimistic one, when a save is refused", () => {
+        saveTake("song", take("1"));
+        const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new DOMException("quota exceeded", "QuotaExceededError");
+        });
+        const result = saveTake("song", take("2"));
+        setItem.mockRestore();
+        expect(result.stored).toBe(false);
+        // The refused take must not show up as saved — reloading would lose it.
+        expect(result.takes.map((t) => t.id)).toEqual(["1"]);
+        expect(loadTakes("song").map((t) => t.id)).toEqual(["1"]);
+    });
+
+    it("keeps a take in the list when its removal cannot be written", () => {
+        saveTake("song", take("1"));
+        const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+            throw new DOMException("quota exceeded", "QuotaExceededError");
+        });
+        const result = removeTake("song", "1");
+        setItem.mockRestore();
+        expect(result.stored).toBe(false);
+        // Storage still holds the take, and the returned list says so instead of
+        // pretending it is gone until the next reload resurrects it.
+        expect(result.takes.map((t) => t.id)).toEqual(["1"]);
     });
 
     it("drops a corrupt stored entry rather than failing the list", () => {
@@ -270,8 +302,10 @@ describe("compositionFromRun", () => {
 });
 
 describe("savedTakes under denied storage", () => {
-    it("reads an empty list and swallows a save when storage is blocked", () => {
+    it("reads an empty list and reports the save as unlanded when storage is blocked", () => {
         expect(withDeniedStorage(() => loadTakes("song"))).toEqual([]);
-        expect(() => withDeniedStorage(() => saveTake("song", take("1")))).not.toThrow();
+        const result = withDeniedStorage(() => saveTake("song", take("1")));
+        expect(result.stored).toBe(false);
+        expect(result.takes).toEqual([]);
     });
 });
