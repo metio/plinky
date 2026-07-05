@@ -34,3 +34,8 @@ dev/catalog-flagged.json
 
 # Python bytecode caches from dev/ scripts
 __pycache__/
+
+# Local build-time env (Sanity news config, etc.); .env.example is the template
+.env.local
+.env
+!.env.example

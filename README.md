@@ -220,6 +220,21 @@ Plinky speaks 26 languages, and contributions are welcome — see
 [TRANSLATING.md](TRANSLATING.md) for how to add a translation. Untranslated strings
 fall back to English, so every language always works while it catches up.
 
+## News banner
+
+The home page can show a small "what's new" picture that links somewhere — a new
+piece, an announcement, a seasonal note. It's optional and edited outside the code
+so anyone can change it live, with no redeploy: the running app fetches the current
+item from a [Sanity](https://www.sanity.io) project at load time.
+
+To connect it, copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`
+and `VITE_SANITY_DATASET`. Add a `news` document type in Sanity with an `image`
+(plus `alt` text), a `link` URL, an optional `headline`, and a `show` boolean; the
+editor uploads a picture and publishes, and the banner appears. Only `https` image
+and link URLs are shown, and a missing or unreachable source simply shows nothing —
+the banner never blocks or breaks the page. Leave the variables unset and no banner
+appears and no network call is made.
+
 ## Development
 
 The project builds with Node.js and npm:
