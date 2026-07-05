@@ -18,7 +18,7 @@ import {
     type StarTier,
     starTier,
 } from "../../lib/gradeProgress";
-import { loadLifetime, progressGrid } from "../../lib/lifetime";
+import { progressGrid } from "../../../core/lifetime";
 import { svgMilestone } from "../../../core/milestoneCard";
 import { usePrefsStore, useServices } from "../../contexts/services";
 import { usePracticeSummary } from "../../hooks/usePracticeSummary";
@@ -82,7 +82,7 @@ export function YouView() {
 
     useEffect(() => {
         let cancelled = false;
-        setFingerprint(progressGrid(loadLifetime()));
+        setFingerprint(progressGrid(services.lifetime.load()));
         loadGradedMastery(services.mastery, services).then(
             (loaded) => !cancelled && setItems(loaded),
         );

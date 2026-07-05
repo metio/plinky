@@ -25,29 +25,26 @@ import {
 } from "../../../core/grade";
 import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradeProgress";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
-import { recordRun } from "../../lib/lifetime";
+
 import { svgMilestone } from "../../../core/milestoneCard";
 import { isFirstS, isFlawless, type Milestone } from "../../../core/milestones";
 import { applyRun, isDue, letterMin, setBacklog } from "../../../core/mastery";
 import { useMastery } from "../../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
 import { useServices, useXmlCodec } from "../../contexts/services";
-import { loadSongFingering } from "../../lib/savedFingering";
+
 import { toReplayEvents } from "../../../core/composition";
 import { listenStepMs } from "../../../core/playback";
-import { decodeGhost, ghostReached, loadGhost, saveGhost } from "../../lib/recording";
+import { decodeGhost, ghostReached } from "../../../core/ghost";
 import {
     type ActiveHolds,
     beginHold,
     compositionFromRun,
     endHold,
     fastestTakeOnsets,
-    loadTakes,
-    removeTake,
     type RunStep,
-    saveTake,
     type Take,
-} from "../../lib/savedTakes";
+} from "../../../core/takes";
 import { isPreciseInput } from "../../../core/midi";
 import {
     LENIENT_TOLERANCE,
@@ -342,14 +339,14 @@ export function ScoreViewer({
     const [transpose, setTranspose] = transposeContext
         ? [transposeContext.transpose, transposeContext.setTranspose]
         : localTranspose;
+    // Bars forced onto each staff row (0 = fit to width), remembered per device.
+    const services = useServices();
     // The fingering the player worked out for this piece (Fingering mode). When they
     // have some, the staff can show theirs instead of the app's suggestion — defaulting
     // to theirs, since they chose it on purpose.
-    const saved = useMemo(() => loadSongFingering(id), [id]);
+    const saved = useMemo(() => services.fingering.load(id), [id, services.fingering]);
     const hasSaved = Object.keys(saved).length > 0;
     const [showMine, setShowMine] = useState(hasSaved);
-    // Bars forced onto each staff row (0 = fit to width), remembered per device.
-    const services = useServices();
     const { prefs: prefsStore, mastery: masteryStore, history: historyStore } = services;
     const xmlCodec = useXmlCodec();
     const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
@@ -459,8 +456,8 @@ export function ScoreViewer({
 
     // Load this score's saved takes; a new score swaps in its own.
     useEffect(() => {
-        setTakes(loadTakes(id));
-    }, [id]);
+        setTakes(services.takes.list(id));
+    }, [id, services.takes.list]);
 
     const [searchParams] = useSearchParams();
     // Adopt a ghost handed over by a ?ghost= link so the player can race a friend's
@@ -472,14 +469,14 @@ export function ScoreViewer({
         }
         const shared = decodeGhost(searchParams.get("ghost") ?? "");
         if (shared) {
-            saveGhost(id, shared);
+            services.ghosts.save(id, shared);
             setStoredGhost(shared);
             setSharedFromLink(true);
         } else {
-            setStoredGhost(loadGhost(id));
+            setStoredGhost(services.ghosts.load(id));
             setSharedFromLink(false);
         }
-    }, [id, canShareGhost, searchParams]);
+    }, [id, canShareGhost, searchParams, services.ghosts.save, services.ghosts.load]);
 
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
     const [forgiving, setForgiving] = useState(() => prefsStore.load().forgiving);
@@ -802,7 +799,11 @@ export function ScoreViewer({
             points.length > 0 ? { points, median: med, hotspots: findHotspots(points, med) } : null,
         );
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
-        recordRun({ accuracy: result.accuracy, timing: result.timing, flow: result.flow });
+        services.lifetime.recordRun({
+            accuracy: result.accuracy,
+            timing: result.timing,
+            flow: result.flow,
+        });
         // Mark the day's challenge done so it shows a ✓ — no streak, just "played" —
         // and keep its result so re-opening the daily shows it rather than a blank run.
         if (daily != null) {
@@ -816,7 +817,7 @@ export function ScoreViewer({
         }
         // Keep the run as this score's ghost to race (and share) next time.
         const onsets = notes.map((note) => note.playedMs);
-        saveGhost(id, onsets);
+        services.ghosts.save(id, onsets);
         setStoredGhost(onsets);
         setSharedFromLink(false);
         // Fold the run into spaced-repetition state: a score that clears the
@@ -1223,7 +1224,7 @@ export function ScoreViewer({
             metrics: grade ?? null,
             composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
         };
-        const saved = saveTake(id, take);
+        const saved = services.takes.save(id, take);
         setTakes(saved.takes);
         setRunSaved(saved.stored ? "saved" : "failed");
     };
@@ -1285,7 +1286,7 @@ export function ScoreViewer({
         }
         // The returned list is what storage really holds — a refused rewrite keeps
         // the take, and the list keeps showing it instead of resurrecting it later.
-        setTakes(removeTake(id, takeId).takes);
+        setTakes(services.takes.remove(id, takeId).takes);
     };
 
     // Playing goes full screen on every device. The play surface holds controls that live
@@ -1319,7 +1320,9 @@ export function ScoreViewer({
         const racing =
             ephemeral || !raceGhost
                 ? null
-                : (fastestTakeOnsets(loadTakes(id)) ?? storedGhost ?? loadGhost(id));
+                : (fastestTakeOnsets(services.takes.list(id)) ??
+                  storedGhost ??
+                  services.ghosts.load(id));
         setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;

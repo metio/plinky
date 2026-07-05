@@ -127,7 +127,7 @@ module.exports = {
                     "^app/testing/",
                     // The ratchet: frozen storage helpers still on the browser-store
                     // singleton. Shrink only.
-                    "^app/lib/(assignment|catalog|lifetime|recording|resetDevice|savedFingering|savedTakes)\\.ts$",
+                    "^app/lib/(assignment|catalog|resetDevice)\\.ts$",
                 ],
             },
             to: { path: "^app/adapters/" },

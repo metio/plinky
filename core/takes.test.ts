@@ -1,10 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
-// @vitest-environment jsdom
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Composition } from "../../core/composition";
-import { withDeniedStorage } from "./deniedStorage";
+import { describe, expect, it } from "vitest";
+import type { Composition } from "./composition";
 import {
     type ActiveHolds,
     beginHold,
@@ -12,15 +10,11 @@ import {
     endHold,
     fastestTakeOnsets,
     ghostOnsets,
-    loadTakes,
-    MAX_TAKES_PER_SONG,
-    removeTake,
     type RunStep,
     type Take,
-    saveTake,
-} from "./savedTakes";
-
-afterEach(() => localStorage.clear());
+    takeFromStored,
+    takeToStored,
+} from "./takes";
 
 const comp = (starts: number[]): Composition => ({
     notes: starts.map((startMs, i) => ({ pitch: 60 + i, startMs, durationMs: 200, velocity: 90 })),
@@ -50,125 +44,6 @@ const grade = (
     ...overrides,
 });
 
-describe("saveTake / loadTakes", () => {
-    it("round-trips a take through the share codec", () => {
-        saveTake("song", take("1"));
-        const loaded = loadTakes("song");
-        expect(loaded).toHaveLength(1);
-        expect(loaded[0]?.letter).toBe("B");
-        expect(loaded[0]?.composition.notes.map((n) => n.startMs)).toEqual([0, 500, 1000]);
-    });
-
-    it("keeps the newest first", () => {
-        saveTake("song", take("1"));
-        saveTake("song", take("2"));
-        expect(loadTakes("song").map((t) => t.id)).toEqual(["2", "1"]);
-    });
-
-    it("round-trips a take's full metrics so a past run's grade survives a reload", () => {
-        saveTake("song", take("1", { metrics: grade({ accuracy: 91, timing: 73, flow: 88 }) }));
-        expect(loadTakes("song")[0]?.metrics).toEqual(
-            grade({ accuracy: 91, timing: 73, flow: 88 }),
-        );
-    });
-
-    it("stores no metrics for a take saved from an ungraded run", () => {
-        saveTake("song", take("1", { metrics: null }));
-        expect(loadTakes("song")[0]?.metrics).toBeNull();
-    });
-
-    it("reads a legacy take that predates stored metrics as having none", () => {
-        // Save a normal take, then strip its metrics field to mimic an entry written
-        // before takes stored a grade — it must still load, just without metrics.
-        saveTake("song", take("1", { metrics: grade() }));
-        const raw = JSON.parse(localStorage.getItem("plinky:takes:song") ?? "[]");
-        delete raw[0].metrics;
-        localStorage.setItem("plinky:takes:song", JSON.stringify(raw));
-        const loaded = loadTakes("song");
-        expect(loaded).toHaveLength(1);
-        expect(loaded[0]?.metrics).toBeNull();
-        expect(loaded[0]?.composition.notes).toHaveLength(3);
-    });
-
-    it("drops a malformed metrics blob rather than failing the load", () => {
-        saveTake("song", take("1"));
-        const raw = JSON.parse(localStorage.getItem("plinky:takes:song") ?? "[]");
-        raw[0].metrics = { accuracy: "oops", timing: 10 };
-        localStorage.setItem("plinky:takes:song", JSON.stringify(raw));
-        const loaded = loadTakes("song");
-        expect(loaded).toHaveLength(1);
-        expect(loaded[0]?.metrics).toBeNull();
-    });
-
-    it("caps the list and drops the oldest", () => {
-        for (let i = 1; i <= MAX_TAKES_PER_SONG + 2; i++) {
-            saveTake("song", take(String(i)));
-        }
-        const loaded = loadTakes("song");
-        expect(loaded).toHaveLength(MAX_TAKES_PER_SONG);
-        // The two oldest (1, 2) fell off; the newest is first.
-        expect(loaded[0]?.id).toBe(String(MAX_TAKES_PER_SONG + 2));
-        expect(loaded.map((t) => t.id)).not.toContain("1");
-    });
-
-    it("keeps each song's takes separate", () => {
-        saveTake("a", take("1"));
-        saveTake("b", take("2"));
-        expect(loadTakes("a").map((t) => t.id)).toEqual(["1"]);
-        expect(loadTakes("b").map((t) => t.id)).toEqual(["2"]);
-    });
-
-    it("removes a take by id", () => {
-        saveTake("song", take("1"));
-        saveTake("song", take("2"));
-        const result = removeTake("song", "1");
-        expect(result.stored).toBe(true);
-        expect(result.takes.map((t) => t.id)).toEqual(["2"]);
-        expect(loadTakes("song").map((t) => t.id)).toEqual(["2"]);
-    });
-
-    it("reports a landed save", () => {
-        expect(saveTake("song", take("1")).stored).toBe(true);
-    });
-
-    it("hands back the stored list, not the optimistic one, when a save is refused", () => {
-        saveTake("song", take("1"));
-        const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
-            throw new DOMException("quota exceeded", "QuotaExceededError");
-        });
-        const result = saveTake("song", take("2"));
-        setItem.mockRestore();
-        expect(result.stored).toBe(false);
-        // The refused take must not show up as saved — reloading would lose it.
-        expect(result.takes.map((t) => t.id)).toEqual(["1"]);
-        expect(loadTakes("song").map((t) => t.id)).toEqual(["1"]);
-    });
-
-    it("keeps a take in the list when its removal cannot be written", () => {
-        saveTake("song", take("1"));
-        const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
-            throw new DOMException("quota exceeded", "QuotaExceededError");
-        });
-        const result = removeTake("song", "1");
-        setItem.mockRestore();
-        expect(result.stored).toBe(false);
-        // Storage still holds the take, and the returned list says so instead of
-        // pretending it is gone until the next reload resurrects it.
-        expect(result.takes.map((t) => t.id)).toEqual(["1"]);
-    });
-
-    it("drops a corrupt stored entry rather than failing the list", () => {
-        localStorage.setItem(
-            "plinky:takes:song",
-            JSON.stringify([
-                { id: "ok", createdAt: 1, letter: "A", complete: true, code: "x" },
-                "junk",
-            ]),
-        );
-        // The valid entry has an unreadable code, so it's skipped; no throw.
-        expect(loadTakes("song")).toEqual([]);
-    });
-});
 
 describe("ghostOnsets", () => {
     it("normalises a take's note onsets to start at zero", () => {
@@ -301,11 +176,22 @@ describe("compositionFromRun", () => {
     });
 });
 
-describe("savedTakes under denied storage", () => {
-    it("reads an empty list and reports the save as unlanded when storage is blocked", () => {
-        expect(withDeniedStorage(() => loadTakes("song"))).toEqual([]);
-        const result = withDeniedStorage(() => saveTake("song", take("1")));
-        expect(result.stored).toBe(false);
-        expect(result.takes).toEqual([]);
+describe("takeToStored / takeFromStored", () => {
+    it("round-trips a take through the compact stored shape", () => {
+        const original = take("1", { metrics: grade(), complete: false });
+        const revived = takeFromStored(JSON.parse(JSON.stringify(takeToStored(original))));
+        expect(revived).toEqual(original);
+    });
+
+    it("reads junk, a missing code, or an unreadable code as no take", () => {
+        expect(takeFromStored("junk")).toBeNull();
+        expect(takeFromStored({ id: "x" })).toBeNull();
+        expect(takeFromStored({ id: "x", code: "not-a-code" })).toBeNull();
+    });
+
+    it("reads an entry that predates stored metrics as having none", () => {
+        const stored = takeToStored(take("1", { metrics: grade() }));
+        const { metrics: _dropped, ...legacy } = stored;
+        expect(takeFromStored(legacy)?.metrics).toBeNull();
     });
 });

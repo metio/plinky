@@ -9,7 +9,9 @@ import { MidiProvider } from "../../contexts/midi";
 import type { DailyResult } from "../../../core/daily";
 import { generatePhrase } from "../../../core/generator";
 
-import { encodeGhost, saveGhost } from "../../lib/recording";
+import { encodeGhost } from "../../../core/ghost";
+import { browserStore } from "../../adapters/browserStore";
+import { createGhostStore } from "../../stores/ghostStore";
 import { GHOST_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../../../core/scoreCanvas";
 import { ScoreViewer } from "./scoreViewer";
 
@@ -459,7 +461,7 @@ describe("ScoreViewer", () => {
         // there — so a saved ghost surfaces its race track once Practice begins.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // mount() renders with id "t"; a saved ghost for it is loaded on Practice.
-        saveGhost("t", [0, 500, 1000]);
+        createGhostStore(browserStore).save("t", [0, 500, 1000]);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         const { container } = mount(phrase, { beatsPerBar: 4 });
         // Wait for OSMD to be ready via the real signal — the Practice button
@@ -485,7 +487,7 @@ describe("ScoreViewer", () => {
         // must not survive into the next run: on a restart, before the first note is
         // played, the ghost belongs at the start line — not painted at the finish
         // because the stale elapsed time reads as the whole piece already played.
-        saveGhost("t", [0, 500, 1000]);
+        createGhostStore(browserStore).save("t", [0, 500, 1000]);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         const practiceButton = await screen.findByRole("button", { name: "Practice" });

@@ -4,7 +4,8 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { loadSongFingering } from "../../lib/savedFingering";
+import { browserStore } from "../../adapters/browserStore";
+import { createFingeringStore } from "../../stores/fingeringStore";
 import { PieceFingering } from "./pieceFingering";
 
 const measure = (n: number, step: string) =>
@@ -34,13 +35,13 @@ describe("PieceFingering", () => {
         const { unmount } = render(<PieceFingering id="t" xml={XML} />);
         // Finger the first note (bar 0, position 0, note 0 of the right hand).
         fireEvent.click(screen.getByLabelText("Finger 2"));
-        expect(loadSongFingering("t")["right:0:0:0"]).toBe(2);
+        expect(createFingeringStore(browserStore).load("t")["right:0:0:0"]).toBe(2);
 
         // Re-opening the piece pre-fills the saved finger and shows a clear control.
         unmount();
         render(<PieceFingering id="t" xml={XML} />);
         expect(screen.getByText(/saved for this piece/)).toBeTruthy();
         fireEvent.click(screen.getByText("Clear it"));
-        expect(loadSongFingering("t")).toEqual({});
+        expect(createFingeringStore(browserStore).load("t")).toEqual({});
     });
 });

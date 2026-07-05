@@ -4,7 +4,7 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { decodeGhost } from "../../lib/recording";
+import { decodeGhost } from "../../../core/ghost";
 import { ShareGhostButton } from "./shareGhostButton";
 
 afterEach(() => {

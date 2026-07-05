@@ -2,14 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useMemo, useState } from "react";
-import {
-    clearSongFingering,
-    type FingerMap,
-    fingerKey,
-    loadSongFingering,
-    setFinger,
-} from "../../lib/savedFingering";
-import { usePrefsStore, useXmlCodec } from "../../contexts/services";
+import { useFingeringStore, usePrefsStore, useXmlCodec } from "../../contexts/services";
+import { type FingerMap, fingerKey } from "../../stores/fingeringStore";
 import { scoreToBars, staffFor, windowCells, windowPositions } from "../../../core/scoreToBars";
 import { m } from "../../paraglide/messages.js";
 import { FingeringDrill, HAND_BUTTON } from "./fingeringTrainer";
@@ -25,9 +19,10 @@ const WINDOW = 2;
 export function PieceFingering({ id, xml }: { id: string; xml: string }) {
     const prefsStore = usePrefsStore();
     const xmlCodec = useXmlCodec();
+    const fingering = useFingeringStore();
     const [hand, setHand] = useState<"left" | "right">("right");
     const [start, setStart] = useState(0);
-    const [map, setMap] = useState<FingerMap>(() => loadSongFingering(id));
+    const [map, setMap] = useState<FingerMap>(() => fingering.load(id));
     // Bumped on "clear" to remount the drill so it re-reads the (now empty) saved map.
     const [version, setVersion] = useState(0);
     // Live colour/symbol feedback, remembered across pieces via prefs.
@@ -133,7 +128,10 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                     if (cell) {
                         // Render from the updated map either way; a refused write
                         // surfaces through the layout's storage banner.
-                        setMap(setFinger(id, map, hand, cell.bar, cell.pos, note, finger).map);
+                        setMap(
+                            fingering.setFinger(id, map, hand, cell.bar, cell.pos, note, finger)
+                                .map,
+                        );
                     }
                 }}
             />
@@ -144,7 +142,7 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                     <button
                         type="button"
                         onClick={() => {
-                            clearSongFingering(id);
+                            fingering.clear(id);
                             setMap({});
                             setVersion((v) => v + 1);
                         }}

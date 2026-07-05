@@ -1,15 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import { readJson, writeJson } from "../stores/jsonStore";
 import {
     type Composition,
     decodeComposition,
     encodeComposition,
     type RecordedNote,
-} from "../../core/composition";
-import { type Grade, parseGrade } from "../../core/grade";
+} from "./composition";
+import { type Grade, parseGrade } from "./grade";
 
 // A saved performance of a piece — your own play, kept per song so you can hear it
 // back, download it, and (the fastest one) race it as your ghost. A take IS a
@@ -35,11 +33,9 @@ export type Take = {
 // without bound. The cap is generous enough to keep a few good attempts.
 export const MAX_TAKES_PER_SONG = 5;
 
-const storageKey = (songId: string) => `plinky:takes:${songId}`;
-
 // Compact on-disk shape: the meta plus the composition as a share code, so a take
 // costs little more than its note list zlib-compressed.
-type StoredTake = {
+export type StoredTake = {
     id: string;
     createdAt: number;
     letter: string;
@@ -117,74 +113,38 @@ export function compositionFromRun(
     return { notes, tempo, beatsPerBar };
 }
 
-export function loadTakes(songId: string): Take[] {
-    const parsed = readJson(browserStore, storageKey(songId));
-    if (!Array.isArray(parsed)) {
-        return [];
+// Decode one stored entry, or null for anything unreadable — a corrupt take is
+// skipped rather than failing the whole list.
+export function takeFromStored(entry: unknown): Take | null {
+    const value = entry as Partial<StoredTake> | null;
+    if (!value || typeof value.id !== "string" || typeof value.code !== "string") {
+        return null;
     }
-    const takes: Take[] = [];
-    for (const entry of parsed) {
-        if (!entry || typeof entry.id !== "string" || typeof entry.code !== "string") {
-            continue;
-        }
-        const composition = decodeComposition(entry.code);
-        if (!composition) {
-            continue;
-        }
-        takes.push({
-            id: entry.id,
-            createdAt: typeof entry.createdAt === "number" ? entry.createdAt : 0,
-            letter: typeof entry.letter === "string" ? entry.letter : "",
-            complete: entry.complete === true,
-            // Older takes predate stored metrics, and the value is untrusted, so an
-            // absent or malformed grade simply reads as null rather than failing the load.
-            metrics: parseGrade(entry.metrics),
-            composition,
-        });
+    const composition = decodeComposition(value.code);
+    if (!composition) {
+        return null;
     }
-    return takes;
+    return {
+        id: value.id,
+        createdAt: typeof value.createdAt === "number" ? value.createdAt : 0,
+        letter: typeof value.letter === "string" ? value.letter : "",
+        complete: value.complete === true,
+        // Older takes predate stored metrics, and the value is untrusted, so an
+        // absent or malformed grade simply reads as null rather than failing the load.
+        metrics: parseGrade(value.metrics),
+        composition,
+    };
 }
 
-function store(songId: string, takes: Take[]): boolean {
-    try {
-        const stored: StoredTake[] = takes.map((take) => ({
-            id: take.id,
-            createdAt: take.createdAt,
-            letter: take.letter,
-            complete: take.complete,
-            metrics: take.metrics,
-            code: encodeComposition(take.composition),
-        }));
-        return writeJson(browserStore, storageKey(songId), stored);
-    } catch {
-        // A take that cannot be encoded never reaches the store.
-        return false;
-    }
-}
-
-// A mutation's outcome: the list as storage now actually holds it, plus whether
-// the write landed — so a caller can render the truth and say when it didn't.
-export type TakesResult = { takes: Take[]; stored: boolean };
-
-// Add a take, newest first, keeping at most MAX_TAKES_PER_SONG (oldest dropped).
-// A failed write leaves storage as it was, so the result then re-reads the real
-// list (without the new take) rather than an optimistic one the next reload
-// would contradict.
-export function saveTake(songId: string, take: Take): TakesResult {
-    const next = [take, ...loadTakes(songId).filter((other) => other.id !== take.id)].slice(
-        0,
-        MAX_TAKES_PER_SONG,
-    );
-    const stored = store(songId, next);
-    return { takes: stored ? next : loadTakes(songId), stored };
-}
-
-// Remove a take by id. On a failed rewrite the take is still in storage, and the
-// returned list says so instead of pretending it is gone.
-export function removeTake(songId: string, takeId: string): TakesResult {
-    const next = loadTakes(songId).filter((take) => take.id !== takeId);
-    const stored = store(songId, next);
-    return { takes: stored ? next : loadTakes(songId), stored };
+export function takeToStored(take: Take): StoredTake {
+    return {
+        id: take.id,
+        createdAt: take.createdAt,
+        letter: take.letter,
+        complete: take.complete,
+        metrics: take.metrics,
+        code: encodeComposition(take.composition),
+    };
 }
 
 // A take's note onsets normalised to start at zero — the ghost a friend races when

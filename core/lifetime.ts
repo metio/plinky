@@ -1,10 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import { readJson, writeJson } from "../stores/jsonStore";
-import { todayKey } from "../../core/daily";
-import { type Grid, toGrid } from "../../core/shareCard";
+import { todayKey } from "./daily";
+import { type Grid, toGrid } from "./shareCard";
 
 // A slow-moving skill fingerprint: the player's Accuracy, Timing and Flow tracked
 // across their practice days, each smoothed with an exponential moving average so
@@ -17,7 +15,6 @@ export type Skill = { accuracy: number; timing: number; flow: number };
 
 export type Lifetime = { days: { date: string; skill: Skill }[] };
 
-const KEY = "plinky:lifetime";
 // The weight a single run carries against the accumulated average. Low enough that
 // progress looks earned, not instant.
 const ALPHA = 0.25;
@@ -51,14 +48,14 @@ function blend(previous: Skill, run: Skill): Skill {
     };
 }
 
-export function loadLifetime(): Lifetime {
-    const parsed = readJson(browserStore, KEY) as Lifetime | null;
-    if (!parsed || !Array.isArray(parsed.days)) {
+// Coerce a parsed stored value into a well-formed Lifetime: a malformed skill
+// would otherwise crash the EMA blend in foldRun or yield a NaN progress grid.
+export function normalizeLifetime(parsed: unknown): Lifetime {
+    const value = parsed as Lifetime | null;
+    if (!value || !Array.isArray(value.days)) {
         return EMPTY;
     }
-    // Keep only well-formed days: a malformed skill would otherwise crash the
-    // EMA blend in recordRun or yield a NaN progress grid.
-    const days = parsed.days.filter(
+    const days = value.days.filter(
         (day) => day && typeof day.date === "string" && isSkill(day.skill),
     );
     return { days };
@@ -67,8 +64,7 @@ export function loadLifetime(): Lifetime {
 // Folds a finished run into the fingerprint: the first run seeds the average, each
 // later one nudges it. Several runs in a day collapse into that day's snapshot, so
 // the columns track distinct sessions rather than raw attempt count.
-export function recordRun(run: Skill, now: Date = new Date()): Lifetime {
-    const lifetime = loadLifetime();
+export function foldRun(lifetime: Lifetime, run: Skill, now: Date): Lifetime {
     const date = todayKey(now);
     // Order by date rather than trusting append order: a clock set back or travel
     // across timezones can produce a run whose day is earlier than the last
@@ -81,9 +77,7 @@ export function recordRun(run: Skill, now: Date = new Date()): Lifetime {
     const days = [...sorted.filter((day) => day.date !== date), { date, skill }].sort((a, b) =>
         a.date.localeCompare(b.date),
     );
-    const next: Lifetime = { days: days.slice(-MAX_DAYS) };
-    writeJson(browserStore, KEY, next);
-    return next;
+    return { days: days.slice(-MAX_DAYS) };
 }
 
 // The recent days as a share grid, or null before any run has been recorded.

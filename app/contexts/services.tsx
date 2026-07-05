@@ -17,6 +17,10 @@ import { createMilestonesStore, type MilestonesStore } from "../stores/milestone
 import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
 import { createThemeStore, type ThemeStore } from "../stores/themeStore";
 import { createFavoritesStore, type FavoritesStore } from "../stores/favoritesStore";
+import { createFingeringStore, type FingeringStore } from "../stores/fingeringStore";
+import { createGhostStore, type GhostStore } from "../stores/ghostStore";
+import { createLifetimeStore, type LifetimeStore } from "../stores/lifetimeStore";
+import { createTakesStore, type TakesStore } from "../stores/takesStore";
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
 import { createSongSource, type SongSource } from "../stores/songSource";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
@@ -44,6 +48,10 @@ export type AppServices = {
     onboarding: OnboardingStore;
     daily: DailyStore;
     milestones: MilestonesStore;
+    lifetime: LifetimeStore;
+    ghosts: GhostStore;
+    takes: TakesStore;
+    fingering: FingeringStore;
     // How the network is reached (see Fetcher). The catalogue sources derive
     // from it, so overriding just this redirects every fetch.
     fetcher: Fetcher;
@@ -78,6 +86,10 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
         onboarding: overrides.onboarding ?? createOnboardingStore(store),
         daily: overrides.daily ?? createDailyStore(store),
         milestones: overrides.milestones ?? createMilestonesStore(store),
+        lifetime: overrides.lifetime ?? createLifetimeStore(store),
+        ghosts: overrides.ghosts ?? createGhostStore(store),
+        takes: overrides.takes ?? createTakesStore(store),
+        fingering: overrides.fingering ?? createFingeringStore(store),
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
         xml: overrides.xml ?? domXmlCodec,
@@ -117,6 +129,10 @@ export function ServicesProvider({
     const onboarding = services?.onboarding;
     const daily = services?.daily;
     const milestones = services?.milestones;
+    const lifetime = services?.lifetime;
+    const ghosts = services?.ghosts;
+    const takes = services?.takes;
+    const fingering = services?.fingering;
     const fetcher = services?.fetcher;
     const audio = services?.audio;
     const xml = services?.xml;
@@ -134,6 +150,10 @@ export function ServicesProvider({
             onboarding ||
             daily ||
             milestones ||
+            lifetime ||
+            ghosts ||
+            takes ||
+            fingering ||
             fetcher ||
             audio ||
             xml ||
@@ -150,6 +170,10 @@ export function ServicesProvider({
                       onboarding,
                       daily,
                       milestones,
+                      lifetime,
+                      ghosts,
+                      takes,
+                      fingering,
                       fetcher,
                       audio,
                       xml,
@@ -168,6 +192,10 @@ export function ServicesProvider({
             onboarding,
             daily,
             milestones,
+            lifetime,
+            ghosts,
+            takes,
+            fingering,
             fetcher,
             audio,
             xml,
@@ -218,6 +246,10 @@ export function useOnboardingStore(): OnboardingStore {
 
 export function useDailyStore(): DailyStore {
     return useServices().daily;
+}
+
+export function useFingeringStore(): FingeringStore {
+    return useServices().fingering;
 }
 
 export function useAudioEngine(): AudioEngine {

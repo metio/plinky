@@ -3,7 +3,7 @@
 
 import { fingerPositions } from "../../core/fingering";
 import type { HandSpan } from "../../core/prefs";
-import { type FingerMap, fingerKey } from "./savedFingering";
+import { type FingerMap, fingerKey } from "../stores/fingeringStore";
 import { scoreToBars } from "../../core/scoreToBars";
 import type { XmlCodec } from "../../core/xml";
 

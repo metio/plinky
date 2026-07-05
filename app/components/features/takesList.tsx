@@ -4,7 +4,7 @@
 import { toMidiNotes, toMusicXml } from "../../../core/composition";
 import { buildMidiFile } from "../../../core/midiFile";
 import { fileStem } from "../../lib/printScore";
-import { ghostOnsets, type Take } from "../../lib/savedTakes";
+import { ghostOnsets, type Take } from "../../../core/takes";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";

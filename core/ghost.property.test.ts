@@ -3,7 +3,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { decodeGhost, encodeGhost, ghostReached } from "./recording";
+import { decodeGhost, encodeGhost, ghostReached } from "./ghost";
 
 // A ghost's onsets ascend (notes are played in order); building them as a running
 // sum of non-negative integer gaps mirrors a real run while covering the empty,

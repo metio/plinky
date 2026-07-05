@@ -5,7 +5,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Composition } from "../../../core/composition";
-import type { Take } from "../../lib/savedTakes";
+import type { Take } from "../../../core/takes";
 import { formatAgo, TakesList } from "./takesList";
 
 afterEach(cleanup);

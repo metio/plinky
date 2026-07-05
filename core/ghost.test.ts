@@ -1,25 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
-// @vitest-environment jsdom
 
-import { afterEach, describe, expect, it } from "vitest";
-import { decodeGhost, encodeGhost, ghostReached, loadGhost, saveGhost } from "./recording";
-import { packToCode } from "../../core/shareCode";
+import { describe, expect, it } from "vitest";
+import { decodeGhost, encodeGhost, ghostReached } from "./ghost";
+import { packToCode } from "./shareCode";
 
-afterEach(() => localStorage.clear());
-
-describe("recording", () => {
-    it("round-trips a ghost per score", () => {
-        saveGhost("twinkle", [0, 500, 1000]);
-        expect(loadGhost("twinkle")).toEqual([0, 500, 1000]);
-        expect(loadGhost("other")).toBeNull();
-    });
-
-    it("rejects malformed stored data", () => {
-        localStorage.setItem("plinky:ghost:x", JSON.stringify({ not: "an array" }));
-        expect(loadGhost("x")).toBeNull();
-    });
-
+describe("ghost codec", () => {
     it("round-trips a ghost through the compact code", () => {
         const code = encodeGhost([0, 499.6, 1000, 2500]);
         expect(decodeGhost(code)).toEqual([0, 500, 1000, 2500]);

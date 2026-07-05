@@ -1,25 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import { readJson, writeJson } from "../stores/jsonStore";
-import { packToCode, unpackFromCode } from "../../core/shareCode";
+import { packToCode, unpackFromCode } from "./shareCode";
 
 // A "ghost": the note onset times of a completed run on a score, each in ms from
 // the run's first note, ascending. Replaying the clock against these lets a later
 // attempt race the earlier one, Mario-Kart style. The shape is plain JSON so the
 // same recording can later be shared with a friend to race against.
-
-const key = (scoreId: string) => `plinky:ghost:${scoreId}`;
-
-export function saveGhost(scoreId: string, onsets: number[]): void {
-    writeJson(browserStore, key(scoreId), onsets);
-}
-
-export function loadGhost(scoreId: string): number[] | null {
-    const value = readJson(browserStore, key(scoreId));
-    return Array.isArray(value) && value.every((onset) => typeof onset === "number") ? value : null;
-}
 
 // The onsets ascend, so the gaps between them are small non-negative numbers that
 // compress far better than the absolute times — a long piece's thousands of onsets
