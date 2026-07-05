@@ -4,7 +4,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { encodeAssignmentLink, makeAssignment } from "../lib/assignment";
+import { encodeAssignmentLink, makeAssignment } from "../../core/assignment";
 import { loadBundledScores } from "../lib/catalog";
 import AssignmentsRoute from "./assignments";
 

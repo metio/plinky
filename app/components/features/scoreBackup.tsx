@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { exportAllPack, importScoresPack, loadUserScores } from "../../lib/catalog";
+import { useStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 
@@ -14,6 +15,7 @@ function pluralScores(count: number): string {
 // all" export and an import that accepts a bundle (a backup, or a set shared by a
 // teacher). Scores live only on this device, so this is how users keep them.
 export function ScoreBackup() {
+    const store = useStore();
     const [count, setCount] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -22,11 +24,11 @@ export function ScoreBackup() {
     const readSeq = useRef(0);
 
     useEffect(() => {
-        setCount(loadUserScores().length);
-    }, []);
+        setCount(loadUserScores(store).length);
+    }, [store]);
 
     const download = () => {
-        const blob = new Blob([exportAllPack()], { type: "application/json" });
+        const blob = new Blob([exportAllPack(store)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.href = url;
@@ -41,12 +43,12 @@ export function ScoreBackup() {
         }
         const mine = ++readSeq.current;
         try {
-            const result = importScoresPack(await file.text());
+            const result = importScoresPack(store, await file.text());
             if (mine !== readSeq.current) {
                 return;
             }
             setStatus(`${m.backup_imported_scores({ count: pluralScores(result.imported) })}.`);
-            setCount(loadUserScores().length);
+            setCount(loadUserScores(store).length);
         } catch (error) {
             if (mine !== readSeq.current) {
                 return;

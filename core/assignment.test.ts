@@ -1,19 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
-// @vitest-environment jsdom
 
-import { afterEach, describe, expect, it } from "vitest";
-import { withDeniedStorage } from "./deniedStorage";
+import { describe, expect, it } from "vitest";
 import {
     type Assignment,
     decodeAssignmentLink,
     encodeAssignmentLink,
-    loadAssignments,
     makeAssignment,
     newAssignmentId,
     parseAssignment,
-    removeAssignment,
-    saveAssignment,
     serializeAssignment,
 } from "./assignment";
 
@@ -27,10 +22,6 @@ const sample = (): Assignment =>
             { id: "arpeggio-g-major" },
         ],
     });
-
-afterEach(() => {
-    localStorage.clear();
-});
 
 describe("makeAssignment", () => {
     it("drops malformed items and keeps the valid ones in order", () => {
@@ -108,51 +99,5 @@ describe("share link", () => {
     it("returns null for a corrupt or empty code", () => {
         expect(decodeAssignmentLink("")).toBeNull();
         expect(decodeAssignmentLink("!!!not-base64!!!")).toBeNull();
-    });
-});
-
-describe("storage", () => {
-    it("saves, loads and removes assignments", () => {
-        const assignment = sample();
-        expect(saveAssignment(assignment)).toBe(true);
-        expect(loadAssignments().map((entry) => entry.id)).toEqual([assignment.id]);
-        removeAssignment(assignment.id);
-        expect(loadAssignments()).toEqual([]);
-    });
-
-    it("upserts by id rather than appending a duplicate", () => {
-        const assignment = sample();
-        saveAssignment(assignment);
-        saveAssignment({ ...assignment, name: "Renamed" });
-        const loaded = loadAssignments();
-        expect(loaded).toHaveLength(1);
-        expect(loaded[0]?.name).toBe("Renamed");
-    });
-
-    it("keeps an edited assignment in its place rather than moving it to the end", () => {
-        const items = [{ id: "scale-c-major" }];
-        for (const name of ["First", "Second", "Third"]) {
-            saveAssignment(makeAssignment({ name, items }));
-        }
-        // Re-saving the first must not reorder the list.
-        saveAssignment(makeAssignment({ name: "First", description: "edited", items }));
-        const loaded = loadAssignments();
-        expect(loaded.map((entry) => entry.id)).toEqual(["first", "second", "third"]);
-        expect(loaded[0]?.description).toBe("edited");
-    });
-});
-
-describe("assignment storage under denied storage", () => {
-    it("loads an empty list rather than throwing when storage is blocked", () => {
-        expect(withDeniedStorage(() => loadAssignments())).toEqual([]);
-    });
-
-    it("reports a failed save rather than throwing when storage is blocked", () => {
-        const assignment = makeAssignment({ name: "T", items: [{ id: "a", tempo: 5000 }] });
-        expect(withDeniedStorage(() => saveAssignment(assignment))).toBe(false);
-    });
-
-    it("swallows a remove when storage is blocked", () => {
-        expect(() => withDeniedStorage(() => removeAssignment("a"))).not.toThrow();
     });
 });

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
+import { useStore } from "../../contexts/services";
 import { resetDevice } from "../../lib/resetDevice";
 import { m } from "../../paraglide/messages.js";
 
@@ -15,10 +16,11 @@ const CANCEL =
 // irreversible, so it sits behind a two-step confirm; the copy points at the Library
 // backup for anyone who wants to keep their scores first.
 export function DangerZone() {
+    const store = useStore();
     const [confirming, setConfirming] = useState(false);
 
     const reset = () => {
-        resetDevice();
+        resetDevice(store);
         window.location.reload();
     };
 

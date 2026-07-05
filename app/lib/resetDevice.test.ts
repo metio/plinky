@@ -4,6 +4,7 @@
 
 import { afterEach, describe, expect, it } from "vitest";
 import { withDeniedStorage } from "./deniedStorage";
+import { browserStore } from "../adapters/browserStore";
 import { resetDevice } from "./resetDevice";
 
 afterEach(() => localStorage.clear());
@@ -15,7 +16,7 @@ describe("resetDevice", () => {
         localStorage.setItem("plinky:scores", "[]");
         localStorage.setItem("other-app", "keep");
 
-        const cleared = resetDevice();
+        const cleared = resetDevice(browserStore);
 
         expect(cleared).toBe(3);
         expect(localStorage.getItem("plinky:prefs")).toBeNull();
@@ -24,12 +25,12 @@ describe("resetDevice", () => {
     });
 
     it("clears nothing on a fresh device", () => {
-        expect(resetDevice()).toBe(0);
+        expect(resetDevice(browserStore)).toBe(0);
     });
 });
 
 describe("resetDevice under denied storage", () => {
     it("clears nothing rather than throwing when storage is blocked", () => {
-        expect(withDeniedStorage(() => resetDevice())).toBe(0);
+        expect(withDeniedStorage(() => resetDevice(browserStore))).toBe(0);
     });
 });

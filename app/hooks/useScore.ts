@@ -10,10 +10,10 @@ import { resolveScore, type Score } from "../lib/catalog";
 // their MusicXML on demand. Returns `undefined` while loading and `null` when no
 // such score exists. A new id re-resolves and discards a stale in-flight fetch.
 export function useScore(scoreId: string): Score | null | undefined {
-    const { songs, exercises } = useServices();
+    const { songs, exercises, store } = useServices();
     const [score, setScore] = useState<Score | null | undefined>(undefined);
     useEffect(() => {
-        const local = resolveScore(scoreId);
+        const local = resolveScore(store, scoreId);
         if (local) {
             setScore(local);
             return;
@@ -29,6 +29,6 @@ export function useScore(scoreId: string): Score | null | undefined {
         return () => {
             cancelled = true;
         };
-    }, [scoreId, songs, exercises]);
+    }, [scoreId, songs, exercises, store]);
     return score;
 }

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useOnboardingStore, useSongSource, useXmlCodec } from "../contexts/services";
+import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../contexts/services";
 import { useState } from "react";
 import { Button, buttonClasses } from "../components/ui/button";
 import { UploadIcon } from "../components/ui/icons";
@@ -44,6 +44,7 @@ const FIELD =
     "w-full rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
 
 export default function LibraryImportRoute() {
+    const store = useStore();
     const onboarding = useOnboardingStore();
     const xmlCodec = useXmlCodec();
     const songs = useSongSource();
@@ -72,7 +73,7 @@ export default function LibraryImportRoute() {
         // The fingerprint identifies the piece by its notes: if it is already bundled, in
         // the song catalogue, or previously imported, flag it as a duplicate.
         const id = songId(xml);
-        const known = new Set(loadCatalog().map((entry) => entry.id));
+        const known = new Set(loadCatalog(store).map((entry) => entry.id));
         setDuplicate(known.has(id) || (await songs.manifest()).some((song) => song.id === id));
         const meta = readScoreMeta(xml);
         setDraft({
@@ -110,7 +111,7 @@ export default function LibraryImportRoute() {
             beatsPerBar: draft.beatsPerBar,
             bundled: false,
         };
-        if (!saveUserScore(score)) {
+        if (!saveUserScore(store, score)) {
             setError(m.import_save_failed());
             return;
         }

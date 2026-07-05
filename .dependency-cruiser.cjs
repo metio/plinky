@@ -111,12 +111,11 @@ module.exports = {
         {
             name: "adapters-only-at-the-composition-root",
             comment:
-                "Concrete adapters are wired in exactly two places: the services context (which " +
-                "injects them) and the app root (which hands the storage-health signal to the " +
-                "banner). Everything else receives its capabilities through the provider, so a " +
-                "test can swap them for fakes. The app/lib entries below are the frozen remainder " +
-                "of the storage-helper migration — a ratchet: move one onto an injected store and " +
-                "delete its line; new modules cannot join the list.",
+                "Concrete adapters are wired at the composition roots only: the services context " +
+                "(which injects them), the app root (which hands the storage-health signal to the " +
+                "banner and reads the theme before the provider exists), and the play route's " +
+                "static meta(). Everything else receives its capabilities through the provider, " +
+                "so a test can swap them for fakes.",
             severity: "error",
             from: {
                 pathNot: [
@@ -125,9 +124,9 @@ module.exports = {
                     "^app/contexts/services\\.tsx$",
                     "^app/root\\.tsx$",
                     "^app/testing/",
-                    // The ratchet: frozen storage helpers still on the browser-store
-                    // singleton. Shrink only.
-                    "^app/lib/(assignment|catalog|resetDevice)\\.ts$",
+                    // meta() runs outside the React tree, so the play route wires
+                    // the real adapter for its prerender/title resolution directly.
+                    "^app/routes/play\\.tsx$",
                 ],
             },
             to: { path: "^app/adapters/" },

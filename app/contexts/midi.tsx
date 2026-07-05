@@ -27,6 +27,7 @@ import {
 } from "../../core/midi";
 import { DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
 import { usePrefsStore } from "./services";
+import { useServices } from "./services";
 import { resetDevice } from "../lib/resetDevice";
 
 export type NoteListener = {
@@ -68,6 +69,9 @@ const MidiContext = createContext<MidiContextValue | null>(null);
 // A single connection shared across the whole app: connecting once persists
 // across route changes, and the computer-keyboard fallback is always live.
 export function MidiProvider({ children }: { children: ReactNode }) {
+    // The dev reset bridge wipes state through the injected store — the provider
+    // renders inside ServicesProvider, so an override reaches it too.
+    const { store } = useServices();
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -150,14 +154,14 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
             reset: () => {
-                resetDevice();
+                resetDevice(store);
                 window.location.reload();
             },
         };
         return () => {
             window.__plinky = undefined;
         };
-    }, [emitNote]);
+    }, [emitNote, store]);
 
     const pressKey = useCallback(
         (note: number) =>

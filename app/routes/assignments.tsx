@@ -12,18 +12,20 @@ import {
     type AssignmentItem,
     decodeAssignmentLink,
     encodeAssignmentLink,
-    loadAssignments,
     makeAssignment,
     newAssignmentId,
     parseAssignment,
-    removeAssignment,
-    saveAssignment,
     serializeAssignment,
     slugifyName,
-} from "../lib/assignment";
+} from "../../core/assignment";
 import { loadCatalog } from "../lib/catalog";
 import type { ExerciseMeta } from "../stores/exerciseSource";
-import { useExerciseSource, useMasteryStore } from "../contexts/services";
+import {
+    useAssignmentsStore,
+    useExerciseSource,
+    useMasteryStore,
+    useStore,
+} from "../contexts/services";
 import type { MasteryStore } from "../stores/masteryStore";
 import { routeMeta, SITE_URL } from "../../core/site";
 import { trackSteps } from "../../core/tracks";
@@ -62,6 +64,8 @@ function download(filename: string, text: string, type: string): void {
 }
 
 export default function AssignmentsRoute() {
+    const store = useStore();
+    const assignmentsStore = useAssignmentsStore();
     const masteryStore = useMasteryStore();
     const exercises = useExerciseSource();
     const [searchParams] = useSearchParams();
@@ -78,9 +82,9 @@ export default function AssignmentsRoute() {
     const [query, setQuery] = useState("");
 
     useEffect(() => {
-        setAssignments(loadAssignments());
+        setAssignments(assignmentsStore.list());
         exercises.manifest().then((exercises: ExerciseMeta[]) => {
-            const fromCatalog = loadCatalog().map((score) => ({
+            const fromCatalog = loadCatalog(store).map((score) => ({
                 id: score.id,
                 title: score.title,
             }));
@@ -90,7 +94,7 @@ export default function AssignmentsRoute() {
             }));
             setPool([...fromCatalog, ...fromExercises]);
         });
-    }, [exercises.manifest]);
+    }, [exercises.manifest, store, assignmentsStore.list]);
 
     // A shared assignment arriving by link is offered for import rather than saved
     // silently, so the player chooses to add a stranger's list to their own.
@@ -117,7 +121,7 @@ export default function AssignmentsRoute() {
             .slice(0, 20);
     }, [pool, query, items]);
 
-    const refresh = () => setAssignments(loadAssignments());
+    const refresh = () => setAssignments(assignmentsStore.list());
 
     const addItem = (id: string) => {
         setItems((current) =>
@@ -159,7 +163,7 @@ export default function AssignmentsRoute() {
         );
 
     const draft = (): Assignment => {
-        const existing = loadAssignments().map((entry) => entry.id);
+        const existing = assignmentsStore.list().map((entry) => entry.id);
         return makeAssignment({ id: newAssignmentId(name, existing), name, description, items });
     };
 
@@ -174,7 +178,7 @@ export default function AssignmentsRoute() {
 
     const onSave = () => {
         const assignment = draft();
-        if (saveAssignment(assignment)) {
+        if (assignmentsStore.save(assignment)) {
             refresh();
             reset();
             setStatus(m.assignments_saved({ name: assignment.name }));
@@ -208,18 +212,18 @@ export default function AssignmentsRoute() {
     };
 
     const onDelete = (assignment: Assignment) => {
-        removeAssignment(assignment.id);
+        assignmentsStore.remove(assignment.id);
         refresh();
     };
 
     // Re-id an imported assignment so it can't overwrite one already saved under the
     // same name, then store it and surface it in the list.
     const importAssignment = (assignment: Assignment) => {
-        const existing = loadAssignments().map((entry) => entry.id);
+        const existing = assignmentsStore.list().map((entry) => entry.id);
         const stored = existing.includes(assignment.id)
             ? makeAssignment({ ...assignment, id: newAssignmentId(assignment.name, existing) })
             : assignment;
-        if (saveAssignment(stored)) {
+        if (assignmentsStore.save(stored)) {
             refresh();
             setStatus(m.assignments_imported({ name: stored.name }));
         } else {

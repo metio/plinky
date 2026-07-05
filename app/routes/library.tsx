@@ -83,7 +83,7 @@ export default function LibraryRoute() {
 
     const reloadLocal = useCallback(() => {
         setLocal(
-            loadCatalog().map((score) => ({
+            loadCatalog(services.store).map((score) => ({
                 id: score.id,
                 title: score.title,
                 composer: score.composer,
@@ -92,7 +92,7 @@ export default function LibraryRoute() {
                 kind: "song" as const,
             })),
         );
-    }, [services.xml]);
+    }, [services.xml, services.store]);
 
     useEffect(() => {
         reloadLocal();
@@ -135,7 +135,7 @@ export default function LibraryRoute() {
 
     const toggle = (id: string) => favoritesStore.toggle(id);
     const remove = (id: string) => {
-        removeUserScore(id);
+        removeUserScore(services.store, id);
         reloadLocal();
         searchRef.current?.focus();
     };

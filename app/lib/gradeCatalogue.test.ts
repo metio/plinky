@@ -31,19 +31,18 @@ const scoreXml = (notes: string) =>
     `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1">${notes}</measure></part></score-partwise>`;
 const NOTE = `<note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration></note>`;
 
+const kv = memoryStore();
 const sources = {
-    songs: (() => {
-        const kv = memoryStore();
-        return createSongSource(httpFetcher, kv, createFavoritesStore(kv));
-    })(),
+    songs: createSongSource(httpFetcher, kv, createFavoritesStore(kv)),
     exercises: createExerciseSource(httpFetcher),
     xml: domXmlCodec,
+    store: kv,
 };
 
 describe("loadGradeCatalogue", () => {
     it("keeps a playable import but drops a note-less one", async () => {
-        saveUserScore(userScore("playable-import-xyz", scoreXml(NOTE + NOTE)));
-        saveUserScore(userScore("empty-import-xyz", scoreXml("")));
+        saveUserScore(kv, userScore("playable-import-xyz", scoreXml(NOTE + NOTE)));
+        saveUserScore(kv, userScore("empty-import-xyz", scoreXml("")));
         const ids = new Set((await loadGradeCatalogue(sources)).map((item) => item.id));
         // A score with notes is a real practice target…
         expect(ids.has("playable-import-xyz")).toBe(true);

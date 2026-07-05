@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
-// @vitest-environment jsdom
-
-import { afterEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
     buildScore,
     exportAllPack,
@@ -16,13 +14,20 @@ import {
     saveUserScore,
     slugify,
 } from "./catalog";
+import { browserStore } from "../adapters/browserStore";
+import { memoryStore } from "../adapters/memoryStore";
+import type { KeyValueStore } from "../ports/keyValueStore";
 import { withDeniedStorage } from "./deniedStorage";
 
 function xml(title = "Test", beats = 4): string {
     return `<?xml version="1.0"?><score-partwise><work><work-title>${title}</work-title></work><identification><creator type="composer">Bach</creator></identification><part id="P1"><measure number="1"><attributes><time><beats>${beats}</beats><beat-type>4</beat-type></time></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
 }
 
-afterEach(() => localStorage.clear());
+// A fresh in-memory store per test — the catalogue takes its persistence injected.
+let kv: KeyValueStore;
+beforeEach(() => {
+    kv = memoryStore();
+});
 
 describe("loadUserScores robustness", () => {
     it("defaults a non-numeric sound tempo rather than emitting NaN", () => {
@@ -33,7 +38,7 @@ describe("loadUserScores robustness", () => {
     });
 
     it("drops corrupt stored entries so the catalogue sort never throws", () => {
-        localStorage.setItem(
+        kv.set(
             "plinky:scores",
             JSON.stringify([
                 {
@@ -48,17 +53,17 @@ describe("loadUserScores robustness", () => {
                 "not an object",
             ]),
         );
-        expect(loadUserScores()).toHaveLength(1);
+        expect(loadUserScores(kv)).toHaveLength(1);
         // The catalogue still sorts without throwing on the dropped entry.
-        expect(() => loadCatalog()).not.toThrow();
+        expect(() => loadCatalog(kv)).not.toThrow();
     });
 
     it("repairs a non-finite stored tempo to the default", () => {
-        localStorage.setItem(
+        kv.set(
             "plinky:scores",
             JSON.stringify([{ id: "x", title: "X", xml: "<x/>", tempo: 0, beatsPerBar: -1 }]),
         );
-        const score = loadUserScores()[0];
+        const score = loadUserScores(kv)[0];
         expect(score?.tempo).toBe(90);
         expect(score?.beatsPerBar).toBe(4);
     });
@@ -66,19 +71,20 @@ describe("loadUserScores robustness", () => {
 
 describe("user scores under denied storage", () => {
     it("reads an empty library rather than throwing when storage is blocked", () => {
-        expect(withDeniedStorage(() => loadUserScores())).toEqual([]);
+        expect(withDeniedStorage(() => loadUserScores(browserStore))).toEqual([]);
     });
 
     it("reports a failed save rather than throwing when storage is blocked", () => {
         const score = buildScore(xml("Blocked"), []);
-        expect(withDeniedStorage(() => saveUserScore(score))).toBe(false);
+        expect(withDeniedStorage(() => saveUserScore(browserStore, score))).toBe(false);
     });
 
     it("surfaces a clean error, not a SecurityError, when importing into blocked storage", () => {
-        saveUserScore(buildScore(xml("Pack"), []));
-        const pack = exportAllPack();
-        localStorage.clear();
-        expect(() => withDeniedStorage(() => importScoresPack(pack))).toThrow(/Could not save/);
+        saveUserScore(kv, buildScore(xml("Pack"), []));
+        const pack = exportAllPack(kv);
+        expect(() => withDeniedStorage(() => importScoresPack(browserStore, pack))).toThrow(
+            /Could not save/,
+        );
     });
 });
 
@@ -125,12 +131,12 @@ describe("buildScore", () => {
 
 describe("user scores", () => {
     it("saves, loads and removes", () => {
-        saveUserScore(buildScore(xml("A"), []));
-        expect(loadUserScores().map((s) => s.id)).toEqual(["a"]);
-        saveUserScore(buildScore(xml("B"), ["a"]));
-        expect(loadUserScores()).toHaveLength(2);
-        removeUserScore("a");
-        expect(loadUserScores().map((s) => s.id)).toEqual(["b"]);
+        saveUserScore(kv, buildScore(xml("A"), []));
+        expect(loadUserScores(kv).map((s) => s.id)).toEqual(["a"]);
+        saveUserScore(kv, buildScore(xml("B"), ["a"]));
+        expect(loadUserScores(kv)).toHaveLength(2);
+        removeUserScore(kv, "a");
+        expect(loadUserScores(kv).map((s) => s.id)).toEqual(["b"]);
     });
 });
 
@@ -145,8 +151,8 @@ describe("loadBundledScores", () => {
 describe("loadCatalog", () => {
     it("includes bundled and user scores, the user's overriding by id", () => {
         const first = loadBundledScores()[0]!;
-        saveUserScore({ ...buildScore(xml("Mine"), []), id: first.id });
-        const catalog = loadCatalog();
+        saveUserScore(kv, { ...buildScore(xml("Mine"), []), id: first.id });
+        const catalog = loadCatalog(kv);
         const entry = catalog.find((score) => score.id === first.id);
         expect(entry?.title).toBe("Mine");
         expect(entry?.bundled).toBe(false);
@@ -155,19 +161,19 @@ describe("loadCatalog", () => {
     });
 
     it("resolves a score by id, or undefined", () => {
-        saveUserScore(buildScore(xml("Solo"), []));
-        expect(resolveScore("solo")?.title).toBe("Solo");
-        expect(resolveScore("nope")).toBeUndefined();
+        saveUserScore(kv, buildScore(xml("Solo"), []));
+        expect(resolveScore(kv, "solo")?.title).toBe("Solo");
+        expect(resolveScore(kv, "nope")).toBeUndefined();
     });
 });
 
 describe("pack backup", () => {
     it("round-trips the user library through export and import", () => {
-        saveUserScore(buildScore(xml("Keep"), []));
-        const pack = exportAllPack();
-        localStorage.clear();
-        const result = importScoresPack(pack);
+        saveUserScore(kv, buildScore(xml("Keep"), []));
+        const pack = exportAllPack(kv);
+        const other = memoryStore();
+        const result = importScoresPack(other, pack);
         expect(result.imported).toBe(1);
-        expect(loadUserScores().map((s) => s.id)).toEqual(["keep"]);
+        expect(loadUserScores(other).map((s) => s.id)).toEqual(["keep"]);
     });
 });

@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
-import { readJson, writeJson } from "../stores/jsonStore";
-import { packToCode, unpackFromCode } from "../../core/shareCode";
+import { packToCode, unpackFromCode } from "./shareCode";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
 // imported scores, or finger exercises) with an optional target tempo and note per
@@ -29,7 +27,6 @@ export interface Assignment {
 }
 
 const FORMAT = "plinky-assignment";
-const STORAGE_KEY = "plinky:assignments";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
@@ -192,48 +189,4 @@ export function decodeAssignmentLink(code: string): Assignment | null {
     } catch {
         return null;
     }
-}
-
-export function loadAssignments(): Assignment[] {
-    const parsed = readJson(browserStore, STORAGE_KEY);
-    if (!Array.isArray(parsed)) {
-        return [];
-    }
-    return parsed
-        .map((entry) => {
-            if (!isRecord(entry) || !Array.isArray(entry.items)) {
-                return null;
-            }
-            const assignment = makeAssignment({
-                id: typeof entry.id === "string" ? entry.id : undefined,
-                name: typeof entry.name === "string" ? entry.name : undefined,
-                description: typeof entry.description === "string" ? entry.description : undefined,
-                items: entry.items,
-            });
-            return assignment.items.length > 0 ? assignment : null;
-        })
-        .filter((entry): entry is Assignment => entry !== null);
-}
-
-function storeAssignments(assignments: Assignment[]): boolean {
-    return writeJson(browserStore, STORAGE_KEY, assignments);
-}
-
-// Upsert by id, so re-saving an edited assignment refreshes it in place. Returns
-// false when the write fails (e.g. storage quota), so a caller can say so.
-export function saveAssignment(assignment: Assignment): boolean {
-    const existing = loadAssignments();
-    const at = existing.findIndex((entry) => entry.id === assignment.id);
-    if (at === -1) {
-        return storeAssignments([...existing, assignment]);
-    }
-    // Overwrite the matching slot so an edit keeps the assignment where it was in
-    // the list rather than jumping to the end.
-    const next = [...existing];
-    next[at] = assignment;
-    return storeAssignments(next);
-}
-
-export function removeAssignment(id: string): void {
-    storeAssignments(loadAssignments().filter((entry) => entry.id !== id));
 }

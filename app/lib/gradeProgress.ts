@@ -4,6 +4,7 @@
 import { loadBundledScores, loadUserScores } from "./catalog";
 import type { Letter } from "../../core/grade";
 import type { XmlCodec } from "../../core/xml";
+import type { KeyValueStore } from "../ports/keyValueStore";
 import { type DecayMode, REVIEW_CAP } from "../../core/review";
 import { isDue, isLapsed, letterMin, type Mastery } from "../../core/mastery";
 import { gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "../../core/scoreDifficulty";
@@ -145,6 +146,8 @@ export type CatalogSources = {
     exercises: { manifest(): Promise<GradeCatalogItem[]> };
     // Grading a bundled or imported score parses its MusicXML through this codec.
     xml: XmlCodec;
+    // Imported scores live in persistent storage; bundled ones ship with the app.
+    store: KeyValueStore;
 };
 
 // The whole gradeable catalogue, keyed by id: songs and exercises from their
@@ -167,7 +170,7 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
             cost: exercise.cost,
         });
     }
-    for (const score of [...loadBundledScores(), ...loadUserScores()]) {
+    for (const score of [...loadBundledScores(), ...loadUserScores(sources.store)]) {
         if (index.has(score.id)) {
             continue;
         }

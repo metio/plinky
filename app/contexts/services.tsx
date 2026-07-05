@@ -10,6 +10,7 @@ import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
+import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
@@ -52,6 +53,7 @@ export type AppServices = {
     ghosts: GhostStore;
     takes: TakesStore;
     fingering: FingeringStore;
+    assignments: AssignmentsStore;
     // How the network is reached (see Fetcher). The catalogue sources derive
     // from it, so overriding just this redirects every fetch.
     fetcher: Fetcher;
@@ -90,6 +92,7 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
         ghosts: overrides.ghosts ?? createGhostStore(store),
         takes: overrides.takes ?? createTakesStore(store),
         fingering: overrides.fingering ?? createFingeringStore(store),
+        assignments: overrides.assignments ?? createAssignmentsStore(store),
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
         xml: overrides.xml ?? domXmlCodec,
@@ -133,6 +136,7 @@ export function ServicesProvider({
     const ghosts = services?.ghosts;
     const takes = services?.takes;
     const fingering = services?.fingering;
+    const assignments = services?.assignments;
     const fetcher = services?.fetcher;
     const audio = services?.audio;
     const xml = services?.xml;
@@ -154,6 +158,7 @@ export function ServicesProvider({
             ghosts ||
             takes ||
             fingering ||
+            assignments ||
             fetcher ||
             audio ||
             xml ||
@@ -174,6 +179,7 @@ export function ServicesProvider({
                       ghosts,
                       takes,
                       fingering,
+                      assignments,
                       fetcher,
                       audio,
                       xml,
@@ -196,6 +202,7 @@ export function ServicesProvider({
             ghosts,
             takes,
             fingering,
+            assignments,
             fetcher,
             audio,
             xml,
@@ -250,6 +257,10 @@ export function useDailyStore(): DailyStore {
 
 export function useFingeringStore(): FingeringStore {
     return useServices().fingering;
+}
+
+export function useAssignmentsStore(): AssignmentsStore {
+    return useServices().assignments;
 }
 
 export function useAudioEngine(): AudioEngine {

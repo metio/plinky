@@ -17,6 +17,10 @@ import { ScoreViewer } from "../components/features/scoreViewer";
 import { TransposeProvider } from "../components/features/transposeContext";
 import { useOnboardingStore } from "../contexts/services";
 import { useScore } from "../hooks/useScore";
+// meta() runs outside the React tree (the router calls it statically), so it
+// cannot receive injected services — the real adapter is wired here directly,
+// the same way the composition root wires its defaults.
+import { browserStore } from "../adapters/browserStore";
 import { resolveScore } from "../lib/catalog";
 import { parseExerciseId } from "../../core/exerciseGen";
 
@@ -29,7 +33,7 @@ export function meta({ params }: Route.MetaArgs) {
     // Bundled scores resolve at prerender (no localStorage), so each one gets its
     // own title, description, and structured data — making the catalogue's pieces
     // indexable instead of every play page sharing a generic shell.
-    const score = resolveScore(params.scoreId);
+    const score = resolveScore(browserStore, params.scoreId);
     if (!score) {
         return routeMeta(m.meta_play_title(), m.meta_play_description_fallback());
     }

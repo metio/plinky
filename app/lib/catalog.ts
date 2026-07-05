@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { browserStore } from "../adapters/browserStore";
+import type { KeyValueStore } from "../ports/keyValueStore";
 import { readJson, writeJson } from "../stores/jsonStore";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
@@ -152,40 +152,46 @@ function normalizeUserScore(raw: unknown): Score | null {
     };
 }
 
-export function loadUserScores(): Score[] {
-    const parsed = readJson(browserStore, STORAGE_KEY);
+export function loadUserScores(kv: KeyValueStore): Score[] {
+    const parsed = readJson(kv, STORAGE_KEY);
     if (!Array.isArray(parsed)) {
         return [];
     }
     return parsed.map(normalizeUserScore).filter((score): score is Score => score !== null);
 }
 
-function storeUserScores(scores: Score[]): boolean {
-    return writeJson(browserStore, STORAGE_KEY, scores);
+function storeUserScores(kv: KeyValueStore, scores: Score[]): boolean {
+    return writeJson(kv, STORAGE_KEY, scores);
 }
 
 // Returns false when the write fails (e.g. storage quota), so callers can tell
 // the user rather than reporting a save that did not happen.
-export function saveUserScore(score: Score): boolean {
-    return storeUserScores([...loadUserScores().filter((entry) => entry.id !== score.id), score]);
+export function saveUserScore(kv: KeyValueStore, score: Score): boolean {
+    return storeUserScores(kv, [
+        ...loadUserScores(kv).filter((entry) => entry.id !== score.id),
+        score,
+    ]);
 }
 
-export function removeUserScore(id: string): void {
-    storeUserScores(loadUserScores().filter((entry) => entry.id !== id));
+export function removeUserScore(kv: KeyValueStore, id: string): void {
+    storeUserScores(
+        kv,
+        loadUserScores(kv).filter((entry) => entry.id !== id),
+    );
 }
 
 // The whole catalogue: bundled scores plus the user's own, a stored piece shadowing
 // a bundled one of the same id, sorted by title.
-export function loadCatalog(): Score[] {
-    const user = loadUserScores();
+export function loadCatalog(kv: KeyValueStore): Score[] {
+    const user = loadUserScores(kv);
     const userIds = new Set(user.map((score) => score.id));
     return [...loadBundledScores().filter((score) => !userIds.has(score.id)), ...user].sort(
         (a, b) => a.title.localeCompare(b.title),
     );
 }
 
-export function resolveScore(id: string | undefined): Score | undefined {
-    return id ? loadCatalog().find((score) => score.id === id) : undefined;
+export function resolveScore(kv: KeyValueStore, id: string | undefined): Score | undefined {
+    return id ? loadCatalog(kv).find((score) => score.id === id) : undefined;
 }
 
 // Derive a stored score from imported MusicXML, giving it an id unique in the
@@ -202,16 +208,16 @@ export function buildScore(xml: string, takenIds: string[]): Score {
 }
 
 // A backup of the user's library (their imported scores) as a bundle.
-export function exportAllPack(): string {
-    return serializePack(loadUserScores());
+export function exportAllPack(kv: KeyValueStore): string {
+    return serializePack(loadUserScores(kv));
 }
 
 // Merge a bundle's scores into local storage, overwriting by id so a re-imported
 // score refreshes. Throws if the bundle is invalid or won't store.
-export function importScoresPack(json: string): { imported: number } {
+export function importScoresPack(kv: KeyValueStore, json: string): { imported: number } {
     const pack = parsePack(json);
 
-    const scores = new Map(loadUserScores().map((score) => [score.id, score]));
+    const scores = new Map(loadUserScores(kv).map((score) => [score.id, score]));
     for (const packScore of pack.scores) {
         const meta = readScoreMeta(packScore.xml);
         scores.set(packScore.id, {
@@ -226,7 +232,7 @@ export function importScoresPack(json: string): { imported: number } {
             ...(packScore.license ? { license: packScore.license } : {}),
         });
     }
-    if (!storeUserScores([...scores.values()])) {
+    if (!storeUserScores(kv, [...scores.values()])) {
         throw new Error("Could not save the scores — they may exceed this device's storage.");
     }
     return { imported: pack.scores.length };

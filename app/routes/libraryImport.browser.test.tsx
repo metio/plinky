@@ -4,6 +4,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { browserStore } from "../adapters/browserStore";
 import { loadBundledScores, loadUserScores } from "../lib/catalog";
 import { generatePhrase } from "../../core/generator";
 import LibraryImportRoute from "./libraryImport";
@@ -39,7 +40,9 @@ describe("LibraryImportRoute", () => {
         // It is confirmed and persisted as a user score under the edited title.
         expect(await screen.findByText(/Added to your library/)).toBeTruthy();
         await waitFor(() =>
-            expect(loadUserScores().some((score) => score.title === "My Étude")).toBe(true),
+            expect(loadUserScores(browserStore).some((score) => score.title === "My Étude")).toBe(
+                true,
+            ),
         );
     });
 
