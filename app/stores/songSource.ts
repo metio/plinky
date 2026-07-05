@@ -4,9 +4,9 @@
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import { decompressMxl } from "../../core/musicxmlFile";
 import type { Score } from "../lib/catalog";
-import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import type { Fetcher } from "../ports/fetcher";
 import type { KeyValueStore } from "../ports/keyValueStore";
+import type { FavoritesStore } from "./favoritesStore";
 import { fetchManifest } from "./manifest";
 
 // The curated song catalogue. Unlike the bundled exercises (inlined into the
@@ -56,7 +56,14 @@ export type SongSource = {
     ensureSeeded(): Promise<void>;
 };
 
-export function createSongSource(fetchUrl: Fetcher, kv: KeyValueStore): SongSource {
+// Seeding writes through the same favorites store the UI subscribes to, so the
+// injected persistence is honored end to end — overriding `store` in the
+// provider redirects the seed writes along with everything else.
+export function createSongSource(
+    fetchUrl: Fetcher,
+    kv: KeyValueStore,
+    favorites: FavoritesStore,
+): SongSource {
     let manifestCache: SongMeta[] | null = null;
 
     const manifest = async (): Promise<SongMeta[]> => {
@@ -126,10 +133,9 @@ export function createSongSource(fetchUrl: Fetcher, kv: KeyValueStore): SongSour
             try {
                 const response = await fetchUrl(SEED_URL);
                 const seed = response.ok ? ((await response.json()) as string[]) : [];
-                const starred = loadFavorites();
                 for (const id of seed) {
-                    if (!starred.has(id)) {
-                        toggleFavorite(id);
+                    if (!favorites.has(id)) {
+                        favorites.toggle(id);
                     }
                 }
                 kv.set(SEEDED_KEY, "1");

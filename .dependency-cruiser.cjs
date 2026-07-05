@@ -108,6 +108,30 @@ module.exports = {
             },
         },
         {
+            name: "adapters-only-at-the-composition-root",
+            comment:
+                "Concrete adapters are wired in exactly two places: the services context (which " +
+                "injects them) and the app root (which hands the storage-health signal to the " +
+                "banner). Everything else receives its capabilities through the provider, so a " +
+                "test can swap them for fakes. The app/lib entries below are the frozen remainder " +
+                "of the storage-helper migration — a ratchet: move one onto an injected store and " +
+                "delete its line; new modules cannot join the list.",
+            severity: "error",
+            from: {
+                pathNot: [
+                    "\\.(test|stories)\\.[jt]sx?$",
+                    "^app/adapters/",
+                    "^app/contexts/services\\.tsx$",
+                    "^app/root\\.tsx$",
+                    "^app/testing/",
+                    // The ratchet: frozen storage helpers still on the browser-store
+                    // singleton. Shrink only.
+                    "^app/lib/(assignment|catalog|dailyDone|dailyResult|lifetime|milestones|onboarding|recording|resetDevice|savedFingering|savedTakes|seenHints|theme)\\.ts$",
+                ],
+            },
+            to: { path: "^app/adapters/" },
+        },
+        {
             name: "dev-depends-on-core",
             comment:
                 "Build/import scripts under dev/ may only reach down into core/ (pure, shared music " +

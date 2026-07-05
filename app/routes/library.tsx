@@ -11,9 +11,9 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { GradeChip } from "../components/features/scoreGrade";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
-import { loadFavorites, toggleFavorite } from "../lib/favorites";
 import { isDue, type Mastery } from "../../core/mastery";
-import { useServices } from "../contexts/services";
+import { useFavoritesStore, useServices } from "../contexts/services";
+import { useFavorites } from "../hooks/useFavorites";
 import { gradeOf, MAX_GRADE } from "../../core/scoreDifficulty";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -58,7 +58,9 @@ export default function LibraryRoute() {
     const [local, setLocal] = useState<Item[]>([]);
     const [exercises, setExercises] = useState<Item[]>([]);
     const [songs, setSongs] = useState<Item[]>([]);
-    const [favorites, setFavorites] = useState<Set<string>>(new Set());
+    // Subscribed, not mirrored: starring anywhere (this list, seeding) re-renders here.
+    const favoritesStore = useFavoritesStore();
+    const favorites = useFavorites();
     const [masteryMap, setMasteryMap] = useState<Record<string, Mastery>>({});
     const [loaded, setLoaded] = useState(false);
     const [query, setQuery] = useState("");
@@ -94,7 +96,6 @@ export default function LibraryRoute() {
 
     useEffect(() => {
         reloadLocal();
-        setFavorites(loadFavorites());
         reloadMastery();
         // The exercise and song manifests load over the network; local scores render
         // first. Exercises are always present; the song catalogue is the deep library.
@@ -132,7 +133,7 @@ export default function LibraryRoute() {
         [query, kindFilter, selectedGrades, favoritesOnly, dueOnly],
     );
 
-    const toggle = (id: string) => setFavorites(new Set(toggleFavorite(id)));
+    const toggle = (id: string) => favoritesStore.toggle(id);
     const remove = (id: string) => {
         removeUserScore(id);
         reloadLocal();

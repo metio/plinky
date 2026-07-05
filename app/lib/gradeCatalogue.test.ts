@@ -6,6 +6,7 @@ import { domXmlCodec } from "../adapters/domXmlCodec";
 import { httpFetcher } from "../adapters/httpFetcher";
 import { memoryStore } from "../adapters/memoryStore";
 import { createExerciseSource } from "../stores/exerciseSource";
+import { createFavoritesStore } from "../stores/favoritesStore";
 import { createSongSource } from "../stores/songSource";
 import { afterEach, describe, expect, it } from "vitest";
 import { saveUserScore, type Score } from "./catalog";
@@ -31,7 +32,10 @@ const scoreXml = (notes: string) =>
 const NOTE = `<note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration></note>`;
 
 const sources = {
-    songs: createSongSource(httpFetcher, memoryStore()),
+    songs: (() => {
+        const kv = memoryStore();
+        return createSongSource(httpFetcher, kv, createFavoritesStore(kv));
+    })(),
     exercises: createExerciseSource(httpFetcher),
     xml: domXmlCodec,
 };
