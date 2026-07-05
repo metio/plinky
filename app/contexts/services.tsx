@@ -12,6 +12,8 @@ import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
+import type { NewsSource } from "../ports/news";
+import { createSanityNews } from "../adapters/sanityNews";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
@@ -69,6 +71,10 @@ export type AppServices = {
     // and the exercise manifest + generated/fetched pieces.
     songs: SongSource;
     exercises: ExerciseSource;
+    // The live home-page news item, fetched from an external content service
+    // (Sanity) so a non-technical editor can change the picture + link without a
+    // redeploy. No configured project or a failed fetch simply yields no news.
+    news: NewsSource;
 };
 
 // Assembles a full service set from a partial override. Derived services follow the
@@ -104,6 +110,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
+        news: overrides.news ?? createSanityNews(fetcher),
     };
 }
 
@@ -149,6 +156,7 @@ export function ServicesProvider({
     const xml = services?.xml;
     const songs = services?.songs;
     const exercises = services?.exercises;
+    const news = services?.news;
     const value = useMemo(
         () =>
             store ||
@@ -171,7 +179,8 @@ export function ServicesProvider({
             midi ||
             xml ||
             songs ||
-            exercises
+            exercises ||
+            news
                 ? createServices({
                       store,
                       prefs,
@@ -194,6 +203,7 @@ export function ServicesProvider({
                       xml,
                       songs,
                       exercises,
+                      news,
                   })
                 : DEFAULT_SERVICES,
         [
@@ -218,6 +228,7 @@ export function ServicesProvider({
             xml,
             songs,
             exercises,
+            news,
         ],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
@@ -287,4 +298,8 @@ export function useSongSource(): SongSource {
 
 export function useExerciseSource(): ExerciseSource {
     return useServices().exercises;
+}
+
+export function useNewsSource(): NewsSource {
+    return useServices().news;
 }

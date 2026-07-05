@@ -6,6 +6,7 @@ import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { HeroKeyboard } from "../components/features/heroKeyboard";
 import { BookIcon, ListIcon, NotesIcon } from "../components/ui/icons";
 import { HomeToday } from "../components/features/homeToday";
+import { NewsBanner } from "../components/features/newsBanner";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { socialMeta, structuredData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -77,6 +78,8 @@ export default function Home() {
             <BeginnerStart />
 
             <HomeToday />
+
+            <NewsBanner />
 
             <DiscoveryChecklist />
 
