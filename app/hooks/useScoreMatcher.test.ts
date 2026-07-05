@@ -237,6 +237,28 @@ describe("useScoreMatcher", () => {
         expect(result.current.done).toBe(0);
     });
 
+    it("resumes from a given onset, grading only the positions from there on", () => {
+        // The fake cursor puts position i at whole time i * 0.25, so 0.5 is the third.
+        const { result } = render([[60], [62], [64], [65]]);
+        act(() => result.current.start(0.5));
+        expect(result.current.practicing).toBe(true);
+        expect(result.current.total).toBe(2);
+        expect(result.current.expected).toEqual([64]);
+
+        act(() => result.current.registerNote(64));
+        act(() => result.current.registerNote(65));
+        expect(result.current.complete).toBe(true);
+        expect(result.current.done).toBe(2);
+    });
+
+    it("does not practice when the resume point is past the last note", () => {
+        const { result, shown } = render([[60], [62]]);
+        act(() => result.current.start(99));
+        expect(result.current.practicing).toBe(false);
+        expect(result.current.total).toBe(0);
+        expect(shown()).toBe(false);
+    });
+
     it("freezes the tempo at start so a later change doesn't rescale note times", () => {
         const onCorrect = vi.fn();
         const { result, rerender } = render([[60], [62]], { onCorrect, tempo: 100 });

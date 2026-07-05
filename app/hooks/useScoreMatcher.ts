@@ -146,42 +146,62 @@ export function useScoreMatcher(
         setPracticing(false);
     }, [getOsmd]);
 
-    const start = useCallback(() => {
-        const osmd = getOsmd();
-        if (!osmd) {
-            return;
-        }
-        const hand = optionsRef.current.hand ?? "both";
-        const steps = collectMatchSteps(osmd, hand);
-        // A score with no playable positions (all rests, or empty) has nothing to
-        // match: entering the practicing state would strand the UI at 0/0 forever,
-        // since completion is only reached by clearing a position.
-        if (steps.length === 0) {
-            osmd.cursor.hide();
-            return;
-        }
-        const state = startMatch(steps);
-        stateRef.current = state;
-        // The collector leaves the cursor reset; walk it to the first playable
-        // position so the visual cursor and the reducer agree from note one.
-        while (!osmd.cursor.iterator.EndReached && stepAtCursor(osmd, hand).pitches.length === 0) {
-            osmd.cursor.next();
-        }
-        osmd.cursor.show();
-        runTempoRef.current = optionsRef.current.tempo ?? 100;
-        runHandRef.current = hand;
-        runForgivingRef.current = optionsRef.current.forgiving ?? false;
-        practicingRef.current = true;
-        setBar(currentBar(state));
-        setTotal(steps.length);
-        setDone(0);
-        setWrong(0);
-        setMissedHere(false);
-        setComplete(false);
-        setRange(stepRange(steps));
-        setExpected(expectedPitches(state));
-        setPracticing(true);
-    }, [getOsmd]);
+    // Begin a run. `fromWhole` — a notated onset in whole notes from the top of the
+    // piece — starts partway through, at the first playable position at or after it,
+    // so taking over from Listen (or resuming a paused run) continues from the shared
+    // cursor position rather than rewinding. The run is graded for what it covers:
+    // total and progress count only the positions from here on. The default, 0, starts
+    // at note one.
+    const start = useCallback(
+        (fromWhole = 0) => {
+            const osmd = getOsmd();
+            if (!osmd) {
+                return;
+            }
+            const hand = optionsRef.current.hand ?? "both";
+            const all = collectMatchSteps(osmd, hand);
+            // The first position at or after the resume point; -1 when none remains
+            // (the cursor sits past the last note), which leaves nothing to play.
+            const startIndex =
+                fromWhole > 0 ? all.findIndex((step) => step.whole >= fromWhole - 1e-6) : 0;
+            const steps = startIndex < 0 ? [] : all.slice(startIndex);
+            // A score with no playable positions (all rests, empty, or resumed past the
+            // end) has nothing to match: entering the practicing state would strand the
+            // UI at 0/0 forever, since completion is only reached by clearing a position.
+            if (steps.length === 0) {
+                osmd.cursor.hide();
+                return;
+            }
+            const state = startMatch(steps);
+            stateRef.current = state;
+            // The collector leaves the cursor reset; walk it to the run's first position
+            // — the first playable step at or after the resume point — so the visual
+            // cursor and the reducer agree from note one.
+            const from = steps[0]!.whole;
+            while (
+                !osmd.cursor.iterator.EndReached &&
+                ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
+                    stepAtCursor(osmd, hand).pitches.length === 0)
+            ) {
+                osmd.cursor.next();
+            }
+            osmd.cursor.show();
+            runTempoRef.current = optionsRef.current.tempo ?? 100;
+            runHandRef.current = hand;
+            runForgivingRef.current = optionsRef.current.forgiving ?? false;
+            practicingRef.current = true;
+            setBar(currentBar(state));
+            setTotal(steps.length);
+            setDone(0);
+            setWrong(0);
+            setMissedHere(false);
+            setComplete(false);
+            setRange(stepRange(steps));
+            setExpected(expectedPitches(state));
+            setPracticing(true);
+        },
+        [getOsmd],
+    );
 
     const registerNote = useCallback(
         (note: number, timestamp = performance.now(), velocity = 0) => {

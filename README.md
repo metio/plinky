@@ -31,7 +31,10 @@ the music) — and starts a note-by-note guide: read the note, play it, and the 
 advances, sounding back what you played. Full screen is where the rest of the play
 controls live, so it's the same generous surface on a phone or a wide desktop alike.
 There you'll also find **Listen**, which plays the piece back so you hear it first,
-lighting up each note as it sounds so your eye can follow along. The
+lighting up each note as it sounds so your eye can follow along. Listen and Practice
+**hand off to each other** — let the computer play a tricky passage then take over
+mid-phrase, or play a while and hand it back — keeping your place either way; the
+**restart** control (or finishing the run) returns you to the top. The
 staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up with
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**

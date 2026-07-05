@@ -453,6 +453,16 @@ export function ScoreViewer({
     // Whether any note has been coloured on the score, so a fresh run re-renders to
     // clear last run's progress only when there is something to clear.
     const paintedRef = useRef(false);
+    // A run that began partway through — taking over from Listen, or resuming where a
+    // stopped run left off. It is graded for what was played, but keeps no ghost: a
+    // partial replay would strand the next race at its early end, and chasing a
+    // full-piece ghost from the middle is meaningless.
+    const partialRunRef = useRef(false);
+
+    // The cursor's current position in whole notes — the shared place Listen and
+    // Practice hand off at, so switching between them continues here rather than
+    // rewinding. 0 at the top of a fresh (or reset) score.
+    const cursorWhole = () => osmdRef.current?.cursor?.iterator?.currentTimeStamp?.RealValue ?? 0;
 
     // Load this score's saved takes; a new score swaps in its own.
     useEffect(() => {
@@ -815,11 +825,15 @@ export function ScoreViewer({
         if (ephemeral) {
             return;
         }
-        // Keep the run as this score's ghost to race (and share) next time.
-        const onsets = notes.map((note) => note.playedMs);
-        services.ghosts.save(id, onsets);
-        setStoredGhost(onsets);
-        setSharedFromLink(false);
+        // Keep a full run as this score's ghost to race (and share) next time; a run
+        // that started partway through (a takeover from Listen) is not a whole-piece
+        // replay, so it grades for what was played but leaves the ghost untouched.
+        if (!partialRunRef.current) {
+            const onsets = notes.map((note) => note.playedMs);
+            services.ghosts.save(id, onsets);
+            setStoredGhost(onsets);
+            setSharedFromLink(false);
+        }
         // Fold the run into spaced-repetition state: a score that clears the
         // threshold becomes learned and schedules (or reschedules) its review.
         const before = masteryStore.load(id);
@@ -879,6 +893,17 @@ export function ScoreViewer({
             exitFullscreen();
         }
     }, [matcher.complete, fullscreen, exitFullscreen]);
+
+    // Leaving the play surface ends the session: return the shared cursor to the top so
+    // re-entering Practice or Listen starts from note one, not where the last session
+    // left off. Handing between Listen and Practice within a session keeps its place;
+    // stepping out resets it.
+    useEffect(() => {
+        if (!fullscreen) {
+            osmdRef.current?.cursor?.reset();
+            osmdRef.current?.cursor?.hide();
+        }
+    }, [fullscreen]);
 
     const toggleBacklog = () => {
         const updated = setBacklog(mastery, !mastery?.backlog, Date.now());
@@ -1021,6 +1046,10 @@ export function ScoreViewer({
         if (!osmd || playingRef.current || keepUpActiveRef.current) {
             return;
         }
+        // Continue from wherever the cursor sits — the note Practice was on when handing
+        // over, or where a paused run left off — instead of rewinding, so play can pass
+        // back and forth without losing the place. The top of a fresh piece reads as 0.
+        const from = cursorWhole();
         enterPlayFullscreen();
         playingRef.current = true;
         matcher.stop();
@@ -1033,8 +1062,21 @@ export function ScoreViewer({
                 cursor.next();
             }
         };
+        // Walk the cursor to the first voice-entry at or after a notated onset, the same
+        // way — for resuming from the handed-off position.
+        const seekToWhole = (whole: number) => {
+            cursor.reset();
+            while (
+                !cursor.iterator.EndReached &&
+                (cursor.iterator.currentTimeStamp?.RealValue ?? 0) < whole
+            ) {
+                cursor.next();
+            }
+        };
         if (loopRef.current.on) {
             seekToBar(loopRef.current.from);
+        } else if (from > 0) {
+            seekToWhole(from);
         } else {
             cursor.reset();
         }
@@ -1054,6 +1096,9 @@ export function ScoreViewer({
             } else if (cursor.iterator.EndReached) {
                 stopListen();
                 bumpTempo();
+                // A play-through that ran to the end has no resume point; return the
+                // cursor to the top so the next Listen or Practice starts fresh.
+                cursor.reset();
                 return;
             }
             // Light the notes now sounding so the eye can follow the music, lifting the
@@ -1300,7 +1345,13 @@ export function ScoreViewer({
         }
     };
 
-    const practice = () => {
+    const practice = (resume = true) => {
+        // Take over at the cursor's current position when resuming (handing over from
+        // Listen, or continuing a run stopped partway); Restart passes resume=false to
+        // begin at the top. The top of a fresh piece reads as 0 either way.
+        const from = resume ? cursorWhole() : 0;
+        const partial = from > 0;
+        partialRunRef.current = partial;
         enterPlayFullscreen();
         stopListen();
         setRunSaved("idle");
@@ -1316,9 +1367,11 @@ export function ScoreViewer({
         setKeepUpResult(null);
         setLiveTempo(tempo);
         // Your fastest complete take is the ghost to chase; falling back to the last
-        // run (or a friend's shared ghost) when you've saved none.
+        // run (or a friend's shared ghost) when you've saved none. A partial run has no
+        // full-piece ghost to race — chasing one from the middle would desync the
+        // marker — so it runs without one.
         const racing =
-            ephemeral || !raceGhost
+            partial || ephemeral || !raceGhost
                 ? null
                 : (fastestTakeOnsets(services.takes.list(id)) ??
                   storedGhost ??
@@ -1346,7 +1399,7 @@ export function ScoreViewer({
         // mark, and move along, the actual notes on the staff as it races.
         ghostMarkRef.current = -1;
         ghostNotesRef.current = racing && osmd ? collectNoteElements(osmd, matcherHand) : [];
-        matcher.start();
+        matcher.start(from);
     };
 
     const handLabel: Record<Hand, string> = {
@@ -1440,7 +1493,7 @@ export function ScoreViewer({
                         {/* Restart the run — a practice-only action, so it's absent while
                         just listening. */}
                         <Show when={matcher.practicing}>
-                            <IconButton onClick={practice} label={m.action_restart()}>
+                            <IconButton onClick={() => practice(false)} label={m.action_restart()}>
                                 <RotateIcon />
                             </IconButton>
                         </Show>

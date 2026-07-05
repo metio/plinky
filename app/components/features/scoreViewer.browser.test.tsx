@@ -329,6 +329,31 @@ describe("ScoreViewer", () => {
         reqFs.mockRestore();
     });
 
+    it("hands off between Listen and Practice without losing the place", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // Four C5 notes: the same key clears every position, so playing two leaves the
+        // run halfway with the cursor partway through.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady()); // Practice: a full-screen run over all four notes
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 2; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // Hand off to Listen, then take back over with Practice: the run resumes from the
+        // current place, not the top — so the couple of remaining notes finish it. Were
+        // it rewound, four fresh notes would be needed and the run would never complete.
+        fireEvent.click(screen.getByRole("button", { name: "Listen" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
+        const resumed = await screen.findByLabelText("C5");
+        for (let i = 0; i < 2; i++) {
+            fireEvent.pointerDown(resumed);
+            fireEvent.pointerUp(resumed);
+        }
+        expect(await screen.findAllByText("Accuracy", undefined, { timeout: 30000 })).toBeTruthy();
+    });
+
     it("does not scroll to the grade when a saved result is shown on open", async () => {
         // Re-opening a finished daily seeds the grade on mount; the result-scroll must
         // not fire then and yank the page down before the player has done anything.
