@@ -354,6 +354,29 @@ describe("ScoreViewer", () => {
         expect(await screen.findAllByText("Accuracy", undefined, { timeout: 30000 })).toBeTruthy();
     });
 
+    it("keeps the place when you leave full screen and come back", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // Four C5 notes; playing two leaves the run halfway.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady()); // Practice: a full-screen run over all four notes
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 2; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // Step out of full screen mid-run, then start Practice again: it picks up where it
+        // left off, so the two remaining notes finish it — a rewound run would need four.
+        fireEvent.click(screen.getByRole("button", { name: "Exit full screen" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
+        const resumed = await screen.findByLabelText("C5");
+        for (let i = 0; i < 2; i++) {
+            fireEvent.pointerDown(resumed);
+            fireEvent.pointerUp(resumed);
+        }
+        expect(await screen.findAllByText("Accuracy", undefined, { timeout: 30000 })).toBeTruthy();
+    });
+
     it("does not scroll to the grade when a saved result is shown on open", async () => {
         // Re-opening a finished daily seeds the grade on mount; the result-scroll must
         // not fire then and yank the page down before the player has done anything.

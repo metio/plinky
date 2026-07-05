@@ -460,9 +460,17 @@ export function ScoreViewer({
     const partialRunRef = useRef(false);
 
     // The cursor's current position in whole notes — the shared place Listen and
-    // Practice hand off at, so switching between them continues here rather than
-    // rewinding. 0 at the top of a fresh (or reset) score.
-    const cursorWhole = () => osmdRef.current?.cursor?.iterator?.currentTimeStamp?.RealValue ?? 0;
+    // Practice hand off at, so switching between them (or leaving and re-entering the
+    // play surface) continues here rather than rewinding. A cursor that has run off the
+    // end carries no resume point: the run is over, so the next start begins at the top,
+    // which reads as 0 — the same as a fresh score.
+    const cursorWhole = () => {
+        const iterator = osmdRef.current?.cursor?.iterator;
+        if (!iterator || iterator.EndReached) {
+            return 0;
+        }
+        return iterator.currentTimeStamp?.RealValue ?? 0;
+    };
 
     // Load this score's saved takes; a new score swaps in its own.
     useEffect(() => {
@@ -894,14 +902,15 @@ export function ScoreViewer({
         }
     }, [matcher.complete, fullscreen, exitFullscreen]);
 
-    // Leaving the play surface ends the session: return the shared cursor to the top so
-    // re-entering Practice or Listen starts from note one, not where the last session
-    // left off. Handing between Listen and Practice within a session keeps its place;
-    // stepping out resets it.
+    // Leaving the play surface — the ✕, Esc, or a finished run dropping out — ends any
+    // run in progress, but keeps the cursor where it is (stop hides, never rewinds), so
+    // re-entering Practice or Listen picks up from the same place. A run that finished on
+    // its own has already stopped; this covers stepping out mid-run.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: stopListen/matcher.stop reset transient playback, not render inputs
     useEffect(() => {
         if (!fullscreen) {
-            osmdRef.current?.cursor?.reset();
-            osmdRef.current?.cursor?.hide();
+            stopListen();
+            matcher.stop();
         }
     }, [fullscreen]);
 
@@ -1096,9 +1105,6 @@ export function ScoreViewer({
             } else if (cursor.iterator.EndReached) {
                 stopListen();
                 bumpTempo();
-                // A play-through that ran to the end has no resume point; return the
-                // cursor to the top so the next Listen or Practice starts fresh.
-                cursor.reset();
                 return;
             }
             // Light the notes now sounding so the eye can follow the music, lifting the
