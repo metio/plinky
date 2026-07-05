@@ -4,7 +4,7 @@
 // Bakes the catalogue's grade boundaries from the committed song costs — no PDMX
 // corpus needed, so CI can run it. It re-derives the even octile cost boundaries over
 // the shipped songs and applies them to:
-//   • GRADE_THRESHOLDS.piece in app/lib/scoreDifficulty.ts (the in-app grade chip),
+//   • GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts (the in-app grade chip),
 //   • each song's grade in public/songs/manifest.json,
 //   • each study's grade in public/exercises/manifest.json (studies grade on the same
 //     piece scale; scale/arpeggio tiles use their own fixed thresholds, untouched),
@@ -21,7 +21,7 @@ import { gradeForCost, octileBoundaries } from "./grading.mts";
 const MAX_GRADE = 8;
 const SONGS = "public/songs";
 const EXERCISES = "public/exercises";
-const THRESHOLDS = "app/lib/scoreDifficulty.ts";
+const THRESHOLDS = "core/scoreDifficulty.ts";
 const PIECE_RE = /(piece:\s*\[)([^\]]*)(\])/;
 
 const check = process.argv.includes("--check");

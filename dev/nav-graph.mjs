@@ -122,7 +122,7 @@ const nodesFor = (targets) => new Set([...targets].map(toNode).filter(Boolean));
 // header's own gear and logo (root.tsx's direct links).
 const global = nodesFor(
     new Set([
-        ...crawl(resolve(APP, "components/navBar.tsx"), new Set()),
+        ...crawl(resolve(APP, "components/ui/navBar.tsx"), new Set()),
         ...targetsIn(readFileSync(resolve(APP, "root.tsx"), "utf8")),
     ]),
 );

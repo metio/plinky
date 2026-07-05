@@ -14,7 +14,7 @@
 // octile cost boundaries over the survivors and re-grades every song — keeping grades
 // 1–8 evenly populated. It rewrites public/songs/manifest.json + seed.json and deletes
 // the orphaned .mxl. **Bake the printed boundaries into GRADE_THRESHOLDS.piece
-// (app/lib/scoreDifficulty.ts), then run `npm run exercises`** so the studies (graded
+// (core/scoreDifficulty.ts), then run `npm run exercises`** so the studies (graded
 // on the same piece scale) re-grade to match. Run locally: `npm run songs:dedup`.
 
 import { createReadStream } from "node:fs";
