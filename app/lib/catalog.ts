@@ -7,6 +7,7 @@ import type { XmlCodec } from "../../core/xml";
 import { readJson, writeJson } from "../stores/jsonStore";
 import { parsePack, serializePack } from "../../core/scorePack";
 import { songId } from "../../core/songId";
+import { slugify } from "./slug";
 
 // The one score catalogue: MusicXML pieces, rendered and practised on OSMD. The
 // bundled public-domain scores ship with the app; user-imported pieces are kept in
@@ -25,15 +26,8 @@ const files = import.meta.glob("../../scores/*.musicxml", {
 
 const STORAGE_KEY = "plinky:scores";
 
-export function slugify(title: string): string {
-    return (
-        title
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "") || "score"
-    );
-}
+// Re-exported so importers that reach for the catalogue's slug keep working.
+export { slugify };
 
 // The demo pieces inlined into the bundle, identical for everyone. Finger exercises
 // and the song catalogue load as on-demand assets instead, keeping the JS small.

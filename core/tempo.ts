@@ -4,6 +4,10 @@
 // Self-paced tempo analysis: instead of scoring against a fixed metronome, we
 // read the player's own tempo back out of the gaps between their notes.
 
+// The tempo curve summarises its points by their median; re-exported here so callers
+// that already read the curve's helpers find it alongside them.
+export { median } from "./stats";
+
 export type TempoPoint = {
     // The note the gap leads into (>= 1); index 0 has no preceding gap.
     index: number;
@@ -52,14 +56,6 @@ export function tempoSeries(
     return points;
 }
 
-export function median(values: number[]): number {
-    if (values.length === 0) {
-        return 0;
-    }
-    const sorted = values.toSorted((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
-}
 
 export type HotspotOptions = {
     // A point is "slow" below `ratio` of the baseline tempo.
