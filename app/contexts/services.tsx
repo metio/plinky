@@ -70,8 +70,9 @@ export type AppServices = {
 // Assembles a full service set from a partial override. Derived services follow the
 // pieces they are built on: overriding just `store` gives every state store over
 // that store, so a test that hands in a memoryStore gets consistent persistence
-// throughout.
-function build(overrides: Partial<AppServices> = {}): AppServices {
+// throughout. Exported for the test harness, which builds one isolated world per
+// test and hands its stores back for seeding and asserting.
+export function createServices(overrides: Partial<AppServices> = {}): AppServices {
     const store = overrides.store ?? browserStore;
     // The song source seeds first-run favorites, so it takes the same favorites
     // store the UI subscribes to — seeding lands where the library reads.
@@ -103,7 +104,7 @@ function build(overrides: Partial<AppServices> = {}): AppServices {
 
 // The production wiring. A component read outside any provider still gets working
 // services, so nothing has to know whether it is inside the app shell or a test.
-const DEFAULT_SERVICES: AppServices = build();
+const DEFAULT_SERVICES: AppServices = createServices();
 
 const ServicesContext = createContext<AppServices>(DEFAULT_SERVICES);
 
@@ -164,7 +165,7 @@ export function ServicesProvider({
             xml ||
             songs ||
             exercises
-                ? build({
+                ? createServices({
                       store,
                       prefs,
                       mastery,

@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { testPrefsStore } from "../../testing/stores";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../../lib/gradeProgress";
 import type { Mastery } from "../../../core/mastery";
 
+import { memoryStore } from "../../adapters/memoryStore";
+import { createPrefsStore } from "../../stores/prefsStore";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { GradeBadge } from "./gradeBadge";
 
 // Stub the catalogue join so the badge sees exactly the mastery we hand it; the grade
@@ -22,7 +24,6 @@ vi.mock("../../lib/gradeProgress", async (importOriginal) => ({
 afterEach(() => {
     cleanup();
     loadMock.mockReset();
-    localStorage.clear();
 });
 
 const fresh: Mastery = {
@@ -44,7 +45,7 @@ const mastered = (grade: number, count: number): GradedMastery[] =>
     }));
 
 const mount = () =>
-    render(
+    renderWithServices(
         <MemoryRouter>
             <GradeBadge />
         </MemoryRouter>,
@@ -66,9 +67,17 @@ describe("GradeBadge", () => {
     });
 
     it("flags competitive mode in its label", async () => {
-        testPrefsStore.save({ ...testPrefsStore.load(), decayMode: "competitive" });
         loadMock.mockResolvedValue(mastered(1, 5));
-        mount();
+        // Seeded before mount, like a returning player whose choice is already stored.
+        const kv = memoryStore();
+        const prefs = createPrefsStore(kv);
+        prefs.save({ ...prefs.load(), decayMode: "competitive" });
+        renderWithServices(
+            <MemoryRouter>
+                <GradeBadge />
+            </MemoryRouter>,
+            { store: kv, prefs },
+        );
         expect(await screen.findByRole("link", { name: /competitive/i })).toBeTruthy();
     });
 });

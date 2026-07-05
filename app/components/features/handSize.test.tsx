@@ -2,20 +2,17 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { testPrefsStore } from "../../testing/stores";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../../contexts/midi";
+import { renderWithServices } from "../../testing/renderWithServices";
 
 import { HandSize } from "./handSize";
 
-afterEach(() => {
-    cleanup();
-    localStorage.clear();
-});
+afterEach(cleanup);
 
 const mount = () =>
-    render(
+    renderWithServices(
         <MidiProvider>
             <HandSize />
         </MidiProvider>,
@@ -26,7 +23,7 @@ const tap = (note: string) => fireEvent.pointerDown(screen.getByLabelText(note))
 
 describe("HandSize", () => {
     it("captures a span from two keys and persists it for one hand", () => {
-        mount();
+        const { services } = mount();
         expect(screen.getAllByText("Not set")).toHaveLength(2);
 
         fireEvent.click(screen.getAllByText("Set")[0]!); // left hand
@@ -37,19 +34,19 @@ describe("HandSize", () => {
         fireEvent.click(screen.getByText("Save"));
         // Only the right hand remains unset, and the left span is stored.
         expect(screen.getAllByText("Not set")).toHaveLength(1);
-        expect(testPrefsStore.load().handSpan).toEqual({ left: 9, right: null });
+        expect(services.prefs.load().handSpan).toEqual({ left: 9, right: null });
     });
 
     it("clears a measured hand back to unset", () => {
-        mount();
+        const { services } = mount();
         fireEvent.click(screen.getAllByText("Set")[1]!); // right hand
         tap("C4");
         tap("A4");
         fireEvent.click(screen.getByText("Save"));
-        expect(testPrefsStore.load().handSpan).toEqual({ left: null, right: 9 });
+        expect(services.prefs.load().handSpan).toEqual({ left: null, right: 9 });
 
         fireEvent.click(screen.getByText("Remove"));
         expect(screen.getAllByText("Not set")).toHaveLength(2);
-        expect(testPrefsStore.load().handSpan).toEqual({ left: null, right: null });
+        expect(services.prefs.load().handSpan).toEqual({ left: null, right: null });
     });
 });
