@@ -67,7 +67,7 @@ describe("parseGrade", () => {
 
     it("accepts each of the seven grade letters", () => {
         // Every letter must round-trip: a hole in the LETTERS list would reject a
-        // legitimately-stored grade as unparseable.
+        // legitimately-stored grade as unparsable.
         for (const letter of ["S", "A", "B", "C", "D", "E", "F"] as const) {
             expect(parseGrade({ ...valid, letter })).toEqual({ ...valid, letter });
         }
