@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - uses: metio/ci/nix-devshell@cc725e2e1fbc779fda95050562d702128ad6e998 # 2026.7.6083955
       - run: nix develop --command npm ci
       # The catalogue's grades must match the octiles of the committed song costs, so a
       # dedup/import that forgot `npm run songs:bake` can't ship inconsistent grades.
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - uses: metio/ci/nix-devshell@cc725e2e1fbc779fda95050562d702128ad6e998 # 2026.7.6083955
       # Pure source analysis (no dependencies), so it skips the install step: a new
       # feature can't bury a page deeper than the navigation-depth budget.
       - run: nix develop --command npm run nav
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - uses: metio/ci/nix-devshell@cc725e2e1fbc779fda95050562d702128ad6e998 # 2026.7.6083955
       - run: nix develop --command npm ci
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
