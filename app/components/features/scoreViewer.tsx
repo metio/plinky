@@ -332,6 +332,9 @@ export function ScoreViewer({
     const [loopTo, setLoopTo] = useState(1);
     const loopRef = useRef({ on: false, from: 1, to: 1 });
     loopRef.current = { on: loopOn, from: loopFrom, to: loopTo };
+    // The last piece the reload effect seeded a loop for, so a relayout of the same
+    // piece leaves the loop untouched while a genuinely new piece reseeds it.
+    const loadedXmlRef = useRef<string | null>(null);
     // Each bar's rendered box, measured once per render, for placing the loop's red
     // selection overlay and mapping a click on the score to the bar under it.
     const measureBoxesRef = useRef<MeasureBox[]>([]);
@@ -1026,13 +1029,19 @@ export function ScoreViewer({
                         // time; a single-staff score offers no such choice.
                         setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
                         setHand("both");
-                        // Seed the loop range to the whole piece so the inputs are
-                        // valid before the player narrows them to a passage.
                         const bars = osmd.Sheet?.SourceMeasures?.length ?? 1;
                         setMeasureCount(bars);
-                        setLoopFrom(1);
-                        setLoopTo(bars);
-                        setLoopOn(false);
+                        // A bar range stays valid across a relayout (bars-per-row,
+                        // treadmill, fingering, transpose all keep the same bars), so
+                        // the loop resets only when the piece itself changes — that is
+                        // what keeps treadmill and loop independent. On a fresh piece
+                        // it seeds to the whole song, the default loop.
+                        if (loadedXmlRef.current !== xml) {
+                            loadedXmlRef.current = xml;
+                            setLoopFrom(1);
+                            setLoopTo(bars);
+                            setLoopOn(false);
+                        }
                         setReady(true);
                     }
                 });
@@ -1835,6 +1844,14 @@ export function ScoreViewer({
                                             checked={loopOn}
                                             onChange={(next) => {
                                                 selectAnchorRef.current = null;
+                                                // Activating the loop repeats the whole
+                                                // piece by default — the common case — so
+                                                // narrowing to a passage (click two bars on
+                                                // the score) stays optional.
+                                                if (next) {
+                                                    setLoopFrom(1);
+                                                    setLoopTo(measureCount);
+                                                }
                                                 setLoopOn(next);
                                             }}
                                             label={m.loop_section()}

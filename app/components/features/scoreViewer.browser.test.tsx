@@ -252,6 +252,38 @@ describe("ScoreViewer", () => {
         );
     });
 
+    it("keeps the loop on across a treadmill toggle — the two are independent", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        const ready = () =>
+            expect(
+                (screen.getByRole("button", { name: "Practice" }) as HTMLButtonElement).disabled,
+            ).toBe(false);
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        // Turning the loop on repeats the whole piece — no bar-picking needed.
+        fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
+        expect(screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked")).toBe(
+            "true",
+        );
+        // Toggling treadmill relayouts the score, but a bar range stays valid across a
+        // relayout, so the loop must survive rather than silently switch off.
+        fireEvent.click(screen.getByRole("switch", { name: "Treadmill" }));
+        await waitFor(ready, { timeout: 30000 });
+        expect(screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked")).toBe(
+            "true",
+        );
+        // And back off again — still on, so the two toggles never clobber each other.
+        fireEvent.click(screen.getByRole("switch", { name: "Treadmill" }));
+        await waitFor(ready, { timeout: 30000 });
+        expect(screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked")).toBe(
+            "true",
+        );
+    });
+
     it("toggles bar numbers, persists the choice, and re-renders the score", async () => {
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
