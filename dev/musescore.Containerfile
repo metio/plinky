@@ -15,7 +15,7 @@
 # Run via: ilo --no-rc shell --remote-user pwuser --update-remote-user-uid \
 #            --containerfile dev/musescore.Containerfile dev/plinky-musescore:latest bash -c '…'
 
-FROM docker.io/library/debian:bookworm-slim
+FROM docker.io/library/debian:bookworm-slim@sha256:60eac759739651111db372c07be67863818726f754804b8707c90979bda511df
 
 # DCMLab's scores are saved with MuseScore 3.6.2 (file format 3.02), newer than Debian's
 # packaged musescore3 (3.2.3), which refuses to open them. The official 3.6.2 AppImage
