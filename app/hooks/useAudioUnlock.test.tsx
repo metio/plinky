@@ -45,13 +45,15 @@ describe("useAudioUnlock", () => {
         expect(audio.unlocked).toBe(3);
     });
 
-    it("resumes audio when the tab returns to the foreground", () => {
-        const { audio } = harness();
-        // jsdom reports document as visible, so the handler takes the resume path.
+    it("re-wakes audio when the tab returns to the foreground, without counting as engagement", () => {
+        const { audio, result } = harness();
+        // jsdom reports document as visible, so the handler takes the wake path.
         act(() => {
             document.dispatchEvent(new Event("visibilitychange"));
         });
-        expect(audio.resumed).toBe(1);
+        expect(audio.unlocked).toBe(1);
+        // Foreground return is not a user gesture, so the hint gate stays closed.
+        expect(result.current).toBe(false);
     });
 
     it("stops listening once unmounted", () => {

@@ -18,7 +18,7 @@ import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { StorageBanner } from "./components/features/storageBanner";
 import { SoundHint } from "./components/features/soundHint";
-import { isIosLike } from "../core/platform";
+import { isInAppBrowser, isIosLike } from "../core/platform";
 import { ThemeToggle } from "./components/features/themeToggle";
 import { browserStore, storageHealth } from "./adapters/browserStore";
 import { MidiProvider } from "./contexts/midi";
@@ -158,9 +158,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const locale = getLocale();
     const pageUrl = `${SITE_URL}${pathname}`;
     const canonical = new URL(`${SITE_URL}${deLocalizeHref(pathname)}`);
-    const iosLike =
-        typeof navigator !== "undefined" &&
-        isIosLike(navigator.userAgent, navigator.maxTouchPoints ?? 0);
+    const hasNavigator = typeof navigator !== "undefined";
+    const iosLike = hasNavigator && isIosLike(navigator.userAgent, navigator.maxTouchPoints ?? 0);
+    const inAppBrowser = hasNavigator && isInAppBrowser(navigator.userAgent);
 
     return (
         <html lang={locale}>
@@ -221,7 +221,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <StorageBanner health={storageHealth} />
                     {/* iOS is decided at this composition root and passed down, so
                         the hint component reads no browser global of its own. */}
-                    <SoundHint iosLike={iosLike} />
+                    <SoundHint iosLike={iosLike} inAppBrowser={inAppBrowser} />
                     {children}
                 </ServicesProvider>
                 <ScrollRestoration />

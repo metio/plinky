@@ -22,6 +22,11 @@ export function preferPlaybackSession(nav: unknown): boolean {
     if (!session || typeof session.type !== "string") {
         return false;
     }
+    if (session.type === "playback") {
+        // Already declared — assigning again would needlessly re-negotiate the audio
+        // route, so this stays cheap enough to call on every gesture and recovery.
+        return true;
+    }
     try {
         session.type = "playback";
         return true;
@@ -31,12 +36,20 @@ export function preferPlaybackSession(nav: unknown): boolean {
     }
 }
 
-let sessionConfigured = false;
+// Re-assert the playback session; a no-op once it is already set. Guarded here so
+// both the gesture path and the interruption-recovery path can call it freely.
+function configureSession(): void {
+    if (typeof navigator !== "undefined") {
+        preferPlaybackSession(navigator);
+    }
+}
 
 // A context suspended by an interruption — a phone call, Siri, a route change, the
 // tab going to the background — must be nudged back to running or the next sound is
-// lost. Only worth attempting while the page is visible; a resume that iOS still
-// gates behind a gesture is a harmless no-op until the next tap re-runs unlock().
+// lost. iOS may also drop the playback session across the interruption, so re-assert
+// it before resuming. Only worth attempting while the page is visible; a resume that
+// iOS still gates behind a gesture is a harmless no-op until the next tap re-runs
+// unlock().
 function nudge(): void {
     if (!sharedContext || sharedContext.state === "running") {
         return;
@@ -44,6 +57,7 @@ function nudge(): void {
     if (typeof document !== "undefined" && document.visibilityState !== "visible") {
         return;
     }
+    configureSession();
     sharedContext.resume().catch(() => {});
 }
 
@@ -165,15 +179,10 @@ export const webAudioEngine: AudioEngine = {
         if (!ctx) {
             return;
         }
-        // Configure the session once (repeated assignment would re-negotiate the
-        // audio route on every gesture); resume and prime on every call so a tap
-        // after an interruption re-wakes a context iOS had suspended.
-        if (!sessionConfigured) {
-            sessionConfigured = true;
-            if (typeof navigator !== "undefined") {
-                preferPlaybackSession(navigator);
-            }
-        }
+        // Re-assert the session, resume, and prime on every call so a tap after an
+        // interruption re-wakes a context iOS had suspended and reinstates the
+        // playback session iOS may have dropped. configureSession no-ops once set.
+        configureSession();
         ctx.resume().catch(() => {});
         prime(ctx);
     },

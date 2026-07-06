@@ -16,3 +16,26 @@ export function isIosLike(userAgent: string, maxTouchPoints: number): boolean {
     }
     return userAgent.includes("Macintosh") && maxTouchPoints > 1;
 }
+
+// User-agent tokens the big social/mail apps add to their embedded (WKWebView)
+// browser. On iOS such an in-app browser often withholds the audio-session API and
+// applies stricter gesture rules, so Web Audio stays silent no matter what the app
+// does — the only cure is opening the page in real Safari. Heuristic by nature: a
+// substring match on the tokens these apps are known to append.
+const IN_APP_BROWSER_TOKENS = [
+    "Instagram",
+    "FBAN",
+    "FBAV",
+    "FB_IAB",
+    "Line/",
+    "Snapchat",
+    "Pinterest",
+    "TikTok",
+    "musical_ly",
+    "Bytedance",
+    "GSA/",
+];
+
+export function isInAppBrowser(userAgent: string): boolean {
+    return IN_APP_BROWSER_TOKENS.some((token) => userAgent.includes(token));
+}

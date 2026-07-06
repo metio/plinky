@@ -208,7 +208,10 @@ browser audio under **Silent Mode**, so Plinky declares itself a playback audio
 session (iOS 16.4+) to play through it like a music app, and re-wakes sound after a
 call or app switch interrupts it. On an older iPhone, or if you still hear nothing,
 turn Silent Mode off (the side switch, or the Action button on iPhone 15 Pro and
-later) and turn the volume up — Plinky shows a one-time reminder on iOS.
+later) and turn the volume up — Plinky shows a one-time reminder on iOS. Opening
+Plinky from inside a social app (Instagram, TikTok, Facebook, …) runs it in an
+embedded browser that blocks sound outright; there the reminder points you to open
+the page in Safari instead.
 
 Plinky installs from your browser like an app and works offline once loaded.
 

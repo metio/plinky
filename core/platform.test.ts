@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { isIosLike } from "./platform";
+import { isInAppBrowser, isIosLike } from "./platform";
 
 const IPHONE =
     "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
@@ -28,5 +28,24 @@ describe("isIosLike", () => {
 
     it("does not treat a touch Android device as iOS", () => {
         expect(isIosLike(ANDROID, 5)).toBe(false);
+    });
+});
+
+describe("isInAppBrowser", () => {
+    it("flags the Instagram in-app browser", () => {
+        expect(isInAppBrowser(`${IPHONE} Instagram 300.0.0.0`)).toBe(true);
+    });
+
+    it("flags the Facebook in-app browser by its FBAN/FBAV tokens", () => {
+        expect(isInAppBrowser(`${IPHONE} [FBAN/FBIOS;FBAV/400.0.0.0]`)).toBe(true);
+    });
+
+    it("flags the TikTok in-app browser", () => {
+        expect(isInAppBrowser(`${IPHONE} musical_ly_2023 BytedanceWebview/d8a21c`)).toBe(true);
+    });
+
+    it("treats plain Safari and Chrome as normal browsers", () => {
+        expect(isInAppBrowser(IPHONE)).toBe(false);
+        expect(isInAppBrowser(ANDROID)).toBe(false);
     });
 });

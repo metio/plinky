@@ -36,8 +36,11 @@ export function useAudioUnlock(): boolean {
             setInteracted(true);
         };
         const onVisible = () => {
+            // A tab returning to the foreground re-asserts the session and resumes,
+            // but is not a user gesture, so it must not flip `interacted` and pop the
+            // hint on a cold load; only a real gesture counts as engagement.
             if (document.visibilityState === "visible") {
-                audio.resume();
+                audio.unlock();
             }
         };
         for (const type of GESTURES) {
