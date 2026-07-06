@@ -3,9 +3,10 @@
   "extends": ["github>metio/renovate-config"],
   "packageRules": [
     {
-      "matchPackageNames": ["playwright", "mcr.microsoft.com/playwright"],
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["playwright"],
       "groupName": "playwright",
-      "description": "Bump the Playwright library and the CI/dev image (its baked browsers must match) in one PR."
+      "description": "Isolate the playwright npm bump in its own PR instead of the shared js group. The vitest browser + a11y gates drive the chromium baked into the nix closure (PLAYWRIGHT_BROWSERS_PATH — nixpkgs' playwright-driver, inherited through the ci flake input), so a playwright ahead of that driver looks for a chromium revision absent from the store and fails the browser gate. With automerge gated on that check the bump can't land early — it simply waits. When a ci-input update advances the driver, rebaseWhen (behind-base-branch) brings this PR up to date, the gate goes green and it automerges. Own group so that transient red never blocks the other javascript dependencies."
     }
   ]
 }
