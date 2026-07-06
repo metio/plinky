@@ -138,6 +138,37 @@ describe("ScoreViewer", () => {
         ).toBeTruthy();
     });
 
+    it("keeps a tempo-locked run alive when fingering numbers are toggled mid-play", async () => {
+        // Toggling the on-staff fingering re-renders the score. The run — its cursor, its
+        // scheduled ticks and its progress — must survive: a reload here would tear the
+        // timers down yet leave the run "running", stranding the metronome with the button
+        // stuck on Stop and no grade ever recorded.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await screen.findByRole("button", { name: "Practice" });
+        await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
+            timeout: 30000,
+        });
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        // Flip the fingering on while the run counts in — the switch it toggles used to be a
+        // dependency of the reload effect, so this is exactly the mid-run redraw to survive.
+        const fingers = await screen.findByRole("button", { name: "Finger position numbers" });
+        expect(fingers.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(fingers);
+        expect(
+            screen
+                .getByRole("button", { name: "Finger position numbers" })
+                .getAttribute("aria-pressed"),
+        ).toBe("true");
+        // The run still counts in, plays to the end and reports the tally.
+        expect(
+            await screen.findByText(/kept up with 0 of/i, undefined, { timeout: 30000 }),
+        ).toBeTruthy();
+    });
+
     it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });

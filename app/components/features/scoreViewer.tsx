@@ -384,9 +384,13 @@ export function ScoreViewer({
     const [treadmill, setTreadmill] = useState(() => prefsStore.load().treadmill);
     const [raceGhost, setRaceGhost] = useState(() => prefsStore.load().raceGhost);
     // Print the suggested fingering numbers on the staff. Seeded from the saved default
-    // (off), flipped live by the in-play toggle; drives the render, so a change reloads the
-    // annotated score.
+    // (off), flipped live by the in-play toggle. The numbers are always baked into the
+    // loaded sheet; the toggle only flips whether OSMD draws them, applied with a re-render
+    // (not a reload) so it can go on and off mid-play without tearing down a run. The ref
+    // carries the live value into the render's constructor when another input reloads.
     const [showFingerings, setShowFingerings] = useState(() => prefsStore.load().showFingerings);
+    const showFingeringsRef = useRef(showFingerings);
+    showFingeringsRef.current = showFingerings;
     // Whether the staff scrolls to keep the played note in view. On by default; the
     // treadmill drives its own centring, so OSMD's follow is off there. Applied straight to
     // OSMD (no reload), so the ref carries the live value into the render's constructor.
@@ -978,6 +982,7 @@ export function ScoreViewer({
                             RenderXMeasuresPerLineAkaSystem: number;
                             RenderMeasureNumbers: boolean;
                             RenderMeasureNumbersOnlyAtSystemStart: boolean;
+                            RenderFingerings: boolean;
                         };
                     }
                 ).rules;
@@ -989,21 +994,24 @@ export function ScoreViewer({
                 // the numbers around as the score re-flows.
                 rules.RenderMeasureNumbers = barNumbers;
                 rules.RenderMeasureNumbersOnlyAtSystemStart = true;
-                // Print suggested fingering on the staff, personalised to the
-                // player's reach, unless they've turned hints off — so the suggestion
-                // sits on the note being read, not mapped onto a key.
-                // Transpose first, then annotate, so the printed fingering is
-                // computed for the key actually being played.
+                // Whether the printed fingering is drawn. The numbers are always baked into
+                // the sheet below, so flipping this rule and re-rendering shows or hides them
+                // without a reload — see the fingering-toggle effect. Set from a ref so a
+                // reload driven by another input still honours the live toggle.
+                rules.RenderFingerings = showFingeringsRef.current;
+                // Suggested fingering belongs on the staff, personalised to the player's
+                // reach, so the suggestion sits on the note being read, not mapped onto a
+                // key. Transpose first, then annotate, so the printed fingering is computed
+                // for the key actually being played. It is always baked in — drawn or not
+                // per the rule above — so the toggle can redraw rather than reload.
                 const transposed =
                     transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
-                const source = showFingerings
-                    ? annotateFingerings(
-                          xmlCodec,
-                          transposed,
-                          prefsStore.load().handSpan,
-                          showMine ? saved : undefined,
-                      )
-                    : transposed;
+                const source = annotateFingerings(
+                    xmlCodec,
+                    transposed,
+                    prefsStore.load().handSpan,
+                    showMine ? saved : undefined,
+                );
                 return osmd.load(source).then(() => {
                     if (!cancelled) {
                         osmd.render();
@@ -1055,7 +1063,39 @@ export function ScoreViewer({
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill, showFingerings]);
+    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill]);
+
+    // Toggle the on-staff fingering with a re-render, not a reload. The numbers are always
+    // baked into the loaded sheet, so flipping OSMD's RenderFingerings rule and redrawing
+    // shows or hides them while the loaded sheet, the cursor's place and any run in progress
+    // all survive — the player can switch fingering on and off mid-play. The reload effect
+    // sets the rule to the live toggle on every fresh render, so this acts only on a real
+    // change and never fires a redundant render straight after a reload.
+    useEffect(() => {
+        const osmd = osmdRef.current;
+        if (!osmd || !ready) {
+            return;
+        }
+        const rules = (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules;
+        if (rules.RenderFingerings === showFingerings) {
+            return;
+        }
+        rules.RenderFingerings = showFingerings;
+        osmd.render();
+        // A fresh render carries no measure boxes or overlay: re-measure the bars for the
+        // loop selection and click-to-select, repaint the overlay, and drop the paint flag.
+        const svg = containerRef.current?.querySelector("svg");
+        measureBoxesRef.current =
+            svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
+        paintedRef.current = false;
+        // render() clears the graphical cursor but keeps its iterator in place; redraw it
+        // where it stood when a run or Listen is using it, and re-centre the treadmill.
+        if (!osmd.cursor.hidden) {
+            osmd.cursor.show();
+            centerCursor();
+        }
+        paintLoopSelection();
+    }, [showFingerings, ready, centerCursor, paintLoopSelection]);
 
     // Walk the cursor one voice-entry at a time, sounding the notes under it and
     // waiting their notated duration at the chosen tempo.
