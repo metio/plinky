@@ -103,6 +103,83 @@ describe("gradeOf", () => {
     });
 });
 
+describe("midiOf reads pitch, accidental and defaults", () => {
+    const one = (pitch: string) =>
+        parsePositions(domXmlCodec, score(`<note><pitch>${pitch}</pitch><duration>2</duration></note>`))
+            .right;
+
+    it("raises a sharp and lowers a flat by a semitone", () => {
+        expect(one("<step>C</step><alter>1</alter><octave>4</octave>")).toEqual([[61]]);
+        expect(one("<step>D</step><alter>-1</alter><octave>4</octave>")).toEqual([[61]]);
+    });
+
+    it("trims whitespace around the step name", () => {
+        expect(one("<step> C </step><octave>4</octave>")).toEqual([[60]]);
+    });
+
+    it("defaults a missing octave to 4 rather than to 0 or a throw", () => {
+        expect(one("<step>C</step>")).toEqual([[60]]);
+    });
+
+    it("skips a pitch with no step, and one whose step names no class, without throwing", () => {
+        const noStep = `<note><pitch><octave>4</octave></pitch><duration>2</duration></note>`;
+        expect(parsePositions(domXmlCodec, score(noStep + note("E", 4))).right).toEqual([[64]]);
+        expect(parsePositions(domXmlCodec, score(note("H", 4) + note("E", 4))).right).toEqual([[64]]);
+    });
+});
+
+describe("parsePositions groups and splits precisely", () => {
+    it("trims whitespace around the staff number", () => {
+        const xml = score(
+            `<note><pitch><step>C</step><octave>2</octave></pitch><duration>2</duration><staff> 2 </staff></note>`,
+        );
+        expect(parsePositions(domXmlCodec, xml)).toEqual({ right: [], left: [[36]] });
+    });
+
+    it("starts a fresh position for a chord marker with nothing before it", () => {
+        // A leading <chord/> has no position to join, so it opens one instead of
+        // indexing off the end of an empty hand.
+        const xml = score(
+            `<note><chord/><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration></note>` +
+                note("E", 4, undefined, true),
+        );
+        expect(parsePositions(domXmlCodec, xml).right).toEqual([[60, 64]]);
+    });
+});
+
+describe("gradeOf caches and averages", () => {
+    it("memoises by id, ignoring any later xml for the same id", () => {
+        const gentle = score([60, 62, 64, 65, 67].map(noteFor).join(""));
+        const brutal = score([36, 84, 40, 80].map(noteFor).join(""));
+        const first = gradeOf(domXmlCodec, "cache-probe", gentle);
+        // The second call must return the cached grade, not re-grade the brutal score.
+        expect(gradeOf(domXmlCodec, "cache-probe", brutal)).toBe(first);
+    });
+
+    it("does not bucket a non-empty balanced two-hand score at the ceiling", () => {
+        const xml = score(
+            note("C", 4, 1) + note("E", 4, 1) + note("C", 2, 2) + note("E", 2, 2),
+        );
+        expect(gradeOf(domXmlCodec, "balanced", xml)).toBeLessThan(MAX_GRADE);
+    });
+
+    it("keeps a long gentle line at grade 1 — length must not inflate the cost", () => {
+        const long = score(Array.from({ length: 40 }, (_, i) => noteFor(60 + (i % 5))).join(""));
+        expect(gradeOf(domXmlCodec, "long-gentle", long)).toBe(1);
+    });
+
+    it("grades a relentless wide-leap piece above grade 1", () => {
+        const brutal = score([36, 84, 40, 80, 45, 76, 48, 72].map(noteFor).join(""));
+        expect(gradeOf(domXmlCodec, "brutal-probe", brutal)).toBeGreaterThan(1);
+    });
+
+    it("grades hard scales and arpeggios above grade 1 on their own scales", () => {
+        const wide = score([48, 72, 50, 74, 52, 76].map(noteFor).join(""));
+        expect(gradeOf(domXmlCodec, "scale-wide", wide)).toBeGreaterThan(1);
+        expect(gradeOf(domXmlCodec, "arpeggio-wide", wide)).toBeGreaterThan(1);
+    });
+});
+
 // Build a <note> from a MIDI pitch (C major only, enough for the test pitches).
 function noteFor(midi: number): string {
     const names = ["C", "C", "D", "D", "E", "F", "F", "G", "G", "A", "A", "B"];

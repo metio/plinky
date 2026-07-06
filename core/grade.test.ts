@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { computeGrade, type Grade, letterFor, parseGrade, scoreKeepUp } from "./grade";
+import { computeGrade, GRADE_COLOR, type Grade, letterFor, parseGrade, scoreKeepUp } from "./grade";
 
 const PERFECT_RHYTHM = { perfect: 10, good: 0, off: 0, total: 10, averageAbsMs: 0 };
 
@@ -63,6 +63,66 @@ describe("parseGrade", () => {
         const missingFlow: Record<string, unknown> = { ...valid };
         delete missingFlow.flow;
         expect(parseGrade(missingFlow)).toBeNull();
+    });
+
+    it("accepts each of the seven grade letters", () => {
+        // Every letter must round-trip: a hole in the LETTERS list would reject a
+        // legitimately-stored grade as unparseable.
+        for (const letter of ["S", "A", "B", "C", "D", "E", "F"] as const) {
+            expect(parseGrade({ ...valid, letter })).toEqual({ ...valid, letter });
+        }
+    });
+
+    it("rejects a dynamics that is neither null nor a finite number", () => {
+        expect(parseGrade({ ...valid, dynamics: "70" })).toBeNull();
+        expect(parseGrade({ ...valid, dynamics: Number.NaN })).toBeNull();
+    });
+});
+
+describe("GRADE_COLOR", () => {
+    it("maps every letter to its contrast-safe light/dark colour classes", () => {
+        expect(GRADE_COLOR).toEqual({
+            S: "text-amber-500 dark:text-amber-300",
+            A: "text-green-600 dark:text-green-400",
+            B: "text-lime-600 dark:text-lime-400",
+            C: "text-yellow-600 dark:text-yellow-400",
+            D: "text-orange-600 dark:text-orange-400",
+            E: "text-red-600 dark:text-red-400",
+            F: "text-red-800 dark:text-red-500",
+        });
+    });
+});
+
+describe("computeGrade timing weighting", () => {
+    const rhythm = (perfect: number, good: number, off: number) => ({
+        perfect,
+        good,
+        off,
+        total: perfect + good + off,
+        averageAbsMs: 0,
+    });
+
+    it("credits a good note 0.6 and an off note 0, over every graded note", () => {
+        // (2 + 2*0.6) / (2 + 2 + 2) * 100 = 53.
+        const grade = computeGrade({
+            correct: 6,
+            wrong: 0,
+            rhythm: rhythm(2, 2, 2),
+            flow: 100,
+            dynamics: null,
+        });
+        expect(grade.timing).toBe(53);
+    });
+
+    it("is a full 100 when a played run had no rhythm-graded notes", () => {
+        const grade = computeGrade({
+            correct: 3,
+            wrong: 0,
+            rhythm: rhythm(0, 0, 0),
+            flow: 100,
+            dynamics: null,
+        });
+        expect(grade.timing).toBe(100);
     });
 });
 
