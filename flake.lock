@@ -1,21 +1,21 @@
 {
   "nodes": {
-    "ci": {
+    "devshell": {
       "inputs": {
         "flake-compat": "flake-compat",
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1783365578,
-        "narHash": "sha256-QKxrW49kEQNIjRdfBiZIKovk1FK+jknOBsGSW3283jo=",
+        "lastModified": 1783367782,
+        "narHash": "sha256-7/6160miyw7UATMxGFo+ZKUB2VC6dVFjAAYI3rM6D8c=",
         "owner": "metio",
-        "repo": "ci",
-        "rev": "c15591ce6feac9e474fcef409e112e98981e6476",
+        "repo": "nix-devshell",
+        "rev": "9bbba31438253f49b9a9f9c5dde4caf74db81e99",
         "type": "github"
       },
       "original": {
         "owner": "metio",
-        "repo": "ci",
+        "repo": "nix-devshell",
         "type": "github"
       }
     },
@@ -52,9 +52,9 @@
     },
     "root": {
       "inputs": {
-        "ci": "ci",
+        "devshell": "devshell",
         "nixpkgs": [
-          "ci",
+          "devshell",
           "nixpkgs"
         ]
       }
