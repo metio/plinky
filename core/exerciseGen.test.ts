@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { buildExerciseId, EXERCISE_TILES, generateExercise, parseExerciseId } from "./exerciseGen";
+import {
+    buildExerciseId,
+    EXERCISE_TILES,
+    exerciseTitle,
+    generateExercise,
+    parseExerciseId,
+} from "./exerciseGen";
 
 describe("exercise ids", () => {
     it("round-trips canonical base ids unchanged", () => {
@@ -143,6 +149,45 @@ describe("generateExercise", () => {
             interval: "single",
         });
         expect((both.match(/<part id=/g) ?? []).length).toBe(2);
+    });
+
+    it("mirrors the hands in contrary motion, the left descending from the tonic", () => {
+        const contrary = generateExercise({
+            type: "major-scale",
+            key: "c",
+            octaves: 1,
+            hands: "contrary",
+            inversion: 0,
+            interval: "single",
+        });
+        const parallel = generateExercise({
+            type: "major-scale",
+            key: "c",
+            octaves: 1,
+            hands: "both",
+            inversion: 0,
+            interval: "single",
+        });
+        // Two staves, and the mirrored left hand makes it differ from parallel both-hands.
+        expect((contrary.match(/<part id=/g) ?? []).length).toBe(2);
+        expect(contrary).not.toBe(parallel);
+    });
+
+    it("falls back to both hands for an arpeggio in contrary motion (contrary is scale-only)", () => {
+        // An arpeggio has no contrary form, so it must render as both hands in parallel
+        // rather than doubling the treble line onto the bass staff — and say so.
+        const base = {
+            type: "major-arpeggio",
+            key: "c",
+            octaves: 1,
+            inversion: 0,
+            interval: "single",
+        } as const;
+        expect(generateExercise({ ...base, hands: "contrary" })).toBe(
+            generateExercise({ ...base, hands: "both" }),
+        );
+        expect(exerciseTitle({ ...base, hands: "contrary" })).toContain("both hands");
+        expect(exerciseTitle({ ...base, hands: "contrary" })).not.toContain("contrary");
     });
 
     it("sounds two notes per position in a scale in thirds (C+E)", () => {

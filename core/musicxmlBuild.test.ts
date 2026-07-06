@@ -60,4 +60,21 @@ describe("buildScore", () => {
         expect(bassBars.length).toBe(2);
         expect(bassBars[1]).toEqual([[43], [43], [43], [43]]); // four G2 (MIDI 43) positions
     });
+
+    it("rewinds the bass by the treble's real duration when the final measure is partial", () => {
+        // Five quarters per hand: a full first bar, then a one-quarter second bar.
+        const treble = [q("C", 5), q("D", 5), q("E", 5), q("F", 5), q("G", 5)];
+        const bass = [q("C", 3), q("D", 3), q("E", 3), q("F", 3), q("G", 3)];
+        const xml = buildScore({ title: "Partial", fifths: 0, beatsPerBar: 4, treble, bass });
+        // The full first bar rewinds a whole bar (8 divisions); the partial final bar holds
+        // one quarter, so it rewinds only 2. A fixed full-bar backup there would rewind
+        // before the bar start and desync the bass from the treble.
+        expect(xml).toContain("<backup><duration>8</duration></backup>");
+        expect(xml).toContain("<backup><duration>2</duration></backup>");
+        expect(scoreToBars(domXmlCodec, xml, staffFor("right")).length).toBe(2);
+        expect(scoreToBars(domXmlCodec, xml, staffFor("left"))).toEqual([
+            [[48], [50], [52], [53]], // C3 D3 E3 F3
+            [[55]], // G3
+        ]);
+    });
 });

@@ -312,6 +312,12 @@ ${bodies}
 }
 
 const isScale = (type: ExerciseType): boolean => type.endsWith("-scale");
+// Contrary motion — right ascending, left descending from the same tonic — is a mirror
+// of the same line, which is defined only for scales. An arpeggio has no such contrary
+// form, so it falls back to both hands in parallel; normalising here keeps the rendered
+// score and its title in agreement and avoids doubling the treble line onto the bass staff.
+const effectiveHands = (config: ExerciseConfig): Hands =>
+    config.hands === "contrary" && !isScale(config.type) ? "both" : config.hands;
 function context(type: ExerciseType, key: string): { tonic: string; fifths: number } {
     const minor =
         type === "natural-minor-scale" ||
@@ -337,19 +343,20 @@ export function generateExercise(config: ExerciseConfig): string {
         ? doubleStops(config.type, tonic, fx, config.octaves, config.interval === "thirds" ? 2 : 5)
         : line.map((note) => [note]);
     const title = exerciseTitle(config);
+    const hands = effectiveHands(config);
     let parts: Part[];
-    if (config.hands === "left") {
+    if (hands === "left") {
         parts = [{ id: "P1", clef: "F", positions: shiftPositions(main, -2) }];
-    } else if (config.hands === "both") {
+    } else if (hands === "both") {
         parts = [
             { id: "P1", clef: "G", positions: main },
             { id: "P2", clef: "F", positions: shiftPositions(main, -2) },
         ];
-    } else if (config.hands === "contrary") {
-        // Both start on the tonic and mirror: right ascends, left descends.
-        const down = isScale(config.type)
-            ? turn(diatonic(tonic, fx, config.octaves, -1), diatonic(tonic, fx, config.octaves, -1))
-            : line;
+    } else if (hands === "contrary") {
+        // Both hands start on the tonic and mirror: right ascends, left descends. Only
+        // scales reach here — effectiveHands sends an arpeggio down the "both" branch.
+        const descending = diatonic(tonic, fx, config.octaves, -1);
+        const down = turn(descending, descending);
         parts = [
             { id: "P1", clef: "G", positions: main },
             { id: "P2", clef: "F", positions: down.map((note) => [note]) },
@@ -374,13 +381,14 @@ const SCALE_LABEL: Record<string, string> = {
 
 export function exerciseTitle(config: ExerciseConfig): string {
     const parts = [`${niceKey(config.key)} ${SCALE_LABEL[config.type]}`];
+    const hands = effectiveHands(config);
     const forms: string[] = [];
     if (config.interval === "thirds") forms.push("in thirds");
     if (config.interval === "sixths") forms.push("in sixths");
     if (config.octaves === 2) forms.push("2 octaves");
-    if (config.hands === "left") forms.push("left hand");
-    if (config.hands === "both") forms.push("both hands");
-    if (config.hands === "contrary") forms.push("contrary motion");
+    if (hands === "left") forms.push("left hand");
+    if (hands === "both") forms.push("both hands");
+    if (hands === "contrary") forms.push("contrary motion");
     if (config.inversion === 1) forms.push("1st inversion");
     if (config.inversion === 2) forms.push("2nd inversion");
     return forms.length ? `${parts[0]} · ${forms.join(", ")}` : parts[0]!;

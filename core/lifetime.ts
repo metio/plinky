@@ -22,8 +22,6 @@ const ALPHA = 0.25;
 const MAX_DAYS = 14;
 export const PROGRESS_COLUMNS = 6;
 
-const EMPTY: Lifetime = { days: [] };
-
 function isSkill(value: unknown): value is Skill {
     if (!value || typeof value !== "object") {
         return false;
@@ -50,10 +48,12 @@ function blend(previous: Skill, run: Skill): Skill {
 
 // Coerce a parsed stored value into a well-formed Lifetime: a malformed skill
 // would otherwise crash the EMA blend in foldRun or yield a NaN progress grid.
+// Every path returns a fresh object so a caller that mutates the result can't
+// corrupt a shared default for the next reader.
 export function normalizeLifetime(parsed: unknown): Lifetime {
     const value = parsed as Lifetime | null;
     if (!value || !Array.isArray(value.days)) {
-        return EMPTY;
+        return { days: [] };
     }
     const days = value.days.filter(
         (day) => day && typeof day.date === "string" && isSkill(day.skill),

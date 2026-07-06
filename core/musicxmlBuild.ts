@@ -96,7 +96,6 @@ function attributesXml(spec: ScoreSpec): string {
 export function buildScore(spec: ScoreSpec): string {
     const trebleMeasures = intoMeasures(spec.treble, spec.beatsPerBar);
     const bassMeasures = spec.bass ? intoMeasures(spec.bass, spec.beatsPerBar) : null;
-    const backup = spec.beatsPerBar * DIVISIONS;
     // Span the longer hand so a bass line that outlasts the treble isn't truncated.
     const measureCount = Math.max(trebleMeasures.length, bassMeasures?.length ?? 0);
     const measures = Array.from({ length: measureCount }, (_, index) => {
@@ -109,11 +108,19 @@ export function buildScore(spec: ScoreSpec): string {
         let body = `${attributes}${treble}`;
         if (bassMeasures) {
             const bass = (bassMeasures[index] ?? []).map((note) => noteXml(note, 2)).join("\n");
-            // The backup rewinds the cursor over the treble notes so the bass staff starts
-            // at the same beat. An empty treble measure leaves the cursor at the bar start,
-            // so no backup is needed — and emitting one there would rewind before the bar.
+            // The backup rewinds the cursor over exactly the treble notes just written, so
+            // the bass staff starts at the same beat. Rewinding a fixed bar instead would
+            // over-rewind a partial (pickup or short final) measure to before the bar start.
+            // An empty treble measure needs no backup — the cursor is already at the bar
+            // start, and emitting one there would rewind before it.
+            const trebleDivisions = trebleNotes.reduce(
+                (sum, note) => sum + RHYTHM[note.value].divisions,
+                0,
+            );
             const rewind =
-                trebleNotes.length > 0 ? `\n      <backup><duration>${backup}</duration></backup>` : "";
+                trebleDivisions > 0
+                    ? `\n      <backup><duration>${trebleDivisions}</duration></backup>`
+                    : "";
             body += `${rewind}\n${bass}`;
         }
         return `    <measure number="${number}">\n${body}\n    </measure>`;

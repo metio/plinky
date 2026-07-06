@@ -4,6 +4,10 @@
 import { todayKey } from "./daily";
 
 // Notes practiced per day, keyed by local calendar date (YYYY-MM-DD), matching todayKey.
+// Every practice day is retained: totalNotes and daysPracticed are lifetime aggregates
+// over the whole map, so an old day can't be pruned without corrupting them. One small
+// number per calendar day keeps the map well within the storage budget for a lifetime of
+// practice, so unlike the fixed-window lifetime fingerprint this map is not capped.
 export type History = Record<string, number>;
 
 export type PracticeSummary = {
