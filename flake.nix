@@ -14,8 +14,11 @@
 # (patched for the nix store, self-contained — no `playwright install --with-deps`
 # and no registry image), wired through PLAYWRIGHT_BROWSERS_PATH for both the
 # vitest browser project and dev/a11y.mjs. Its browser revision is fixed by the
-# nixpkgs pin, so the `playwright` npm dependency is held to the matching version
-# (Renovate lock-maintenance bumps nixpkgs; a paired npm bump follows).
+# nixpkgs pin (inherited through the `ci` input), so the `playwright` npm
+# dependency must match that driver version. Both stay Renovate-owned: a `ci`
+# input update advances the driver, and the `playwright` npm bump self-gates on
+# the browser check — a version ahead of the driver fails it and waits for the
+# next driver bump to rebase green, so the two converge without a manual edit.
 {
   description = "Plinky: a client-only React Router SPA for learning the piano";
 
