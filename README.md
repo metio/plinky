@@ -53,10 +53,11 @@ numbers** on each row's first bar make a passage easy to find (and line up with 
 loop's from/to), or you can turn them off for a cleaner staff. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
-Single notes, **chords**, and **two-hand grand staffs** all work the same. To drill a
-tricky passage, **tap a bar to start a loop and another to end it** — the chosen bars
-fill **red** so the stretch you're repeating is clear (or set the first and last bar by
-number). Turn on
+Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
+**Loop** and the piece repeats whole; to drill just a passage, **tap two bars on the
+score** — they fill **red** so the stretch you're repeating is clear, and the range
+(with a *Whole song* reset) sits right beside the score, so you can also set the first
+and last bar by number. Turn on
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
 score along, so one hand's slip never stops the other.
 
@@ -191,7 +192,7 @@ a student.
 - **With the on-screen piano** — tap the keys shown under each score. On a wide-ranging
   piece the keyboard shows a moving window that follows the notes you're playing, so the
   keys never shrink to slivers; set its width — **1, 2 or 3 octaves, or the whole piece**
-  fixed — under *More options*. Handy on a phone or tablet with no MIDI or keyboard.
+  fixed — in the *Practice tools* drawer. Handy on a phone or tablet with no MIDI or keyboard.
 
 Still learning where the notes are? The keys can carry their **note names** — every key,
 or just the C keys as orientation landmarks (the white key left of each pair of black
