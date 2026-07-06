@@ -10,6 +10,7 @@ export type FakeAudioEngine = AudioEngine & {
     strikes: NoteStrike[];
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
     resumed: number;
+    unlocked: number;
     // The fake audio clock, advanced by the test.
     time: number;
 };
@@ -19,12 +20,16 @@ export function fakeAudioEngine(): FakeAudioEngine {
         strikes: [],
         clicks: [],
         resumed: 0,
+        unlocked: 0,
         time: 0,
         now() {
             return engine.time;
         },
         resume() {
             engine.resumed += 1;
+        },
+        unlock() {
+            engine.unlocked += 1;
         },
         strike(strike) {
             engine.strikes.push(strike);

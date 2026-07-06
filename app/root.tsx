@@ -17,6 +17,8 @@ import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { StorageBanner } from "./components/features/storageBanner";
+import { SoundHint } from "./components/features/soundHint";
+import { isIosLike } from "../core/platform";
 import { ThemeToggle } from "./components/features/themeToggle";
 import { browserStore, storageHealth } from "./adapters/browserStore";
 import { MidiProvider } from "./contexts/midi";
@@ -156,6 +158,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const locale = getLocale();
     const pageUrl = `${SITE_URL}${pathname}`;
     const canonical = new URL(`${SITE_URL}${deLocalizeHref(pathname)}`);
+    const iosLike =
+        typeof navigator !== "undefined" &&
+        isIosLike(navigator.userAgent, navigator.maxTouchPoints ?? 0);
 
     return (
         <html lang={locale}>
@@ -214,6 +219,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         adapter's health signal so the banner itself stays oblivious
                         to where the signal comes from. */}
                     <StorageBanner health={storageHealth} />
+                    {/* iOS is decided at this composition root and passed down, so
+                        the hint component reads no browser global of its own. */}
+                    <SoundHint iosLike={iosLike} />
                     {children}
                 </ServicesProvider>
                 <ScrollRestoration />

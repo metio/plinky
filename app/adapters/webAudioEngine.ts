@@ -10,6 +10,43 @@ import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
 
 let sharedContext: AudioContext | null = null;
 
+// Declare the page a "playback" audio session so iOS Safari stops routing Web
+// Audio through the ringer channel that Silent Mode mutes — the one clean, first-
+// party way to make the synth audible with the silent switch / Action button on.
+// It is WebKit-only (iOS 16.4+, ~all current iOS users) and a no-op everywhere
+// else, which is fine: no other engine mutes Web Audio for Silent Mode. Takes the
+// navigator as an argument so the decision is testable without a browser global.
+// Returns whether the session type was set.
+export function preferPlaybackSession(nav: unknown): boolean {
+    const session = (nav as { audioSession?: { type?: string } } | null | undefined)?.audioSession;
+    if (!session || typeof session.type !== "string") {
+        return false;
+    }
+    try {
+        session.type = "playback";
+        return true;
+    } catch {
+        // A browser that exposes audioSession read-only still gets the resume path.
+        return false;
+    }
+}
+
+let sessionConfigured = false;
+
+// A context suspended by an interruption — a phone call, Siri, a route change, the
+// tab going to the background — must be nudged back to running or the next sound is
+// lost. Only worth attempting while the page is visible; a resume that iOS still
+// gates behind a gesture is a harmless no-op until the next tap re-runs unlock().
+function nudge(): void {
+    if (!sharedContext || sharedContext.state === "running") {
+        return;
+    }
+    if (typeof document !== "undefined" && document.visibilityState !== "visible") {
+        return;
+    }
+    sharedContext.resume().catch(() => {});
+}
+
 function context(): AudioContext | null {
     if (typeof window === "undefined") {
         return null;
@@ -25,8 +62,35 @@ function context(): AudioContext | null {
         } catch {
             sharedContext = null;
         }
+        // iOS parks the context in "interrupted"/"suspended" across audio
+        // interruptions; recover the moment the browser reports the transition.
+        sharedContext?.addEventListener?.("statechange", nudge);
     }
     return sharedContext;
+}
+
+// The context only needs the silent priming buffer once — the first gesture that
+// plays it moves iOS Safari's context out of suspended for the rest of the visit.
+let primed = false;
+
+// Play a one-sample silent buffer. Some iOS versions only transition a context to
+// `running` once a buffer has actually started, so this rides alongside resume()
+// on the first gesture. A browser that refuses the source still got the resume.
+function prime(ctx: AudioContext): void {
+    if (primed) {
+        return;
+    }
+    primed = true;
+    try {
+        const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        source.start(0);
+    } catch {
+        // Leave `primed` true: a browser that rejects the buffer source will
+        // reject a retry too, and resume() is what matters on it anyway.
+    }
 }
 
 // A piano-like voice synthesized in the Web Audio graph (no sample assets, so it
@@ -95,6 +159,23 @@ export const webAudioEngine: AudioEngine = {
         context()
             ?.resume()
             .catch(() => {});
+    },
+    unlock() {
+        const ctx = context();
+        if (!ctx) {
+            return;
+        }
+        // Configure the session once (repeated assignment would re-negotiate the
+        // audio route on every gesture); resume and prime on every call so a tap
+        // after an interruption re-wakes a context iOS had suspended.
+        if (!sessionConfigured) {
+            sessionConfigured = true;
+            if (typeof navigator !== "undefined") {
+                preferPlaybackSession(navigator);
+            }
+        }
+        ctx.resume().catch(() => {});
+        prime(ctx);
     },
     strike(note) {
         const ctx = context();

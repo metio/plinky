@@ -202,6 +202,14 @@ Every keyboard shows a small badge in its corner — a green tick the moment a M
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your
 instrument is hooked up.
 
+Sound is synthesised in the browser, so the on-screen and computer keyboards make
+sound everywhere — MIDI is only for *input* from a real piano. iPhones normally mute
+browser audio under **Silent Mode**, so Plinky declares itself a playback audio
+session (iOS 16.4+) to play through it like a music app, and re-wakes sound after a
+call or app switch interrupts it. On an older iPhone, or if you still hear nothing,
+turn Silent Mode off (the side switch, or the Action button on iPhone 15 Pro and
+later) and turn the volume up — Plinky shows a one-time reminder on iOS.
+
 Plinky installs from your browser like an app and works offline once loaded.
 
 ## How it works

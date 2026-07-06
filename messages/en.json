@@ -134,6 +134,7 @@
   "action_remove_confirm": "Remove?",
   "action_dismiss": "Dismiss",
   "storage_write_failed": "This device's storage is full or blocked — new progress isn't being saved.",
+  "sound_ios_hint": "No sound? On iPhone, turn off Silent Mode (the side switch, or the Action button on newer models) and turn the volume up.",
   "coach_play_modes": "Three ways to work a piece: Play reads the score, Ear trains you to find notes by sound, and Finger Position sorts out which finger goes where. Switch any time.",
   "coach_practice_loop": "New here? Press Listen to hear the piece, then play along slowly. If you slip, keep going — you don't have to start over.",
   "more_options": "Practice tools",

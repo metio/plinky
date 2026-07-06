@@ -25,6 +25,12 @@ export interface AudioEngine {
     // Ask the engine to leave the suspended state browsers park audio in until
     // a user gesture. Best-effort.
     resume(): void;
+    // Wake audio from inside a user gesture: resume the context and play a silent
+    // buffer through it. iOS Safari parks a freshly opened context suspended until
+    // a gesture actually plays something, and a resume() alone does not always
+    // move it to running there — the silent buffer does. Call once on the first
+    // pointer/key gesture, before any note has been struck. Best-effort.
+    unlock(): void;
     strike(strike: NoteStrike): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;

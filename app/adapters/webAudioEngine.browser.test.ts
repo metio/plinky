@@ -20,6 +20,25 @@ describe("webAudioEngine", () => {
         }).not.toThrow();
     });
 
+    it("unlocks — resumes and primes a silent buffer — without throwing", () => {
+        expect(() => {
+            webAudioEngine.unlock();
+            // A second call must be a cheap no-op on the priming, not a throw.
+            webAudioEngine.unlock();
+        }).not.toThrow();
+    });
+
+    it("declares a playback audio session where the browser exposes one", () => {
+        webAudioEngine.unlock();
+        // WebKit-only (iOS 16.4+); Chromium and Firefox have no audioSession, and
+        // there the assertion simply does not run — the unlock above still must not
+        // have thrown, which is the cross-engine guarantee.
+        const session = (navigator as unknown as { audioSession?: { type?: string } }).audioSession;
+        if (session) {
+            expect(session.type).toBe("playback");
+        }
+    });
+
     it("ignores a zero-gain strike instead of feeding it to a ramp", () => {
         // An exponential ramp to 0 is a RangeError; the engine must drop it.
         expect(() =>
