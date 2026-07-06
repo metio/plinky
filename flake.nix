@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: 0BSD
 
 # The Plinky development environment. It consumes the shared metio devShell
-# (`ci.lib.mkDevShell`), so the lint gate (reuse, typos, yamllint, actionlint,
+# (`devshell.lib.mkDevShell`), so the lint gate (reuse, typos, yamllint, actionlint,
 # shellcheck, markdownlint) is defined once org-wide, and every CI gate runs
 # through `nix develop --command …` — resolving the exact tool versions in
-# flake.lock, identical to a local run. `inputs.nixpkgs.follows = "ci/nixpkgs"`
+# flake.lock, identical to a local run. `inputs.nixpkgs.follows = "devshell/nixpkgs"`
 # keeps one nixpkgs pin across the org.
 #
 # The project's own JS tools (biome, knip, tsc, vitest, stryker, depcruise) come
@@ -14,8 +14,8 @@
 # (patched for the nix store, self-contained — no `playwright install --with-deps`
 # and no registry image), wired through PLAYWRIGHT_BROWSERS_PATH for both the
 # vitest browser project and dev/a11y.mjs. Its browser revision is fixed by the
-# nixpkgs pin (inherited through the `ci` input), so the `playwright` npm
-# dependency must match that driver version. Both stay Renovate-owned: a `ci`
+# nixpkgs pin (inherited through the `devshell` input), so the `playwright` npm
+# dependency must match that driver version. Both stay Renovate-owned: a `devshell`
 # input update advances the driver, and the `playwright` npm bump self-gates on
 # the browser check — a version ahead of the driver fails it and waits for the
 # next driver bump to rebase green, so the two converge without a manual edit.
@@ -23,12 +23,12 @@
   description = "Plinky: a client-only React Router SPA for learning the piano";
 
   inputs = {
-    ci.url = "github:metio/ci";
-    nixpkgs.follows = "ci/nixpkgs";
+    devshell.url = "github:metio/nix-devshell";
+    nixpkgs.follows = "devshell/nixpkgs";
   };
 
   outputs =
-    { nixpkgs, ci, ... }:
+    { nixpkgs, devshell, ... }:
     let
       systems = [
         "x86_64-linux"
@@ -52,7 +52,7 @@
           # calls one of these and that each name below is defined.
           #
           # The shared lint-gate wrappers (ci-reuse, ci-typos, ci-yaml,
-          # ci-actionlint, ci-markdown) come from ci.lib.mkDevShell, defined once
+          # ci-actionlint, ci-markdown) come from devshell.lib.mkDevShell, defined once
           # org-wide; the wrappers below are the repo-specific gates.
           ciCommands = [
             (pkgs.writeShellScriptBin "ci-typecheck" ''exec npm run typecheck "$@"'')
@@ -70,7 +70,7 @@
           ];
         in
         {
-          default = ci.lib.mkDevShell {
+          default = devshell.lib.mkDevShell {
             inherit pkgs;
             packages = [
               pkgs.nodejs_24
