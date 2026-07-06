@@ -14,7 +14,7 @@ jobs:
     # Its `detect` job enables each gate from this repo's package.json scripts.
     # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
     name: Frontend
-    uses: metio/ci/.github/workflows/frontend.yml@947c065b5786db55c4b3145a3dbf1670b7ae7d61 # feat/frontend-workflow
+    uses: metio/ci/.github/workflows/frontend.yml@cc725e2e1fbc779fda95050562d702128ad6e998 # 2026.7.6083955
     with:
       # Node returns DNS records verbatim, so a bare `localhost` can resolve to
       # ::1 first — the prerender's internal server and its own fetch would then
