@@ -46,6 +46,22 @@ describe("rawDifficulty", () => {
         const leaping = score([60, 72, 64, 76, 67].map((p) => noteFor(p)).join(""));
         expect(rawDifficulty(domXmlCodec, inHand)).toBeLessThan(rawDifficulty(domXmlCodec, leaping));
     });
+
+    it("averages effort per note rather than summing it, so length alone doesn't inflate", () => {
+        // The same octave-leap figure repeated: averaged, the per-note effort barely
+        // moves however long the line; summing would scale it with the note count.
+        const figure = (repeats: number) =>
+            score(
+                Array.from({ length: repeats }, () => [60, 72])
+                    .flat()
+                    .map((p) => noteFor(p))
+                    .join(""),
+            );
+        const short = rawDifficulty(domXmlCodec, figure(3)); // 6 notes
+        const long = rawDifficulty(domXmlCodec, figure(15)); // 30 notes
+        expect(short).toBeGreaterThan(0);
+        expect(long).toBeLessThan(short * 2);
+    });
 });
 
 describe("categoryOf", () => {

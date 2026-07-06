@@ -8,6 +8,7 @@ import {
     expectedPitches,
     type MatchStep,
     matchNote,
+    STAFF_FOR,
     startMatch,
     stepRange,
 } from "./matcher";
@@ -143,5 +144,35 @@ describe("helpers", () => {
     it("stepRange pads the pitch extremes by a whole tone each side", () => {
         expect(stepRange([step([60, 72]), step([55])])).toEqual({ from: 53, to: 74 });
         expect(stepRange([])).toBeNull();
+    });
+});
+
+describe("matcher constants and edges", () => {
+    it("maps each single hand to its staff index", () => {
+        expect(STAFF_FOR).toEqual({ right: 0, left: 1 });
+    });
+
+    it("expects no pitches and rests on bar 0 with no steps, and empties once complete", () => {
+        const empty = startMatch([]);
+        expect(expectedPitches(empty)).toEqual([]);
+        expect(currentBar(empty)).toBe(0);
+        const done = matchNote(startMatch([step([60])]), 60).state;
+        expect(expectedPitches(done)).toEqual([]);
+    });
+
+    it("resets the assembled pitches to empty when a position clears", () => {
+        const result = matchNote(startMatch([step([60]), step([62])]), 60);
+        expect(result.state.hit).toEqual([]);
+    });
+
+    it("defaults to non-forgiving, so a next-position note counts as wrong", () => {
+        // No third argument: the default must be strict, not forgiving.
+        const state = startMatch([step([60]), step([62])]);
+        expect(matchNote(state, 62).events).toEqual([{ kind: "wrong", note: 62 }]);
+    });
+
+    it("forgiving into a chord emits the carried note as its own hit event", () => {
+        const result = matchNote(startMatch([step([60]), step([62, 65])]), 62, true);
+        expect(result.events).toContainEqual({ kind: "hit", note: 62 });
     });
 });

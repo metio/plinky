@@ -45,6 +45,17 @@ describe("summarizePractice", () => {
         expect(summary.daysPracticed).toBe(2);
     });
 
+    it("counts only the days with positive notes", () => {
+        // parseHistory keeps a stored 0 — it is a finite number — but a zero-note day
+        // is not a day practiced.
+        const summary = summarizePractice(
+            { "2026-06-21": 30, "2026-06-22": 0, "2026-06-23": 20 },
+            NOW,
+        );
+        expect(summary.totalNotes).toBe(50);
+        expect(summary.daysPracticed).toBe(2);
+    });
+
     it("returns the last seven days in order", () => {
         const summary = summarizePractice({ "2026-06-23": 7 }, NOW);
         expect(summary.recent).toHaveLength(7);

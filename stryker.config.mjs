@@ -56,8 +56,10 @@ export default {
     tempDirName: ".stryker-tmp",
     // Ratchet, like the coverage and bundle-size gates: `break` fails the run below
     // this score. Raise it as the suite improves; never lower it to pass a red run.
-    // The scoped modules sit at ~87% (composition.ts is 95% — its remaining survivors
-    // are equivalent mutants: unreachable typed-index fallbacks and finite-checks the
-    // JSON codec makes redundant); the margin below break absorbs timeout jitter.
-    thresholds: { high: 95, low: 85, break: 85 },
+    // All six modules are in the low-to-high 90s and their remaining survivors are
+    // equivalent mutants (unreachable typed-index fallbacks, `Number.isFinite`
+    // subsuming type checks, an element's textContent never being null); the whole
+    // sweep sits at ~93%, and the margin below break absorbs Stryker's timeout jitter
+    // under concurrency.
+    thresholds: { high: 95, low: 90, break: 90 },
 };
