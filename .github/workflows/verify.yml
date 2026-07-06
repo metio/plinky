@@ -53,11 +53,21 @@ jobs:
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
       - run: nix develop --command npm run arch
+  i18n:
+    name: i18n
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      # Pure source analysis (no dependencies), so it skips the install step: every
+      # locale must carry every base-locale message, so a new string can't ship
+      # untranslated and silently fall back to English.
+      - run: nix develop --command npm run messages:check
   verify:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, bake-check, nav, arch]
+    needs: [frontend, bake-check, nav, arch, i18n]
     if: always()
     runs-on: ubuntu-latest
     steps:

@@ -39,6 +39,7 @@ npm run typecheck
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
 npm run arch          # layer rules + confined globals
+npm run messages:check # every locale carries every message (blocking)
 npm run knip          # dead code (blocking)
 npx biome check       # lint + format
 npm run nav           # navigation-depth budget
@@ -79,8 +80,11 @@ npm run size          # bundle budget
   test target: memoryStore fakes for stores, fast-check property suites
   (`*.property.test.ts`) for pure core logic, `*.browser.test.tsx` for
   real-browser behavior.
-- **UI strings** go through paraglide: add keys to `messages/en.json` only
-  (other locales fall back), then `npm run messages` regenerates the gitignored
+- **UI strings** go through paraglide: add the key to `messages/en.json` (the
+  base-locale contract) **and translate it into all other `messages/*.json`** —
+  `npm run messages:check` is a blocking gate that fails on any locale missing a
+  key (or carrying an orphan one), so a string can't ship English-only and
+  silently fall back. Then `npm run messages` regenerates the gitignored
   `app/paraglide/`.
 - **Every file** carries the two SPDX header lines declaring the Plinky Authors
   and the 0BSD licence (or a `REUSE.toml` entry when the format can't hold
