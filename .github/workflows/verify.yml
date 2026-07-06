@@ -6,108 +6,24 @@ on:
     branches: [main]
 permissions:
   contents: read
-# Every gate runs through the flake devShell (`nix develop --command`), so CI
-# resolves the exact tool versions in flake.lock — node, chromium, and the shared
-# metio lint gate (reuse, typos, yamllint, actionlint, markdownlint) — identical
-# to a local run. The metio/ci/nix-devshell action installs Nix and caches the
-# /nix store keyed on flake.lock, so a gate only downloads its closure when the
-# pin changes.
-#
-# Node returns DNS records verbatim, so a bare `localhost` can resolve to ::1
-# (IPv6) first — the prerender's internal server and its own fetch would then
-# land on different stacks and the request is refused. Force IPv4 so bind and
-# connect meet on 127.0.0.1.
-env:
-  NODE_OPTIONS: --dns-result-order=ipv4first
 jobs:
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      - run: nix develop --command npm run typecheck
-      - run: nix develop --command npm test
-      # Size is a per-visitor budget: build one locale (tree-shaken to its own
-      # language) and measure what a single language actually ships. The deploy
-      # builds every locale and merges them (npm run build:locales).
-      - run: nix develop --command bash -c 'PLINKY_LOCALE=en npm run build'
-      - name: Check bundle size
-        run: nix develop --command npm run size
-  browser:
-    name: browser
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      # Chromium comes from the flake (PLAYWRIGHT_BROWSERS_PATH → the nix-store
-      # playwright-driver browsers), so no `playwright install --with-deps` and no
-      # registry image. The `playwright` npm version is held to the driver's.
-      - run: nix develop --command npm run test:browser
-  coverage:
-    name: coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      # Fails when any project's coverage drops below the thresholds pinned in
-      # vitest.config.ts, so the ratchet only moves up.
-      - run: nix develop --command npm run coverage
-  lighthouse:
-    name: lighthouse
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      # Lighthouse measures per-visitor script weight, so build one locale. A
-      # pinned build has no "/" route, so it emits no __spa-fallback.html; every
-      # audited URL is a prerendered /en/ page, so no 404 fallback is needed.
-      - run: nix develop --command bash -c 'PLINKY_LOCALE=en npm run build'
-      # The action brings its own Chrome and node, so it runs on the runner rather
-      # than through the devShell; it only reads the built ./build/client.
-      - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
-        with:
-          configPath: ./lighthouserc.json
-          temporaryPublicStorage: true
-  accessibility-light:
-    name: accessibility-light
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      - run: nix develop --command npm run a11y:light
-  accessibility-dark:
-    name: accessibility-dark
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      # axe-core in both themes is the accessibility gate — Lighthouse audits only
-      # light mode, so dark-mode contrast would otherwise go unchecked.
-      - run: nix develop --command npm run a11y:dark
-  biome:
-    name: biome
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      - run: nix develop --command npx biome ci
-  knip:
-    name: knip
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command npm ci
-      - run: nix develop --command npm run knip
+  frontend:
+    # The shared Vite/React pipeline (build, browser + coverage, biome lint,
+    # knip, a11y light/dark, lighthouse, and the metio lint gate: reuse, typos,
+    # yamllint, actionlint, markdownlint), run through this repo's flake devShell.
+    # Its `detect` job enables each gate from this repo's package.json scripts.
+    # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
+    name: Frontend
+    uses: metio/ci/.github/workflows/frontend.yml@947c065b5786db55c4b3145a3dbf1670b7ae7d61 # feat/frontend-workflow
+    with:
+      # Node returns DNS records verbatim, so a bare `localhost` can resolve to
+      # ::1 first — the prerender's internal server and its own fetch would then
+      # land on different stacks and the request is refused. Force IPv4.
+      node-options: --dns-result-order=ipv4first
+      # Size and lighthouse are per-visitor budgets: build one locale (tree-shaken
+      # to its own language) so they measure what a single language ships. The
+      # deploy builds every locale and merges them (npm run build:locales).
+      build-command: PLINKY_LOCALE=en npm run build
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
@@ -137,47 +53,11 @@ jobs:
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
       - run: nix develop --command npm run arch
-  typos:
-    name: typos
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command typos
-  markdown:
-    name: markdown
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command markdownlint-cli2 "**/*.md"
-  yaml:
-    name: yaml
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command yamllint .
-  github-actions:
-    name: github-actions
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      # actionlint shells out to shellcheck (in the devShell) for run: blocks.
-      - run: nix develop --command actionlint
-  reuse:
-    name: reuse
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
-      - run: nix develop --command reuse lint
   verify:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [build, browser, coverage, lighthouse, accessibility-light, accessibility-dark, biome, knip, bake-check, nav, arch, typos, markdown, yaml, github-actions, reuse]
+    needs: [frontend, bake-check, nav, arch]
     if: always()
     runs-on: ubuntu-latest
     steps:
