@@ -1650,7 +1650,7 @@ export function ScoreViewer({
                 {ready && measureCount > 1 && loopOn && !matcher.practicing && !keepUpRunning && (
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                         <span className="font-medium text-red-600 dark:text-red-400">
-                            {m.loop_section()}
+                            🔁 {m.loop_section()}
                         </span>
                         {loopFrom === 1 && loopTo === measureCount ? (
                             <span className="text-gray-500 dark:text-gray-400">
@@ -1769,7 +1769,7 @@ export function ScoreViewer({
                     onClose={() => setToolsOpen(false)}
                     title={m.more_options()}
                 >
-                    <FieldGroup label={m.group_tempo()}>
+                    <FieldGroup label={`🎵 ${m.group_tempo()}`}>
                         {lockTempo ? (
                             <Labeled label={m.scores_tempo()}>
                                 <Bpm tempo={tempo} />
@@ -1822,7 +1822,7 @@ export function ScoreViewer({
                         )}
                     </FieldGroup>
 
-                    <FieldGroup label={m.group_metronome()}>
+                    <FieldGroup label={`🥁 ${m.group_metronome()}`}>
                         <Option caption={m.metronome_caption()}>
                             <Switch
                                 checked={metronomeOn}
@@ -1862,7 +1862,7 @@ export function ScoreViewer({
                         )}
                     </FieldGroup>
 
-                    <FieldGroup label={m.group_practice()}>
+                    <FieldGroup label={`🎯 ${m.group_practice()}`}>
                         <Option caption={m.keep_up_hint()}>
                             <Switch
                                 checked={enforceTempo}
@@ -1950,7 +1950,7 @@ export function ScoreViewer({
                                 challenge has no transpose, and most pieces have no saved
                                 fingering, so the heading would otherwise stand alone. */}
                     {(!lockTempo || (hasSaved && showFingerings)) && (
-                        <FieldGroup label={m.group_notation()}>
+                        <FieldGroup label={`🎼 ${m.group_notation()}`}>
                             {!lockTempo && (
                                 <span className="flex flex-col gap-1">
                                     <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
@@ -2002,7 +2002,7 @@ export function ScoreViewer({
                         </FieldGroup>
                     )}
 
-                    <FieldGroup label={m.group_layout()}>
+                    <FieldGroup label={`🎨 ${m.group_layout()}`}>
                         <Option caption={m.treadmill_hint()}>
                             <Switch
                                 checked={treadmill}
