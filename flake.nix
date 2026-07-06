@@ -51,9 +51,9 @@
           # only the CI mode. dev/check-ci-parity.mjs enforces that every gate job
           # calls one of these and that each name below is defined.
           #
-          # These live in the repo flake for now to prototype the pattern; the
-          # shared metio lint gate (ci-reuse, ci-typos, …) belongs in
-          # ci.lib.mkDevShell so every repo inherits one definition — the follow-up.
+          # The shared lint-gate wrappers (ci-reuse, ci-typos, ci-yaml,
+          # ci-actionlint, ci-markdown) come from ci.lib.mkDevShell, defined once
+          # org-wide; the wrappers below are the repo-specific gates.
           ciCommands = [
             (pkgs.writeShellScriptBin "ci-typecheck" ''exec npm run typecheck "$@"'')
             (pkgs.writeShellScriptBin "ci-test" ''exec npm run test "$@"'')
@@ -67,9 +67,6 @@
             (pkgs.writeShellScriptBin "ci-build" ''exec env PLINKY_LOCALE=en npm run build "$@"'')
             (pkgs.writeShellScriptBin "ci-size" ''exec npm run size "$@"'')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
-            # Shared metio lint gate — prototyped here; slated to move into mkDevShell.
-            (pkgs.writeShellScriptBin "ci-reuse" ''exec reuse lint "$@"'')
-            (pkgs.writeShellScriptBin "ci-typos" ''exec typos "$@"'')
           ];
         in
         {

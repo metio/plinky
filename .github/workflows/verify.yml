@@ -22,8 +22,10 @@ jobs:
       node-options: --dns-result-order=ipv4first
       # Size and lighthouse are per-visitor budgets: build one locale (tree-shaken
       # to its own language) so they measure what a single language ships. The
-      # deploy builds every locale and merges them (npm run build:locales).
-      build-command: PLINKY_LOCALE=en npm run build
+      # deploy builds every locale and merges them (npm run build:locales). The
+      # per-locale invocation lives in the ci-build flake wrapper, so this and a
+      # local `nix develop --command ci-build` stay one definition.
+      build-command: ci-build
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest

@@ -36,6 +36,11 @@ for (const line of workflow.split("\n")) {
         job = jobHeader[1];
         continue;
     }
+    // Skip YAML comments: a `#` line may quote `nix develop --command …` as prose
+    // without being a gate step.
+    if (line.trim().startsWith("#")) {
+        continue;
+    }
     const invocation = line.match(/nix develop --command\s+(.+?)\s*$/);
     if (!invocation) {
         continue;
