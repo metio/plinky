@@ -268,3 +268,18 @@ export function EyeIcon({ className }: IconProps) {
         </Icon>
     );
 }
+
+// Three horizontal sliders with knobs — "adjust the controls here", distinct from
+// the header's gear (global settings). Opens the per-piece Practice-tools panel.
+export function SlidersIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+            <circle cx="16" cy="6" r="2.4" fill="currentColor" stroke="none" />
+            <circle cx="8" cy="12" r="2.4" fill="currentColor" stroke="none" />
+            <circle cx="15" cy="18" r="2.4" fill="currentColor" stroke="none" />
+        </Icon>
+    );
+}

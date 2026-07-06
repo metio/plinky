@@ -85,7 +85,9 @@ describe("Daily", () => {
             </MemoryRouter>,
         );
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
-        // The tempo is shown but fixed — no slider to dial it to taste.
+        // The tempo is shown but fixed in the Practice-tools drawer — a readout, no
+        // slider to dial it to taste.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         expect(screen.getByText(/\d+ BPM/)).toBeTruthy();
         expect(document.querySelector('input[type="range"]')).toBeNull();
     });

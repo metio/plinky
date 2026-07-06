@@ -184,12 +184,11 @@ describe("ScoreViewer", () => {
             },
             { timeout: 30000 },
         );
-        // Open the tools first so the Loop switch is mounted to assert on, then click a
-        // bar. OSMD can re-layout after its first paint — on Gecko especially — so the
-        // measure boxes the hit-test reads may still be settling when a single click
-        // fires; a 30%-width point on a three-bar line sits squarely in bar 1, so poll
-        // the click until it lands and turns the loop on rather than firing once.
-        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        // Clicking a bar turns the loop on and narrows it — no drawer, no fold — and
+        // its range controls appear right by the score. OSMD can re-layout after its
+        // first paint (Gecko especially), so the measure boxes may still be settling; a
+        // 30%-width point on a three-bar line sits in bar 1, so poll the click until it
+        // lands rather than firing once.
         await waitFor(
             () => {
                 const rect = svg.getBoundingClientRect();
@@ -197,9 +196,7 @@ describe("ScoreViewer", () => {
                     clientX: rect.left + rect.width * 0.3,
                     clientY: rect.top + rect.height * 0.5,
                 });
-                expect(
-                    screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked"),
-                ).toBe("true");
+                expect(screen.getByLabelText("Loop from bar")).toBeTruthy();
             },
             { timeout: 30000 },
         );
@@ -857,6 +854,9 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
             timeout: 30000,
         });
+        // The transpose control lives in the Practice-tools drawer, which mounts its
+        // contents only while open.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         const up = screen.getByLabelText("Transpose up a semitone");
         fireEvent.click(up);
         fireEvent.click(up);
@@ -890,6 +890,9 @@ describe("ScoreViewer", () => {
             </MemoryRouter>,
         );
         await awaitReady();
+        // Open the drawer (where transpose would live) and confirm it isn't there —
+        // a locked-tempo challenge must stay in the written key for everyone.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         expect(screen.queryByText("Transpose")).toBeNull();
     });
 });
