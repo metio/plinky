@@ -153,22 +153,26 @@ describe("ScoreViewer", () => {
             },
             { timeout: 30000 },
         );
-        // Click inside the staff — the bar under (or nearest) the point becomes the loop.
-        const rect = svg.getBoundingClientRect();
-        fireEvent.click(score, {
-            clientX: rect.left + rect.width * 0.3,
-            clientY: rect.top + rect.height * 0.5,
-        });
-        // The click turns the loop on and sets its range…
+        // Open the tools first so the Loop switch is mounted to assert on, then click a
+        // bar. OSMD can re-layout after its first paint — on Gecko especially — so the
+        // measure boxes the hit-test reads may still be settling when a single click
+        // fires; a 30%-width point on a three-bar line sits squarely in bar 1, so poll
+        // the click until it lands and turns the loop on rather than firing once.
         fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         await waitFor(
-            () =>
+            () => {
+                const rect = svg.getBoundingClientRect();
+                fireEvent.click(score, {
+                    clientX: rect.left + rect.width * 0.3,
+                    clientY: rect.top + rect.height * 0.5,
+                });
                 expect(
                     screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked"),
-                ).toBe("true"),
+                ).toBe("true");
+            },
             { timeout: 30000 },
         );
-        // …and fills the selected bar with a red backdrop rect behind the notes.
+        // The selected bar gets a red backdrop rect behind its notes.
         const fills = score.querySelectorAll("rect.plinky-bar-selection");
         expect(fills.length).toBeGreaterThan(0);
         expect(fills[0]?.getAttribute("fill")).toBe("#ef4444");

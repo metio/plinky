@@ -75,15 +75,39 @@ export default defineConfig({
                 },
             },
             {
+                // The bulk of the browser suite injects fakeMidi, so it exercises
+                // OSMD/SVG rendering, layout, input and a11y rather than Web MIDI —
+                // engine-agnostic work worth running on a second engine. Firefox's
+                // Gecko joins Chromium here. The real Web MIDI path lives in the
+                // browser-midi project below; Playwright rejects the `midi`
+                // permission on Firefox, so this project must not request it.
                 test: {
                     name: "browser",
                     include: ["app/**/*.browser.test.{ts,tsx}", "core/**/*.browser.test.{ts,tsx}"],
+                    exclude: ["app/contexts/midi.browser.test.tsx"],
                     setupFiles: ["./app/test-setup.ts"],
                     browser: {
                         enabled: true,
-                        // MIDI arrives pre-granted, so the real Web MIDI adapter's
-                        // permission and silent-resume paths run for real. Chromium
-                        // gates even sysex-free access behind the sysex grant.
+                        provider: playwright(),
+                        headless: true,
+                        instances: [{ browser: "chromium" }, { browser: "firefox" }],
+                    },
+                },
+            },
+            {
+                // The real Web MIDI adapter can only be automated in Chromium:
+                // Playwright grants its `midi`/`midi-sysex` permission there, so the
+                // adapter's genuine permission and silent-resume paths run for real
+                // (Chromium gates even sysex-free access behind the sysex grant).
+                // Firefox gates Web MIDI behind a site-permission add-on that can't
+                // be provisioned here, and WebKit has no Web MIDI at all — neither
+                // can run these, so this project stays Chromium-only.
+                test: {
+                    name: "browser-midi",
+                    include: ["app/contexts/midi.browser.test.tsx"],
+                    setupFiles: ["./app/test-setup.ts"],
+                    browser: {
+                        enabled: true,
                         provider: playwright({
                             contextOptions: { permissions: ["midi", "midi-sysex"] },
                         }),

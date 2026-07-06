@@ -17,7 +17,7 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "npm run messages && react-router typegen && tsc",
     "test": "npm run messages && vitest run --project node",
-    "test:browser": "npm run messages && vitest run --project browser",
+    "test:browser": "npm run messages && vitest run --project 'browser*'",
     "lint": "biome check",
     "arch": "depcruise core app dev react-router.config.ts && node dev/check-globals.mjs",
     "size": "node dev/check-bundle-size.mjs",

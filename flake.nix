@@ -52,7 +52,7 @@
             PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
           };
-          menu = ''echo "  plus node ${pkgs.nodejs_24.version} and chromium ${pkgs.playwright-driver.version} for the vitest browser + a11y gates."'';
+          menu = ''echo "  plus node ${pkgs.nodejs_24.version} and chromium + firefox ${pkgs.playwright-driver.version} for the vitest browser + a11y gates."'';
         };
       });
 

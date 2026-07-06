@@ -13,8 +13,8 @@ is described in [ARCHITECTURE.md](ARCHITECTURE.md) and **enforced** by
 ## The dev environment
 
 The toolchain is a nix flake (`flake.nix`) that consumes the shared
-[metio/ci](https://github.com/metio/ci) devShell — node, chromium (for the
-vitest browser + a11y gates), and the shared lint gate (reuse, typos, yamllint,
+[metio/ci](https://github.com/metio/ci) devShell — node, chromium + firefox (for
+the vitest browser + a11y gates), and the shared lint gate (reuse, typos, yamllint,
 actionlint, markdownlint). Run any command through it so local and CI resolve
 the identical versions pinned in `flake.lock`:
 
@@ -37,7 +37,7 @@ typos and coverage:
 ```sh
 npm run typecheck
 npm test              # node project (vitest)
-npm run test:browser  # real chromium (vitest browser mode)
+npm run test:browser  # real chromium + firefox (vitest browser mode)
 npm run arch          # layer rules + confined globals
 npm run knip          # dead code (blocking)
 npx biome check       # lint + format
@@ -68,9 +68,13 @@ npm run size          # bundle budget
 - **jsdom component tests** render through `renderWithServices`
   (`app/testing/renderWithServices.tsx`) — one isolated in-memory world per
   test. `app/testing/stores.ts` is only for the **browser** project, whose job
-  is the real integration. Browser tests that mount `MidiProvider` must inject
-  `fakeMidi` — the test context has the MIDI permission pre-granted, so the
-  real adapter would silently open a genuine connection.
+  is the real integration. That project runs on **chromium + firefox** and grants
+  no MIDI permission, so browser tests that mount `MidiProvider` must inject
+  `fakeMidi` — otherwise the real adapter reaches for Web MIDI (which Playwright
+  can't grant on firefox at all). The real Web MIDI adapter is exercised only in
+  the separate **browser-midi** project, which is chromium-only with the `midi`
+  permission pre-granted (firefox gates it behind an un-automatable add-on, webkit
+  has no Web MIDI) — keep new real-adapter assertions in that one file.
 - **Tests are essential.** Every new seam, store, adapter and component is a
   test target: memoryStore fakes for stores, fast-check property suites
   (`*.property.test.ts`) for pure core logic, `*.browser.test.tsx` for
