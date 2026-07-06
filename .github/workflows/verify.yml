@@ -33,7 +33,7 @@ jobs:
       - run: nix develop --command npm ci
       # The catalogue's grades must match the octiles of the committed song costs, so a
       # dedup/import that forgot `npm run songs:bake` can't ship inconsistent grades.
-      - run: nix develop --command bash -c 'npm run songs:bake -- --check'
+      - run: nix develop --command ci-bake-check
   nav:
     name: nav
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
       - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
       # Pure source analysis (no dependencies), so it skips the install step: a new
       # feature can't bury a page deeper than the navigation-depth budget.
-      - run: nix develop --command npm run nav
+      - run: nix develop --command ci-nav
   arch:
     name: arch
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
       - run: nix develop --command npm ci
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
-      - run: nix develop --command npm run arch
+      - run: nix develop --command ci-arch
   i18n:
     name: i18n
     runs-on: ubuntu-latest
@@ -62,12 +62,22 @@ jobs:
       # Pure source analysis (no dependencies), so it skips the install step: every
       # locale must carry every base-locale message, so a new string can't ship
       # untranslated and silently fall back to English.
-      - run: nix develop --command npm run messages:check
+      - run: nix develop --command ci-messages-check
+  ci-parity:
+    name: ci-parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      # Pure source analysis (no dependencies): every gate job must run through a
+      # ci-* wrapper defined in flake.nix, so a local `nix develop --command
+      # ci-<name>` runs exactly what CI runs.
+      - run: nix develop --command ci-parity
   verify:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, bake-check, nav, arch, i18n]
+    needs: [frontend, bake-check, nav, arch, i18n, ci-parity]
     if: always()
     runs-on: ubuntu-latest
     steps:

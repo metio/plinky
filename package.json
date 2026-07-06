@@ -4,6 +4,7 @@
   "scripts": {
     "messages": "node dev/compile-messages.mjs",
     "messages:check": "node dev/check-messages.mjs",
+    "ci:parity": "node dev/check-ci-parity.mjs",
     "exercises": "tsx dev/gen-exercises.mts",
     "songs:import": "tsx dev/import-pdmx.mts",
     "scores:import": "tsx dev/import-scores.mts",

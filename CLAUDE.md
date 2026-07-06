@@ -28,6 +28,17 @@ CI mirrors this exactly: every job in `.github/workflows/verify.yml` is
 `playwright` npm version is held to the flake's `playwright-driver`, so bump
 both together.
 
+Each gate is also a **`ci-<name>` wrapper** defined with `writeShellScriptBin` in
+`flake.nix`, capturing exactly how CI invokes it (e.g. `ci-build` bakes in the
+per-locale `PLINKY_LOCALE=en` build the size budget measures, `ci-reuse` is
+`reuse lint`). So `nix develop --command ci-<name>` runs precisely what CI runs,
+and the same name works bare inside `nix develop` — the `ci-` prefix leaves the raw
+tool free for its other modes. A CI gate job must invoke its check through a
+`ci-*` wrapper, never a raw command inline; `npm run ci:parity` is a blocking gate
+that enforces this and that every wrapper a job names exists in `flake.nix`. (The
+shared metio lint-gate wrappers live here for now; promoting them into
+`ci.lib.mkDevShell` so every repo inherits one definition is the follow-up.)
+
 ## The gate
 
 Run the full local gate and check exit codes before pushing (each through
@@ -40,6 +51,7 @@ npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
 npm run arch          # layer rules + confined globals
 npm run messages:check # every locale carries every message (blocking)
+npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
 npx biome check       # lint + format
 npm run nav           # navigation-depth budget

@@ -39,22 +39,57 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
     in
     {
-      devShells = forAllSystems (pkgs: {
-        default = ci.lib.mkDevShell {
-          inherit pkgs;
-          packages = [
-            pkgs.nodejs_24
-            pkgs.jq # the aggregate gate and a few dev scripts read job/JSON output
+      devShells = forAllSystems (
+        pkgs:
+        let
+          # One canonical command per CI gate. Each `ci-<name>` runs the gate
+          # EXACTLY as its verify.yml job does — including a gate's special CI
+          # invocation, like the per-locale build the size budget measures — so
+          # `nix develop --command ci-<name>` is literally what CI runs, and the
+          # same name works bare inside `nix develop`. The `ci-` prefix leaves the
+          # raw tool (reuse, npm, biome) free for its other modes; the wrapper pins
+          # only the CI mode. dev/check-ci-parity.mjs enforces that every gate job
+          # calls one of these and that each name below is defined.
+          #
+          # These live in the repo flake for now to prototype the pattern; the
+          # shared metio lint gate (ci-reuse, ci-typos, …) belongs in
+          # ci.lib.mkDevShell so every repo inherits one definition — the follow-up.
+          ciCommands = [
+            (pkgs.writeShellScriptBin "ci-typecheck" ''exec npm run typecheck "$@"'')
+            (pkgs.writeShellScriptBin "ci-test" ''exec npm run test "$@"'')
+            (pkgs.writeShellScriptBin "ci-test-browser" ''exec npm run test:browser "$@"'')
+            (pkgs.writeShellScriptBin "ci-arch" ''exec npm run arch "$@"'')
+            (pkgs.writeShellScriptBin "ci-nav" ''exec npm run nav "$@"'')
+            (pkgs.writeShellScriptBin "ci-knip" ''exec npm run knip "$@"'')
+            (pkgs.writeShellScriptBin "ci-biome" ''exec npx biome check "$@"'')
+            (pkgs.writeShellScriptBin "ci-messages-check" ''exec npm run messages:check "$@"'')
+            (pkgs.writeShellScriptBin "ci-bake-check" ''exec npm run songs:bake -- --check "$@"'')
+            (pkgs.writeShellScriptBin "ci-build" ''exec env PLINKY_LOCALE=en npm run build "$@"'')
+            (pkgs.writeShellScriptBin "ci-size" ''exec npm run size "$@"'')
+            (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
+            # Shared metio lint gate — prototyped here; slated to move into mkDevShell.
+            (pkgs.writeShellScriptBin "ci-reuse" ''exec reuse lint "$@"'')
+            (pkgs.writeShellScriptBin "ci-typos" ''exec typos "$@"'')
           ];
-          env = {
-            # The browsers ship in the nix closure, so playwright must not try to
-            # download its own into a read-only store path.
-            PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
-            PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+        in
+        {
+          default = ci.lib.mkDevShell {
+            inherit pkgs;
+            packages = [
+              pkgs.nodejs_24
+              pkgs.jq # the aggregate gate and a few dev scripts read job/JSON output
+            ]
+            ++ ciCommands;
+            env = {
+              # The browsers ship in the nix closure, so playwright must not try to
+              # download its own into a read-only store path.
+              PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+              PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+            };
+            menu = ''echo "  plus node ${pkgs.nodejs_24.version} and chromium + firefox ${pkgs.playwright-driver.version} for the vitest browser + a11y gates, and ci-* wrappers that run each gate the CI way (ci-parity checks the mapping)."'';
           };
-          menu = ''echo "  plus node ${pkgs.nodejs_24.version} and chromium + firefox ${pkgs.playwright-driver.version} for the vitest browser + a11y gates."'';
-        };
-      });
+        }
+      );
 
       formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
     };
