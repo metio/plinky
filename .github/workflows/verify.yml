@@ -6,10 +6,17 @@ on:
     branches: [main]
 permissions:
   contents: read
-# In the Playwright container, localhost resolves to ::1 (IPv6) first, so the
-# prerender's internal server and its own requests can land on different stacks
-# and the fetch is refused. Prefer IPv4 everywhere so both bind and connect on
-# 127.0.0.1; harmless on the non-container runners.
+# Every gate runs through the flake devShell (`nix develop --command`), so CI
+# resolves the exact tool versions in flake.lock — node, chromium, and the shared
+# metio lint gate (reuse, typos, yamllint, actionlint, markdownlint) — identical
+# to a local run. The metio/ci/nix-devshell action installs Nix and caches the
+# /nix store keyed on flake.lock, so a gate only downloads its closure when the
+# pin changes.
+#
+# Node returns DNS records verbatim, so a bare `localhost` can resolve to ::1
+# (IPv6) first — the prerender's internal server and its own fetch would then
+# land on different stacks and the request is refused. Force IPv4 so bind and
+# connect meet on 127.0.0.1.
 env:
   NODE_OPTIONS: --dns-result-order=ipv4first
 jobs:
@@ -18,60 +25,50 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
+      - run: nix develop --command npm run typecheck
+      - run: nix develop --command npm test
       # Size is a per-visitor budget: build one locale (tree-shaken to its own
       # language) and measure what a single language actually ships. The deploy
       # builds every locale and merges them (npm run build:locales).
-      - run: PLINKY_LOCALE=en npm run build
+      - run: nix develop --command bash -c 'PLINKY_LOCALE=en npm run build'
       - name: Check bundle size
-        run: npm run size
+        run: nix develop --command npm run size
   browser:
     name: browser
     runs-on: ubuntu-latest
-    # Run in Playwright's own image — the same one the dev container builds on — so
-    # the browsers and their system libraries are already present. This avoids a
-    # `playwright install --with-deps`, whose apt step breaks when a preconfigured
-    # runner repository (e.g. packages.microsoft.com) returns 403. Keep the tag in
-    # step with the `playwright` dependency in package.json.
-    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      # Node and the browsers come from the image; no setup-node needed.
-      - run: npm ci
-      - run: npm run test:browser
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
+      # Chromium comes from the flake (PLAYWRIGHT_BROWSERS_PATH → the nix-store
+      # playwright-driver browsers), so no `playwright install --with-deps` and no
+      # registry image. The `playwright` npm version is held to the driver's.
+      - run: nix develop --command npm run test:browser
   coverage:
     name: coverage
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      # Node and the browsers come from the image; no setup-node needed.
-      - run: npm ci
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
       # Fails when any project's coverage drops below the thresholds pinned in
       # vitest.config.ts, so the ratchet only moves up.
-      - run: npm run coverage
+      - run: nix develop --command npm run coverage
   lighthouse:
     name: lighthouse
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
       # Lighthouse measures per-visitor script weight, so build one locale. A
       # pinned build has no "/" route, so it emits no __spa-fallback.html; every
       # audited URL is a prerendered /en/ page, so no 404 fallback is needed.
-      - run: PLINKY_LOCALE=en npm run build
+      - run: nix develop --command bash -c 'PLINKY_LOCALE=en npm run build'
+      # The action brings its own Chrome and node, so it runs on the runner rather
+      # than through the devShell; it only reads the built ./build/client.
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
         with:
@@ -80,122 +77,102 @@ jobs:
   accessibility-light:
     name: accessibility-light
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      # Node and the browsers come from the image; no setup-node needed.
-      - run: npm ci
-      - run: npm run a11y:light
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
+      - run: nix develop --command npm run a11y:light
   accessibility-dark:
     name: accessibility-dark
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.61.0-noble
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      # Node and the browsers come from the image; no setup-node needed.
-      - run: npm ci
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
       # axe-core in both themes is the accessibility gate — Lighthouse audits only
       # light mode, so dark-mode contrast would otherwise go unchecked.
-      - run: npm run a11y:dark
+      - run: nix develop --command npm run a11y:dark
   biome:
     name: biome
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npx biome ci
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
+      - run: nix develop --command npx biome ci
   knip:
     name: knip
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm run knip
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
+      - run: nix develop --command npm run knip
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
       # The catalogue's grades must match the octiles of the committed song costs, so a
       # dedup/import that forgot `npm run songs:bake` can't ship inconsistent grades.
-      - run: npm run songs:bake -- --check
+      - run: nix develop --command bash -c 'npm run songs:bake -- --check'
   nav:
     name: nav
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
       # Pure source analysis (no dependencies), so it skips the install step: a new
       # feature can't bury a page deeper than the navigation-depth budget.
-      - run: npm run nav
+      - run: nix develop --command npm run nav
   arch:
     name: arch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command npm ci
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
-      - run: npm run arch
+      - run: nix develop --command npm run arch
   typos:
     name: typos
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: crate-ci/typos@bee27e3a4fd1ea2111cf90ab89cd076c870fce14 # v1
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command typos
   markdown:
     name: markdown
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: DavidAnson/markdownlint-cli2-action@ded1f9488f68a970bc66ea5619e13e9b52e601cd # v23
-        with:
-          globs: "**/*.md"
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command markdownlint-cli2 "**/*.md"
   yaml:
     name: yaml
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - run: pipx install yamllint && yamllint .
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command yamllint .
   github-actions:
     name: github-actions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: reviewdog/action-actionlint@6fb7acc99f4a1008869fa8a0f09cfca740837d9d # v1
-        with:
-          fail_on_error: true
-          filter_mode: nofilter
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      # actionlint shells out to shellcheck (in the devShell) for run: blocks.
+      - run: nix develop --command actionlint
   reuse:
     name: reuse
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6
+      - uses: metio/ci/nix-devshell@84b9ffe3e7a023be8335f28eb3aa6a8c6cb13cf0 # 2026.7.6074607
+      - run: nix develop --command reuse lint
   verify:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.

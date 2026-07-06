@@ -11,6 +11,14 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
 
+# flake.lock is nix-generated JSON; it pins the toolchain both CI and local
+# shells resolve from flake.nix.
+[[annotations]]
+path = "flake.lock"
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "0BSD"
+
 # Catalog scores (MusicXML) are transcriptions/arrangements of public-domain or
 # non-copyrightable music, dedicated to the public domain (CC0). Each is its own
 # file so its license is tracked individually.

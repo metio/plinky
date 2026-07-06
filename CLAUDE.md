@@ -10,10 +10,29 @@ The architecture — a pure `core/` under ports, adapters, stores and components
 is described in [ARCHITECTURE.md](ARCHITECTURE.md) and **enforced** by
 `npm run arch` (dependency-cruiser + `dev/check-globals.mjs`).
 
+## The dev environment
+
+The toolchain is a nix flake (`flake.nix`) that consumes the shared
+[metio/ci](https://github.com/metio/ci) devShell — node, chromium (for the
+vitest browser + a11y gates), and the shared lint gate (reuse, typos, yamllint,
+actionlint, markdownlint). Run any command through it so local and CI resolve
+the identical versions pinned in `flake.lock`:
+
+```sh
+nix develop --command npm test      # one-off
+nix develop                         # or enter the shell, then run commands bare
+```
+
+CI mirrors this exactly: every job in `.github/workflows/verify.yml` is
+`nix develop --command …` behind the `metio/ci/nix-devshell` action. The
+`playwright` npm version is held to the flake's `playwright-driver`, so bump
+both together.
+
 ## The gate
 
-Run the full local gate and check exit codes before pushing; CI runs the same
-jobs plus markdown lint, REUSE, typos and coverage:
+Run the full local gate and check exit codes before pushing (each through
+`nix develop --command`); CI runs the same jobs plus markdown lint, REUSE,
+typos and coverage:
 
 ```sh
 npm run typecheck
