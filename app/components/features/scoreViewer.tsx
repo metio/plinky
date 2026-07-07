@@ -27,12 +27,12 @@ import {
 import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradeProgress";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 
-import { svgMilestone } from "../../../core/milestoneCard";
-import { isFirstS, isFlawless, type Milestone } from "../../../core/milestones";
+import { isFirstS, isFlawless } from "../../../core/milestones";
 import { applyRun, letterMin } from "../../../core/mastery";
 import { useMastery } from "../../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
 import { useServices, useXmlCodec } from "../../contexts/services";
+import { useMilestoneChannel } from "../../contexts/milestone";
 
 import { toReplayEvents } from "../../../core/composition";
 import { listenStepMs } from "../../../core/playback";
@@ -115,7 +115,6 @@ import {
 import { PerformanceStrip } from "../ui/performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { SegmentedControl } from "../ui/segmentedControl";
-import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
 import { BumpValue, Stepper } from "../ui/stepper";
 import { Switch } from "../ui/switch";
@@ -154,47 +153,6 @@ function Option({ caption, children }: { caption: string; children: ReactNode })
             {children}
             <span className="text-xs text-gray-500 dark:text-gray-400">{caption}</span>
         </span>
-    );
-}
-
-// A celebratory banner for an earned moment (first S, grade-up, flawless run), with the
-// matching share card to post. Quiet — it sits above the run grid, never interrupts.
-function MilestoneBanner({ milestone }: { milestone: Milestone }) {
-    const heading =
-        milestone.kind === "grade-up"
-            ? m.milestone_grade_heading({ level: milestone.grade })
-            : milestone.kind === "flawless"
-              ? m.milestone_flawless_heading({ title: milestone.songTitle })
-              : m.milestone_first_s_heading({ title: milestone.songTitle });
-    const cardTitle =
-        milestone.kind === "grade-up"
-            ? m.grades_current({ level: milestone.grade })
-            : milestone.kind === "flawless"
-              ? m.milestone_flawless_title()
-              : m.milestone_first_s_title();
-    const detail =
-        milestone.kind === "grade-up"
-            ? milestone.skill > 0
-                ? m.grades_skill({ rating: milestone.skill })
-                : undefined
-            : milestone.songTitle;
-    const boast =
-        milestone.kind === "grade-up"
-            ? m.milestone_grade_boast({ level: milestone.grade })
-            : milestone.kind === "flawless"
-              ? m.milestone_flawless_boast({ title: milestone.songTitle })
-              : m.milestone_first_s_boast({ title: milestone.songTitle });
-    return (
-        <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-            <h3 className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
-                {heading}
-            </h3>
-            <ShareButtons
-                text={boast}
-                imageSvg={svgMilestone({ title: cardTitle, detail })}
-                imageText={boast}
-            />
-        </section>
     );
 }
 
@@ -455,9 +413,10 @@ export function ScoreViewer({
     // reads the same windows as the grade and share grid.
     const [runTolerance, setRunTolerance] = useState(seededResult?.tolerance ?? PRECISE_TOLERANCE);
     const [shareGrid, setShareGrid] = useState<Grid | null>(seededResult?.grid ?? null);
-    // An earned-moment card (first S, grade-up, flawless run) shown above the run grid,
-    // resolved after the run's mastery is folded in. At most one per run.
-    const [milestone, setMilestone] = useState<Milestone | null>(null);
+    // An earned moment (first S, grade-up, flawless run) is published to the app-wide
+    // channel once the run's mastery is folded in, for the shell banner to celebrate. At
+    // most one per run; cleared at the next run's start.
+    const { publish: publishMilestone, dismiss: dismissMilestone } = useMilestoneChannel();
     const [tempoCurve, setTempoCurve] = useState<{
         points: TempoPoint[];
         median: number;
@@ -888,12 +847,12 @@ export function ScoreViewer({
             if (reached > services.milestones.reachedGrade()) {
                 services.milestones.recordReachedGrade(reached);
                 const rating = skillRating(items, prefs.decayMode, Date.now());
-                setMilestone({ kind: "grade-up", grade: reached, skill: rating });
+                publishMilestone({ kind: "grade-up", grade: reached, skill: rating });
             } else if (flawlessNow) {
                 services.milestones.recordFlawless();
-                setMilestone({ kind: "flawless", songTitle: title });
+                publishMilestone({ kind: "flawless", songTitle: title });
             } else if (firstS) {
-                setMilestone({ kind: "first-s", songTitle: title });
+                publishMilestone({ kind: "first-s", songTitle: title });
             }
         });
     }, [
@@ -912,6 +871,7 @@ export function ScoreViewer({
         masteryStore,
         historyStore,
         services,
+        publishMilestone,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
@@ -1476,7 +1436,7 @@ export function ScoreViewer({
         setGrade(null);
         setRunNotes([]);
         setShareGrid(null);
-        setMilestone(null);
+        dismissMilestone();
         setTempoCurve(null);
         setKeepUpResult(null);
         setLiveTempo(tempo);
@@ -2247,7 +2207,6 @@ export function ScoreViewer({
                 <FullScreen off>
                     {grade && (
                         <div ref={gradePanelRef} className="space-y-3">
-                            {milestone && <MilestoneBanner milestone={milestone} />}
                             {!ephemeral &&
                                 (runSaved === "saved" ? (
                                     <p className="text-sm text-green-700 dark:text-green-400">

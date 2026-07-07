@@ -18,6 +18,8 @@ import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { StorageBanner } from "./components/features/storageBanner";
 import { UpdateBanner } from "./components/features/updateBanner";
+import { MilestoneBannerHost } from "./components/features/milestoneBanner";
+import { MilestoneProvider } from "./contexts/milestone";
 import { SoundHint } from "./components/features/soundHint";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { ThemeToggle } from "./components/features/themeToggle";
@@ -307,7 +309,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     {/* iOS is decided at this composition root and passed down, so
                         the hint component reads no browser global of its own. */}
                     <SoundHint iosLike={iosLike} inAppBrowser={inAppBrowser} />
-                    {children}
+                    {/* An earned moment from a run anywhere in the routed tree publishes
+                        to the channel; the shell banner is its single subscriber, so the
+                        celebration is the same wherever the run happened. */}
+                    <MilestoneProvider>
+                        <MilestoneBannerHost />
+                        {children}
+                    </MilestoneProvider>
                 </ServicesProvider>
                 <ScrollRestoration />
                 <Scripts />
