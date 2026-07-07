@@ -831,6 +831,29 @@ describe("ScoreViewer", () => {
         expect(screen.getByRole("tab", { name: "Both" })).toBeTruthy();
     });
 
+    it("keeps the chosen hand across a relayout — the hand belongs to the piece, not the layout", async () => {
+        const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
+        mount(grand, { beatsPerBar: 4 });
+        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        const left = await screen.findByRole("tab", { name: "Left" }, { timeout: 30000 });
+        fireEvent.click(left);
+        await expect
+            .poll(() => screen.getByRole("tab", { name: "Left" }).getAttribute("aria-selected"))
+            .toBe("true");
+        // Toggling bar numbers relayouts the score (a fresh OSMD render), just like
+        // treadmill/transpose/fingering. The hand choice must survive it rather than
+        // silently reverting to Both and drilling both hands under the player.
+        fireEvent.click(screen.getByRole("switch", { name: "Bar numbers" }));
+        await expect
+            .poll(() => screen.getByRole("tab", { name: "Left" }).getAttribute("aria-selected"), {
+                timeout: 30000,
+            })
+            .toBe("true");
+        expect(screen.getByRole("tab", { name: "Both" }).getAttribute("aria-selected")).toBe(
+            "false",
+        );
+    });
+
     it("omits the hands selector for a single-staff score", async () => {
         const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(single, { beatsPerBar: 4 });

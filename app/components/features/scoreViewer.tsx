@@ -725,16 +725,17 @@ export function ScoreViewer({
                         // A grand staff (two staves) can be drilled one hand at a
                         // time; a single-staff score offers no such choice.
                         setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
-                        setHand("both");
                         const bars = osmd.Sheet?.SourceMeasures?.length ?? 1;
                         setMeasureCount(bars);
-                        // A bar range stays valid across a relayout (bars-per-row,
-                        // treadmill, fingering, transpose all keep the same bars), so
-                        // the loop resets only when the piece itself changes — that is
-                        // what keeps treadmill and loop independent. On a fresh piece
-                        // it seeds to the whole song, the default loop.
+                        // The hand selection and the bar range both belong to the piece,
+                        // not the layout: a relayout (bars-per-row, treadmill, fingering,
+                        // transpose) keeps the same staves and bars, so a chosen hand and
+                        // loop must survive it — resetting only when the piece itself
+                        // changes keeps them independent of the reading-mode toggles. On a
+                        // fresh piece the hand seeds to both and the loop to the whole song.
                         if (loadedXmlRef.current !== xml) {
                             loadedXmlRef.current = xml;
+                            setHand("both");
                             setLoopFrom(1);
                             setLoopTo(bars);
                             setLoopOn(false);
