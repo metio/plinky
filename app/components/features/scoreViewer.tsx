@@ -29,7 +29,6 @@ import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 
 import { isFirstS, isFlawless } from "../../../core/milestones";
 import { applyRun, letterMin } from "../../../core/mastery";
-import { useMastery } from "../../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
 import { useServices, useXmlCodec } from "../../contexts/services";
 import { useMilestoneChannel } from "../../contexts/milestone";
@@ -422,11 +421,6 @@ export function ScoreViewer({
         median: number;
         hotspots: Hotspot[];
     } | null>(null);
-    // Mastery comes from the shared store, so a mark-learned anywhere (here, or a
-    // MarkLearnedButton on the page) re-renders every view of it together. Ephemeral
-    // pieces (sprints) aren't tracked, so they read as null.
-    const storedMastery = useMastery(id);
-    const mastery = ephemeral ? null : storedMastery;
     // The tempo a run was matched at, captured when practice starts so the run's
     // self-paced tempo curve reads against the same reference the matcher used,
     // even if the slider is moved afterwards.
