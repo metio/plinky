@@ -7,9 +7,15 @@ import { type MeasureBox, NOTE_COLOR, PLAYED_COLOR, SELECT_COLOR } from "../../c
 
 // OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
 // cursor hands back the base type, so reach the accessors by shape. getSVGGElement is the
-// notehead group; getStemSVG is the stem, a separate element by id — colouring the head
-// group alone leaves the stem black, so a coloured note reads as only a coloured dot.
-type WithSvg = { getSVGGElement?: () => SVGGElement; getStemSVG?: () => Element | null };
+// notehead group (a flag on an unbeamed short note rides inside it); getStemSVG is the
+// stem, a separate element by id; getBeamSVGs are the beams joining short notes, each also
+// a separate element by id — colouring the head group alone leaves the stem and beam black,
+// so a coloured note reads as only a coloured dot.
+type WithSvg = {
+    getSVGGElement?: () => SVGGElement;
+    getStemSVG?: () => Element | null;
+    getBeamSVGs?: () => (Element | null)[];
+};
 
 function svgOf(gNote: unknown): SVGGElement | undefined {
     try {
@@ -28,17 +34,32 @@ function stemOf(gNote: unknown): SVGElement | undefined {
     }
 }
 
-// The rendered parts that make up one whole note: the notehead group and, when the note
-// has one, the stem it carries. A note OSMD drew no glyph for has no notehead, and counts
-// as unrendered — no parts, so callers skip it whole. A chord shares a single stem, so the
-// same element can appear for several noteheads; painting it more than once is harmless.
+function beamsOf(gNote: unknown): SVGElement[] {
+    try {
+        const beams = (gNote as WithSvg).getBeamSVGs?.() ?? [];
+        return beams.filter((beam): beam is SVGElement => beam instanceof SVGElement);
+    } catch {
+        return [];
+    }
+}
+
+// The rendered parts that make up one whole note: the notehead group and, when the note has
+// them, the stem and beams it carries. A note OSMD drew no glyph for has no notehead, and
+// counts as unrendered — no parts, so callers skip it whole. Elements are shared: a chord's
+// noteheads share one stem, and a beam spans the whole group, so the same element can appear
+// for several noteheads; painting or restoring it more than once is harmless.
 function partsOf(gNote: unknown): SVGElement[] {
     const head = svgOf(gNote);
     if (!head) {
         return [];
     }
+    const parts: SVGElement[] = [head];
     const stem = stemOf(gNote);
-    return stem ? [head, stem] : [head];
+    if (stem) {
+        parts.push(stem);
+    }
+    parts.push(...beamsOf(gNote));
+    return parts;
 }
 
 // VexFlow gives each glyph its own explicit paint, so a colour set on the group doesn't

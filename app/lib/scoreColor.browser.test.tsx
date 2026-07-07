@@ -5,7 +5,8 @@ import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { collectSteps } from "../hooks/useScoreMatcher";
 import { generatePhrase } from "../../core/generator";
-import { collectNoteElements } from "./scoreColor";
+import { PLAYED_COLOR } from "../../core/scoreCanvas";
+import { collectNoteElements, paintPlayedNotes } from "./scoreColor";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
 const containers: HTMLElement[] = [];
@@ -27,6 +28,24 @@ async function renderOsmd(xml: string): Promise<OpenSheetMusicDisplay> {
 }
 
 const PHRASE = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+
+// Two eighth notes joined by a beam, then a quarter. OSMD draws the beam as its own SVG
+// element outside the notehead group, so it exercises the beam-colouring path.
+const BEAMED = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
+  <part id="P1"><measure number="1">
+    <attributes><divisions>2</divisions><key><fifths>0</fifths></key>
+      <time><beats>2</beats><beat-type>4</beat-type></time>
+      <clef><sign>G</sign><line>2</line></clef></attributes>
+    <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>
+      <type>eighth</type><stem>up</stem><beam number="1">begin</beam></note>
+    <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration>
+      <type>eighth</type><stem>up</stem><beam number="1">end</beam></note>
+    <note><pitch><step>E</step><octave>4</octave></pitch><duration>2</duration>
+      <type>quarter</type></note>
+  </measure></part>
+</score-partwise>`;
 
 describe("collectNoteElements", () => {
     it("produces one step per playable position, in step with the matcher", async () => {
@@ -51,5 +70,27 @@ describe("collectNoteElements", () => {
         }
         osmd.cursor.reset();
         expect(collectNoteElements(osmd, "both").length).toBe(expected);
+    });
+});
+
+describe("paintPlayedNotes (real OSMD)", () => {
+    it("colours a beamed note's beam, not only its head", async () => {
+        const osmd = await renderOsmd(BEAMED);
+        // The cursor sits on the first beamed eighth (C4); paint the two beamed pitches.
+        osmd.cursor.show();
+        osmd.cursor.reset();
+        paintPlayedNotes(osmd, [60, 62]);
+        osmd.cursor.reset();
+        osmd.cursor.hide();
+        // OSMD tags each beam element's id with "-beam"; VexFlow fills the beam polygon, so
+        // its colour rides on fill (paintElement sets both fill and stroke regardless).
+        const beams = [...document.querySelectorAll('[id*="-beam"]')];
+        expect(beams.length).toBeGreaterThan(0);
+        const coloured = beams.some(
+            (beam) =>
+                beam.getAttribute("fill") === PLAYED_COLOR ||
+                beam.getAttribute("stroke") === PLAYED_COLOR,
+        );
+        expect(coloured).toBe(true);
     });
 });

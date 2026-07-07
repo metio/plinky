@@ -24,17 +24,21 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 // A graphical note backed by a real <g><path/></g>, mirroring OSMD's VexFlow
 // output: halfTone + 12 is the MIDI pitch, and getSVGGElement yields the group.
-// getStemSVG yields a separate stroked <path>, the way OSMD exposes the stem.
+// getStemSVG yields a separate stroked <path>, the way OSMD exposes the stem, and
+// getBeamSVGs the separate beam paths joining short notes.
 function gNote(midi: number, withElement = true, rest = false) {
     const group = document.createElementNS(SVG_NS, "g");
     group.appendChild(document.createElementNS(SVG_NS, "path"));
     const stem = document.createElementNS(SVG_NS, "path");
+    const beam = document.createElementNS(SVG_NS, "path");
     return {
         sourceNote: { halfTone: midi - 12, isRest: () => rest },
         getSVGGElement: () => (withElement ? group : undefined),
         getStemSVG: () => stem,
+        getBeamSVGs: () => [beam],
         group,
         stem,
+        beam,
     };
 }
 
@@ -137,12 +141,14 @@ describe("paintPlayedNotes", () => {
         expect(note.group.getAttribute("fill")).toBeNull();
     });
 
-    it("colours the whole note, painting the stem's stroke as well as the head", () => {
+    it("colours the whole note — head, stem and beam", () => {
         const played = gNote(60);
         paintPlayedNotes(fakeOsmd([played]), [60]);
-        // The head is filled; the stem is a stroked path, so its colour rides on stroke.
+        // The head is filled; the stem and beam are stroked paths, so their colour rides on
+        // stroke. A short note left with a black beam would read as a broken colour trail.
         expect(played.group.getAttribute("fill")).toBe(PLAYED_COLOR);
         expect(played.stem.getAttribute("stroke")).toBe(PLAYED_COLOR);
+        expect(played.beam.getAttribute("stroke")).toBe(PLAYED_COLOR);
     });
 });
 
@@ -179,13 +185,15 @@ describe("highlightCursorNotes / restoreNotes", () => {
         expect(rest.group.getAttribute("fill")).toBeNull();
     });
 
-    it("highlights and restores the stem along with the head", () => {
+    it("highlights and restores the stem and beam along with the head", () => {
         const note = gNote(60);
         const painted = highlightCursorNotes(fakeOsmd([note]), WINDOW_COLOR);
         expect(note.stem.getAttribute("stroke")).toBe(WINDOW_COLOR);
+        expect(note.beam.getAttribute("stroke")).toBe(WINDOW_COLOR);
         restoreNotes(painted);
-        // Untouched before the highlight, the stem falls back to plain black, not a
+        // Untouched before the highlight, the stem and beam fall back to plain black, not a
         // leftover highlight outline.
         expect(note.stem.getAttribute("stroke")).toBe(NOTE_COLOR);
+        expect(note.beam.getAttribute("stroke")).toBe(NOTE_COLOR);
     });
 });
