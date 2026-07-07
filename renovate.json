@@ -5,8 +5,13 @@
     {
       "matchManagers": ["npm"],
       "matchPackageNames": ["playwright"],
-      "groupName": "playwright",
-      "description": "Isolate the playwright npm bump in its own PR instead of the shared js group. The vitest browser + a11y gates drive the chromium baked into the nix closure (PLAYWRIGHT_BROWSERS_PATH — nixpkgs' playwright-driver, inherited through the ci flake input), so a playwright ahead of that driver looks for a chromium revision absent from the store and fails the browser gate. With automerge gated on that check the bump can't land early — it simply waits. When a ci-input update advances the driver, rebaseWhen (behind-base-branch) brings this PR up to date, the gate goes green and it automerges. Own group so that transient red never blocks the other javascript dependencies."
+      "groupName": "browser toolchain",
+      "description": "Pull the playwright npm bump out of the shared js group and into one PR with the nix flake update (rule below). The vitest browser + a11y gates drive the chromium baked into the nix closure (PLAYWRIGHT_BROWSERS_PATH — nixpkgs' playwright-driver, inherited through the devshell flake input), and each playwright npm release hard-codes the chromium revision it expects, so the npm package and that driver are two halves of one version: whichever moves first fails the browser gate until the other catches up. Grouping them means the flake bump that advances the driver and the matching playwright bump land in the same PR and go green together, instead of two separate red PRs that each fail to automerge alone. Until nixpkgs ships the matching driver the grouped PR waits (gated on the browser check); when it does, Renovate folds the flake update into this branch, the gate passes and it automerges."
+    },
+    {
+      "matchManagers": ["nix"],
+      "groupName": "browser toolchain",
+      "description": "Ride the flake.lock (devshell input) update in the same PR as the playwright npm bump above — advancing the devshell input is what carries nixpkgs' playwright-driver forward, so the two must move together to keep the browser gate green."
     }
   ]
 }
