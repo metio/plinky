@@ -7,8 +7,9 @@ name: Preview
 # distinct origin per branch matters here: all of Plinky's state lives in localStorage
 # (per-origin), so a preview must never share production's origin or it could read and
 # corrupt real users' data. Each push publishes to <slug>.plinky-preview.pages.dev
-# (and <slug>.preview.plinky.fun once the custom domain is attached), and — when the
-# branch has an open PR — posts the URL as a sticky comment.
+# (and <slug>.preview.plinky.fun once the custom domain is attached), and records a
+# GitHub Deployment so the PR shows the environment and a "View deployment" link —
+# deliberately not a PR comment, which would email on every push.
 #
 # The build prerenders English only for speed, but still renders every language at
 # runtime: build:locales always builds the all-locales root (the SPA fallback shell and
@@ -33,7 +34,9 @@ on:
       - renovate/**
 permissions:
   contents: read
-  pull-requests: write
+  # Record a native GitHub Deployment (not a PR comment) so the PR shows the
+  # environment and a "View deployment" link without emailing on every push.
+  deployments: write
 concurrency:
   # One preview build per branch at a time; a newer push supersedes an in-flight one.
   group: preview-${{ github.ref_name }}
@@ -87,26 +90,36 @@ jobs:
           --project-name=plinky-preview
           --branch="${{ steps.slug.outputs.slug }}"
           --commit-dirty=true
-      - name: Publish the preview URL
+      - name: Record the preview deployment
         env:
           GH_TOKEN: ${{ github.token }}
           URL: ${{ steps.slug.outputs.url }}
+          SLUG: ${{ steps.slug.outputs.slug }}
         run: |
           {
             echo "### 🔎 Preview deployed"
             echo ""
             echo "[$URL]($URL)"
           } >> "$GITHUB_STEP_SUMMARY"
-          # If this branch has an open PR, keep one sticky comment updated in place
-          # rather than piling a new one on every push.
-          pr=$(gh pr list --head "${GITHUB_REF_NAME}" --state open --json number --jq '.[0].number // empty')
-          [ -n "$pr" ] || exit 0
-          marker="<!-- plinky-preview -->"
-          body="${marker}"$'\n'"🔎 **Preview:** ${URL} — updated for \`${GITHUB_SHA}\`."
-          cid=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr}/comments" \
-            --jq "map(select(.body | contains(\"${marker}\"))) | .[0].id // empty")
-          if [ -n "$cid" ]; then
-            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${cid}" -f body="${body}" >/dev/null
-          else
-            gh pr comment "$pr" --body "${body}" >/dev/null
-          fi
+          # A native GitHub Deployment rather than a PR comment: the PR then shows the
+          # environment and a "View deployment" link, and no comment email lands on every
+          # push. auto_merge off and no required contexts so it is created immediately for
+          # this exact commit; transient so GitHub retires the environment once a newer
+          # deploy supersedes it.
+          cat > deployment.json <<JSON
+          {
+            "ref": "${GITHUB_SHA}",
+            "environment": "preview/${SLUG}",
+            "auto_merge": false,
+            "required_contexts": [],
+            "transient_environment": true,
+            "production_environment": false,
+            "description": "Cloudflare Pages preview"
+          }
+          JSON
+          id=$(gh api "repos/${GITHUB_REPOSITORY}/deployments" --input deployment.json --jq '.id')
+          gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}/statuses" \
+            -f state=success \
+            -f environment_url="${URL}" \
+            -f log_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            -f description="Preview is live" >/dev/null
