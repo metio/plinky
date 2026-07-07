@@ -46,6 +46,15 @@ export function useMetronome(
             if (now === null) {
                 return;
             }
+            // A backgrounded tab throttles this poll to >=1s while the audio clock keeps
+            // advancing, so `next` can fall far behind. Advance the grid past every elapsed
+            // beat without sounding it: this preserves the beat phase but resyncs to the
+            // present. Queuing those past-due ticks instead would burst — osc.start(time)
+            // with a time already gone starts immediately, so the whole cluster fires at once.
+            while (next < now) {
+                tick += 1;
+                next += 60 / Math.max(1, bpmRef.current) / subs;
+            }
             while (next < now + 0.12) {
                 const onBeat = tick % subs === 0;
                 const downbeat = (tick / subs) % beatsInBar === 0;

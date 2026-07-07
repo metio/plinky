@@ -56,13 +56,31 @@ describe("useMetronome", () => {
 
     it("marks subdivision ticks between beats", () => {
         const { audio } = harness(true, 120, 4, 2);
-        // Let the lookahead window sweep over a full beat so an off-beat
-        // subdivision tick is queued alongside the beats.
-        audio.time = 1;
-        vi.advanceTimersByTime(50);
+        // Sweep the lookahead window across a beat so an off-beat subdivision tick and the
+        // following on-beat tick are queued in turn — nudging the clock a little at a time
+        // rather than jumping it a full second (which resyncs past the elapsed beats).
+        audio.time = 0.3;
+        vi.advanceTimersByTime(30);
+        audio.time = 0.6;
+        vi.advanceTimersByTime(30);
         const kinds = audio.clicks.map((click) => click.kind);
         expect(kinds).toContain("sub");
         expect(kinds).toContain("beat");
+    });
+
+    it("resyncs after a background gap instead of bursting every past-due tick", () => {
+        const { audio } = harness(true, 120, 4);
+        // A backgrounded tab throttles the poll while the audio clock runs on a full
+        // several seconds. The catch-up must skip the elapsed beats and resync to the
+        // present, not queue seconds' worth of clicks all in the past — osc.start(time)
+        // with a time already gone starts immediately, dumping the cluster as one burst.
+        audio.time = 5;
+        vi.advanceTimersByTime(30);
+        const afterGap = audio.clicks.filter((click) => click.time > 1);
+        // Nothing is queued in the past, and it resyncs to a single near-future tick
+        // rather than the ~10 past-due clicks a full second of 120 bpm would hold.
+        expect(afterGap.every((click) => click.time >= 5)).toBe(true);
+        expect(afterGap.length).toBeLessThanOrEqual(2);
     });
 
     it("queues silent ticks while muted, so the pulse survives a mute toggle", () => {
