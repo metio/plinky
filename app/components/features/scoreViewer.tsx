@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { FullScreen, FullscreenProvider, Midi, Show, useMidiConnected } from "./conditional";
@@ -9,13 +9,13 @@ import { useFullscreen } from "../../hooks/useFullscreen";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
-import { useTimerChain } from "../../hooks/useTimerChain";
 import { useKeepUp } from "../../hooks/useKeepUp";
+import { useListenPlayback } from "../../hooks/useListenPlayback";
 import { useGhostRace } from "../../hooks/useGhostRace";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
-import { cursorWhole, seekToBar, seekToWhole } from "../../lib/scoreCursor";
+import { cursorWhole, seekToWhole } from "../../lib/scoreCursor";
 import { cadence } from "../../../core/cadence";
 import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
 import {
@@ -31,9 +31,6 @@ import { GRADE_COLOR, type Grade } from "../../../core/grade";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { useServices, useXmlCodec } from "../../contexts/services";
 import { useMilestoneChannel } from "../../contexts/milestone";
-
-import { toReplayEvents } from "../../../core/composition";
-import { listenStepMs } from "../../../core/playback";
 import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
 import { isPreciseInput } from "../../../core/midi";
 import { PRECISE_TOLERANCE } from "../../../core/rhythm";
@@ -41,19 +38,10 @@ import {
     clearBarSelection,
     clientPointToSvg,
     collectMeasureBoxes,
-    highlightCursorNotes,
-    type PaintedNote,
     paintBarSelection,
     paintPlayedNotes,
-    restoreNotes,
-    trailNotes,
 } from "../../lib/scoreColor";
-import {
-    LISTENED_COLOR,
-    type MeasureBox,
-    measureAtPoint,
-    WINDOW_COLOR,
-} from "../../../core/scoreCanvas";
+import { type MeasureBox, measureAtPoint } from "../../../core/scoreCanvas";
 import type { Grid, RunNote } from "../../../core/shareCard";
 import { transposeMusicXml } from "../../../core/transpose";
 import { m } from "../../paraglide/messages.js";
@@ -138,16 +126,6 @@ export function ScoreViewer({
     // re-fire without this latch would double-count the run. Reset at run start.
     const gradedRef = useRef(false);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-    // Listen and take-replay share one transport — one cursor walk, one stop — so
-    // their loop runs on one shared timer chain; the play-along owns its own inside
-    // useKeepUp, so stopping one mode can never cut down another's timers.
-    const listenChain = useTimerChain();
-    // The notes Listen has lit as "now sounding", held so the highlight can be lifted
-    // when the cursor moves on and when playback stops.
-    const listenHighlightRef = useRef<PaintedNote[]>([]);
-    // Tracks playback synchronously, so a second click that lands before the
-    // `playing` state has re-rendered can't start a second cursor loop.
-    const playingRef = useRef(false);
     const tempoRef = useRef(initialTempo ?? 100);
     // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
     // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
@@ -156,18 +134,15 @@ export function ScoreViewer({
     const synth = useSynth();
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(false);
-    const [playing, setPlaying] = useState(false);
     // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
     // on the clock rather than waiting for you, so a note not cleared before it passes is a
     // miss. `guideNotes` sounds the notes as they pass for a follow-along; off, it's a
     // read-at-tempo test. Session toggles (not persisted), off by default.
     const [enforceTempo, setEnforceTempo] = useState(false);
     const [guideNotes, setGuideNotes] = useState(true);
-    // This score's saved takes, the take currently replaying (if any), and how the
-    // finished run's save went — "saved" and "failed" both retire the save prompt,
-    // but only a landed write may claim success.
+    // This score's saved takes, and how the finished run's save went — "saved" and
+    // "failed" both retire the save prompt, but only a landed write may claim success.
     const [takes, setTakes] = useState<Take[]>([]);
-    const [activeReplayId, setActiveReplayId] = useState<string | null>(null);
     const [runSaved, setRunSaved] = useState<"idle" | "saved" | "failed">("idle");
     const [metronomeOn, setMetronomeOn] = useState(false);
     // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
@@ -433,6 +408,25 @@ export function ScoreViewer({
         runStartedAt,
     });
 
+    // The listening transport — Listen and take-replay share one cursor walk, one
+    // clock, one stop. It reads the loop range and tempo live, marks the score as
+    // painted when its trail lands, and leaves the cursor shown if the matcher owns it.
+    const readLoop = useCallback(() => loopRef.current, []);
+    const markPainted = useCallback(() => {
+        paintedRef.current = true;
+    }, []);
+    const isPracticing = useCallback(() => matcher.practicing, [matcher.practicing]);
+    const listenPlayback = useListenPlayback({
+        getOsmd,
+        synth,
+        tempo: readTempo,
+        loop: readLoop,
+        onLap: bumpTempo,
+        centerCursor,
+        markPainted,
+        isPracticing,
+    });
+
     // Fill the selected loop bars with the red overlay (or clear it when the loop is off),
     // reading the live range from loopRef so the callback stays stable. Re-run after each
     // render and whenever the range changes.
@@ -458,7 +452,7 @@ export function ScoreViewer({
     // number inputs remain the keyboard-accessible way in.
     const selectBarAt = useCallback(
         (clientX: number, clientY: number) => {
-            if (matcher.practicing || playingRef.current || measureCount <= 1) {
+            if (matcher.practicing || listenPlayback.active() || measureCount <= 1) {
                 return;
             }
             const svg = containerRef.current?.querySelector("svg");
@@ -482,7 +476,7 @@ export function ScoreViewer({
                 selectAnchorRef.current = null;
             }
         },
-        [matcher.practicing, measureCount],
+        [matcher.practicing, measureCount, listenPlayback.active],
     );
 
     // Slide the keyboard window to keep the notes being played in view, re-framing only
@@ -640,7 +634,7 @@ export function ScoreViewer({
     // biome-ignore lint/correctness/useExhaustiveDependencies: stopListen/stopKeepUp/matcher.stop reset transient playback, not render inputs
     useEffect(() => {
         if (!fullscreen) {
-            stopListen();
+            listenPlayback.stop();
             // A tempo-locked play-along drives the cursor from its own timers and funnels
             // every note into the run; without tearing it down here, leaving full screen
             // freezes it mid-run and strands note input until Stop.
@@ -648,18 +642,6 @@ export function ScoreViewer({
             matcher.stop();
         }
     }, [fullscreen]);
-
-    const stopListen = () => {
-        listenChain.clear();
-        restoreNotes(listenHighlightRef.current);
-        listenHighlightRef.current = [];
-        if (!matcher.practicing) {
-            osmdRef.current?.cursor?.hide();
-        }
-        playingRef.current = false;
-        setPlaying(false);
-        setActiveReplayId(null);
-    };
 
     // Reload OSMD whenever the score changes, and stop any playback/practice — a
     // tempo-locked play-along included, or a layout change mid-run would strand its
@@ -670,7 +652,7 @@ export function ScoreViewer({
         setReady(false);
         setLoadError(false);
         paintedRef.current = false;
-        stopListen();
+        listenPlayback.stop();
         keepUp.stop();
         matcher.stop();
         import("opensheetmusicdisplay")
@@ -824,71 +806,18 @@ export function ScoreViewer({
         paintLoopSelection();
     }, [showFingerings, ready, centerCursor, paintLoopSelection]);
 
-    // Walk the cursor one voice-entry at a time, sounding the notes under it and
-    // waiting their notated duration at the chosen tempo.
+    // Start Listen: the play surface goes full screen, any self-paced run stops, and
+    // the transport walks the cursor from wherever it sits — the note Practice was on
+    // when handing over, or where a paused run left off — instead of rewinding, so play
+    // can pass back and forth without losing the place.
     const listen = () => {
-        const osmd = osmdRef.current;
-        if (!osmd || playingRef.current || keepUp.active()) {
+        if (listenPlayback.active() || keepUp.active()) {
             return;
         }
-        // Continue from wherever the cursor sits — the note Practice was on when handing
-        // over, or where a paused run left off — instead of rewinding, so play can pass
-        // back and forth without losing the place. The top of a fresh piece reads as 0.
         const from = resumePoint();
         enterPlayFullscreen();
-        playingRef.current = true;
         matcher.stop();
-        const cursor: Cursor = osmd.cursor;
-        if (loopRef.current.on) {
-            seekToBar(cursor, loopRef.current.from);
-        } else if (from > 0) {
-            seekToWhole(cursor, from);
-        } else {
-            cursor.reset();
-        }
-        cursor.show();
-        setPlaying(true);
-        const tick = () => {
-            const loop = loopRef.current;
-            // Past the loop's last bar (or the score's end while looping), jump back
-            // to the start bar rather than stopping — and ramp the tempo if the
-            // trainer is on, so each pass drills the passage a little faster.
-            if (
-                loop.on &&
-                (cursor.iterator.EndReached || cursor.iterator.CurrentMeasureIndex > loop.to - 1)
-            ) {
-                bumpTempo();
-                seekToBar(cursor, loop.from);
-            } else if (cursor.iterator.EndReached) {
-                stopListen();
-                bumpTempo();
-                return;
-            }
-            // Light the notes now sounding so the eye can follow the music, leaving a
-            // blue trail on the ones just heard — the cursor box alone is easy to lose,
-            // and the trail records which stretches the computer played once it moves on.
-            trailNotes(listenHighlightRef.current, LISTENED_COLOR);
-            paintedRef.current = true;
-            listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
-            const lengths: number[] = [];
-            for (const note of cursor.NotesUnderCursor()) {
-                const quarters = note.Length.RealValue * 4;
-                if (!note.isRest() && note.halfTone > 0) {
-                    // `quarters` is a count of quarter notes; the synth wants seconds, which
-                    // depends on the tempo — one quarter is 60/BPM seconds. Without scaling,
-                    // the sustain is only right at 60 BPM and over-rings into a blur above it.
-                    synth.playNote(note.halfTone + 12, {
-                        duration: quarters * (60 / tempoRef.current),
-                    });
-                }
-                // Rests count too, so a written gap dwells its own length.
-                lengths.push(quarters);
-            }
-            cursor.next();
-            centerCursor();
-            listenChain.push(tick, listenStepMs(lengths, tempoRef.current));
-        };
-        tick();
+        listenPlayback.start(from);
     };
 
     // Start a tempo-locked play-along: the play surface goes full screen, any
@@ -896,7 +825,7 @@ export function ScoreViewer({
     // over — scoring only the practised hand, exactly as self-paced practice does.
     const playAlong = () => {
         const osmd = osmdRef.current;
-        if (!osmd || playingRef.current || keepUp.active()) {
+        if (!osmd || listenPlayback.active() || keepUp.active()) {
             return;
         }
         enterPlayFullscreen();
@@ -933,60 +862,16 @@ export function ScoreViewer({
         setRunSaved(saved.stored ? "saved" : "failed");
     };
 
-    // Replay a saved take: play it straight from the recorded performance — its own
-    // onsets, pitches, held lengths and velocities — so the playback is the run you
-    // gave, note for note. The staff cursor follows for a visual cue but never gates the
-    // timing: driving playback off the take (not the loaded score's cursor) means a
-    // score whose notation carries ties or rests the run doesn't mirror one-to-one can't
-    // skew it — the earlier coupling made notes bunch up, then drag.
+    // Replay a saved take: any Listen in progress hands the transport over, and the
+    // self-paced matcher stops so the replay owns the cursor.
     const replayTake = (take: Take) => {
-        const osmd = osmdRef.current;
-        if (!osmd) {
-            return;
-        }
-        if (playingRef.current) {
-            stopListen();
-        }
-        playingRef.current = true;
         matcher.stop();
-        setActiveReplayId(take.id);
-        const cursor: Cursor = osmd.cursor;
-        cursor.reset();
-        cursor.show();
-        setPlaying(true);
-        const events = toReplayEvents(take.composition);
-        let step = 0;
-        const tick = () => {
-            if (step >= events.length) {
-                stopListen();
-                return;
-            }
-            restoreNotes(listenHighlightRef.current);
-            listenHighlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
-            const event = events[step]!;
-            for (const note of event.notes) {
-                synth.playNote(note.pitch, {
-                    velocity: note.velocity,
-                    duration: note.durationMs / 1000,
-                });
-            }
-            // Advance the visual cursor alongside the audio; when the score runs out
-            // before the take does, the audio simply plays on to the end.
-            if (!cursor.iterator.EndReached) {
-                cursor.next();
-                centerCursor();
-            }
-            const next = events[step + 1];
-            step++;
-            const delay = next !== undefined ? Math.max(40, next.atMs - event.atMs) : 500;
-            listenChain.push(tick, delay);
-        };
-        tick();
+        listenPlayback.replay(take);
     };
 
     const deleteTake = (takeId: string) => {
-        if (activeReplayId === takeId) {
-            stopListen();
+        if (listenPlayback.activeReplayId === takeId) {
+            listenPlayback.stop();
         }
         // The returned list is what storage really holds — a refused rewrite keeps
         // the take, and the list keeps showing it instead of resurrecting it later.
@@ -1012,7 +897,7 @@ export function ScoreViewer({
         const partial = from > 0;
         partialRunRef.current = partial;
         enterPlayFullscreen();
-        stopListen();
+        listenPlayback.stop();
         setRunSaved("idle");
         // A fresh recorder also zeroes the run clock, so the ghost tick's startedAt
         // guard holds until the run's first note arrives — a stale start timestamp
@@ -1068,10 +953,10 @@ export function ScoreViewer({
         <Button
             variant="secondary"
             disabled={!ready || keepUp.running}
-            onClick={() => (playing ? stopListen() : listen())}
+            onClick={() => (listenPlayback.playing ? listenPlayback.stop() : listen())}
         >
-            {playing ? <StopIcon /> : <PlayIcon />}
-            {playing ? m.action_listen_stop() : m.action_listen()}
+            {listenPlayback.playing ? <StopIcon /> : <PlayIcon />}
+            {listenPlayback.playing ? m.action_listen_stop() : m.action_listen()}
         </Button>
     );
     // Practice is the screen's primary action, so it carries the dominant filled variant.
@@ -1309,7 +1194,10 @@ export function ScoreViewer({
                         // Lighthouse amplifies under CPU throttling). The max-height keeps
                         // it from crowding the keyboard off-screen; taller scores scroll.
                         className={`no-scrollbar overflow-auto ${
-                            ready && measureCount > 1 && !playing && !matcher.practicing
+                            ready &&
+                            measureCount > 1 &&
+                            !listenPlayback.playing &&
+                            !matcher.practicing
                                 ? "cursor-pointer"
                                 : ""
                         } ${
@@ -1547,15 +1435,15 @@ export function ScoreViewer({
                             id={id}
                             takes={takes}
                             title={title}
-                            activeReplayId={activeReplayId}
-                            playing={playing}
+                            activeReplayId={listenPlayback.activeReplayId}
+                            playing={listenPlayback.playing}
                             lastRunOnsets={ghostRace.storedGhost}
                             canShareLastRun={!ghostRace.sharedFromLink}
                             onReplay={(take) => {
                                 setRunsOpen(false);
                                 replayTake(take);
                             }}
-                            onStop={stopListen}
+                            onStop={listenPlayback.stop}
                             onDelete={deleteTake}
                         />
                     </Drawer>
