@@ -9,6 +9,7 @@ import { FullScreen, FullscreenProvider, Midi, Show, useMidiConnected } from "./
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
+import { usePref } from "../../hooks/usePref";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
@@ -288,9 +289,9 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     const { prefs: prefsStore } = services;
     const xmlCodec = useXmlCodec();
-    const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
+    const [barsPerRow, setBarsPerRow] = usePref(prefsStore, "barsPerRow");
     // Whether to number the first bar of each staff row, remembered per device.
-    const [barNumbers, setBarNumbers] = useState(() => prefsStore.load().barNumbers);
+    const [barNumbers, setBarNumbers] = usePref(prefsStore, "barNumbers");
     // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
     // alone would read as desktop). Drives the focus strip and a shorter staff box so the
     // keyboard never buries the notes, in either orientation.
@@ -313,12 +314,12 @@ export function ScoreViewer({
     // notes being played; the player picks its width (or 0 to keep the whole piece in
     // view, fixed). Changing it re-frames from scratch (clear the remembered window).
     const [keyWindow, setKeyWindow] = useState<Span | null>(null);
-    const [keyboardOctaves, setKeyboardOctaves] = useState(() => prefsStore.load().keyboardOctaves);
+    const [keyboardOctaves, setKeyboardOctaves] = usePref(prefsStore, "keyboardOctaves");
     const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
     // Render the piece as one horizontal line that scrolls under a fixed gaze, instead of
     // wrapping into rows — the "treadmill" reading mode. Off by default.
-    const [treadmill, setTreadmill] = useState(() => prefsStore.load().treadmill);
-    const [raceGhost, setRaceGhost] = useState(() => prefsStore.load().raceGhost);
+    const [treadmill, setTreadmill] = usePref(prefsStore, "treadmill");
+    const [raceGhost, setRaceGhost] = usePref(prefsStore, "raceGhost");
     // Print the suggested fingering numbers on the staff. Seeded from the saved default
     // (off), flipped live by the in-play toggle. The numbers are always baked into the
     // loaded sheet; the toggle only flips whether OSMD draws them, applied with a re-render
@@ -437,7 +438,7 @@ export function ScoreViewer({
     }, [id, canShareGhost, searchParams, services.ghosts.save, services.ghosts.load]);
 
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
-    const [forgiving, setForgiving] = useState(() => prefsStore.load().forgiving);
+    const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
     const matcher = useScoreMatcher(() => osmdRef.current, {
         tempo,
         hand,
@@ -1803,26 +1804,14 @@ export function ScoreViewer({
                         <Option caption={m.forgiving_hint()}>
                             <Switch
                                 checked={forgiving}
-                                onChange={(next) => {
-                                    prefsStore.save({
-                                        ...prefsStore.load(),
-                                        forgiving: next,
-                                    });
-                                    setForgiving(next);
-                                }}
+                                onChange={setForgiving}
                                 label={m.forgiving_toggle()}
                             />
                         </Option>
                         <Option caption={m.race_ghost_hint()}>
                             <Switch
                                 checked={raceGhost}
-                                onChange={(next) => {
-                                    prefsStore.save({
-                                        ...prefsStore.load(),
-                                        raceGhost: next,
-                                    });
-                                    setRaceGhost(next);
-                                }}
+                                onChange={setRaceGhost}
                                 label={m.race_ghost_toggle()}
                             />
                         </Option>
@@ -1927,26 +1916,14 @@ export function ScoreViewer({
                         <Option caption={m.treadmill_hint()}>
                             <Switch
                                 checked={treadmill}
-                                onChange={(next) => {
-                                    prefsStore.save({
-                                        ...prefsStore.load(),
-                                        treadmill: next,
-                                    });
-                                    setTreadmill(next);
-                                }}
+                                onChange={setTreadmill}
                                 label={m.treadmill_toggle()}
                             />
                         </Option>
                         <Option caption={m.bar_numbers_hint()}>
                             <Switch
                                 checked={barNumbers}
-                                onChange={(next) => {
-                                    prefsStore.save({
-                                        ...prefsStore.load(),
-                                        barNumbers: next,
-                                    });
-                                    setBarNumbers(next);
-                                }}
+                                onChange={setBarNumbers}
                                 label={m.bar_numbers_toggle()}
                             />
                         </Option>
@@ -1961,14 +1938,7 @@ export function ScoreViewer({
                                             label: n === 0 ? m.bars_per_row_auto() : String(n),
                                         }))}
                                         value={String(barsPerRow)}
-                                        onChange={(id) => {
-                                            const n = Number(id);
-                                            setBarsPerRow(n);
-                                            prefsStore.save({
-                                                ...prefsStore.load(),
-                                                barsPerRow: n,
-                                            });
-                                        }}
+                                        onChange={(id) => setBarsPerRow(Number(id))}
                                         label={m.bars_per_row()}
                                     />
                                 </Labeled>
@@ -1983,13 +1953,10 @@ export function ScoreViewer({
                                     }))}
                                     value={String(keyboardOctaves)}
                                     onChange={(id) => {
-                                        const n = Number(id);
-                                        setKeyboardOctaves(n);
+                                        // Re-frame the keyboard window from scratch when the
+                                        // octave count changes; usePref persists the choice.
+                                        setKeyboardOctaves(Number(id));
                                         setKeyWindow(null);
-                                        prefsStore.save({
-                                            ...prefsStore.load(),
-                                            keyboardOctaves: n,
-                                        });
                                     }}
                                     label={m.keyboard_octaves()}
                                 />
