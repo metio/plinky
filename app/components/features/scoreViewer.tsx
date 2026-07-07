@@ -28,7 +28,7 @@ import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 
 import { svgMilestone } from "../../../core/milestoneCard";
 import { isFirstS, isFlawless, type Milestone } from "../../../core/milestones";
-import { applyRun, isDue, letterMin, setBacklog } from "../../../core/mastery";
+import { applyRun, letterMin } from "../../../core/mastery";
 import { useMastery } from "../../hooks/useMastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
 import { useServices, useXmlCodec } from "../../contexts/services";
@@ -105,6 +105,7 @@ import {
     CloseIcon,
     EyeIcon,
     HandIcon,
+    ListIcon,
     PlayIcon,
     RotateIcon,
     SlidersIcon,
@@ -378,6 +379,8 @@ export function ScoreViewer({
     // Whether the Practice-tools drawer (all the play settings) is open. Reachable
     // both at rest and in full screen — the drawer portals above the score.
     const [toolsOpen, setToolsOpen] = useState(false);
+    // Whether the Runs drawer (your saved performances of this piece) is open.
+    const [runsOpen, setRunsOpen] = useState(false);
     // The slice of keyboard on show. A wide-ranging piece would shrink every key to a
     // sliver if framed whole, so the keyboard tracks a bounded window that follows the
     // notes being played; the player picks its width (or 0 to keep the whole piece in
@@ -932,12 +935,6 @@ export function ScoreViewer({
             matcher.stop();
         }
     }, [fullscreen]);
-
-    const toggleBacklog = () => {
-        const updated = setBacklog(mastery, !mastery?.backlog, Date.now());
-        masteryStore.save(id, updated);
-        onMastery?.();
-    };
 
     const stopListen = () => {
         for (const id of timers.current) {
@@ -1563,6 +1560,15 @@ export function ScoreViewer({
             {m.more_options()}
         </Button>
     );
+    // Opens the Runs drawer: your saved performances of this piece. Kept out of the main
+    // column so browsing them, sharing your last run, or replaying one never clutters the
+    // resting play view. Not for an ephemeral piece, which can't be saved.
+    const runsButton = !ephemeral && (
+        <Button variant="secondary" onClick={() => setRunsOpen(true)}>
+            <ListIcon />
+            {m.takes_button()}
+        </Button>
+    );
 
     return (
         <FullscreenProvider active={fullscreen}>
@@ -1657,6 +1663,7 @@ export function ScoreViewer({
                     <div className="flex flex-wrap items-center gap-3">
                         {practiceButton}
                         {toolsButton}
+                        {runsButton}
                     </div>
                 </FullScreen>
                 {/* When the loop is on, its range and narrowing controls sit right by the
@@ -2093,31 +2100,6 @@ export function ScoreViewer({
                     </FieldGroup>
                 </Drawer>
 
-                <div
-                    hidden={ephemeral || fullscreen}
-                    className="flex flex-wrap items-center gap-3 text-sm"
-                >
-                    {/* The learned state itself now reads from the colour of the header
-                    check (green when learned), so no text repeats it; here we keep only
-                    the actionable review/backlog control and the due nudge. */}
-                    {mastery?.learned && (
-                        <>
-                            {isDue(mastery, Date.now()) && (
-                                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                                    {m.mastery_due()}
-                                </span>
-                            )}
-                            <button
-                                type="button"
-                                onClick={toggleBacklog}
-                                className="text-indigo-600 underline dark:text-indigo-400"
-                            >
-                                {mastery.backlog ? m.mastery_resume() : m.mastery_backlog()}
-                            </button>
-                        </>
-                    )}
-                </div>
-
                 <FullScreen off>
                     <Show when={sharedFromLink}>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -2343,12 +2325,21 @@ export function ScoreViewer({
                         </div>
                     )}
                 </FullScreen>
-                <FullScreen off>
-                    {/* One home for your own performances of this piece: share your last run
-                    as a ghost, and — once saved — the list of takes. Always present (except on
-                    an ephemeral piece, which can't be saved) so the feature is discoverable
-                    before there's anything in it. */}
-                    {!ephemeral && (
+                {/* Your saved performances of this piece live in their own drawer — sharing
+                your last run, replaying or racing an old one — so browsing them never
+                clutters the resting play column. The drawer's count-titled header stands in
+                for a section heading; replaying one closes the drawer so the score behind it
+                is in view. Not for an ephemeral piece, which can't be saved. */}
+                {!ephemeral && (
+                    <Drawer
+                        open={runsOpen}
+                        onClose={() => setRunsOpen(false)}
+                        title={
+                            takes.length > 0
+                                ? m.takes_heading({ count: takes.length })
+                                : m.takes_panel_heading()
+                        }
+                    >
                         <TakesPanel
                             id={id}
                             takes={takes}
@@ -2357,12 +2348,15 @@ export function ScoreViewer({
                             playing={playing}
                             lastRunOnsets={storedGhost}
                             canShareLastRun={!sharedFromLink}
-                            onReplay={replayTake}
+                            onReplay={(take) => {
+                                setRunsOpen(false);
+                                replayTake(take);
+                            }}
                             onStop={stopListen}
                             onDelete={deleteTake}
                         />
-                    )}
-                </FullScreen>
+                    </Drawer>
+                )}
             </div>
         </FullscreenProvider>
     );

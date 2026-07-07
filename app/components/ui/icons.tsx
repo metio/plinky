@@ -192,6 +192,25 @@ export function ClockIcon({ className }: IconProps) {
     );
 }
 
+// An archive box with a lid — "shelve this piece" (move to backlog). Filled lid when
+// shelved so the toggle reads its state at a glance.
+export function ArchiveIcon({ className, filled = false }: IconProps & { filled?: boolean }) {
+    return (
+        <Icon className={className}>
+            <rect
+                x="3"
+                y="4"
+                width="18"
+                height="4"
+                rx="1"
+                fill={filled ? "currentColor" : "none"}
+            />
+            <path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8" />
+            <path d="M10 12h4" />
+        </Icon>
+    );
+}
+
 // --- Navigation icons --------------------------------------------------------
 
 // A house — "home".

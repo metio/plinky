@@ -436,6 +436,7 @@
   "attribution_public_domain": "Domaine public",
   "attribution_via": "via",
   "attribution_edited_by": "éd.",
+  "takes_button": "Prises",
   "takes_heading": "Vos prises ({count})",
   "takes_panel_heading": "Vos prises",
   "takes_empty_hint": "Terminez une partie et enregistrez-la pour conserver une prise ici — rejouez-la, affrontez son fantôme, ou défiez un ami.",

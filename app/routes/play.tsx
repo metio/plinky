@@ -8,6 +8,7 @@ import { Show } from "../components/features/conditional";
 import { EarPiece } from "../components/features/earPiece";
 import { ExerciseForms } from "../components/features/exerciseForms";
 import { ExportButton } from "../components/features/exportButton";
+import { BacklogButton } from "../components/features/backlogButton";
 import { MarkLearnedButton } from "../components/features/markLearnedButton";
 import { PieceFingering } from "../components/features/pieceFingering";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
@@ -87,6 +88,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 <PrintButton xml={score.xml} title={score.title} />
                                 <ExportButton xml={score.xml} title={score.title} />
                                 <MarkLearnedButton id={score.id} />
+                                <BacklogButton id={score.id} />
                             </div>
                         </div>
                         {score.composer && (

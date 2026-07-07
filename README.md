@@ -120,17 +120,17 @@ one-tap **review session** walks you through everything that's fading, and you c
   most economical finger positions for your hand, the two bars you're on are
   **highlighted in the full piece** so you keep your place, and it's **saved per piece**
   so the positions you work out are there when you come back).
-- **Your takes** — every play page carries a **Your takes** panel, so the feature is there
-  to find before you've saved a thing: with nothing yet, it tells you how to make a take
-  (finish a run, then save it). Each piece keeps your last few, each
-  showing the **grade and the accuracy, timing and flow** it earned so you can compare
-  attempts at a glance: **replay** one and it plays back onto the staff in your own
-  timing — on a MIDI piano, even how long you held each key, so your articulation comes
-  back too — **download** it as MIDI or MusicXML, **challenge a friend** to race it by
-  link, or delete it. From the top of that same panel you can
-  **challenge a friend with your last run** straight away, no save needed. Your fastest
-  complete take is the **ghost** you race next time — racing is on by default and toggles
-  off under the score's practice options.
+- **Your runs** — every play page has a **Runs** button beside Practice that opens a
+  drawer of your saved performances, so the feature is there to find before you've saved a
+  thing: with nothing yet, it tells you how to make a run (play a piece through, then save
+  it). Each piece keeps your last few, each showing the **grade and the accuracy, timing
+  and flow** it earned so you can compare attempts at a glance: **replay** one and it plays
+  back onto the staff in your own timing — on a MIDI piano, even how long you held each key,
+  so your articulation comes back too — **download** it as MIDI or MusicXML, **challenge a
+  friend** to race it by link, or delete it. From the top of the drawer you can **challenge
+  a friend with your last run** straight away, no save needed. Your fastest complete run is
+  the **ghost** you race next time — racing is on by default and toggles off under the
+  score's practice options.
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the

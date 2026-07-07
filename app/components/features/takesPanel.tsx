@@ -9,7 +9,6 @@ import { ghostOnsets, type Take } from "../../../core/takes";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
-import { Disclosure } from "../ui/disclosure";
 import { CloseIcon, PlayIcon, StopIcon } from "../ui/icons";
 import { ShareGhostButton } from "./shareGhostButton";
 
@@ -33,12 +32,11 @@ export function formatAgo(fromMs: number, nowMs: number, locale: string): string
     return rtf.format(Math.round(hours / 24), "day");
 }
 
-// The "your takes" home for a piece, always present on the play page so the feature is
-// discoverable before you have anything saved. It gathers everything about your own
-// performances of the piece in one place: a header action to share your last run as a
-// ghost (available the moment you've played once, no save needed), and — once you save a
-// take — the folded list of saved takes to replay, download or delete. With no takes yet
-// it explains how to get one, so the panel is never an empty mystery.
+// The body of the Runs drawer: everything about your own performances of a piece in one
+// place — a top action to share your last run as a ghost (available the moment you've
+// played once, no save needed), and the list of saved runs to replay, race, download or
+// delete. With nothing saved it explains how to get a run, so the drawer is never an empty
+// mystery. The drawer frame supplies the heading and count, so this renders none of its own.
 export function TakesPanel({
     id,
     takes,
@@ -73,7 +71,7 @@ export function TakesPanel({
     const now = Date.now();
     const stem = fileStem(title);
     return (
-        <section aria-label={m.takes_panel_heading()} className="space-y-2">
+        <div className="space-y-3">
             {lastRunOnsets && canShareLastRun && (
                 <div className="flex justify-start">
                     <ShareGhostButton
@@ -86,93 +84,84 @@ export function TakesPanel({
                 </div>
             )}
             {takes.length === 0 ? (
-                <div className="space-y-1">
-                    <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        {m.takes_panel_heading()}
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.takes_empty_hint()}
-                    </p>
-                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.takes_empty_hint()}</p>
             ) : (
-                <Disclosure summary={m.takes_heading({ count: takes.length })}>
-                    <ul className="space-y-2">
-                        {takes.map((take) => {
-                            const replaying = activeReplayId === take.id;
-                            return (
-                                <li
-                                    key={take.id}
-                                    className="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-800"
-                                >
-                                    <span className="font-semibold">{take.letter || "—"}</span>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                        {formatAgo(take.createdAt, now, getLocale())}
-                                        {!take.complete && ` · ${m.takes_partial()}`}
-                                    </span>
-                                    {take.metrics && (
-                                        <span className="flex items-center gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
-                                            <span>
-                                                {m.scores_accuracy()} {take.metrics.accuracy}%
-                                            </span>
-                                            <span>
-                                                {m.scores_timing()} {take.metrics.timing}%
-                                            </span>
-                                            <span>
-                                                {m.scores_flow()} {take.metrics.flow}%
-                                            </span>
+                <ul className="space-y-2">
+                    {takes.map((take) => {
+                        const replaying = activeReplayId === take.id;
+                        return (
+                            <li
+                                key={take.id}
+                                className="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-800"
+                            >
+                                <span className="font-semibold">{take.letter || "—"}</span>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                    {formatAgo(take.createdAt, now, getLocale())}
+                                    {!take.complete && ` · ${m.takes_partial()}`}
+                                </span>
+                                {take.metrics && (
+                                    <span className="flex items-center gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                                        <span>
+                                            {m.scores_accuracy()} {take.metrics.accuracy}%
                                         </span>
-                                    )}
-                                    <span className="ml-auto flex items-center gap-1">
-                                        <IconButton
-                                            label={replaying ? m.takes_stop() : m.takes_replay()}
-                                            onClick={() => (replaying ? onStop() : onReplay(take))}
-                                            disabled={playing && !replaying}
-                                        >
-                                            {replaying ? <StopIcon /> : <PlayIcon />}
-                                        </IconButton>
-                                        <ShareGhostButton
-                                            id={id}
-                                            title={title}
-                                            onsets={ghostOnsets(take)}
-                                            label={m.takes_share_ghost()}
-                                        />
-                                        <Button
-                                            onClick={() =>
-                                                downloadBlob(
-                                                    buildMidiFile(toMidiNotes(take.composition), {
-                                                        tempo: take.composition.tempo,
-                                                    }),
-                                                    "audio/midi",
-                                                    `${stem}-take.mid`,
-                                                )
-                                            }
-                                        >
-                                            {m.takes_download_midi()}
-                                        </Button>
-                                        <Button
-                                            onClick={() =>
-                                                downloadBlob(
-                                                    toMusicXml(take.composition),
-                                                    "application/xml",
-                                                    `${stem}-take.musicxml`,
-                                                )
-                                            }
-                                        >
-                                            {m.takes_download_musicxml()}
-                                        </Button>
-                                        <IconButton
-                                            label={m.takes_delete()}
-                                            onClick={() => onDelete(take.id)}
-                                        >
-                                            <CloseIcon />
-                                        </IconButton>
+                                        <span>
+                                            {m.scores_timing()} {take.metrics.timing}%
+                                        </span>
+                                        <span>
+                                            {m.scores_flow()} {take.metrics.flow}%
+                                        </span>
                                     </span>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </Disclosure>
+                                )}
+                                <span className="ml-auto flex items-center gap-1">
+                                    <IconButton
+                                        label={replaying ? m.takes_stop() : m.takes_replay()}
+                                        onClick={() => (replaying ? onStop() : onReplay(take))}
+                                        disabled={playing && !replaying}
+                                    >
+                                        {replaying ? <StopIcon /> : <PlayIcon />}
+                                    </IconButton>
+                                    <ShareGhostButton
+                                        id={id}
+                                        title={title}
+                                        onsets={ghostOnsets(take)}
+                                        label={m.takes_share_ghost()}
+                                    />
+                                    <Button
+                                        onClick={() =>
+                                            downloadBlob(
+                                                buildMidiFile(toMidiNotes(take.composition), {
+                                                    tempo: take.composition.tempo,
+                                                }),
+                                                "audio/midi",
+                                                `${stem}-take.mid`,
+                                            )
+                                        }
+                                    >
+                                        {m.takes_download_midi()}
+                                    </Button>
+                                    <Button
+                                        onClick={() =>
+                                            downloadBlob(
+                                                toMusicXml(take.composition),
+                                                "application/xml",
+                                                `${stem}-take.musicxml`,
+                                            )
+                                        }
+                                    >
+                                        {m.takes_download_musicxml()}
+                                    </Button>
+                                    <IconButton
+                                        label={m.takes_delete()}
+                                        onClick={() => onDelete(take.id)}
+                                    >
+                                        <CloseIcon />
+                                    </IconButton>
+                                </span>
+                            </li>
+                        );
+                    })}
+                </ul>
             )}
-        </section>
+        </div>
     );
 }

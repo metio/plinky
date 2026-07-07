@@ -436,6 +436,7 @@
   "attribution_public_domain": "퍼블릭 도메인",
   "attribution_via": "출처",
   "attribution_edited_by": "편",
+  "takes_button": "녹음",
   "takes_heading": "내 녹음 ({count})",
   "takes_panel_heading": "내 녹음",
   "takes_empty_hint": "끝까지 연주하고 저장하면 녹음이 여기 남아요 — 다시 재생하거나, 고스트와 경주하거나, 친구에게 도전장을 내밀 수 있어요.",

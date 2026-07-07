@@ -436,6 +436,7 @@
   "attribution_public_domain": "公有领域",
   "attribution_via": "来源",
   "attribution_edited_by": "编订",
+  "takes_button": "录音",
   "takes_heading": "你的录音（{count}）",
   "takes_panel_heading": "你的录音",
   "takes_empty_hint": "把一首曲子弹到最后并保存下来，就能在这里留下一段录音——之后可以回放、与它的残影竞速，或向好友发起挑战。",

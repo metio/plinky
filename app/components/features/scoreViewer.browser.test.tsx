@@ -93,13 +93,14 @@ describe("ScoreViewer", () => {
         expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
-    it("always shows the takes panel with a how-to hint before any take is saved", async () => {
-        // The panel is always present (on a savable piece) so the feature is discoverable;
-        // with nothing saved it explains how to make a take rather than hiding entirely.
+    it("opens a Runs drawer that explains how to make a run before any is saved", async () => {
+        // The Runs button is always in the action row (on a savable piece) so the feature is
+        // discoverable; opening it with nothing saved explains how to make a run.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
-        expect(screen.getByText(/finish a run and save it/i)).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Runs" }));
+        expect(await screen.findByText(/play a piece through and save it/i)).toBeTruthy();
     });
 
     it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {

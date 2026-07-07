@@ -38,15 +38,12 @@ const base = {
     onDelete: () => {},
 };
 
-// With takes present the list lives inside a folded Disclosure, so each test opens it first.
-const open = () => fireEvent.click(screen.getByRole("button", { name: /your takes/i }));
-
 describe("TakesPanel", () => {
-    it("explains how to make a take when there are none yet", () => {
+    it("explains how to make a run when there are none yet", () => {
         render(<TakesPanel {...base} takes={[]} />);
-        // The panel is always present so the feature is discoverable; with nothing saved it
-        // tells you how to get a take rather than showing an empty mystery.
-        expect(screen.getByText(/finish a run and save it/i)).toBeTruthy();
+        // As the Runs drawer's body it's shown whenever the drawer is open, so with nothing
+        // saved it tells you how to get a run rather than being an empty mystery.
+        expect(screen.getByText(/play a piece through and save it/i)).toBeTruthy();
         expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
     });
 
@@ -73,7 +70,6 @@ describe("TakesPanel", () => {
 
     it("lists each saved take with a replay control", () => {
         render(<TakesPanel {...base} takes={[mk("1"), mk("2", { letter: "A" })]} />);
-        open();
         expect(screen.getAllByRole("button", { name: /replay/i })).toHaveLength(2);
     });
 
@@ -95,7 +91,6 @@ describe("TakesPanel", () => {
                 ]}
             />,
         );
-        open();
         expect(screen.getByText(/Accuracy 91%/)).toBeTruthy();
         expect(screen.getByText(/Timing 73%/)).toBeTruthy();
         expect(screen.getByText(/Flow 88%/)).toBeTruthy();
@@ -103,13 +98,11 @@ describe("TakesPanel", () => {
 
     it("omits the metrics line for a take with no stored grade", () => {
         render(<TakesPanel {...base} takes={[mk("1", { metrics: null })]} />);
-        open();
         expect(screen.queryByText(/Accuracy/)).toBeNull();
     });
 
     it("copies a share link when challenging a friend with a take", async () => {
         render(<TakesPanel {...base} takes={[mk("1")]} />);
-        open();
         fireEvent.click(screen.getByRole("button", { name: /challenge a friend/i }));
         expect(await screen.findByText(/link copied/i)).toBeTruthy();
     });
@@ -117,7 +110,6 @@ describe("TakesPanel", () => {
     it("replays the clicked take", () => {
         const onReplay = vi.fn();
         render(<TakesPanel {...base} takes={[mk("1")]} onReplay={onReplay} />);
-        open();
         fireEvent.click(screen.getByRole("button", { name: /replay/i }));
         expect(onReplay).toHaveBeenCalledWith(expect.objectContaining({ id: "1" }));
     });
@@ -133,7 +125,6 @@ describe("TakesPanel", () => {
                 onStop={onStop}
             />,
         );
-        open();
         fireEvent.click(screen.getByRole("button", { name: /stop/i }));
         expect(onStop).toHaveBeenCalled();
         // The other take can't start a competing replay while one is playing.
@@ -144,14 +135,12 @@ describe("TakesPanel", () => {
     it("deletes a take by id", () => {
         const onDelete = vi.fn();
         render(<TakesPanel {...base} takes={[mk("1")]} onDelete={onDelete} />);
-        open();
-        fireEvent.click(screen.getByRole("button", { name: /delete take/i }));
+        fireEvent.click(screen.getByRole("button", { name: /delete run/i }));
         expect(onDelete).toHaveBeenCalledWith("1");
     });
 
     it("flags an incomplete take as partial", () => {
         render(<TakesPanel {...base} takes={[mk("1", { complete: false })]} />);
-        open();
         expect(screen.getByText(/partial/i)).toBeTruthy();
     });
 });

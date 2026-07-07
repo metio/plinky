@@ -436,6 +436,7 @@
   "attribution_public_domain": "Dominio pubblico",
   "attribution_via": "via",
   "attribution_edited_by": "ed.",
+  "takes_button": "Esecuzioni",
   "takes_heading": "Le tue esecuzioni ({count})",
   "takes_panel_heading": "Le tue esecuzioni",
   "takes_empty_hint": "Completa un'esecuzione e salvala per conservarla qui — riascoltala, gareggia contro il suo fantasma o sfida un amico.",

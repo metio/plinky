@@ -436,6 +436,7 @@
   "attribution_public_domain": "Јавно власништво",
   "attribution_via": "преко",
   "attribution_edited_by": "прир.",
+  "takes_button": "Покушаји",
   "takes_heading": "Твоји покушаји ({count})",
   "takes_panel_heading": "Твоји покушаји",
   "takes_empty_hint": "Одсвирај комад до краја и сачувај га да овде задржиш покушај — понови га, тркај се с његовим духом или изазови пријатеља.",
