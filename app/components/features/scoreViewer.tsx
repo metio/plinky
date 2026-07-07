@@ -11,6 +11,7 @@ import { usePref } from "../../hooks/usePref";
 import { useTempoControls } from "../../hooks/useTempoControls";
 import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { useLoopSelection } from "../../hooks/useLoopSelection";
+import { useReadingMode } from "../../hooks/useReadingMode";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
 import { useRunResult } from "../../hooks/useRunResult";
@@ -169,9 +170,21 @@ export function ScoreViewer({
     const [showMine, setShowMine] = useState(hasSaved);
     const { prefs: prefsStore } = services;
     const xmlCodec = useXmlCodec();
-    const [barsPerRow, setBarsPerRow] = usePref(prefsStore, "barsPerRow");
-    // Whether to number the first bar of each staff row, remembered per device.
-    const [barNumbers, setBarNumbers] = usePref(prefsStore, "barNumbers");
+    // How the score is laid out and read — bars per row, bar numbers, treadmill, on-staff
+    // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
+    const reading = useReadingMode();
+    const {
+        barsPerRow,
+        setBarsPerRow,
+        barNumbers,
+        setBarNumbers,
+        treadmill,
+        setTreadmill,
+        showFingerings,
+        setShowFingerings,
+        scrollFollow,
+        setScrollFollow,
+    } = reading;
     // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
     // alone would read as desktop). Drives the focus strip and a shorter staff box so the
     // keyboard never buries the notes, in either orientation.
@@ -196,19 +209,7 @@ export function ScoreViewer({
     const [keyWindow, setKeyWindow] = useState<Span | null>(null);
     const [keyboardOctaves, setKeyboardOctaves] = usePref(prefsStore, "keyboardOctaves");
     const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
-    // Render the piece as one horizontal line that scrolls under a fixed gaze, instead of
-    // wrapping into rows — the "treadmill" reading mode. Off by default.
-    const [treadmill, setTreadmill] = usePref(prefsStore, "treadmill");
     const [raceGhost, setRaceGhost] = usePref(prefsStore, "raceGhost");
-    // Print the suggested fingering numbers on the staff. Seeded from the saved default
-    // (off), flipped live by the in-play toggle. The numbers are always baked into the
-    // loaded sheet; the toggle only flips whether OSMD draws them, applied with a re-render
-    // (not a reload) so it can go on and off mid-play without tearing down a run.
-    const [showFingerings, setShowFingerings] = useState(() => prefsStore.load().showFingerings);
-    // Whether the staff scrolls to keep the played note in view. On by default; the
-    // treadmill drives its own centring, so OSMD's follow is off there. Applied straight to
-    // OSMD (no reload).
-    const [scrollFollow, setScrollFollow] = useState(true);
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
