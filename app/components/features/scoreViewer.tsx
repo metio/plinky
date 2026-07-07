@@ -13,7 +13,7 @@ import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useSco
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { cadence } from "../../../core/cadence";
-import { deriveRunOutcome } from "../../../core/runOutcome";
+import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
 import type { DailyResult } from "../../../core/daily";
 import { STAFF_FOR } from "../../../core/matcher";
 import { GRADE_COLOR, type Grade, type KeepUpResult, scoreKeepUp } from "../../../core/grade";
@@ -63,9 +63,9 @@ import {
     SELECT_COLOR,
     WINDOW_COLOR,
 } from "../../../core/scoreCanvas";
-import { type Grid, handsPlayed, laggingHand, type RunNote } from "../../../core/shareCard";
+import type { Grid, RunNote } from "../../../core/shareCard";
 import { transposeMusicXml } from "../../../core/transpose";
-import { type Hotspot, instantaneousBpm, type TempoPoint } from "../../../core/tempo";
+import { instantaneousBpm } from "../../../core/tempo";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { Button, IconButton } from "../ui/button";
@@ -85,13 +85,11 @@ import {
     SlidersIcon,
     StopIcon,
 } from "../ui/icons";
-import { PerformanceStrip } from "../ui/performanceStrip";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { SegmentedControl } from "../ui/segmentedControl";
-import { ShareCard } from "./shareCard";
+import { RunResult } from "./runResult";
 import { BumpValue, Stepper } from "../ui/stepper";
 import { Switch } from "../ui/switch";
-import { TempoGraph } from "../ui/tempoGraph";
 
 // A cleared note plus the velocity it was played at and the pitches sounded at
 // that step — the run's raw record, from which the grade, the per-note strip and
@@ -390,11 +388,7 @@ export function ScoreViewer({
     // channel once the run's mastery is folded in, for the shell banner to celebrate. At
     // most one per run; cleared at the next run's start.
     const { publish: publishMilestone, dismiss: dismissMilestone } = useMilestoneChannel();
-    const [tempoCurve, setTempoCurve] = useState<{
-        points: TempoPoint[];
-        median: number;
-        hotspots: Hotspot[];
-    } | null>(null);
+    const [tempoCurve, setTempoCurve] = useState<TempoCurve | null>(null);
     // The tempo a run was matched at, captured when practice starts so the run's
     // self-paced tempo curve reads against the same reference the matcher used,
     // even if the slider is moved afterwards.
@@ -1451,15 +1445,10 @@ export function ScoreViewer({
     // Which hand trailed the other on a two-hand run (null on a single-hand one), read at
     // the same tempo scale as the shared grid so the readout matches its rows. Only
     // meaningful once a run is graded.
-    const handVerdict = (() => {
-        if (!grade) {
-            return null;
-        }
-        const intended = initialTempo ?? runTempoRef.current;
-        return laggingHand(runNotes, {
-            tempoScale: intended > 0 ? runTempoRef.current / intended : 1,
-        });
-    })();
+    // The run's tempo re-referenced to the piece's own, so the results panel reads the
+    // lagging hand at the same scale the share grid was built with.
+    const intendedTempo = initialTempo ?? runTempoRef.current;
+    const runTempoScale = intendedTempo > 0 ? runTempoRef.current / intendedTempo : 1;
 
     // Listen lives only in the full-screen top bar. Playing enters full screen on every
     // device, so that is the one place it's reachable — which keeps the inline /play view to
@@ -2162,109 +2151,19 @@ export function ScoreViewer({
                 <FullScreen off>
                     {grade && (
                         <div ref={gradePanelRef} className="space-y-3">
-                            {!ephemeral &&
-                                (runSaved === "saved" ? (
-                                    <p className="text-sm text-green-700 dark:text-green-400">
-                                        {m.takes_saved()}
-                                    </p>
-                                ) : runSaved === "failed" ? (
-                                    <p className="text-sm text-red-700 dark:text-red-400">
-                                        {m.takes_save_failed()}
-                                    </p>
-                                ) : (
-                                    <div className="flex flex-wrap items-center gap-3">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                                            {m.takes_save_prompt()}
-                                        </span>
-                                        <Button variant="primary" onClick={saveCurrentTake}>
-                                            {m.takes_save()}
-                                        </Button>
-                                    </div>
-                                ))}
-                            <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
-                                <div
-                                    className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}
-                                >
-                                    {grade.letter}
-                                </div>
-                                <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
-                                    <dt className="text-gray-500 dark:text-gray-400">
-                                        {m.scores_accuracy()}
-                                    </dt>
-                                    <dd className="text-right font-mono tabular-nums">
-                                        {grade.accuracy}%
-                                    </dd>
-                                    <dt className="text-gray-500 dark:text-gray-400">
-                                        {m.scores_timing()}
-                                    </dt>
-                                    <dd className="text-right font-mono tabular-nums">
-                                        {grade.timing}%
-                                    </dd>
-                                    <dt className="text-gray-500 dark:text-gray-400">
-                                        {m.scores_flow()}
-                                    </dt>
-                                    <dd className="text-right font-mono tabular-nums">
-                                        {grade.flow}%
-                                    </dd>
-                                    {grade.dynamics !== null && (
-                                        <>
-                                            <dt className="text-gray-400 dark:text-gray-500">
-                                                {m.scores_dynamics()}
-                                            </dt>
-                                            <dd className="text-right font-mono tabular-nums text-gray-500 dark:text-gray-400">
-                                                {grade.dynamics}%
-                                            </dd>
-                                        </>
-                                    )}
-                                </dl>
-                            </div>
-                            <PerformanceStrip notes={runNotes} tolerance={runTolerance} />
-                            {tempoCurve && (
-                                <section className="space-y-1">
-                                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                        {m.tempo_heading()}
-                                    </h3>
-                                    <TempoGraph
-                                        points={tempoCurve.points}
-                                        median={tempoCurve.median}
-                                        hotspots={tempoCurve.hotspots}
-                                    />
-                                </section>
-                            )}
-                            {handVerdict && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {handVerdict === "even"
-                                        ? m.hands_even()
-                                        : handVerdict === "left"
-                                          ? m.hand_left_lagged()
-                                          : m.hand_right_lagged()}
-                                </p>
-                            )}
-                            {shareGrid && (
-                                <ShareCard
-                                    grid={shareGrid}
-                                    caption={m.share_heading()}
-                                    gridLabel={m.share_grid_label()}
-                                    rowLabels={
-                                        handsPlayed(runNotes).length > 1
-                                            ? handsPlayed(runNotes).map((staff) =>
-                                                  staff === 0 ? m.hand_right() : m.hand_left(),
-                                              )
-                                            : [m.share_row_you()]
-                                    }
-                                    boast={
-                                        daily != null
-                                            ? m.daily_share_boast({
-                                                  number: daily,
-                                                  grade: grade.letter,
-                                              })
-                                            : m.share_boast({ title })
-                                    }
-                                    heading={
-                                        daily != null ? `🎹 Plinky ${daily} ${grade.letter}` : title
-                                    }
-                                />
-                            )}
+                            <RunResult
+                                grade={grade}
+                                notes={runNotes}
+                                tolerance={runTolerance}
+                                grid={shareGrid}
+                                tempoCurve={tempoCurve}
+                                tempoScale={runTempoScale}
+                                daily={daily}
+                                title={title}
+                                ephemeral={ephemeral}
+                                runSaved={runSaved}
+                                onSaveTake={saveCurrentTake}
+                            />
                         </div>
                     )}
                 </FullScreen>
