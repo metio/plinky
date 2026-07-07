@@ -15,6 +15,13 @@ import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { cadence } from "../../../core/cadence";
 import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
+import {
+    type RunCapture,
+    captureCleared,
+    captureRelease,
+    liveTempo as nextLiveTempo,
+    startCapture,
+} from "../../../core/runCapture";
 import { recordRun } from "../../lib/recordRun";
 import type { DailyResult } from "../../../core/daily";
 import { STAFF_FOR } from "../../../core/matcher";
@@ -35,10 +42,7 @@ import { toReplayEvents } from "../../../core/composition";
 import { listenStepMs } from "../../../core/playback";
 import { decodeGhost, ghostReached } from "../../../core/ghost";
 import {
-    type ActiveHolds,
-    beginHold,
     compositionFromRun,
-    endHold,
     fastestTakeOnsets,
     type RunStep,
     type Take,
@@ -70,7 +74,6 @@ import {
 } from "../../../core/scoreCanvas";
 import type { Grid, RunNote } from "../../../core/shareCard";
 import { transposeMusicXml } from "../../../core/transpose";
-import { instantaneousBpm } from "../../../core/tempo";
 import { m } from "../../paraglide/messages.js";
 import { Button, IconButton } from "../ui/button";
 import { Drawer } from "../ui/drawer";
@@ -91,13 +94,6 @@ import {
 import { PianoKeyboard } from "./pianoKeyboard";
 import { PracticeToolsDrawer } from "./practiceToolsDrawer";
 import { RunResult } from "./runResult";
-
-// A cleared note plus the velocity it was played at and the pitches sounded at
-// that step — the run's raw record, from which the grade, the per-note strip and
-// the share grid are derived, and a saved take's notes are reconstructed.
-// heldMs is the real key-hold length, filled in from the MIDI note-off once the key is
-// released (absent for imprecise input, which reports no meaningful hold).
-type PlayedNote = RunNote & { velocity: number; pitches: number[]; heldMs?: number };
 
 // A typed bar number for the loop range — a number field (not a stepper), because a
 // piece can run to many bars and typing the target beats tapping a stepper there.
@@ -168,17 +164,10 @@ export function ScoreViewer({
     // `playing` state has re-rendered can't start a second cursor loop.
     const playingRef = useRef(false);
     const tempoRef = useRef(initialTempo ?? 100);
-    const notesRef = useRef<PlayedNote[]>([]);
-    // Each still-held MIDI pitch mapped to the run note it belongs to and when it was
-    // struck, so its note-off can fill in that note's real hold length.
-    const holdRef = useRef<ActiveHolds>(new Map());
-    const startRef = useRef(0);
-    const baseOffsetRef = useRef(0);
-    // Whether any note this run came from an imprecise input (on-screen or computer
-    // keyboard). Those can't tap a true rhythm, so the run's timing is graded with
-    // widened windows rather than flooring a touch player — the primary input — at
-    // zero. Reset when a run starts; read when it is graded.
-    const impreciseRef = useRef(false);
+    // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
+    // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
+    // callback and the MIDI release handler both advance it between renders.
+    const captureRef = useRef<RunCapture>(startCapture());
     const synth = useSynth();
     const [ready, setReady] = useState(false);
     const [loadError, setLoadError] = useState(false);
@@ -433,50 +422,13 @@ export function ScoreViewer({
                 paintPlayedNotes(osmd, info.pitches);
                 paintedRef.current = true;
             }
-            // Record each note's notated time (the ideal) and when it was actually
-            // played, both relative to the first note, for the grade, the per-note
-            // strip and the share grid.
-            if (info.ordinal === 0) {
-                startRef.current = info.timestamp;
-                baseOffsetRef.current = info.timeMs;
-            }
-            notesRef.current = [
-                ...notesRef.current,
-                {
-                    targetMs: info.timeMs - baseOffsetRef.current,
-                    playedMs: info.timestamp - startRef.current,
-                    wrongBefore: info.wrongBefore,
-                    velocity: info.velocity,
-                    pitches: [...info.pitches],
-                    staves: info.staves,
-                },
-            ];
-            // Remember which run note each struck pitch belongs to, so its release can
-            // record how long the key was held.
-            const noteIndex = notesRef.current.length - 1;
-            for (const pitch of info.pitches) {
-                beginHold(holdRef.current, pitch, noteIndex, info.timestamp);
-            }
-            // Track the player's tempo from the gap to the previous note and ease
-            // the adaptive metronome toward it, so a single rushed note nudges
-            // rather than jerks the pulse. Clamped to the slider's own range.
-            const played = notesRef.current;
-            if (played.length >= 2) {
-                const a = played[played.length - 2];
-                const b = played[played.length - 1];
-                if (a && b) {
-                    const inst = instantaneousBpm(
-                        runTempoRef.current,
-                        b.targetMs - a.targetMs,
-                        b.playedMs - a.playedMs,
-                    );
-                    if (inst > 0 && Number.isFinite(inst)) {
-                        setLiveTempo((prev) =>
-                            Math.round(Math.min(180, Math.max(40, prev * 0.6 + inst * 0.4))),
-                        );
-                    }
-                }
-            }
+            // Record the cleared note — its ideal and actual timing, and a hold per
+            // pitch for the release to close — for the grade, the per-note strip, the
+            // share grid and the saved take.
+            captureCleared(captureRef.current, info);
+            // Ease the adaptive metronome toward the player's own pace, read from the
+            // gap between the last two notes.
+            setLiveTempo((prev) => nextLiveTempo(captureRef.current, runTempoRef.current, prev));
         },
     });
     useMidiInput({
@@ -488,7 +440,7 @@ export function ScoreViewer({
                 return;
             }
             if (!isPreciseInput(event.device)) {
-                impreciseRef.current = true;
+                captureRef.current.imprecise = true;
             }
             matcher.registerNote(event.note, event.timestamp, event.velocity);
         },
@@ -499,16 +451,7 @@ export function ScoreViewer({
             if (!isPreciseInput(event.device)) {
                 return;
             }
-            const released = endHold(holdRef.current, event.note, event.timestamp);
-            if (!released) {
-                return;
-            }
-            const note = notesRef.current[released.index];
-            if (note) {
-                // A chord's pitches release one by one; keep the longest so the note's
-                // recorded length is how long the chord actually rang.
-                note.heldMs = Math.max(note.heldMs ?? 0, released.heldMs);
-            }
+            captureRelease(captureRef.current, event.note, event.timestamp);
         },
     });
     const { status, requestAccess } = useMidiConnection();
@@ -621,14 +564,15 @@ export function ScoreViewer({
     }, [tempo]);
 
     // Advance the ghost on the live clock while practicing — it starts with the
-    // player's first note (startRef), so the two race from the same moment.
+    // player's first note (the capture's startedAt), so the two race from the same moment.
     useEffect(() => {
         if (!matcher.practicing || !ghost) {
             return;
         }
         const tick = () => {
-            if (startRef.current > 0) {
-                setGhostDone(ghostReached(ghost, performance.now() - startRef.current));
+            const startedAt = captureRef.current.startedAt;
+            if (startedAt > 0) {
+                setGhostDone(ghostReached(ghost, performance.now() - startedAt));
             }
         };
         const timer = window.setInterval(tick, 50);
@@ -689,7 +633,7 @@ export function ScoreViewer({
             return;
         }
         gradedRef.current = true;
-        const notes = notesRef.current;
+        const notes = captureRef.current.notes;
         // Everything the finished run shows and records — the grade, the timing tolerance,
         // the per-hand share grid and the tempo curve — is a pure function of the played
         // notes. The component only produces the run; deriveRunOutcome scores it.
@@ -702,7 +646,7 @@ export function ScoreViewer({
             notes,
             correct: matcher.total,
             wrong: matcher.wrong,
-            imprecise: impreciseRef.current,
+            imprecise: captureRef.current.imprecise,
             intendedTempo: initialTempo ?? runTempoRef.current,
             runTempo: runTempoRef.current,
         });
@@ -1211,7 +1155,7 @@ export function ScoreViewer({
     // Save the just-finished run as a take: rebuild a Composition from the captured
     // steps (their played onsets, pitches and velocity) and store it under this song.
     const saveCurrentTake = () => {
-        const steps: RunStep[] = notesRef.current.map((note) => ({
+        const steps: RunStep[] = captureRef.current.notes.map((note) => ({
             pitches: note.pitches,
             startMs: note.playedMs,
             velocity: note.velocity,
@@ -1314,9 +1258,10 @@ export function ScoreViewer({
         enterPlayFullscreen();
         stopListen();
         setRunSaved("idle");
-        notesRef.current = [];
-        holdRef.current.clear();
-        impreciseRef.current = false;
+        // A fresh recorder also zeroes the run clock, so the ghost tick's startedAt
+        // guard holds until the run's first note arrives — a stale start timestamp
+        // would paint the ghost at the finish the moment Practice is pressed.
+        captureRef.current = startCapture();
         gradeFromRunRef.current = false;
         gradedRef.current = false;
         setGrade(null);
@@ -1339,12 +1284,6 @@ export function ScoreViewer({
         setGhost(racing);
         setGhostDone(0);
         runTempoRef.current = tempo;
-        // The first note of the run seeds these (ordinal 0); clear them here so the
-        // ghost tick's `startRef.current > 0` guard holds until that note arrives.
-        // A stale start timestamp from a prior run would make the elapsed time huge
-        // and paint the ghost at the finish from the moment Practice is pressed.
-        startRef.current = 0;
-        baseOffsetRef.current = 0;
         // The hand the matcher and the ghost step through: the whole grand staff
         // when there's a single staff, otherwise the hand being drilled. (Fingering
         // is printed on the staff at load time, not computed per run.)
