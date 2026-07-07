@@ -10,6 +10,7 @@ import { useFullscreen } from "../../hooks/useFullscreen";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
+import { useTimerChain } from "../../hooks/useTimerChain";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
@@ -157,7 +158,11 @@ export function ScoreViewer({
     // re-fire without this latch would double-count the run. Reset at run start.
     const gradedRef = useRef(false);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-    const timers = useRef<number[]>([]);
+    // Each cursor-driving loop runs on its own timer chain, so stopping one mode can
+    // never cut down another's timers: Listen and take-replay share one transport
+    // (one cursor walk, one stop), the tempo-locked play-along has its own.
+    const listenChain = useTimerChain();
+    const keepUpChain = useTimerChain();
     // The notes Listen has lit as "now sounding", held so the highlight can be lifted
     // when the cursor moves on and when playback stops.
     const listenHighlightRef = useRef<PaintedNote[]>([]);
@@ -735,10 +740,7 @@ export function ScoreViewer({
     }, [fullscreen]);
 
     const stopListen = () => {
-        for (const id of timers.current) {
-            window.clearTimeout(id);
-        }
-        timers.current = [];
+        listenChain.clear();
         restoreNotes(listenHighlightRef.current);
         listenHighlightRef.current = [];
         if (!matcher.practicing) {
@@ -749,14 +751,17 @@ export function ScoreViewer({
         setActiveReplayId(null);
     };
 
-    // Reload OSMD whenever the score changes, and stop any playback/practice.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: matcher.stop/stopListen reset transient playback, not render inputs
+    // Reload OSMD whenever the score changes, and stop any playback/practice — a
+    // tempo-locked play-along included, or a layout change mid-run would strand its
+    // running state (the Stop label, the ticking metronome) with the timers gone.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: matcher.stop/stopListen/stopKeepUp reset transient playback, not render inputs
     useEffect(() => {
         let cancelled = false;
         setReady(false);
         setLoadError(false);
         paintedRef.current = false;
         stopListen();
+        stopKeepUp();
         matcher.stop();
         import("opensheetmusicdisplay")
             .then(({ OpenSheetMusicDisplay }) => {
@@ -854,14 +859,9 @@ export function ScoreViewer({
             });
         return () => {
             cancelled = true;
-            for (const id of timers.current) {
-                window.clearTimeout(id);
-            }
-            // A re-render (a layout change) clears the timers above, which would strand a
-            // play-along run with the input still routed to it; end it cleanly.
-            keepUpActiveRef.current = false;
-            keepUpStateRef.current = startKeepUp();
-            // A change of layout (bars-per-row, treadmill, transpose) re-runs this
+            // The effect body stops every playback mode before loading; the timer chains
+            // also clear themselves on unmount, so nothing here can fire into a torn-down
+            // score. A change of layout (bars-per-row, treadmill, transpose) re-runs this
             // effect, building a fresh OSMD on the same container. OSMD renders into a
             // new SVG rather than replacing the old one, so without removing the previous
             // render its SVG stays behind and each switch stacks another copy. clear()
@@ -976,17 +976,14 @@ export function ScoreViewer({
             }
             cursor.next();
             centerCursor();
-            timers.current.push(window.setTimeout(tick, listenStepMs(lengths, tempoRef.current)));
+            listenChain.push(tick, listenStepMs(lengths, tempoRef.current));
         };
         tick();
     };
 
     // Stop a play-along run early — the timers, the metronome and the cursor all wind down.
     const stopKeepUp = () => {
-        for (const id of timers.current) {
-            window.clearTimeout(id);
-        }
-        timers.current = [];
+        keepUpChain.clear();
         keepUpActiveRef.current = false;
         keepUpStateRef.current = startKeepUp();
         setKeepUpRunning(false);
@@ -1091,12 +1088,12 @@ export function ScoreViewer({
             openStep();
             cursor.next();
             centerCursor();
-            timers.current.push(window.setTimeout(tick, listenStepMs(lengths, tempoRef.current)));
+            keepUpChain.push(tick, listenStepMs(lengths, tempoRef.current));
         };
 
         // A one-bar count-in on the metronome (already ticking) before the first note.
         const beatMs = 60000 / tempoRef.current;
-        timers.current.push(window.setTimeout(tick, beatMs * (beatsPerBar ?? 4)));
+        keepUpChain.push(tick, beatMs * (beatsPerBar ?? 4));
     };
 
     // In play-along, a struck pitch that the open step expects counts toward catching it;
@@ -1188,7 +1185,7 @@ export function ScoreViewer({
             const next = events[step + 1];
             step++;
             const delay = next !== undefined ? Math.max(40, next.atMs - event.atMs) : 500;
-            timers.current.push(window.setTimeout(tick, delay));
+            listenChain.push(tick, delay);
         };
         tick();
     };
