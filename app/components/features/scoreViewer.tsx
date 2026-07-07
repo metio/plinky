@@ -13,6 +13,7 @@ import { usePref } from "../../hooks/usePref";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
+import { cursorWhole, seekToBar, seekToWhole, stepLengths } from "../../lib/scoreCursor";
 import { cadence } from "../../../core/cadence";
 import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
 import {
@@ -370,16 +371,8 @@ export function ScoreViewer({
 
     // The cursor's current position in whole notes — the shared place Listen and
     // Practice hand off at, so switching between them (or leaving and re-entering the
-    // play surface) continues here rather than rewinding. A cursor that has run off the
-    // end carries no resume point: the run is over, so the next start begins at the top,
-    // which reads as 0 — the same as a fresh score.
-    const cursorWhole = () => {
-        const iterator = osmdRef.current?.cursor?.iterator;
-        if (!iterator || iterator.EndReached) {
-            return 0;
-        }
-        return iterator.currentTimeStamp?.RealValue ?? 0;
-    };
+    // play surface) continues here rather than rewinding.
+    const resumePoint = () => cursorWhole(osmdRef.current?.cursor);
 
     // Load this score's saved takes; a new score swaps in its own.
     useEffect(() => {
@@ -914,13 +907,7 @@ export function ScoreViewer({
         // Step the reset cursor back to where it stood — OSMD has no direct seek — and show
         // it again where a run or Listen was using it, re-centring the treadmill.
         if (wasVisible) {
-            cursor.reset();
-            while (
-                !cursor.iterator.EndReached &&
-                (cursor.iterator.currentTimeStamp?.RealValue ?? 0) < at
-            ) {
-                cursor.next();
-            }
+            seekToWhole(cursor, at);
             cursor.show();
             centerCursor();
         }
@@ -937,34 +924,15 @@ export function ScoreViewer({
         // Continue from wherever the cursor sits — the note Practice was on when handing
         // over, or where a paused run left off — instead of rewinding, so play can pass
         // back and forth without losing the place. The top of a fresh piece reads as 0.
-        const from = cursorWhole();
+        const from = resumePoint();
         enterPlayFullscreen();
         playingRef.current = true;
         matcher.stop();
         const cursor: Cursor = osmd.cursor;
-        // Walk the cursor to the first voice-entry of a 1-based bar from a clean
-        // reset — OSMD has no direct seek, so the range loop steps to it.
-        const seekToBar = (bar: number) => {
-            cursor.reset();
-            while (!cursor.iterator.EndReached && cursor.iterator.CurrentMeasureIndex < bar - 1) {
-                cursor.next();
-            }
-        };
-        // Walk the cursor to the first voice-entry at or after a notated onset, the same
-        // way — for resuming from the handed-off position.
-        const seekToWhole = (whole: number) => {
-            cursor.reset();
-            while (
-                !cursor.iterator.EndReached &&
-                (cursor.iterator.currentTimeStamp?.RealValue ?? 0) < whole
-            ) {
-                cursor.next();
-            }
-        };
         if (loopRef.current.on) {
-            seekToBar(loopRef.current.from);
+            seekToBar(cursor, loopRef.current.from);
         } else if (from > 0) {
-            seekToWhole(from);
+            seekToWhole(cursor, from);
         } else {
             cursor.reset();
         }
@@ -980,7 +948,7 @@ export function ScoreViewer({
                 (cursor.iterator.EndReached || cursor.iterator.CurrentMeasureIndex > loop.to - 1)
             ) {
                 bumpTempo();
-                seekToBar(loop.from);
+                seekToBar(cursor, loop.from);
             } else if (cursor.iterator.EndReached) {
                 stopListen();
                 bumpTempo();
@@ -1119,10 +1087,7 @@ export function ScoreViewer({
                 finish();
                 return;
             }
-            const lengths: number[] = [];
-            for (const note of cursor.NotesUnderCursor()) {
-                lengths.push(note.Length.RealValue * 4);
-            }
+            const lengths = stepLengths(cursor.NotesUnderCursor());
             openStep();
             cursor.next();
             centerCursor();
@@ -1252,7 +1217,7 @@ export function ScoreViewer({
         // Take over at the cursor's current position when resuming (handing over from
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
         // begin at the top. The top of a fresh piece reads as 0 either way.
-        const from = resume ? cursorWhole() : 0;
+        const from = resume ? resumePoint() : 0;
         const partial = from > 0;
         partialRunRef.current = partial;
         enterPlayFullscreen();
