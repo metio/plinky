@@ -212,12 +212,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [emitNote],
     );
 
+    // The inputs seen connected on the last refresh, so a disconnection can be spotted.
+    const connectedInputsRef = useRef<Set<string>>(new Set());
+
     const refreshDevices = useCallback(() => {
         const connection = connectionRef.current;
         if (!connection) {
             return;
         }
         const list: MidiDevice[] = [];
+        const nowConnected = new Set<string>();
         for (const input of connection.inputs()) {
             list.push({
                 id: input.id,
@@ -226,9 +230,25 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 state: input.state,
             });
             input.onMessage(makeHandler(input.name));
+            if (input.state === "connected") {
+                nowConnected.add(input.id);
+            }
+        }
+        // A device unplugged mid-hold never sends its note-offs, so a held note would stay
+        // stuck on — in the debug panel, on the on-screen keyboard, and in any run's hold
+        // that never resolves. When an input that was connected has gone (or flipped to
+        // disconnected), release every held note. A held pitch isn't attributed to a device,
+        // so this releases all of them on any disconnection — a stray note-off is far less
+        // bad than a stuck note.
+        const dropped = [...connectedInputsRef.current].some((id) => !nowConnected.has(id));
+        connectedInputsRef.current = nowConnected;
+        if (dropped) {
+            for (const note of heldNotesRef.current) {
+                emitNote("noteoff", note, 0, 1, "MIDI", performance.now());
+            }
         }
         setDevices(list);
-    }, [makeHandler]);
+    }, [makeHandler, emitNote]);
 
     // Each request gets a sequence number; only the latest may wire itself in.
     // A stale resolve (an earlier click, or one landing after unmount) closes its

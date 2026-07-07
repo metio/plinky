@@ -95,6 +95,24 @@ describe("MidiProvider", () => {
         expect(midi.connection.closed()).toBe(true);
     });
 
+    it("releases a held note when its device disconnects, so nothing sticks on", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        // A key goes down and stays down — no note-off has arrived yet.
+        act(() => input.emit([0x90, 60, 100]));
+        expect(result.current.heldNotes).toContain(60);
+
+        // The device is unplugged before the release, so it never sends the note-off.
+        midi.connection.inputs = () => [];
+        act(() => midi.connection.stateChange());
+        // The held note is released on the disconnection rather than left stuck on.
+        expect(result.current.heldNotes).not.toContain(60);
+    });
+
     it("plays from the computer keyboard and shifts the octave", () => {
         const { result } = renderHook(() => useMidiConnection(), {
             wrapper: wrapperWith(fakeMidi()),
