@@ -11,13 +11,14 @@ import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
+import { useRunResult } from "../../hooks/useRunResult";
 import { useGhostRace } from "../../hooks/useGhostRace";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { cursorWhole, seekToWhole } from "../../lib/scoreCursor";
 import { cadence } from "../../../core/cadence";
-import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
+import { deriveRunOutcome } from "../../../core/runOutcome";
 import {
     type RunCapture,
     captureCleared,
@@ -27,13 +28,11 @@ import {
 } from "../../../core/runCapture";
 import { recordRun } from "../../lib/recordRun";
 import type { DailyResult } from "../../../core/daily";
-import type { Grade } from "../../../core/grade";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { useServices, useXmlCodec } from "../../contexts/services";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
 import { isPreciseInput } from "../../../core/midi";
-import { PRECISE_TOLERANCE } from "../../../core/rhythm";
 import {
     clearBarSelection,
     clientPointToSvg,
@@ -42,7 +41,6 @@ import {
     paintPlayedNotes,
 } from "../../lib/scoreColor";
 import { type MeasureBox, measureAtPoint } from "../../../core/scoreCanvas";
-import type { Grid, RunNote } from "../../../core/shareCard";
 import { transposeMusicXml } from "../../../core/transpose";
 import { m } from "../../paraglide/messages.js";
 import { Button, IconButton } from "../ui/button";
@@ -137,10 +135,9 @@ export function ScoreViewer({
     // read-at-tempo test. Session toggles (not persisted), off by default.
     const [enforceTempo, setEnforceTempo] = useState(false);
     const [guideNotes, setGuideNotes] = useState(true);
-    // This score's saved takes, and how the finished run's save went — "saved" and
-    // "failed" both retire the save prompt, but only a landed write may claim success.
+    // This score's saved takes. How the finished run's save went lives with the rest of
+    // the run result below.
     const [takes, setTakes] = useState<Take[]>([]);
-    const [runSaved, setRunSaved] = useState<"idle" | "saved" | "failed">("idle");
     const [metronomeOn, setMetronomeOn] = useState(false);
     // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
     // triplets, 4 = sixteenths.
@@ -267,17 +264,22 @@ export function ScoreViewer({
     const [hand, setHand] = useState<Hand>("both");
     const [staffCount, setStaffCount] = useState(1);
 
-    const [grade, setGrade] = useState<Grade | null>(seededResult?.grade ?? null);
-    const [runNotes, setRunNotes] = useState<RunNote[]>(seededResult?.notes ?? []);
-    // The timing leniency the finished run was graded at, kept so the per-note strip
-    // reads the same windows as the grade and share grid.
-    const [runTolerance, setRunTolerance] = useState(seededResult?.tolerance ?? PRECISE_TOLERANCE);
-    const [shareGrid, setShareGrid] = useState<Grid | null>(seededResult?.grid ?? null);
+    // The finished self-paced run's result — the grade and every surface derived from
+    // it (per-note strip, share grid, tempo curve) plus the save verdict — owned as one
+    // unit that records, marks and clears together. Seeded when a saved daily re-opens.
+    const runResult = useRunResult(seededResult);
+    const {
+        grade,
+        notes: runNotes,
+        tolerance: runTolerance,
+        grid: shareGrid,
+        tempoCurve,
+        saved: runSaved,
+    } = runResult;
     // An earned moment (first S, grade-up, flawless run) is published to the app-wide
     // channel once the run's mastery is folded in, for the shell banner to celebrate. At
     // most one per run; cleared at the next run's start.
     const { publish: publishMilestone, dismiss: dismissMilestone } = useMilestoneChannel();
-    const [tempoCurve, setTempoCurve] = useState<TempoCurve | null>(null);
     // The tempo a run was matched at, captured when practice starts so the run's
     // self-paced tempo curve reads against the same reference the matcher used,
     // even if the slider is moved afterwards.
@@ -543,12 +545,7 @@ export function ScoreViewer({
         // Everything the finished run shows and records — the grade, the timing tolerance,
         // the per-hand share grid and the tempo curve — is a pure function of the played
         // notes. The component only produces the run; deriveRunOutcome scores it.
-        const {
-            grade: result,
-            tolerance,
-            grid,
-            tempoCurve,
-        } = deriveRunOutcome({
+        const outcome = deriveRunOutcome({
             notes,
             correct: matcher.total,
             wrong: matcher.wrong,
@@ -557,23 +554,19 @@ export function ScoreViewer({
             runTempo: runTempoRef.current,
         });
         gradeFromRunRef.current = true;
-        setGrade(result);
+        runResult.record({ ...outcome, notes });
         // A short major flourish to celebrate finishing — a fuller arpeggio for a
         // stronger grade, a gentle lift for a weaker one, never a penalty. playNote
         // no-ops when sound is muted, so the mute checkbox is the gate.
-        for (const beat of cadence(result.letter)) {
+        for (const beat of cadence(outcome.grade.letter)) {
             synth.playNote(beat.note, {
                 velocity: beat.velocity,
                 duration: beat.duration,
                 delay: beat.at,
             });
         }
-        setRunNotes(notes);
-        setRunTolerance(tolerance);
-        setShareGrid(grid);
         // A finished run nudges the tempo trainer up for the next attempt.
         bumpTempo();
-        setTempoCurve(tempoCurve);
         // React to the finished run: record it in every store that remembers a run and
         // surface any earned moment. The component only produces the run; recordRun writes
         // it. It hands back the onsets when they become this score's new ghost, so the
@@ -587,9 +580,9 @@ export function ScoreViewer({
                 partial: partialRunRef.current,
                 notes,
                 correct: matcher.total,
-                grade: result,
-                grid,
-                tolerance,
+                grade: outcome.grade,
+                grid: outcome.grid,
+                tolerance: outcome.tolerance,
             },
             services,
             Date.now(),
@@ -616,6 +609,7 @@ export function ScoreViewer({
         services,
         publishMilestone,
         ghostRace.adoptOwnRun,
+        runResult.record,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
@@ -823,9 +817,18 @@ export function ScoreViewer({
         listenPlayback.start(from);
     };
 
+    // Wipe the self-paced run's result and the earned milestone. A fresh self-paced run
+    // and a keep-up run both clear them, so a finished self-paced result can't linger
+    // beneath the next run, and its Save prompt can't save a stale take (a keep-up run
+    // never rewrites the capture the prompt would save).
+    const clearSelfPacedResult = () => {
+        runResult.clear();
+        dismissMilestone();
+    };
+
     // Start a tempo-locked play-along: the play surface goes full screen, any
-    // self-paced run stops, last run's colours wipe, and the keep-up clock takes
-    // over — scoring only the practised hand, exactly as self-paced practice does.
+    // self-paced run stops, last run's result and colours wipe, and the keep-up clock
+    // takes over — scoring only the practised hand, exactly as self-paced practice does.
     const playAlong = () => {
         const osmd = osmdRef.current;
         if (!osmd || listenPlayback.active() || keepUp.active()) {
@@ -833,6 +836,7 @@ export function ScoreViewer({
         }
         enterPlayFullscreen();
         matcher.stop();
+        clearSelfPacedResult();
         if (paintedRef.current) {
             osmd.render();
             paintedRef.current = false;
@@ -862,7 +866,7 @@ export function ScoreViewer({
         };
         const saved = services.takes.save(id, take);
         setTakes(saved.takes);
-        setRunSaved(saved.stored ? "saved" : "failed");
+        runResult.markSaved(saved.stored);
     };
 
     // Replay a saved take: any Listen in progress hands the transport over, and the
@@ -901,18 +905,13 @@ export function ScoreViewer({
         partialRunRef.current = partial;
         enterPlayFullscreen();
         listenPlayback.stop();
-        setRunSaved("idle");
+        clearSelfPacedResult();
         // A fresh recorder also zeroes the run clock, so the ghost tick's startedAt
         // guard holds until the run's first note arrives — a stale start timestamp
         // would paint the ghost at the finish the moment Practice is pressed.
         captureRef.current = startCapture();
         gradeFromRunRef.current = false;
         gradedRef.current = false;
-        setGrade(null);
-        setRunNotes([]);
-        setShareGrid(null);
-        dismissMilestone();
-        setTempoCurve(null);
         keepUp.clearResult();
         setLiveTempo(tempo);
         runTempoRef.current = tempo;

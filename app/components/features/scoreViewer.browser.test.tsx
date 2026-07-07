@@ -199,6 +199,50 @@ describe("ScoreViewer", () => {
         ).toBeTruthy();
     });
 
+    it("clears a finished self-paced result when a keep-up run runs, not stacking it under the card", async () => {
+        // A finished self-paced grade panel is on screen (seeded). Starting a keep-up run
+        // must wipe it: otherwise, once the keep-up run leaves full screen, its result card
+        // and the stale self-paced grade panel both show at once — and the grade panel's
+        // Save prompt would save the old, unrelated take.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const seededResult: DailyResult = {
+            grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
+            grid: [["best", "good"]],
+            notes: [],
+            tolerance: 1,
+        };
+        render(
+            <MemoryRouter>
+                <ServicesProvider services={midiFake}>
+                    <MidiProvider>
+                        <ScoreViewer
+                            id="t"
+                            xml={phrase}
+                            title="T"
+                            beatsPerBar={4}
+                            seededResult={seededResult}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        // The seeded self-paced grade panel is up (its Accuracy readout is on screen).
+        expect(await screen.findAllByText("Accuracy", undefined, { timeout: 30000 })).toBeTruthy();
+        // The seeded result shows before OSMD is ready, so wait for the score to be
+        // interactive — a keep-up run bails while osmd is still null.
+        await awaitReady();
+        // Turn on Keep up and start the tempo-locked run.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        // The keep-up run counts in, runs to the end and reports its tally, leaving full
+        // screen — the moment both result panels would coexist.
+        await screen.findByText(/kept up with/i, undefined, { timeout: 30000 });
+        // The stale self-paced grade panel is gone; only the keep-up card remains.
+        expect(screen.queryByText("Accuracy")).toBeNull();
+    });
+
     it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
