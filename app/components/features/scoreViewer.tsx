@@ -11,19 +11,12 @@ import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
-import { summarizeDynamics } from "../../../core/dynamics";
 import { annotateFingerings } from "../../lib/fingerScore";
-import { computeFlow } from "../../../core/flow";
 import { cadence } from "../../../core/cadence";
+import { deriveRunOutcome } from "../../../core/runOutcome";
 import type { DailyResult } from "../../../core/daily";
 import { STAFF_FOR } from "../../../core/matcher";
-import {
-    computeGrade,
-    GRADE_COLOR,
-    type Grade,
-    type KeepUpResult,
-    scoreKeepUp,
-} from "../../../core/grade";
+import { GRADE_COLOR, type Grade, type KeepUpResult, scoreKeepUp } from "../../../core/grade";
 import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradeProgress";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 
@@ -46,13 +39,7 @@ import {
     type Take,
 } from "../../../core/takes";
 import { isPreciseInput } from "../../../core/midi";
-import {
-    LENIENT_TOLERANCE,
-    makeHit,
-    PRECISE_TOLERANCE,
-    summarize,
-    timingDeltas,
-} from "../../../core/rhythm";
+import { PRECISE_TOLERANCE } from "../../../core/rhythm";
 import {
     clearBarSelection,
     clientPointToSvg,
@@ -76,22 +63,9 @@ import {
     SELECT_COLOR,
     WINDOW_COLOR,
 } from "../../../core/scoreCanvas";
-import {
-    type Grid,
-    handGrid,
-    handsPlayed,
-    laggingHand,
-    type RunNote,
-} from "../../../core/shareCard";
+import { type Grid, handsPlayed, laggingHand, type RunNote } from "../../../core/shareCard";
 import { transposeMusicXml } from "../../../core/transpose";
-import {
-    findHotspots,
-    type Hotspot,
-    instantaneousBpm,
-    median,
-    type TempoPoint,
-    tempoSeries,
-} from "../../../core/tempo";
+import { type Hotspot, instantaneousBpm, type TempoPoint } from "../../../core/tempo";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { Button, IconButton } from "../ui/button";
@@ -745,24 +719,21 @@ export function ScoreViewer({
         }
         gradedRef.current = true;
         const notes = notesRef.current;
-        const velocities = notes.map((note) => note.velocity);
-        const hasDynamics = new Set(velocities).size > 1;
-        const tolerance = impreciseRef.current ? LENIENT_TOLERANCE : PRECISE_TOLERANCE;
-        const deltas = timingDeltas(notes);
-        const hits = deltas.map((delta, index) => makeHit(index, delta, tolerance));
-        const result = computeGrade({
+        // Everything the finished run shows and records — the grade, the timing tolerance,
+        // the per-hand share grid and the tempo curve — is a pure function of the played
+        // notes. The component only produces the run; deriveRunOutcome scores it.
+        const {
+            grade: result,
+            tolerance,
+            grid,
+            tempoCurve,
+        } = deriveRunOutcome({
+            notes,
             correct: matcher.total,
             wrong: matcher.wrong,
-            rhythm: summarize(hits),
-            flow: computeFlow(notes),
-            dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
-        });
-        // Speed is scored against the piece's own tempo, not the practice-tempo dial, so
-        // a slow run reads slow however the slider was set. With no intrinsic tempo the
-        // scale is 1, leaving Speed to measure how evenly the notated rhythm was kept.
-        const intendedTempo = initialTempo ?? runTempoRef.current;
-        const grid = handGrid(notes, {
-            tempoScale: intendedTempo > 0 ? runTempoRef.current / intendedTempo : 1,
+            imprecise: impreciseRef.current,
+            intendedTempo: initialTempo ?? runTempoRef.current,
+            runTempo: runTempoRef.current,
         });
         gradeFromRunRef.current = true;
         setGrade(result);
@@ -781,17 +752,7 @@ export function ScoreViewer({
         setShareGrid(grid);
         // A finished run nudges the tempo trainer up for the next attempt.
         bumpTempo();
-        // Read the player's own tempo back out of the gaps between their notes, so
-        // the results show where they sped up or dragged against their own pace.
-        const points = tempoSeries(
-            runTempoRef.current,
-            notes.map((note) => note.targetMs),
-            notes.map((note) => note.playedMs),
-        );
-        const med = median(points.map((point) => point.bpm));
-        setTempoCurve(
-            points.length > 0 ? { points, median: med, hotspots: findHotspots(points, med) } : null,
-        );
+        setTempoCurve(tempoCurve);
         // Fold the run's core trio into the lifetime fingerprint shown on /progress.
         services.lifetime.recordRun({
             accuracy: result.accuracy,
