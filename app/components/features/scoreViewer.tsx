@@ -3,7 +3,6 @@
 
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { FullScreen, FullscreenProvider, Midi, Show, useMidiConnected } from "./conditional";
 import { useFullscreen } from "../../hooks/useFullscreen";
@@ -11,6 +10,7 @@ import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
 import { useTimerChain } from "../../hooks/useTimerChain";
+import { useGhostRace } from "../../hooks/useGhostRace";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
@@ -42,20 +42,13 @@ import { useMilestoneChannel } from "../../contexts/milestone";
 
 import { toReplayEvents } from "../../../core/composition";
 import { listenStepMs } from "../../../core/playback";
-import { decodeGhost, ghostReached } from "../../../core/ghost";
-import {
-    compositionFromRun,
-    fastestTakeOnsets,
-    type RunStep,
-    type Take,
-} from "../../../core/takes";
+import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
 import { isPreciseInput } from "../../../core/midi";
 import { PRECISE_TOLERANCE } from "../../../core/rhythm";
 import {
     clearBarSelection,
     clientPointToSvg,
     collectMeasureBoxes,
-    collectNoteElements,
     highlightCursorNotes,
     type PaintedNote,
     paintBarSelection,
@@ -65,11 +58,9 @@ import {
     trailNotes,
 } from "../../lib/scoreColor";
 import {
-    GHOST_COLOR,
     LISTENED_COLOR,
     type MeasureBox,
     measureAtPoint,
-    NOTE_COLOR,
     PLAYED_COLOR,
     SELECT_COLOR,
     WINDOW_COLOR,
@@ -326,19 +317,6 @@ export function ScoreViewer({
     // selector only appears for the grand-staff (two-staff) scores it applies to.
     const [hand, setHand] = useState<Hand>("both");
     const [staffCount, setStaffCount] = useState(1);
-    // A previous completed run on this score to race against — the note onset times
-    // — and how far that ghost has reached as the current run's clock elapses.
-    const [ghost, setGhost] = useState<number[] | null>(null);
-    const [ghostDone, setGhostDone] = useState(0);
-    // The rendered note groups per step, captured when a race starts, and which
-    // step currently wears the ghost's colour — so the marker can move along the
-    // staff and be restored as it leaves each note.
-    const ghostNotesRef = useRef<SVGGElement[][]>([]);
-    const ghostMarkRef = useRef(-1);
-    // The ghost saved for this score (own last run, or a friend's loaded by link) —
-    // the source for the share link. Mirrors storage so the share button reacts.
-    const [storedGhost, setStoredGhost] = useState<number[] | null>(null);
-    const [sharedFromLink, setSharedFromLink] = useState(false);
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's
     // own pace when adaptive.
@@ -384,28 +362,10 @@ export function ScoreViewer({
         setTakes(services.takes.list(id));
     }, [id, services.takes.list]);
 
-    const [searchParams] = useSearchParams();
-    // Adopt a ghost handed over by a ?ghost= link so the player can race a friend's
-    // run; otherwise the score's own stored ghost is the one to race and to re-share.
-    useEffect(() => {
-        if (!canShareGhost) {
-            setStoredGhost(null);
-            return;
-        }
-        const shared = decodeGhost(searchParams.get("ghost") ?? "");
-        if (shared) {
-            services.ghosts.save(id, shared);
-            setStoredGhost(shared);
-            setSharedFromLink(true);
-        } else {
-            setStoredGhost(services.ghosts.load(id));
-            setSharedFromLink(false);
-        }
-    }, [id, canShareGhost, searchParams, services.ghosts.save, services.ghosts.load]);
-
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
     const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
-    const matcher = useScoreMatcher(() => osmdRef.current, {
+    const getOsmd = useCallback(() => osmdRef.current, []);
+    const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
         forgiving,
@@ -454,6 +414,19 @@ export function ScoreViewer({
     });
     const { status, requestAccess } = useMidiConnection();
     const connected = useMidiConnected();
+
+    // The ghost race — a previous run replayed against the clock on the staff and the
+    // race track. Armed at run start; the run clock's zero is the capture's startedAt.
+    const runStartedAt = useCallback(() => captureRef.current.startedAt, []);
+    const ghostRace = useGhostRace({
+        id,
+        canShareGhost,
+        getOsmd,
+        practicing: matcher.practicing,
+        complete: matcher.complete,
+        done: matcher.done,
+        runStartedAt,
+    });
 
     // In treadmill mode OSMD's own follow-cursor is off, so the active bar is centred by
     // hand: scroll its box horizontally to bring the cursor to the middle — the fixed gaze
@@ -561,58 +534,6 @@ export function ScoreViewer({
         tempoRef.current = tempo;
     }, [tempo]);
 
-    // Advance the ghost on the live clock while practicing — it starts with the
-    // player's first note (the capture's startedAt), so the two race from the same moment.
-    useEffect(() => {
-        if (!matcher.practicing || !ghost) {
-            return;
-        }
-        const tick = () => {
-            const startedAt = captureRef.current.startedAt;
-            if (startedAt > 0) {
-                setGhostDone(ghostReached(ghost, performance.now() - startedAt));
-            }
-        };
-        const timer = window.setInterval(tick, 50);
-        return () => window.clearInterval(timer);
-    }, [matcher.practicing, ghost]);
-
-    // Move the ghost's colour onto the note it has currently reached, restoring the
-    // one it leaves to green if the player has already played it there, else black.
-    // Captured note groups outlive a render, so this paints the real staff.
-    useEffect(() => {
-        const steps = ghostNotesRef.current;
-        if (steps.length === 0) {
-            return;
-        }
-        const restore = (step: number) => {
-            const base = matcher.done > step ? PLAYED_COLOR : NOTE_COLOR;
-            for (const element of steps[step] ?? []) {
-                paintElement(element, base);
-            }
-        };
-        const previous = ghostMarkRef.current;
-        // Off the staff once the race is over or paused.
-        if (!ghost || !matcher.practicing || matcher.complete) {
-            if (previous >= 0) {
-                restore(previous);
-                ghostMarkRef.current = -1;
-            }
-            return;
-        }
-        const target = Math.min(ghostDone, steps.length - 1);
-        if (target === previous) {
-            return;
-        }
-        if (previous >= 0) {
-            restore(previous);
-        }
-        for (const element of steps[target] ?? []) {
-            paintElement(element, GHOST_COLOR);
-        }
-        ghostMarkRef.current = target;
-    }, [ghostDone, ghost, matcher.practicing, matcher.complete, matcher.done]);
-
     // Keep the red loop overlay in step with the range and each fresh render (ready is the
     // signal that the boxes were just re-measured). paintLoopSelection reads the live range
     // from a ref, so these are triggers, not closure inputs.
@@ -670,7 +591,7 @@ export function ScoreViewer({
         // surface any earned moment. The component only produces the run; recordRun writes
         // it. It hands back the onsets when they become this score's new ghost, so the
         // share button's mirror can follow.
-        const { ghost } = recordRun(
+        const { ghost: newGhost } = recordRun(
             {
                 id,
                 title,
@@ -687,9 +608,8 @@ export function ScoreViewer({
             Date.now(),
             publishMilestone,
         );
-        if (ghost) {
-            setStoredGhost(ghost);
-            setSharedFromLink(false);
+        if (newGhost) {
+            ghostRace.adoptOwnRun(newGhost);
         }
         if (!ephemeral) {
             onMastery?.();
@@ -708,6 +628,7 @@ export function ScoreViewer({
         synth,
         services,
         publishMilestone,
+        ghostRace.adoptOwnRun,
     ]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
@@ -1233,35 +1154,20 @@ export function ScoreViewer({
         setTempoCurve(null);
         setKeepUpResult(null);
         setLiveTempo(tempo);
-        // Your fastest complete take is the ghost to chase; falling back to the last
-        // run (or a friend's shared ghost) when you've saved none. A partial run has no
-        // full-piece ghost to race — chasing one from the middle would desync the
-        // marker — so it runs without one.
-        const racing =
-            partial || ephemeral || !raceGhost
-                ? null
-                : (fastestTakeOnsets(services.takes.list(id)) ??
-                  storedGhost ??
-                  services.ghosts.load(id));
-        setGhost(racing);
-        setGhostDone(0);
         runTempoRef.current = tempo;
         // The hand the matcher and the ghost step through: the whole grand staff
         // when there's a single staff, otherwise the hand being drilled. (Fingering
         // is printed on the staff at load time, not computed per run.)
-        const osmd = osmdRef.current;
         const matcherHand: Hand = staffCount < 2 ? "both" : hand;
         // A fresh run from the top wipes the previous run's colours for a clean slate; a
         // resumed run (taking over from Listen) keeps them, so the blue Listen trail and
         // any earlier green survive and the score shows how the whole piece was played.
         if (!partial && paintedRef.current) {
-            osmd?.render();
+            osmdRef.current?.render();
             paintedRef.current = false;
         }
-        // Capture each step's rendered notes (post-render) so the ghost's colour can
-        // mark, and move along, the actual notes on the staff as it races.
-        ghostMarkRef.current = -1;
-        ghostNotesRef.current = racing && osmd ? collectNoteElements(osmd, matcherHand) : [];
+        // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
+        ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
         matcher.start(from);
     };
 
@@ -1616,7 +1522,7 @@ export function ScoreViewer({
                 />
 
                 <FullScreen off>
-                    <Show when={sharedFromLink}>
+                    <Show when={ghostRace.sharedFromLink}>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             {m.ghost_shared_loaded()}
                         </p>
@@ -1651,10 +1557,10 @@ export function ScoreViewer({
                         {/* The race track rides along in full screen too — a thin bar below
                         the score — so racing a ghost survives the move to always-full-screen
                         play; without it the race would be invisible whenever you play. */}
-                        <Show when={ghost}>
+                        <Show when={ghostRace.ghost}>
                             <GhostTrack
                                 you={matcher.done}
-                                ghost={ghostDone}
+                                ghost={ghostRace.ghostDone}
                                 total={matcher.total}
                             />
                         </Show>
@@ -1770,8 +1676,8 @@ export function ScoreViewer({
                             title={title}
                             activeReplayId={activeReplayId}
                             playing={playing}
-                            lastRunOnsets={storedGhost}
-                            canShareLastRun={!sharedFromLink}
+                            lastRunOnsets={ghostRace.storedGhost}
+                            canShareLastRun={!ghostRace.sharedFromLink}
                             onReplay={(take) => {
                                 setRunsOpen(false);
                                 replayTake(take);
