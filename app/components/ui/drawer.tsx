@@ -11,9 +11,11 @@ import { CloseIcon } from "./icons";
 // on a phone, over a dimmed backdrop. A backdrop tap or Escape closes it; focus
 // moves into the panel on open and returns to the trigger on close, and Tab is
 // trapped inside so it behaves like a modal dialog for a keyboard and for axe.
-// It renders through a portal onto the body so it sits above a full-screen score
-// (which is itself a fixed z-50 layer). The enter slide honours reduced motion;
-// closing unmounts at once.
+// It renders through a portal so it sits above a full-screen score (itself a fixed
+// z-50 layer). The portal target is the active Fullscreen-API element when one is
+// open — the browser paints only that element's subtree, so a portal onto the body
+// would render invisibly behind it — and the body otherwise. The enter slide honours
+// reduced motion; closing unmounts at once.
 export function Drawer({
     open,
     onClose,
@@ -118,6 +120,6 @@ export function Drawer({
                 <div className="space-y-4 overflow-y-auto px-4 py-4">{children}</div>
             </div>
         </div>,
-        document.body,
+        document.fullscreenElement ?? document.body,
     );
 }
