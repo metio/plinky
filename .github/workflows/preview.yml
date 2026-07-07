@@ -1,0 +1,114 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+name: Preview
+# Per-branch preview deploys to Cloudflare Pages. Production stays on GitHub Pages
+# (website.yml) — this exists because GitHub Pages serves one site per repo at one
+# domain, so it can't give each branch its own origin. Cloudflare Pages can, and a
+# distinct origin per branch matters here: all of Plinky's state lives in localStorage
+# (per-origin), so a preview must never share production's origin or it could read and
+# corrupt real users' data. Each push publishes to <slug>.plinky-preview.pages.dev
+# (and <slug>.preview.plinky.fun once the custom domain is attached), and — when the
+# branch has an open PR — posts the URL as a sticky comment.
+#
+# The build prerenders English only for speed, but still renders every language at
+# runtime: build:locales always builds the all-locales root (the SPA fallback shell and
+# a client bundle carrying every language), so a /de/ deep link falls back to it and
+# renders in German. Only the static prerendered pages are English.
+#
+# One-time setup before this can run (then set the repo variable PREVIEW_ENABLED=true):
+#   1. Cloudflare account → Pages → create a project named "plinky-preview"
+#      (Direct Upload / no Git connection; this workflow uploads the build).
+#   2. Create an API token (template: "Cloudflare Pages — Edit") and add repo secrets
+#      CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+#   3. For nice URLs: add the custom domain in the Pages project and a wildcard CNAME
+#      *.preview → plinky-preview.pages.dev in plinky.fun's DNS, then set the repo
+#      variable PREVIEW_DOMAIN=preview.plinky.fun. Left unset, the URLs are the free
+#      <slug>.plinky-preview.pages.dev, which need no DNS.
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+      - gh-pages
+      - renovate/**
+permissions:
+  contents: read
+  pull-requests: write
+concurrency:
+  # One preview build per branch at a time; a newer push supersedes an in-flight one.
+  group: preview-${{ github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  deploy:
+    name: Build & deploy preview
+    # Inert until Cloudflare is wired up, so merging the workflow can't red-fail every
+    # branch push in the meantime. Flip PREVIEW_ENABLED=true once secrets + project exist.
+    if: ${{ vars.PREVIEW_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build (English prerender, all languages at runtime)
+        # Set PLINKY_LOCALES to a comma list to prerender more languages.
+        run: PLINKY_LOCALES=en npm run build:locales
+        env:
+          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
+          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+      - name: Add SPA fallback
+        # Cloudflare Pages serves 404.html for an unmatched path, so a deep-link refresh
+        # (or an unprerendered locale) lands on the shell and the client router takes over.
+        run: cp build/client/__spa-fallback.html build/client/404.html
+      - name: Derive a preview slug from the branch
+        id: slug
+        # A branch ref isn't a valid DNS label (slashes, case, length), so normalise it:
+        # lower-case, non-alphanumerics to hyphens, trimmed, capped at Cloudflare's 28-char
+        # alias limit. Readable and predictable; the immutable per-deploy *.pages.dev URL
+        # is the collision-proof backstop if two branches ever slug the same.
+        run: |
+          slug=$(printf '%s' "${GITHUB_REF_NAME}" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' \
+            | cut -c1-28 \
+            | sed -E 's/-+$//')
+          domain="${{ vars.PREVIEW_DOMAIN }}"
+          [ -n "$domain" ] || domain="plinky-preview.pages.dev"
+          {
+            echo "slug=$slug"
+            echo "url=https://$slug.$domain"
+          } >> "$GITHUB_OUTPUT"
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: >-
+          npx --yes wrangler@4 pages deploy build/client
+          --project-name=plinky-preview
+          --branch="${{ steps.slug.outputs.slug }}"
+          --commit-dirty=true
+      - name: Publish the preview URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: ${{ steps.slug.outputs.url }}
+        run: |
+          {
+            echo "### 🔎 Preview deployed"
+            echo ""
+            echo "[$URL]($URL)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          # If this branch has an open PR, keep one sticky comment updated in place
+          # rather than piling a new one on every push.
+          pr=$(gh pr list --head "${GITHUB_REF_NAME}" --state open --json number --jq '.[0].number // empty')
+          [ -n "$pr" ] || exit 0
+          marker="<!-- plinky-preview -->"
+          body="${marker}"$'\n'"🔎 **Preview:** ${URL} — updated for \`${GITHUB_SHA}\`."
+          cid=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${pr}/comments" \
+            --jq "map(select(.body | contains(\"${marker}\"))) | .[0].id // empty")
+          if [ -n "$cid" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${cid}" -f body="${body}" >/dev/null
+          else
+            gh pr comment "$pr" --body "${body}" >/dev/null
+          fi
