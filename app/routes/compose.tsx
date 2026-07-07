@@ -24,6 +24,8 @@ import {
 } from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
 import { buildMidiFile } from "../../core/midiFile";
+import { readScoreFile } from "../../core/musicxmlFile";
+import { parseMusicXml } from "../../core/musicxmlParse";
 
 import { useOnboardingStore, usePrefsStore, useXmlCodec } from "../contexts/services";
 import { fileStem } from "../lib/printScore";
@@ -306,18 +308,19 @@ export default function Compose() {
                     bytes[2] === 0x68 &&
                     bytes[3] === 0x64;
                 if (isMidi) {
+                    // Only this handler needs the MIDI parser, and nothing else imports it,
+                    // so it splits into its own chunk — worth loading on demand. The MusicXML
+                    // codecs, by contrast, are already in the eager graph (the song/exercise
+                    // sources and the export button import them), so importing them here is
+                    // static: a dynamic import couldn't split anything off.
                     const { parseMidiFile } = await import("../../core/midiParse");
                     loaded = parseMidiFile(bytes);
                 } else {
-                    const [{ readScoreFile }, { parseMusicXml }] = await Promise.all([
-                        import("../../core/musicxmlFile"),
-                        import("../../core/musicxmlParse"),
-                    ]);
                     const xml = await readScoreFile(file);
                     loaded = xml ? parseMusicXml(xmlCodec, xml) : null;
                 }
             } catch {
-                // Reading the bytes or a lazily-loaded parser throwing must surface the
+                // Reading the bytes or the on-demand MIDI parser throwing must surface the
                 // same error as an unreadable file, not reject unhandled through `void`.
                 loaded = null;
             }
