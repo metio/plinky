@@ -14,14 +14,11 @@ import { useSynth } from "../../hooks/useSynth";
 import { annotateFingerings } from "../../lib/fingerScore";
 import { cadence } from "../../../core/cadence";
 import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
+import { recordRun } from "../../lib/recordRun";
 import type { DailyResult } from "../../../core/daily";
 import { STAFF_FOR } from "../../../core/matcher";
 import { GRADE_COLOR, type Grade, type KeepUpResult, scoreKeepUp } from "../../../core/grade";
-import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradeProgress";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
-
-import { isFirstS, isFlawless } from "../../../core/milestones";
-import { applyRun, letterMin } from "../../../core/mastery";
 import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
 import { useServices, useXmlCodec } from "../../contexts/services";
 import { useMilestoneChannel } from "../../contexts/milestone";
@@ -289,7 +286,7 @@ export function ScoreViewer({
     const saved = useMemo(() => services.fingering.load(id), [id, services.fingering]);
     const hasSaved = Object.keys(saved).length > 0;
     const [showMine, setShowMine] = useState(hasSaved);
-    const { prefs: prefsStore, mastery: masteryStore, history: historyStore } = services;
+    const { prefs: prefsStore } = services;
     const xmlCodec = useXmlCodec();
     const [barsPerRow, setBarsPerRow] = useState(() => prefsStore.load().barsPerRow);
     // Whether to number the first bar of each staff row, remembered per device.
@@ -747,63 +744,34 @@ export function ScoreViewer({
         // A finished run nudges the tempo trainer up for the next attempt.
         bumpTempo();
         setTempoCurve(tempoCurve);
-        // Fold the run's core trio into the lifetime fingerprint shown on /progress.
-        services.lifetime.recordRun({
-            accuracy: result.accuracy,
-            timing: result.timing,
-            flow: result.flow,
-        });
-        // Mark the day's challenge done so it shows a ✓ — no streak, just "played" —
-        // and keep its result so re-opening the daily shows it rather than a blank run.
-        if (daily != null) {
-            services.daily.recordDone(daily);
-            services.daily.saveResult(daily, { grade: result, grid, notes, tolerance });
-        }
-        // Count the run's notes toward the practice history.
-        historyStore.record(matcher.total);
-        if (ephemeral) {
-            return;
-        }
-        // Keep a full run as this score's ghost to race (and share) next time; a run
-        // that started partway through (a takeover from Listen) is not a whole-piece
-        // replay, so it grades for what was played but leaves the ghost untouched.
-        if (!partialRunRef.current) {
-            const onsets = notes.map((note) => note.playedMs);
-            services.ghosts.save(id, onsets);
-            setStoredGhost(onsets);
+        // React to the finished run: record it in every store that remembers a run and
+        // surface any earned moment. The component only produces the run; recordRun writes
+        // it. It hands back the onsets when they become this score's new ghost, so the
+        // share button's mirror can follow.
+        const { ghost } = recordRun(
+            {
+                id,
+                title,
+                daily,
+                ephemeral,
+                partial: partialRunRef.current,
+                notes,
+                correct: matcher.total,
+                grade: result,
+                grid,
+                tolerance,
+            },
+            services,
+            Date.now(),
+            publishMilestone,
+        );
+        if (ghost) {
+            setStoredGhost(ghost);
             setSharedFromLink(false);
         }
-        // Fold the run into spaced-repetition state: a score that clears the
-        // threshold becomes learned and schedules (or reschedules) its review.
-        const before = masteryStore.load(id);
-        const threshold = letterMin(prefsStore.load().masteryThreshold);
-        const updated = applyRun(before, result.score, threshold, Date.now());
-        masteryStore.save(id, updated);
-        onMastery?.();
-
-        // Surface one earned-moment card. Grade-up is the biggest moment so it wins a
-        // tie; the others it pre-empts can still fire on a later run (a flawless run
-        // keeps its one-time flag; a song's first S is guarded by its best score, so a
-        // grade-up that buries it is a rare, accepted loss). A grade-up is read from the
-        // ladder recomputed across all mastery, so it resolves asynchronously.
-        const firstS = isFirstS(result.score, before?.bestScore ?? 0);
-        const flawlessNow = isFlawless(result) && !services.milestones.flawlessDone();
-        const prefs = prefsStore.load();
-        // The grade-up check reads the ladder across the whole catalogue, so it resolves
-        // asynchronously; the first-S and flawless checks above are already decided.
-        loadGradedMastery(masteryStore, services).then((items) => {
-            const reached = currentGrade(items);
-            if (reached > services.milestones.reachedGrade()) {
-                services.milestones.recordReachedGrade(reached);
-                const rating = skillRating(items, prefs.decayMode, Date.now());
-                publishMilestone({ kind: "grade-up", grade: reached, skill: rating });
-            } else if (flawlessNow) {
-                services.milestones.recordFlawless();
-                publishMilestone({ kind: "flawless", songTitle: title });
-            } else if (firstS) {
-                publishMilestone({ kind: "first-s", songTitle: title });
-            }
-        });
+        if (!ephemeral) {
+            onMastery?.();
+        }
     }, [
         matcher.complete,
         matcher.total,
@@ -816,9 +784,6 @@ export function ScoreViewer({
         initialTempo,
         bumpTempo,
         synth,
-        prefsStore.load,
-        masteryStore,
-        historyStore,
         services,
         publishMilestone,
     ]);
