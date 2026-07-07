@@ -21,8 +21,23 @@ const CACHE = "plinky-__BUILD_HASH__";
 // The generic shell for routes that were not prerendered to their own document.
 const SPA_FALLBACK = "/__spa-fallback.html";
 
+// The hashed shell chunks the prerendered documents load, stamped in at build time
+// (dev/stamp-sw.mjs) as newline-joined URLs. Precaching them at install means a new build's
+// cache holds what its HTML references, so the app still boots offline after a background
+// update — without this, activate evicts the old chunks and a fresh cache holding only the
+// shell HTML would white-screen on the next offline open. Unstamped this is the empty list.
+const PRECACHE = "__PRECACHE__".split("\n").filter((url) => url.startsWith("/"));
+
 self.addEventListener("install", (event) => {
-    event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(["/", SPA_FALLBACK])));
+    // Add each entry rather than addAll: addAll is atomic and one stray 404 would abort the
+    // whole install, so a single missing asset can't block the SW updating.
+    event.waitUntil(
+        caches
+            .open(CACHE)
+            .then((cache) =>
+                Promise.allSettled(["/", SPA_FALLBACK, ...PRECACHE].map((url) => cache.add(url))),
+            ),
+    );
     // Deliberately no skipWaiting() here: a new build parks in "waiting" instead of
     // seizing control of open tabs. Activating immediately would evict the old cache
     // (see the activate handler) out from under a running tab, whose HTML still points

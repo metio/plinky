@@ -154,6 +154,12 @@ function useServiceWorkerUpdate() {
         }
         const container = navigator.serviceWorker;
         let cancelled = false;
+        // Whether a worker already controlled this page when the effect ran. A later
+        // controllerchange then means a NEW build seized control (an update) — so every
+        // open tab must reload onto it, not only the one that clicked apply, or the others
+        // keep running the old HTML and 404 on their next lazy chunk. The first-ever install
+        // has no prior controller, and its claim-driven controllerchange must leave the page.
+        const hadController = !!container.controller;
 
         // A worker in "waiting" is a new build ready to take over. It only counts as
         // an update when a previous worker already controls this page — the first
@@ -183,10 +189,11 @@ function useServiceWorkerUpdate() {
             })
             .catch(() => {});
 
-        // The accepted worker taking control evicts the previous build's cache, so
-        // reload once onto the version we just applied.
+        // A new worker taking control evicts the previous build's cache, so reload onto it
+        // — whether this tab initiated the update or another tab did (applying stays false
+        // here but a controller already existed). Skip only the first install's claim.
         const onControllerChange = () => {
-            if (applying.current) {
+            if (applying.current || hadController) {
                 applying.current = false;
                 window.location.reload();
             }
