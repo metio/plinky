@@ -31,6 +31,16 @@ export function Drawer({
     // Off-screen on mount, then slid in on the next frame so the transition runs.
     const [shown, setShown] = useState(false);
 
+    // The trap effect keys only on `open` so it sets up focus once per open, not on every
+    // parent render. onClose, an inline arrow from the caller, changes identity each render;
+    // reading it through a latest-value ref keeps the handler current without making it a
+    // dependency — otherwise the effect re-runs constantly during playback and yanks focus
+    // back onto the dialog after every keystroke, breaking keyboard use of the panel.
+    const onCloseRef = useRef(onClose);
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
     useEffect(() => {
         if (!open) {
             setShown(false);
@@ -48,7 +58,7 @@ export function Drawer({
         panelRef.current?.focus();
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
-                onClose();
+                onCloseRef.current();
                 return;
             }
             const panel = panelRef.current;
@@ -63,10 +73,16 @@ export function Drawer({
             }
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
-            if (event.shiftKey && document.activeElement === first) {
+            const active = document.activeElement;
+            // On open focus sits on the dialog container itself (tabIndex -1), which is
+            // neither first nor last — so without treating it (and anything outside the
+            // panel) as a boundary, the very first Tab or Shift+Tab escapes to the page
+            // behind. Wrap forward Tab to the first control and Shift+Tab to the last.
+            const atEdge = active === panel || !panel.contains(active);
+            if (event.shiftKey && (active === first || atEdge)) {
                 event.preventDefault();
                 last?.focus();
-            } else if (!event.shiftKey && document.activeElement === last) {
+            } else if (!event.shiftKey && (active === last || atEdge)) {
                 event.preventDefault();
                 first?.focus();
             }
@@ -80,7 +96,7 @@ export function Drawer({
             document.body.style.overflow = previousOverflow;
             restoreFocus?.focus?.();
         };
-    }, [open, onClose]);
+    }, [open]);
 
     if (!open || typeof document === "undefined") {
         return null;
