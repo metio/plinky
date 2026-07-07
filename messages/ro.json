@@ -437,6 +437,8 @@
   "attribution_via": "prin",
   "attribution_edited_by": "ed.",
   "takes_heading": "Înregistrările tale ({count})",
+  "takes_panel_heading": "Înregistrările tale",
+  "takes_empty_hint": "Termină o sesiune și salveaz-o ca să păstrezi o înregistrare aici — reia-o, întrece-i umbra sau provoacă un prieten.",
   "takes_partial": "parțial",
   "takes_replay": "Reascultă această înregistrare",
   "takes_stop": "Oprește",

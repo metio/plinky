@@ -437,6 +437,8 @@
   "attribution_via": "через",
   "attribution_edited_by": "ред.",
   "takes_heading": "Ваші спроби ({count})",
+  "takes_panel_heading": "Ваші спроби",
+  "takes_empty_hint": "Пройдіть п’єсу до кінця й збережіть її, щоб залишити тут спробу — відтворіть її, позмагайтеся з її тінню або киньте виклик другові.",
   "takes_partial": "частково",
   "takes_replay": "Відтворити цю спробу",
   "takes_stop": "Зупинити",

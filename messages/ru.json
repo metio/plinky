@@ -437,6 +437,8 @@
   "attribution_via": "через",
   "attribution_edited_by": "ред.",
   "takes_heading": "Ваши дубли ({count})",
+  "takes_panel_heading": "Ваши дубли",
+  "takes_empty_hint": "Завершите прохождение и сохраните его, чтобы оставить дубль здесь — воспроизведите его, обгоните его призрака или бросьте вызов другу.",
   "takes_partial": "частично",
   "takes_replay": "Воспроизвести этот дубль",
   "takes_stop": "Стоп",

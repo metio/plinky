@@ -437,6 +437,8 @@
   "attribution_via": "преко",
   "attribution_edited_by": "прир.",
   "takes_heading": "Твоји покушаји ({count})",
+  "takes_panel_heading": "Твоји покушаји",
+  "takes_empty_hint": "Одсвирај комад до краја и сачувај га да овде задржиш покушај — понови га, тркај се с његовим духом или изазови пријатеља.",
   "takes_partial": "делимично",
   "takes_replay": "Понови овај покушај",
   "takes_stop": "Заустави",

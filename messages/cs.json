@@ -437,6 +437,8 @@
   "attribution_via": "přes",
   "attribution_edited_by": "ed.",
   "takes_heading": "Vaše pokusy ({count})",
+  "takes_panel_heading": "Vaše pokusy",
+  "takes_empty_hint": "Dohrajte skladbu do konce a uložte ji, aby tu pokus zůstal — přehrajte si ho, závoďte s jeho duchem nebo vyzvěte kamaráda.",
   "takes_partial": "částečný",
   "takes_replay": "Přehrát tento pokus",
   "takes_stop": "Zastavit",

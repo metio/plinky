@@ -437,6 +437,8 @@
   "attribution_via": "via",
   "attribution_edited_by": "red.",
   "takes_heading": "Jouw opnames ({count})",
+  "takes_panel_heading": "Jouw opnames",
+  "takes_empty_hint": "Speel een stuk helemaal uit en sla het op om hier een opname te bewaren — speel die opnieuw af, race tegen zijn schaduw of daag een vriend uit.",
   "takes_partial": "gedeeltelijk",
   "takes_replay": "Deze opname opnieuw afspelen",
   "takes_stop": "Stoppen",

@@ -437,6 +437,8 @@
   "attribution_via": "via",
   "attribution_edited_by": "ed.",
   "takes_heading": "Le tue esecuzioni ({count})",
+  "takes_panel_heading": "Le tue esecuzioni",
+  "takes_empty_hint": "Completa un'esecuzione e salvala per conservarla qui — riascoltala, gareggia contro il suo fantasma o sfida un amico.",
   "takes_partial": "parziale",
   "takes_replay": "Riascolta questa esecuzione",
   "takes_stop": "Ferma",

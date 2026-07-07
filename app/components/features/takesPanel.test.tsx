@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Composition } from "../../../core/composition";
 import type { Take } from "../../../core/takes";
-import { formatAgo, TakesList } from "./takesList";
+import { formatAgo, TakesPanel } from "./takesPanel";
 
 afterEach(cleanup);
 
@@ -31,24 +31,55 @@ const base = {
     title: "Song",
     activeReplayId: null,
     playing: false,
+    lastRunOnsets: null,
+    canShareLastRun: false,
     onReplay: () => {},
     onStop: () => {},
     onDelete: () => {},
 };
 
-// The list lives inside a folded Disclosure, so each test opens it first.
+// With takes present the list lives inside a folded Disclosure, so each test opens it first.
 const open = () => fireEvent.click(screen.getByRole("button", { name: /your takes/i }));
 
-describe("TakesList", () => {
+describe("TakesPanel", () => {
+    it("explains how to make a take when there are none yet", () => {
+        render(<TakesPanel {...base} takes={[]} />);
+        // The panel is always present so the feature is discoverable; with nothing saved it
+        // tells you how to get a take rather than showing an empty mystery.
+        expect(screen.getByText(/finish a run and save it/i)).toBeTruthy();
+        expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
+    });
+
+    it("offers to share your last run once you've played, even with no take saved", () => {
+        render(<TakesPanel {...base} takes={[]} lastRunOnsets={[0, 250, 500]} canShareLastRun />);
+        expect(
+            screen.getByRole("button", { name: /challenge a friend with your last run/i }),
+        ).toBeTruthy();
+    });
+
+    it("hides the last-run share when the ghost came from a friend's link", () => {
+        render(
+            <TakesPanel
+                {...base}
+                takes={[]}
+                lastRunOnsets={[0, 250, 500]}
+                canShareLastRun={false}
+            />,
+        );
+        expect(
+            screen.queryByRole("button", { name: /challenge a friend with your last run/i }),
+        ).toBeNull();
+    });
+
     it("lists each saved take with a replay control", () => {
-        render(<TakesList {...base} takes={[mk("1"), mk("2", { letter: "A" })]} />);
+        render(<TakesPanel {...base} takes={[mk("1"), mk("2", { letter: "A" })]} />);
         open();
         expect(screen.getAllByRole("button", { name: /replay/i })).toHaveLength(2);
     });
 
     it("shows a graded take's accuracy, timing and flow", () => {
         render(
-            <TakesList
+            <TakesPanel
                 {...base}
                 takes={[
                     mk("1", {
@@ -71,13 +102,13 @@ describe("TakesList", () => {
     });
 
     it("omits the metrics line for a take with no stored grade", () => {
-        render(<TakesList {...base} takes={[mk("1", { metrics: null })]} />);
+        render(<TakesPanel {...base} takes={[mk("1", { metrics: null })]} />);
         open();
         expect(screen.queryByText(/Accuracy/)).toBeNull();
     });
 
     it("copies a share link when challenging a friend with a take", async () => {
-        render(<TakesList {...base} takes={[mk("1")]} />);
+        render(<TakesPanel {...base} takes={[mk("1")]} />);
         open();
         fireEvent.click(screen.getByRole("button", { name: /challenge a friend/i }));
         expect(await screen.findByText(/link copied/i)).toBeTruthy();
@@ -85,7 +116,7 @@ describe("TakesList", () => {
 
     it("replays the clicked take", () => {
         const onReplay = vi.fn();
-        render(<TakesList {...base} takes={[mk("1")]} onReplay={onReplay} />);
+        render(<TakesPanel {...base} takes={[mk("1")]} onReplay={onReplay} />);
         open();
         fireEvent.click(screen.getByRole("button", { name: /replay/i }));
         expect(onReplay).toHaveBeenCalledWith(expect.objectContaining({ id: "1" }));
@@ -94,7 +125,7 @@ describe("TakesList", () => {
     it("shows a Stop control for the replaying take and disables the others", () => {
         const onStop = vi.fn();
         render(
-            <TakesList
+            <TakesPanel
                 {...base}
                 takes={[mk("1"), mk("2")]}
                 activeReplayId="1"
@@ -112,14 +143,14 @@ describe("TakesList", () => {
 
     it("deletes a take by id", () => {
         const onDelete = vi.fn();
-        render(<TakesList {...base} takes={[mk("1")]} onDelete={onDelete} />);
+        render(<TakesPanel {...base} takes={[mk("1")]} onDelete={onDelete} />);
         open();
         fireEvent.click(screen.getByRole("button", { name: /delete take/i }));
         expect(onDelete).toHaveBeenCalledWith("1");
     });
 
     it("flags an incomplete take as partial", () => {
-        render(<TakesList {...base} takes={[mk("1", { complete: false })]} />);
+        render(<TakesPanel {...base} takes={[mk("1", { complete: false })]} />);
         open();
         expect(screen.getByText(/partial/i)).toBeTruthy();
     });

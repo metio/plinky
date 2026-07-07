@@ -437,6 +437,8 @@
   "attribution_via": "via",
   "attribution_edited_by": "red.",
   "takes_heading": "Gjennomkjøringene dine ({count})",
+  "takes_panel_heading": "Gjennomkjøringene dine",
+  "takes_empty_hint": "Spill gjennom et stykke og lagre det for å beholde en gjennomkjøring her — spill den av på nytt, kjør om kapp mot spøkelset eller utfordre en venn.",
   "takes_partial": "delvis",
   "takes_replay": "Spill av denne gjennomkjøringen",
   "takes_stop": "Stopp",

@@ -100,8 +100,7 @@ import { Drawer } from "../ui/drawer";
 import { FocusStrip } from "./focusStrip";
 import { GhostTrack } from "../ui/ghostTrack";
 import { useTranspose } from "./transposeContext";
-import { ShareGhostButton } from "./shareGhostButton";
-import { TakesList } from "./takesList";
+import { TakesPanel } from "./takesPanel";
 import {
     CloseIcon,
     EyeIcon,
@@ -2345,27 +2344,19 @@ export function ScoreViewer({
                     )}
                 </FullScreen>
                 <FullScreen off>
-                    {/* Challenge a friend with the run you just played, no save needed —
-                    your own ghost, not a friend's loaded by link. Left-aligned like the
-                    rest of the column so it doesn't drift off on its own. */}
-                    {storedGhost && !sharedFromLink && (
-                        <div className="flex justify-start">
-                            <ShareGhostButton
-                                id={id}
-                                title={title}
-                                onsets={storedGhost}
-                                label={m.takes_share_last_run()}
-                                showLabel
-                            />
-                        </div>
-                    )}
-                    {takes.length > 0 && (
-                        <TakesList
+                    {/* One home for your own performances of this piece: share your last run
+                    as a ghost, and — once saved — the list of takes. Always present (except on
+                    an ephemeral piece, which can't be saved) so the feature is discoverable
+                    before there's anything in it. */}
+                    {!ephemeral && (
+                        <TakesPanel
                             id={id}
                             takes={takes}
                             title={title}
                             activeReplayId={activeReplayId}
                             playing={playing}
+                            lastRunOnsets={storedGhost}
+                            canShareLastRun={!sharedFromLink}
                             onReplay={replayTake}
                             onStop={stopListen}
                             onDelete={deleteTake}

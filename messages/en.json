@@ -437,6 +437,8 @@
   "attribution_via": "via",
   "attribution_edited_by": "ed.",
   "takes_heading": "Your takes ({count})",
+  "takes_panel_heading": "Your takes",
+  "takes_empty_hint": "Finish a run and save it to keep a take here — replay it, race its ghost, or challenge a friend.",
   "takes_partial": "partial",
   "takes_replay": "Replay this take",
   "takes_stop": "Stop",

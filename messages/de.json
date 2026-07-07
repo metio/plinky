@@ -437,6 +437,8 @@
   "attribution_via": "über",
   "attribution_edited_by": "Hrsg.",
   "takes_heading": "Deine Aufnahmen ({count})",
+  "takes_panel_heading": "Deine Aufnahmen",
+  "takes_empty_hint": "Spiel ein Stück zu Ende und speichere es, um eine Aufnahme hier zu behalten — spiel sie erneut ab, tritt gegen ihren Geist an oder fordere einen Freund heraus.",
   "takes_partial": "teilweise",
   "takes_replay": "Diese Aufnahme abspielen",
   "takes_stop": "Stopp",

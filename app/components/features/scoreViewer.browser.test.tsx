@@ -93,6 +93,15 @@ describe("ScoreViewer", () => {
         expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
+    it("always shows the takes panel with a how-to hint before any take is saved", async () => {
+        // The panel is always present (on a savable piece) so the feature is discoverable;
+        // with nothing saved it explains how to make a take rather than hiding entirely.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        await awaitReady();
+        expect(screen.getByText(/finish a run and save it/i)).toBeTruthy();
+    });
+
     it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
         // The browser viewport is phone-sized, so playing auto-enters full screen where
         // the toggles live; stub the Fullscreen API the headless browser withholds.

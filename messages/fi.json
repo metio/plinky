@@ -437,6 +437,8 @@
   "attribution_via": "lähteestä",
   "attribution_edited_by": "toim.",
   "takes_heading": "Otoksesi ({count})",
+  "takes_panel_heading": "Otoksesi",
+  "takes_empty_hint": "Suorita kappale loppuun ja tallenna se, niin otos säilyy tässä — toista se, kilpaile sen haamua vastaan tai haasta ystävä.",
   "takes_partial": "osittainen",
   "takes_replay": "Toista tämä otos",
   "takes_stop": "Pysäytä",

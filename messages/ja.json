@@ -437,6 +437,8 @@
   "attribution_via": "提供元",
   "attribution_edited_by": "校訂",
   "takes_heading": "あなたの演奏（{count}）",
+  "takes_panel_heading": "あなたの演奏",
+  "takes_empty_hint": "最後まで弾いたら保存して、この演奏をここに残しましょう — 再生したり、ゴーストと競争したり、友だちに挑戦したりできます。",
   "takes_partial": "途中まで",
   "takes_replay": "この演奏を再生",
   "takes_stop": "停止",
