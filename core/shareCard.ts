@@ -264,6 +264,19 @@ const FILL: Record<Level, string> = {
     none: "#374151",
 };
 
+// The heading renders as one unwrapped line at font-size 64 on the 1080px-wide card, so a
+// long piece title would overrun the viewBox and clip on both ends (text-anchor middle) once
+// rasterised. Clamp it to what the line can hold, with an ellipsis — a budget chosen to sit
+// inside the card at this font on a system sans-serif.
+const MAX_HEADING_CHARS = 28;
+
+export function clampHeading(heading: string): string {
+    if (heading.length <= MAX_HEADING_CHARS) {
+        return heading;
+    }
+    return `${heading.slice(0, MAX_HEADING_CHARS - 1).trimEnd()}…`;
+}
+
 // A 1080×1350 dark portrait card — the shape sized for a social feed. Pure markup
 // so it can be tested and rasterised to PNG in the browser without a DOM.
 export function svgCard(grid: Grid, heading: string): string {
@@ -288,7 +301,7 @@ export function svgCard(grid: Grid, heading: string): string {
         .join("");
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\
 <rect width="${width}" height="${height}" fill="#0f172a"/>\
-<text x="${width / 2}" y="${top - 64}" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(heading)}</text>\
+<text x="${width / 2}" y="${top - 64}" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="64" font-weight="700" text-anchor="middle">${escapeXml(clampHeading(heading))}</text>\
 ${cells}\
 <text x="${width / 2}" y="${top + gridH + 96}" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="40" text-anchor="middle">plinky.fun</text>\
 </svg>`;

@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { LENIENT_TOLERANCE } from "./rhythm";
 import {
+    clampHeading,
     computeSegments,
     gridEmoji,
     handGrid,
@@ -300,5 +301,24 @@ describe("svgCard", () => {
         const svg = svgCard(handGrid(spaced(1)), 'A & B <"x">');
         expect(svg).toContain("A &amp; B &lt;&quot;x&quot;&gt;");
         expect(svg).not.toContain('<"x">');
+    });
+
+    it("clamps a long title so it can't overflow and clip in the card", () => {
+        const long = "Prelude and Fugue in C-sharp minor, BWV 849 (arranged)";
+        const svg = svgCard(handGrid(spaced(1)), long);
+        expect(svg).toContain("…");
+        expect(svg).not.toContain(long);
+    });
+});
+
+describe("clampHeading", () => {
+    it("leaves a short title untouched", () => {
+        expect(clampHeading("Für Elise")).toBe("Für Elise");
+    });
+
+    it("truncates a long title to an ellipsis within the card's width", () => {
+        const clamped = clampHeading("Prelude and Fugue in C-sharp minor, BWV 849");
+        expect(clamped.endsWith("…")).toBe(true);
+        expect(clamped.length).toBeLessThanOrEqual(28);
     });
 });
