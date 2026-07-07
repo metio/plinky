@@ -35,8 +35,9 @@ jobs:
       locales: ${{ steps.list.outputs.locales }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
       - id: list
-        run: echo "locales=$(node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
+        run: echo "locales=$(nix develop --command node -p "JSON.stringify(require('./project.inlang/settings.json').locales)")" >> "$GITHUB_OUTPUT"
 
   build-root:
     name: Build root (all locales)
@@ -44,16 +45,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
       - name: Build root
         # Supplies "/" (a runtime language-detect redirect, so it can't be pinned
         # to one locale) and the SPA fallback, plus the public assets and the
         # root-redirect chunks.
-        run: npm run build:client
+        run: nix develop --command npm run build:client
         env:
           PLINKY_ROOT_ONLY: "1"
           # Optional home-page news banner (Sanity). Public identifiers baked into
@@ -76,14 +74,11 @@ jobs:
         locale: ${{ fromJSON(needs.setup.outputs.locales) }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
       - name: Build ${{ matrix.locale }}
         # Tree-shaken to this one language; prerenders only its /<locale>/ pages.
-        run: npm run build:client
+        run: nix develop --command npm run build:client
         env:
           PLINKY_LOCALE: ${{ matrix.locale }}
           VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
@@ -105,17 +100,15 @@ jobs:
       contents: write # peaceiris pushes the built site to the gh-pages branch
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: artifacts
       - name: Merge locale bundles
-        run: node dev/merge-locale-artifacts.mjs artifacts
+        run: nix develop --command node dev/merge-locale-artifacts.mjs artifacts
       - name: Stamp service worker + sitemap
         # No npm install: both scripts use only Node built-ins + settings.json.
-        run: node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs
+        run: nix develop --command node dev/stamp-sw.mjs && nix develop --command node dev/gen-sitemap.mjs
       - name: Add SPA fallback
         # GitHub Pages has no SPA rewrite, so a deep link 404s on refresh. Serving
         # the prerendered shell as 404.html lets the client router take over.
