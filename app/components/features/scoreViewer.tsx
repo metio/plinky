@@ -27,7 +27,7 @@ import {
 } from "../../../core/runCapture";
 import { recordRun } from "../../lib/recordRun";
 import type { DailyResult } from "../../../core/daily";
-import { GRADE_COLOR, type Grade } from "../../../core/grade";
+import type { Grade } from "../../../core/grade";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { useServices, useXmlCodec } from "../../contexts/services";
 import { useMilestoneChannel } from "../../contexts/milestone";
@@ -63,12 +63,9 @@ import {
 } from "../ui/icons";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { PracticeToolsDrawer } from "./practiceToolsDrawer";
+import { KeepUpResultCard } from "./keepUpResultCard";
+import { LoopRangeBar } from "./loopRangeBar";
 import { RunResult } from "./runResult";
-
-// A typed bar number for the loop range — a number field (not a stepper), because a
-// piece can run to many bars and typing the target beats tapping a stepper there.
-const NUMBER_INPUT =
-    "w-14 rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300";
 
 // Renders a MusicXML score with OpenSheetMusicDisplay. Listen plays it back on the
 // shared synth, walking OSMD's cursor so the highlight follows; Practice turns the
@@ -1097,68 +1094,20 @@ export function ScoreViewer({
                 </FullScreen>
                 {/* When the loop is on, its range and narrowing controls sit right by the
                 score — the drawer's backdrop covers the score, so narrowing happens here,
-                drawer closed: tap two bars on the score, or type the first and last bar.
-                Hidden during a run, when the score isn't yours to click. */}
+                drawer closed. Hidden during a run, when the score isn't yours to click. */}
                 {ready && measureCount > 1 && loopOn && !matcher.practicing && !keepUp.running && (
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                        <span className="font-medium text-red-600 dark:text-red-400">
-                            🔁 {m.loop_section()}
-                        </span>
-                        {loopFrom === 1 && loopTo === measureCount ? (
-                            <span className="text-gray-500 dark:text-gray-400">
-                                {m.loop_hint_narrow()}
-                            </span>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    selectAnchorRef.current = null;
-                                    setLoopFrom(1);
-                                    setLoopTo(measureCount);
-                                }}
-                                className="min-h-11 text-indigo-700 hover:underline dark:text-indigo-300"
-                            >
-                                {m.loop_whole_song()}
-                            </button>
-                        )}
-                        <span className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
-                            <input
-                                type="number"
-                                min={1}
-                                max={measureCount}
-                                value={loopFrom}
-                                onChange={(event) => {
-                                    const value = Math.min(
-                                        Math.max(Number(event.target.value), 1),
-                                        measureCount,
-                                    );
-                                    setLoopFrom(value);
-                                    // The start can't pass the end — drag the end along
-                                    // so the range never inverts.
-                                    setLoopTo((to) => Math.max(to, value));
-                                }}
-                                aria-label={m.loop_from()}
-                                className={NUMBER_INPUT}
-                            />
-                            <span aria-hidden="true">–</span>
-                            <input
-                                type="number"
-                                min={loopFrom}
-                                max={measureCount}
-                                value={loopTo}
-                                onChange={(event) =>
-                                    setLoopTo(
-                                        Math.min(
-                                            Math.max(Number(event.target.value), loopFrom),
-                                            measureCount,
-                                        ),
-                                    )
-                                }
-                                aria-label={m.loop_to()}
-                                className={NUMBER_INPUT}
-                            />
-                        </span>
-                    </div>
+                    <LoopRangeBar
+                        measureCount={measureCount}
+                        from={loopFrom}
+                        to={loopTo}
+                        setFrom={setLoopFrom}
+                        setTo={setLoopTo}
+                        onWholeSong={() => {
+                            selectAnchorRef.current = null;
+                            setLoopFrom(1);
+                            setLoopTo(measureCount);
+                        }}
+                    />
                 )}
                 {/* OSMD renders to its container's full offset width, which includes any
                 border or padding on that element; were either on the element OSMD owns, the
@@ -1379,21 +1328,7 @@ export function ScoreViewer({
                 {/* The play-along result — how many beats you kept up with — shown when a
                 tempo-locked run finishes, in place of the self-paced grade panel. */}
                 <FullScreen off>
-                    {keepUp.result && (
-                        <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
-                            <div
-                                className={`text-5xl font-bold leading-none ${GRADE_COLOR[keepUp.result.letter]}`}
-                            >
-                                {keepUp.result.letter}
-                            </div>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">
-                                {m.keep_up_result({
-                                    inTime: keepUp.result.inTime,
-                                    total: keepUp.result.total,
-                                })}
-                            </p>
-                        </div>
-                    )}
+                    {keepUp.result && <KeepUpResultCard result={keepUp.result} />}
                 </FullScreen>
                 {/* The grade narrows the type for the readouts below, so it stays an `&&`
                 guard; the full-screen branch is the declarative half. */}
