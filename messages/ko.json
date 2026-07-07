@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Plinky의 새 버전을 사용할 수 있습니다.",
+  "update_reload": "새로고침",
   "news_label": "새 소식",
   "library_heading": "라이브러리",
   "library_intro": "곡, 음계와 아르페지오, 연습곡, 그리고 직접 가져온 악보까지 한곳에 모았어요. 종류나 등급으로 거르고, 연습 중인 곡에 별표를 달고, 하나를 열어 읽고 듣고 연습해 보세요.",

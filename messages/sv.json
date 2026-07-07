@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "En ny version av Plinky är tillgänglig.",
+  "update_reload": "Ladda om",
   "news_label": "Nyheter",
   "library_heading": "Bibliotek",
   "library_intro": "Låtar, skalor och arpeggion, etyder och dina egna importer — allt på ett ställe. Filtrera efter typ eller nivå, stjärnmärk det du jobbar med, och öppna sedan ett för att läsa, höra och öva.",

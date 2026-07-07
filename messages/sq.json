@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Është në dispozicion një version i ri i Plinky.",
+  "update_reload": "Ringarko",
   "news_label": "Ç'ka të re",
   "library_heading": "Biblioteka",
   "library_intro": "Këngë, shkallë e arpexho, studime dhe importimet e tua — të gjitha në një vend. Filtro sipas llojit ose notës, vendos yll te ajo me të cilën po punon, pastaj hape për ta lexuar, dëgjuar dhe praktikuar.",

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     isRouteErrorResponse,
     Links,
@@ -17,6 +17,7 @@ import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { StorageBanner } from "./components/features/storageBanner";
+import { UpdateBanner } from "./components/features/updateBanner";
 import { SoundHint } from "./components/features/soundHint";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { ThemeToggle } from "./components/features/themeToggle";
@@ -133,7 +134,81 @@ function Header() {
     );
 }
 
+// Watches the offline service worker for a newer build and, when one is ready,
+// surfaces it as a prompt instead of letting it seize the tab. Lives at the
+// composition root because it owns navigator.serviceWorker; components downstream
+// receive only the boolean and the "apply" callback.
+function useServiceWorkerUpdate() {
+    const [updateReady, setUpdateReady] = useState(false);
+    // The build parked in "waiting", to be told to take over once the user accepts.
+    const waiting = useRef<ServiceWorker | null>(null);
+    // Set the moment we ask the waiting worker to activate, so the controllerchange
+    // it triggers reloads this tab — while the first-ever install's controllerchange
+    // (which we did not initiate) leaves the page alone.
+    const applying = useRef(false);
+
+    useEffect(() => {
+        // In dev the SW would cache the dev server's assets and serve them stale.
+        if (!import.meta.env.PROD || !("serviceWorker" in navigator)) {
+            return;
+        }
+        const container = navigator.serviceWorker;
+        let cancelled = false;
+
+        // A worker in "waiting" is a new build ready to take over. It only counts as
+        // an update when a previous worker already controls this page — the first
+        // install has no predecessor and must stay silent.
+        const offer = (worker: ServiceWorker | null) => {
+            if (!cancelled && worker && container.controller) {
+                waiting.current = worker;
+                setUpdateReady(true);
+            }
+        };
+
+        container
+            .register("/sw.js")
+            .then((registration) => {
+                if (cancelled) {
+                    return;
+                }
+                offer(registration.waiting);
+                registration.addEventListener("updatefound", () => {
+                    const installing = registration.installing;
+                    installing?.addEventListener("statechange", () => {
+                        if (installing.state === "installed") {
+                            offer(registration.waiting);
+                        }
+                    });
+                });
+            })
+            .catch(() => {});
+
+        // The accepted worker taking control evicts the previous build's cache, so
+        // reload once onto the version we just applied.
+        const onControllerChange = () => {
+            if (applying.current) {
+                applying.current = false;
+                window.location.reload();
+            }
+        };
+        container.addEventListener("controllerchange", onControllerChange);
+
+        return () => {
+            cancelled = true;
+            container.removeEventListener("controllerchange", onControllerChange);
+        };
+    }, []);
+
+    const applyUpdate = useCallback(() => {
+        applying.current = true;
+        waiting.current?.postMessage({ type: "SKIP_WAITING" });
+    }, []);
+
+    return { updateReady, applyUpdate };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+    const { updateReady, applyUpdate } = useServiceWorkerUpdate();
     // Apply the saved theme (following the OS when "system") here in the layout,
     // so even the error page is themed — App's render is skipped on an error.
     useEffect(() => {
@@ -219,6 +294,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         adapter's health signal so the banner itself stays oblivious
                         to where the signal comes from. */}
                     <StorageBanner health={storageHealth} />
+                    {/* A newer build parks in "waiting"; this offers it as a prompt
+                        rather than letting it swap in mid-interaction. */}
+                    <UpdateBanner updateReady={updateReady} onReload={applyUpdate} />
                     {/* iOS is decided at this composition root and passed down, so
                         the hint component reads no browser global of its own. */}
                     <SoundHint iosLike={iosLike} inAppBrowser={inAppBrowser} />
@@ -232,14 +310,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-    // Register the offline service worker in production builds only; in dev it
-    // would cache the dev server's assets and serve them stale.
-    useEffect(() => {
-        if (import.meta.env.PROD && "serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/sw.js").catch(() => {});
-        }
-    }, []);
-
+    // The service worker is registered by the layout's update watcher, which also
+    // offers a new build as a prompt rather than swapping it in mid-interaction.
     return (
         <MidiProvider>
             <Outlet />

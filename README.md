@@ -216,7 +216,9 @@ Plinky from inside a social app (Instagram, TikTok, Facebook, …) runs it in an
 embedded browser that blocks sound outright; there the reminder points you to open
 the page in Safari instead.
 
-Plinky installs from your browser like an app and works offline once loaded.
+Plinky installs from your browser like an app and works offline once loaded. When
+a new version ships it waits quietly rather than reloading mid-task: a banner
+offers it, and the app updates only when you choose to reload.
 
 ## How it works
 

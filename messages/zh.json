@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Plinky 有新版本可用。",
+  "update_reload": "重新加载",
   "news_label": "最新动态",
   "library_heading": "曲库",
   "library_intro": "歌曲、音阶与琶音、练习曲，以及你导入的乐谱——全部集中在一处。按类型或评级筛选，为正在练习的加星标，然后打开任意一首来阅读、聆听并练习。",

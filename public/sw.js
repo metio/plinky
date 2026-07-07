@@ -23,7 +23,18 @@ const SPA_FALLBACK = "/__spa-fallback.html";
 
 self.addEventListener("install", (event) => {
     event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(["/", SPA_FALLBACK])));
-    self.skipWaiting();
+    // Deliberately no skipWaiting() here: a new build parks in "waiting" instead of
+    // seizing control of open tabs. Activating immediately would evict the old cache
+    // (see the activate handler) out from under a running tab, whose HTML still points
+    // at the previous build's hashed chunks — the next lazy route import would 404 and
+    // the router would hard-reload mid-interaction. The client offers the update as a
+    // banner and posts SKIP_WAITING only when the user accepts.
+});
+
+self.addEventListener("message", (event) => {
+    if (event.data?.type === "SKIP_WAITING") {
+        self.skipWaiting();
+    }
 });
 
 self.addEventListener("activate", (event) => {

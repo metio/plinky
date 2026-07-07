@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Dostupna je nova verzija Plinkyja.",
+  "update_reload": "Ponovno učitaj",
   "news_label": "Novosti",
   "library_heading": "Biblioteka",
   "library_intro": "Skladbe, ljestvice i arpeggi, etide i vlastiti uvozi — sve na jednom mjestu. Filtriraj po vrsti ili ocjeni, označi zvjezdicom ono što vježbaš, pa otvori skladbu da je pročitaš, čuješ i vježbaš.",

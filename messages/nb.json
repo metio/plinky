@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "En ny versjon av Plinky er tilgjengelig.",
+  "update_reload": "Last inn på nytt",
   "news_label": "Nyheter",
   "library_heading": "Bibliotek",
   "library_intro": "Sanger, skalaer og arpeggioer, etyder og dine egne importer — alt på ett sted. Filtrer etter type eller karakter, stjernemerk det du øver på, og åpne et for å lese, høre og øve på det.",

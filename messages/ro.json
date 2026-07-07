@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Este disponibilă o versiune nouă a Plinky.",
+  "update_reload": "Reîncarcă",
   "news_label": "Noutăți",
   "library_heading": "Bibliotecă",
   "library_intro": "Piese, game și arpegii, studii și propriile tale importuri — toate într-un singur loc. Filtrează după tip sau nivel, marchează cu o stea ce exersezi, apoi deschide o piesă ca să o citești, să o asculți și să o exersezi.",

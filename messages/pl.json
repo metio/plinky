@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Dostępna jest nowa wersja Plinky.",
+  "update_reload": "Załaduj ponownie",
   "news_label": "Nowości",
   "library_heading": "Biblioteka",
   "library_intro": "Utwory, gamy i arpeggia, etiudy oraz twoje własne importy — wszystko w jednym miejscu. Filtruj według rodzaju lub poziomu, oznaczaj gwiazdką to, nad czym pracujesz, a potem otwórz utwór, by go przeczytać, usłyszeć i poćwiczyć.",

@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Plinky の新しいバージョンが利用できます。",
+  "update_reload": "再読み込み",
   "news_label": "お知らせ",
   "library_heading": "ライブラリ",
   "library_intro": "曲、スケールとアルペジオ、練習曲、そして自分で取り込んだ楽譜 — すべてここに。種類やグレードで絞り込み、練習中のものにスターを付けて、開けば読んで、聴いて、練習できます。",

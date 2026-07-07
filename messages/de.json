@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Eine neue Version von Plinky ist verfügbar.",
+  "update_reload": "Neu laden",
   "news_label": "Neuigkeiten",
   "library_heading": "Bibliothek",
   "library_intro": "Songs, Tonleitern & Arpeggien, Etüden und deine eigenen Importe – alles an einem Ort. Filtere nach Art oder Note, markiere mit einem Stern, woran du arbeitest, und öffne ein Stück zum Lesen, Hören und Üben.",

@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Elérhető a Plinky új verziója.",
+  "update_reload": "Újratöltés",
   "news_label": "Újdonságok",
   "library_heading": "Könyvtár",
   "library_intro": "Dalok, skálák és arpeggiók, etűdök és a saját importjaid — mind egy helyen. Szűrj típus vagy szint szerint, csillagozd meg, amin dolgozol, majd nyiss meg egyet, hogy elolvasd, meghallgasd és gyakorold.",

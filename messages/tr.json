@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Plinky'nin yeni bir sürümü mevcut.",
+  "update_reload": "Yeniden yükle",
   "news_label": "Yenilikler",
   "library_heading": "Kütüphane",
   "library_intro": "Şarkılar, gamlar ve arpejler, etütler ve kendi içe aktardıkların — hepsi tek yerde. Türe veya seviyeye göre filtrele, üzerinde çalıştığını yıldızla, sonra birini açıp oku, dinle ve çalış.",

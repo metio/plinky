@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Plinkystä on saatavilla uusi versio.",
+  "update_reload": "Lataa uudelleen",
   "news_label": "Ajankohtaista",
   "library_heading": "Kirjasto",
   "library_intro": "Kappaleet, asteikot ja arpeggiot, etydit ja omat tuontisi — kaikki yhdessä paikassa. Suodata tyypin tai arvosanan mukaan, merkitse tähdellä työn alla olevat ja avaa nuotti lukeaksesi, kuullaksesi ja harjoitellaksesi sitä.",

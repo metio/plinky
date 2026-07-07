@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "Je k dispozícii nová verzia Plinky.",
+  "update_reload": "Znovu načítať",
   "news_label": "Novinky",
   "library_heading": "Knižnica",
   "library_intro": "Skladby, stupnice a arpeggiá, etudy a vaše vlastné importy — všetko na jednom mieste. Filtrujte podľa druhu alebo známky, označte hviezdičkou to, na čom pracujete, a potom niektorú otvorte, aby ste si ju prečítali, vypočuli a precvičili.",

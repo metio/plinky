@@ -1,5 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "update_available": "È disponibile una nuova versione di Plinky.",
+  "update_reload": "Ricarica",
   "news_label": "Novità",
   "library_heading": "Libreria",
   "library_intro": "Brani, scale e arpeggi, studi e i tuoi import — tutto in un posto. Filtra per tipo o livello, aggiungi ai preferiti ciò su cui stai lavorando, poi aprine uno per leggerlo, ascoltarlo ed esercitarti.",
