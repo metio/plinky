@@ -21,16 +21,22 @@ describe("MarkLearnedButton", () => {
         expect(button().getAttribute("aria-label")).toBe("Mark learned");
         expect(button().getAttribute("aria-pressed")).toBe("false");
 
+        // Not learned: a quiet outline check — a stroked path, no filled disc.
+        expect(button().querySelector("circle")).toBeNull();
+
         fireEvent.click(button());
         expect(services.mastery.load("btn-click")?.learned).toBe(true);
         // Learned: the same control stays, now pressed and labelled "Learned".
         expect(button().getAttribute("aria-pressed")).toBe("true");
         expect(button().getAttribute("aria-label")).toBe("Learned");
+        // ...and shouting it with a filled badge — the disc is the loud "done" cue.
+        expect(button().querySelector("circle")).not.toBeNull();
 
         // Clicking again un-marks it, so a mistaken mark isn't a dead end.
         fireEvent.click(button());
         expect(services.mastery.load("btn-click")?.learned).toBe(false);
         expect(button().getAttribute("aria-pressed")).toBe("false");
+        expect(button().querySelector("circle")).toBeNull();
     });
 
     it("shows an already-learned piece as pressed and ready to toggle off", () => {

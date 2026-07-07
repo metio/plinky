@@ -67,7 +67,34 @@ export function GhostIcon({ className }: IconProps) {
 }
 
 // A tick — "connected / all good". Paired with a green tint, never an x.
-export function CheckIcon({ className }: IconProps) {
+export function CheckIcon({
+    className = "h-4 w-4",
+    filled = false,
+}: IconProps & { filled?: boolean }) {
+    // Filled draws a solid disc with the check cut in white — a loud "done" badge for a
+    // toggled-on state that has to read at a glance, far stronger than a thin stroke. The
+    // disc takes currentColor, so the button's green flows into it; the check stays white
+    // for contrast against the fill in either theme.
+    if (filled) {
+        return (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className={className}
+                aria-hidden="true"
+            >
+                <circle cx="12" cy="12" r="10" fill="currentColor" />
+                <path
+                    d="M7.5 12.4l3 3 6-6.6"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+            </svg>
+        );
+    }
     return (
         <Icon className={className}>
             <path d="M5 13l4 4L19 7" />
