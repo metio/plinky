@@ -13,7 +13,9 @@ import type { Fetcher } from "../ports/fetcher";
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 export function createHttpFetcher(timeoutMs = DEFAULT_TIMEOUT_MS): Fetcher {
-    return (url) => fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+    // The caller's init is forwarded (the news source's cache: "no-store"), but the
+    // timeout signal is always ours — a stalled request must abort however it was made.
+    return (url, init) => fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
 }
 
 export const httpFetcher = createHttpFetcher();

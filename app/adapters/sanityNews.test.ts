@@ -52,6 +52,16 @@ describe("createSanityNews", () => {
         );
     });
 
+    it("reads past the browser cache, so a toggled banner is never served stale", async () => {
+        let init: RequestInit | undefined;
+        const fetcher = async (_url: string, requestInit?: RequestInit) => {
+            init = requestInit;
+            return jsonResponse({ enabled: true, item });
+        };
+        await createSanityNews(fetcher, config).fetchActive();
+        expect(init?.cache).toBe("no-store");
+    });
+
     it("returns null without fetching when no project is configured", async () => {
         let called = false;
         const fetcher = async () => {

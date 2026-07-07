@@ -19,6 +19,16 @@ describe("httpFetcher", () => {
         expect(fetchSpy.mock.calls[0]![1]?.signal).toBeInstanceOf(AbortSignal);
     });
 
+    it("forwards the caller's request options alongside the timeout signal", async () => {
+        const fetchSpy = vi.fn((_url: string, _init?: RequestInit) =>
+            Promise.resolve(new Response("ok")),
+        );
+        vi.stubGlobal("fetch", fetchSpy);
+        await createHttpFetcher()("/news", { cache: "no-store" });
+        expect(fetchSpy.mock.calls[0]![1]?.cache).toBe("no-store");
+        expect(fetchSpy.mock.calls[0]![1]?.signal).toBeInstanceOf(AbortSignal);
+    });
+
     it("aborts a request that outlasts the timeout instead of hanging forever", async () => {
         // A fetch that only ever settles when its signal aborts — a stalled connection.
         vi.stubGlobal(

@@ -71,7 +71,11 @@ export function createSanityNews(
                 return null;
             }
             try {
-                const response = await fetchUrl(queryUrl(config));
+                // Bypass the browser HTTP cache: the master switch and the shown item
+                // change in Studio without a redeploy, so a cached "off" (or a stale
+                // item) must never outlive a publish. Sanity's apicdn is purged on
+                // publish, so the network read is fresh; only the client cache is the risk.
+                const response = await fetchUrl(queryUrl(config), { cache: "no-store" });
                 if (!response.ok) {
                     return null;
                 }
