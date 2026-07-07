@@ -119,6 +119,26 @@ describe("ScoreViewer", () => {
         );
     });
 
+    it("clears the on-staff fingering numbers when the toggle is switched back off", async () => {
+        // Switching fingering off must remove the numbers, not leave them stranded over the
+        // reclaimed space: a bare re-render repositions the cached labels without destroying
+        // them, so the toggle rebuilds the graphic model to re-create them per the rule.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady());
+        const score = screen.getByRole("img", { name: "T" });
+        const textCount = () => score.querySelectorAll("text").length;
+        const baseline = textCount();
+        const fingers = screen.getByRole("button", { name: "Finger position numbers" });
+        // On: the fingering digits are drawn, adding text nodes to the staff.
+        fireEvent.click(fingers);
+        await waitFor(() => expect(textCount()).toBeGreaterThan(baseline), { timeout: 30000 });
+        // Off: every one of them is gone again.
+        fireEvent.click(fingers);
+        await waitFor(() => expect(textCount()).toBe(baseline), { timeout: 30000 });
+    });
+
     it("runs a tempo-locked play-along and reports how many notes you kept up with", async () => {
         // Small viewport → play-along auto-enters full screen; stub the withheld API.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);

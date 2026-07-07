@@ -103,7 +103,6 @@ import { useTranspose } from "./transposeContext";
 import { ShareGhostButton } from "./shareGhostButton";
 import { TakesList } from "./takesList";
 import {
-    CheckIcon,
     CloseIcon,
     EyeIcon,
     HandIcon,
@@ -293,7 +292,7 @@ export function ScoreViewer({
     // the step's rendered note groups (to paint green on a hit, red on a miss).
     const keepUpExpectedRef = useRef<number[]>([]);
     const keepUpStruckRef = useRef<Set<number>>(new Set());
-    const keepUpNotesRef = useRef<SVGGElement[]>([]);
+    const keepUpNotesRef = useRef<SVGElement[]>([]);
     // This score's saved takes, the take currently replaying (if any), and how the
     // finished run's save went — "saved" and "failed" both retire the save prompt,
     // but only a landed write may claim success.
@@ -1079,12 +1078,15 @@ export function ScoreViewer({
         };
     }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill]);
 
-    // Toggle the on-staff fingering with a re-render, not a reload. The numbers are always
-    // baked into the loaded sheet, so flipping OSMD's RenderFingerings rule and redrawing
-    // shows or hides them while the loaded sheet, the cursor's place and any run in progress
-    // all survive — the player can switch fingering on and off mid-play. The reload effect
-    // sets the rule to the live toggle on every fresh render, so this acts only on a real
-    // change and never fires a redundant render straight after a reload.
+    // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
+    // and any run in progress survive — the player can switch fingering on and off mid-play.
+    // The numbers are always baked into the loaded sheet; flipping OSMD's RenderFingerings
+    // rule alone isn't enough, because a bare render() repositions the cached fingering
+    // labels but never destroys them, leaving stale numbers over the reclaimed space when
+    // switching off. updateGraphic() rebuilds the graphic model from the parsed sheet, so
+    // the labels are created afresh per the rule — all when on, none when off. The reload
+    // effect sets the rule to the live toggle on every fresh render, so this acts only on a
+    // real change and never fires a redundant rebuild straight after a reload.
     useEffect(() => {
         const osmd = osmdRef.current;
         if (!osmd || !ready) {
@@ -1095,6 +1097,12 @@ export function ScoreViewer({
             return;
         }
         rules.RenderFingerings = showFingerings;
+        // Remember where the cursor stands and whether a run or Listen is driving it, so it
+        // resumes on the same note: updateGraphic() re-initialises the cursor to the start.
+        const cursor = osmd.cursor;
+        const wasVisible = !cursor.hidden;
+        const at = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
+        osmd.updateGraphic();
         osmd.render();
         // A fresh render carries no measure boxes or overlay: re-measure the bars for the
         // loop selection and click-to-select, repaint the overlay, and drop the paint flag.
@@ -1102,10 +1110,17 @@ export function ScoreViewer({
         measureBoxesRef.current =
             svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
         paintedRef.current = false;
-        // render() clears the graphical cursor but keeps its iterator in place; redraw it
-        // where it stood when a run or Listen is using it, and re-centre the treadmill.
-        if (!osmd.cursor.hidden) {
-            osmd.cursor.show();
+        // Step the reset cursor back to where it stood — OSMD has no direct seek — and show
+        // it again where a run or Listen was using it, re-centring the treadmill.
+        if (wasVisible) {
+            cursor.reset();
+            while (
+                !cursor.iterator.EndReached &&
+                (cursor.iterator.currentTimeStamp?.RealValue ?? 0) < at
+            ) {
+                cursor.next();
+            }
+            cursor.show();
             centerCursor();
         }
         paintLoopSelection();
@@ -1264,8 +1279,10 @@ export function ScoreViewer({
             }
             keepUpExpectedRef.current = expected;
             keepUpStruckRef.current = new Set();
-            keepUpNotesRef.current = highlightCursorNotes(osmd, WINDOW_COLOR).map(
-                (painted) => painted.element,
+            // Keep every rendered part of each highlighted note — head and stem — so a hit
+            // or miss later colours the whole note, not just its head.
+            keepUpNotesRef.current = highlightCursorNotes(osmd, WINDOW_COLOR).flatMap((painted) =>
+                painted.parts.map((part) => part.element),
             );
         };
 
@@ -2081,13 +2098,11 @@ export function ScoreViewer({
                     hidden={ephemeral || fullscreen}
                     className="flex flex-wrap items-center gap-3 text-sm"
                 >
-                    {/* The mark-learned shortcut lives in the header icon row; here we
-                    only show the earned status and the review/backlog control. */}
+                    {/* The learned state itself now reads from the colour of the header
+                    check (green when learned), so no text repeats it; here we keep only
+                    the actionable review/backlog control and the due nudge. */}
                     {mastery?.learned && (
                         <>
-                            <span className="inline-flex items-center gap-1 font-medium text-green-700 dark:text-green-400">
-                                <CheckIcon className="h-4 w-4" /> {m.mastery_learned()}
-                            </span>
                             {isDue(mastery, Date.now()) && (
                                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
                                     {m.mastery_due()}
@@ -2331,9 +2346,10 @@ export function ScoreViewer({
                 </FullScreen>
                 <FullScreen off>
                     {/* Challenge a friend with the run you just played, no save needed —
-                    your own ghost, not a friend's loaded by link. */}
+                    your own ghost, not a friend's loaded by link. Left-aligned like the
+                    rest of the column so it doesn't drift off on its own. */}
                     {storedGhost && !sharedFromLink && (
-                        <div className="flex justify-end">
+                        <div className="flex justify-start">
                             <ShareGhostButton
                                 id={id}
                                 title={title}
