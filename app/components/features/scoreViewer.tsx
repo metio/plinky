@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { FullScreen, FullscreenProvider, Midi, Show, useMidiConnected } from "./conditional";
@@ -10,14 +9,14 @@ import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
 import { useTempoControls } from "../../hooks/useTempoControls";
+import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
 import { useRunResult } from "../../hooks/useRunResult";
 import { useGhostRace } from "../../hooks/useGhostRace";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
-import { annotateFingerings } from "../../lib/fingerScore";
-import { cursorWhole, seekToWhole } from "../../lib/scoreCursor";
+import { cursorWhole } from "../../lib/scoreCursor";
 import { cadence } from "../../../core/cadence";
 import { deriveRunOutcome } from "../../../core/runOutcome";
 import {
@@ -36,11 +35,10 @@ import { isPreciseInput } from "../../../core/midi";
 import {
     clearBarSelection,
     clientPointToSvg,
-    collectMeasureBoxes,
     paintBarSelection,
     paintPlayedNotes,
 } from "../../lib/scoreColor";
-import { type MeasureBox, measureAtPoint } from "../../../core/scoreCanvas";
+import { measureAtPoint } from "../../../core/scoreCanvas";
 import { transposeMusicXml } from "../../../core/transpose";
 import { m } from "../../paraglide/messages.js";
 import { Button, IconButton } from "../ui/button";
@@ -120,14 +118,11 @@ export function ScoreViewer({
     // render — whose identity can churn while `matcher.complete` stays true; a
     // re-fire without this latch would double-count the run. Reset at run start.
     const gradedRef = useRef(false);
-    const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
     // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
     // callback and the MIDI release handler both advance it between renders.
     const captureRef = useRef<RunCapture>(startCapture());
     const synth = useSynth();
-    const [ready, setReady] = useState(false);
-    const [loadError, setLoadError] = useState(false);
     // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
     // on the clock rather than waiting for you, so a note not cleared before it passes is a
     // miss. `guideNotes` sounds the notes as they pass for a follow-along; off, it's a
@@ -164,18 +159,11 @@ export function ScoreViewer({
     // 1-based for the player; the cursor walks them 0-based, hence the offset in
     // listen(). The range is read from a ref during playback so the loop reacts to
     // the inputs without restarting the cursor loop.
-    const [measureCount, setMeasureCount] = useState(1);
     const [loopOn, setLoopOn] = useState(false);
     const [loopFrom, setLoopFrom] = useState(1);
     const [loopTo, setLoopTo] = useState(1);
     const loopRef = useRef({ on: false, from: 1, to: 1 });
     loopRef.current = { on: loopOn, from: loopFrom, to: loopTo };
-    // The last piece the reload effect seeded a loop for, so a relayout of the same
-    // piece leaves the loop untouched while a genuinely new piece reseeds it.
-    const loadedXmlRef = useRef<string | null>(null);
-    // Each bar's rendered box, measured once per render, for placing the loop's red
-    // selection overlay and mapping a click on the score to the bar under it.
-    const measureBoxesRef = useRef<MeasureBox[]>([]);
     // The first bar of an in-progress click selection; the next click sets the far end.
     const selectAnchorRef = useRef<number | null>(null);
     // Transposition shifts the whole piece into a more comfortable key, ±12
@@ -232,17 +220,12 @@ export function ScoreViewer({
     // Print the suggested fingering numbers on the staff. Seeded from the saved default
     // (off), flipped live by the in-play toggle. The numbers are always baked into the
     // loaded sheet; the toggle only flips whether OSMD draws them, applied with a re-render
-    // (not a reload) so it can go on and off mid-play without tearing down a run. The ref
-    // carries the live value into the render's constructor when another input reloads.
+    // (not a reload) so it can go on and off mid-play without tearing down a run.
     const [showFingerings, setShowFingerings] = useState(() => prefsStore.load().showFingerings);
-    const showFingeringsRef = useRef(showFingerings);
-    showFingeringsRef.current = showFingerings;
     // Whether the staff scrolls to keep the played note in view. On by default; the
     // treadmill drives its own centring, so OSMD's follow is off there. Applied straight to
-    // OSMD (no reload), so the ref carries the live value into the render's constructor.
+    // OSMD (no reload).
     const [scrollFollow, setScrollFollow] = useState(true);
-    const scrollFollowRef = useRef(true);
-    scrollFollowRef.current = scrollFollow;
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). Read after mount to avoid a
     // hydration mismatch; the portrait layout stays fully usable, so this never forces
@@ -257,10 +240,9 @@ export function ScoreViewer({
         () => (transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose)),
         [xml, transpose, xmlCodec],
     );
-    // Which hand to practice, and the score's staff count — the hands-separate
-    // selector only appears for the grand-staff (two-staff) scores it applies to.
+    // Which hand to practice — the hands-separate selector only appears for the
+    // grand-staff (two-staff) scores it applies to (the staff count comes from the score).
     const [hand, setHand] = useState<Hand>("both");
-    const [staffCount, setStaffCount] = useState(1);
 
     // The finished self-paced run's result — the grade and every surface derived from
     // it (per-note strip, share grid, tempo curve) plus the save verdict — owned as one
@@ -282,9 +264,6 @@ export function ScoreViewer({
     // self-paced tempo curve reads against the same reference the matcher used,
     // even if the slider is moved afterwards.
     const runTempoRef = useRef(initialTempo ?? 100);
-    // Whether any note has been coloured on the score, so a fresh run re-renders to
-    // clear last run's progress only when there is something to clear.
-    const paintedRef = useRef(false);
     // A run that began partway through — taking over from Listen, or resuming where a
     // stopped run left off. It is graded for what was played, but keeps no ghost: a
     // partial replay would strand the next race at its early end, and chasing a
@@ -294,35 +273,64 @@ export function ScoreViewer({
     // The cursor's current position in whole notes — the shared place Listen and
     // Practice hand off at, so switching between them (or leaving and re-entering the
     // play surface) continues here rather than rewinding.
-    const resumePoint = () => cursorWhole(osmdRef.current?.cursor);
-
     // Load this score's saved takes; a new score swaps in its own.
     useEffect(() => {
         setTakes(services.takes.list(id));
     }, [id, services.takes.list]);
 
-    const getOsmd = useCallback(() => osmdRef.current, []);
+    // The score-rendering surface: OSMD loads and re-renders the piece, and reports what
+    // the rest of the play surface reads off it. The transports and the matcher drive the
+    // cursor through getOsmd(); it is created before them so they can read it. Its own
+    // coordination callbacks run through refs inside the hook, so referencing those
+    // later-created transports from here is safe — they are called only after render.
+    const score = useOsmdScore(containerRef, {
+        xml,
+        transpose,
+        showMine,
+        saved,
+        barsPerRow,
+        barNumbers,
+        treadmill,
+        showFingerings,
+        scrollFollow,
+        onReload: () => {
+            listenPlayback.stop();
+            keepUp.stop();
+            matcher.stop();
+        },
+        onRendered: ({ bars, freshPiece }) => {
+            // A fresh render carries no in-progress click selection.
+            selectAnchorRef.current = null;
+            // The hand selection and the bar range belong to the piece, not the layout: a
+            // relayout keeps the same staves and bars, so a chosen hand and loop survive it,
+            // reseeding only when the piece itself changes. A fresh piece seeds the hand to
+            // both and the loop to the whole song.
+            if (freshPiece) {
+                setHand("both");
+                setLoopFrom(1);
+                setLoopTo(bars);
+                setLoopOn(false);
+            }
+        },
+    });
+    const {
+        getOsmd,
+        ready,
+        loadError,
+        staffCount,
+        measureCount,
+        measureBoxes,
+        centerCursor,
+        markPainted,
+        painted,
+        resetPaint,
+        renderVersion,
+    } = score;
 
-    // In treadmill mode OSMD's own follow-cursor is off, so the active bar is centred by
-    // hand: scroll its box horizontally to bring the cursor to the middle — the fixed gaze
-    // the music slides under. A no-op when not treadmill or the cursor isn't shown.
-    const centerCursor = useCallback(() => {
-        if (!treadmill) {
-            return;
-        }
-        const el = osmdRef.current?.cursor?.cursorElement;
-        const box = containerRef.current;
-        if (el && box) {
-            box.scrollTo({ left: el.offsetLeft - box.clientWidth / 2, behavior: "smooth" });
-        }
-    }, [treadmill]);
-
-    // Something has coloured the score — a run's trail, a Listen trail, a keep-up
-    // window. Both playback transports flag it so the next run re-renders to wipe
-    // last run's marks only when there is something to clear.
-    const markPainted = useCallback(() => {
-        paintedRef.current = true;
-    }, []);
+    // The cursor's current position in whole notes — the shared place Listen and Practice
+    // hand off at, so switching between them (or leaving and re-entering the play surface)
+    // continues here rather than rewinding.
+    const resumePoint = () => cursorWhole(getOsmd()?.cursor);
 
     // Tempo-locked play-along ("keep up"): the clock advances the cursor and scores each
     // beat; finishing drops out of full screen so the result comes into view.
@@ -359,10 +367,10 @@ export function ScoreViewer({
             }
             // Colour the notes just cleared — the cursor is still on them, as it
             // only advances after this callback — so the score shows progress.
-            const osmd = osmdRef.current;
+            const osmd = getOsmd();
             if (osmd) {
                 paintPlayedNotes(osmd, info.pitches);
-                paintedRef.current = true;
+                markPainted();
             }
             // Record the cleared note — its ideal and actual timing, and a hold per
             // pitch for the release to close — for the grade, the per-note strip, the
@@ -439,14 +447,14 @@ export function ScoreViewer({
         if (loopRef.current.on) {
             paintBarSelection(
                 svg,
-                measureBoxesRef.current,
+                measureBoxes(),
                 loopRef.current.from - 1,
                 loopRef.current.to - 1,
             );
         } else {
             clearBarSelection(svg);
         }
-    }, []);
+    }, [measureBoxes]);
 
     // Click a bar to build the loop range: the first click drops the anchor (a one-bar
     // loop), the next extends to the far end. Only while set-up, not mid-play, and the
@@ -457,11 +465,11 @@ export function ScoreViewer({
                 return;
             }
             const svg = containerRef.current?.querySelector("svg");
-            if (!(svg instanceof SVGSVGElement) || measureBoxesRef.current.length === 0) {
+            if (!(svg instanceof SVGSVGElement) || measureBoxes().length === 0) {
                 return;
             }
             const point = clientPointToSvg(svg, clientX, clientY);
-            const measure = measureAtPoint(measureBoxesRef.current, point.x, point.y);
+            const measure = measureAtPoint(measureBoxes(), point.x, point.y);
             if (measure === null) {
                 return;
             }
@@ -477,7 +485,7 @@ export function ScoreViewer({
                 selectAnchorRef.current = null;
             }
         },
-        [matcher.practicing, measureCount, listenPlayback.active],
+        [matcher.practicing, measureCount, listenPlayback.active, measureBoxes],
     );
 
     // Slide the keyboard window to keep the notes being played in view, re-framing only
@@ -516,13 +524,15 @@ export function ScoreViewer({
         centerCursor();
     }, [centerCursor, matcher.done, matcher.practicing]);
 
-    // Keep the red loop overlay in step with the range and each fresh render (ready is the
-    // signal that the boxes were just re-measured). paintLoopSelection reads the live range
-    // from a ref, so these are triggers, not closure inputs.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: the loop state and ready are re-paint triggers, not inputs
+    // Keep the red loop overlay in step with the range and each fresh render. A render
+    // bumps renderVersion after re-measuring the bars and dropping any prior overlay (OSMD
+    // draws into a new SVG), so the loop must repaint then; the loop range is the other
+    // trigger. paintLoopSelection reads the live range from a ref, so these are triggers,
+    // not closure inputs.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: the loop state and renderVersion are re-paint triggers, not inputs
     useEffect(() => {
         paintLoopSelection();
-    }, [loopOn, loopFrom, loopTo, ready, paintLoopSelection]);
+    }, [loopOn, loopFrom, loopTo, renderVersion, paintLoopSelection]);
 
     // Grade a run once it completes, from the captured timing and velocity. A run
     // with no real velocity variation (the computer keyboard) is graded without
@@ -632,170 +642,6 @@ export function ScoreViewer({
         }
     }, [fullscreen]);
 
-    // Reload OSMD whenever the score changes, and stop any playback/practice — a
-    // tempo-locked play-along included, or a layout change mid-run would strand its
-    // running state (the Stop label, the ticking metronome) with the timers gone.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: matcher.stop/stopListen/stopKeepUp reset transient playback, not render inputs
-    useEffect(() => {
-        let cancelled = false;
-        setReady(false);
-        setLoadError(false);
-        paintedRef.current = false;
-        listenPlayback.stop();
-        keepUp.stop();
-        matcher.stop();
-        import("opensheetmusicdisplay")
-            .then(({ OpenSheetMusicDisplay }) => {
-                if (cancelled || !containerRef.current) {
-                    return;
-                }
-                const osmd = new OpenSheetMusicDisplay(containerRef.current, {
-                    autoResize: true,
-                    drawingParameters: "compact",
-                    // Scroll the staff to keep the cursor in view as it advances, so a
-                    // multi-line piece follows along while you play instead of forcing
-                    // you to scroll — critical on a phone where the staff is tall. The
-                    // treadmill drives its own horizontal centring, so OSMD's vertical
-                    // follow is turned off there.
-                    followCursor: scrollFollowRef.current && !treadmill,
-                    // One continuous horizontal staffline that scrolls right, rather than
-                    // wrapping into rows — the treadmill reading mode.
-                    renderSingleHorizontalStaffline: treadmill,
-                });
-                osmdRef.current = osmd;
-                const rules = (
-                    osmd as unknown as {
-                        rules: {
-                            RenderXMeasuresPerLineAkaSystem: number;
-                            RenderMeasureNumbers: boolean;
-                            RenderMeasureNumbersOnlyAtSystemStart: boolean;
-                            RenderFingerings: boolean;
-                        };
-                    }
-                ).rules;
-                // Force a fixed number of bars per row when the player picks one, for
-                // bigger, more readable notation on a small screen; 0 fits them to width.
-                rules.RenderXMeasuresPerLineAkaSystem = barsPerRow;
-                // Number the first bar of each row when bar numbers are on, so the same
-                // rows are labelled every render; OSMD's default cadence otherwise moves
-                // the numbers around as the score re-flows.
-                rules.RenderMeasureNumbers = barNumbers;
-                rules.RenderMeasureNumbersOnlyAtSystemStart = true;
-                // Whether the printed fingering is drawn. The numbers are always baked into
-                // the sheet below, so flipping this rule and re-rendering shows or hides them
-                // without a reload — see the fingering-toggle effect. Set from a ref so a
-                // reload driven by another input still honours the live toggle.
-                rules.RenderFingerings = showFingeringsRef.current;
-                // Suggested fingering belongs on the staff, personalised to the player's
-                // reach, so the suggestion sits on the note being read, not mapped onto a
-                // key. Transpose first, then annotate, so the printed fingering is computed
-                // for the key actually being played. It is always baked in — drawn or not
-                // per the rule above — so the toggle can redraw rather than reload.
-                const transposed =
-                    transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
-                const source = annotateFingerings(
-                    xmlCodec,
-                    transposed,
-                    prefsStore.load().handSpan,
-                    showMine ? saved : undefined,
-                );
-                return osmd.load(source).then(() => {
-                    if (!cancelled) {
-                        osmd.render();
-                        // Measure every bar's box off the fresh render, for the loop's
-                        // selection overlay and click-to-select. The cursor is free here
-                        // (nothing is playing), and a fresh render carries no selection.
-                        const svg = containerRef.current?.querySelector("svg");
-                        measureBoxesRef.current =
-                            svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
-                        selectAnchorRef.current = null;
-                        // A grand staff (two staves) can be drilled one hand at a
-                        // time; a single-staff score offers no such choice.
-                        setStaffCount(osmd.Sheet?.getCompleteNumberOfStaves() ?? 1);
-                        const bars = osmd.Sheet?.SourceMeasures?.length ?? 1;
-                        setMeasureCount(bars);
-                        // The hand selection and the bar range both belong to the piece,
-                        // not the layout: a relayout (bars-per-row, treadmill, fingering,
-                        // transpose) keeps the same staves and bars, so a chosen hand and
-                        // loop must survive it — resetting only when the piece itself
-                        // changes keeps them independent of the reading-mode toggles. On a
-                        // fresh piece the hand seeds to both and the loop to the whole song.
-                        if (loadedXmlRef.current !== xml) {
-                            loadedXmlRef.current = xml;
-                            setHand("both");
-                            setLoopFrom(1);
-                            setLoopTo(bars);
-                            setLoopOn(false);
-                        }
-                        setReady(true);
-                    }
-                });
-            })
-            // A failed chunk import or MusicXML that OSMD can't load would otherwise
-            // leave ready false forever — a silently dead viewer with disabled
-            // controls and no explanation. Surface it instead.
-            .catch(() => {
-                if (!cancelled) {
-                    setLoadError(true);
-                }
-            });
-        return () => {
-            cancelled = true;
-            // The effect body stops every playback mode before loading; the timer chains
-            // also clear themselves on unmount, so nothing here can fire into a torn-down
-            // score. A change of layout (bars-per-row, treadmill, transpose) re-runs this
-            // effect, building a fresh OSMD on the same container. OSMD renders into a
-            // new SVG rather than replacing the old one, so without removing the previous
-            // render its SVG stays behind and each switch stacks another copy. clear()
-            // frees OSMD's own state but leaves its <svg> in the DOM, so empty the
-            // container too.
-            osmdRef.current?.clear();
-            containerRef.current?.replaceChildren();
-        };
-    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill]);
-
-    // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
-    // and any run in progress survive — the player can switch fingering on and off mid-play.
-    // The numbers are always baked into the loaded sheet; flipping OSMD's RenderFingerings
-    // rule alone isn't enough, because a bare render() repositions the cached fingering
-    // labels but never destroys them, leaving stale numbers over the reclaimed space when
-    // switching off. updateGraphic() rebuilds the graphic model from the parsed sheet, so
-    // the labels are created afresh per the rule — all when on, none when off. The reload
-    // effect sets the rule to the live toggle on every fresh render, so this acts only on a
-    // real change and never fires a redundant rebuild straight after a reload.
-    useEffect(() => {
-        const osmd = osmdRef.current;
-        if (!osmd || !ready) {
-            return;
-        }
-        const rules = (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules;
-        if (rules.RenderFingerings === showFingerings) {
-            return;
-        }
-        rules.RenderFingerings = showFingerings;
-        // Remember where the cursor stands and whether a run or Listen is driving it, so it
-        // resumes on the same note: updateGraphic() re-initialises the cursor to the start.
-        const cursor = osmd.cursor;
-        const wasVisible = !cursor.hidden;
-        const at = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
-        osmd.updateGraphic();
-        osmd.render();
-        // A fresh render carries no measure boxes or overlay: re-measure the bars for the
-        // loop selection and click-to-select, repaint the overlay, and drop the paint flag.
-        const svg = containerRef.current?.querySelector("svg");
-        measureBoxesRef.current =
-            svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
-        paintedRef.current = false;
-        // Step the reset cursor back to where it stood — OSMD has no direct seek — and show
-        // it again where a run or Listen was using it, re-centring the treadmill.
-        if (wasVisible) {
-            seekToWhole(cursor, at);
-            cursor.show();
-            centerCursor();
-        }
-        paintLoopSelection();
-    }, [showFingerings, ready, centerCursor, paintLoopSelection]);
-
     // Start Listen: the play surface goes full screen, any self-paced run stops, and
     // the transport walks the cursor from wherever it sits — the note Practice was on
     // when handing over, or where a paused run left off — instead of rewinding, so play
@@ -823,16 +669,16 @@ export function ScoreViewer({
     // self-paced run stops, last run's result and colours wipe, and the keep-up clock
     // takes over — scoring only the practised hand, exactly as self-paced practice does.
     const playAlong = () => {
-        const osmd = osmdRef.current;
+        const osmd = getOsmd();
         if (!osmd || listenPlayback.active() || keepUp.active()) {
             return;
         }
         enterPlayFullscreen();
         matcher.stop();
         clearSelfPacedResult();
-        if (paintedRef.current) {
+        if (painted()) {
             osmd.render();
-            paintedRef.current = false;
+            resetPaint();
         }
         keepUp.start({ hand: staffCount < 2 ? "both" : hand, guideNotes });
     };
@@ -915,9 +761,9 @@ export function ScoreViewer({
         // A fresh run from the top wipes the previous run's colours for a clean slate; a
         // resumed run (taking over from Listen) keeps them, so the blue Listen trail and
         // any earlier green survive and the score shows how the whole piece was played.
-        if (!partial && paintedRef.current) {
-            osmdRef.current?.render();
-            paintedRef.current = false;
+        if (!partial && painted()) {
+            getOsmd()?.render();
+            resetPaint();
         }
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
         ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
@@ -1043,7 +889,7 @@ export function ScoreViewer({
                                 onClick={() => {
                                     const next = !scrollFollow;
                                     setScrollFollow(next);
-                                    const osmd = osmdRef.current;
+                                    const osmd = getOsmd();
                                     if (osmd) {
                                         osmd.FollowCursor = next;
                                     }
