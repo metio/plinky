@@ -5,9 +5,11 @@ import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type Hand, STAFF_FOR } from "../../core/matcher";
 import { type MeasureBox, NOTE_COLOR, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
-// OSMD's graphical notes expose their rendered SVG group only on the VexFlow
-// subclass; the cursor hands back the base type, so reach the accessor by shape.
-type WithSvg = { getSVGGElement?: () => SVGGElement };
+// OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
+// cursor hands back the base type, so reach the accessors by shape. getSVGGElement is the
+// notehead group; getStemSVG is the stem, a separate element by id — colouring the head
+// group alone leaves the stem black, so a coloured note reads as only a coloured dot.
+type WithSvg = { getSVGGElement?: () => SVGGElement; getStemSVG?: () => Element | null };
 
 function svgOf(gNote: unknown): SVGGElement | undefined {
     try {
@@ -17,12 +19,37 @@ function svgOf(gNote: unknown): SVGGElement | undefined {
     }
 }
 
-// VexFlow sets an explicit fill on each glyph path, so the group's colour doesn't
-// cascade — paint the group and every descendant.
-export function paintElement(element: SVGGElement, color: string): void {
+function stemOf(gNote: unknown): SVGElement | undefined {
+    try {
+        const stem = (gNote as WithSvg).getStemSVG?.();
+        return stem instanceof SVGElement ? stem : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+// The rendered parts that make up one whole note: the notehead group and, when the note
+// has one, the stem it carries. A note OSMD drew no glyph for has no notehead, and counts
+// as unrendered — no parts, so callers skip it whole. A chord shares a single stem, so the
+// same element can appear for several noteheads; painting it more than once is harmless.
+function partsOf(gNote: unknown): SVGElement[] {
+    const head = svgOf(gNote);
+    if (!head) {
+        return [];
+    }
+    const stem = stemOf(gNote);
+    return stem ? [head, stem] : [head];
+}
+
+// VexFlow gives each glyph its own explicit paint, so a colour set on the group doesn't
+// cascade — set it on the element and every descendant. Both fill and stroke are set, so
+// one call colours filled glyphs (noteheads, beams) and stroked ones (stems) alike.
+export function paintElement(element: SVGElement, color: string): void {
     element.setAttribute("fill", color);
+    element.setAttribute("stroke", color);
     for (const child of element.querySelectorAll("*")) {
         child.setAttribute("fill", color);
+        child.setAttribute("stroke", color);
     }
 }
 
@@ -80,9 +107,8 @@ export function paintMeasureRange(
         const measure = osmd.cursor.iterator.CurrentMeasureIndex;
         if (measure >= from && measure < to) {
             for (const gNote of osmd.cursor.GNotesUnderCursor()) {
-                const element = svgOf(gNote);
-                if (element) {
-                    paintElement(element, color);
+                for (const part of partsOf(gNote)) {
+                    paintElement(part, color);
                 }
             }
         }
@@ -209,15 +235,36 @@ export function paintBarSelection(
     }
 }
 
-// One note and the fill it wore before being highlighted, so the highlight can be
-// lifted without assuming the note was plain black (it may already be played-green).
-export type PaintedNote = { element: SVGGElement; fill: string };
+// One whole note captured before being highlighted: each of its parts (notehead group,
+// stem) with the exact fill and stroke it wore, plus whether it already carried a mark —
+// a practised green — rather than plain black. Grouping the parts lets the highlight lift
+// back to precisely what was there, and lets the trail decide once per note (from the
+// notehead) whether to keep the prior mark or lay its own, then apply that to the stem too.
+type PaintedPart = { element: SVGElement; fill: string; stroke: string };
+export type PaintedNote = { parts: PaintedPart[]; marked: boolean };
 
-// Paints the playable notes at the cursor's current position an "active" colour and
-// returns them with their prior fill, so the caller can restore them as the cursor
-// moves on — the moving highlight that follows Listen playback. Like paintPlayedNotes,
-// it mutates the rendered SVG directly rather than re-rendering, which would lose the
-// cursor every note.
+function capturePart(element: SVGElement): PaintedPart {
+    return {
+        element,
+        fill: element.getAttribute("fill") ?? NOTE_COLOR,
+        stroke: element.getAttribute("stroke") ?? NOTE_COLOR,
+    };
+}
+
+function restorePart({ element, fill, stroke }: PaintedPart): void {
+    element.setAttribute("fill", fill);
+    element.setAttribute("stroke", stroke);
+    for (const child of element.querySelectorAll("*")) {
+        child.setAttribute("fill", fill);
+        child.setAttribute("stroke", stroke);
+    }
+}
+
+// Paints the playable notes at the cursor's current position an "active" colour — whole
+// note, stem and all — and returns them with their prior paint, so the caller can restore
+// them as the cursor moves on: the moving highlight that follows Listen playback. Like
+// paintPlayedNotes, it mutates the rendered SVG directly rather than re-rendering, which
+// would lose the cursor every note.
 export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string): PaintedNote[] {
     const painted: PaintedNote[] = [];
     for (const gNote of osmd.cursor.GNotesUnderCursor()) {
@@ -225,29 +272,43 @@ export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string)
         if (note.isRest() || note.halfTone <= 0) {
             continue;
         }
-        const element = svgOf(gNote);
-        if (element) {
-            painted.push({ element, fill: element.getAttribute("fill") ?? NOTE_COLOR });
+        const parts = partsOf(gNote).map(capturePart);
+        const head = parts[0];
+        if (!head) {
+            continue;
+        }
+        // The notehead is the first part; its prior fill tells whether the note already
+        // wore a mark, and the whole note follows that verdict.
+        painted.push({ parts, marked: head.fill !== NOTE_COLOR });
+        for (const { element } of parts) {
             paintElement(element, color);
         }
     }
     return painted;
 }
 
-// Restores notes lifted by highlightCursorNotes to the fill they wore before.
+// Restores notes lifted by highlightCursorNotes to the paint they wore before.
 export function restoreNotes(painted: PaintedNote[]): void {
-    for (const { element, fill } of painted) {
-        paintElement(element, fill);
+    for (const { parts } of painted) {
+        for (const part of parts) {
+            restorePart(part);
+        }
     }
 }
 
-// Leaves a persistent trail on notes the highlight is moving off: paints them `color`
-// only where they were untouched (plain black), keeping any prior mark — a practised
-// green — so the trail records where the piece was heard without erasing where it was
-// played. Used by Listen to lay down its blue trail as the cursor advances.
+// Leaves a persistent trail on notes the highlight is moving off: paints an untouched note
+// (plain black) `color`, but keeps any prior mark — a practised green — so the trail records
+// where the piece was heard without erasing where it was played. Used by Listen to lay down
+// its blue trail as the cursor advances.
 export function trailNotes(painted: PaintedNote[], color: string): void {
-    for (const { element, fill } of painted) {
-        paintElement(element, fill === NOTE_COLOR ? color : fill);
+    for (const { parts, marked } of painted) {
+        for (const part of parts) {
+            if (marked) {
+                restorePart(part);
+            } else {
+                paintElement(part.element, color);
+            }
+        }
     }
 }
 
@@ -298,9 +359,8 @@ export function paintPlayedNotes(
         if (!pitches.includes(gNote.sourceNote.halfTone + 12)) {
             continue;
         }
-        const element = svgOf(gNote);
-        if (element) {
-            paintElement(element, color);
+        for (const part of partsOf(gNote)) {
+            paintElement(part, color);
         }
     }
 }

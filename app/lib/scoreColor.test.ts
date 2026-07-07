@@ -24,13 +24,17 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 // A graphical note backed by a real <g><path/></g>, mirroring OSMD's VexFlow
 // output: halfTone + 12 is the MIDI pitch, and getSVGGElement yields the group.
+// getStemSVG yields a separate stroked <path>, the way OSMD exposes the stem.
 function gNote(midi: number, withElement = true, rest = false) {
     const group = document.createElementNS(SVG_NS, "g");
     group.appendChild(document.createElementNS(SVG_NS, "path"));
+    const stem = document.createElementNS(SVG_NS, "path");
     return {
         sourceNote: { halfTone: midi - 12, isRest: () => rest },
         getSVGGElement: () => (withElement ? group : undefined),
+        getStemSVG: () => stem,
         group,
+        stem,
     };
 }
 
@@ -132,6 +136,14 @@ describe("paintPlayedNotes", () => {
         expect(() => paintPlayedNotes(fakeOsmd([note]), [60])).not.toThrow();
         expect(note.group.getAttribute("fill")).toBeNull();
     });
+
+    it("colours the whole note, painting the stem's stroke as well as the head", () => {
+        const played = gNote(60);
+        paintPlayedNotes(fakeOsmd([played]), [60]);
+        // The head is filled; the stem is a stroked path, so its colour rides on stroke.
+        expect(played.group.getAttribute("fill")).toBe(PLAYED_COLOR);
+        expect(played.stem.getAttribute("stroke")).toBe(PLAYED_COLOR);
+    });
 });
 
 describe("highlightCursorNotes / restoreNotes", () => {
@@ -165,5 +177,15 @@ describe("highlightCursorNotes / restoreNotes", () => {
         const painted = highlightCursorNotes(fakeOsmd([rest, offscreen]), WINDOW_COLOR);
         expect(painted).toHaveLength(0);
         expect(rest.group.getAttribute("fill")).toBeNull();
+    });
+
+    it("highlights and restores the stem along with the head", () => {
+        const note = gNote(60);
+        const painted = highlightCursorNotes(fakeOsmd([note]), WINDOW_COLOR);
+        expect(note.stem.getAttribute("stroke")).toBe(WINDOW_COLOR);
+        restoreNotes(painted);
+        // Untouched before the highlight, the stem falls back to plain black, not a
+        // leftover highlight outline.
+        expect(note.stem.getAttribute("stroke")).toBe(NOTE_COLOR);
     });
 });
