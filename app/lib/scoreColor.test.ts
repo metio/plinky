@@ -196,4 +196,33 @@ describe("highlightCursorNotes / restoreNotes", () => {
         expect(note.stem.getAttribute("stroke")).toBe(NOTE_COLOR);
         expect(note.beam.getAttribute("stroke")).toBe(NOTE_COLOR);
     });
+
+    it("restores a chord's shared stem and beam, not just the last notehead's capture", () => {
+        // A chord's noteheads are separate gNotes that hand back the SAME stem and beam.
+        // Capturing must happen before any painting, or the second notehead records the
+        // already-highlighted shared element as its "prior" and restore leaves it stuck.
+        const stem = document.createElementNS(SVG_NS, "path");
+        const beam = document.createElementNS(SVG_NS, "path");
+        const chordNote = (midi: number) => {
+            const group = document.createElementNS(SVG_NS, "g");
+            group.appendChild(document.createElementNS(SVG_NS, "path"));
+            return {
+                sourceNote: { halfTone: midi - 12, isRest: () => false },
+                getSVGGElement: () => group,
+                getStemSVG: () => stem,
+                getBeamSVGs: () => [beam],
+                group,
+                stem,
+                beam,
+            };
+        };
+        const low = chordNote(60);
+        const high = chordNote(64);
+        const painted = highlightCursorNotes(fakeOsmd([low, high]), WINDOW_COLOR);
+        expect(stem.getAttribute("stroke")).toBe(WINDOW_COLOR);
+        expect(beam.getAttribute("stroke")).toBe(WINDOW_COLOR);
+        restoreNotes(painted);
+        expect(stem.getAttribute("stroke")).toBe(NOTE_COLOR);
+        expect(beam.getAttribute("stroke")).toBe(NOTE_COLOR);
+    });
 });

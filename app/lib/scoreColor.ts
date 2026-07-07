@@ -288,6 +288,11 @@ function restorePart({ element, fill, stroke }: PaintedPart): void {
 // would lose the cursor every note.
 export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string): PaintedNote[] {
     const painted: PaintedNote[] = [];
+    // Capture every note's prior paint BEFORE painting any of them. A chord's noteheads are
+    // separate gNotes that share one stem and beam, so painting note-by-note would let a
+    // later notehead capture that shared element already in the highlight colour and record
+    // it as the "prior" — restoreNotes would then leave the stem/beam stuck highlighted.
+    // Capturing first means every note records the true original colour.
     for (const gNote of osmd.cursor.GNotesUnderCursor()) {
         const note = gNote.sourceNote;
         if (note.isRest() || note.halfTone <= 0) {
@@ -301,6 +306,8 @@ export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string)
         // The notehead is the first part; its prior fill tells whether the note already
         // wore a mark, and the whole note follows that verdict.
         painted.push({ parts, marked: head.fill !== NOTE_COLOR });
+    }
+    for (const { parts } of painted) {
         for (const { element } of parts) {
             paintElement(element, color);
         }
