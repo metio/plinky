@@ -21,7 +21,7 @@ export function MarkLearnedButton({ id }: { id: string }) {
     const learned = mastery?.learned ?? false;
     return (
         <IconButton
-            variant="ghost"
+            variant="plain"
             aria-pressed={learned}
             onClick={() =>
                 masteryStore.save(

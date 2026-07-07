@@ -8,7 +8,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 // quieter `secondary`/`ghost` around it (and `danger` for destructive actions) — so
 // the main action reads as the main action and selectors don't masquerade as buttons.
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "plain";
 
 const VARIANT: Record<ButtonVariant, string> = {
     primary:
@@ -17,6 +17,12 @@ const VARIANT: Record<ButtonVariant, string> = {
         "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900",
     ghost: "text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900",
     danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400",
+    // Ghost's hover, but no text colour of its own — for a button that sets its own
+    // colour to signal state (e.g. the learned toggle). Without tailwind-merge, a variant
+    // that shipped its own text-* would fight the caller's, and same-property utilities
+    // resolve by stylesheet order, not class-string order — so the caller could silently
+    // lose. Owning no colour here leaves the caller's the only one, so it always wins.
+    plain: "hover:bg-indigo-100 dark:hover:bg-indigo-900",
 };
 
 const BASE =
