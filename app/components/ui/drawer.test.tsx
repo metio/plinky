@@ -56,4 +56,31 @@ describe("Drawer", () => {
         }
         expect(onClose).toHaveBeenCalledTimes(2);
     });
+
+    it("portals into the active Fullscreen element so it isn't hidden behind the score", () => {
+        // The native Fullscreen API paints only the fullscreen element's subtree, so a
+        // portal onto the body would render invisibly behind a full-screen score. With one
+        // open, the drawer must mount inside it.
+        const stage = document.createElement("div");
+        document.body.appendChild(stage);
+        Object.defineProperty(document, "fullscreenElement", {
+            configurable: true,
+            value: stage,
+        });
+        try {
+            render(
+                <Drawer open onClose={() => {}} title="Practice tools">
+                    <p>panel body</p>
+                </Drawer>,
+            );
+            const dialog = screen.getByRole("dialog", { name: "Practice tools" });
+            expect(stage.contains(dialog)).toBe(true);
+        } finally {
+            Object.defineProperty(document, "fullscreenElement", {
+                configurable: true,
+                value: null,
+            });
+            stage.remove();
+        }
+    });
 });
