@@ -9,6 +9,7 @@ import { useFullscreen } from "../../hooks/useFullscreen";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
+import { useTempoControls } from "../../hooks/useTempoControls";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
 import { useRunResult } from "../../hooks/useRunResult";
@@ -23,7 +24,6 @@ import {
     type RunCapture,
     captureCleared,
     captureRelease,
-    liveTempo as nextLiveTempo,
     startCapture,
 } from "../../../core/runCapture";
 import { recordRun } from "../../lib/recordRun";
@@ -121,7 +121,6 @@ export function ScoreViewer({
     // re-fire without this latch would double-count the run. Reset at run start.
     const gradedRef = useRef(false);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-    const tempoRef = useRef(initialTempo ?? 100);
     // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
     // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
     // callback and the MIDI release handler both advance it between renders.
@@ -138,29 +137,28 @@ export function ScoreViewer({
     // This score's saved takes. How the finished run's save went lives with the rest of
     // the run result below.
     const [takes, setTakes] = useState<Take[]>([]);
-    const [metronomeOn, setMetronomeOn] = useState(false);
-    // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
-    // triplets, 4 = sixteenths.
-    const [subdivision, setSubdivision] = useState(1);
-    // An adaptive metronome follows the player's own tempo, read live from their
-    // note timing, instead of ticking at the fixed slider speed.
-    const [adaptive, setAdaptive] = useState(false);
-    const [liveTempo, setLiveTempo] = useState(initialTempo ?? 100);
-    const [tempo, setTempo] = useState(initialTempo ?? 100);
-    // The tempo trainer ramps the tempo up by a step after each completed run, up to
-    // a target — practising a piece from comfortable to performance speed. Read from
-    // a ref at run-end so a completion handler created earlier sees the live setting.
-    const [trainerOn, setTrainerOn] = useState(false);
-    const [trainerTarget, setTrainerTarget] = useState(140);
-    const trainerRef = useRef({ on: false, target: 140 });
-    trainerRef.current = { on: trainerOn, target: trainerTarget };
-    // Stable so the completion effect can depend on it without re-running; it reads
-    // the trainer setting from a ref, so an empty dependency list is correct.
-    const bumpTempo = useCallback(() => {
-        if (trainerRef.current.on) {
-            setTempo((current) => Math.min(current + 5, trainerRef.current.target));
-        }
-    }, []);
+    // The tempo settings — the slider, the adaptive live pace, the metronome toggles and
+    // the tempo trainer — held together. The metronome *effect* stays at its call site
+    // below: it reads keepUp.running, which is created after this.
+    const {
+        tempo,
+        setTempo,
+        liveTempo,
+        readTempo,
+        resyncLive,
+        easeToward,
+        metronomeOn,
+        setMetronomeOn,
+        subdivision,
+        setSubdivision,
+        adaptive,
+        setAdaptive,
+        trainerOn,
+        setTrainerOn,
+        trainerTarget,
+        setTrainerTarget,
+        bumpTempo,
+    } = useTempoControls({ initialTempo: initialTempo ?? 100 });
     // Section looping: Listen repeats a bar range over and over so a hard passage
     // can be drilled — read along, or play along with the metronome. Bars are
     // 1-based for the player; the cursor walks them 0-based, hence the offset in
@@ -328,7 +326,6 @@ export function ScoreViewer({
 
     // Tempo-locked play-along ("keep up"): the clock advances the cursor and scores each
     // beat; finishing drops out of full screen so the result comes into view.
-    const readTempo = useCallback(() => tempoRef.current, []);
     const keepUp = useKeepUp({
         getOsmd,
         synth,
@@ -373,7 +370,7 @@ export function ScoreViewer({
             captureCleared(captureRef.current, info);
             // Ease the adaptive metronome toward the player's own pace, read from the
             // gap between the last two notes.
-            setLiveTempo((prev) => nextLiveTempo(captureRef.current, runTempoRef.current, prev));
+            easeToward(captureRef.current, runTempoRef.current);
         },
     });
     useMidiInput({
@@ -518,10 +515,6 @@ export function ScoreViewer({
     useEffect(() => {
         centerCursor();
     }, [centerCursor, matcher.done, matcher.practicing]);
-
-    useEffect(() => {
-        tempoRef.current = tempo;
-    }, [tempo]);
 
     // Keep the red loop overlay in step with the range and each fresh render (ready is the
     // signal that the boxes were just re-measured). paintLoopSelection reads the live range
@@ -913,7 +906,7 @@ export function ScoreViewer({
         gradeFromRunRef.current = false;
         gradedRef.current = false;
         keepUp.clearResult();
-        setLiveTempo(tempo);
+        resyncLive();
         runTempoRef.current = tempo;
         // The hand the matcher and the ghost step through: the whole grand staff
         // when there's a single staff, otherwise the hand being drilled. (Fingering
