@@ -2,32 +2,48 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect } from "react";
-import { Outlet, useParams } from "react-router";
+import { Navigate, Outlet, useLocation, useParams } from "react-router";
 import { BottomNav } from "../components/ui/navBar";
 import { useSongSource } from "../contexts/services";
-import { isLocale } from "../paraglide/runtime.js";
+import { isLocale, localizeHref } from "../paraglide/runtime.js";
 
 // The parent of every localized page. The active locale comes from the URL
-// prefix (the `url` strategy reads it directly), so this only validates the
-// segment and keeps <html lang> in sync on the client.
+// prefix (the `url` strategy reads it directly), so this validates the segment
+// and keeps <html lang> in sync on the client.
 export default function LocaleLayout() {
     const songs = useSongSource();
     const { locale } = useParams();
-
-    if (!isLocale(locale)) {
-        // An unknown locale prefix is a 404, surfaced by the root ErrorBoundary.
-        throw new Response("Not Found", { status: 404 });
-    }
+    const { pathname } = useLocation();
+    const valid = isLocale(locale);
 
     useEffect(() => {
-        document.documentElement.lang = locale;
-    }, [locale]);
+        if (valid && locale) {
+            document.documentElement.lang = locale;
+        }
+    }, [valid, locale]);
 
     // On first run, seed a few songs per grade into the library so it's useful out
     // of the box; guarded so it happens once.
     useEffect(() => {
-        songs.ensureSeeded();
-    }, [songs.ensureSeeded]);
+        if (valid) {
+            songs.ensureSeeded();
+        }
+    }, [valid, songs.ensureSeeded]);
+
+    // An unknown locale prefix — a typo, a stale link, a bot probing paths — can't
+    // select a language, so redirect to the same page under the resolved locale rather
+    // than dead-ending: the visitor keeps the page they asked for. localizeHref picks the
+    // target the way the bare "/" does (the browser's preferred language, English by
+    // default); the bad first segment is dropped and the rest re-localized. During
+    // prerender there is no navigator to resolve against — and an unknown locale is never
+    // prerendered — so defer the redirect to the client, exactly as the root redirect does.
+    if (!valid) {
+        if (typeof window === "undefined") {
+            return null;
+        }
+        const rest = pathname.replace(/^\/[^/]+/, "") || "/";
+        return <Navigate to={localizeHref(rest)} replace />;
+    }
 
     return (
         <>
