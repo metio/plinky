@@ -144,6 +144,8 @@ function useServiceWorkerUpdate() {
     const [updateReady, setUpdateReady] = useState(false);
     // The build parked in "waiting", to be told to take over once the user accepts.
     const waiting = useRef<ServiceWorker | null>(null);
+    // The registration, kept so accepting the update can run one last update check.
+    const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
     // Set the moment we ask the waiting worker to activate, so the controllerchange
     // it triggers reloads this tab — while the first-ever install's controllerchange
     // (which we did not initiate) leaves the page alone.
@@ -179,6 +181,7 @@ function useServiceWorkerUpdate() {
                 if (cancelled) {
                     return;
                 }
+                registrationRef.current = registration;
                 offer(registration.waiting);
                 registration.addEventListener("updatefound", () => {
                     const installing = registration.installing;
@@ -210,7 +213,50 @@ function useServiceWorkerUpdate() {
 
     const applyUpdate = useCallback(() => {
         applying.current = true;
-        waiting.current?.postMessage({ type: "SKIP_WAITING" });
+        // One last update check before switching, so back-to-back deploys can't strand
+        // the click on an intermediate build: if a newer sw.js has been published since
+        // this one parked, wait for it to install and activate THAT — the waiting slot
+        // only ever holds one worker, so the freshest wins. The parked build remains the
+        // fallback when the check fails (offline), finds nothing, or takes too long —
+        // activating it triggers a reload, and the reload's own update check self-heals
+        // onto anything newer.
+        const applyParked = () => waiting.current?.postMessage({ type: "SKIP_WAITING" });
+        const registration = registrationRef.current;
+        if (!registration) {
+            applyParked();
+            return;
+        }
+        let done = false;
+        const finish = (worker: ServiceWorker | null) => {
+            if (done) {
+                return;
+            }
+            done = true;
+            window.clearTimeout(timer);
+            (worker ?? waiting.current)?.postMessage({ type: "SKIP_WAITING" });
+        };
+        // A slow network must not leave the click hanging: past this, take the parked
+        // build rather than keep the player waiting on a fetch.
+        const timer = window.setTimeout(() => finish(null), 4000);
+        registration
+            .update()
+            .then(() => {
+                const installing = registration.installing;
+                if (!installing) {
+                    // Nothing newer found (or it already reached waiting).
+                    finish(registration.waiting);
+                    return;
+                }
+                installing.addEventListener("statechange", () => {
+                    if (installing.state === "installed") {
+                        finish(registration.waiting);
+                    } else if (installing.state === "redundant") {
+                        // The newer build failed to install; the parked one still works.
+                        finish(null);
+                    }
+                });
+            })
+            .catch(() => finish(null));
     }, []);
 
     return { updateReady, applyUpdate };
