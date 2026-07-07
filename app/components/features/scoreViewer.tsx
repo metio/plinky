@@ -10,6 +10,7 @@ import { useMetronome } from "../../hooks/useMetronome";
 import { usePref } from "../../hooks/usePref";
 import { useTempoControls } from "../../hooks/useTempoControls";
 import { useOsmdScore } from "../../hooks/useOsmdScore";
+import { useLoopSelection } from "../../hooks/useLoopSelection";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
 import { useRunResult } from "../../hooks/useRunResult";
@@ -32,13 +33,7 @@ import { useServices, useXmlCodec } from "../../contexts/services";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
 import { isPreciseInput } from "../../../core/midi";
-import {
-    clearBarSelection,
-    clientPointToSvg,
-    paintBarSelection,
-    paintPlayedNotes,
-} from "../../lib/scoreColor";
-import { measureAtPoint } from "../../../core/scoreCanvas";
+import { paintPlayedNotes } from "../../lib/scoreColor";
 import { transposeMusicXml } from "../../../core/transpose";
 import { m } from "../../paraglide/messages.js";
 import { Button, IconButton } from "../ui/button";
@@ -154,18 +149,6 @@ export function ScoreViewer({
         setTrainerTarget,
         bumpTempo,
     } = useTempoControls({ initialTempo: initialTempo ?? 100 });
-    // Section looping: Listen repeats a bar range over and over so a hard passage
-    // can be drilled — read along, or play along with the metronome. Bars are
-    // 1-based for the player; the cursor walks them 0-based, hence the offset in
-    // listen(). The range is read from a ref during playback so the loop reacts to
-    // the inputs without restarting the cursor loop.
-    const [loopOn, setLoopOn] = useState(false);
-    const [loopFrom, setLoopFrom] = useState(1);
-    const [loopTo, setLoopTo] = useState(1);
-    const loopRef = useRef({ on: false, from: 1, to: 1 });
-    loopRef.current = { on: loopOn, from: loopFrom, to: loopTo };
-    // The first bar of an in-progress click selection; the next click sets the far end.
-    const selectAnchorRef = useRef<number | null>(null);
     // Transposition shifts the whole piece into a more comfortable key, ±12
     // semitones. It rewrites the MusicXML before OSMD loads it, so playback, the
     // printed key and the matcher all follow — the reload effect depends on it.
@@ -300,16 +283,14 @@ export function ScoreViewer({
         },
         onRendered: ({ bars, freshPiece }) => {
             // A fresh render carries no in-progress click selection.
-            selectAnchorRef.current = null;
+            loop.cancelSelection();
             // The hand selection and the bar range belong to the piece, not the layout: a
             // relayout keeps the same staves and bars, so a chosen hand and loop survive it,
             // reseeding only when the piece itself changes. A fresh piece seeds the hand to
             // both and the loop to the whole song.
             if (freshPiece) {
                 setHand("both");
-                setLoopFrom(1);
-                setLoopTo(bars);
-                setLoopOn(false);
+                loop.reseedWholeSong(bars);
             }
         },
     });
@@ -423,70 +404,29 @@ export function ScoreViewer({
     // The listening transport — Listen and take-replay share one cursor walk, one
     // clock, one stop. It reads the loop range and tempo live, marks the score as
     // painted when its trail lands, and leaves the cursor shown if the matcher owns it.
-    const readLoop = useCallback(() => loopRef.current, []);
+    // Section looping: the loop range, the click-to-select, and the red overlay that OSMD's
+    // fresh SVG drops on each render (repainted off renderVersion). A click builds the range
+    // only when the score is idle — not mid-run or mid-playback (canSelect), read at click
+    // time so it can see the transports created below.
+    const loop = useLoopSelection({
+        containerRef,
+        measureBoxes,
+        measureCount,
+        renderVersion,
+        canSelect: () => !matcher.practicing && !listenPlayback.active() && measureCount > 1,
+    });
+
     const isPracticing = useCallback(() => matcher.practicing, [matcher.practicing]);
     const listenPlayback = useListenPlayback({
         getOsmd,
         synth,
         tempo: readTempo,
-        loop: readLoop,
+        loop: loop.read,
         onLap: bumpTempo,
         centerCursor,
         markPainted,
         isPracticing,
     });
-
-    // Fill the selected loop bars with the red overlay (or clear it when the loop is off),
-    // reading the live range from loopRef so the callback stays stable. Re-run after each
-    // render and whenever the range changes.
-    const paintLoopSelection = useCallback(() => {
-        const svg = containerRef.current?.querySelector("svg");
-        if (!(svg instanceof SVGSVGElement)) {
-            return;
-        }
-        if (loopRef.current.on) {
-            paintBarSelection(
-                svg,
-                measureBoxes(),
-                loopRef.current.from - 1,
-                loopRef.current.to - 1,
-            );
-        } else {
-            clearBarSelection(svg);
-        }
-    }, [measureBoxes]);
-
-    // Click a bar to build the loop range: the first click drops the anchor (a one-bar
-    // loop), the next extends to the far end. Only while set-up, not mid-play, and the
-    // number inputs remain the keyboard-accessible way in.
-    const selectBarAt = useCallback(
-        (clientX: number, clientY: number) => {
-            if (matcher.practicing || listenPlayback.active() || measureCount <= 1) {
-                return;
-            }
-            const svg = containerRef.current?.querySelector("svg");
-            if (!(svg instanceof SVGSVGElement) || measureBoxes().length === 0) {
-                return;
-            }
-            const point = clientPointToSvg(svg, clientX, clientY);
-            const measure = measureAtPoint(measureBoxes(), point.x, point.y);
-            if (measure === null) {
-                return;
-            }
-            const bar = measure + 1;
-            if (selectAnchorRef.current === null) {
-                selectAnchorRef.current = bar;
-                setLoopOn(true);
-                setLoopFrom(bar);
-                setLoopTo(bar);
-            } else {
-                setLoopFrom(Math.min(selectAnchorRef.current, bar));
-                setLoopTo(Math.max(selectAnchorRef.current, bar));
-                selectAnchorRef.current = null;
-            }
-        },
-        [matcher.practicing, measureCount, listenPlayback.active, measureBoxes],
-    );
 
     // Slide the keyboard window to keep the notes being played in view, re-framing only
     // when they leave it. Falls back to the whole range (null window) when not practising,
@@ -523,16 +463,6 @@ export function ScoreViewer({
     useEffect(() => {
         centerCursor();
     }, [centerCursor, matcher.done, matcher.practicing]);
-
-    // Keep the red loop overlay in step with the range and each fresh render. A render
-    // bumps renderVersion after re-measuring the bars and dropping any prior overlay (OSMD
-    // draws into a new SVG), so the loop must repaint then; the loop range is the other
-    // trigger. paintLoopSelection reads the live range from a ref, so these are triggers,
-    // not closure inputs.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: the loop state and renderVersion are re-paint triggers, not inputs
-    useEffect(() => {
-        paintLoopSelection();
-    }, [loopOn, loopFrom, loopTo, renderVersion, paintLoopSelection]);
 
     // Grade a run once it completes, from the captured timing and velocity. A run
     // with no real velocity variation (the computer keyboard) is graded without
@@ -939,18 +869,14 @@ export function ScoreViewer({
                 {/* When the loop is on, its range and narrowing controls sit right by the
                 score — the drawer's backdrop covers the score, so narrowing happens here,
                 drawer closed. Hidden during a run, when the score isn't yours to click. */}
-                {ready && measureCount > 1 && loopOn && !matcher.practicing && !keepUp.running && (
+                {ready && measureCount > 1 && loop.on && !matcher.practicing && !keepUp.running && (
                     <LoopRangeBar
                         measureCount={measureCount}
-                        from={loopFrom}
-                        to={loopTo}
-                        setFrom={setLoopFrom}
-                        setTo={setLoopTo}
-                        onWholeSong={() => {
-                            selectAnchorRef.current = null;
-                            setLoopFrom(1);
-                            setLoopTo(measureCount);
-                        }}
+                        from={loop.from}
+                        to={loop.to}
+                        setFrom={loop.setFrom}
+                        setTo={loop.setTo}
+                        onWholeSong={loop.wholeSong}
                     />
                 )}
                 {/* OSMD renders to its container's full offset width, which includes any
@@ -974,7 +900,7 @@ export function ScoreViewer({
                         tabIndex={0}
                         role="img"
                         aria-label={title}
-                        onClick={(event) => selectBarAt(event.clientX, event.clientY)}
+                        onClick={(event) => loop.selectBarAt(event.clientX, event.clientY)}
                         // A bounded scroll box so the follow-cursor scrolls the staff inside
                         // it — keeping the controls and on-screen keyboard in view below
                         // rather than scrolling the whole page out from under them. Full screen
@@ -1042,18 +968,8 @@ export function ScoreViewer({
                     setHand={setHand}
                     practicing={matcher.practicing}
                     loopAvailable={ready && measureCount > 1}
-                    loopOn={loopOn}
-                    onToggleLoop={(next) => {
-                        selectAnchorRef.current = null;
-                        // Activating the loop repeats the whole piece by default — the
-                        // common case — so narrowing to a passage (click two bars on the
-                        // score) stays optional.
-                        if (next) {
-                            setLoopFrom(1);
-                            setLoopTo(measureCount);
-                        }
-                        setLoopOn(next);
-                    }}
+                    loopOn={loop.on}
+                    onToggleLoop={loop.toggle}
                     showTranspose={!lockTempo}
                     transpose={transpose}
                     setTranspose={setTranspose}
