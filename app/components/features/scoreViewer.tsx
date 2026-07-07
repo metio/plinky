@@ -18,6 +18,14 @@ import { deriveRunOutcome, type TempoCurve } from "../../../core/runOutcome";
 import { recordRun } from "../../lib/recordRun";
 import type { DailyResult } from "../../../core/daily";
 import { STAFF_FOR } from "../../../core/matcher";
+import {
+    type KeepUpState,
+    closeKeepUpStep,
+    keepUpProgress as progressOf,
+    openKeepUpStep,
+    startKeepUp,
+    strikeKeepUp,
+} from "../../../core/keepUp";
 import { GRADE_COLOR, type Grade, type KeepUpResult, scoreKeepUp } from "../../../core/grade";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { useServices, useXmlCodec } from "../../contexts/services";
@@ -186,11 +194,11 @@ export function ScoreViewer({
     const [keepUpProgress, setKeepUpProgress] = useState({ inTime: 0, done: 0 });
     const [keepUpResult, setKeepUpResult] = useState<KeepUpResult | null>(null);
     const keepUpActiveRef = useRef(false);
-    const keepUpHitsRef = useRef<boolean[]>([]);
-    // The pitches expected at the currently-open step, which of them have been played, and
-    // the step's rendered note groups (to paint green on a hit, red on a miss).
-    const keepUpExpectedRef = useRef<number[]>([]);
-    const keepUpStruckRef = useRef<Set<number>>(new Set());
+    // The pure play-along scorer (core/keepUp): which pitches the open step expects, which
+    // have been struck, and the closed steps' hits. Held in a ref because the MIDI handler
+    // and the timer loop both advance it between renders.
+    const keepUpStateRef = useRef<KeepUpState>(startKeepUp());
+    // The open step's rendered note groups, to paint green on a hit, red on a miss.
     const keepUpNotesRef = useRef<SVGElement[]>([]);
     // This score's saved takes, the take currently replaying (if any), and how the
     // finished run's save went — "saved" and "failed" both retire the save prompt,
@@ -915,7 +923,7 @@ export function ScoreViewer({
             // A re-render (a layout change) clears the timers above, which would strand a
             // play-along run with the input still routed to it; end it cleanly.
             keepUpActiveRef.current = false;
-            keepUpExpectedRef.current = [];
+            keepUpStateRef.current = startKeepUp();
             // A change of layout (bars-per-row, treadmill, transpose) re-runs this
             // effect, building a fresh OSMD on the same container. OSMD renders into a
             // new SVG rather than replacing the old one, so without removing the previous
@@ -1068,7 +1076,7 @@ export function ScoreViewer({
         }
         timers.current = [];
         keepUpActiveRef.current = false;
-        keepUpExpectedRef.current = [];
+        keepUpStateRef.current = startKeepUp();
         setKeepUpRunning(false);
         osmdRef.current?.cursor?.hide();
     };
@@ -1096,34 +1104,28 @@ export function ScoreViewer({
         cursor.reset();
         cursor.show();
         keepUpActiveRef.current = true;
-        keepUpHitsRef.current = [];
-        keepUpExpectedRef.current = [];
-        keepUpStruckRef.current = new Set();
+        keepUpStateRef.current = startKeepUp();
         keepUpNotesRef.current = [];
         setKeepUpResult(null);
         setKeepUpProgress({ inTime: 0, done: 0 });
         setKeepUpRunning(true);
 
-        // Resolve the step that just closed: a hit if every expected pitch was struck in
-        // time, otherwise a miss — painting the notes green or red to trail your run.
+        // Resolve the step that just closed — the reducer scores it (or skips an unscored
+        // position); the surface paints the notes green or red to trail your run.
         const closeStep = () => {
-            if (keepUpExpectedRef.current.length === 0) {
+            const { state, hit } = closeKeepUpStep(keepUpStateRef.current);
+            keepUpStateRef.current = state;
+            if (hit === null) {
                 return;
             }
-            const struck = keepUpStruckRef.current;
-            const hit = keepUpExpectedRef.current.every((pitch) => struck.has(pitch));
-            keepUpHitsRef.current.push(hit);
             for (const element of keepUpNotesRef.current) {
                 paintElement(element, hit ? PLAYED_COLOR : SELECT_COLOR);
             }
-            setKeepUpProgress((prev) => ({
-                inTime: prev.inTime + (hit ? 1 : 0),
-                done: prev.done + 1,
-            }));
+            setKeepUpProgress(progressOf(state));
         };
 
-        // Open the step now under the cursor: record its expected pitches, highlight its
-        // notes as "play now", and sound them if the guide is on.
+        // Open the step now under the cursor: collect its expected pitches for the reducer,
+        // highlight its notes as "play now", and sound them if the guide is on.
         const openStep = () => {
             const expected: number[] = [];
             for (const note of cursor.NotesUnderCursor()) {
@@ -1142,8 +1144,7 @@ export function ScoreViewer({
                     });
                 }
             }
-            keepUpExpectedRef.current = expected;
-            keepUpStruckRef.current = new Set();
+            keepUpStateRef.current = openKeepUpStep(keepUpStateRef.current, expected);
             // Light "play now" only when this step has notes for the practised hand. A
             // hands-separate run leaves the other hand's positions unscored (closeStep skips
             // an empty step), so highlighting them would strand a blue mark the trail never
@@ -1159,10 +1160,10 @@ export function ScoreViewer({
 
         const finish = () => {
             keepUpActiveRef.current = false;
-            keepUpExpectedRef.current = [];
             setKeepUpRunning(false);
             cursor.hide();
-            setKeepUpResult(scoreKeepUp(keepUpHitsRef.current));
+            setKeepUpResult(scoreKeepUp(keepUpStateRef.current.hits));
+            keepUpStateRef.current = startKeepUp();
             // Leave full screen so the result (hidden while full screen) comes into view —
             // a no-op on desktop, which never entered it.
             exitFullscreen();
@@ -1197,11 +1198,10 @@ export function ScoreViewer({
             return;
         }
         synth.playNote(note);
-        if (!keepUpExpectedRef.current.includes(note)) {
-            return;
-        }
-        keepUpStruckRef.current.add(note);
-        if (keepUpExpectedRef.current.every((pitch) => keepUpStruckRef.current.has(pitch))) {
+        const { state, caught } = strikeKeepUp(keepUpStateRef.current, note);
+        keepUpStateRef.current = state;
+        // The strike that completes the step turns it green early, before the clock closes it.
+        if (caught) {
             for (const element of keepUpNotesRef.current) {
                 paintElement(element, PLAYED_COLOR);
             }
