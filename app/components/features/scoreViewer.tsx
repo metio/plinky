@@ -16,6 +16,7 @@ import { annotateFingerings } from "../../lib/fingerScore";
 import { computeFlow } from "../../../core/flow";
 import { cadence } from "../../../core/cadence";
 import type { DailyResult } from "../../../core/daily";
+import { STAFF_FOR } from "../../../core/matcher";
 import {
     computeGrade,
     GRADE_COLOR,
@@ -928,10 +929,16 @@ export function ScoreViewer({
     // run in progress, but keeps the cursor where it is (stop hides, never rewinds), so
     // re-entering Practice or Listen picks up from the same place. A run that finished on
     // its own has already stopped; this covers stepping out mid-run.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: stopListen/matcher.stop reset transient playback, not render inputs
+    // biome-ignore lint/correctness/useExhaustiveDependencies: stopListen/stopKeepUp/matcher.stop reset transient playback, not render inputs
     useEffect(() => {
         if (!fullscreen) {
             stopListen();
+            // A tempo-locked play-along drives the cursor from its own timers and funnels
+            // every note into the run; without tearing it down here, leaving full screen
+            // freezes it mid-run and strands note input until Stop.
+            if (keepUpActiveRef.current) {
+                stopKeepUp();
+            }
             matcher.stop();
         }
     }, [fullscreen]);
@@ -1191,7 +1198,12 @@ export function ScoreViewer({
             for (const note of cursor.NotesUnderCursor()) {
                 const quarters = note.Length.RealValue * 4;
                 if (!note.isRest() && note.halfTone > 0) {
-                    synth.playNote(note.halfTone + 12, { duration: quarters });
+                    // `quarters` is a count of quarter notes; the synth wants seconds, which
+                    // depends on the tempo — one quarter is 60/BPM seconds. Without scaling,
+                    // the sustain is only right at 60 BPM and over-rings into a blur above it.
+                    synth.playNote(note.halfTone + 12, {
+                        duration: quarters * (60 / tempoRef.current),
+                    });
                 }
                 // Rests count too, so a written gap dwells its own length.
                 lengths.push(quarters);
@@ -1231,6 +1243,9 @@ export function ScoreViewer({
             osmd.render();
             paintedRef.current = false;
         }
+        // Score only the practised hand, exactly as self-paced practice does — otherwise a
+        // hands-separate run demands the other hand's notes too and every step scores a miss.
+        const runHand: Hand = staffCount < 2 ? "both" : hand;
         const cursor: Cursor = osmd.cursor;
         cursor.reset();
         cursor.show();
@@ -1266,20 +1281,34 @@ export function ScoreViewer({
         const openStep = () => {
             const expected: number[] = [];
             for (const note of cursor.NotesUnderCursor()) {
-                if (!note.isRest() && note.halfTone > 0) {
-                    expected.push(note.halfTone + 12);
-                    if (guideNotes) {
-                        synth.playNote(note.halfTone + 12, { duration: note.Length.RealValue * 4 });
-                    }
+                if (note.isRest() || note.halfTone <= 0) {
+                    continue;
+                }
+                if (runHand !== "both" && note.ParentStaff?.idInMusicSheet !== STAFF_FOR[runHand]) {
+                    continue;
+                }
+                expected.push(note.halfTone + 12);
+                if (guideNotes) {
+                    // Same tempo scaling as Listen: Length.RealValue * 4 is a quarter-note
+                    // count, and the synth duration is in seconds (60/BPM per quarter).
+                    synth.playNote(note.halfTone + 12, {
+                        duration: note.Length.RealValue * 4 * (60 / tempoRef.current),
+                    });
                 }
             }
             keepUpExpectedRef.current = expected;
             keepUpStruckRef.current = new Set();
-            // Keep every rendered part of each highlighted note — head and stem — so a hit
-            // or miss later colours the whole note, not just its head.
-            keepUpNotesRef.current = highlightCursorNotes(osmd, WINDOW_COLOR).flatMap((painted) =>
-                painted.parts.map((part) => part.element),
-            );
+            // Light "play now" only when this step has notes for the practised hand. A
+            // hands-separate run leaves the other hand's positions unscored (closeStep skips
+            // an empty step), so highlighting them would strand a blue mark the trail never
+            // lifts. Keep every rendered part — head, stem, beam — so the hit/miss colour
+            // later fills the whole note, not just its head.
+            keepUpNotesRef.current =
+                expected.length === 0
+                    ? []
+                    : highlightCursorNotes(osmd, WINDOW_COLOR).flatMap((painted) =>
+                          painted.parts.map((part) => part.element),
+                      );
         };
 
         const finish = () => {

@@ -55,6 +55,23 @@ describe("ghostOnsets", () => {
     it("is empty for a take with no notes", () => {
         expect(ghostOnsets(take("1", { composition: comp([]) }))).toEqual([]);
     });
+
+    it("collapses a chord's shared onset to one step so the count matches the matcher", () => {
+        // compositionFromRun stores one note per pitch, so a chord is several notes at the
+        // same onset. The race and on-staff marker count one entry per step (chord = one
+        // step), so the onsets must collapse — here three struck together, then one note.
+        const chord: Composition = {
+            notes: [
+                { pitch: 60, startMs: 200, durationMs: 200, velocity: 90 },
+                { pitch: 64, startMs: 200, durationMs: 200, velocity: 90 },
+                { pitch: 67, startMs: 200, durationMs: 200, velocity: 90 },
+                { pitch: 72, startMs: 700, durationMs: 200, velocity: 90 },
+            ],
+            tempo: 120,
+            beatsPerBar: 4,
+        };
+        expect(ghostOnsets(take("1", { composition: chord }))).toEqual([0, 500]);
+    });
 });
 
 describe("fastestTakeOnsets", () => {

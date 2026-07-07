@@ -155,7 +155,18 @@ export function ghostOnsets(take: Take): number[] {
         return [];
     }
     const origin = notes[0]!.startMs;
-    return notes.map((note) => note.startMs - origin);
+    // A chord is stored as one note per pitch, all sharing an onset, but the race and the
+    // on-staff ghost marker count one entry per step (a chord is one step). Collapse equal
+    // consecutive onsets so the ghost's length matches the matcher's step count — otherwise
+    // a chord advances the ghost by its size and it overshoots to the finish.
+    const onsets: number[] = [];
+    for (const note of notes) {
+        const onset = note.startMs - origin;
+        if (onsets.length === 0 || onsets[onsets.length - 1] !== onset) {
+            onsets.push(onset);
+        }
+    }
+    return onsets;
 }
 
 // The onsets of the fastest complete take — the ghost to race — or null when there's
