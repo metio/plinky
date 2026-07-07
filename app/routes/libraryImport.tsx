@@ -8,7 +8,7 @@ import { UploadIcon } from "../components/ui/icons";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { GradeChip } from "../components/features/scoreGrade";
 import { StaffPreview } from "../components/features/staffPreview";
-import { loadCatalog, type Score, saveUserScore, slugify } from "../lib/catalog";
+import { loadCatalog, type Score, saveUserScore } from "../lib/catalog";
 import { readScoreMeta } from "../../core/scoreMeta";
 import { readScoreFile } from "../../core/musicxmlFile";
 
@@ -84,7 +84,10 @@ export default function LibraryImportRoute() {
             tempo: String(meta.tempo),
             description: "",
             beatsPerBar: meta.beatsPerBar,
-            grade: gradeOf(xmlCodec, slugify(meta.title), xml),
+            // Grade by the content fingerprint, the same id the score is saved under and the
+            // key gradeOf memoises on. A title slug collides — every untitled import shares
+            // one — so the preview would show the first import's grade for the rest.
+            grade: gradeOf(xmlCodec, id, xml),
         });
     };
 

@@ -114,7 +114,9 @@ const GRADE_THRESHOLDS: Record<Category, number[]> = {
 const gradeCache = new Map<string, number>();
 
 // A score's 1–8 grade: its fingering-cost difficulty placed against its category's
-// thresholds. Memoised by id, since a score's notes don't change.
+// thresholds. Memoised by id, which MUST be the content fingerprint (songId): the cache
+// trusts the id to identify the notes and never re-reads xml on a hit, so a caller keying
+// by anything else — a title slug, say — makes distinct scores collide onto one grade.
 export function gradeOf(codec: XmlCodec, id: string, xml: string): number {
     const cached = gradeCache.get(id);
     if (cached !== undefined) {
