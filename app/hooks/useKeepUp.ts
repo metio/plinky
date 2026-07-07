@@ -36,6 +36,7 @@ export function useKeepUp({
     tempo,
     beatsPerBar,
     centerCursor,
+    markPainted,
     onFinish,
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
@@ -45,6 +46,10 @@ export function useKeepUp({
     beatsPerBar: number;
     // Re-centre the treadmill after each cursor step; a no-op elsewhere.
     centerCursor: () => void;
+    // A run paints the score — the "play now" window, then a green/red hit/miss
+    // trail it leaves in place. The surface tracks that something is painted so the
+    // next run re-renders to wipe it; without this signal last run's marks persist.
+    markPainted: () => void;
     // The run reached the end (not stopped early) — the surface leaves full
     // screen here so the result comes into view.
     onFinish: () => void;
@@ -142,6 +147,12 @@ export function useKeepUp({
                     : highlightCursorNotes(osmd, WINDOW_COLOR).flatMap((painted) =>
                           painted.parts.map((part) => part.element),
                       );
+            // The highlight — and the hit/miss colour closeStep/registerNote later
+            // paint over the same elements — dirties the score. Flag it so the next
+            // run wipes the trail; this hook never restores it itself.
+            if (notesRef.current.length > 0) {
+                markPainted();
+            }
         };
 
         const finish = () => {

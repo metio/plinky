@@ -317,6 +317,13 @@ export function ScoreViewer({
         }
     }, [treadmill]);
 
+    // Something has coloured the score — a run's trail, a Listen trail, a keep-up
+    // window. Both playback transports flag it so the next run re-renders to wipe
+    // last run's marks only when there is something to clear.
+    const markPainted = useCallback(() => {
+        paintedRef.current = true;
+    }, []);
+
     // Tempo-locked play-along ("keep up"): the clock advances the cursor and scores each
     // beat; finishing drops out of full screen so the result comes into view.
     const readTempo = useCallback(() => tempoRef.current, []);
@@ -326,6 +333,7 @@ export function ScoreViewer({
         tempo: readTempo,
         beatsPerBar: beatsPerBar ?? 4,
         centerCursor,
+        markPainted,
         onFinish: exitFullscreen,
     });
 
@@ -409,9 +417,6 @@ export function ScoreViewer({
     // clock, one stop. It reads the loop range and tempo live, marks the score as
     // painted when its trail lands, and leaves the cursor shown if the matcher owns it.
     const readLoop = useCallback(() => loopRef.current, []);
-    const markPainted = useCallback(() => {
-        paintedRef.current = true;
-    }, []);
     const isPracticing = useCallback(() => matcher.practicing, [matcher.practicing]);
     const listenPlayback = useListenPlayback({
         getOsmd,
