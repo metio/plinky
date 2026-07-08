@@ -23,6 +23,29 @@ describe("useFullscreen", () => {
         expect(element.requestFullscreen).toHaveBeenCalled();
     });
 
+    it("keeps only the in-page overlay in an installed PWA, never the real Fullscreen API", () => {
+        // A standalone PWA has no browser chrome to reclaim, and on Android asking for real
+        // fullscreen is what sends a finished run back a page (its programmatic exit pops the
+        // history entry Chrome couples to fullscreen). So the overlay flag flips, but the
+        // element is never asked to fill the screen.
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: query === "(display-mode: standalone)",
+            media: query,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+        }));
+        const element = document.createElement("div");
+        element.requestFullscreen = vi.fn().mockResolvedValue(undefined);
+        const { result } = renderHook(() => {
+            const ref = useRef<HTMLDivElement>(element);
+            return useFullscreen(ref);
+        });
+
+        act(() => result.current.enter());
+        expect(result.current.fullscreen).toBe(true);
+        expect(element.requestFullscreen).not.toHaveBeenCalled();
+    });
+
     it("follows the browser leaving full screen on its own", () => {
         const element = document.createElement("div");
         element.requestFullscreen = vi.fn().mockResolvedValue(undefined);
