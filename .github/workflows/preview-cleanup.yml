@@ -11,9 +11,12 @@ name: Preview cleanup
 #     cleans exactly that branch. This only covers branches deleted AFTER this workflow
 #     landed on the default branch: GitHub runs the default branch's copy at delete time
 #     and never replays past deletions.
-#   * workflow_dispatch — clean one named branch, or (prune_orphans) sweep every deployed
-#     branch that no longer exists on GitHub. The sweep is the backfill for branches deleted
-#     before this existed, and a periodic drift cleanup.
+#   * workflow_dispatch — clean one named branch, or (prune_orphans) reconcile both the
+#     Cloudflare deployments and the preview/* GitHub environments against the set of live
+#     branches, removing everything whose branch no longer exists on GitHub — including
+#     environments whose deployment is already gone. One run handles every pruning action;
+#     it is the backfill for branches deleted before this existed, and a periodic drift
+#     cleanup.
 #
 # The slug derivation MUST match preview.yml exactly, or this would look under the wrong
 # branch alias and delete nothing.
@@ -156,28 +159,45 @@ jobs:
             page=$((page + 1))
           done
 
-          if [ "${#targets[@]}" -eq 0 ]; then
-            echo "No preview deployments to delete."
-            exit 0
-          fi
-
           # force=true is required to remove the deployment currently backing a branch
           # alias; without it Cloudflare refuses to delete the live alias.
-          declare -A del_slugs=()
-          for entry in "${targets[@]}"; do
-            id=${entry%%$'\t'*}
-            branch=${entry#*$'\t'}
-            curl -fsS -X DELETE "${auth[@]}" "${api}/${id}?force=true" >/dev/null
-            del_slugs["$branch"]=1
-            echo "  deleted ${id} (branch ${branch})"
-          done
-          echo "Deleted ${#targets[@]} deployment(s) across ${#del_slugs[@]} branch(es)."
+          if [ "${#targets[@]}" -eq 0 ]; then
+            echo "No Cloudflare deployments to delete."
+          else
+            for entry in "${targets[@]}"; do
+              id=${entry%%$'\t'*}
+              branch=${entry#*$'\t'}
+              curl -fsS -X DELETE "${auth[@]}" "${api}/${id}?force=true" >/dev/null
+              echo "  deleted deployment ${id} (branch ${branch})"
+            done
+            echo "Deleted ${#targets[@]} Cloudflare deployment(s)."
+          fi
 
-          # Retire each cleaned branch's transient GitHub environment; this also clears its
-          # deployment records from the PR. Needs the admin-scoped PREVIEW_CLEANUP_TOKEN;
-          # with only the built-in token this 403s and is skipped — tolerated, since the
-          # Cloudflare teardown above still counts as a successful cleanup.
-          for slug in "${!del_slugs[@]}"; do
+          # Retire the transient GitHub Deployment environments; this also clears their
+          # deployment records from the PR. In prune mode reconcile the FULL set of
+          # preview/* environments against the keep-set, so orphans whose Cloudflare
+          # deployment is already gone are removed too — one run handles every pruning
+          # action. In single mode just the one target. Needs the admin-scoped
+          # PREVIEW_CLEANUP_TOKEN; with only the built-in token these 403 and are skipped —
+          # tolerated, since the Cloudflare teardown above still counts as a cleanup.
+          env_slugs=()
+          if [ "$MODE" = single ]; then
+            [ -n "${TARGET:-}" ] && env_slugs+=("$TARGET")
+          else
+            while read -r name; do
+              slug=${name#preview/}
+              [ -n "$slug" ] || continue
+              kept "$slug" && continue
+              env_slugs+=("$slug")
+            done < <(gh api "repos/${GITHUB_REPOSITORY}/environments" --paginate \
+              --jq '.environments[].name | select(startswith("preview/"))')
+          fi
+
+          if [ "${#env_slugs[@]}" -eq 0 ]; then
+            echo "No GitHub environments to retire."
+            exit 0
+          fi
+          for slug in "${env_slugs[@]}"; do
             env_name="preview/${slug}"
             if gh api -X DELETE "repos/${GITHUB_REPOSITORY}/environments/${env_name}" >/dev/null 2>&1; then
               echo "Removed GitHub environment '${env_name}'."
