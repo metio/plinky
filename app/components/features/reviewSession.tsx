@@ -129,7 +129,7 @@ export function ReviewSession() {
                         title={score.title}
                         initialTempo={score.tempo}
                         beatsPerBar={score.beatsPerBar}
-                        onMastery={() => setPlayedCurrent(true)}
+                        onRunComplete={() => setPlayedCurrent(true)}
                     />
                 </>
             )}

@@ -14,10 +14,10 @@ import { ReviewSession } from "./reviewSession";
 // Stub the heavy score viewer (OSMD) and the score resolver, so the test exercises the
 // session flow, not playback.
 vi.mock("./scoreViewer", () => ({
-    ScoreViewer: ({ title, onMastery }: { title: string; onMastery?: () => void }) => (
+    ScoreViewer: ({ title, onRunComplete }: { title: string; onRunComplete?: () => void }) => (
         <div>
             viewer:{title}
-            <button type="button" onClick={() => onMastery?.()}>
+            <button type="button" onClick={() => onRunComplete?.()}>
                 play {title}
             </button>
         </div>

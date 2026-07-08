@@ -442,14 +442,14 @@ describe("ScoreViewer", () => {
         reqFs.mockRestore();
     });
 
-    it("grades a completed run once even when the parent re-creates onMastery each render", async () => {
-        // A review session passes a fresh inline onMastery on every render, and calling it
+    it("grades a completed run once even when the parent re-creates onRunComplete each render", async () => {
+        // A review session passes a fresh inline onRunComplete on every render, and calling it
         // back flips parent state — which re-creates the callback. Without a per-run latch
         // the identity churn re-fires the completion effect while the run is still complete,
         // double-counting the run (history, lifetime, ghost, mastery, cadence). This harness
-        // reproduces that churn: onMastery both records a call and forces a re-render.
+        // reproduces that churn: onRunComplete both records a call and forces a re-render.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const onMastery = vi.fn();
+        const onRunComplete = vi.fn();
         // Built once so the xml prop stays referentially stable across the harness's
         // re-renders; a fresh string would reload OSMD mid-run and derail the test.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
@@ -461,8 +461,8 @@ describe("ScoreViewer", () => {
                     xml={phrase}
                     title="T"
                     beatsPerBar={4}
-                    onMastery={() => {
-                        onMastery();
+                    onRunComplete={() => {
+                        onRunComplete();
                         setPlayed(true);
                     }}
                 />
@@ -488,9 +488,9 @@ describe("ScoreViewer", () => {
             fireEvent.pointerUp(key);
         }
         // Once the grade panel is up the completion effect has settled; a re-fire would
-        // already have called onMastery a second time.
+        // already have called onRunComplete a second time.
         await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
-        expect(onMastery).toHaveBeenCalledTimes(1);
+        expect(onRunComplete).toHaveBeenCalledTimes(1);
     });
 
     it("enters full screen to play even on a large screen, where Listen lives", async () => {

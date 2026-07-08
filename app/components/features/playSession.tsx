@@ -55,7 +55,7 @@ export type PlaySessionProps = {
     id: string;
     xml: string;
     title: string;
-    onMastery?: () => void;
+    onRunComplete?: () => void;
     initialTempo?: number;
     beatsPerBar?: number;
     lockTempo?: boolean;
@@ -73,7 +73,7 @@ function usePlaySessionValue({
     id,
     xml,
     title,
-    onMastery,
+    onRunComplete,
     initialTempo,
     beatsPerBar,
     lockTempo,
@@ -90,7 +90,7 @@ function usePlaySessionValue({
     const gradeFromRunRef = useRef(false);
     // Latches a completed run's grading so its side effects (history, lifetime,
     // ghost, mastery, daily, cadence) land exactly once. The completion effect
-    // depends on inputs — like an onMastery callback the parent re-creates each
+    // depends on inputs — like an onRunComplete callback the parent re-creates each
     // render — whose identity can churn while `matcher.complete` stays true; a
     // re-fire without this latch would double-count the run. Reset at run start.
     const gradedRef = useRef(false);
@@ -469,7 +469,7 @@ function usePlaySessionValue({
             ghostRace.adoptOwnRun(newGhost);
         }
         if (!ephemeral) {
-            onMastery?.();
+            onRunComplete?.();
         }
     }, [
         matcher.complete,
@@ -477,7 +477,7 @@ function usePlaySessionValue({
         matcher.wrong,
         id,
         title,
-        onMastery,
+        onRunComplete,
         ephemeral,
         daily,
         initialTempo,
