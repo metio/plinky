@@ -35,7 +35,12 @@ const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
 
 const awaitReady = async () => {
     const practice = await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
-    await expect.poll(() => (practice as HTMLButtonElement).disabled).toBe(false);
+    // The default expect.poll timeout is 1s — far too short for OSMD's cold render under the
+    // istanbul-instrumented coverage run, where the Practice button stays disabled for many
+    // seconds. Match the 30s the rest of the suite's waits use.
+    await expect
+        .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000, interval: 100 })
+        .toBe(false);
     return practice;
 };
 
