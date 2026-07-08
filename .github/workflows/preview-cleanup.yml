@@ -109,7 +109,13 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          GH_TOKEN: ${{ github.token }}
+          # Deleting an environment needs repo-admin, which the built-in GITHUB_TOKEN
+          # cannot be granted (its permissions block has no administration scope). Supply
+          # PREVIEW_CLEANUP_TOKEN — a PAT with admin (fine-grained: Administration read/write;
+          # classic: repo) — to enable it. Absent, this falls back to the built-in token and
+          # the environment deletions are skipped (best-effort), while the Cloudflare
+          # teardown still runs in full.
+          GH_TOKEN: ${{ secrets.PREVIEW_CLEANUP_TOKEN || github.token }}
           MODE: ${{ steps.plan.outputs.mode }}
           TARGET: ${{ steps.plan.outputs.target }}
           KEEP: ${{ steps.plan.outputs.keep }}
@@ -168,7 +174,8 @@ jobs:
           echo "Deleted ${#targets[@]} deployment(s) across ${#del_slugs[@]} branch(es)."
 
           # Retire each cleaned branch's transient GitHub environment; this also clears its
-          # deployment records from the PR. Needs admin scope, so tolerate a 403 — the
+          # deployment records from the PR. Needs the admin-scoped PREVIEW_CLEANUP_TOKEN;
+          # with only the built-in token this 403s and is skipped — tolerated, since the
           # Cloudflare teardown above still counts as a successful cleanup.
           for slug in "${!del_slugs[@]}"; do
             env_name="preview/${slug}"
