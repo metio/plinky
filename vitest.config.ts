@@ -70,7 +70,12 @@ export default defineConfig({
                         "core/**/*.test.{ts,tsx}",
                         "dev/**/*.test.mts",
                     ],
-                    exclude: ["app/**/*.browser.test.*", "core/**/*.browser.test.*"],
+                    exclude: [
+                        "app/**/*.browser.test.*",
+                        "core/**/*.browser.test.*",
+                        "app/**/*.mobile.test.*",
+                        "core/**/*.mobile.test.*",
+                    ],
                     setupFiles: ["./app/test-setup.ts", "./app/test-setup.node.ts"],
                 },
             },
@@ -112,6 +117,33 @@ export default defineConfig({
                             contextOptions: { permissions: ["midi", "midi-sysex"] },
                         }),
                         headless: true,
+                        instances: [{ browser: "chromium" }],
+                    },
+                },
+            },
+            {
+                // The mobile viewport project: the play/notation flows rendered at a
+                // phone size with touch input — the profile the mobile-first surface
+                // (auto-scroll, focus strip, rotate hint, on-screen keyboard) targets and
+                // that the desktop `browser` project never exercises, so regressions that
+                // only show at phone width and coarse pointer slip past every other gate.
+                // Its name starts with "browser" so the `browser*` project glob (and the
+                // ci-test-browser gate) picks it up with no extra wiring. Chromium-only:
+                // Playwright's isMobile/touch emulation is a Chromium feature that Firefox
+                // rejects. Files carry the `.mobile.test.tsx` suffix.
+                test: {
+                    name: "browser-mobile",
+                    include: ["app/**/*.mobile.test.{ts,tsx}", "core/**/*.mobile.test.{ts,tsx}"],
+                    setupFiles: ["./app/test-setup.ts"],
+                    browser: {
+                        enabled: true,
+                        provider: playwright({
+                            contextOptions: { hasTouch: true, isMobile: true },
+                        }),
+                        headless: true,
+                        // A representative small phone in portrait: narrow enough to trip
+                        // the compact/portrait layout branches, tall enough to be realistic.
+                        viewport: { width: 390, height: 844 },
                         instances: [{ browser: "chromium" }],
                     },
                 },
