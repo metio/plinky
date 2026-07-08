@@ -759,7 +759,7 @@ export type PlaySession = ReturnType<typeof usePlaySessionValue>;
 
 const PlaySessionContext = createContext<PlaySession | null>(null);
 
-// Read the play session. Throws outside a provider so a mis-mounted surface fails loud
+// Read the play session. Throws outside a provider so a wrongly mounted surface fails loud
 // rather than silently rendering an empty score.
 export function usePlaySession(): PlaySession {
     const session = useContext(PlaySessionContext);
