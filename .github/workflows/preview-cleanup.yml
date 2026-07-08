@@ -199,9 +199,13 @@ jobs:
           fi
           for slug in "${env_slugs[@]}"; do
             env_name="preview/${slug}"
-            if gh api -X DELETE "repos/${GITHUB_REPOSITORY}/environments/${env_name}" >/dev/null 2>&1; then
+            # The environments API takes the name as a single URL-encoded path segment, so
+            # the slash in preview/<slug> MUST be %2F — passed literally it resolves to a
+            # different, missing route and 404s. Surface the real API error rather than
+            # blaming token scope, so a genuine 403 (missing admin PAT) is distinguishable.
+            if err=$(gh api -X DELETE "repos/${GITHUB_REPOSITORY}/environments/preview%2F${slug}" 2>&1); then
               echo "Removed GitHub environment '${env_name}'."
             else
-              echo "Could not delete GitHub environment '${env_name}' (likely token scope); skipping."
+              echo "Could not delete GitHub environment '${env_name}': ${err//$'\n'/ }"
             fi
           done
