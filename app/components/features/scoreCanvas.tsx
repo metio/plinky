@@ -41,6 +41,10 @@ export function ScoreCanvas() {
                 tabIndex={0}
                 role="img"
                 aria-label={title}
+                // Arm on a real pointer press here, then act on the click. A compatibility
+                // click that retargets onto the score when the keyboard unmounts at a run's
+                // end carries no press, so it never builds a loop the player didn't ask for.
+                onPointerDown={loop.arm}
                 onClick={(event) => loop.selectBarAt(event.clientX, event.clientY)}
                 // A bounded scroll box so the follow-cursor scrolls the staff inside
                 // it — keeping the controls and on-screen keyboard in view below

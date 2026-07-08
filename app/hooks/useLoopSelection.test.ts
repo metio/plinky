@@ -82,10 +82,23 @@ describe("useLoopSelection", () => {
 
     it("ignores a click when the score is not selectable", () => {
         const { result } = setup(8, () => false);
-        act(() => result.current.selectBarAt(10, 10));
+        // Arm it, so this exercises the not-selectable guard rather than the press guard.
+        act(() => {
+            result.current.arm();
+            result.current.selectBarAt(10, 10);
+        });
         // No anchor dropped, no range change.
         expect(result.current.on).toBe(false);
         expect(result.current.from).toBe(1);
         expect(result.current.to).toBe(1);
+    });
+
+    it("ignores a press-less click, so a retargeted compatibility click builds no loop", () => {
+        // canSelect is true, but no arm() precedes the click — the browser compatibility
+        // click that lands on the score when the keyboard unmounts has no pointer press.
+        const { result } = setup(8);
+        act(() => result.current.selectBarAt(10, 10));
+        expect(result.current.on).toBe(false);
+        expect(result.current.read()).toEqual({ on: false, from: 1, to: 1 });
     });
 });

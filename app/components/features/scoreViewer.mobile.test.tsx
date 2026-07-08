@@ -75,10 +75,13 @@ describe("ScoreViewer on a phone", () => {
         await waitFor(
             () => {
                 const rect = svg.getBoundingClientRect();
-                fireEvent.click(score, {
+                const at = {
                     clientX: rect.left + rect.width * 0.3,
                     clientY: rect.top + rect.height * 0.5,
-                });
+                };
+                // A genuine tap on the score: the pointer press arms the click.
+                fireEvent.pointerDown(score, at);
+                fireEvent.click(score, at);
                 expect(screen.getByLabelText("Loop from bar")).toBeTruthy();
             },
             { timeout: 30000 },
@@ -86,6 +89,34 @@ describe("ScoreViewer on a phone", () => {
         const fills = score.querySelectorAll("rect.plinky-bar-selection");
         expect(fills.length).toBeGreaterThan(0);
         expect(fills[0]?.getAttribute("fill")).toBe("#ef4444");
+    });
+
+    it("does not build a loop from a retargeted click when a run finishes", async () => {
+        // On a touch device the tap that completes the run lands on the on-screen keyboard,
+        // but its compatibility click retargets to the score once the keyboard unmounts and
+        // the score reclaims that space — a click with no pointer press on the score. That
+        // must not silently build a one-bar loop the player never asked for.
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
+        const score = mount(phrase, { beatsPerBar: 4 }).container;
+        const img = await screen.findByRole("img", { name: "T" });
+        fireEvent.click(await awaitReady());
+        const key = await screen.findByLabelText("C5");
+        // A two-bar, four-per-bar phrase clears in eight presses of its single degree.
+        for (let i = 0; i < 8; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
+        // The retargeted compatibility click: a bare click on the score, no pointer press.
+        const svg = img.querySelector("svg")!;
+        const rect = svg.getBoundingClientRect();
+        fireEvent.click(img, {
+            clientX: rect.left + rect.width * 0.3,
+            clientY: rect.top + rect.height * 0.5,
+        });
+        expect(screen.queryByLabelText("Loop from bar")).toBeNull();
+        expect(score.querySelectorAll("rect.plinky-bar-selection").length).toBe(0);
     });
 
     it("colours notes on the score as they are played", async () => {

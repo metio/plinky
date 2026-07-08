@@ -34,6 +34,9 @@ export type LoopSelection = {
     toggle: (next: boolean) => void;
     // Reset the range to the whole piece, leaving the loop on.
     wholeSong: () => void;
+    // Arm the next click as a genuine selection: called on a real pointer press on the
+    // score, so a compatibility click that carries no press (see selectBarAt) is ignored.
+    arm: () => void;
     // Click a bar to build the range: the first click drops the anchor (a one-bar loop),
     // the next extends to the far end. A no-op while a run or playback owns the score.
     selectBarAt: (clientX: number, clientY: number) => void;
@@ -69,10 +72,18 @@ export function useLoopSelection({
     loopRef.current = { on, from, to };
     // The first bar of an in-progress click selection; the next click sets the far end.
     const anchorRef = useRef<number | null>(null);
+    // Set by a real pointer press on the score, cleared as the ensuing click is consumed.
+    // A browser's compatibility click — the one that retargets onto the score when the
+    // on-screen keyboard unmounts at a run's end — carries no such press, so it finds this
+    // false and builds no loop.
+    const armedRef = useRef(false);
     const canSelectRef = useRef(canSelect);
     canSelectRef.current = canSelect;
 
     const read = useCallback(() => loopRef.current, []);
+    const arm = useCallback(() => {
+        armedRef.current = true;
+    }, []);
     const cancelSelection = useCallback(() => {
         anchorRef.current = null;
     }, []);
@@ -119,6 +130,12 @@ export function useLoopSelection({
 
     const selectBarAt = useCallback(
         (clientX: number, clientY: number) => {
+            // Only a click backed by a genuine pointer press on the score counts; a
+            // press-less compatibility click is dropped here rather than building a loop.
+            if (!armedRef.current) {
+                return;
+            }
+            armedRef.current = false;
             if (!canSelectRef.current()) {
                 return;
             }
@@ -161,6 +178,7 @@ export function useLoopSelection({
         read,
         toggle,
         wholeSong,
+        arm,
         selectBarAt,
         cancelSelection,
         reseedWholeSong,

@@ -266,10 +266,13 @@ describe("ScoreViewer", () => {
         await waitFor(
             () => {
                 const rect = svg.getBoundingClientRect();
-                fireEvent.click(score, {
+                const at = {
                     clientX: rect.left + rect.width * 0.3,
                     clientY: rect.top + rect.height * 0.5,
-                });
+                };
+                // A genuine tap: the pointer press arms the click that follows.
+                fireEvent.pointerDown(score, at);
+                fireEvent.click(score, at);
                 expect(screen.getByLabelText("Loop from bar")).toBeTruthy();
             },
             { timeout: 30000 },
