@@ -88,13 +88,22 @@ jobs:
             # Slug every branch that still exists on GitHub; the execute step keeps those
             # and deletes deployments for any slug not in this set. Live main/gh-pages/
             # renovate branches are in the set, so they're protected (they carry no preview
-            # anyway — preview.yml ignores them).
+            # anyway — preview.yml ignores them). Capture into a variable so a failed API
+            # call aborts here under set -e rather than yielding an empty keep-set.
+            branches=$(gh api "repos/${GITHUB_REPOSITORY}/branches" --paginate --jq '.[].name')
             keep=""
             while read -r name; do
               [ -n "$name" ] || continue
               keep="$keep $(slugify "$name")"
-            done < <(gh api "repos/${GITHUB_REPOSITORY}/branches" --paginate --jq '.[].name')
-            echo "keep=$(printf '%s' "$keep" | tr ' ' '\n' | sort -u | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+            done <<< "$branches"
+            keep=$(printf '%s' "$keep" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+            # Every repo has at least its default branch, so an empty keep-set means the
+            # enumeration failed — refuse to prune rather than delete every deployment.
+            if [ -z "${keep// /}" ]; then
+              echo "::error::No live branches enumerated; refusing to prune." >&2
+              exit 1
+            fi
+            echo "keep=$keep" >> "$GITHUB_OUTPUT"
           fi
       - name: Delete matching deployments and retire environments
         env:
