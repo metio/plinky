@@ -59,6 +59,62 @@ describe("AssignmentsRoute", () => {
         expect(screen.queryByText("Import this assignment")).toBeNull();
     });
 
+    it("browses the whole catalogue page by page without a query", async () => {
+        mount();
+        // A blank query already lists the first page of pieces to browse.
+        const firstPage = await screen.findAllByText("Add");
+        expect(firstPage).toHaveLength(20);
+        fireEvent.click(screen.getByText("Show more"));
+        expect(screen.getAllByText("Add").length).toBeGreaterThan(20);
+    });
+
+    it("resets to the first page when the query changes", async () => {
+        mount();
+        fireEvent.click(await screen.findByText("Show more"));
+        fireEvent.change(screen.getByLabelText(/Search pieces/), { target: { value: "e" } });
+        expect(screen.getAllByText("Add").length).toBeLessThanOrEqual(20);
+    });
+
+    it("explains what a save still needs until it is possible", async () => {
+        mount();
+        const hint = /To save, give the assignment a name/;
+        expect(screen.getByText(hint)).toBeTruthy();
+        fireEvent.change(screen.getByLabelText("Assignment name"), {
+            target: { value: "My set" },
+        });
+        fireEvent.change(screen.getByLabelText(/Search pieces/), {
+            target: { value: "Twinkle" },
+        });
+        fireEvent.click(await screen.findByText("Add"));
+        // Name and a piece are both present, so the hint yields to an active Save.
+        expect(screen.queryByText(hint)).toBeNull();
+        expect(screen.getByText<HTMLButtonElement>("Save").disabled).toBe(false);
+    });
+
+    it("edits a saved assignment in place", async () => {
+        mount();
+        fireEvent.change(screen.getByLabelText("Assignment name"), {
+            target: { value: "My set" },
+        });
+        fireEvent.change(screen.getByLabelText(/Search pieces/), {
+            target: { value: "Twinkle" },
+        });
+        fireEvent.click(await screen.findByText("Add"));
+        fireEvent.click(screen.getByText("Save"));
+        await screen.findByRole("status");
+        // Editing loads the stored assignment back into the builder…
+        fireEvent.click(screen.getByLabelText("Edit My set"));
+        expect(screen.getByLabelText<HTMLInputElement>("Assignment name").value).toBe("My set");
+        fireEvent.change(screen.getByLabelText("Assignment name"), {
+            target: { value: "Renamed set" },
+        });
+        fireEvent.click(screen.getByText("Save"));
+        // …and saving overwrites it instead of adding a sibling.
+        await waitFor(() => expect(screen.getByText("Renamed set")).toBeTruthy());
+        expect(screen.queryByText("My set")).toBeNull();
+        expect(screen.getAllByLabelText(/^Edit /)).toHaveLength(1);
+    });
+
     it("reorders and removes items in the basket", async () => {
         mount();
         const search = screen.getByLabelText(/Search pieces/);

@@ -38,6 +38,8 @@ export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.assignments_heading(), m.meta_assignments_description());
 }
 
+const PICKER_PAGE = 20;
+
 const FIELD =
     "rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300";
 
@@ -70,6 +72,10 @@ export default function AssignmentsRoute() {
     const [description, setDescription] = useState("");
     const [items, setItems] = useState<AssignmentItem[]>([]);
     const [query, setQuery] = useState("");
+    const [visible, setVisible] = useState(PICKER_PAGE);
+    // The id of the saved assignment being edited, so saving overwrites it in place
+    // instead of creating a sibling.
+    const [editingId, setEditingId] = useState<string | null>(null);
 
     useEffect(() => {
         setAssignments(assignmentsStore.list());
@@ -100,15 +106,12 @@ export default function AssignmentsRoute() {
     const matches = useMemo(() => {
         const q = query.trim().toLowerCase();
         const chosen = new Set(items.map((item) => item.id));
-        // A blank query browses the catalogue (the first 20 unused pieces) rather than
-        // showing nothing, so a teacher can build an assignment without first guessing
-        // a title to type.
-        return pool
-            .filter(
-                (entry) =>
-                    !chosen.has(entry.id) && (q === "" || entry.title.toLowerCase().includes(q)),
-            )
-            .slice(0, 20);
+        // A blank query browses the whole catalogue rather than showing nothing, so a
+        // teacher can build an assignment without first guessing a title to type.
+        return pool.filter(
+            (entry) =>
+                !chosen.has(entry.id) && (q === "" || entry.title.toLowerCase().includes(q)),
+        );
     }, [pool, query, items]);
 
     const refresh = () => setAssignments(assignmentsStore.list());
@@ -154,7 +157,14 @@ export default function AssignmentsRoute() {
 
     const draft = (): Assignment => {
         const existing = assignmentsStore.list().map((entry) => entry.id);
-        return makeAssignment({ id: newAssignmentId(name, existing), name, description, items });
+        // An edit keeps its id so the save lands on the stored assignment, even when
+        // the name changed.
+        return makeAssignment({
+            id: editingId ?? newAssignmentId(name, existing),
+            name,
+            description,
+            items,
+        });
     };
 
     const reset = () => {
@@ -162,6 +172,15 @@ export default function AssignmentsRoute() {
         setDescription("");
         setItems([]);
         setQuery("");
+        setEditingId(null);
+    };
+
+    const startEdit = (assignment: Assignment) => {
+        setName(assignment.name);
+        setDescription(assignment.description ?? "");
+        setItems(assignment.items);
+        setEditingId(assignment.id);
+        window.scrollTo({ top: 0 });
     };
 
     const canSave = name.trim().length > 0 && items.length > 0;
@@ -292,12 +311,15 @@ export default function AssignmentsRoute() {
                     className={`${FIELD} w-full`}
                     placeholder={m.assignments_search_placeholder()}
                     value={query}
-                    onChange={(event) => setQuery(event.target.value)}
+                    onChange={(event) => {
+                        setQuery(event.target.value);
+                        setVisible(PICKER_PAGE);
+                    }}
                     aria-label={m.assignments_search_placeholder()}
                 />
                 <Show when={matches.length > 0}>
                     <ul className="divide-y divide-gray-100 rounded-md border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-                        {matches.map((entry) => (
+                        {matches.slice(0, visible).map((entry) => (
                             <li
                                 key={entry.id}
                                 className="flex items-center justify-between gap-2 px-3 py-1.5 text-sm"
@@ -309,6 +331,11 @@ export default function AssignmentsRoute() {
                             </li>
                         ))}
                     </ul>
+                </Show>
+                <Show when={visible < matches.length}>
+                    <Button variant="secondary" onClick={() => setVisible((n) => n + PICKER_PAGE)}>
+                        {m.library_show_more()}
+                    </Button>
                 </Show>
 
                 {items.length > 0 ? (
@@ -397,6 +424,11 @@ export default function AssignmentsRoute() {
                         {m.assignments_share()}
                     </Button>
                 </div>
+                <Show when={!canSave}>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {m.assignments_save_hint()}
+                    </p>
+                </Show>
             </section>
 
             <section className="space-y-3">
@@ -440,6 +472,15 @@ export default function AssignmentsRoute() {
                                                 {doneCount}/{steps.length}
                                             </span>
                                         </span>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => startEdit(assignment)}
+                                            aria-label={m.assignments_edit_label({
+                                                name: assignment.name,
+                                            })}
+                                        >
+                                            {m.assignments_edit()}
+                                        </Button>
                                         <Button
                                             variant="secondary"
                                             onClick={() => onShare(assignment)}
