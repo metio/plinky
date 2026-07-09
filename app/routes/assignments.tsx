@@ -109,8 +109,7 @@ export default function AssignmentsRoute() {
         // A blank query browses the whole catalogue rather than showing nothing, so a
         // teacher can build an assignment without first guessing a title to type.
         return pool.filter(
-            (entry) =>
-                !chosen.has(entry.id) && (q === "" || entry.title.toLowerCase().includes(q)),
+            (entry) => !chosen.has(entry.id) && (q === "" || entry.title.toLowerCase().includes(q)),
         );
     }, [pool, query, items]);
 
