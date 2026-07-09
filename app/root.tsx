@@ -16,6 +16,7 @@ import { SoundHint } from "./components/features/soundHint";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { HelpLink } from "./components/features/helpLink";
 import { browserStore, storageHealth } from "./adapters/browserStore";
+import { runActivity } from "./lib/activity";
 import { describeError, issueUrl } from "./lib/errorReport";
 import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { MidiProvider } from "./contexts/midi";
@@ -146,9 +147,20 @@ function useServiceWorkerUpdate() {
             reload: () => window.location.reload(),
             setTimeout: (run, ms) => window.setTimeout(run, ms),
             clearTimeout: (id) => window.clearTimeout(id),
+            // A reload must not wipe out a practice run: park it while a run is
+            // active and release it the moment the app goes idle.
+            holdReload: () => runActivity.active(),
         });
         setWatcher(created);
-        return () => created.dispose();
+        const unsubscribe = runActivity.subscribe(() => {
+            if (!runActivity.active()) {
+                created.flushReload();
+            }
+        });
+        return () => {
+            unsubscribe();
+            created.dispose();
+        };
     }, []);
 
     const subscribe = useCallback(

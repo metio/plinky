@@ -32,6 +32,7 @@ import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
 import { createSongSource, type SongSource } from "../stores/songSource";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
+import { type ActivitySignal, runActivity } from "../lib/activity";
 
 // The app's injected integration points, gathered in one place. Every external
 // capability the UI depends on — persistence, the state stores over it, audio,
@@ -81,6 +82,9 @@ export type AppServices = {
     // can write per-page help in every language without a redeploy. Language-aware;
     // no configured project or a failed fetch simply yields no items.
     help: HelpSource;
+    // The "a run is in progress" signal: screens begin/end it, the composition
+    // root reads it to hold a service-worker reload until the app is idle.
+    activity: ActivitySignal;
 };
 
 // Assembles a full service set from a partial override. Derived services follow the
@@ -118,6 +122,9 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
         news: overrides.news ?? createSanityNews(fetcher),
         help: overrides.help ?? createSanityHelp(fetcher),
+        // The shared app-wide instance by default — the composition root watches
+        // the same signal the screens write to.
+        activity: overrides.activity ?? runActivity,
     };
 }
 
@@ -149,6 +156,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     exercises: true,
     news: true,
     help: true,
+    activity: true,
 };
 const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
 

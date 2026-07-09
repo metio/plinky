@@ -147,7 +147,13 @@ function fakeTimers() {
 // .then() hop.
 const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-function setup({ controller = {} as object | null } = {}) {
+function setup({
+    controller = {} as object | null,
+    hold,
+}: {
+    controller?: object | null;
+    hold?: () => boolean;
+} = {}) {
     const container = fakeContainer(controller);
     const timers = fakeTimers();
     const reloads = { count: 0 };
@@ -156,6 +162,7 @@ function setup({ controller = {} as object | null } = {}) {
             reloads.count += 1;
         },
         ...timers.env,
+        holdReload: hold,
     });
     const readyFlips: boolean[] = [];
     watcher.subscribe(() => readyFlips.push(watcher.updateReady()));
@@ -231,6 +238,39 @@ describe("createSwUpdateWatcher", () => {
         const { container, reloads } = setup();
         container.fireControllerChange();
         expect(reloads.count).toBe(1);
+    });
+
+    describe("held reloads", () => {
+        it("parks the reload while a run is active and fires it on flush", () => {
+            let busy = true;
+            const { container, reloads, watcher } = setup({ hold: () => busy });
+            container.fireControllerChange();
+            expect(reloads.count).toBe(0);
+            // Flushing while the run is still going keeps the reload parked.
+            watcher.flushReload();
+            expect(reloads.count).toBe(0);
+            busy = false;
+            watcher.flushReload();
+            expect(reloads.count).toBe(1);
+            // The pending flag cleared with the reload; further flushes are no-ops.
+            watcher.flushReload();
+            expect(reloads.count).toBe(1);
+        });
+
+        it("reloads immediately when nothing holds it", () => {
+            const { container, reloads, watcher } = setup({ hold: () => false });
+            container.fireControllerChange();
+            expect(reloads.count).toBe(1);
+            // Nothing parked: flush stays quiet.
+            watcher.flushReload();
+            expect(reloads.count).toBe(1);
+        });
+
+        it("flush without any controllerchange is a no-op", () => {
+            const { reloads, watcher } = setup({ hold: () => false });
+            watcher.flushReload();
+            expect(reloads.count).toBe(0);
+        });
     });
 
     it("latches a failed registration instead of swallowing it", async () => {

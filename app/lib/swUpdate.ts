@@ -34,6 +34,10 @@ export type SwEnv = {
     reload(): void;
     setTimeout(run: () => void, ms: number): number;
     clearTimeout(id: number): void;
+    // When present and true at reload time, the reload is parked instead of
+    // fired — a new build seizing control must not wipe out a practice run in
+    // progress. The caller flushes once the hold clears (see flushReload).
+    holdReload?(): boolean;
 };
 
 export type SwUpdateWatcher = {
@@ -45,6 +49,9 @@ export type SwUpdateWatcher = {
     // that silently stops updating is undebuggable from the outside.
     registrationFailed(): boolean;
     applyUpdate(): void;
+    // Fires a reload that was parked behind env.holdReload, if the hold has
+    // cleared; otherwise a no-op. Safe to call on every hold change.
+    flushReload(): void;
     dispose(): void;
 };
 
@@ -122,13 +129,25 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
             notify();
         });
 
+    // A reload wanted now but parked because env.holdReload said the player is
+    // mid-run; flushReload releases it once the hold clears.
+    let reloadPending = false;
+    const requestReload = () => {
+        if (env.holdReload?.()) {
+            reloadPending = true;
+            return;
+        }
+        reloadPending = false;
+        env.reload();
+    };
+
     // A new worker taking control evicts the previous build's cache, so reload onto it
     // — whether this tab initiated the update or another tab did (applying stays false
     // here but a controller already existed). Skip only the first install's claim.
     const onControllerChange = () => {
         if (applying || hadController) {
             applying = false;
-            env.reload();
+            requestReload();
         }
     };
     container.addEventListener("controllerchange", onControllerChange);
@@ -188,6 +207,11 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
         updateReady: () => updateReady,
         registrationFailed: () => registrationFailed,
         applyUpdate,
+        flushReload() {
+            if (reloadPending) {
+                requestReload();
+            }
+        },
         dispose() {
             disposed = true;
             container.removeEventListener("controllerchange", onControllerChange);

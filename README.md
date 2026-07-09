@@ -226,7 +226,10 @@ the page in Safari instead.
 
 Plinky installs from your browser like an app and works offline once loaded. When
 a new version ships it waits quietly rather than reloading mid-task: a banner
-offers it, and the app updates only when you choose to reload.
+offers it, and the app updates only when you choose to reload. Even when an
+update arrives from another tab, a reload never interrupts a run in progress —
+it waits for the run to finish. And if updates can't be installed on a device at
+all, Plinky says so in a dismissible notice instead of silently falling behind.
 
 ## How it works
 

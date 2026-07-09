@@ -369,6 +369,16 @@ function usePlaySessionValue({
         },
     });
 
+    // A practice run in progress holds the app-wide activity signal, so a
+    // service-worker reload arriving mid-run waits until the run ends. The
+    // effect cleanup ends it on finish, abort or unmount alike.
+    useEffect(() => {
+        if (!matcher.practicing) {
+            return;
+        }
+        return services.activity.begin();
+    }, [matcher.practicing, services.activity]);
+
     // The listening transport — Listen and take-replay share one cursor walk, one clock,
     // one stop. It reads the loop range and tempo live, marks the score as painted when its
     // trail lands, and leaves the cursor shown if the matcher owns it.
