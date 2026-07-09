@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import {
     isRouteErrorResponse,
     Links,
@@ -24,6 +24,7 @@ import { SoundHint } from "./components/features/soundHint";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { HelpLink } from "./components/features/helpLink";
 import { browserStore, storageHealth } from "./adapters/browserStore";
+import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme } from "./lib/theme";
@@ -136,128 +137,37 @@ function Header() {
     );
 }
 
-// Watches the offline service worker for a newer build and, when one is ready,
-// surfaces it as a prompt instead of letting it seize the tab. Lives at the
-// composition root because it owns navigator.serviceWorker; components downstream
-// receive only the boolean and the "apply" callback.
+// The service-worker update state machine lives in lib/swUpdate; this hook is the
+// composition root's wiring — it owns navigator.serviceWorker, window.location and
+// the timers, and hands components downstream only the boolean and the "apply"
+// callback.
 function useServiceWorkerUpdate() {
-    const [updateReady, setUpdateReady] = useState(false);
-    // The build parked in "waiting", to be told to take over once the user accepts.
-    const waiting = useRef<ServiceWorker | null>(null);
-    // The registration, kept so accepting the update can run one last update check.
-    const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
-    // Set the moment we ask the waiting worker to activate, so the controllerchange
-    // it triggers reloads this tab — while the first-ever install's controllerchange
-    // (which we did not initiate) leaves the page alone.
-    const applying = useRef(false);
+    const [watcher, setWatcher] = useState<SwUpdateWatcher | null>(null);
 
     useEffect(() => {
         // In dev the SW would cache the dev server's assets and serve them stale.
         if (!import.meta.env.PROD || !("serviceWorker" in navigator)) {
             return;
         }
-        const container = navigator.serviceWorker;
-        let cancelled = false;
-        // Whether a worker already controlled this page when the effect ran. A later
-        // controllerchange then means a NEW build seized control (an update) — so every
-        // open tab must reload onto it, not only the one that clicked apply, or the others
-        // keep running the old HTML and 404 on their next lazy chunk. The first-ever install
-        // has no prior controller, and its claim-driven controllerchange must leave the page.
-        const hadController = !!container.controller;
-
-        // A worker in "waiting" is a new build ready to take over. It only counts as
-        // an update when a previous worker already controls this page — the first
-        // install has no predecessor and must stay silent.
-        const offer = (worker: ServiceWorker | null) => {
-            if (!cancelled && worker && container.controller) {
-                waiting.current = worker;
-                setUpdateReady(true);
-            }
-        };
-
-        container
-            .register("/sw.js")
-            .then((registration) => {
-                if (cancelled) {
-                    return;
-                }
-                registrationRef.current = registration;
-                offer(registration.waiting);
-                registration.addEventListener("updatefound", () => {
-                    const installing = registration.installing;
-                    installing?.addEventListener("statechange", () => {
-                        if (installing.state === "installed") {
-                            offer(registration.waiting);
-                        }
-                    });
-                });
-            })
-            .catch(() => {});
-
-        // A new worker taking control evicts the previous build's cache, so reload onto it
-        // — whether this tab initiated the update or another tab did (applying stays false
-        // here but a controller already existed). Skip only the first install's claim.
-        const onControllerChange = () => {
-            if (applying.current || hadController) {
-                applying.current = false;
-                window.location.reload();
-            }
-        };
-        container.addEventListener("controllerchange", onControllerChange);
-
-        return () => {
-            cancelled = true;
-            container.removeEventListener("controllerchange", onControllerChange);
-        };
+        const created = createSwUpdateWatcher(navigator.serviceWorker, {
+            reload: () => window.location.reload(),
+            setTimeout: (run, ms) => window.setTimeout(run, ms),
+            clearTimeout: (id) => window.clearTimeout(id),
+        });
+        setWatcher(created);
+        return () => created.dispose();
     }, []);
 
-    const applyUpdate = useCallback(() => {
-        applying.current = true;
-        // One last update check before switching, so back-to-back deploys can't strand
-        // the click on an intermediate build: if a newer sw.js has been published since
-        // this one parked, wait for it to install and activate THAT — the waiting slot
-        // only ever holds one worker, so the freshest wins. The parked build remains the
-        // fallback when the check fails (offline), finds nothing, or takes too long —
-        // activating it triggers a reload, and the reload's own update check self-heals
-        // onto anything newer.
-        const applyParked = () => waiting.current?.postMessage({ type: "SKIP_WAITING" });
-        const registration = registrationRef.current;
-        if (!registration) {
-            applyParked();
-            return;
-        }
-        let done = false;
-        const finish = (worker: ServiceWorker | null) => {
-            if (done) {
-                return;
-            }
-            done = true;
-            window.clearTimeout(timer);
-            (worker ?? waiting.current)?.postMessage({ type: "SKIP_WAITING" });
-        };
-        // A slow network must not leave the click hanging: past this, take the parked
-        // build rather than keep the player waiting on a fetch.
-        const timer = window.setTimeout(() => finish(null), 4000);
-        registration
-            .update()
-            .then(() => {
-                const installing = registration.installing;
-                if (!installing) {
-                    // Nothing newer found (or it already reached waiting).
-                    finish(registration.waiting);
-                    return;
-                }
-                installing.addEventListener("statechange", () => {
-                    if (installing.state === "installed") {
-                        finish(registration.waiting);
-                    } else if (installing.state === "redundant") {
-                        // The newer build failed to install; the parked one still works.
-                        finish(null);
-                    }
-                });
-            })
-            .catch(() => finish(null));
-    }, []);
+    const subscribe = useCallback(
+        (onChange: () => void) => (watcher ? watcher.subscribe(onChange) : () => {}),
+        [watcher],
+    );
+    const updateReady = useSyncExternalStore(
+        subscribe,
+        () => watcher?.updateReady() ?? false,
+        () => false,
+    );
+    const applyUpdate = useCallback(() => watcher?.applyUpdate(), [watcher]);
 
     return { updateReady, applyUpdate };
 }
