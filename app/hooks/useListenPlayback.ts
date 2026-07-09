@@ -66,13 +66,23 @@ export function useListenPlayback({
     // The notes lit as "now sounding", held so the highlight can be lifted when
     // the cursor moves on and when playback stops.
     const highlightRef = useRef<PaintedNote[]>([]);
+    // Listen leaves a blue trail; a replay's highlight is purely transient. Stop
+    // needs to know which, so the note sounding at the moment of a stop or a
+    // Listen→Practice handoff joins the trail instead of snapping back to black.
+    const modeRef = useRef<"listen" | "replay" | null>(null);
 
     // Whether the transport currently owns the cursor — synchronous.
     const active = () => activeRef.current;
 
     const stop = () => {
         chain.clear();
-        restoreNotes(highlightRef.current);
+        if (modeRef.current === "listen" && highlightRef.current.length > 0) {
+            trailNotes(highlightRef.current, LISTENED_COLOR);
+            markPainted();
+        } else {
+            restoreNotes(highlightRef.current);
+        }
+        modeRef.current = null;
         highlightRef.current = [];
         if (!isPracticing()) {
             getOsmd()?.cursor?.hide();
@@ -91,6 +101,7 @@ export function useListenPlayback({
             return;
         }
         activeRef.current = true;
+        modeRef.current = "listen";
         const cursor: Cursor = osmd.cursor;
         if (loop().on) {
             seekToBar(cursor, loop().from);
@@ -155,6 +166,7 @@ export function useListenPlayback({
             stop();
         }
         activeRef.current = true;
+        modeRef.current = "replay";
         setActiveReplayId(take.id);
         const cursor: Cursor = osmd.cursor;
         cursor.reset();

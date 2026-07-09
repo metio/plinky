@@ -839,6 +839,24 @@ describe("ScoreViewer", () => {
         expect(screen.getByRole("button", { name: "Stop" })).toBeTruthy();
     });
 
+    it("leaves the note sounding at a Listen stop blue, not snapped back to black", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        await enterAndListen();
+        await expect
+            .poll(() => document.querySelectorAll(`g[fill="${WINDOW_COLOR}"]`).length, {
+                timeout: 15000,
+            })
+            .toBeGreaterThan(0);
+        const sounding = Array.from(document.querySelectorAll(`g[fill="${WINDOW_COLOR}"]`));
+        fireEvent.click(screen.getByRole("button", { name: "Stop" }));
+        // The note under the cursor at the stop joins the trail — a handoff to
+        // Practice must not leave a single uncoloured gap between blue and green.
+        for (const group of sounding) {
+            expect(group.getAttribute("fill")).toBe(LISTENED_COLOR);
+        }
+    });
+
     it("keeps the notes you practised coloured when you hand off to Listen", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // Four C5 notes; play two so they turn green.
