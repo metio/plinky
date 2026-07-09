@@ -253,6 +253,24 @@ all without a redeploy. Only `https` image and link URLs are shown, and a missin
 unreachable source simply shows nothing — the banner never blocks or breaks the
 page. Leave the variables unset and no banner appears and no network call is made.
 
+## Help page
+
+The **?** in the header opens a help page that explains Plinky area by area — one
+section per part of the app, and it drops you on the section for the page you came
+from. Like the news banner, the content is edited outside the code in the same
+[Sanity](https://www.sanity.io) project, so anyone can write and update it live with
+no redeploy, and it's translated: a reader downloads only their own language.
+
+The app owns the sections (their titles are translated with the rest of the UI); Sanity
+holds the blocks inside them. Add a `helpItem` document type with a `pageKey` (which
+section it belongs to — `gettingStarted`, `home`, `play`, `library`, `daily`, `compose`,
+`assignments`, `you`, `review`, or `settings`), an `order`, an optional `image` (shared
+across languages) with internationalized `alt` text, an internationalized `text` body,
+and an optional `link`. Publish a block and it appears under its section; a section with
+no blocks shows a short "on the way" note. Only `https` image and link URLs are shown,
+and an unreachable source falls back to the section skeleton — help never breaks the
+page. It reuses the news banner's `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
+
 ## Development
 
 The project builds with Node.js and npm:

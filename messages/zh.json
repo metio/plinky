@@ -558,5 +558,16 @@
   "theme_system": "🖥️ 跟随系统",
   "theme_light": "☀️ 浅色",
   "theme_dark": "🌙 深色",
-  "theme_aria": "主题：{theme}。点击以更改。"
+  "theme_aria": "主题：{theme}。点击以更改。",
+  "nav_help": "帮助",
+  "help_title": "帮助",
+  "help_intro": "了解 Plinky 各个部分的运作方式。直接跳到你有疑问的部分。",
+  "help_section_getting_started": "入门",
+  "help_section_play": "弹奏乐曲",
+  "help_section_assignments": "作业",
+  "help_section_review": "复习",
+  "help_loading": "正在加载帮助…",
+  "help_empty": "该部分的帮助即将推出。",
+  "help_learn_more": "了解更多",
+  "meta_help_description": "了解 Plinky 的运作方式：涵盖应用每个部分的指南，从你的第一个音符到进度跟踪。"
 }

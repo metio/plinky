@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Systém",
   "theme_light": "☀️ Světlý",
   "theme_dark": "🌙 Tmavý",
-  "theme_aria": "Motiv: {theme}. Kliknutím změníte."
+  "theme_aria": "Motiv: {theme}. Kliknutím změníte.",
+  "nav_help": "Nápověda",
+  "help_title": "Nápověda",
+  "help_intro": "Jak Plinky funguje, oblast po oblasti. Přejděte přímo na část, ke které máte dotaz.",
+  "help_section_getting_started": "Začínáme",
+  "help_section_play": "Hraní skladby",
+  "help_section_assignments": "Úkoly",
+  "help_section_review": "Opakování",
+  "help_loading": "Načítání nápovědy…",
+  "help_empty": "Nápověda pro tuto oblast se připravuje.",
+  "help_learn_more": "Zjistit více",
+  "meta_help_description": "Jak Plinky funguje: návody pro každou část aplikace, od první noty až po sledování vašeho pokroku."
 }

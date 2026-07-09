@@ -19,5 +19,6 @@ export default [
         route("you", "routes/you.tsx"),
         route("review", "routes/review.tsx"),
         route("settings", "routes/settings.tsx"),
+        route("help", "routes/help.tsx"),
     ]),
 ] satisfies RouteConfig;

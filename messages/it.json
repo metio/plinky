@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Sistema",
   "theme_light": "☀️ Chiaro",
   "theme_dark": "🌙 Scuro",
-  "theme_aria": "Tema: {theme}. Clicca per cambiare."
+  "theme_aria": "Tema: {theme}. Clicca per cambiare.",
+  "nav_help": "Aiuto",
+  "help_title": "Aiuto",
+  "help_intro": "Come funziona Plinky, area per area. Vai direttamente alla parte su cui hai una domanda.",
+  "help_section_getting_started": "Per iniziare",
+  "help_section_play": "Suonare un brano",
+  "help_section_assignments": "Compiti",
+  "help_section_review": "Ripasso",
+  "help_loading": "Caricamento dell’aiuto…",
+  "help_empty": "L’aiuto per quest’area è in arrivo.",
+  "help_learn_more": "Scopri di più",
+  "meta_help_description": "Come funziona Plinky: guide per ogni parte dell’app, dalla tua prima nota al monitoraggio dei tuoi progressi."
 }

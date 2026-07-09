@@ -14,6 +14,8 @@ import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
 import type { NewsSource } from "../ports/news";
 import { createSanityNews } from "../adapters/sanityNews";
+import type { HelpSource } from "../ports/help";
+import { createSanityHelp } from "../adapters/sanityHelp";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
@@ -75,6 +77,10 @@ export type AppServices = {
     // (Sanity) so a non-technical editor can change the picture + link without a
     // redeploy. No configured project or a failed fetch simply yields no news.
     news: NewsSource;
+    // The help page's content, fetched from the same Sanity project so an editor
+    // can write per-page help in every language without a redeploy. Language-aware;
+    // no configured project or a failed fetch simply yields no items.
+    help: HelpSource;
 };
 
 // Assembles a full service set from a partial override. Derived services follow the
@@ -111,6 +117,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
         news: overrides.news ?? createSanityNews(fetcher),
+        help: overrides.help ?? createSanityHelp(fetcher),
     };
 }
 
@@ -157,6 +164,7 @@ export function ServicesProvider({
     const songs = services?.songs;
     const exercises = services?.exercises;
     const news = services?.news;
+    const help = services?.help;
     const value = useMemo(
         () =>
             store ||
@@ -180,7 +188,8 @@ export function ServicesProvider({
             xml ||
             songs ||
             exercises ||
-            news
+            news ||
+            help
                 ? createServices({
                       store,
                       prefs,
@@ -204,6 +213,7 @@ export function ServicesProvider({
                       songs,
                       exercises,
                       news,
+                      help,
                   })
                 : DEFAULT_SERVICES,
         [
@@ -229,6 +239,7 @@ export function ServicesProvider({
             songs,
             exercises,
             news,
+            help,
         ],
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
@@ -302,4 +313,8 @@ export function useExerciseSource(): ExerciseSource {
 
 export function useNewsSource(): NewsSource {
     return useServices().news;
+}
+
+export function useHelpSource(): HelpSource {
+    return useServices().help;
 }

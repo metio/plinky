@@ -558,5 +558,16 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Lyst",
   "theme_dark": "🌙 Mørkt",
-  "theme_aria": "Tema: {theme}. Klik for at ændre."
+  "theme_aria": "Tema: {theme}. Klik for at ændre.",
+  "nav_help": "Hjælp",
+  "help_title": "Hjælp",
+  "help_intro": "Sådan fungerer Plinky, område for område. Gå direkte til den del, du har et spørgsmål om.",
+  "help_section_getting_started": "Kom godt i gang",
+  "help_section_play": "Spil et stykke",
+  "help_section_assignments": "Opgaver",
+  "help_section_review": "Gentagelse",
+  "help_loading": "Indlæser hjælp…",
+  "help_empty": "Hjælp til dette område er på vej.",
+  "help_learn_more": "Læs mere",
+  "meta_help_description": "Sådan fungerer Plinky: vejledninger til hver del af appen, fra din første node til at følge dine fremskridt."
 }

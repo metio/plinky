@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Rendszer",
   "theme_light": "☀️ Világos",
   "theme_dark": "🌙 Sötét",
-  "theme_aria": "Téma: {theme}. Kattints a módosításhoz."
+  "theme_aria": "Téma: {theme}. Kattints a módosításhoz.",
+  "nav_help": "Súgó",
+  "help_title": "Súgó",
+  "help_intro": "Hogyan működik a Plinky, területről területre. Ugorj közvetlenül arra a részre, amelyről kérdésed van.",
+  "help_section_getting_started": "Első lépések",
+  "help_section_play": "Egy darab lejátszása",
+  "help_section_assignments": "Feladatok",
+  "help_section_review": "Ismétlés",
+  "help_loading": "Súgó betöltése…",
+  "help_empty": "Ehhez a területhez hamarosan érkezik a súgó.",
+  "help_learn_more": "Tudj meg többet",
+  "meta_help_description": "Hogyan működik a Plinky: útmutatók az alkalmazás minden részéhez, az első hangjegytől a fejlődésed követéséig."
 }

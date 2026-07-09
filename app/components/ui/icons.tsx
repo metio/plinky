@@ -36,6 +36,17 @@ export function PlayIcon({ className }: IconProps) {
     );
 }
 
+// A question mark in a circle — the universal "help".
+export function QuestionIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.2 9.2a2.8 2.8 0 1 1 3.6 2.7c-.7.3-1.3.9-1.3 1.9" />
+            <path d="M12 16.8h.01" />
+        </Icon>
+    );
+}
+
 // A filled square — the universal "stop".
 export function StopIcon({ className }: IconProps) {
     return (

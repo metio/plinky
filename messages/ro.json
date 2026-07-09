@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Sistem",
   "theme_light": "☀️ Luminos",
   "theme_dark": "🌙 Întunecat",
-  "theme_aria": "Temă: {theme}. Apasă pentru a schimba."
+  "theme_aria": "Temă: {theme}. Apasă pentru a schimba.",
+  "nav_help": "Ajutor",
+  "help_title": "Ajutor",
+  "help_intro": "Cum funcționează Plinky, zonă cu zonă. Sari direct la partea despre care ai o întrebare.",
+  "help_section_getting_started": "Primii pași",
+  "help_section_play": "Cântarea unei piese",
+  "help_section_assignments": "Teme",
+  "help_section_review": "Recapitulare",
+  "help_loading": "Se încarcă ajutorul…",
+  "help_empty": "Ajutorul pentru această zonă este pe drum.",
+  "help_learn_more": "Află mai multe",
+  "meta_help_description": "Cum funcționează Plinky: ghiduri pentru fiecare parte a aplicației, de la prima notă până la urmărirea progresului tău."
 }

@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Sustav",
   "theme_light": "☀️ Svijetla",
   "theme_dark": "🌙 Tamna",
-  "theme_aria": "Tema: {theme}. Klikni za promjenu."
+  "theme_aria": "Tema: {theme}. Klikni za promjenu.",
+  "nav_help": "Pomoć",
+  "help_title": "Pomoć",
+  "help_intro": "Kako Plinky radi, područje po područje. Idite izravno na dio o kojem imate pitanje.",
+  "help_section_getting_started": "Početak",
+  "help_section_play": "Sviranje skladbe",
+  "help_section_assignments": "Zadaci",
+  "help_section_review": "Ponavljanje",
+  "help_loading": "Učitavanje pomoći…",
+  "help_empty": "Pomoć za ovo područje uskoro stiže.",
+  "help_learn_more": "Saznajte više",
+  "meta_help_description": "Kako Plinky radi: vodiči za svaki dio aplikacije, od prve note do praćenja vašeg napretka."
 }

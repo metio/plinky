@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Системна",
   "theme_light": "☀️ Світла",
   "theme_dark": "🌙 Темна",
-  "theme_aria": "Тема: {theme}. Натисніть, щоб змінити."
+  "theme_aria": "Тема: {theme}. Натисніть, щоб змінити.",
+  "nav_help": "Довідка",
+  "help_title": "Довідка",
+  "help_intro": "Як працює Plinky, розділ за розділом. Перейдіть одразу до потрібної частини.",
+  "help_section_getting_started": "Початок роботи",
+  "help_section_play": "Гра твору",
+  "help_section_assignments": "Завдання",
+  "help_section_review": "Повторення",
+  "help_loading": "Завантаження довідки…",
+  "help_empty": "Довідка для цього розділу незабаром з’явиться.",
+  "help_learn_more": "Дізнатися більше",
+  "meta_help_description": "Як працює Plinky: посібники для кожної частини застосунку, від першої ноти до відстеження вашого прогресу."
 }

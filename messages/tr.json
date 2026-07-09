@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Sistem",
   "theme_light": "☀️ Açık",
   "theme_dark": "🌙 Koyu",
-  "theme_aria": "Tema: {theme}. Değiştirmek için tıkla."
+  "theme_aria": "Tema: {theme}. Değiştirmek için tıkla.",
+  "nav_help": "Yardım",
+  "help_title": "Yardım",
+  "help_intro": "Plinky nasıl çalışır, bölüm bölüm. Sorunuz olan kısma doğrudan gidin.",
+  "help_section_getting_started": "Başlarken",
+  "help_section_play": "Bir parça çalmak",
+  "help_section_assignments": "Ödevler",
+  "help_section_review": "Tekrar",
+  "help_loading": "Yardım yükleniyor…",
+  "help_empty": "Bu alan için yardım yakında geliyor.",
+  "help_learn_more": "Daha fazla bilgi",
+  "meta_help_description": "Plinky nasıl çalışır: ilk notanızdan ilerlemenizi takip etmeye kadar uygulamanın her bölümü için kılavuzlar."
 }

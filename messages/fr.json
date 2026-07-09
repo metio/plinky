@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Système",
   "theme_light": "☀️ Clair",
   "theme_dark": "🌙 Sombre",
-  "theme_aria": "Thème : {theme}. Cliquez pour changer."
+  "theme_aria": "Thème : {theme}. Cliquez pour changer.",
+  "nav_help": "Aide",
+  "help_title": "Aide",
+  "help_intro": "Comment fonctionne Plinky, section par section. Accédez directement à la partie qui vous intéresse.",
+  "help_section_getting_started": "Premiers pas",
+  "help_section_play": "Jouer un morceau",
+  "help_section_assignments": "Devoirs",
+  "help_section_review": "Révision",
+  "help_loading": "Chargement de l’aide…",
+  "help_empty": "L’aide pour cette section arrive bientôt.",
+  "help_learn_more": "En savoir plus",
+  "meta_help_description": "Comment fonctionne Plinky : des guides pour chaque partie de l’application, de votre première note au suivi de votre progression."
 }

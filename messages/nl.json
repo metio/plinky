@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Systeem",
   "theme_light": "☀️ Licht",
   "theme_dark": "🌙 Donker",
-  "theme_aria": "Thema: {theme}. Klik om te wijzigen."
+  "theme_aria": "Thema: {theme}. Klik om te wijzigen.",
+  "nav_help": "Help",
+  "help_title": "Help",
+  "help_intro": "Hoe Plinky werkt, gebied voor gebied. Ga direct naar het onderdeel waarover je een vraag hebt.",
+  "help_section_getting_started": "Aan de slag",
+  "help_section_play": "Een stuk spelen",
+  "help_section_assignments": "Opdrachten",
+  "help_section_review": "Herhaling",
+  "help_loading": "Help laden…",
+  "help_empty": "Help voor dit onderdeel is onderweg.",
+  "help_learn_more": "Meer informatie",
+  "meta_help_description": "Hoe Plinky werkt: uitleg voor elk onderdeel van de app, van je eerste noot tot het bijhouden van je voortgang."
 }

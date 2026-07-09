@@ -558,5 +558,16 @@
   "theme_system": "🖥️ システム",
   "theme_light": "☀️ ライト",
   "theme_dark": "🌙 ダーク",
-  "theme_aria": "テーマ：{theme}。クリックで変更。"
+  "theme_aria": "テーマ：{theme}。クリックで変更。",
+  "nav_help": "ヘルプ",
+  "help_title": "ヘルプ",
+  "help_intro": "Plinky の使い方をエリアごとに紹介します。質問したい部分に直接移動できます。",
+  "help_section_getting_started": "はじめに",
+  "help_section_play": "曲を演奏する",
+  "help_section_assignments": "課題",
+  "help_section_review": "復習",
+  "help_loading": "ヘルプを読み込んでいます…",
+  "help_empty": "このエリアのヘルプは準備中です。",
+  "help_learn_more": "詳しく見る",
+  "meta_help_description": "Plinky の使い方：最初の音符から進捗の確認まで、アプリの各機能のガイド。"
 }

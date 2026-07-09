@@ -558,5 +558,16 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Jasny",
   "theme_dark": "🌙 Ciemny",
-  "theme_aria": "Motyw: {theme}. Kliknij, aby zmienić."
+  "theme_aria": "Motyw: {theme}. Kliknij, aby zmienić.",
+  "nav_help": "Pomoc",
+  "help_title": "Pomoc",
+  "help_intro": "Jak działa Plinky, obszar po obszarze. Przejdź od razu do części, o którą chcesz zapytać.",
+  "help_section_getting_started": "Pierwsze kroki",
+  "help_section_play": "Granie utworu",
+  "help_section_assignments": "Zadania",
+  "help_section_review": "Powtórka",
+  "help_loading": "Ładowanie pomocy…",
+  "help_empty": "Pomoc dla tego obszaru jest w drodze.",
+  "help_learn_more": "Dowiedz się więcej",
+  "meta_help_description": "Jak działa Plinky: przewodniki po każdej części aplikacji, od pierwszej nuty po śledzenie postępów."
 }

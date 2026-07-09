@@ -22,7 +22,7 @@ import { MilestoneBannerHost } from "./components/features/milestoneBanner";
 import { MilestoneProvider } from "./contexts/milestone";
 import { SoundHint } from "./components/features/soundHint";
 import { isInAppBrowser, isIosLike } from "../core/platform";
-import { ThemeToggle } from "./components/features/themeToggle";
+import { HelpLink } from "./components/features/helpLink";
 import { browserStore, storageHealth } from "./adapters/browserStore";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
@@ -103,7 +103,7 @@ function Header() {
                     the fixed bottom tab bar (BottomNav), so the header stays slim. */}
                 <HeaderNav className="hidden items-center gap-1 md:flex" />
                 <div className="flex items-center gap-4">
-                    <ThemeToggle />
+                    <HelpLink />
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
