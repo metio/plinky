@@ -1,11 +1,16 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-export type Theme = "light" | "dark" | "system";
+// The one list of valid theme choices — parseTheme and the pre-paint bootstrap
+// script both derive from it, so a theme value cannot be known to one and not
+// the other.
+export const THEMES = ["light", "dark", "system"] as const;
+
+export type Theme = (typeof THEMES)[number];
 
 // Coerce a stored value into a valid theme; anything else follows the OS.
 export function parseTheme(value: unknown): Theme {
-    return value === "light" || value === "dark" || value === "system" ? value : "system";
+    return THEMES.includes(value as Theme) ? (value as Theme) : "system";
 }
 
 // Resolve "system" to the effective light/dark; the caller supplies the OS

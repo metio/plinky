@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { parseTheme, type Theme } from "../../core/theme";
+import { parseTheme, THEMES, type Theme } from "../../core/theme";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { createJsonStore, type JsonStore } from "./jsonStore";
 
@@ -29,10 +29,12 @@ export function createThemeStore(kv: KeyValueStore): ThemeStore {
 // flash. The parse failure is contained to the parse — a corrupt stored value
 // still falls through to the OS preference instead of skipping theming.
 export function themeBootstrapScript(): string {
+    // The valid-theme list is embedded from core/theme, so the inline script can
+    // never disagree with parseTheme about what counts as a saved choice.
     return (
         "(function(){try{" +
         `var t=null;try{t=JSON.parse(localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}))}catch(e){}` +
-        'if(t!=="light"&&t!=="dark"&&t!=="system"){t="system";}' +
+        `if(${JSON.stringify(THEMES)}.indexOf(t)<0){t="system";}` +
         'if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches))' +
         '{document.documentElement.classList.add("dark");}' +
         "}catch(e){}})();"
