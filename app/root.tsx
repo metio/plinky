@@ -2,15 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import {
-    isRouteErrorResponse,
-    Links,
-    Meta,
-    Outlet,
-    Scripts,
-    ScrollRestoration,
-    useLocation,
-} from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "react-router";
 
 import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
@@ -24,6 +16,7 @@ import { SoundHint } from "./components/features/soundHint";
 import { isInAppBrowser, isIosLike } from "../core/platform";
 import { HelpLink } from "./components/features/helpLink";
 import { browserStore, storageHealth } from "./adapters/browserStore";
+import { describeError, issueUrl } from "./lib/errorReport";
 import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
@@ -291,37 +284,12 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    const notFound = isRouteErrorResponse(error) && error.status === 404;
-
-    let technical: string;
-    if (isRouteErrorResponse(error)) {
-        technical = `${error.status} ${error.statusText}`;
-    } else if (error instanceof Error) {
-        technical = `${error.message}\n\n${error.stack ?? ""}`.trim();
-    } else {
-        technical = String(error);
-    }
+    const report = describeError(error);
+    const { notFound, technical } = report;
 
     const where = typeof window !== "undefined" ? window.location.href : "";
     const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
-    const body = [
-        "**What were you doing when this happened?**",
-        "",
-        "_(please describe)_",
-        "",
-        `**Page:** ${where}`,
-        "",
-        "**Details**",
-        "",
-        "```",
-        technical,
-        "```",
-        "",
-        `**Browser:** ${userAgent}`,
-    ].join("\n");
-    const issueUrl = `${REPO_ISSUES}?title=${encodeURIComponent(
-        notFound ? "Page not found" : `Error: ${technical.split("\n")[0]}`,
-    )}&body=${encodeURIComponent(body)}`;
+    const reportUrl = issueUrl(REPO_ISSUES, report, where, userAgent);
 
     return (
         <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
@@ -351,7 +319,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     </button>
                 )}
                 <a
-                    href={issueUrl}
+                    href={reportUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
