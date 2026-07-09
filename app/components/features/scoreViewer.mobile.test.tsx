@@ -58,7 +58,7 @@ describe("ScoreViewer on a phone", () => {
         expect(await screen.findByText(/play a piece through/i)).toBeTruthy();
     });
 
-    it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
+    it("puts the cursor at a tapped bar while the loop is off, to start from there", async () => {
         const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
         const score = await screen.findByRole("img", { name: "T" });
@@ -82,7 +82,50 @@ describe("ScoreViewer on a phone", () => {
                 // A genuine tap on the score: the pointer press arms the click.
                 fireEvent.pointerDown(score, at);
                 fireEvent.click(score, at);
-                expect(screen.getByLabelText("Loop from bar")).toBeTruthy();
+                // The tap claims no loop — it shows the cursor at the bar instead, the
+                // start position the next Practice or Listen resumes from.
+                const cursor = document.querySelector('img[id^="cursorImg"]');
+                if (!(cursor instanceof HTMLImageElement) || cursor.style.display === "none") {
+                    throw new Error("cursor not shown yet");
+                }
+            },
+            { timeout: 30000 },
+        );
+        expect(screen.queryByLabelText("Loop from bar")).toBeNull();
+        expect(score.querySelectorAll("rect.plinky-bar-selection")).toHaveLength(0);
+    });
+
+    it("narrows the loop to a tapped bar, filling it with a red overlay", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        const score = await screen.findByRole("img", { name: "T" });
+        const svg = await waitFor(
+            () => {
+                const rendered = score.querySelector("svg");
+                if (!rendered || rendered.querySelectorAll("g").length === 0) {
+                    throw new Error("not rendered yet");
+                }
+                return rendered;
+            },
+            { timeout: 30000 },
+        );
+        // With the loop on (whole song), a tap narrows the range to the tapped bar.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
+        await waitFor(
+            () => {
+                const rect = svg.getBoundingClientRect();
+                const at = {
+                    clientX: rect.left + rect.width * 0.3,
+                    clientY: rect.top + rect.height * 0.5,
+                };
+                // A genuine tap on the score: the pointer press arms the click.
+                fireEvent.pointerDown(score, at);
+                fireEvent.click(score, at);
+                // The whole-song 1–3 range narrows to the single tapped bar.
+                const from = screen.getByLabelText("Loop from bar") as HTMLInputElement;
+                const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
+                expect(to.value).toBe(from.value);
             },
             { timeout: 30000 },
         );
