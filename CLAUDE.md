@@ -63,8 +63,8 @@ npm run size          # bundle budget
 
 - **New persistent state** = a store factory in `app/stores/` over the injected
   `KeyValueStore` (use the `jsonStore` idiom), registered as an `AppServices`
-  capability in `app/contexts/services.tsx` — in all five places: the type, the
-  build, the provider destructure, the memo deps, and the `||` chain. Add the
+  capability in `app/contexts/services.tsx` — in all three places: the type, the
+  build, and `SERVICE_KEY_SET` (the compiler flags a miss in any of them). Add the
   narrow `useXStore()` hook only once a component consumes it, or knip fails
   the build.
 - **Components never import adapters or singletons** — they receive capabilities

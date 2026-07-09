@@ -121,6 +121,37 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     };
 }
 
+// The one list of capability names, in a stable order. The Record type makes it
+// exhaustive in both directions: adding a capability to AppServices without
+// naming it here (or vice versa) fails to compile — so the provider below can
+// never silently ignore an override.
+const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
+    store: true,
+    prefs: true,
+    mastery: true,
+    history: true,
+    favorites: true,
+    theme: true,
+    hints: true,
+    onboarding: true,
+    daily: true,
+    milestones: true,
+    lifetime: true,
+    ghosts: true,
+    takes: true,
+    fingering: true,
+    assignments: true,
+    fetcher: true,
+    audio: true,
+    midi: true,
+    xml: true,
+    songs: true,
+    exercises: true,
+    news: true,
+    help: true,
+};
+const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
+
 // The production wiring. A component read outside any provider still gets working
 // services, so nothing has to know whether it is inside the app shell or a test.
 const DEFAULT_SERVICES: AppServices = createServices();
@@ -138,109 +169,19 @@ export function ServicesProvider({
     services?: Partial<AppServices>;
     children: ReactNode;
 }) {
-    // Keyed on the individual overrides, not the prop object's identity: an inline
-    // `services={{ store }}` literal is a fresh object every render, and rebuilding
-    // the set each time would mint new stores whose subscribers miss saves made
-    // through the previous instances.
-    const store = services?.store;
-    const prefs = services?.prefs;
-    const mastery = services?.mastery;
-    const history = services?.history;
-    const favorites = services?.favorites;
-    const theme = services?.theme;
-    const hints = services?.hints;
-    const onboarding = services?.onboarding;
-    const daily = services?.daily;
-    const milestones = services?.milestones;
-    const lifetime = services?.lifetime;
-    const ghosts = services?.ghosts;
-    const takes = services?.takes;
-    const fingering = services?.fingering;
-    const assignments = services?.assignments;
-    const fetcher = services?.fetcher;
-    const audio = services?.audio;
-    const midi = services?.midi;
-    const xml = services?.xml;
-    const songs = services?.songs;
-    const exercises = services?.exercises;
-    const news = services?.news;
-    const help = services?.help;
+    // Keyed on the individual override values, not the prop object's identity: an
+    // inline `services={{ store }}` literal is a fresh object every render, and
+    // rebuilding the set each time would mint new stores whose subscribers miss
+    // saves made through the previous instances. SERVICE_KEYS is a fixed list, so
+    // the dependency array has a stable length and order across renders.
+    const overrides = SERVICE_KEYS.map((key) => services?.[key]);
     const value = useMemo(
         () =>
-            store ||
-            prefs ||
-            mastery ||
-            history ||
-            favorites ||
-            theme ||
-            hints ||
-            onboarding ||
-            daily ||
-            milestones ||
-            lifetime ||
-            ghosts ||
-            takes ||
-            fingering ||
-            assignments ||
-            fetcher ||
-            audio ||
-            midi ||
-            xml ||
-            songs ||
-            exercises ||
-            news ||
-            help
-                ? createServices({
-                      store,
-                      prefs,
-                      mastery,
-                      history,
-                      favorites,
-                      theme,
-                      hints,
-                      onboarding,
-                      daily,
-                      milestones,
-                      lifetime,
-                      ghosts,
-                      takes,
-                      fingering,
-                      assignments,
-                      fetcher,
-                      audio,
-                      midi,
-                      xml,
-                      songs,
-                      exercises,
-                      news,
-                      help,
-                  })
+            overrides.some((override) => override !== undefined)
+                ? createServices(services)
                 : DEFAULT_SERVICES,
-        [
-            store,
-            prefs,
-            mastery,
-            history,
-            favorites,
-            theme,
-            hints,
-            onboarding,
-            daily,
-            milestones,
-            lifetime,
-            ghosts,
-            takes,
-            fingering,
-            assignments,
-            fetcher,
-            audio,
-            midi,
-            xml,
-            songs,
-            exercises,
-            news,
-            help,
-        ],
+        // biome-ignore lint/correctness/useExhaustiveDependencies: the memo is keyed on each override value; `services` itself is deliberately not a dependency (see above)
+        overrides,
     );
     return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
