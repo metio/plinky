@@ -118,6 +118,12 @@ function sourceStudies(): void {
         }
         const name = cleanText(row.song_name ?? "");
         const composer = cleanText(row.composer_name || row.artist_name || "");
+        // The line-level STUDY_RE prefilter also matches noise elsewhere in the row —
+        // e.g. a folk-dance subtitle spelling "Bayerisch" as "Beyerisch" — so require
+        // the study composer in the fields that actually name the piece.
+        if (!STUDY_RE.test(`${name} ${composer}`)) {
+            continue;
+        }
         // Drop byte-for-byte re-uploads of the same étude before the costlier read.
         const key = `${name}|${composer}|${bars}|${notes}`;
         if (seen.has(key)) {
