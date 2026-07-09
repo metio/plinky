@@ -42,7 +42,7 @@ import { useRunResult } from "../../hooks/useRunResult";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
-import { cursorWhole } from "../../lib/scoreCursor";
+import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { recordRun } from "../../lib/recordRun";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
@@ -356,6 +356,17 @@ function usePlaySessionValue({
         measureCount,
         renderVersion: score.renderVersion,
         canSelect: () => !matcher.practicing && !listenPlayback.active() && measureCount > 1,
+        // A tap with the loop off puts the cursor at that bar, so Practice and Listen
+        // pick up from the tapped spot instead of the top or the last handoff.
+        onBareClick: (bar) => {
+            const osmd = getOsmd();
+            if (!osmd) {
+                return;
+            }
+            seekToBar(osmd.cursor, bar);
+            osmd.cursor.show();
+            centerCursor();
+        },
     });
 
     // The listening transport — Listen and take-replay share one cursor walk, one clock,

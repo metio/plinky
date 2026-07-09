@@ -52,6 +52,7 @@ export function useLoopSelection({
     measureCount,
     renderVersion,
     canSelect,
+    onBareClick,
 }: {
     containerRef: RefObject<HTMLDivElement | null>;
     // Each bar's rendered box, for placing the overlay and mapping a click to a bar.
@@ -64,6 +65,9 @@ export function useLoopSelection({
     // Whether a click may build the range now — false while a run or playback owns the
     // score. Read at click time, so it may close over transports created after this hook.
     canSelect: () => boolean;
+    // A genuine bar click while the loop is off. The loop claims clicks only once it's
+    // on; with it off, the tap belongs to the caller — setting the start position.
+    onBareClick?: (bar: number) => void;
 }): LoopSelection {
     const [on, setOn] = useState(false);
     const [from, setFrom] = useState(1);
@@ -79,6 +83,8 @@ export function useLoopSelection({
     const armedRef = useRef(false);
     const canSelectRef = useRef(canSelect);
     canSelectRef.current = canSelect;
+    const onBareClickRef = useRef(onBareClick);
+    onBareClickRef.current = onBareClick;
 
     const read = useCallback(() => loopRef.current, []);
     const arm = useCallback(() => {
@@ -149,9 +155,12 @@ export function useLoopSelection({
                 return;
             }
             const bar = measure + 1;
+            if (!loopRef.current.on) {
+                onBareClickRef.current?.(bar);
+                return;
+            }
             if (anchorRef.current === null) {
                 anchorRef.current = bar;
-                setOn(true);
                 setFrom(bar);
                 setTo(bar);
             } else {
