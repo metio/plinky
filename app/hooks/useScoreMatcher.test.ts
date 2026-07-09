@@ -28,6 +28,8 @@ function fakeOsmd(positions: Position[]): { osmd: OpenSheetMusicDisplay; shown: 
             return {
                 EndReached: index >= positions.length,
                 currentTimeStamp: { RealValue: index * 0.25 },
+                // Four quarter-note positions per 4/4 bar.
+                CurrentMeasureIndex: Math.floor(index / 4),
             };
         },
         NotesUnderCursor() {
@@ -257,6 +259,24 @@ describe("useScoreMatcher", () => {
         expect(result.current.practicing).toBe(false);
         expect(result.current.total).toBe(0);
         expect(shown()).toBe(false);
+    });
+
+    it("laps a section loop instead of completing the run", () => {
+        // Two 4/4 bars of quarter notes; the loop confines the run to bar 1.
+        const { result } = render([[60], [62], [64], [65], [67], [69], [71], [72]]);
+        act(() => result.current.start(0, { from: 1, to: 1 }));
+        expect(result.current.total).toBe(4);
+        for (const note of [60, 62, 64, 65]) {
+            act(() => result.current.registerNote(note));
+        }
+        // Clearing the range's last position rewinds to its first for another pass:
+        // the drill never completes, and the per-lap progress starts over.
+        expect(result.current.complete).toBe(false);
+        expect(result.current.practicing).toBe(true);
+        expect(result.current.done).toBe(0);
+        expect(result.current.expected).toEqual([60]);
+        act(() => result.current.registerNote(60));
+        expect(result.current.done).toBe(1);
     });
 
     it("freezes the tempo at start so a later change doesn't rescale note times", () => {

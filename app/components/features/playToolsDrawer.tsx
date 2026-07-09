@@ -87,7 +87,15 @@ export function PlayToolsDrawer() {
             practicing={matcher.practicing}
             loopAvailable={ready && measureCount > 1}
             loopOn={loop.on}
-            onToggleLoop={loop.toggle}
+            onToggleLoop={(next) => {
+                loop.toggle(next);
+                // Turning the loop on closes the drawer: the bar-range controls and the
+                // tap-two-bars score sit behind its backdrop, so leaving it open reads
+                // as "loop did nothing".
+                if (next) {
+                    setToolsOpen(false);
+                }
+            }}
             showTranspose={!lockTempo}
             transpose={transpose}
             setTranspose={setTranspose}

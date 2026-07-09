@@ -654,7 +654,9 @@ function usePlaySessionValue({
         }
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
         ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
-        matcher.start(from);
+        // With the section loop on, Practice drills the selected bars on repeat, the
+        // same range Listen laps, instead of running the whole piece once.
+        matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
     };
 
     // Reveal the next note by colour per the player's hint setting — always, only once

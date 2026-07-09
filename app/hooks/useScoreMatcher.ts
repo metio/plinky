@@ -66,6 +66,18 @@ export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): 
     return collectMatchSteps(osmd, hand).map((step) => step.pitches);
 }
 
+// Walk the reset cursor forward to the first playable position at or after `from`,
+// so the visual cursor and the reducer agree from note one.
+function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): void {
+    while (
+        !osmd.cursor.iterator.EndReached &&
+        ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
+            stepAtCursor(osmd, hand).pitches.length === 0)
+    ) {
+        osmd.cursor.next();
+    }
+}
+
 // Step the visual cursor to the next playable position for the hand — rests, and
 // the stretches where only the other hand sounds, are skipped exactly the way the
 // step collector skipped them.
@@ -139,6 +151,12 @@ export function useScoreMatcher(
     // to the selector mid-run can't desync the position count from what's matched.
     const runHandRef = useRef<Hand>(options.hand ?? "both");
     const runForgivingRef = useRef(options.forgiving ?? false);
+    // A section loop confines the run to a bar range and laps it: clearing the range's
+    // last position rewinds to its first for another pass, and the run never completes
+    // (a drill has no end to grade). Held with the run's steps so a lap can restart
+    // the reducer without re-collecting the score.
+    const runLoopRef = useRef(false);
+    const runStepsRef = useRef<MatchStep[]>([]);
 
     const stop = useCallback(() => {
         practicingRef.current = false;
@@ -153,7 +171,9 @@ export function useScoreMatcher(
     // total and progress count only the positions from here on. The default, 0, starts
     // at note one.
     const start = useCallback(
-        (fromWhole = 0) => {
+        // `loop` — a 1-based inclusive bar range — overrides the resume point: the run
+        // plays only that section and laps it until stopped.
+        (fromWhole = 0, loop: { from: number; to: number } | null = null) => {
             const osmd = getOsmd();
             if (!osmd) {
                 return;
@@ -164,7 +184,11 @@ export function useScoreMatcher(
             // (the cursor sits past the last note), which leaves nothing to play.
             const startIndex =
                 fromWhole > 0 ? all.findIndex((step) => step.whole >= fromWhole - 1e-6) : 0;
-            const steps = startIndex < 0 ? [] : all.slice(startIndex);
+            const steps = loop
+                ? all.filter((step) => step.bar >= loop.from - 1 && step.bar <= loop.to - 1)
+                : startIndex < 0
+                  ? []
+                  : all.slice(startIndex);
             // A score with no playable positions (all rests, empty, or resumed past the
             // end) has nothing to match: entering the practicing state would strand the
             // UI at 0/0 forever, since completion is only reached by clearing a position.
@@ -174,18 +198,11 @@ export function useScoreMatcher(
             }
             const state = startMatch(steps);
             stateRef.current = state;
-            // The collector leaves the cursor reset; walk it to the run's first position
-            // — the first playable step at or after the resume point — so the visual
-            // cursor and the reducer agree from note one.
-            const from = steps[0]!.whole;
-            while (
-                !osmd.cursor.iterator.EndReached &&
-                ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
-                    stepAtCursor(osmd, hand).pitches.length === 0)
-            ) {
-                osmd.cursor.next();
-            }
+            // The collector leaves the cursor reset; walk it to the run's first position.
+            seekCursorTo(osmd, hand, steps[0]!.whole);
             osmd.cursor.show();
+            runLoopRef.current = loop !== null;
+            runStepsRef.current = steps;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
             runHandRef.current = hand;
             runForgivingRef.current = optionsRef.current.forgiving ?? false;
@@ -238,6 +255,20 @@ export function useScoreMatcher(
                 // A new position clears the per-position miss flag, so the "reveal
                 // on mistake" hint hides again until the next slip.
                 setMissedHere(false);
+            }
+            if (next.complete && runLoopRef.current) {
+                // Lap the section: rewind the reducer and the cursor to the range's
+                // first position and keep going. The run stays open — a drill has no
+                // completion to grade — and the per-lap progress count starts over.
+                const fresh = startMatch(runStepsRef.current);
+                stateRef.current = fresh;
+                osmd.cursor.reset();
+                seekCursorTo(osmd, runHandRef.current, runStepsRef.current[0]!.whole);
+                setDone(0);
+                setMissedHere(false);
+                setBar(currentBar(fresh));
+                setExpected(expectedPitches(fresh));
+                return;
             }
             setBar(currentBar(next));
             setExpected(expectedPitches(next));
