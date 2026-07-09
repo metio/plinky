@@ -131,7 +131,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   a friend with your last run** straight away, no save needed. Your fastest complete run is
   the **ghost** you race next time — racing is on by default and toggles off under the
   score's practice options.
-- **Assignments** — build an ordered practice list for a student (or yourself): browse
+- **Assignments** — a built-in **First steps** set (the demo tunes, then the easiest
+  studies) is ready to play on day one; beyond it, build an ordered practice list for
+  a student (or yourself): browse
   or search the whole catalogue page by page, add pieces, and give each an optional
   target tempo and note. Save it, **edit it later**, share it by link, or pass it
   around as a file; each piece checks off as it's learned.

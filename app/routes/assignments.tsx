@@ -19,7 +19,8 @@ import {
     serializeAssignment,
     slugifyName,
 } from "../../core/assignment";
-import { loadCatalog } from "../lib/catalog";
+import { loadBundledScores, loadCatalog } from "../lib/catalog";
+import { starterAssignment } from "../../core/starterAssignments";
 import type { ExerciseMeta } from "../stores/exerciseSource";
 import {
     useAssignmentsStore,
@@ -63,6 +64,9 @@ export default function AssignmentsRoute() {
     const [searchParams] = useSearchParams();
     const [pool, setPool] = useState<PoolItem[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
+    // Curated, always-available sets assembled from the shipped catalogue — not stored,
+    // so they track the catalogue instead of a snapshot in localStorage.
+    const [builtin, setBuiltin] = useState<Assignment[]>([]);
     const [incoming, setIncoming] = useState<Assignment | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -95,6 +99,14 @@ export default function AssignmentsRoute() {
                 title: exercise.title,
             }));
             setPool([...fromCatalog, ...fromExercises]);
+            const starter = starterAssignment({
+                id: "starter-first-steps",
+                name: m.assignments_starter_name(),
+                description: m.assignments_starter_description(),
+                demos: loadBundledScores().map((score) => ({ id: score.id })),
+                exercises,
+            });
+            setBuiltin(starter ? [starter] : []);
         });
     }, [exercises.manifest, store, assignmentsStore.list]);
 
@@ -189,6 +201,45 @@ export default function AssignmentsRoute() {
     };
 
     const canSave = name.trim().length > 0 && items.length > 0;
+
+    const stepsFor = (assignment: Assignment) =>
+        trackSteps(
+            assignment.items.map((item) => item.id),
+            (id) => done(id, masteryStore),
+        );
+
+    // The numbered step list an assignment renders — shared by the built-in sets and
+    // the player's own.
+    const renderSteps = (steps: ReturnType<typeof trackSteps>) => (
+        <ol className="space-y-1">
+            {steps.map((step, index) => (
+                <li key={step.scoreId} className="flex items-center gap-2">
+                    <span
+                        aria-hidden="true"
+                        className={`${STEP_MARK} ${
+                            step.status === "done"
+                                ? "bg-green-600 text-white"
+                                : step.status === "current"
+                                  ? "bg-indigo-600 text-white"
+                                  : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                        }`}
+                    >
+                        {step.status === "done" ? <CheckIcon className="h-4 w-4" /> : index + 1}
+                    </span>
+                    <Link
+                        to={`/play/${step.scoreId}`}
+                        className={
+                            step.status === "current"
+                                ? "font-medium text-indigo-700 dark:text-indigo-300"
+                                : "text-gray-700 hover:underline dark:text-gray-300"
+                        }
+                    >
+                        {titleOf(step.scoreId)}
+                    </Link>
+                </li>
+            ))}
+        </ol>
+    );
 
     const onSave = () => {
         const assignment = draft();
@@ -441,6 +492,53 @@ export default function AssignmentsRoute() {
                 </Show>
             </section>
 
+            <Show when={builtin.length > 0}>
+                <section className="space-y-3">
+                    <h2 className="font-semibold">{m.assignments_builtin_heading()}</h2>
+                    <ul className="space-y-2">
+                        {builtin.map((assignment) => {
+                            const steps = stepsFor(assignment);
+                            const doneCount = steps.filter((step) => step.status === "done").length;
+                            return (
+                                <li
+                                    key={assignment.id}
+                                    className="space-y-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
+                                >
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="flex-1">
+                                            <span className="font-medium">{assignment.name}</span>{" "}
+                                            <span className="tabular-nums text-gray-500 dark:text-gray-400">
+                                                {doneCount}/{steps.length}
+                                            </span>
+                                        </span>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => onShare(assignment, assignment.id)}
+                                        >
+                                            {copiedShare === assignment.id
+                                                ? m.share_copied()
+                                                : m.assignments_share()}
+                                        </Button>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => onDownload(assignment)}
+                                        >
+                                            {m.assignments_download()}
+                                        </Button>
+                                    </div>
+                                    {assignment.description && (
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            {assignment.description}
+                                        </p>
+                                    )}
+                                    {renderSteps(steps)}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </section>
+            </Show>
+
             <section className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <h2 className="font-semibold">{m.assignments_yours_heading()}</h2>
@@ -465,10 +563,7 @@ export default function AssignmentsRoute() {
                 ) : (
                     <ul className="space-y-2">
                         {assignments.map((assignment) => {
-                            const steps = trackSteps(
-                                assignment.items.map((item) => item.id),
-                                (id) => done(id, masteryStore),
-                            );
+                            const steps = stepsFor(assignment);
                             const doneCount = steps.filter((step) => step.status === "done").length;
                             return (
                                 <li
@@ -515,41 +610,7 @@ export default function AssignmentsRoute() {
                                             {m.assignments_remove()}
                                         </Button>
                                     </div>
-                                    <ol className="space-y-1">
-                                        {steps.map((step, index) => (
-                                            <li
-                                                key={step.scoreId}
-                                                className="flex items-center gap-2"
-                                            >
-                                                <span
-                                                    aria-hidden="true"
-                                                    className={`${STEP_MARK} ${
-                                                        step.status === "done"
-                                                            ? "bg-green-600 text-white"
-                                                            : step.status === "current"
-                                                              ? "bg-indigo-600 text-white"
-                                                              : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                                                    }`}
-                                                >
-                                                    {step.status === "done" ? (
-                                                        <CheckIcon className="h-4 w-4" />
-                                                    ) : (
-                                                        index + 1
-                                                    )}
-                                                </span>
-                                                <Link
-                                                    to={`/play/${step.scoreId}`}
-                                                    className={
-                                                        step.status === "current"
-                                                            ? "font-medium text-indigo-700 dark:text-indigo-300"
-                                                            : "text-gray-700 hover:underline dark:text-gray-300"
-                                                    }
-                                                >
-                                                    {titleOf(step.scoreId)}
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </ol>
+                                    {renderSteps(steps)}
                                 </li>
                             );
                         })}

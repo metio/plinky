@@ -37,15 +37,20 @@ describe("AssignmentsRoute", () => {
             target: { value: "Twinkle" },
         });
         fireEvent.click(await screen.findByText("Add"));
-        // The chosen piece moves into the ordered basket.
-        expect(screen.getByText(/Twinkle/)).toBeTruthy();
+        // The chosen piece moves into the ordered basket (the built-in set lists the
+        // same tune, so the match is not unique).
+        expect(screen.getAllByText(/Twinkle/).length).toBeGreaterThan(0);
         fireEvent.click(screen.getByText("Save"));
         // It is confirmed and listed under the player's own assignments, its piece
         // shown as a playable step.
         expect(await screen.findByRole("status")).toHaveTextContent(/Saved/);
         expect(screen.getByText("My set")).toBeTruthy();
-        const step = screen.getByRole("link", { name: /Twinkle/ });
-        expect(step.getAttribute("href")).toContain(`/play/${bundledId("twinkle")}`);
+        const steps = screen.getAllByRole("link", { name: /Twinkle/ });
+        expect(
+            steps.some((step) =>
+                step.getAttribute("href")?.includes(`/play/${bundledId("twinkle")}`),
+            ),
+        ).toBe(true);
     });
 
     it("offers a shared assignment from a link and imports it", async () => {
@@ -134,6 +139,15 @@ describe("AssignmentsRoute", () => {
         // the eye already is, not only in the status line at the top of the page.
         expect(await screen.findByText("Copied!")).toBeTruthy();
         expect(writeText).toHaveBeenCalledWith(expect.stringContaining("assignment="));
+    });
+
+    it("offers a built-in First steps assignment from the shipped catalogue", async () => {
+        mount();
+        // Assembled from the catalogue at load time, so it needs no saved state.
+        expect(await screen.findByText("First steps")).toBeTruthy();
+        expect(screen.getByText("Built-in assignments")).toBeTruthy();
+        // The demo tunes lead the set, each a playable step.
+        expect(screen.getAllByRole("link", { name: /Twinkle/ }).length).toBeGreaterThan(0);
     });
 
     it("reorders and removes items in the basket", async () => {
