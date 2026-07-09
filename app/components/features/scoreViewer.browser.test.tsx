@@ -338,8 +338,10 @@ describe("ScoreViewer", () => {
                 (screen.getByRole("button", { name: "Practice" }) as HTMLButtonElement).disabled,
             ).toBe(false);
         fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
-        // Turning the loop on repeats the whole piece — no bar-picking needed.
+        // Turning the loop on repeats the whole piece — no bar-picking needed — and
+        // closes the drawer so the bar-range controls aren't left behind its backdrop.
         fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         expect(screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked")).toBe(
             "true",
         );
@@ -955,10 +957,15 @@ describe("ScoreViewer", () => {
         expect(loop.getAttribute("aria-checked")).toBe("false");
         expect(screen.queryByLabelText("Loop from bar")).toBeNull();
         fireEvent.click(loop);
-        expect(loop.getAttribute("aria-checked")).toBe("true");
-        // The range seeds to the whole piece — OSMD reported three bars.
+        // Enabling closes the drawer so the freshly revealed range controls are
+        // reachable, not buried behind its backdrop; the range seeds to the whole
+        // piece — OSMD reported three bars.
         const to = screen.getByLabelText("Loop to bar") as HTMLInputElement;
         expect(to.value).toBe("3");
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        expect(screen.getByRole("switch", { name: "Loop" }).getAttribute("aria-checked")).toBe(
+            "true",
+        );
     });
 
     it("never lets the loop range invert", async () => {
