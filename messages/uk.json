@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Доступна нова версія Plinky.",
+  "update_broken": "Наразі оновлення не встановлюються на цьому пристрої — застосунок працює далі, а наступне перезавантаження сторінки спробує ще раз.",
   "update_reload": "Оновити",
   "news_label": "Новини",
   "library_heading": "Бібліотека",

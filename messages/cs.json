@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Je k dispozici nová verze Plinky.",
+  "update_broken": "Aktualizace teď na tomto zařízení nelze instalovat — aplikace funguje dál a pozdější načtení stránky to zkusí znovu.",
   "update_reload": "Načíst znovu",
   "news_label": "Novinky",
   "library_heading": "Knihovna",

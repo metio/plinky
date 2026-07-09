@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Plinky の新しいバージョンが利用できます。",
+  "update_broken": "現在この端末では更新をインストールできません — アプリはそのまま使え、後で再読み込みすると再試行されます。",
   "update_reload": "再読み込み",
   "news_label": "お知らせ",
   "library_heading": "ライブラリ",

@@ -37,9 +37,13 @@ export type SwEnv = {
 };
 
 export type SwUpdateWatcher = {
-    // useSyncExternalStore-shaped: notify on change, read the current snapshot.
+    // useSyncExternalStore-shaped: notify on change, read the current snapshots.
     subscribe(onChange: () => void): () => void;
     updateReady(): boolean;
+    // Latched on: the service worker could not be registered, so this page will
+    // never receive updates. Surfaced rather than swallowed — an installed app
+    // that silently stops updating is undebuggable from the outside.
+    registrationFailed(): boolean;
     applyUpdate(): void;
     dispose(): void;
 };
@@ -59,7 +63,14 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
     // (which we did not initiate) leaves the page alone.
     let applying = false;
     let disposed = false;
+    let registrationFailed = false;
     const listeners = new Set<() => void>();
+
+    const notify = () => {
+        for (const listener of [...listeners]) {
+            listener();
+        }
+    };
 
     // Whether a worker already controlled this page when the watcher started. A later
     // controllerchange then means a NEW build seized control (an update) — so every
@@ -83,9 +94,7 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
             return;
         }
         updateReady = true;
-        for (const listener of [...listeners]) {
-            listener();
-        }
+        notify();
     };
 
     container
@@ -105,7 +114,13 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
                 });
             });
         })
-        .catch(() => {});
+        .catch(() => {
+            if (disposed) {
+                return;
+            }
+            registrationFailed = true;
+            notify();
+        });
 
     // A new worker taking control evicts the previous build's cache, so reload onto it
     // — whether this tab initiated the update or another tab did (applying stays false
@@ -171,6 +186,7 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
             };
         },
         updateReady: () => updateReady,
+        registrationFailed: () => registrationFailed,
         applyUpdate,
         dispose() {
             disposed = true;

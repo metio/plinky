@@ -233,11 +233,34 @@ describe("createSwUpdateWatcher", () => {
         expect(reloads.count).toBe(1);
     });
 
-    it("swallows a failed registration and never offers", async () => {
+    it("latches a failed registration instead of swallowing it", async () => {
         const { container, watcher } = setup();
+        let notified = 0;
+        watcher.subscribe(() => {
+            notified += 1;
+        });
+        expect(watcher.registrationFailed()).toBe(false);
         container.rejectRegister();
         await tick();
         expect(watcher.updateReady()).toBe(false);
+        expect(watcher.registrationFailed()).toBe(true);
+        expect(notified).toBe(1);
+    });
+
+    it("does not flag a registration that fails after dispose", async () => {
+        const { container, watcher } = setup();
+        watcher.dispose();
+        container.rejectRegister();
+        await tick();
+        expect(watcher.registrationFailed()).toBe(false);
+    });
+
+    it("reports no failure while registration is pending or succeeded", async () => {
+        const { container, watcher } = setup();
+        expect(watcher.registrationFailed()).toBe(false);
+        container.resolveRegister(fakeRegistration());
+        await tick();
+        expect(watcher.registrationFailed()).toBe(false);
     });
 
     it("ignores a registration that resolves after dispose", async () => {

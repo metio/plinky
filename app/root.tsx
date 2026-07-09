@@ -160,13 +160,18 @@ function useServiceWorkerUpdate() {
         () => watcher?.updateReady() ?? false,
         () => false,
     );
+    const updateBroken = useSyncExternalStore(
+        subscribe,
+        () => watcher?.registrationFailed() ?? false,
+        () => false,
+    );
     const applyUpdate = useCallback(() => watcher?.applyUpdate(), [watcher]);
 
-    return { updateReady, applyUpdate };
+    return { updateReady, updateBroken, applyUpdate };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    const { updateReady, applyUpdate } = useServiceWorkerUpdate();
+    const { updateReady, updateBroken, applyUpdate } = useServiceWorkerUpdate();
     // Apply the saved theme (following the OS when "system") here in the layout,
     // so even the error page is themed — App's render is skipped on an error.
     useEffect(() => {
@@ -254,7 +259,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <StorageBanner health={storageHealth} />
                     {/* A newer build parks in "waiting"; this offers it as a prompt
                         rather than letting it swap in mid-interaction. */}
-                    <UpdateBanner updateReady={updateReady} onReload={applyUpdate} />
+                    <UpdateBanner
+                        updateReady={updateReady}
+                        updateBroken={updateBroken}
+                        onReload={applyUpdate}
+                    />
                     {/* iOS is decided at this composition root and passed down, so
                         the hint component reads no browser global of its own. */}
                     <SoundHint iosLike={iosLike} inAppBrowser={inAppBrowser} />

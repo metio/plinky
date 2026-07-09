@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Plinky의 새 버전을 사용할 수 있습니다.",
+  "update_broken": "지금은 이 기기에 업데이트를 설치할 수 없습니다 — 앱은 계속 작동하며, 나중에 새로 고치면 다시 시도합니다.",
   "update_reload": "새로고침",
   "news_label": "새 소식",
   "library_heading": "라이브러리",

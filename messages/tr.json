@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Plinky'nin yeni bir sürümü mevcut.",
+  "update_broken": "Şu anda bu cihaza güncellemeler yüklenemiyor — uygulama çalışmaya devam ediyor, daha sonra sayfayı yenilemek tekrar dener.",
   "update_reload": "Yeniden yükle",
   "news_label": "Yenilikler",
   "library_heading": "Kütüphane",

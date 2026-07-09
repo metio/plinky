@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Elérhető a Plinky új verziója.",
+  "update_broken": "A frissítések most nem telepíthetők ezen az eszközön — az alkalmazás továbbra is működik, és egy későbbi újratöltés újra próbálkozik.",
   "update_reload": "Újratöltés",
   "news_label": "Újdonságok",
   "library_heading": "Könyvtár",

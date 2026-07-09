@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Plinkystä on saatavilla uusi versio.",
+  "update_broken": "Päivityksiä ei voi juuri nyt asentaa tälle laitteelle — sovellus toimii silti, ja myöhempi uudelleenlataus yrittää uudelleen.",
   "update_reload": "Lataa uudelleen",
   "news_label": "Ajankohtaista",
   "library_heading": "Kirjasto",

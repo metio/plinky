@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "En ny version av Plinky är tillgänglig.",
+  "update_broken": "Uppdateringar kan inte installeras på den här enheten just nu — appen fungerar ändå, och en senare omladdning försöker igen.",
   "update_reload": "Ladda om",
   "news_label": "Nyheter",
   "library_heading": "Bibliotek",

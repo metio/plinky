@@ -1,6 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "update_available": "Plinky 有新版本可用。",
+  "update_broken": "目前无法在此设备上安装更新——应用仍可正常使用，稍后重新加载页面会再次尝试。",
   "update_reload": "重新加载",
   "news_label": "最新动态",
   "library_heading": "曲库",
