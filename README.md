@@ -146,7 +146,9 @@ one-tap **review session** walks you through everything that's fading, and you c
 On the **home page**, someone who has never played piano is met by a **New to piano?**
 card that hands them a first short song and a reassurance that reading notation comes
 later — it disappears the moment you've played anything. Alongside it, a gentle,
-dismissible **discovery checklist** points out the app's corners, and the first time you
+dismissible **Getting started** checklist explains how Plinky works and walks the first
+session in order — set yourself up, then play your first piece (your first assignment
+when you have one) — before pointing out the app's other corners, and the first time you
 open a score a one-time tip explains the three modes and the listen-then-play-slowly
 loop — a guided tour where you land, never a gate on progress.
 

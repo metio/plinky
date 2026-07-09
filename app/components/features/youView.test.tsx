@@ -76,6 +76,6 @@ describe("YouView", () => {
         );
 
         expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
-        expect(screen.queryByText("Explore Plinky")).toBeNull();
+        expect(screen.queryByText("Getting started")).toBeNull();
     });
 });

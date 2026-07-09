@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import {
+    useAssignmentsStore,
     useDailyStore,
     useHintsStore,
     useHistoryStore,
@@ -21,15 +22,17 @@ import { m } from "../../paraglide/messages.js";
 import { CheckIcon, CloseIcon } from "../ui/icons";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
-// The feature-discovery checklist: an opt-in tour of the app's corners, each step
-// completed by doing it and deep-linking to where you do it. Order runs from the
-// first thing a new player does to the more advanced surfaces. It lives on the home
-// page — where a first-time player actually lands — so the tour is discoverable
+// The Getting-started checklist: an opt-in tour of how Plinky works, each step
+// completed by doing it and deep-linking to where you do it. Settings come first (a
+// hand size tailors everything after), then the first piece to play — the player's
+// first assignment when they have one, a single demo tune otherwise. It lives on the
+// home page — where a first-time player actually lands — so the tour is discoverable
 // rather than buried; the ✕ dismisses it for good (for fast starters), and it hides
-// itself once every step is done.
+// itself once every step is done. The played step's link is resolved at render time,
+// so `to` here is only its fallback.
 const DISCOVERY: { key: DiscoveryId; icon: string; label: () => string; to: string }[] = [
-    { key: "played", icon: "🎹", label: m.grades_start_play, to: "/library" },
     { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
+    { key: "played", icon: "🎹", label: m.grades_start_play, to: `/play/${FIRST_SONG_ID}` },
     { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily" },
     { key: "earTried", icon: "👂", label: m.discover_ear, to: `/play/${FIRST_SONG_ID}?mode=ear` },
     {
@@ -54,6 +57,9 @@ export function DiscoveryChecklist() {
         done: Record<DiscoveryId, boolean>;
         progress: DiscoveryProgress;
         dismissed: boolean;
+        // Where "play your first piece" leads: the first step of the player's first
+        // assignment when they have one, a single demo tune otherwise.
+        playTo: string;
     } | null>(null);
 
     const prefsStore = usePrefsStore();
@@ -62,6 +68,7 @@ export function DiscoveryChecklist() {
     const daily = useDailyStore();
     const onboarding = useOnboardingStore();
     const hints = useHintsStore();
+    const assignmentsStore = useAssignmentsStore();
     useEffect(() => {
         const done = discoveries({
             prefs: prefsStore.load(),
@@ -70,12 +77,14 @@ export function DiscoveryChecklist() {
             lastDaily: daily.lastDone(),
             marked: onboarding.marked(),
         });
+        const firstItem = assignmentsStore.list()[0]?.items[0];
         setState({
             done,
             progress: discoveryProgress(done),
             dismissed: hints.seen(DISCOVERY_DISMISSED),
+            playTo: firstItem ? `/play/${firstItem.id}` : `/play/${FIRST_SONG_ID}`,
         });
-    }, [prefsStore, masteryStore, historyStore, daily, onboarding, hints]);
+    }, [prefsStore, masteryStore, historyStore, daily, onboarding, hints, assignmentsStore]);
 
     if (!state || state.dismissed || state.progress.allDone) {
         return null;
@@ -127,7 +136,7 @@ export function DiscoveryChecklist() {
                             </span>
                             <span aria-hidden="true">{step.icon}</span>
                             <Link
-                                to={step.to}
+                                to={step.key === "played" ? state.playTo : step.to}
                                 className={
                                     stepDone
                                         ? "text-gray-500 line-through dark:text-gray-400"
