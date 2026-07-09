@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { BARS_PER_ROW, KEYBOARD_OCTAVES } from "../../../core/prefs";
+import { BARS_PER_ROW, KEYBOARD_OCTAVES, type NoteHints } from "../../../core/prefs";
 import type { Hand } from "../../../core/matcher";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
@@ -36,6 +36,12 @@ function Option({ caption, children }: { caption: string; children: ReactNode })
         </span>
     );
 }
+
+const noteHintLabel: Record<NoteHints, string> = {
+    always: m.note_hints_always(),
+    miss: m.note_hints_miss(),
+    never: m.note_hints_never(),
+};
 
 const handLabel: Record<Hand, string> = {
     both: m.hand_both(),
@@ -71,6 +77,8 @@ export function PracticeToolsDrawer({
     setGuideNotes,
     forgiving,
     setForgiving,
+    noteHints,
+    setNoteHints,
     raceGhost,
     setRaceGhost,
     staffCount,
@@ -117,6 +125,8 @@ export function PracticeToolsDrawer({
     setGuideNotes: (value: boolean) => void;
     forgiving: boolean;
     setForgiving: (value: boolean) => void;
+    noteHints: NoteHints;
+    setNoteHints: (value: NoteHints) => void;
     raceGhost: boolean;
     setRaceGhost: (value: boolean) => void;
     staffCount: number;
@@ -259,6 +269,19 @@ export function PracticeToolsDrawer({
                         onChange={setForgiving}
                         label={m.forgiving_toggle()}
                     />
+                </Option>
+                <Option caption={m.settings_note_hints_help()}>
+                    <Labeled label={m.settings_note_hints()}>
+                        <SegmentedControl
+                            options={(["always", "miss", "never"] as const).map((option) => ({
+                                id: option,
+                                label: noteHintLabel[option],
+                            }))}
+                            value={noteHints}
+                            onChange={setNoteHints}
+                            label={m.settings_note_hints()}
+                        />
+                    </Labeled>
                 </Option>
                 <Option caption={m.race_ghost_hint()}>
                     <Switch

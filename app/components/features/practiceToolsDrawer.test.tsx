@@ -33,6 +33,8 @@ const props = () => ({
     setGuideNotes: vi.fn(),
     forgiving: false,
     setForgiving: vi.fn(),
+    noteHints: "miss" as const,
+    setNoteHints: vi.fn(),
     raceGhost: true,
     setRaceGhost: vi.fn(),
     staffCount: 1,
@@ -77,6 +79,13 @@ describe("PracticeToolsDrawer", () => {
         render(<PracticeToolsDrawer {...props()} lockTempo />);
         expect(screen.queryByRole("slider", { name: m.scores_tempo() })).toBeNull();
         expect(screen.queryByRole("switch", { name: m.tempo_trainer() })).toBeNull();
+    });
+
+    it("reports a note-hints choice through setNoteHints", () => {
+        const p = props();
+        render(<PracticeToolsDrawer {...p} />);
+        fireEvent.click(screen.getByRole("tab", { name: m.note_hints_always() }));
+        expect(p.setNoteHints).toHaveBeenCalledWith("always");
     });
 
     it("offers the hands-separate selector only for a grand staff", () => {

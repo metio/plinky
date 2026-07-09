@@ -31,6 +31,8 @@ export function PlayToolsDrawer() {
         setGuideNotes,
         forgiving,
         setForgiving,
+        noteHints,
+        setNoteHints,
         raceGhost,
         setRaceGhost,
         staffCount,
@@ -75,6 +77,8 @@ export function PlayToolsDrawer() {
             setGuideNotes={setGuideNotes}
             forgiving={forgiving}
             setForgiving={setForgiving}
+            noteHints={noteHints}
+            setNoteHints={setNoteHints}
             raceGhost={raceGhost}
             setRaceGhost={setRaceGhost}
             staffCount={staffCount}

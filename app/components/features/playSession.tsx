@@ -659,7 +659,9 @@ function usePlaySessionValue({
 
     // Reveal the next note by colour per the player's hint setting — always, only once
     // they've slipped at this position, or never. A wrong key flashes red regardless.
-    const noteHints = prefsStore.load().noteHints;
+    // Writable from the Practice-tools drawer too, so the hint behaviour can change
+    // without leaving the music; usePref persists it as the global setting.
+    const [noteHints, setNoteHints] = usePref(prefsStore, "noteHints");
     const hintNotes =
         noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
             ? matcher.expected
@@ -714,6 +716,8 @@ function usePlaySessionValue({
         keyboardOctaves,
         setKeyboardOctaves,
         hintNotes,
+        noteHints,
+        setNoteHints,
         focusXml,
         // Tempo settings.
         tempo,
