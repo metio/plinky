@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Järjestelmä",
   "theme_light": "☀️ Vaalea",
   "theme_dark": "🌙 Tumma",
-  "theme_aria": "Teema: {theme}. Vaihda napsauttamalla."
+  "theme_aria": "Teema: {theme}. Vaihda napsauttamalla.",
+  "nav_help": "Ohje",
+  "help_title": "Ohje",
+  "help_intro": "Miten Plinky toimii, osa kerrallaan. Siirry suoraan siihen kohtaan, josta sinulla on kysyttävää.",
+  "help_section_getting_started": "Aloitus",
+  "help_section_play": "Kappaleen soittaminen",
+  "help_section_assignments": "Tehtävät",
+  "help_section_review": "Kertaus",
+  "help_loading": "Ladataan ohjetta…",
+  "help_empty": "Tämän osan ohje on tulossa.",
+  "help_learn_more": "Lue lisää",
+  "meta_help_description": "Miten Plinky toimii: oppaat sovelluksen jokaiseen osaan, ensimmäisestä nuotista edistymisesi seurantaan."
 }

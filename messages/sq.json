@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Sistemi",
   "theme_light": "☀️ E çelët",
   "theme_dark": "🌙 E errët",
-  "theme_aria": "Tema: {theme}. Kliko për ta ndryshuar."
+  "theme_aria": "Tema: {theme}. Kliko për ta ndryshuar.",
+  "nav_help": "Ndihmë",
+  "help_title": "Ndihmë",
+  "help_intro": "Si funksionon Plinky, zonë pas zone. Kalo drejt te pjesa për të cilën ke një pyetje.",
+  "help_section_getting_started": "Fillimi",
+  "help_section_play": "Të luash një pjesë",
+  "help_section_assignments": "Detyra",
+  "help_section_review": "Përsëritje",
+  "help_loading": "Po ngarkohet ndihma…",
+  "help_empty": "Ndihma për këtë zonë është duke ardhur.",
+  "help_learn_more": "Mëso më shumë",
+  "meta_help_description": "Si funksionon Plinky: udhëzues për çdo pjesë të aplikacionit, nga nota jote e parë deri te ndjekja e progresit tënd."
 }

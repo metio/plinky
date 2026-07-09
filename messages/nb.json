@@ -558,5 +558,16 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Lyst",
   "theme_dark": "🌙 Mørkt",
-  "theme_aria": "Tema: {theme}. Klikk for å endre."
+  "theme_aria": "Tema: {theme}. Klikk for å endre.",
+  "nav_help": "Hjelp",
+  "help_title": "Hjelp",
+  "help_intro": "Slik fungerer Plinky, område for område. Gå rett til den delen du har et spørsmål om.",
+  "help_section_getting_started": "Kom i gang",
+  "help_section_play": "Spille et stykke",
+  "help_section_assignments": "Oppgaver",
+  "help_section_review": "Repetisjon",
+  "help_loading": "Laster hjelp…",
+  "help_empty": "Hjelp for dette området er på vei.",
+  "help_learn_more": "Les mer",
+  "meta_help_description": "Slik fungerer Plinky: veiledninger for hver del av appen, fra din første tone til å følge fremgangen din."
 }

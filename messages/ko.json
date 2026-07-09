@@ -558,5 +558,16 @@
   "theme_system": "🖥️ 시스템",
   "theme_light": "☀️ 라이트",
   "theme_dark": "🌙 다크",
-  "theme_aria": "테마: {theme}. 클릭하여 변경."
+  "theme_aria": "테마: {theme}. 클릭하여 변경.",
+  "nav_help": "도움말",
+  "help_title": "도움말",
+  "help_intro": "Plinky의 작동 방식을 영역별로 안내합니다. 궁금한 부분으로 바로 이동하세요.",
+  "help_section_getting_started": "시작하기",
+  "help_section_play": "곡 연주하기",
+  "help_section_assignments": "과제",
+  "help_section_review": "복습",
+  "help_loading": "도움말 불러오는 중…",
+  "help_empty": "이 영역의 도움말은 곧 제공됩니다.",
+  "help_learn_more": "자세히 보기",
+  "meta_help_description": "Plinky 작동 방식: 첫 음표부터 진행 상황 추적까지, 앱의 모든 부분에 대한 가이드."
 }

@@ -558,5 +558,16 @@
   "theme_system": "🖥️ Sistema",
   "theme_light": "☀️ Claro",
   "theme_dark": "🌙 Escuro",
-  "theme_aria": "Tema: {theme}. Clique para mudar."
+  "theme_aria": "Tema: {theme}. Clique para mudar.",
+  "nav_help": "Ajuda",
+  "help_title": "Ajuda",
+  "help_intro": "Como o Plinky funciona, área por área. Vá direto para a parte sobre a qual tem uma dúvida.",
+  "help_section_getting_started": "Primeiros passos",
+  "help_section_play": "Tocar uma peça",
+  "help_section_assignments": "Tarefas",
+  "help_section_review": "Revisão",
+  "help_loading": "Carregando a ajuda…",
+  "help_empty": "A ajuda para esta área está a caminho.",
+  "help_learn_more": "Saiba mais",
+  "meta_help_description": "Como o Plinky funciona: guias para cada parte do app, da sua primeira nota ao acompanhamento do seu progresso."
 }

@@ -8,6 +8,12 @@
 // a malformed or unsafe payload becomes `null` (no banner), never a render of
 // attacker-chosen markup or a non-https URL.
 
+import { isHttpsUrl } from "./url";
+
+// Re-exported so callers that reach for the news module's URL guard keep working;
+// the definition lives in core/url so the help page can share the same gate.
+export { isHttpsUrl } from "./url";
+
 export type NewsItem = {
     // Stable identifier, so a dismissal sticks to this item and a newly published
     // item shows again.
@@ -24,20 +30,6 @@ export type NewsItem = {
     // picture shifts nothing. Defaults to 16/9 when absent or invalid.
     aspect?: number;
 };
-
-// True only for a well-formed https URL. Rejects http, data:, javascript:, and
-// anything unparsable — the one gate that keeps editor-supplied URLs safe to put
-// in an <img src> / <a href>.
-export function isHttpsUrl(value: unknown): value is string {
-    if (typeof value !== "string") {
-        return false;
-    }
-    try {
-        return new URL(value).protocol === "https:";
-    } catch {
-        return false;
-    }
-}
 
 // Validate a raw payload (from any content service, already mapped to loose
 // fields) into a NewsItem, or null when it is missing anything required or fails
