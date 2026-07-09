@@ -822,6 +822,23 @@ describe("ScoreViewer", () => {
             .toBe(true);
     });
 
+    it("offers Restart while listening and takes the playback back to the top", async () => {
+        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        mount(phrase, { beatsPerBar: 4 });
+        await enterAndListen();
+        // Let playback advance far enough to leave a trail.
+        await expect
+            .poll(() => document.querySelectorAll(`g[fill="${LISTENED_COLOR}"]`).length, {
+                timeout: 15000,
+            })
+            .toBeGreaterThan(0);
+        fireEvent.click(screen.getByRole("button", { name: "Restart" }));
+        // The trail wipes, so the blue tells the story of the fresh pass only…
+        expect(document.querySelectorAll(`g[fill="${LISTENED_COLOR}"]`).length).toBe(0);
+        // …and Listen keeps playing, now from the first note.
+        expect(screen.getByRole("button", { name: "Stop" })).toBeTruthy();
+    });
+
     it("keeps the notes you practised coloured when you hand off to Listen", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // Four C5 notes; play two so they turn green.

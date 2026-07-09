@@ -29,6 +29,7 @@ export function PlayTransport() {
         listenPlayback,
         enforceTempo,
         listen,
+        restartListen,
         practice,
         playAlong,
         getOsmd,
@@ -110,10 +111,13 @@ export function PlayTransport() {
                             {keepUp.progress.inTime}/{keepUp.progress.done}
                         </span>
                     </Show>
-                    {/* Restart the run — a practice-only action, so it's absent while
-                    just listening. */}
-                    <Show when={matcher.practicing}>
-                        <IconButton onClick={() => practice(false)} label={m.action_restart()}>
+                    {/* Restart from the first note — a fresh practice run, or Listen
+                    taken back to the top. */}
+                    <Show when={matcher.practicing || listenPlayback.playing}>
+                        <IconButton
+                            onClick={() => (matcher.practicing ? practice(false) : restartListen())}
+                            label={m.action_restart()}
+                        >
                             <RotateIcon />
                         </IconButton>
                     </Show>

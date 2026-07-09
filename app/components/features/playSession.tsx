@@ -540,6 +540,20 @@ function usePlaySessionValue({
         listenPlayback.start(from);
     };
 
+    // Restart Listen from the top (or the loop's start bar). The trail wipes like a
+    // fresh practice run, so the blue tells the story of this pass only.
+    const restartListen = () => {
+        if (!listenPlayback.playing) {
+            return;
+        }
+        listenPlayback.stop();
+        if (score.painted()) {
+            getOsmd()?.render();
+            score.resetPaint();
+        }
+        listenPlayback.start(0);
+    };
+
     // Wipe the self-paced run's result and the earned milestone. A fresh self-paced run
     // and a keep-up run both clear them, so a finished self-paced result can't linger
     // beneath the next run, and its Save prompt can't save a stale take (a keep-up run
@@ -747,6 +761,7 @@ function usePlaySessionValue({
         takes,
         // Actions the surface drives.
         listen,
+        restartListen,
         practice,
         playAlong,
         saveCurrentTake,
