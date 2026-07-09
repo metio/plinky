@@ -3,7 +3,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { encodeAssignmentLink, makeAssignment } from "../../core/assignment";
 import { loadBundledScores } from "../lib/catalog";
 import AssignmentsRoute from "./assignments";
@@ -23,6 +23,7 @@ const mount = (entry = "/assignments") =>
 afterEach(() => {
     cleanup();
     localStorage.clear();
+    vi.restoreAllMocks();
 });
 
 describe("AssignmentsRoute", () => {
@@ -113,6 +114,26 @@ describe("AssignmentsRoute", () => {
         await waitFor(() => expect(screen.getByText("Renamed set")).toBeTruthy());
         expect(screen.queryByText("My set")).toBeNull();
         expect(screen.getAllByLabelText(/^Edit /)).toHaveLength(1);
+    });
+
+    it("confirms a copied share link on the button that was pressed", async () => {
+        // The test browsers have no navigator.share, so onShare takes the clipboard
+        // path; a stubbed write keeps the copy from needing a real permission.
+        const writeText = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
+        const code = encodeAssignmentLink(
+            makeAssignment({ name: "Shared set", items: [{ id: "twinkle-twinkle" }] }),
+        );
+        mount(`/assignments?assignment=${code}`);
+        fireEvent.click(await screen.findByText("Import this assignment"));
+        await waitFor(() => expect(screen.getByText("Shared set")).toBeTruthy());
+        // The builder's own (disabled) Share button also reads "Share link"; the
+        // saved assignment's is the enabled one.
+        const shareButtons = screen.getAllByText<HTMLButtonElement>("Share link");
+        fireEvent.click(shareButtons.find((button) => !button.disabled)!);
+        // The pressed button itself reads "Copied!" — the confirmation lives where
+        // the eye already is, not only in the status line at the top of the page.
+        expect(await screen.findByText("Copied!")).toBeTruthy();
+        expect(writeText).toHaveBeenCalledWith(expect.stringContaining("assignment="));
     });
 
     it("reorders and removes items in the basket", async () => {
