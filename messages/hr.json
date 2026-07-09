@@ -444,7 +444,7 @@
   "takes_button": "Pokušaji",
   "takes_heading": "Tvoji pokušaji ({count})",
   "takes_panel_heading": "Tvoji pokušaji",
-  "takes_empty_hint": "Odsviraj do kraja i spremi da ovdje sačuvaš pokušaj — ponovi ga, utrkuj se s njegovim duhom ili izazovi prijatelja.",
+  "takes_empty_hint": "Odsviraj do kraja i pokušaj se ovdje sprema automatski — ponovi ga, utrkuj se s njegovim duhom ili izazovi prijatelja.",
   "takes_partial": "djelomično",
   "takes_replay": "Ponovi ovaj pokušaj",
   "takes_stop": "Zaustavi",

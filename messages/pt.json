@@ -444,7 +444,7 @@
   "takes_button": "Gravações",
   "takes_heading": "Suas gravações ({count})",
   "takes_panel_heading": "Suas gravações",
-  "takes_empty_hint": "Termine uma execução e salve-a para guardar uma gravação aqui — reproduza-a, corra contra seu fantasma ou desafie um amigo.",
+  "takes_empty_hint": "Termine uma execução e a gravação fica guardada aqui automaticamente — reproduza-a, corra contra seu fantasma ou desafie um amigo.",
   "takes_partial": "parcial",
   "takes_replay": "Reproduzir esta gravação",
   "takes_stop": "Parar",

@@ -444,7 +444,7 @@
   "takes_button": "녹음",
   "takes_heading": "내 녹음 ({count})",
   "takes_panel_heading": "내 녹음",
-  "takes_empty_hint": "끝까지 연주하고 저장하면 녹음이 여기 남아요 — 다시 재생하거나, 고스트와 경주하거나, 친구에게 도전장을 내밀 수 있어요.",
+  "takes_empty_hint": "끝까지 연주하면 녹음이 자동으로 여기 남아요 — 다시 재생하거나, 고스트와 경주하거나, 친구에게 도전장을 내밀 수 있어요.",
   "takes_partial": "부분",
   "takes_replay": "이 녹음 다시 재생",
   "takes_stop": "멈춤",

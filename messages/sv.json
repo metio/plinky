@@ -444,7 +444,7 @@
   "takes_button": "Tagningar",
   "takes_heading": "Dina tagningar ({count})",
   "takes_panel_heading": "Dina tagningar",
-  "takes_empty_hint": "Spela ett stycke till slutet och spara det så att en tagning stannar här — spela upp den, tävla mot dess spöke eller utmana en vän.",
+  "takes_empty_hint": "Spela ett stycke till slutet så sparas tagningen här automatiskt — spela upp den, tävla mot dess spöke eller utmana en vän.",
   "takes_partial": "delvis",
   "takes_replay": "Spela upp den här tagningen",
   "takes_stop": "Stoppa",

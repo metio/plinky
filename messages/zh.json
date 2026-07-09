@@ -444,7 +444,7 @@
   "takes_button": "录音",
   "takes_heading": "你的录音（{count}）",
   "takes_panel_heading": "你的录音",
-  "takes_empty_hint": "把一首曲子弹到最后并保存下来，就能在这里留下一段录音——之后可以回放、与它的残影竞速，或向好友发起挑战。",
+  "takes_empty_hint": "把一首曲子弹到最后，录音会自动留在这里——之后可以回放、与它的残影竞速，或向好友发起挑战。",
   "takes_partial": "未弹完",
   "takes_replay": "回放这段录音",
   "takes_stop": "停止",

@@ -444,7 +444,7 @@
   "takes_button": "Prises",
   "takes_heading": "Vos prises ({count})",
   "takes_panel_heading": "Vos prises",
-  "takes_empty_hint": "Terminez une partie et enregistrez-la pour conserver une prise ici — rejouez-la, affrontez son fantôme, ou défiez un ami.",
+  "takes_empty_hint": "Terminez une partie et la prise est conservée ici automatiquement — rejouez-la, affrontez son fantôme, ou défiez un ami.",
   "takes_partial": "partielle",
   "takes_replay": "Rejouer cette prise",
   "takes_stop": "Arrêter",

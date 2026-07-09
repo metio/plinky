@@ -444,7 +444,7 @@
   "takes_button": "Felvételek",
   "takes_heading": "A felvételeid ({count})",
   "takes_panel_heading": "A felvételeid",
-  "takes_empty_hint": "Játssz végig egy futást, és mentsd el, hogy itt maradjon egy felvétel — játszd vissza, versenyezz a szellemével, vagy hívj ki egy barátot.",
+  "takes_empty_hint": "Játssz végig egy darabot, és a felvétel automatikusan itt marad — játszd vissza, versenyezz a szellemével, vagy hívj ki egy barátot.",
   "takes_partial": "részleges",
   "takes_replay": "Felvétel visszajátszása",
   "takes_stop": "Leállítás",

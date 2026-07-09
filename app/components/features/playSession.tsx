@@ -12,6 +12,7 @@ import {
     useState,
 } from "react";
 import { cadence } from "../../../core/cadence";
+import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { isPreciseInput } from "../../../core/midi";
@@ -413,6 +414,7 @@ function usePlaySessionValue({
     // dynamics rather than crediting a constant. Timing is judged against the
     // player's own pace (so a steady run at any tempo reads as in time) with windows
     // widened for imprecise input (on-screen / computer keyboard).
+    // biome-ignore lint/correctness/useExhaustiveDependencies: saveTake is a per-render closure, not an input; the gradedRef latch pins the effect to one fire per run
     useEffect(() => {
         if (!matcher.complete || gradedRef.current) {
             return;
@@ -469,6 +471,10 @@ function usePlaySessionValue({
             ghostRace.adoptOwnRun(newGhost);
         }
         if (!ephemeral) {
+            // Keep the finished run as a take without a separate Save press — finishing
+            // a song and later finding Runs empty reads as data loss. The result panel's
+            // saved/failed note reflects how the write landed.
+            saveTake(outcome.grade);
             onRunComplete?.();
         }
     }, [
@@ -583,7 +589,9 @@ function usePlaySessionValue({
 
     // Save the just-finished run as a take: rebuild a Composition from the captured
     // steps (their played onsets, pitches and velocity) and store it under this song.
-    const saveCurrentTake = () => {
+    // The grade arrives as a parameter because the completion effect saves before the
+    // recorded result has re-rendered into runResult.grade.
+    const saveTake = (grade: Grade | null) => {
         const steps: RunStep[] = captureRef.current.notes.map((note) => ({
             pitches: note.pitches,
             startMs: note.playedMs,
@@ -596,15 +604,16 @@ function usePlaySessionValue({
         const take: Take = {
             id: crypto.randomUUID(),
             createdAt: Date.now(),
-            letter: runResult.grade?.letter ?? "",
+            letter: grade?.letter ?? "",
             complete: matcher.complete,
-            metrics: runResult.grade ?? null,
+            metrics: grade,
             composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
         };
         const stored = services.takes.save(id, take);
         setTakes(stored.takes);
         runResult.markSaved(stored.stored);
     };
+    const saveCurrentTake = () => saveTake(runResult.grade);
 
     // Replay a saved take: any Listen in progress hands the transport over, and the
     // self-paced matcher stops so the replay owns the cursor.

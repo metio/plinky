@@ -444,7 +444,7 @@
   "takes_button": "Podejścia",
   "takes_heading": "Twoje podejścia ({count})",
   "takes_panel_heading": "Twoje podejścia",
-  "takes_empty_hint": "Zagraj utwór do końca i zapisz go, aby zachować tu podejście — odtwórz je, ścigaj się z jego duchem albo rzuć wyzwanie znajomemu.",
+  "takes_empty_hint": "Zagraj utwór do końca, a podejście zapisze się tu automatycznie — odtwórz je, ścigaj się z jego duchem albo rzuć wyzwanie znajomemu.",
   "takes_partial": "częściowe",
   "takes_replay": "Odtwórz to podejście",
   "takes_stop": "Zatrzymaj",

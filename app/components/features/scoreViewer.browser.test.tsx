@@ -100,7 +100,7 @@ describe("ScoreViewer", () => {
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Runs" }));
-        expect(await screen.findByText(/play a piece through and save it/i)).toBeTruthy();
+        expect(await screen.findByText(/play a piece through/i)).toBeTruthy();
     });
 
     it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
@@ -496,6 +496,27 @@ describe("ScoreViewer", () => {
         // already have called onRunComplete a second time.
         await screen.findAllByText("Accuracy", undefined, { timeout: 30000 });
         expect(onRunComplete).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps a finished run as a take without a separate save press", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // A one-bar phrase whose every note is C5, so the same key clears each position.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady());
+        const key = await screen.findByLabelText("C5");
+        for (let i = 0; i < 4; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // The result panel confirms the automatic save instead of prompting for one —
+        // finishing a song and later finding Runs empty read as data loss.
+        expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
+        expect(screen.queryByText("Save this run?")).toBeNull();
+        fireEvent.click(screen.getByRole("button", { name: "Runs" }));
+        // The drawer lists the kept take rather than the how-to hint.
+        expect(screen.queryByText(/play a piece through/i)).toBeNull();
+        expect(screen.getAllByRole("button", { name: /replay/i }).length).toBeGreaterThan(0);
     });
 
     it("enters full screen to play even on a large screen, where Listen lives", async () => {

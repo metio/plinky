@@ -455,7 +455,7 @@
   "takes_button": "Runs",
   "takes_heading": "Your runs ({count})",
   "takes_panel_heading": "Your runs",
-  "takes_empty_hint": "Play a piece through and save it to keep a run here — replay it, race its ghost, or challenge a friend.",
+  "takes_empty_hint": "Play a piece through and the run is kept here automatically — replay it, race its ghost, or challenge a friend.",
   "takes_partial": "partial",
   "takes_replay": "Replay this run",
   "takes_stop": "Stop",

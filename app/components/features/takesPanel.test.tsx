@@ -43,7 +43,7 @@ describe("TakesPanel", () => {
         render(<TakesPanel {...base} takes={[]} />);
         // As the Runs drawer's body it's shown whenever the drawer is open, so with nothing
         // saved it tells you how to get a run rather than being an empty mystery.
-        expect(screen.getByText(/play a piece through and save it/i)).toBeTruthy();
+        expect(screen.getByText(/play a piece through/i)).toBeTruthy();
         expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
     });
 

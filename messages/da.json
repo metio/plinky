@@ -444,7 +444,7 @@
   "takes_button": "Gennemløb",
   "takes_heading": "Dine gennemløb ({count})",
   "takes_panel_heading": "Dine gennemløb",
-  "takes_empty_hint": "Spil et stykke færdigt og gem det for at beholde et gennemløb her — spil det igen, kør om kap mod dets spøgelse, eller udfordr en ven.",
+  "takes_empty_hint": "Spil et stykke færdigt, så gemmes gennemløbet her automatisk — spil det igen, kør om kap mod dets spøgelse, eller udfordr en ven.",
   "takes_partial": "delvist",
   "takes_replay": "Afspil dette gennemløb igen",
   "takes_stop": "Stop",

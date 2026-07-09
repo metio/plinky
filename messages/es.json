@@ -444,7 +444,7 @@
   "takes_button": "Tomas",
   "takes_heading": "Tus tomas ({count})",
   "takes_panel_heading": "Tus tomas",
-  "takes_empty_hint": "Termina una pieza y guárdala para conservar una toma aquí — vuelve a reproducirla, compite contra su fantasma o reta a un amigo.",
+  "takes_empty_hint": "Termina una pieza y la toma se guarda aquí automáticamente — vuelve a reproducirla, compite contra su fantasma o reta a un amigo.",
   "takes_partial": "parcial",
   "takes_replay": "Reproducir esta toma",
   "takes_stop": "Detener",

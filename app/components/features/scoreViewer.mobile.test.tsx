@@ -55,7 +55,7 @@ describe("ScoreViewer on a phone", () => {
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Runs" }));
-        expect(await screen.findByText(/play a piece through and save it/i)).toBeTruthy();
+        expect(await screen.findByText(/play a piece through/i)).toBeTruthy();
     });
 
     it("selects a bar by clicking it, filling the loop range with a red overlay", async () => {
