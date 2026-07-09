@@ -66,6 +66,12 @@ export default function AssignmentsRoute() {
     const [incoming, setIncoming] = useState<Assignment | null>(null);
     const [status, setStatus] = useState<string | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
+    // Which Share button just copied its link — "draft" or a saved assignment's id —
+    // so the confirmation shows on the button that was pressed, not only in the status
+    // line that can sit scrolled far above it.
+    const [copiedShare, setCopiedShare] = useState<string | null>(null);
+    const copyTimer = useRef(0);
+    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
 
     // Builder state.
     const [name, setName] = useState("");
@@ -202,7 +208,7 @@ export default function AssignmentsRoute() {
             `${slugifyName(assignment.name)}.json`,
         );
 
-    const onShare = async (assignment: Assignment) => {
+    const onShare = async (assignment: Assignment, buttonKey: string) => {
         const url = `${SITE_URL}${localizeHref("/assignments")}?assignment=${encodeAssignmentLink(assignment)}`;
         try {
             if (typeof navigator.share === "function") {
@@ -212,6 +218,11 @@ export default function AssignmentsRoute() {
                 });
             } else {
                 await navigator.clipboard?.writeText(url);
+                // Confirm on the button itself, reverting after a moment; the status
+                // line repeats it for assistive tech.
+                setCopiedShare(buttonKey);
+                window.clearTimeout(copyTimer.current);
+                copyTimer.current = window.setTimeout(() => setCopiedShare(null), 2000);
                 setStatus(m.assignments_link_copied());
             }
         } catch {
@@ -418,9 +429,9 @@ export default function AssignmentsRoute() {
                     <Button
                         variant="secondary"
                         disabled={!canSave}
-                        onClick={() => onShare(draft())}
+                        onClick={() => onShare(draft(), "draft")}
                     >
-                        {m.assignments_share()}
+                        {copiedShare === "draft" ? m.share_copied() : m.assignments_share()}
                     </Button>
                 </div>
                 <Show when={!canSave}>
@@ -482,9 +493,11 @@ export default function AssignmentsRoute() {
                                         </Button>
                                         <Button
                                             variant="secondary"
-                                            onClick={() => onShare(assignment)}
+                                            onClick={() => onShare(assignment, assignment.id)}
                                         >
-                                            {m.assignments_share()}
+                                            {copiedShare === assignment.id
+                                                ? m.share_copied()
+                                                : m.assignments_share()}
                                         </Button>
                                         <Button
                                             variant="secondary"
