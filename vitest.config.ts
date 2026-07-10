@@ -170,9 +170,12 @@ export default defineConfig({
                         expect: {
                             toMatchScreenshot: {
                                 comparatorName: "pixelmatch",
-                                // Absorb sub-pixel anti-aliasing jitter without
-                                // letting a real layout change through: up to
-                                // 0.1% of pixels may differ.
+                                // The strict default: cross-machine rendering is
+                                // near-perfect (most stories match CI byte-for-byte),
+                                // so 0.1% absorbs sub-pixel anti-aliasing jitter and
+                                // nothing more. AA-dense stories that genuinely drift
+                                // between machines get a named, per-story allowance in
+                                // .storybook/vitest.setup.ts — never widen this one.
                                 comparatorOptions: { allowedMismatchedPixelRatio: 0.001 },
                                 // Baselines are committed, so they live outside the
                                 // gitignored __screenshots__ failure-capture dir.
