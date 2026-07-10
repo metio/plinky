@@ -9,6 +9,7 @@ import {
     decodeAssignmentLink,
     encodeAssignmentLink,
     makeAssignment,
+    MAX_DESCRIPTION_LENGTH,
     missingAssignmentIds,
     newAssignmentId,
     nextAssignmentStep,
@@ -225,5 +226,18 @@ describe("nextAssignmentStep with missing pieces", () => {
             total: 1,
             scoreId: "a1",
         });
+    });
+});
+
+describe("description length", () => {
+    it("keeps a long description up to the cap, while notes stay short", () => {
+        const long = "x".repeat(3000);
+        const assignment = makeAssignment({
+            name: "Long",
+            description: long,
+            items: [{ id: "a", note: long }],
+        });
+        expect(assignment.description).toHaveLength(MAX_DESCRIPTION_LENGTH);
+        expect(assignment.items[0]?.note).toHaveLength(200);
     });
 });

@@ -45,6 +45,19 @@ function cleanNote(value: unknown): string | undefined {
     return trimmed.length > 0 ? trimmed.slice(0, 200) : undefined;
 }
 
+// A description carries real instructions — several sentences, line breaks — so
+// it gets a much roomier cap than a per-item note; still bounded so a share link
+// compresses to something a URL can hold.
+export const MAX_DESCRIPTION_LENGTH = 2000;
+
+function cleanDescription(value: unknown): string | undefined {
+    if (typeof value !== "string") {
+        return undefined;
+    }
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed.slice(0, MAX_DESCRIPTION_LENGTH) : undefined;
+}
+
 function cleanItem(value: unknown): AssignmentItem | null {
     if (!isRecord(value) || typeof value.id !== "string" || value.id.length === 0) {
         return null;
@@ -85,7 +98,7 @@ export function makeAssignment(parts: {
 }): Assignment {
     const name =
         typeof parts.name === "string" && parts.name.trim() ? parts.name.trim() : "Untitled";
-    const description = cleanNote(parts.description);
+    const description = cleanDescription(parts.description);
     const items = parts.items
         .map(cleanItem)
         .filter((item): item is AssignmentItem => item !== null);

@@ -19,11 +19,15 @@ import {
     missingAssignmentIds,
     newAssignmentId,
     parseAssignment,
+    MAX_DESCRIPTION_LENGTH,
     pruneAssignment,
     serializeAssignment,
     slugifyName,
 } from "../../core/assignment";
+import { moveTo } from "../../core/reorder";
+import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useCopied } from "../hooks/useCopied";
+import { useDragReorder } from "../hooks/useDragReorder";
 import { useKnownPieces } from "../hooks/useKnownPieces";
 import { loadBundledScores, loadCatalog } from "../lib/catalog";
 import { starterAssignment } from "../../core/starterAssignments";
@@ -104,8 +108,12 @@ function AssignmentCard({
                 </Button>
                 {actionsAfter}
             </div>
+            {/* Descriptions are real instructions, often several sentences with
+                line breaks — give them their space instead of clamping. */}
             {description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
+                <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                    {description}
+                </p>
             )}
             {children}
         </li>
@@ -143,6 +151,13 @@ export default function AssignmentsRoute() {
     // The id of the saved assignment being edited, so saving overwrites it in place
     // instead of creating a sibling.
     const [editingId, setEditingId] = useState<string | null>(null);
+    // Which face of the page shows: the assignment lists, or the one draft the
+    // builder holds. Component state, like every tab in the app — the builder's
+    // draft survives a peek at the list, and no history entries pile up.
+    const [tab, setTab] = useState<"list" | "builder">("list");
+    // Drag-to-reorder for the basket rows; the arrow buttons stay as the
+    // keyboard and assistive-tech path.
+    const drag = useDragReorder((from, to) => setItems((current) => moveTo(current, from, to)));
 
     useEffect(() => {
         setAssignments(assignmentsStore.list());
@@ -272,7 +287,13 @@ export default function AssignmentsRoute() {
         setDescription(assignment.description ?? "");
         setItems(assignment.items);
         setEditingId(assignment.id);
+        setTab("builder");
         window.scrollTo({ top: 0 });
+    };
+
+    const cancelEdit = () => {
+        reset();
+        setTab("list");
     };
 
     const canSave = name.trim().length > 0 && items.length > 0;
@@ -329,6 +350,9 @@ export default function AssignmentsRoute() {
         if (assignmentsStore.save(assignment)) {
             refresh();
             reset();
+            // Land back on the list with the saved assignment in view — the
+            // builder is empty again, ready for the next one.
+            setTab("list");
             setStatus(m.assignments_saved({ name: assignment.name }));
         } else {
             setStatus(m.assignments_save_failed());
@@ -432,7 +456,20 @@ export default function AssignmentsRoute() {
                 </p>
             )}
 
-            {incoming && (
+            <SegmentedControl
+                options={[
+                    { id: "list", label: m.assignments_tab_list() },
+                    {
+                        id: "builder",
+                        label: editingId ? m.assignments_tab_edit() : m.assignments_tab_create(),
+                    },
+                ]}
+                value={tab}
+                onChange={setTab}
+                label={m.assignments_heading()}
+            />
+
+            {tab === "list" && incoming && (
                 <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
                     <h2 className="font-semibold">{m.assignments_received_heading()}</h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -464,157 +501,203 @@ export default function AssignmentsRoute() {
                 </section>
             )}
 
-            <section className="space-y-3">
-                <h2 className="font-semibold">{m.assignments_build_heading()}</h2>
-                <input
-                    className={`${FIELD} w-full`}
-                    placeholder={m.assignments_search_placeholder()}
-                    value={query}
-                    onChange={(event) => {
-                        setQuery(event.target.value);
-                        setVisible(PICKER_PAGE);
-                    }}
-                    aria-label={m.assignments_search_placeholder()}
-                />
-                <Show when={matches.length > 0}>
-                    <ul className="divide-y divide-gray-100 rounded-md border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-                        {matches.slice(0, visible).map((entry) => (
-                            <li
-                                key={entry.id}
-                                className="flex items-center justify-between gap-2 px-3 py-1.5 text-sm"
-                            >
-                                <span className="truncate">{entry.title}</span>
-                                <Button variant="secondary" onClick={() => addItem(entry.id)}>
-                                    {m.assignments_add()}
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </Show>
-                <Show when={visible < matches.length}>
-                    <Button variant="secondary" onClick={() => setVisible((n) => n + PICKER_PAGE)}>
-                        {m.library_show_more()}
-                    </Button>
-                </Show>
-
-                {items.length > 0 ? (
-                    <ol className="space-y-2">
-                        {items.map((item, index) => (
-                            <li
-                                key={item.id}
-                                className="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
-                            >
-                                <span className="font-mono text-xs text-gray-400">
-                                    {index + 1}.
-                                </span>
-                                {known.isMissing(item.id) ? (
-                                    <span className="flex-1 truncate italic text-gray-400 dark:text-gray-500">
-                                        {m.assignments_step_missing()}
-                                    </span>
-                                ) : (
-                                    <span className="flex-1 truncate">{titleOf(item.id)}</span>
-                                )}
-                                <input
-                                    type="number"
-                                    min={20}
-                                    max={400}
-                                    className={`${FIELD} w-20`}
-                                    placeholder={m.assignments_tempo_placeholder()}
-                                    value={item.tempo ?? ""}
-                                    onChange={(event) => setItemTempo(index, event.target.value)}
-                                    aria-label={m.assignments_tempo_label({
-                                        title: titleOf(item.id),
-                                    })}
-                                />
-                                <input
-                                    className={`${FIELD} w-40`}
-                                    placeholder={m.assignments_note_placeholder()}
-                                    value={item.note ?? ""}
-                                    onChange={(event) => setItemNote(index, event.target.value)}
-                                    aria-label={m.assignments_note_label({
-                                        title: titleOf(item.id),
-                                    })}
-                                />
-                                <span className="flex gap-1">
-                                    <IconButton
-                                        variant="secondary"
-                                        disabled={index === 0}
-                                        onClick={() => moveItem(index, -1)}
-                                        label={m.assignments_move_up()}
-                                    >
-                                        <ArrowUpIcon className="h-5 w-5" />
-                                    </IconButton>
-                                    <IconButton
-                                        variant="secondary"
-                                        disabled={index === items.length - 1}
-                                        onClick={() => moveItem(index, 1)}
-                                        label={m.assignments_move_down()}
-                                    >
-                                        <ArrowDownIcon className="h-5 w-5" />
-                                    </IconButton>
-                                    <IconButton
-                                        variant="ghost"
-                                        onClick={() => removeItem(index)}
-                                        label={m.assignments_remove()}
-                                        className="text-red-600 dark:text-red-400"
-                                    >
-                                        <CloseIcon className="h-5 w-5" />
-                                    </IconButton>
-                                </span>
-                            </li>
-                        ))}
-                    </ol>
-                ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {m.assignments_empty_basket()}
-                    </p>
-                )}
-
-                {/* Naming sits right above Save so the last step before saving
-                    is in view — the disabled button explains itself. */}
-                <div className="flex flex-col gap-2 sm:flex-row">
+            {tab === "builder" && (
+                <section className="space-y-3">
+                    <h2 className="font-semibold">{m.assignments_build_heading()}</h2>
+                    {editingId && (
+                        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                            {m.assignments_editing({ name })}
+                        </p>
+                    )}
                     <input
-                        className={`${FIELD} flex-1`}
-                        placeholder={m.assignments_name_placeholder()}
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        aria-label={m.assignments_name_label()}
+                        className={`${FIELD} w-full`}
+                        placeholder={m.assignments_search_placeholder()}
+                        value={query}
+                        onChange={(event) => {
+                            setQuery(event.target.value);
+                            setVisible(PICKER_PAGE);
+                        }}
+                        aria-label={m.assignments_search_placeholder()}
                     />
-                    <input
-                        className={`${FIELD} flex-1`}
-                        placeholder={m.assignments_description_placeholder()}
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                        aria-label={m.assignments_description_label()}
-                    />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                    <Button variant="primary" disabled={!canSave} onClick={onSave}>
-                        {m.assignments_save()}
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        disabled={!canSave}
-                        onClick={() => onDownload(draft())}
-                    >
-                        {m.assignments_download()}
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        disabled={!canSave}
-                        onClick={() => onShare(draft(), "draft")}
-                    >
-                        {copiedShare === "draft" ? m.share_copied() : m.assignments_share()}
-                    </Button>
-                </div>
-                <Show when={!canSave}>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {m.assignments_save_hint()}
-                    </p>
-                </Show>
-            </section>
+                    <Show when={matches.length > 0}>
+                        <ul className="divide-y divide-gray-100 rounded-md border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+                            {matches.slice(0, visible).map((entry) => (
+                                <li
+                                    key={entry.id}
+                                    className="flex items-center justify-between gap-2 px-3 py-1.5 text-sm"
+                                >
+                                    <span className="truncate">{entry.title}</span>
+                                    <Button variant="secondary" onClick={() => addItem(entry.id)}>
+                                        {m.assignments_add()}
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    </Show>
+                    <Show when={visible < matches.length}>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setVisible((n) => n + PICKER_PAGE)}
+                        >
+                            {m.library_show_more()}
+                        </Button>
+                    </Show>
 
-            <Show when={builtin.length > 0}>
+                    {items.length > 0 ? (
+                        <>
+                            <ol className="space-y-2" ref={drag.listRef}>
+                                {items.map((item, index) => (
+                                    <li
+                                        key={item.id}
+                                        className={`flex flex-wrap items-center gap-2 rounded-md border px-3 py-2 text-sm ${
+                                            drag.dragIndex === index
+                                                ? "border-indigo-400 opacity-60"
+                                                : drag.dragIndex !== null &&
+                                                    drag.overIndex === index
+                                                  ? "border-indigo-400 ring-2 ring-indigo-300 dark:ring-indigo-700"
+                                                  : "border-gray-200 dark:border-gray-800"
+                                        }`}
+                                    >
+                                        <span className="font-mono text-xs text-gray-400">
+                                            {index + 1}.
+                                        </span>
+                                        {/* The title doubles as the drag handle (pointer events
+                                    cover mouse and touch); the arrow buttons stay as the
+                                    keyboard path, so this handle is not a tab stop. */}
+                                        {known.isMissing(item.id) ? (
+                                            <span
+                                                {...drag.handleProps(index)}
+                                                className="flex-1 cursor-grab select-none truncate italic text-gray-400 active:cursor-grabbing dark:text-gray-500"
+                                            >
+                                                {m.assignments_step_missing()}
+                                            </span>
+                                        ) : (
+                                            <span
+                                                {...drag.handleProps(index)}
+                                                className="flex-1 cursor-grab select-none truncate active:cursor-grabbing"
+                                            >
+                                                {titleOf(item.id)}
+                                            </span>
+                                        )}
+                                        <input
+                                            type="number"
+                                            min={20}
+                                            max={400}
+                                            className={`${FIELD} w-20`}
+                                            placeholder={m.assignments_tempo_placeholder()}
+                                            value={item.tempo ?? ""}
+                                            onChange={(event) =>
+                                                setItemTempo(index, event.target.value)
+                                            }
+                                            aria-label={m.assignments_tempo_label({
+                                                title: titleOf(item.id),
+                                            })}
+                                        />
+                                        <input
+                                            className={`${FIELD} w-40`}
+                                            placeholder={m.assignments_note_placeholder()}
+                                            value={item.note ?? ""}
+                                            onChange={(event) =>
+                                                setItemNote(index, event.target.value)
+                                            }
+                                            aria-label={m.assignments_note_label({
+                                                title: titleOf(item.id),
+                                            })}
+                                        />
+                                        <span className="flex gap-1">
+                                            <IconButton
+                                                variant="secondary"
+                                                disabled={index === 0}
+                                                onClick={() => moveItem(index, -1)}
+                                                label={m.assignments_move_up()}
+                                            >
+                                                <ArrowUpIcon className="h-5 w-5" />
+                                            </IconButton>
+                                            <IconButton
+                                                variant="secondary"
+                                                disabled={index === items.length - 1}
+                                                onClick={() => moveItem(index, 1)}
+                                                label={m.assignments_move_down()}
+                                            >
+                                                <ArrowDownIcon className="h-5 w-5" />
+                                            </IconButton>
+                                            <IconButton
+                                                variant="ghost"
+                                                onClick={() => removeItem(index)}
+                                                label={m.assignments_remove()}
+                                                className="text-red-600 dark:text-red-400"
+                                            >
+                                                <CloseIcon className="h-5 w-5" />
+                                            </IconButton>
+                                        </span>
+                                    </li>
+                                ))}
+                            </ol>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                                {m.assignments_reorder_hint()}
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {m.assignments_empty_basket()}
+                        </p>
+                    )}
+
+                    {/* Naming sits right above Save so the last step before saving
+                    is in view — the disabled button explains itself. The
+                    description gets a full-width textarea: it holds real
+                    instructions, not a one-line label. */}
+                    <div className="flex flex-col gap-2">
+                        <input
+                            className={`${FIELD} w-full`}
+                            placeholder={m.assignments_name_placeholder()}
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                            aria-label={m.assignments_name_label()}
+                        />
+                        <textarea
+                            className={`${FIELD} min-h-24 w-full resize-y leading-relaxed`}
+                            rows={4}
+                            maxLength={MAX_DESCRIPTION_LENGTH}
+                            placeholder={m.assignments_description_placeholder()}
+                            value={description}
+                            onChange={(event) => setDescription(event.target.value)}
+                            aria-label={m.assignments_description_label()}
+                        />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Button variant="primary" disabled={!canSave} onClick={onSave}>
+                            {m.assignments_save()}
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            disabled={!canSave}
+                            onClick={() => onDownload(draft())}
+                        >
+                            {m.assignments_download()}
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            disabled={!canSave}
+                            onClick={() => onShare(draft(), "draft")}
+                        >
+                            {copiedShare === "draft" ? m.share_copied() : m.assignments_share()}
+                        </Button>
+                        {editingId && (
+                            <Button variant="secondary" onClick={cancelEdit}>
+                                {m.action_cancel()}
+                            </Button>
+                        )}
+                    </div>
+                    <Show when={!canSave}>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {m.assignments_save_hint()}
+                        </p>
+                    </Show>
+                </section>
+            )}
+
+            <Show when={tab === "list" && builtin.length > 0}>
                 <section className="space-y-3">
                     <h2 className="font-semibold">{m.assignments_builtin_heading()}</h2>
                     <ul className="space-y-2">
@@ -638,90 +721,95 @@ export default function AssignmentsRoute() {
                 </section>
             </Show>
 
-            <section className="space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="font-semibold">{m.assignments_yours_heading()}</h2>
-                    <Button variant="secondary" onClick={() => fileRef.current?.click()}>
-                        {m.assignments_import_file()}
-                    </Button>
-                    <input
-                        ref={fileRef}
-                        type="file"
-                        accept="application/json,.json"
-                        className="hidden"
-                        onChange={(event) => {
-                            importFile(event.target.files?.[0]);
-                            event.target.value = "";
-                        }}
-                    />
-                </div>
-                {assignments.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {m.assignments_yours_empty()}
-                    </p>
-                ) : (
-                    <ul className="space-y-2">
-                        {assignments.map((assignment) => {
-                            const steps = stepsFor(assignment);
-                            const missing = missingIn(assignment);
-                            const survivors = availableItemCount(
-                                assignment.items,
-                                (id) => !known.isMissing(id),
-                            );
-                            return (
-                                <AssignmentCard
-                                    key={assignment.id}
-                                    assignment={assignment}
-                                    steps={steps}
-                                    copiedShare={copiedShare}
-                                    onShare={onShare}
-                                    onDownload={onDownload}
-                                    actionsBefore={
-                                        <>
-                                            {missing.length > 0 && (
+            {tab === "list" && (
+                <section className="space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h2 className="font-semibold">{m.assignments_yours_heading()}</h2>
+                        <Button variant="secondary" onClick={() => fileRef.current?.click()}>
+                            {m.assignments_import_file()}
+                        </Button>
+                        <input
+                            ref={fileRef}
+                            type="file"
+                            accept="application/json,.json"
+                            className="hidden"
+                            onChange={(event) => {
+                                importFile(event.target.files?.[0]);
+                                event.target.value = "";
+                            }}
+                        />
+                    </div>
+                    {assignments.length === 0 ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {m.assignments_yours_empty()}
+                        </p>
+                    ) : (
+                        <ul className="space-y-2">
+                            {assignments.map((assignment) => {
+                                const steps = stepsFor(assignment);
+                                const missing = missingIn(assignment);
+                                const survivors = availableItemCount(
+                                    assignment.items,
+                                    (id) => !known.isMissing(id),
+                                );
+                                return (
+                                    <AssignmentCard
+                                        key={assignment.id}
+                                        assignment={assignment}
+                                        steps={steps}
+                                        copiedShare={copiedShare}
+                                        onShare={onShare}
+                                        onDownload={onDownload}
+                                        description={assignment.description}
+                                        actionsBefore={
+                                            <>
+                                                {missing.length > 0 && (
+                                                    <Button
+                                                        variant="secondary"
+                                                        // Pruning every step would leave an empty
+                                                        // assignment; deletion is the honest action then.
+                                                        disabled={survivors === 0}
+                                                        onClick={() => onPruneMissing(assignment)}
+                                                        aria-label={m.assignments_remove_missing_label(
+                                                            {
+                                                                name: assignment.name,
+                                                            },
+                                                        )}
+                                                    >
+                                                        {m.assignments_remove_missing()}
+                                                    </Button>
+                                                )}
                                                 <Button
                                                     variant="secondary"
-                                                    // Pruning every step would leave an empty
-                                                    // assignment; deletion is the honest action then.
-                                                    disabled={survivors === 0}
-                                                    onClick={() => onPruneMissing(assignment)}
-                                                    aria-label={m.assignments_remove_missing_label({
+                                                    onClick={() => startEdit(assignment)}
+                                                    aria-label={m.assignments_edit_label({
                                                         name: assignment.name,
                                                     })}
                                                 >
-                                                    {m.assignments_remove_missing()}
+                                                    {m.assignments_edit()}
                                                 </Button>
-                                            )}
+                                            </>
+                                        }
+                                        actionsAfter={
                                             <Button
-                                                variant="secondary"
-                                                onClick={() => startEdit(assignment)}
-                                                aria-label={m.assignments_edit_label({
+                                                variant="danger"
+                                                onClick={() => onDelete(assignment)}
+                                                aria-label={m.assignments_delete_label({
                                                     name: assignment.name,
                                                 })}
                                             >
-                                                {m.assignments_edit()}
+                                                {m.assignments_remove()}
                                             </Button>
-                                        </>
-                                    }
-                                    actionsAfter={
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => onDelete(assignment)}
-                                            aria-label={m.assignments_delete_label({
-                                                name: assignment.name,
-                                            })}
-                                        >
-                                            {m.assignments_remove()}
-                                        </Button>
-                                    }
-                                >
-                                    {renderSteps(steps)}
-                                </AssignmentCard>
-                            );
-                        })}
-                    </ul>
-                )}
-            </section>
+                                        }
+                                    >
+                                        {renderSteps(steps)}
+                                    </AssignmentCard>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </section>
+            )}
 
             <Link to="/" className={`text-sm ${linkClasses}`}>
                 {m.action_back_home()}
