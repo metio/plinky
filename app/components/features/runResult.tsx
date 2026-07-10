@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { GRADE_COLOR, type Grade } from "../../../core/grade";
+import type { Grade } from "../../../core/grade";
 import type { TempoCurve } from "../../../core/runOutcome";
 import { type Grid, handsPlayed, laggingHand, type RunNote } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { GradeLetter } from "../ui/gradeLetter";
 import { PerformanceStrip } from "../ui/performanceStrip";
 import { ShareCard } from "./shareCard";
 import { TempoGraph } from "../ui/tempoGraph";
@@ -67,9 +68,7 @@ export function RunResult({
                     </div>
                 ))}
             <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
-                <div className={`text-5xl font-bold leading-none ${GRADE_COLOR[grade.letter]}`}>
-                    {grade.letter}
-                </div>
+                <GradeLetter letter={grade.letter} />
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
                     <dt className="text-gray-500 dark:text-gray-400">{m.scores_accuracy()}</dt>
                     <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>

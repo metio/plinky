@@ -3,6 +3,7 @@
 
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, IconButton } from "../components/ui/button";
+import { linkClasses } from "../components/ui/classes";
 import { ConfirmButton } from "../components/ui/confirmButton";
 import { Chip } from "../components/ui/chip";
 import { Show } from "../components/features/conditional";
@@ -405,7 +406,7 @@ export default function LibraryRoute() {
 
                     <ScoreBackup />
 
-                    <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+                    <Link to="/" className={`text-sm ${linkClasses}`}>
                         {m.action_back_home()}
                     </Link>
                 </>

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
+import { linkClasses } from "../components/ui/classes";
 import { CoachMark } from "../components/features/coachMark";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { ScoreViewer } from "../components/features/scoreViewer";
@@ -125,7 +126,7 @@ export default function DailyRoute() {
                 </>
             )}
 
-            <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+            <Link to="/" className={`text-sm ${linkClasses}`}>
                 {m.action_back_home()}
             </Link>
         </main>

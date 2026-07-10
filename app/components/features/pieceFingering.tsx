@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useMemo, useState } from "react";
+import { linkClasses } from "../ui/classes";
 import { useFingeringStore, usePrefsStore, useXmlCodec } from "../../contexts/services";
 import { type FingerMap, fingerKey } from "../../stores/fingeringStore";
 import { scoreToBars, staffFor, windowCells, windowPositions } from "../../../core/scoreToBars";
@@ -146,7 +147,7 @@ export function PieceFingering({ id, xml }: { id: string; xml: string }) {
                             setMap({});
                             setVersion((v) => v + 1);
                         }}
-                        className="text-indigo-700 underline dark:text-indigo-300"
+                        className={linkClasses}
                     >
                         {m.fingering_clear()}
                     </button>

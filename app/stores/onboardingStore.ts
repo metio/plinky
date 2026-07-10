@@ -3,7 +3,7 @@
 
 import { type DiscoveryId, MARKABLE } from "../../core/onboarding";
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore } from "./jsonStore";
+import { createStringSetStore } from "./jsonStore";
 
 // The markable half of the discovery checklist: which try-it-once features the
 // player has reached. The derived steps read real state elsewhere; this store
@@ -20,27 +20,8 @@ export type OnboardingStore = {
 };
 
 export function createOnboardingStore(kv: KeyValueStore): OnboardingStore {
-    const store = createJsonStore<ReadonlySet<DiscoveryId>>(
-        kv,
-        KEY,
-        (raw) => {
-            if (raw === null) {
-                return new Set();
-            }
-            try {
-                const parsed: unknown = JSON.parse(raw);
-                return new Set(
-                    Array.isArray(parsed)
-                        ? parsed.filter((id): id is DiscoveryId =>
-                              MARKABLE.includes(id as DiscoveryId),
-                          )
-                        : [],
-                );
-            } catch {
-                return new Set();
-            }
-        },
-        (value) => [...value],
+    const store = createStringSetStore(kv, KEY, (id): id is DiscoveryId =>
+        MARKABLE.includes(id as DiscoveryId),
     );
     return {
         marked: store.load,

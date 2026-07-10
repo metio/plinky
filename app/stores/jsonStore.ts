@@ -36,7 +36,37 @@ export function writeJson(kv: KeyValueStore, key: string, value: unknown): boole
     }
 }
 
+// The defensive half of a parse callback: absent or corrupt raw data reads as
+// the fallback, and only valid JSON reaches `coerce` — so each store's parse
+// only has to shape a successfully parsed value, not guard the parsing.
+export function parseJson<T>(raw: string | null, fallback: T, coerce: (parsed: unknown) => T): T {
+    if (raw === null) {
+        return fallback;
+    }
+    try {
+        return coerce(JSON.parse(raw));
+    } catch {
+        return fallback;
+    }
+}
+
 type Listener = () => void;
+
+// One subscribe over several stores: the listener is registered with each, and
+// the returned teardown detaches it from all of them — for a store facade that
+// spans more than one key.
+export function mergeSubscribe(
+    ...subscribes: Array<(onChange: Listener) => () => void>
+): (onChange: Listener) => () => void {
+    return (onChange) => {
+        const offs = subscribes.map((subscribe) => subscribe(onChange));
+        return () => {
+            for (const off of offs) {
+                off();
+            }
+        };
+    };
+}
 
 // Same-tab notification plus cross-tab pickup: saves notify the local listeners
 // directly; a change in another tab arrives as the browser's storage event,
@@ -156,6 +186,32 @@ function setRaw(kv: KeyValueStore, key: string, raw: string): boolean {
     } catch {
         return false;
     }
+}
+
+// A set of strings under one key, stored as a JSON array — favorites, seen
+// hints, discovered features. `isValid` narrows which stored strings count as
+// members; anything else (junk, an id from a removed feature) reads as absent.
+export function createStringSetStore<T extends string = string>(
+    kv: KeyValueStore,
+    key: string,
+    isValid: (value: string) => value is T = (value: string): value is T => true,
+): JsonStore<ReadonlySet<T>> {
+    return createJsonStore<ReadonlySet<T>>(
+        kv,
+        key,
+        (raw) =>
+            parseJson(
+                raw,
+                new Set<T>(),
+                (parsed) =>
+                    new Set(
+                        Array.isArray(parsed)
+                            ? parsed.filter((id): id is T => typeof id === "string" && isValid(id))
+                            : [],
+                    ),
+            ),
+        (value) => [...value],
+    );
 }
 
 // A family of values under a common key prefix — one entry per catalogue piece.

@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { isRecord } from "./guards";
+
 // The Plinky score-bundle format: a JSON document with MusicXML embedded, used to
 // back up a library and to share or mass-import a set of scores. Each score carries
 // its own content, so a bundle is self-contained.
@@ -24,10 +26,6 @@ export interface ScorePack {
 }
 
 const FORMAT = "plinky-scores";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
-}
 
 // Tempo and beats-per-bar feed the 60000/tempo playback and grading math, so a
 // zero, negative, or non-finite value is dropped here and re-derived from the

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { attributionFor } from "../../../core/attribution";
+import { linkClasses } from "./classes";
 import { m } from "../../paraglide/messages.js";
 
 // A subtle provenance line for a catalogue piece: its licence (linking to the
@@ -26,7 +27,7 @@ export function Attribution({
         return null;
     }
 
-    const link = "text-indigo-700 underline dark:text-indigo-300";
+    const link = linkClasses;
     return (
         <p className="flex flex-wrap items-center gap-x-2 text-xs text-gray-500 dark:text-gray-500">
             {licenseDetail && (

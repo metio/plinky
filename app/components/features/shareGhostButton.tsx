@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
 import { encodeGhost } from "../../../core/ghost";
 import { SITE_URL } from "../../../core/site";
+import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
 import { localizeHref } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
@@ -32,7 +32,7 @@ export function ShareGhostButton({
     showLabel?: boolean;
 }) {
     // Briefly confirm a clipboard copy on the surface where no native share sheet ran.
-    const [copied, setCopied] = useState(false);
+    const [copied, flashCopied] = useCopied();
     const share = async () => {
         const url = `${SITE_URL}${localizeHref(`/play/${id}`)}?ghost=${encodeGhost(onsets)}`;
         try {
@@ -40,7 +40,7 @@ export function ShareGhostButton({
                 await navigator.share({ url, text: m.ghost_share_boast({ title }) });
             } else {
                 await navigator.clipboard?.writeText(url);
-                setCopied(true);
+                flashCopied();
             }
         } catch {
             // A cancelled share or a blocked clipboard needs no message.

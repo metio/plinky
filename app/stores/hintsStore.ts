@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore } from "./jsonStore";
+import { createStringSetStore } from "./jsonStore";
 
 // Which one-time coaching hints the player has already seen or dismissed, so each
 // shows at most once. A plain per-device set under one key — cleared by the
@@ -18,26 +18,7 @@ export type HintsStore = {
 };
 
 export function createHintsStore(kv: KeyValueStore): HintsStore {
-    const store = createJsonStore<ReadonlySet<string>>(
-        kv,
-        KEY,
-        (raw) => {
-            if (raw === null) {
-                return new Set();
-            }
-            try {
-                const parsed: unknown = JSON.parse(raw);
-                return new Set(
-                    Array.isArray(parsed)
-                        ? parsed.filter((id): id is string => typeof id === "string")
-                        : [],
-                );
-            } catch {
-                return new Set();
-            }
-        },
-        (value) => [...value],
-    );
+    const store = createStringSetStore(kv, KEY);
     return {
         seen: (id) => store.load().has(id),
         markSeen(id) {

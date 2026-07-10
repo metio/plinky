@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, buttonClasses } from "../components/ui/button";
+import { fieldClasses } from "../components/ui/classes";
 import { CoachMark } from "../components/features/coachMark";
 import { ConfirmButton } from "../components/ui/confirmButton";
 import { KeyboardHint } from "../components/ui/keyboardHint";
@@ -12,6 +13,7 @@ import { PianoKeyboard } from "../components/features/pianoKeyboard";
 import { StaffPreview } from "../components/features/staffPreview";
 import { useMidiConnection, useMidiInput } from "../contexts/midi";
 import { downloadBlob } from "../lib/download";
+import { useCopied } from "../hooks/useCopied";
 import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
 import {
@@ -38,8 +40,7 @@ export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.compose_heading(), m.meta_compose_description());
 }
 
-const FIELD =
-    "rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
+const FIELD = fieldClasses;
 
 // The end of the recorded timeline in milliseconds — the moment the last-released
 // note stops sounding. New notes append after it, so a loaded share keeps growing.
@@ -63,7 +64,7 @@ export default function Compose() {
     const [notes, setNotes] = useState<RecordedNote[]>([]);
     const [checkpoint, setCheckpoint] = useState<number | null>(null);
     const [playing, setPlaying] = useState(false);
-    const [copied, setCopied] = useState(false);
+    const [copied, flashCopied] = useCopied();
     const [staffXml, setStaffXml] = useState<string | null>(null);
     const [metronomeOn, setMetronomeOn] = useState(false);
     const [countingIn, setCountingIn] = useState(false);
@@ -237,12 +238,9 @@ export default function Compose() {
         const url = `${window.location.origin}${localizeHref("/compose")}?c=${code}`;
         navigator.clipboard
             ?.writeText(url)
-            .then(() => {
-                setCopied(true);
-                window.setTimeout(() => setCopied(false), 2000);
-            })
+            .then(() => flashCopied())
             .catch(() => {});
-    }, [notes, tempo, beatsPerBar]);
+    }, [notes, tempo, beatsPerBar, flashCopied]);
 
     const downloadMidi = useCallback(() => {
         const data = buildMidiFile(toMidiNotes({ notes, tempo, beatsPerBar }), { tempo });

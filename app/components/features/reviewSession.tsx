@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useScore } from "../../hooks/useScore";
 import { Button } from "../ui/button";
+import { linkClasses } from "../ui/classes";
 import { dueReviews, loadGradedMastery } from "../../lib/gradeProgress";
 import { setBacklog } from "../../../core/mastery";
 import { usePrefsStore, useServices } from "../../contexts/services";
@@ -11,7 +12,7 @@ import { m } from "../../paraglide/messages.js";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ScoreViewer } from "./scoreViewer";
 
-const BACK = "text-sm text-indigo-700 underline dark:text-indigo-300";
+const BACK = `text-sm ${linkClasses}`;
 
 // A guided pass through the pieces that are fading: play each, then move on, with a
 // shelve for anything you're not working on right now. The queue is snapshotted on

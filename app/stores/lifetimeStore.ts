@@ -3,7 +3,7 @@
 
 import { foldRun, type Lifetime, normalizeLifetime, type Skill } from "../../core/lifetime";
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore } from "./jsonStore";
+import { createJsonStore, parseJson } from "./jsonStore";
 
 // The slow-moving skill fingerprint (see core/lifetime): persisted per device,
 // folded on every finished run, read by the You page's progress grid.
@@ -20,16 +20,9 @@ export type LifetimeStore = {
 };
 
 export function createLifetimeStore(kv: KeyValueStore): LifetimeStore {
-    const store = createJsonStore<Lifetime>(kv, KEY, (raw) => {
-        if (raw === null) {
-            return { days: [] };
-        }
-        try {
-            return normalizeLifetime(JSON.parse(raw));
-        } catch {
-            return { days: [] };
-        }
-    });
+    const store = createJsonStore<Lifetime>(kv, KEY, (raw) =>
+        parseJson(raw, { days: [] }, normalizeLifetime),
+    );
     return {
         load: store.load,
         recordRun(run, now = new Date()) {

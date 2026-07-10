@@ -3,7 +3,7 @@
 
 import { parseTheme, THEMES, type Theme } from "../../core/theme";
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore, type JsonStore } from "./jsonStore";
+import { createJsonStore, type JsonStore, parseJson } from "./jsonStore";
 
 // The saved theme choice. The pre-paint bootstrap script in the app root reads
 // the same key directly (it runs before React), so the key is exported for it.
@@ -12,16 +12,7 @@ export const THEME_STORAGE_KEY = "plinky:theme";
 export type ThemeStore = JsonStore<Theme>;
 
 export function createThemeStore(kv: KeyValueStore): ThemeStore {
-    return createJsonStore(kv, THEME_STORAGE_KEY, (raw) => {
-        if (raw === null) {
-            return "system";
-        }
-        try {
-            return parseTheme(JSON.parse(raw));
-        } catch {
-            return "system";
-        }
-    });
+    return createJsonStore(kv, THEME_STORAGE_KEY, (raw) => parseJson(raw, "system", parseTheme));
 }
 
 // The pre-paint bootstrap the app root inlines: sets the dark class from the

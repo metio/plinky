@@ -8,7 +8,10 @@ import { memoryStore } from "../adapters/memoryStore";
 import {
     createJsonStore,
     createKeyedJsonStore,
+    createStringSetStore,
     type JsonStore,
+    mergeSubscribe,
+    parseJson,
     readJson,
     writeJson,
 } from "./jsonStore";
@@ -59,6 +62,77 @@ describe("readJson / writeJson", () => {
         const cycle: Record<string, unknown> = {};
         cycle.self = cycle;
         expect(writeJson(memoryStore(), "k", cycle)).toBe(false);
+    });
+});
+
+describe("parseJson", () => {
+    const coerce = (parsed: unknown): number => (typeof parsed === "number" ? parsed : -1);
+
+    it("reads nothing stored as the fallback without calling coerce", () => {
+        const spy = vi.fn(coerce);
+        expect(parseJson(null, 7, spy)).toBe(7);
+        expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("reads corrupt JSON as the fallback rather than throwing", () => {
+        expect(parseJson("{not json", 7, coerce)).toBe(7);
+    });
+
+    it("hands valid JSON to coerce", () => {
+        expect(parseJson("42", 7, coerce)).toBe(42);
+        expect(parseJson('"junk"', 7, coerce)).toBe(-1);
+    });
+
+    it("contains a throwing coerce to the fallback", () => {
+        expect(
+            parseJson("42", 7, () => {
+                throw new Error("bad shape");
+            }),
+        ).toBe(7);
+    });
+});
+
+describe("createStringSetStore", () => {
+    it("reads nothing stored, corrupt JSON, and a non-array all as the empty set", () => {
+        const kv = memoryStore();
+        const store = createStringSetStore(kv, "plinky:set");
+        expect(store.load().size).toBe(0);
+        kv.set("plinky:set", "{corrupt");
+        expect(store.load().size).toBe(0);
+        kv.set("plinky:set", '{"a":1}');
+        expect(store.load().size).toBe(0);
+    });
+
+    it("round-trips a set and drops non-string entries on read", () => {
+        const kv = memoryStore();
+        const store = createStringSetStore(kv, "plinky:set");
+        expect(store.save(new Set(["a", "b"]))).toBe(true);
+        expect([...store.load()].sort()).toEqual(["a", "b"]);
+        kv.set("plinky:set", JSON.stringify(["a", 1, null, "b"]));
+        expect([...store.load()].sort()).toEqual(["a", "b"]);
+    });
+
+    it("keeps only members the validity guard admits", () => {
+        const kv = memoryStore();
+        kv.set("plinky:set", JSON.stringify(["keep", "drop"]));
+        const store = createStringSetStore(kv, "plinky:set", (id): id is "keep" => id === "keep");
+        expect([...store.load()]).toEqual(["keep"]);
+    });
+});
+
+describe("mergeSubscribe", () => {
+    it("registers the listener with every store and tears all of them down", () => {
+        const a = shapeStore(memoryStore());
+        const b = createJsonStore(memoryStore(), "plinky:test-b", parse);
+        const onChange = vi.fn();
+        const unsubscribe = mergeSubscribe(a.subscribe, b.subscribe)(onChange);
+        a.save({ n: 1 });
+        b.save({ n: 2 });
+        expect(onChange).toHaveBeenCalledTimes(2);
+        unsubscribe();
+        a.save({ n: 3 });
+        b.save({ n: 4 });
+        expect(onChange).toHaveBeenCalledTimes(2);
     });
 });
 

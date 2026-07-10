@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: 0BSD
 
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
-import { decompressMxl } from "../../core/musicxmlFile";
 import type { Score } from "../../core/score";
 import type { Fetcher } from "../ports/fetcher";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { FavoritesStore } from "./favoritesStore";
-import { fetchManifest } from "./manifest";
+import { cachedManifest, fetchMxlXml } from "./manifest";
 
 // The curated song catalogue. Unlike the bundled exercises (inlined into the
 // JS) and user imports (kept in the browser store), songs are too many to
@@ -64,39 +63,10 @@ export function createSongSource(
     kv: KeyValueStore,
     favorites: FavoritesStore,
 ): SongSource {
-    let manifestCache: SongMeta[] | null = null;
-    let manifestInFlight: Promise<SongMeta[]> | null = null;
+    const manifest = cachedManifest<SongMeta>(fetchUrl, MANIFEST_URL);
 
-    const manifest = (): Promise<SongMeta[]> => {
-        if (manifestCache) {
-            return Promise.resolve(manifestCache);
-        }
-        // Concurrent first-render callers share one request rather than each firing the
-        // fetch. Only a completed fetch is cached; a failure clears the in-flight promise
-        // so the next call tries the network again.
-        if (!manifestInFlight) {
-            manifestInFlight = fetchManifest<SongMeta>(fetchUrl, MANIFEST_URL).then((fetched) => {
-                manifestInFlight = null;
-                if (fetched) {
-                    manifestCache = fetched;
-                }
-                return fetched ?? [];
-            });
-        }
-        return manifestInFlight;
-    };
-
-    const fetchXml = async (id: string, license?: string): Promise<string | null> => {
-        try {
-            const response = await fetchUrl(`/songs/${licenseDir(license)}/${id}.mxl`);
-            if (!response.ok) {
-                return null;
-            }
-            return decompressMxl(new Uint8Array(await response.arrayBuffer()));
-        } catch {
-            return null;
-        }
-    };
+    const fetchXml = (id: string, license?: string): Promise<string | null> =>
+        fetchMxlXml(fetchUrl, `/songs/${licenseDir(license)}/${id}.mxl`);
 
     return {
         manifest,

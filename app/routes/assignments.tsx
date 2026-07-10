@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, IconButton } from "../components/ui/button";
+import { compactFieldClasses, linkClasses } from "../components/ui/classes";
 import { downloadBlob } from "../lib/download";
 import { Show } from "../components/features/conditional";
 import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/ui/icons";
@@ -19,6 +20,7 @@ import {
     serializeAssignment,
     slugifyName,
 } from "../../core/assignment";
+import { useCopied } from "../hooks/useCopied";
 import { loadBundledScores, loadCatalog } from "../lib/catalog";
 import { starterAssignment } from "../../core/starterAssignments";
 import type { ExerciseMeta } from "../stores/exerciseSource";
@@ -41,8 +43,7 @@ export function meta(_args: Route.MetaArgs) {
 
 const PICKER_PAGE = 20;
 
-const FIELD =
-    "rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300";
+const FIELD = compactFieldClasses;
 
 // A pickable piece for the builder: a catalogue score or a finger exercise, both
 // reduced to the id and title the basket needs.
@@ -73,9 +74,7 @@ export default function AssignmentsRoute() {
     // Which Share button just copied its link — "draft" or a saved assignment's id —
     // so the confirmation shows on the button that was pressed, not only in the status
     // line that can sit scrolled far above it.
-    const [copiedShare, setCopiedShare] = useState<string | null>(null);
-    const copyTimer = useRef(0);
-    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+    const [copiedShare, flashCopied] = useCopied();
 
     // Builder state.
     const [name, setName] = useState("");
@@ -271,9 +270,7 @@ export default function AssignmentsRoute() {
                 await navigator.clipboard?.writeText(url);
                 // Confirm on the button itself, reverting after a moment; the status
                 // line repeats it for assistive tech.
-                setCopiedShare(buttonKey);
-                window.clearTimeout(copyTimer.current);
-                copyTimer.current = window.setTimeout(() => setCopiedShare(null), 2000);
+                flashCopied(buttonKey);
                 setStatus(m.assignments_link_copied());
             }
         } catch {
@@ -618,7 +615,7 @@ export default function AssignmentsRoute() {
                 )}
             </section>
 
-            <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+            <Link to="/" className={`text-sm ${linkClasses}`}>
                 {m.action_back_home()}
             </Link>
         </main>

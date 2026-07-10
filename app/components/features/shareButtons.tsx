@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
 import { type Brand, BrandIcon } from "../ui/brandIcons";
 
@@ -73,11 +74,8 @@ export function ShareButtons({
     imageSvg: string;
     imageText: string;
 }) {
-    const [copied, setCopied] = useState(false);
-    // The "Copied!" label reverts after a moment; the timer is held so it can be
-    // cleared on unmount, since a card can be navigated away within it.
-    const copyTimer = useRef(0);
-    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+    // The "Copied!" label reverts after a moment.
+    const [copied, flashCopied] = useCopied();
     // Whether this device can hand a file to the system share sheet — the only web
     // path to Instagram and TikTok. Resolved after mount: the prerendered HTML is
     // device-agnostic, so the button reads "Save image" until the client confirms.
@@ -100,11 +98,7 @@ export function ShareButtons({
                     // absent, and the catch covers a denied or failed write.
                     navigator.clipboard
                         ?.writeText(text)
-                        .then(() => {
-                            setCopied(true);
-                            window.clearTimeout(copyTimer.current);
-                            copyTimer.current = window.setTimeout(() => setCopied(false), 2000);
-                        })
+                        .then(() => flashCopied())
                         .catch(() => {});
                 }}
                 className={LINK}

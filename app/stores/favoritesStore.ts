@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore } from "./jsonStore";
+import { createStringSetStore } from "./jsonStore";
 
 // The scores a user has starred, kept on the device. One source of truth over
 // the injected store: the library list subscribes to it, first-run seeding
@@ -22,26 +22,7 @@ export type FavoritesStore = {
 };
 
 export function createFavoritesStore(kv: KeyValueStore): FavoritesStore {
-    const store = createJsonStore<ReadonlySet<string>>(
-        kv,
-        KEY,
-        (raw) => {
-            if (raw === null) {
-                return new Set();
-            }
-            try {
-                const parsed: unknown = JSON.parse(raw);
-                return new Set(
-                    Array.isArray(parsed)
-                        ? parsed.filter((id): id is string => typeof id === "string")
-                        : [],
-                );
-            } catch {
-                return new Set();
-            }
-        },
-        (value) => [...value],
-    );
+    const store = createStringSetStore(kv, KEY);
     return {
         load: store.load,
         has: (id) => store.load().has(id),

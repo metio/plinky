@@ -20,6 +20,7 @@ import {
 import { FIRST_SONG_ID } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { CheckIcon, CloseIcon } from "../ui/icons";
+import { linkClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { Show } from "./conditional";
 
@@ -60,7 +61,7 @@ const DISCOVERY: {
 ];
 
 const DISCOVERY_DISMISSED = "discovery-panel";
-const LINK = "text-indigo-700 underline dark:text-indigo-300";
+const LINK = linkClasses;
 
 // The fresh-visitor state: nothing done, nothing dismissed. Rendering it by default
 // puts the checklist into the prerendered shell, so the common first visit sees it in

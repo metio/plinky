@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/button";
+import { GradeLetter } from "../ui/gradeLetter";
 import { Show } from "./conditional";
 import { useSynth } from "../../hooks/useSynth";
 import { drillToMusicXml } from "../../../core/drillStaff";
@@ -14,7 +15,7 @@ import {
     reasonFor,
     scoreFingering,
 } from "../../../core/fingeringScore";
-import { GRADE_COLOR, type Letter } from "../../../core/grade";
+import type { Letter } from "../../../core/grade";
 import { noteName } from "../../../core/midi";
 import { usePrefsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -263,11 +264,7 @@ export function FingeringDrill({
             {result ? (
                 <div className="space-y-3">
                     <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
-                        <div
-                            className={`text-5xl font-bold leading-none ${GRADE_COLOR[letterFor(result.efficiency)]}`}
-                        >
-                            {letterFor(result.efficiency)}
-                        </div>
+                        <GradeLetter letter={letterFor(result.efficiency)} />
                         <div className="space-y-1 text-sm">
                             <p className="font-medium">
                                 {m.fingering_smoothness({

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { isRecord } from "./guards";
 import { packToCode, unpackFromCode } from "./shareCode";
 
 // A teacher's assignment: a named, ordered list of catalogue ids (bundled pieces,
@@ -27,10 +28,6 @@ export interface Assignment {
 }
 
 const FORMAT = "plinky-assignment";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
-}
 
 // A tempo feeds the 60000/tempo playback math, so only a sane positive value is
 // kept; anything else is dropped and the item simply carries no target.

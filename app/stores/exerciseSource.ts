@@ -3,10 +3,9 @@
 
 import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
 import { type ExerciseConfig, exerciseTitle, generateExercise } from "../../core/exerciseGen";
-import { decompressMxl } from "../../core/musicxmlFile";
 import type { Score } from "../../core/score";
 import type { Fetcher } from "../ports/fetcher";
-import { fetchManifest } from "./manifest";
+import { cachedManifest, fetchMxlXml } from "./manifest";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the
 // fly from the id's config (zero storage, every form instantly available).
@@ -45,43 +44,11 @@ export type ExerciseSource = {
 };
 
 export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
-    let manifestCache: ExerciseMeta[] | null = null;
-    let manifestInFlight: Promise<ExerciseMeta[]> | null = null;
+    const manifest = cachedManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL);
 
-    const manifest = (): Promise<ExerciseMeta[]> => {
-        if (manifestCache) {
-            return Promise.resolve(manifestCache);
-        }
-        // Concurrent first-render callers share one request rather than each firing the
-        // fetch. Only a completed fetch is cached; a failure clears the in-flight promise
-        // so the next call tries the network again.
-        if (!manifestInFlight) {
-            manifestInFlight = fetchManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL).then(
-                (fetched) => {
-                    manifestInFlight = null;
-                    if (fetched) {
-                        manifestCache = fetched;
-                    }
-                    return fetched ?? [];
-                },
-            );
-        }
-        return manifestInFlight;
-    };
-
-    // A study's MusicXML lives in a compressed .mxl named by its fingerprint id;
-    // decompress the fetched bytes to the score string.
-    const fetchStudyXml = async (id: string): Promise<string | null> => {
-        try {
-            const response = await fetchUrl(`/exercises/studies/${id}.mxl`);
-            if (!response.ok) {
-                return null;
-            }
-            return decompressMxl(new Uint8Array(await response.arrayBuffer()));
-        } catch {
-            return null;
-        }
-    };
+    // A study's MusicXML lives in a compressed .mxl named by its fingerprint id.
+    const fetchStudyXml = (id: string): Promise<string | null> =>
+        fetchMxlXml(fetchUrl, `/exercises/studies/${id}.mxl`);
 
     return {
         manifest,

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type Assignment, makeAssignment } from "../../core/assignment";
+import { isRecord } from "../../core/guards";
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore } from "./jsonStore";
+import { createJsonStore, parseJson } from "./jsonStore";
 
 // The received/authored assignments kept on this device (see core/assignment
 // for the model, validation and share-link codec).
@@ -19,17 +20,9 @@ export type AssignmentsStore = {
     subscribe(onChange: () => void): () => void;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null;
-}
-
 export function createAssignmentsStore(kv: KeyValueStore): AssignmentsStore {
-    const store = createJsonStore<Assignment[]>(kv, KEY, (raw) => {
-        if (raw === null) {
-            return [];
-        }
-        try {
-            const parsed: unknown = JSON.parse(raw);
+    const store = createJsonStore<Assignment[]>(kv, KEY, (raw) =>
+        parseJson(raw, [], (parsed) => {
             if (!Array.isArray(parsed)) {
                 return [];
             }
@@ -48,10 +41,8 @@ export function createAssignmentsStore(kv: KeyValueStore): AssignmentsStore {
                     return assignment.items.length > 0 ? assignment : null;
                 })
                 .filter((entry): entry is Assignment => entry !== null);
-        } catch {
-            return [];
-        }
-    });
+        }),
+    );
 
     return {
         list: store.load,

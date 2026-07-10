@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect } from "react";
+import { linkClasses } from "../components/ui/classes";
 import { itemsForPage, paragraphs } from "../../core/help";
 import type { HelpItem } from "../../core/help";
 import { useHelp } from "../hooks/useHelp";
@@ -58,7 +59,7 @@ function HelpBlock({ item }: { item: HelpItem }) {
                     href={item.linkUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-block text-sm text-indigo-700 underline dark:text-indigo-300"
+                    className={`inline-block text-sm ${linkClasses}`}
                 >
                     {m.help_learn_more()} →
                 </a>

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
+import { linkClasses } from "../components/ui/classes";
 import { DangerZone } from "../components/features/dangerZone";
 import { HandSize } from "../components/features/handSize";
 import { KeyMapping } from "../components/features/keyMapping";
@@ -254,7 +255,7 @@ export default function Settings() {
                     href="https://github.com/metio/plinky/issues"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm text-indigo-700 underline dark:text-indigo-300"
+                    className={`text-sm ${linkClasses}`}
                 >
                     {m.settings_get_help()} →
                 </a>

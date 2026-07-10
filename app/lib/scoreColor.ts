@@ -65,13 +65,17 @@ function partsOf(gNote: unknown): SVGElement[] {
 // VexFlow gives each glyph its own explicit paint, so a colour set on the group doesn't
 // cascade — set it on the element and every descendant. Both fill and stroke are set, so
 // one call colours filled glyphs (noteheads, beams) and stroked ones (stems) alike.
-export function paintElement(element: SVGElement, color: string): void {
-    element.setAttribute("fill", color);
-    element.setAttribute("stroke", color);
+function setColors(element: SVGElement, fill: string, stroke: string): void {
+    element.setAttribute("fill", fill);
+    element.setAttribute("stroke", stroke);
     for (const child of element.querySelectorAll("*")) {
-        child.setAttribute("fill", color);
-        child.setAttribute("stroke", color);
+        child.setAttribute("fill", fill);
+        child.setAttribute("stroke", stroke);
     }
+}
+
+export function paintElement(element: SVGElement, color: string): void {
+    setColors(element, color, color);
 }
 
 // The rendered SVG groups of the playable notes at each step, in the same order
@@ -273,12 +277,7 @@ function capturePart(element: SVGElement): PaintedPart {
 }
 
 function restorePart({ element, fill, stroke }: PaintedPart): void {
-    element.setAttribute("fill", fill);
-    element.setAttribute("stroke", stroke);
-    for (const child of element.querySelectorAll("*")) {
-        child.setAttribute("fill", fill);
-        child.setAttribute("stroke", stroke);
-    }
+    setColors(element, fill, stroke);
 }
 
 // Paints the playable notes at the cursor's current position an "active" colour — whole

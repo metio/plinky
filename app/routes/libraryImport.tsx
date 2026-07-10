@@ -4,6 +4,7 @@
 import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../contexts/services";
 import { useState } from "react";
 import { Button, buttonClasses } from "../components/ui/button";
+import { fieldClasses, linkClasses } from "../components/ui/classes";
 import { UploadIcon } from "../components/ui/icons";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { GradeChip } from "../components/features/scoreGrade";
@@ -41,8 +42,7 @@ type Draft = {
     grade: number;
 };
 
-const FIELD =
-    "w-full rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
+const FIELD = `w-full ${fieldClasses}`;
 
 export default function LibraryImportRoute() {
     const store = useStore();
@@ -140,7 +140,7 @@ export default function LibraryImportRoute() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.import_intro()}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                     {m.import_local_note()}{" "}
-                    <Link to="/settings" className="text-indigo-700 underline dark:text-indigo-300">
+                    <Link to="/settings" className={linkClasses}>
                         {m.import_backup_link()}
                     </Link>
                     .
@@ -279,10 +279,7 @@ export default function LibraryImportRoute() {
                 </div>
             )}
 
-            <Link
-                to="/library"
-                className="block text-sm text-indigo-700 underline dark:text-indigo-300"
-            >
+            <Link to="/library" className={`block text-sm ${linkClasses}`}>
                 {m.import_back_to_library()}
             </Link>
         </main>

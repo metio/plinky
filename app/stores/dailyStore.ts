@@ -3,7 +3,7 @@
 
 import type { DailyResult } from "../../core/daily";
 import type { KeyValueStore } from "../ports/keyValueStore";
-import { createJsonStore } from "./jsonStore";
+import { createJsonStore, mergeSubscribe, parseJson } from "./jsonStore";
 
 // The daily challenge's per-device memory: the last daily completed (enough for a
 // ✓ on today's tile and the onboarding step — deliberately NOT a streak; Plinky
@@ -37,19 +37,10 @@ function cleanNumber(value: unknown): number {
 type StoredResult = (DailyResult & { number: number }) | null;
 
 export function createDailyStore(kv: KeyValueStore): DailyStore {
-    const done = createJsonStore<number>(kv, DONE_KEY, (raw) => {
-        try {
-            return cleanNumber(JSON.parse(raw ?? "0"));
-        } catch {
-            return 0;
-        }
-    });
-    const result = createJsonStore<StoredResult>(kv, RESULT_KEY, (raw) => {
-        if (raw === null) {
-            return null;
-        }
-        try {
-            const parsed = JSON.parse(raw) as Record<string, unknown> | null;
+    const done = createJsonStore<number>(kv, DONE_KEY, (raw) => parseJson(raw, 0, cleanNumber));
+    const result = createJsonStore<StoredResult>(kv, RESULT_KEY, (raw) =>
+        parseJson(raw, null, (value) => {
+            const parsed = value as Record<string, unknown> | null;
             if (
                 !parsed ||
                 typeof parsed.number !== "number" ||
@@ -62,10 +53,8 @@ export function createDailyStore(kv: KeyValueStore): DailyStore {
                 return null;
             }
             return parsed as unknown as StoredResult;
-        } catch {
-            return null;
-        }
-    });
+        }),
+    );
 
     return {
         lastDone: done.load,
@@ -84,13 +73,6 @@ export function createDailyStore(kv: KeyValueStore): DailyStore {
             return rest;
         },
         saveResult: (number, value) => result.save({ number, ...value }),
-        subscribe(onChange) {
-            const offDone = done.subscribe(onChange);
-            const offResult = result.subscribe(onChange);
-            return () => {
-                offDone();
-                offResult();
-            };
-        },
+        subscribe: mergeSubscribe(done.subscribe, result.subscribe),
     };
 }

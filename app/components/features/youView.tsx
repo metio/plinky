@@ -26,6 +26,7 @@ import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import type { Grid } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
 import { buttonClasses } from "../ui/button";
+import { linkClasses } from "../ui/classes";
 import { Show } from "./conditional";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ShareButtons } from "./shareButtons";
@@ -53,7 +54,7 @@ const GRADE_ABOUT: Record<number, () => string> = {
 };
 
 const SUGGESTION_COUNT = 4;
-const LINK = "text-indigo-700 underline dark:text-indigo-300";
+const LINK = linkClasses;
 
 function Stat({ label, value }: { label: string; value: string }) {
     return (
@@ -318,7 +319,7 @@ export function YouView() {
                 />
             )}
 
-            <Link to="/" className="text-sm text-indigo-700 underline dark:text-indigo-300">
+            <Link to="/" className={`text-sm ${LINK}`}>
                 {m.action_back_home()}
             </Link>
         </main>

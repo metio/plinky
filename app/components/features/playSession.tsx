@@ -10,6 +10,7 @@ import {
     useMemo,
     useRef,
     useState,
+    useSyncExternalStore,
 } from "react";
 import { cadence } from "../../../core/cadence";
 import type { Grade } from "../../../core/grade";
@@ -27,7 +28,7 @@ import { compositionFromRun, type RunStep, type Take } from "../../../core/takes
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
-import { useServices, useXmlCodec } from "../../contexts/services";
+import { useHintsStore, useServices, useXmlCodec } from "../../contexts/services";
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useGhostRace } from "../../hooks/useGhostRace";
 import { useKeepUp } from "../../hooks/useKeepUp";
@@ -47,6 +48,9 @@ import { paintPlayedNotes } from "../../lib/scoreColor";
 import { recordRun } from "../../lib/recordRun";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
+
+// The one-time hint nudging a touch phone sideways for a wider keyboard.
+const ROTATE_HINT_ID = "rotate";
 
 // Everything a piece needs to be played: the OSMD render surface, the transports (Listen,
 // self-paced Practice, tempo-locked keep-up), the ghost race, the loop, the tempo and
@@ -182,13 +186,15 @@ function usePlaySessionValue({
     const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
     const [raceGhost, setRaceGhost] = usePref(prefsStore, "raceGhost");
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
-    // when it would actually help (portrait, no MIDI). Read after mount to avoid a
-    // hydration mismatch; the portrait layout stays fully usable, so this never forces
-    // an orientation (WCAG 1.3.4).
-    const [rotateDismissed, setRotateDismissed] = useState(false);
-    useEffect(() => {
-        setRotateDismissed(services.store.get("plinky:rotate-hint") === "dismissed");
-    }, [services.store]);
+    // when it would actually help (portrait, no MIDI). The server snapshot treats it as
+    // dismissed so the prerendered HTML never flashes it; the portrait layout stays
+    // fully usable, so this never forces an orientation (WCAG 1.3.4).
+    const hints = useHintsStore();
+    const rotateDismissed = useSyncExternalStore(
+        hints.subscribe,
+        () => hints.seen(ROTATE_HINT_ID),
+        () => true,
+    );
     // The notation the mobile focus strip shows — transposed to match what's played,
     // but un-annotated (it's for reading the bar, not the printed fingering).
     const focusXml = useMemo(
@@ -710,8 +716,7 @@ function usePlaySessionValue({
 
     // Dismiss the rotate-your-phone nudge, and remember the choice.
     const dismissRotate = () => {
-        services.store.set("plinky:rotate-hint", "dismissed");
-        setRotateDismissed(true);
+        hints.markSeen(ROTATE_HINT_ID);
     };
 
     return {

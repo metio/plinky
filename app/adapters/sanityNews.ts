@@ -4,6 +4,12 @@
 import { type NewsItem, parseNews } from "../../core/news";
 import type { Fetcher } from "../ports/fetcher";
 import type { NewsSource } from "../ports/news";
+import {
+    fetchSanityResult,
+    type SanityConfig,
+    sanityProjectFromEnv,
+    sanityQueryUrl,
+} from "./sanity";
 
 // Reads the active news item from a Sanity project's public query API. The editor
 // publishes a picture + link in Sanity Studio; the live app fetches it here — no
@@ -18,15 +24,7 @@ import type { NewsSource } from "../ports/news";
 // the image asset to a direct https CDN URL. News is hidden when the switch is
 // explicitly off, so the board works with just a shown item and no settings doc.
 
-export type SanityConfig = {
-    projectId: string;
-    dataset: string;
-    // Sanity API version, `YYYY-MM-DD` (without the leading `v`).
-    apiVersion: string;
-    // The GROQ query returning one news document already shaped to the loose
-    // fields parseNews expects.
-    query: string;
-};
+export type { SanityConfig };
 
 const DEFAULT_QUERY =
     '{"enabled": *[_type == "siteSettings"][0].newsEnabled, ' +
@@ -36,29 +34,15 @@ const DEFAULT_QUERY =
 
 // The Sanity config from build-time env, or null when the project isn't wired
 // yet — in which case the source stays silent and never touches the network.
-// Vite inlines `VITE_`-prefixed vars at build; unset means no news.
 export function sanityConfigFromEnv(): SanityConfig | null {
-    const projectId = import.meta.env?.VITE_SANITY_PROJECT_ID as string | undefined;
-    const dataset = import.meta.env?.VITE_SANITY_DATASET as string | undefined;
-    if (!projectId || !dataset) {
+    const project = sanityProjectFromEnv();
+    if (!project) {
         return null;
     }
     return {
-        projectId,
-        dataset,
-        apiVersion:
-            (import.meta.env?.VITE_SANITY_API_VERSION as string | undefined) || "2024-01-01",
+        ...project,
         query: (import.meta.env?.VITE_SANITY_QUERY as string | undefined) || DEFAULT_QUERY,
     };
-}
-
-function queryUrl(config: SanityConfig): string {
-    // The `apicdn` host is the cached, read-optimized endpoint meant for public
-    // client reads; CORS is open for a public dataset.
-    return (
-        `https://${config.projectId}.apicdn.sanity.io/v${config.apiVersion}` +
-        `/data/query/${config.dataset}?query=${encodeURIComponent(config.query)}`
-    );
 }
 
 export function createSanityNews(
@@ -70,33 +54,18 @@ export function createSanityNews(
             if (!config) {
                 return null;
             }
-            try {
-                // Bypass the browser HTTP cache: the master switch and the shown item
-                // change in Studio without a redeploy, so a cached "off" (or a stale
-                // item) must never outlive a publish. Sanity's apicdn is purged on
-                // publish, so the network read is fresh; only the client cache is the risk.
-                const response = await fetchUrl(queryUrl(config), { cache: "no-store" });
-                if (!response.ok) {
-                    return null;
-                }
-                const body: unknown = await response.json();
-                const result = (body as { result?: unknown } | null)?.result;
-                if (typeof result !== "object" || result === null) {
-                    return null;
-                }
-                const { enabled, item } = result as { enabled?: unknown; item?: unknown };
-                // The siteSettings master switch: the board is hidden only when
-                // `newsEnabled` is explicitly false, so it works with just a shown
-                // item even before any settings document exists.
-                if (enabled === false) {
-                    return null;
-                }
-                return parseNews(item);
-            } catch {
-                // A network failure, a non-JSON body, or a malformed result all
-                // mean no news — never a thrown error into the render.
+            const result = await fetchSanityResult(fetchUrl, sanityQueryUrl(config));
+            if (typeof result !== "object" || result === null) {
                 return null;
             }
+            const { enabled, item } = result as { enabled?: unknown; item?: unknown };
+            // The siteSettings master switch: the board is hidden only when
+            // `newsEnabled` is explicitly false, so it works with just a shown
+            // item even before any settings document exists.
+            if (enabled === false) {
+                return null;
+            }
+            return parseNews(item);
         },
     };
 }

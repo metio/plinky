@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { m } from "../../paraglide/messages.js";
+import { linkClasses } from "./classes";
 import { LocalizedLink as Link } from "./localizedLink";
 
 function formatOffset(offset: number): string {
@@ -38,7 +39,7 @@ export function KeyboardHint({ octaveOffset }: { octaveOffset: number }) {
                     <span className="font-mono">{formatOffset(octaveOffset)}</span>.
                 </p>
                 <p>
-                    <Link to="/settings" className="text-indigo-700 underline dark:text-indigo-300">
+                    <Link to="/settings" className={linkClasses}>
                         {m.keyboard_hint_customise()}
                     </Link>
                 </p>
