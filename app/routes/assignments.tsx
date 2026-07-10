@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, IconButton } from "../components/ui/button";
 import { compactFieldClasses, linkClasses } from "../components/ui/classes";
@@ -56,6 +56,57 @@ function done(id: string, mastery: MasteryStore): boolean {
 
 const STEP_MARK =
     "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold";
+
+// One assignment in a list: name + progress, the Share/Download pair, and the
+// step list. Extra buttons slot in before Share (`actionsBefore`) and after
+// Download (`actionsAfter`); the children are the rendered steps.
+function AssignmentCard({
+    assignment,
+    steps,
+    copiedShare,
+    onShare,
+    onDownload,
+    actionsBefore,
+    actionsAfter,
+    description,
+    children,
+}: {
+    assignment: Assignment;
+    steps: ReturnType<typeof trackSteps>;
+    copiedShare: string | null;
+    onShare: (assignment: Assignment, key: string) => void;
+    onDownload: (assignment: Assignment) => void;
+    actionsBefore?: ReactNode;
+    actionsAfter?: ReactNode;
+    description?: string;
+    children: ReactNode;
+}) {
+    const doneCount = steps.filter((step) => step.status === "done").length;
+    return (
+        <li className="space-y-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800">
+            <div className="flex flex-wrap items-center gap-2">
+                <span className="flex-1">
+                    <span className="font-medium">{assignment.name}</span>{" "}
+                    <span className="tabular-nums text-gray-500 dark:text-gray-400">
+                        {doneCount}/{steps.length}
+                    </span>
+                </span>
+                {actionsBefore}
+                <Button variant="secondary" onClick={() => onShare(assignment, assignment.id)}>
+                    {copiedShare === assignment.id ? m.share_copied() : m.assignments_share()}
+                </Button>
+                <Button variant="secondary" onClick={() => onDownload(assignment)}>
+                    {m.assignments_download()}
+                </Button>
+                {actionsAfter}
+            </div>
+            {description && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
+            )}
+            {children}
+        </li>
+    );
+}
 
 export default function AssignmentsRoute() {
     const store = useStore();
@@ -495,41 +546,18 @@ export default function AssignmentsRoute() {
                     <ul className="space-y-2">
                         {builtin.map((assignment) => {
                             const steps = stepsFor(assignment);
-                            const doneCount = steps.filter((step) => step.status === "done").length;
                             return (
-                                <li
+                                <AssignmentCard
                                     key={assignment.id}
-                                    className="space-y-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
+                                    assignment={assignment}
+                                    steps={steps}
+                                    copiedShare={copiedShare}
+                                    onShare={onShare}
+                                    onDownload={onDownload}
+                                    description={assignment.description}
                                 >
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span className="flex-1">
-                                            <span className="font-medium">{assignment.name}</span>{" "}
-                                            <span className="tabular-nums text-gray-500 dark:text-gray-400">
-                                                {doneCount}/{steps.length}
-                                            </span>
-                                        </span>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => onShare(assignment, assignment.id)}
-                                        >
-                                            {copiedShare === assignment.id
-                                                ? m.share_copied()
-                                                : m.assignments_share()}
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => onDownload(assignment)}
-                                        >
-                                            {m.assignments_download()}
-                                        </Button>
-                                    </div>
-                                    {assignment.description && (
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            {assignment.description}
-                                        </p>
-                                    )}
                                     {renderSteps(steps)}
-                                </li>
+                                </AssignmentCard>
                             );
                         })}
                     </ul>
@@ -561,19 +589,15 @@ export default function AssignmentsRoute() {
                     <ul className="space-y-2">
                         {assignments.map((assignment) => {
                             const steps = stepsFor(assignment);
-                            const doneCount = steps.filter((step) => step.status === "done").length;
                             return (
-                                <li
+                                <AssignmentCard
                                     key={assignment.id}
-                                    className="space-y-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
-                                >
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span className="flex-1">
-                                            <span className="font-medium">{assignment.name}</span>{" "}
-                                            <span className="tabular-nums text-gray-500 dark:text-gray-400">
-                                                {doneCount}/{steps.length}
-                                            </span>
-                                        </span>
+                                    assignment={assignment}
+                                    steps={steps}
+                                    copiedShare={copiedShare}
+                                    onShare={onShare}
+                                    onDownload={onDownload}
+                                    actionsBefore={
                                         <Button
                                             variant="secondary"
                                             onClick={() => startEdit(assignment)}
@@ -583,20 +607,8 @@ export default function AssignmentsRoute() {
                                         >
                                             {m.assignments_edit()}
                                         </Button>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => onShare(assignment, assignment.id)}
-                                        >
-                                            {copiedShare === assignment.id
-                                                ? m.share_copied()
-                                                : m.assignments_share()}
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => onDownload(assignment)}
-                                        >
-                                            {m.assignments_download()}
-                                        </Button>
+                                    }
+                                    actionsAfter={
                                         <Button
                                             variant="danger"
                                             onClick={() => onDelete(assignment)}
@@ -606,9 +618,10 @@ export default function AssignmentsRoute() {
                                         >
                                             {m.assignments_remove()}
                                         </Button>
-                                    </div>
+                                    }
+                                >
                                     {renderSteps(steps)}
-                                </li>
+                                </AssignmentCard>
                             );
                         })}
                     </ul>
