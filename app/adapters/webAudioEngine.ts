@@ -119,7 +119,13 @@ const PARTIALS: { ratio: number; gain: number; type: OscillatorType }[] = [
     { ratio: 4, gain: 0.1, type: "sine" },
 ];
 
-function strike(ctx: AudioContext, { note, gain, duration, delay }: NoteStrike): void {
+// The voice is written against BaseAudioContext so the same synthesis renders
+// live (AudioContext) and into a file (OfflineAudioContext, for video export) —
+// one recipe, so an exported take sounds exactly like its in-app replay.
+export function renderStrike(
+    ctx: BaseAudioContext,
+    { note, gain, duration, delay }: NoteStrike,
+): void {
     const now = ctx.currentTime + Math.max(0, delay);
     const frequency = midiToFrequency(note);
 
@@ -189,7 +195,7 @@ export const webAudioEngine: AudioEngine = {
     strike(note) {
         const ctx = context();
         if (ctx && note.gain > 0) {
-            strike(ctx, note);
+            renderStrike(ctx, note);
         }
     },
     click(time, kind, gain) {

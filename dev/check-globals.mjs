@@ -19,6 +19,7 @@ const CONFINED = {
     XMLSerializer: ["app/adapters/domXmlCodec.ts"],
     requestMIDIAccess: ["app/adapters/webMidi.ts"],
     AudioContext: ["app/adapters/webAudioEngine.ts"],
+    OfflineAudioContext: ["app/adapters/offlineAudio.ts"],
 };
 
 function walk(dir) {
