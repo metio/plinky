@@ -399,23 +399,6 @@ export default function AssignmentsRoute() {
 
             <section className="space-y-3">
                 <h2 className="font-semibold">{m.assignments_build_heading()}</h2>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                    <input
-                        className={`${FIELD} flex-1`}
-                        placeholder={m.assignments_name_placeholder()}
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        aria-label={m.assignments_name_label()}
-                    />
-                    <input
-                        className={`${FIELD} flex-1`}
-                        placeholder={m.assignments_description_placeholder()}
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                        aria-label={m.assignments_description_label()}
-                    />
-                </div>
-
                 <input
                     className={`${FIELD} w-full`}
                     placeholder={m.assignments_search_placeholder()}
@@ -514,6 +497,24 @@ export default function AssignmentsRoute() {
                     </p>
                 )}
 
+                {/* Naming sits right above Save so the last step before saving
+                    is in view — the disabled button explains itself. */}
+                <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                        className={`${FIELD} flex-1`}
+                        placeholder={m.assignments_name_placeholder()}
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        aria-label={m.assignments_name_label()}
+                    />
+                    <input
+                        className={`${FIELD} flex-1`}
+                        placeholder={m.assignments_description_placeholder()}
+                        value={description}
+                        onChange={(event) => setDescription(event.target.value)}
+                        aria-label={m.assignments_description_label()}
+                    />
+                </div>
                 <div className="flex flex-wrap gap-2">
                     <Button variant="primary" disabled={!canSave} onClick={onSave}>
                         {m.assignments_save()}
