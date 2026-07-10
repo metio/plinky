@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Attribution } from "../components/ui/attribution";
+import { Button } from "../components/ui/button";
 import { attributionFor } from "../../core/attribution";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
@@ -52,8 +53,11 @@ export function meta({ params }: Route.MetaArgs) {
 export default function PlayRoute({ params }: Route.ComponentProps) {
     const onboarding = useOnboardingStore();
     // Resolves a tick after paint: undefined while loading, null when there is no
-    // such score.
-    const score = useScore(params.scoreId);
+    // such score, "unavailable" when a fetch failed — a retry bumps `attempt`
+    // to ask again (a failed fetch is never cached).
+    const [attempt, setAttempt] = useState(0);
+    const resolved = useScore(params.scoreId, attempt);
+    const score = resolved === "unavailable" ? undefined : resolved;
     const [mode, setMode] = useState<PlayMode>("play");
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
@@ -135,6 +139,16 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
             )}
             <Show when={score === null}>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.play_not_found()}</p>
+            </Show>
+            <Show when={resolved === "unavailable"}>
+                <div className="space-y-3">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {m.play_unavailable()}
+                    </p>
+                    <Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>
+                        {m.play_retry()}
+                    </Button>
+                </div>
             </Show>
         </main>
     );

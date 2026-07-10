@@ -7,11 +7,15 @@ import { resolveScore, type Score } from "../lib/catalog";
 
 // Resolve a score id across every source, the way the play page does. Bundled and
 // user scores resolve synchronously from local storage; exercises and songs fetch
-// their MusicXML on demand. Returns `undefined` while loading and `null` when no
-// such score exists. A new id re-resolves and discards a stale in-flight fetch.
-export function useScore(scoreId: string): Score | null | undefined {
+// their MusicXML on demand. Returns `undefined` while loading, `null` when no such
+// score exists, and "unavailable" when a fetch failed and the answer is unknown —
+// a valid piece behind a flaky network must not read as nonexistent. Bumping
+// `attempt` re-resolves (a failed manifest is never cached, so a retry can
+// succeed); a new id re-resolves and discards a stale in-flight fetch.
+export function useScore(scoreId: string, attempt = 0): Score | null | undefined | "unavailable" {
     const { songs, exercises, store } = useServices();
-    const [score, setScore] = useState<Score | null | undefined>(undefined);
+    const [score, setScore] = useState<Score | null | undefined | "unavailable">(undefined);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` is a hook argument; a bump must re-run the resolution
     useEffect(() => {
         const local = resolveScore(store, scoreId);
         if (local) {
@@ -21,7 +25,20 @@ export function useScore(scoreId: string): Score | null | undefined {
         setScore(undefined);
         let cancelled = false;
         (async () => {
-            const found = (await exercises.resolve(scoreId)) ?? (await songs.resolve(scoreId));
+            const fromExercises = await exercises.resolve(scoreId);
+            if (fromExercises !== null && fromExercises !== "unavailable") {
+                if (!cancelled) {
+                    setScore(fromExercises);
+                }
+                return;
+            }
+            const fromSongs = await songs.resolve(scoreId);
+            const found =
+                fromSongs !== null && fromSongs !== "unavailable"
+                    ? fromSongs
+                    : fromExercises === "unavailable" || fromSongs === "unavailable"
+                      ? ("unavailable" as const)
+                      : null;
             if (!cancelled) {
                 setScore(found);
             }
@@ -29,6 +46,6 @@ export function useScore(scoreId: string): Score | null | undefined {
         return () => {
             cancelled = true;
         };
-    }, [scoreId, songs, exercises, store]);
+    }, [scoreId, songs, exercises, store, attempt]);
     return score;
 }

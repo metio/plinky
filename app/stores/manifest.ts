@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { decompressMxl } from "../../core/musicxmlFile";
+import type { Score } from "../../core/score";
 import type { Fetcher } from "../ports/fetcher";
+
+// The outcome of resolving a catalogue id: the Score, null when a loaded
+// catalogue has no such piece, or "unavailable" when the network kept the
+// question from being answered — a real piece must never read as nonexistent
+// just because a fetch failed.
+export type ResolvedScore = Score | "unavailable" | null;
 
 // Fetch a catalogue manifest: a JSON array whose entries carry a string id.
 // Returns the validated entries for a completed fetch, or null for anything
@@ -38,14 +45,17 @@ export async function fetchManifest<T extends { id: string }>(
 
 // The manifest fetch as a memoized getter: concurrent first-render callers share
 // one request rather than each firing the fetch. Only a completed fetch is cached
-// for the session; a failure answers [] for that call only and clears the
-// in-flight promise, so the next call tries the network again.
+// for the session; a failure answers null for that call only and clears the
+// in-flight promise, so the next call tries the network again. The null is part
+// of the contract: "the catalogue is empty" and "the catalogue is unreachable"
+// must stay distinguishable, or an offline moment would read as every fetched
+// piece having vanished.
 export function cachedManifest<T extends { id: string }>(
     fetchUrl: Fetcher,
     url: string,
-): () => Promise<T[]> {
+): () => Promise<T[] | null> {
     let cache: T[] | null = null;
-    let inFlight: Promise<T[]> | null = null;
+    let inFlight: Promise<T[] | null> | null = null;
     return () => {
         if (cache) {
             return Promise.resolve(cache);
@@ -56,7 +66,7 @@ export function cachedManifest<T extends { id: string }>(
                 if (fetched) {
                     cache = fetched;
                 }
-                return fetched ?? [];
+                return fetched;
             });
         }
         return inFlight;

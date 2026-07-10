@@ -12,15 +12,19 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import {
     type Assignment,
     type AssignmentItem,
+    availableItemCount,
     decodeAssignmentLink,
     encodeAssignmentLink,
     makeAssignment,
+    missingAssignmentIds,
     newAssignmentId,
     parseAssignment,
+    pruneAssignment,
     serializeAssignment,
     slugifyName,
 } from "../../core/assignment";
 import { useCopied } from "../hooks/useCopied";
+import { useKnownPieces } from "../hooks/useKnownPieces";
 import { loadBundledScores, loadCatalog } from "../lib/catalog";
 import { starterAssignment } from "../../core/starterAssignments";
 import type { ExerciseMeta } from "../stores/exerciseSource";
@@ -113,6 +117,9 @@ export default function AssignmentsRoute() {
     const assignmentsStore = useAssignmentsStore();
     const masteryStore = useMasteryStore();
     const exercises = useExerciseSource();
+    // Whether a step's id resolves anywhere the play page can — indeterminate
+    // (never "missing") until every source has loaded.
+    const known = useKnownPieces();
     const [searchParams] = useSearchParams();
     const [pool, setPool] = useState<PoolItem[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -139,7 +146,10 @@ export default function AssignmentsRoute() {
 
     useEffect(() => {
         setAssignments(assignmentsStore.list());
-        exercises.manifest().then((exercises: ExerciseMeta[]) => {
+        // A failed manifest (null) leaves the picker to the local catalogue for
+        // now; missing-ness is judged by useKnownPieces, never by this pool.
+        exercises.manifest().then((manifest: ExerciseMeta[] | null) => {
+            const exercises = manifest ?? [];
             const fromCatalog = loadCatalog(store).map((score) => ({
                 id: score.id,
                 title: score.title,
@@ -166,10 +176,16 @@ export default function AssignmentsRoute() {
         setIncoming(decodeAssignmentLink(searchParams.get("assignment") ?? ""));
     }, [searchParams]);
 
+    // The picker pool covers the catalogue and exercises; songs are labelled from
+    // the wider known-pieces set, and an unresolved id falls back to itself.
     const titleOf = useMemo(() => {
         const byId = new Map(pool.map((entry) => [entry.id, entry.title]));
-        return (id: string) => byId.get(id) ?? id;
-    }, [pool]);
+        return (id: string) => byId.get(id) ?? known.titleOf(id) ?? id;
+    }, [pool, known]);
+
+    // The steps of an assignment whose ids no longer resolve on this device.
+    const missingIn = (assignment: Assignment) =>
+        missingAssignmentIds(assignment.items, (id) => !known.isMissing(id));
 
     const matches = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -276,16 +292,24 @@ export default function AssignmentsRoute() {
                     >
                         {step.status === "done" ? <CheckIcon className="h-4 w-4" /> : index + 1}
                     </span>
-                    <Link
-                        to={`/play/${step.scoreId}`}
-                        className={
-                            step.status === "current"
-                                ? "font-medium text-indigo-700 dark:text-indigo-300"
-                                : "text-gray-700 hover:underline dark:text-gray-300"
-                        }
-                    >
-                        {titleOf(step.scoreId)}
-                    </Link>
+                    {known.isMissing(step.scoreId) ? (
+                        // A dead id gets a labelled placeholder instead of a link into
+                        // the play page's "not on this device" dead end.
+                        <span className="italic text-gray-400 dark:text-gray-500">
+                            {m.assignments_step_missing()}
+                        </span>
+                    ) : (
+                        <Link
+                            to={`/play/${step.scoreId}`}
+                            className={
+                                step.status === "current"
+                                    ? "font-medium text-indigo-700 dark:text-indigo-300"
+                                    : "text-gray-700 hover:underline dark:text-gray-300"
+                            }
+                        >
+                            {titleOf(step.scoreId)}
+                        </Link>
+                    )}
                 </li>
             ))}
         </ol>
@@ -334,6 +358,18 @@ export default function AssignmentsRoute() {
         refresh();
     };
 
+    // Save the assignment with its missing steps dropped. The confirmation is
+    // gated on the store's verdict, so a failed write never reads as a save.
+    const onPruneMissing = (assignment: Assignment) => {
+        const pruned = pruneAssignment(assignment, (id) => !known.isMissing(id));
+        if (assignmentsStore.save(pruned)) {
+            refresh();
+            setStatus(m.assignments_missing_removed({ name: pruned.name }));
+        } else {
+            setStatus(m.assignments_save_failed());
+        }
+    };
+
     // Re-id an imported assignment so it can't overwrite one already saved under the
     // same name, then store it and surface it in the list.
     const importAssignment = (assignment: Assignment) => {
@@ -343,7 +379,18 @@ export default function AssignmentsRoute() {
             : assignment;
         if (assignmentsStore.save(stored)) {
             refresh();
-            setStatus(m.assignments_imported({ name: stored.name }));
+            // With the sources loaded, an import whose pieces don't all resolve says
+            // so — the steps still land, marked missing, and play once imported.
+            const available = availableItemCount(stored.items, (id) => !known.isMissing(id));
+            setStatus(
+                known.ready && available < stored.items.length
+                    ? m.assignments_imported_partial({
+                          name: stored.name,
+                          available,
+                          total: stored.items.length,
+                      })
+                    : m.assignments_imported({ name: stored.name }),
+            );
         } else {
             setStatus(m.assignments_save_failed());
         }
@@ -385,6 +432,17 @@ export default function AssignmentsRoute() {
                             count: incoming.items.length,
                         })}
                     </p>
+                    <Show when={known.ready}>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {m.assignments_available_count({
+                                available: availableItemCount(
+                                    incoming.items,
+                                    (id) => !known.isMissing(id),
+                                ),
+                                total: incoming.items.length,
+                            })}
+                        </p>
+                    </Show>
                     <Button
                         variant="primary"
                         onClick={() => {
@@ -440,7 +498,13 @@ export default function AssignmentsRoute() {
                                 <span className="font-mono text-xs text-gray-400">
                                     {index + 1}.
                                 </span>
-                                <span className="flex-1 truncate">{titleOf(item.id)}</span>
+                                {known.isMissing(item.id) ? (
+                                    <span className="flex-1 truncate italic text-gray-400 dark:text-gray-500">
+                                        {m.assignments_step_missing()}
+                                    </span>
+                                ) : (
+                                    <span className="flex-1 truncate">{titleOf(item.id)}</span>
+                                )}
                                 <input
                                     type="number"
                                     min={20}
@@ -590,6 +654,11 @@ export default function AssignmentsRoute() {
                     <ul className="space-y-2">
                         {assignments.map((assignment) => {
                             const steps = stepsFor(assignment);
+                            const missing = missingIn(assignment);
+                            const survivors = availableItemCount(
+                                assignment.items,
+                                (id) => !known.isMissing(id),
+                            );
                             return (
                                 <AssignmentCard
                                     key={assignment.id}
@@ -599,15 +668,31 @@ export default function AssignmentsRoute() {
                                     onShare={onShare}
                                     onDownload={onDownload}
                                     actionsBefore={
-                                        <Button
-                                            variant="secondary"
-                                            onClick={() => startEdit(assignment)}
-                                            aria-label={m.assignments_edit_label({
-                                                name: assignment.name,
-                                            })}
-                                        >
-                                            {m.assignments_edit()}
-                                        </Button>
+                                        <>
+                                            {missing.length > 0 && (
+                                                <Button
+                                                    variant="secondary"
+                                                    // Pruning every step would leave an empty
+                                                    // assignment; deletion is the honest action then.
+                                                    disabled={survivors === 0}
+                                                    onClick={() => onPruneMissing(assignment)}
+                                                    aria-label={m.assignments_remove_missing_label({
+                                                        name: assignment.name,
+                                                    })}
+                                                >
+                                                    {m.assignments_remove_missing()}
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant="secondary"
+                                                onClick={() => startEdit(assignment)}
+                                                aria-label={m.assignments_edit_label({
+                                                    name: assignment.name,
+                                                })}
+                                            >
+                                                {m.assignments_edit()}
+                                            </Button>
+                                        </>
                                     }
                                     actionsAfter={
                                         <Button

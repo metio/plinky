@@ -24,7 +24,7 @@ const scoreFor = (id: string): Score => ({
 });
 
 // Only `resolve` is exercised; the rest of each source is unused here.
-const source = <T,>(resolve: (id: string) => Promise<Score | null>): T =>
+const source = <T,>(resolve: (id: string) => Promise<Score | null | "unavailable">): T =>
     ({ resolve }) as unknown as T;
 
 const wrap =
@@ -41,7 +41,7 @@ describe("useScore", () => {
         const songs = source<SongSource>(() => Promise.resolve(null));
         const { result } = renderHook(() => useScore("étude"), { wrapper: wrap(exercises, songs) });
         expect(result.current).toBeUndefined();
-        await waitFor(() => expect(result.current?.id).toBe("étude"));
+        await waitFor(() => expect(result.current).toEqual(scoreFor("étude")));
     });
 
     it("discards a stale in-flight fetch when the id changes mid-flight", async () => {
@@ -61,10 +61,53 @@ describe("useScore", () => {
             initialProps: { id: "a" },
         });
         rerender({ id: "b" });
-        await waitFor(() => expect(result.current?.id).toBe("b"));
+        await waitFor(() => expect(result.current).toEqual(scoreFor("b")));
 
         releaseA?.(scoreFor("a"));
         await new Promise((resolve) => setTimeout(resolve, 0));
-        expect(result.current?.id).toBe("b");
+        expect(result.current).toEqual(scoreFor("b"));
+    });
+
+    it("reports unavailable — not not-found — when a source cannot answer", async () => {
+        const exercises = source<ExerciseSource>(() => Promise.resolve("unavailable"));
+        const songs = source<SongSource>(() => Promise.resolve(null));
+        const { result } = renderHook(() => useScore("real-but-offline"), {
+            wrapper: wrap(exercises, songs),
+        });
+        await waitFor(() => expect(result.current).toBe("unavailable"));
+    });
+
+    it("reports unavailable when only the song source failed", async () => {
+        const exercises = source<ExerciseSource>(() => Promise.resolve(null));
+        const songs = source<SongSource>(() => Promise.resolve("unavailable"));
+        const { result } = renderHook(() => useScore("real-but-offline"), {
+            wrapper: wrap(exercises, songs),
+        });
+        await waitFor(() => expect(result.current).toBe("unavailable"));
+    });
+
+    it("lets a resolved score outrank another source's failure", async () => {
+        const exercises = source<ExerciseSource>(() => Promise.resolve("unavailable"));
+        const songs = source<SongSource>((id) => Promise.resolve(scoreFor(id)));
+        const { result } = renderHook(() => useScore("song-1"), {
+            wrapper: wrap(exercises, songs),
+        });
+        await waitFor(() => expect(result.current).toEqual(scoreFor("song-1")));
+    });
+
+    it("re-resolves when the attempt counter bumps, so a retry can succeed", async () => {
+        let calls = 0;
+        const exercises = source<ExerciseSource>((id) => {
+            calls++;
+            return Promise.resolve(calls === 1 ? "unavailable" : scoreFor(id));
+        });
+        const songs = source<SongSource>(() => Promise.resolve(null));
+        const { result, rerender } = renderHook(
+            ({ attempt }: { attempt: number }) => useScore("flaky", attempt),
+            { wrapper: wrap(exercises, songs), initialProps: { attempt: 0 } },
+        );
+        await waitFor(() => expect(result.current).toBe("unavailable"));
+        rerender({ attempt: 1 });
+        await waitFor(() => expect(result.current).toEqual(scoreFor("flaky")));
     });
 });

@@ -188,17 +188,67 @@ export function decodeAssignmentLink(code: string): Assignment | null {
     }
 }
 
+// An assignment carries opaque piece ids, so a step can outlive the piece it
+// points at (a deleted import, a link from another device). These helpers judge
+// items against a caller-supplied "is this id known?" predicate — the catalogue
+// itself never enters core.
+
+// The distinct unknown ids, in first-seen order.
+export function missingAssignmentIds(
+    items: AssignmentItem[],
+    isKnown: (id: string) => boolean,
+): string[] {
+    const missing: string[] = [];
+    for (const item of items) {
+        if (!isKnown(item.id) && !missing.includes(item.id)) {
+            missing.push(item.id);
+        }
+    }
+    return missing;
+}
+
+// How many items resolve to a known piece, for an "N of M available" message.
+export function availableItemCount(
+    items: AssignmentItem[],
+    isKnown: (id: string) => boolean,
+): number {
+    return items.filter((item) => isKnown(item.id)).length;
+}
+
+// The assignment with its unknown items dropped; survivors keep their order and
+// their tempo/note. Pruning every item yields an empty assignment — callers
+// decide whether that is a save or a delete.
+export function pruneAssignment(
+    assignment: Assignment,
+    isKnown: (id: string) => boolean,
+): Assignment {
+    return { ...assignment, items: assignment.items.filter((item) => isKnown(item.id)) };
+}
+
+// How many assignments reference a piece id — a delete confirmation can then
+// name the blast radius before an imported score is removed.
+export function assignmentsReferencing(assignments: Assignment[], id: string): number {
+    return assignments.filter((assignment) =>
+        assignment.items.some((item) => item.id === id),
+    ).length;
+}
+
 // The "continue where you left off" pointer for the home page: walk the
 // assignments in order and return the first one with an unfinished step, as its
 // name, the current step's 1-based position and score, and the step count. Every
 // assignment finished (or none saved) → null, and the caller falls back to its
-// generated suggestion.
+// generated suggestion. A step whose piece is missing can't be continued, so
+// `isMissing` skips it to the next playable step; an assignment whose remaining
+// steps are all missing yields no pointer rather than a dead link.
 export function nextAssignmentStep(
     assignments: Assignment[],
     isDone: (id: string) => boolean,
+    isMissing: (id: string) => boolean = () => false,
 ): { name: string; step: number; total: number; scoreId: string } | null {
     for (const assignment of assignments) {
-        const current = assignment.items.findIndex((item) => !isDone(item.id));
+        const current = assignment.items.findIndex(
+            (item) => !isDone(item.id) && !isMissing(item.id),
+        );
         if (current >= 0) {
             return {
                 name: assignment.name,

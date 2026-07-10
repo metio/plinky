@@ -4,12 +4,16 @@
 import { describe, expect, it } from "vitest";
 import {
     type Assignment,
+    assignmentsReferencing,
+    availableItemCount,
     decodeAssignmentLink,
     encodeAssignmentLink,
     makeAssignment,
+    missingAssignmentIds,
     newAssignmentId,
     nextAssignmentStep,
     parseAssignment,
+    pruneAssignment,
     serializeAssignment,
 } from "./assignment";
 
@@ -126,5 +130,100 @@ describe("nextAssignmentStep", () => {
         ).toEqual({ name: "open", step: 2, total: 2, scoreId: "b2" });
         expect(nextAssignmentStep([set("done", ["a1"])], (id) => learned.has(id))).toBeNull();
         expect(nextAssignmentStep([], () => false)).toBeNull();
+    });
+});
+
+describe("missing pieces", () => {
+    const known = new Set(["a", "b"]);
+    const isKnown = (id: string) => known.has(id);
+    const set = (items: string[]) =>
+        makeAssignment({ id: "set", name: "Set", items: items.map((id) => ({ id })) });
+
+    it("reports nothing missing for an empty item list", () => {
+        expect(missingAssignmentIds([], isKnown)).toEqual([]);
+        expect(availableItemCount([], isKnown)).toBe(0);
+    });
+
+    it("reports nothing missing when every id is known", () => {
+        expect(missingAssignmentIds(set(["a", "b"]).items, isKnown)).toEqual([]);
+        expect(availableItemCount(set(["a", "b"]).items, isKnown)).toBe(2);
+    });
+
+    it("reports each unknown id once, in first-seen order", () => {
+        expect(missingAssignmentIds(set(["x", "a", "y", "x"]).items, isKnown)).toEqual(["x", "y"]);
+        expect(availableItemCount(set(["x", "a", "y", "x"]).items, isKnown)).toBe(1);
+    });
+
+    it("reports every id when none are known", () => {
+        expect(missingAssignmentIds(set(["x", "y"]).items, isKnown)).toEqual(["x", "y"]);
+        expect(availableItemCount(set(["x", "y"]).items, isKnown)).toBe(0);
+    });
+
+    it("prunes exactly the unknown items and keeps tempo and note on survivors", () => {
+        const assignment = makeAssignment({
+            id: "set",
+            name: "Set",
+            items: [{ id: "a", tempo: 100, note: "slow" }, { id: "x" }, { id: "b" }],
+        });
+        const pruned = pruneAssignment(assignment, isKnown);
+        expect(pruned.items).toEqual([{ id: "a", tempo: 100, note: "slow" }, { id: "b" }]);
+        expect(pruned.name).toBe("Set");
+        expect(pruned.id).toBe("set");
+    });
+
+    it("prunes to an empty item list when nothing is known", () => {
+        expect(pruneAssignment(set(["x", "y"]), isKnown).items).toEqual([]);
+    });
+
+    it("counts the assignments referencing an id", () => {
+        const assignments = [set(["a", "x"]), set(["b"]), set(["x", "x"])];
+        expect(assignmentsReferencing(assignments, "x")).toBe(2);
+        expect(assignmentsReferencing(assignments, "b")).toBe(1);
+        expect(assignmentsReferencing(assignments, "nope")).toBe(0);
+        expect(assignmentsReferencing([], "x")).toBe(0);
+    });
+});
+
+describe("nextAssignmentStep with missing pieces", () => {
+    const set = (id: string, items: string[]) =>
+        makeAssignment({ id, name: id, items: items.map((piece) => ({ id: piece })) });
+
+    it("skips a missing current step and points at the next playable one", () => {
+        const missing = new Set(["dead"]);
+        const next = nextAssignmentStep(
+            [set("Set", ["dead", "a2", "a3"])],
+            () => false,
+            (id) => missing.has(id),
+        );
+        expect(next).toEqual({ name: "Set", step: 2, total: 3, scoreId: "a2" });
+    });
+
+    it("yields no pointer when every remaining step is missing", () => {
+        const missing = new Set(["dead", "gone"]);
+        expect(
+            nextAssignmentStep([set("Set", ["dead", "gone"])], () => false, (id) =>
+                missing.has(id),
+            ),
+        ).toBeNull();
+    });
+
+    it("falls through an all-missing assignment to the next one", () => {
+        const missing = new Set(["dead"]);
+        expect(
+            nextAssignmentStep(
+                [set("Broken", ["dead"]), set("Fine", ["b1"])],
+                () => false,
+                (id) => missing.has(id),
+            ),
+        ).toEqual({ name: "Fine", step: 1, total: 1, scoreId: "b1" });
+    });
+
+    it("treats nothing as missing by default", () => {
+        expect(nextAssignmentStep([set("Set", ["a1"])], () => false)).toEqual({
+            name: "Set",
+            step: 1,
+            total: 1,
+            scoreId: "a1",
+        });
     });
 });

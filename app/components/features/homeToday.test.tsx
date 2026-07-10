@@ -25,6 +25,10 @@ vi.mock("../../lib/gradeProgress", async (importOriginal) => ({
 // The starter assignment is only built from the exercise manifest + bundled
 // demos; an empty manifest keeps it to the demos, whose ids the tests can name.
 const exercises = { manifest: () => Promise.resolve([]) };
+// An empty song manifest makes the known-piece set ready, so unresolvable step
+// ids read as missing; without it the default source's failed fetch keeps the
+// set indeterminate.
+const songs = { manifest: () => Promise.resolve([]) };
 
 afterEach(() => {
     cleanup();
@@ -70,6 +74,34 @@ describe("HomeToday", () => {
         expect(await screen.findByText("Today")).toBeTruthy();
         const learn = await screen.findByRole("link", { name: /Learn “First Steps Song”/ });
         expect(learn.getAttribute("href")).toContain("/play/g1-easy");
+    });
+
+    it("skips a missing current step and continues at the next resolvable one", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([]);
+        // biome-ignore lint/suspicious/noExplicitAny: a partial song source is all the panel reads
+        const { services } = mount({ songs: songs as any });
+        const playable = loadBundledScores()[0]!.id;
+        services.assignments.save(
+            makeAssignment({ name: "My set", items: [{ id: "gone-id" }, { id: playable }] }),
+        );
+        // The known-piece set is ready, so the dead first step is skipped and the
+        // CTA lands on the playable one — never on the play page's dead end.
+        const cont = await screen.findByRole("link", { name: /Continue “My set”.*step 2 of 2/ });
+        expect(cont.getAttribute("href")).toContain(`/play/${playable}`);
+    });
+
+    it("keeps today's pick while the known-piece set is indeterminate", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([]);
+        // A failed song-manifest fetch leaves the set indeterminate — the panel
+        // still renders, and no step is treated as missing.
+        const failingSongs = { manifest: () => Promise.resolve(null) };
+        // biome-ignore lint/suspicious/noExplicitAny: a partial song source is all the panel reads
+        const { services } = mount({ songs: failingSongs as any });
+        services.assignments.save(makeAssignment({ name: "My set", items: [{ id: "gone-id" }] }));
+        const cont = await screen.findByRole("link", { name: /Continue “My set”/ });
+        expect(cont.getAttribute("href")).toContain("/play/gone-id");
     });
 
     it("continues a saved assignment ahead of the built-in starter", async () => {

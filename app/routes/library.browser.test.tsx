@@ -7,8 +7,11 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { browserStore } from "../adapters/browserStore";
 import { domXmlCodec } from "../adapters/domXmlCodec";
+import { makeAssignment } from "../../core/assignment";
+import { createAssignmentsStore } from "../stores/assignmentsStore";
 import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
 
+import AssignmentsRoute from "./assignments";
 import Library from "./library";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
@@ -95,6 +98,29 @@ describe("Library", () => {
         expect(screen.getByText("My Tune")).toBeTruthy();
         fireEvent.click(screen.getByRole("button", { name: "Remove?" }));
         await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
+    });
+
+    it("warns that a score is used by an assignment, deletes anyway, and the step goes missing", async () => {
+        const score = buildScore(domXmlCodec, USER_XML, []);
+        saveUserScore(browserStore, score);
+        createAssignmentsStore(browserStore).save(
+            makeAssignment({ id: "set", name: "Set", items: [{ id: score.id }] }),
+        );
+        const view = renderLibrary();
+        expect(await screen.findByText("My Tune")).toBeTruthy();
+        fireEvent.click(screen.getByLabelText("Remove"));
+        // The armed confirm names the blast radius instead of a bare "Remove?".
+        fireEvent.click(screen.getByRole("button", { name: "Used by 1 assignment — remove?" }));
+        await waitFor(() => expect(screen.queryByText("My Tune")).toBeNull());
+        view.unmount();
+        // The assignment survives the delete; its step now reads as missing.
+        render(
+            <MemoryRouter>
+                <AssignmentsRoute />
+            </MemoryRouter>,
+        );
+        expect(await screen.findByText("Set")).toBeTruthy();
+        expect(await screen.findByText("No longer on this device")).toBeTruthy();
     });
 
     it("gives a long title the shrink-and-truncate contract so it can't widen the row", async () => {

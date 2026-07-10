@@ -5,7 +5,9 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { encodeAssignmentLink, makeAssignment } from "../../core/assignment";
+import { browserStore } from "../adapters/browserStore";
 import { loadBundledScores } from "../lib/catalog";
+import { createAssignmentsStore } from "../stores/assignmentsStore";
 import AssignmentsRoute from "./assignments";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
@@ -148,6 +150,45 @@ describe("AssignmentsRoute", () => {
         expect(screen.getByText("Built-in assignments")).toBeTruthy();
         // The demo tunes lead the set, each a playable step.
         expect(screen.getAllByRole("link", { name: /Twinkle/ }).length).toBeGreaterThan(0);
+    });
+
+    it("marks a stale step as missing, and prunes it into a persisted save", async () => {
+        createAssignmentsStore(browserStore).save(
+            makeAssignment({
+                id: "stale-set",
+                name: "Stale set",
+                items: [{ id: bundledId("twinkle") }, { id: "gone-id" }],
+            }),
+        );
+        mount();
+        // Once every source has loaded, the dead id reads as missing and carries
+        // no link into the play page's dead end.
+        expect(await screen.findByText("No longer on this device")).toBeTruthy();
+        expect(
+            screen
+                .getAllByRole("link")
+                .some((link) => link.getAttribute("href")?.includes("gone-id")),
+        ).toBe(false);
+        fireEvent.click(screen.getByText("Remove missing pieces"));
+        expect(await screen.findByRole("status")).toHaveTextContent(/Removed the missing/);
+        expect(screen.queryByText("No longer on this device")).toBeNull();
+        expect(createAssignmentsStore(browserStore).list()[0]?.items).toEqual([
+            { id: bundledId("twinkle") },
+        ]);
+    });
+
+    it("tells how many of a shared link's pieces resolve on this device", async () => {
+        const code = encodeAssignmentLink(
+            makeAssignment({
+                name: "Shared set",
+                items: [{ id: bundledId("twinkle") }, { id: "gone-id" }],
+            }),
+        );
+        mount(`/assignments?assignment=${code}`);
+        expect(await screen.findByText("1 of 2 pieces are available on this device.")).toBeTruthy();
+        // The import is still allowed — the missing piece may arrive later.
+        fireEvent.click(screen.getByText("Import this assignment"));
+        expect(await screen.findByRole("status")).toHaveTextContent(/1 of 2 pieces/);
     });
 
     it("reorders and removes items in the basket", async () => {

@@ -67,7 +67,7 @@ describe("exerciseSource.manifest", () => {
         expect(fetches).toBe(1);
     });
 
-    it("answers empty on a failed fetch but retries — a transient failure must not empty the catalogue for the session", async () => {
+    it("answers null on a failed fetch but retries — a transient failure must not read as an empty catalogue for the session", async () => {
         let calls = 0;
         const source = createExerciseSource(() => {
             calls++;
@@ -75,7 +75,7 @@ describe("exerciseSource.manifest", () => {
                 ? Promise.reject(new TypeError("network down"))
                 : Promise.resolve(Response.json([scaleMeta]));
         });
-        expect(await source.manifest()).toEqual([]);
+        expect(await source.manifest()).toBeNull();
         expect(await source.manifest()).toHaveLength(1);
         // The recovered manifest is cached like any completed one.
         await source.manifest();
@@ -90,20 +90,21 @@ describe("exerciseSource.manifest", () => {
                 ? Promise.resolve(new Response(null, { status: 503 }))
                 : Promise.resolve(Response.json([studyMeta]));
         });
-        expect(await source.manifest()).toEqual([]);
-        expect((await source.manifest())[0]?.id).toBe("ex-study");
+        expect(await source.manifest()).toBeNull();
+        expect((await source.manifest())?.[0]?.id).toBe("ex-study");
     });
 
     it("treats a non-array manifest body as a failure rather than crashing consumers", async () => {
         const source = createExerciseSource(withManifest({ unexpected: "object" }));
-        expect(await source.manifest()).toEqual([]);
+        expect(await source.manifest()).toBeNull();
     });
 });
 
 describe("exerciseSource.resolve", () => {
     it("rebuilds a generated scale from its stored config", async () => {
         const source = createExerciseSource(withManifest([scaleMeta]));
-        const score = await source.resolve("ex-scale");
+        const resolved = await source.resolve("ex-scale");
+        const score = typeof resolved === "object" ? resolved : null;
         expect(score?.title).toBe("C major scale");
         expect(score?.xml).toContain("score-partwise");
         expect(score?.license).toBe("CC0-1.0");
@@ -114,7 +115,8 @@ describe("exerciseSource.resolve", () => {
         const source = createExerciseSource(
             withManifest([studyMeta], () => new Response(studyMxl())),
         );
-        const score = await source.resolve("ex-study");
+        const resolved = await source.resolve("ex-study");
+        const score = typeof resolved === "object" ? resolved : null;
         expect(score?.xml).toBe(STUDY_XML);
         expect(score?.composer).toBe("Czerny");
         expect(score?.title).toBe("Study No. 1");
@@ -125,10 +127,19 @@ describe("exerciseSource.resolve", () => {
         expect(await source.resolve("not-an-exercise")).toBeNull();
     });
 
-    it("is null when a study's .mxl cannot be fetched", async () => {
+    it("is unavailable — not null — when a study's .mxl cannot be fetched", async () => {
+        // The manifest names the study, so the piece exists; only the fetch
+        // failed, and "gone" would be a lie the play page repeats to the user.
         const source = createExerciseSource(
             withManifest([studyMeta], () => new Response(null, { status: 500 })),
         );
-        expect(await source.resolve("ex-study")).toBeNull();
+        expect(await source.resolve("ex-study")).toBe("unavailable");
+    });
+
+    it("is unavailable when the manifest itself cannot be fetched", async () => {
+        const source = createExerciseSource(() =>
+            Promise.resolve(new Response(null, { status: 500 })),
+        );
+        expect(await source.resolve("ex-study")).toBe("unavailable");
     });
 });

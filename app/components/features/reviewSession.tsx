@@ -43,7 +43,10 @@ export function ReviewSession() {
     }, [prefsStore.load, services]);
 
     const current = queue?.[index];
-    const score = useScore(current ?? "");
+    const resolved = useScore(current ?? "");
+    // An unreachable piece renders like one still loading; the session's Skip
+    // button already lets the player move past it.
+    const score = resolved === "unavailable" ? undefined : resolved;
 
     // Hold the personal data until it's loaded, so nothing flashes during prerender.
     if (queue === null) {

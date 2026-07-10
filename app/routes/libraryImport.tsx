@@ -75,7 +75,9 @@ export default function LibraryImportRoute() {
         // the song catalogue, or previously imported, flag it as a duplicate.
         const id = songId(xml);
         const known = new Set(loadCatalog(store).map((entry) => entry.id));
-        setDuplicate(known.has(id) || (await songs.manifest()).some((song) => song.id === id));
+        setDuplicate(
+            known.has(id) || ((await songs.manifest()) ?? []).some((song) => song.id === id),
+        );
         const meta = readScoreMeta(xmlCodec, xml);
         setDraft({
             xml,

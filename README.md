@@ -139,7 +139,11 @@ one-tap **review session** walks you through everything that's fading, and you c
   a student (or yourself): browse
   or search the whole catalogue page by page, add pieces, and give each an optional
   target tempo and note. Save it, **edit it later**, share it by link, or pass it
-  around as a file; each piece checks off as it's learned.
+  around as a file; each piece checks off as it's learned. A step whose piece is no
+  longer on the device (a deleted import, a link from elsewhere) is labelled as
+  missing instead of leading to a dead end, and a one-tap action prunes those steps;
+  importing a shared assignment says up front how many of its pieces resolve here,
+  and deleting a score from the Library warns when saved assignments still use it.
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the

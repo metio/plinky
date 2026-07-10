@@ -12,6 +12,7 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { GradeChip } from "../components/features/scoreGrade";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
+import { assignmentsReferencing } from "../../core/assignment";
 import { isDue, type Mastery } from "../../core/mastery";
 import { useFavoritesStore, useServices } from "../contexts/services";
 import { useFavorites } from "../hooks/useFavorites";
@@ -103,10 +104,12 @@ export default function LibraryRoute() {
         reloadMastery();
         // The exercise and song manifests load over the network; local scores render
         // first. Exercises are always present; the song catalogue is the deep library.
+        // A failed manifest (null) lists nothing for now; the library is display
+        // only, so the gap heals on the next visit.
         Promise.all([services.exercises.manifest(), services.songs.manifest()]).then(
             ([exerciseList, manifest]) => {
                 setExercises(
-                    exerciseList.map((exercise) => ({
+                    (exerciseList ?? []).map((exercise) => ({
                         id: exercise.id,
                         title: exercise.title,
                         composer: exercise.composer ?? "",
@@ -116,7 +119,7 @@ export default function LibraryRoute() {
                     })),
                 );
                 setSongs(
-                    manifest.map((song) => ({
+                    (manifest ?? []).map((song) => ({
                         id: song.id,
                         title: song.title,
                         composer: song.composer,
@@ -142,6 +145,19 @@ export default function LibraryRoute() {
         removeUserScore(services.store, id);
         reloadLocal();
         searchRef.current?.focus();
+    };
+
+    // The confirm label for a removable score names how many saved assignments
+    // still reference it — the delete proceeds either way, and those steps then
+    // read as missing on the assignments page.
+    const removeConfirmLabel = (id: string) => {
+        const used = assignmentsReferencing(services.assignments.list(), id);
+        if (used === 0) {
+            return m.action_remove_confirm();
+        }
+        return used === 1
+            ? m.library_remove_used_one({ count: used })
+            : m.library_remove_used_other({ count: used });
     };
 
     const now = Date.now();
@@ -382,7 +398,7 @@ export default function LibraryRoute() {
                                             <ConfirmButton
                                                 variant="ghost"
                                                 onConfirm={() => remove(item.id)}
-                                                confirmLabel={m.action_remove_confirm()}
+                                                confirmLabel={removeConfirmLabel(item.id)}
                                                 label={m.action_remove()}
                                                 className="text-red-600 dark:text-red-400"
                                             >

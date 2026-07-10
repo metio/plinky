@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -9,6 +9,7 @@ import { fakeMidi } from "../adapters/fakeMidi";
 import { ServicesProvider } from "../contexts/services";
 import { loadBundledScores } from "../lib/catalog";
 import { browserStore } from "../adapters/browserStore";
+import { httpFetcher } from "../adapters/httpFetcher";
 import { createOnboardingStore } from "../stores/onboardingStore";
 import Play from "./play";
 import type { Route } from "./+types/play";
@@ -49,6 +50,32 @@ describe("Play", () => {
 
     it("reports a missing score", async () => {
         renderPlay("no-such-score");
+        expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
+    });
+
+    it("offers a retry instead of 'not found' while the catalogue is unreachable", async () => {
+        // The fetcher override rebuilds the song/exercise sources over it, so a
+        // failing network is simulated at the injected seam.
+        let offline = true;
+        const flaky: typeof httpFetcher = (url, init) =>
+            offline ? Promise.reject(new TypeError("offline")) : httpFetcher(url, init);
+        const props = { params: { scoreId: "no-such-score" } } as unknown as Route.ComponentProps;
+        render(
+            <MemoryRouter>
+                <ServicesProvider services={{ ...midiFake, fetcher: flaky }}>
+                    <MidiProvider>
+                        <Play {...props} />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        // Unreachable is not "gone": the page must not claim the piece is absent.
+        expect(await screen.findByText(/check your connection/)).toBeTruthy();
+        expect(screen.queryByText("That score isn't on this device.")).toBeNull();
+        // With the network back, the retry re-asks — and a genuinely unknown id
+        // now gets the honest not-found answer.
+        offline = false;
+        fireEvent.click(screen.getByRole("button", { name: "Try again" }));
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
     });
 

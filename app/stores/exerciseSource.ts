@@ -3,9 +3,8 @@
 
 import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
 import { type ExerciseConfig, exerciseTitle, generateExercise } from "../../core/exerciseGen";
-import type { Score } from "../../core/score";
 import type { Fetcher } from "../ports/fetcher";
-import { cachedManifest, fetchMxlXml } from "./manifest";
+import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
 // The finger-exercise catalogue. Generated scales/arpeggios are produced on the
 // fly from the id's config (zero storage, every form instantly available).
@@ -36,11 +35,15 @@ export type ExerciseMeta = {
 const MANIFEST_URL = "/exercises/manifest.json";
 
 export type ExerciseSource = {
-    manifest(): Promise<ExerciseMeta[]>;
+    // The browsable metadata list, or null when the fetch failed — callers that
+    // only display may treat null as empty, but "unreachable" must never read
+    // as "these pieces no longer exist".
+    manifest(): Promise<ExerciseMeta[] | null>;
     // An exercise id as a playable Score: a generated scale/arpeggio is rebuilt
     // from its stored config, a study fetches its .mxl. Null for ids that are
-    // not exercises, so the play flow falls through to the other sources.
-    resolve(id: string): Promise<Score | null>;
+    // not exercises, so the play flow falls through to the other sources;
+    // "unavailable" when a fetch failed and the answer is simply unknown.
+    resolve(id: string): Promise<ResolvedScore>;
 };
 
 export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
@@ -53,7 +56,11 @@ export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
     return {
         manifest,
         async resolve(id) {
-            const meta = (await manifest()).find((exercise) => exercise.id === id);
+            const list = await manifest();
+            if (list === null) {
+                return "unavailable";
+            }
+            const meta = list.find((exercise) => exercise.id === id);
             if (!meta) {
                 return null;
             }
@@ -74,7 +81,9 @@ export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
             }
             const xml = await fetchStudyXml(id);
             if (xml === null) {
-                return null;
+                // The manifest names this study, so the piece exists — only its
+                // .mxl could not be fetched right now.
+                return "unavailable";
             }
             return {
                 id,

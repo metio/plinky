@@ -15,8 +15,8 @@ const sourceOver = (fetchUrl: Fetcher, kv = memoryStore()): SongSource =>
     createSongSource(fetchUrl, kv, createFavoritesStore(kv));
 
 describe("songSource.manifest", () => {
-    it("returns an empty catalogue when the manifest can't be fetched", async () => {
-        expect(await sourceOver(failing).manifest()).toEqual([]);
+    it("signals an unfetchable manifest as null, not as an empty catalogue", async () => {
+        expect(await sourceOver(failing).manifest()).toBeNull();
     });
 
     it("caches the manifest for the session", async () => {
@@ -51,8 +51,8 @@ describe("songSource.manifest", () => {
                 ? Promise.reject(new TypeError("network down"))
                 : Promise.resolve(Response.json([{ id: "s1" }]));
         });
-        expect(await source.manifest()).toEqual([]);
-        expect((await source.manifest())[0]?.id).toBe("s1");
+        expect(await source.manifest()).toBeNull();
+        expect((await source.manifest())?.[0]?.id).toBe("s1");
         // The recovered manifest is cached like any completed one.
         await source.manifest();
         expect(calls).toBe(2);
@@ -62,7 +62,29 @@ describe("songSource.manifest", () => {
         const source = sourceOver(() =>
             Promise.resolve(Response.json([{ id: "ok" }, null, "junk"])),
         );
-        expect((await source.manifest()).map((song) => song.id)).toEqual(["ok"]);
+        expect(((await source.manifest()) ?? []).map((song) => song.id)).toEqual(["ok"]);
+    });
+});
+
+describe("songSource.resolve", () => {
+    it("is null for an id a loaded manifest does not know", async () => {
+        const source = sourceOver(() => Promise.resolve(Response.json([])));
+        expect(await source.resolve("no-such-song")).toBeNull();
+    });
+
+    it("is unavailable when the manifest cannot be fetched", async () => {
+        expect(await sourceOver(failing).resolve("s1")).toBe("unavailable");
+    });
+
+    it("is unavailable when the song's .mxl cannot be fetched", async () => {
+        const source = sourceOver((url) =>
+            Promise.resolve(
+                url.includes("manifest")
+                    ? Response.json([{ id: "s1" }])
+                    : new Response(null, { status: 500 }),
+            ),
+        );
+        expect(await source.resolve("s1")).toBe("unavailable");
     });
 });
 

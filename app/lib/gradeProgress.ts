@@ -142,8 +142,10 @@ export type GradeCatalogItem = { id: string; title: string; grade: number; cost:
 // sources, taken as a parameter so the caller decides which services back the
 // catalogue.
 export type CatalogSources = {
-    songs: { manifest(): Promise<GradeCatalogItem[]> };
-    exercises: { manifest(): Promise<GradeCatalogItem[]> };
+    // Null signals a failed fetch (see the source contracts); the catalogue
+    // treats it as contributing nothing this pass.
+    songs: { manifest(): Promise<GradeCatalogItem[] | null> };
+    exercises: { manifest(): Promise<GradeCatalogItem[] | null> };
     // Grading a bundled or imported score parses its MusicXML through this codec.
     xml: XmlCodec;
     // Imported scores live in persistent storage; bundled ones ship with the app.
@@ -155,9 +157,11 @@ export type CatalogSources = {
 // MusicXML. The pools the grades draw from.
 async function buildCatalogue(sources: CatalogSources): Promise<Map<string, GradeCatalogItem>> {
     const index = new Map<string, GradeCatalogItem>();
+    // A failed manifest (null) contributes nothing this pass; the catalogue is
+    // rebuilt on the next load, so the gap heals once the network is back.
     const [songs, exercises] = await Promise.all([
-        sources.songs.manifest(),
-        sources.exercises.manifest(),
+        sources.songs.manifest().then((list) => list ?? []),
+        sources.exercises.manifest().then((list) => list ?? []),
     ]);
     for (const song of songs) {
         index.set(song.id, { id: song.id, title: song.title, grade: song.grade, cost: song.cost });

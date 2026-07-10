@@ -17,6 +17,7 @@ import {
     useServices,
 } from "../../contexts/services";
 import { nextAssignmentStep } from "../../../core/assignment";
+import { useKnownPieces } from "../../hooks/useKnownPieces";
 import { starterAssignment } from "../../../core/starterAssignments";
 import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { type Task, todayTasks } from "../../../core/today";
@@ -56,6 +57,11 @@ export function HomeToday() {
     const assignmentsStore = useAssignmentsStore();
     const exercises = useExerciseSource();
     const services = useServices();
+    // Skips steps whose pieces no longer resolve, so the Continue link never
+    // lands on the play page's dead end. While the sources are still loading
+    // (or unreachable) nothing reads as missing — the panel never blocks on,
+    // or degrades with, the network.
+    const known = useKnownPieces();
     const [tasks, setTasks] = useState<Task[] | null>(null);
 
     useEffect(() => {
@@ -66,7 +72,7 @@ export function HomeToday() {
             // The manifest only feeds the starter assignment; without it the
             // panel still stands, so a fetch failure degrades to no starter
             // rather than an empty panel.
-            exercises.manifest().catch(() => []),
+            exercises.manifest().then((list) => list ?? []),
         ]).then(([items, catalogue, exerciseList]) => {
             if (cancelled) {
                 return;
@@ -94,6 +100,7 @@ export function HomeToday() {
             const assignment = nextAssignmentStep(
                 [...assignmentsStore.list(), ...(starter ? [starter] : [])],
                 (id) => services.mastery.load(id)?.learned === true,
+                (id) => known.isMissing(id),
             );
             setTasks(
                 todayTasks({
@@ -107,7 +114,7 @@ export function HomeToday() {
         return () => {
             cancelled = true;
         };
-    }, [prefsStore.load, assignmentsStore.list, exercises.manifest, services]);
+    }, [prefsStore.load, assignmentsStore.list, exercises.manifest, services, known]);
 
     if (tasks === null) {
         return null;
