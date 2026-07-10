@@ -53,6 +53,16 @@ editors have reworked them in the Studio. It authenticates with the
 `SANITY_EDITOR_TOKEN` secret, a robot token with the **Editor** role (the
 deploy token can't write documents).
 
+## Help-page pictures
+
+The manual **Help Screenshots** workflow illustrates every help block with a
+real screenshot: it builds the site, drives a browser to each app section,
+uploads the pictures as Sanity image assets, and patches the seeded blocks
+(`dev/help-screenshots.mjs` in the app repo). Re-run it after a visual
+redesign to refresh the pictures — it only touches each block's image and
+English alt text, never the body. It uses the same `SANITY_EDITOR_TOKEN`
+secret as the content seed.
+
 ## Make browser reads work (in sanity.io/manage)
 
 - **Public dataset** — API → Datasets → set `production` to Public (Plinky reads
