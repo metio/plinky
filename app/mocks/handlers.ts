@@ -14,4 +14,8 @@ export const handlers = [
     http.get("*/songs/:dir/:id.mxl", () => new HttpResponse(null, { status: 404 })),
     http.get("*/exercises/manifest.json", () => HttpResponse.json([])),
     http.get("*/exercises/studies/:cid.mxl", () => new HttpResponse(null, { status: 404 })),
+    // The Sanity query API (news, help, board): an empty result by default, so a
+    // test that wires a real Sanity adapter gets "no content" — the same answer an
+    // empty project gives — unless it overrides the route with a payload.
+    http.get("https://*.apicdn.sanity.io/*", () => HttpResponse.json({ result: null })),
 ];
