@@ -98,7 +98,7 @@ npm run size          # bundle budget
   `app/**/__story-shots__/` (chromium-only, fixed 800×600 viewport, the flake
   pins the browser so local and CI rasterize identically). After an intentional
   visual change — or when adding a story — refresh with
-  `npm run test:storybook -- -u` and commit the changed PNGs; a baseline diff in
+  `npm run test:storybook -- -u` and commit the changed images; a baseline diff in
   review is the feature. Stories must render deterministically: no live dates,
   no randomness, no unawaited async.
 - **UI strings** go through paraglide: add the key to `messages/en.json` (the
