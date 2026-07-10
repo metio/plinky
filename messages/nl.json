@@ -573,5 +573,6 @@
   "help_empty": "Help voor dit onderdeel is onderweg.",
   "help_learn_more": "Meer informatie",
   "meta_help_description": "Hoe Plinky werkt: uitleg voor elk onderdeel van de app, van je eerste noot tot het bijhouden van je voortgang.",
-  "discover_jump_in": "Meteen beginnen"
+  "discover_jump_in": "Meteen beginnen",
+  "today_assignment": "Ga verder met “{name}” — stap {step} van {total}"
 }

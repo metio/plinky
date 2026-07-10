@@ -573,5 +573,6 @@
   "help_empty": "このエリアのヘルプは準備中です。",
   "help_learn_more": "詳しく見る",
   "meta_help_description": "Plinky の使い方：最初の音符から進捗の確認まで、アプリの各機能のガイド。",
-  "discover_jump_in": "さっそく始める"
+  "discover_jump_in": "さっそく始める",
+  "today_assignment": "「{name}」の続き — ステップ {step}/{total}"
 }

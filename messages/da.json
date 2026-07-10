@@ -573,5 +573,6 @@
   "help_empty": "Hjælp til dette område er på vej.",
   "help_learn_more": "Læs mere",
   "meta_help_description": "Sådan fungerer Plinky: vejledninger til hver del af appen, fra din første node til at følge dine fremskridt.",
-  "discover_jump_in": "Gå direkte i gang"
+  "discover_jump_in": "Gå direkte i gang",
+  "today_assignment": "Fortsæt “{name}” — trin {step} af {total}"
 }

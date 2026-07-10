@@ -8,6 +8,7 @@
 export type Task =
     | { key: "review"; count: number; to: string }
     | { key: "daily"; to: string; done: boolean }
+    | { key: "assignment"; name: string; step: number; total: number; to: string }
     | { key: "learn"; title: string; to: string }
     | { key: "browse"; to: string };
 
@@ -16,14 +17,19 @@ export type TodayInput = {
     dueIds: string[];
     // Whether today's daily challenge is already done.
     dailyDoneToday: boolean;
+    // The first assignment with an unfinished step; its current step is the
+    // player's next piece on that path.
+    assignment: { name: string; step: number; total: number; scoreId: string } | null;
     // The gentlest unmastered piece of the grade being worked on, if any.
     suggestion: { id: string; title: string } | null;
 };
 
 // Refresh what's fading first (keeps grades sharp), then the daily, then something
-// new to learn. If there's genuinely nothing queued, fall back to browsing — the list
-// is never empty, so the player always has a next step.
-export function todayTasks({ dueIds, dailyDoneToday, suggestion }: TodayInput): Task[] {
+// new to learn — the open assignment's current step when one exists (a deliberately
+// chosen path beats a generated pick), the grade suggestion otherwise. If there's
+// genuinely nothing queued, fall back to browsing — the list is never empty, so the
+// player always has a next step.
+export function todayTasks({ dueIds, dailyDoneToday, assignment, suggestion }: TodayInput): Task[] {
     const tasks: Task[] = [];
     if (dueIds.length > 0) {
         // One due piece goes straight to it; several start a guided review session
@@ -35,7 +41,17 @@ export function todayTasks({ dueIds, dailyDoneToday, suggestion }: TodayInput): 
     if (!dailyDoneToday) {
         tasks.push({ key: "daily", to: "/daily", done: false });
     }
-    if (suggestion) {
+    if (assignment) {
+        tasks.push({
+            key: "assignment",
+            name: assignment.name,
+            step: assignment.step,
+            total: assignment.total,
+            // Straight into the current step's play page — continuing must never
+            // require finding the assignment on its own page first.
+            to: `/play/${assignment.scoreId}`,
+        });
+    } else if (suggestion) {
         tasks.push({ key: "learn", title: suggestion.title, to: `/play/${suggestion.id}` });
     }
     if (tasks.length === 0) {

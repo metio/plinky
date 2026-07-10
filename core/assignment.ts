@@ -190,3 +190,26 @@ export function decodeAssignmentLink(code: string): Assignment | null {
         return null;
     }
 }
+
+// The "continue where you left off" pointer for the home page: walk the
+// assignments in order and return the first one with an unfinished step, as its
+// name, the current step's 1-based position and score, and the step count. Every
+// assignment finished (or none saved) → null, and the caller falls back to its
+// generated suggestion.
+export function nextAssignmentStep(
+    assignments: Assignment[],
+    isDone: (id: string) => boolean,
+): { name: string; step: number; total: number; scoreId: string } | null {
+    for (const assignment of assignments) {
+        const current = assignment.items.findIndex((item) => !isDone(item.id));
+        if (current >= 0) {
+            return {
+                name: assignment.name,
+                step: current + 1,
+                total: assignment.items.length,
+                scoreId: assignment.items[current]!.id,
+            };
+        }
+    }
+    return null;
+}

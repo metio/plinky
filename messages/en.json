@@ -573,5 +573,6 @@
   "theme_light": "☀️ Light",
   "theme_dark": "🌙 Dark",
   "theme_aria": "Theme: {theme}. Click to change.",
-  "discover_jump_in": "Jump right in"
+  "discover_jump_in": "Jump right in",
+  "today_assignment": "Continue “{name}” — step {step} of {total}"
 }
