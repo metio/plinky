@@ -3,7 +3,7 @@
 
 import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { HeroKeyboard } from "../components/features/heroKeyboard";
-import { BookIcon, ListIcon, NotesIcon } from "../components/ui/icons";
+import { BookIcon, ListIcon, NotesIcon, PinIcon } from "../components/ui/icons";
 import { HomeToday } from "../components/features/homeToday";
 import { NewsBanner } from "../components/features/newsBanner";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
@@ -35,6 +35,7 @@ const FEATURES = [
         Icon: ListIcon,
     },
     { to: "/compose", label: m.play_compose, blurb: m.play_compose_blurb, Icon: NotesIcon },
+    { to: "/board", label: m.board_title, blurb: m.home_board_blurb, Icon: PinIcon },
 ];
 
 export default function Home() {

@@ -25,7 +25,7 @@ const ON_DEMAND = /webCodecsVideo/;
 // (`PLINKY_LOCALE=en npm run build`), because the deploy ships one tree-shaken
 // bundle per language (dev/build-locales.mjs) — a German visitor never downloads
 // Korean. So this tracks real per-visitor weight, not the summed all-locales output.
-const BUDGET_TOTAL_KB = 545;
+const BUDGET_TOTAL_KB = 550;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -55,7 +55,7 @@ const BUDGET_TOTAL_KB = 545;
 // languages to every visitor. Per-locale builds (dev/build-locales.mjs) tree-shake
 // each bundle down to its own language, so a single visitor's app code dropped to
 // ~216 KB — the budget follows. Keep it tight; a real regression trips this line.
-const BUDGET_APP_KB = 235;
+const BUDGET_APP_KB = 240;
 
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))

@@ -294,6 +294,25 @@ no blocks shows a short "on the way" note. Only `https` image and link URLs are 
 and an unreachable source falls back to the section skeleton — help never breaks the
 page. It reuses the news banner's `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
 
+## The board
+
+The board is Plinky's pin-board of artists worth following — pianists and
+composers the content team wants to put in front of players, each with a
+picture, a short blurb, and a follow link. Recognized social links (Instagram,
+TikTok, YouTube, X, Bluesky, Threads) get their platform's icon on the follow
+button; anything else becomes a plain visit link. Like the news banner and help
+page, the content lives in the same [Sanity](https://www.sanity.io) project and
+is edited live with no redeploy, and blurbs are translated: a reader downloads
+only their own language.
+
+Add a `boardArtist` document type with a `name`, an `image` (shared across
+languages) with internationalized `alt` text, an internationalized `text` blurb,
+a `link` URL, an `order`, and a `show` boolean. Publish an artist and the card
+appears; flip `show` off and it disappears, all without a redeploy. Only `https`
+image and link URLs are shown, and an unreachable source simply shows an empty
+board — the page never breaks. It reuses the news banner's
+`VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
+
 ## Development
 
 The project builds with Node.js and npm:

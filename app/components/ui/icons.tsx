@@ -211,6 +211,16 @@ export function StarIcon({ className, filled = false }: IconProps & { filled?: b
     );
 }
 
+// A push-pin, head-on with its needle — "pinned to the board".
+export function PinIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M9 4h6l-1 6 3 3H7l3-3z" />
+            <path d="M12 13v7" />
+        </Icon>
+    );
+}
+
 // An arrow rising out of a tray — "upload" / drop a file to import.
 export function UploadIcon({ className }: IconProps) {
     return (
