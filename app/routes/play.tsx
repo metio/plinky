@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Attribution } from "../components/ui/attribution";
+import { attributionFor } from "../../core/attribution";
+import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { EarPiece } from "../components/features/earPiece";
 import { ExerciseForms } from "../components/features/exerciseForms";
@@ -114,6 +116,14 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             id={score.id}
                             xml={score.xml}
                             title={score.title}
+                            credit={creditLine(
+                                score.title,
+                                attributionFor({
+                                    composer: score.composer,
+                                    license: score.license,
+                                    source: score.source,
+                                }),
+                            )}
                             initialTempo={score.tempo}
                             beatsPerBar={score.beatsPerBar}
                             canShareGhost

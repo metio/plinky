@@ -4,6 +4,7 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import { webAudioEngine } from "../adapters/webAudioEngine";
+import { webCodecsVideoExporter } from "../adapters/webCodecsVideo";
 import { webMidi } from "../adapters/webMidi";
 import type { MidiAccessPort } from "../ports/midiAccess";
 import type { AudioEngine } from "../ports/audioEngine";
@@ -15,6 +16,7 @@ import { httpFetcher } from "../adapters/httpFetcher";
 import type { NewsSource } from "../ports/news";
 import { createSanityNews } from "../adapters/sanityNews";
 import type { HelpSource } from "../ports/help";
+import type { VideoExporter } from "../ports/videoExporter";
 import { createSanityHelp } from "../adapters/sanityHelp";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
@@ -84,6 +86,8 @@ export type AppServices = {
     help: HelpSource;
     // The "a run is in progress" signal: screens begin/end it, the composition
     // root reads it to hold a service-worker reload until the app is idle.
+    // Turns a take into a shareable MP4 where the engine can encode one.
+    video: VideoExporter;
     activity: ActivitySignal;
 };
 
@@ -122,6 +126,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
         news: overrides.news ?? createSanityNews(fetcher),
         help: overrides.help ?? createSanityHelp(fetcher),
+        video: overrides.video ?? webCodecsVideoExporter,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.
         activity: overrides.activity ?? runActivity,
@@ -156,6 +161,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     exercises: true,
     news: true,
     help: true,
+    video: true,
     activity: true,
 };
 const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
@@ -266,4 +272,8 @@ export function useNewsSource(): NewsSource {
 
 export function useHelpSource(): HelpSource {
     return useServices().help;
+}
+
+export function useVideoExporter(): VideoExporter {
+    return useServices().video;
 }

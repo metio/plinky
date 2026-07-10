@@ -56,6 +56,9 @@ export type PlaySessionProps = {
     id: string;
     xml: string;
     title: string;
+    // The provenance line burnt into an exported take video; empty means the
+    // piece carries no credit beyond its title (a generated exercise).
+    credit?: string;
     onRunComplete?: () => void;
     initialTempo?: number;
     beatsPerBar?: number;
@@ -74,6 +77,7 @@ function usePlaySessionValue({
     id,
     xml,
     title,
+    credit,
     onRunComplete,
     initialTempo,
     beatsPerBar,
@@ -714,6 +718,7 @@ function usePlaySessionValue({
         // Piece identity and framing.
         id,
         title,
+        credit: credit ?? "",
         daily,
         ephemeral,
         lockTempo,

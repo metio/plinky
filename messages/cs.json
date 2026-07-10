@@ -574,5 +574,7 @@
   "help_learn_more": "Zjistit více",
   "meta_help_description": "Jak Plinky funguje: návody pro každou část aplikace, od první noty až po sledování vašeho pokroku.",
   "discover_jump_in": "Rovnou začít",
-  "today_assignment": "Pokračujte v „{name}“ — krok {step} z {total}"
+  "today_assignment": "Pokračujte v „{name}“ — krok {step} z {total}",
+  "takes_download_video": "Uložit video",
+  "takes_video_progress": "Vykreslování… {percent}%"
 }

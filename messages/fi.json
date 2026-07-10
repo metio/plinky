@@ -574,5 +574,7 @@
   "help_learn_more": "Lue lisää",
   "meta_help_description": "Miten Plinky toimii: oppaat sovelluksen jokaiseen osaan, ensimmäisestä nuotista edistymisesi seurantaan.",
   "discover_jump_in": "Aloita heti",
-  "today_assignment": "Jatka ”{name}” — vaihe {step}/{total}"
+  "today_assignment": "Jatka ”{name}” — vaihe {step}/{total}",
+  "takes_download_video": "Tallenna video",
+  "takes_video_progress": "Hahmonnetaan… {percent}%"
 }

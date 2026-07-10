@@ -10,6 +10,7 @@ import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
 import { CloseIcon, PlayIcon, StopIcon } from "../ui/icons";
+import { ExportVideoButton } from "./exportVideoButton";
 import { ShareGhostButton } from "./shareGhostButton";
 
 // A short "3 minutes ago" for when a take was saved, localised without a message
@@ -41,6 +42,7 @@ export function TakesPanel({
     id,
     takes,
     title,
+    credit,
     activeReplayId,
     playing,
     lastRunOnsets,
@@ -53,6 +55,9 @@ export function TakesPanel({
     id: string;
     takes: Take[];
     title: string;
+    // The provenance line an exported take video carries (title-only when the
+    // piece has no composer/licence to credit).
+    credit: string;
     // The take currently replaying, if any — its row shows a Stop control.
     activeReplayId: string | null;
     // True while anything (a replay or Listen) owns the synth and cursor, so the
@@ -150,6 +155,7 @@ export function TakesPanel({
                                     >
                                         {m.takes_download_musicxml()}
                                     </Button>
+                                    <ExportVideoButton take={take} title={title} credit={credit} />
                                     <IconButton
                                         label={m.takes_delete()}
                                         onClick={() => onDelete(take.id)}

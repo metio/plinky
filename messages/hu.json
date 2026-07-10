@@ -574,5 +574,7 @@
   "help_learn_more": "Tudj meg többet",
   "meta_help_description": "Hogyan működik a Plinky: útmutatók az alkalmazás minden részéhez, az első hangjegytől a fejlődésed követéséig.",
   "discover_jump_in": "Vágj bele",
-  "today_assignment": "Folytasd: „{name}” — {step}/{total}. lépés"
+  "today_assignment": "Folytasd: „{name}” — {step}/{total}. lépés",
+  "takes_download_video": "Videó mentése",
+  "takes_video_progress": "Renderelés… {percent}%"
 }

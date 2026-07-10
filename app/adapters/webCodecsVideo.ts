@@ -4,6 +4,7 @@
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
 import type { VideoExporter, VideoExportInput } from "../ports/videoExporter";
 import { frameTimesMs } from "../../core/videoFrames";
+import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
 
 // The WebCodecs implementation of the video-file seam: frames painted onto an
 // OffscreenCanvas go through VideoEncoder (H.264), the soundtrack through
@@ -65,7 +66,7 @@ export const webCodecsVideoExporter: VideoExporter = {
                 VideoEncoder.isConfigSupported(videoConfig({ width: 1280, height: 720, fps: 30 })),
                 AudioEncoder.isConfigSupported({
                     codec: AUDIO_CODEC,
-                    sampleRate: 48_000,
+                    sampleRate: EXPORT_SAMPLE_RATE,
                     numberOfChannels: 2,
                     bitrate: AUDIO_BITRATE,
                 }),
@@ -77,13 +78,14 @@ export const webCodecsVideoExporter: VideoExporter = {
     },
 
     async export(input, onProgress) {
+        const audio = await renderTakeAudio(input.notes);
         const muxer = new Muxer({
             target: new ArrayBufferTarget(),
             video: { codec: "avc", width: input.width, height: input.height },
             audio: {
                 codec: "aac",
-                sampleRate: input.audio.sampleRate,
-                numberOfChannels: input.audio.numberOfChannels,
+                sampleRate: audio.sampleRate,
+                numberOfChannels: audio.numberOfChannels,
             },
             // The whole file assembles in memory, so the moov atom lands up
             // front and the result streams from the first byte.
@@ -106,18 +108,18 @@ export const webCodecsVideoExporter: VideoExporter = {
             output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
             error: fail,
         });
-        audioEncoder.configure(audioConfig(input.audio));
+        audioEncoder.configure(audioConfig(audio));
 
         // Audio first: it's cheap, and the muxer interleaves by timestamp.
-        for (let from = 0; from < input.audio.length; from += AUDIO_CHUNK_FRAMES) {
-            const count = Math.min(AUDIO_CHUNK_FRAMES, input.audio.length - from);
+        for (let from = 0; from < audio.length; from += AUDIO_CHUNK_FRAMES) {
+            const count = Math.min(AUDIO_CHUNK_FRAMES, audio.length - from);
             const data = new AudioData({
                 format: "f32-planar",
-                sampleRate: input.audio.sampleRate,
+                sampleRate: audio.sampleRate,
                 numberOfFrames: count,
-                numberOfChannels: input.audio.numberOfChannels,
-                timestamp: Math.round((from / input.audio.sampleRate) * 1_000_000),
-                data: planarSlice(input.audio, from, count),
+                numberOfChannels: audio.numberOfChannels,
+                timestamp: Math.round((from / audio.sampleRate) * 1_000_000),
+                data: planarSlice(audio, from, count),
             });
             audioEncoder.encode(data);
             data.close();

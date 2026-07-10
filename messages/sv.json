@@ -574,5 +574,7 @@
   "help_learn_more": "Läs mer",
   "meta_help_description": "Så fungerar Plinky: guider för varje del av appen, från din första ton till att följa dina framsteg.",
   "discover_jump_in": "Sätt igång direkt",
-  "today_assignment": "Fortsätt “{name}” — steg {step} av {total}"
+  "today_assignment": "Fortsätt “{name}” — steg {step} av {total}",
+  "takes_download_video": "Spara video",
+  "takes_video_progress": "Renderar… {percent}%"
 }

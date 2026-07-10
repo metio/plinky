@@ -574,5 +574,7 @@
   "help_learn_more": "Les mer",
   "meta_help_description": "Slik fungerer Plinky: veiledninger for hver del av appen, fra din første tone til å følge fremgangen din.",
   "discover_jump_in": "Hopp rett i det",
-  "today_assignment": "Fortsett “{name}” — steg {step} av {total}"
+  "today_assignment": "Fortsett “{name}” — steg {step} av {total}",
+  "takes_download_video": "Lagre video",
+  "takes_video_progress": "Gjengir… {percent}%"
 }

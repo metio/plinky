@@ -574,5 +574,7 @@
   "theme_dark": "🌙 Dark",
   "theme_aria": "Theme: {theme}. Click to change.",
   "discover_jump_in": "Jump right in",
-  "today_assignment": "Continue “{name}” — step {step} of {total}"
+  "today_assignment": "Continue “{name}” — step {step} of {total}",
+  "takes_download_video": "Save video",
+  "takes_video_progress": "Rendering… {percent}%"
 }

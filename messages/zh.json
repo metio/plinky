@@ -574,5 +574,7 @@
   "help_learn_more": "了解更多",
   "meta_help_description": "了解 Plinky 的运作方式：涵盖应用每个部分的指南，从你的第一个音符到进度跟踪。",
   "discover_jump_in": "立即上手",
-  "today_assignment": "继续《{name}》——第 {step}/{total} 步"
+  "today_assignment": "继续《{name}》——第 {step}/{total} 步",
+  "takes_download_video": "保存视频",
+  "takes_video_progress": "正在渲染… {percent}%"
 }

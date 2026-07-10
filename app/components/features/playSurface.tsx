@@ -23,6 +23,7 @@ export function PlaySurface() {
     const {
         id,
         title,
+        credit,
         daily,
         ephemeral,
         ready,
@@ -122,6 +123,7 @@ export function PlaySurface() {
                         id={id}
                         takes={takes}
                         title={title}
+                        credit={credit}
                         activeReplayId={listenPlayback.activeReplayId}
                         playing={listenPlayback.playing}
                         lastRunOnsets={ghostRace.storedGhost}

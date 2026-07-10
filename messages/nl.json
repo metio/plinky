@@ -574,5 +574,7 @@
   "help_learn_more": "Meer informatie",
   "meta_help_description": "Hoe Plinky werkt: uitleg voor elk onderdeel van de app, van je eerste noot tot het bijhouden van je voortgang.",
   "discover_jump_in": "Meteen beginnen",
-  "today_assignment": "Ga verder met “{name}” — stap {step} van {total}"
+  "today_assignment": "Ga verder met “{name}” — stap {step} van {total}",
+  "takes_download_video": "Video opslaan",
+  "takes_video_progress": "Renderen… {percent}%"
 }

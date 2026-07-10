@@ -8,6 +8,8 @@
 // engines — the UI asks supported() and simply doesn't offer the feature where
 // the answer is no.
 
+import type { RecordedNote } from "../../core/composition";
+
 export type VideoExportInput = {
     width: number;
     height: number;
@@ -16,8 +18,10 @@ export type VideoExportInput = {
     // Paint the frame at timeMs (video clock, 0 = first frame) into the given
     // context. Called once per frame in order, so a painter may keep caches.
     paint(context: OffscreenCanvasRenderingContext2D, timeMs: number): void;
-    // The full soundtrack, aligned to the same clock.
-    audio: AudioBuffer;
+    // The performance to sound: the exporter renders the soundtrack itself
+    // (offline, with the live synth's voice) so callers stay free of audio
+    // machinery.
+    notes: RecordedNote[];
 };
 
 export interface VideoExporter {

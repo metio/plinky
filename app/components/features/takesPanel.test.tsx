@@ -29,6 +29,7 @@ const mk = (id: string, overrides: Partial<Take> = {}): Take => ({
 const base = {
     id: "song",
     title: "Song",
+    credit: "Song · Composer · CC0",
     activeReplayId: null,
     playing: false,
     lastRunOnsets: null,

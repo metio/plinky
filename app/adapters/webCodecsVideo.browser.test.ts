@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { renderTakeAudio } from "./offlineAudio";
 import { webCodecsVideoExporter } from "./webCodecsVideo";
 
 // The export is chromium territory (firefox has no AAC encoder); supported()
@@ -18,9 +17,6 @@ describe("webCodecsVideoExporter", () => {
         if (!(await webCodecsVideoExporter.supported())) {
             return;
         }
-        const audio = await renderTakeAudio([
-            { pitch: 60, startMs: 0, durationMs: 300, velocity: 100 },
-        ]);
         const progress: number[] = [];
         const blob = await webCodecsVideoExporter.export(
             {
@@ -34,7 +30,7 @@ describe("webCodecsVideoExporter", () => {
                     context.fillStyle = "#6366f1";
                     context.fillRect((timeMs / 1_200) * 320, 60, 40, 60);
                 },
-                audio,
+                notes: [{ pitch: 60, startMs: 0, durationMs: 300, velocity: 100 }],
             },
             (fraction) => progress.push(fraction),
         );

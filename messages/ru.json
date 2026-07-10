@@ -574,5 +574,7 @@
   "help_learn_more": "Подробнее",
   "meta_help_description": "Как работает Plinky: руководства по каждой части приложения, от первой ноты до отслеживания вашего прогресса.",
   "discover_jump_in": "Сразу к делу",
-  "today_assignment": "Продолжить «{name}» — шаг {step} из {total}"
+  "today_assignment": "Продолжить «{name}» — шаг {step} из {total}",
+  "takes_download_video": "Сохранить видео",
+  "takes_video_progress": "Рендеринг… {percent}%"
 }
