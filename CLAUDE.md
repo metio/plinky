@@ -93,14 +93,18 @@ npm run size          # bundle budget
   test target: memoryStore fakes for stores, fast-check property suites
   (`*.property.test.ts`) for pure core logic, `*.browser.test.tsx` for
   real-browser behavior.
-- **Stories are visual regression tests.** The `storybook` vitest project
-  screenshots every story and compares it to a committed baseline in
-  `app/**/__story-shots__/` (chromium-only, fixed 800×600 viewport, the flake
-  pins the browser so local and CI rasterize identically). After an intentional
-  visual change — or when adding a story — refresh with
-  `npm run test:storybook -- -u` and commit the changed images; a baseline diff in
-  review is the feature. Stories must render deterministically: no live dates,
-  no randomness, no unawaited async.
+- **Stories are visual regression tests, in both themes.** The `storybook`
+  vitest project screenshots every story light and dark (the hook flips the
+  `.dark` root class for a second, `-dark`-named baseline) and compares both
+  to committed baselines in `app/**/__story-shots__/` (chromium-only, fixed
+  800×600 viewport, the flake pins the browser so local and CI rasterize
+  identically). After an intentional visual change — or when adding a story —
+  refresh with `npm run test:storybook -- -u` and commit the changed images; a
+  baseline diff in review is the feature. Stories must render
+  deterministically: no live dates, no randomness, no unawaited async — and a
+  story whose visible content includes emoji joins the `EMOJI_STORIES` skip
+  set in `.storybook/vitest.setup.ts` (emoji glyphs rasterize
+  machine-dependently).
 - **UI strings** go through paraglide: add the key to `messages/en.json` (the
   base-locale contract) **and translate it into all other `messages/*.json`** —
   `npm run messages:check` is a blocking gate that fails on any locale missing a
