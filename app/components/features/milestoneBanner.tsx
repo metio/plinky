@@ -5,6 +5,7 @@ import { useMilestoneChannel } from "../../contexts/milestone";
 import { svgMilestone } from "../../../core/milestoneCard";
 import type { Milestone } from "../../../core/milestones";
 import { m } from "../../paraglide/messages.js";
+import { Banner } from "../ui/banner";
 import { ShareButtons } from "./shareButtons";
 
 // A celebratory notice for an earned moment (first S, grade-up, flawless run), with the
@@ -43,31 +44,21 @@ export function MilestoneBanner({
               ? m.milestone_flawless_boast({ title: milestone.songTitle })
               : m.milestone_first_s_boast({ title: milestone.songTitle });
     return (
-        <div
-            role="status"
-            className="border-b border-indigo-300 bg-indigo-50 px-6 py-3 dark:border-indigo-800 dark:bg-indigo-950"
-        >
-            <div className="mx-auto max-w-3xl space-y-2">
-                <div className="flex items-start justify-between gap-4">
-                    <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
-                        {heading}
-                    </p>
-                    <button
-                        type="button"
-                        onClick={onDismiss}
-                        aria-label={m.action_dismiss()}
-                        className="shrink-0 text-indigo-900 hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100"
-                    >
-                        ✕
-                    </button>
-                </div>
+        <Banner
+            tone="indigo"
+            onDismiss={onDismiss}
+            dismissLabel={m.action_dismiss()}
+            emphasis
+            footer={
                 <ShareButtons
                     text={boast}
                     imageSvg={svgMilestone({ title: cardTitle, detail })}
                     imageText={boast}
                 />
-            </div>
-        </div>
+            }
+        >
+            {heading}
+        </Banner>
     );
 }
 

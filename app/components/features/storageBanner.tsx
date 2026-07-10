@@ -3,6 +3,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { m } from "../../paraglide/messages.js";
+import { Banner } from "../ui/banner";
 
 // The signal the banner watches: whether a storage write has failed on this
 // device. Structural on purpose — the browser-store adapter satisfies it and a
@@ -26,23 +27,13 @@ export function StorageBanner({ health }: { health: StorageHealth }) {
         return null;
     }
     return (
-        <div
+        <Banner
+            tone="amber"
             role="alert"
-            className="border-b border-amber-300 bg-amber-50 px-6 py-2 dark:border-amber-800 dark:bg-amber-950"
+            onDismiss={() => setDismissed(true)}
+            dismissLabel={m.action_dismiss()}
         >
-            <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
-                <p className="text-sm text-amber-900 dark:text-amber-200">
-                    {m.storage_write_failed()}
-                </p>
-                <button
-                    type="button"
-                    onClick={() => setDismissed(true)}
-                    aria-label={m.action_dismiss()}
-                    className="text-amber-900 hover:text-amber-700 dark:text-amber-200 dark:hover:text-amber-100"
-                >
-                    ✕
-                </button>
-            </div>
-        </div>
+            {m.storage_write_failed()}
+        </Banner>
     );
 }

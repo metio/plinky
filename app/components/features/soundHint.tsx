@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { useHintsStore } from "../../contexts/services";
 import { useAudioUnlock } from "../../hooks/useAudioUnlock";
 import { m } from "../../paraglide/messages.js";
+import { Banner } from "../ui/banner";
 
 const HINT_ID = "ios-sound";
 
@@ -30,23 +31,12 @@ export function SoundHint({ iosLike, inAppBrowser }: { iosLike: boolean; inAppBr
         return null;
     }
     return (
-        <div
-            role="status"
-            className="border-b border-sky-300 bg-sky-50 px-6 py-2 dark:border-sky-800 dark:bg-sky-950"
+        <Banner
+            tone="sky"
+            onDismiss={() => hints.markSeen(HINT_ID)}
+            dismissLabel={m.action_dismiss()}
         >
-            <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
-                <p className="text-sm text-sky-900 dark:text-sky-200">
-                    {inAppBrowser ? m.sound_inapp_hint() : m.sound_ios_hint()}
-                </p>
-                <button
-                    type="button"
-                    onClick={() => hints.markSeen(HINT_ID)}
-                    aria-label={m.action_dismiss()}
-                    className="text-sky-900 hover:text-sky-700 dark:text-sky-200 dark:hover:text-sky-100"
-                >
-                    ✕
-                </button>
-            </div>
-        </div>
+            {inAppBrowser ? m.sound_inapp_hint() : m.sound_ios_hint()}
+        </Banner>
     );
 }
