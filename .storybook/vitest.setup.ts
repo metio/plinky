@@ -22,12 +22,15 @@ const EMOJI_STORIES = new Set([
     "discoveryChecklist.stories.tsx > Partly Done",
 ]);
 
-// Every story doubles as a visual regression test: after it renders (and any
-// play function has run), the rendered document is compared against a committed
-// per-story baseline. The project runs only on chromium pinned by the flake, so
-// local and CI rasterize with the same engine; the preview self-hosts the fonts
-// (awaited here) and freezes animations, which is what makes a pixel
-// comparison meaningful. Refresh baselines with `npm run test:storybook -- -u`.
+// Every story doubles as a visual regression test in both themes: after it
+// renders (and any play function has run), the rendered document is compared
+// against a committed per-story baseline, then the `.dark` class — the same
+// switch the app's theme store flips — goes on the root element and a second,
+// `-dark`-named baseline is compared. The project runs only on chromium pinned
+// by the flake, so local and CI rasterize with the same engine; the preview
+// self-hosts the fonts (awaited here) and freezes animations, which is what
+// makes a pixel comparison meaningful. Refresh baselines with
+// `npm run test:storybook -- -u`.
 afterEach(async (ctx) => {
     const key = `${ctx.task.file.name.split("/").pop()} > ${ctx.task.name}`;
     if (EMOJI_STORIES.has(key)) {
@@ -39,9 +42,15 @@ afterEach(async (ctx) => {
     await document.fonts.load("400 16px 'Inter Variable'");
     await document.fonts.load("600 16px 'Inter Variable'");
     await document.fonts.ready;
-    await expect(page.elementLocator(document.body)).toMatchScreenshot({
-        // The capture is retried until two consecutive frames match; a loaded
-        // CI runner can still be painting well past the 5s default.
-        timeout: 15_000,
-    });
+    // The capture is retried until two consecutive frames match; a loaded
+    // CI runner can still be painting well past the 5s default.
+    const options = { timeout: 15_000 };
+    const body = page.elementLocator(document.body);
+    try {
+        await expect(body).toMatchScreenshot(options);
+        document.documentElement.classList.add("dark");
+        await expect(body).toMatchScreenshot(`${ctx.task.name}-dark`, options);
+    } finally {
+        document.documentElement.classList.remove("dark");
+    }
 });
