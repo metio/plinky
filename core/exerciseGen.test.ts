@@ -9,6 +9,7 @@ import {
     generateExercise,
     parseExerciseId,
 } from "./exerciseGen";
+import { songId } from "./songId";
 
 describe("exercise ids", () => {
     it("round-trips canonical base ids unchanged", () => {
@@ -60,10 +61,28 @@ describe("exercise ids", () => {
         expect(parseExerciseId("QmAbc123")).toBeNull();
     });
 
-    it("has 108 tiles that all round-trip", () => {
-        expect(EXERCISE_TILES).toHaveLength(108);
+    it("has 97 tiles that all round-trip", () => {
+        expect(EXERCISE_TILES).toHaveLength(97);
         for (const tile of EXERCISE_TILES) {
             expect(parseExerciseId(buildExerciseId(tile))).toEqual(tile);
+        }
+    });
+
+    it("offers exactly one chromatic-scale tile (the canonical C-rooted run)", () => {
+        const chromatic = EXERCISE_TILES.filter((tile) => tile.type === "chromatic-scale");
+        expect(chromatic).toHaveLength(1);
+        expect(chromatic[0]!.key).toBe("c");
+    });
+
+    it("gives every tile distinct content, so no two share a fingerprint id", () => {
+        // The manifest keys entries by songId(xml), a content fingerprint. Two tiles
+        // generating note-identical MusicXML would collapse to one id and surface as
+        // duplicate rows / duplicate React keys downstream.
+        const ids = new Map<string, string>();
+        for (const tile of EXERCISE_TILES) {
+            const id = songId(generateExercise(tile));
+            expect(ids.get(id), `${buildExerciseId(tile)} vs ${ids.get(id)}`).toBeUndefined();
+            ids.set(id, buildExerciseId(tile));
         }
     });
 });

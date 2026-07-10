@@ -158,7 +158,16 @@ export default function AssignmentsRoute() {
                 id: exercise.id,
                 title: exercise.title,
             }));
-            setPool([...fromCatalog, ...fromExercises]);
+            // Content-fingerprint ids can collide across sources (an import matching a
+            // catalogue piece). Keep the first occurrence so the picker never renders
+            // duplicate ids — which would collide as React keys — and titleOf labels a
+            // step with the surviving entry's title.
+            const seen = new Set<string>();
+            setPool(
+                [...fromCatalog, ...fromExercises].filter((entry) =>
+                    seen.has(entry.id) ? false : (seen.add(entry.id), true),
+                ),
+            );
             const starter = starterAssignment({
                 id: "starter-first-steps",
                 name: m.assignments_starter_name(),

@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { encodeAssignmentLink, makeAssignment } from "../../core/assignment";
 import { memoryStore } from "../adapters/memoryStore";
 import { loadBundledScores } from "../lib/catalog";
 import { createAssignmentsStore } from "../stores/assignmentsStore";
-import type { ExerciseSource } from "../stores/exerciseSource";
+import type { ExerciseMeta, ExerciseSource } from "../stores/exerciseSource";
 import type { SongSource } from "../stores/songSource";
 import { renderWithServices } from "../testing/renderWithServices";
 import AssignmentsRoute from "./assignments";
@@ -163,5 +163,39 @@ describe("AssignmentsRoute missing pieces", () => {
         mount({ store: memoryStore(), ...pendingSources() }, `/assignments?assignment=${code}`);
         await screen.findByText(/An assignment was shared/);
         expect(screen.queryByText(/available on this device/)).toBeNull();
+    });
+});
+
+describe("AssignmentsRoute picker pool dedup", () => {
+    // The manifest keys entries by content fingerprint, so two entries can carry
+    // the same id (an import matching a catalogue piece, or a generator glitch).
+    const meta = (title: string): ExerciseMeta => ({
+        id: "dup-id",
+        title,
+        grade: 1,
+        cost: 1,
+        kind: "scale-arpeggio",
+        tempo: 90,
+        beatsPerBar: 4,
+    });
+
+    it("renders a duplicated id once and labels the basket with the surviving title", async () => {
+        mount({
+            store: memoryStore(),
+            exercises: source<ExerciseSource>(
+                () => Promise.resolve([meta("First title"), meta("Second title")]) as never,
+            ),
+            songs: source<SongSource>(() => Promise.resolve([])),
+        });
+        expect(await screen.findByText("First title")).toBeTruthy();
+        // The first occurrence wins; the duplicate never renders a second row.
+        expect(screen.getAllByText("First title")).toHaveLength(1);
+        expect(screen.queryByText("Second title")).toBeNull();
+        // The pool also lists the local catalogue, so scope the click to this row.
+        const row = screen.getByText("First title").closest("li")!;
+        fireEvent.click(within(row).getByText("Add"));
+        // The basket step is labelled from the surviving pool entry.
+        expect(await screen.findByText("First title")).toBeTruthy();
+        expect(screen.queryByText("Second title")).toBeNull();
     });
 });

@@ -491,14 +491,17 @@ export const EXERCISE_TILES: ExerciseConfig[] = [
             }),
         ),
     ),
-    ...MAJOR_SLUGS.map((key) => ({
+    // A chromatic run covers every semitone regardless of key — a "G♭ chromatic
+    // scale" is just the C one transposed, and enharmonic keys even fingerprint to
+    // the same content id — so exactly one canonical C-rooted tile is browsable.
+    {
         type: "chromatic-scale" as ExerciseType,
-        key,
+        key: "c",
         octaves: 1 as const,
         hands: "right" as const,
         inversion: 0 as const,
         interval: "single" as const,
-    })),
+    },
     ...MINOR_SLUGS.flatMap((key) =>
         (
             [

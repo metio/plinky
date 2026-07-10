@@ -3,7 +3,7 @@
 
 // Emits the finger-exercise metadata the app browses. The exercises themselves are
 // generated client-side from their config (core/exerciseGen.ts) — this just
-// precomputes the grade of each of the 96 canonical tiles so the library can filter
+// precomputes the grade of each canonical tile so the library can filter
 // by grade without parsing MusicXML per row, ordered easiest-first within a grade.
 //
 // It also sources Hanon (The Virtuoso Pianist) from the local PDMX corpus when
