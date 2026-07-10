@@ -60,6 +60,7 @@
             (pkgs.writeShellScriptBin "ci-test-browser" ''exec npm run test:browser "$@"'')
             (pkgs.writeShellScriptBin "ci-arch" ''exec npm run arch "$@"'')
             (pkgs.writeShellScriptBin "ci-nav" ''exec npm run nav "$@"'')
+            (pkgs.writeShellScriptBin "ci-tailwind" ''exec npm run tailwind "$@"'')
             (pkgs.writeShellScriptBin "ci-knip" ''exec npm run knip "$@"'')
             (pkgs.writeShellScriptBin "ci-biome" ''exec npx biome check "$@"'')
             (pkgs.writeShellScriptBin "ci-messages-check" ''exec npm run messages:check "$@"'')

@@ -55,6 +55,16 @@ jobs:
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
       - run: nix develop --command ci-arch
+  tailwind:
+    name: tailwind
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # Every class name in source must compile against app/app.css — an unknown
+      # utility silently applies no styling, which no other gate can see.
+      - run: nix develop --command ci-tailwind
   i18n:
     name: i18n
     runs-on: ubuntu-latest
@@ -79,7 +89,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, bake-check, nav, arch, i18n, ci-parity]
+    needs: [frontend, bake-check, nav, arch, tailwind, i18n, ci-parity]
     if: always()
     runs-on: ubuntu-latest
     steps:

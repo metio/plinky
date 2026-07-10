@@ -50,6 +50,7 @@ npm run typecheck
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
 npm run arch          # layer rules + confined globals
+npm run tailwind      # every class name compiles against app.css (blocking)
 npm run messages:check # every locale carries every message (blocking)
 npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
