@@ -17,8 +17,14 @@ import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
 // H.264 High profile, level 4.0 — comfortably covers 720p at any fps we ask
 // for, and hardware-decodes everywhere a video might be shared.
 const VIDEO_CODEC = "avc1.640028";
-// AAC-LC, the plain stereo audio every player expects inside an MP4.
-const AUDIO_CODEC = "mp4a.40.2";
+// AAC-LC, the plain stereo audio every player expects inside an MP4 — but the
+// AAC encoder is licensed and plain Chromium ships without it, so Opus (which
+// mp4-muxer can also carry in an MP4, and every modern player decodes) is the
+// fallback that keeps the export working there. Real Chrome gets AAC.
+const AUDIO_CODECS = [
+    { codec: "mp4a.40.2", container: "aac" as const },
+    { codec: "opus", container: "opus" as const },
+];
 const AUDIO_BITRATE = 192_000;
 const VIDEO_BITRATE = 6_000_000;
 // A keyframe every two seconds keeps seeking snappy without bloating the file.
@@ -36,13 +42,30 @@ function videoConfig(input: Pick<VideoExportInput, "width" | "height" | "fps">) 
     } satisfies VideoEncoderConfig;
 }
 
-function audioConfig(audio: AudioBuffer) {
+function audioConfig(codec: string, audio: Pick<AudioBuffer, "sampleRate" | "numberOfChannels">) {
     return {
-        codec: AUDIO_CODEC,
+        codec,
         sampleRate: audio.sampleRate,
         numberOfChannels: audio.numberOfChannels,
         bitrate: AUDIO_BITRATE,
     } satisfies AudioEncoderConfig;
+}
+
+// The first audio codec this engine can actually encode, or null.
+async function pickAudioCodec(): Promise<(typeof AUDIO_CODECS)[number] | null> {
+    for (const entry of AUDIO_CODECS) {
+        try {
+            const check = await AudioEncoder.isConfigSupported(
+                audioConfig(entry.codec, { sampleRate: EXPORT_SAMPLE_RATE, numberOfChannels: 2 }),
+            );
+            if (check.supported) {
+                return entry;
+            }
+        } catch {
+            // An unknown codec string throws; try the next one.
+        }
+    }
+    return null;
 }
 
 // The AudioBuffer's channels, re-laid as the planar float frames AudioData
@@ -62,16 +85,10 @@ export const webCodecsVideoExporter: VideoExporter = {
             return false;
         }
         try {
-            const [video, audio] = await Promise.all([
-                VideoEncoder.isConfigSupported(videoConfig({ width: 1280, height: 720, fps: 30 })),
-                AudioEncoder.isConfigSupported({
-                    codec: AUDIO_CODEC,
-                    sampleRate: EXPORT_SAMPLE_RATE,
-                    numberOfChannels: 2,
-                    bitrate: AUDIO_BITRATE,
-                }),
-            ]);
-            return video.supported === true && audio.supported === true;
+            const video = await VideoEncoder.isConfigSupported(
+                videoConfig({ width: 1280, height: 720, fps: 30 }),
+            );
+            return video.supported === true && (await pickAudioCodec()) !== null;
         } catch {
             return false;
         }
@@ -79,11 +96,15 @@ export const webCodecsVideoExporter: VideoExporter = {
 
     async export(input, onProgress) {
         const audio = await renderTakeAudio(input.notes);
+        const audioCodec = await pickAudioCodec();
+        if (!audioCodec) {
+            throw new Error("no encodable audio codec; supported() would have said no");
+        }
         const muxer = new Muxer({
             target: new ArrayBufferTarget(),
             video: { codec: "avc", width: input.width, height: input.height },
             audio: {
-                codec: "aac",
+                codec: audioCodec.container,
                 sampleRate: audio.sampleRate,
                 numberOfChannels: audio.numberOfChannels,
             },
@@ -108,7 +129,7 @@ export const webCodecsVideoExporter: VideoExporter = {
             output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
             error: fail,
         });
-        audioEncoder.configure(audioConfig(audio));
+        audioEncoder.configure(audioConfig(audioCodec.codec, audio));
 
         // Audio first: it's cheap, and the muxer interleaves by timestamp.
         for (let from = 0; from < audio.length; from += AUDIO_CHUNK_FRAMES) {
