@@ -11,6 +11,10 @@ import "../app/app.css";
 // face, or the story screenshots would rasterize whatever system font the
 // machine happens to have — the one cross-machine difference we can remove.
 import "@fontsource-variable/inter/wght.css";
+// Emoji too: the sans stack ends in "Noto Color Emoji", and this @font-face
+// satisfies it with one pinned webfont — otherwise every emoji glyph comes
+// from the OS, and Fedora's and ubuntu's system emoji draw differently.
+import "@fontsource/noto-color-emoji";
 
 // Screenshots need a still frame: freeze animations and transitions at their
 // end state, and hide the text caret, so a story always rasterizes identically.

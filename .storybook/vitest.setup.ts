@@ -22,6 +22,14 @@ afterEach(async () => {
     // fallback font mid-swap. Request the app face explicitly first.
     await document.fonts.load("400 16px 'Inter Variable'");
     await document.fonts.load("600 16px 'Inter Variable'");
+    await document.fonts.load("400 16px 'Noto Color Emoji'", "🎹");
     await document.fonts.ready;
+    // A face that failed to fetch resolves the waits above without erroring —
+    // and the screenshot would silently rasterize a machine-dependent fallback.
+    for (const face of ["'Inter Variable'", "'Noto Color Emoji'"]) {
+        if (!document.fonts.check(`400 16px ${face}`, "🎹A")) {
+            throw new Error(`${face} did not load; the screenshot would use a system font`);
+        }
+    }
     await expect(page.elementLocator(document.body)).toMatchScreenshot();
 });

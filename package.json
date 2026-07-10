@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.2",
+    "@fontsource/noto-color-emoji": "^5.2.12",
     "@inlang/paraglide-js": "^2.20.1",
     "@react-router/dev": "^8.0.1",
     "@storybook/addon-vitest": "^10.4.6",
