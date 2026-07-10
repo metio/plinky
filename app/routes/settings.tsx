@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { linkClasses } from "../components/ui/classes";
 import { DangerZone } from "../components/features/dangerZone";
@@ -23,6 +23,53 @@ import type { Route } from "./+types/settings";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.nav_settings(), m.meta_settings_description());
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+    return (
+        <section className="space-y-3">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {title}
+            </h2>
+            {children}
+        </section>
+    );
+}
+
+function SelectField({
+    label,
+    value,
+    onChange,
+    options,
+    help,
+}: {
+    label: string;
+    value: string | number;
+    onChange: (value: string) => void;
+    options: readonly { value: string | number; label: string }[];
+    help?: string;
+}) {
+    return (
+        <>
+            <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                {label}
+                <select
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
+                >
+                    {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            {help !== undefined && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">{help}</p>
+            )}
+        </>
+    );
 }
 
 export default function Settings() {
@@ -68,10 +115,7 @@ export default function Settings() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">{m.settings_subtitle()}</p>
             </header>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_appearance()}
-                </h2>
+            <Section title={m.settings_appearance()}>
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-700 dark:text-gray-300">
                         {m.settings_theme()}
@@ -84,12 +128,9 @@ export default function Settings() {
                     </span>
                     <LanguageSwitcher />
                 </div>
-            </section>
+            </Section>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_sound()}
-                </h2>
+            <Section title={m.settings_sound()}>
                 <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input
                         type="checkbox"
@@ -116,76 +157,46 @@ export default function Settings() {
                         {m.settings_test()}
                     </Button>
                 </div>
-            </section>
+            </Section>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_mastery()}
-                </h2>
-                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    {m.settings_mastery_threshold()}
-                    <select
-                        value={prefs.masteryThreshold}
-                        onChange={(event) =>
-                            update({ masteryThreshold: event.target.value as Letter })
-                        }
-                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
-                    >
-                        {(["S", "A", "B", "C", "D"] as Letter[]).map((letter) => (
-                            <option key={letter} value={letter}>
-                                {letter}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {m.settings_mastery_help()}
-                </p>
-            </section>
+            <Section title={m.settings_mastery()}>
+                <SelectField
+                    label={m.settings_mastery_threshold()}
+                    value={prefs.masteryThreshold}
+                    onChange={(value) => update({ masteryThreshold: value as Letter })}
+                    options={(["S", "A", "B", "C", "D"] as Letter[]).map((letter) => ({
+                        value: letter,
+                        label: letter,
+                    }))}
+                    help={m.settings_mastery_help()}
+                />
+            </Section>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_grades()}
-                </h2>
-                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    {m.settings_decay()}
-                    <select
-                        value={prefs.decayMode}
-                        onChange={(event) => update({ decayMode: event.target.value as DecayMode })}
-                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
-                    >
-                        <option value="gentle">{m.settings_decay_gentle()}</option>
-                        <option value="competitive">{m.settings_decay_competitive()}</option>
-                    </select>
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {prefs.decayMode === "competitive"
-                        ? m.settings_decay_competitive_help()
-                        : m.settings_decay_gentle_help()}
-                </p>
-                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    {m.settings_review_cap()}
-                    <select
-                        value={prefs.reviewCap}
-                        onChange={(event) => update({ reviewCap: Number(event.target.value) })}
-                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
-                    >
-                        {REVIEW_CAPS.map((cap) => (
-                            <option key={cap} value={cap}>
-                                {cap}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {m.settings_review_cap_help()}
-                </p>
-            </section>
+            <Section title={m.settings_grades()}>
+                <SelectField
+                    label={m.settings_decay()}
+                    value={prefs.decayMode}
+                    onChange={(value) => update({ decayMode: value as DecayMode })}
+                    options={[
+                        { value: "gentle", label: m.settings_decay_gentle() },
+                        { value: "competitive", label: m.settings_decay_competitive() },
+                    ]}
+                    help={
+                        prefs.decayMode === "competitive"
+                            ? m.settings_decay_competitive_help()
+                            : m.settings_decay_gentle_help()
+                    }
+                />
+                <SelectField
+                    label={m.settings_review_cap()}
+                    value={prefs.reviewCap}
+                    onChange={(value) => update({ reviewCap: Number(value) })}
+                    options={REVIEW_CAPS.map((cap) => ({ value: cap, label: String(cap) }))}
+                    help={m.settings_review_cap_help()}
+                />
+            </Section>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_fingering()}
-                </h2>
+            <Section title={m.settings_fingering()}>
                 <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input
                         type="checkbox"
@@ -194,63 +205,44 @@ export default function Settings() {
                     />
                     {m.settings_show_fingerings()}
                 </label>
-                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    {m.settings_note_hints()}
-                    <select
-                        value={prefs.noteHints}
-                        onChange={(event) => update({ noteHints: event.target.value as NoteHints })}
-                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
-                    >
-                        <option value="always">{m.note_hints_always()}</option>
-                        <option value="miss">{m.note_hints_miss()}</option>
-                        <option value="never">{m.note_hints_never()}</option>
-                    </select>
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {m.settings_note_hints_help()}
-                </p>
-                <label className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    {m.settings_note_labels()}
-                    <select
-                        value={prefs.noteLabels}
-                        onChange={(event) =>
-                            update({ noteLabels: event.target.value as NoteLabels })
-                        }
-                        className="rounded-md border border-gray-300 px-2 py-1 dark:border-gray-700 dark:bg-gray-900"
-                    >
-                        <option value="all">{m.note_labels_all()}</option>
-                        <option value="c">{m.note_labels_c()}</option>
-                        <option value="off">{m.note_labels_off()}</option>
-                    </select>
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {m.settings_note_labels_help()}
-                </p>
+                <SelectField
+                    label={m.settings_note_hints()}
+                    value={prefs.noteHints}
+                    onChange={(value) => update({ noteHints: value as NoteHints })}
+                    options={[
+                        { value: "always", label: m.note_hints_always() },
+                        { value: "miss", label: m.note_hints_miss() },
+                        { value: "never", label: m.note_hints_never() },
+                    ]}
+                    help={m.settings_note_hints_help()}
+                />
+                <SelectField
+                    label={m.settings_note_labels()}
+                    value={prefs.noteLabels}
+                    onChange={(value) => update({ noteLabels: value as NoteLabels })}
+                    options={[
+                        { value: "all", label: m.note_labels_all() },
+                        { value: "c", label: m.note_labels_c() },
+                        { value: "off", label: m.note_labels_off() },
+                    ]}
+                    help={m.settings_note_labels_help()}
+                />
                 <HandSize />
-            </section>
+            </Section>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_keyboard()}
-                </h2>
+            <Section title={m.settings_keyboard()}>
                 <KeyMapping />
-            </section>
+            </Section>
 
             {/* No Web MIDI (Safari, all iOS) means no device to connect — the
                 keyboard is the input there, so the whole panel is hidden. */}
             {midiSupport !== "unsupported" && (
-                <section className="space-y-3">
-                    <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {m.settings_connect_midi()}
-                    </h2>
+                <Section title={m.settings_connect_midi()}>
                     <MidiConnect />
-                </section>
+                </Section>
             )}
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_help()}
-                </h2>
+            <Section title={m.settings_help()}>
                 <a
                     href="https://github.com/metio/plinky/issues"
                     target="_blank"
@@ -259,7 +251,7 @@ export default function Settings() {
                 >
                     {m.settings_get_help()} →
                 </a>
-            </section>
+            </Section>
 
             <DangerZone />
         </main>
