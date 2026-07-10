@@ -42,6 +42,17 @@ To deploy from a machine instead, set the `SANITY_STUDIO_*` variables in `.env`
 npm ci && npx sanity login && npm run deploy
 ```
 
+## Seed content
+
+`seed/help.ndjson` holds the initial help-page blocks — one English block per
+section (the app falls back to English until a translation is added in the
+Studio). The manual **Seed Studio Content** workflow imports it with
+`sanity dataset import --replace`, so re-running it overwrites those seed
+documents (and only those) with the file's version — don't re-run it after
+editors have reworked them in the Studio. It authenticates with the
+`SANITY_EDITOR_TOKEN` secret, a robot token with the **Editor** role (the
+deploy token can't write documents).
+
 ## Make browser reads work (in sanity.io/manage)
 
 - **Public dataset** — API → Datasets → set `production` to Public (Plinky reads

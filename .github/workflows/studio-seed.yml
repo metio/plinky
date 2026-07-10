@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: 0BSD
+name: Seed Studio Content
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seed:
+    name: Import seed content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - name: Import help content
+        working-directory: studio
+        env:
+          SANITY_STUDIO_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
+          SANITY_STUDIO_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_EDITOR_TOKEN }}
+        run: |
+          nix develop ../ --command bash -c \
+            "npm ci && npx sanity dataset import seed/help.ndjson $SANITY_STUDIO_DATASET --replace"
