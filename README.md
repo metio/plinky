@@ -290,7 +290,7 @@ from. Like the news banner, the content is edited outside the code in the same
 no redeploy, and it's translated: a reader downloads only their own language.
 
 The app owns the sections (their titles are translated with the rest of the UI); Sanity
-holds the blocks inside them. Add a `helpItem` document type with a `pageKey` (which
+holds the blocks inside them. The `helpItem` document type (see [studio/](studio/)) carries a `pageKey` (which
 section it belongs to — `gettingStarted`, `home`, `play`, `library`, `daily`, `compose`,
 `assignments`, `you`, `review`, or `settings`), an `order`, an optional `image` (shared
 across languages) with internationalized `alt` text, an internationalized `text` body,

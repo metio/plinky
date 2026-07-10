@@ -16,6 +16,9 @@ deploys the Studio that hosts it.
   item" toggle. The most recently updated shown item appears on the home page.
 - **Site settings** — a single document with **News board enabled**, the master
   switch that hides the whole banner when off.
+- **Help block** — one block on the `/help` page: the section it belongs to
+  (`pageKey`), an order, an optional picture, internationalized alt text and
+  body, and an optional learn-more link.
 - **Board artist** — an artist pinned to the `/board` page: a name, a picture,
   internationalized alt text and blurb, a follow link, an order, and a "Show this
   artist" toggle.
