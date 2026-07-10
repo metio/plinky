@@ -31,6 +31,14 @@ describe("frameTimesMs", () => {
         expect(times[3]).toBe(100);
         expect(times.at(-1)!).toBeLessThan(1_000);
     });
+
+    it("keeps the last frame inside a duration that is a whole number of frames", () => {
+        // 64_400 ms at 50 fps is exactly 3_220 frames; float division would
+        // round the count up and stamp a frame at the very end.
+        const times = frameTimesMs(64_400, 50);
+        expect(times).toHaveLength(3_220);
+        expect(times.at(-1)!).toBeLessThan(64_400);
+    });
 });
 
 describe("frameAt", () => {

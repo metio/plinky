@@ -43,7 +43,10 @@ export function videoDurationMs(notes: RecordedNote[]): number {
 // encoder will stamp onto the stream, so they come from frame arithmetic (index
 // over fps), never from accumulating floats.
 export function frameTimesMs(durationMs: number, fps: number): number[] {
-    const count = Math.ceil((durationMs / 1000) * fps);
+    // Multiply before dividing: durationMs and fps are integers, so the frame
+    // count is exact. Dividing first can round a whole-frame duration up and
+    // put a spurious frame at (or past) the video's end.
+    const count = Math.ceil((durationMs * fps) / 1000);
     return Array.from({ length: count }, (_, index) => (index * 1000) / fps);
 }
 
