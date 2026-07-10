@@ -4,7 +4,7 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import { webAudioEngine } from "../adapters/webAudioEngine";
-import { webCodecsVideoExporter } from "../adapters/webCodecsVideo";
+import { lazyVideoExporter } from "../adapters/lazyVideo";
 import { webMidi } from "../adapters/webMidi";
 import type { MidiAccessPort } from "../ports/midiAccess";
 import type { AudioEngine } from "../ports/audioEngine";
@@ -126,7 +126,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
         news: overrides.news ?? createSanityNews(fetcher),
         help: overrides.help ?? createSanityHelp(fetcher),
-        video: overrides.video ?? webCodecsVideoExporter,
+        video: overrides.video ?? lazyVideoExporter,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.
         activity: overrides.activity ?? runActivity,

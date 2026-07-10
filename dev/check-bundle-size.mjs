@@ -15,6 +15,10 @@ import { gzipSync } from "node:zlib";
 
 const DIR = "build/client/assets";
 const VENDOR = /opensheetmusicdisplay/;
+// Chunks fetched only by a rare, deliberate act — the video export's encoder
+// (WebCodecs adapter + mp4-muxer) loads on first use, never on a page visit —
+// so like OSMD they are budgeted apart from the per-visitor app weight.
+const ON_DEMAND = /webCodecsVideo/;
 
 // The client bundle a SINGLE visitor downloads: the fixed OSMD vendor chunk
 // (~310 KB, pinned) plus our own code. CI measures a per-locale build
@@ -62,7 +66,10 @@ const total = chunks.reduce((sum, chunk) => sum + chunk.gz, 0);
 const vendor = chunks
     .filter((chunk) => VENDOR.test(chunk.name))
     .reduce((sum, chunk) => sum + chunk.gz, 0);
-const app = total - vendor;
+const onDemand = chunks
+    .filter((chunk) => ON_DEMAND.test(chunk.name))
+    .reduce((sum, chunk) => sum + chunk.gz, 0);
+const app = total - vendor - onDemand;
 const kb = (bytes) => (bytes / 1024).toFixed(1);
 
 console.log("Largest client chunks (gzipped):");
@@ -70,13 +77,13 @@ for (const chunk of chunks.slice(0, 8)) {
     console.log(`  ${kb(chunk.gz).padStart(7)} KB  ${chunk.name}`);
 }
 console.log(
-    `Total ${kb(total)} KB · vendor/OSMD ${kb(vendor)} KB · app ${kb(app)} KB ` +
-        `(budgets: total ${BUDGET_TOTAL_KB}, app ${BUDGET_APP_KB})`,
+    `Total ${kb(total)} KB · vendor/OSMD ${kb(vendor)} KB · on-demand ${kb(onDemand)} KB · ` +
+        `app ${kb(app)} KB (budgets: total ${BUDGET_TOTAL_KB}, app ${BUDGET_APP_KB})`,
 );
 
 const problems = [];
-if (total / 1024 > BUDGET_TOTAL_KB) {
-    problems.push(`total ${kb(total)} KB exceeds the ${BUDGET_TOTAL_KB} KB budget`);
+if ((total - onDemand) / 1024 > BUDGET_TOTAL_KB) {
+    problems.push(`total ${kb(total - onDemand)} KB exceeds the ${BUDGET_TOTAL_KB} KB budget`);
 }
 if (app / 1024 > BUDGET_APP_KB) {
     problems.push(`app ${kb(app)} KB exceeds the ${BUDGET_APP_KB} KB budget`);
