@@ -23,7 +23,8 @@ const mount = (entry = "/assignments") =>
     );
 
 // The builder lives on its own tab; tests that use it open it first.
-const openBuilder = () => fireEvent.click(screen.getByRole("tab", { name: /Create new|Edit assignment/ }));
+const openBuilder = () =>
+    fireEvent.click(screen.getByRole("tab", { name: /Create new|Edit assignment/ }));
 
 afterEach(() => {
     cleanup();
@@ -209,7 +210,8 @@ describe("AssignmentsRoute", () => {
         fireEvent.click(await screen.findByText("Add"));
         // Two items in order; dragging the second row's title above the first
         // reorders them (pointer events — the same path touch takes).
-        const rows = () => screen.getAllByLabelText("Remove").map((button) => button.closest("li")!);
+        const rows = () =>
+            screen.getAllByLabelText("Remove").map((button) => button.closest("li")!);
         expect(within(rows()[0]!).queryByText(/Twinkle/)).toBeTruthy();
         const handle = within(rows()[1]!).getByText(/Ode/);
         fireEvent.pointerDown(handle, {

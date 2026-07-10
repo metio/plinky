@@ -179,9 +179,13 @@ export default function AssignmentsRoute() {
             // step with the surviving entry's title.
             const seen = new Set<string>();
             setPool(
-                [...fromCatalog, ...fromExercises].filter((entry) =>
-                    seen.has(entry.id) ? false : (seen.add(entry.id), true),
-                ),
+                [...fromCatalog, ...fromExercises].filter((entry) => {
+                    if (seen.has(entry.id)) {
+                        return false;
+                    }
+                    seen.add(entry.id);
+                    return true;
+                }),
             );
             const starter = starterAssignment({
                 id: "starter-first-steps",

@@ -15,7 +15,6 @@ export function Chip({
     ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { selected?: boolean }) {
     return (
-        // biome-ignore lint/a11y/useButtonType: type is set from a defaulted prop
         <button
             type={type}
             className={`inline-flex min-h-11 items-center justify-center rounded-full border px-3.5 text-sm font-medium transition-colors disabled:opacity-50 ${

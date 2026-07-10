@@ -47,7 +47,6 @@ export function Button({
     ...rest
 }: ButtonProps) {
     return (
-        // biome-ignore lint/a11y/useButtonType: type is set from a defaulted prop
         <button type={type} className={buttonClasses(variant, className)} {...rest}>
             {children}
         </button>
@@ -72,7 +71,6 @@ export function IconButton({
     ...rest
 }: IconButtonProps) {
     return (
-        // biome-ignore lint/a11y/useButtonType: type is set from a defaulted prop
         <button
             type={type}
             aria-label={label}
