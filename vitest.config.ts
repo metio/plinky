@@ -149,7 +149,9 @@ export default defineConfig({
                 },
             },
             // Every story runs as a browser test, so stories double as tests and
-            // count toward coverage.
+            // count toward coverage — and each one is also a visual regression
+            // test: the setup file screenshots the rendered story and compares it
+            // against a committed baseline (see .storybook/vitest.setup.ts).
             {
                 plugins: [storybookTest({ configDir: ".storybook" })],
                 test: {
@@ -159,7 +161,32 @@ export default defineConfig({
                         enabled: true,
                         provider: playwright(),
                         headless: true,
+                        // One canonical render box: the screenshots are pixel
+                        // baselines, so the viewport must never float with the
+                        // environment. Chromium-only for the same reason — one
+                        // engine, pinned by the flake on every machine.
+                        viewport: { width: 800, height: 600 },
                         instances: [{ browser: "chromium" }],
+                        expect: {
+                            toMatchScreenshot: {
+                                comparatorName: "pixelmatch",
+                                // Absorb sub-pixel anti-aliasing jitter without
+                                // letting a real layout change through: up to
+                                // 0.1% of pixels may differ.
+                                comparatorOptions: { allowedMismatchedPixelRatio: 0.001 },
+                                // Baselines are committed, so they live outside the
+                                // gitignored __screenshots__ failure-capture dir.
+                                resolveScreenshotPath: ({
+                                    root,
+                                    testFileDirectory,
+                                    testFileName,
+                                    arg,
+                                    browserName,
+                                    ext,
+                                }) =>
+                                    `${root}/${testFileDirectory}/__story-shots__/${testFileName}/${arg}-${browserName}${ext}`,
+                            },
+                        },
                     },
                 },
             },

@@ -7,6 +7,18 @@ import { MidiProvider } from "../app/contexts/midi";
 import { localeNames } from "../core/locales";
 import { locales, overwriteGetLocale } from "../app/paraglide/runtime.js";
 import "../app/app.css";
+// The app self-hosts Inter (see root.tsx); stories must render with the same
+// face, or the story screenshots would rasterize whatever system font the
+// machine happens to have — the one cross-machine difference we can remove.
+import "@fontsource-variable/inter/wght.css";
+
+// Screenshots need a still frame: freeze animations and transitions at their
+// end state, and hide the text caret, so a story always rasterizes identically.
+const FREEZE = `*, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    caret-color: transparent !important;
+}`;
 
 // Toolbar globals so any story can be viewed in any language and in light/dark.
 const preview: Preview = {
@@ -45,6 +57,7 @@ const preview: Preview = {
             return (
                 <MemoryRouter>
                     <MidiProvider>
+                        <style>{FREEZE}</style>
                         <Story />
                     </MidiProvider>
                 </MemoryRouter>

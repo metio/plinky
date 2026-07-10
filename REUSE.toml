@@ -110,3 +110,11 @@ path = ["public/favicon.ico", "public/*.svg", "public/og.png"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"
+
+# Story screenshot baselines: rendered from our own components by the visual
+# regression suite (vitest toMatchScreenshot over the Storybook stories).
+[[annotations]]
+path = ["app/**/__story-shots__/**/*.png"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "0BSD"
