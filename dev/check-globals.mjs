@@ -20,6 +20,11 @@ const CONFINED = {
     requestMIDIAccess: ["app/adapters/webMidi.ts"],
     AudioContext: ["app/adapters/webAudioEngine.ts"],
     OfflineAudioContext: ["app/adapters/offlineAudio.ts"],
+    VideoEncoder: ["app/adapters/webCodecsVideo.ts"],
+    AudioEncoder: ["app/adapters/webCodecsVideo.ts"],
+    VideoFrame: ["app/adapters/webCodecsVideo.ts"],
+    AudioData: ["app/adapters/webCodecsVideo.ts"],
+    OffscreenCanvas: ["app/adapters/webCodecsVideo.ts"],
 };
 
 function walk(dir) {
