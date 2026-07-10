@@ -10,9 +10,11 @@ import { FullScreen, Midi, Show } from "./conditional";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { usePlaySession } from "./playSession";
 
-// The practice stage — everything below the score while a self-paced run is underway: the
-// progress + MIDI-connect row, the ghost race track, the turn-your-phone nudge, the mobile
-// focus strip, and the on-screen keyboard. Shown only while practising; hidden otherwise.
+// The practice stage — everything below the score: the progress + MIDI-connect row, the
+// ghost race track, the turn-your-phone nudge, the mobile focus strip, and the on-screen
+// keyboard. The run-bound rows show only while practising; the keyboard also stays up
+// through all of full screen (unless hidden from the top bar), so the keys are there to
+// noodle on before a run starts and the "Show keys" toggle always has keys to show.
 export function PlayStage() {
     const {
         matcher,
@@ -33,7 +35,7 @@ export function PlayStage() {
     } = usePlaySession();
 
     return (
-        <Show when={matcher.practicing}>
+        <Show when={matcher.practicing || fullscreen}>
             <div className={`space-y-2 ${fullscreen ? "shrink-0" : ""}`}>
                 {/* Full screen keeps only the score and the keys; its progress count
                 rides in the top bar, so this full-width status row is dropped. */}
@@ -61,7 +63,7 @@ export function PlayStage() {
                 {/* The race track rides along in full screen too — a thin bar below
                 the score — so racing a ghost survives the move to always-full-screen
                 play; without it the race would be invisible whenever you play. */}
-                <Show when={ghostRace.ghost}>
+                <Show when={matcher.practicing && ghostRace.ghost}>
                     <GhostTrack
                         you={matcher.done}
                         ghost={ghostRace.ghostDone}

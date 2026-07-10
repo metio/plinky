@@ -47,6 +47,17 @@ export function QuestionIcon({ className }: IconProps) {
     );
 }
 
+// A speaker with sound waves — playback you listen to, as opposed to play you perform.
+export function SpeakerIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M4 9.5h3l4-3.5v12l-4-3.5H4z" fill="currentColor" stroke="none" />
+            <path d="M14.5 9a4.2 4.2 0 0 1 0 6" />
+            <path d="M17.5 6.5a8.2 8.2 0 0 1 0 11" />
+        </Icon>
+    );
+}
+
 // A filled square — the universal "stop".
 export function StopIcon({ className }: IconProps) {
     return (

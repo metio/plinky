@@ -11,6 +11,7 @@ import {
     PlayIcon,
     RotateIcon,
     SlidersIcon,
+    SpeakerIcon,
     StopIcon,
 } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
@@ -45,23 +46,32 @@ export function PlayTransport() {
     // Listen lives only in the full-screen top bar. Playing enters full screen on every
     // device, so that is the one place it's reachable — which keeps the inline /play view to
     // a single primary action (Practice), the piece's front door.
+    //
+    // Both transport buttons keep a constant label and a single icon slot that flips
+    // play ↔ stop, so starting or stopping never reflows the bar: the label is the
+    // button's identity, the icon (plus aria-pressed) is its state. Listen wears the
+    // speaker — playback you hear — leaving the play triangle to Practice, the mode
+    // where you play.
     const listenButton = (
         <Button
             variant="secondary"
             disabled={!ready || keepUp.running}
+            aria-pressed={listenPlayback.playing}
             onClick={() => (listenPlayback.playing ? listenPlayback.stop() : listen())}
         >
-            {listenPlayback.playing ? <StopIcon /> : <PlayIcon />}
-            {listenPlayback.playing ? m.action_listen_stop() : m.action_listen()}
+            {listenPlayback.playing ? <StopIcon /> : <SpeakerIcon />}
+            {m.action_listen()}
         </Button>
     );
     // Practice is the screen's primary action, so it carries the dominant filled variant.
     // It enters full screen first, then starts the run; with "keep up" on it starts a
     // tempo-locked play-along instead of the self-paced run.
+    const practiceRunning = matcher.practicing || keepUp.running;
     const practiceButton = (
         <Button
             variant="primary"
             disabled={!ready}
+            aria-pressed={practiceRunning}
             onClick={() => {
                 if (matcher.practicing) {
                     matcher.stop();
@@ -74,7 +84,8 @@ export function PlayTransport() {
                 }
             }}
         >
-            {matcher.practicing || keepUp.running ? m.action_listen_stop() : m.action_practice()}
+            {practiceRunning ? <StopIcon /> : <PlayIcon />}
+            {m.action_practice()}
         </Button>
     );
     // Opens the Practice-tools drawer. A sliders icon, deliberately not a gear — the

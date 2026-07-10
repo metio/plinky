@@ -103,6 +103,24 @@ describe("ScoreViewer", () => {
         expect(await screen.findByText(/play a piece through/i)).toBeTruthy();
     });
 
+    it("keeps the keys on stage through full screen, run or no run", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // An all-C5 phrase, so the C5 key is inside the keyboard's visible window.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        const practice = await awaitReady();
+        fireEvent.click(practice); // enters full screen and starts the run
+        expect(await screen.findByLabelText("C5")).toBeTruthy();
+        // Stopping the run must not take the keyboard with it — full screen is
+        // still the playing surface, and Show keys must always have keys to show.
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        expect(screen.getByLabelText("C5")).toBeTruthy();
+        fireEvent.click(screen.getByRole("button", { name: "Hide keys" }));
+        expect(screen.queryByLabelText("C5")).toBeNull();
+        fireEvent.click(screen.getByRole("button", { name: "Show keys" }));
+        expect(screen.getByLabelText("C5")).toBeTruthy();
+    });
+
     it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
         // The browser viewport is phone-sized, so playing auto-enters full screen where
         // the toggles live; stub the Fullscreen API the headless browser withholds.
@@ -899,7 +917,9 @@ describe("ScoreViewer", () => {
         // The trail wipes, so the blue tells the story of the fresh pass only…
         expect(document.querySelectorAll(`g[fill="${LISTENED_COLOR}"]`).length).toBe(0);
         // …and Listen keeps playing, now from the first note.
-        expect(screen.getByRole("button", { name: "Stop" })).toBeTruthy();
+        expect(screen.getByRole("button", { name: "Listen" }).getAttribute("aria-pressed")).toBe(
+            "true",
+        );
     });
 
     it("leaves the note sounding at a Listen stop blue, not snapped back to black", async () => {
@@ -912,7 +932,8 @@ describe("ScoreViewer", () => {
             })
             .toBeGreaterThan(0);
         const sounding = Array.from(document.querySelectorAll(`g[fill="${WINDOW_COLOR}"]`));
-        fireEvent.click(screen.getByRole("button", { name: "Stop" }));
+        // The Listen button is pressed while playing; clicking it again stops.
+        fireEvent.click(screen.getByRole("button", { name: "Listen" }));
         // The note under the cursor at the stop joins the trail — a handoff to
         // Practice must not leave a single uncoloured gap between blue and green.
         for (const group of sounding) {
