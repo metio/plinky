@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { BeginnerStart } from "../components/features/beginnerStart";
 import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { HeroKeyboard } from "../components/features/heroKeyboard";
 import { BookIcon, ListIcon, NotesIcon } from "../components/ui/icons";
@@ -49,7 +48,7 @@ export default function Home() {
                     <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
                         {m.home_heading()}
                     </h1>
-                    <p className="max-w-xl text-pretty leading-relaxed text-gray-600 dark:text-gray-300">
+                    <p className="text-pretty leading-relaxed text-gray-600 dark:text-gray-300">
                         {m.home_intro()}
                     </p>
                 </div>
@@ -75,13 +74,14 @@ export default function Home() {
                 </div>
             </section>
 
-            <BeginnerStart />
+            {/* The one front door for a new player: the Getting-started checklist sits
+            in the prime slot the moment the page opens, prerendered for the common
+            first visit. It reconciles itself away as its steps complete. */}
+            <DiscoveryChecklist />
 
             <HomeToday />
 
             <NewsBanner />
-
-            <DiscoveryChecklist />
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">

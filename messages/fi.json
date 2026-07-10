@@ -172,7 +172,6 @@
   "mode_ear": "Kuulo",
   "mode_fingering": "Sormitus",
   "action_listen": "▶ Kuuntele",
-  "action_listen_stop": "■ Pysäytä",
   "action_metronome": "Metronomi",
   "action_print": "Tulosta",
   "action_export_midi": "Vie MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} puolisävelaskelta",
   "action_save": "Tallenna",
   "sprint_two_hands": "Kaksi kättä",
-  "beginner_heading": "Uusi pianon parissa? Aloita tästä.",
-  "beginner_intro": "Sinun ei tarvitse vielä lukea nuotteja. Valitse kosketin, kuule nuotti ja opettele yksi lyhyt kappale — notaation lukeminen tulee myöhemmin, kun kätesi tuntevat tien. Koskettimissa näkyvät niiden nimet opetellessasi.",
-  "beginner_cta": "Soita ensimmäinen kappaleesi",
   "home_eyebrow": "Ilmainen · selaimessasi · ei asennettavaa",
   "home_keyboard_hint": "Napauta kosketinta — se on plink.",
   "home_heading": "Harjoittele pianonsoittoa selaimessa",
@@ -576,5 +572,6 @@
   "help_loading": "Ladataan ohjetta…",
   "help_empty": "Tämän osan ohje on tulossa.",
   "help_learn_more": "Lue lisää",
-  "meta_help_description": "Miten Plinky toimii: oppaat sovelluksen jokaiseen osaan, ensimmäisestä nuotista edistymisesi seurantaan."
+  "meta_help_description": "Miten Plinky toimii: oppaat sovelluksen jokaiseen osaan, ensimmäisestä nuotista edistymisesi seurantaan.",
+  "discover_jump_in": "Aloita heti"
 }

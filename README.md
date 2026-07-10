@@ -143,12 +143,12 @@ one-tap **review session** walks you through everything that's fading, and you c
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
   carries an optional *About this grade* note.
 
-On the **home page**, someone who has never played piano is met by a **New to piano?**
-card that hands them a first short song and a reassurance that reading notation comes
-later — it disappears the moment you've played anything. Alongside it, a gentle,
-dismissible **Getting started** checklist explains how Plinky works and walks the first
-session in order — set yourself up, then play your first piece (your first assignment
-when you have one) — before pointing out the app's other corners, and the first time you
+On the **home page**, a gentle, dismissible **Getting started** checklist explains how
+Plinky works and walks the first session in order — set yourself up (hand size and key
+mapping first, so everything after is tailored to you), then play your first piece (your
+first assignment when you have one) — before pointing out the app's other corners. The
+steps that put your fingers on keys right away carry a small **Jump right in** marker,
+the shortcut for anyone who'd rather play first and configure later. The first time you
 open a score a one-time tip explains the three modes and the listen-then-play-slowly
 loop — a guided tour where you land, never a gate on progress.
 

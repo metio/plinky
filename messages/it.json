@@ -172,7 +172,6 @@
   "mode_ear": "Orecchio",
   "mode_fingering": "Diteggiatura",
   "action_listen": "▶ Ascolta",
-  "action_listen_stop": "■ Ferma",
   "action_metronome": "Metronomo",
   "action_print": "Stampa",
   "action_export_midi": "Esporta MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} semitoni",
   "action_save": "Salva",
   "sprint_two_hands": "Due mani",
-  "beginner_heading": "Nuovo al pianoforte? Inizia qui.",
-  "beginner_intro": "Non serve ancora saper leggere la musica. Scegli un tasto, ascolta una nota e impara una breve canzone — leggere la notazione viene dopo, quando le mani conoscono la strada. I tasti mostrano i loro nomi mentre impari.",
-  "beginner_cta": "Suona la tua prima canzone",
   "home_eyebrow": "Gratis · nel browser · niente da installare",
   "home_keyboard_hint": "Tocca un tasto — ecco un plink.",
   "home_heading": "Esercitati al pianoforte nel browser",
@@ -576,5 +572,6 @@
   "help_loading": "Caricamento dell’aiuto…",
   "help_empty": "L’aiuto per quest’area è in arrivo.",
   "help_learn_more": "Scopri di più",
-  "meta_help_description": "Come funziona Plinky: guide per ogni parte dell’app, dalla tua prima nota al monitoraggio dei tuoi progressi."
+  "meta_help_description": "Come funziona Plinky: guide per ogni parte dell’app, dalla tua prima nota al monitoraggio dei tuoi progressi.",
+  "discover_jump_in": "Inizia subito"
 }

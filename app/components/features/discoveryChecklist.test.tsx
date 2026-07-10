@@ -34,9 +34,19 @@ describe("DiscoveryChecklist", () => {
         mount();
         await screen.findByText("Getting started");
         const links = screen.getAllByRole("link");
-        // Setting yourself up leads; playing your first piece follows.
+        // Setting yourself up leads — hand size, then the key mapping — and
+        // playing your first piece follows.
         expect(links[0]?.getAttribute("href")).toBe("/en/settings");
-        expect(links[1]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}`);
+        expect(links[1]?.getAttribute("href")).toBe("/en/settings");
+        expect(links[2]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}`);
+    });
+
+    it("marks the straight-to-the-keys steps with the jump-in pill", async () => {
+        mount();
+        await screen.findByText("Getting started");
+        // Exactly the two steps that start you playing immediately — the first
+        // piece and the daily challenge — carry the shortcut marker.
+        expect(screen.getAllByText("Jump right in")).toHaveLength(2);
     });
 
     it("points the play step at the first assignment when one exists", async () => {

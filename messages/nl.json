@@ -172,7 +172,6 @@
   "mode_ear": "Gehoor",
   "mode_fingering": "Vingerzetting",
   "action_listen": "▶ Beluisteren",
-  "action_listen_stop": "■ Stoppen",
   "action_metronome": "Metronoom",
   "action_print": "Afdrukken",
   "action_export_midi": "MIDI exporteren",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} halve tonen",
   "action_save": "Opslaan",
   "sprint_two_hands": "Twee handen",
-  "beginner_heading": "Nieuw met piano? Begin hier.",
-  "beginner_intro": "Je hoeft nog geen noten te lezen. Kies een toets, hoor een noot en leer één kort liedje — noten lezen komt later, als je handen de weg kennen. De toetsen tonen hun naam terwijl je leert.",
-  "beginner_cta": "Speel je eerste liedje",
   "home_eyebrow": "Gratis · in je browser · niets te installeren",
   "home_keyboard_hint": "Tik op een toets — dat is een plink.",
   "home_heading": "Oefen piano in je browser",
@@ -576,5 +572,6 @@
   "help_loading": "Help laden…",
   "help_empty": "Help voor dit onderdeel is onderweg.",
   "help_learn_more": "Meer informatie",
-  "meta_help_description": "Hoe Plinky werkt: uitleg voor elk onderdeel van de app, van je eerste noot tot het bijhouden van je voortgang."
+  "meta_help_description": "Hoe Plinky werkt: uitleg voor elk onderdeel van de app, van je eerste noot tot het bijhouden van je voortgang.",
+  "discover_jump_in": "Meteen beginnen"
 }

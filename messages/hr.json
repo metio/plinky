@@ -172,7 +172,6 @@
   "mode_ear": "Sluh",
   "mode_fingering": "Položaj prstiju",
   "action_listen": "▶ Slušaj",
-  "action_listen_stop": "■ Zaustavi",
   "action_metronome": "Metronom",
   "action_print": "Ispiši",
   "action_export_midi": "Izvezi MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} polutona",
   "action_save": "Spremi",
   "sprint_two_hands": "Obje ruke",
-  "beginner_heading": "Nov si za klavir? Počni ovdje.",
-  "beginner_intro": "Još ne moraš znati čitati note. Odaberi tipku, čuj notu i nauči jednu kratku pjesmu — čitanje notacije dolazi kasnije, kad ti ruke upoznaju put. Tipke pokazuju svoja imena dok učiš.",
-  "beginner_cta": "Odsviraj svoju prvu pjesmu",
   "home_eyebrow": "Besplatno · u pregledniku · ništa za instalirati",
   "home_keyboard_hint": "Dodirni tipku — to je plink.",
   "home_heading": "Vježbajte klavir u pregledniku",
@@ -576,5 +572,6 @@
   "help_loading": "Učitavanje pomoći…",
   "help_empty": "Pomoć za ovo područje uskoro stiže.",
   "help_learn_more": "Saznajte više",
-  "meta_help_description": "Kako Plinky radi: vodiči za svaki dio aplikacije, od prve note do praćenja vašeg napretka."
+  "meta_help_description": "Kako Plinky radi: vodiči za svaki dio aplikacije, od prve note do praćenja vašeg napretka.",
+  "discover_jump_in": "Odmah počni"
 }

@@ -172,7 +172,6 @@
   "mode_ear": "Auz",
   "mode_fingering": "Poziția degetelor",
   "action_listen": "▶ Ascultă",
-  "action_listen_stop": "■ Oprește",
   "action_metronome": "Metronom",
   "action_print": "Tipărește",
   "action_export_midi": "Exportă MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} semitonuri",
   "action_save": "Salvează",
   "sprint_two_hands": "Două mâini",
-  "beginner_heading": "Nou la pian? Începe aici.",
-  "beginner_intro": "Nu trebuie să citești note încă. Alege o clapă, ascultă o notă și învață o piesă scurtă — citirea notației vine mai târziu, odată ce mâinile tale știu drumul. Clapele își arată numele cât înveți.",
-  "beginner_cta": "Cântă prima ta piesă",
   "home_eyebrow": "Gratuit · în browser · nimic de instalat",
   "home_keyboard_hint": "Apasă o clapă — asta e un plink.",
   "home_heading": "Exersează pian în browser",
@@ -576,5 +572,6 @@
   "help_loading": "Se încarcă ajutorul…",
   "help_empty": "Ajutorul pentru această zonă este pe drum.",
   "help_learn_more": "Află mai multe",
-  "meta_help_description": "Cum funcționează Plinky: ghiduri pentru fiecare parte a aplicației, de la prima notă până la urmărirea progresului tău."
+  "meta_help_description": "Cum funcționează Plinky: ghiduri pentru fiecare parte a aplicației, de la prima notă până la urmărirea progresului tău.",
+  "discover_jump_in": "Începe imediat"
 }

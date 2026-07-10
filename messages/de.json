@@ -172,7 +172,6 @@
   "mode_ear": "Gehör",
   "mode_fingering": "Fingersatz",
   "action_listen": "▶ Anhören",
-  "action_listen_stop": "■ Stopp",
   "action_metronome": "Metronom",
   "action_print": "Drucken",
   "action_export_midi": "MIDI exportieren",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} Halbtöne",
   "action_save": "Speichern",
   "sprint_two_hands": "Beide Hände",
-  "beginner_heading": "Neu am Klavier? Fang hier an.",
-  "beginner_intro": "Du musst noch keine Noten lesen können. Wähle eine Taste, höre eine Note und lerne ein kurzes Lied – das Notenlesen kommt später, wenn deine Hände den Weg kennen. Die Tasten zeigen ihre Namen, während du lernst.",
-  "beginner_cta": "Spiele dein erstes Lied",
   "home_eyebrow": "Kostenlos · im Browser · nichts zu installieren",
   "home_keyboard_hint": "Tippe eine Taste an – das ist ein Plink.",
   "home_heading": "Klavier üben im Browser",
@@ -576,5 +572,6 @@
   "help_loading": "Hilfe wird geladen…",
   "help_empty": "Hilfe für diesen Bereich ist in Arbeit.",
   "help_learn_more": "Mehr erfahren",
-  "meta_help_description": "Wie Plinky funktioniert: Anleitungen für jeden Teil der App, von deiner ersten Note bis zur Verfolgung deines Fortschritts."
+  "meta_help_description": "Wie Plinky funktioniert: Anleitungen für jeden Teil der App, von deiner ersten Note bis zur Verfolgung deines Fortschritts.",
+  "discover_jump_in": "Direkt loslegen"
 }

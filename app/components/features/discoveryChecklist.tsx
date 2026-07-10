@@ -21,19 +21,33 @@ import { FIRST_SONG_ID } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { CheckIcon, CloseIcon } from "../ui/icons";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { Show } from "./conditional";
 
-// The Getting-started checklist: an opt-in tour of how Plinky works, each step
-// completed by doing it and deep-linking to where you do it. Settings come first (a
-// hand size tailors everything after), then the first piece to play — the player's
-// first assignment when they have one, a single demo tune otherwise. It lives on the
-// home page — where a first-time player actually lands — so the tour is discoverable
-// rather than buried; the ✕ dismisses it for good (for fast starters), and it hides
-// itself once every step is done. The played step's link is resolved at render time,
-// so `to` here is only its fallback.
-const DISCOVERY: { key: DiscoveryId; icon: string; label: () => string; to: string }[] = [
+// The Getting-started checklist — the home page's one front door for a new player:
+// an opt-in tour of how Plinky works, each step completed by doing it and
+// deep-linking to where you do it. The two set-up steps come first (a hand size and
+// key mapping tailor everything after), then the hands-on steps — and the ones that
+// put fingers on keys right away carry a "jump right in" pill, the shortcut for
+// anyone who'd rather play first and configure later. The ✕ dismisses it for good
+// (for fast starters), and it hides itself once every step is done. The played
+// step's link is resolved at render time, so `to` here is only its fallback.
+const DISCOVERY: {
+    key: DiscoveryId;
+    icon: string;
+    label: () => string;
+    to: string;
+    quick?: boolean;
+}[] = [
     { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
-    { key: "played", icon: "🎹", label: m.grades_start_play, to: `/play/${FIRST_SONG_ID}` },
-    { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily" },
+    { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },
+    {
+        key: "played",
+        icon: "🎹",
+        label: m.grades_start_play,
+        to: `/play/${FIRST_SONG_ID}`,
+        quick: true,
+    },
+    { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily", quick: true },
     { key: "earTried", icon: "👂", label: m.discover_ear, to: `/play/${FIRST_SONG_ID}?mode=ear` },
     {
         key: "fingeringTried",
@@ -43,16 +57,23 @@ const DISCOVERY: { key: DiscoveryId; icon: string; label: () => string; to: stri
     },
     { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
     { key: "imported", icon: "📥", label: m.discover_import, to: "/library/import" },
-    { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },
 ];
 
 const DISCOVERY_DISMISSED = "discovery-panel";
 const LINK = "text-indigo-700 underline dark:text-indigo-300";
 
+// The fresh-visitor state: nothing done, nothing dismissed. Rendering it by default
+// puts the checklist into the prerendered shell, so the common first visit sees it in
+// the first paint with no layout shift.
+const FRESH: Record<DiscoveryId, boolean> = Object.fromEntries(
+    DISCOVERY.map((step) => [step.key, false]),
+) as Record<DiscoveryId, boolean>;
+
 export function DiscoveryChecklist() {
-    // Resolves on the client only: the completion state and the dismissal both live in
-    // localStorage, absent at prerender. Null until then keeps the static shell — and
-    // CLS — stable, then the panel appears for a player who still has corners to find.
+    // Shown in its fresh state by default: completion and dismissal live in
+    // localStorage, absent at prerender, so a true newcomer — the state every
+    // prerender captures — gets the checklist in the static shell. A returning
+    // player's real progress (or dismissal) is reconciled on the client after mount.
     const [state, setState] = useState<{
         done: Record<DiscoveryId, boolean>;
         progress: DiscoveryProgress;
@@ -60,7 +81,12 @@ export function DiscoveryChecklist() {
         // Where "play your first piece" leads: the first step of the player's first
         // assignment when they have one, a single demo tune otherwise.
         playTo: string;
-    } | null>(null);
+    }>({
+        done: FRESH,
+        progress: discoveryProgress(FRESH),
+        dismissed: false,
+        playTo: `/play/${FIRST_SONG_ID}`,
+    });
 
     const prefsStore = usePrefsStore();
     const masteryStore = useMasteryStore();
@@ -86,13 +112,13 @@ export function DiscoveryChecklist() {
         });
     }, [prefsStore, masteryStore, historyStore, daily, onboarding, hints, assignmentsStore]);
 
-    if (!state || state.dismissed || state.progress.allDone) {
+    if (state.dismissed || state.progress.allDone) {
         return null;
     }
 
     const dismiss = () => {
         hints.markSeen(DISCOVERY_DISMISSED);
-        setState((prev) => (prev ? { ...prev, dismissed: true } : prev));
+        setState((prev) => ({ ...prev, dismissed: true }));
     };
 
     return (
@@ -145,6 +171,13 @@ export function DiscoveryChecklist() {
                             >
                                 {step.label()}
                             </Link>
+                            {/* The shortcut marker for the itchy-fingered: these
+                            steps start you playing immediately, no set-up needed. */}
+                            <Show when={step.quick && !stepDone}>
+                                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                                    {m.discover_jump_in()}
+                                </span>
+                            </Show>
                         </li>
                     );
                 })}

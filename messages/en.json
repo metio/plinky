@@ -182,7 +182,6 @@
   "mode_ear": "Ear",
   "mode_fingering": "Finger Position",
   "action_listen": "Listen",
-  "action_listen_stop": "Stop",
   "action_metronome": "Metronome",
   "action_print": "Print",
   "action_export_midi": "Export MIDI",
@@ -232,9 +231,6 @@
   "hand_size_semitones": "{count} semitones",
   "action_save": "Save",
   "sprint_two_hands": "Two hands",
-  "beginner_heading": "New to piano? Start here.",
-  "beginner_intro": "You don't need to read music yet. Pick a key, hear a note, and learn one short song — reading the notation comes later, once your hands know the way. The keys show their names while you learn.",
-  "beginner_cta": "Play your first song",
   "home_eyebrow": "Free · in your browser · nothing to install",
   "home_keyboard_hint": "Tap a key — that's a plink.",
   "home_heading": "Practice piano in your browser",
@@ -576,5 +572,6 @@
   "theme_system": "🖥️ System",
   "theme_light": "☀️ Light",
   "theme_dark": "🌙 Dark",
-  "theme_aria": "Theme: {theme}. Click to change."
+  "theme_aria": "Theme: {theme}. Click to change.",
+  "discover_jump_in": "Jump right in"
 }

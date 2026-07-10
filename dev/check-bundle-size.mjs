@@ -33,8 +33,8 @@ const BUDGET_TOTAL_KB = 545;
 // ear-training reveal/skip, and the mode deep-links; and saved takes per song (the
 // list with score-driven replay, MIDI/MusicXML download, and ghost-from-takes); and
 // the self-contained play-title actions (Print / Export / Mark-learned fed raw data
-// + a transpose context); and the absolute-beginner onboarding — the home "New to
-// piano?" front door, the note-name key labels with their Settings control and
+// + a transpose context); and the absolute-beginner onboarding — the home
+// Getting-started checklist, the note-name key labels with their Settings control and
 // reactive store, and the mode / practice-loop coach marks; and the play-option
 // captions that explain each practice-tool control and its values inline; and the
 // click-to-select loop range with its red bar overlay (measure hit-testing + SVG

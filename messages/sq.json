@@ -172,7 +172,6 @@
   "mode_ear": "Veshi",
   "mode_fingering": "Pozicioni i Gishtave",
   "action_listen": "▶ Dëgjo",
-  "action_listen_stop": "■ Ndalo",
   "action_metronome": "Metronom",
   "action_print": "Printo",
   "action_export_midi": "Eksporto MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} gjysmëtone",
   "action_save": "Ruaj",
   "sprint_two_hands": "Dy duar",
-  "beginner_heading": "I ri me pianon? Fillo këtu.",
-  "beginner_intro": "S'ke nevojë ende të lexosh muzikë. Zgjidh një tast, dëgjo një notë dhe mëso një këngë të shkurtër — leximi i notacionit vjen më vonë, kur duart ta dinë rrugën. Tastet tregojnë emrat e tyre ndërsa mëson.",
-  "beginner_cta": "Luaj këngën tënde të parë",
   "home_eyebrow": "Falas · në shfletues · asgjë për të instaluar",
   "home_keyboard_hint": "Trokit një tast — ky është një plink.",
   "home_heading": "Praktiko pianon në shfletues",
@@ -576,5 +572,6 @@
   "help_loading": "Po ngarkohet ndihma…",
   "help_empty": "Ndihma për këtë zonë është duke ardhur.",
   "help_learn_more": "Mëso më shumë",
-  "meta_help_description": "Si funksionon Plinky: udhëzues për çdo pjesë të aplikacionit, nga nota jote e parë deri te ndjekja e progresit tënd."
+  "meta_help_description": "Si funksionon Plinky: udhëzues për çdo pjesë të aplikacionit, nga nota jote e parë deri te ndjekja e progresit tënd.",
+  "discover_jump_in": "Fillo menjëherë"
 }

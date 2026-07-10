@@ -172,7 +172,6 @@
   "mode_ear": "Sluch",
   "mode_fingering": "Prstoklad",
   "action_listen": "▶ Vypočuť",
-  "action_listen_stop": "■ Zastaviť",
   "action_metronome": "Metronóm",
   "action_print": "Tlačiť",
   "action_export_midi": "Exportovať MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} poltónov",
   "action_save": "Uložiť",
   "sprint_two_hands": "Obe ruky",
-  "beginner_heading": "Nováčik pri klavíri? Začnite tu.",
-  "beginner_intro": "Zatiaľ nemusíte vedieť čítať noty. Vyberte kláves, vypočujte si notu a naučte sa jednu krátku skladbu — čítanie notácie príde neskôr, keď vaše ruky nájdu cestu. Klávesy počas učenia zobrazujú svoje názvy.",
-  "beginner_cta": "Zahrajte svoju prvú skladbu",
   "home_eyebrow": "Zadarmo · v prehliadači · nič sa neinštaluje",
   "home_keyboard_hint": "Ťuknite na kláves — to je plink.",
   "home_heading": "Cvičte klavír v prehliadači",
@@ -576,5 +572,6 @@
   "help_loading": "Načítava sa pomocník…",
   "help_empty": "Pomocník pre túto oblasť sa pripravuje.",
   "help_learn_more": "Zistiť viac",
-  "meta_help_description": "Ako Plinky funguje: návody pre každú časť aplikácie, od prvej noty až po sledovanie vášho pokroku."
+  "meta_help_description": "Ako Plinky funguje: návody pre každú časť aplikácie, od prvej noty až po sledovanie vášho pokroku.",
+  "discover_jump_in": "Rovno začať"
 }

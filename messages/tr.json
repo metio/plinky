@@ -172,7 +172,6 @@
   "mode_ear": "Kulak",
   "mode_fingering": "Parmak Konumu",
   "action_listen": "▶ Dinle",
-  "action_listen_stop": "■ Durdur",
   "action_metronome": "Metronom",
   "action_print": "Yazdır",
   "action_export_midi": "MIDI dışa aktar",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} yarım ses",
   "action_save": "Kaydet",
   "sprint_two_hands": "İki el",
-  "beginner_heading": "Piyanoya yeni mi başladın? Buradan başla.",
-  "beginner_intro": "Henüz nota okumana gerek yok. Bir tuş seç, bir nota dinle ve kısa bir şarkı öğren — notayı okumak sonra gelir, ellerin yolu öğrenince. Sen öğrenirken tuşlar adlarını gösterir.",
-  "beginner_cta": "İlk şarkını çal",
   "home_eyebrow": "Ücretsiz · tarayıcında · kurulum yok",
   "home_keyboard_hint": "Bir tuşa dokun — işte bir plink.",
   "home_heading": "Tarayıcınızda piyano çalışın",
@@ -576,5 +572,6 @@
   "help_loading": "Yardım yükleniyor…",
   "help_empty": "Bu alan için yardım yakında geliyor.",
   "help_learn_more": "Daha fazla bilgi",
-  "meta_help_description": "Plinky nasıl çalışır: ilk notanızdan ilerlemenizi takip etmeye kadar uygulamanın her bölümü için kılavuzlar."
+  "meta_help_description": "Plinky nasıl çalışır: ilk notanızdan ilerlemenizi takip etmeye kadar uygulamanın her bölümü için kılavuzlar.",
+  "discover_jump_in": "Hemen başla"
 }

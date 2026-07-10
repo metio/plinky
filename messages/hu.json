@@ -172,7 +172,6 @@
   "mode_ear": "Hallás",
   "mode_fingering": "Ujjrend",
   "action_listen": "▶ Meghallgatás",
-  "action_listen_stop": "■ Leállítás",
   "action_metronome": "Metronóm",
   "action_print": "Nyomtatás",
   "action_export_midi": "MIDI exportálása",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} félhang",
   "action_save": "Mentés",
   "sprint_two_hands": "Két kéz",
-  "beginner_heading": "Új a zongorázásban? Kezdd itt.",
-  "beginner_intro": "Még nem kell kottát olvasnod. Válassz egy billentyűt, hallgass meg egy hangot, és tanulj meg egy rövid dalt — a kottaolvasás később jön, ha a kezed már ismeri az utat. A billentyűk mutatják a nevüket, amíg tanulsz.",
-  "beginner_cta": "Játszd le az első dalodat",
   "home_eyebrow": "Ingyenes · a böngésződben · nincs mit telepíteni",
   "home_keyboard_hint": "Koppints egy billentyűre — ez egy plink.",
   "home_heading": "Gyakorolj zongorázni a böngészőben",
@@ -576,5 +572,6 @@
   "help_loading": "Súgó betöltése…",
   "help_empty": "Ehhez a területhez hamarosan érkezik a súgó.",
   "help_learn_more": "Tudj meg többet",
-  "meta_help_description": "Hogyan működik a Plinky: útmutatók az alkalmazás minden részéhez, az első hangjegytől a fejlődésed követéséig."
+  "meta_help_description": "Hogyan működik a Plinky: útmutatók az alkalmazás minden részéhez, az első hangjegytől a fejlődésed követéséig.",
+  "discover_jump_in": "Vágj bele"
 }

@@ -172,7 +172,6 @@
   "mode_ear": "청음",
   "mode_fingering": "운지",
   "action_listen": "▶ 듣기",
-  "action_listen_stop": "■ 멈춤",
   "action_metronome": "메트로놈",
   "action_print": "인쇄",
   "action_export_midi": "MIDI 내보내기",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} 반음",
   "action_save": "저장",
   "sprint_two_hands": "양손",
-  "beginner_heading": "피아노가 처음인가요? 여기서 시작하세요.",
-  "beginner_intro": "아직 악보를 읽을 줄 몰라도 괜찮아요. 건반을 하나 고르고, 음을 듣고, 짧은 곡 하나를 익혀보세요 — 악보 읽기는 손이 길을 익힌 뒤에 와요. 배우는 동안 건반에 음 이름이 표시돼요.",
-  "beginner_cta": "첫 곡 연주하기",
   "home_eyebrow": "무료 · 브라우저에서 · 설치 필요 없음",
   "home_keyboard_hint": "건반을 눌러보세요 — 그게 플링크예요.",
   "home_heading": "브라우저에서 피아노 연습",
@@ -576,5 +572,6 @@
   "help_loading": "도움말 불러오는 중…",
   "help_empty": "이 영역의 도움말은 곧 제공됩니다.",
   "help_learn_more": "자세히 보기",
-  "meta_help_description": "Plinky 작동 방식: 첫 음표부터 진행 상황 추적까지, 앱의 모든 부분에 대한 가이드."
+  "meta_help_description": "Plinky 작동 방식: 첫 음표부터 진행 상황 추적까지, 앱의 모든 부분에 대한 가이드.",
+  "discover_jump_in": "바로 시작하기"
 }

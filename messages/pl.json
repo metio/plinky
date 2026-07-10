@@ -172,7 +172,6 @@
   "mode_ear": "Słuch",
   "mode_fingering": "Ułożenie palców",
   "action_listen": "▶ Posłuchaj",
-  "action_listen_stop": "■ Zatrzymaj",
   "action_metronome": "Metronom",
   "action_print": "Drukuj",
   "action_export_midi": "Eksportuj MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} półtonów",
   "action_save": "Zapisz",
   "sprint_two_hands": "Obie ręce",
-  "beginner_heading": "Dopiero zaczynasz z pianinem? Zacznij tutaj.",
-  "beginner_intro": "Nie musisz jeszcze czytać nut. Wybierz klawisz, usłysz nutę i naucz się jednej krótkiej piosenki — czytanie notacji przyjdzie później, gdy twoje ręce poznają drogę. Klawisze pokazują swoje nazwy, gdy się uczysz.",
-  "beginner_cta": "Zagraj swoją pierwszą piosenkę",
   "home_eyebrow": "Za darmo · w przeglądarce · nic do zainstalowania",
   "home_keyboard_hint": "Dotknij klawisza — to plink.",
   "home_heading": "Ćwicz grę na pianinie w przeglądarce",
@@ -576,5 +572,6 @@
   "help_loading": "Ładowanie pomocy…",
   "help_empty": "Pomoc dla tego obszaru jest w drodze.",
   "help_learn_more": "Dowiedz się więcej",
-  "meta_help_description": "Jak działa Plinky: przewodniki po każdej części aplikacji, od pierwszej nuty po śledzenie postępów."
+  "meta_help_description": "Jak działa Plinky: przewodniki po każdej części aplikacji, od pierwszej nuty po śledzenie postępów.",
+  "discover_jump_in": "Zacznij od razu"
 }

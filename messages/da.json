@@ -172,7 +172,6 @@
   "mode_ear": "Gehør",
   "mode_fingering": "Fingersætning",
   "action_listen": "▶ Lyt",
-  "action_listen_stop": "■ Stop",
   "action_metronome": "Metronom",
   "action_print": "Udskriv",
   "action_export_midi": "Eksportér MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} halvtoner",
   "action_save": "Gem",
   "sprint_two_hands": "To hænder",
-  "beginner_heading": "Ny til klaver? Start her.",
-  "beginner_intro": "Du behøver ikke kunne læse noder endnu. Vælg en tangent, hør en node, og lær ét kort stykke — nodelæsningen kommer senere, når dine hænder kender vejen. Tangenterne viser deres navne, mens du lærer.",
-  "beginner_cta": "Spil dit første stykke",
   "home_eyebrow": "Gratis · i din browser · intet at installere",
   "home_keyboard_hint": "Tryk på en tangent — det er et plink.",
   "home_heading": "Øv klaver i din browser",
@@ -576,5 +572,6 @@
   "help_loading": "Indlæser hjælp…",
   "help_empty": "Hjælp til dette område er på vej.",
   "help_learn_more": "Læs mere",
-  "meta_help_description": "Sådan fungerer Plinky: vejledninger til hver del af appen, fra din første node til at følge dine fremskridt."
+  "meta_help_description": "Sådan fungerer Plinky: vejledninger til hver del af appen, fra din første node til at følge dine fremskridt.",
+  "discover_jump_in": "Gå direkte i gang"
 }

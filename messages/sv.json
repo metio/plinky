@@ -172,7 +172,6 @@
   "mode_ear": "Gehör",
   "mode_fingering": "Fingersättning",
   "action_listen": "▶ Lyssna",
-  "action_listen_stop": "■ Stoppa",
   "action_metronome": "Metronom",
   "action_print": "Skriv ut",
   "action_export_midi": "Exportera MIDI",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} halvtoner",
   "action_save": "Spara",
   "sprint_two_hands": "Två händer",
-  "beginner_heading": "Nybörjare på piano? Börja här.",
-  "beginner_intro": "Du behöver inte kunna läsa noter ännu. Välj en tangent, hör en ton och lär dig en kort låt — att läsa noterna kommer senare, när händerna kan vägen. Tangenterna visar sina namn medan du lär dig.",
-  "beginner_cta": "Spela din första låt",
   "home_eyebrow": "Gratis · i webbläsaren · inget att installera",
   "home_keyboard_hint": "Tryck på en tangent — det är ett plink.",
   "home_heading": "Öva piano i webbläsaren",
@@ -576,5 +572,6 @@
   "help_loading": "Läser in hjälp…",
   "help_empty": "Hjälp för det här området är på väg.",
   "help_learn_more": "Läs mer",
-  "meta_help_description": "Så fungerar Plinky: guider för varje del av appen, från din första ton till att följa dina framsteg."
+  "meta_help_description": "Så fungerar Plinky: guider för varje del av appen, från din första ton till att följa dina framsteg.",
+  "discover_jump_in": "Sätt igång direkt"
 }

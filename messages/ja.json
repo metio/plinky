@@ -172,7 +172,6 @@
   "mode_ear": "聴音",
   "mode_fingering": "指使い",
   "action_listen": "▶ 聴く",
-  "action_listen_stop": "■ 停止",
   "action_metronome": "メトロノーム",
   "action_print": "印刷",
   "action_export_midi": "MIDIをエクスポート",
@@ -222,9 +221,6 @@
   "hand_size_semitones": "{count} 半音",
   "action_save": "保存",
   "sprint_two_hands": "両手",
-  "beginner_heading": "ピアノは初めて？ここから始めましょう。",
-  "beginner_intro": "まだ楽譜が読めなくても大丈夫。キーを選び、音を聴いて、短い1曲を覚えましょう — 記譜を読むのは後から、手が道を覚えてからで十分です。学ぶ間、キーには音名が表示されます。",
-  "beginner_cta": "最初の曲を弾く",
   "home_eyebrow": "無料 · ブラウザで · インストール不要",
   "home_keyboard_hint": "キーをタップ — それがプリンクです。",
   "home_heading": "ブラウザでピアノを練習",
@@ -576,5 +572,6 @@
   "help_loading": "ヘルプを読み込んでいます…",
   "help_empty": "このエリアのヘルプは準備中です。",
   "help_learn_more": "詳しく見る",
-  "meta_help_description": "Plinky の使い方：最初の音符から進捗の確認まで、アプリの各機能のガイド。"
+  "meta_help_description": "Plinky の使い方：最初の音符から進捗の確認まで、アプリの各機能のガイド。",
+  "discover_jump_in": "さっそく始める"
 }
