@@ -267,7 +267,9 @@ fall back to English, so every language always works while it catches up.
 The home page can show a small "what's new" picture that links somewhere — a new
 piece, an announcement, a seasonal note. It's optional and edited outside the code
 so anyone can change it live, with no redeploy: the running app fetches the current
-item from a [Sanity](https://www.sanity.io) project at load time.
+item from a [Sanity](https://www.sanity.io) project at load time. The document
+schemas live in [studio/](studio/), and every change to them redeploys the hosted
+Studio from CI.
 
 To connect it, copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`
 and `VITE_SANITY_DATASET`. In Sanity, add a `news` document type with an `image`
@@ -308,9 +310,9 @@ page, the content lives in the same [Sanity](https://www.sanity.io) project and
 is edited live with no redeploy, and blurbs are translated: a reader downloads
 only their own language.
 
-Add a `boardArtist` document type with a `name`, an `image` (shared across
-languages) with internationalized `alt` text, an internationalized `text` blurb,
-a `link` URL, an `order`, and a `show` boolean. Publish an artist and the card
+The `boardArtist` document type (see [studio/](studio/)) carries a `name`, an
+`image` (shared across languages) with internationalized `alt` text, an
+internationalized `text` blurb, a `link` URL, an `order`, and a `show` boolean. Publish an artist and the card
 appears; flip `show` off and it disappears, all without a redeploy. Only `https`
 image and link URLs are shown, and an unreachable source simply shows an empty
 board — the page never breaks. It reuses the news banner's
