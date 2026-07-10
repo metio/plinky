@@ -7,6 +7,7 @@ import { type TodayInput, todayTasks } from "./today";
 const input = (overrides: Partial<TodayInput> = {}): TodayInput => ({
     dueIds: [],
     dailyDoneToday: false,
+    assignment: null,
     suggestion: null,
     ...overrides,
 });
@@ -38,6 +39,31 @@ describe("todayTasks", () => {
         expect(tasks.map((t) => t.key)).toEqual(["learn", "daily"]);
         // It's still a link to today's result, marked done.
         expect(tasks[1]).toEqual({ key: "daily", to: "/daily", done: true });
+    });
+
+    it("puts the open assignment's current step in the learn slot, over the suggestion", () => {
+        const tasks = todayTasks(
+            input({
+                assignment: { name: "First steps", step: 2, total: 8, scoreId: "step-two" },
+                suggestion: { id: "song-x", title: "A New Piece" },
+            }),
+        );
+        expect(tasks.map((t) => t.key)).toEqual(["daily", "assignment"]);
+        // Straight into the step's play page, not the assignments page.
+        expect(tasks[1]).toEqual({
+            key: "assignment",
+            name: "First steps",
+            step: 2,
+            total: 8,
+            to: "/play/step-two",
+        });
+    });
+
+    it("returns to the generated suggestion once every assignment is finished", () => {
+        const tasks = todayTasks(
+            input({ assignment: null, suggestion: { id: "song-x", title: "A New Piece" } }),
+        );
+        expect(tasks.map((t) => t.key)).toEqual(["daily", "learn"]);
     });
 
     it("falls back to browsing, with the done daily still reachable", () => {

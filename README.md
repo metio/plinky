@@ -148,7 +148,12 @@ Plinky works and walks the first session in order — set yourself up (hand size
 mapping first, so everything after is tailored to you), then play your first piece (your
 first assignment when you have one) — before pointing out the app's other corners. The
 steps that put your fingers on keys right away carry a small **Jump right in** marker,
-the shortcut for anyone who'd rather play first and configure later. The first time you
+the shortcut for anyone who'd rather play first and configure later. The **Today**
+panel alongside it lists the day's practice as one-tap links — pieces due for review,
+the daily challenge, and **your open assignment's next step** ("Continue *First
+steps* — step 2 of 5"), which goes straight into that piece; while an assignment is
+open, its next step stands in for the generic something-new suggestion, so the path
+you (or your teacher) chose is always one tap from the front page. The first time you
 open a score a one-time tip explains the three modes and the listen-then-play-slowly
 loop — a guided tour where you land, never a gate on progress.
 

@@ -8,6 +8,7 @@ import {
     encodeAssignmentLink,
     makeAssignment,
     newAssignmentId,
+    nextAssignmentStep,
     parseAssignment,
     serializeAssignment,
 } from "./assignment";
@@ -99,5 +100,31 @@ describe("share link", () => {
     it("returns null for a corrupt or empty code", () => {
         expect(decodeAssignmentLink("")).toBeNull();
         expect(decodeAssignmentLink("!!!not-base64!!!")).toBeNull();
+    });
+});
+
+describe("nextAssignmentStep", () => {
+    const set = (id: string, items: string[]) =>
+        makeAssignment({ id, name: id, items: items.map((piece) => ({ id: piece })) });
+
+    it("points at the first unlearned step of the first open assignment", () => {
+        const learned = new Set(["a1", "a2"]);
+        const next = nextAssignmentStep(
+            [set("First steps", ["a1", "a2", "a3", "a4"])],
+            (id) => learned.has(id),
+        );
+        expect(next).toEqual({ name: "First steps", step: 3, total: 4, scoreId: "a3" });
+    });
+
+    it("skips finished assignments and reports null when everything is done", () => {
+        const learned = new Set(["a1", "b1"]);
+        expect(
+            nextAssignmentStep(
+                [set("done", ["a1"]), set("open", ["b1", "b2"])],
+                (id) => learned.has(id),
+            ),
+        ).toEqual({ name: "open", step: 2, total: 2, scoreId: "b2" });
+        expect(nextAssignmentStep([set("done", ["a1"])], (id) => learned.has(id))).toBeNull();
+        expect(nextAssignmentStep([], () => false)).toBeNull();
     });
 });

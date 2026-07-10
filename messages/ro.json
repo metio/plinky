@@ -573,5 +573,6 @@
   "help_empty": "Ajutorul pentru această zonă este pe drum.",
   "help_learn_more": "Află mai multe",
   "meta_help_description": "Cum funcționează Plinky: ghiduri pentru fiecare parte a aplicației, de la prima notă până la urmărirea progresului tău.",
-  "discover_jump_in": "Începe imediat"
+  "discover_jump_in": "Începe imediat",
+  "today_assignment": "Continuă „{name}” — pasul {step} din {total}"
 }

@@ -10,15 +10,24 @@ import {
     loadGradeCatalogue,
     loadGradedMastery,
 } from "../../lib/gradeProgress";
-import { usePrefsStore, useServices } from "../../contexts/services";
+import {
+    useAssignmentsStore,
+    useExerciseSource,
+    usePrefsStore,
+    useServices,
+} from "../../contexts/services";
+import { nextAssignmentStep } from "../../../core/assignment";
+import { starterAssignment } from "../../../core/starterAssignments";
 import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { type Task, todayTasks } from "../../../core/today";
+import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
 const ICON: Record<Task["key"], string> = {
     review: "🔁",
     daily: "📅",
+    assignment: "📋",
     learn: "🎹",
     browse: "📚",
 };
@@ -29,6 +38,8 @@ function taskLabel(task: Task): string {
             return m.today_review({ count: task.count });
         case "daily":
             return task.done ? m.today_daily_done() : m.today_daily();
+        case "assignment":
+            return m.today_assignment({ name: task.name, step: task.step, total: task.total });
         case "learn":
             return m.today_learn({ title: task.title });
         case "browse":
@@ -42,6 +53,8 @@ function taskLabel(task: Task): string {
 // prerendered shell and appears once the client resolves it.
 export function HomeToday() {
     const prefsStore = usePrefsStore();
+    const assignmentsStore = useAssignmentsStore();
+    const exercises = useExerciseSource();
     const services = useServices();
     const [tasks, setTasks] = useState<Task[] | null>(null);
 
@@ -50,7 +63,11 @@ export function HomeToday() {
         Promise.all([
             loadGradedMastery(services.mastery, services),
             loadGradeCatalogue(services),
-        ]).then(([items, catalogue]) => {
+            // The manifest only feeds the starter assignment; without it the
+            // panel still stands, so a fetch failure degrades to no starter
+            // rather than an empty panel.
+            exercises.manifest().catch(() => []),
+        ]).then(([items, catalogue, exerciseList]) => {
             if (cancelled) {
                 return;
             }
@@ -63,10 +80,26 @@ export function HomeToday() {
             );
             const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
             const dailyDoneToday = services.daily.lastDone() === dailyNumber(todayKey(new Date()));
+            // The player's own assignments first — a saved set is a deliberate
+            // path — then the built-in starter, so a fresh device has a guided
+            // path in the panel from day one. Same construction as on
+            // /assignments, so the two views always agree on the steps.
+            const starter = starterAssignment({
+                id: "starter-first-steps",
+                name: m.assignments_starter_name(),
+                description: m.assignments_starter_description(),
+                demos: loadBundledScores().map((score) => ({ id: score.id })),
+                exercises: exerciseList,
+            });
+            const assignment = nextAssignmentStep(
+                [...assignmentsStore.list(), ...(starter ? [starter] : [])],
+                (id) => services.mastery.load(id)?.learned === true,
+            );
             setTasks(
                 todayTasks({
                     dueIds: dueReviews(items, now, prefs.reviewCap),
                     dailyDoneToday,
+                    assignment,
                     suggestion: suggestion ? { id: suggestion.id, title: suggestion.title } : null,
                 }),
             );
@@ -74,7 +107,7 @@ export function HomeToday() {
         return () => {
             cancelled = true;
         };
-    }, [prefsStore.load, services]);
+    }, [prefsStore.load, assignmentsStore.list, exercises.manifest, services]);
 
     if (tasks === null) {
         return null;

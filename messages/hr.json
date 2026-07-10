@@ -573,5 +573,6 @@
   "help_empty": "Pomoć za ovo područje uskoro stiže.",
   "help_learn_more": "Saznajte više",
   "meta_help_description": "Kako Plinky radi: vodiči za svaki dio aplikacije, od prve note do praćenja vašeg napretka.",
-  "discover_jump_in": "Odmah počni"
+  "discover_jump_in": "Odmah počni",
+  "today_assignment": "Nastavi “{name}” — korak {step} od {total}"
 }

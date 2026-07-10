@@ -573,5 +573,6 @@
   "help_empty": "A ajuda para esta área está a caminho.",
   "help_learn_more": "Saiba mais",
   "meta_help_description": "Como o Plinky funciona: guias para cada parte do app, da sua primeira nota ao acompanhamento do seu progresso.",
-  "discover_jump_in": "Comece já"
+  "discover_jump_in": "Comece já",
+  "today_assignment": "Continue “{name}” — passo {step} de {total}"
 }

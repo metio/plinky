@@ -573,5 +573,6 @@
   "help_empty": "该部分的帮助即将推出。",
   "help_learn_more": "了解更多",
   "meta_help_description": "了解 Plinky 的运作方式：涵盖应用每个部分的指南，从你的第一个音符到进度跟踪。",
-  "discover_jump_in": "立即上手"
+  "discover_jump_in": "立即上手",
+  "today_assignment": "继续《{name}》——第 {step}/{total} 步"
 }
