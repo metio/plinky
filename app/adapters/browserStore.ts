@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { createEmitter } from "../../core/emitter";
 import type { KeyValueStore } from "../ports/keyValueStore";
 
 // The one place the app touches `localStorage`. Merely *accessing* the global can throw
@@ -24,16 +25,11 @@ function guarded<T>(run: (store: Storage) => T, fallback: T): T {
 // of every save site growing its own warning. Individual callers still get the
 // boolean verdict per write; this is the aggregate signal.
 let writeFailed = false;
-const healthListeners = new Set<() => void>();
+const healthEmitter = createEmitter();
 
 export const storageHealth = {
     failed: (): boolean => writeFailed,
-    subscribe(onChange: () => void): () => void {
-        healthListeners.add(onChange);
-        return () => {
-            healthListeners.delete(onChange);
-        };
-    },
+    subscribe: healthEmitter.subscribe,
 };
 
 function markWriteFailed(): void {
@@ -41,9 +37,7 @@ function markWriteFailed(): void {
         return;
     }
     writeFailed = true;
-    for (const listener of [...healthListeners]) {
-        listener();
-    }
+    healthEmitter.notify();
 }
 
 export const browserStore: KeyValueStore = {

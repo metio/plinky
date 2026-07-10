@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { createEmitter } from "../../core/emitter";
 import type { KeyValueStore } from "../ports/keyValueStore";
 
 // The one JSON-over-KeyValueStore idiom, shared by every store: parse defensively,
@@ -73,35 +74,23 @@ export function mergeSubscribe(
 // filtered by `matches` so a write to an unrelated key wakes nobody. A null
 // event key means the whole store was cleared, which any key may be part of.
 function createBus(matches: (key: string) => boolean) {
-    const listeners = new Set<Listener>();
-    // One broken subscriber must not silence the rest — every listener hears
-    // about a change, whatever its peers do. Applies to both delivery paths:
-    // the same-tab notify loop and the cross-tab storage handler.
-    const safely = (listener: Listener) => {
-        try {
-            listener();
-        } catch {
-            // The subscriber's failure is its own; delivery continues.
-        }
-    };
+    const emitter = createEmitter();
     return {
-        notify() {
-            for (const listener of [...listeners]) {
-                safely(listener);
-            }
-        },
+        notify: emitter.notify,
         subscribe(onChange: Listener): () => void {
-            listeners.add(onChange);
+            const off = emitter.subscribe(onChange);
+            // The cross-tab handler delivers with the same per-listener
+            // isolation as the same-tab notify loop.
             const onStorage = (event: StorageEvent) => {
                 if (event.key === null || matches(event.key)) {
-                    safely(onChange);
+                    emitter.safely(onChange);
                 }
             };
             if (typeof window !== "undefined") {
                 window.addEventListener("storage", onStorage);
             }
             return () => {
-                listeners.delete(onChange);
+                off();
                 if (typeof window !== "undefined") {
                     window.removeEventListener("storage", onStorage);
                 }

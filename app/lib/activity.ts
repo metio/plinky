@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { createEmitter } from "../../core/emitter";
+
 // A counting "something is in progress" signal. A practice run begins an
 // activity and ends it when the run finishes or unmounts; the composition root
 // reads it to hold a service-worker reload until the player is between runs.
@@ -18,17 +20,12 @@ export type ActivitySignal = {
 
 export function createActivitySignal(): ActivitySignal {
     let count = 0;
-    const listeners = new Set<() => void>();
-    const notify = () => {
-        for (const listener of [...listeners]) {
-            listener();
-        }
-    };
+    const emitter = createEmitter();
     return {
         begin() {
             count += 1;
             if (count === 1) {
-                notify();
+                emitter.notify();
             }
             let ended = false;
             return () => {
@@ -38,17 +35,12 @@ export function createActivitySignal(): ActivitySignal {
                 ended = true;
                 count -= 1;
                 if (count === 0) {
-                    notify();
+                    emitter.notify();
                 }
             };
         },
         active: () => count > 0,
-        subscribe(onChange) {
-            listeners.add(onChange);
-            return () => {
-                listeners.delete(onChange);
-            };
-        },
+        subscribe: emitter.subscribe,
     };
 }
 
