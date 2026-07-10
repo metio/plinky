@@ -108,12 +108,15 @@ describe("HomeToday", () => {
         masteryMock.mockResolvedValue([]);
         catalogueMock.mockResolvedValue([]);
         const { services } = mount();
+        // Real bundled ids: once the known-piece set is ready, only resolvable
+        // steps count, so an invented id would read as missing and be skipped.
+        const [first, second] = loadBundledScores().map((score) => score.id);
         services.assignments.save(
-            makeAssignment({ name: "My set", items: [{ id: "piece-a" }, { id: "piece-b" }] }),
+            makeAssignment({ name: "My set", items: [{ id: first! }, { id: second! }] }),
         );
-        services.mastery.save("piece-a", markLearned(null, 0));
+        services.mastery.save(first!, markLearned(null, 0));
         const cont = await screen.findByRole("link", { name: /Continue “My set”/ });
-        expect(cont.getAttribute("href")).toContain("/play/piece-b");
+        expect(cont.getAttribute("href")).toContain(`/play/${second}`);
         expect(cont.textContent).toContain("step 2 of 2");
     });
 });
