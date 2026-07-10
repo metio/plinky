@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { encodeAssignmentLink, makeAssignment } from "../../core/assignment";
@@ -22,6 +22,9 @@ const mount = (entry = "/assignments") =>
         </MemoryRouter>,
     );
 
+// The builder lives on its own tab; tests that use it open it first.
+const openBuilder = () => fireEvent.click(screen.getByRole("tab", { name: /Create new|Edit assignment/ }));
+
 afterEach(() => {
     cleanup();
     localStorage.clear();
@@ -31,6 +34,7 @@ afterEach(() => {
 describe("AssignmentsRoute", () => {
     it("builds an assignment from the catalogue and saves it", async () => {
         mount();
+        openBuilder();
         fireEvent.change(screen.getByLabelText("Assignment name"), {
             target: { value: "My set" },
         });
@@ -43,8 +47,8 @@ describe("AssignmentsRoute", () => {
         // same tune, so the match is not unique).
         expect(screen.getAllByText(/Twinkle/).length).toBeGreaterThan(0);
         fireEvent.click(screen.getByText("Save"));
-        // It is confirmed and listed under the player's own assignments, its piece
-        // shown as a playable step.
+        // Saving lands back on the list tab, where it is confirmed and listed under
+        // the player's own assignments, its piece shown as a playable step.
         expect(await screen.findByRole("status")).toHaveTextContent(/Saved/);
         expect(screen.getByText("My set")).toBeTruthy();
         const steps = screen.getAllByRole("link", { name: /Twinkle/ });
@@ -69,6 +73,7 @@ describe("AssignmentsRoute", () => {
 
     it("browses the whole catalogue page by page without a query", async () => {
         mount();
+        openBuilder();
         // A blank query already lists the first page of pieces to browse.
         const firstPage = await screen.findAllByText("Add");
         expect(firstPage).toHaveLength(20);
@@ -78,6 +83,7 @@ describe("AssignmentsRoute", () => {
 
     it("resets to the first page when the query changes", async () => {
         mount();
+        openBuilder();
         fireEvent.click(await screen.findByText("Show more"));
         fireEvent.change(screen.getByLabelText(/Search pieces/), { target: { value: "e" } });
         expect(screen.getAllByText("Add").length).toBeLessThanOrEqual(20);
@@ -85,6 +91,7 @@ describe("AssignmentsRoute", () => {
 
     it("explains what a save still needs until it is possible", async () => {
         mount();
+        openBuilder();
         const hint = /To save, give the assignment a name/;
         expect(screen.getByText(hint)).toBeTruthy();
         fireEvent.change(screen.getByLabelText("Assignment name"), {
@@ -101,6 +108,7 @@ describe("AssignmentsRoute", () => {
 
     it("edits a saved assignment in place", async () => {
         mount();
+        openBuilder();
         fireEvent.change(screen.getByLabelText("Assignment name"), {
             target: { value: "My set" },
         });
@@ -193,12 +201,28 @@ describe("AssignmentsRoute", () => {
 
     it("reorders and removes items in the basket", async () => {
         mount();
+        openBuilder();
         const search = screen.getByLabelText(/Search pieces/);
         fireEvent.change(search, { target: { value: "Twinkle" } });
         fireEvent.click(await screen.findByText("Add"));
         fireEvent.change(search, { target: { value: "Ode" } });
         fireEvent.click(await screen.findByText("Add"));
-        // Two items in order; removing the first leaves the second.
+        // Two items in order; dragging the second row's title above the first
+        // reorders them (pointer events — the same path touch takes).
+        const rows = () => screen.getAllByLabelText("Remove").map((button) => button.closest("li")!);
+        expect(within(rows()[0]!).queryByText(/Twinkle/)).toBeTruthy();
+        const handle = within(rows()[1]!).getByText(/Ode/);
+        fireEvent.pointerDown(handle, {
+            pointerId: 1,
+            clientY: rows()[1]!.getBoundingClientRect().top + 5,
+        });
+        fireEvent.pointerMove(handle, {
+            pointerId: 1,
+            clientY: rows()[0]!.getBoundingClientRect().top + 2,
+        });
+        fireEvent.pointerUp(handle, { pointerId: 1 });
+        expect(within(rows()[0]!).queryByText(/Ode/)).toBeTruthy();
+        // Removing the first row leaves the other.
         expect(screen.getAllByLabelText("Remove")).toHaveLength(2);
         fireEvent.click(screen.getAllByLabelText("Remove")[0]!);
         expect(screen.getAllByLabelText("Remove")).toHaveLength(1);
