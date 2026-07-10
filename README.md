@@ -137,9 +137,12 @@ one-tap **review session** walks you through everything that's fading, and you c
 - **Assignments** — a built-in **First steps** set (the demo tunes, then the easiest
   studies) is ready to play on day one; beyond it, build an ordered practice list for
   a student (or yourself): browse
-  or search the whole catalogue page by page, add pieces, and give each an optional
-  target tempo and note. Save it, **edit it later**, share it by link, or pass it
-  around as a file; each piece checks off as it's learned. A step whose piece is no
+  or search the whole catalogue page by page, add pieces, drag titles into the
+  right order (or use the arrow buttons), and give each an optional target tempo
+  and note, plus a free-form description for the whole set. The page splits into
+  two tabs — your assignments, and the one you're creating or editing. Save it,
+  **edit it later**, share it by link, or pass it around as a file; each piece
+  checks off as it's learned. A step whose piece is no
   longer on the device (a deleted import, a link from elsewhere) is labelled as
   missing instead of leading to a dead end, and a one-tap action prunes those steps;
   importing a shared assignment says up front how many of its pieces resolve here,
