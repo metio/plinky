@@ -52,13 +52,21 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
       - run: nix develop --command npm ci
+      - name: Add the Mock Service Worker script
+        # Previews answer Sanity queries from MSW (the preview origins are not on
+        # Sanity's CORS allowlist), so the worker script ships with the build.
+        run: nix develop --command npx msw init public
       - name: Build (English prerender, all languages at runtime)
         # Set PLINKY_LOCALES to a comma list to prerender more languages.
         run: nix develop --command npm run build:locales
         env:
           PLINKY_LOCALES: en
-          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
-          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+          VITE_PREVIEW_MOCKS: "1"
+          # The adapters stay silent without a project id; previews never reach
+          # the real API (MSW answers first), so a placeholder works when the
+          # repo variable is unset.
+          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID || 'preview0' }}
+          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET || 'production' }}
       - name: Add SPA fallback
         # Cloudflare Pages serves 404.html for an unmatched path, so a deep-link refresh
         # (or an unprerendered locale) lands on the shell and the client router takes over.
