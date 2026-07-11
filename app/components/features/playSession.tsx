@@ -25,6 +25,7 @@ import {
 } from "../../../core/runCapture";
 import { deriveRunOutcome } from "../../../core/runOutcome";
 import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
+import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
@@ -129,8 +130,6 @@ function usePlaySessionValue({
     // read-at-tempo test. Session toggles (not persisted), off by default.
     const [enforceTempo, setEnforceTempo] = useState(false);
     const [guideNotes, setGuideNotes] = useState(true);
-    // This score's saved takes. How the finished run's save went lives with the run result.
-    const [takes, setTakes] = useState<Take[]>([]);
     // The tempo settings — the slider, the adaptive live pace, the metronome toggles and
     // the tempo trainer — held together. The metronome *effect* stays at its call site
     // below: it reads keepUp.running, which is created after this.
@@ -164,6 +163,9 @@ function usePlaySessionValue({
         ? [transposeContext.transpose, transposeContext.setTranspose]
         : localTranspose;
     const services = useServices();
+    // This score's saved takes, live over the store; how the finished run's save
+    // went lives with the run result.
+    const takesList = useTakes(services.takes, id);
     // The fingering the player worked out for this piece (Fingering mode). When they
     // have some, the staff can show theirs instead of the app's suggestion — defaulting
     // to theirs, since they chose it on purpose.
@@ -248,11 +250,6 @@ function usePlaySessionValue({
     // partial replay would strand the next race at its early end, and chasing a
     // full-piece ghost from the middle is meaningless.
     const partialRunRef = useRef(false);
-
-    // Load this score's saved takes; a new score swaps in its own.
-    useEffect(() => {
-        setTakes(services.takes.list(id));
-    }, [id, services.takes.list]);
 
     // The score-rendering surface: OSMD loads and re-renders the piece, and reports what
     // the rest of the play surface reads off it. The transports and the matcher drive the
@@ -710,9 +707,7 @@ function usePlaySessionValue({
             metrics: grade,
             composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
         };
-        const stored = services.takes.save(id, take);
-        setTakes(stored.takes);
-        runResult.markSaved(stored.stored);
+        runResult.markSaved(takesList.save(take));
     };
     const saveCurrentTake = () => saveTake(runResult.grade);
 
@@ -727,9 +722,7 @@ function usePlaySessionValue({
         if (listenPlayback.activeReplayId === takeId) {
             listenPlayback.stop();
         }
-        // The returned list is what storage really holds — a refused rewrite keeps
-        // the take, and the list keeps showing it instead of resurrecting it later.
-        setTakes(services.takes.remove(id, takeId).takes);
+        takesList.remove(takeId);
     };
 
     const practice = (resume = true) => {
@@ -891,7 +884,7 @@ function usePlaySessionValue({
         status,
         requestAccess,
         // Saved takes.
-        takes,
+        takes: takesList.takes,
         // Actions the surface drives.
         listen,
         restartListen,

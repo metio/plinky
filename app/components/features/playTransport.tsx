@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { m } from "../../paraglide/messages.js";
+import { ToggleIconButton } from "../ui/toggleIconButton";
 import { Button, IconButton } from "../ui/button";
 import {
     CloseIcon,
@@ -137,19 +138,18 @@ export function PlayTransport() {
                     </Show>
                     {/* Show/hide the fingering numbers on the staff without leaving the
                     music — seeded from the setting, flipped here for this session. */}
-                    <IconButton
+                    <ToggleIconButton
                         onClick={() => setShowFingerings((on) => !on)}
-                        aria-pressed={showFingerings}
+                        pressed={showFingerings}
                         label={m.action_finger_numbers()}
-                        className={showFingerings ? "text-indigo-600 dark:text-indigo-400" : ""}
                     >
                         <HandIcon />
-                    </IconButton>
+                    </ToggleIconButton>
                     {/* Turn the follow-the-note scrolling off to read at your own pace,
                     or on to let the staff keep up. Moot in treadmill, which scrolls
                     itself. */}
                     <Show when={!treadmill}>
-                        <IconButton
+                        <ToggleIconButton
                             onClick={() => {
                                 const next = !scrollFollow;
                                 setScrollFollow(next);
@@ -158,12 +158,11 @@ export function PlayTransport() {
                                     osmd.FollowCursor = next;
                                 }
                             }}
-                            aria-pressed={scrollFollow}
+                            pressed={scrollFollow}
                             label={m.action_scroll_follow()}
-                            className={scrollFollow ? "text-indigo-600 dark:text-indigo-400" : ""}
                         >
                             <EyeIcon />
-                        </IconButton>
+                        </ToggleIconButton>
                     </Show>
                     {/* The Practice-tools drawer — tempo, loop, metronome, keep-up and
                     the rest — reachable without leaving full screen. */}
@@ -173,14 +172,13 @@ export function PlayTransport() {
                     {/* Swap the keyboard area for the fingering editor: work out (or
                     fine-tune) the fingers for the piece with the difficulty heat-map
                     washed over the score. */}
-                    <IconButton
+                    <ToggleIconButton
                         onClick={() => setFingerStrip((on: boolean) => !on)}
-                        aria-pressed={fingerStrip}
+                        pressed={fingerStrip}
                         label={m.action_fingering_editor()}
-                        className={fingerStrip ? "text-indigo-600 dark:text-indigo-400" : ""}
                     >
                         <FingersIcon />
-                    </IconButton>
+                    </ToggleIconButton>
                     <Button
                         variant="secondary"
                         onClick={() => setHideKeyboard((on) => !on)}

@@ -65,5 +65,20 @@ describe("ExportVideoButton", () => {
         fireEvent.click(await screen.findByRole("button", { name: "Save video" }));
         await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
         expect(exportMock.mock.calls[0]?.[0]?.notes).toEqual(take.composition.notes);
+        // The default orientation is landscape 720p.
+        expect(exportMock.mock.calls[0]?.[0]?.width).toBe(1280);
+        expect(exportMock.mock.calls[0]?.[0]?.height).toBe(720);
+    });
+
+    it("swaps the axes when the 9:16 format is picked", async () => {
+        const exportMock = vi.fn<VideoExporter["export"]>(
+            async () => new Blob(["mp4"], { type: "video/mp4" }),
+        );
+        mount({ supported: async () => true, export: exportMock });
+        fireEvent.click(await screen.findByRole("tab", { name: "9:16" }));
+        fireEvent.click(screen.getByRole("button", { name: /Save a portrait video/ }));
+        await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
+        expect(exportMock.mock.calls[0]?.[0]?.width).toBe(720);
+        expect(exportMock.mock.calls[0]?.[0]?.height).toBe(1280);
     });
 });

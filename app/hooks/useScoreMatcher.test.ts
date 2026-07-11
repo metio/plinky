@@ -292,3 +292,50 @@ describe("useScoreMatcher", () => {
         expect(times[1]).toBeCloseTo(600);
     });
 });
+
+describe("whole-piece step indexing (the reveal/ghost address space)", () => {
+    it("reports absolute indices when a run resumes mid-piece", () => {
+        const { osmd } = fakeOsmd([[60], [62], [64], [65]]);
+        const correct: CorrectInfo[] = [];
+        const { result } = renderHook(() =>
+            useScoreMatcher(() => osmd, { onCorrect: (info) => correct.push(info) }),
+        );
+        // Resume at the third position (0.5 whole notes in): its ordinal within
+        // the run is 0, but its index among the piece's steps is 2.
+        act(() => result.current.start(0.5));
+        act(() => result.current.registerNote(64));
+        expect(correct[0]?.ordinal).toBe(0);
+        expect(correct[0]?.index).toBe(2);
+    });
+
+    it("reports the wrong-attempt count and the absolute index of the stuck position", () => {
+        const { osmd } = fakeOsmd([[60], [62]]);
+        const wrongs: { index: number; misses: number }[] = [];
+        const { result } = renderHook(() =>
+            useScoreMatcher(() => osmd, { onWrong: (info) => wrongs.push(info) }),
+        );
+        act(() => result.current.start());
+        act(() => result.current.registerNote(61));
+        act(() => result.current.registerNote(61));
+        act(() => result.current.registerNote(60));
+        act(() => result.current.registerNote(61));
+        // Two misses at the first position (counting up), then one at the second.
+        expect(wrongs).toEqual([
+            { index: 0, misses: 1 },
+            { index: 0, misses: 2 },
+            { index: 1, misses: 1 },
+        ]);
+    });
+
+    it("anchors a section loop's indices at the loop's first step", () => {
+        // Two 4/4 bars of quarters; loop bar 2 (positions 4..7).
+        const { osmd } = fakeOsmd([[60], [60], [60], [60], [64], [65], [67], [69]]);
+        const correct: CorrectInfo[] = [];
+        const { result } = renderHook(() =>
+            useScoreMatcher(() => osmd, { onCorrect: (info) => correct.push(info) }),
+        );
+        act(() => result.current.start(0, { from: 2, to: 2 }));
+        act(() => result.current.registerNote(64));
+        expect(correct[0]?.index).toBe(4);
+    });
+});

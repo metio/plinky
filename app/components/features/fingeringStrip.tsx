@@ -7,10 +7,11 @@ import { barHeat } from "../../../core/fingerHeat";
 import { fingerQualities } from "../../../core/fingeringScore";
 import { noteName } from "../../../core/midi";
 import type { MeasureBox } from "../../../core/scoreCanvas";
-import { scoreToBars, staffFor, windowCells, windowPositions } from "../../../core/scoreToBars";
+import { scoreToBars, staffFor } from "../../../core/scoreToBars";
 import { useFingeringStore, usePrefsStore, useXmlCodec } from "../../contexts/services";
 import { clearBarHeat, paintBarHeat } from "../../lib/scoreColor";
 import { m } from "../../paraglide/messages.js";
+import { useBarWindow } from "../../hooks/useBarWindow";
 import { type FingerMap, fingerKey } from "../../stores/fingeringStore";
 
 import type { FingerQuality } from "../../../core/fingeringScore";
@@ -74,16 +75,13 @@ export function FingeringStrip({
     const xmlCodec = useXmlCodec();
     const fingering = useFingeringStore();
     const [hand, setHand] = useState<Hand>("right");
-    const [start, setStart] = useState(0);
     const [map, setMap] = useState<FingerMap>(() => fingering.load(id));
     const [active, setActive] = useState(0);
 
     const span = prefsStore.load().handSpan[hand] ?? undefined;
     const bars = useMemo(() => scoreToBars(xmlCodec, xml, staffFor(hand)), [xmlCodec, xml, hand]);
-    const lastStart = Math.max(0, bars.length - WINDOW);
-    const clamped = Math.min(start, lastStart);
-    const positions = useMemo(() => windowPositions(bars, clamped, WINDOW), [bars, clamped]);
-    const cells = useMemo(() => windowCells(bars, clamped, WINDOW), [bars, clamped]);
+    const window = useBarWindow(bars, WINDOW);
+    const { positions, cells } = window;
 
     // The window's fingers: the player's saved choice where one exists, the
     // optimal fingering for their hand span everywhere else — the strip opens
@@ -191,10 +189,10 @@ export function FingeringStrip({
                     <button
                         type="button"
                         onClick={() => {
-                            setStart((s) => Math.max(0, Math.min(s, lastStart) - 1));
+                            window.prev();
                             setActive(0);
                         }}
-                        disabled={clamped <= 0}
+                        disabled={!window.canPrev}
                         aria-label={m.fingering_prev_bars()}
                         className="rounded-md bg-indigo-50 px-2 py-1.5 text-sm font-medium text-indigo-700 disabled:opacity-40 dark:bg-indigo-950 dark:text-indigo-300"
                     >
@@ -202,18 +200,18 @@ export function FingeringStrip({
                     </button>
                     <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
                         {m.fingering_bars({
-                            from: clamped + 1,
-                            to: Math.min(clamped + WINDOW, bars.length),
+                            from: window.start + 1,
+                            to: window.end,
                             total: bars.length,
                         })}
                     </span>
                     <button
                         type="button"
                         onClick={() => {
-                            setStart((s) => Math.min(lastStart, Math.min(s, lastStart) + 1));
+                            window.next();
                             setActive(0);
                         }}
-                        disabled={clamped >= lastStart}
+                        disabled={!window.canNext}
                         aria-label={m.fingering_next_bars()}
                         className="rounded-md bg-indigo-50 px-2 py-1.5 text-sm font-medium text-indigo-700 disabled:opacity-40 dark:bg-indigo-950 dark:text-indigo-300"
                     >
