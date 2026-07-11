@@ -78,3 +78,53 @@ describe("takeScenePainter", () => {
         }
     });
 });
+
+describe("takeScenePainter with a score panel", () => {
+    // A stand-in score image: a mid-grey sheet, so panel pixels are telling.
+    const sheet = new OffscreenCanvas(800, 300);
+    sheet.getContext("2d")!.fillStyle = "#808080";
+    sheet.getContext("2d")!.fillRect(0, 0, 800, 300);
+    const score = {
+        image: sheet,
+        width: 800,
+        height: 300,
+        steps: [[{ x: 100, y: 100, width: 30, height: 30 }]],
+    };
+
+    function paintWithScore(timeMs: number): OffscreenCanvasRenderingContext2D {
+        const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
+        const context = canvas.getContext("2d")!;
+        takeScenePainter({
+            title: "Menuet",
+            credit: "Menuet · J. S. Bach · CC0",
+            notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 100 }],
+            durationMs: LEAD_IN_MS + 2_000,
+            width: WIDTH,
+            height: HEIGHT,
+            score,
+        })(context, timeMs);
+        return context;
+    }
+
+    function countGreyPixels(context: OffscreenCanvasRenderingContext2D): number {
+        const { data } = context.getImageData(0, 0, WIDTH, HEIGHT);
+        let count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i] === 0x80 && data[i + 1] === 0x80 && data[i + 2] === 0x80) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    it("draws the score sheet into the panel", () => {
+        expect(countGreyPixels(paintWithScore(0))).toBeGreaterThan(5_000);
+    });
+
+    it("tints the played step's noteheads once its onset passes", () => {
+        // The tint blends accent over the grey sheet, eating grey pixels.
+        const before = countGreyPixels(paintWithScore(0));
+        const after = countGreyPixels(paintWithScore(LEAD_IN_MS + 100));
+        expect(before).toBeGreaterThan(after + 100);
+    });
+});

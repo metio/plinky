@@ -127,7 +127,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   and flow** it earned so you can compare attempts at a glance: **replay** one and it plays
   back onto the staff in your own timing — on a MIDI piano, even how long you held each key,
   so your articulation comes back too — **download** it as MIDI or MusicXML, **save it as
-  a video** (an MP4 of the keyboard playing your take — each press lights its key in full
+  a video** (an MP4 of your take: the sheet music of what you played with each note
+  tinting as it sounds, above the keyboard where each press lights its key in full
   and fades while held, so even fast repeats read clearly — with the piece's title, composer
   and licence burnt in, ready for any chat or feed — offered on browsers that can encode
   one, Chrome and friends today), **challenge a

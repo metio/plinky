@@ -87,3 +87,31 @@ export function creditLine(title: string, attribution: Attribution): string {
     }
     return parts.join(" · ");
 }
+
+// A rectangle on the pre-rendered score image, in image pixels — one or more per
+// step (a chord's noteheads), collected by the exporter's off-screen render.
+export type ScoreBox = { x: number; y: number; width: number; height: number };
+
+// The score panel shows a sliding window of the (taller) score image. The window
+// centres on the current step and clamps to the image, so the opening frames sit
+// at the top and the closing frames at the bottom — never past an edge.
+export function scoreWindowTop(centerY: number, windowHeight: number, imageHeight: number): number {
+    const top = centerY - windowHeight / 2;
+    return Math.max(0, Math.min(top, Math.max(0, imageHeight - windowHeight)));
+}
+
+// How many of the run's steps have sounded by the frame's latest onset (frameAt's
+// currentOnsetMs, on the notes' clock) — the steps the painter colours as played.
+// Before the first onset nothing is played.
+export function playedStepCount(onsets: readonly number[], currentOnsetMs: number | null): number {
+    if (currentOnsetMs === null) {
+        return 0;
+    }
+    let count = 0;
+    for (const onset of onsets) {
+        if (onset <= currentOnsetMs) {
+            count++;
+        }
+    }
+    return count;
+}

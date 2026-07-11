@@ -6,6 +6,7 @@ import type { Take } from "../../../core/takes";
 import { videoDurationMs } from "../../../core/videoFrames";
 import { useVideoExporter } from "../../contexts/services";
 import { downloadBlob } from "../../lib/download";
+import { buildScoreSnapshot } from "../../lib/scoreSnapshot";
 import { takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -53,6 +54,10 @@ export function ExportVideoButton({
         try {
             const notes = take.composition.notes;
             const durationMs = videoDurationMs(notes);
+            // The take's own notation, rendered off-screen and rasterized once, so
+            // the video shows the sheet music with each note tinted as it sounds.
+            // A take the renderer can't draw exports keyboard-only instead.
+            const score = await buildScoreSnapshot(take);
             const blob = await exporter.export(
                 {
                     width: WIDTH,
@@ -66,6 +71,7 @@ export function ExportVideoButton({
                         durationMs,
                         width: WIDTH,
                         height: HEIGHT,
+                        score,
                     }),
                     notes,
                 },

@@ -3,7 +3,13 @@
 
 import { describe, expect, it } from "vitest";
 import { attributionFor } from "./attribution";
-import { creditLine, sceneKeys, sceneRange } from "./videoScene";
+import {
+    creditLine,
+    playedStepCount,
+    sceneKeys,
+    sceneRange,
+    scoreWindowTop,
+} from "./videoScene";
 
 describe("sceneRange", () => {
     it("snaps outward to whole octaves around the take's pitches", () => {
@@ -54,5 +60,26 @@ describe("creditLine", () => {
 
     it("omits what a piece doesn't have rather than printing blanks", () => {
         expect(creditLine("Étude", attributionFor({}))).toBe("Étude");
+    });
+});
+
+describe("scoreWindowTop", () => {
+    it("centres on the step and clamps to the image edges", () => {
+        expect(scoreWindowTop(500, 400, 2000)).toBe(300);
+        expect(scoreWindowTop(50, 400, 2000)).toBe(0);
+        expect(scoreWindowTop(1950, 400, 2000)).toBe(1600);
+    });
+
+    it("pins to the top when the image is shorter than the window", () => {
+        expect(scoreWindowTop(100, 400, 300)).toBe(0);
+    });
+});
+
+describe("playedStepCount", () => {
+    it("counts the onsets that have sounded, none before the first", () => {
+        expect(playedStepCount([0, 500, 1000], null)).toBe(0);
+        expect(playedStepCount([0, 500, 1000], 0)).toBe(1);
+        expect(playedStepCount([0, 500, 1000], 700)).toBe(2);
+        expect(playedStepCount([0, 500, 1000], 1000)).toBe(3);
     });
 });

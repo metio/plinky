@@ -3,11 +3,19 @@
 
 import type { RecordedNote } from "../../core/composition";
 import { frameAt, pressGlow } from "../../core/videoFrames";
-import { type SceneKey, sceneKeys, sceneRange } from "../../core/videoScene";
+import {
+    playedStepCount,
+    type SceneKey,
+    sceneKeys,
+    sceneRange,
+    type ScoreBox,
+    scoreWindowTop,
+} from "../../core/videoScene";
 
 // Paints one frame of the exported video: a dark stage with the piece's title,
-// a progress rail, the keyboard with the sounding keys lit, and the credit
-// line with the wordmark — so a shared file carries its provenance and origin
+// a progress rail, the notation (when a snapshot was rendered) with the played
+// notes tinted, the keyboard with the sounding keys lit, and the credit line
+// with the wordmark — so a shared file carries its provenance and origin
 // wherever it's reposted. Pure canvas drawing over the pure scene geometry;
 // the exporter calls it once per frame.
 
@@ -31,6 +39,15 @@ const ACCENT = "#6366f1";
 const WHITE_KEY = "#f3f4f6";
 const BLACK_KEY = "#111827";
 
+// The pre-rendered notation the frame can carry: the score rasterized once,
+// plus each step's notehead boxes on it (in image pixels, playing order).
+export type SceneScore = {
+    image: CanvasImageSource;
+    width: number;
+    height: number;
+    steps: ScoreBox[][];
+};
+
 export type ScenePainterInput = {
     title: string;
     // The provenance line from core/videoScene's creditLine.
@@ -39,16 +56,27 @@ export type ScenePainterInput = {
     durationMs: number;
     width: number;
     height: number;
+    // Optional notation panel; without it the keyboard fills the stage as before.
+    score?: SceneScore | null;
 };
 
 type Context2D = Pick<
     OffscreenCanvasRenderingContext2D,
-    "fillRect" | "fillText" | "beginPath" | "roundRect" | "fill" | "save" | "restore"
+    | "fillRect"
+    | "fillText"
+    | "beginPath"
+    | "roundRect"
+    | "fill"
+    | "save"
+    | "restore"
+    | "drawImage"
+    | "clip"
 > & {
     fillStyle: string | CanvasGradient | CanvasPattern;
     font: string;
     textBaseline: CanvasTextBaseline;
     textAlign: CanvasTextAlign;
+    globalAlpha: number;
 };
 
 export function takeScenePainter({
@@ -58,12 +86,17 @@ export function takeScenePainter({
     durationMs,
     width,
     height,
+    score = null,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
-    const keyboardTop = height * 0.42;
-    const keyboardHeight = height * 0.4;
+    // With a notation panel the keyboard cedes the middle of the stage to it.
+    const keyboardTop = score ? height * 0.66 : height * 0.42;
+    const keyboardHeight = score ? height * 0.24 : height * 0.4;
     const margin = Math.round(width * 0.05);
+    // The run's distinct onsets in playing order — step i of the snapshot sounded
+    // at onsets[i], mirroring how the matcher and the take both count steps.
+    const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
 
     // A sounding key is painted as the resting colour blended toward the accent
     // by its glow — full at the press, decaying while held — so a repeated press
@@ -101,6 +134,10 @@ export function takeScenePainter({
         context.fillStyle = ACCENT;
         context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
 
+        if (score) {
+            drawScore(context, score, frame.currentOnsetMs);
+        }
+
         // White keys first so the black keys straddle on top; sounding keys lit
         // by the freshest press of their pitch, so a re-press during a long hold
         // still snaps back to full.
@@ -128,4 +165,56 @@ export function takeScenePainter({
         context.font = `400 ${Math.round(height * 0.032)}px Inter, system-ui, sans-serif`;
         context.fillText(credit, margin, height * 0.95);
     };
+
+    // The notation panel: a light card holding a window of the score image that
+    // follows the current step down the page, with every played step's noteheads
+    // tinted in the accent — the sheet-music twin of the lit keys below it.
+    function drawScore(context: Context2D, sheet: SceneScore, currentOnsetMs: number | null) {
+        const panelX = margin;
+        const panelY = height * 0.3;
+        const panelW = width - margin * 2;
+        const panelH = height * 0.32;
+        const scale = panelW / sheet.width;
+        const windowH = panelH / scale;
+        const played = playedStepCount(onsets, currentOnsetMs);
+        const currentBox = sheet.steps[Math.max(0, played - 1)]?.[0];
+        const centerY = currentBox ? currentBox.y + currentBox.height / 2 : 0;
+        const top = scoreWindowTop(centerY, windowH, sheet.height);
+
+        context.save();
+        context.fillStyle = INK;
+        context.beginPath();
+        context.roundRect(panelX, panelY, panelW, panelH, 8);
+        context.fill();
+        context.clip();
+        context.drawImage(
+            sheet.image,
+            0,
+            top,
+            sheet.width,
+            windowH,
+            panelX,
+            panelY,
+            panelW,
+            panelH,
+        );
+        // Tint the played steps' noteheads; the freshest press reads strongest.
+        for (let index = 0; index < played && index < sheet.steps.length; index++) {
+            context.fillStyle = ACCENT;
+            context.globalAlpha = index === played - 1 ? 0.5 : 0.3;
+            for (const box of sheet.steps[index] ?? []) {
+                context.beginPath();
+                context.roundRect(
+                    panelX + (box.x - 1) * scale,
+                    panelY + (box.y - top - 1) * scale,
+                    (box.width + 2) * scale,
+                    (box.height + 2) * scale,
+                    2,
+                );
+                context.fill();
+            }
+        }
+        context.restore();
+        context.globalAlpha = 1;
+    }
 }
