@@ -111,6 +111,11 @@ export const webCodecsVideoExporter: VideoExporter = {
             // The whole file assembles in memory, so the moov atom lands up
             // front and the result streams from the first byte.
             fastStart: "in-memory",
+            // Firefox's H.264 encoder emits its first chunk with a small
+            // non-zero DTS, which the muxer's default strict mode rejects
+            // (killing the whole export); offsetting each track so its first
+            // sample sits at zero is a no-op on engines that already emit 0.
+            firstTimestampBehavior: "offset",
         });
 
         // Encoder errors surface through the callback; keep the first one and

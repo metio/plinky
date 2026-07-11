@@ -4,9 +4,10 @@
 import { describe, expect, it } from "vitest";
 import { webCodecsVideoExporter } from "./webCodecsVideo";
 
-// The export is chromium territory (firefox has no AAC encoder); supported()
-// is the seam the UI trusts, so on an engine that reports false the export is
-// simply never offered — the test then has nothing further to verify.
+// supported() is the seam the UI trusts: on an engine that reports false the
+// export is simply never offered, and the test then has nothing further to
+// verify. Where it reports true (chromium with AAC, firefox via the Opus
+// fallback) the full export must produce a playable file.
 
 describe("webCodecsVideoExporter", () => {
     it("answers supported() without throwing on any engine", async () => {
