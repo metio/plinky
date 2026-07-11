@@ -91,7 +91,11 @@ export function takeScenePainter({
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
-    // With a notation panel the keyboard cedes the middle of the stage to it.
+    // With a notation panel the keyboard cedes the middle of the stage to it —
+    // and a portrait frame drops the keyboard entirely: on the vertical feeds
+    // the notation is the story, and the full-height panel keeps its glyphs
+    // readable on a phone.
+    const scoreOnly = score !== null && height > width;
     const keyboardTop = score ? height * 0.66 : height * 0.42;
     const keyboardHeight = score ? height * 0.24 : height * 0.4;
     const margin = Math.round(width * 0.05);
@@ -142,6 +146,11 @@ export function takeScenePainter({
             drawScore(context, score, frame.currentOnsetMs, timeMs);
         }
 
+        if (scoreOnly) {
+            drawCredit(context);
+            return;
+        }
+
         // White keys first so the black keys straddle on top; sounding keys lit
         // by the freshest press of their pitch, so a re-press during a long hold
         // still snaps back to full.
@@ -163,12 +172,16 @@ export function takeScenePainter({
             drawKey(context, key, glowOf(key.pitch));
         }
 
+        drawCredit(context);
+    };
+
+    function drawCredit(context: Context2D) {
         context.textAlign = "left";
         context.textBaseline = "alphabetic";
         context.fillStyle = MUTED;
         context.font = `400 ${Math.round(unit * 0.032)}px Inter, system-ui, sans-serif`;
         context.fillText(credit, margin, height * 0.95);
-    };
+    }
 
     // The notation panel: a light card holding a window of the score image that
     // follows the current step down the page, with every played step's noteheads
@@ -182,7 +195,9 @@ export function takeScenePainter({
         const panelX = margin;
         const panelY = height * 0.3;
         const panelW = width - margin * 2;
-        const panelH = height * 0.32;
+        // Score-only frames give the panel the keyboard's room as well, down to
+        // just above the credit line.
+        const panelH = scoreOnly ? height * 0.6 : height * 0.32;
         const scale = panelW / sheet.width;
         const windowH = panelH / scale;
         const played = playedStepCount(onsets, currentOnsetMs);
