@@ -602,5 +602,9 @@
   "takes_download_video": "Зберегти відео",
   "takes_download_video_portrait": "Зберегти вертикальне відео (9:16, для Reels і Shorts)",
   "takes_video_progress": "Рендеринг… {percent}%",
-  "footer_follow": "Підписуйтесь на Plinky"
+  "footer_follow": "Підписуйтесь на Plinky",
+  "person_eyebrow": "Композитор",
+  "person_pieces": "{count} п’єс для занять",
+  "person_empty": "У каталозі поки немає нікого з таким ім’ям.",
+  "meta_person_description": "П’єси {name} на Plinky — безкоштовні ноти для занять у браузері."
 }

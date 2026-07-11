@@ -602,5 +602,9 @@
   "takes_download_video": "Spara video",
   "takes_download_video_portrait": "Spara en stående video (9:16, för Reels och Shorts)",
   "takes_video_progress": "Renderar… {percent}%",
-  "footer_follow": "Följ Plinky"
+  "footer_follow": "Följ Plinky",
+  "person_eyebrow": "Kompositör",
+  "person_pieces": "{count} stycken att öva på",
+  "person_empty": "Ingen med det namnet i katalogen ännu.",
+  "meta_person_description": "{name}s stycken på Plinky — gratis noter att öva på i webbläsaren."
 }

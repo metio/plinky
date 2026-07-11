@@ -17,6 +17,7 @@ import { isDue, type Mastery } from "../../core/mastery";
 import { useFavoritesStore, useServices } from "../contexts/services";
 import { useFavorites } from "../hooks/useFavorites";
 import { gradeOf, MAX_GRADE } from "../../core/scoreDifficulty";
+import { personSlug } from "../../core/person";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
@@ -358,16 +359,19 @@ export default function LibraryRoute() {
                                         >
                                             <StarIcon className="h-5 w-5" filled={starred} />
                                         </IconButton>
-                                        <Link
-                                            to={`/play/${item.id}`}
-                                            // min-w-0 lets this flex child shrink below its
-                                            // content so a long title truncates instead of
-                                            // pushing the row — and the whole page — wider than
-                                            // the viewport (which would clip the fixed bottom nav).
-                                            className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-gray-300 px-3 py-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-                                        >
+                                        {/* min-w-0 lets this flex child shrink below its
+                                            content so a long title truncates instead of
+                                            pushing the row — and the whole page — wider than
+                                            the viewport (which would clip the fixed bottom nav).
+                                            The title link stretches over the whole card
+                                            (after:inset-0); the composer link stacks above the
+                                            stretch (z-10) so it opens the person page instead. */}
+                                        <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md border border-gray-300 px-3 py-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
                                             <span className="min-w-0 flex-1">
-                                                <span className="block truncate font-medium">
+                                                <Link
+                                                    to={`/play/${item.id}`}
+                                                    className="block truncate font-medium after:absolute after:inset-0"
+                                                >
                                                     {item.title}
                                                     {mastery?.learned && (
                                                         <span className="ml-1 inline-flex items-center text-green-600 dark:text-green-400">
@@ -385,15 +389,23 @@ export default function LibraryRoute() {
                                                             </span>
                                                         </span>
                                                     )}
-                                                </span>
-                                                {item.composer && (
-                                                    <span className="block truncate text-xs text-gray-600 dark:text-gray-400">
-                                                        {item.composer}
-                                                    </span>
-                                                )}
+                                                </Link>
+                                                {item.composer &&
+                                                    (personSlug(item.composer) ? (
+                                                        <Link
+                                                            to={`/person/${personSlug(item.composer)}`}
+                                                            className="relative z-10 block w-fit max-w-full truncate text-xs text-gray-600 hover:text-indigo-600 hover:underline dark:text-gray-400 dark:hover:text-indigo-400"
+                                                        >
+                                                            {item.composer}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="block truncate text-xs text-gray-600 dark:text-gray-400">
+                                                            {item.composer}
+                                                        </span>
+                                                    ))}
                                             </span>
                                             <GradeChip grade={item.grade} />
-                                        </Link>
+                                        </div>
                                         {item.removable && (
                                             <ConfirmButton
                                                 variant="ghost"

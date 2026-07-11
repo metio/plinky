@@ -602,5 +602,9 @@
   "takes_download_video": "Video opslaan",
   "takes_download_video_portrait": "Een staande video opslaan (9:16, voor Reels en Shorts)",
   "takes_video_progress": "Renderen… {percent}%",
-  "footer_follow": "Volg Plinky"
+  "footer_follow": "Volg Plinky",
+  "person_eyebrow": "Componist",
+  "person_pieces": "{count} stukken om te oefenen",
+  "person_empty": "Nog niemand met die naam in de catalogus.",
+  "meta_person_description": "De stukken van {name} op Plinky — gratis bladmuziek om in de browser te oefenen."
 }

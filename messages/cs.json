@@ -602,5 +602,9 @@
   "takes_download_video": "Uložit video",
   "takes_download_video_portrait": "Uložit video na výšku (9:16, pro Reels a Shorts)",
   "takes_video_progress": "Vykreslování… {percent}%",
-  "footer_follow": "Sledujte Plinky"
+  "footer_follow": "Sledujte Plinky",
+  "person_eyebrow": "Skladatel",
+  "person_pieces": "{count} skladeb k procvičování",
+  "person_empty": "Nikdo takový v katalogu zatím není.",
+  "meta_person_description": "Skladby {name} na Plinky — noty zdarma k procvičování v prohlížeči."
 }

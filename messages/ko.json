@@ -602,5 +602,9 @@
   "takes_download_video": "동영상 저장",
   "takes_download_video_portrait": "세로 영상 저장 (9:16, 릴스·쇼츠용)",
   "takes_video_progress": "렌더링 중… {percent}%",
-  "footer_follow": "Plinky 팔로우"
+  "footer_follow": "Plinky 팔로우",
+  "person_eyebrow": "작곡가",
+  "person_pieces": "연습할 수 있는 곡 {count}개",
+  "person_empty": "카탈로그에 아직 그 이름의 작곡가가 없습니다.",
+  "meta_person_description": "Plinky의 {name} 곡 — 브라우저에서 연습하는 무료 악보."
 }

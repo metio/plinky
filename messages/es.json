@@ -602,5 +602,9 @@
   "takes_download_video": "Guardar vídeo",
   "takes_download_video_portrait": "Guardar un vídeo vertical (9:16, para Reels y Shorts)",
   "takes_video_progress": "Generando… {percent}%",
-  "footer_follow": "Sigue a Plinky"
+  "footer_follow": "Sigue a Plinky",
+  "person_eyebrow": "Compositor",
+  "person_pieces": "{count} piezas para practicar",
+  "person_empty": "Nadie con ese nombre en el catálogo todavía.",
+  "meta_person_description": "Las piezas de {name} en Plinky — partituras gratuitas para practicar en el navegador."
 }

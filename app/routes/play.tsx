@@ -6,6 +6,8 @@ import { useSearchParams } from "react-router";
 import { Attribution } from "../components/ui/attribution";
 import { Button } from "../components/ui/button";
 import { attributionFor } from "../../core/attribution";
+import { personSlug } from "../../core/person";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { EarPiece } from "../components/features/earPiece";
@@ -99,7 +101,18 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         </div>
                         {score.composer && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {score.composer}
+                                {/* The composer's name opens their page — everything of
+                                    theirs in the catalogue, one tap away. */}
+                                {personSlug(score.composer) ? (
+                                    <Link
+                                        to={`/person/${personSlug(score.composer)}`}
+                                        className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+                                    >
+                                        {score.composer}
+                                    </Link>
+                                ) : (
+                                    score.composer
+                                )}
                             </p>
                         )}
                         <Attribution

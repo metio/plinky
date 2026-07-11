@@ -602,5 +602,9 @@
   "takes_download_video": "Enregistrer la vidéo",
   "takes_download_video_portrait": "Enregistrer une vidéo verticale (9:16, pour Reels et Shorts)",
   "takes_video_progress": "Rendu… {percent}%",
-  "footer_follow": "Suivez Plinky"
+  "footer_follow": "Suivez Plinky",
+  "person_eyebrow": "Compositeur",
+  "person_pieces": "{count} morceaux à travailler",
+  "person_empty": "Personne de ce nom dans le catalogue pour l’instant.",
+  "meta_person_description": "Les morceaux de {name} sur Plinky — partitions gratuites à travailler dans le navigateur."
 }

@@ -602,5 +602,9 @@
   "takes_download_video": "Save video",
   "takes_download_video_portrait": "Save a portrait video (9:16, for Reels and Shorts)",
   "takes_video_progress": "Rendering… {percent}%",
-  "footer_follow": "Follow Plinky"
+  "footer_follow": "Follow Plinky",
+  "person_eyebrow": "Composer",
+  "person_pieces": "{count} pieces to practise",
+  "person_empty": "Nobody by that name in the catalogue yet.",
+  "meta_person_description": "{name}’s pieces on Plinky — free sheet music to practise in your browser."
 }

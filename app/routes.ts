@@ -21,5 +21,6 @@ export default [
         route("settings", "routes/settings.tsx"),
         route("help", "routes/help.tsx"),
         route("board", "routes/board.tsx"),
+        route("person/:slug", "routes/person.tsx"),
     ]),
 ] satisfies RouteConfig;

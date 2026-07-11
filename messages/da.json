@@ -602,5 +602,9 @@
   "takes_download_video": "Gem video",
   "takes_download_video_portrait": "Gem en lodret video (9:16, til Reels og Shorts)",
   "takes_video_progress": "Gengiver… {percent}%",
-  "footer_follow": "Følg Plinky"
+  "footer_follow": "Følg Plinky",
+  "person_eyebrow": "Komponist",
+  "person_pieces": "{count} stykker at øve",
+  "person_empty": "Ingen med det navn i kataloget endnu.",
+  "meta_person_description": "{name}s stykker på Plinky — gratis noder at øve i browseren."
 }

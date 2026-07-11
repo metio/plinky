@@ -322,6 +322,14 @@ image and link URLs are shown, and an unreachable source simply shows an empty
 board — the page never breaks. It reuses the news banner's
 `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
 
+## Composer pages
+
+Every composer credited in the catalogue gets a page at `/person/<name>` —
+all of their pieces in one place, easiest first, each one tap from being
+practised. The composer's name on a play page links there. Spelling variants
+across the source corpora ("J.S. Bach", "Johann Sebastian Bach (1685 - 1750)")
+are canonicalized so one composer owns one page.
+
 ## Follow Plinky
 
 Every page ends with a slim footer linking to Plinky's own channels —

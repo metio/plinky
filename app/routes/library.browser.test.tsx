@@ -127,16 +127,17 @@ describe("Library", () => {
         saveUserScore(browserStore, buildScore(domXmlCodec, LONG_TITLE_XML, []));
         renderLibrary();
         const title = await screen.findByText(LONG_TITLE);
-        // The title clips with an ellipsis…
+        // The title link clips with an ellipsis…
         expect(title.className).toContain("truncate");
-        // …which only takes effect if every flex ancestor up to the row link is allowed
-        // to shrink below its content. Without min-w-0 on the link, an unbreakable title
-        // pushes the row — and the fixed bottom nav — past the viewport edge.
-        const titleBlock = title.parentElement as HTMLElement;
-        expect(titleBlock.className).toContain("min-w-0");
-        const row = title.closest("a") as HTMLElement;
-        expect(row.className).toContain("min-w-0");
-        expect(row.className).toContain("flex-1");
+        // …which only takes effect if every flex ancestor up to the row card is allowed
+        // to shrink below its content. Without min-w-0 on the column and the card, an
+        // unbreakable title pushes the row — and the fixed bottom nav — past the
+        // viewport edge.
+        const column = title.parentElement as HTMLElement;
+        expect(column.className).toContain("min-w-0");
+        const card = title.closest("div") as HTMLElement;
+        expect(card.className).toContain("min-w-0");
+        expect(card.className).toContain("flex-1");
     });
 
     it("filters to only the pieces due for review", async () => {
