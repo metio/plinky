@@ -63,9 +63,9 @@ const themeStore = createThemeStore(browserStore);
 const THEME_INIT_SCRIPT = themeBootstrapScript();
 
 export const links: Route.LinksFunction = () => [
-    { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
+    { rel: "icon", href: "/icon-192.png", type: "image/png" },
     { rel: "manifest", href: "/manifest.webmanifest" },
-    { rel: "apple-touch-icon", href: "/logo.svg" },
+    { rel: "apple-touch-icon", href: "/icon-180.png" },
     // Preload the Latin variable font so text paints in Inter without a swap;
     // the href is the same hashed asset the bundled @font-face resolves to. Only
     // for locales whose text actually comes from this subset (see above).
@@ -89,8 +89,22 @@ function Header() {
         <header className="border-b border-gray-200 px-6 py-3 font-sans dark:border-gray-800">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Link to="/" aria-label="Plinky home">
-                        <img src="/logo-horizontal.svg" alt="Plinky" className="h-8" />
+                    {/* The wordmark is text (it follows the theme for free); its i is the
+                        dotless ı with a pink dot drawn above, echoing the app icon's
+                        accent. Decorative only — the link carries the accessible name. */}
+                    <Link to="/" aria-label="Plinky home" className="flex items-center gap-2">
+                        <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-md" />
+                        <span
+                            aria-hidden="true"
+                            className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
+                        >
+                            Pl
+                            <span className="relative">
+                                ı
+                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-fuchsia-400" />
+                            </span>
+                            nky
+                        </span>
                     </Link>
                     <GradeBadge />
                 </div>

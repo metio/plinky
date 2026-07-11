@@ -103,10 +103,10 @@ precedence = "override"
 SPDX-FileCopyrightText = "PDMX contributors"
 SPDX-License-Identifier = "CC0-1.0"
 
-# Generated logo art, the binary favicon, and the social-card image: declared
-# here so the asset files stay untouched.
+# Generated logo art, the app-icon renders, the binary favicon, and the
+# social-card image: declared here so the asset files stay untouched.
 [[annotations]]
-path = ["public/favicon.ico", "public/*.svg", "public/og.png"]
+path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"

@@ -4,10 +4,7 @@ SPDX-License-Identifier: 0BSD
 -->
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="public/logo-horizontal-dark.svg">
-    <img alt="Plinky" src="public/logo-horizontal.svg" width="360">
-  </picture>
+  <img alt="Plinky" src="public/icon-banner-512.png" width="220">
 </p>
 
 <p align="center">A beginner-friendly piano trainer that turns practice into a game.</p>
