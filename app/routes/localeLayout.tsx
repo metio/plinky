@@ -50,7 +50,13 @@ export default function LocaleLayout() {
         <>
             {/* Room for the fixed mobile tab bar so it never covers the last of a page. */}
             <div className="pb-20 md:pb-0">
-                <Outlet />
+                {/* The page area holds at least a viewport, so the footer paints below
+                    the fold and client-side content never shoves it down mid-view — a
+                    footer that enters the first paint high on an empty page and then
+                    jumps is a cumulative-layout-shift the perf gate rejects. */}
+                <div className="min-h-svh">
+                    <Outlet />
+                </div>
                 <SiteFooter />
             </div>
             <BottomNav />
