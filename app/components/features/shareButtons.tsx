@@ -4,11 +4,14 @@
 import { useEffect, useState } from "react";
 import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
+import { SITE_URL } from "../../../core/site";
 import { type Brand, BrandIcon } from "../ui/brandIcons";
 
 // The platforms offered as one-tap links, each opening its share composer with the
-// text prefilled. Instagram and TikTok have no such web link — they are reached
-// through the system share sheet behind the Share button instead.
+// text prefilled. Facebook's composer takes a URL (plus the text as a quote) rather
+// than free text; Instagram and TikTok have no web composer at all — Instagram is
+// offered as an image share (the card PNG through the system share sheet, where the
+// app appears), and TikTok stays behind the generic Share button.
 const SHARE_TARGETS: { brand: Brand; label: string; href: (text: string) => string }[] = [
     { brand: "x", label: "X", href: (t) => `https://x.com/intent/post?text=${t}` },
     {
@@ -22,6 +25,12 @@ const SHARE_TARGETS: { brand: Brand; label: string; href: (text: string) => stri
         href: (t) => `https://www.threads.net/intent/post?text=${t}`,
     },
     { brand: "whatsapp", label: "WhatsApp", href: (t) => `https://wa.me/?text=${t}` },
+    {
+        brand: "facebook",
+        label: "Facebook",
+        href: (t) =>
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${t}`,
+    },
 ];
 
 const LINK =
@@ -127,6 +136,23 @@ export function ShareButtons({
                     <BrandIcon brand={target.brand} />
                 </a>
             ))}
+            <button
+                type="button"
+                // Instagram has no web composer, but it's an image platform and the
+                // card is an image: hand the PNG to the system share sheet (where
+                // Instagram appears), or save it and open Instagram to post there.
+                onClick={() => {
+                    if (!canShareFiles) {
+                        window.open("https://www.instagram.com/", "_blank", "noreferrer");
+                    }
+                    saveImage(imageSvg, imageText).catch(() => {});
+                }}
+                aria-label={m.share_on({ platform: "Instagram" })}
+                title={m.share_on({ platform: "Instagram" })}
+                className={`${LINK} inline-flex items-center`}
+            >
+                <BrandIcon brand="instagram" />
+            </button>
         </div>
     );
 }
