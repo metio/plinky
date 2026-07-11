@@ -16,6 +16,10 @@ carolan = "carolan"
 weill = "weill"
 # "ND" is the NoDerivatives token in SPDX licence codes (CC-BY-ND-4.0), not "AND".
 nd = "nd"
+# "anonymus" is a real corpus spelling of an unnamed composer that the person-page
+# canonicalization must recognize — the alias's whole job is mapping it to
+# "Anonymous".
+anonymus = "anonymus"
 
 # The translation catalogs and the song catalogue are intentionally in many
 # languages, and the imported PDMX manifest holds real-world titles/composers plus
