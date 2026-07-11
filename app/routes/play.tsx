@@ -10,18 +10,16 @@ import { personSlug } from "../../core/person";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
-import { EarPiece } from "../components/features/earPiece";
 import { ExerciseForms } from "../components/features/exerciseForms";
 import { ExportButton } from "../components/features/exportButton";
 import { BacklogButton } from "../components/features/backlogButton";
 import { MarkLearnedButton } from "../components/features/markLearnedButton";
-import { PieceFingering } from "../components/features/pieceFingering";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
 import { PrintButton } from "../components/features/printButton";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { TransposeProvider } from "../components/features/transposeContext";
-import { useOnboardingStore } from "../contexts/services";
+import { useOnboardingStore, usePrefsStore } from "../contexts/services";
 import { useScore } from "../hooks/useScore";
 // meta() runs outside the React tree (the router calls it statically), so it
 // cannot receive injected services — the real adapter is wired here directly,
@@ -54,6 +52,7 @@ export function meta({ params }: Route.MetaArgs) {
 
 export default function PlayRoute({ params }: Route.ComponentProps) {
     const onboarding = useOnboardingStore();
+    const prefsStore = usePrefsStore();
     // Resolves a tick after paint: undefined while loading, null when there is no
     // such score, "unavailable" when a fetch failed — a retry bumps `attempt`
     // to ask again (a failed fetch is never cached).
@@ -65,18 +64,20 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // Export buttons, so all three render in the same key.
     const [transpose, setTranspose] = useState(0);
 
-    // A ?mode=ear|fingering link (from the discovery checklist) opens straight into
-    // that drill. Applied after mount rather than as the initial state so it doesn't
-    // diverge from the prerendered "play" markup, and it marks the matching discovery
-    // step the same way switching with the mode bar does.
+    // The drills live inside Practice now, but the discovery checklist's old
+    // ?mode=ear|fingering deep links keep working: an ear link switches the
+    // hidden-notes practice pref on, and both mark their discovery step — the
+    // page stays on the score, where the drill actually happens.
     const [searchParams] = useSearchParams();
     useEffect(() => {
         const requested = searchParams.get("mode");
-        if (requested === "ear" || requested === "fingering") {
-            setMode(requested);
-            onboarding.markDiscovered(requested === "ear" ? "earTried" : "fingeringTried");
+        if (requested === "ear") {
+            prefsStore.save({ ...prefsStore.load(), hiddenNotes: true });
+            onboarding.markDiscovered("earTried");
+        } else if (requested === "fingering") {
+            onboarding.markDiscovered("fingeringTried");
         }
-    }, [searchParams, onboarding]);
+    }, [searchParams, onboarding, prefsStore]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -149,8 +150,6 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             onShowScore={() => setMode("play")}
                         />
                     </Show>
-                    {mode === "ear" && <EarPiece xml={score.xml} />}
-                    {mode === "fingering" && <PieceFingering id={score.id} xml={score.xml} />}
                 </TransposeProvider>
             )}
             <Show when={score === null}>

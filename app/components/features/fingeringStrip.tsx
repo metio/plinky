@@ -12,13 +12,34 @@ import { useFingeringStore, usePrefsStore, useXmlCodec } from "../../contexts/se
 import { clearBarHeat, paintBarHeat } from "../../lib/scoreColor";
 import { m } from "../../paraglide/messages.js";
 import { type FingerMap, fingerKey } from "../../stores/fingeringStore";
-import {
-    HAND_BUTTON,
-    NEUTRAL,
-    QUALITY_STYLE,
-    QUALITY_SYMBOL,
-    QUALITY_TEXT,
-} from "./fingeringTrainer";
+
+import type { FingerQuality } from "../../../core/fingeringScore";
+
+// Gentle per-position colours for the live feedback — informative, never
+// alarming — each paired with a glyph so the verdict doesn't rely on colour
+// alone (readable to a colour-blind player, and a label for assistive tech).
+const QUALITY_STYLE: Record<FingerQuality, string> = {
+    good: "border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-950/40",
+    ok: "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40",
+    bad: "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40",
+};
+const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string }> = {
+    good: { glyph: "✓", label: () => m.fingering_quality_good() },
+    ok: { glyph: "≈", label: () => m.fingering_quality_ok() },
+    bad: { glyph: "!", label: () => m.fingering_quality_bad() },
+};
+const QUALITY_TEXT: Record<FingerQuality, string> = {
+    good: "text-green-700 dark:text-green-300",
+    ok: "text-amber-700 dark:text-amber-300",
+    bad: "text-red-700 dark:text-red-300",
+};
+const NEUTRAL = "border-gray-200 dark:border-gray-800";
+
+// The hand-toggle button style.
+const HAND_BUTTON = (selected: boolean) =>
+    selected
+        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
+        : "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300";
 
 // Two bars at a time, the same window the Finger Position tab works in.
 const WINDOW = 2;

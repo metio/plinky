@@ -4,8 +4,6 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { browserStore } from "../../adapters/browserStore";
-import { createOnboardingStore } from "../../stores/onboardingStore";
 import { PlayModeBar } from "./playModeBar";
 
 afterEach(() => {
@@ -21,25 +19,16 @@ describe("PlayModeBar", () => {
         expect(screen.getByRole("tab", { name: "Play" }).getAttribute("aria-selected")).toBe(
             "true",
         );
-        expect(screen.getByRole("tab", { name: "Ear" }).getAttribute("aria-selected")).toBe(
+        expect(screen.getByRole("tab", { name: "Runs" }).getAttribute("aria-selected")).toBe(
             "false",
         );
 
-        fireEvent.click(screen.getByRole("tab", { name: "Finger Position" }));
-        expect(onChange).toHaveBeenCalledWith("fingering");
+        fireEvent.click(screen.getByRole("tab", { name: "Runs" }));
+        expect(onChange).toHaveBeenCalledWith("runs");
     });
 
-    it("records reaching Ear and Fingering for the discovery checklist", () => {
-        // The bar renders on the default services (real browser storage in jsdom), so
-        // a fresh store over the same backing reads what the clicks marked.
-        const marked = () => createOnboardingStore(browserStore).marked();
+    it("offers exactly the two tabs — the drills live inside Practice now", () => {
         render(<PlayModeBar mode="play" onChange={vi.fn()} />);
-        expect(marked().has("earTried")).toBe(false);
-
-        fireEvent.click(screen.getByRole("tab", { name: "Ear" }));
-        expect(marked().has("earTried")).toBe(true);
-
-        fireEvent.click(screen.getByRole("tab", { name: "Finger Position" }));
-        expect(marked().has("fingeringTried")).toBe(true);
+        expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual(["Play", "Runs"]);
     });
 });

@@ -42,9 +42,9 @@ export const FirstVisit: Story = {
     },
 };
 
-export const EarMode: Story = {
+export const RunsMode: Story = {
     render: function Render() {
-        return <Harness initial="ear" seenHints={[]} />;
+        return <Harness initial="runs" seenHints={[]} />;
     },
 };
 

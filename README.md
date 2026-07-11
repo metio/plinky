@@ -121,14 +121,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   again. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
   a staff to share or export (see below).
-- **Any piece, three ways** — open a score and a tab bar switches how you work it:
-  **Play** (read, hear, and practise it), **Ear** (hear a two-bar phrase and play it
-  back), or **Finger Position** (choose the finger positions for a two-bar window; each
-  note lights **green/amber/red** as you go — with a symbol too, so it reads without
-  colour, and you can fade it off — to show how the move flows, it's scored against the
-  most economical finger positions for your hand, the two bars you're on are
-  **highlighted in the full piece** so you keep your place, and it's **saved per piece**
-  so the positions you work out are there when you come back).
+- **Two tabs per piece** — **Play** holds the score and everything you do with it:
+  reading, listening, practising, ear training (the **Hidden notes** toggle) and the
+  **fingering editor** in full screen (see above), so the drills happen on the real
+  music instead of in separate tabs. **Runs** keeps your saved performances.
 - **Your runs** — every play page has a **Runs** tab (and a button beside Practice
   that jumps to it) giving your saved performances the whole page, so the feature is
   there to find before you've saved a thing: with nothing yet, it tells you how to make a run (play a piece through, then save

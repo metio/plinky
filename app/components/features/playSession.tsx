@@ -28,7 +28,12 @@ import { compositionFromRun, type RunStep, type Take } from "../../../core/takes
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
-import { useHintsStore, useServices, useXmlCodec } from "../../contexts/services";
+import {
+    useHintsStore,
+    useOnboardingStore,
+    useServices,
+    useXmlCodec,
+} from "../../contexts/services";
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useGhostRace } from "../../hooks/useGhostRace";
 import { useKeepUp } from "../../hooks/useKeepUp";
@@ -185,7 +190,15 @@ function usePlaySessionValue({
     const [hideKeyboard, setHideKeyboard] = useState(false);
     // The fullscreen fingering editor: swaps the on-screen keyboard for the
     // fingering strip and washes the score with the difficulty heat-map.
-    const [fingerStrip, setFingerStrip] = useState(false);
+    const [fingerStrip, setFingerStripState] = useState(false);
+    // Opening the fingering editor ticks its discovery step — the strip is the
+    // fingering drill's home now that its tab is gone.
+    const setFingerStrip: typeof setFingerStripState = (value) => {
+        if (value === true || (typeof value === "function" && value(fingerStrip))) {
+            onboarding.markDiscovered("fingeringTried");
+        }
+        setFingerStripState(value);
+    };
     // Whether the Practice-tools drawer (all the play settings) is open.
     const [toolsOpen, setToolsOpen] = useState(false);
     // Whether the Runs drawer (your saved performances of this piece) is open.
@@ -308,7 +321,16 @@ function usePlaySessionValue({
     const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
     // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
     // found, red once the tries budget is spent. Persisted like the other play prefs.
-    const [hiddenNotes, setHiddenNotes] = usePref(prefsStore, "hiddenNotes");
+    const onboarding = useOnboardingStore();
+    const [hiddenNotes, setHiddenNotesPref] = usePref(prefsStore, "hiddenNotes");
+    // Turning the ear drill on ticks its discovery step — the toggle IS the
+    // feature now that the Ear tab is gone.
+    const setHiddenNotes = (value: boolean) => {
+        if (value) {
+            onboarding.markDiscovered("earTried");
+        }
+        setHiddenNotesPref(value);
+    };
     const [revealTries, setRevealTries] = usePref(prefsStore, "revealTries");
     const hidden = useHiddenNotes(getOsmd, {
         enabled: hiddenNotes,
