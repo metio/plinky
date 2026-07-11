@@ -600,5 +600,6 @@
   "discover_jump_in": "Ξεκίνα αμέσως",
   "today_assignment": "Συνέχισε το «{name}» — βήμα {step} από {total}",
   "takes_download_video": "Αποθήκευση βίντεο",
+  "takes_download_video_portrait": "Αποθήκευση κάθετου βίντεο (9:16, για Reels και Shorts)",
   "takes_video_progress": "Απόδοση… {percent}%"
 }

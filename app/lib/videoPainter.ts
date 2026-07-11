@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { RecordedNote } from "../../core/composition";
-import { frameAt, pressGlow } from "../../core/videoFrames";
+import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";
 import {
     playedStepCount,
     type SceneKey,
@@ -10,6 +10,7 @@ import {
     sceneRange,
     type ScoreBox,
     scoreWindowTop,
+    stepCenterAt,
 } from "../../core/videoScene";
 
 // Paints one frame of the exported video: a dark stage with the piece's title,
@@ -94,6 +95,9 @@ export function takeScenePainter({
     const keyboardTop = score ? height * 0.66 : height * 0.42;
     const keyboardHeight = score ? height * 0.24 : height * 0.4;
     const margin = Math.round(width * 0.05);
+    // Portrait frames are taller than wide; type scales by the smaller side so
+    // titles stay titles instead of billboards.
+    const unit = Math.min(width, height);
     // The run's distinct onsets in playing order — step i of the snapshot sounded
     // at onsets[i], mirroring how the matcher and the take both count steps.
     const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
@@ -120,11 +124,11 @@ export function takeScenePainter({
         context.textAlign = "left";
         context.textBaseline = "top";
         context.fillStyle = INK;
-        context.font = `600 ${Math.round(height * 0.06)}px Inter, system-ui, sans-serif`;
+        context.font = `600 ${Math.round(unit * 0.06)}px Inter, system-ui, sans-serif`;
         context.fillText(title, margin, height * 0.08);
         context.textAlign = "right";
         context.fillStyle = MUTED;
-        context.font = `500 ${Math.round(height * 0.035)}px Inter, system-ui, sans-serif`;
+        context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
         context.fillText("plinky.fun", width - margin, height * 0.09);
 
         // The progress rail between title and keys.
@@ -135,7 +139,7 @@ export function takeScenePainter({
         context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
 
         if (score) {
-            drawScore(context, score, frame.currentOnsetMs);
+            drawScore(context, score, frame.currentOnsetMs, timeMs);
         }
 
         // White keys first so the black keys straddle on top; sounding keys lit
@@ -162,14 +166,19 @@ export function takeScenePainter({
         context.textAlign = "left";
         context.textBaseline = "alphabetic";
         context.fillStyle = MUTED;
-        context.font = `400 ${Math.round(height * 0.032)}px Inter, system-ui, sans-serif`;
+        context.font = `400 ${Math.round(unit * 0.032)}px Inter, system-ui, sans-serif`;
         context.fillText(credit, margin, height * 0.95);
     };
 
     // The notation panel: a light card holding a window of the score image that
     // follows the current step down the page, with every played step's noteheads
     // tinted in the accent — the sheet-music twin of the lit keys below it.
-    function drawScore(context: Context2D, sheet: SceneScore, currentOnsetMs: number | null) {
+    function drawScore(
+        context: Context2D,
+        sheet: SceneScore,
+        currentOnsetMs: number | null,
+        timeMs: number,
+    ) {
         const panelX = margin;
         const panelY = height * 0.3;
         const panelW = width - margin * 2;
@@ -177,8 +186,12 @@ export function takeScenePainter({
         const scale = panelW / sheet.width;
         const windowH = panelH / scale;
         const played = playedStepCount(onsets, currentOnsetMs);
-        const currentBox = sheet.steps[Math.max(0, played - 1)]?.[0];
-        const centerY = currentBox ? currentBox.y + currentBox.height / 2 : 0;
+        // The window glides between step centres with the music, never jumping.
+        const centers = sheet.steps.map((group) => {
+            const box = group[0];
+            return box ? box.y + box.height / 2 : 0;
+        });
+        const centerY = stepCenterAt(onsets, centers, timeMs - LEAD_IN_MS);
         const top = scoreWindowTop(centerY, windowH, sheet.height);
 
         context.save();

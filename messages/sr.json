@@ -600,5 +600,6 @@
   "discover_jump_in": "Одмах почни",
   "today_assignment": "Настави „{name}“ — корак {step} од {total}",
   "takes_download_video": "Сачувај видео",
+  "takes_download_video_portrait": "Сачувај усправни видео (9:16, за Reels и Shorts)",
   "takes_video_progress": "Исцртавање… {percent}%"
 }

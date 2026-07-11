@@ -9,6 +9,7 @@ import {
     sceneKeys,
     sceneRange,
     scoreWindowTop,
+    stepCenterAt,
 } from "./videoScene";
 
 describe("sceneRange", () => {
@@ -81,5 +82,16 @@ describe("playedStepCount", () => {
         expect(playedStepCount([0, 500, 1000], 0)).toBe(1);
         expect(playedStepCount([0, 500, 1000], 700)).toBe(2);
         expect(playedStepCount([0, 500, 1000], 1000)).toBe(3);
+    });
+});
+
+describe("stepCenterAt", () => {
+    it("glides between step centres and clamps at the ends", () => {
+        const onsets = [0, 1000];
+        const centers = [100, 300];
+        expect(stepCenterAt(onsets, centers, -50)).toBe(100);
+        expect(stepCenterAt(onsets, centers, 500)).toBe(200);
+        expect(stepCenterAt(onsets, centers, 2000)).toBe(300);
+        expect(stepCenterAt([], [], 0)).toBe(0);
     });
 });

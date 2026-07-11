@@ -600,5 +600,6 @@
   "discover_jump_in": "Сразу к делу",
   "today_assignment": "Продолжить «{name}» — шаг {step} из {total}",
   "takes_download_video": "Сохранить видео",
+  "takes_download_video_portrait": "Сохранить вертикальное видео (9:16, для Reels и Shorts)",
   "takes_video_progress": "Рендеринг… {percent}%"
 }

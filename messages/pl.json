@@ -600,5 +600,6 @@
   "discover_jump_in": "Zacznij od razu",
   "today_assignment": "Kontynuuj „{name}” — krok {step} z {total}",
   "takes_download_video": "Zapisz wideo",
+  "takes_download_video_portrait": "Zapisz pionowe wideo (9:16, do Reels i Shorts)",
   "takes_video_progress": "Renderowanie… {percent}%"
 }

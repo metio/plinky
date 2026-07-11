@@ -110,3 +110,25 @@ export const ScoreMidPiece: Story = {
 export const ScoreLeadIn: Story = {
     render: () => <ScoreFrame timeMs={0} />,
 };
+
+// The 9:16 portrait frame for the vertical feeds, mid-piece with the score.
+export const ScorePortrait: Story = {
+    render: () => <PortraitFrame />,
+};
+
+function PortraitFrame() {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+        const context = canvasRef.current?.getContext("2d");
+        if (context) {
+            const sheet = fakeSheet();
+            takeScenePainter({
+                ...TAKE,
+                width: 360,
+                height: 640,
+                score: { image: sheet.image, width: 1200, height: 260, steps: sheet.steps },
+            })(context, LEAD_IN_MS + 440);
+        }
+    }, []);
+    return <canvas ref={canvasRef} width={360} height={640} />;
+}

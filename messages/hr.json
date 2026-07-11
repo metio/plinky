@@ -600,5 +600,6 @@
   "discover_jump_in": "Odmah počni",
   "today_assignment": "Nastavi “{name}” — korak {step} od {total}",
   "takes_download_video": "Spremi video",
+  "takes_download_video_portrait": "Spremi uspravni video (9:16, za Reels i Shorts)",
   "takes_video_progress": "Iscrtavanje… {percent}%"
 }

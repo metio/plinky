@@ -600,5 +600,6 @@
   "discover_jump_in": "Vágj bele",
   "today_assignment": "Folytasd: „{name}” — {step}/{total}. lépés",
   "takes_download_video": "Videó mentése",
+  "takes_download_video_portrait": "Álló videó mentése (9:16, Reels és Shorts számára)",
   "takes_video_progress": "Renderelés… {percent}%"
 }

@@ -600,5 +600,6 @@
   "discover_jump_in": "立即上手",
   "today_assignment": "继续《{name}》——第 {step}/{total} 步",
   "takes_download_video": "保存视频",
+  "takes_download_video_portrait": "保存竖屏视频（9:16，适用于 Reels 和 Shorts）",
   "takes_video_progress": "正在渲染… {percent}%"
 }

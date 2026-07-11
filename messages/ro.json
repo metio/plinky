@@ -600,5 +600,6 @@
   "discover_jump_in": "Începe imediat",
   "today_assignment": "Continuă „{name}” — pasul {step} din {total}",
   "takes_download_video": "Salvează videoclipul",
+  "takes_download_video_portrait": "Salvează un video vertical (9:16, pentru Reels și Shorts)",
   "takes_video_progress": "Se redă… {percent}%"
 }

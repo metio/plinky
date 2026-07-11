@@ -12,6 +12,7 @@ import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 
 // 720p at 30fps: crisp enough for any feed, small enough to render in seconds.
+// Portrait swaps the axes for the 9:16 feeds (Reels, Shorts, TikTok).
 const WIDTH = 1280;
 const HEIGHT = 720;
 const FPS = 30;
@@ -49,7 +50,7 @@ export function ExportVideoButton({
         return null;
     }
 
-    const save = async () => {
+    const save = async (width: number, height: number) => {
         setProgress(0);
         try {
             const notes = take.composition.notes;
@@ -60,8 +61,8 @@ export function ExportVideoButton({
             const score = await buildScoreSnapshot(take);
             const blob = await exporter.export(
                 {
-                    width: WIDTH,
-                    height: HEIGHT,
+                    width,
+                    height,
                     fps: FPS,
                     durationMs,
                     paint: takeScenePainter({
@@ -69,8 +70,8 @@ export function ExportVideoButton({
                         credit,
                         notes,
                         durationMs,
-                        width: WIDTH,
-                        height: HEIGHT,
+                        width,
+                        height,
                         score,
                     }),
                     notes,
@@ -84,10 +85,24 @@ export function ExportVideoButton({
     };
 
     return (
-        <Button variant="ghost" onClick={save} disabled={progress !== null}>
-            {progress === null
-                ? m.takes_download_video()
-                : m.takes_video_progress({ percent: Math.round(progress * 100) })}
-        </Button>
+        <>
+            <Button
+                variant="ghost"
+                onClick={() => save(WIDTH, HEIGHT)}
+                disabled={progress !== null}
+            >
+                {progress === null
+                    ? m.takes_download_video()
+                    : m.takes_video_progress({ percent: Math.round(progress * 100) })}
+            </Button>
+            <Button
+                variant="ghost"
+                onClick={() => save(HEIGHT, WIDTH)}
+                disabled={progress !== null}
+                aria-label={m.takes_download_video_portrait()}
+            >
+                9:16
+            </Button>
+        </>
     );
 }

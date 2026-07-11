@@ -600,5 +600,6 @@
   "discover_jump_in": "Lancez-vous",
   "today_assignment": "Continuez « {name} » — étape {step} sur {total}",
   "takes_download_video": "Enregistrer la vidéo",
+  "takes_download_video_portrait": "Enregistrer une vidéo verticale (9:16, pour Reels et Shorts)",
   "takes_video_progress": "Rendu… {percent}%"
 }

@@ -115,3 +115,31 @@ export function playedStepCount(onsets: readonly number[], currentOnsetMs: numbe
     }
     return count;
 }
+
+// Where the score window should centre at time t (notes clock): gliding from the
+// current step's centre toward the next step's as its onset approaches, so the
+// sheet scrolls smoothly instead of jumping per note. Clamps to the first and
+// last steps outside the run.
+export function stepCenterAt(
+    onsets: readonly number[],
+    centers: readonly number[],
+    tMs: number,
+): number {
+    if (centers.length === 0) {
+        return 0;
+    }
+    if (tMs <= (onsets[0] ?? 0)) {
+        return centers[0] ?? 0;
+    }
+    for (let index = 0; index < onsets.length - 1; index++) {
+        const a = onsets[index] ?? 0;
+        const b = onsets[index + 1] ?? a;
+        if (tMs < b) {
+            const from = centers[index] ?? 0;
+            const to = centers[Math.min(index + 1, centers.length - 1)] ?? from;
+            const progress = b > a ? (tMs - a) / (b - a) : 1;
+            return from + (to - from) * progress;
+        }
+    }
+    return centers[centers.length - 1] ?? 0;
+}
