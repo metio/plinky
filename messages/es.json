@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Notas ocultas",
   "hidden_notes_hint": "Practica de oído: las notas empiezan ocultas y se revelan al encontrarlas — verdes si aciertas, rojas cuando se agotan los intentos. Escucha primero y luego toca lo que oíste.",
   "reveal_tries": "Intentos",
-  "reveal_tries_caption": "Cuántos intentos fallidos permite una nota oculta antes de revelarse en rojo."
+  "reveal_tries_caption": "Cuántos intentos fallidos permite una nota oculta antes de revelarse en rojo.",
+  "action_fingering_editor": "Digitación",
+  "fingering_heat_legend": "Los compases sombreados son más difíciles de digitar — cuanto más rojo, más complicado el pasaje."
 }

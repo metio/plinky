@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Hidden notes",
   "hidden_notes_hint": "Practise by ear: the notes start hidden and reveal as you find them — green when you get one, red when your tries run out. Listen first, then play back what you heard.",
   "reveal_tries": "Tries",
-  "reveal_tries_caption": "Wrong attempts a hidden note allows before it reveals itself in red."
+  "reveal_tries_caption": "Wrong attempts a hidden note allows before it reveals itself in red.",
+  "action_fingering_editor": "Finger positions",
+  "fingering_heat_legend": "Shaded bars are harder to finger — the deeper the red, the trickier the passage."
 }

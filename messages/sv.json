@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Dolda noter",
   "hidden_notes_hint": "Öva på gehör: noterna börjar dolda och avslöjas när du hittar dem — grönt när du prickar rätt, rött när försöken tar slut. Lyssna först, spela sedan det du hörde.",
   "reveal_tries": "Försök",
-  "reveal_tries_caption": "Hur många felförsök en dold not tillåter innan den avslöjas i rött."
+  "reveal_tries_caption": "Hur många felförsök en dold not tillåter innan den avslöjas i rött.",
+  "action_fingering_editor": "Fingersättning",
+  "fingering_heat_legend": "Skuggade takter är svårare att spela — ju djupare rött, desto knepigare passage."
 }

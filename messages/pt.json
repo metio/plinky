@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Notas ocultas",
   "hidden_notes_hint": "Pratique de ouvido: as notas começam ocultas e revelam-se quando você as encontra — verdes ao acertar, vermelhas quando as tentativas acabam. Ouça primeiro, depois toque o que ouviu.",
   "reveal_tries": "Tentativas",
-  "reveal_tries_caption": "Quantas tentativas erradas uma nota oculta permite antes de se revelar em vermelho."
+  "reveal_tries_caption": "Quantas tentativas erradas uma nota oculta permite antes de se revelar em vermelho.",
+  "action_fingering_editor": "Dedilhado",
+  "fingering_heat_legend": "Os compassos sombreados são mais difíceis de dedilhar — quanto mais forte o vermelho, mais complicada a passagem."
 }

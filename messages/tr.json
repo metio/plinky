@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Gizli notalar",
   "hidden_notes_hint": "Kulaktan çalış: notalar başta gizlidir ve buldukça ortaya çıkar — doğruysa yeşil, hakların bitince kırmızı. Önce dinle, sonra duyduğunu çal.",
   "reveal_tries": "Deneme",
-  "reveal_tries_caption": "Gizli bir notanın kırmızı olarak ortaya çıkmadan önce izin verdiği yanlış deneme sayısı."
+  "reveal_tries_caption": "Gizli bir notanın kırmızı olarak ortaya çıkmadan önce izin verdiği yanlış deneme sayısı.",
+  "action_fingering_editor": "Parmak dizilimi",
+  "fingering_heat_legend": "Gölgeli ölçüler daha zor çalınır — kırmızı ne kadar koyuysa pasaj o kadar çetindir."
 }

@@ -6,6 +6,7 @@ import { Button, IconButton } from "../ui/button";
 import {
     CloseIcon,
     EyeIcon,
+    FingersIcon,
     HandIcon,
     ListIcon,
     PlayIcon,
@@ -36,6 +37,8 @@ export function PlayTransport() {
         getOsmd,
         reading,
         hideKeyboard,
+        fingerStrip,
+        setFingerStrip,
         setHideKeyboard,
         setToolsOpen,
         setRunsOpen,
@@ -166,6 +169,17 @@ export function PlayTransport() {
                     the rest — reachable without leaving full screen. */}
                     <IconButton onClick={() => setToolsOpen(true)} label={m.more_options()}>
                         <SlidersIcon />
+                    </IconButton>
+                    {/* Swap the keyboard area for the fingering editor: work out (or
+                    fine-tune) the fingers for the piece with the difficulty heat-map
+                    washed over the score. */}
+                    <IconButton
+                        onClick={() => setFingerStrip((on: boolean) => !on)}
+                        aria-pressed={fingerStrip}
+                        label={m.action_fingering_editor()}
+                        className={fingerStrip ? "text-indigo-600 dark:text-indigo-400" : ""}
+                    >
+                        <FingersIcon />
                     </IconButton>
                     <Button
                         variant="secondary"

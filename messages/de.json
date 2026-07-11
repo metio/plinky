@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Versteckte Noten",
   "hidden_notes_hint": "Nach Gehör üben: Die Noten sind zunächst verborgen und erscheinen, sobald du sie findest — grün bei Treffer, rot wenn die Versuche aufgebraucht sind. Erst anhören, dann nachspielen.",
   "reveal_tries": "Versuche",
-  "reveal_tries_caption": "Wie viele Fehlversuche eine versteckte Note erlaubt, bevor sie sich rot zeigt."
+  "reveal_tries_caption": "Wie viele Fehlversuche eine versteckte Note erlaubt, bevor sie sich rot zeigt.",
+  "action_fingering_editor": "Fingersatz",
+  "fingering_heat_legend": "Eingefärbte Takte sind schwerer zu greifen — je tiefer das Rot, desto kniffliger die Passage."
 }

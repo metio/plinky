@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Note nascoste",
   "hidden_notes_hint": "Esercitati a orecchio: le note partono nascoste e si rivelano quando le trovi — verdi se indovini, rosse quando finisci i tentativi. Prima ascolta, poi risuona ciò che hai sentito.",
   "reveal_tries": "Tentativi",
-  "reveal_tries_caption": "Quanti tentativi sbagliati concede una nota nascosta prima di rivelarsi in rosso."
+  "reveal_tries_caption": "Quanti tentativi sbagliati concede una nota nascosta prima di rivelarsi in rosso.",
+  "action_fingering_editor": "Diteggiatura",
+  "fingering_heat_legend": "Le battute ombreggiate sono più difficili da diteggiare — più il rosso è intenso, più il passaggio è insidioso."
 }

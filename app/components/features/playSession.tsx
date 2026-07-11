@@ -174,6 +174,9 @@ function usePlaySessionValue({
     // In full screen the keyboard can be folded away, handing all the height to the
     // score — what a player on a real MIDI piano wants.
     const [hideKeyboard, setHideKeyboard] = useState(false);
+    // The fullscreen fingering editor: swaps the on-screen keyboard for the
+    // fingering strip and washes the score with the difficulty heat-map.
+    const [fingerStrip, setFingerStrip] = useState(false);
     // Whether the Practice-tools drawer (all the play settings) is open.
     const [toolsOpen, setToolsOpen] = useState(false);
     // Whether the Runs drawer (your saved performances of this piece) is open.
@@ -779,6 +782,8 @@ function usePlaySessionValue({
         exitFullscreen,
         hideKeyboard,
         setHideKeyboard,
+        fingerStrip,
+        setFingerStrip,
         toolsOpen,
         setToolsOpen,
         runsOpen,

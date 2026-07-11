@@ -65,6 +65,14 @@ the phrase first, and each note reveals itself as you find it — **green** when
 it, **red** once your tries run out (1 by default, up to 3), so the score you finish
 with is the story of what your ear caught.
 
+Right in full screen, a **finger-positions** button swaps the keyboard for a fingering
+editor: every note arrives pre-fingered with the optimal choice for your measured hand
+span, and you tap a note then one of the **ten fingers** below to override it — saved
+per piece, with the green/amber/red flow feedback always on. While it's open the score
+washes its bars red by **fingering difficulty**, a heat-map that shows at a glance
+where the piece actually gets hard — spot the deep-red bars, tap them into a loop, and
+drill exactly there.
+
 Practice is self-paced by default, but flip on **Keep up** and it becomes tempo-locked:
 after a one-bar count-in, the cursor advances on the beat whether or not you're ready, and
 any note you don't catch before it passes is a miss (Synthesia / Guitar-Hero style). The

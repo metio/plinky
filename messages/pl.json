@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Ukryte nuty",
   "hidden_notes_hint": "Ćwicz ze słuchu: nuty są początkowo ukryte i odsłaniają się, gdy je znajdziesz — na zielono przy trafieniu, na czerwono po wyczerpaniu prób. Najpierw posłuchaj, potem zagraj to, co usłyszałeś.",
   "reveal_tries": "Próby",
-  "reveal_tries_caption": "Ile błędnych prób dopuszcza ukryta nuta, zanim odsłoni się na czerwono."
+  "reveal_tries_caption": "Ile błędnych prób dopuszcza ukryta nuta, zanim odsłoni się na czerwono.",
+  "action_fingering_editor": "Palcowanie",
+  "fingering_heat_legend": "Zacieniowane takty są trudniejsze do zagrania — im głębsza czerwień, tym bardziej podchwytliwy fragment."
 }

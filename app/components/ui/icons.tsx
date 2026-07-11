@@ -337,6 +337,19 @@ export function HandIcon({ className }: IconProps) {
     );
 }
 
+// Two hands' fingertips over a keys line — the fullscreen fingering editor.
+export function FingersIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M4 14V8.5a1.2 1.2 0 0 1 2.4 0V14" />
+            <path d="M8.5 14V6.5a1.2 1.2 0 0 1 2.4 0V14" />
+            <path d="M13.1 14V6.5a1.2 1.2 0 0 1 2.4 0V14" />
+            <path d="M17.6 14V8.5a1.2 1.2 0 0 1 2.4 0V14" />
+            <path d="M3 17.5h18" />
+        </Icon>
+    );
+}
+
 // An eye — the follow-the-note (auto-scroll) toggle.
 export function EyeIcon({ className }: IconProps) {
     return (

@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "숨겨진 음표",
   "hidden_notes_hint": "귀로 연습하세요: 음표는 처음에 숨겨져 있고 찾아내면 드러납니다 — 맞히면 초록색, 시도 횟수를 다 쓰면 빨간색. 먼저 듣고, 들은 대로 연주하세요.",
   "reveal_tries": "시도 횟수",
-  "reveal_tries_caption": "숨겨진 음표가 빨간색으로 드러나기 전까지 허용되는 오답 횟수."
+  "reveal_tries_caption": "숨겨진 음표가 빨간색으로 드러나기 전까지 허용되는 오답 횟수.",
+  "action_fingering_editor": "운지법",
+  "fingering_heat_legend": "음영이 있는 마디는 운지가 더 어렵습니다 — 빨간색이 짙을수록 까다로운 부분입니다."
 }

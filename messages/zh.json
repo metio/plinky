@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "隐藏音符",
   "hidden_notes_hint": "凭耳朵练习：音符起初是隐藏的，找到后才会显现 — 弹对了变绿，次数用完变红。先听一遍，再弹出你听到的。",
   "reveal_tries": "尝试次数",
-  "reveal_tries_caption": "隐藏音符在以红色显现之前允许的弹错次数。"
+  "reveal_tries_caption": "隐藏音符在以红色显现之前允许的弹错次数。",
+  "action_fingering_editor": "指法",
+  "fingering_heat_legend": "着色的小节更难安排指法 — 红色越深，段落越棘手。"
 }

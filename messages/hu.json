@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Rejtett hangjegyek",
   "hidden_notes_hint": "Gyakorolj hallás után: a hangjegyek rejtve indulnak, és akkor tűnnek elő, amikor megtalálod őket — zölden, ha eltaláltad, pirosan, ha elfogytak a próbálkozások. Előbb hallgasd meg, majd játszd vissza.",
   "reveal_tries": "Próbák",
-  "reveal_tries_caption": "Hány téves próbálkozást enged egy rejtett hangjegy, mielőtt pirosan felfedi magát."
+  "reveal_tries_caption": "Hány téves próbálkozást enged egy rejtett hangjegy, mielőtt pirosan felfedi magát.",
+  "action_fingering_editor": "Ujjrend",
+  "fingering_heat_legend": "A színezett ütemek nehezebben játszhatók — minél mélyebb a piros, annál trükkösebb a szakasz."
 }

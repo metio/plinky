@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Verborgen noten",
   "hidden_notes_hint": "Oefen op het gehoor: de noten beginnen verborgen en verschijnen zodra je ze vindt — groen bij raak, rood als je pogingen op zijn. Luister eerst, speel dan na wat je hoorde.",
   "reveal_tries": "Pogingen",
-  "reveal_tries_caption": "Hoeveel foute pogingen een verborgen noot toestaat voordat die zich rood onthult."
+  "reveal_tries_caption": "Hoeveel foute pogingen een verborgen noot toestaat voordat die zich rood onthult.",
+  "action_fingering_editor": "Vingerzetting",
+  "fingering_heat_legend": "Gearceerde maten zijn lastiger te spelen — hoe dieper het rood, hoe lastiger de passage."
 }

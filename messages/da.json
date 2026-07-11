@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Skjulte noder",
   "hidden_notes_hint": "Øv efter gehør: noderne starter skjult og afsløres, når du finder dem — grønt når du rammer, rødt når forsøgene slipper op. Lyt først, og spil så det, du hørte.",
   "reveal_tries": "Forsøg",
-  "reveal_tries_caption": "Hvor mange forkerte forsøg en skjult node tillader, før den afsløres med rødt."
+  "reveal_tries_caption": "Hvor mange forkerte forsøg en skjult node tillader, før den afsløres med rødt.",
+  "action_fingering_editor": "Fingersætning",
+  "fingering_heat_legend": "Skraverede takter er sværere at spille — jo dybere rød, desto vanskeligere passage."
 }

@@ -1,10 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useCallback } from "react";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { GhostTrack } from "../ui/ghostTrack";
 import { CloseIcon } from "../ui/icons";
+import { FingeringStrip } from "./fingeringStrip";
 import { FocusStrip } from "./focusStrip";
 import { FullScreen, Midi, Show } from "./conditional";
 import { PianoKeyboard } from "./pianoKeyboard";
@@ -30,9 +32,22 @@ export function PlayStage() {
         dismissRotate,
         focusXml,
         hideKeyboard,
+        fingerStrip,
         keyWindow,
         hintNotes,
+        id,
+        xml,
+        staffCount,
+        containerRef,
+        score,
     } = usePlaySession();
+
+    // A stable handle to the rendered score SVG, so the strip's heat effect only
+    // repaints when the render actually changes, not on every stage re-render.
+    const getSvg = useCallback(() => {
+        const found = containerRef.current?.querySelector("svg");
+        return found instanceof SVGSVGElement ? found : null;
+    }, [containerRef]);
 
     return (
         <Show when={matcher.practicing || fullscreen}>
@@ -103,14 +118,27 @@ export function PlayStage() {
                         />
                     </Show>
                 </FullScreen>
-                <Show when={!(fullscreen && hideKeyboard)}>
-                    <PianoKeyboard
-                        expected={hintNotes}
-                        wrong={matcher.lastWrong}
-                        from={keyWindow?.from}
-                        to={keyWindow?.to}
+                {/* In fullscreen the fingering editor takes the keyboard's slot when
+                    toggled from the transport; otherwise the keys show unless hidden. */}
+                {fullscreen && fingerStrip ? (
+                    <FingeringStrip
+                        id={id}
+                        xml={xml}
+                        staffCount={staffCount}
+                        svg={getSvg}
+                        measureBoxes={score.measureBoxes}
+                        renderVersion={score.renderVersion}
                     />
-                </Show>
+                ) : (
+                    <Show when={!(fullscreen && hideKeyboard)}>
+                        <PianoKeyboard
+                            expected={hintNotes}
+                            wrong={matcher.lastWrong}
+                            from={keyWindow?.from}
+                            to={keyWindow?.to}
+                        />
+                    </Show>
+                )}
             </div>
         </Show>
     );

@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Nota të fshehura",
   "hidden_notes_hint": "Ushtrohu me vesh: notat nisin të fshehura dhe zbulohen kur i gjen — jeshile kur ia qëllon, të kuqe kur mbarojnë përpjekjet. Dëgjo në fillim, pastaj luaj atë që dëgjove.",
   "reveal_tries": "Përpjekje",
-  "reveal_tries_caption": "Sa përpjekje të gabuara lejon një notë e fshehur para se të zbulohet e kuqe."
+  "reveal_tries_caption": "Sa përpjekje të gabuara lejon një notë e fshehur para se të zbulohet e kuqe.",
+  "action_fingering_editor": "Pozicionet e gishtave",
+  "fingering_heat_legend": "Masat e hijezuara janë më të vështira për t’u luajtur — sa më e thellë e kuqja, aq më i ndërlikuar pasazhi."
 }

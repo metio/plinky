@@ -34,7 +34,7 @@ const REASON: Record<FingerReason, () => string> = {
 type Slot = { pos: number; note: number };
 
 // Gentle per-position colours for the live feedback — informative, never alarming.
-const QUALITY_STYLE: Record<FingerQuality, string> = {
+export const QUALITY_STYLE: Record<FingerQuality, string> = {
     good: "border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-950/40",
     ok: "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40",
     bad: "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40",
@@ -42,17 +42,17 @@ const QUALITY_STYLE: Record<FingerQuality, string> = {
 
 // A glyph per verdict so the feedback doesn't rely on colour alone — readable to a
 // colour-blind player, and a label for assistive tech.
-const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string }> = {
+export const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string }> = {
     good: { glyph: "✓", label: () => m.fingering_quality_good() },
     ok: { glyph: "≈", label: () => m.fingering_quality_ok() },
     bad: { glyph: "!", label: () => m.fingering_quality_bad() },
 };
-const QUALITY_TEXT: Record<FingerQuality, string> = {
+export const QUALITY_TEXT: Record<FingerQuality, string> = {
     good: "text-green-700 dark:text-green-300",
     ok: "text-amber-700 dark:text-amber-300",
     bad: "text-red-700 dark:text-red-300",
 };
-const NEUTRAL = "border-gray-200 dark:border-gray-800";
+export const NEUTRAL = "border-gray-200 dark:border-gray-800";
 
 // A self-paced grade for the fingering's smoothness, reusing the run grade's
 // letters and colours so the feedback reads like the rest of the app.

@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Notes cachées",
   "hidden_notes_hint": "Travaillez à l’oreille : les notes commencent cachées et se révèlent quand vous les trouvez — en vert si vous réussissez, en rouge quand les essais sont épuisés. Écoutez d’abord, puis rejouez ce que vous avez entendu.",
   "reveal_tries": "Essais",
-  "reveal_tries_caption": "Nombre d’essais ratés qu’une note cachée autorise avant de se révéler en rouge."
+  "reveal_tries_caption": "Nombre d’essais ratés qu’une note cachée autorise avant de se révéler en rouge.",
+  "action_fingering_editor": "Doigtés",
+  "fingering_heat_legend": "Les mesures ombrées sont plus difficiles à doigter — plus le rouge est profond, plus le passage est délicat."
 }

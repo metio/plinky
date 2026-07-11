@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Skryté noty",
   "hidden_notes_hint": "Cvičte podle sluchu: noty jsou zpočátku skryté a odhalují se, jak je nacházíte — zeleně při úspěchu, červeně po vyčerpání pokusů. Nejdřív si skladbu poslechněte, pak ji zahrajte.",
   "reveal_tries": "Pokusy",
-  "reveal_tries_caption": "Kolik chybných pokusů skrytá nota dovolí, než se odhalí červeně."
+  "reveal_tries_caption": "Kolik chybných pokusů skrytá nota dovolí, než se odhalí červeně.",
+  "action_fingering_editor": "Prstoklad",
+  "fingering_heat_legend": "Podbarvené takty se hrají obtížněji — čím sytější červená, tím záludnější pasáž."
 }

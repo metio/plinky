@@ -253,6 +253,41 @@ export function collectMeasureBoxes(osmd: OpenSheetMusicDisplay, svg: SVGSVGElem
 // any prior selection first.
 const SELECTION_CLASS = "plinky-bar-selection";
 
+// The fingering-difficulty heat-map: a translucent red wash behind each bar whose
+// opacity follows its 0..1 heat, so the hard passages size themselves at a glance.
+// Its own class, so it coexists with (and clears independently of) the loop's
+// selection fill.
+const HEAT_CLASS = "plinky-bar-heat";
+
+export function clearBarHeat(svg: SVGSVGElement): void {
+    for (const rect of svg.querySelectorAll(`.${HEAT_CLASS}`)) {
+        rect.remove();
+    }
+}
+
+export function paintBarHeat(svg: SVGSVGElement, boxes: MeasureBox[], heats: number[]): void {
+    clearBarHeat(svg);
+    const pad = 6;
+    for (const box of boxes) {
+        const heat = heats[box.measure] ?? 0;
+        // Cold bars get no wash at all — the map highlights, it doesn't carpet.
+        if (heat <= 0.05) {
+            continue;
+        }
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("class", HEAT_CLASS);
+        rect.setAttribute("x", String(box.x - pad));
+        rect.setAttribute("y", String(box.y - pad));
+        rect.setAttribute("width", String(box.width + pad * 2));
+        rect.setAttribute("height", String(box.height + pad * 2));
+        rect.setAttribute("rx", "4");
+        rect.setAttribute("fill", SELECT_COLOR);
+        rect.setAttribute("fill-opacity", String(0.06 + heat * 0.22));
+        rect.setAttribute("pointer-events", "none");
+        svg.insertBefore(rect, svg.firstChild);
+    }
+}
+
 export function clearBarSelection(svg: SVGSVGElement): void {
     for (const rect of svg.querySelectorAll(`.${SELECTION_CLASS}`)) {
         rect.remove();

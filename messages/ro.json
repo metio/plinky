@@ -610,5 +610,7 @@
   "hidden_notes_toggle": "Note ascunse",
   "hidden_notes_hint": "Exersează după ureche: notele pornesc ascunse și se dezvăluie când le găsești — verzi la reușită, roșii când se termină încercările. Ascultă mai întâi, apoi cântă ce ai auzit.",
   "reveal_tries": "Încercări",
-  "reveal_tries_caption": "Câte încercări greșite permite o notă ascunsă înainte să se dezvăluie în roșu."
+  "reveal_tries_caption": "Câte încercări greșite permite o notă ascunsă înainte să se dezvăluie în roșu.",
+  "action_fingering_editor": "Digitație",
+  "fingering_heat_legend": "Măsurile umbrite sunt mai greu de cântat — cu cât roșul e mai intens, cu atât pasajul e mai dificil."
 }
