@@ -606,5 +606,9 @@
   "person_eyebrow": "Componist",
   "person_pieces": "{count} stukken om te oefenen",
   "person_empty": "Nog niemand met die naam in de catalogus.",
-  "meta_person_description": "De stukken van {name} op Plinky — gratis bladmuziek om in de browser te oefenen."
+  "meta_person_description": "De stukken van {name} op Plinky — gratis bladmuziek om in de browser te oefenen.",
+  "hidden_notes_toggle": "Verborgen noten",
+  "hidden_notes_hint": "Oefen op het gehoor: de noten beginnen verborgen en verschijnen zodra je ze vindt — groen bij raak, rood als je pogingen op zijn. Luister eerst, speel dan na wat je hoorde.",
+  "reveal_tries": "Pogingen",
+  "reveal_tries_caption": "Hoeveel foute pogingen een verborgen noot toestaat voordat die zich rood onthult."
 }

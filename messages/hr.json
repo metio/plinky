@@ -606,5 +606,9 @@
   "person_eyebrow": "Skladatelj",
   "person_pieces": "{count} skladbi za vježbanje",
   "person_empty": "Nitko s tim imenom još nije u katalogu.",
-  "meta_person_description": "Skladbe {name} na Plinkyju — besplatne note za vježbanje u pregledniku."
+  "meta_person_description": "Skladbe {name} na Plinkyju — besplatne note za vježbanje u pregledniku.",
+  "hidden_notes_toggle": "Skrivene note",
+  "hidden_notes_hint": "Vježbaj po sluhu: note su isprva skrivene i otkrivaju se kad ih pronađeš — zeleno kad pogodiš, crveno kad potrošiš pokušaje. Prvo poslušaj, zatim odsviraj što si čuo.",
+  "reveal_tries": "Pokušaji",
+  "reveal_tries_caption": "Koliko pogrešnih pokušaja skrivena nota dopušta prije nego što se otkrije crveno."
 }

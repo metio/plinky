@@ -606,5 +606,9 @@
   "person_eyebrow": "Compositeur",
   "person_pieces": "{count} morceaux à travailler",
   "person_empty": "Personne de ce nom dans le catalogue pour l’instant.",
-  "meta_person_description": "Les morceaux de {name} sur Plinky — partitions gratuites à travailler dans le navigateur."
+  "meta_person_description": "Les morceaux de {name} sur Plinky — partitions gratuites à travailler dans le navigateur.",
+  "hidden_notes_toggle": "Notes cachées",
+  "hidden_notes_hint": "Travaillez à l’oreille : les notes commencent cachées et se révèlent quand vous les trouvez — en vert si vous réussissez, en rouge quand les essais sont épuisés. Écoutez d’abord, puis rejouez ce que vous avez entendu.",
+  "reveal_tries": "Essais",
+  "reveal_tries_caption": "Nombre d’essais ratés qu’une note cachée autorise avant de se révéler en rouge."
 }

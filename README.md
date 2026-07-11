@@ -59,7 +59,11 @@ score** — they fill **red** so the stretch you're repeating is clear, and the 
 (with a *Whole song* reset) sits right beside the score, so you can also set the first
 and last bar by number. Turn on
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
-score along, so one hand's slip never stops the other.
+score along, so one hand's slip never stops the other. And for ear training, turn on
+**Hidden notes**: the noteheads start blank (the staff and rhythm stay), you Listen to
+the phrase first, and each note reveals itself as you find it — **green** when you get
+it, **red** once your tries run out (1 by default, up to 3), so the score you finish
+with is the story of what your ear caught.
 
 Practice is self-paced by default, but flip on **Keep up** and it becomes tempo-locked:
 after a one-bar count-in, the cursor advances on the beat whether or not you're ready, and

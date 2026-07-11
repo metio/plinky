@@ -41,6 +41,7 @@ import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useRunResult } from "../../hooks/useRunResult";
 import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
+import { useHiddenNotes } from "../../hooks/useHiddenNotes";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
@@ -293,6 +294,21 @@ function usePlaySessionValue({
 
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
     const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
+    // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
+    // found, red once the tries budget is spent. Persisted like the other play prefs.
+    const [hiddenNotes, setHiddenNotes] = usePref(prefsStore, "hiddenNotes");
+    const [revealTries, setRevealTries] = usePref(prefsStore, "revealTries");
+    const hidden = useHiddenNotes(getOsmd, {
+        enabled: hiddenNotes,
+        tries: revealTries,
+        hand: staffCount < 2 ? "both" : hand,
+    });
+    // Turning the mode off mid-piece must bring the music back immediately.
+    useEffect(() => {
+        if (!hiddenNotes) {
+            hidden.restore();
+        }
+    }, [hiddenNotes, hidden.restore]);
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
@@ -301,6 +317,9 @@ function usePlaySessionValue({
             for (const pitch of info.pitches) {
                 synth.playNote(pitch);
             }
+            // A hidden note earned its reveal — lift the blank before the green
+            // paint below, so the note appears already coloured.
+            hidden.revealCorrect(info.index);
             // Colour the notes just cleared — the cursor is still on them, as it
             // only advances after this callback — so the score shows progress.
             const osmd = getOsmd();
@@ -315,6 +334,12 @@ function usePlaySessionValue({
             // Ease the adaptive metronome toward the player's own pace, read from the
             // gap between the last two notes.
             easeToward(captureRef.current, runTempoRef.current);
+        },
+        onWrong: ({ index, misses }) => {
+            // The tries budget spent on a hidden note reveals it red — the lesson
+            // arrives, and (keep-going aside) the run still waits for the right key.
+            hidden.revealMissed(index, misses);
+            markPainted();
         },
     });
     useMidiInput({
@@ -550,6 +575,8 @@ function usePlaySessionValue({
             // freezes it mid-run and strands note input until Stop.
             keepUp.stop();
             matcher.stop();
+            // Stepping out mid-run must never leave the resting score half blank.
+            hidden.restore();
         }
     }, [fullscreen]);
 
@@ -574,6 +601,9 @@ function usePlaySessionValue({
         const from = resumePoint();
         enterPlayFullscreen();
         matcher.stop();
+        // With hidden notes on, Listen is the "hear it first" half of ear practice:
+        // the phrase sounds over a blanked staff, ready to be played back.
+        hidden.conceal();
         listenPlayback.start(from);
     };
 
@@ -610,6 +640,9 @@ function usePlaySessionValue({
         }
         enterPlayFullscreen();
         matcher.stop();
+        // Keep-up is read-at-tempo: a blanked staff would be unreadable, so the
+        // hidden-notes game stays a self-paced feature.
+        hidden.restore();
         clearSelfPacedResult();
         if (score.painted()) {
             osmd.render();
@@ -694,7 +727,14 @@ function usePlaySessionValue({
         if (!partial && score.painted()) {
             getOsmd()?.render();
             score.resetPaint();
+            // A fresh render rebuilt the SVG, so any previous blanks are gone with it;
+            // forget them and blank the new elements below.
+            hidden.restore();
         }
+        // Blank the noteheads (a no-op unless hidden-notes is on, or when a resumed
+        // run is already concealed). Runs before the matcher seeks the cursor — the
+        // collection walk resets it.
+        hidden.conceal();
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
         ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
         // With the section loop on, Practice drills the selected bars on repeat, the
@@ -787,6 +827,10 @@ function usePlaySessionValue({
         setForgiving,
         raceGhost,
         setRaceGhost,
+        hiddenNotes,
+        setHiddenNotes,
+        revealTries,
+        setRevealTries,
         transpose,
         setTranspose,
         showMine,

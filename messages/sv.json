@@ -606,5 +606,9 @@
   "person_eyebrow": "Kompositör",
   "person_pieces": "{count} stycken att öva på",
   "person_empty": "Ingen med det namnet i katalogen ännu.",
-  "meta_person_description": "{name}s stycken på Plinky — gratis noter att öva på i webbläsaren."
+  "meta_person_description": "{name}s stycken på Plinky — gratis noter att öva på i webbläsaren.",
+  "hidden_notes_toggle": "Dolda noter",
+  "hidden_notes_hint": "Öva på gehör: noterna börjar dolda och avslöjas när du hittar dem — grönt när du prickar rätt, rött när försöken tar slut. Lyssna först, spela sedan det du hörde.",
+  "reveal_tries": "Försök",
+  "reveal_tries_caption": "Hur många felförsök en dold not tillåter innan den avslöjas i rött."
 }

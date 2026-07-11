@@ -606,5 +606,9 @@
   "person_eyebrow": "Komponist",
   "person_pieces": "{count} stykker å øve på",
   "person_empty": "Ingen med det navnet i katalogen ennå.",
-  "meta_person_description": "{name} sine stykker på Plinky — gratis noter å øve på i nettleseren."
+  "meta_person_description": "{name} sine stykker på Plinky — gratis noter å øve på i nettleseren.",
+  "hidden_notes_toggle": "Skjulte noter",
+  "hidden_notes_hint": "Øv på gehør: notene starter skjult og avsløres når du finner dem — grønt når du treffer, rødt når forsøkene er brukt opp. Lytt først, og spill så det du hørte.",
+  "reveal_tries": "Forsøk",
+  "reveal_tries_caption": "Hvor mange feilforsøk en skjult note tillater før den avsløres i rødt."
 }

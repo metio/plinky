@@ -606,5 +606,9 @@
   "person_eyebrow": "Säveltäjä",
   "person_pieces": "{count} kappaletta harjoiteltavaksi",
   "person_empty": "Ketään sen nimistä ei vielä ole luettelossa.",
-  "meta_person_description": "{name} — kappaleet Plinkyssä: ilmaisia nuotteja harjoitteluun selaimessa."
+  "meta_person_description": "{name} — kappaleet Plinkyssä: ilmaisia nuotteja harjoitteluun selaimessa.",
+  "hidden_notes_toggle": "Piilotetut nuotit",
+  "hidden_notes_hint": "Harjoittele korvakuulolta: nuotit ovat aluksi piilossa ja paljastuvat, kun löydät ne — vihreänä kun osut, punaisena kun yritykset loppuvat. Kuuntele ensin, soita sitten kuulemasi.",
+  "reveal_tries": "Yritykset",
+  "reveal_tries_caption": "Montako väärää yritystä piilotettu nuotti sallii ennen kuin se paljastuu punaisena."
 }

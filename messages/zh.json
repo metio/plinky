@@ -606,5 +606,9 @@
   "person_eyebrow": "作曲家",
   "person_pieces": "可练习的乐曲 {count} 首",
   "person_empty": "目录中还没有这个名字的作曲家。",
-  "meta_person_description": "Plinky 上 {name} 的乐曲 — 在浏览器中练习的免费乐谱。"
+  "meta_person_description": "Plinky 上 {name} 的乐曲 — 在浏览器中练习的免费乐谱。",
+  "hidden_notes_toggle": "隐藏音符",
+  "hidden_notes_hint": "凭耳朵练习：音符起初是隐藏的，找到后才会显现 — 弹对了变绿，次数用完变红。先听一遍，再弹出你听到的。",
+  "reveal_tries": "尝试次数",
+  "reveal_tries_caption": "隐藏音符在以红色显现之前允许的弹错次数。"
 }

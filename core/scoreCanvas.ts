@@ -22,6 +22,9 @@ export const LISTENED_COLOR = "#3b82f6";
 // The loop selection is filled behind its bars in a bright red so the stretch you're
 // about to drill reads at a glance — the same red the share grid's weakest band uses.
 export const SELECT_COLOR = "#ef4444";
+// A hidden note revealed by failure (the tries budget spent) — the same red the
+// wrong-key flash and the loop selection use, so "red = missed" stays one meaning.
+export const MISSED_COLOR = "#ef4444";
 
 // A rendered measure's bounding box in SVG user units.
 export type MeasureBox = { measure: number; x: number; y: number; width: number; height: number };

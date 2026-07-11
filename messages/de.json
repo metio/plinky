@@ -606,5 +606,9 @@
   "person_eyebrow": "Komponist",
   "person_pieces": "{count} Stücke zum Üben",
   "person_empty": "Niemanden mit diesem Namen im Katalog gefunden.",
-  "meta_person_description": "Stücke von {name} auf Plinky — freie Noten zum Üben im Browser."
+  "meta_person_description": "Stücke von {name} auf Plinky — freie Noten zum Üben im Browser.",
+  "hidden_notes_toggle": "Versteckte Noten",
+  "hidden_notes_hint": "Nach Gehör üben: Die Noten sind zunächst verborgen und erscheinen, sobald du sie findest — grün bei Treffer, rot wenn die Versuche aufgebraucht sind. Erst anhören, dann nachspielen.",
+  "reveal_tries": "Versuche",
+  "reveal_tries_caption": "Wie viele Fehlversuche eine versteckte Note erlaubt, bevor sie sich rot zeigt."
 }

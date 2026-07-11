@@ -606,5 +606,9 @@
   "person_eyebrow": "Compozitor",
   "person_pieces": "{count} piese de exersat",
   "person_empty": "Nimeni cu acest nume în catalog deocamdată.",
-  "meta_person_description": "Piesele lui {name} pe Plinky — partituri gratuite de exersat în browser."
+  "meta_person_description": "Piesele lui {name} pe Plinky — partituri gratuite de exersat în browser.",
+  "hidden_notes_toggle": "Note ascunse",
+  "hidden_notes_hint": "Exersează după ureche: notele pornesc ascunse și se dezvăluie când le găsești — verzi la reușită, roșii când se termină încercările. Ascultă mai întâi, apoi cântă ce ai auzit.",
+  "reveal_tries": "Încercări",
+  "reveal_tries_caption": "Câte încercări greșite permite o notă ascunsă înainte să se dezvăluie în roșu."
 }

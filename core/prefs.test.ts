@@ -23,6 +23,8 @@ const BASE: Prefs = {
     keyboardOctaves: 2,
     treadmill: false,
     raceGhost: true,
+    hiddenNotes: false,
+    revealTries: 1,
 };
 
 const stored = (patch: object) => JSON.stringify({ ...BASE, ...patch });
@@ -119,5 +121,18 @@ describe("parsePrefs", () => {
     it("defaults treadmill off and keeps the stored toggle", () => {
         expect(parsePrefs(null).treadmill).toBe(false);
         expect(parsePrefs(stored({ treadmill: true })).treadmill).toBe(true);
+    });
+});
+
+describe("hidden-notes prefs", () => {
+    it("validates the tries budget against the allowed values", () => {
+        expect(parsePrefs(stored({ revealTries: 3 })).revealTries).toBe(3);
+        expect(parsePrefs(stored({ revealTries: 7 })).revealTries).toBe(1);
+        expect(parsePrefs(stored({ revealTries: "2" })).revealTries).toBe(1);
+    });
+
+    it("keeps the mode off unless a boolean says otherwise", () => {
+        expect(parsePrefs(stored({ hiddenNotes: true })).hiddenNotes).toBe(true);
+        expect(parsePrefs(stored({ hiddenNotes: "yes" })).hiddenNotes).toBe(false);
     });
 });

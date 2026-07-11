@@ -94,3 +94,35 @@ describe("paintPlayedNotes (real OSMD)", () => {
         expect(coloured).toBe(true);
     });
 });
+
+describe("hidden-notes hide/reveal (real OSMD)", () => {
+    it("blanks every notehead, reveals one step coloured, and restores the rest", async () => {
+        const { hideNoteElements, revealNoteElements, unhideNoteElements } = await import(
+            "./scoreColor"
+        );
+        const osmd = await renderOsmd(PHRASE);
+        const steps = collectNoteElements(osmd, "both");
+        expect(steps.length).toBeGreaterThan(1);
+
+        hideNoteElements(steps);
+        for (const step of steps) {
+            for (const element of step) {
+                expect(element.getAttribute("visibility")).toBe("hidden");
+            }
+        }
+
+        // Revealing a step lifts the blank and paints the verdict colour.
+        revealNoteElements(steps[0]!, PLAYED_COLOR);
+        for (const element of steps[0]!) {
+            expect(element.getAttribute("visibility")).toBeNull();
+            expect(element.getAttribute("fill")).toBe(PLAYED_COLOR);
+        }
+        // The other steps stay blank until they resolve.
+        expect(steps[1]![0]!.getAttribute("visibility")).toBe("hidden");
+
+        // Restoring unhides everything but keeps the earned colours.
+        unhideNoteElements(steps);
+        expect(steps[1]![0]!.getAttribute("visibility")).toBeNull();
+        expect(steps[0]![0]!.getAttribute("fill")).toBe(PLAYED_COLOR);
+    });
+});

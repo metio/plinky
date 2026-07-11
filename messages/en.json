@@ -606,5 +606,9 @@
   "person_eyebrow": "Composer",
   "person_pieces": "{count} pieces to practise",
   "person_empty": "Nobody by that name in the catalogue yet.",
-  "meta_person_description": "{name}’s pieces on Plinky — free sheet music to practise in your browser."
+  "meta_person_description": "{name}’s pieces on Plinky — free sheet music to practise in your browser.",
+  "hidden_notes_toggle": "Hidden notes",
+  "hidden_notes_hint": "Practise by ear: the notes start hidden and reveal as you find them — green when you get one, red when your tries run out. Listen first, then play back what you heard.",
+  "reveal_tries": "Tries",
+  "reveal_tries_caption": "Wrong attempts a hidden note allows before it reveals itself in red."
 }

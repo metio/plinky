@@ -72,6 +72,12 @@ export type Prefs = {
     // Race a translucent replay of your best run (or fastest saved take) on the piece
     // while you practise. On by default; turn it off to practise without the chase.
     raceGhost: boolean;
+    // Practise by ear: the noteheads start hidden and each one is revealed as it is
+    // resolved — green when you find it, red once the tries budget is spent. Listen
+    // first, then play back what you heard.
+    hiddenNotes: boolean;
+    // How many wrong attempts a hidden note allows before it reveals itself red.
+    revealTries: number;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -84,6 +90,10 @@ export const BARS_PER_ROW = [0, 2, 3, 4];
 // On-screen-keyboard window choices, in octaves: a sliding 1–3-octave window that
 // follows the notes, or 0 for the whole piece framed at once (fixed).
 export const KEYBOARD_OCTAVES = [0, 1, 2, 3];
+
+// Tries a hidden note allows before revealing red. Bounded small: the reveal is
+// the lesson, and endless guessing teaches nothing.
+export const REVEAL_TRIES = [1, 2, 3];
 
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
@@ -124,6 +134,8 @@ function defaults(): Prefs {
         keyboardOctaves: 2,
         treadmill: false,
         raceGhost: true,
+        hiddenNotes: false,
+        revealTries: 1,
     };
 }
 
@@ -174,6 +186,11 @@ export function parsePrefs(raw: string | null): Prefs {
                 : base.keyboardOctaves,
             treadmill: typeof parsed.treadmill === "boolean" ? parsed.treadmill : base.treadmill,
             raceGhost: typeof parsed.raceGhost === "boolean" ? parsed.raceGhost : base.raceGhost,
+            hiddenNotes:
+                typeof parsed.hiddenNotes === "boolean" ? parsed.hiddenNotes : base.hiddenNotes,
+            revealTries: REVEAL_TRIES.includes(parsed.revealTries)
+                ? parsed.revealTries
+                : base.revealTries,
         };
     } catch {
         return base;

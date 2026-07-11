@@ -94,6 +94,11 @@ function advanceCursor(osmd: OpenSheetMusicDisplay, hand: Hand): void {
 export type CorrectInfo = {
     pitches: number[];
     ordinal: number;
+    // The position's index among the WHOLE piece's playable steps (not just this
+    // run's), so per-note visuals — the hidden-notes reveal, ghost markers — can
+    // address the engraved note even when the run started mid-piece or loops a
+    // section.
+    index: number;
     timestamp: number;
     timeMs: number;
     velocity: number;
@@ -114,6 +119,10 @@ export function useScoreMatcher(
     getOsmd: () => OpenSheetMusicDisplay | null,
     options: {
         onCorrect?: (info: CorrectInfo) => void;
+        // A wrong note at a position: its whole-piece step index and how many wrong
+        // attempts that position has absorbed so far (1 on the first slip) — what a
+        // tries budget compares against.
+        onWrong?: (info: { index: number; misses: number }) => void;
         tempo?: number;
         hand?: Hand;
         // Forgiving advance: when the player plays a note belonging to the NEXT position,
@@ -157,6 +166,9 @@ export function useScoreMatcher(
     // the reducer without re-collecting the score.
     const runLoopRef = useRef(false);
     const runStepsRef = useRef<MatchStep[]>([]);
+    // Where the run's first step sits among the whole piece's steps, so relative
+    // reducer indices translate to the engraved note they belong to.
+    const runStartIndexRef = useRef(0);
 
     const stop = useCallback(() => {
         practicingRef.current = false;
@@ -203,6 +215,9 @@ export function useScoreMatcher(
             osmd.cursor.show();
             runLoopRef.current = loop !== null;
             runStepsRef.current = steps;
+            // Both slicing and the loop's bar filter keep contiguous runs of `all`,
+            // so the first step's position anchors every later relative index.
+            runStartIndexRef.current = steps[0] ? all.indexOf(steps[0]) : 0;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
             runHandRef.current = hand;
             runForgivingRef.current = optionsRef.current.forgiving ?? false;
@@ -235,6 +250,10 @@ export function useScoreMatcher(
                     setMissedHere(true);
                     wrongSeq.current += 1;
                     setLastWrong({ note: event.note, seq: wrongSeq.current });
+                    optionsRef.current.onWrong?.({
+                        index: runStartIndexRef.current + next.index,
+                        misses: next.sinceWrong,
+                    });
                     continue;
                 }
                 if (event.kind !== "cleared") {
@@ -243,6 +262,7 @@ export function useScoreMatcher(
                 optionsRef.current.onCorrect?.({
                     pitches: event.playedPitches,
                     ordinal: event.ordinal,
+                    index: runStartIndexRef.current + event.ordinal,
                     timestamp,
                     timeMs: event.step.whole * 4 * (60000 / runTempoRef.current),
                     velocity,

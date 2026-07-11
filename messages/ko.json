@@ -606,5 +606,9 @@
   "person_eyebrow": "작곡가",
   "person_pieces": "연습할 수 있는 곡 {count}개",
   "person_empty": "카탈로그에 아직 그 이름의 작곡가가 없습니다.",
-  "meta_person_description": "Plinky의 {name} 곡 — 브라우저에서 연습하는 무료 악보."
+  "meta_person_description": "Plinky의 {name} 곡 — 브라우저에서 연습하는 무료 악보.",
+  "hidden_notes_toggle": "숨겨진 음표",
+  "hidden_notes_hint": "귀로 연습하세요: 음표는 처음에 숨겨져 있고 찾아내면 드러납니다 — 맞히면 초록색, 시도 횟수를 다 쓰면 빨간색. 먼저 듣고, 들은 대로 연주하세요.",
+  "reveal_tries": "시도 횟수",
+  "reveal_tries_caption": "숨겨진 음표가 빨간색으로 드러나기 전까지 허용되는 오답 횟수."
 }

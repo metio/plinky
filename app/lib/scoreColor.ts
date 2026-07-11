@@ -78,6 +78,33 @@ export function paintElement(element: SVGElement, color: string): void {
     setColors(element, color, color);
 }
 
+// Hidden-notes practice: blank a step's noteheads so the player works by ear. The
+// group stays in the layout (visibility, not display — spacing and the cursor are
+// untouched), and revealing simply lifts the attribute and paints the verdict.
+export function hideNoteElements(steps: SVGGElement[][]): void {
+    for (const step of steps) {
+        for (const element of step) {
+            element.setAttribute("visibility", "hidden");
+        }
+    }
+}
+
+export function revealNoteElements(step: SVGGElement[], color: string): void {
+    for (const element of step) {
+        element.removeAttribute("visibility");
+        paintElement(element, color);
+    }
+}
+
+// Leaving the mode mid-run (or ending it) must never strand invisible music.
+export function unhideNoteElements(steps: SVGGElement[][]): void {
+    for (const step of steps) {
+        for (const element of step) {
+            element.removeAttribute("visibility");
+        }
+    }
+}
+
 // The rendered SVG groups of the playable notes at each step, in the same order
 // and with the same hand filter the matcher steps through — so index i here is the
 // note the ghost's i-th onset belongs to. Leaves the cursor reset for the caller.

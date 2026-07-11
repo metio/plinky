@@ -92,6 +92,8 @@ export default function Settings() {
         keyboardOctaves: 2,
         treadmill: false,
         raceGhost: true,
+        hiddenNotes: false,
+        revealTries: 1,
     });
     const synth = useSynth();
     const { support: midiSupport } = useMidiConnection();

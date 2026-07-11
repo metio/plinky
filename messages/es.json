@@ -606,5 +606,9 @@
   "person_eyebrow": "Compositor",
   "person_pieces": "{count} piezas para practicar",
   "person_empty": "Nadie con ese nombre en el catálogo todavía.",
-  "meta_person_description": "Las piezas de {name} en Plinky — partituras gratuitas para practicar en el navegador."
+  "meta_person_description": "Las piezas de {name} en Plinky — partituras gratuitas para practicar en el navegador.",
+  "hidden_notes_toggle": "Notas ocultas",
+  "hidden_notes_hint": "Practica de oído: las notas empiezan ocultas y se revelan al encontrarlas — verdes si aciertas, rojas cuando se agotan los intentos. Escucha primero y luego toca lo que oíste.",
+  "reveal_tries": "Intentos",
+  "reveal_tries_caption": "Cuántos intentos fallidos permite una nota oculta antes de revelarse en rojo."
 }

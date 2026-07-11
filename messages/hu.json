@@ -606,5 +606,9 @@
   "person_eyebrow": "Zeneszerző",
   "person_pieces": "{count} gyakorolható darab",
   "person_empty": "Ilyen néven még senki sincs a katalógusban.",
-  "meta_person_description": "{name} darabjai a Plinkyn — ingyenes kották böngészőben való gyakorláshoz."
+  "meta_person_description": "{name} darabjai a Plinkyn — ingyenes kották böngészőben való gyakorláshoz.",
+  "hidden_notes_toggle": "Rejtett hangjegyek",
+  "hidden_notes_hint": "Gyakorolj hallás után: a hangjegyek rejtve indulnak, és akkor tűnnek elő, amikor megtalálod őket — zölden, ha eltaláltad, pirosan, ha elfogytak a próbálkozások. Előbb hallgasd meg, majd játszd vissza.",
+  "reveal_tries": "Próbák",
+  "reveal_tries_caption": "Hány téves próbálkozást enged egy rejtett hangjegy, mielőtt pirosan felfedi magát."
 }

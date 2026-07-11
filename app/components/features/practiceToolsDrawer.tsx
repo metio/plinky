@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { BARS_PER_ROW, KEYBOARD_OCTAVES, type NoteHints } from "../../../core/prefs";
+import { BARS_PER_ROW, KEYBOARD_OCTAVES, type NoteHints, REVEAL_TRIES } from "../../../core/prefs";
 import type { Hand } from "../../../core/matcher";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
@@ -81,6 +81,10 @@ export function PracticeToolsDrawer({
     setNoteHints,
     raceGhost,
     setRaceGhost,
+    hiddenNotes,
+    setHiddenNotes,
+    revealTries,
+    setRevealTries,
     staffCount,
     hand,
     setHand,
@@ -129,6 +133,10 @@ export function PracticeToolsDrawer({
     setNoteHints: (value: NoteHints) => void;
     raceGhost: boolean;
     setRaceGhost: (value: boolean) => void;
+    hiddenNotes: boolean;
+    setHiddenNotes: (value: boolean) => void;
+    revealTries: number;
+    setRevealTries: (value: number) => void;
     staffCount: number;
     hand: Hand;
     setHand: (value: Hand) => void;
@@ -290,6 +298,28 @@ export function PracticeToolsDrawer({
                         label={m.race_ghost_toggle()}
                     />
                 </Option>
+                <Option caption={m.hidden_notes_hint()}>
+                    <Switch
+                        checked={hiddenNotes}
+                        onChange={setHiddenNotes}
+                        label={m.hidden_notes_toggle()}
+                    />
+                </Option>
+                {hiddenNotes && (
+                    <Option caption={m.reveal_tries_caption()}>
+                        <Labeled label={m.reveal_tries()}>
+                            <SegmentedControl
+                                options={REVEAL_TRIES.map((n) => ({
+                                    id: String(n),
+                                    label: String(n),
+                                }))}
+                                value={String(revealTries)}
+                                onChange={(id) => setRevealTries(Number(id))}
+                                label={m.reveal_tries()}
+                            />
+                        </Labeled>
+                    </Option>
+                )}
                 {staffCount >= 2 && (
                     <Option caption={m.hand_caption()}>
                         <Labeled label={m.hand_label()}>

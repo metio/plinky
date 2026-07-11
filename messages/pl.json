@@ -606,5 +606,9 @@
   "person_eyebrow": "Kompozytor",
   "person_pieces": "{count} utworów do ćwiczenia",
   "person_empty": "Nikogo o tym nazwisku nie ma jeszcze w katalogu.",
-  "meta_person_description": "Utwory {name} na Plinky — darmowe nuty do ćwiczenia w przeglądarce."
+  "meta_person_description": "Utwory {name} na Plinky — darmowe nuty do ćwiczenia w przeglądarce.",
+  "hidden_notes_toggle": "Ukryte nuty",
+  "hidden_notes_hint": "Ćwicz ze słuchu: nuty są początkowo ukryte i odsłaniają się, gdy je znajdziesz — na zielono przy trafieniu, na czerwono po wyczerpaniu prób. Najpierw posłuchaj, potem zagraj to, co usłyszałeś.",
+  "reveal_tries": "Próby",
+  "reveal_tries_caption": "Ile błędnych prób dopuszcza ukryta nuta, zanim odsłoni się na czerwono."
 }

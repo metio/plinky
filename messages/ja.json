@@ -606,5 +606,9 @@
   "person_eyebrow": "作曲家",
   "person_pieces": "練習できる曲：{count}曲",
   "person_empty": "その名前の作曲家はまだカタログにありません。",
-  "meta_person_description": "Plinkyにある{name}の曲 — ブラウザで練習できる無料楽譜。"
+  "meta_person_description": "Plinkyにある{name}の曲 — ブラウザで練習できる無料楽譜。",
+  "hidden_notes_toggle": "音符を隠す",
+  "hidden_notes_hint": "耳で練習：音符は最初隠れていて、見つけると現れます — 正解なら緑、試行回数を使い切ると赤。まず聴いてから、聴いた通りに弾きましょう。",
+  "reveal_tries": "試行回数",
+  "reveal_tries_caption": "隠れた音符が赤く現れるまでに許される間違いの回数。"
 }

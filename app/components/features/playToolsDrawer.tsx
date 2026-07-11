@@ -35,6 +35,10 @@ export function PlayToolsDrawer() {
         setNoteHints,
         raceGhost,
         setRaceGhost,
+        hiddenNotes,
+        setHiddenNotes,
+        revealTries,
+        setRevealTries,
         staffCount,
         hand,
         setHand,
@@ -81,6 +85,10 @@ export function PlayToolsDrawer() {
             setNoteHints={setNoteHints}
             raceGhost={raceGhost}
             setRaceGhost={setRaceGhost}
+            hiddenNotes={hiddenNotes}
+            setHiddenNotes={setHiddenNotes}
+            revealTries={revealTries}
+            setRevealTries={setRevealTries}
             staffCount={staffCount}
             hand={hand}
             setHand={setHand}

@@ -606,5 +606,9 @@
   "person_eyebrow": "Skladatel",
   "person_pieces": "{count} skladeb k procvičování",
   "person_empty": "Nikdo takový v katalogu zatím není.",
-  "meta_person_description": "Skladby {name} na Plinky — noty zdarma k procvičování v prohlížeči."
+  "meta_person_description": "Skladby {name} na Plinky — noty zdarma k procvičování v prohlížeči.",
+  "hidden_notes_toggle": "Skryté noty",
+  "hidden_notes_hint": "Cvičte podle sluchu: noty jsou zpočátku skryté a odhalují se, jak je nacházíte — zeleně při úspěchu, červeně po vyčerpání pokusů. Nejdřív si skladbu poslechněte, pak ji zahrajte.",
+  "reveal_tries": "Pokusy",
+  "reveal_tries_caption": "Kolik chybných pokusů skrytá nota dovolí, než se odhalí červeně."
 }

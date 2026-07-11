@@ -606,5 +606,9 @@
   "person_eyebrow": "Compositore",
   "person_pieces": "{count} brani da esercitare",
   "person_empty": "Nessuno con questo nome nel catalogo, per ora.",
-  "meta_person_description": "I brani di {name} su Plinky — spartiti gratuiti da praticare nel browser."
+  "meta_person_description": "I brani di {name} su Plinky — spartiti gratuiti da praticare nel browser.",
+  "hidden_notes_toggle": "Note nascoste",
+  "hidden_notes_hint": "Esercitati a orecchio: le note partono nascoste e si rivelano quando le trovi — verdi se indovini, rosse quando finisci i tentativi. Prima ascolta, poi risuona ciò che hai sentito.",
+  "reveal_tries": "Tentativi",
+  "reveal_tries_caption": "Quanti tentativi sbagliati concede una nota nascosta prima di rivelarsi in rosso."
 }

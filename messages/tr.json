@@ -606,5 +606,9 @@
   "person_eyebrow": "Besteci",
   "person_pieces": "Çalışılacak {count} parça",
   "person_empty": "Katalogda henüz bu isimde kimse yok.",
-  "meta_person_description": "Plinky’de {name} parçaları — tarayıcıda çalışmak için ücretsiz notalar."
+  "meta_person_description": "Plinky’de {name} parçaları — tarayıcıda çalışmak için ücretsiz notalar.",
+  "hidden_notes_toggle": "Gizli notalar",
+  "hidden_notes_hint": "Kulaktan çalış: notalar başta gizlidir ve buldukça ortaya çıkar — doğruysa yeşil, hakların bitince kırmızı. Önce dinle, sonra duyduğunu çal.",
+  "reveal_tries": "Deneme",
+  "reveal_tries_caption": "Gizli bir notanın kırmızı olarak ortaya çıkmadan önce izin verdiği yanlış deneme sayısı."
 }
