@@ -590,5 +590,9 @@
   "action_fingering_editor": "Fingersatz",
   "fingering_heat_legend": "Eingefärbte Takte sind schwerer zu greifen — je tiefer das Rot, desto kniffliger die Passage.",
   "mode_runs": "Durchläufe",
-  "video_orientation": "Videoformat"
+  "video_orientation": "Videoformat",
+  "video_quality": "Qualität",
+  "video_fps": "Bildrate",
+  "video_show_score": "Noten",
+  "video_show_keyboard": "Klaviatur"
 }

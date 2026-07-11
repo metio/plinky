@@ -590,5 +590,9 @@
   "action_fingering_editor": "Doigtés",
   "fingering_heat_legend": "Les mesures ombrées sont plus difficiles à doigter — plus le rouge est profond, plus le passage est délicat.",
   "mode_runs": "Prises",
-  "video_orientation": "Format vidéo"
+  "video_orientation": "Format vidéo",
+  "video_quality": "Qualité",
+  "video_fps": "Fréquence d’images",
+  "video_show_score": "Partition",
+  "video_show_keyboard": "Clavier"
 }

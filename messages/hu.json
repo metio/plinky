@@ -590,5 +590,9 @@
   "action_fingering_editor": "Ujjrend",
   "fingering_heat_legend": "A színezett ütemek nehezebben játszhatók — minél mélyebb a piros, annál trükkösebb a szakasz.",
   "mode_runs": "Futamok",
-  "video_orientation": "Videóformátum"
+  "video_orientation": "Videóformátum",
+  "video_quality": "Minőség",
+  "video_fps": "Képkockasebesség",
+  "video_show_score": "Kotta",
+  "video_show_keyboard": "Billentyűzet"
 }

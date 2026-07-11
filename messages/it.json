@@ -590,5 +590,9 @@
   "action_fingering_editor": "Diteggiatura",
   "fingering_heat_legend": "Le battute ombreggiate sono più difficili da diteggiare — più il rosso è intenso, più il passaggio è insidioso.",
   "mode_runs": "Esecuzioni",
-  "video_orientation": "Formato video"
+  "video_orientation": "Formato video",
+  "video_quality": "Qualità",
+  "video_fps": "Fotogrammi",
+  "video_show_score": "Spartito",
+  "video_show_keyboard": "Tastiera"
 }

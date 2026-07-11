@@ -590,5 +590,9 @@
   "action_fingering_editor": "Аплікатура",
   "fingering_heat_legend": "Затінені такти складніші для аплікатури — що глибший червоний, то підступніший пасаж.",
   "mode_runs": "Прогони",
-  "video_orientation": "Формат відео"
+  "video_orientation": "Формат відео",
+  "video_quality": "Якість",
+  "video_fps": "Частота кадрів",
+  "video_show_score": "Ноти",
+  "video_show_keyboard": "Клавіатура"
 }

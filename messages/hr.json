@@ -590,5 +590,9 @@
   "action_fingering_editor": "Prstomet",
   "fingering_heat_legend": "Osjenčani taktovi teže se sviraju — što je crvena dublja, to je dionica zahtjevnija.",
   "mode_runs": "Izvedbe",
-  "video_orientation": "Format videozapisa"
+  "video_orientation": "Format videozapisa",
+  "video_quality": "Kvaliteta",
+  "video_fps": "Broj sličica",
+  "video_show_score": "Note",
+  "video_show_keyboard": "Klavijatura"
 }

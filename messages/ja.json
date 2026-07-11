@@ -590,5 +590,9 @@
   "action_fingering_editor": "運指",
   "fingering_heat_legend": "色付きの小節は運指が難しい部分です — 赤が濃いほど手ごわいパッセージです。",
   "mode_runs": "テイク",
-  "video_orientation": "動画の形式"
+  "video_orientation": "動画の形式",
+  "video_quality": "画質",
+  "video_fps": "フレームレート",
+  "video_show_score": "楽譜",
+  "video_show_keyboard": "鍵盤"
 }

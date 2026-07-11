@@ -81,4 +81,31 @@ describe("ExportVideoButton", () => {
         expect(exportMock.mock.calls[0]?.[0]?.width).toBe(720);
         expect(exportMock.mock.calls[0]?.[0]?.height).toBe(1280);
     });
+
+    it("scales the encode to the picked quality and frame rate", async () => {
+        const exportMock = vi.fn<VideoExporter["export"]>(
+            async () => new Blob(["mp4"], { type: "video/mp4" }),
+        );
+        mount({ supported: async () => true, export: exportMock });
+        fireEvent.click(await screen.findByRole("tab", { name: "1080p" }));
+        fireEvent.click(screen.getByRole("tab", { name: "60" }));
+        fireEvent.click(screen.getByRole("button", { name: "Save video" }));
+        await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
+        expect(exportMock.mock.calls[0]?.[0]?.width).toBe(1920);
+        expect(exportMock.mock.calls[0]?.[0]?.height).toBe(1080);
+        expect(exportMock.mock.calls[0]?.[0]?.fps).toBe(60);
+    });
+
+    it("hides the keyboard switch where it has no effect", async () => {
+        mount({ supported: async () => true, export: vi.fn() });
+        // Landscape with the score on offers it…
+        expect(await screen.findByRole("switch", { name: "Keyboard" })).toBeTruthy();
+        // …the score off leaves only the keyboard, so the switch goes…
+        fireEvent.click(screen.getByRole("switch", { name: "Score" }));
+        expect(screen.queryByRole("switch", { name: "Keyboard" })).toBeNull();
+        // …and portrait is score-only by design.
+        fireEvent.click(screen.getByRole("switch", { name: "Score" }));
+        fireEvent.click(screen.getByRole("tab", { name: "9:16" }));
+        expect(screen.queryByRole("switch", { name: "Keyboard" })).toBeNull();
+    });
 });

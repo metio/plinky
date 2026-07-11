@@ -9,7 +9,7 @@ import { ghostOnsets, type Take } from "../../../core/takes";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
-import { CloseIcon, PlayIcon, StopIcon } from "../ui/icons";
+import { PlayIcon, StopIcon, TrashIcon } from "../ui/icons";
 import { ExportVideoButton } from "./exportVideoButton";
 import type { OriginalScore } from "../../lib/scoreSnapshot";
 import { ShareGhostButton } from "./shareGhostButton";
@@ -126,8 +126,9 @@ export function TakesPanel({
                                         <IconButton
                                             label={m.takes_delete()}
                                             onClick={() => onDelete(take.id)}
+                                            className="text-red-600 dark:text-red-400"
                                         >
-                                            <CloseIcon />
+                                            <TrashIcon />
                                         </IconButton>
                                     </span>
                                 </div>

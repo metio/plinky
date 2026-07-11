@@ -590,5 +590,9 @@
   "action_fingering_editor": "Parmak dizilimi",
   "fingering_heat_legend": "Gölgeli ölçüler daha zor çalınır — kırmızı ne kadar koyuysa pasaj o kadar çetindir.",
   "mode_runs": "Denemeler",
-  "video_orientation": "Video biçimi"
+  "video_orientation": "Video biçimi",
+  "video_quality": "Kalite",
+  "video_fps": "Kare hızı",
+  "video_show_score": "Nota",
+  "video_show_keyboard": "Klavye"
 }

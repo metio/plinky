@@ -590,5 +590,9 @@
   "action_fingering_editor": "Pozicionet e gishtave",
   "fingering_heat_legend": "Masat e hijezuara janë më të vështira për t’u luajtur — sa më e thellë e kuqja, aq më i ndërlikuar pasazhi.",
   "mode_runs": "Ekzekutimet",
-  "video_orientation": "Formati i videos"
+  "video_orientation": "Formati i videos",
+  "video_quality": "Cilësia",
+  "video_fps": "Shpejtësia e kuadrove",
+  "video_show_score": "Partitura",
+  "video_show_keyboard": "Tastiera"
 }

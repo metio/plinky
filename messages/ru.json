@@ -590,5 +590,9 @@
   "action_fingering_editor": "Аппликатура",
   "fingering_heat_legend": "Затенённые такты сложнее для аппликатуры — чем гуще красный, тем каверзнее пассаж.",
   "mode_runs": "Прогоны",
-  "video_orientation": "Формат видео"
+  "video_orientation": "Формат видео",
+  "video_quality": "Качество",
+  "video_fps": "Частота кадров",
+  "video_show_score": "Ноты",
+  "video_show_keyboard": "Клавиатура"
 }

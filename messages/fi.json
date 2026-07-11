@@ -590,5 +590,9 @@
   "action_fingering_editor": "Sormijärjestys",
   "fingering_heat_legend": "Sävytetyt tahdit ovat vaikeampia sormittaa — mitä syvempi punainen, sitä hankalampi kohta.",
   "mode_runs": "Suoritukset",
-  "video_orientation": "Videon muoto"
+  "video_orientation": "Videon muoto",
+  "video_quality": "Laatu",
+  "video_fps": "Kuvataajuus",
+  "video_show_score": "Nuotit",
+  "video_show_keyboard": "Koskettimisto"
 }

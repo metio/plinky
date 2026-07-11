@@ -11,16 +11,16 @@ import { takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { SegmentedControl } from "../ui/segmentedControl";
+import { Switch } from "../ui/switch";
 
-// 720p at 30fps: crisp enough for any feed, small enough to render in seconds.
-// Portrait swaps the axes for the 9:16 feeds (Reels, Shorts, TikTok).
-const WIDTH = 1280;
-const HEIGHT = 720;
-const FPS = 30;
+// The base 16:9 sizes per quality step; portrait swaps the axes for the
+// vertical feeds (Reels, Shorts, TikTok).
+const SIZES = { "720": { width: 1280, height: 720 }, "1080": { width: 1920, height: 1080 } };
 
-// Renders a saved take as an MP4 — the keyboard playing itself with the
-// piece's title and credit burnt in — and downloads it. Only offered where the
-// engine can actually encode one (the exporter is asked, not sniffed); while
+// Renders a saved take as an MP4 — the score and/or keyboard playing itself
+// with the piece's title and credit burnt in — and downloads it. The Runs tab
+// gives the options room: format, quality, frame rate, and which layers the
+// stage shows. Only offered where the engine can actually encode one; while
 // rendering, the label counts progress so a long take visibly works.
 export function ExportVideoButton({
     take,
@@ -38,10 +38,11 @@ export function ExportVideoButton({
     const exporter = useVideoExporter();
     const [supported, setSupported] = useState(false);
     const [progress, setProgress] = useState<number | null>(null);
-    // Which feed the file is for: 16:9 for the landscape platforms, 9:16 for
-    // Reels/Shorts/TikTok. A picker instead of two buttons, so the choice reads
-    // before the render starts.
     const [orientation, setOrientation] = useState<"landscape" | "portrait">("landscape");
+    const [quality, setQuality] = useState<keyof typeof SIZES>("720");
+    const [fps, setFps] = useState<30 | 60>(30);
+    const [showScore, setShowScore] = useState(true);
+    const [showKeyboard, setShowKeyboard] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
@@ -59,20 +60,23 @@ export function ExportVideoButton({
         return null;
     }
 
-    const save = async (width: number, height: number) => {
+    const save = async () => {
         setProgress(0);
         try {
+            const base = SIZES[quality];
+            const width = orientation === "portrait" ? base.height : base.width;
+            const height = orientation === "portrait" ? base.width : base.height;
             const notes = take.composition.notes;
             const durationMs = videoDurationMs(notes);
             // The take's own notation, rendered off-screen and rasterized once, so
             // the video shows the sheet music with each note tinted as it sounds.
             // A take the renderer can't draw exports keyboard-only instead.
-            const score = await buildScoreSnapshot(take, original);
+            const score = showScore ? await buildScoreSnapshot(take, original) : null;
             const blob = await exporter.export(
                 {
                     width,
                     height,
-                    fps: FPS,
+                    fps,
                     durationMs,
                     paint: takeScenePainter({
                         title,
@@ -82,6 +86,7 @@ export function ExportVideoButton({
                         width,
                         height,
                         score,
+                        keyboard: showKeyboard,
                     }),
                     notes,
                 },
@@ -94,7 +99,7 @@ export function ExportVideoButton({
     };
 
     return (
-        <span className="inline-flex items-center gap-1.5">
+        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2">
             <SegmentedControl
                 options={[
                     { id: "landscape", label: "16:9" },
@@ -104,11 +109,38 @@ export function ExportVideoButton({
                 onChange={setOrientation}
                 label={m.video_orientation()}
             />
+            <SegmentedControl
+                options={[
+                    { id: "720", label: "720p" },
+                    { id: "1080", label: "1080p" },
+                ]}
+                value={quality}
+                onChange={(id) => setQuality(id as keyof typeof SIZES)}
+                label={m.video_quality()}
+            />
+            <SegmentedControl
+                options={[
+                    { id: "30", label: "30" },
+                    { id: "60", label: "60" },
+                ]}
+                value={String(fps)}
+                onChange={(id) => setFps(Number(id) as 30 | 60)}
+                label={m.video_fps()}
+            />
+            <Switch checked={showScore} onChange={setShowScore} label={m.video_show_score()} />
+            {/* Landscape can drop either layer (never both — with the score off the
+                keyboard is all that's left); portrait is score-only by design, so
+                the keyboard switch only appears where it has an effect. */}
+            {orientation === "landscape" && showScore && (
+                <Switch
+                    checked={showKeyboard}
+                    onChange={setShowKeyboard}
+                    label={m.video_show_keyboard()}
+                />
+            )}
             <Button
                 variant="ghost"
-                onClick={() =>
-                    orientation === "portrait" ? save(HEIGHT, WIDTH) : save(WIDTH, HEIGHT)
-                }
+                onClick={save}
                 disabled={progress !== null}
                 aria-label={
                     orientation === "portrait"
@@ -120,6 +152,6 @@ export function ExportVideoButton({
                     ? m.takes_download_video()
                     : m.takes_video_progress({ percent: Math.round(progress * 100) })}
             </Button>
-        </span>
+        </div>
     );
 }

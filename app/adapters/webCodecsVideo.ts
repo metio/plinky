@@ -14,9 +14,11 @@ import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
 // both encoders today; supported() asks the engine about the exact
 // configurations, so anything less capable simply reports unsupported.
 
-// H.264 High profile, level 4.0 — comfortably covers 720p at any fps we ask
-// for, and hardware-decodes everywhere a video might be shared.
-const VIDEO_CODEC = "avc1.640028";
+// H.264 High profile — level 4.0 comfortably covers 720p (and 1080p30);
+// 1080p60 needs level 4.2. Both hardware-decode everywhere a video might be
+// shared.
+const VIDEO_CODEC_L40 = "avc1.640028";
+const VIDEO_CODEC_L42 = "avc1.64002a";
 // AAC-LC, the plain stereo audio every player expects inside an MP4 — but the
 // AAC encoder is licensed and plain Chromium ships without it, so Opus (which
 // mp4-muxer can also carry in an MP4, and every modern player decodes) is the
@@ -26,6 +28,8 @@ const AUDIO_CODECS = [
     { codec: "opus", container: "opus" as const },
 ];
 const AUDIO_BITRATE = 192_000;
+// The 720p30 reference bitrate; more pixels or frames scale it up so 1080p60
+// doesn't smear at a 720p budget.
 const VIDEO_BITRATE = 6_000_000;
 // A keyframe every two seconds keeps seeking snappy without bloating the file.
 const KEYFRAME_INTERVAL_MS = 2_000;
@@ -33,11 +37,12 @@ const KEYFRAME_INTERVAL_MS = 2_000;
 const AUDIO_CHUNK_FRAMES = 4_096;
 
 function videoConfig(input: Pick<VideoExportInput, "width" | "height" | "fps">) {
+    const load = (input.width * input.height * input.fps) / (1280 * 720 * 30);
     return {
-        codec: VIDEO_CODEC,
+        codec: load > 3 ? VIDEO_CODEC_L42 : VIDEO_CODEC_L40,
         width: input.width,
         height: input.height,
-        bitrate: VIDEO_BITRATE,
+        bitrate: Math.round(VIDEO_BITRATE * Math.max(1, load)),
         framerate: input.fps,
     } satisfies VideoEncoderConfig;
 }

@@ -590,5 +590,9 @@
   "action_fingering_editor": "Vingerzetting",
   "fingering_heat_legend": "Gearceerde maten zijn lastiger te spelen — hoe dieper het rood, hoe lastiger de passage.",
   "mode_runs": "Pogingen",
-  "video_orientation": "Videoformaat"
+  "video_orientation": "Videoformaat",
+  "video_quality": "Kwaliteit",
+  "video_fps": "Beeldsnelheid",
+  "video_show_score": "Bladmuziek",
+  "video_show_keyboard": "Klavier"
 }

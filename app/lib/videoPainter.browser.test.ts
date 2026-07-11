@@ -121,6 +121,29 @@ describe("takeScenePainter with a score panel", () => {
         expect(countGreyPixels(paintWithScore(0))).toBeGreaterThan(5_000);
     });
 
+    it("hands the whole stage to the score when the keyboard is dropped by choice", () => {
+        // Landscape, keyboard off: the score panel takes the keyboard's band too,
+        // so the sheet paints far more pixels than the shared layout shows.
+        const paintLayout = (keyboard: boolean) => {
+            const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
+            const context = canvas.getContext("2d")!;
+            takeScenePainter({
+                title: "Menuet",
+                credit: "Menuet · J. S. Bach · CC0",
+                notes: [{ pitch: 60, startMs: 0, durationMs: 400, velocity: 100 }],
+                durationMs: LEAD_IN_MS + 2_000,
+                width: WIDTH,
+                height: HEIGHT,
+                score,
+                keyboard,
+            })(context, 0);
+            return context;
+        };
+        const withKeys = countGreyPixels(paintLayout(true));
+        const scoreOnly = countGreyPixels(paintLayout(false));
+        expect(scoreOnly).toBeGreaterThan(withKeys * 1.5);
+    });
+
     it("tints the played step's noteheads once its onset passes", () => {
         // The tint blends accent over the grey sheet, eating grey pixels.
         const before = countGreyPixels(paintWithScore(0));

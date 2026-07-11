@@ -60,6 +60,9 @@ export type ScenePainterInput = {
     height: number;
     // Optional notation panel; without it the keyboard fills the stage as before.
     score?: SceneScore | null;
+    // Whether the on-screen keyboard is part of the stage. Off hands the whole
+    // stage to the notation (ignored when there is no score to show instead).
+    keyboard?: boolean;
 };
 
 type Context2D = Pick<
@@ -103,14 +106,16 @@ export function takeScenePainter({
     width,
     height,
     score = null,
+    keyboard = true,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
-    // With a notation panel the keyboard cedes the middle of the stage to it —
-    // and a portrait frame drops the keyboard entirely: on the vertical feeds
-    // the notation is the story, and the full-height panel keeps its glyphs
-    // readable on a phone.
-    const scoreOnly = score !== null && height > width;
+    // With a notation panel the keyboard cedes the middle of the stage to it.
+    // A portrait frame drops the keyboard entirely (on the vertical feeds the
+    // notation is the story, and the full-height panel keeps its glyphs readable
+    // on a phone), and the exporter can drop it by choice — but only when a
+    // score exists to fill the stage instead.
+    const scoreOnly = score !== null && (height > width || !keyboard);
     const keyboardTop = score ? height * 0.66 : height * 0.42;
     const keyboardHeight = score ? height * 0.24 : height * 0.4;
     const margin = Math.round(width * 0.05);
