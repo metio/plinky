@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { m } from "../../paraglide/messages.js";
-import { Drawer } from "../ui/drawer";
 import { FullScreen, Show } from "./conditional";
 import { KeepUpResultCard } from "./keepUpResultCard";
 import { LoopRangeBar } from "./loopRangeBar";
@@ -36,8 +35,8 @@ export function PlaySurface() {
         runResult,
         runTempoScale,
         gradePanelRef,
-        runsOpen,
-        setRunsOpen,
+        runsView,
+        showScore,
         takes,
         xml,
         hand,
@@ -48,79 +47,16 @@ export function PlaySurface() {
 
     return (
         <>
-            <PlayTransport />
-            {/* When the loop is on, its range and narrowing controls sit right by the
-            score — the drawer's backdrop covers the score, so narrowing happens here,
-            drawer closed. Hidden during a run, when the score isn't yours to click. */}
-            {ready && measureCount > 1 && loop.on && !matcher.practicing && !keepUp.running && (
-                <LoopRangeBar
-                    measureCount={measureCount}
-                    from={loop.from}
-                    to={loop.to}
-                    setFrom={loop.setFrom}
-                    setTo={loop.setTo}
-                    onWholeSong={loop.wholeSong}
-                />
-            )}
-            <ScoreCanvas />
-
-            {/* All play settings live in one drawer, opened by the Practice-tools
-            button (at rest and in the full-screen transport) and portaled above the
-            score — so the resting view stays uncluttered and the settings are reachable
-            mid-play, not stranded in a fold that vanishes in full screen. */}
-            <PlayToolsDrawer />
-
-            <FullScreen off>
-                <Show when={ghostRace.sharedFromLink}>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.ghost_shared_loaded()}
-                    </p>
-                </Show>
-            </FullScreen>
-
-            <PlayStage />
-
-            {/* The play-along result — how many beats you kept up with — shown when a
-            tempo-locked run finishes, in place of the self-paced grade panel. */}
-            <FullScreen off>
-                {keepUp.result && <KeepUpResultCard result={keepUp.result} />}
-            </FullScreen>
-            {/* The grade narrows the type for the readouts below, so it stays an `&&`
-            guard; the full-screen branch is the declarative half. */}
-            <FullScreen off>
-                {runResult.grade && (
-                    <div ref={gradePanelRef} className="space-y-3">
-                        <RunResult
-                            grade={runResult.grade}
-                            notes={runResult.notes}
-                            tolerance={runResult.tolerance}
-                            grid={runResult.grid}
-                            tempoCurve={runResult.tempoCurve}
-                            tempoScale={runTempoScale}
-                            daily={daily}
-                            title={title}
-                            ephemeral={ephemeral}
-                            runSaved={runResult.saved}
-                            onSaveTake={saveCurrentTake}
-                        />
-                    </div>
-                )}
-            </FullScreen>
-            {/* Your saved performances of this piece live in their own drawer — sharing
-            your last run, replaying or racing an old one — so browsing them never
-            clutters the resting play column. The drawer's count-titled header stands in
-            for a section heading; replaying one closes the drawer so the score behind it
-            is in view. Not for an ephemeral piece, which can't be saved. */}
-            {!ephemeral && (
-                <Drawer
-                    open={runsOpen}
-                    onClose={() => setRunsOpen(false)}
-                    title={
-                        takes.length > 0
+            {/* The Runs tab replaces the resting play column with the saved-runs page —
+            the score below stays mounted (hidden, never unmounted) because replaying a
+            take drives its cursor; replay hops back to the Play tab to watch it. */}
+            {runsView && !ephemeral && (
+                <section className="space-y-3">
+                    <h2 className="text-lg font-semibold">
+                        {takes.length > 0
                             ? m.takes_heading({ count: takes.length })
-                            : m.takes_panel_heading()
-                    }
-                >
+                            : m.takes_panel_heading()}
+                    </h2>
                     <TakesPanel
                         id={id}
                         takes={takes}
@@ -132,14 +68,74 @@ export function PlaySurface() {
                         canShareLastRun={!ghostRace.sharedFromLink}
                         original={{ xml, hand }}
                         onReplay={(take) => {
-                            setRunsOpen(false);
+                            showScore();
                             replayTake(take);
                         }}
                         onStop={listenPlayback.stop}
                         onDelete={deleteTake}
                     />
-                </Drawer>
+                </section>
             )}
+            <div className={runsView ? "hidden" : "space-y-5"}>
+                <PlayTransport />
+                {/* When the loop is on, its range and narrowing controls sit right by the
+            score — the drawer's backdrop covers the score, so narrowing happens here,
+            drawer closed. Hidden during a run, when the score isn't yours to click. */}
+                {ready && measureCount > 1 && loop.on && !matcher.practicing && !keepUp.running && (
+                    <LoopRangeBar
+                        measureCount={measureCount}
+                        from={loop.from}
+                        to={loop.to}
+                        setFrom={loop.setFrom}
+                        setTo={loop.setTo}
+                        onWholeSong={loop.wholeSong}
+                    />
+                )}
+                <ScoreCanvas />
+
+                {/* All play settings live in one drawer, opened by the Practice-tools
+            button (at rest and in the full-screen transport) and portaled above the
+            score — so the resting view stays uncluttered and the settings are reachable
+            mid-play, not stranded in a fold that vanishes in full screen. */}
+                <PlayToolsDrawer />
+
+                <FullScreen off>
+                    <Show when={ghostRace.sharedFromLink}>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {m.ghost_shared_loaded()}
+                        </p>
+                    </Show>
+                </FullScreen>
+
+                <PlayStage />
+
+                {/* The play-along result — how many beats you kept up with — shown when a
+            tempo-locked run finishes, in place of the self-paced grade panel. */}
+                <FullScreen off>
+                    {keepUp.result && <KeepUpResultCard result={keepUp.result} />}
+                </FullScreen>
+                {/* The grade narrows the type for the readouts below, so it stays an `&&`
+            guard; the full-screen branch is the declarative half. */}
+                <FullScreen off>
+                    {runResult.grade && (
+                        <div ref={gradePanelRef} className="space-y-3">
+                            <RunResult
+                                grade={runResult.grade}
+                                notes={runResult.notes}
+                                tolerance={runResult.tolerance}
+                                grid={runResult.grid}
+                                tempoCurve={runResult.tempoCurve}
+                                tempoScale={runTempoScale}
+                                daily={daily}
+                                title={title}
+                                ephemeral={ephemeral}
+                                runSaved={runResult.saved}
+                                onSaveTake={saveCurrentTake}
+                            />
+                        </div>
+                    )}
+                </FullScreen>
+            </div>
         </>
     );
 }

@@ -612,5 +612,7 @@
   "reveal_tries": "Versuche",
   "reveal_tries_caption": "Wie viele Fehlversuche eine versteckte Note erlaubt, bevor sie sich rot zeigt.",
   "action_fingering_editor": "Fingersatz",
-  "fingering_heat_legend": "Eingefärbte Takte sind schwerer zu greifen — je tiefer das Rot, desto kniffliger die Passage."
+  "fingering_heat_legend": "Eingefärbte Takte sind schwerer zu greifen — je tiefer das Rot, desto kniffliger die Passage.",
+  "mode_runs": "Durchläufe",
+  "video_orientation": "Videoformat"
 }

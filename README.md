@@ -132,9 +132,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   most economical finger positions for your hand, the two bars you're on are
   **highlighted in the full piece** so you keep your place, and it's **saved per piece**
   so the positions you work out are there when you come back).
-- **Your runs** — every play page has a **Runs** button beside Practice that opens a
-  drawer of your saved performances, so the feature is there to find before you've saved a
-  thing: with nothing yet, it tells you how to make a run (play a piece through, then save
+- **Your runs** — every play page has a **Runs** tab (and a button beside Practice
+  that jumps to it) giving your saved performances the whole page, so the feature is
+  there to find before you've saved a thing: with nothing yet, it tells you how to make a run (play a piece through, then save
   it). Each piece keeps your last few, each showing the **grade and the accuracy, timing
   and flow** it earned so you can compare attempts at a glance: **replay** one and it plays
   back onto the staff in your own timing — on a MIDI piano, even how long you held each key,
@@ -143,8 +143,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   tinting as it sounds, above the keyboard where each press lights its key in full
   and fades while held, so even fast repeats read clearly — with the piece's title, composer
   and licence burnt in, ready for any chat or feed — offered on browsers that can encode
-  one, Chrome and friends today), **challenge a
-  friend** to race it by link, or delete it. From the top of the drawer you can **challenge
+  one, Chrome and friends today — pick **16:9 or 9:16** right beside Save), **challenge a
+  friend** to race it by link, or delete it. From the top of the tab you can **challenge
   a friend with your last run** straight away, no save needed. Your fastest complete run is
   the **ghost** you race next time — racing is on by default and toggles off under the
   score's practice options.

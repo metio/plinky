@@ -612,5 +612,7 @@
   "reveal_tries": "Forsøk",
   "reveal_tries_caption": "Hvor mange feilforsøk en skjult note tillater før den avsløres i rødt.",
   "action_fingering_editor": "Fingersetting",
-  "fingering_heat_legend": "Skraverte takter er vanskeligere å spille — jo dypere rødt, desto mer krevende passasje."
+  "fingering_heat_legend": "Skraverte takter er vanskeligere å spille — jo dypere rødt, desto mer krevende passasje.",
+  "mode_runs": "Forsøk",
+  "video_orientation": "Videoformat"
 }

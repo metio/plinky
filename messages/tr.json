@@ -612,5 +612,7 @@
   "reveal_tries": "Deneme",
   "reveal_tries_caption": "Gizli bir notanın kırmızı olarak ortaya çıkmadan önce izin verdiği yanlış deneme sayısı.",
   "action_fingering_editor": "Parmak dizilimi",
-  "fingering_heat_legend": "Gölgeli ölçüler daha zor çalınır — kırmızı ne kadar koyuysa pasaj o kadar çetindir."
+  "fingering_heat_legend": "Gölgeli ölçüler daha zor çalınır — kırmızı ne kadar koyuysa pasaj o kadar çetindir.",
+  "mode_runs": "Denemeler",
+  "video_orientation": "Video biçimi"
 }

@@ -7,14 +7,16 @@ import { CoachMark } from "./coachMark";
 import { SegmentedControl } from "../ui/segmentedControl";
 
 // The ways to work a piece. "play" is the score itself (read it, hear it, practise
-// it); "ear" and "fingering" are the focused drills. They share the open piece, so
-// switching never leaves the page.
-export type PlayMode = "play" | "ear" | "fingering";
+// it); "ear" and "fingering" are the focused drills; "runs" is your saved
+// performances of it — replays, ghosts and exports, with the whole page to breathe.
+// They share the open piece, so switching never leaves the page.
+export type PlayMode = "play" | "ear" | "fingering" | "runs";
 
 const MODES: { id: PlayMode; label: () => string }[] = [
     { id: "play", label: m.mode_play },
     { id: "ear", label: m.mode_ear },
     { id: "fingering", label: m.mode_fingering },
+    { id: "runs", label: m.mode_runs },
 ];
 
 // A slim tab bar that sticks to the top while you scroll a long score, so the modes

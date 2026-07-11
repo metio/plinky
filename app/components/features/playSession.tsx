@@ -72,6 +72,12 @@ export type PlaySessionProps = {
     ephemeral?: boolean;
     canShareGhost?: boolean;
     seededResult?: DailyResult | null;
+    // The resting page's Runs tab: true renders the saved-runs page instead of the
+    // resting play column (fullscreen is unaffected), and the callbacks hop between
+    // the page's tabs — the session can't own the tab, the route does.
+    runsView?: boolean;
+    onShowRuns?: () => void;
+    onShowScore?: () => void;
 };
 
 // Assembles the whole play session: all the hooks, the effects that coordinate them, and
@@ -91,6 +97,9 @@ function usePlaySessionValue({
     ephemeral,
     canShareGhost,
     seededResult,
+    runsView = false,
+    onShowRuns,
+    onShowScore,
 }: PlaySessionProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
@@ -180,7 +189,7 @@ function usePlaySessionValue({
     // Whether the Practice-tools drawer (all the play settings) is open.
     const [toolsOpen, setToolsOpen] = useState(false);
     // Whether the Runs drawer (your saved performances of this piece) is open.
-    const [runsOpen, setRunsOpen] = useState(false);
+
     // The slice of keyboard on show. A wide-ranging piece would shrink every key to a
     // sliver if framed whole, so the keyboard tracks a bounded window that follows the
     // notes being played; the player picks its width (or 0 to keep the whole piece in
@@ -786,8 +795,9 @@ function usePlaySessionValue({
         setFingerStrip,
         toolsOpen,
         setToolsOpen,
-        runsOpen,
-        setRunsOpen,
+        runsView,
+        showRuns: () => onShowRuns?.(),
+        showScore: () => onShowScore?.(),
         portrait,
         coarsePointer,
         rotateDismissed,

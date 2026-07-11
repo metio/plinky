@@ -612,5 +612,7 @@
   "reveal_tries": "Próby",
   "reveal_tries_caption": "Ile błędnych prób dopuszcza ukryta nuta, zanim odsłoni się na czerwono.",
   "action_fingering_editor": "Palcowanie",
-  "fingering_heat_legend": "Zacieniowane takty są trudniejsze do zagrania — im głębsza czerwień, tym bardziej podchwytliwy fragment."
+  "fingering_heat_legend": "Zacieniowane takty są trudniejsze do zagrania — im głębsza czerwień, tym bardziej podchwytliwy fragment.",
+  "mode_runs": "Przebiegi",
+  "video_orientation": "Format wideo"
 }

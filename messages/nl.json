@@ -612,5 +612,7 @@
   "reveal_tries": "Pogingen",
   "reveal_tries_caption": "Hoeveel foute pogingen een verborgen noot toestaat voordat die zich rood onthult.",
   "action_fingering_editor": "Vingerzetting",
-  "fingering_heat_legend": "Gearceerde maten zijn lastiger te spelen — hoe dieper het rood, hoe lastiger de passage."
+  "fingering_heat_legend": "Gearceerde maten zijn lastiger te spelen — hoe dieper het rood, hoe lastiger de passage.",
+  "mode_runs": "Pogingen",
+  "video_orientation": "Videoformaat"
 }

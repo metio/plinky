@@ -41,7 +41,7 @@ export function PlayTransport() {
         setFingerStrip,
         setHideKeyboard,
         setToolsOpen,
-        setRunsOpen,
+        showRuns,
         exitFullscreen,
     } = usePlaySession();
     const { showFingerings, setShowFingerings, treadmill, scrollFollow, setScrollFollow } = reading;
@@ -103,7 +103,7 @@ export function PlayTransport() {
     // column so browsing them, sharing your last run, or replaying one never clutters the
     // resting play view. Not for an ephemeral piece, which can't be saved.
     const runsButton = !ephemeral && (
-        <Button variant="secondary" onClick={() => setRunsOpen(true)}>
+        <Button variant="secondary" onClick={showRuns}>
             <ListIcon />
             {m.takes_button()}
         </Button>

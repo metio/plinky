@@ -612,5 +612,7 @@
   "reveal_tries": "Essais",
   "reveal_tries_caption": "Nombre d’essais ratés qu’une note cachée autorise avant de se révéler en rouge.",
   "action_fingering_editor": "Doigtés",
-  "fingering_heat_legend": "Les mesures ombrées sont plus difficiles à doigter — plus le rouge est profond, plus le passage est délicat."
+  "fingering_heat_legend": "Les mesures ombrées sont plus difficiles à doigter — plus le rouge est profond, plus le passage est délicat.",
+  "mode_runs": "Prises",
+  "video_orientation": "Format vidéo"
 }

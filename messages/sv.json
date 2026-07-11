@@ -612,5 +612,7 @@
   "reveal_tries": "Försök",
   "reveal_tries_caption": "Hur många felförsök en dold not tillåter innan den avslöjas i rött.",
   "action_fingering_editor": "Fingersättning",
-  "fingering_heat_legend": "Skuggade takter är svårare att spela — ju djupare rött, desto knepigare passage."
+  "fingering_heat_legend": "Skuggade takter är svårare att spela — ju djupare rött, desto knepigare passage.",
+  "mode_runs": "Försök",
+  "video_orientation": "Videoformat"
 }
