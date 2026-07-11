@@ -81,7 +81,10 @@ async function rasterizeSvg(
     const clone = svg.cloneNode(true) as SVGElement;
     clone.setAttribute("width", String(width));
     clone.setAttribute("height", String(height));
-    const blob = new Blob([new XMLSerializer().serializeToString(clone)], {
+    // outerHTML serializes an SVG element to valid standalone markup in every
+    // browser we run in (the print path relies on the same), keeping this module
+    // off the XML codec, which is a document parser seam, not an SVG one.
+    const blob = new Blob([clone.outerHTML], {
         type: "image/svg+xml",
     });
     const url = URL.createObjectURL(blob);
