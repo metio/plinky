@@ -65,6 +65,36 @@ describe("Board against a mocked Sanity API", () => {
         expect(screen.getByAltText("Ada at the piano").getAttribute("src")).toBe(ada.imageUrl);
     });
 
+    it("renders a real published pin whose blurb and alt are empty", async () => {
+        // The exact envelope the live dataset served for the first pinned artist —
+        // no blurb, no alt text, just a name, a picture and a follow link.
+        server.use(
+            http.get(QUERY_URL, () =>
+                HttpResponse.json({
+                    result: [
+                        {
+                            id: "02e77525-2c9e-4d6f-886e-2748b0909499",
+                            imageAlt: "",
+                            imageUrl:
+                                "https://cdn.sanity.io/images/susa35pw/production/f55b0bb7fc3d52639ab8034f23b5883d11445afd-150x150.jpg",
+                            linkUrl: "https://www.instagram.com/ludovico_einaudi/",
+                            name: "Ludovico Einaudi",
+                            order: 0,
+                            text: "",
+                        },
+                    ],
+                    syncTags: ["s1:Q6UMXw", "s1:xuEgpA"],
+                    ms: 8,
+                }),
+            ),
+        );
+        renderWithServices(<Board />, board);
+        expect(await screen.findByText("Ludovico Einaudi")).toBeTruthy();
+        expect(screen.getByText("Follow on Instagram").closest("a")?.getAttribute("href")).toBe(
+            "https://www.instagram.com/ludovico_einaudi/",
+        );
+    });
+
     it("asks Sanity for the reader's language", async () => {
         let requested = "";
         server.use(

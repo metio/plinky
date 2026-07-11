@@ -19,12 +19,16 @@ describe("parseBoardArtist", () => {
         expect(parseBoardArtist(artist)).toEqual(artist);
     });
 
-    it("rejects an entry without id, name, or text", () => {
+    it("rejects an entry without id or name", () => {
         expect(parseBoardArtist({ ...artist, id: "" })).toBeNull();
         expect(parseBoardArtist({ ...artist, name: "  " })).toBeNull();
-        expect(parseBoardArtist({ ...artist, text: "" })).toBeNull();
         expect(parseBoardArtist(null)).toBeNull();
         expect(parseBoardArtist("nope")).toBeNull();
+    });
+
+    it("keeps an entry whose blurb is empty — a name, picture and link suffice", () => {
+        expect(parseBoardArtist({ ...artist, text: "" })?.text).toBe("");
+        expect(parseBoardArtist({ ...artist, text: undefined })?.text).toBe("");
     });
 
     it("trims the name", () => {

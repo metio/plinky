@@ -6,7 +6,8 @@ import { isHttpsUrl } from "./url";
 // One artist pinned to the board: a name, a short blurb, a picture, and a link to
 // where the artist lives online (usually a social profile). Editor-controlled, so
 // nothing is trusted: an unsafe image or link URL is dropped, and an entry with no
-// usable name or text is discarded rather than rendered empty.
+// usable name is discarded rather than rendered empty. The blurb is optional —
+// a name, a picture and a follow link already make a useful pin.
 export type BoardArtist = {
     // Stable identifier from the content source.
     id: string;
@@ -15,7 +16,8 @@ export type BoardArtist = {
     // Sort order on the board; lower first.
     order: number;
     // The blurb, already in the reader's language (or the English fallback).
-    // Plain text — the page renders it as text nodes, never as markup.
+    // Plain text — the page renders it as text nodes, never as markup. Empty
+    // when the editors pinned the artist without one.
     text: string;
     // The artist's picture, shared across languages. https only; a rejected URL
     // leaves the card text-only.
@@ -26,9 +28,9 @@ export type BoardArtist = {
     linkUrl?: string;
 };
 
-// Validate one raw entry into a BoardArtist, or null when it lacks an id, a name,
-// or usable text. An unsafe image/link URL is dropped without discarding the whole
-// entry, so a bad link never costs the reader the artist.
+// Validate one raw entry into a BoardArtist, or null when it lacks an id or a
+// name. An unsafe image/link URL is dropped without discarding the whole entry,
+// so a bad link never costs the reader the artist.
 export function parseBoardArtist(raw: unknown): BoardArtist | null {
     if (typeof raw !== "object" || raw === null) {
         return null;
@@ -41,15 +43,12 @@ export function parseBoardArtist(raw: unknown): BoardArtist | null {
     if (typeof name !== "string" || name.trim() === "") {
         return null;
     }
-    if (typeof text !== "string" || text.trim() === "") {
-        return null;
-    }
     const artist: BoardArtist = {
         id,
         name: name.trim(),
         order:
             typeof record.order === "number" && Number.isFinite(record.order) ? record.order : 0,
-        text,
+        text: typeof text === "string" ? text.trim() : "",
     };
     if (isHttpsUrl(record.imageUrl)) {
         artist.imageUrl = record.imageUrl;

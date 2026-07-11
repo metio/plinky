@@ -18,6 +18,8 @@ const BASE_PATHS = [
     "/you",
     "/review",
     "/settings",
+    "/help",
+    "/board",
 ];
 
 // Prerender a play page for every bundled score so each piece is indexable with its own
