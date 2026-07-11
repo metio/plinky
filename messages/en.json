@@ -601,5 +601,6 @@
   "today_assignment": "Continue “{name}” — step {step} of {total}",
   "takes_download_video": "Save video",
   "takes_download_video_portrait": "Save a portrait video (9:16, for Reels and Shorts)",
-  "takes_video_progress": "Rendering… {percent}%"
+  "takes_video_progress": "Rendering… {percent}%",
+  "footer_follow": "Follow Plinky"
 }

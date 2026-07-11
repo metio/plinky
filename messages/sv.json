@@ -601,5 +601,6 @@
   "today_assignment": "Fortsätt “{name}” — steg {step} av {total}",
   "takes_download_video": "Spara video",
   "takes_download_video_portrait": "Spara en stående video (9:16, för Reels och Shorts)",
-  "takes_video_progress": "Renderar… {percent}%"
+  "takes_video_progress": "Renderar… {percent}%",
+  "footer_follow": "Följ Plinky"
 }

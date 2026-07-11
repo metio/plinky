@@ -601,5 +601,6 @@
   "today_assignment": "Ga verder met “{name}” — stap {step} van {total}",
   "takes_download_video": "Video opslaan",
   "takes_download_video_portrait": "Een staande video opslaan (9:16, voor Reels en Shorts)",
-  "takes_video_progress": "Renderen… {percent}%"
+  "takes_video_progress": "Renderen… {percent}%",
+  "footer_follow": "Volg Plinky"
 }

@@ -601,5 +601,6 @@
   "today_assignment": "“{name}” listesine devam et — {step}/{total}. adım",
   "takes_download_video": "Videoyu kaydet",
   "takes_download_video_portrait": "Dikey video kaydet (9:16, Reels ve Shorts için)",
-  "takes_video_progress": "İşleniyor… {percent}%"
+  "takes_video_progress": "İşleniyor… {percent}%",
+  "footer_follow": "Plinky'yi takip et"
 }

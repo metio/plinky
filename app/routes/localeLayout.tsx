@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import { Navigate, Outlet, useLocation, useParams } from "react-router";
 import { BottomNav } from "../components/ui/navBar";
+import { SiteFooter } from "../components/ui/siteFooter";
 import { useSongSource } from "../contexts/services";
 import { isLocale, localizeHref } from "../paraglide/runtime.js";
 
@@ -50,6 +51,7 @@ export default function LocaleLayout() {
             {/* Room for the fixed mobile tab bar so it never covers the last of a page. */}
             <div className="pb-20 md:pb-0">
                 <Outlet />
+                <SiteFooter />
             </div>
             <BottomNav />
         </>

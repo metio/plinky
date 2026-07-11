@@ -601,5 +601,6 @@
   "today_assignment": "Pokračujte v „{name}“ — krok {step} z {total}",
   "takes_download_video": "Uložit video",
   "takes_download_video_portrait": "Uložit video na výšku (9:16, pro Reels a Shorts)",
-  "takes_video_progress": "Vykreslování… {percent}%"
+  "takes_video_progress": "Vykreslování… {percent}%",
+  "footer_follow": "Sledujte Plinky"
 }

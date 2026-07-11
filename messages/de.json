@@ -601,5 +601,6 @@
   "today_assignment": "Weiter mit „{name}“ — Schritt {step} von {total}",
   "takes_download_video": "Video speichern",
   "takes_download_video_portrait": "Video im Hochformat speichern (9:16, für Reels und Shorts)",
-  "takes_video_progress": "Rendern… {percent}%"
+  "takes_video_progress": "Rendern… {percent}%",
+  "footer_follow": "Folge Plinky"
 }

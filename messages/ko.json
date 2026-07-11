@@ -601,5 +601,6 @@
   "today_assignment": "“{name}” 이어서 하기 — {step}/{total} 단계",
   "takes_download_video": "동영상 저장",
   "takes_download_video_portrait": "세로 영상 저장 (9:16, 릴스·쇼츠용)",
-  "takes_video_progress": "렌더링 중… {percent}%"
+  "takes_video_progress": "렌더링 중… {percent}%",
+  "footer_follow": "Plinky 팔로우"
 }

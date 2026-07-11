@@ -601,5 +601,6 @@
   "today_assignment": "Continue “{name}” — passo {step} de {total}",
   "takes_download_video": "Guardar vídeo",
   "takes_download_video_portrait": "Guardar um vídeo vertical (9:16, para Reels e Shorts)",
-  "takes_video_progress": "A renderizar… {percent}%"
+  "takes_video_progress": "A renderizar… {percent}%",
+  "footer_follow": "Siga o Plinky"
 }

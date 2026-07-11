@@ -320,6 +320,12 @@ image and link URLs are shown, and an unreachable source simply shows an empty
 board — the page never breaks. It reuses the news banner's
 `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
 
+## Follow Plinky
+
+Every page ends with a slim footer linking to Plinky's own channels —
+[Instagram](https://www.instagram.com/plinky.piano) and
+[Facebook](https://www.facebook.com/profile.php?id=61591963944991).
+
 ## Development
 
 The project builds with Node.js and npm:

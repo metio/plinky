@@ -601,5 +601,6 @@
   "today_assignment": "Fortsæt “{name}” — trin {step} af {total}",
   "takes_download_video": "Gem video",
   "takes_download_video_portrait": "Gem en lodret video (9:16, til Reels og Shorts)",
-  "takes_video_progress": "Gengiver… {percent}%"
+  "takes_video_progress": "Gengiver… {percent}%",
+  "footer_follow": "Følg Plinky"
 }

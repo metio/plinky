@@ -601,5 +601,6 @@
   "today_assignment": "Fortsett “{name}” — steg {step} av {total}",
   "takes_download_video": "Lagre video",
   "takes_download_video_portrait": "Lagre en stående video (9:16, for Reels og Shorts)",
-  "takes_video_progress": "Gjengir… {percent}%"
+  "takes_video_progress": "Gjengir… {percent}%",
+  "footer_follow": "Følg Plinky"
 }

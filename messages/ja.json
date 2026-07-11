@@ -601,5 +601,6 @@
   "today_assignment": "「{name}」の続き — ステップ {step}/{total}",
   "takes_download_video": "動画を保存",
   "takes_download_video_portrait": "縦型動画を保存（9:16、リール・ショート向け）",
-  "takes_video_progress": "書き出し中… {percent}%"
+  "takes_video_progress": "書き出し中… {percent}%",
+  "footer_follow": "Plinkyをフォロー"
 }

@@ -601,5 +601,6 @@
   "today_assignment": "Продолжить «{name}» — шаг {step} из {total}",
   "takes_download_video": "Сохранить видео",
   "takes_download_video_portrait": "Сохранить вертикальное видео (9:16, для Reels и Shorts)",
-  "takes_video_progress": "Рендеринг… {percent}%"
+  "takes_video_progress": "Рендеринг… {percent}%",
+  "footer_follow": "Подписывайтесь на Plinky"
 }
