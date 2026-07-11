@@ -13,9 +13,9 @@ afterEach(cleanup);
 describe("KeyMapping", () => {
     it("shows the default keys per note", () => {
         renderWithServices(<KeyMapping />);
-        // The left hand's C is bound to 'a' by default.
+        // The left hand's C is bound to 'z' by default.
         expect(screen.getByRole("button", { name: /Rebind C, Left hand/i }).textContent).toContain(
-            "A",
+            "Z",
         );
     });
 
@@ -26,11 +26,11 @@ describe("KeyMapping", () => {
         fireEvent.click(cap);
         expect(cap.getAttribute("aria-pressed")).toBe("true");
 
-        fireEvent.keyDown(window, { key: "z" });
+        fireEvent.keyDown(window, { key: "a" });
 
         expect(cap.getAttribute("aria-pressed")).toBe("false");
-        expect(cap.textContent).toContain("Z");
-        expect(services.prefs.load().keyMap.left.z).toBe(0);
+        expect(cap.textContent).toContain("A");
+        expect(services.prefs.load().keyMap.left.a).toBe(0);
     });
 
     it("cancels an armed rebind on Escape without changing the binding", () => {
@@ -41,7 +41,7 @@ describe("KeyMapping", () => {
         fireEvent.keyDown(window, { key: "Escape" });
 
         expect(cap.getAttribute("aria-pressed")).toBe("false");
-        expect(services.prefs.load().keyMap.left.a).toBe(0);
+        expect(services.prefs.load().keyMap.left.z).toBe(0);
     });
 
     it("marks the keys discovery step on engaging, even when the defaults are kept", () => {
@@ -52,7 +52,7 @@ describe("KeyMapping", () => {
         fireEvent.click(screen.getByRole("button", { name: /Rebind C, Left hand/i }));
         fireEvent.keyDown(window, { key: "Escape" });
         expect(services.onboarding.marked().has("keysCustomized")).toBe(true);
-        expect(services.prefs.load().keyMap.left.a).toBe(0);
+        expect(services.prefs.load().keyMap.left.z).toBe(0);
     });
 
     it("marks the keys discovery step when the standard layout is kept via reset", () => {
@@ -64,11 +64,11 @@ describe("KeyMapping", () => {
     it("restores the default layout on reset", () => {
         const { services } = renderWithServices(<KeyMapping />);
         fireEvent.click(screen.getByRole("button", { name: /Rebind C, Left hand/i }));
-        fireEvent.keyDown(window, { key: "z" });
-        expect(services.prefs.load().keyMap.left.z).toBe(0);
+        fireEvent.keyDown(window, { key: "a" });
+        expect(services.prefs.load().keyMap.left.a).toBe(0);
 
         fireEvent.click(screen.getByRole("button", { name: "Reset to default" }));
-        expect(services.prefs.load().keyMap.left.a).toBe(0);
-        expect("z" in services.prefs.load().keyMap.left).toBe(false);
+        expect(services.prefs.load().keyMap.left.z).toBe(0);
+        expect("a" in services.prefs.load().keyMap.left).toBe(false);
     });
 });

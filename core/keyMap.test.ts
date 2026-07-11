@@ -13,9 +13,16 @@ import {
 
 describe("keyForSlot", () => {
     it("finds the key bound to a hand's note slot", () => {
-        expect(keyForSlot(DEFAULT_KEY_MAP, "left", 0)).toBe("a");
-        expect(keyForSlot(DEFAULT_KEY_MAP, "left", 7)).toBe("g");
-        expect(keyForSlot(DEFAULT_KEY_MAP, "right", 7)).toBe(";");
+        expect(keyForSlot(DEFAULT_KEY_MAP, "left", 0)).toBe("z");
+        expect(keyForSlot(DEFAULT_KEY_MAP, "left", 7)).toBe("b");
+        expect(keyForSlot(DEFAULT_KEY_MAP, "right", 7)).toBe("t");
+    });
+
+    it("covers the full octave — A and B have keys of their own", () => {
+        expect(keyForSlot(DEFAULT_KEY_MAP, "left", 9)).toBe("n");
+        expect(keyForSlot(DEFAULT_KEY_MAP, "left", 11)).toBe("m");
+        expect(keyForSlot(DEFAULT_KEY_MAP, "right", 9)).toBe("y");
+        expect(keyForSlot(DEFAULT_KEY_MAP, "right", 11)).toBe("u");
     });
 
     it("returns null when nothing is bound to the slot", () => {
@@ -26,33 +33,33 @@ describe("keyForSlot", () => {
 
 describe("rebind", () => {
     it("binds a free key to a slot", () => {
-        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
-        expect(next.left.z).toBe(0);
-        expect("a" in next.left).toBe(false);
+        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "l");
+        expect(next.left.l).toBe(0);
+        expect("z" in next.left).toBe(false);
     });
 
     it("lowercases the bound key", () => {
-        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "Z");
-        expect(next.left.z).toBe(0);
+        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "L");
+        expect(next.left.l).toBe(0);
     });
 
     it("drops the slot's previous key so a note has exactly one key", () => {
-        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
-        expect(keyForSlot(next, "left", 0)).toBe("z");
-        expect("a" in next.left).toBe(false);
+        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "l");
+        expect(keyForSlot(next, "left", 0)).toBe("l");
+        expect("z" in next.left).toBe(false);
     });
 
     it("removes the key from any other slot it held, in either hand", () => {
-        // Move the right hand's 'h' (its C) onto the left hand's C; 'h' must leave the right.
-        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "h");
-        expect(next.left.h).toBe(0);
-        expect("h" in next.right).toBe(false);
-        expect("a" in next.left).toBe(false);
+        // Move the right hand's 'q' (its C) onto the left hand's C; 'q' must leave the right.
+        const next = rebind(DEFAULT_KEY_MAP, "left", 0, "q");
+        expect(next.left.q).toBe(0);
+        expect("q" in next.right).toBe(false);
+        expect("z" in next.left).toBe(false);
     });
 
     it("does not mutate the input", () => {
         const before = JSON.stringify(DEFAULT_KEY_MAP);
-        rebind(DEFAULT_KEY_MAP, "left", 0, "z");
+        rebind(DEFAULT_KEY_MAP, "left", 0, "l");
         expect(JSON.stringify(DEFAULT_KEY_MAP)).toBe(before);
     });
 });
@@ -77,31 +84,41 @@ describe("cleanKeyMap", () => {
         expect(cleaned.right).toEqual(DEFAULT_KEY_MAP.right);
     });
 
+    it("rejects a map saved when a hand spanned fewer slots", () => {
+        // The eight-slot C–G span an earlier layout stored: too narrow to be
+        // usable now, so the whole hand reverts to the full-octave default.
+        const narrow = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7 };
+        expect(isDefaultKeyMap(cleanKeyMap({ left: narrow, right: narrow }))).toBe(true);
+    });
+
     it("rejects a hand with an out-of-range or duplicate slot", () => {
-        expect(isDefaultKeyMap(cleanKeyMap({ left: { ...DEFAULT_KEY_MAP.left, a: 9 } }))).toBe(
+        expect(isDefaultKeyMap(cleanKeyMap({ left: { ...DEFAULT_KEY_MAP.left, z: 12 } }))).toBe(
             true,
         );
     });
 
     it("resets the whole layout when the two hands share a key", () => {
-        // A full, individually-valid right hand that steals the left hand's 'a'.
-        const clashRight = { a: 0, u: 1, j: 2, i: 3, k: 4, l: 5, p: 6, ";": 7 };
+        // A full, individually-valid right hand that steals the left hand's 'z'.
+        const clashRight = { ...DEFAULT_KEY_MAP.right };
+        delete clashRight.q;
+        clashRight.z = 0;
         const cleaned = cleanKeyMap({ left: DEFAULT_KEY_MAP.left, right: clashRight });
         expect(isDefaultKeyMap(cleaned)).toBe(true);
     });
 
     it("keeps a customised but valid map", () => {
-        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
+        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "l");
         const cleaned = cleanKeyMap(custom);
-        expect(cleaned.left.z).toBe(0);
+        expect(cleaned.left.l).toBe(0);
         expect(isDefaultKeyMap(cleaned)).toBe(false);
     });
 });
 
 describe("isDefaultKeyMap", () => {
     it("is true for the default regardless of key order", () => {
+        const { z: _z, ...rest } = DEFAULT_KEY_MAP.left;
         const reordered: KeyMap = {
-            left: { g: 7, a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6 },
+            left: { ...rest, z: 0 },
             right: DEFAULT_KEY_MAP.right,
         };
         expect(isDefaultKeyMap(reordered)).toBe(true);

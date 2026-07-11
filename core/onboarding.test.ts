@@ -47,7 +47,7 @@ describe("discoveries", () => {
     });
 
     it("marks the keys step once any binding differs from the default", () => {
-        const prefs = { ...DEFAULT_PREFS, keyMap: rebind(DEFAULT_KEY_MAP, "right", 0, "q") };
+        const prefs = { ...DEFAULT_PREFS, keyMap: rebind(DEFAULT_KEY_MAP, "right", 0, "l") };
         expect(discoveries({ ...fresh(), prefs }).keysCustomized).toBe(true);
     });
 

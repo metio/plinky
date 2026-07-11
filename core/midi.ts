@@ -94,8 +94,9 @@ const LEFT_HAND_BASE_NOTE = 60; // C4 at octave offset 0
 const RIGHT_HAND_BASE_NOTE = 72; // C5 — one octave above the left hand
 
 // Map a pressed key to its MIDI note for the active octave offset, or null when the
-// key is not part of the layout. The five-finger home-row split is the default, but a
-// player can rebind keys (see keyMap), so the live mapping is passed in.
+// key is not part of the layout. The two-row virtual-piano split (a full octave per
+// hand) is the default, but a player can rebind keys (see keyMap), so the live
+// mapping is passed in.
 export function keyToNote(
     key: string,
     octaveOffset: number,

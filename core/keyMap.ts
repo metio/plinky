@@ -1,11 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// The computer-keyboard layout: which physical key plays each of the eight notes
-// (C C♯ D D♯ E F F♯ G) under each hand. The default is the five-finger home-row
-// split — left hand on A S D F G (+ W E T for the black keys), right hand an octave
-// up on H J K L ; (+ U I P) — but a player can rebind any key, so the layout lives
-// in prefs and the keyboard input layer reads it from here.
+// The computer-keyboard layout: which physical key plays each of the twelve notes
+// of one octave (C through B) under each hand. The default is the classic
+// virtual-piano split — left hand on the bottom letter row (Z X C V B N M white,
+// S D G H J black), right hand an octave up on the top letter row (Q W E R T Y U
+// white, 2 3 5 6 7 black) — so every note of a piece is reachable, A and B
+// included. A player can rebind any key, so the layout lives in prefs and the
+// keyboard input layer reads it from here.
 
 export type Hand = "left" | "right";
 
@@ -13,9 +15,9 @@ export type Hand = "left" | "right";
 // hand's base C; the key strings are lowercased, matching `KeyboardEvent.key`.
 export type KeyMap = { left: Record<string, number>; right: Record<string, number> };
 
-// The eight playable slots in one hand's span: C through G with the three black
-// keys among them. Index is the semitone offset stored in the map.
-export const SEMITONES = [0, 1, 2, 3, 4, 5, 6, 7] as const;
+// The twelve playable slots in one hand's span: a full octave, C through B.
+// Index is the semitone offset stored in the map.
+export const SEMITONES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
 
 // Display labels for each semitone slot, sharps spelled with ♯.
 export const NOTE_LABELS: Record<number, string> = {
@@ -27,13 +29,17 @@ export const NOTE_LABELS: Record<number, string> = {
     5: "F",
     6: "F♯",
     7: "G",
+    8: "G♯",
+    9: "A",
+    10: "A♯",
+    11: "B",
 };
 
 export const HANDS: Hand[] = ["left", "right"];
 
 export const DEFAULT_KEY_MAP: KeyMap = {
-    left: { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7 },
-    right: { h: 0, u: 1, j: 2, i: 3, k: 4, l: 5, p: 6, ";": 7 },
+    left: { z: 0, s: 1, x: 2, d: 3, c: 4, v: 5, g: 6, b: 7, h: 8, n: 9, j: 10, m: 11 },
+    right: { q: 0, "2": 1, w: 2, "3": 3, e: 4, r: 5, "5": 6, t: 7, "6": 8, y: 9, "7": 10, u: 11 },
 };
 
 function cloneMap(map: KeyMap): KeyMap {
@@ -68,10 +74,10 @@ export function rebind(map: KeyMap, hand: Hand, semitone: number, key: string): 
     return next;
 }
 
-// A hand is usable only as a complete, unambiguous span: exactly the eight slots
-// 0–7, each held by a distinct non-empty key. A partially-corrupt hand is rejected
-// wholesale (the caller substitutes the default) rather than half-repaired into a
-// surprising layout.
+// A hand is usable only as a complete, unambiguous span: exactly the twelve slots
+// 0–11, each held by a distinct non-empty key. A partially-corrupt hand — or a map
+// saved when the span was narrower — is rejected wholesale (the caller substitutes
+// the default) rather than half-repaired into a surprising layout.
 function validHand(value: unknown): Record<string, number> | null {
     if (!value || typeof value !== "object") {
         return null;
@@ -86,7 +92,7 @@ function validHand(value: unknown): Record<string, number> | null {
         if (typeof key !== "string" || key.length < 1 || typeof slot !== "number") {
             return null;
         }
-        if (!Number.isInteger(slot) || slot < 0 || slot > 7 || slots.has(slot)) {
+        if (!Number.isInteger(slot) || slot < 0 || slot > 11 || slots.has(slot)) {
             return null;
         }
         slots.add(slot);
