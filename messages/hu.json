@@ -612,5 +612,7 @@
   "reveal_tries": "Próbák",
   "reveal_tries_caption": "Hány téves próbálkozást enged egy rejtett hangjegy, mielőtt pirosan felfedi magát.",
   "action_fingering_editor": "Ujjrend",
-  "fingering_heat_legend": "A színezett ütemek nehezebben játszhatók — minél mélyebb a piros, annál trükkösebb a szakasz."
+  "fingering_heat_legend": "A színezett ütemek nehezebben játszhatók — minél mélyebb a piros, annál trükkösebb a szakasz.",
+  "mode_runs": "Futamok",
+  "video_orientation": "Videóformátum"
 }

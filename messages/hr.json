@@ -612,5 +612,7 @@
   "reveal_tries": "Pokušaji",
   "reveal_tries_caption": "Koliko pogrešnih pokušaja skrivena nota dopušta prije nego što se otkrije crveno.",
   "action_fingering_editor": "Prstomet",
-  "fingering_heat_legend": "Osjenčani taktovi teže se sviraju — što je crvena dublja, to je dionica zahtjevnija."
+  "fingering_heat_legend": "Osjenčani taktovi teže se sviraju — što je crvena dublja, to je dionica zahtjevnija.",
+  "mode_runs": "Izvedbe",
+  "video_orientation": "Format videozapisa"
 }

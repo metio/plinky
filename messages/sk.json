@@ -612,5 +612,7 @@
   "reveal_tries": "Pokusy",
   "reveal_tries_caption": "Koľko chybných pokusov skrytá nota dovolí, kým sa odhalí červenou.",
   "action_fingering_editor": "Prstoklad",
-  "fingering_heat_legend": "Podfarbené takty sa hrajú ťažšie — čím sýtejšia červená, tým zradnejšia pasáž."
+  "fingering_heat_legend": "Podfarbené takty sa hrajú ťažšie — čím sýtejšia červená, tým zradnejšia pasáž.",
+  "mode_runs": "Pokusy",
+  "video_orientation": "Formát videa"
 }

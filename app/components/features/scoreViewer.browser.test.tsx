@@ -22,12 +22,29 @@ import { ScoreViewer } from "./scoreViewer";
 // provider would silently open a REAL Web MIDI connection under every test.
 const midiFake = { midi: fakeMidi() };
 
+// The Runs tab lives with the route (the mode bar), so the harness mirrors that
+// wiring: the Runs button switches the view, replay switches it back.
+function Harness({ xml, ...props }: { xml: string; beatsPerBar?: number }) {
+    const [runsView, setRunsView] = useState(false);
+    return (
+        <ScoreViewer
+            id="t"
+            xml={xml}
+            title="T"
+            runsView={runsView}
+            onShowRuns={() => setRunsView(true)}
+            onShowScore={() => setRunsView(false)}
+            {...props}
+        />
+    );
+}
+
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
     render(
         <MemoryRouter>
             <ServicesProvider services={midiFake}>
                 <MidiProvider>
-                    <ScoreViewer id="t" xml={xml} title="T" {...props} />
+                    <Harness xml={xml} {...props} />
                 </MidiProvider>
             </ServicesProvider>
         </MemoryRouter>,
@@ -93,7 +110,7 @@ describe("ScoreViewer", () => {
         expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
-    it("opens a Runs drawer that explains how to make a run before any is saved", async () => {
+    it("opens a Runs view that explains how to make a run before any is saved", async () => {
         // The Runs button is always in the action row (on a savable piece) so the feature is
         // discoverable; opening it with nothing saved explains how to make a run.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
@@ -571,8 +588,10 @@ describe("ScoreViewer", () => {
         // finishing a song and later finding Runs empty read as data loss.
         expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
         expect(screen.queryByText("Save this run?")).toBeNull();
-        fireEvent.click(screen.getByRole("button", { name: "Runs" }));
-        // The drawer lists the kept take rather than the how-to hint.
+        // Completion has already dropped out of full screen; the Runs button is
+        // back in the resting action row.
+        fireEvent.click(await screen.findByRole("button", { name: "Runs" }));
+        // The Runs view lists the kept take rather than the how-to hint.
         expect(screen.queryByText(/play a piece through/i)).toBeNull();
         expect(screen.getAllByRole("button", { name: /replay/i }).length).toBeGreaterThan(0);
     });

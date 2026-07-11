@@ -612,5 +612,7 @@
   "reveal_tries": "Intentos",
   "reveal_tries_caption": "Cuántos intentos fallidos permite una nota oculta antes de revelarse en rojo.",
   "action_fingering_editor": "Digitación",
-  "fingering_heat_legend": "Los compases sombreados son más difíciles de digitar — cuanto más rojo, más complicado el pasaje."
+  "fingering_heat_legend": "Los compases sombreados son más difíciles de digitar — cuanto más rojo, más complicado el pasaje.",
+  "mode_runs": "Intentos",
+  "video_orientation": "Formato de vídeo"
 }

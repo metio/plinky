@@ -612,5 +612,7 @@
   "reveal_tries": "Yritykset",
   "reveal_tries_caption": "Montako väärää yritystä piilotettu nuotti sallii ennen kuin se paljastuu punaisena.",
   "action_fingering_editor": "Sormijärjestys",
-  "fingering_heat_legend": "Sävytetyt tahdit ovat vaikeampia sormittaa — mitä syvempi punainen, sitä hankalampi kohta."
+  "fingering_heat_legend": "Sävytetyt tahdit ovat vaikeampia sormittaa — mitä syvempi punainen, sitä hankalampi kohta.",
+  "mode_runs": "Suoritukset",
+  "video_orientation": "Videon muoto"
 }

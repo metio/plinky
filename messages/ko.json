@@ -612,5 +612,7 @@
   "reveal_tries": "시도 횟수",
   "reveal_tries_caption": "숨겨진 음표가 빨간색으로 드러나기 전까지 허용되는 오답 횟수.",
   "action_fingering_editor": "운지법",
-  "fingering_heat_legend": "음영이 있는 마디는 운지가 더 어렵습니다 — 빨간색이 짙을수록 까다로운 부분입니다."
+  "fingering_heat_legend": "음영이 있는 마디는 운지가 더 어렵습니다 — 빨간색이 짙을수록 까다로운 부분입니다.",
+  "mode_runs": "연주 기록",
+  "video_orientation": "동영상 형식"
 }

@@ -612,5 +612,7 @@
   "reveal_tries": "試行回数",
   "reveal_tries_caption": "隠れた音符が赤く現れるまでに許される間違いの回数。",
   "action_fingering_editor": "運指",
-  "fingering_heat_legend": "色付きの小節は運指が難しい部分です — 赤が濃いほど手ごわいパッセージです。"
+  "fingering_heat_legend": "色付きの小節は運指が難しい部分です — 赤が濃いほど手ごわいパッセージです。",
+  "mode_runs": "テイク",
+  "video_orientation": "動画の形式"
 }

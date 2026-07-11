@@ -612,5 +612,7 @@
   "reveal_tries": "尝试次数",
   "reveal_tries_caption": "隐藏音符在以红色显现之前允许的弹错次数。",
   "action_fingering_editor": "指法",
-  "fingering_heat_legend": "着色的小节更难安排指法 — 红色越深，段落越棘手。"
+  "fingering_heat_legend": "着色的小节更难安排指法 — 红色越深，段落越棘手。",
+  "mode_runs": "演奏记录",
+  "video_orientation": "视频格式"
 }

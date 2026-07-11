@@ -612,5 +612,7 @@
   "reveal_tries": "Forsøg",
   "reveal_tries_caption": "Hvor mange forkerte forsøg en skjult node tillader, før den afsløres med rødt.",
   "action_fingering_editor": "Fingersætning",
-  "fingering_heat_legend": "Skraverede takter er sværere at spille — jo dybere rød, desto vanskeligere passage."
+  "fingering_heat_legend": "Skraverede takter er sværere at spille — jo dybere rød, desto vanskeligere passage.",
+  "mode_runs": "Forsøg",
+  "video_orientation": "Videoformat"
 }

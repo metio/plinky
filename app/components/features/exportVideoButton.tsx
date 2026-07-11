@@ -10,6 +10,7 @@ import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot"
 import { takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { SegmentedControl } from "../ui/segmentedControl";
 
 // 720p at 30fps: crisp enough for any feed, small enough to render in seconds.
 // Portrait swaps the axes for the 9:16 feeds (Reels, Shorts, TikTok).
@@ -37,6 +38,10 @@ export function ExportVideoButton({
     const exporter = useVideoExporter();
     const [supported, setSupported] = useState(false);
     const [progress, setProgress] = useState<number | null>(null);
+    // Which feed the file is for: 16:9 for the landscape platforms, 9:16 for
+    // Reels/Shorts/TikTok. A picker instead of two buttons, so the choice reads
+    // before the render starts.
+    const [orientation, setOrientation] = useState<"landscape" | "portrait">("landscape");
 
     useEffect(() => {
         let cancelled = false;
@@ -89,24 +94,32 @@ export function ExportVideoButton({
     };
 
     return (
-        <>
+        <span className="inline-flex items-center gap-1.5">
+            <SegmentedControl
+                options={[
+                    { id: "landscape", label: "16:9" },
+                    { id: "portrait", label: "9:16" },
+                ]}
+                value={orientation}
+                onChange={setOrientation}
+                label={m.video_orientation()}
+            />
             <Button
                 variant="ghost"
-                onClick={() => save(WIDTH, HEIGHT)}
+                onClick={() =>
+                    orientation === "portrait" ? save(HEIGHT, WIDTH) : save(WIDTH, HEIGHT)
+                }
                 disabled={progress !== null}
+                aria-label={
+                    orientation === "portrait"
+                        ? m.takes_download_video_portrait()
+                        : m.takes_download_video()
+                }
             >
                 {progress === null
                     ? m.takes_download_video()
                     : m.takes_video_progress({ percent: Math.round(progress * 100) })}
             </Button>
-            <Button
-                variant="ghost"
-                onClick={() => save(HEIGHT, WIDTH)}
-                disabled={progress !== null}
-                aria-label={m.takes_download_video_portrait()}
-            >
-                9:16
-            </Button>
-        </>
+        </span>
     );
 }

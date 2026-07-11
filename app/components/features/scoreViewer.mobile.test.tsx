@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { generatePhrase } from "../../../core/generator";
@@ -22,12 +23,29 @@ import { ScoreViewer } from "./scoreViewer";
 // silently open a real Web MIDI connection under every test.
 const midiFake = { midi: fakeMidi() };
 
+// The Runs tab lives with the route (the mode bar), so the harness mirrors that
+// wiring: the Runs button switches the view in place.
+function Harness({ xml, ...props }: { xml: string; beatsPerBar?: number }) {
+    const [runsView, setRunsView] = useState(false);
+    return (
+        <ScoreViewer
+            id="t"
+            xml={xml}
+            title="T"
+            runsView={runsView}
+            onShowRuns={() => setRunsView(true)}
+            onShowScore={() => setRunsView(false)}
+            {...props}
+        />
+    );
+}
+
 const mount = (xml: string, props: Partial<{ beatsPerBar: number }> = {}) =>
     render(
         <MemoryRouter>
             <ServicesProvider services={midiFake}>
                 <MidiProvider>
-                    <ScoreViewer id="t" xml={xml} title="T" {...props} />
+                    <Harness xml={xml} {...props} />
                 </MidiProvider>
             </ServicesProvider>
         </MemoryRouter>,
@@ -50,7 +68,7 @@ afterEach(() => {
 });
 
 describe("ScoreViewer on a phone", () => {
-    it("opens the Runs drawer from the resting action row", async () => {
+    it("opens the Runs view from the resting action row", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();

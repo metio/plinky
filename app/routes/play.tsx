@@ -124,7 +124,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
 
                     <PlayModeBar mode={mode} onChange={setMode} />
 
-                    <Show when={mode === "play"}>
+                    <Show when={mode === "play" || mode === "runs"}>
                         {parseExerciseId(score.id) && (
                             <ExerciseForms config={parseExerciseId(score.id)!} />
                         )}
@@ -144,6 +144,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             initialTempo={score.tempo}
                             beatsPerBar={score.beatsPerBar}
                             canShareGhost
+                            runsView={mode === "runs"}
+                            onShowRuns={() => setMode("runs")}
+                            onShowScore={() => setMode("play")}
                         />
                     </Show>
                     {mode === "ear" && <EarPiece xml={score.xml} />}

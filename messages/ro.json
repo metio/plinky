@@ -612,5 +612,7 @@
   "reveal_tries": "Încercări",
   "reveal_tries_caption": "Câte încercări greșite permite o notă ascunsă înainte să se dezvăluie în roșu.",
   "action_fingering_editor": "Digitație",
-  "fingering_heat_legend": "Măsurile umbrite sunt mai greu de cântat — cu cât roșul e mai intens, cu atât pasajul e mai dificil."
+  "fingering_heat_legend": "Măsurile umbrite sunt mai greu de cântat — cu cât roșul e mai intens, cu atât pasajul e mai dificil.",
+  "mode_runs": "Interpretări",
+  "video_orientation": "Format video"
 }

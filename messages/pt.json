@@ -612,5 +612,7 @@
   "reveal_tries": "Tentativas",
   "reveal_tries_caption": "Quantas tentativas erradas uma nota oculta permite antes de se revelar em vermelho.",
   "action_fingering_editor": "Dedilhado",
-  "fingering_heat_legend": "Os compassos sombreados são mais difíceis de dedilhar — quanto mais forte o vermelho, mais complicada a passagem."
+  "fingering_heat_legend": "Os compassos sombreados são mais difíceis de dedilhar — quanto mais forte o vermelho, mais complicada a passagem.",
+  "mode_runs": "Execuções",
+  "video_orientation": "Formato do vídeo"
 }
