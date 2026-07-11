@@ -116,7 +116,13 @@ export const ScorePortrait: Story = {
     render: () => <PortraitFrame />,
 };
 
-function PortraitFrame() {
+// A long title on the narrow portrait frame: it ellipsizes short of the
+// wordmark instead of running under it.
+export const PortraitLongTitle: Story = {
+    render: () => <PortraitFrame title="Twinkle, Twinkle, Little Star (both hands)" />,
+};
+
+function PortraitFrame({ title = TAKE.title }: { title?: string }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     useEffect(() => {
         const context = canvasRef.current?.getContext("2d");
@@ -124,11 +130,12 @@ function PortraitFrame() {
             const sheet = fakeSheet();
             takeScenePainter({
                 ...TAKE,
+                title,
                 width: 360,
                 height: 640,
                 score: { image: sheet.image, width: 1200, height: 260, steps: sheet.steps },
             })(context, LEAD_IN_MS + 440);
         }
-    }, []);
+    }, [title]);
     return <canvas ref={canvasRef} width={360} height={640} />;
 }

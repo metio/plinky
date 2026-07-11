@@ -9,6 +9,7 @@ import {
     sceneKeys,
     sceneRange,
     type ScoreBox,
+    scorePanelRect,
     scoreWindowTop,
     stepCenterAt,
 } from "../../core/videoScene";
@@ -72,6 +73,7 @@ type Context2D = Pick<
     | "restore"
     | "drawImage"
     | "clip"
+    | "measureText"
 > & {
     fillStyle: string | CanvasGradient | CanvasPattern;
     font: string;
@@ -79,6 +81,19 @@ type Context2D = Pick<
     textAlign: CanvasTextAlign;
     globalAlpha: number;
 };
+
+// Trim text to fit `room` in the context's current font, ending in an ellipsis
+// when anything had to go.
+function ellipsize(context: Context2D, text: string, room: number): string {
+    if (context.measureText(text).width <= room) {
+        return text;
+    }
+    let keep = text.length;
+    while (keep > 0 && context.measureText(`${text.slice(0, keep)}…`).width > room) {
+        keep--;
+    }
+    return `${text.slice(0, keep)}…`;
+}
 
 export function takeScenePainter({
     title,
@@ -125,11 +140,16 @@ export function takeScenePainter({
         context.fillStyle = BACKGROUND;
         context.fillRect(0, 0, width, height);
 
+        // The wordmark measures first so the title knows where it must stop —
+        // on a narrow portrait frame a long title would otherwise run under it.
+        context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
+        const wordmarkWidth = context.measureText("plinky.fun").width;
         context.textAlign = "left";
         context.textBaseline = "top";
         context.fillStyle = INK;
         context.font = `600 ${Math.round(unit * 0.06)}px Inter, system-ui, sans-serif`;
-        context.fillText(title, margin, height * 0.08);
+        const titleRoom = width - margin * 2 - wordmarkWidth - unit * 0.04;
+        context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
         context.textAlign = "right";
         context.fillStyle = MUTED;
         context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
@@ -193,11 +213,14 @@ export function takeScenePainter({
         timeMs: number,
     ) {
         const panelX = margin;
-        const panelY = height * 0.3;
         const panelW = width - margin * 2;
         // Score-only frames give the panel the keyboard's room as well, down to
-        // just above the credit line.
-        const panelH = scoreOnly ? height * 0.6 : height * 0.32;
+        // just above the credit line. A piece shorter than the band shrinks the
+        // card to the sheet and centres it, instead of trailing blank white.
+        const band = scoreOnly
+            ? { y: height * 0.3, height: height * 0.6 }
+            : { y: height * 0.3, height: height * 0.32 };
+        const { y: panelY, height: panelH } = scorePanelRect(band, panelW, sheet);
         const scale = panelW / sheet.width;
         const windowH = panelH / scale;
         const played = playedStepCount(onsets, currentOnsetMs);

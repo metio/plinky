@@ -8,6 +8,7 @@ import {
     playedStepCount,
     sceneKeys,
     sceneRange,
+    scorePanelRect,
     scoreWindowTop,
     stepCenterAt,
 } from "./videoScene";
@@ -61,6 +62,23 @@ describe("creditLine", () => {
 
     it("omits what a piece doesn't have rather than printing blanks", () => {
         expect(creditLine("Étude", attributionFor({}))).toBe("Étude");
+    });
+});
+
+describe("scorePanelRect", () => {
+    it("keeps the full band for a sheet taller than it", () => {
+        // 1000-wide sheet at panel width 500 → half scale; 2000 tall → 1000 shown.
+        expect(scorePanelRect({ y: 100, height: 300 }, 500, { width: 1000, height: 2000 })).toEqual(
+            { y: 100, height: 300 },
+        );
+    });
+
+    it("shrinks to a short sheet and centres it in the band", () => {
+        // 1000×200 sheet at panel width 500 scales to 100 tall — the card hugs
+        // the single system instead of trailing blank space.
+        expect(scorePanelRect({ y: 100, height: 300 }, 500, { width: 1000, height: 200 })).toEqual(
+            { y: 200, height: 100 },
+        );
     });
 });
 

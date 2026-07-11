@@ -100,6 +100,20 @@ export function scoreWindowTop(centerY: number, windowHeight: number, imageHeigh
     return Math.max(0, Math.min(top, Math.max(0, imageHeight - windowHeight)));
 }
 
+// The panel the painter actually draws for the score: the ideal band shrunk to
+// the sheet's own scaled height when the piece is shorter than the band (a
+// one-system piece must not trail empty card below its single row), and centred
+// within the band it was given so the stage stays balanced.
+export function scorePanelRect(
+    band: { y: number; height: number },
+    panelWidth: number,
+    sheet: { width: number; height: number },
+): { y: number; height: number } {
+    const scaledSheetHeight = (sheet.height / sheet.width) * panelWidth;
+    const height = Math.min(band.height, scaledSheetHeight);
+    return { y: band.y + (band.height - height) / 2, height };
+}
+
 // How many of the run's steps have sounded by the frame's latest onset (frameAt's
 // currentOnsetMs, on the notes' clock) — the steps the painter colours as played.
 // Before the first onset nothing is played.
