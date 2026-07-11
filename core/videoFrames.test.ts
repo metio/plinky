@@ -3,7 +3,15 @@
 
 import { describe, expect, it } from "vitest";
 import type { RecordedNote } from "./composition";
-import { frameAt, frameTimesMs, LEAD_IN_MS, TAIL_MS, videoDurationMs } from "./videoFrames";
+import {
+    frameAt,
+    frameTimesMs,
+    LEAD_IN_MS,
+    PRESS_FADE_MS,
+    pressGlow,
+    TAIL_MS,
+    videoDurationMs,
+} from "./videoFrames";
 
 const note = (startMs: number, durationMs = 500, pitch = 60): RecordedNote => ({
     pitch,
@@ -70,5 +78,31 @@ describe("frameAt", () => {
         expect(frame.down).toEqual([]);
         expect(frame.done).toBe(3);
         expect(frame.currentOnsetMs).toBe(1_000);
+    });
+});
+
+describe("pressGlow", () => {
+    it("is full at the press, decays while held, and never goes dark", () => {
+        expect(pressGlow(0)).toBe(1);
+        expect(pressGlow(PRESS_FADE_MS / 2)).toBeCloseTo(0.5);
+        expect(pressGlow(PRESS_FADE_MS * 10)).toBeGreaterThan(0);
+        expect(pressGlow(PRESS_FADE_MS * 10)).toBeLessThan(0.5);
+    });
+
+    it("a re-press outglows the same note held that long", () => {
+        expect(pressGlow(0)).toBeGreaterThan(pressGlow(1_000));
+    });
+});
+
+describe("frameAt heldMs", () => {
+    it("reports how long each sounding note has been held", () => {
+        const notes = [
+            { pitch: 60, startMs: 0, durationMs: 1_000, velocity: 100 },
+            { pitch: 64, startMs: 400, durationMs: 1_000, velocity: 100 },
+        ];
+        const frame = frameAt(notes, LEAD_IN_MS + 500);
+        const byPitch = new Map(frame.down.map((entry) => [entry.pitch, entry.heldMs]));
+        expect(byPitch.get(60)).toBe(500);
+        expect(byPitch.get(64)).toBe(100);
     });
 });

@@ -13,8 +13,10 @@ import type { RecordedNote } from "./composition";
 export type FrameState = {
     // This frame's instant, in ms from the take's first note.
     timeMs: number;
-    // The keys sounding at this instant, for the on-screen keyboard.
-    down: { pitch: number; velocity: number }[];
+    // The keys sounding at this instant, for the on-screen keyboard; heldMs is
+    // how long each note has been sounding, so a renderer can let the press
+    // visibly decay and re-light on a repeat.
+    down: { pitch: number; velocity: number; heldMs: number }[];
     // The onset (ms on the notes' clock) of the latest note started by this
     // instant — the cursor's chord — or null before the first onset. An onset
     // rather than an index, so the state is independent of the note list's
@@ -50,13 +52,24 @@ export function frameTimesMs(durationMs: number, fps: number): number[] {
     return Array.from({ length: count }, (_, index) => (index * 1000) / fps);
 }
 
+// How brightly a sounding key glows, given how long its note has been held:
+// full at the press, easing linearly to a floor over the fade — never to
+// nothing, so a long-held note still reads as down. The snap back to full on
+// the next onset is what makes a repeated press of the same key visible.
+export const PRESS_FADE_MS = 1_500;
+const PRESS_GLOW_FLOOR = 0.35;
+
+export function pressGlow(heldMs: number): number {
+    return Math.max(PRESS_GLOW_FLOOR, Math.min(1, 1 - heldMs / PRESS_FADE_MS));
+}
+
 // Sample the take at one instant. timeMs is on the video clock (0 = start of
 // the lead-in); the notes' own clock starts LEAD_IN_MS later.
 export function frameAt(notes: RecordedNote[], timeMs: number): FrameState {
     const t = timeMs - LEAD_IN_MS;
     const down = notes
         .filter((note) => note.startMs <= t && t < note.startMs + note.durationMs)
-        .map((note) => ({ pitch: note.pitch, velocity: note.velocity }));
+        .map((note) => ({ pitch: note.pitch, velocity: note.velocity, heldMs: t - note.startMs }));
     let currentOnsetMs: number | null = null;
     let done = 0;
     for (const note of notes) {
