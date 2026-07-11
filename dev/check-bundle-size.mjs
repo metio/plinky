@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 // Verifies the built client JavaScript stays within budget, so the bundle can't
-// grow unnoticed. Run after `npm run build` (the CI build job and `npm run size`).
+// grow unnoticed — and that no dev-only surface leaks into what visitors run.
+// Run after `npm run build` (the CI build job and `npm run size`).
 //
 // Budgets are gzipped sizes and a ratchet: lower them as you trim; raise them
 // deliberately when a feature genuinely needs the bytes. OpenSheetMusicDisplay is
@@ -57,10 +58,32 @@ const BUDGET_TOTAL_KB = 550;
 // ~216 KB — the budget follows. Keep it tight; a real regression trips this line.
 const BUDGET_APP_KB = 240;
 
+// Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
+// inject MIDI, dump state, and wipe the device). Its source sits behind an
+// `import.meta.env.PROD` early-return that the production build strips as dead
+// code; this asserts the stripping actually happened, on the artifact itself.
+const FORBIDDEN = ["__plinky", "Test bridge"];
+
 const chunks = readdirSync(DIR)
     .filter((name) => name.endsWith(".js"))
     .map((name) => ({ name, gz: gzipSync(readFileSync(`${DIR}/${name}`)).length }))
     .sort((a, b) => b.gz - a.gz);
+
+const leaks = readdirSync(DIR)
+    .filter((name) => name.endsWith(".js"))
+    .flatMap((name) => {
+        const source = readFileSync(`${DIR}/${name}`, "utf8");
+        return FORBIDDEN.filter((token) => source.includes(token)).map(
+            (token) => `"${token}" found in ${name}`,
+        );
+    });
+if (leaks.length > 0) {
+    console.error(
+        `Dev-only code leaked into the production bundle:\n- ${leaks.join("\n- ")}\n` +
+            "The test bridge must stay behind its import.meta.env.PROD guard.",
+    );
+    process.exit(1);
+}
 
 const total = chunks.reduce((sum, chunk) => sum + chunk.gz, 0);
 const vendor = chunks
