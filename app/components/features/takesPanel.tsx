@@ -95,36 +95,50 @@ export function TakesPanel({
                     {takes.map((take) => {
                         const replaying = activeReplayId === take.id;
                         return (
+                            // Two stacked lines, each free to wrap: the run's identity with
+                            // the compact controls top-right, and the export actions below.
+                            // Nothing shares a line it can't fit on, so the row never
+                            // overflows the drawer, however narrow.
                             <li
                                 key={take.id}
-                                className="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-800"
+                                className="space-y-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-800"
                             >
-                                <span className="font-semibold">{take.letter || "—"}</span>
-                                <span className="text-gray-500 dark:text-gray-400">
-                                    {formatAgo(take.createdAt, now, getLocale())}
-                                    {!take.complete && ` · ${m.takes_partial()}`}
-                                </span>
-                                {take.metrics && (
-                                    <span className="flex items-center gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
-                                        <span>
-                                            {m.scores_accuracy()} {take.metrics.accuracy}%
-                                        </span>
-                                        <span>
-                                            {m.scores_timing()} {take.metrics.timing}%
-                                        </span>
-                                        <span>
-                                            {m.scores_flow()} {take.metrics.flow}%
-                                        </span>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="font-semibold">{take.letter || "—"}</span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                        {formatAgo(take.createdAt, now, getLocale())}
+                                        {!take.complete && ` · ${m.takes_partial()}`}
                                     </span>
-                                )}
-                                <span className="ml-auto flex items-center gap-1">
-                                    <IconButton
-                                        label={replaying ? m.takes_stop() : m.takes_replay()}
-                                        onClick={() => (replaying ? onStop() : onReplay(take))}
-                                        disabled={playing && !replaying}
-                                    >
-                                        {replaying ? <StopIcon /> : <PlayIcon />}
-                                    </IconButton>
+                                    {take.metrics && (
+                                        <span className="flex items-center gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                                            <span>
+                                                {m.scores_accuracy()} {take.metrics.accuracy}%
+                                            </span>
+                                            <span>
+                                                {m.scores_timing()} {take.metrics.timing}%
+                                            </span>
+                                            <span>
+                                                {m.scores_flow()} {take.metrics.flow}%
+                                            </span>
+                                        </span>
+                                    )}
+                                    <span className="ml-auto flex items-center gap-1">
+                                        <IconButton
+                                            label={replaying ? m.takes_stop() : m.takes_replay()}
+                                            onClick={() => (replaying ? onStop() : onReplay(take))}
+                                            disabled={playing && !replaying}
+                                        >
+                                            {replaying ? <StopIcon /> : <PlayIcon />}
+                                        </IconButton>
+                                        <IconButton
+                                            label={m.takes_delete()}
+                                            onClick={() => onDelete(take.id)}
+                                        >
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </span>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-1.5">
                                     <ShareGhostButton
                                         id={id}
                                         title={title}
@@ -156,13 +170,7 @@ export function TakesPanel({
                                         {m.takes_download_musicxml()}
                                     </Button>
                                     <ExportVideoButton take={take} title={title} credit={credit} />
-                                    <IconButton
-                                        label={m.takes_delete()}
-                                        onClick={() => onDelete(take.id)}
-                                    >
-                                        <CloseIcon />
-                                    </IconButton>
-                                </span>
+                                </div>
                             </li>
                         );
                     })}
