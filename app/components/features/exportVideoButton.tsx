@@ -78,7 +78,7 @@ export function ExportVideoButton({
     };
 
     return (
-        <Button onClick={save} disabled={progress !== null}>
+        <Button variant="ghost" onClick={save} disabled={progress !== null}>
             {progress === null
                 ? m.takes_download_video()
                 : m.takes_video_progress({ percent: Math.round(progress * 100) })}

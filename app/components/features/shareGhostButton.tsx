@@ -6,7 +6,7 @@ import { SITE_URL } from "../../../core/site";
 import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
 import { localizeHref } from "../../paraglide/runtime.js";
-import { Button, IconButton } from "../ui/button";
+import { Button, type ButtonVariant, IconButton } from "../ui/button";
 import { GhostIcon } from "../ui/icons";
 
 // Hand a run to a friend as a link they open to race it. The onsets are any run's
@@ -20,6 +20,7 @@ export function ShareGhostButton({
     onsets,
     label,
     showLabel = false,
+    variant = "secondary",
 }: {
     // The song id, so the link points back at this piece.
     id: string;
@@ -30,6 +31,9 @@ export function ShareGhostButton({
     // Icon-only with `label` as the accessible name (in a row of icons), or a button
     // with the label visible (standalone).
     showLabel?: boolean;
+    // Matches the surrounding row: the quiet ghost look inside a toolbar strip,
+    // the tinted default when standalone.
+    variant?: ButtonVariant;
 }) {
     // Briefly confirm a clipboard copy on the surface where no native share sheet ran.
     const [copied, flashCopied] = useCopied();
@@ -68,6 +72,7 @@ export function ShareGhostButton({
             <IconButton
                 label={label}
                 onClick={share}
+                variant={variant}
                 className="text-fuchsia-600 dark:text-fuchsia-400"
             >
                 <GhostIcon />

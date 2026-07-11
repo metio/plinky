@@ -95,34 +95,23 @@ export function TakesPanel({
                     {takes.map((take) => {
                         const replaying = activeReplayId === take.id;
                         return (
-                            // Two stacked lines, each free to wrap: the run's identity with
-                            // the compact controls top-right, and the export actions below.
-                            // Nothing shares a line it can't fit on, so the row never
-                            // overflows the drawer, however narrow.
+                            // A run is a small card of three fixed zones so no width can
+                            // scramble it: a header line that never wraps (identity left,
+                            // replay/delete pinned right), the metrics as their own quiet
+                            // line, and a footer strip of ghost-styled export actions
+                            // behind a hairline — wrapping inside the strip reads as a
+                            // toolbar, not as overflow.
                             <li
                                 key={take.id}
-                                className="space-y-2 rounded-md border border-gray-200 p-2 text-sm dark:border-gray-800"
+                                className="rounded-md border border-gray-200 text-sm dark:border-gray-800"
                             >
-                                <div className="flex flex-wrap items-center gap-2">
+                                <div className="flex items-center gap-2 px-2 pt-1">
                                     <span className="font-semibold">{take.letter || "—"}</span>
-                                    <span className="text-gray-500 dark:text-gray-400">
+                                    <span className="truncate text-gray-500 dark:text-gray-400">
                                         {formatAgo(take.createdAt, now, getLocale())}
                                         {!take.complete && ` · ${m.takes_partial()}`}
                                     </span>
-                                    {take.metrics && (
-                                        <span className="flex items-center gap-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
-                                            <span>
-                                                {m.scores_accuracy()} {take.metrics.accuracy}%
-                                            </span>
-                                            <span>
-                                                {m.scores_timing()} {take.metrics.timing}%
-                                            </span>
-                                            <span>
-                                                {m.scores_flow()} {take.metrics.flow}%
-                                            </span>
-                                        </span>
-                                    )}
-                                    <span className="ml-auto flex items-center gap-1">
+                                    <span className="ml-auto flex shrink-0 items-center gap-1">
                                         <IconButton
                                             label={replaying ? m.takes_stop() : m.takes_replay()}
                                             onClick={() => (replaying ? onStop() : onReplay(take))}
@@ -138,14 +127,29 @@ export function TakesPanel({
                                         </IconButton>
                                     </span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-1.5">
+                                {take.metrics && (
+                                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 px-2 pb-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                                        <span>
+                                            {m.scores_accuracy()} {take.metrics.accuracy}%
+                                        </span>
+                                        <span>
+                                            {m.scores_timing()} {take.metrics.timing}%
+                                        </span>
+                                        <span>
+                                            {m.scores_flow()} {take.metrics.flow}%
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex flex-wrap items-center gap-x-1 border-t border-gray-200 px-1 py-1 dark:border-gray-800">
                                     <ShareGhostButton
                                         id={id}
                                         title={title}
                                         onsets={ghostOnsets(take)}
                                         label={m.takes_share_ghost()}
+                                        variant="plain"
                                     />
                                     <Button
+                                        variant="ghost"
                                         onClick={() =>
                                             downloadBlob(
                                                 buildMidiFile(toMidiNotes(take.composition), {
@@ -159,6 +163,7 @@ export function TakesPanel({
                                         {m.takes_download_midi()}
                                     </Button>
                                     <Button
+                                        variant="ghost"
                                         onClick={() =>
                                             downloadBlob(
                                                 toMusicXml(take.composition),
