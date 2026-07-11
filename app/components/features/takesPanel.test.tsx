@@ -2,11 +2,18 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
+import type React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Composition } from "../../../core/composition";
 import type { Take } from "../../../core/takes";
+import { renderWithServices } from "../../testing/renderWithServices";
 import { formatAgo, TakesPanel } from "./takesPanel";
+
+// The panel probes the video exporter on mount; a fake keeps jsdom from pulling
+// the real encoder chunk, whose late dynamic import outlives the test teardown.
+const noVideo = { supported: async () => false, export: async () => new Blob() };
+const render = (ui: React.ReactElement) => renderWithServices(ui, { video: noVideo });
 
 afterEach(cleanup);
 

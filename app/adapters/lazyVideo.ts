@@ -9,8 +9,14 @@ import type { VideoExporter, VideoExportInput } from "../ports/videoExporter";
 // deliberate act, and the bundle budget is a per-visitor cost.
 export const lazyVideoExporter: VideoExporter = {
     async supported(): Promise<boolean> {
-        const { webCodecsVideoExporter } = await import("./webCodecsVideo");
-        return webCodecsVideoExporter.supported();
+        // A chunk that can't load (an offline moment, a torn-down test
+        // environment) means "no video here", never an unhandled rejection.
+        try {
+            const { webCodecsVideoExporter } = await import("./webCodecsVideo");
+            return webCodecsVideoExporter.supported();
+        } catch {
+            return false;
+        }
     },
     async export(input: VideoExportInput, onProgress?: (fraction: number) => void): Promise<Blob> {
         const { webCodecsVideoExporter } = await import("./webCodecsVideo");
