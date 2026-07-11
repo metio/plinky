@@ -56,3 +56,57 @@ export const HeldAndFaded: Story = { args: { timeMs: LEAD_IN_MS + 1_700 } };
 
 // The re-press of the same key: back to full glory.
 export const RePressed: Story = { args: { timeMs: LEAD_IN_MS + 2_040 } };
+
+// A deterministic stand-in sheet: staff lines and notehead dots drawn onto a
+// canvas synchronously, so the score-mode frames rasterize identically without
+// a real (async) notation render.
+function fakeSheet(): {
+    image: HTMLCanvasElement;
+    steps: { x: number; y: number; width: number; height: number }[][];
+} {
+    const image = document.createElement("canvas");
+    image.width = 1200;
+    image.height = 260;
+    const ctx = image.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 1200, 260);
+    ctx.fillStyle = "#111827";
+    for (let line = 0; line < 5; line++) {
+        ctx.fillRect(40, 80 + line * 14, 1120, 2);
+    }
+    const steps = [0, 1, 2].map((step) => {
+        const x = 160 + step * 320;
+        ctx.beginPath();
+        ctx.ellipse(x + 11, 108, 11, 8, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(x + 20, 52, 2, 54);
+        return [{ x, y: 96, width: 24, height: 22 }];
+    });
+    return { image, steps };
+}
+
+function ScoreFrame({ timeMs }: { timeMs: number }) {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+        const context = canvasRef.current?.getContext("2d");
+        if (context) {
+            const sheet = fakeSheet();
+            takeScenePainter({
+                ...TAKE,
+                score: { image: sheet.image, width: 1200, height: 260, steps: sheet.steps },
+            })(context, timeMs);
+        }
+    }, [timeMs]);
+    return <canvas ref={canvasRef} width={TAKE.width} height={TAKE.height} />;
+}
+
+// Score mode, mid-piece: the second step just sounded — its notehead tinted
+// strongest, the first more quietly, the third still ink.
+export const ScoreMidPiece: Story = {
+    render: () => <ScoreFrame timeMs={LEAD_IN_MS + 440} />,
+};
+
+// Score mode at the lead-in: the untouched sheet above the resting keyboard.
+export const ScoreLeadIn: Story = {
+    render: () => <ScoreFrame timeMs={0} />,
+};
