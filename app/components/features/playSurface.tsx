@@ -39,6 +39,8 @@ export function PlaySurface() {
         runsOpen,
         setRunsOpen,
         takes,
+        xml,
+        hand,
         replayTake,
         deleteTake,
         saveCurrentTake,
@@ -128,6 +130,7 @@ export function PlaySurface() {
                         playing={listenPlayback.playing}
                         lastRunOnsets={ghostRace.storedGhost}
                         canShareLastRun={!ghostRace.sharedFromLink}
+                        original={{ xml, hand }}
                         onReplay={(take) => {
                             setRunsOpen(false);
                             replayTake(take);

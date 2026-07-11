@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { toMusicXml } from "../../core/composition";
+import type { Hand } from "../../core/matcher";
 import type { Take } from "../../core/takes";
 import type { ScoreBox } from "../../core/videoScene";
 import { collectNoteElements } from "./scoreColor";
@@ -18,12 +19,33 @@ export type ScoreSnapshot = {
     steps: ScoreBox[][];
 };
 
-// Render the take's own notation off-screen (the print button's idiom: an owned
-// OSMD instance, never the ScoreViewer's) and rasterize it. The score comes from
-// the take's composition, so the video shows exactly what was played — chords,
-// held lengths and all. Returns null when anything fails: a take a browser can't
-// render simply exports without notation, never a broken video.
-export async function buildScoreSnapshot(take: Take): Promise<ScoreSnapshot | null> {
+// The piece's real notation, when the exporting page knows it — so the video
+// shows the score a viewer would recognize, not a re-engraving of the playing.
+export type OriginalScore = { xml: string; hand: Hand };
+
+// Render the notation off-screen (the print button's idiom: an owned OSMD
+// instance, never the ScoreViewer's) and rasterize it. Preferred source: the
+// piece's own MusicXML, whose steps the take's onsets tint one for one — the
+// matcher cleared them in exactly that order. When the take doesn't line up
+// (played beyond the score's steps: another piece, another hand), or when no
+// original is known (compose takes), the take's own composition renders
+// instead. Returns null when everything fails: the video exports keyboard-only,
+// never broken.
+export async function buildScoreSnapshot(
+    take: Take,
+    original: OriginalScore | null = null,
+): Promise<ScoreSnapshot | null> {
+    if (original) {
+        const snapshot = await snapshotFromXml(original.xml, original.hand);
+        const takeSteps = new Set(take.composition.notes.map((note) => note.startMs)).size;
+        if (snapshot && takeSteps <= snapshot.steps.length) {
+            return snapshot;
+        }
+    }
+    return snapshotFromXml(toMusicXml(take.composition), "both");
+}
+
+async function snapshotFromXml(xml: string, hand: Hand): Promise<ScoreSnapshot | null> {
     const host = document.createElement("div");
     host.style.position = "absolute";
     host.style.left = "-99999px";
@@ -39,7 +61,7 @@ export async function buildScoreSnapshot(take: Take): Promise<ScoreSnapshot | nu
             autoResize: false,
             drawingParameters: "compact",
         });
-        await osmd.load(toMusicXml(take.composition));
+        await osmd.load(xml);
         osmd.render();
         const svg = host.querySelector("svg");
         if (!svg) {
@@ -51,7 +73,7 @@ export async function buildScoreSnapshot(take: Take): Promise<ScoreSnapshot | nu
         }
         // Box positions relative to the SVG's own top-left, in the same pixels
         // the rasterization below uses.
-        const steps = collectNoteElements(osmd, "both").map((group) =>
+        const steps = collectNoteElements(osmd, hand).map((group) =>
             group.map((element) => {
                 const rect = element.getBoundingClientRect();
                 return {

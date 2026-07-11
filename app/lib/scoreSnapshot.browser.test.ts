@@ -42,3 +42,38 @@ describe("buildScoreSnapshot", () => {
         expect(later.x > box.x || later.y > box.y).toBe(true);
     });
 });
+
+describe("buildScoreSnapshot with the original score", () => {
+    it("prefers the piece's own notation when the take lines up, falls back when not", async () => {
+        // The original piece: four single notes → four steps.
+        const xml = (await import("../../core/composition")).toMusicXml({
+            notes: [60, 62, 64, 65].map((pitch, index) => ({
+                pitch,
+                startMs: index * 500,
+                durationMs: 400,
+                velocity: 90,
+            })),
+            tempo: 120,
+            beatsPerBar: 4,
+        });
+        // The take covers three of them — a partial run still tints the original.
+        const fits = await buildScoreSnapshot(take, { xml, hand: "both" });
+        expect(fits!.steps).toHaveLength(4);
+        // A take with more onsets than the score has steps cannot be this piece;
+        // it falls back to its own notation (three steps).
+        const overshoot = {
+            ...take,
+            composition: {
+                ...take.composition,
+                notes: [0, 500, 1000, 1500, 2000].map((startMs) => ({
+                    pitch: 60,
+                    startMs,
+                    durationMs: 200,
+                    velocity: 90,
+                })),
+            },
+        };
+        const fallback = await buildScoreSnapshot(overshoot, { xml, hand: "both" });
+        expect(fallback!.steps).toHaveLength(5);
+    });
+});

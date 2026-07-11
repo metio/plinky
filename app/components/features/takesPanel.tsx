@@ -11,6 +11,7 @@ import { getLocale } from "../../paraglide/runtime.js";
 import { Button, IconButton } from "../ui/button";
 import { CloseIcon, PlayIcon, StopIcon } from "../ui/icons";
 import { ExportVideoButton } from "./exportVideoButton";
+import type { OriginalScore } from "../../lib/scoreSnapshot";
 import { ShareGhostButton } from "./shareGhostButton";
 
 // A short "3 minutes ago" for when a take was saved, localised without a message
@@ -47,6 +48,7 @@ export function TakesPanel({
     playing,
     lastRunOnsets,
     canShareLastRun,
+    original = null,
     onReplay,
     onStop,
     onDelete,
@@ -69,6 +71,8 @@ export function TakesPanel({
     // Whether to offer that share — suppressed when the current ghost was loaded from a
     // friend's link rather than being your own run.
     canShareLastRun: boolean;
+    // The piece's notation + practised hand, for the exported video's score.
+    original?: OriginalScore | null;
     onReplay: (take: Take) => void;
     onStop: () => void;
     onDelete: (takeId: string) => void;
@@ -174,7 +178,12 @@ export function TakesPanel({
                                     >
                                         {m.takes_download_musicxml()}
                                     </Button>
-                                    <ExportVideoButton take={take} title={title} credit={credit} />
+                                    <ExportVideoButton
+                                        take={take}
+                                        title={title}
+                                        credit={credit}
+                                        original={original}
+                                    />
                                 </div>
                             </li>
                         );

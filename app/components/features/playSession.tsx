@@ -794,6 +794,9 @@ function usePlaySessionValue({
         hasSaved,
         hand,
         setHand,
+        // The piece's own MusicXML, for consumers that render their own staff
+        // (the exported video's recognizable score).
+        xml,
         // Transports and the run.
         matcher,
         keepUp,

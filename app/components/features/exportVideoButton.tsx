@@ -6,7 +6,7 @@ import type { Take } from "../../../core/takes";
 import { videoDurationMs } from "../../../core/videoFrames";
 import { useVideoExporter } from "../../contexts/services";
 import { downloadBlob } from "../../lib/download";
-import { buildScoreSnapshot } from "../../lib/scoreSnapshot";
+import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
 import { takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -25,10 +25,14 @@ export function ExportVideoButton({
     take,
     title,
     credit,
+    original = null,
 }: {
     take: Take;
     title: string;
     credit: string;
+    // The piece's own notation (and the hand it was practised with), when the
+    // page knows it — the recognizable score beats a re-engraving of the take.
+    original?: OriginalScore | null;
 }) {
     const exporter = useVideoExporter();
     const [supported, setSupported] = useState(false);
@@ -58,7 +62,7 @@ export function ExportVideoButton({
             // The take's own notation, rendered off-screen and rasterized once, so
             // the video shows the sheet music with each note tinted as it sounds.
             // A take the renderer can't draw exports keyboard-only instead.
-            const score = await buildScoreSnapshot(take);
+            const score = await buildScoreSnapshot(take, original);
             const blob = await exporter.export(
                 {
                     width,
