@@ -11,6 +11,9 @@ import { FocusStrip } from "./focusStrip";
 import { FullScreen, Midi, Show } from "./conditional";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { usePlaySession } from "./playSession";
+import { KeyboardQuickControls } from "./keyboardQuickControls";
+import { useNoteLabels } from "../../hooks/useNoteLabels";
+import { usePrefsStore } from "../../contexts/services";
 
 // The practice stage — everything below the score: the progress + MIDI-connect row, the
 // ghost race track, the turn-your-phone nudge, the mobile focus strip, and the on-screen
@@ -32,7 +35,11 @@ export function PlayStage() {
         dismissRotate,
         focusXml,
         hideKeyboard,
+        setHideKeyboard,
         fingerStrip,
+        keyboardOctaves,
+        setKeyboardOctaves,
+        setKeyWindow,
         keyWindow,
         hintNotes,
         id,
@@ -41,6 +48,9 @@ export function PlayStage() {
         containerRef,
         score,
     } = usePlaySession();
+
+    const prefsStore = usePrefsStore();
+    const noteLabels = useNoteLabels();
 
     // A stable handle to the rendered score SVG, so the strip's heat effect only
     // repaints when the render actually changes, not on every stage re-render.
@@ -118,6 +128,25 @@ export function PlayStage() {
                         />
                     </Show>
                 </FullScreen>
+                {/* The keyboard's own quick controls, right where the keys live: fold
+                    them away, cycle the window width, cycle the note names. Shortcuts
+                    onto the same prefs the drawer and Settings edit. */}
+                {fullscreen && !fingerStrip && (
+                    <KeyboardQuickControls
+                        hidden={hideKeyboard}
+                        onToggleHidden={() => setHideKeyboard((on) => !on)}
+                        octaves={keyboardOctaves}
+                        onOctaves={(n) => {
+                            // Re-frame the keyboard window from scratch; usePref persists.
+                            setKeyboardOctaves(n);
+                            setKeyWindow(null);
+                        }}
+                        noteLabels={noteLabels}
+                        onNoteLabels={(value) =>
+                            prefsStore.save({ ...prefsStore.load(), noteLabels: value })
+                        }
+                    />
+                )}
                 {/* In fullscreen the fingering editor takes the keyboard's slot when
                     toggled from the transport; otherwise the keys show unless hidden. */}
                 {fullscreen && fingerStrip ? (

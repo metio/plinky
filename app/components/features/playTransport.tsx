@@ -9,7 +9,6 @@ import {
     EyeIcon,
     FingersIcon,
     HandIcon,
-    ListIcon,
     PlayIcon,
     RotateIcon,
     SlidersIcon,
@@ -26,7 +25,6 @@ import { usePlaySession } from "./playSession";
 export function PlayTransport() {
     const {
         ready,
-        ephemeral,
         matcher,
         keepUp,
         listenPlayback,
@@ -37,12 +35,9 @@ export function PlayTransport() {
         playAlong,
         getOsmd,
         reading,
-        hideKeyboard,
         fingerStrip,
         setFingerStrip,
-        setHideKeyboard,
         setToolsOpen,
-        showRuns,
         exitFullscreen,
     } = usePlaySession();
     const { showFingerings, setShowFingerings, treadmill, scrollFollow, setScrollFollow } = reading;
@@ -103,13 +98,6 @@ export function PlayTransport() {
     // Opens the Runs drawer: your saved performances of this piece. Kept out of the main
     // column so browsing them, sharing your last run, or replaying one never clutters the
     // resting play view. Not for an ephemeral piece, which can't be saved.
-    const runsButton = !ephemeral && (
-        <Button variant="secondary" onClick={showRuns}>
-            <ListIcon />
-            {m.takes_button()}
-        </Button>
-    );
-
     return (
         <>
             <FullScreen>
@@ -179,18 +167,11 @@ export function PlayTransport() {
                     >
                         <FingersIcon />
                     </ToggleIconButton>
-                    <Button
-                        variant="secondary"
-                        onClick={() => setHideKeyboard((on) => !on)}
-                        aria-pressed={hideKeyboard}
-                        className="ml-auto"
-                    >
-                        {hideKeyboard ? m.action_show_keyboard() : m.action_hide_keyboard()}
-                    </Button>
                     <IconButton
                         variant="primary"
                         onClick={exitFullscreen}
                         label={m.action_exit_fullscreen()}
+                        className="ml-auto"
                     >
                         <CloseIcon />
                     </IconButton>
@@ -204,7 +185,6 @@ export function PlayTransport() {
                 <div className="flex flex-wrap items-center gap-3">
                     {practiceButton}
                     {toolsButton}
-                    {runsButton}
                 </div>
             </FullScreen>
         </>

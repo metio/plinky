@@ -79,10 +79,9 @@ export type PlaySessionProps = {
     canShareGhost?: boolean;
     seededResult?: DailyResult | null;
     // The resting page's Runs tab: true renders the saved-runs page instead of the
-    // resting play column (fullscreen is unaffected), and the callbacks hop between
-    // the page's tabs — the session can't own the tab, the route does.
+    // resting play column (fullscreen is unaffected), and the callback hops back to
+    // the score — the session can't own the tab, the route does.
     runsView?: boolean;
-    onShowRuns?: () => void;
     onShowScore?: () => void;
 };
 
@@ -104,7 +103,6 @@ function usePlaySessionValue({
     canShareGhost,
     seededResult,
     runsView = false,
-    onShowRuns,
     onShowScore,
 }: PlaySessionProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -811,7 +809,6 @@ function usePlaySessionValue({
         toolsOpen,
         setToolsOpen,
         runsView,
-        showRuns: () => onShowRuns?.(),
         showScore: () => onShowScore?.(),
         portrait,
         coarsePointer,

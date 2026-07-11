@@ -146,7 +146,6 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             beatsPerBar={score.beatsPerBar}
                             canShareGhost
                             runsView={mode === "runs"}
-                            onShowRuns={() => setMode("runs")}
                             onShowScore={() => setMode("play")}
                         />
                     </Show>

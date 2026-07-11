@@ -26,16 +26,22 @@ const midiFake = { midi: fakeMidi() };
 // wiring: the Runs button switches the view, replay switches it back.
 function Harness({ xml, ...props }: { xml: string; beatsPerBar?: number }) {
     const [runsView, setRunsView] = useState(false);
+    // The Runs tab lives with the route's mode bar; this stand-in button plays
+    // that part so the surface can be driven the way the page drives it.
     return (
-        <ScoreViewer
-            id="t"
-            xml={xml}
-            title="T"
-            runsView={runsView}
-            onShowRuns={() => setRunsView(true)}
-            onShowScore={() => setRunsView(false)}
-            {...props}
-        />
+        <>
+            <button type="button" onClick={() => setRunsView(true)}>
+                Runs
+            </button>
+            <ScoreViewer
+                id="t"
+                xml={xml}
+                title="T"
+                runsView={runsView}
+                onShowScore={() => setRunsView(false)}
+                {...props}
+            />
+        </>
     );
 }
 

@@ -350,6 +350,18 @@ export function FingersIcon({ className }: IconProps) {
     );
 }
 
+// A piano-keys outline — the keyboard fold toggle.
+export function KeysIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <rect x="3" y="7" width="18" height="10" rx="2" />
+            <path d="M8.5 7v6" />
+            <path d="M12 7v6" />
+            <path d="M15.5 7v6" />
+        </Icon>
+    );
+}
+
 // An eye — the follow-the-note (auto-scroll) toggle.
 export function EyeIcon({ className }: IconProps) {
     return (
