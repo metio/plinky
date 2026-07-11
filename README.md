@@ -325,8 +325,9 @@ board — the page never breaks. It reuses the news banner's
 ## Follow Plinky
 
 Every page ends with a slim footer linking to Plinky's own channels —
-[Instagram](https://www.instagram.com/plinky.piano) and
-[Facebook](https://www.facebook.com/profile.php?id=61591963944991).
+[Instagram](https://www.instagram.com/plinky.piano),
+[Facebook](https://www.facebook.com/profile.php?id=61591963944991) and
+the source itself on [GitHub](https://github.com/metio/plinky).
 
 ## Development
 

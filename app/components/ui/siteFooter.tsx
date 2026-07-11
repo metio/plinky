@@ -11,6 +11,7 @@ const CHANNELS: { brand: Brand; label: string; href: string }[] = [
         label: "Facebook",
         href: "https://www.facebook.com/profile.php?id=61591963944991",
     },
+    { brand: "github", label: "GitHub", href: "https://github.com/metio/plinky" },
 ];
 
 // The quiet last line of every page: where to follow Plinky. Mirrors the
