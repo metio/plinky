@@ -13,17 +13,18 @@ import {
 
 // Reads the board's artists from the same Sanity project as the news banner and
 // help page. Each `boardArtist` document carries internationalized `text` and
-// `alt` arrays (one entry per locale, keyed `en`/`de`/…); the query projects the
-// reader's language out of them and falls back to English, so a visitor downloads
-// only their locale's words. The picture and name are shared across languages.
+// `alt` arrays — one entry per locale, marked by a `lang` field (what the Studio's
+// language dropdown writes) or by the entry's `_key` (what our seed imports set);
+// the query accepts either and falls back to English, so a visitor downloads only
+// their locale's words. The picture and name are shared across languages.
 export type SanityBoardConfig = SanityConfig;
 
 const DEFAULT_QUERY =
     '*[_type == "boardArtist" && show != false]{' +
     '"id": _id, name, "order": coalesce(order, 0), ' +
     '"imageUrl": image.asset->url, ' +
-    '"imageAlt": coalesce(alt[_key == $lang][0].value, alt[_key == "en"][0].value, ""), ' +
-    '"text": coalesce(text[_key == $lang][0].value, text[_key == "en"][0].value, ""), ' +
+    '"imageAlt": coalesce(alt[lang == $lang || _key == $lang][0].value, alt[lang == "en" || _key == "en"][0].value, ""), ' +
+    '"text": coalesce(text[lang == $lang || _key == $lang][0].value, text[lang == "en" || _key == "en"][0].value, ""), ' +
     '"linkUrl": link}';
 
 // The Sanity config from build-time env, or null when the project isn't wired yet —
