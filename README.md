@@ -212,10 +212,12 @@ a student.
   *Connect MIDI*; Plinky reconnects it automatically on your next visit. Web MIDI is
   available in Chrome, Edge, and Firefox on desktop and Android; Safari and iOS do
   not expose it, so use the keyboard fallback there.
-- **With your computer keyboard** — `A S D F G` plays the left hand and
-  `H J K L ;` the right, each a five-finger C–G position, with an octave shift to
-  move around; remap any of these keys to your own layout in **Settings**. (Two-hand
-  pieces span both staves, so a MIDI keyboard is the comfortable way to play those.)
+- **With your computer keyboard** — the bottom letter row plays the left hand
+  (`Z X C V B N M` the white keys, `S D G H J` the black) and the top row the
+  right hand an octave up (`Q W E R T Y U` white, `2 3 5 6 7` black), each a full
+  C-to-B octave, with an octave shift to move around; remap any of these keys to
+  your own layout in **Settings**. (Two-hand pieces span both staves, so a MIDI
+  keyboard is the comfortable way to play those.)
 - **With the on-screen piano** — tap the keys shown under each score. On a wide-ranging
   piece the keyboard shows a moving window that follows the notes you're playing, so the
   keys never shrink to slivers; set its width — **1, 2 or 3 octaves, or the whole piece**

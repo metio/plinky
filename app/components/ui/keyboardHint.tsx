@@ -21,16 +21,16 @@ export function KeyboardHint({ octaveOffset }: { octaveOffset: number }) {
             <div className="space-y-1 pt-2">
                 <p>
                     <span className="font-medium">{m.keyboard_hint_left()}</span> —{" "}
-                    <span className="font-mono">A S D F G</span>
+                    <span className="font-mono">Z X C V B N M</span>
                     {m.keyboard_hint_white_keys()}{" "}
-                    <span className="font-mono">W E&nbsp;&nbsp;T</span>
+                    <span className="font-mono">S D&nbsp;&nbsp;G H J</span>
                     {m.keyboard_hint_black_keys()}
                 </p>
                 <p>
                     <span className="font-medium">{m.keyboard_hint_right()}</span> —{" "}
-                    <span className="font-mono">H J K L ;</span>
+                    <span className="font-mono">Q W E R T Y U</span>
                     {m.keyboard_hint_white_keys()}{" "}
-                    <span className="font-mono">U I&nbsp;&nbsp;P</span>
+                    <span className="font-mono">2 3&nbsp;&nbsp;5 6 7</span>
                     {m.keyboard_hint_black_keys()}
                 </p>
                 <p>

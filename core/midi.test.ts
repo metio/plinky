@@ -41,36 +41,41 @@ describe("pitchClass", () => {
 });
 
 describe("keyToNote", () => {
-    it("maps the left hand to C–G on the home row from C4", () => {
-        expect(keyToNote("a", 0)).toBe(60); // C4
-        expect(keyToNote("s", 0)).toBe(62); // D4
-        expect(keyToNote("g", 0)).toBe(67); // G4
-        expect(keyToNote("w", 0)).toBe(61); // C#4
-        expect(keyToNote("t", 0)).toBe(66); // F#4
+    it("maps the left hand to a full octave on the bottom row from C4", () => {
+        expect(keyToNote("z", 0)).toBe(60); // C4
+        expect(keyToNote("x", 0)).toBe(62); // D4
+        expect(keyToNote("b", 0)).toBe(67); // G4
+        expect(keyToNote("n", 0)).toBe(69); // A4
+        expect(keyToNote("m", 0)).toBe(71); // B4
+        expect(keyToNote("s", 0)).toBe(61); // C#4
+        expect(keyToNote("g", 0)).toBe(66); // F#4
+        expect(keyToNote("j", 0)).toBe(70); // A#4
     });
 
-    it("maps the right hand to C–G an octave up from C5", () => {
-        expect(keyToNote("h", 0)).toBe(72); // C5
-        expect(keyToNote(";", 0)).toBe(79); // G5
-        expect(keyToNote("u", 0)).toBe(73); // C#5
-        expect(keyToNote("p", 0)).toBe(78); // F#5
+    it("maps the right hand to a full octave on the top row from C5", () => {
+        expect(keyToNote("q", 0)).toBe(72); // C5
+        expect(keyToNote("t", 0)).toBe(79); // G5
+        expect(keyToNote("y", 0)).toBe(81); // A5
+        expect(keyToNote("u", 0)).toBe(83); // B5
+        expect(keyToNote("2", 0)).toBe(73); // C#5
+        expect(keyToNote("7", 0)).toBe(82); // A#5
     });
 
     it("shifts both hands by the octave offset", () => {
-        expect(keyToNote("a", 1)).toBe(72);
-        expect(keyToNote("h", -1)).toBe(60);
+        expect(keyToNote("z", 1)).toBe(72);
+        expect(keyToNote("q", -1)).toBe(60);
     });
 
-    it("returns null for keys outside the five-finger layout", () => {
-        for (const key of ["q", "r", "y", "o", "z", "1"]) {
+    it("returns null for keys outside the layout", () => {
+        for (const key of ["a", "f", "k", "l", "o", "p", "i", "1", "8", ";"]) {
             expect(keyToNote(key, 0)).toBeNull();
         }
     });
 
     it("honours a custom key map", () => {
-        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "z");
-        expect(keyToNote("z", 0, custom)).toBe(60); // 'z' now plays the left hand's C4
-        expect(keyToNote("a", 0, custom)).toBeNull(); // the default 'a' is no longer bound
+        const custom = rebind(DEFAULT_KEY_MAP, "left", 0, "a");
+        expect(keyToNote("a", 0, custom)).toBe(60); // 'a' now plays the left hand's C4
+        expect(keyToNote("z", 0, custom)).toBeNull(); // the default 'z' is no longer bound
     });
 });
 

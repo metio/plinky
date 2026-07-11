@@ -117,9 +117,9 @@ describe("MidiProvider", () => {
         const { result } = renderHook(() => useMidiConnection(), {
             wrapper: wrapperWith(fakeMidi()),
         });
-        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "a" })));
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z" })));
         expect(result.current.heldNotes).toContain(60);
-        act(() => window.dispatchEvent(new KeyboardEvent("keyup", { key: "a" })));
+        act(() => window.dispatchEvent(new KeyboardEvent("keyup", { key: "z" })));
         expect(result.current.heldNotes).not.toContain(60);
 
         act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" })));
@@ -130,7 +130,7 @@ describe("MidiProvider", () => {
         const { result } = renderHook(() => useMidiConnection(), {
             wrapper: wrapperWith(fakeMidi()),
         });
-        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "a" })));
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z" })));
         expect(result.current.heldNotes).toContain(60);
         // The keyup would otherwise be delivered to whatever window took focus,
         // leaving the note stuck; blur must clear it.
