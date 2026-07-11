@@ -51,11 +51,14 @@ export type StoredTake = {
 // struck at. This is what the play surface captures per matched step. heldMs is the
 // real key-hold length when a MIDI piano reported the release, so the take can replay
 // the actual articulation; it's absent for input that reports no meaningful hold.
+// targetMs is the step's notated onset at the run tempo, the score's own clock —
+// it bounds the derived length of a note that reported no hold.
 export type RunStep = {
     pitches: number[];
     startMs: number;
     velocity: number;
     heldMs?: number;
+    targetMs?: number;
 };
 
 // The shortest note a derived duration may take, so a near-simultaneous pair still
@@ -92,8 +95,11 @@ export function endHold(
 // Reconstruct a Composition from a run's cleared steps. Each pitch in a step becomes a
 // note at that step's onset. Its length is the real key-hold when a MIDI piano captured
 // one (so the take replays your actual articulation — a clipped staccato or a note held
-// long), and otherwise the gap to the next onset, so notes from imprecise input still
-// connect on the staff and in exports. The final step, with no successor to measure
+// long). Input that reports no meaningful hold (mouse, touch, computer keyboard — a
+// click's length is noise, not intent) gets the gap to the next onset so notes still
+// connect, but capped at the score's own inter-onset gap: pausing to find the next key
+// must not stretch the note through the search — the note ends where the piece says,
+// and silence honestly fills the hunt. The final step, with no successor to measure
 // against, falls back to a beat.
 export function compositionFromRun(
     steps: RunStep[],
@@ -104,7 +110,14 @@ export function compositionFromRun(
     const notes: RecordedNote[] = [];
     steps.forEach((step, index) => {
         const next = steps[index + 1];
-        const gapMs = next ? next.startMs - step.startMs : beatMs;
+        let gapMs = next ? next.startMs - step.startMs : beatMs;
+        const notatedGapMs =
+            next && next.targetMs !== undefined && step.targetMs !== undefined
+                ? next.targetMs - step.targetMs
+                : undefined;
+        if (notatedGapMs !== undefined && notatedGapMs > 0) {
+            gapMs = Math.min(gapMs, notatedGapMs);
+        }
         const durationMs = Math.max(MIN_DURATION_MS, step.heldMs ?? gapMs);
         for (const pitch of step.pitches) {
             notes.push({ pitch, startMs: step.startMs, durationMs, velocity: step.velocity });

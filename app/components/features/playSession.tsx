@@ -628,6 +628,9 @@ function usePlaySessionValue({
             startMs: note.playedMs,
             velocity: note.velocity,
             heldMs: note.heldMs,
+            // The notated onset, so a note with no measured hold can't ring
+            // longer than the score says while the player hunts for the next key.
+            targetMs: note.targetMs,
         }));
         if (steps.length === 0) {
             return;

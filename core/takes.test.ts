@@ -212,3 +212,39 @@ describe("takeToStored / takeFromStored", () => {
         expect(takeFromStored(legacy)?.metrics).toBeNull();
     });
 });
+
+describe("compositionFromRun durations", () => {
+    const step = (startMs: number, targetMs?: number, heldMs?: number) => ({
+        pitches: [60],
+        startMs,
+        velocity: 90,
+        ...(targetMs !== undefined ? { targetMs } : {}),
+        ...(heldMs !== undefined ? { heldMs } : {}),
+    });
+
+    it("caps an unheld note at the notated gap so hunting for the next key adds silence", () => {
+        // Notated a beat apart (500ms at 120bpm), but the player searched 3s.
+        const composition = compositionFromRun([step(0, 0), step(3_000, 500)], 120, 4);
+        expect(composition.notes[0]?.durationMs).toBe(500);
+    });
+
+    it("keeps the shorter actual gap when the player rushes ahead of the score", () => {
+        const composition = compositionFromRun([step(0, 0), step(300, 500)], 120, 4);
+        expect(composition.notes[0]?.durationMs).toBe(300);
+    });
+
+    it("falls back to the raw gap when a step carries no notated onset", () => {
+        const composition = compositionFromRun([step(0), step(3_000)], 120, 4);
+        expect(composition.notes[0]?.durationMs).toBe(3_000);
+    });
+
+    it("a measured MIDI hold always wins over the derived gap", () => {
+        const composition = compositionFromRun([step(0, 0, 2_200), step(3_000, 500)], 120, 4);
+        expect(composition.notes[0]?.durationMs).toBe(2_200);
+    });
+
+    it("ignores a degenerate notated gap (a chord's second onset at the same tick)", () => {
+        const composition = compositionFromRun([step(0, 500), step(800, 500)], 120, 4);
+        expect(composition.notes[0]?.durationMs).toBe(800);
+    });
+});
