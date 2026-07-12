@@ -8,11 +8,9 @@ import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { IconButton } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
+import { ChoiceField, SwitchField } from "../ui/fields";
 import { RotateIcon } from "../ui/icons";
-import { Labeled, Option } from "../ui/option";
-import { SegmentedControl } from "../ui/segmentedControl";
 import { Stepper } from "../ui/stepper";
-import { Switch } from "../ui/switch";
 import { usePlaySession } from "./playSession";
 
 const handLabel: Record<Hand, string> = {
@@ -25,7 +23,9 @@ const handLabel: Record<Hand, string> = {
 // are ABOUT to play — changing any of them mid-piece would mean starting over
 // anyway, so they live before the run, behind one disclosure, instead of in the
 // mid-play drawer: the hand to drill, tempo-locked keep-up, transposition,
-// hidden-notes ear practice, and the tempo trainer.
+// hidden-notes ear practice, and the tempo trainer. Every option renders through
+// the same ChoiceField/SwitchField the Settings page uses, so a control looks
+// and explains itself the same wherever it appears.
 export function RunSetup() {
     const {
         lockTempo,
@@ -61,110 +61,104 @@ export function RunSetup() {
     return (
         <Disclosure summary={m.run_setup()}>
             {staffCount >= 2 && (
-                <Option caption={m.hand_caption()}>
-                    <Labeled label={m.hand_label()}>
-                        <SegmentedControl
-                            options={(["both", "right", "left"] as const).map((option) => ({
-                                id: option,
-                                label: handLabel[option],
-                            }))}
-                            value={hand}
-                            onChange={setHand}
-                            label={m.hand_label()}
-                            disabled={matcher.practicing}
-                        />
-                    </Labeled>
-                </Option>
-            )}
-            <Option caption={m.keep_up_hint()}>
-                <Switch
-                    checked={enforceTempo}
-                    onChange={setEnforceTempo}
-                    label={m.keep_up_toggle()}
+                <ChoiceField
+                    label={m.hand_label()}
+                    value={hand}
+                    onChange={setHand}
+                    options={(["both", "right", "left"] as const).map((option) => ({
+                        id: option,
+                        label: handLabel[option],
+                    }))}
+                    help={m.hand_caption()}
+                    disabled={matcher.practicing}
                 />
-            </Option>
+            )}
+            <SwitchField
+                label={m.keep_up_toggle()}
+                checked={enforceTempo}
+                onChange={setEnforceTempo}
+                help={m.keep_up_hint()}
+            />
             {enforceTempo && (
-                <Option caption={m.guide_notes_hint()}>
-                    <Switch
-                        checked={guideNotes}
-                        onChange={setGuideNotes}
-                        label={m.guide_notes_toggle()}
-                    />
-                </Option>
-            )}
-            <Option caption={m.hidden_notes_hint()}>
-                <Switch
-                    checked={hiddenNotes}
-                    onChange={setHiddenNotes}
-                    label={m.hidden_notes_toggle()}
+                <SwitchField
+                    label={m.guide_notes_toggle()}
+                    checked={guideNotes}
+                    onChange={setGuideNotes}
+                    help={m.guide_notes_hint()}
                 />
-            </Option>
+            )}
+            <SwitchField
+                label={m.hidden_notes_toggle()}
+                checked={hiddenNotes}
+                onChange={setHiddenNotes}
+                help={m.hidden_notes_hint()}
+            />
             {hiddenNotes && (
-                <Option caption={m.reveal_tries_caption()}>
-                    <Labeled label={m.reveal_tries()}>
-                        <SegmentedControl
-                            options={REVEAL_TRIES.map((n) => ({ id: String(n), label: String(n) }))}
-                            value={String(revealTries)}
-                            onChange={(id) => setRevealTries(Number(id))}
-                            label={m.reveal_tries()}
-                        />
-                    </Labeled>
-                </Option>
+                <ChoiceField
+                    label={m.reveal_tries()}
+                    value={String(revealTries)}
+                    onChange={(id) => setRevealTries(Number(id))}
+                    options={REVEAL_TRIES.map((n) => ({ id: String(n), label: String(n) }))}
+                    help={m.reveal_tries_caption()}
+                />
             )}
             {!lockTempo && <TransposeRow transpose={transpose} setTranspose={setTranspose} />}
             {!lockTempo && (
-                <Option caption={m.tempo_trainer_caption()}>
-                    <Switch checked={trainerOn} onChange={setTrainerOn} label={m.tempo_trainer()} />
-                </Option>
+                <SwitchField
+                    label={m.tempo_trainer()}
+                    checked={trainerOn}
+                    onChange={setTrainerOn}
+                    help={m.tempo_trainer_caption()}
+                />
             )}
-            <Option caption={m.race_ghost_hint()}>
-                <Switch checked={raceGhost} onChange={setRaceGhost} label={m.race_ghost_toggle()} />
-            </Option>
+            <SwitchField
+                label={m.race_ghost_toggle()}
+                checked={raceGhost}
+                onChange={setRaceGhost}
+                help={m.race_ghost_hint()}
+            />
             {ready && measureCount > 1 && (
-                <Option caption={m.loop_caption()}>
-                    <Switch checked={loop.on} onChange={loop.toggle} label={m.loop_section()} />
-                </Option>
+                <SwitchField
+                    label={m.loop_section()}
+                    checked={loop.on}
+                    onChange={loop.toggle}
+                    help={m.loop_caption()}
+                />
             )}
             {hasSaved && reading.showFingerings && (
-                <Option caption={m.fingering_show_mine_caption()}>
-                    <Switch
-                        checked={showMine}
-                        onChange={setShowMine}
-                        label={m.fingering_show_mine()}
-                    />
-                </Option>
+                <SwitchField
+                    label={m.fingering_show_mine()}
+                    checked={showMine}
+                    onChange={setShowMine}
+                    help={m.fingering_show_mine_caption()}
+                />
             )}
-            <Option caption={m.treadmill_hint()}>
-                <Switch
-                    checked={reading.treadmill}
-                    onChange={reading.setTreadmill}
-                    label={m.treadmill_toggle()}
-                />
-            </Option>
-            <Option caption={m.bar_numbers_hint()}>
-                <Switch
-                    checked={reading.barNumbers}
-                    onChange={reading.setBarNumbers}
-                    label={m.bar_numbers_toggle()}
-                />
-            </Option>
+            <SwitchField
+                label={m.treadmill_toggle()}
+                checked={reading.treadmill}
+                onChange={reading.setTreadmill}
+                help={m.treadmill_hint()}
+            />
+            <SwitchField
+                label={m.bar_numbers_toggle()}
+                checked={reading.barNumbers}
+                onChange={reading.setBarNumbers}
+                help={m.bar_numbers_hint()}
+            />
             {!reading.treadmill && (
-                <Option caption={m.bars_per_row_caption()}>
-                    <Labeled label={m.bars_per_row()}>
-                        <SegmentedControl
-                            options={BARS_PER_ROW.map((n) => ({
-                                id: String(n),
-                                label: n === 0 ? m.bars_per_row_auto() : String(n),
-                            }))}
-                            value={String(reading.barsPerRow)}
-                            onChange={(id) => reading.setBarsPerRow(Number(id))}
-                            label={m.bars_per_row()}
-                        />
-                    </Labeled>
-                </Option>
+                <ChoiceField
+                    label={m.bars_per_row()}
+                    value={String(reading.barsPerRow)}
+                    onChange={(id) => reading.setBarsPerRow(Number(id))}
+                    options={BARS_PER_ROW.map((n) => ({
+                        id: String(n),
+                        label: n === 0 ? m.bars_per_row_auto() : String(n),
+                    }))}
+                    help={m.bars_per_row_caption()}
+                />
             )}
             {!lockTempo && trainerOn && (
-                <Option caption={m.tempo_trainer_target_caption()}>
+                <div className="space-y-1">
                     <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                         <span>{m.tempo_trainer_target()}</span>
                         <input
@@ -177,7 +171,10 @@ export function RunSetup() {
                         />
                         <Bpm tempo={trainerTarget} className="w-12" />
                     </label>
-                </Option>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {m.tempo_trainer_target_caption()}
+                    </p>
+                </div>
             )}
         </Disclosure>
     );
@@ -192,7 +189,7 @@ function TransposeRow({
     setTranspose: Dispatch<SetStateAction<number>>;
 }) {
     return (
-        <span className="flex flex-col gap-1">
+        <div className="space-y-1">
             <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                 <span>{m.transpose()}</span>
                 <Stepper
@@ -221,9 +218,7 @@ function TransposeRow({
                     </IconButton>
                 )}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-                {m.transpose_caption()}
-            </span>
-        </span>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{m.transpose_caption()}</p>
+        </div>
     );
 }

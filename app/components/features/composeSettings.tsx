@@ -3,7 +3,7 @@
 
 import { m } from "../../paraglide/messages.js";
 import { fieldClasses } from "../ui/classes";
-import { CheckboxField } from "../ui/fields";
+import { SwitchField } from "../ui/fields";
 
 type ComposeSettingsProps = {
     title: string;
@@ -72,20 +72,16 @@ export function ComposeSettings({
                     <option value={6}>6/4</option>
                 </select>
             </label>
-            <span className="pb-2">
-                <CheckboxField
-                    label={m.compose_quantize_label()}
-                    checked={quantizeOn}
-                    onChange={onQuantize}
-                />
-            </span>
-            <span className="pb-2">
-                <CheckboxField
-                    label={m.compose_metronome_label()}
-                    checked={metronomeOn}
-                    onChange={onMetronome}
-                />
-            </span>
+            <SwitchField
+                label={m.compose_quantize_label()}
+                checked={quantizeOn}
+                onChange={onQuantize}
+            />
+            <SwitchField
+                label={m.compose_metronome_label()}
+                checked={metronomeOn}
+                onChange={onMetronome}
+            />
         </section>
     );
 }

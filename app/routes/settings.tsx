@@ -3,7 +3,7 @@
 
 import { Button } from "../components/ui/button";
 import { linkClasses } from "../components/ui/classes";
-import { ChoiceField } from "../components/ui/fields";
+import { ChoiceField, SwitchField } from "../components/ui/fields";
 import {
     FingersIcon,
     GradCapIcon,
@@ -17,7 +17,7 @@ import {
 } from "../components/ui/icons";
 import { Keyboard } from "../components/ui/keyboard";
 import { SettingsSection } from "../components/ui/settingsSection";
-import { Switch } from "../components/ui/switch";
+
 import { DangerZone } from "../components/features/dangerZone";
 import { HandSize } from "../components/features/handSize";
 import { KeyMapping } from "../components/features/keyMapping";
@@ -77,7 +77,7 @@ export default function Settings() {
                 hint={m.settings_sound_hint()}
                 icon={<SpeakerIcon className={ICON} />}
             >
-                <Switch
+                <SwitchField
                     label={m.settings_play_sounds()}
                     checked={prefs.sound}
                     onChange={(sound) => update({ sound })}
@@ -152,7 +152,7 @@ export default function Settings() {
                 hint={m.settings_fingering_hint()}
                 icon={<FingersIcon className={ICON} />}
             >
-                <Switch
+                <SwitchField
                     label={m.settings_show_fingerings()}
                     checked={prefs.showFingerings}
                     onChange={(showFingerings) => update({ showFingerings })}
@@ -212,12 +212,12 @@ export default function Settings() {
                     }))}
                     help={m.metronome_subdivision_caption()}
                 />
-                <Switch
+                <SwitchField
                     label={m.metronome_accent()}
                     checked={prefs.metronomeAccent}
                     onChange={(metronomeAccent) => update({ metronomeAccent })}
                 />
-                <Switch
+                <SwitchField
                     label={m.metronome_adaptive()}
                     checked={prefs.metronomeAdaptive}
                     onChange={(metronomeAdaptive) => update({ metronomeAdaptive })}

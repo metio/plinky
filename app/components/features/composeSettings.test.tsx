@@ -58,9 +58,9 @@ describe("ComposeSettings", () => {
         const onQuantize = vi.fn();
         const onMetronome = vi.fn();
         mount({ onQuantize, onMetronome });
-        fireEvent.click(screen.getByLabelText("Tidy the rhythm"));
+        fireEvent.click(screen.getByRole("switch", { name: "Tidy the rhythm" }));
         expect(onQuantize).toHaveBeenCalledWith(false);
-        fireEvent.click(screen.getByLabelText("Metronome"));
+        fireEvent.click(screen.getByRole("switch", { name: "Metronome" }));
         expect(onMetronome).toHaveBeenCalledWith(true);
     });
 });

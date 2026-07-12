@@ -4,7 +4,7 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CheckboxField, ChoiceField } from "./fields";
+import { ChoiceField, SwitchField } from "./fields";
 
 afterEach(cleanup);
 
@@ -43,17 +43,22 @@ describe("ChoiceField", () => {
     });
 });
 
-describe("CheckboxField", () => {
-    it("toggles through the label as the click target", () => {
+describe("SwitchField", () => {
+    it("is a real switch that reports the flipped state", () => {
         const onChange = vi.fn();
-        render(<CheckboxField label="Play sounds" checked={false} onChange={onChange} />);
+        render(<SwitchField label="Play sounds" checked={false} onChange={onChange} />);
 
-        fireEvent.click(screen.getByLabelText("Play sounds"));
+        fireEvent.click(screen.getByRole("switch", { name: "Play sounds" }));
         expect(onChange).toHaveBeenCalledWith(true);
     });
 
-    it("renders the input disabled when asked", () => {
-        render(<CheckboxField label="Accent" checked onChange={() => {}} disabled />);
-        expect(screen.getByLabelText<HTMLInputElement>("Accent").disabled).toBe(true);
+    it("shows the help line only when one is given", () => {
+        const { rerender } = render(<SwitchField label="Loop" checked onChange={() => {}} />);
+        expect(screen.queryByText("Repeats the section")).toBeNull();
+
+        rerender(
+            <SwitchField label="Loop" checked onChange={() => {}} help="Repeats the section" />,
+        );
+        expect(screen.getByText("Repeats the section")).toBeTruthy();
     });
 });
