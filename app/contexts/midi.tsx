@@ -13,6 +13,7 @@ import {
 import {
     KEYBOARD_DEVICE,
     KEYBOARD_VELOCITY,
+    MIC_DEVICE,
     ON_SCREEN_DEVICE,
     keyToNote,
     MAX_EVENTS,
@@ -61,6 +62,10 @@ declare global {
     }
 }
 
+// The microphone's connection lifecycle, mirroring MidiStatus so the settings
+// panel can speak the same language for both input seams.
+export type MicStatus = "unsupported" | "idle" | "requesting" | "listening" | "denied" | "error";
+
 type MidiContextValue = {
     support: MidiSupport;
     status: MidiStatus;
@@ -75,6 +80,11 @@ type MidiContextValue = {
     // Play a note from the on-screen keyboard through the same funnel as MIDI.
     pressKey: (note: number) => void;
     releaseKey: (note: number) => void;
+    // The microphone as an input device: an acoustic piano heard through pitch
+    // detection lands in the same funnel as a MIDI keyboard.
+    micStatus: MicStatus;
+    startMic: () => void;
+    stopMic: () => void;
 };
 
 const MidiContext = createContext<MidiContextValue | null>(null);
@@ -85,7 +95,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // Injected capabilities: the MIDI seam itself, and the store the dev reset
     // bridge wipes — the provider renders inside ServicesProvider, so overrides
     // (a fake MIDI in tests) reach it too.
-    const { midi, store } = useServices();
+    const { midi, store, pitch } = useServices();
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -201,6 +211,41 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             window.__plinky = undefined;
         };
     }, [emitNote, store, makeHandler]);
+
+    // Microphone pitch events join the funnel as fixed-velocity notes — the
+    // detector hears WHICH note, not yet how hard it was struck.
+    const [micStatus, setMicStatus] = useState<MicStatus>("idle");
+    useEffect(() => {
+        if (!pitch.supported()) {
+            setMicStatus("unsupported");
+        }
+    }, [pitch]);
+    const startMic = useCallback(() => {
+        setMicStatus("requesting");
+        void pitch
+            .start((event) => {
+                if (event.kind === "on") {
+                    emitNote(
+                        "noteon",
+                        event.note,
+                        KEYBOARD_VELOCITY,
+                        1,
+                        MIC_DEVICE,
+                        performance.now(),
+                    );
+                } else {
+                    emitNote("noteoff", event.note, 0, 1, MIC_DEVICE, performance.now());
+                }
+            })
+            .then(setMicStatus);
+    }, [pitch, emitNote]);
+    const stopMic = useCallback(() => {
+        pitch.stop();
+        setMicStatus(pitch.supported() ? "idle" : "unsupported");
+    }, [pitch]);
+    // Leaving the app entirely releases the microphone; route changes keep it,
+    // the same way the MIDI connection persists.
+    useEffect(() => () => pitch.stop(), [pitch]);
 
     const pressKey = useCallback(
         (note: number) =>
@@ -414,6 +459,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         subscribe,
         pressKey,
         releaseKey,
+        micStatus,
+        startMic,
+        stopMic,
     };
 
     return <MidiContext.Provider value={value}>{children}</MidiContext.Provider>;

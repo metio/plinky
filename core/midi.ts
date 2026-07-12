@@ -78,14 +78,16 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
 
 export const KEYBOARD_DEVICE = "Computer keyboard";
 export const ON_SCREEN_DEVICE = "On-screen keyboard";
+export const MIC_DEVICE = "Microphone";
 export const KEYBOARD_VELOCITY = 80;
 
 // Whether an input source carries true velocity and rhythm. The on-screen and
 // computer-keyboard fallbacks send a fixed velocity and can't tap a precise beat,
-// so a run played on them is timed with widened windows; a real MIDI instrument
+// and microphone pitch detection adds its own latency and wobble on top — so runs
+// played on any of them are timed with widened windows; a real MIDI instrument
 // (any other device name) is held to the tight ones.
 export function isPreciseInput(device: string): boolean {
-    return device !== ON_SCREEN_DEVICE && device !== KEYBOARD_DEVICE;
+    return device !== ON_SCREEN_DEVICE && device !== KEYBOARD_DEVICE && device !== MIC_DEVICE;
 }
 export const MIN_OCTAVE_OFFSET = -3;
 export const MAX_OCTAVE_OFFSET = 3;

@@ -5,8 +5,10 @@ import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
 import { webAudioEngine } from "../adapters/webAudioEngine";
 import { lazyVideoExporter } from "../adapters/lazyVideo";
+import { micPitch } from "../adapters/micPitch";
 import { webMidi } from "../adapters/webMidi";
 import type { MidiAccessPort } from "../ports/midiAccess";
+import type { PitchInput } from "../ports/pitchInput";
 import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
@@ -72,6 +74,9 @@ export type AppServices = {
     audio: AudioEngine;
     // Where MIDI comes from (see MidiAccessPort).
     midi: MidiAccessPort;
+    // Where microphone pitch detection comes from (see PitchInput), so an
+    // acoustic piano can be an input device too.
+    pitch: PitchInput;
     // How MusicXML strings become walkable documents and back (see XmlCodec).
     xml: XmlCodec;
     // The fetched halves of the catalogue: the song manifest + on-demand .mxl,
@@ -127,6 +132,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
         midi: overrides.midi ?? webMidi,
+        pitch: overrides.pitch ?? micPitch(),
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
@@ -163,6 +169,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     fetcher: true,
     audio: true,
     midi: true,
+    pitch: true,
     xml: true,
     songs: true,
     exercises: true,

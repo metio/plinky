@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import {
     isPreciseInput,
+    MIC_DEVICE,
     KEYBOARD_DEVICE,
     keyToNote,
     noteName,
@@ -112,6 +113,10 @@ describe("parseMidiMessage", () => {
 describe("isPreciseInput", () => {
     it("treats a real MIDI device as precise", () => {
         expect(isPreciseInput("Roland FP-30")).toBe(true);
+    });
+
+    it("treats the microphone as imprecise, so mic runs get the widened windows", () => {
+        expect(isPreciseInput(MIC_DEVICE)).toBe(false);
     });
 
     it("treats the keyboard fallbacks as imprecise", () => {

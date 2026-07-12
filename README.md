@@ -229,7 +229,13 @@ a student.
 - **With a digital piano** — connect it over USB or Bluetooth MIDI and click
   *Connect MIDI*; Plinky reconnects it automatically on your next visit. Web MIDI is
   available in Chrome, Edge, and Firefox on desktop and Android; Safari and iOS do
-  not expose it, so use the keyboard fallback there.
+  not expose it — there, let Plinky listen instead (below) or use the keyboard fallback.
+- **With an acoustic piano (or any piano, no cable)** — start **listening** in
+  Settings and Plinky hears your playing through the microphone, one note at a
+  time, feeding the same practice flow a MIDI keyboard does. Pitch heard from a
+  room is wobblier than a wire, so mic runs are graded with the same generous,
+  widened timing windows as the keyboard fallbacks — it should feel encouraging,
+  never picky. Works everywhere a microphone does, including Safari and iOS.
 - **With your computer keyboard** — the bottom letter row plays the left hand
   (`Z X C V B N M` the white keys, `S D G H J` the black) and the top row the
   right hand an octave up (`Q W E R T Y U` white, `2 3 5 6 7` black), each a full

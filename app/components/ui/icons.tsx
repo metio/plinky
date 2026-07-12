@@ -431,3 +431,15 @@ export function SlidersIcon({ className }: IconProps) {
         </Icon>
     );
 }
+
+// A microphone on its stand — the room as an input device: play a real piano
+// and Plinky listens.
+export function MicIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0" />
+            <line x1="12" y1="18" x2="12" y2="21" />
+        </Icon>
+    );
+}

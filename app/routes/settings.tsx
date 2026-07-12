@@ -9,6 +9,7 @@ import {
     GradCapIcon,
     KeysIcon,
     MetronomeIcon,
+    MicIcon,
     PlugIcon,
     QuestionIcon,
     SlidersIcon,
@@ -22,6 +23,7 @@ import { DangerZone } from "../components/features/dangerZone";
 import { HandSize } from "../components/features/handSize";
 import { KeyMapping } from "../components/features/keyMapping";
 import { LanguageSwitcher } from "../components/ui/languageSwitcher";
+import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
 import { ThemeToggle } from "../components/features/themeToggle";
 import { useMidiConnection } from "../contexts/midi";
@@ -44,7 +46,7 @@ const ICON = "h-5 w-5";
 export default function Settings() {
     const { prefs, update } = usePrefs();
     const synth = useSynth();
-    const { support: midiSupport } = useMidiConnection();
+    const { support: midiSupport, micStatus } = useMidiConnection();
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -237,6 +239,18 @@ export default function Settings() {
                     icon={<PlugIcon className={ICON} />}
                 >
                     <MidiConnect />
+                </SettingsSection>
+            )}
+
+            {/* No microphone API (very old browsers, some webviews) means nothing
+                to listen with, so the whole panel is hidden. */}
+            {micStatus !== "unsupported" && (
+                <SettingsSection
+                    title={m.mic_heading()}
+                    hint={m.mic_hint()}
+                    icon={<MicIcon className={ICON} />}
+                >
+                    <MicConnect />
                 </SettingsSection>
             )}
 

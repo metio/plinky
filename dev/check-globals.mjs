@@ -18,7 +18,7 @@ const CONFINED = {
     DOMParser: ["app/adapters/domXmlCodec.ts"],
     XMLSerializer: ["app/adapters/domXmlCodec.ts"],
     requestMIDIAccess: ["app/adapters/webMidi.ts"],
-    AudioContext: ["app/adapters/webAudioEngine.ts"],
+    AudioContext: ["app/adapters/webAudioEngine.ts", "app/adapters/micPitch.ts"],
     OfflineAudioContext: ["app/adapters/offlineAudio.ts"],
     VideoEncoder: ["app/adapters/webCodecsVideo.ts"],
     AudioEncoder: ["app/adapters/webCodecsVideo.ts"],
