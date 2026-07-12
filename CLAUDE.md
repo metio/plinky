@@ -60,6 +60,11 @@ npm run build         # includes the prerender
 npm run size          # bundle budget
 ```
 
+`typecheck` and `lint` first verify (via `dev/check-node-modules.mjs`) that the
+installed `node_modules` still matches `package-lock.json` — after a rebase or
+pull that bumps a dependency, run `npm ci` first, or the local gate runs older
+tools than CI's fresh install and can pass what CI fails.
+
 ## Conventions the tools don't fully enforce
 
 - **New persistent state** = a store factory in `app/stores/` over the injected
