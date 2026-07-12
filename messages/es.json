@@ -349,9 +349,7 @@
   "settings_danger_heading": "Zona de peligro",
   "settings_reset_help": "Borra todo en este dispositivo: tus partituras, progreso y ajustes. Esto no se puede deshacer, así que descarga primero una copia de seguridad desde la Biblioteca si quieres conservar tus partituras.",
   "settings_reset": "Restablecer este dispositivo",
-  "settings_reset_confirm": "¿Borrar todo en este dispositivo?",
   "settings_reset_yes": "Sí, borrarlo",
-  "settings_reset_cancel": "Cancelar",
   "action_practice": "Practicar",
   "tracks_heading": "Rutas",
   "tracks_intro": "Sigue una ruta hacia abajo. Todo permanece desbloqueado: el orden es solo una sugerencia y los marcadores muestran en qué ya has registrado una puntuación.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metrónomo",
   "metronome_accent": "Acentuar el primer tiempo de cada compás",
   "video_export": "Vídeo",
-  "daily_title": "Reto diario #{number}"
+  "daily_title": "Reto diario #{number}",
+  "settings_appearance_hint": "Elige cómo se ve Plinky y qué idioma habla.",
+  "settings_sound_hint": "Plinky puede tocar cada nota que pulses. ¡Pulsa Probar para escuchar una!",
+  "settings_mastery_hint": "Qué tan bien debes tocar una canción para que cuente como aprendida.",
+  "settings_grades_hint": "Qué pasa con tus notas cuando te tomas un descanso.",
+  "settings_fingering_hint": "Pequeños ayudantes que muestran qué tecla y qué dedo usar.",
+  "settings_metronome_hint": "El clic constante que te ayuda a llevar el ritmo.",
+  "settings_midi_hint": "Conecta un teclado de piano real para que Plinky te escuche tocar.",
+  "settings_labels_example": "¡Pruébalo! Este pequeño piano muestra tu elección."
 }

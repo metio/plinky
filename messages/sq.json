@@ -349,9 +349,7 @@
   "settings_danger_heading": "Zona e rrezikut",
   "settings_reset_help": "Fshij gjithçka në këtë pajisje — partiturat, përparimin dhe cilësimet e tua. Kjo s'mund të zhbëhet, kështu që shkarko fillimisht një kopje rezervë nga Biblioteka nëse do t'i mbash partiturat.",
   "settings_reset": "Rivendos këtë pajisje",
-  "settings_reset_confirm": "Të fshij gjithçka në këtë pajisje?",
   "settings_reset_yes": "Po, fshije",
-  "settings_reset_cancel": "Anulo",
   "action_practice": "Praktiko",
   "tracks_heading": "Shtigje",
   "tracks_intro": "Ndiq një shteg poshtë. Gjithçka mbetet e shkyçur — radha është një sugjerim dhe shenjuesit tregojnë ku ke marrë tashmë një rezultat.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Thekso rrahjen e parë të çdo mase",
   "video_export": "Video",
-  "daily_title": "Sfida ditore #{number}"
+  "daily_title": "Sfida ditore #{number}",
+  "settings_appearance_hint": "Zgjidh si duket Plinky dhe në cilën gjuhë flet.",
+  "settings_sound_hint": "Plinky mund të luajë çdo notë që shtyp. Shtyp Provo për të dëgjuar një!",
+  "settings_mastery_hint": "Sa mirë duhet ta luash një pjesë që të llogaritet si e mësuar.",
+  "settings_grades_hint": "Çfarë ndodh me notat e tua kur bën pushim.",
+  "settings_fingering_hint": "Ndihmës të vegjël që tregojnë cilin tast dhe cilin gisht të përdorësh.",
+  "settings_metronome_hint": "Klikimi i njëtrajtshëm që të ndihmon të mbash ritmin.",
+  "settings_midi_hint": "Lidh një tastierë të vërtetë pianoje që Plinky të të dëgjojë duke luajtur.",
+  "settings_labels_example": "Provoje! Ky piano i vogël tregon zgjedhjen tënde."
 }

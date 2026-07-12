@@ -349,9 +349,7 @@
   "settings_danger_heading": "Gevarenzone",
   "settings_reset_help": "Wis alles op dit apparaat — je stukken, voortgang en instellingen. Dit kan niet ongedaan worden gemaakt, dus download eerst een back-up vanuit de bibliotheek als je je stukken wilt behouden.",
   "settings_reset": "Dit apparaat resetten",
-  "settings_reset_confirm": "Alles op dit apparaat wissen?",
   "settings_reset_yes": "Ja, wissen",
-  "settings_reset_cancel": "Annuleren",
   "action_practice": "Oefenen",
   "tracks_heading": "Trajecten",
   "tracks_intro": "Volg een pad naar beneden. Alles blijft ontgrendeld – de volgorde is een suggestie en de markeringen tonen waar je al een score hebt neergezet.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronoom",
   "metronome_accent": "Accentueer de eerste tel van elke maat",
   "video_export": "Video",
-  "daily_title": "Dagelijkse uitdaging #{number}"
+  "daily_title": "Dagelijkse uitdaging #{number}",
+  "settings_appearance_hint": "Kies hoe Plinky eruitziet en welke taal het spreekt.",
+  "settings_sound_hint": "Plinky kan elke noot spelen die je indrukt. Druk op Testen om er een te horen!",
+  "settings_mastery_hint": "Hoe goed je een stuk moet spelen voordat het als geleerd telt.",
+  "settings_grades_hint": "Wat er met je cijfers gebeurt als je een pauze neemt.",
+  "settings_fingering_hint": "Kleine helpers die laten zien welke toets en welke vinger je gebruikt.",
+  "settings_metronome_hint": "De gelijkmatige tik die je helpt in de maat te blijven.",
+  "settings_midi_hint": "Sluit een echt pianoklavier aan zodat Plinky je hoort spelen.",
+  "settings_labels_example": "Probeer het! Dit kleine piano'tje laat je keuze zien."
 }

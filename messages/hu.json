@@ -349,9 +349,7 @@
   "settings_danger_heading": "Veszélyzóna",
   "settings_reset_help": "Törölj mindent erről az eszközről — a kottáidat, a haladásod és a beállításaid. Ez nem vonható vissza, ezért előbb tölts le egy biztonsági mentést a Könyvtárból, ha meg akarod tartani a kottáidat.",
   "settings_reset": "Eszköz visszaállítása",
-  "settings_reset_confirm": "Törölsz mindent erről az eszközről?",
   "settings_reset_yes": "Igen, töröld",
-  "settings_reset_cancel": "Mégse",
   "action_practice": "Gyakorlás",
   "tracks_heading": "Útvonalak",
   "tracks_intro": "Kövess egy lefelé vezető utat. Minden feloldva marad — a sorrend csak javaslat, a jelölők pedig azt mutatják, hol értél már el pontszámot.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronóm",
   "metronome_accent": "Minden ütem első ütésének hangsúlyozása",
   "video_export": "Videó",
-  "daily_title": "Napi kihívás #{number}"
+  "daily_title": "Napi kihívás #{number}",
+  "settings_appearance_hint": "Válaszd ki, hogyan nézzen ki a Plinky, és milyen nyelven beszéljen.",
+  "settings_sound_hint": "A Plinky minden lenyomott hangot le tud játszani. Nyomd meg a Teszt gombot, hogy hallj egyet!",
+  "settings_mastery_hint": "Milyen jól kell eljátszanod egy darabot, hogy megtanultnak számítson.",
+  "settings_grades_hint": "Mi történik az osztályzataiddal, ha szünetet tartasz.",
+  "settings_fingering_hint": "Kis segítők, amelyek megmutatják, melyik billentyűt és ujjat használd.",
+  "settings_metronome_hint": "Az egyenletes kattogás, ami segít tartani a tempót.",
+  "settings_midi_hint": "Csatlakoztass egy igazi zongorabillentyűzetet, hogy a Plinky hallja a játékod.",
+  "settings_labels_example": "Próbáld ki! Ez a kis zongora mutatja a választásod."
 }

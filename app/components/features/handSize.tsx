@@ -1,14 +1,15 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMidiInput } from "../../contexts/midi";
 import { intervalName } from "../../../core/intervals";
 import { noteName } from "../../../core/midi";
 import type { HandSpan } from "../../../core/prefs";
-import { usePrefsStore } from "../../contexts/services";
+import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { SettingsSection } from "../ui/settingsSection";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 type Side = "left" | "right";
@@ -20,14 +21,10 @@ const SIDES: Side[] = ["left", "right"];
 // funnel as practice — a tap on the on-screen keys or a real MIDI piano both land
 // as note events — so the two furthest keys the player reaches give the span.
 export function HandSize() {
-    const prefsStore = usePrefsStore();
-    const [spans, setSpans] = useState<HandSpan>({ left: null, right: null });
+    const { prefs, update } = usePrefs();
+    const spans = prefs.handSpan;
     const [active, setActive] = useState<Side | null>(null);
     const [captured, setCaptured] = useState<number[]>([]);
-
-    useEffect(() => {
-        setSpans(prefsStore.load().handSpan);
-    }, [prefsStore.load]);
 
     useMidiInput({
         onNoteOn: (event) => {
@@ -51,13 +48,10 @@ export function HandSize() {
         setActive(null);
         setCaptured([]);
     };
-    const persist = (next: HandSpan) => {
-        prefsStore.save({ ...prefsStore.load(), handSpan: next });
-        setSpans(next);
-    };
+    const persist = (next: HandSpan) => update({ handSpan: next });
     const save = () => {
         if (active && measured !== null) {
-            persist({ ...prefsStore.load().handSpan, [active]: measured });
+            persist({ ...spans, [active]: measured });
             cancel();
         }
     };
@@ -75,16 +69,11 @@ export function HandSize() {
     }
 
     return (
-        <section className="space-y-3">
-            <div>
-                <h3 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {m.settings_hand_size()}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.settings_hand_size_hint()}
-                </p>
-            </div>
-
+        <SettingsSection
+            title={m.settings_hand_size()}
+            hint={m.settings_hand_size_hint()}
+            level={3}
+        >
             <div className="space-y-2">
                 {SIDES.map((side) => {
                     const span = spans[side];
@@ -141,6 +130,6 @@ export function HandSize() {
                     </div>
                 </div>
             )}
-        </section>
+        </SettingsSection>
     );
 }

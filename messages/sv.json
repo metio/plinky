@@ -349,9 +349,7 @@
   "settings_danger_heading": "Farozon",
   "settings_reset_help": "Radera allt på den här enheten — dina stycken, framsteg och inställningar. Detta kan inte ångras, så ladda ner en säkerhetskopia från biblioteket först om du vill behålla dina stycken.",
   "settings_reset": "Återställ den här enheten",
-  "settings_reset_confirm": "Radera allt på den här enheten?",
   "settings_reset_yes": "Ja, radera det",
-  "settings_reset_cancel": "Avbryt",
   "action_practice": "Övning",
   "tracks_heading": "Spår",
   "tracks_intro": "Följ en stig nedåt. Allt förblir upplåst — ordningen är ett förslag och markörerna visar vad du redan har satt ett resultat på.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Betona första slaget i varje takt",
   "video_export": "Video",
-  "daily_title": "Dagens utmaning #{number}"
+  "daily_title": "Dagens utmaning #{number}",
+  "settings_appearance_hint": "Välj hur Plinky ser ut och vilket språk den talar.",
+  "settings_sound_hint": "Plinky kan spela varje ton du trycker på. Tryck på Testa för att höra en!",
+  "settings_mastery_hint": "Hur bra du måste spela ett stycke innan det räknas som inlärt.",
+  "settings_grades_hint": "Vad som händer med dina betyg när du tar en paus.",
+  "settings_fingering_hint": "Små hjälpare som visar vilken tangent och vilket finger du ska använda.",
+  "settings_metronome_hint": "Det jämna klicket som hjälper dig att hålla takten.",
+  "settings_midi_hint": "Anslut ett riktigt pianoklaviatur så att Plinky hör dig spela.",
+  "settings_labels_example": "Prova! Det här lilla pianot visar ditt val."
 }

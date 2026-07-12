@@ -349,9 +349,7 @@
   "settings_danger_heading": "Tehlikeli bölge",
   "settings_reset_help": "Bu cihazdaki her şeyi sil — parçaların, ilerlemen ve ayarların. Bu geri alınamaz, o yüzden parçalarını korumak istiyorsan önce Kütüphane'den bir yedek indir.",
   "settings_reset": "Bu cihazı sıfırla",
-  "settings_reset_confirm": "Bu cihazdaki her şey silinsin mi?",
   "settings_reset_yes": "Evet, sil",
-  "settings_reset_cancel": "İptal",
   "action_practice": "Alıştırma",
   "tracks_heading": "Patikalar",
   "tracks_intro": "Bir yolu aşağı doğru takip et. Her şey açık kalır — sıra bir öneridir ve işaretler daha önce skor aldığın yerleri gösterir.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Her ölçünün ilk vuruşunu vurgula",
   "video_export": "Video",
-  "daily_title": "Günlük #{number}"
+  "daily_title": "Günlük #{number}",
+  "settings_appearance_hint": "Plinky'nin nasıl göründüğünü ve hangi dili konuştuğunu seç.",
+  "settings_sound_hint": "Plinky bastığın her notayı çalabilir. Birini duymak için Dene'ye bas!",
+  "settings_mastery_hint": "Bir parçanın öğrenilmiş sayılması için ne kadar iyi çalman gerektiği.",
+  "settings_grades_hint": "Ara verdiğinde notlarına ne olacağı.",
+  "settings_fingering_hint": "Hangi tuşu ve hangi parmağı kullanacağını gösteren küçük yardımcılar.",
+  "settings_metronome_hint": "Tempoyu tutmana yardım eden düzenli tık sesi.",
+  "settings_midi_hint": "Plinky çaldığını duyabilsin diye gerçek bir piyano klavyesi bağla.",
+  "settings_labels_example": "Dene! Bu küçük piyano seçimini gösterir."
 }

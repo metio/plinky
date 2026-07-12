@@ -349,9 +349,7 @@
   "settings_danger_heading": "Zona pericolosa",
   "settings_reset_help": "Cancella tutto su questo dispositivo — i tuoi spartiti, progressi e impostazioni. Non si può annullare, quindi scarica prima un backup dalla Libreria se vuoi conservare i tuoi spartiti.",
   "settings_reset": "Ripristina questo dispositivo",
-  "settings_reset_confirm": "Cancellare tutto su questo dispositivo?",
   "settings_reset_yes": "Sì, cancella",
-  "settings_reset_cancel": "Annulla",
   "action_practice": "Esercitati",
   "tracks_heading": "Percorsi",
   "tracks_intro": "Segui un percorso verso il basso. Tutto resta sbloccato: l'ordine è solo un suggerimento e i segnaposto mostrano dove hai già registrato un punteggio.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronomo",
   "metronome_accent": "Accenta il primo battito di ogni battuta",
   "video_export": "Video",
-  "daily_title": "Sfida del giorno #{number}"
+  "daily_title": "Sfida del giorno #{number}",
+  "settings_appearance_hint": "Scegli l'aspetto di Plinky e la lingua che parla.",
+  "settings_sound_hint": "Plinky può suonare ogni nota che premi. Premi Prova per sentirne una!",
+  "settings_mastery_hint": "Quanto bene devi suonare un brano perché conti come imparato.",
+  "settings_grades_hint": "Cosa succede ai tuoi voti quando fai una pausa.",
+  "settings_fingering_hint": "Piccoli aiuti che mostrano quale tasto e quale dito usare.",
+  "settings_metronome_hint": "Il clic costante che ti aiuta a tenere il tempo.",
+  "settings_midi_hint": "Collega una vera tastiera di pianoforte così Plinky può sentirti suonare.",
+  "settings_labels_example": "Provalo! Questo piccolo pianoforte mostra la tua scelta."
 }

@@ -349,9 +349,7 @@
   "settings_danger_heading": "危险区",
   "settings_reset_help": "清除此设备上的一切——你的乐谱、进度和设置。此操作无法撤销，若想保留乐谱，请先在曲库下载备份。",
   "settings_reset": "重置此设备",
-  "settings_reset_confirm": "清除此设备上的一切？",
   "settings_reset_yes": "是的，清除",
-  "settings_reset_cancel": "取消",
   "action_practice": "练习",
   "tracks_heading": "学习路线",
   "tracks_intro": "沿着路线向下走。所有内容始终解锁——顺序只是建议，标记显示你已经取得成绩的项目。",
@@ -590,5 +588,13 @@
   "settings_metronome": "节拍器",
   "metronome_accent": "强调每小节的第一拍",
   "video_export": "视频",
-  "daily_title": "每日挑战 #{number}"
+  "daily_title": "每日挑战 #{number}",
+  "settings_appearance_hint": "选择 Plinky 的外观和说的语言。",
+  "settings_sound_hint": "你按下的每个音 Plinky 都能弹出来。按“试听”听一个吧!",
+  "settings_mastery_hint": "一首曲子要弹得多好才算学会。",
+  "settings_grades_hint": "休息一段时间后,你的成绩会怎么变化。",
+  "settings_fingering_hint": "小帮手会告诉你该用哪个键、哪根手指。",
+  "settings_metronome_hint": "帮你保持节奏的、均匀的嗒嗒声。",
+  "settings_midi_hint": "接上真正的钢琴键盘,Plinky 就能听到你的演奏。",
+  "settings_labels_example": "试试看!这架小钢琴会展示你的选择。"
 }

@@ -368,9 +368,7 @@
   "settings_danger_heading": "Danger zone",
   "settings_reset_help": "Erase everything on this device — your scores, progress, and settings. This can't be undone, so download a backup from the Library first if you want to keep your scores.",
   "settings_reset": "Reset this device",
-  "settings_reset_confirm": "Erase everything on this device?",
   "settings_reset_yes": "Yes, erase it",
-  "settings_reset_cancel": "Cancel",
   "settings_reset_failed": "Some data couldn't be erased — your device storage may be full or blocked. Nothing was reloaded; try again.",
   "action_practice": "Practice",
   "tracks_heading": "Tracks",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronome",
   "metronome_accent": "Accent the first beat of each bar",
   "video_export": "Video",
-  "daily_title": "Daily #{number}"
+  "daily_title": "Daily #{number}",
+  "settings_appearance_hint": "Pick how Plinky looks and which language it speaks.",
+  "settings_sound_hint": "Plinky can play every note you press. Press Test to hear one!",
+  "settings_mastery_hint": "How well you must play a song before it counts as learned.",
+  "settings_grades_hint": "What happens to your grades when you take a break.",
+  "settings_fingering_hint": "Little helpers that show which key and finger to use.",
+  "settings_metronome_hint": "The steady click that helps you keep time.",
+  "settings_midi_hint": "Plug in a real piano keyboard so Plinky can hear you play.",
+  "settings_labels_example": "Try it! This little piano shows your choice."
 }

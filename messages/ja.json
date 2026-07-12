@@ -349,9 +349,7 @@
   "settings_danger_heading": "危険な操作",
   "settings_reset_help": "このデバイス上のすべて — 楽譜、進捗、設定 — を消去します。取り消せないので、楽譜を残したい場合はまずライブラリからバックアップをダウンロードしてください。",
   "settings_reset": "このデバイスをリセット",
-  "settings_reset_confirm": "このデバイス上のすべてを消去しますか？",
   "settings_reset_yes": "はい、消去します",
-  "settings_reset_cancel": "キャンセル",
   "action_practice": "練習",
   "tracks_heading": "トラック",
   "tracks_intro": "上から下へ進んでいきましょう。すべて常に開放されています — 順番はあくまで目安で、マーカーはすでにスコアを記録した項目を示します。",
@@ -590,5 +588,13 @@
   "settings_metronome": "メトロノーム",
   "metronome_accent": "各小節の1拍目を強調する",
   "video_export": "動画",
-  "daily_title": "デイリー #{number}"
+  "daily_title": "デイリー #{number}",
+  "settings_appearance_hint": "Plinky の見た目と話す言語を選ぼう。",
+  "settings_sound_hint": "Plinky は押した音をぜんぶ鳴らせるよ。「テスト」を押して聞いてみよう!",
+  "settings_mastery_hint": "曲が「おぼえた」になるには、どれくらい上手に弾けばいいか。",
+  "settings_grades_hint": "お休みしたとき、成績がどうなるか。",
+  "settings_fingering_hint": "どの鍵盤をどの指で弾くかを教えてくれる小さなヘルパー。",
+  "settings_metronome_hint": "リズムを守るのを助けてくれる、一定のカチカチ音。",
+  "settings_midi_hint": "本物のピアノ鍵盤をつなぐと、Plinky に演奏が聞こえるよ。",
+  "settings_labels_example": "ためしてみて!この小さなピアノに選んだものが出るよ。"
 }

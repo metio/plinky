@@ -349,9 +349,7 @@
   "settings_danger_heading": "Strefa zagrożenia",
   "settings_reset_help": "Wymaż wszystko na tym urządzeniu — twoje nuty, postępy i ustawienia. Tego nie da się cofnąć, więc najpierw pobierz kopię zapasową z Biblioteki, jeśli chcesz zachować swoje nuty.",
   "settings_reset": "Zresetuj to urządzenie",
-  "settings_reset_confirm": "Wymazać wszystko na tym urządzeniu?",
   "settings_reset_yes": "Tak, wymaż",
-  "settings_reset_cancel": "Anuluj",
   "action_practice": "Ćwicz",
   "tracks_heading": "Ścieżki",
   "tracks_intro": "Podążaj ścieżką w dół. Wszystko pozostaje odblokowane — kolejność to sugestia, a znaczniki pokazują, gdzie masz już zapisany wynik.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Akcentuj pierwszą miarę każdego taktu",
   "video_export": "Wideo",
-  "daily_title": "Dzienne wyzwanie #{number}"
+  "daily_title": "Dzienne wyzwanie #{number}",
+  "settings_appearance_hint": "Wybierz, jak wygląda Plinky i w jakim języku mówi.",
+  "settings_sound_hint": "Plinky może zagrać każdą nutę, którą naciśniesz. Naciśnij Testuj, aby jedną usłyszeć!",
+  "settings_mastery_hint": "Jak dobrze trzeba zagrać utwór, żeby liczył się jako nauczony.",
+  "settings_grades_hint": "Co dzieje się z twoimi ocenami, gdy robisz przerwę.",
+  "settings_fingering_hint": "Mali pomocnicy pokazujący, którego klawisza i palca użyć.",
+  "settings_metronome_hint": "Równomierne klikanie, które pomaga trzymać rytm.",
+  "settings_midi_hint": "Podłącz prawdziwą klawiaturę pianina, aby Plinky słyszał, jak grasz.",
+  "settings_labels_example": "Wypróbuj! To małe pianino pokazuje twój wybór."
 }

@@ -349,9 +349,7 @@
   "settings_danger_heading": "위험 구역",
   "settings_reset_help": "이 기기의 모든 것을 지워요 — 악보, 진행 상황, 설정까지. 되돌릴 수 없으니, 악보를 남기고 싶다면 먼저 라이브러리에서 백업을 내려받으세요.",
   "settings_reset": "이 기기 초기화",
-  "settings_reset_confirm": "이 기기의 모든 것을 지울까요?",
   "settings_reset_yes": "네, 지울게요",
-  "settings_reset_cancel": "취소",
   "action_practice": "연습",
   "tracks_heading": "트랙",
   "tracks_intro": "아래로 따라 내려가세요. 모든 것이 항상 열려 있어요 — 순서는 제안일 뿐이고, 표시는 이미 점수를 기록한 항목을 보여줘요.",
@@ -590,5 +588,13 @@
   "settings_metronome": "메트로놈",
   "metronome_accent": "각 마디의 첫 박을 강조",
   "video_export": "동영상",
-  "daily_title": "데일리 #{number}"
+  "daily_title": "데일리 #{number}",
+  "settings_appearance_hint": "Plinky의 모습과 사용할 언어를 골라요.",
+  "settings_sound_hint": "Plinky는 누르는 모든 음을 소리 낼 수 있어요. 테스트를 눌러 들어 보세요!",
+  "settings_mastery_hint": "곡을 얼마나 잘 쳐야 배운 것으로 인정되는지 정해요.",
+  "settings_grades_hint": "쉬는 동안 성적이 어떻게 되는지 정해요.",
+  "settings_fingering_hint": "어떤 건반을 어떤 손가락으로 칠지 알려 주는 작은 도우미예요.",
+  "settings_metronome_hint": "박자를 지키도록 도와주는 일정한 딸깍 소리예요.",
+  "settings_midi_hint": "진짜 피아노 건반을 연결하면 Plinky가 연주를 들을 수 있어요.",
+  "settings_labels_example": "해 보세요! 이 작은 피아노가 선택한 모습을 보여 줘요."
 }

@@ -349,9 +349,7 @@
   "settings_danger_heading": "Zone de danger",
   "settings_reset_help": "Effacez tout sur cet appareil — vos partitions, votre progression et vos réglages. C'est irréversible, alors téléchargez d'abord une sauvegarde depuis la Bibliothèque si vous voulez garder vos partitions.",
   "settings_reset": "Réinitialiser cet appareil",
-  "settings_reset_confirm": "Tout effacer sur cet appareil ?",
   "settings_reset_yes": "Oui, tout effacer",
-  "settings_reset_cancel": "Annuler",
   "action_practice": "Entraînement",
   "tracks_heading": "Parcours",
   "tracks_intro": "Suivez un parcours de haut en bas. Tout reste débloqué : l'ordre est une suggestion et les repères indiquent où vous avez déjà obtenu un score.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Métronome",
   "metronome_accent": "Accentuer le premier temps de chaque mesure",
   "video_export": "Vidéo",
-  "daily_title": "Défi du jour #{number}"
+  "daily_title": "Défi du jour #{number}",
+  "settings_appearance_hint": "Choisissez l'apparence de Plinky et la langue qu'il parle.",
+  "settings_sound_hint": "Plinky peut jouer chaque note que vous pressez. Appuyez sur Tester pour en entendre une !",
+  "settings_mastery_hint": "À quel point il faut bien jouer un morceau pour qu'il compte comme appris.",
+  "settings_grades_hint": "Ce qui arrive à vos notes quand vous faites une pause.",
+  "settings_fingering_hint": "Petites aides qui montrent quelle touche et quel doigt utiliser.",
+  "settings_metronome_hint": "Le clic régulier qui vous aide à garder le tempo.",
+  "settings_midi_hint": "Branchez un vrai clavier de piano pour que Plinky vous entende jouer.",
+  "settings_labels_example": "Essayez ! Ce petit piano montre votre choix."
 }

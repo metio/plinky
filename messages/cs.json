@@ -349,9 +349,7 @@
   "settings_danger_heading": "Nebezpečná zóna",
   "settings_reset_help": "Vymaže vše na tomto zařízení — vaše skladby, pokrok i nastavení. Nelze to vzít zpět, takže pokud si chcete skladby ponechat, stáhněte si nejprve zálohu v Knihovně.",
   "settings_reset": "Resetovat toto zařízení",
-  "settings_reset_confirm": "Vymazat vše na tomto zařízení?",
   "settings_reset_yes": "Ano, vymazat",
-  "settings_reset_cancel": "Zrušit",
   "action_practice": "Cvičit",
   "tracks_heading": "Cesty",
   "tracks_intro": "Postupujte cestou dolů. Vše zůstává odemčené — pořadí je jen návrh a značky ukazují, kde už máte zaznamenané skóre.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Zdůraznit první dobu každého taktu",
   "video_export": "Video",
-  "daily_title": "Denní výzva #{number}"
+  "daily_title": "Denní výzva #{number}",
+  "settings_appearance_hint": "Vyber si, jak Plinky vypadá a jakým jazykem mluví.",
+  "settings_sound_hint": "Plinky umí zahrát každou notu, kterou stiskneš. Stiskni Vyzkoušet a jednu uslyšíš!",
+  "settings_mastery_hint": "Jak dobře musíš skladbu zahrát, aby se počítala jako naučená.",
+  "settings_grades_hint": "Co se stane s tvými známkami, když si dáš pauzu.",
+  "settings_fingering_hint": "Malí pomocníci, kteří ukazují, kterou klávesu a který prst použít.",
+  "settings_metronome_hint": "Pravidelné klikání, které ti pomáhá držet tempo.",
+  "settings_midi_hint": "Připoj opravdovou klavírní klaviaturu, aby tě Plinky slyšel hrát.",
+  "settings_labels_example": "Vyzkoušej to! Tohle malé piano ukazuje tvou volbu."
 }

@@ -12,7 +12,8 @@ import {
     rebind,
     SEMITONES,
 } from "../../../core/keyMap";
-import { useOnboardingStore, usePrefsStore } from "../../contexts/services";
+import { useOnboardingStore } from "../../contexts/services";
+import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 
@@ -36,9 +37,9 @@ function keyCap(key: string | null): string {
 // the new layout immediately. Off by default visually — most players use a piano,
 // touch, or the stock layout — but one tap away for anyone who wants their own keys.
 export function KeyMapping() {
-    const prefsStore = usePrefsStore();
+    const { prefs, update } = usePrefs();
+    const map = prefs.keyMap;
     const onboarding = useOnboardingStore();
-    const [map, setMap] = useState<KeyMap>(DEFAULT_KEY_MAP);
     // The slot currently listening for a key, or null when idle.
     const [arming, setArming] = useState<{ hand: Hand; semitone: number } | null>(null);
 
@@ -47,18 +48,7 @@ export function KeyMapping() {
     // the defaults completes it too, not only one who lands on a non-default binding.
     const markEngaged = () => onboarding.markDiscovered("keysCustomized");
 
-    useEffect(() => {
-        setMap(prefsStore.load().keyMap);
-    }, [prefsStore.load]);
-
-    const persist = useCallback(
-        (next: KeyMap) => {
-            setMap(next);
-            // Merge onto the latest stored prefs so a change elsewhere on the page isn't lost.
-            prefsStore.save({ ...prefsStore.load(), keyMap: next });
-        },
-        [prefsStore.save, prefsStore.load],
-    );
+    const persist = useCallback((next: KeyMap) => update({ keyMap: next }), [update]);
 
     // While a cap is armed, capture the next keystroke before it reaches the keyboard
     // input layer (capture phase + stopPropagation), so arming a cap can't sound a note.

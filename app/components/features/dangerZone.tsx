@@ -5,19 +5,15 @@ import { useState } from "react";
 import { useStore } from "../../contexts/services";
 import { PREFIX, resetDevice } from "../../lib/resetDevice";
 import { m } from "../../paraglide/messages.js";
-
-const OUTLINE =
-    "rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950";
-const SOLID = "rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-500";
-const CANCEL =
-    "rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300";
+import { ConfirmButton } from "../ui/confirmButton";
+import { TrashIcon } from "../ui/icons";
+import { SettingsSection } from "../ui/settingsSection";
 
 // Erase all of this device's Plinky data and start fresh. Destructive and
-// irreversible, so it sits behind a two-step confirm; the copy points at the Library
-// backup for anyone who wants to keep their scores first.
+// irreversible, so it sits behind the app-wide two-click ConfirmButton; the copy
+// points at the Library backup for anyone who wants to keep their scores first.
 export function DangerZone() {
     const store = useStore();
-    const [confirming, setConfirming] = useState(false);
     const [failed, setFailed] = useState(false);
 
     const reset = () => {
@@ -32,33 +28,20 @@ export function DangerZone() {
     };
 
     return (
-        <section className="space-y-3">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {m.settings_danger_heading()}
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{m.settings_reset_help()}</p>
-            {confirming ? (
-                <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium text-red-700 dark:text-red-300">
-                        {m.settings_reset_confirm()}
-                    </span>
-                    <button type="button" onClick={reset} className={SOLID}>
-                        {m.settings_reset_yes()}
-                    </button>
-                    <button type="button" onClick={() => setConfirming(false)} className={CANCEL}>
-                        {m.settings_reset_cancel()}
-                    </button>
-                </div>
-            ) : (
-                <button type="button" onClick={() => setConfirming(true)} className={OUTLINE}>
-                    {m.settings_reset()}
-                </button>
-            )}
+        <SettingsSection
+            title={m.settings_danger_heading()}
+            hint={m.settings_reset_help()}
+            icon={<TrashIcon className="h-5 w-5" />}
+            tone="danger"
+        >
+            <ConfirmButton variant="danger" confirmLabel={m.settings_reset_yes()} onConfirm={reset}>
+                {m.settings_reset()}
+            </ConfirmButton>
             {failed && (
                 <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-300">
                     {m.settings_reset_failed()}
                 </p>
             )}
-        </section>
+        </SettingsSection>
     );
 }

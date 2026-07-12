@@ -349,9 +349,7 @@
   "settings_danger_heading": "Vaaravyöhyke",
   "settings_reset_help": "Poista kaikki tältä laitteelta — nuottisi, edistymisesi ja asetuksesi. Tätä ei voi kumota, joten lataa ensin varmuuskopio Kirjastosta, jos haluat säilyttää nuottisi.",
   "settings_reset": "Nollaa tämä laite",
-  "settings_reset_confirm": "Poistetaanko kaikki tältä laitteelta?",
   "settings_reset_yes": "Kyllä, poista se",
-  "settings_reset_cancel": "Peruuta",
   "action_practice": "Harjoittelu",
   "tracks_heading": "Polut",
   "tracks_intro": "Seuraa polkua alaspäin. Kaikki pysyy avoinna — järjestys on ehdotus, ja merkit näyttävät, mihin olet jo asettanut tuloksen.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronomi",
   "metronome_accent": "Korosta jokaisen tahdin ensimmäinen isku",
   "video_export": "Video",
-  "daily_title": "Päivän haaste #{number}"
+  "daily_title": "Päivän haaste #{number}",
+  "settings_appearance_hint": "Valitse, miltä Plinky näyttää ja mitä kieltä se puhuu.",
+  "settings_sound_hint": "Plinky voi soittaa jokaisen painamasi nuotin. Paina Kokeile kuullaksesi yhden!",
+  "settings_mastery_hint": "Kuinka hyvin kappale pitää soittaa, ennen kuin se lasketaan opituksi.",
+  "settings_grades_hint": "Mitä arvosanoillesi tapahtuu, kun pidät taukoa.",
+  "settings_fingering_hint": "Pienet apurit, jotka näyttävät, mitä kosketinta ja sormea käyttää.",
+  "settings_metronome_hint": "Tasainen naksutus, joka auttaa pysymään tahdissa.",
+  "settings_midi_hint": "Kytke oikea pianokoskettimisto, jotta Plinky kuulee soittosi.",
+  "settings_labels_example": "Kokeile! Tämä pieni piano näyttää valintasi."
 }

@@ -349,9 +349,7 @@
   "settings_danger_heading": "Опасна зона",
   "settings_reset_help": "Обриши све на овом уређају — твоје нумере, напредак и подешавања. Ово се не може опозвати, па прво преузми резервну копију из Библиотеке ако желиш да сачуваш нумере.",
   "settings_reset": "Ресетуј овај уређај",
-  "settings_reset_confirm": "Обрисати све на овом уређају?",
   "settings_reset_yes": "Да, обриши",
-  "settings_reset_cancel": "Откажи",
   "action_practice": "Вежбај",
   "tracks_heading": "Стазе",
   "tracks_intro": "Прати пут наниже. Све остаје откључано — редослед је предлог, а ознаке показују где си већ остварио резултат.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Метроном",
   "metronome_accent": "Нагласи прву добу сваког такта",
   "video_export": "Видео",
-  "daily_title": "Дневни изазов #{number}"
+  "daily_title": "Дневни изазов #{number}",
+  "settings_appearance_hint": "Izaberi kako Plinky izgleda i kojim jezikom govori.",
+  "settings_sound_hint": "Plinky može da odsvira svaku notu koju pritisneš. Pritisni Isprobaj da čuješ jednu!",
+  "settings_mastery_hint": "Koliko dobro moraš da odsviraš kompoziciju da bi se računala kao naučena.",
+  "settings_grades_hint": "Šta se dešava sa tvojim ocenama kada napraviš pauzu.",
+  "settings_fingering_hint": "Mali pomoćnici koji pokazuju koji taster i koji prst da koristiš.",
+  "settings_metronome_hint": "Ravnomerni klik koji ti pomaže da držiš ritam.",
+  "settings_midi_hint": "Priključi pravu klavirsku klavijaturu da te Plinky čuje kako sviraš.",
+  "settings_labels_example": "Isprobaj! Ovaj mali klavir pokazuje tvoj izbor."
 }

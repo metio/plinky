@@ -349,9 +349,7 @@
   "settings_danger_heading": "Zonă periculoasă",
   "settings_reset_help": "Șterge tot de pe acest dispozitiv — partiturile, progresul și setările. Nu se poate anula, așa că descarcă mai întâi un backup din Bibliotecă dacă vrei să-ți păstrezi partiturile.",
   "settings_reset": "Resetează acest dispozitiv",
-  "settings_reset_confirm": "Ștergi tot de pe acest dispozitiv?",
   "settings_reset_yes": "Da, șterge tot",
-  "settings_reset_cancel": "Anulează",
   "action_practice": "Exersează",
   "tracks_heading": "Trasee",
   "tracks_intro": "Urmează un traseu în jos. Totul rămâne deblocat — ordinea e o sugestie, iar marcajele arată unde ai obținut deja un scor.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Accentuează primul timp al fiecărei măsuri",
   "video_export": "Video",
-  "daily_title": "Provocarea zilei #{number}"
+  "daily_title": "Provocarea zilei #{number}",
+  "settings_appearance_hint": "Alege cum arată Plinky și ce limbă vorbește.",
+  "settings_sound_hint": "Plinky poate cânta fiecare notă pe care o apeși. Apasă Testează ca să auzi una!",
+  "settings_mastery_hint": "Cât de bine trebuie să cânți o piesă ca să conteze ca învățată.",
+  "settings_grades_hint": "Ce se întâmplă cu notele tale când iei o pauză.",
+  "settings_fingering_hint": "Mici ajutoare care arată ce clapă și ce deget să folosești.",
+  "settings_metronome_hint": "Clicul constant care te ajută să ții ritmul.",
+  "settings_midi_hint": "Conectează o claviatură de pian adevărată ca Plinky să te audă cântând.",
+  "settings_labels_example": "Încearcă! Acest pian mic îți arată alegerea."
 }

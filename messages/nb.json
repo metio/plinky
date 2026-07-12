@@ -349,9 +349,7 @@
   "settings_danger_heading": "Faresone",
   "settings_reset_help": "Slett alt på denne enheten — stykkene, fremgangen og innstillingene dine. Dette kan ikke angres, så last ned en sikkerhetskopi fra biblioteket først om du vil beholde stykkene dine.",
   "settings_reset": "Tilbakestill denne enheten",
-  "settings_reset_confirm": "Slette alt på denne enheten?",
   "settings_reset_yes": "Ja, slett det",
-  "settings_reset_cancel": "Avbryt",
   "action_practice": "Øv",
   "tracks_heading": "Stier",
   "tracks_intro": "Følg en sti nedover. Alt forblir låst opp — rekkefølgen er et forslag, og markørene viser hva du allerede har satt en poengsum på.",
@@ -590,5 +588,13 @@
   "settings_metronome": "Metronom",
   "metronome_accent": "Betón første slag i hver takt",
   "video_export": "Video",
-  "daily_title": "Dagens utfordring #{number}"
+  "daily_title": "Dagens utfordring #{number}",
+  "settings_appearance_hint": "Velg hvordan Plinky ser ut og hvilket språk den snakker.",
+  "settings_sound_hint": "Plinky kan spille hver tone du trykker på. Trykk på Test for å høre en!",
+  "settings_mastery_hint": "Hvor godt du må spille et stykke før det teller som lært.",
+  "settings_grades_hint": "Hva som skjer med karakterene dine når du tar en pause.",
+  "settings_fingering_hint": "Små hjelpere som viser hvilken tangent og hvilken finger du skal bruke.",
+  "settings_metronome_hint": "Det jevne klikket som hjelper deg å holde takten.",
+  "settings_midi_hint": "Koble til et ekte pianokeyboard så Plinky kan høre deg spille.",
+  "settings_labels_example": "Prøv det! Dette lille pianoet viser valget ditt."
 }
