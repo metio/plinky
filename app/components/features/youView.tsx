@@ -1,121 +1,31 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useState } from "react";
-import {
-    currentGrade,
-    dueReviews,
-    type GradeCatalogItem,
-    type GradedMastery,
-    gradeFreshness,
-    gradeSuggestions,
-    loadGradeCatalogue,
-    loadGradedMastery,
-    masteredInGrade,
-    nextStar,
-    poolSizes,
-    skillRating,
-    type StarTier,
-    starTier,
-} from "../../lib/gradeProgress";
-import { progressGrid } from "../../../core/lifetime";
 import { svgMilestone } from "../../../core/milestoneCard";
-import { usePrefsStore, useServices } from "../../contexts/services";
-import { usePracticeSummary } from "../../hooks/usePracticeSummary";
-import { MAX_GRADE } from "../../../core/scoreDifficulty";
-import type { Grid } from "../../../core/shareCard";
+import { useYouData } from "../../hooks/useYouData";
 import { m } from "../../paraglide/messages.js";
-import { buttonClasses } from "../ui/button";
 import { linkClasses } from "../ui/classes";
-import { Show } from "./conditional";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { Show } from "./conditional";
+import { GradeRoadmap } from "./gradeRoadmap";
+import { RefreshQueue } from "./refreshQueue";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
-
-type EarnedTier = Exclude<StarTier, "none">;
-const STAR: Record<EarnedTier, string> = { bronze: "🥉", silver: "🥈", gold: "🥇" };
-const STAR_LABEL: Record<EarnedTier, () => string> = {
-    bronze: m.grades_star_bronze,
-    silver: m.grades_star_silver,
-    gold: m.grades_star_gold,
-};
-
-// A one-line "what playing at this grade feels like" for each of the eight grades, for
-// the optional "About this grade" disclosure — a go-deeper layer, never a reading gate.
-const GRADE_ABOUT: Record<number, () => string> = {
-    1: m.grade_about_1,
-    2: m.grade_about_2,
-    3: m.grade_about_3,
-    4: m.grade_about_4,
-    5: m.grade_about_5,
-    6: m.grade_about_6,
-    7: m.grade_about_7,
-    8: m.grade_about_8,
-};
-
-const SUGGESTION_COUNT = 4;
-const LINK = linkClasses;
-
-function Stat({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="rounded-md border border-gray-200 p-4 dark:border-gray-800">
-            <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {label}
-            </div>
-            <div className="font-mono text-3xl tabular-nums">{value}</div>
-        </div>
-    );
-}
+import { WeekChart } from "./weekChart";
+import { ActivityStats, YouStanding } from "./youStanding";
 
 // The "You" page: how good you are at playing, in one place. Standing (grade + skill)
 // and activity (days, notes) up top; what to play next and the grade roadmap;
 // the single refresh queue; then the retrospective — a 7-day chart and the lifetime
-// Accuracy/Timing/Flow fingerprint. Reads mastery, the catalogue and practice history
-// after mount, so the personal data is absent from the prerendered shell.
+// Accuracy/Timing/Flow fingerprint. All the data arrives through useYouData, which
+// waits for the personal data before the page paints anything — a single full paint
+// keeps CLS at zero on this client-only page.
 export function YouView() {
-    const prefsStore = usePrefsStore();
-    const services = useServices();
-    const [items, setItems] = useState<GradedMastery[] | null>(null);
-    const [catalogue, setCatalogue] = useState<GradeCatalogItem[]>([]);
-    // Subscribed, not sampled: a run finished elsewhere updates the summary live.
-    const summary = usePracticeSummary();
-    const [fingerprint, setFingerprint] = useState<Grid | null>(null);
-
-    useEffect(() => {
-        let cancelled = false;
-        setFingerprint(progressGrid(services.lifetime.load()));
-        loadGradedMastery(services.mastery, services).then(
-            (loaded) => !cancelled && setItems(loaded),
-        );
-        loadGradeCatalogue(services).then((loaded) => !cancelled && setCatalogue(loaded));
-        return () => {
-            cancelled = true;
-        };
-    }, [services]);
-
-    // Wait for the personal data before painting anything, so the page renders once
-    // fully rather than prerendering a roadmap that shifts as the data lands — the
-    // whole page is client-only mastery/history, and a single paint keeps CLS at zero.
-    if (items === null) {
+    const data = useYouData();
+    if (data === null) {
         return null;
     }
-
-    const now = Date.now();
-    const prefs = prefsStore.load();
-    const mode = prefs.decayMode;
-    const resolved = items;
-    const level = currentGrade(resolved);
-    const skill = skillRating(resolved, mode, now);
-    const reviews = dueReviews(resolved, now, prefs.reviewCap);
-    const byId = new Map(resolved.map((item) => [item.id, item]));
-    const masteredIds = new Set(
-        resolved.filter((item) => item.mastery.learned && !item.mastery.backlog).map((i) => i.id),
-    );
-    const sizes = poolSizes(catalogue);
-    const grades = Array.from({ length: MAX_GRADE }, (_, i) => i + 1);
-    const workingGrade = Math.min(level + 1, MAX_GRADE);
-    const upNext = gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT);
-    const max = summary ? Math.max(1, ...summary.recent.map((day) => day.notes)) : 1;
+    const { level, skill, mode, workingGrade, upNext, summary, fingerprint } = data;
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -124,36 +34,13 @@ export function YouView() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.you_intro()}</p>
             </header>
 
-            <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 p-4 dark:border-gray-800">
-                <span className="flex items-center gap-3">
-                    <span aria-hidden="true" className="text-4xl">
-                        🎓
-                    </span>
-                    <span className="text-2xl font-bold">
-                        {level === 0 ? m.grades_not_started() : m.grades_current({ level })}
-                    </span>
-                </span>
-                <span className="flex flex-col items-end gap-0.5 text-right text-sm text-gray-600 dark:text-gray-400">
-                    <span title={m.grades_skill_help()}>{m.grades_skill({ rating: skill })}</span>
-                    <Show when={mode === "competitive"}>
-                        <span
-                            title={m.grades_competitive_help()}
-                            className="font-medium text-amber-700 dark:text-amber-400"
-                        >
-                            ⚔️ {m.grades_competitive()}
-                        </span>
-                    </Show>
-                </span>
-            </div>
+            <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
 
             {summary && (
-                <div className="grid grid-cols-2 gap-4">
-                    <Stat
-                        label={m.progress_days_practiced()}
-                        value={String(summary.daysPracticed)}
-                    />
-                    <Stat label={m.progress_notes_played()} value={String(summary.totalNotes)} />
-                </div>
+                <ActivityStats
+                    daysPracticed={summary.daysPracticed}
+                    totalNotes={summary.totalNotes}
+                />
             )}
 
             <Show when={level >= 1}>
@@ -180,7 +67,7 @@ export function YouView() {
                     <ul className="space-y-1 text-sm">
                         {upNext.map((item) => (
                             <li key={item.id}>
-                                <Link to={`/play/${item.id}`} className={LINK}>
+                                <Link to={`/play/${item.id}`} className={linkClasses}>
                                     {item.title}
                                 </Link>
                             </li>
@@ -189,122 +76,17 @@ export function YouView() {
                 </section>
             </Show>
 
-            <ul className="space-y-2">
-                {grades.map((grade) => {
-                    const mastered = masteredInGrade(resolved, grade, mode, now);
-                    const tier = starTier(mastered);
-                    const next = nextStar(mastered);
-                    const { due } = gradeFreshness(resolved, grade, mode, now);
-                    const total = sizes.get(grade) ?? 0;
-                    return (
-                        <li
-                            key={grade}
-                            className={`space-y-2 rounded-md border p-3 ${
-                                grade === level
-                                    ? "border-indigo-300 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-950/40"
-                                    : "border-gray-200 dark:border-gray-800"
-                            }`}
-                        >
-                            <div className="flex items-center justify-between gap-3">
-                                <span className="flex items-center gap-2">
-                                    <span className="font-semibold">
-                                        {m.grades_grade({ grade })}
-                                    </span>
-                                    {tier !== "none" && (
-                                        <span role="img" aria-label={STAR_LABEL[tier]()}>
-                                            {STAR[tier]}
-                                        </span>
-                                    )}
-                                </span>
-                                <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
-                                    <span className="tabular-nums">
-                                        {m.grades_pool({ mastered, total })}
-                                    </span>
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                        {next
-                                            ? m.grades_to_next({
-                                                  count: next.remaining,
-                                                  tier: STAR_LABEL[next.tier](),
-                                              })
-                                            : m.grades_maxed()}
-                                    </span>
-                                    <Show when={due > 0}>
-                                        <span className="text-amber-700 dark:text-amber-400">
-                                            {m.grades_due({ count: due })}
-                                        </span>
-                                    </Show>
-                                </span>
-                            </div>
-                            <details className="text-sm">
-                                <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">
-                                    {m.grade_about_heading()}
-                                </summary>
-                                <p className="pt-1 text-gray-600 dark:text-gray-400">
-                                    {GRADE_ABOUT[grade]?.()}
-                                </p>
-                            </details>
-                        </li>
-                    );
-                })}
-            </ul>
+            <GradeRoadmap
+                items={data.items}
+                level={level}
+                mode={mode}
+                now={data.now}
+                poolSizes={data.poolSizes}
+            />
 
-            <section className="space-y-2">
-                <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {m.grades_refresh_heading()}
-                </h2>
-                {reviews.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {m.grades_all_fresh()}
-                    </p>
-                ) : (
-                    <>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {m.refresh_why()}
-                        </p>
-                        <Link to="/review" className={buttonClasses("primary")}>
-                            {m.review_start({ count: reviews.length })}
-                        </Link>
-                        <ul className="space-y-1 text-sm">
-                            {reviews.map((id) => (
-                                <li key={id}>
-                                    <Link to={`/play/${id}`} className={LINK}>
-                                        {byId.get(id)?.title ?? id}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </>
-                )}
-            </section>
+            <RefreshQueue reviews={data.reviews} />
 
-            {summary && (
-                <div>
-                    <h2 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {m.progress_last_7_days()}
-                    </h2>
-                    <div className="flex h-32 items-end gap-2">
-                        {summary.recent.map((day) => (
-                            <div
-                                key={day.date}
-                                className="flex h-full flex-1 flex-col items-center justify-end gap-1"
-                                title={
-                                    day.notes === 1
-                                        ? m.progress_notes_one({ count: day.notes })
-                                        : m.progress_notes_other({ count: day.notes })
-                                }
-                            >
-                                <div
-                                    className="w-full rounded-t bg-indigo-500"
-                                    style={{ height: `${Math.round((day.notes / max) * 100)}%` }}
-                                />
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {day.date.slice(5)}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            {summary && <WeekChart recent={summary.recent} />}
 
             {fingerprint && (
                 <ShareCard
