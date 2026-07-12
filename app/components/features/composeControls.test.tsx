@@ -52,11 +52,21 @@ describe("ComposeControls", () => {
         expect(screen.getByRole("button", { name: "Count in" })).toHaveProperty("disabled", false);
     });
 
-    it("shows the armed count-in and blocks re-arming", () => {
+    it("cancels an armed count-in from either button, even on an empty canvas", () => {
         const onCountIn = vi.fn();
-        mount({ countingIn: true, onCountIn });
-        const button = screen.getByRole("button", { name: /Counting in/ });
-        expect(button).toHaveProperty("disabled", true);
+        const onStop = vi.fn();
+        mount({ countingIn: true, empty: true, onCountIn, onStop });
+
+        // The armed primary is a cancel, not a locked status.
+        fireEvent.click(screen.getByRole("button", { name: /Counting in/ }));
+        expect(onStop).toHaveBeenCalledTimes(1);
+        expect(onCountIn).not.toHaveBeenCalled();
+
+        // The transport button reads Stop and works too — no note needs to exist.
+        const stop = screen.getByRole("button", { name: "Stop" });
+        expect(stop).toHaveProperty("disabled", false);
+        fireEvent.click(stop);
+        expect(onStop).toHaveBeenCalledTimes(2);
     });
 
     it("labels the checkpoint reset with the kept note count", () => {

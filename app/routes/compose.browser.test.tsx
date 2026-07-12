@@ -169,6 +169,19 @@ describe("Compose", () => {
         expect(await screen.findByText("3 notes")).toBeTruthy();
     });
 
+    it("silences the recording metronome when leaving full screen", async () => {
+        mount();
+        // Count in drops into full screen and, after one bar, leaves the
+        // metronome clicking for the recording.
+        fireEvent.click(screen.getByRole("button", { name: "Count in" }));
+        const metronome = screen.getByLabelText<HTMLInputElement>("Metronome");
+        await waitFor(() => expect(metronome.checked).toBe(true), { timeout: 5000 });
+
+        // Stepping back out must end the click too, not leave it ticking at rest.
+        fireEvent.click(screen.getByRole("button", { name: "Exit full screen" }));
+        await waitFor(() => expect(metronome.checked).toBe(false));
+    });
+
     it("cancels a pending count-in when the take is cleared", async () => {
         mount();
         await strike(60);

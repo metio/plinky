@@ -35,11 +35,18 @@ export function ComposeControls({
 }: ComposeControlsProps) {
     return (
         <section className="flex flex-wrap gap-2">
-            <Button variant="primary" onClick={onCountIn} disabled={countingIn}>
+            {/* While the count-in clicks, both buttons are ways out: the armed
+                primary cancels, and the transport button reads Stop — so stopping
+                works without leaving full screen. */}
+            <Button variant="primary" onClick={countingIn ? onStop : onCountIn}>
                 {countingIn ? m.compose_counting_in() : m.compose_count_in()}
             </Button>
-            <Button variant="secondary" onClick={playing ? onStop : onPlay} disabled={empty}>
-                {playing ? m.compose_stop() : m.compose_play()}
+            <Button
+                variant="secondary"
+                onClick={playing || countingIn ? onStop : onPlay}
+                disabled={empty && !countingIn}
+            >
+                {playing || countingIn ? m.compose_stop() : m.compose_play()}
             </Button>
             <Button variant="secondary" onClick={onSetCheckpoint} disabled={empty}>
                 {m.compose_set_checkpoint()}

@@ -117,13 +117,14 @@ export default function Compose() {
     // on-screen keys live; the stage's ✕ (or Esc) steps back out.
     const stageRef = useRef<HTMLElement>(null);
     const { fullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen(stageRef);
-    // Stepping out of full screen stops playback and any armed count-in, the way
-    // leaving the play surface ends a run — but only on the transition, so
-    // playing the take back at rest is untouched.
+    // Stepping out of full screen stops playback, any armed count-in and the
+    // recording metronome, the way leaving the play surface ends a run — but only
+    // on the transition, so playing the take back at rest is untouched.
     const wasFullscreen = useRef(false);
     useEffect(() => {
         if (wasFullscreen.current && !fullscreen) {
             transport.stop();
+            setMetronomeOn(false);
         }
         wasFullscreen.current = fullscreen;
     }, [fullscreen, transport.stop]);
