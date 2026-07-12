@@ -13,6 +13,7 @@ import {
     useSyncExternalStore,
 } from "react";
 import { cadence } from "../../../core/cadence";
+import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import { isPreciseInput } from "../../../core/midi";
@@ -45,7 +46,12 @@ import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useRunResult } from "../../hooks/useRunResult";
-import { type CorrectInfo, type Hand, useScoreMatcher } from "../../hooks/useScoreMatcher";
+import {
+    collectSteps,
+    type CorrectInfo,
+    type Hand,
+    useScoreMatcher,
+} from "../../hooks/useScoreMatcher";
 import { useHiddenNotes } from "../../hooks/useHiddenNotes";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
@@ -274,6 +280,26 @@ function usePlaySessionValue({
     });
     const { getOsmd, ready, staffCount, measureCount, measureBoxes, centerCursor, markPainted } =
         score;
+
+    // Frame the on-screen keyboard around the notes THIS piece uses, so a narrow
+    // tune shows a short keyboard instead of a fixed two octaves. Recomputed only
+    // when the sounding pitches can have changed — a new piece (xml) or a
+    // transposition — never on a layout relayout or a mid-run repaint, so reading
+    // the steps (which walks and resets the cursor) can't disturb a live run.
+    const [keyRange, setKeyRange] = useState<{ from: number; to: number }>(DEFAULT_KEY_RANGE);
+    useEffect(() => {
+        const osmd = getOsmd();
+        if (!ready || !osmd) {
+            return;
+        }
+        // Both hands, so switching the practised hand never resizes the keyboard.
+        setKeyRange(songKeyRange(collectSteps(osmd, "both").flat()));
+        // xml/transpose/staffCount aren't read here — they are the triggers: the
+        // sounding pitches change only when the piece or its key does, and gating
+        // on them keeps collectSteps (which walks the cursor) off the mid-run
+        // repaint path.
+        // biome-ignore lint/correctness/useExhaustiveDependencies: content-change triggers, read via getOsmd
+    }, [ready, xml, transpose, staffCount, getOsmd]);
 
     // The cursor's current position in whole notes — the shared place Listen and Practice
     // hand off at, so switching between them (or leaving and re-entering the play surface)
@@ -803,6 +829,7 @@ function usePlaySessionValue({
         measureCount,
         // Reading + keyboard framing.
         reading,
+        keyRange,
         hintNotes,
         noteHints,
         setNoteHints,

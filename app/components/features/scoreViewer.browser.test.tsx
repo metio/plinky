@@ -139,6 +139,19 @@ describe("ScoreViewer", () => {
         expect(screen.getByLabelText("C5")).toBeTruthy();
     });
 
+    it("frames the keyboard to the piece's own range, not a fixed two octaves", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        // An all-C5 phrase: the old fixed C4–C6 keyboard always drew C4 and C6,
+        // far from the single note played. The keyboard now frames the piece, so
+        // those distant keys are gone while C5 stays.
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady());
+        expect(await screen.findByLabelText("C5")).toBeTruthy();
+        expect(screen.queryByLabelText("C4")).toBeNull();
+        expect(screen.queryByLabelText("C6")).toBeNull();
+    });
+
     it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
         // The browser viewport is phone-sized, so playing auto-enters full screen where
         // the toggles live; stub the Fullscreen API the headless browser withholds.

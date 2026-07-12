@@ -31,6 +31,7 @@ export function PlayStage() {
         hideKeyboard,
         fingerStrip,
         hintNotes,
+        keyRange,
         id,
         xml,
         staffCount,
@@ -113,7 +114,12 @@ export function PlayStage() {
                     />
                 ) : (
                     <Show when={!(fullscreen && hideKeyboard)}>
-                        <PianoKeyboard expected={hintNotes} wrong={matcher.lastWrong} />
+                        <PianoKeyboard
+                            expected={hintNotes}
+                            wrong={matcher.lastWrong}
+                            from={keyRange.from}
+                            to={keyRange.to}
+                        />
                     </Show>
                 )}
             </div>
