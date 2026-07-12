@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
+import { tempoTerm } from "../../../core/tempoTerm";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { BumpValue } from "../ui/stepper";
@@ -229,19 +230,25 @@ function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: nu
                 <Bpm tempo={tempo} />
             </button>
             {open && (
-                <span className="absolute left-0 top-full z-30 mt-1 flex items-center gap-2 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-                    <input
-                        type="range"
-                        min={40}
-                        max={180}
-                        value={tempo}
-                        onChange={(event) => setTempo(Number(event.target.value))}
-                        aria-label={m.scores_tempo()}
-                    />
-                    <BumpValue
-                        value={tempo}
-                        className="w-10 text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    />
+                <span className="absolute left-0 top-full z-30 mt-1 flex flex-col gap-1 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                    <span className="flex items-center gap-2">
+                        <input
+                            type="range"
+                            min={40}
+                            max={180}
+                            value={tempo}
+                            onChange={(event) => setTempo(Number(event.target.value))}
+                            aria-label={m.scores_tempo()}
+                        />
+                        <BumpValue
+                            value={tempo}
+                            className="w-10 text-sm font-semibold text-gray-800 dark:text-gray-200"
+                        />
+                    </span>
+                    {/* The speed as music: the classical term for the current mark. */}
+                    <span className="text-xs italic text-gray-500 dark:text-gray-400">
+                        {tempoTerm(tempo)}
+                    </span>
                 </span>
             )}
         </span>

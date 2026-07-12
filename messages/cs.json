@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Malí pomocníci, kteří ukazují, kterou klávesu a který prst použít.",
   "settings_metronome_hint": "Pravidelné klikání, které ti pomáhá držet tempo.",
   "settings_midi_hint": "Připoj opravdovou klavírní klaviaturu, aby tě Plinky slyšel hrát.",
-  "settings_labels_example": "Vyzkoušej to! Tohle malé piano ukazuje tvou volbu."
+  "settings_labels_example": "Vyzkoušej to! Tohle malé piano ukazuje tvou volbu.",
+  "daily_reveal": "Otevři dnešní výzvu!"
 }

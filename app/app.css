@@ -13,6 +13,19 @@ SPDX-License-Identifier: 0BSD
     /* The landing keyboard's keys rise in on load, left to right via a per-key
        delay. Transform/opacity only, so it never shifts layout. */
     --animate-key-rise: key-rise 0.5s ease-out both;
+    /* The daily challenge rising out of its just-opened present. */
+    --animate-daily-reveal: daily-reveal 0.45s ease-out both;
+}
+
+@keyframes daily-reveal {
+    from {
+        transform: translateY(0.75rem) scale(0.985);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
 }
 
 @keyframes key-rise {

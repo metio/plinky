@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Hangi tuşu ve hangi parmağı kullanacağını gösteren küçük yardımcılar.",
   "settings_metronome_hint": "Tempoyu tutmana yardım eden düzenli tık sesi.",
   "settings_midi_hint": "Plinky çaldığını duyabilsin diye gerçek bir piyano klavyesi bağla.",
-  "settings_labels_example": "Dene! Bu küçük piyano seçimini gösterir."
+  "settings_labels_example": "Dene! Bu küçük piyano seçimini gösterir.",
+  "daily_reveal": "Bugünün görevini aç!"
 }

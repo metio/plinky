@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Kleine Helfer, die zeigen, welche Taste und welcher Finger dran ist.",
   "settings_metronome_hint": "Das gleichmäßige Klicken, das dir hilft, im Takt zu bleiben.",
   "settings_midi_hint": "Schließe ein echtes Klavier-Keyboard an, damit Plinky dich hören kann.",
-  "settings_labels_example": "Probier es aus! Dieses kleine Klavier zeigt deine Auswahl."
+  "settings_labels_example": "Probier es aus! Dieses kleine Klavier zeigt deine Auswahl.",
+  "daily_reveal": "Öffne die heutige Aufgabe!"
 }

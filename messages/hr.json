@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Mali pomagači koji pokazuju koju tipku i koji prst koristiti.",
   "settings_metronome_hint": "Ravnomjerni klik koji ti pomaže držati ritam.",
   "settings_midi_hint": "Priključi pravu klavirsku klavijaturu da te Plinky čuje kako sviraš.",
-  "settings_labels_example": "Isprobaj! Ovaj mali klavir pokazuje tvoj izbor."
+  "settings_labels_example": "Isprobaj! Ovaj mali klavir pokazuje tvoj izbor.",
+  "daily_reveal": "Otvori današnji izazov!"
 }

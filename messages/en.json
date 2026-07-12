@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Little helpers that show which key and finger to use.",
   "settings_metronome_hint": "The steady click that helps you keep time.",
   "settings_midi_hint": "Plug in a real piano keyboard so Plinky can hear you play.",
-  "settings_labels_example": "Try it! This little piano shows your choice."
+  "settings_labels_example": "Try it! This little piano shows your choice.",
+  "daily_reveal": "Open today's challenge!"
 }

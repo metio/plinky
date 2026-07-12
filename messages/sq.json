@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Ndihmës të vegjël që tregojnë cilin tast dhe cilin gisht të përdorësh.",
   "settings_metronome_hint": "Klikimi i njëtrajtshëm që të ndihmon të mbash ritmin.",
   "settings_midi_hint": "Lidh një tastierë të vërtetë pianoje që Plinky të të dëgjojë duke luajtur.",
-  "settings_labels_example": "Provoje! Ky piano i vogël tregon zgjedhjen tënde."
+  "settings_labels_example": "Provoje! Ky piano i vogël tregon zgjedhjen tënde.",
+  "daily_reveal": "Hap sfidën e sotme!"
 }

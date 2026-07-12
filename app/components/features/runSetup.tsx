@@ -169,7 +169,7 @@ export function RunSetup() {
                             onChange={(event) => setTrainerTarget(Number(event.target.value))}
                             aria-label={m.tempo_trainer_target()}
                         />
-                        <Bpm tempo={trainerTarget} className="w-12" />
+                        <Bpm tempo={trainerTarget} term />
                     </label>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         {m.tempo_trainer_target_caption()}

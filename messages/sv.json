@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Små hjälpare som visar vilken tangent och vilket finger du ska använda.",
   "settings_metronome_hint": "Det jämna klicket som hjälper dig att hålla takten.",
   "settings_midi_hint": "Anslut ett riktigt pianoklaviatur så att Plinky hör dig spela.",
-  "settings_labels_example": "Prova! Det här lilla pianot visar ditt val."
+  "settings_labels_example": "Prova! Det här lilla pianot visar ditt val.",
+  "daily_reveal": "Öppna dagens utmaning!"
 }

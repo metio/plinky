@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Pequeños ayudantes que muestran qué tecla y qué dedo usar.",
   "settings_metronome_hint": "El clic constante que te ayuda a llevar el ritmo.",
   "settings_midi_hint": "Conecta un teclado de piano real para que Plinky te escuche tocar.",
-  "settings_labels_example": "¡Pruébalo! Este pequeño piano muestra tu elección."
+  "settings_labels_example": "¡Pruébalo! Este pequeño piano muestra tu elección.",
+  "daily_reveal": "¡Abre el reto de hoy!"
 }

@@ -7,6 +7,7 @@ import { BookIcon, ListIcon, NotesIcon, PinIcon } from "../components/ui/icons";
 import { HomeToday } from "../components/features/homeToday";
 import { NewsBanner } from "../components/features/newsBanner";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
+import { useSynth } from "../hooks/useSynth";
 import { socialMeta, structuredData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -26,19 +27,35 @@ export function meta(_args: Route.MetaArgs) {
 // The things you can do, most-used first. The daily challenge is intentionally absent
 // here — it lives in the Today panel above, so it isn't surfaced twice. One full-width
 // card each, with room to actually explain the feature.
+// Each card carries a note of the C-major arpeggio, so mousing down the list
+// plays a rising line — the page hums along with the browsing.
 const FEATURES = [
-    { to: "/library", label: m.home_browse_all, blurb: m.home_library_blurb, Icon: BookIcon },
+    {
+        to: "/library",
+        label: m.home_browse_all,
+        blurb: m.home_library_blurb,
+        Icon: BookIcon,
+        note: 60,
+    },
     {
         to: "/assignments",
         label: m.home_assignments,
         blurb: m.home_assignments_blurb,
         Icon: ListIcon,
+        note: 64,
     },
-    { to: "/compose", label: m.play_compose, blurb: m.play_compose_blurb, Icon: NotesIcon },
-    { to: "/board", label: m.board_title, blurb: m.home_board_blurb, Icon: PinIcon },
+    {
+        to: "/compose",
+        label: m.play_compose,
+        blurb: m.play_compose_blurb,
+        Icon: NotesIcon,
+        note: 67,
+    },
+    { to: "/board", label: m.board_title, blurb: m.home_board_blurb, Icon: PinIcon, note: 72 },
 ];
 
 export default function Home() {
+    const synth = useSynth();
     return (
         <main className="mx-auto max-w-3xl space-y-12 p-6 font-sans">
             <section className="space-y-6 pt-2">
@@ -93,6 +110,14 @@ export default function Home() {
                         <Link
                             key={feature.to}
                             to={feature.to}
+                            // A soft plink on mouse hover only: touch fires pointerenter
+                            // on every tap, which would double as a phantom key press.
+                            // The synth already honours the sound/mute preference.
+                            onPointerEnter={(event) => {
+                                if (event.pointerType === "mouse") {
+                                    synth.playNote(feature.note, { velocity: 55, duration: 0.4 });
+                                }
+                            }}
                             className="group flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
                         >
                             <feature.Icon className="mt-0.5 h-8 w-8 shrink-0 text-indigo-600 group-hover:text-indigo-700 dark:text-indigo-400 dark:group-hover:text-indigo-300" />

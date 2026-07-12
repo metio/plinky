@@ -10,6 +10,7 @@ import { ServicesProvider } from "../contexts/services";
 import { dailyNumber, todayKey } from "../../core/daily";
 import { browserStore } from "../adapters/browserStore";
 import { createDailyStore } from "../stores/dailyStore";
+import { m } from "../paraglide/messages.js";
 import Daily from "./daily";
 
 // OSMD renders only in a real browser, so this runs in the browser project.
@@ -21,6 +22,10 @@ afterEach(() => {
     cleanup();
     localStorage.clear();
 });
+
+// An unplayed daily hides behind the present; open it before reaching the score.
+const openPresent = async () =>
+    fireEvent.click(await screen.findByRole("button", { name: m.daily_reveal() }));
 
 describe("Daily", () => {
     it("heads the page with the running challenge number", async () => {
@@ -52,6 +57,7 @@ describe("Daily", () => {
                 </ServicesProvider>
             </MemoryRouter>,
         );
+        await openPresent();
         // The generated phrase renders through the graded score viewer, which leads with
         // its single primary action (Practice); Listen waits in the full-screen top bar.
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
@@ -68,6 +74,7 @@ describe("Daily", () => {
                 </ServicesProvider>
             </MemoryRouter>,
         );
+        await openPresent();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
         // OSMD must render within its container: the scrollable region's content is
         // no wider than the region itself, so no horizontal scrollbar appears.
@@ -90,6 +97,7 @@ describe("Daily", () => {
                 </ServicesProvider>
             </MemoryRouter>,
         );
+        await openPresent();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
         // A locked-tempo challenge offers no tempo control anywhere at rest: the
         // Run-setup disclosure holds no trainer or transpose, and no slider exists.

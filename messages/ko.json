@@ -596,5 +596,6 @@
   "settings_fingering_hint": "어떤 건반을 어떤 손가락으로 칠지 알려 주는 작은 도우미예요.",
   "settings_metronome_hint": "박자를 지키도록 도와주는 일정한 딸깍 소리예요.",
   "settings_midi_hint": "진짜 피아노 건반을 연결하면 Plinky가 연주를 들을 수 있어요.",
-  "settings_labels_example": "해 보세요! 이 작은 피아노가 선택한 모습을 보여 줘요."
+  "settings_labels_example": "해 보세요! 이 작은 피아노가 선택한 모습을 보여 줘요.",
+  "daily_reveal": "오늘의 도전을 열어 보세요!"
 }

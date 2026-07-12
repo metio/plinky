@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Kis segítők, amelyek megmutatják, melyik billentyűt és ujjat használd.",
   "settings_metronome_hint": "Az egyenletes kattogás, ami segít tartani a tempót.",
   "settings_midi_hint": "Csatlakoztass egy igazi zongorabillentyűzetet, hogy a Plinky hallja a játékod.",
-  "settings_labels_example": "Próbáld ki! Ez a kis zongora mutatja a választásod."
+  "settings_labels_example": "Próbáld ki! Ez a kis zongora mutatja a választásod.",
+  "daily_reveal": "Nyisd ki a mai kihívást!"
 }

@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Petites aides qui montrent quelle touche et quel doigt utiliser.",
   "settings_metronome_hint": "Le clic régulier qui vous aide à garder le tempo.",
   "settings_midi_hint": "Branchez un vrai clavier de piano pour que Plinky vous entende jouer.",
-  "settings_labels_example": "Essayez ! Ce petit piano montre votre choix."
+  "settings_labels_example": "Essayez ! Ce petit piano montre votre choix.",
+  "daily_reveal": "Ouvrez le défi du jour !"
 }

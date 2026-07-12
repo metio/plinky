@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Pienet apurit, jotka näyttävät, mitä kosketinta ja sormea käyttää.",
   "settings_metronome_hint": "Tasainen naksutus, joka auttaa pysymään tahdissa.",
   "settings_midi_hint": "Kytke oikea pianokoskettimisto, jotta Plinky kuulee soittosi.",
-  "settings_labels_example": "Kokeile! Tämä pieni piano näyttää valintasi."
+  "settings_labels_example": "Kokeile! Tämä pieni piano näyttää valintasi.",
+  "daily_reveal": "Avaa päivän haaste!"
 }

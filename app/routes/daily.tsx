@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
+import { DailyReveal } from "../components/features/dailyReveal";
 import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
@@ -91,17 +92,21 @@ export default function DailyRoute() {
 
             {mode === "challenge" ? (
                 today && (
-                    <ScoreViewer
-                        key={today.number}
-                        id={`daily-${today.number}`}
-                        xml={today.xml}
-                        title={`Plinky #${today.number}`}
-                        daily={today.number}
-                        initialTempo={today.tempo}
-                        lockTempo
-                        ephemeral
-                        seededResult={today.result}
-                    />
+                    // The unplayed daily arrives as a present to open; a finished
+                    // one shows its result without ceremony.
+                    <DailyReveal alreadyOpen={today.result !== null}>
+                        <ScoreViewer
+                            key={today.number}
+                            id={`daily-${today.number}`}
+                            xml={today.xml}
+                            title={`Plinky #${today.number}`}
+                            daily={today.number}
+                            initialTempo={today.tempo}
+                            lockTempo
+                            ephemeral
+                            seededResult={today.result}
+                        />
+                    </DailyReveal>
                 )
             ) : (
                 <>

@@ -596,5 +596,6 @@
   "settings_fingering_hint": "小帮手会告诉你该用哪个键、哪根手指。",
   "settings_metronome_hint": "帮你保持节奏的、均匀的嗒嗒声。",
   "settings_midi_hint": "接上真正的钢琴键盘,Plinky 就能听到你的演奏。",
-  "settings_labels_example": "试试看!这架小钢琴会展示你的选择。"
+  "settings_labels_example": "试试看!这架小钢琴会展示你的选择。",
+  "daily_reveal": "打开今天的挑战!"
 }

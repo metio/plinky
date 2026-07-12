@@ -596,5 +596,6 @@
   "settings_fingering_hint": "どの鍵盤をどの指で弾くかを教えてくれる小さなヘルパー。",
   "settings_metronome_hint": "リズムを守るのを助けてくれる、一定のカチカチ音。",
   "settings_midi_hint": "本物のピアノ鍵盤をつなぐと、Plinky に演奏が聞こえるよ。",
-  "settings_labels_example": "ためしてみて!この小さなピアノに選んだものが出るよ。"
+  "settings_labels_example": "ためしてみて!この小さなピアノに選んだものが出るよ。",
+  "daily_reveal": "今日のチャレンジを開けよう!"
 }

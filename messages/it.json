@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Piccoli aiuti che mostrano quale tasto e quale dito usare.",
   "settings_metronome_hint": "Il clic costante che ti aiuta a tenere il tempo.",
   "settings_midi_hint": "Collega una vera tastiera di pianoforte così Plinky può sentirti suonare.",
-  "settings_labels_example": "Provalo! Questo piccolo pianoforte mostra la tua scelta."
+  "settings_labels_example": "Provalo! Questo piccolo pianoforte mostra la tua scelta.",
+  "daily_reveal": "Apri la sfida di oggi!"
 }

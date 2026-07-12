@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Mici ajutoare care arată ce clapă și ce deget să folosești.",
   "settings_metronome_hint": "Clicul constant care te ajută să ții ritmul.",
   "settings_midi_hint": "Conectează o claviatură de pian adevărată ca Plinky să te audă cântând.",
-  "settings_labels_example": "Încearcă! Acest pian mic îți arată alegerea."
+  "settings_labels_example": "Încearcă! Acest pian mic îți arată alegerea.",
+  "daily_reveal": "Deschide provocarea de azi!"
 }

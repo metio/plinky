@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Kleine helpers die laten zien welke toets en welke vinger je gebruikt.",
   "settings_metronome_hint": "De gelijkmatige tik die je helpt in de maat te blijven.",
   "settings_midi_hint": "Sluit een echt pianoklavier aan zodat Plinky je hoort spelen.",
-  "settings_labels_example": "Probeer het! Dit kleine piano'tje laat je keuze zien."
+  "settings_labels_example": "Probeer het! Dit kleine piano'tje laat je keuze zien.",
+  "daily_reveal": "Open de uitdaging van vandaag!"
 }

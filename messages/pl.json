@@ -596,5 +596,6 @@
   "settings_fingering_hint": "Mali pomocnicy pokazujący, którego klawisza i palca użyć.",
   "settings_metronome_hint": "Równomierne klikanie, które pomaga trzymać rytm.",
   "settings_midi_hint": "Podłącz prawdziwą klawiaturę pianina, aby Plinky słyszał, jak grasz.",
-  "settings_labels_example": "Wypróbuj! To małe pianino pokazuje twój wybór."
+  "settings_labels_example": "Wypróbuj! To małe pianino pokazuje twój wybór.",
+  "daily_reveal": "Otwórz dzisiejsze wyzwanie!"
 }
