@@ -60,9 +60,19 @@ const PD_STEMS = /\b(tchaikov|tschaikow|rachmanin|mussorg|moussorg)\w*/;
 // True when the composition is confidently public domain. Composer-name patterns read
 // ONLY the composer field (a title word like "bachelor" must never admit a song); the
 // traditional/anonymous markers may land in either field, so those read both.
+// Works the corpora mislabel "Traditional" that are in fact 20th-century and
+// still under copyright — the label admits them through the traditional rule,
+// so they are denied by title first. Petit Papa Noël is Henri Martinet (d.
+// 1985), You Are My Sunshine is Davis/Mitchell (published 1940), Tzena Tzena
+// is Issachar Miron (published 1941).
+const COPYRIGHTED_WORKS = /\b(petit papa noel|you are my sunshine|tzena)\b/;
+
 export function isPublicDomain(composer: string, title = ""): boolean {
     if (composer.trim() === "") {
         return false; // no attribution — can't confirm anything
+    }
+    if (COPYRIGHTED_WORKS.test(fold(title))) {
+        return false;
     }
     if (TRADITIONAL.test(fold(`${composer} ${title}`))) {
         return true;

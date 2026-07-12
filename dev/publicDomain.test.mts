@@ -104,3 +104,16 @@ describe("isPublicDomain", () => {
         expect(isPublicDomain("   ")).toBe(false);
     });
 });
+
+describe("the copyrighted-works denylist beats the traditional label", () => {
+    it("denies 20th-century works the corpora mislabel Traditional", () => {
+        expect(isPublicDomain("Misc Traditional", "petit papa noel")).toBe(false);
+        expect(isPublicDomain("Traditional", "you are my sunshine")).toBe(false);
+        expect(isPublicDomain("Trad", "Tzena Tzena")).toBe(false);
+    });
+
+    it("keeps admitting genuinely traditional works", () => {
+        expect(isPublicDomain("Traditional", "Greensleeves")).toBe(true);
+    });
+});
+
