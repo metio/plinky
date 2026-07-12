@@ -7,6 +7,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { fakeMidi } from "../adapters/fakeMidi";
 import { ServicesProvider } from "../contexts/services";
+import { m } from "../paraglide/messages.js";
+import { switchOn } from "../testing/controls";
 import Compose from "./compose";
 
 let mounted: HTMLElement[] = [];
@@ -174,14 +176,13 @@ describe("Compose", () => {
         // Count in drops into full screen and, after one bar, leaves the
         // metronome clicking for the recording.
         fireEvent.click(screen.getByRole("button", { name: "Count in" }));
-        const metronome = screen.getByRole("switch", { name: "Metronome" });
-        await waitFor(() => expect(metronome.getAttribute("aria-checked")).toBe("true"), {
+        await waitFor(() => expect(switchOn(m.compose_metronome_label)).toBe(true), {
             timeout: 5000,
         });
 
         // Stepping back out must end the click too, not leave it ticking at rest.
         fireEvent.click(screen.getByRole("button", { name: "Exit full screen" }));
-        await waitFor(() => expect(metronome.getAttribute("aria-checked")).toBe("false"));
+        await waitFor(() => expect(switchOn(m.compose_metronome_label)).toBe(false));
     });
 
     it("cancels a pending count-in when the take is cleared", async () => {

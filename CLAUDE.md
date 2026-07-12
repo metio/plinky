@@ -98,6 +98,14 @@ tools than CI's fresh install and can pass what CI fails.
   test target: memoryStore fakes for stores, fast-check property suites
   (`*.property.test.ts`) for pure core logic, `*.browser.test.tsx` for
   real-browser behavior.
+- **Tests select controls by message key, not copy.** Use the helpers in
+  `app/testing/controls.ts` (`toggle`/`switchOn` for SwitchField,
+  `choose`/`chosen` for ChoiceField, `pressed` for ToggleIconButton) and pass
+  the paraglide message the component renders — `toggle(m.settings_play_sounds)`
+  — so a reworded label can't strand a selector; the same goes for plain role
+  queries (`getByRole("button", { name: m.assignments_save() })`). Hardcode a
+  string only when the copy itself is what the test asserts. The helpers stay
+  role-based on purpose — never reach for data-testid.
 - **Stories are visual regression tests, in both themes.** The `storybook`
   vitest project screenshots every story light and dark (the hook flips the
   `.dark` root class for a second, `-dark`-named baseline) and compares both

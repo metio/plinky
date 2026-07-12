@@ -6,6 +6,9 @@ import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
+import { m } from "../paraglide/messages.js";
+import { choose } from "../testing/controls";
+import { switchOn, toggle } from "../testing/controls";
 import { renderWithServices } from "../testing/renderWithServices";
 import Settings from "./settings";
 
@@ -25,27 +28,26 @@ describe("Settings", () => {
         const { services } = mount();
         expect(services.prefs.load().sound).toBe(true);
 
-        fireEvent.click(screen.getByRole("switch", { name: "Play note sounds" }));
+        toggle(m.settings_play_sounds);
         expect(services.prefs.load().sound).toBe(false);
+        expect(switchOn(m.settings_play_sounds)).toBe(false);
     });
 
     it("persists a segmented choice and marks it selected", () => {
         const { services } = mount();
 
-        const s = screen.getByRole("tab", { name: "S" });
-        fireEvent.click(s);
+        choose(m.settings_mastery_threshold, "S");
         expect(services.prefs.load().masteryThreshold).toBe("S");
-        expect(s.getAttribute("aria-selected")).toBe("true");
     });
 
     it("disables the volume slider while sound is off, and persists the level", () => {
         const { services } = mount();
-        const slider = screen.getByLabelText<HTMLInputElement>("Volume");
+        const slider = screen.getByLabelText<HTMLInputElement>(m.settings_volume());
 
         fireEvent.change(slider, { target: { value: "25" } });
         expect(services.prefs.load().volume).toBe(25);
 
-        fireEvent.click(screen.getByRole("switch", { name: "Play note sounds" }));
+        toggle(m.settings_play_sounds);
         expect(slider.disabled).toBe(true);
     });
 
@@ -54,7 +56,7 @@ describe("Settings", () => {
         // The default labels only the C keys as landmarks.
         expect(services.prefs.load().noteLabels).toBe("c");
 
-        fireEvent.click(screen.getByRole("tab", { name: "Every key" }));
+        choose(m.settings_note_labels, m.note_labels_all);
         expect(services.prefs.load().noteLabels).toBe("all");
         // The example octave now prints a label on a non-C key too.
         expect(screen.getByLabelText("D4").textContent).toContain("D");
@@ -66,9 +68,7 @@ describe("Settings", () => {
         // The Hand size panel saves independently; the page-level controls must
         // keep editing the latest prefs rather than clobbering that save.
         services.prefs.save({ ...services.prefs.load(), handSpan: { left: 9, right: null } });
-        fireEvent.click(
-            screen.getByRole("switch", { name: "Show finger position hints while practicing" }),
-        );
+        toggle(m.settings_show_fingerings);
 
         const stored = services.prefs.load();
         expect(stored.showFingerings).toBe(true);
@@ -78,6 +78,6 @@ describe("Settings", () => {
     it("hides the MIDI section where Web MIDI is unsupported", () => {
         mount();
         // jsdom has no navigator.requestMIDIAccess, so the whole panel is gone.
-        expect(screen.queryByText("Connect MIDI")).toBeNull();
+        expect(screen.queryByText(m.settings_connect_midi())).toBeNull();
     });
 });

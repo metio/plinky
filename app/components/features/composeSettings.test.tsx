@@ -4,6 +4,8 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { m } from "../../paraglide/messages.js";
+import { toggle } from "../../testing/controls";
 import { ComposeSettings } from "./composeSettings";
 
 const noop = () => {};
@@ -58,9 +60,9 @@ describe("ComposeSettings", () => {
         const onQuantize = vi.fn();
         const onMetronome = vi.fn();
         mount({ onQuantize, onMetronome });
-        fireEvent.click(screen.getByRole("switch", { name: "Tidy the rhythm" }));
+        toggle(m.compose_quantize_label);
         expect(onQuantize).toHaveBeenCalledWith(false);
-        fireEvent.click(screen.getByRole("switch", { name: "Metronome" }));
+        toggle(m.compose_metronome_label);
         expect(onMetronome).toHaveBeenCalledWith(true);
     });
 });
