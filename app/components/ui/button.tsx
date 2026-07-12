@@ -16,7 +16,9 @@ const VARIANT: Record<ButtonVariant, string> = {
     secondary:
         "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900",
     ghost: "text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900",
-    danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400",
+    // red-700, not the brighter reds: white text needs it to clear the WCAG
+    // 4.5:1 contrast ratio in both themes.
+    danger: "bg-red-700 text-white hover:bg-red-800 dark:bg-red-700 dark:hover:bg-red-600",
     // Ghost's hover, but no text colour of its own — for a button that sets its own
     // colour to signal state (e.g. the learned toggle). Without tailwind-merge, a variant
     // that shipped its own text-* would fight the caller's, and same-property utilities
