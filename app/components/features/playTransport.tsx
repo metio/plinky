@@ -1,7 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useState } from "react";
 import { m } from "../../paraglide/messages.js";
+import { Bpm } from "../ui/bpm";
+import { BumpValue } from "../ui/stepper";
 import { ToggleIconButton } from "../ui/toggleIconButton";
 import { Button, IconButton } from "../ui/button";
 import {
@@ -11,7 +14,7 @@ import {
     HandIcon,
     PlayIcon,
     RotateIcon,
-    SlidersIcon,
+    ForwardIcon,
     SpeakerIcon,
     StopIcon,
     MetronomeIcon,
@@ -38,10 +41,14 @@ export function PlayTransport() {
         reading,
         fingerStrip,
         setFingerStrip,
-        setToolsOpen,
         exitFullscreen,
         metronomeOn,
         setMetronomeOn,
+        forgiving,
+        setForgiving,
+        tempo,
+        setTempo,
+        lockTempo,
     } = usePlaySession();
     const { showFingerings, setShowFingerings, treadmill, scrollFollow, setScrollFollow } = reading;
 
@@ -88,14 +95,6 @@ export function PlayTransport() {
         >
             {practiceRunning ? <StopIcon /> : <PlayIcon />}
             {m.action_practice()}
-        </Button>
-    );
-    // Opens the Practice-tools drawer. A sliders icon, deliberately not a gear — the
-    // header gear is the app's global /settings, these are the per-piece knobs.
-    const toolsButton = (
-        <Button variant="secondary" onClick={() => setToolsOpen(true)}>
-            <SlidersIcon />
-            {m.more_options()}
         </Button>
     );
     // Opens the Runs drawer: your saved performances of this piece. Kept out of the main
@@ -164,11 +163,18 @@ export function PlayTransport() {
                     >
                         <MetronomeIcon />
                     </ToggleIconButton>
-                    {/* The Practice-tools drawer — tempo, metronome detail, loop and the
-                    rest of the live tweaks — reachable without leaving full screen. */}
-                    <IconButton onClick={() => setToolsOpen(true)} label={m.more_options()}>
-                        <SlidersIcon />
-                    </IconButton>
+                    {/* The one shared tempo, adjustable mid-play: a BPM readout that
+                    opens a small slider popover. Hidden for a locked challenge. */}
+                    {!lockTempo && <TempoPopover tempo={tempo} setTempo={setTempo} />}
+                    {/* Keep going past a slip without leaving the music — read live
+                    by the matcher, so it takes effect on the very next note. */}
+                    <ToggleIconButton
+                        onClick={() => setForgiving(!forgiving)}
+                        pressed={forgiving}
+                        label={m.forgiving_toggle()}
+                    >
+                        <ForwardIcon />
+                    </ToggleIconButton>
                     {/* Swap the keyboard area for the fingering editor: work out (or
                     fine-tune) the fingers for the piece with the difficulty heat-map
                     washed over the score. */}
@@ -194,11 +200,44 @@ export function PlayTransport() {
             the rest of the transport live in the full-screen top bar (above), reachable
             once play begins, so the resting /play view stays uncluttered. */}
             <FullScreen off>
-                <div className="flex flex-wrap items-center gap-3">
-                    {practiceButton}
-                    {toolsButton}
-                </div>
+                <div className="flex flex-wrap items-center gap-3">{practiceButton}</div>
             </FullScreen>
         </>
+    );
+}
+
+// The BPM readout that doubles as the mid-play tempo control: tapping it opens
+// a small popover with the slider, so the transport carries one compact number
+// instead of a full-width row.
+function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: number) => void }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <span className="relative">
+            <button
+                type="button"
+                onClick={() => setOpen((value) => !value)}
+                aria-expanded={open}
+                aria-label={m.scores_tempo()}
+                className="min-h-11 rounded-md px-2 text-sm font-semibold tabular-nums text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+                <Bpm tempo={tempo} />
+            </button>
+            {open && (
+                <span className="absolute left-0 top-full z-30 mt-1 flex items-center gap-2 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                    <input
+                        type="range"
+                        min={40}
+                        max={180}
+                        value={tempo}
+                        onChange={(event) => setTempo(Number(event.target.value))}
+                        aria-label={m.scores_tempo()}
+                    />
+                    <BumpValue
+                        value={tempo}
+                        className="w-10 text-sm font-semibold text-gray-800 dark:text-gray-200"
+                    />
+                </span>
+            )}
+        </span>
     );
 }

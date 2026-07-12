@@ -1,20 +1,22 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { KEYBOARD_OCTAVES, type NoteLabels } from "../../../core/prefs";
+import type { NoteHints, NoteLabels } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { KeysIcon } from "../ui/icons";
 import { ToggleIconButton } from "../ui/toggleIconButton";
 
 // The keyboard's own quick controls, sitting right above the keys in full
-// screen: fold the keys away, cycle the window width, cycle the note names.
+// screen: fold the keys away, cycle the note names, cycle the next-note hint.
 // Each is a shortcut onto the same preference the tools drawer and Settings
 // edit with full captions — one source of truth, two doors — so a change here
 // is a change everywhere.
 
-// Tap-to-cycle orders. Octaves walk the useful widths then the whole piece;
-// labels walk from most help to none.
+// Tap-to-cycle orders, each walking from most help to none.
 const LABELS_CYCLE: NoteLabels[] = ["all", "c", "off"];
+const HINTS_CYCLE: NoteHints[] = ["always", "miss", "never"];
+// Filled / half / empty: how much the keyboard gives away about the next note.
+const hintGlyph: Record<NoteHints, string> = { always: "◉", miss: "◐", never: "○" };
 
 function nextIn<T>(cycle: readonly T[], current: T): T {
     const index = cycle.indexOf(current);
@@ -29,37 +31,24 @@ const labelGlyph: Record<NoteLabels, string> = { all: "ABC", c: "C", off: "–" 
 export function KeyboardQuickControls({
     hidden,
     onToggleHidden,
-    octaves,
-    onOctaves,
     noteLabels,
     onNoteLabels,
+    noteHints,
+    onNoteHints,
 }: {
     // Whether the keys are folded away; the cluster stays visible as the way back.
     hidden: boolean;
     onToggleHidden: () => void;
-    // The keyboard window width in octaves (0 = the whole piece, fixed).
-    octaves: number;
-    onOctaves: (value: number) => void;
     noteLabels: NoteLabels;
     onNoteLabels: (value: NoteLabels) => void;
+    // When the keyboard lights the next note to play: always / after a miss / never.
+    noteHints: NoteHints;
+    onNoteHints: (value: NoteHints) => void;
 }) {
-    // The octave cycle starts from the allowed list with 0 (All) last, so
-    // tapping reads as "wider, wider, wider, everything".
-    const octaveCycle = [...KEYBOARD_OCTAVES.filter((n) => n !== 0), 0];
     return (
         <div className="flex items-center justify-end gap-1">
             {!hidden && (
                 <>
-                    <button
-                        type="button"
-                        onClick={() => onOctaves(nextIn(octaveCycle, octaves))}
-                        aria-label={`${m.keyboard_octaves()}: ${
-                            octaves === 0 ? m.keyboard_octaves_all() : octaves
-                        }`}
-                        className={CYCLE_BUTTON}
-                    >
-                        {octaves === 0 ? m.keyboard_octaves_all() : `${octaves}×`}
-                    </button>
                     <button
                         type="button"
                         onClick={() => onNoteLabels(nextIn(LABELS_CYCLE, noteLabels))}
@@ -73,6 +62,20 @@ export function KeyboardQuickControls({
                         className={CYCLE_BUTTON}
                     >
                         {labelGlyph[noteLabels]}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onNoteHints(nextIn(HINTS_CYCLE, noteHints))}
+                        aria-label={`${m.settings_note_hints()}: ${
+                            noteHints === "always"
+                                ? m.note_hints_always()
+                                : noteHints === "miss"
+                                  ? m.note_hints_miss()
+                                  : m.note_hints_never()
+                        }`}
+                        className={CYCLE_BUTTON}
+                    >
+                        {hintGlyph[noteHints]}
                     </button>
                 </>
             )}

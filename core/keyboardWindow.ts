@@ -17,37 +17,6 @@ function clampFrom(from: number, span: number, range: Span): number {
     return Math.max(range.from, Math.min(from, range.to - span));
 }
 
-// The window to show next, given the previous one. `active` is the set of notes that
-// must be visible right now (the position being played); when it's empty the window
-// holds still. Returns the full piece range unchanged when it already fits, so narrow
-// pieces behave exactly as before — no sliding, the whole keyboard at once.
-export function nextKeyboardWindow(
-    prev: Span | null,
-    range: Span | null,
-    active: number[],
-    maxSpan: number = DEFAULT_KEYBOARD_SPAN,
-): Span | null {
-    if (!range) {
-        return null;
-    }
-    if (range.to - range.from <= maxSpan) {
-        return range;
-    }
-    if (active.length === 0) {
-        return prev ?? { from: range.from, to: range.from + maxSpan };
-    }
-    const lo = Math.min(...active);
-    const hi = Math.max(...active);
-    // Still framed by the current window — leave it exactly where it is.
-    if (prev && lo >= prev.from && hi <= prev.to) {
-        return prev;
-    }
-    // Re-frame: a window wide enough for the chord, centred on it so there's reading
-    // room on both sides, then clamped inside the piece's own range.
-    const span = Math.max(maxSpan, hi - lo);
-    const from = clampFrom(Math.round((lo + hi) / 2 - span / 2), span, range);
-    return { from, to: from + span };
-}
 
 // Free play (Compose) has no upcoming notes to frame the window around, so it follows
 // the note you just played instead: it holds while that note sits in the comfortable

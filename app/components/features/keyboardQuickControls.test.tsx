@@ -10,64 +10,55 @@ afterEach(cleanup);
 
 const noop = () => {};
 
+function renderControls(overrides: Partial<Parameters<typeof KeyboardQuickControls>[0]> = {}) {
+    return render(
+        <KeyboardQuickControls
+            hidden={false}
+            onToggleHidden={noop}
+            noteLabels="c"
+            onNoteLabels={noop}
+            noteHints="miss"
+            onNoteHints={noop}
+            {...overrides}
+        />,
+    );
+}
+
 describe("KeyboardQuickControls", () => {
-    it("cycles the window width wider and wraps All back to one octave", () => {
-        const onOctaves = vi.fn();
-        const { rerender } = render(
-            <KeyboardQuickControls
-                hidden={false}
-                onToggleHidden={noop}
-                octaves={2}
-                onOctaves={onOctaves}
-                noteLabels="c"
-                onNoteLabels={noop}
-            />,
+    it("cycles the note names from every key to just C to off", () => {
+        const onNoteLabels = vi.fn();
+        renderControls({ noteLabels: "all", onNoteLabels });
+        fireEvent.click(screen.getByRole("button", { name: "Note names on the keys: Every key" }));
+        expect(onNoteLabels).toHaveBeenCalledWith("c");
+    });
+
+    it("cycles the next-note hint and wraps never back to always", () => {
+        const onNoteHints = vi.fn();
+        const { rerender } = renderControls({ noteHints: "miss", onNoteHints });
+        fireEvent.click(
+            screen.getByRole("button", { name: /Show the next note.*|.*next note.*/i }),
         );
-        fireEvent.click(screen.getByRole("button", { name: "Keys: 2" }));
-        expect(onOctaves).toHaveBeenCalledWith(3);
+        expect(onNoteHints).toHaveBeenCalledWith("never");
 
         rerender(
             <KeyboardQuickControls
                 hidden={false}
                 onToggleHidden={noop}
-                octaves={0}
-                onOctaves={onOctaves}
                 noteLabels="c"
                 onNoteLabels={noop}
+                noteHints="never"
+                onNoteHints={onNoteHints}
             />,
         );
-        fireEvent.click(screen.getByRole("button", { name: "Keys: All" }));
-        expect(onOctaves).toHaveBeenLastCalledWith(1);
-    });
-
-    it("cycles the note names from every key to just C to off", () => {
-        const onNoteLabels = vi.fn();
-        render(
-            <KeyboardQuickControls
-                hidden={false}
-                onToggleHidden={noop}
-                octaves={2}
-                onOctaves={noop}
-                noteLabels="all"
-                onNoteLabels={onNoteLabels}
-            />,
+        fireEvent.click(
+            screen.getByRole("button", { name: /Show the next note.*|.*next note.*/i }),
         );
-        fireEvent.click(screen.getByRole("button", { name: "Note names on the keys: Every key" }));
-        expect(onNoteLabels).toHaveBeenCalledWith("c");
+        expect(onNoteHints).toHaveBeenLastCalledWith("always");
     });
 
     it("folds down to just the way back when the keys are hidden", () => {
         const onToggleHidden = vi.fn();
-        render(
-            <KeyboardQuickControls
-                hidden
-                onToggleHidden={onToggleHidden}
-                octaves={2}
-                onOctaves={noop}
-                noteLabels="c"
-                onNoteLabels={noop}
-            />,
-        );
+        renderControls({ hidden: true, onToggleHidden });
         // The cycles disappear with the keys; only the show-keys toggle remains.
         expect(screen.getAllByRole("button")).toHaveLength(1);
         fireEvent.click(screen.getByRole("button", { name: "Show keys" }));

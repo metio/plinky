@@ -29,7 +29,7 @@ import { buildMidiFile } from "../../core/midiFile";
 import { readScoreFile } from "../../core/musicxmlFile";
 import { parseMusicXml } from "../../core/musicxmlParse";
 
-import { useOnboardingStore, usePrefsStore, useXmlCodec } from "../contexts/services";
+import { useOnboardingStore, useXmlCodec } from "../contexts/services";
 import { fileStem } from "../lib/printScore";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -54,7 +54,6 @@ const COMPOSE_REACH: Span = { from: 21, to: 108 };
 
 export default function Compose() {
     const onboarding = useOnboardingStore();
-    const prefsStore = usePrefsStore();
     const xmlCodec = useXmlCodec();
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
@@ -73,13 +72,10 @@ export default function Compose() {
     // non-empty take; null when there's nothing to confirm.
     const [pendingReplace, setPendingReplace] = useState<Composition | null>(null);
 
-    // The on-screen keyboard mirrors the practice surface: a window of the player's
-    // chosen width (Settings → keyboard octaves; 0 = show all) that follows what they
-    // play, rather than a frozen three octaves. Read once on mount.
-    const [keyboardSpan] = useState(() => {
-        const octaves = prefsStore.load().keyboardOctaves;
-        return octaves === 0 ? Number.POSITIVE_INFINITY : octaves * 12;
-    });
+    // The on-screen keyboard shows a two-octave window that follows what the
+    // player improvises — compose has no piece to frame "whole", so a bounded
+    // follower keeps the keys a playable size wherever the music wanders.
+    const keyboardSpan = 24;
     const [keyWindow, setKeyWindow] = useState<Span>(() =>
         followKeyboardWindow(null, 60, keyboardSpan, COMPOSE_REACH),
     );
@@ -127,7 +123,7 @@ export default function Compose() {
                 followKeyboardWindow(prev, event.note, keyboardSpan, COMPOSE_REACH),
             );
         },
-        [keyboardSpan],
+        [],
     );
 
     const handleNoteOff = useCallback(

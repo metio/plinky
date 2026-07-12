@@ -3,7 +3,7 @@
 
 import type { Dispatch, SetStateAction } from "react";
 import type { Hand } from "../../../core/matcher";
-import { REVEAL_TRIES } from "../../../core/prefs";
+import { BARS_PER_ROW, REVEAL_TRIES } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { IconButton } from "../ui/button";
@@ -47,6 +47,15 @@ export function RunSetup() {
         setTrainerOn,
         trainerTarget,
         setTrainerTarget,
+        raceGhost,
+        setRaceGhost,
+        ready,
+        measureCount,
+        loop,
+        hasSaved,
+        showMine,
+        setShowMine,
+        reading,
     } = usePlaySession();
 
     return (
@@ -106,6 +115,52 @@ export function RunSetup() {
             {!lockTempo && (
                 <Option caption={m.tempo_trainer_caption()}>
                     <Switch checked={trainerOn} onChange={setTrainerOn} label={m.tempo_trainer()} />
+                </Option>
+            )}
+            <Option caption={m.race_ghost_hint()}>
+                <Switch checked={raceGhost} onChange={setRaceGhost} label={m.race_ghost_toggle()} />
+            </Option>
+            {ready && measureCount > 1 && (
+                <Option caption={m.loop_caption()}>
+                    <Switch checked={loop.on} onChange={loop.toggle} label={m.loop_section()} />
+                </Option>
+            )}
+            {hasSaved && reading.showFingerings && (
+                <Option caption={m.fingering_show_mine_caption()}>
+                    <Switch
+                        checked={showMine}
+                        onChange={setShowMine}
+                        label={m.fingering_show_mine()}
+                    />
+                </Option>
+            )}
+            <Option caption={m.treadmill_hint()}>
+                <Switch
+                    checked={reading.treadmill}
+                    onChange={reading.setTreadmill}
+                    label={m.treadmill_toggle()}
+                />
+            </Option>
+            <Option caption={m.bar_numbers_hint()}>
+                <Switch
+                    checked={reading.barNumbers}
+                    onChange={reading.setBarNumbers}
+                    label={m.bar_numbers_toggle()}
+                />
+            </Option>
+            {!reading.treadmill && (
+                <Option caption={m.bars_per_row_caption()}>
+                    <Labeled label={m.bars_per_row()}>
+                        <SegmentedControl
+                            options={BARS_PER_ROW.map((n) => ({
+                                id: String(n),
+                                label: n === 0 ? m.bars_per_row_auto() : String(n),
+                            }))}
+                            value={String(reading.barsPerRow)}
+                            onChange={(id) => reading.setBarsPerRow(Number(id))}
+                            label={m.bars_per_row()}
+                        />
+                    </Labeled>
                 </Option>
             )}
             {!lockTempo && trainerOn && (

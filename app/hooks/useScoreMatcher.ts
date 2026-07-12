@@ -159,7 +159,7 @@ export function useScoreMatcher(
     // The hand is fixed for the duration of a run, captured at start, so a change
     // to the selector mid-run can't desync the position count from what's matched.
     const runHandRef = useRef<Hand>(options.hand ?? "both");
-    const runForgivingRef = useRef(options.forgiving ?? false);
+
     // A section loop confines the run to a bar range and laps it: clearing the range's
     // last position rewinds to its first for another pass, and the run never completes
     // (a drill has no end to grade). Held with the run's steps so a lap can restart
@@ -220,7 +220,6 @@ export function useScoreMatcher(
             runStartIndexRef.current = steps[0] ? all.indexOf(steps[0]) : 0;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
             runHandRef.current = hand;
-            runForgivingRef.current = optionsRef.current.forgiving ?? false;
             practicingRef.current = true;
             setBar(currentBar(state));
             setTotal(steps.length);
@@ -242,7 +241,13 @@ export function useScoreMatcher(
             if (!practicingRef.current || !osmd || !state || state.complete) {
                 return;
             }
-            const { state: next, events } = matchNote(state, note, runForgivingRef.current);
+            // Keep-going is read live (not captured at start): the fullscreen
+            // toggle must take effect on the very next note, mid-run.
+            const { state: next, events } = matchNote(
+                state,
+                note,
+                optionsRef.current.forgiving ?? false,
+            );
             stateRef.current = next;
             for (const event of events) {
                 if (event.kind === "wrong") {

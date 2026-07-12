@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePrefsStore } from "../contexts/services";
+import { usePref } from "./usePref";
 import { type RunCapture, liveTempo as nextLiveTempo } from "../../core/runCapture";
 
 // The play surface's tempo settings, held as one unit: the slider tempo, the adaptive
@@ -48,12 +50,12 @@ export function useTempoControls({
     const [tempo, setTempo] = useState(initialTempo);
     const [liveTempo, setLiveTempo] = useState(initialTempo);
     const [metronomeOn, setMetronomeOn] = useState(false);
-    // How finely the metronome divides each beat: 1 = beats, 2 = eighths, 3 =
-    // triplets, 4 = sixteenths.
-    const [subdivision, setSubdivision] = useState(1);
-    // An adaptive metronome follows the player's own tempo, read live from their
-    // note timing, instead of ticking at the fixed slider speed.
-    const [adaptive, setAdaptive] = useState(false);
+    const prefsStore = usePrefsStore();
+    // The metronome's voice — how finely each beat divides (1 = beats, 2 =
+    // eighths, 3 = triplets, 4 = sixteenths) and whether it follows the player's
+    // own pace — is set once in Settings and persists across pieces.
+    const [subdivision, setSubdivision] = usePref(prefsStore, "metronomeSubdivision");
+    const [adaptive, setAdaptive] = usePref(prefsStore, "metronomeAdaptive");
     // The tempo trainer ramps the tempo up by a step after each completed run, up to
     // a target — practising a piece from comfortable to performance speed.
     const [trainerOn, setTrainerOn] = useState(false);

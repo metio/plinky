@@ -7,7 +7,6 @@ import { KeepUpResultCard } from "./keepUpResultCard";
 import { LoopRangeBar } from "./loopRangeBar";
 import { usePlaySession } from "./playSession";
 import { PlayStage } from "./playStage";
-import { PlayToolsDrawer } from "./playToolsDrawer";
 import { PlayTransport } from "./playTransport";
 import { RunResult } from "./runResult";
 import { RunSetup } from "./runSetup";
@@ -99,12 +98,6 @@ export function PlaySurface() {
                     />
                 )}
                 <ScoreCanvas />
-
-                {/* All play settings live in one drawer, opened by the Practice-tools
-            button (at rest and in the full-screen transport) and portaled above the
-            score — so the resting view stays uncluttered and the settings are reachable
-            mid-play, not stranded in a fold that vanishes in full screen. */}
-                <PlayToolsDrawer />
 
                 <FullScreen off>
                     <Show when={ghostRace.sharedFromLink}>

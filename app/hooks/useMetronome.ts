@@ -18,6 +18,9 @@ export function useMetronome(
     bpm: number,
     beatsPerBar: number,
     subdivision = 1,
+    // Accent the downbeat louder than the other beats; off makes every beat equal
+    // — the Settings-page voice control.
+    accent = true,
 ): void {
     const bpmRef = useRef(bpm);
     bpmRef.current = bpm;
@@ -58,7 +61,7 @@ export function useMetronome(
             while (next < now + 0.12) {
                 const onBeat = tick % subs === 0;
                 const downbeat = (tick / subs) % beatsInBar === 0;
-                const kind = !onBeat ? "sub" : downbeat ? "accent" : "beat";
+                const kind = !onBeat ? "sub" : downbeat && accent ? "accent" : "beat";
                 const prefs = prefsStore.load();
                 const level = kind === "accent" ? 0.3 : kind === "beat" ? 0.18 : 0.08;
                 const gain = prefs.sound ? level * (prefs.volume / 100) : 0;
@@ -70,5 +73,5 @@ export function useMetronome(
         schedule();
         const timer = window.setInterval(schedule, 25);
         return () => window.clearInterval(timer);
-    }, [enabled, beatsPerBar, subdivision, audio, prefsStore]);
+    }, [enabled, beatsPerBar, subdivision, accent, audio, prefsStore]);
 }

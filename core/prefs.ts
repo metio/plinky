@@ -61,10 +61,12 @@ export type Prefs = {
     // home-row split; a player can remap it (see keyMap), and the keyboard input layer
     // reads this.
     keyMap: KeyMap;
-    // How many octaves of the on-screen keyboard to show while playing — a window that
-    // follows the notes, so a wide piece's keys stay a playable size — or 0 to frame the
-    // whole piece at once (fixed, never sliding, for players who prefer a stable map).
-    keyboardOctaves: number;
+    // The metronome's finer voice, set once in Settings: how many clicks divide
+    // each beat, whether the downbeat is accented louder than the rest, and
+    // whether the pulse adapts to the player's own pace.
+    metronomeSubdivision: number;
+    metronomeAccent: boolean;
+    metronomeAdaptive: boolean;
     // Render the piece as one continuous horizontal line that scrolls under a fixed gaze
     // as you play (a notation "treadmill"), instead of wrapping into stacked rows. Off by
     // default — the wrapped score is the familiar reading layout.
@@ -87,9 +89,8 @@ export const REVIEW_CAPS = [5, 8, 12, 20];
 // Bars-per-row choices: 0 = fit to width (the default), or force 2–4 for bigger bars.
 export const BARS_PER_ROW = [0, 2, 3, 4];
 
-// On-screen-keyboard window choices, in octaves: a sliding 1–3-octave window that
-// follows the notes, or 0 for the whole piece framed at once (fixed).
-export const KEYBOARD_OCTAVES = [0, 1, 2, 3];
+// Metronome subdivision choices: clicks per beat (2 = eighths, 3 = triplets…).
+export const METRONOME_SUBDIVISIONS = [1, 2, 3, 4];
 
 // Tries a hidden note allows before revealing red. Bounded small: the reveal is
 // the lesson, and endless guessing teaches nothing.
@@ -131,7 +132,9 @@ function defaults(): Prefs {
         barsPerRow: 0,
         barNumbers: true,
         keyMap: cleanKeyMap(undefined),
-        keyboardOctaves: 2,
+        metronomeSubdivision: 1,
+        metronomeAccent: true,
+        metronomeAdaptive: false,
         treadmill: false,
         raceGhost: true,
         hiddenNotes: false,
@@ -181,9 +184,17 @@ export function parsePrefs(raw: string | null): Prefs {
             barNumbers:
                 typeof parsed.barNumbers === "boolean" ? parsed.barNumbers : base.barNumbers,
             keyMap: cleanKeyMap(parsed.keyMap),
-            keyboardOctaves: KEYBOARD_OCTAVES.includes(parsed.keyboardOctaves)
-                ? parsed.keyboardOctaves
-                : base.keyboardOctaves,
+            metronomeSubdivision: METRONOME_SUBDIVISIONS.includes(parsed.metronomeSubdivision)
+                ? parsed.metronomeSubdivision
+                : base.metronomeSubdivision,
+            metronomeAccent:
+                typeof parsed.metronomeAccent === "boolean"
+                    ? parsed.metronomeAccent
+                    : base.metronomeAccent,
+            metronomeAdaptive:
+                typeof parsed.metronomeAdaptive === "boolean"
+                    ? parsed.metronomeAdaptive
+                    : base.metronomeAdaptive,
             treadmill: typeof parsed.treadmill === "boolean" ? parsed.treadmill : base.treadmill,
             raceGhost: typeof parsed.raceGhost === "boolean" ? parsed.raceGhost : base.raceGhost,
             hiddenNotes:

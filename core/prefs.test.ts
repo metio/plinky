@@ -20,7 +20,9 @@ const BASE: Prefs = {
     barsPerRow: 0,
     barNumbers: true,
     keyMap: DEFAULT_KEY_MAP,
-    keyboardOctaves: 2,
+    metronomeSubdivision: 1,
+    metronomeAccent: true,
+    metronomeAdaptive: false,
     treadmill: false,
     raceGhost: true,
     hiddenNotes: false,
@@ -112,10 +114,12 @@ describe("parsePrefs", () => {
         expect(parsePrefs(stored({ keyMap: { left: "oops" } })).keyMap).toEqual(DEFAULT_KEY_MAP);
     });
 
-    it("defaults to a two-octave keyboard window and rejects an off-list value", () => {
-        expect(parsePrefs(null).keyboardOctaves).toBe(2);
-        expect(parsePrefs(stored({ keyboardOctaves: 0 })).keyboardOctaves).toBe(0);
-        expect(parsePrefs(stored({ keyboardOctaves: 7 })).keyboardOctaves).toBe(2);
+    it("validates the metronome voice against its allowed values", () => {
+        expect(parsePrefs(null).metronomeSubdivision).toBe(1);
+        expect(parsePrefs(stored({ metronomeSubdivision: 3 })).metronomeSubdivision).toBe(3);
+        expect(parsePrefs(stored({ metronomeSubdivision: 9 })).metronomeSubdivision).toBe(1);
+        expect(parsePrefs(stored({ metronomeAccent: false })).metronomeAccent).toBe(false);
+        expect(parsePrefs(stored({ metronomeAdaptive: "yes" })).metronomeAdaptive).toBe(false);
     });
 
     it("defaults treadmill off and keeps the stored toggle", () => {

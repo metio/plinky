@@ -15,7 +15,6 @@ import {
 import { cadence } from "../../../core/cadence";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
-import { nextKeyboardWindow, type Span } from "../../../core/keyboardWindow";
 import { isPreciseInput } from "../../../core/midi";
 import {
     captureCleared,
@@ -199,17 +198,8 @@ function usePlaySessionValue({
         }
         setFingerStripState(value);
     };
-    // Whether the Practice-tools drawer (all the play settings) is open.
-    const [toolsOpen, setToolsOpen] = useState(false);
     // Whether the Runs drawer (your saved performances of this piece) is open.
 
-    // The slice of keyboard on show. A wide-ranging piece would shrink every key to a
-    // sliver if framed whole, so the keyboard tracks a bounded window that follows the
-    // notes being played; the player picks its width (or 0 to keep the whole piece in
-    // view, fixed). Changing it re-frames from scratch (clear the remembered window).
-    const [keyWindow, setKeyWindow] = useState<Span | null>(null);
-    const [keyboardOctaves, setKeyboardOctaves] = usePref(prefsStore, "keyboardOctaves");
-    const keyboardSpan = keyboardOctaves === 0 ? Number.POSITIVE_INFINITY : keyboardOctaves * 12;
     const [raceGhost, setRaceGhost] = usePref(prefsStore, "raceGhost");
     // A once-dismissible nudge to turn a touch phone sideways for a wider keyboard, only
     // when it would actually help (portrait, no MIDI). The server snapshot treats it as
@@ -305,11 +295,13 @@ function usePlaySessionValue({
     // A metronome on demand: fixed at the chosen tempo, or following the player's own pace
     // when adaptive. Keep-up mode always ticks (a count-in then the beat you're racing),
     // whatever the metronome toggle; a self-paced run honours the toggle.
+    const [metronomeAccent] = usePref(prefsStore, "metronomeAccent");
     useMetronome(
         metronomeOn || keepUp.running,
         keepUp.running ? tempo : adaptive ? liveTempo : tempo,
         beatsPerBar ?? 4,
         keepUp.running ? 1 : subdivision,
+        metronomeAccent,
     );
 
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
@@ -457,15 +449,6 @@ function usePlaySessionValue({
         markPainted,
         isPracticing,
     });
-
-    // Slide the keyboard window to keep the notes being played in view, re-framing only
-    // when they leave it. Falls back to the whole range (null window) when not practising,
-    // where PianoKeyboard's own default applies.
-    useEffect(() => {
-        setKeyWindow((prev) =>
-            nextKeyboardWindow(prev, matcher.range, matcher.expected, keyboardSpan),
-        );
-    }, [matcher.range, matcher.expected, keyboardSpan]);
 
     // When a run finishes, bring the result into view: the player's eyes are on the
     // keyboard, and the grade renders below it (and below the whole score on the way
@@ -806,8 +789,6 @@ function usePlaySessionValue({
         setHideKeyboard,
         fingerStrip,
         setFingerStrip,
-        toolsOpen,
-        setToolsOpen,
         runsView,
         showScore: () => onShowScore?.(),
         portrait,
@@ -823,10 +804,6 @@ function usePlaySessionValue({
         measureCount,
         // Reading + keyboard framing.
         reading,
-        keyWindow,
-        setKeyWindow,
-        keyboardOctaves,
-        setKeyboardOctaves,
         hintNotes,
         noteHints,
         setNoteHints,

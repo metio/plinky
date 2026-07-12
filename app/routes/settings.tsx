@@ -15,6 +15,7 @@ import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../../core/grade";
 import type { DecayMode } from "../../core/review";
 import { DEFAULT_KEY_MAP } from "../../core/keyMap";
+import { METRONOME_SUBDIVISIONS } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, type Prefs, REVIEW_CAPS } from "../../core/prefs";
 import { usePrefsStore } from "../contexts/services";
 import { routeMeta } from "../../core/site";
@@ -89,7 +90,9 @@ export default function Settings() {
         barsPerRow: 0,
         barNumbers: true,
         keyMap: DEFAULT_KEY_MAP,
-        keyboardOctaves: 2,
+        metronomeSubdivision: 1,
+        metronomeAccent: true,
+        metronomeAdaptive: false,
         treadmill: false,
         raceGhost: true,
         hiddenNotes: false,
@@ -230,6 +233,35 @@ export default function Settings() {
                     help={m.settings_note_labels_help()}
                 />
                 <HandSize />
+            </Section>
+
+            <Section title={m.settings_metronome()}>
+                <SelectField
+                    label={m.metronome_subdivision()}
+                    value={String(prefs.metronomeSubdivision)}
+                    onChange={(value) => update({ metronomeSubdivision: Number(value) })}
+                    options={METRONOME_SUBDIVISIONS.map((n) => ({
+                        value: String(n),
+                        label: String(n),
+                    }))}
+                    help={m.metronome_subdivision_caption()}
+                />
+                <label className="flex items-center gap-2 text-sm">
+                    <input
+                        type="checkbox"
+                        checked={prefs.metronomeAccent}
+                        onChange={(event) => update({ metronomeAccent: event.target.checked })}
+                    />
+                    {m.metronome_accent()}
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                    <input
+                        type="checkbox"
+                        checked={prefs.metronomeAdaptive}
+                        onChange={(event) => update({ metronomeAdaptive: event.target.checked })}
+                    />
+                    {m.metronome_adaptive()}
+                </label>
             </Section>
 
             <Section title={m.settings_keyboard()}>

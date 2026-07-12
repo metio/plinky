@@ -37,11 +37,9 @@ export function PlayStage() {
         hideKeyboard,
         setHideKeyboard,
         fingerStrip,
-        keyboardOctaves,
-        setKeyboardOctaves,
-        setKeyWindow,
-        keyWindow,
         hintNotes,
+        noteHints,
+        setNoteHints,
         id,
         xml,
         staffCount,
@@ -135,16 +133,12 @@ export function PlayStage() {
                     <KeyboardQuickControls
                         hidden={hideKeyboard}
                         onToggleHidden={() => setHideKeyboard((on) => !on)}
-                        octaves={keyboardOctaves}
-                        onOctaves={(n) => {
-                            // Re-frame the keyboard window from scratch; usePref persists.
-                            setKeyboardOctaves(n);
-                            setKeyWindow(null);
-                        }}
                         noteLabels={noteLabels}
                         onNoteLabels={(value) =>
                             prefsStore.save({ ...prefsStore.load(), noteLabels: value })
                         }
+                        noteHints={noteHints}
+                        onNoteHints={setNoteHints}
                     />
                 )}
                 {/* In fullscreen the fingering editor takes the keyboard's slot when
@@ -160,12 +154,7 @@ export function PlayStage() {
                     />
                 ) : (
                     <Show when={!(fullscreen && hideKeyboard)}>
-                        <PianoKeyboard
-                            expected={hintNotes}
-                            wrong={matcher.lastWrong}
-                            from={keyWindow?.from}
-                            to={keyWindow?.to}
-                        />
+                        <PianoKeyboard expected={hintNotes} wrong={matcher.lastWrong} />
                     </Show>
                 )}
             </div>
