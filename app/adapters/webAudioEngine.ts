@@ -171,6 +171,11 @@ function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): 
     osc.stop(time + 0.06);
 }
 
+// When each pitch last started sounding plus how long it rings, on the wall
+// clock — the echo probe below answers from this. A plain map stays tiny: one
+// entry per distinct pitch ever struck this visit.
+const struckUntil = new Map<number, number>();
+
 export const webAudioEngine: AudioEngine = {
     now() {
         return context()?.currentTime ?? null;
@@ -196,6 +201,10 @@ export const webAudioEngine: AudioEngine = {
         const ctx = context();
         if (ctx && note.gain > 0) {
             renderStrike(ctx, note);
+            struckUntil.set(
+                note.note,
+                performance.now() + (Math.max(0, note.delay) + note.duration) * 1000,
+            );
         }
     },
     click(time, kind, gain) {
@@ -203,5 +212,9 @@ export const webAudioEngine: AudioEngine = {
         if (ctx && gain > 0) {
             click(ctx, time, kind, gain);
         }
+    },
+    recentlyStruck(note, withinMs) {
+        const until = struckUntil.get(note);
+        return until !== undefined && performance.now() < until + withinMs;
     },
 };

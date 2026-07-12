@@ -57,6 +57,35 @@ describe("MicConnect", () => {
         expect(heard).toEqual([{ note: 64, device: "Microphone" }]);
     });
 
+    it("swallows the speaker's own echo — on and off — but hears the player", async () => {
+        const pitch = fakePitch();
+        const heard: Array<{ note: number; device: string }> = [];
+        // An engine that says "I just synthesized C4": the mic hearing C4 (or
+        // its octave neighbour) is our speaker, anything else is the player.
+        const audio = {
+            now: () => 0,
+            resume: () => {},
+            unlock: () => {},
+            strike: () => {},
+            click: () => {},
+            recentlyStruck: (note: number) => note === 60,
+        };
+        renderWithServices(
+            <MidiProvider>
+                <MicConnect />
+                <FunnelProbe heard={heard} />
+            </MidiProvider>,
+            { pitch, audio },
+        );
+        fireEvent.click(screen.getByRole("button", { name: m.mic_listen() }));
+        await waitFor(() => expect(pitch.listening()).toBe(true));
+
+        act(() => pitch.emit({ kind: "on", note: 60 }));
+        act(() => pitch.emit({ kind: "on", note: 64 }));
+        act(() => pitch.emit({ kind: "off", note: 60 }));
+        expect(heard).toEqual([{ note: 64, device: "Microphone" }]);
+    });
+
     it("says so when the microphone is declined, without crashing the page", async () => {
         mount(fakePitch("denied"));
 

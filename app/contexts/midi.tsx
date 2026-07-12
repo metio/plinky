@@ -95,7 +95,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // Injected capabilities: the MIDI seam itself, and the store the dev reset
     // bridge wipes — the provider renders inside ServicesProvider, so overrides
     // (a fake MIDI in tests) reach it too.
-    const { midi, store, pitch } = useServices();
+    const { midi, store, pitch, audio } = useServices();
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -222,9 +222,25 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     }, [pitch]);
     const startMic = useCallback(() => {
         setMicStatus("requesting");
+        // Notes the guard swallowed as our own speaker's echo, so their later
+        // note-offs are swallowed too instead of releasing keys never pressed.
+        const suppressed = new Set<number>();
         void pitch
             .start((event) => {
                 if (event.kind === "on") {
+                    // The echo guard: while Listen playback, the metronome or the
+                    // completion flourish rings from the speaker, the detector will
+                    // hear it. A pitch (or its octave neighbour — the detector's one
+                    // characteristic slip) that WE recently synthesized is our own
+                    // sound coming back, not the player — drop it. Anything else
+                    // passes, so playing along over playback still works.
+                    const echoed = [event.note, event.note - 12, event.note + 12].some(
+                        (candidate) => audio.recentlyStruck?.(candidate, 300) === true,
+                    );
+                    if (echoed) {
+                        suppressed.add(event.note);
+                        return;
+                    }
                     emitNote(
                         "noteon",
                         event.note,
@@ -234,11 +250,14 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                         performance.now(),
                     );
                 } else {
+                    if (suppressed.delete(event.note)) {
+                        return;
+                    }
                     emitNote("noteoff", event.note, 0, 1, MIC_DEVICE, performance.now());
                 }
             })
             .then(setMicStatus);
-    }, [pitch, emitNote]);
+    }, [pitch, emitNote, audio]);
     const stopMic = useCallback(() => {
         pitch.stop();
         setMicStatus(pitch.supported() ? "idle" : "unsupported");

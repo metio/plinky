@@ -34,4 +34,9 @@ export interface AudioEngine {
     strike(strike: NoteStrike): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;
+    // Whether the engine synthesized this pitch recently enough that a
+    // microphone could still be hearing it ring — the echo probe the mic input
+    // uses to ignore the app's own speaker. Optional: fakes and offline
+    // renderers have no speaker to echo.
+    recentlyStruck?(note: number, withinMs: number): boolean;
 }
