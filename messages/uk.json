@@ -594,5 +594,6 @@
   "video_quality": "Якість",
   "video_fps": "Частота кадрів",
   "video_show_score": "Ноти",
-  "video_show_keyboard": "Клавіатура"
+  "video_show_keyboard": "Клавіатура",
+  "run_setup": "Налаштуйте прогін"
 }

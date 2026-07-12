@@ -594,5 +594,6 @@
   "video_quality": "Qualità",
   "video_fps": "Fotogrammi",
   "video_show_score": "Spartito",
-  "video_show_keyboard": "Tastiera"
+  "video_show_keyboard": "Tastiera",
+  "run_setup": "Prepara l’esecuzione"
 }

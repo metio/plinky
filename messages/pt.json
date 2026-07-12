@@ -594,5 +594,6 @@
   "video_quality": "Qualidade",
   "video_fps": "Taxa de quadros",
   "video_show_score": "Partitura",
-  "video_show_keyboard": "Teclado"
+  "video_show_keyboard": "Teclado",
+  "run_setup": "Prepare a sua execução"
 }

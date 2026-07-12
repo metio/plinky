@@ -594,5 +594,6 @@
   "video_quality": "Ποιότητα",
   "video_fps": "Ρυθμός καρέ",
   "video_show_score": "Παρτιτούρα",
-  "video_show_keyboard": "Πλήκτρα"
+  "video_show_keyboard": "Πλήκτρα",
+  "run_setup": "Ρύθμισε την εκτέλεσή σου"
 }

@@ -594,5 +594,6 @@
   "video_quality": "Kalite",
   "video_fps": "Kare hızı",
   "video_show_score": "Nota",
-  "video_show_keyboard": "Klavye"
+  "video_show_keyboard": "Klavye",
+  "run_setup": "Çalışını ayarla"
 }

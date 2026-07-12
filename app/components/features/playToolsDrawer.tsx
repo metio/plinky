@@ -4,7 +4,7 @@
 import { usePlaySession } from "./playSession";
 import { PracticeToolsDrawer } from "./practiceToolsDrawer";
 
-// The play-settings drawer, wired to the session: tempo and the trainer, the metronome,
+// The play-settings drawer, wired to the session: the live tweaks — tempo, metronome,
 // keep-up, looping, transposition, fingering, the reading layout and the keyboard framing.
 // A thin adapter — it reads the shared session and hands PracticeToolsDrawer its props.
 export function PlayToolsDrawer() {
@@ -14,10 +14,6 @@ export function PlayToolsDrawer() {
         lockTempo,
         tempo,
         setTempo,
-        trainerOn,
-        setTrainerOn,
-        trainerTarget,
-        setTrainerTarget,
         metronomeOn,
         setMetronomeOn,
         adaptive,
@@ -25,29 +21,15 @@ export function PlayToolsDrawer() {
         liveTempo,
         subdivision,
         setSubdivision,
-        enforceTempo,
-        setEnforceTempo,
-        guideNotes,
-        setGuideNotes,
         forgiving,
         setForgiving,
         noteHints,
         setNoteHints,
         raceGhost,
         setRaceGhost,
-        hiddenNotes,
-        setHiddenNotes,
-        revealTries,
-        setRevealTries,
-        staffCount,
-        hand,
-        setHand,
-        matcher,
         ready,
         measureCount,
         loop,
-        transpose,
-        setTranspose,
         hasSaved,
         showMine,
         setShowMine,
@@ -64,10 +46,6 @@ export function PlayToolsDrawer() {
             lockTempo={lockTempo}
             tempo={tempo}
             setTempo={setTempo}
-            trainerOn={trainerOn}
-            setTrainerOn={setTrainerOn}
-            trainerTarget={trainerTarget}
-            setTrainerTarget={setTrainerTarget}
             metronomeOn={metronomeOn}
             setMetronomeOn={setMetronomeOn}
             adaptive={adaptive}
@@ -75,24 +53,12 @@ export function PlayToolsDrawer() {
             liveTempo={liveTempo}
             subdivision={subdivision}
             setSubdivision={setSubdivision}
-            enforceTempo={enforceTempo}
-            setEnforceTempo={setEnforceTempo}
-            guideNotes={guideNotes}
-            setGuideNotes={setGuideNotes}
             forgiving={forgiving}
             setForgiving={setForgiving}
             noteHints={noteHints}
             setNoteHints={setNoteHints}
             raceGhost={raceGhost}
             setRaceGhost={setRaceGhost}
-            hiddenNotes={hiddenNotes}
-            setHiddenNotes={setHiddenNotes}
-            revealTries={revealTries}
-            setRevealTries={setRevealTries}
-            staffCount={staffCount}
-            hand={hand}
-            setHand={setHand}
-            practicing={matcher.practicing}
             loopAvailable={ready && measureCount > 1}
             loopOn={loop.on}
             onToggleLoop={(next) => {
@@ -104,9 +70,6 @@ export function PlayToolsDrawer() {
                     setToolsOpen(false);
                 }
             }}
-            showTranspose={!lockTempo}
-            transpose={transpose}
-            setTranspose={setTranspose}
             showMineAvailable={hasSaved && reading.showFingerings}
             showMine={showMine}
             setShowMine={setShowMine}

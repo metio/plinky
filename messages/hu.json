@@ -594,5 +594,6 @@
   "video_quality": "Minőség",
   "video_fps": "Képkockasebesség",
   "video_show_score": "Kotta",
-  "video_show_keyboard": "Billentyűzet"
+  "video_show_keyboard": "Billentyűzet",
+  "run_setup": "Állítsd be a futamot"
 }

@@ -594,5 +594,6 @@
   "video_quality": "화질",
   "video_fps": "프레임 속도",
   "video_show_score": "악보",
-  "video_show_keyboard": "건반"
+  "video_show_keyboard": "건반",
+  "run_setup": "연주 설정"
 }

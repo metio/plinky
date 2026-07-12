@@ -14,6 +14,7 @@ import {
     SlidersIcon,
     SpeakerIcon,
     StopIcon,
+    MetronomeIcon,
 } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlaySession } from "./playSession";
@@ -39,6 +40,8 @@ export function PlayTransport() {
         setFingerStrip,
         setToolsOpen,
         exitFullscreen,
+        metronomeOn,
+        setMetronomeOn,
     } = usePlaySession();
     const { showFingerings, setShowFingerings, treadmill, scrollFollow, setScrollFollow } = reading;
 
@@ -152,8 +155,17 @@ export function PlayTransport() {
                             <EyeIcon />
                         </ToggleIconButton>
                     </Show>
-                    {/* The Practice-tools drawer — tempo, loop, metronome, keep-up and
-                    the rest — reachable without leaving full screen. */}
+                    {/* The metronome, one tap from the music — its finer settings
+                    (adaptive, subdivision) stay in the drawer. */}
+                    <ToggleIconButton
+                        onClick={() => setMetronomeOn(!metronomeOn)}
+                        pressed={metronomeOn}
+                        label={m.action_metronome()}
+                    >
+                        <MetronomeIcon />
+                    </ToggleIconButton>
+                    {/* The Practice-tools drawer — tempo, metronome detail, loop and the
+                    rest of the live tweaks — reachable without leaving full screen. */}
                     <IconButton onClick={() => setToolsOpen(true)} label={m.more_options()}>
                         <SlidersIcon />
                     </IconButton>

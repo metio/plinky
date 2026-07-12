@@ -10,6 +10,7 @@ import { PlayStage } from "./playStage";
 import { PlayToolsDrawer } from "./playToolsDrawer";
 import { PlayTransport } from "./playTransport";
 import { RunResult } from "./runResult";
+import { RunSetup } from "./runSetup";
 import { ScoreCanvas } from "./scoreCanvas";
 import { TakesPanel } from "./takesPanel";
 
@@ -78,6 +79,12 @@ export function PlaySurface() {
             )}
             <div className={runsView ? "hidden" : "space-y-5"}>
                 <PlayTransport />
+                {/* Run setup — the settings that shape the run about to start (changing
+                them mid-piece means restarting anyway) — lives on the resting page,
+                not in the mid-play drawer. */}
+                <FullScreen off>
+                    <RunSetup />
+                </FullScreen>
                 {/* When the loop is on, its range and narrowing controls sit right by the
             score — the drawer's backdrop covers the score, so narrowing happens here,
             drawer closed. Hidden during a run, when the score isn't yours to click. */}

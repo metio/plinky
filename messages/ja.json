@@ -594,5 +594,6 @@
   "video_quality": "画質",
   "video_fps": "フレームレート",
   "video_show_score": "楽譜",
-  "video_show_keyboard": "鍵盤"
+  "video_show_keyboard": "鍵盤",
+  "run_setup": "演奏のセットアップ"
 }

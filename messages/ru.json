@@ -594,5 +594,6 @@
   "video_quality": "Качество",
   "video_fps": "Частота кадров",
   "video_show_score": "Ноты",
-  "video_show_keyboard": "Клавиатура"
+  "video_show_keyboard": "Клавиатура",
+  "run_setup": "Настройте прогон"
 }

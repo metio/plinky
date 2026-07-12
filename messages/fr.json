@@ -594,5 +594,6 @@
   "video_quality": "Qualité",
   "video_fps": "Fréquence d’images",
   "video_show_score": "Partition",
-  "video_show_keyboard": "Clavier"
+  "video_show_keyboard": "Clavier",
+  "run_setup": "Préparez votre prise"
 }

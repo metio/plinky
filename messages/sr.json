@@ -594,5 +594,6 @@
   "video_quality": "Квалитет",
   "video_fps": "Број кадрова",
   "video_show_score": "Ноте",
-  "video_show_keyboard": "Клавијатура"
+  "video_show_keyboard": "Клавијатура",
+  "run_setup": "Подеси извођење"
 }

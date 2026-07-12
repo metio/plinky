@@ -594,5 +594,6 @@
   "video_quality": "Qualität",
   "video_fps": "Bildrate",
   "video_show_score": "Noten",
-  "video_show_keyboard": "Klaviatur"
+  "video_show_keyboard": "Klaviatur",
+  "run_setup": "Durchlauf einrichten"
 }

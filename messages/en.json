@@ -594,5 +594,6 @@
   "video_quality": "Quality",
   "video_fps": "Frame rate",
   "video_show_score": "Score",
-  "video_show_keyboard": "Keyboard"
+  "video_show_keyboard": "Keyboard",
+  "run_setup": "Set up your run"
 }

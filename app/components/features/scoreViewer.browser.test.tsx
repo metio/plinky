@@ -201,7 +201,7 @@ describe("ScoreViewer", () => {
         });
         // Turn on Keep up, then start — with no notes played every beat is a miss, but the
         // clock-driven run still counts in, runs to the end, and reports the tally.
-        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         expect(
@@ -221,7 +221,7 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
-        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         // Flip the fingering on while the run counts in — the switch it toggles used to be a
@@ -274,7 +274,7 @@ describe("ScoreViewer", () => {
         // interactive — a keep-up run bails while osmd is still null.
         await awaitReady();
         // Turn on Keep up and start the tempo-locked run.
-        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         // The keep-up run counts in, runs to the end and reports its tally, leaving full
@@ -1014,7 +1014,7 @@ describe("ScoreViewer", () => {
     it("offers a hands-separate selector only for a grand staff", async () => {
         const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         mount(grand, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         // The selector appears once OSMD reports two staves; its three options name
         // the hands. This also exercises the OSMD staff API the matcher filters on.
         expect(await screen.findByRole("tab", { name: "Right" }, { timeout: 30000 })).toBeTruthy();
@@ -1025,7 +1025,7 @@ describe("ScoreViewer", () => {
     it("keeps the chosen hand across a relayout — the hand belongs to the piece, not the layout", async () => {
         const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
         mount(grand, { beatsPerBar: 4 });
-        fireEvent.click(await screen.findByRole("button", { name: "Practice tools" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         const left = await screen.findByRole("tab", { name: "Left" }, { timeout: 30000 });
         fireEvent.click(left);
         await expect
@@ -1034,6 +1034,7 @@ describe("ScoreViewer", () => {
         // Toggling bar numbers relayouts the score (a fresh OSMD render), just like
         // treadmill/transpose/fingering. The hand choice must survive it rather than
         // silently reverting to Both and drilling both hands under the player.
+        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
         fireEvent.click(screen.getByRole("switch", { name: "Bar numbers" }));
         await expect
             .poll(() => screen.getByRole("tab", { name: "Left" }).getAttribute("aria-selected"), {
@@ -1051,7 +1052,7 @@ describe("ScoreViewer", () => {
         // Wait until the score is interactive, then confirm the single-staff piece offers
         // no hand choice.
         await awaitReady();
-        fireEvent.click(screen.getByRole("button", { name: "Practice tools" }));
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         expect(screen.queryByRole("tab", { name: "Right" })).toBeNull();
         expect(screen.queryByRole("tab", { name: "Left" })).toBeNull();
     });

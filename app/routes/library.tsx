@@ -17,7 +17,7 @@ import { isDue, type Mastery } from "../../core/mastery";
 import { useFavoritesStore, useServices } from "../contexts/services";
 import { useFavorites } from "../hooks/useFavorites";
 import { gradeOf, MAX_GRADE } from "../../core/scoreDifficulty";
-import { personSlug } from "../../core/person";
+import { canonicalComposer, personSlug } from "../../core/person";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
@@ -396,7 +396,7 @@ export default function LibraryRoute() {
                                                             to={`/person/${personSlug(item.composer)}`}
                                                             className="relative z-10 block w-fit max-w-full truncate text-xs text-gray-600 hover:text-indigo-600 hover:underline dark:text-gray-400 dark:hover:text-indigo-400"
                                                         >
-                                                            {item.composer}
+                                                            {canonicalComposer(item.composer)}
                                                         </Link>
                                                     ) : (
                                                         <span className="block truncate text-xs text-gray-600 dark:text-gray-400">

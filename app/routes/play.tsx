@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router";
 import { Attribution } from "../components/ui/attribution";
 import { Button } from "../components/ui/button";
 import { attributionFor } from "../../core/attribution";
-import { personSlug } from "../../core/person";
+import { canonicalComposer, personSlug } from "../../core/person";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
@@ -109,7 +109,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                         to={`/person/${personSlug(score.composer)}`}
                                         className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
                                     >
-                                        {score.composer}
+                                        {canonicalComposer(score.composer)}
                                     </Link>
                                 ) : (
                                     score.composer

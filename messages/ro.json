@@ -594,5 +594,6 @@
   "video_quality": "Calitate",
   "video_fps": "Rată de cadre",
   "video_show_score": "Partitură",
-  "video_show_keyboard": "Claviatură"
+  "video_show_keyboard": "Claviatură",
+  "run_setup": "Pregătește interpretarea"
 }

@@ -594,5 +594,6 @@
   "video_quality": "Cilësia",
   "video_fps": "Shpejtësia e kuadrove",
   "video_show_score": "Partitura",
-  "video_show_keyboard": "Tastiera"
+  "video_show_keyboard": "Tastiera",
+  "run_setup": "Përgatit ekzekutimin"
 }

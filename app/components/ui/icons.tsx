@@ -350,6 +350,17 @@ export function FingersIcon({ className }: IconProps) {
     );
 }
 
+// A metronome — the click-track toggle.
+export function MetronomeIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M9 4h6l3 16H6z" />
+            <path d="M12 14L16.5 6.5" />
+            <circle cx="12" cy="14" r="1" />
+        </Icon>
+    );
+}
+
 // A trash can — destructive delete, always paired with a red tint.
 export function TrashIcon({ className }: IconProps) {
     return (

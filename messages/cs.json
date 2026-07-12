@@ -594,5 +594,6 @@
   "video_quality": "Kvalita",
   "video_fps": "Snímková frekvence",
   "video_show_score": "Noty",
-  "video_show_keyboard": "Klaviatura"
+  "video_show_keyboard": "Klaviatura",
+  "run_setup": "Nastavte si pokus"
 }

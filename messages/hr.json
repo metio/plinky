@@ -594,5 +594,6 @@
   "video_quality": "Kvaliteta",
   "video_fps": "Broj sličica",
   "video_show_score": "Note",
-  "video_show_keyboard": "Klavijatura"
+  "video_show_keyboard": "Klavijatura",
+  "run_setup": "Postavi izvedbu"
 }

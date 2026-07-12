@@ -594,5 +594,6 @@
   "video_quality": "Calidad",
   "video_fps": "Fotogramas",
   "video_show_score": "Partitura",
-  "video_show_keyboard": "Teclado"
+  "video_show_keyboard": "Teclado",
+  "run_setup": "Prepara tu intento"
 }

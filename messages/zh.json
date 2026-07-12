@@ -594,5 +594,6 @@
   "video_quality": "画质",
   "video_fps": "帧率",
   "video_show_score": "乐谱",
-  "video_show_keyboard": "键盘"
+  "video_show_keyboard": "键盘",
+  "run_setup": "设置本次演奏"
 }

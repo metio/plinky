@@ -16,10 +16,6 @@ const props = () => ({
     lockTempo: false,
     tempo: 100,
     setTempo: vi.fn(),
-    trainerOn: false,
-    setTrainerOn: vi.fn(),
-    trainerTarget: 140,
-    setTrainerTarget: vi.fn(),
     metronomeOn: false,
     setMetronomeOn: vi.fn(),
     adaptive: false,
@@ -27,30 +23,15 @@ const props = () => ({
     liveTempo: 100,
     subdivision: 1,
     setSubdivision: vi.fn(),
-    enforceTempo: false,
-    setEnforceTempo: vi.fn(),
-    guideNotes: true,
-    setGuideNotes: vi.fn(),
     forgiving: false,
     setForgiving: vi.fn(),
     noteHints: "miss" as const,
     setNoteHints: vi.fn(),
     raceGhost: true,
-    hiddenNotes: false,
-    setHiddenNotes: vi.fn(),
-    revealTries: 1,
-    setRevealTries: vi.fn(),
     setRaceGhost: vi.fn(),
-    staffCount: 1,
-    hand: "both" as const,
-    setHand: vi.fn(),
-    practicing: false,
     loopAvailable: true,
     loopOn: false,
     onToggleLoop: vi.fn(),
-    showTranspose: true,
-    transpose: 0,
-    setTranspose: vi.fn(),
     showMineAvailable: false,
     showMine: false,
     setShowMine: vi.fn(),
@@ -79,10 +60,9 @@ describe("PracticeToolsDrawer", () => {
         expect(p.onToggleLoop).toHaveBeenCalledWith(true);
     });
 
-    it("hides the tempo slider and trainer for a locked challenge", () => {
+    it("hides the tempo slider for a locked challenge", () => {
         render(<PracticeToolsDrawer {...props()} lockTempo />);
         expect(screen.queryByRole("slider", { name: m.scores_tempo() })).toBeNull();
-        expect(screen.queryByRole("switch", { name: m.tempo_trainer() })).toBeNull();
     });
 
     it("reports a note-hints choice through setNoteHints", () => {
@@ -92,17 +72,11 @@ describe("PracticeToolsDrawer", () => {
         expect(p.setNoteHints).toHaveBeenCalledWith("always");
     });
 
-    it("offers the hands-separate selector only for a grand staff", () => {
-        const { rerender } = render(<PracticeToolsDrawer {...props()} staffCount={1} />);
+    it("holds only the live tweaks — the run-setup settings moved out", () => {
+        render(<PracticeToolsDrawer {...props()} />);
+        for (const gone of [m.keep_up_toggle(), m.hidden_notes_toggle(), m.tempo_trainer()]) {
+            expect(screen.queryByRole("switch", { name: gone })).toBeNull();
+        }
         expect(screen.queryByRole("tablist", { name: m.hand_label() })).toBeNull();
-        rerender(<PracticeToolsDrawer {...props()} staffCount={2} />);
-        expect(screen.getByRole("tablist", { name: m.hand_label() })).toBeTruthy();
-    });
-
-    it("reveals the guide-notes toggle only when keep-up is on", () => {
-        const { rerender } = render(<PracticeToolsDrawer {...props()} enforceTempo={false} />);
-        expect(screen.queryByRole("switch", { name: m.guide_notes_toggle() })).toBeNull();
-        rerender(<PracticeToolsDrawer {...props()} enforceTempo />);
-        expect(screen.getByRole("switch", { name: m.guide_notes_toggle() })).toBeTruthy();
     });
 });

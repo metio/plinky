@@ -594,5 +594,6 @@
   "video_quality": "Kwaliteit",
   "video_fps": "Beeldsnelheid",
   "video_show_score": "Bladmuziek",
-  "video_show_keyboard": "Klavier"
+  "video_show_keyboard": "Klavier",
+  "run_setup": "Stel je poging in"
 }

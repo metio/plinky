@@ -594,5 +594,6 @@
   "video_quality": "Kvalitet",
   "video_fps": "Bildfrekvens",
   "video_show_score": "Noter",
-  "video_show_keyboard": "Klaviatur"
+  "video_show_keyboard": "Klaviatur",
+  "run_setup": "Gör i ordning ditt försök"
 }

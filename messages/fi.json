@@ -594,5 +594,6 @@
   "video_quality": "Laatu",
   "video_fps": "Kuvataajuus",
   "video_show_score": "Nuotit",
-  "video_show_keyboard": "Koskettimisto"
+  "video_show_keyboard": "Koskettimisto",
+  "run_setup": "Valmistele suorituksesi"
 }

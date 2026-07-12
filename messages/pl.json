@@ -594,5 +594,6 @@
   "video_quality": "Jakość",
   "video_fps": "Klatki na sekundę",
   "video_show_score": "Nuty",
-  "video_show_keyboard": "Klawiatura"
+  "video_show_keyboard": "Klawiatura",
+  "run_setup": "Przygotuj przebieg"
 }
