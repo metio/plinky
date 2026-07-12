@@ -102,6 +102,19 @@ describe("transposeMusicXml", () => {
         expect(pitches(result)[0]?.name).toBe("Bb");
     });
 
+    it("updates an existing alter element in place when the accidental survives", () => {
+        // C♯4 up a major 2nd is D♯4: the note already carries <alter>, so the
+        // element is rewritten rather than removed or duplicated.
+        const result = transposeMusicXml(domXmlCodec, score(note("C", 4, 1)), 2);
+        expect(pitches(result)[0]).toMatchObject({ name: "D#", midi: 63 });
+        expect(result.match(/<alter>/g)).toHaveLength(1);
+    });
+
+    it("skips a pitch whose step letter isn't musical", () => {
+        const xml = score("<note><pitch><step>H</step><octave>4</octave></pitch></note>");
+        expect(transposeMusicXml(domXmlCodec, xml, 2)).toContain("<step>H</step>");
+    });
+
     it("leaves rests and unpitched notes alone", () => {
         const xml = score("<note><rest/><duration>4</duration></note>");
         expect(transposeMusicXml(domXmlCodec, xml, 5)).toContain("<rest/>");

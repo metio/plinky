@@ -63,6 +63,15 @@ describe("creditLine", () => {
     it("omits what a piece doesn't have rather than printing blanks", () => {
         expect(creditLine("Étude", attributionFor({}))).toBe("Étude");
     });
+
+    it("prints 'Public domain' for a public-domain licence, the label otherwise", () => {
+        expect(creditLine("Menuet", attributionFor({ license: "CC0-1.0" }))).toContain(
+            "Public domain",
+        );
+        const attributed = creditLine("Menuet", attributionFor({ license: "CC-BY-4.0" }));
+        expect(attributed).not.toContain("Public domain");
+        expect(attributed).toMatch(/CC.BY/i);
+    });
 });
 
 describe("scorePanelRect", () => {

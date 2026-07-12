@@ -38,6 +38,28 @@ describe("scoreToBars", () => {
         expect(scoreToBars(domXmlCodec, "not xml at all <", 1)).toEqual([]);
     });
 
+    it("returns nothing for a score without a part", () => {
+        expect(scoreToBars(domXmlCodec, "<score-partwise></score-partwise>", 1)).toEqual([]);
+    });
+
+    it("skips notes it can't pitch instead of guessing", () => {
+        const xml = `<score-partwise><part id="P1"><measure number="1">
+            <note><staff>1</staff></note>
+            <note><pitch><step>C</step><octave>x</octave></pitch><staff>1</staff></note>
+            ${note("E", 4, 1)}
+        </measure></part></score-partwise>`;
+        // The pitchless note and the non-numeric octave both drop; only E4 remains.
+        expect(scoreToBars(domXmlCodec, xml, 1)).toEqual([[[64]]]);
+    });
+
+    it("lets a stray leading chord note start its own position", () => {
+        const xml = `<score-partwise><part id="P1"><measure number="1">
+            ${note("C", 4, 1, true)}${note("E", 4, 1)}
+        </measure></part></score-partwise>`;
+        // A <chord/> with nothing before it can't join a previous position.
+        expect(scoreToBars(domXmlCodec, xml, 1)).toEqual([[[60], [64]]]);
+    });
+
     it("flattens a bar window in play order, clamped to range", () => {
         const bars = scoreToBars(domXmlCodec, XML, 1);
         expect(windowPositions(bars, 0, 2)).toEqual([[60, 64], [67], [62]]);

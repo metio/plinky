@@ -2,10 +2,31 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toMusicXml } from "../../../core/composition";
 import { ExportMenu } from "./exportMenu";
+
+// OSMD is heavy and browser-only; print only needs it to leave an SVG in the
+// off-screen host, so the fake renders one and records the lifecycle calls.
+const osmdCalls = vi.hoisted(() => ({ load: 0, cleared: 0 }));
+vi.mock("opensheetmusicdisplay", () => ({
+    OpenSheetMusicDisplay: class {
+        private host: HTMLElement;
+        constructor(host: HTMLElement) {
+            this.host = host;
+        }
+        async load() {
+            osmdCalls.load++;
+        }
+        render() {
+            this.host.innerHTML = "<svg><text>score</text></svg>";
+        }
+        clear() {
+            osmdCalls.cleared++;
+        }
+    },
+}));
 
 const xml = toMusicXml({
     notes: [
@@ -81,6 +102,36 @@ describe("ExportMenu", () => {
         fireEvent.click(screen.getByRole("button", { name: /Export MusicXML/ }));
         expect(downloadName).toMatch(/\.musicxml$/);
         expect(await exported!.text()).toBe(xml);
+    });
+
+    it("prints through a new window when the pop-up is allowed", async () => {
+        const win = {
+            document: { write: vi.fn(), close: vi.fn() },
+            focus: vi.fn(),
+            print: vi.fn(),
+        };
+        const open = vi.spyOn(window, "open").mockReturnValue(win as unknown as Window);
+        openMenu();
+
+        fireEvent.click(screen.getByRole("button", { name: /Print/ }));
+        await waitFor(() => expect(win.print).toHaveBeenCalled());
+        expect(open).toHaveBeenCalledWith("", "_blank");
+        // The printed document carries the rendered staff and the title.
+        expect(win.document.write.mock.calls[0]?.[0]).toContain("<svg>");
+        expect(win.document.write.mock.calls[0]?.[0]).toContain("My Song");
+        // The off-screen render host is torn down again (the toolbar's icon SVGs
+        // remain — only the -99999px staging div must be gone).
+        expect(osmdCalls.cleared).toBeGreaterThan(0);
+        expect(document.querySelector('div[style*="-99999"]')).toBeNull();
+    });
+
+    it("falls back to a hidden iframe when the pop-up is blocked", async () => {
+        vi.spyOn(window, "open").mockReturnValue(null);
+        openMenu();
+
+        fireEvent.click(screen.getByRole("button", { name: /Print/ }));
+        await waitFor(() => expect(document.querySelector("iframe")).toBeTruthy());
+        document.querySelector("iframe")?.remove();
     });
 
     it("exports nothing as MIDI for a score it cannot parse", () => {

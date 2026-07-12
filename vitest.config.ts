@@ -48,14 +48,13 @@ export default defineConfig({
             reporter: ["text", "html", "lcov"],
             // Ratchet: CI fails if any metric drops below these. Raise them as
             // coverage grows; never lower them merely to make a red build pass.
-            // Re-baselined when the ABC trainer engine (a large, heavily-unit-tested
-            // layer) was removed in the move to MusicXML, leaving a higher share of
-            // UI-route code; the catalogue and engine themselves stay well covered.
+            // Baselined ~4 points under the measured node+browser numbers
+            // (89/85/87/89), so ordinary churn fits but a real erosion fails.
             thresholds: {
-                statements: 74,
-                branches: 66,
-                functions: 71,
-                lines: 74,
+                statements: 85,
+                branches: 81,
+                functions: 82,
+                lines: 85,
             },
         },
         projects: [
