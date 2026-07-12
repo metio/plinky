@@ -62,7 +62,8 @@ describe("ExportVideoButton", () => {
             async () => new Blob(["mp4"], { type: "video/mp4" }),
         );
         mount({ supported: async () => true, export: exportMock });
-        fireEvent.click(await screen.findByRole("button", { name: "Save video" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Video" }));
+        fireEvent.click(screen.getByRole("button", { name: "Save video" }));
         await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
         expect(exportMock.mock.calls[0]?.[0]?.notes).toEqual(take.composition.notes);
         // The default orientation is landscape 720p.
@@ -75,7 +76,8 @@ describe("ExportVideoButton", () => {
             async () => new Blob(["mp4"], { type: "video/mp4" }),
         );
         mount({ supported: async () => true, export: exportMock });
-        fireEvent.click(await screen.findByRole("tab", { name: "9:16" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Video" }));
+        fireEvent.click(screen.getByRole("tab", { name: "9:16" }));
         fireEvent.click(screen.getByRole("button", { name: /Save a portrait video/ }));
         await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
         expect(exportMock.mock.calls[0]?.[0]?.width).toBe(720);
@@ -87,7 +89,8 @@ describe("ExportVideoButton", () => {
             async () => new Blob(["mp4"], { type: "video/mp4" }),
         );
         mount({ supported: async () => true, export: exportMock });
-        fireEvent.click(await screen.findByRole("tab", { name: "1080p" }));
+        fireEvent.click(await screen.findByRole("button", { name: "Video" }));
+        fireEvent.click(screen.getByRole("tab", { name: "1080p" }));
         fireEvent.click(screen.getByRole("tab", { name: "60" }));
         fireEvent.click(screen.getByRole("button", { name: "Save video" }));
         await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
@@ -98,6 +101,7 @@ describe("ExportVideoButton", () => {
 
     it("hides the keyboard switch where it has no effect", async () => {
         mount({ supported: async () => true, export: vi.fn() });
+        fireEvent.click(await screen.findByRole("button", { name: "Video" }));
         // Landscape with the score on offers it…
         expect(await screen.findByRole("switch", { name: "Keyboard" })).toBeTruthy();
         // …the score off leaves only the keyboard, so the switch goes…

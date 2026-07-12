@@ -162,7 +162,6 @@
   "action_finger_numbers": "Sormitusnumerot",
   "action_scroll_follow": "Seuraa nuottia",
   "rotate_hint": "Käännä puhelin vaakatasoon saadaksesi suuremman koskettimiston.",
-  "action_back_home": "Takaisin alkuun",
   "mode_label": "Harjoitustila",
   "mode_play": "Soita",
   "action_listen": "▶ Kuuntele",
@@ -455,7 +454,6 @@
   "takes_saved": "Otos tallennettu",
   "takes_save_failed": "Otosta ei voitu tallentaa — tämän laitteen tallennustila on täynnä tai estetty.",
   "takes_share_ghost": "Haasta ystävä tällä otoksella",
-  "takes_share_last_run": "Haasta ystävä viimeisimmällä suorituksellasi",
   "takes_link_copied": "Linkki kopioitu",
   "midi_unsupported_keyboard": "Tämä selain ei tarjoa Web MIDI -rajapintaa. Käytä Chromea, Edgeä tai Firefoxia tietokoneella tai Androidilla — tai soita tietokoneen näppäimistöllä alla.",
   "midi_connect": "Liitä MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Koskettimisto",
   "run_setup": "Valmistele suorituksesi",
   "settings_metronome": "Metronomi",
-  "metronome_accent": "Korosta jokaisen tahdin ensimmäinen isku"
+  "metronome_accent": "Korosta jokaisen tahdin ensimmäinen isku",
+  "video_export": "Video",
+  "daily_title": "Päivän haaste #{number}"
 }

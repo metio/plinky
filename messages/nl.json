@@ -162,7 +162,6 @@
   "action_finger_numbers": "Vingerzettingsnummers",
   "action_scroll_follow": "Volg de noot",
   "rotate_hint": "Draai je telefoon dwars voor een groter klavier.",
-  "action_back_home": "Terug naar start",
   "mode_label": "Oefenmodus",
   "mode_play": "Spelen",
   "action_listen": "▶ Beluisteren",
@@ -455,7 +454,6 @@
   "takes_saved": "Opname opgeslagen",
   "takes_save_failed": "Kon deze opname niet opslaan — de opslag van dit apparaat is vol of geblokkeerd.",
   "takes_share_ghost": "Daag een vriend uit met deze opname",
-  "takes_share_last_run": "Daag een vriend uit met je laatste run",
   "takes_link_copied": "Link gekopieerd",
   "midi_unsupported_keyboard": "Deze browser biedt geen Web MIDI-API. Gebruik Chrome, Edge of Firefox op desktop of Android – of speel hieronder met je computertoetsenbord.",
   "midi_connect": "MIDI verbinden",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klavier",
   "run_setup": "Stel je poging in",
   "settings_metronome": "Metronoom",
-  "metronome_accent": "Accentueer de eerste tel van elke maat"
+  "metronome_accent": "Accentueer de eerste tel van elke maat",
+  "video_export": "Video",
+  "daily_title": "Dagelijkse uitdaging #{number}"
 }

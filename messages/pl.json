@@ -162,7 +162,6 @@
   "action_finger_numbers": "Numery ułożenia palców",
   "action_scroll_follow": "Podążaj za nutą",
   "rotate_hint": "Obróć telefon w poziomie, aby uzyskać większą klawiaturę.",
-  "action_back_home": "Wróć do strony głównej",
   "mode_label": "Tryb ćwiczeń",
   "mode_play": "Graj",
   "action_listen": "▶ Posłuchaj",
@@ -455,7 +454,6 @@
   "takes_saved": "Podejście zapisane",
   "takes_save_failed": "Nie udało się zapisać tego podejścia — pamięć tego urządzenia jest pełna lub zablokowana.",
   "takes_share_ghost": "Rzuć znajomemu wyzwanie tym podejściem",
-  "takes_share_last_run": "Rzuć znajomemu wyzwanie swoim ostatnim wykonaniem",
   "takes_link_copied": "Link skopiowany",
   "midi_unsupported_keyboard": "Ta przeglądarka nie udostępnia Web MIDI API. Użyj Chrome, Edge lub Firefox na komputerze albo Androidzie — lub graj na klawiaturze komputera poniżej.",
   "midi_connect": "Połącz MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klawiatura",
   "run_setup": "Przygotuj przebieg",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Akcentuj pierwszą miarę każdego taktu"
+  "metronome_accent": "Akcentuj pierwszą miarę każdego taktu",
+  "video_export": "Wideo",
+  "daily_title": "Dzienne wyzwanie #{number}"
 }

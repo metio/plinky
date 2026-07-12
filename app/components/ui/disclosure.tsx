@@ -21,7 +21,10 @@ export function Disclosure({
     const [open, setOpen] = useState(defaultOpen);
     const panelId = useId();
     return (
-        <div className="basis-full">
+        // display:contents — the summary button and the panel participate in the
+        // CALLER's layout as siblings, so the button can sit inline in an action
+        // row while the full-width panel wraps to its own line below.
+        <div className="contents">
             <button
                 type="button"
                 aria-expanded={open}
@@ -38,7 +41,7 @@ export function Disclosure({
             </button>
             <div
                 id={panelId}
-                className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${
+                className={`grid basis-full transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${
                     open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                 }`}
             >

@@ -33,7 +33,7 @@ describe("Daily", () => {
                 </ServicesProvider>
             </MemoryRouter>,
         );
-        expect(await screen.findByText(/Plinky #\d+/)).toBeTruthy();
+        expect(await screen.findByRole("heading", { name: /Daily #\d+/ })).toBeTruthy();
     });
 
     it("renders today's generated phrase through the graded viewer", async () => {

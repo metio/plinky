@@ -4,7 +4,7 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, IconButton } from "../components/ui/button";
-import { compactFieldClasses, linkClasses } from "../components/ui/classes";
+import { compactFieldClasses } from "../components/ui/classes";
 import { downloadBlob } from "../lib/download";
 import { Show } from "../components/features/conditional";
 import { ArrowDownIcon, ArrowUpIcon, CheckIcon, CloseIcon } from "../components/ui/icons";
@@ -814,10 +814,6 @@ export default function AssignmentsRoute() {
                     )}
                 </section>
             )}
-
-            <Link to="/" className={`text-sm ${linkClasses}`}>
-                {m.action_back_home()}
-            </Link>
         </main>
     );
 }

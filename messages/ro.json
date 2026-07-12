@@ -162,7 +162,6 @@
   "action_finger_numbers": "Numerele pozițiilor degetelor",
   "action_scroll_follow": "Urmărește nota",
   "rotate_hint": "Întoarce telefonul pe orizontală pentru o claviatură mai mare.",
-  "action_back_home": "Înapoi acasă",
   "mode_label": "Mod de exersare",
   "mode_play": "Cântă",
   "action_listen": "▶ Ascultă",
@@ -455,7 +454,6 @@
   "takes_saved": "Înregistrare salvată",
   "takes_save_failed": "Nu s-a putut salva înregistrarea — stocarea acestui dispozitiv e plină sau blocată.",
   "takes_share_ghost": "Provoacă un prieten cu această înregistrare",
-  "takes_share_last_run": "Provoacă un prieten cu ultima ta sesiune",
   "takes_link_copied": "Link copiat",
   "midi_unsupported_keyboard": "Acest browser nu expune API-ul Web MIDI. Folosește Chrome, Edge sau Firefox pe desktop sau Android — sau cântă cu tastatura calculatorului mai jos.",
   "midi_connect": "Conectează MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Claviatură",
   "run_setup": "Pregătește interpretarea",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Accentuează primul timp al fiecărei măsuri"
+  "metronome_accent": "Accentuează primul timp al fiecărei măsuri",
+  "video_export": "Video",
+  "daily_title": "Provocarea zilei #{number}"
 }

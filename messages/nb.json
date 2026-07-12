@@ -162,7 +162,6 @@
   "action_finger_numbers": "Fingerstillingsnumre",
   "action_scroll_follow": "Følg tonen",
   "rotate_hint": "Snu telefonen sidelengs for et større tastatur.",
-  "action_back_home": "Tilbake til start",
   "mode_label": "Øvingsmodus",
   "mode_play": "Spill",
   "action_listen": "▶ Lytt",
@@ -455,7 +454,6 @@
   "takes_saved": "Gjennomkjøring lagret",
   "takes_save_failed": "Kunne ikke lagre denne gjennomkjøringen — lagringen på denne enheten er full eller blokkert.",
   "takes_share_ghost": "Utfordre en venn med denne gjennomkjøringen",
-  "takes_share_last_run": "Utfordre en venn med din siste gjennomkjøring",
   "takes_link_copied": "Lenke kopiert",
   "midi_unsupported_keyboard": "Denne nettleseren støtter ikke Web MIDI API. Bruk Chrome, Edge eller Firefox på datamaskin eller Android — eller spill med datatastaturet nedenfor.",
   "midi_connect": "Koble til MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klaviatur",
   "run_setup": "Gjør klart forsøket",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Betón første slag i hver takt"
+  "metronome_accent": "Betón første slag i hver takt",
+  "video_export": "Video",
+  "daily_title": "Dagens utfordring #{number}"
 }

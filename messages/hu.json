@@ -162,7 +162,6 @@
   "action_finger_numbers": "Ujjrendszámok",
   "action_scroll_follow": "Kövesd a hangot",
   "rotate_hint": "Fordítsd oldalra a telefonod a nagyobb billentyűzetért.",
-  "action_back_home": "Vissza a kezdőlapra",
   "mode_label": "Gyakorlási mód",
   "mode_play": "Játék",
   "action_listen": "▶ Meghallgatás",
@@ -455,7 +454,6 @@
   "takes_saved": "Felvétel mentve",
   "takes_save_failed": "Nem sikerült menteni a felvételt — az eszköz tárhelye megtelt vagy le van tiltva.",
   "takes_share_ghost": "Hívj ki egy barátot ezzel a felvétellel",
-  "takes_share_last_run": "Hívj ki egy barátot a legutóbbi futásoddal",
   "takes_link_copied": "Link másolva",
   "midi_unsupported_keyboard": "Ez a böngésző nem támogatja a Web MIDI API-t. Használj Chrome-ot, Edge-et vagy Firefoxot asztali gépen vagy Androidon — vagy játssz a számítógép billentyűzetén alább.",
   "midi_connect": "MIDI csatlakoztatása",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Billentyűzet",
   "run_setup": "Állítsd be a futamot",
   "settings_metronome": "Metronóm",
-  "metronome_accent": "Minden ütem első ütésének hangsúlyozása"
+  "metronome_accent": "Minden ütem első ütésének hangsúlyozása",
+  "video_export": "Videó",
+  "daily_title": "Napi kihívás #{number}"
 }

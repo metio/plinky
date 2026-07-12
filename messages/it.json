@@ -162,7 +162,6 @@
   "action_finger_numbers": "Numeri di diteggiatura",
   "action_scroll_follow": "Segui la nota",
   "rotate_hint": "Ruota il telefono in orizzontale per una tastiera più grande.",
-  "action_back_home": "Torna alla home",
   "mode_label": "Modalità di esercizio",
   "mode_play": "Suona",
   "action_listen": "▶ Ascolta",
@@ -455,7 +454,6 @@
   "takes_saved": "Esecuzione salvata",
   "takes_save_failed": "Impossibile salvare questa esecuzione — la memoria di questo dispositivo è piena o bloccata.",
   "takes_share_ghost": "Sfida un amico con questa esecuzione",
-  "takes_share_last_run": "Sfida un amico con la tua ultima esecuzione",
   "takes_link_copied": "Link copiato",
   "midi_unsupported_keyboard": "Questo browser non espone la Web MIDI API. Usa Chrome, Edge o Firefox su desktop o Android, oppure suona con la tastiera del computer qui sotto.",
   "midi_connect": "Collega MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Tastiera",
   "run_setup": "Prepara l’esecuzione",
   "settings_metronome": "Metronomo",
-  "metronome_accent": "Accenta il primo battito di ogni battuta"
+  "metronome_accent": "Accenta il primo battito di ogni battuta",
+  "video_export": "Video",
+  "daily_title": "Sfida del giorno #{number}"
 }

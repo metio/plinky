@@ -318,10 +318,6 @@ export function YouView() {
                     }
                 />
             )}
-
-            <Link to="/" className={`text-sm ${LINK}`}>
-                {m.action_back_home()}
-            </Link>
         </main>
     );
 }

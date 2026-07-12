@@ -162,7 +162,6 @@
   "action_finger_numbers": "운지 번호",
   "action_scroll_follow": "음표 따라가기",
   "rotate_hint": "휴대폰을 가로로 돌리면 건반이 더 커져요.",
-  "action_back_home": "홈으로",
   "mode_label": "연습 모드",
   "mode_play": "연주",
   "action_listen": "▶ 듣기",
@@ -455,7 +454,6 @@
   "takes_saved": "녹음 저장됨",
   "takes_save_failed": "이 녹음을 저장하지 못했어요 — 이 기기의 저장 공간이 가득 찼거나 막혀 있어요.",
   "takes_share_ghost": "이 녹음으로 친구에게 도전장을",
-  "takes_share_last_run": "마지막 연주로 친구에게 도전장을",
   "takes_link_copied": "링크 복사됨",
   "midi_unsupported_keyboard": "이 브라우저는 Web MIDI API를 지원하지 않아요. 데스크톱이나 Android에서 Chrome, Edge 또는 Firefox를 사용하거나 아래 컴퓨터 키보드로 연주하세요.",
   "midi_connect": "MIDI 연결",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "건반",
   "run_setup": "연주 설정",
   "settings_metronome": "메트로놈",
-  "metronome_accent": "각 마디의 첫 박을 강조"
+  "metronome_accent": "각 마디의 첫 박을 강조",
+  "video_export": "동영상",
+  "daily_title": "데일리 #{number}"
 }

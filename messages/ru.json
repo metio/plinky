@@ -162,7 +162,6 @@
   "action_finger_numbers": "Номера пальцев",
   "action_scroll_follow": "Следовать за нотой",
   "rotate_hint": "Поверните телефон горизонтально для большей клавиатуры.",
-  "action_back_home": "На главную",
   "mode_label": "Режим занятий",
   "mode_play": "Игра",
   "action_listen": "▶ Прослушать",
@@ -455,7 +454,6 @@
   "takes_saved": "Дубль сохранён",
   "takes_save_failed": "Не удалось сохранить этот дубль — хранилище устройства заполнено или заблокировано.",
   "takes_share_ghost": "Бросьте другу вызов этим дублем",
-  "takes_share_last_run": "Бросьте другу вызов своим последним прохождением",
   "takes_link_copied": "Ссылка скопирована",
   "midi_unsupported_keyboard": "Этот браузер не поддерживает Web MIDI API. Используйте Chrome, Edge или Firefox на компьютере или Android — либо играйте на клавиатуре компьютера ниже.",
   "midi_connect": "Подключить MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Клавиатура",
   "run_setup": "Настройте прогон",
   "settings_metronome": "Метроном",
-  "metronome_accent": "Акцентировать первую долю каждого такта"
+  "metronome_accent": "Акцентировать первую долю каждого такта",
+  "video_export": "Видео",
+  "daily_title": "Ежедневный вызов #{number}"
 }

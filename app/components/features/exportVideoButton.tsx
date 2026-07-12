@@ -10,6 +10,7 @@ import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot"
 import { takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
 import { Switch } from "../ui/switch";
 
@@ -45,7 +46,7 @@ export function ExportVideoButton({
     const [showKeyboard, setShowKeyboard] = useState(true);
     // Treadmill: the score as one horizontal line scrolling under a fixed gaze
     // — the densest layout, made for the vertical feeds.
-    const [treadmill, setTreadmill] = useState(false);
+    const [treadmill, setTreadmill] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
@@ -103,62 +104,71 @@ export function ExportVideoButton({
     };
 
     return (
-        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2">
-            <SegmentedControl
-                options={[
-                    { id: "landscape", label: "16:9" },
-                    { id: "portrait", label: "9:16" },
-                ]}
-                value={orientation}
-                onChange={setOrientation}
-                label={m.video_orientation()}
-            />
-            <SegmentedControl
-                options={[
-                    { id: "720", label: "720p" },
-                    { id: "1080", label: "1080p" },
-                ]}
-                value={quality}
-                onChange={(id) => setQuality(id as keyof typeof SIZES)}
-                label={m.video_quality()}
-            />
-            <SegmentedControl
-                options={[
-                    { id: "30", label: "30" },
-                    { id: "60", label: "60" },
-                ]}
-                value={String(fps)}
-                onChange={(id) => setFps(Number(id) as 30 | 60)}
-                label={m.video_fps()}
-            />
-            <Switch checked={showScore} onChange={setShowScore} label={m.video_show_score()} />
-            {showScore && (
-                <Switch checked={treadmill} onChange={setTreadmill} label={m.treadmill_toggle()} />
-            )}
-            {/* Landscape can drop either layer (never both — with the score off the
+        // The whole video flow lives behind one disclosure, so a take's row keeps
+        // its one-tap exports flat and the multi-option video panel opens as a
+        // clearly grouped card below.
+        <Disclosure summary={m.video_export()}>
+            <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-gray-200 p-2 dark:border-gray-800">
+                <SegmentedControl
+                    options={[
+                        { id: "landscape", label: "16:9" },
+                        { id: "portrait", label: "9:16" },
+                    ]}
+                    value={orientation}
+                    onChange={setOrientation}
+                    label={m.video_orientation()}
+                />
+                <SegmentedControl
+                    options={[
+                        { id: "720", label: "720p" },
+                        { id: "1080", label: "1080p" },
+                    ]}
+                    value={quality}
+                    onChange={(id) => setQuality(id as keyof typeof SIZES)}
+                    label={m.video_quality()}
+                />
+                <SegmentedControl
+                    options={[
+                        { id: "30", label: "30" },
+                        { id: "60", label: "60" },
+                    ]}
+                    value={String(fps)}
+                    onChange={(id) => setFps(Number(id) as 30 | 60)}
+                    label={m.video_fps()}
+                />
+                <Switch checked={showScore} onChange={setShowScore} label={m.video_show_score()} />
+                {showScore && (
+                    <Switch
+                        checked={treadmill}
+                        onChange={setTreadmill}
+                        label={m.treadmill_toggle()}
+                    />
+                )}
+                {/* Landscape can drop either layer (never both — with the score off the
                 keyboard is all that's left); portrait is score-only by design, so
                 the keyboard switch only appears where it has an effect. */}
-            {orientation === "landscape" && showScore && (
-                <Switch
-                    checked={showKeyboard}
-                    onChange={setShowKeyboard}
-                    label={m.video_show_keyboard()}
-                />
-            )}
-            <Button
-                variant="ghost"
-                onClick={save}
-                disabled={progress !== null}
-                aria-label={
-                    orientation === "portrait"
-                        ? m.takes_download_video_portrait()
-                        : m.takes_download_video()
-                }
-            >
-                {progress === null
-                    ? m.takes_download_video()
-                    : m.takes_video_progress({ percent: Math.round(progress * 100) })}
-            </Button>
-        </div>
+                {orientation === "landscape" && showScore && (
+                    <Switch
+                        checked={showKeyboard}
+                        onChange={setShowKeyboard}
+                        label={m.video_show_keyboard()}
+                    />
+                )}
+                <Button
+                    variant="ghost"
+                    onClick={save}
+                    disabled={progress !== null}
+                    aria-label={
+                        orientation === "portrait"
+                            ? m.takes_download_video_portrait()
+                            : m.takes_download_video()
+                    }
+                >
+                    {progress === null
+                        ? m.takes_download_video()
+                        : m.takes_video_progress({ percent: Math.round(progress * 100) })}
+                </Button>
+            </div>
+        </Disclosure>
     );
 }

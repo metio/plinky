@@ -181,7 +181,6 @@
   "action_finger_numbers": "Finger position numbers",
   "action_scroll_follow": "Follow the note",
   "rotate_hint": "Turn your phone sideways for a bigger keyboard.",
-  "action_back_home": "Back home",
   "mode_label": "Practice mode",
   "mode_play": "Play",
   "action_listen": "Listen",
@@ -475,7 +474,6 @@
   "takes_saved": "Run saved",
   "takes_save_failed": "Couldn't save this run — this device's storage is full or blocked.",
   "takes_share_ghost": "Challenge a friend with this run",
-  "takes_share_last_run": "Challenge a friend with your last run",
   "takes_link_copied": "Link copied",
   "midi_unsupported_keyboard": "This browser does not expose the Web MIDI API. Use Chrome, Edge, or Firefox on desktop or Android — or play with your computer keyboard below.",
   "midi_connect": "Connect MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Keyboard",
   "run_setup": "Set up your run",
   "settings_metronome": "Metronome",
-  "metronome_accent": "Accent the first beat of each bar"
+  "metronome_accent": "Accent the first beat of each bar",
+  "video_export": "Video",
+  "daily_title": "Daily #{number}"
 }
