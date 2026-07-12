@@ -9,7 +9,6 @@
   "library_tab_search": "Szukaj",
   "library_tab_manage": "Zarządzaj",
   "library_tabs_label": "Sekcje biblioteki",
-  "library_cant_find": "Nie możesz znaleźć swojego utworu? Dodaj go samodzielnie",
   "library_show_more": "Pokaż więcej",
   "library_filter_due": "⏰ Do powtórki",
   "library_remove_used_one": "Używane przez {count} zadanie — usunąć?",

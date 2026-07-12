@@ -9,7 +9,6 @@
   "library_tab_search": "搜索",
   "library_tab_manage": "管理",
   "library_tabs_label": "曲库栏目",
-  "library_cant_find": "找不到想弹的曲子？自己添加吧",
   "library_show_more": "显示更多",
   "library_filter_due": "⏰ 待复习",
   "library_remove_used_one": "被 {count} 个作业使用——确定移除？",

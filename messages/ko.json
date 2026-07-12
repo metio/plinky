@@ -9,7 +9,6 @@
   "library_tab_search": "검색",
   "library_tab_manage": "관리",
   "library_tabs_label": "라이브러리 섹션",
-  "library_cant_find": "찾는 곡이 없나요? 직접 추가하세요",
   "library_show_more": "더 보기",
   "library_filter_due": "⏰ 복습 시간",
   "library_remove_used_one": "과제 {count}개에서 사용 중이에요 — 삭제할까요?",

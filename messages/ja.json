@@ -9,7 +9,6 @@
   "library_tab_search": "検索",
   "library_tab_manage": "管理",
   "library_tabs_label": "ライブラリのセクション",
-  "library_cant_find": "お探しの曲が見つかりませんか？自分で追加しましょう",
   "library_show_more": "もっと見る",
   "library_filter_due": "⏰ 復習の時期",
   "library_remove_used_one": "{count} 件の課題で使われています — 削除しますか？",

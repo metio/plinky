@@ -9,7 +9,6 @@
   "library_tab_search": "Поиск",
   "library_tab_manage": "Управление",
   "library_tabs_label": "Разделы библиотеки",
-  "library_cant_find": "Не нашли свою песню? Добавьте её сами",
   "library_show_more": "Показать ещё",
   "library_filter_due": "⏰ Пора повторить",
   "library_remove_used_one": "Используется в {count} задании — удалить?",

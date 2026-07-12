@@ -94,18 +94,6 @@ export default function LibraryRoute() {
                 </>
             ) : (
                 <>
-                    {/* The catalogue runs to thousands of songs, so the "it isn't here, add
-                your own" path sits up top where someone who just failed a search can
-                find it, not buried under a long, paginated list. */}
-                    <button
-                        type="button"
-                        onClick={() => setTab("manage")}
-                        className="flex w-full items-center justify-between gap-2 rounded-md border border-indigo-200 bg-indigo-50/60 px-4 py-2.5 text-left text-sm font-medium text-indigo-800 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-200"
-                    >
-                        <span>{m.library_cant_find()}</span>
-                        <span aria-hidden="true">→</span>
-                    </button>
-
                     <input
                         ref={searchRef}
                         type="search"

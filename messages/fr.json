@@ -9,7 +9,6 @@
   "library_tab_search": "Rechercher",
   "library_tab_manage": "Gérer",
   "library_tabs_label": "Sections de la bibliothèque",
-  "library_cant_find": "Vous ne trouvez pas votre morceau ? Ajoutez-le vous-même",
   "library_show_more": "Afficher plus",
   "library_filter_due": "⏰ À réviser",
   "library_remove_used_one": "Utilisé par {count} devoir — supprimer ?",

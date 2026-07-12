@@ -9,7 +9,6 @@
   "library_tab_search": "Søg",
   "library_tab_manage": "Administrér",
   "library_tabs_label": "Biblioteksafsnit",
-  "library_cant_find": "Kan du ikke finde dit stykke? Tilføj det selv",
   "library_show_more": "Vis mere",
   "library_filter_due": "⏰ Klar nu",
   "library_remove_used_one": "Bruges af {count} opgave — fjern?",

@@ -9,7 +9,6 @@
   "library_tab_search": "Haku",
   "library_tab_manage": "Hallinnoi",
   "library_tabs_label": "Kirjaston osiot",
-  "library_cant_find": "Etkö löydä kappalettasi? Lisää se itse",
   "library_show_more": "Näytä lisää",
   "library_filter_due": "⏰ Kerrattavaa nyt",
   "library_remove_used_one": "Käytössä {count} tehtävässä — poistetaanko?",

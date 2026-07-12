@@ -46,12 +46,6 @@ describe("Library tabs", () => {
         expect(await screen.findByText("My Tune")).toBeTruthy();
     });
 
-    it("jumps to Manage from the can't-find banner", async () => {
-        mount(memoryStore());
-        fireEvent.click(await screen.findByRole("button", { name: /Add it yourself/ }));
-        expect(screen.getByText("Scores & backup")).toBeTruthy();
-    });
-
     it("opens straight on Manage from a ?tab=manage deep link", async () => {
         renderWithServices(
             <MemoryRouter initialEntries={["/library?tab=manage"]}>
