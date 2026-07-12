@@ -121,8 +121,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   from the play page.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
-  streak to keep up. Once played, re-opening the day's challenge shows your result
-  again. Like any piece, the day's phrase leaves through the title line's **Export
+  streak to keep up. An unplayed day arrives as a little present to open; once
+  played, re-opening the day's challenge shows your result again. Like any piece, the day's phrase leaves through the title line's **Export
   menu** — print it, or download it as MIDI or MusicXML, each option explained in
   plain words. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
@@ -210,7 +210,11 @@ practice grade (Accuracy, Timing and Flow).
 
 Earned moments also surface their own **milestone card** on the run summary — your
 first S on a piece, reaching a new grade, or a flawless run — to share or save. Each
-appears at most once and never interrupts; it just waits beside your results.
+appears at most once and never interrupts; it just waits beside your results. All of
+them land permanently on the You page's **Achievements** shelf: every grade you've
+ever reached, your first bronze/silver/gold star, the first S, the flawless run, and
+cumulative days-played and notes-played targets — unearned badges stay visible as
+goals, and taking a break never removes one.
 
 ## Bring your own scores
 
