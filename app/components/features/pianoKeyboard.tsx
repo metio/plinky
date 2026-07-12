@@ -14,11 +14,16 @@ export function PianoKeyboard({
     wrong = null,
     from = 60,
     to = 84,
+    well,
 }: {
     expected?: number[];
     wrong?: { note: number; seq: number } | null;
     from?: number;
     to?: number;
+    // The keybed's width and centring. Omitted falls back to the shared
+    // centred, capped instrument; full screen passes a full-width well so the
+    // keys use the whole page.
+    well?: string;
 }) {
     const { heldNotes, pressKey, releaseKey } = useMidiConnection();
     const labels = useNoteLabels();
@@ -26,6 +31,7 @@ export function PianoKeyboard({
         <Keyboard
             from={from}
             to={to}
+            well={well}
             lit={new Set(heldNotes)}
             expected={expected}
             wrong={wrong}

@@ -119,6 +119,9 @@ export function PlayStage() {
                             wrong={matcher.lastWrong}
                             from={keyRange.from}
                             to={keyRange.to}
+                            // Full screen is the playing surface — let the keys use
+                            // the whole page width instead of the capped rest well.
+                            well={fullscreen ? "w-full" : undefined}
                         />
                     </Show>
                 )}
