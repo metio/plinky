@@ -287,6 +287,11 @@ function usePlaySessionValue({
     // transposition — never on a layout relayout or a mid-run repaint, so reading
     // the steps (which walks and resets the cursor) can't disturb a live run.
     const [keyRange, setKeyRange] = useState<{ from: number; to: number }>(DEFAULT_KEY_RANGE);
+    // xml/transpose/staffCount aren't read in the body — they are the triggers:
+    // the sounding pitches change only when the piece or its key does, and gating
+    // on them keeps collectSteps (which walks the cursor) off the mid-run repaint
+    // path. The osmd is read imperatively through the stable getOsmd.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: xml/transpose/staffCount are content-change triggers
     useEffect(() => {
         const osmd = getOsmd();
         if (!ready || !osmd) {
@@ -294,11 +299,6 @@ function usePlaySessionValue({
         }
         // Both hands, so switching the practised hand never resizes the keyboard.
         setKeyRange(songKeyRange(collectSteps(osmd, "both").flat()));
-        // xml/transpose/staffCount aren't read here — they are the triggers: the
-        // sounding pitches change only when the piece or its key does, and gating
-        // on them keeps collectSteps (which walks the cursor) off the mid-run
-        // repaint path.
-        // biome-ignore lint/correctness/useExhaustiveDependencies: content-change triggers, read via getOsmd
     }, [ready, xml, transpose, staffCount, getOsmd]);
 
     // The cursor's current position in whole notes — the shared place Listen and Practice
