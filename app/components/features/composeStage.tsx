@@ -67,8 +67,26 @@ export function ComposeStage({
                         </IconButton>
                     )}
                 </div>
-                <div className={fullscreen ? "min-h-0 flex-1 overflow-y-auto" : ""}>
-                    <div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
+                <div className={fullscreen ? "flex min-h-0 flex-1 flex-col" : ""}>
+                    <div
+                        className={`rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900 ${
+                            fullscreen ? "relative min-h-0 flex-1 overflow-y-auto" : ""
+                        }`}
+                    >
+                        {/* The keys' quick controls ride the sketch's corner, the same
+                            placement play uses — so folding the keys away hands their
+                            whole strip to the staff. */}
+                        {fullscreen && (
+                            <KeyboardQuickControls
+                                floating
+                                hidden={hideKeyboard}
+                                onToggleHidden={() => setHideKeyboard((on) => !on)}
+                                noteLabels={noteLabels}
+                                onNoteLabels={(value) =>
+                                    prefsStore.save({ ...prefsStore.load(), noteLabels: value })
+                                }
+                            />
+                        )}
                         {staffXml ? (
                             <StaffPreview xml={staffXml} label={m.compose_staff_label()} />
                         ) : (
@@ -84,19 +102,9 @@ export function ComposeStage({
                     )}
                 </div>
                 {/* The keys live in full screen only — the same surface play grants
-                    a run — with play's quick controls to relabel or fold them away. */}
-                {fullscreen && (
-                    <div className="space-y-2">
-                        <KeyboardQuickControls
-                            hidden={hideKeyboard}
-                            onToggleHidden={() => setHideKeyboard((on) => !on)}
-                            noteLabels={noteLabels}
-                            onNoteLabels={(value) =>
-                                prefsStore.save({ ...prefsStore.load(), noteLabels: value })
-                            }
-                        />
-                        {!hideKeyboard && <PianoKeyboard from={keyWindow.from} to={keyWindow.to} />}
-                    </div>
+                    a run — and only while shown, so hiding them leaves no stray row. */}
+                {fullscreen && !hideKeyboard && (
+                    <PianoKeyboard from={keyWindow.from} to={keyWindow.to} />
                 )}
             </section>
         </FullscreenProvider>

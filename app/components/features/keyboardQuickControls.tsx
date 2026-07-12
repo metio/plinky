@@ -35,6 +35,7 @@ export function KeyboardQuickControls({
     onNoteLabels,
     noteHints,
     onNoteHints,
+    floating = false,
 }: {
     // Whether the keys are folded away; the cluster stays visible as the way back.
     hidden: boolean;
@@ -46,9 +47,19 @@ export function KeyboardQuickControls({
     // omits the pair and the cycle button stays off the bar.
     noteHints?: NoteHints;
     onNoteHints?: (value: NoteHints) => void;
+    // Pin the cluster to its nearest positioned ancestor's bottom-right corner —
+    // the score box — instead of taking a row of its own. Out of the flow, hiding
+    // the keys frees their whole strip for the score.
+    floating?: boolean;
 }) {
     return (
-        <div className="flex items-center justify-end gap-1">
+        <div
+            className={`flex items-center justify-end gap-1 ${
+                floating
+                    ? "absolute right-3 bottom-3 z-10 rounded-md bg-white/90 shadow-sm dark:bg-gray-900/90"
+                    : ""
+            }`}
+        >
             {!hidden && (
                 <>
                     <button

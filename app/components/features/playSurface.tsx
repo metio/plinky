@@ -24,6 +24,7 @@ export function PlaySurface() {
         credit,
         daily,
         ephemeral,
+        fullscreen,
         ready,
         measureCount,
         matcher,
@@ -73,7 +74,17 @@ export function PlaySurface() {
                     />
                 </section>
             )}
-            <div className={runsView ? "hidden" : "space-y-5"}>
+            {/* In full screen the column joins the shell's flex chain, so the score's
+            flex-1 really stretches and reclaims whatever the keyboard isn't using. */}
+            <div
+                className={
+                    runsView
+                        ? "hidden"
+                        : fullscreen
+                          ? "flex min-h-0 flex-1 flex-col gap-2"
+                          : "space-y-5"
+                }
+            >
                 <PlayTransport />
                 {/* When the loop is on, its range and narrowing controls sit right by the
             score — the drawer's backdrop covers the score, so narrowing happens here,

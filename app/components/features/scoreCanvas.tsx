@@ -1,12 +1,17 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { usePrefsStore } from "../../contexts/services";
+import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { m } from "../../paraglide/messages.js";
+import { KeyboardQuickControls } from "./keyboardQuickControls";
 import { usePlaySession } from "./playSession";
 
 // The score itself: the bordered scroll box OSMD renders into, plus the load-error notice.
 // It attaches the session's container ref (OSMD renders here) and forwards a click to the
 // loop's bar picker; everything about what's drawn lives in the session's render surface.
+// In full screen the keyboard's quick controls ride this box's corner rather than taking
+// a row of their own, so folding the keys away hands their whole strip to the score.
 export function ScoreCanvas() {
     const {
         containerRef,
@@ -19,7 +24,14 @@ export function ScoreCanvas() {
         listenPlayback,
         loop,
         title,
+        hideKeyboard,
+        setHideKeyboard,
+        fingerStrip,
+        noteHints,
+        setNoteHints,
     } = usePlaySession();
+    const prefsStore = usePrefsStore();
+    const noteLabels = useNoteLabels();
     return (
         // OSMD renders to its container's full offset width, which includes any border or
         // padding on that element; were either on the element OSMD owns, the rendered system
@@ -29,9 +41,22 @@ export function ScoreCanvas() {
         // keyboard users (axe scrollable-region-focusable).
         <div
             className={`rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800 ${
-                fullscreen ? "flex min-h-0 flex-1 flex-col" : ""
+                fullscreen ? "relative flex min-h-0 flex-1 flex-col" : ""
             }`}
         >
+            {fullscreen && !fingerStrip && (
+                <KeyboardQuickControls
+                    floating
+                    hidden={hideKeyboard}
+                    onToggleHidden={() => setHideKeyboard((on) => !on)}
+                    noteLabels={noteLabels}
+                    onNoteLabels={(value) =>
+                        prefsStore.save({ ...prefsStore.load(), noteLabels: value })
+                    }
+                    noteHints={noteHints}
+                    onNoteHints={setNoteHints}
+                />
+            )}
             {/* Click a bar to build the loop range; the loop from/to number inputs
             are the keyboard-accessible equivalent, so no key handler is needed. */}
             {/* biome-ignore lint/a11y/useKeyWithClickEvents: the loop from/to number inputs are the keyboard path */}
