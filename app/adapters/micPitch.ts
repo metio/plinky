@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { createNoteTracker, detectPitch, frequencyToMidi } from "../../core/pitch";
+import { createNoteTracker, detectPitch, frequencyToMidi, rms } from "../../core/pitch";
 import type { PitchInput, PitchStartResult } from "../ports/pitchInput";
 
 // The real microphone: getUserMedia into an AnalyserNode, a frame of samples
@@ -79,8 +79,10 @@ export function micPitch(): PitchInput {
                 const tick = () => {
                     analyser.getFloatTimeDomainData(frame);
                     const freq = detectPitch(frame, sampleRate);
+                    const level = rms(frame);
                     for (const event of tracker.track(
                         freq === null ? null : frequencyToMidi(freq),
+                        level,
                     )) {
                         onEvent(event);
                     }

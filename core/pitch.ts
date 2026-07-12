@@ -112,7 +112,30 @@ export function detectPitch(frame: Float32Array, sampleRate: number): number | n
     return freq >= MIN_FREQ && freq <= MAX_FREQ ? freq : null;
 }
 
-export type PitchEvent = { kind: "on" | "off"; note: number };
+export type PitchEvent = {
+    kind: "on" | "off";
+    note: number;
+    // How hard the note reads as struck, MIDI velocity range — only on "on"
+    // events, derived from the frame loudness while the note established itself.
+    velocity?: number;
+};
+
+// Map a frame's RMS loudness onto MIDI velocity. Logarithmic like hearing, and
+// deliberately compressed into a friendly band: a whisper still sounds like a
+// note, a hammered chord doesn't clip — headroom over fidelity.
+const VELOCITY_FLOOR = 35;
+const VELOCITY_CEIL = 112;
+export function levelToVelocity(level: number): number {
+    if (level <= SILENCE_RMS) {
+        return VELOCITY_FLOOR;
+    }
+    // ~0.01 RMS (just audible) → floor; ~0.35 (a hard strike near the mic) → ceiling.
+    const span = Math.log10(0.35 / SILENCE_RMS);
+    const position = Math.log10(level / SILENCE_RMS) / span;
+    return Math.round(
+        Math.min(VELOCITY_CEIL, Math.max(VELOCITY_FLOOR, VELOCITY_FLOOR + (VELOCITY_CEIL - VELOCITY_FLOOR) * position)),
+    );
+}
 
 export type TrackerOptions = {
     // Consecutive frames agreeing on a note before it sounds. Low enough to
@@ -133,12 +156,13 @@ export function createNoteTracker(options: TrackerOptions = {}) {
     let sounding: number | null = null;
     let candidate: number | null = null;
     let candidateRun = 0;
+    let candidatePeak = 0;
     let awayRun = 0;
 
     return {
-        // Feed one frame's detection (null = silence/noise); collect the
-        // events it settles into.
-        track(note: number | null): PitchEvent[] {
+        // Feed one frame's detection (null = silence/noise) with the frame's
+        // loudness; collect the events it settles into.
+        track(note: number | null, level = 0): PitchEvent[] {
             const events: PitchEvent[] = [];
 
             if (note !== null && note === sounding) {
@@ -153,10 +177,12 @@ export function createNoteTracker(options: TrackerOptions = {}) {
 
             if (note !== null) {
                 candidateRun = note === candidate ? candidateRun + 1 : 1;
+                candidatePeak = note === candidate ? Math.max(candidatePeak, level) : level;
                 candidate = note;
             } else {
                 candidate = null;
                 candidateRun = 0;
+                candidatePeak = 0;
             }
 
             const promote = candidate !== null && candidateRun >= onFrames;
@@ -166,10 +192,15 @@ export function createNoteTracker(options: TrackerOptions = {}) {
                 awayRun = 0;
             }
             if (sounding === null && promote && candidate !== null) {
-                events.push({ kind: "on", note: candidate });
+                events.push({
+                    kind: "on",
+                    note: candidate,
+                    velocity: levelToVelocity(candidatePeak),
+                });
                 sounding = candidate;
                 candidate = null;
                 candidateRun = 0;
+                candidatePeak = 0;
             }
             return events;
         },

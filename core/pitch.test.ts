@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
     createNoteTracker,
+    levelToVelocity,
     detectPitch,
     frequencyToMidi,
     midiToFrequency,
@@ -87,7 +88,7 @@ describe("createNoteTracker", () => {
         const tracker = createNoteTracker({ onFrames: 3, offFrames: 6 });
         expect(tracker.track(60)).toEqual([]);
         expect(tracker.track(60)).toEqual([]);
-        expect(tracker.track(60)).toEqual([{ kind: "on", note: 60 }]);
+        expect(tracker.track(60)).toEqual([{ kind: "on", note: 60, velocity: 35 }]);
         // The same sounding note re-detected changes nothing.
         expect(tracker.track(60)).toEqual([]);
     });
@@ -116,7 +117,7 @@ describe("createNoteTracker", () => {
         expect(tracker.track(62)).toEqual([]);
         expect(tracker.track(62)).toEqual([
             { kind: "off", note: 60 },
-            { kind: "on", note: 62 },
+            { kind: "on", note: 62, velocity: 35 },
         ]);
     });
 
@@ -125,5 +126,27 @@ describe("createNoteTracker", () => {
         tracker.track(72);
         expect(tracker.flush()).toEqual([{ kind: "off", note: 72 }]);
         expect(tracker.flush()).toEqual([]);
+    });
+});
+
+describe("levelToVelocity", () => {
+    it("maps loudness onto a friendly velocity band, never past its edges", () => {
+        expect(levelToVelocity(0)).toBe(35);
+        expect(levelToVelocity(0.005)).toBe(35);
+        expect(levelToVelocity(5)).toBe(112);
+        // Louder frames read as harder strikes.
+        expect(levelToVelocity(0.2)).toBeGreaterThan(levelToVelocity(0.05));
+        expect(levelToVelocity(0.05)).toBeGreaterThan(levelToVelocity(0.02));
+    });
+
+    it("threads the struck loudness through to the note-on event", () => {
+        const tracker = createNoteTracker({ onFrames: 2 });
+        tracker.track(60, 0.05);
+        const [on] = tracker.track(60, 0.2);
+        expect(on).toMatchObject({ kind: "on", note: 60 });
+        // The peak frame during establishment decides — not the last one.
+        const loud = tracker.flush();
+        expect(loud).toHaveLength(1);
+        expect(on?.velocity).toBe(levelToVelocity(0.2));
     });
 });

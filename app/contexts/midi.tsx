@@ -212,8 +212,8 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         };
     }, [emitNote, store, makeHandler]);
 
-    // Microphone pitch events join the funnel as fixed-velocity notes — the
-    // detector hears WHICH note, not yet how hard it was struck.
+    // Microphone pitch events join the funnel carrying a loudness-derived
+    // velocity, falling back to the keyboard's fixed one for an event without.
     const [micStatus, setMicStatus] = useState<MicStatus>("idle");
     useEffect(() => {
         if (!pitch.supported()) {
@@ -228,7 +228,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                     emitNote(
                         "noteon",
                         event.note,
-                        KEYBOARD_VELOCITY,
+                        event.velocity ?? KEYBOARD_VELOCITY,
                         1,
                         MIC_DEVICE,
                         performance.now(),
