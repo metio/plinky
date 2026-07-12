@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Det jevne klikket som hjelper deg å holde takten.",
   "settings_midi_hint": "Koble til et ekte pianokeyboard så Plinky kan høre deg spille.",
   "settings_labels_example": "Prøv det! Dette lille pianoet viser valget ditt.",
-  "daily_reveal": "Åpne dagens utfordring!"
+  "daily_reveal": "Åpne dagens utfordring!",
+  "achievements_heading": "Prestasjoner",
+  "achievements_hint": "Alt du har opptjent. Merker er dine for alltid — en pause fjerner aldri noen.",
+  "achievement_star": "Første {tier}-stjerne",
+  "achievement_first_s": "Første S-karakter",
+  "achievement_flawless": "En feilfri runde",
+  "achievement_days": "{count} dager med spilling",
+  "achievement_notes": "{count} toner spilt",
+  "achievement_earned": "Opptjent",
+  "achievement_locked": "Ikke opptjent ennå"
 }

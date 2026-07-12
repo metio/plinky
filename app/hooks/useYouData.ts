@@ -6,6 +6,8 @@ import type { DecayMode } from "../../core/review";
 import { progressGrid } from "../../core/lifetime";
 import { MAX_GRADE } from "../../core/scoreDifficulty";
 import type { Grid } from "../../core/shareCard";
+import { type Achievement, collectAchievements, type StarKind } from "../../core/achievements";
+import { letterFor } from "../../core/grade";
 import type { PracticeSummary } from "../../core/history";
 import {
     currentGrade,
@@ -15,8 +17,10 @@ import {
     gradeSuggestions,
     loadGradeCatalogue,
     loadGradedMastery,
+    masteredInGrade,
     poolSizes,
     skillRating,
+    starTier,
 } from "../lib/gradeProgress";
 import { useServices } from "../contexts/services";
 import { usePracticeSummary } from "./usePracticeSummary";
@@ -41,6 +45,8 @@ export type YouData = {
     poolSizes: Map<number, number>;
     summary: PracticeSummary | null;
     fingerprint: Grid | null;
+    // The collectible badge set, earned flags included.
+    achievements: Achievement[];
 };
 
 // Everything the "You" page shows, loaded once per mount and derived in one
@@ -82,6 +88,25 @@ export function useYouData(): YouData | null {
     );
     const workingGrade = Math.min(level + 1, MAX_GRADE);
 
+    // Badge facts are counted cumulatively: the celebrated grade never lowers,
+    // best scores never drop, and stars are judged under gentle decay — so an
+    // earned badge can never quietly disappear.
+    const stars = new Set<StarKind>();
+    for (let grade = 1; grade <= MAX_GRADE; grade++) {
+        const tier = starTier(masteredInGrade(items, grade, "gentle", now));
+        if (tier !== "none") {
+            stars.add(tier);
+        }
+    }
+    const achievements = collectAchievements({
+        reachedGrade: Math.max(services.milestones.reachedGrade(), level),
+        hasS: items.some((item) => letterFor(item.mastery.bestScore) === "S"),
+        flawless: services.milestones.flawlessDone(),
+        stars,
+        daysPracticed: summary?.daysPracticed ?? 0,
+        totalNotes: summary?.totalNotes ?? 0,
+    });
+
     return {
         items,
         mode,
@@ -97,5 +122,6 @@ export function useYouData(): YouData | null {
         poolSizes: poolSizes(catalogue),
         summary,
         fingerprint,
+        achievements,
     };
 }

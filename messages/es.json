@@ -597,5 +597,14 @@
   "settings_metronome_hint": "El clic constante que te ayuda a llevar el ritmo.",
   "settings_midi_hint": "Conecta un teclado de piano real para que Plinky te escuche tocar.",
   "settings_labels_example": "¡Pruébalo! Este pequeño piano muestra tu elección.",
-  "daily_reveal": "¡Abre el reto de hoy!"
+  "daily_reveal": "¡Abre el reto de hoy!",
+  "achievements_heading": "Logros",
+  "achievements_hint": "Todo lo que has conseguido. Las insignias son tuyas para siempre: un descanso nunca te quita ninguna.",
+  "achievement_star": "Primera estrella de {tier}",
+  "achievement_first_s": "Primera nota S",
+  "achievement_flawless": "Una partida perfecta",
+  "achievement_days": "{count} días jugando",
+  "achievement_notes": "{count} notas tocadas",
+  "achievement_earned": "Conseguido",
+  "achievement_locked": "Aún no conseguido"
 }

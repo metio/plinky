@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Det jævne klik, der hjælper dig med at holde takten.",
   "settings_midi_hint": "Tilslut et rigtigt klaviatur, så Plinky kan høre dig spille.",
   "settings_labels_example": "Prøv det! Dette lille klaver viser dit valg.",
-  "daily_reveal": "Åbn dagens udfordring!"
+  "daily_reveal": "Åbn dagens udfordring!",
+  "achievements_heading": "Præstationer",
+  "achievements_hint": "Alt det, du har optjent. Mærker er dine for altid — en pause fjerner aldrig et.",
+  "achievement_star": "Første {tier}-stjerne",
+  "achievement_first_s": "Første S-karakter",
+  "achievement_flawless": "En fejlfri gennemspilning",
+  "achievement_days": "{count} dages spil",
+  "achievement_notes": "{count} noder spillet",
+  "achievement_earned": "Optjent",
+  "achievement_locked": "Ikke optjent endnu"
 }

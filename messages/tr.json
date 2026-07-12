@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Tempoyu tutmana yardım eden düzenli tık sesi.",
   "settings_midi_hint": "Plinky çaldığını duyabilsin diye gerçek bir piyano klavyesi bağla.",
   "settings_labels_example": "Dene! Bu küçük piyano seçimini gösterir.",
-  "daily_reveal": "Bugünün görevini aç!"
+  "daily_reveal": "Bugünün görevini aç!",
+  "achievements_heading": "Başarılar",
+  "achievements_hint": "Kazandığın her şey. Rozetler sonsuza dek senin — ara vermek asla birini geri almaz.",
+  "achievement_star": "İlk {tier} yıldız",
+  "achievement_first_s": "İlk S notu",
+  "achievement_flawless": "Hatasız bir çalış",
+  "achievement_days": "{count} gün çalma",
+  "achievement_notes": "{count} nota çalındı",
+  "achievement_earned": "Kazanıldı",
+  "achievement_locked": "Henüz kazanılmadı"
 }

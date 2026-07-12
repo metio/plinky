@@ -597,5 +597,14 @@
   "settings_metronome_hint": "The steady click that helps you keep time.",
   "settings_midi_hint": "Plug in a real piano keyboard so Plinky can hear you play.",
   "settings_labels_example": "Try it! This little piano shows your choice.",
-  "daily_reveal": "Open today's challenge!"
+  "daily_reveal": "Open today's challenge!",
+  "achievements_heading": "Achievements",
+  "achievements_hint": "Everything you've earned. Badges are yours forever — taking a break never removes one.",
+  "achievement_star": "First {tier} star",
+  "achievement_first_s": "First S grade",
+  "achievement_flawless": "A flawless run",
+  "achievement_days": "{count} days of playing",
+  "achievement_notes": "{count} notes played",
+  "achievement_earned": "Earned",
+  "achievement_locked": "Not earned yet"
 }

@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Il clic costante che ti aiuta a tenere il tempo.",
   "settings_midi_hint": "Collega una vera tastiera di pianoforte così Plinky può sentirti suonare.",
   "settings_labels_example": "Provalo! Questo piccolo pianoforte mostra la tua scelta.",
-  "daily_reveal": "Apri la sfida di oggi!"
+  "daily_reveal": "Apri la sfida di oggi!",
+  "achievements_heading": "Traguardi",
+  "achievements_hint": "Tutto ciò che hai guadagnato. I badge sono tuoi per sempre — una pausa non ne toglie mai uno.",
+  "achievement_star": "Prima stella {tier}",
+  "achievement_first_s": "Primo voto S",
+  "achievement_flawless": "Un'esecuzione perfetta",
+  "achievement_days": "{count} giorni di gioco",
+  "achievement_notes": "{count} note suonate",
+  "achievement_earned": "Ottenuto",
+  "achievement_locked": "Non ancora ottenuto"
 }

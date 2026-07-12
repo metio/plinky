@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Pravidelné klikanie, ktoré ti pomáha držať tempo.",
   "settings_midi_hint": "Pripoj skutočnú klavírnu klaviatúru, aby ťa Plinky počul hrať.",
   "settings_labels_example": "Vyskúšaj to! Toto malé piano ukazuje tvoju voľbu.",
-  "daily_reveal": "Otvor dnešnú výzvu!"
+  "daily_reveal": "Otvor dnešnú výzvu!",
+  "achievements_heading": "Úspechy",
+  "achievements_hint": "Všetko, čo si si vyslúžil. Odznaky sú tvoje navždy — prestávka ti žiadny nevezme.",
+  "achievement_star": "Prvá {tier} hviezda",
+  "achievement_first_s": "Prvá známka S",
+  "achievement_flawless": "Bezchybné zahranie",
+  "achievement_days": "{count} dní hrania",
+  "achievement_notes": "{count} zahraných nôt",
+  "achievement_earned": "Získané",
+  "achievement_locked": "Zatiaľ nezískané"
 }

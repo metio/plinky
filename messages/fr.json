@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Le clic régulier qui vous aide à garder le tempo.",
   "settings_midi_hint": "Branchez un vrai clavier de piano pour que Plinky vous entende jouer.",
   "settings_labels_example": "Essayez ! Ce petit piano montre votre choix.",
-  "daily_reveal": "Ouvrez le défi du jour !"
+  "daily_reveal": "Ouvrez le défi du jour !",
+  "achievements_heading": "Succès",
+  "achievements_hint": "Tout ce que vous avez gagné. Les badges sont à vous pour toujours — une pause n'en retire jamais un.",
+  "achievement_star": "Première étoile {tier}",
+  "achievement_first_s": "Première note S",
+  "achievement_flawless": "Une partie sans faute",
+  "achievement_days": "{count} jours de jeu",
+  "achievement_notes": "{count} notes jouées",
+  "achievement_earned": "Obtenu",
+  "achievement_locked": "Pas encore obtenu"
 }

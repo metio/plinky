@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Klikimi i njëtrajtshëm që të ndihmon të mbash ritmin.",
   "settings_midi_hint": "Lidh një tastierë të vërtetë pianoje që Plinky të të dëgjojë duke luajtur.",
   "settings_labels_example": "Provoje! Ky piano i vogël tregon zgjedhjen tënde.",
-  "daily_reveal": "Hap sfidën e sotme!"
+  "daily_reveal": "Hap sfidën e sotme!",
+  "achievements_heading": "Arritjet",
+  "achievements_hint": "Gjithçka që ke fituar. Stemat janë të tuat përgjithmonë — një pushim nuk të heq asnjë.",
+  "achievement_star": "Ylli i parë {tier}",
+  "achievement_first_s": "Nota e parë S",
+  "achievement_flawless": "Një luajtje pa gabime",
+  "achievement_days": "{count} ditë duke luajtur",
+  "achievement_notes": "{count} nota të luajtura",
+  "achievement_earned": "E fituar",
+  "achievement_locked": "Ende e pafituar"
 }

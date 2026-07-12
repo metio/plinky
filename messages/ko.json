@@ -597,5 +597,14 @@
   "settings_metronome_hint": "박자를 지키도록 도와주는 일정한 딸깍 소리예요.",
   "settings_midi_hint": "진짜 피아노 건반을 연결하면 Plinky가 연주를 들을 수 있어요.",
   "settings_labels_example": "해 보세요! 이 작은 피아노가 선택한 모습을 보여 줘요.",
-  "daily_reveal": "오늘의 도전을 열어 보세요!"
+  "daily_reveal": "오늘의 도전을 열어 보세요!",
+  "achievements_heading": "업적",
+  "achievements_hint": "네가 노력해서 얻은 모든 것. 배지는 영원히 네 것이야 — 쉬어도 절대 사라지지 않아.",
+  "achievement_star": "첫 {tier} 별",
+  "achievement_first_s": "첫 S 등급",
+  "achievement_flawless": "실수 없는 연주",
+  "achievement_days": "{count}일 동안 연주",
+  "achievement_notes": "음표 {count}개 연주",
+  "achievement_earned": "획득함",
+  "achievement_locked": "아직 획득 전"
 }

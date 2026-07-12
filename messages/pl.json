@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Równomierne klikanie, które pomaga trzymać rytm.",
   "settings_midi_hint": "Podłącz prawdziwą klawiaturę pianina, aby Plinky słyszał, jak grasz.",
   "settings_labels_example": "Wypróbuj! To małe pianino pokazuje twój wybór.",
-  "daily_reveal": "Otwórz dzisiejsze wyzwanie!"
+  "daily_reveal": "Otwórz dzisiejsze wyzwanie!",
+  "achievements_heading": "Osiągnięcia",
+  "achievements_hint": "Wszystko, co zdobyłeś. Odznaki są twoje na zawsze — przerwa nigdy żadnej nie zabiera.",
+  "achievement_star": "Pierwsza {tier} gwiazdka",
+  "achievement_first_s": "Pierwsza ocena S",
+  "achievement_flawless": "Bezbłędne wykonanie",
+  "achievement_days": "{count} dni grania",
+  "achievement_notes": "{count} zagranych nut",
+  "achievement_earned": "Zdobyte",
+  "achievement_locked": "Jeszcze nie zdobyte"
 }

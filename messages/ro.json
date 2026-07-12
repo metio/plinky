@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Clicul constant care te ajută să ții ritmul.",
   "settings_midi_hint": "Conectează o claviatură de pian adevărată ca Plinky să te audă cântând.",
   "settings_labels_example": "Încearcă! Acest pian mic îți arată alegerea.",
-  "daily_reveal": "Deschide provocarea de azi!"
+  "daily_reveal": "Deschide provocarea de azi!",
+  "achievements_heading": "Realizări",
+  "achievements_hint": "Tot ce ai câștigat. Insignele sunt ale tale pentru totdeauna — o pauză nu îți ia niciodată vreuna.",
+  "achievement_star": "Prima stea de {tier}",
+  "achievement_first_s": "Prima notă S",
+  "achievement_flawless": "O execuție fără greșeală",
+  "achievement_days": "{count} zile de cântat",
+  "achievement_notes": "{count} note cântate",
+  "achievement_earned": "Câștigat",
+  "achievement_locked": "Încă necâștigat"
 }

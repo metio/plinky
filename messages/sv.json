@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Det jämna klicket som hjälper dig att hålla takten.",
   "settings_midi_hint": "Anslut ett riktigt pianoklaviatur så att Plinky hör dig spela.",
   "settings_labels_example": "Prova! Det här lilla pianot visar ditt val.",
-  "daily_reveal": "Öppna dagens utmaning!"
+  "daily_reveal": "Öppna dagens utmaning!",
+  "achievements_heading": "Prestationer",
+  "achievements_hint": "Allt du har förtjänat. Märken är dina för alltid — en paus tar aldrig bort något.",
+  "achievement_star": "Första {tier}-stjärnan",
+  "achievement_first_s": "Första S-betyget",
+  "achievement_flawless": "En felfri runda",
+  "achievement_days": "{count} dagars spelande",
+  "achievement_notes": "{count} spelade toner",
+  "achievement_earned": "Förtjänad",
+  "achievement_locked": "Inte förtjänad än"
 }

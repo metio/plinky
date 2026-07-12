@@ -6,6 +6,7 @@ import { useYouData } from "../../hooks/useYouData";
 import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
 import { RefreshQueue } from "./refreshQueue";
@@ -85,6 +86,8 @@ export function YouView() {
             />
 
             <RefreshQueue reviews={data.reviews} />
+
+            <AchievementGallery achievements={data.achievements} />
 
             {summary && <WeekChart recent={summary.recent} />}
 

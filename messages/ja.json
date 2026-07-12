@@ -597,5 +597,14 @@
   "settings_metronome_hint": "リズムを守るのを助けてくれる、一定のカチカチ音。",
   "settings_midi_hint": "本物のピアノ鍵盤をつなぐと、Plinky に演奏が聞こえるよ。",
   "settings_labels_example": "ためしてみて!この小さなピアノに選んだものが出るよ。",
-  "daily_reveal": "今日のチャレンジを開けよう!"
+  "daily_reveal": "今日のチャレンジを開けよう!",
+  "achievements_heading": "じっせき",
+  "achievements_hint": "きみががんばって手に入れたもの。バッジはずっときみのもの。お休みしてもなくならないよ。",
+  "achievement_star": "はじめての{tier}スター",
+  "achievement_first_s": "はじめてのSランク",
+  "achievement_flawless": "ノーミスでえんそう",
+  "achievement_days": "{count}日あそんだ",
+  "achievement_notes": "{count}この音をひいた",
+  "achievement_earned": "かくとく",
+  "achievement_locked": "まだこれから"
 }

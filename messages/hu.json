@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Az egyenletes kattogás, ami segít tartani a tempót.",
   "settings_midi_hint": "Csatlakoztass egy igazi zongorabillentyűzetet, hogy a Plinky hallja a játékod.",
   "settings_labels_example": "Próbáld ki! Ez a kis zongora mutatja a választásod.",
-  "daily_reveal": "Nyisd ki a mai kihívást!"
+  "daily_reveal": "Nyisd ki a mai kihívást!",
+  "achievements_heading": "Eredmények",
+  "achievements_hint": "Minden, amit kiérdemeltél. A jelvények örökre a tieid — egy szünet sosem vesz el egyet sem.",
+  "achievement_star": "Első {tier} csillag",
+  "achievement_first_s": "Első S osztályzat",
+  "achievement_flawless": "Hibátlan lejátszás",
+  "achievement_days": "{count} nap játék",
+  "achievement_notes": "{count} lejátszott hang",
+  "achievement_earned": "Megszerezve",
+  "achievement_locked": "Még nincs megszerezve"
 }

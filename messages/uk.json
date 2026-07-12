@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Рівномірні клацання, що допомагають тримати ритм.",
   "settings_midi_hint": "Підключи справжню фортепіанну клавіатуру, щоб Plinky чув твою гру.",
   "settings_labels_example": "Спробуй! Це маленьке піаніно показує твій вибір.",
-  "daily_reveal": "Відкрий сьогоднішнє завдання!"
+  "daily_reveal": "Відкрий сьогоднішнє завдання!",
+  "achievements_heading": "Досягнення",
+  "achievements_hint": "Усе, що ти заробив. Значки твої назавжди — перерва ніколи їх не забирає.",
+  "achievement_star": "Перша зірка ({tier})",
+  "achievement_first_s": "Перша оцінка S",
+  "achievement_flawless": "Бездоганне виконання",
+  "achievement_days": "{count} днів гри",
+  "achievement_notes": "{count} зіграних нот",
+  "achievement_earned": "Здобуто",
+  "achievement_locked": "Ще не здобуто"
 }

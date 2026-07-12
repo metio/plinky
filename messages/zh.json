@@ -597,5 +597,14 @@
   "settings_metronome_hint": "帮你保持节奏的、均匀的嗒嗒声。",
   "settings_midi_hint": "接上真正的钢琴键盘,Plinky 就能听到你的演奏。",
   "settings_labels_example": "试试看!这架小钢琴会展示你的选择。",
-  "daily_reveal": "打开今天的挑战!"
+  "daily_reveal": "打开今天的挑战!",
+  "achievements_heading": "成就",
+  "achievements_hint": "你努力赢得的一切。徽章永远属于你——休息不会拿走任何一个。",
+  "achievement_star": "第一颗{tier}星",
+  "achievement_first_s": "第一个 S 评级",
+  "achievement_flawless": "一次零失误演奏",
+  "achievement_days": "弹奏 {count} 天",
+  "achievement_notes": "弹了 {count} 个音符",
+  "achievement_earned": "已获得",
+  "achievement_locked": "尚未获得"
 }

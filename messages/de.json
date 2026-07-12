@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Das gleichmäßige Klicken, das dir hilft, im Takt zu bleiben.",
   "settings_midi_hint": "Schließe ein echtes Klavier-Keyboard an, damit Plinky dich hören kann.",
   "settings_labels_example": "Probier es aus! Dieses kleine Klavier zeigt deine Auswahl.",
-  "daily_reveal": "Öffne die heutige Aufgabe!"
+  "daily_reveal": "Öffne die heutige Aufgabe!",
+  "achievements_heading": "Erfolge",
+  "achievements_hint": "Alles, was du dir verdient hast. Abzeichen gehören dir für immer — eine Pause nimmt dir keins weg.",
+  "achievement_star": "Erster {tier}-Stern",
+  "achievement_first_s": "Erste S-Note",
+  "achievement_flawless": "Ein fehlerfreier Durchlauf",
+  "achievement_days": "{count} Tage gespielt",
+  "achievement_notes": "{count} Noten gespielt",
+  "achievement_earned": "Verdient",
+  "achievement_locked": "Noch nicht verdient"
 }

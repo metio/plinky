@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Tasainen naksutus, joka auttaa pysymään tahdissa.",
   "settings_midi_hint": "Kytke oikea pianokoskettimisto, jotta Plinky kuulee soittosi.",
   "settings_labels_example": "Kokeile! Tämä pieni piano näyttää valintasi.",
-  "daily_reveal": "Avaa päivän haaste!"
+  "daily_reveal": "Avaa päivän haaste!",
+  "achievements_heading": "Saavutukset",
+  "achievements_hint": "Kaikki, minkä olet ansainnut. Merkit ovat sinun ikuisesti — tauko ei koskaan vie yhtäkään.",
+  "achievement_star": "Ensimmäinen {tier}tähti",
+  "achievement_first_s": "Ensimmäinen S-arvosana",
+  "achievement_flawless": "Virheetön suoritus",
+  "achievement_days": "{count} päivää soittoa",
+  "achievement_notes": "{count} soitettua nuottia",
+  "achievement_earned": "Ansaittu",
+  "achievement_locked": "Ei vielä ansaittu"
 }

@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Ravnomjerni klik koji ti pomaže držati ritam.",
   "settings_midi_hint": "Priključi pravu klavirsku klavijaturu da te Plinky čuje kako sviraš.",
   "settings_labels_example": "Isprobaj! Ovaj mali klavir pokazuje tvoj izbor.",
-  "daily_reveal": "Otvori današnji izazov!"
+  "daily_reveal": "Otvori današnji izazov!",
+  "achievements_heading": "Postignuća",
+  "achievements_hint": "Sve što si zaradio. Značke su tvoje zauvijek — pauza ti nikad ne oduzima nijednu.",
+  "achievement_star": "Prva {tier} zvjezdica",
+  "achievement_first_s": "Prva ocjena S",
+  "achievement_flawless": "Izvedba bez greške",
+  "achievement_days": "{count} dana sviranja",
+  "achievement_notes": "{count} odsviranih nota",
+  "achievement_earned": "Zarađeno",
+  "achievement_locked": "Još nije zarađeno"
 }

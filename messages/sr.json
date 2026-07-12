@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Ravnomerni klik koji ti pomaže da držiš ritam.",
   "settings_midi_hint": "Priključi pravu klavirsku klavijaturu da te Plinky čuje kako sviraš.",
   "settings_labels_example": "Isprobaj! Ovaj mali klavir pokazuje tvoj izbor.",
-  "daily_reveal": "Otvori današnji izazov!"
+  "daily_reveal": "Otvori današnji izazov!",
+  "achievements_heading": "Dostignuća",
+  "achievements_hint": "Sve što si zaradio. Bedževi su tvoji zauvek — pauza ti nikad ne oduzima nijedan.",
+  "achievement_star": "Prva {tier} zvezdica",
+  "achievement_first_s": "Prva ocena S",
+  "achievement_flawless": "Izvedba bez greške",
+  "achievement_days": "{count} dana sviranja",
+  "achievement_notes": "{count} odsviranih nota",
+  "achievement_earned": "Zarađeno",
+  "achievement_locked": "Još nije zarađeno"
 }

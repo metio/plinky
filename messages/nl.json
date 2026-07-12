@@ -597,5 +597,14 @@
   "settings_metronome_hint": "De gelijkmatige tik die je helpt in de maat te blijven.",
   "settings_midi_hint": "Sluit een echt pianoklavier aan zodat Plinky je hoort spelen.",
   "settings_labels_example": "Probeer het! Dit kleine piano'tje laat je keuze zien.",
-  "daily_reveal": "Open de uitdaging van vandaag!"
+  "daily_reveal": "Open de uitdaging van vandaag!",
+  "achievements_heading": "Prestaties",
+  "achievements_hint": "Alles wat je hebt verdiend. Badges zijn voor altijd van jou — een pauze neemt er nooit een af.",
+  "achievement_star": "Eerste {tier} ster",
+  "achievement_first_s": "Eerste S-beoordeling",
+  "achievement_flawless": "Een foutloze run",
+  "achievement_days": "{count} dagen gespeeld",
+  "achievement_notes": "{count} noten gespeeld",
+  "achievement_earned": "Verdiend",
+  "achievement_locked": "Nog niet verdiend"
 }

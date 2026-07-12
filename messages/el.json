@@ -597,5 +597,14 @@
   "settings_metronome_hint": "Το σταθερό κλικ που σε βοηθά να κρατάς τον ρυθμό.",
   "settings_midi_hint": "Σύνδεσε ένα αληθινό πληκτρολόγιο πιάνου για να σε ακούει το Plinky.",
   "settings_labels_example": "Δοκίμασέ το! Αυτό το μικρό πιάνο δείχνει την επιλογή σου.",
-  "daily_reveal": "Άνοιξε την πρόκληση της ημέρας!"
+  "daily_reveal": "Άνοιξε την πρόκληση της ημέρας!",
+  "achievements_heading": "Επιτεύγματα",
+  "achievements_hint": "Όλα όσα έχεις κερδίσει. Τα σήματα είναι δικά σου για πάντα — ένα διάλειμμα δεν αφαιρεί ποτέ κανένα.",
+  "achievement_star": "Πρώτο {tier} αστέρι",
+  "achievement_first_s": "Πρώτος βαθμός S",
+  "achievement_flawless": "Μια άψογη εκτέλεση",
+  "achievement_days": "{count} μέρες παιξίματος",
+  "achievement_notes": "{count} νότες παιγμένες",
+  "achievement_earned": "Κερδισμένο",
+  "achievement_locked": "Όχι ακόμα"
 }
