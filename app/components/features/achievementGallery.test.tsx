@@ -28,10 +28,12 @@ describe("AchievementGallery", () => {
         // Earned and locked states are announced, not only colour-coded.
         expect(screen.getAllByText(m.achievement_earned())).toHaveLength(5);
         expect(screen.getAllByText(m.achievement_locked())).toHaveLength(achievements.length - 5);
-        // The dimmed badge carries the visual mute; the earned one doesn't.
+        // The visual mute sits on the decorative emoji only — dimming the label
+        // would sink it below the contrast floor the axe gate enforces.
         const firstS = screen.getByText(m.achievement_first_s()).closest("li");
-        expect(firstS?.className).not.toContain("grayscale");
+        expect(firstS?.innerHTML).not.toContain("grayscale");
         const flawless = screen.getByText(m.achievement_flawless()).closest("li");
-        expect(flawless?.className).toContain("grayscale");
+        expect(flawless?.querySelector('[aria-hidden="true"]')?.className).toContain("grayscale");
+        expect(flawless?.querySelector('[aria-hidden="true"]')?.className).toContain("opacity-45");
     });
 });

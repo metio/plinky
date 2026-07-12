@@ -47,13 +47,24 @@ export function AchievementGallery({ achievements }: { achievements: Achievement
                             className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center ${
                                 badge.earned
                                     ? "border-indigo-200 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-950/40"
-                                    : "border-gray-200 opacity-45 grayscale dark:border-gray-800"
+                                    : "border-dashed border-gray-200 dark:border-gray-800"
                             }`}
                         >
-                            <span aria-hidden="true" className="text-2xl">
+                            {/* Only the decorative emoji dims for a locked badge — fading
+                                the label too would sink it below the contrast floor. */}
+                            <span
+                                aria-hidden="true"
+                                className={`text-2xl ${badge.earned ? "" : "opacity-45 grayscale"}`}
+                            >
                                 {emoji}
                             </span>
-                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                            <span
+                                className={`text-xs font-medium ${
+                                    badge.earned
+                                        ? "text-gray-700 dark:text-gray-300"
+                                        : "text-gray-600 dark:text-gray-400"
+                                }`}
+                            >
                                 {label}
                             </span>
                             <span className="sr-only">
