@@ -11,7 +11,7 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { ExerciseForms } from "../components/features/exerciseForms";
-import { ExportButton } from "../components/features/exportButton";
+import { ExportButton, ExportMusicXmlButton } from "../components/features/exportButton";
 import { BacklogButton } from "../components/features/backlogButton";
 import { MarkLearnedButton } from "../components/features/markLearnedButton";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
@@ -96,6 +96,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             <div className="flex shrink-0 items-center gap-1">
                                 <PrintButton xml={score.xml} title={score.title} />
                                 <ExportButton xml={score.xml} title={score.title} />
+                                <ExportMusicXmlButton xml={score.xml} title={score.title} />
                                 <MarkLearnedButton id={score.id} />
                                 <BacklogButton id={score.id} />
                             </div>

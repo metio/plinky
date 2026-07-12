@@ -171,6 +171,7 @@
   "action_metronome": "メトロノーム",
   "action_print": "印刷",
   "action_export_midi": "MIDIをエクスポート",
+  "action_export_musicxml": "MusicXMLを書き出す",
   "metronome_adaptive": "適応",
   "metronome_subdivision": "拍を分割",
   "tempo_trainer": "テンポトレーナー",

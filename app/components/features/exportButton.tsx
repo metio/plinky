@@ -10,7 +10,7 @@ import { fileStem } from "../../lib/printScore";
 import { transposeMusicXml } from "../../../core/transpose";
 import { m } from "../../paraglide/messages.js";
 import { IconButton } from "../ui/button";
-import { NotesIcon } from "../ui/icons";
+import { DownloadIcon, NotesIcon } from "../ui/icons";
 import { useTranspose } from "./transposeContext";
 
 // Exports the piece as a Standard MIDI File, derived straight from its MusicXML at
@@ -39,6 +39,31 @@ export function ExportButton({ xml, title }: { xml: string; title: string }) {
             className="text-violet-600 dark:text-violet-400"
         >
             <NotesIcon />
+        </IconButton>
+    );
+}
+
+// Downloads the piece's MusicXML itself, at the page's current transposition —
+// the take-it-anywhere notation twin of the MIDI export above.
+export function ExportMusicXmlButton({ xml, title }: { xml: string; title: string }) {
+    const xmlCodec = useXmlCodec();
+    const transpose = useTranspose()?.transpose ?? 0;
+    const exportMusicXml = () => {
+        const source = transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
+        downloadBlob(
+            source,
+            "application/vnd.recordare.musicxml+xml",
+            `${fileStem(title)}.musicxml`,
+        );
+    };
+    return (
+        <IconButton
+            variant="ghost"
+            onClick={exportMusicXml}
+            label={m.action_export_musicxml()}
+            className="text-violet-600 dark:text-violet-400"
+        >
+            <DownloadIcon />
         </IconButton>
     );
 }

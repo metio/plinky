@@ -171,6 +171,7 @@
   "action_metronome": "Metronomi",
   "action_print": "Tulosta",
   "action_export_midi": "Vie MIDI",
+  "action_export_musicxml": "Vie MusicXML",
   "metronome_adaptive": "Mukautuva",
   "metronome_subdivision": "Jaa isku",
   "tempo_trainer": "Tempoharjoittelija",

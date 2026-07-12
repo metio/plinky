@@ -171,6 +171,7 @@
   "action_metronome": "节拍器",
   "action_print": "打印",
   "action_export_midi": "导出 MIDI",
+  "action_export_musicxml": "导出 MusicXML",
   "metronome_adaptive": "自适应",
   "metronome_subdivision": "细分拍子",
   "tempo_trainer": "速度训练",

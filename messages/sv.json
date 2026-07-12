@@ -171,6 +171,7 @@
   "action_metronome": "Metronom",
   "action_print": "Skriv ut",
   "action_export_midi": "Exportera MIDI",
+  "action_export_musicxml": "Exportera MusicXML",
   "metronome_adaptive": "Adaptiv",
   "metronome_subdivision": "Dela upp taktslaget",
   "tempo_trainer": "Tempotränare",

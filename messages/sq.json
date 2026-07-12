@@ -171,6 +171,7 @@
   "action_metronome": "Metronom",
   "action_print": "Printo",
   "action_export_midi": "Eksporto MIDI",
+  "action_export_musicxml": "Eksporto MusicXML",
   "metronome_adaptive": "Përshtatës",
   "metronome_subdivision": "Ndaje rrahjen",
   "tempo_trainer": "Stërvitës tempoje",

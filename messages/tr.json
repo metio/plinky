@@ -171,6 +171,7 @@
   "action_metronome": "Metronom",
   "action_print": "Yazdır",
   "action_export_midi": "MIDI dışa aktar",
+  "action_export_musicxml": "MusicXML olarak dışa aktar",
   "metronome_adaptive": "Uyarlanır",
   "metronome_subdivision": "Vuruşu böl",
   "tempo_trainer": "Tempo çalıştırıcı",

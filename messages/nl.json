@@ -171,6 +171,7 @@
   "action_metronome": "Metronoom",
   "action_print": "Afdrukken",
   "action_export_midi": "MIDI exporteren",
+  "action_export_musicxml": "MusicXML exporteren",
   "metronome_adaptive": "Adaptief",
   "metronome_subdivision": "Tel onderverdelen",
   "tempo_trainer": "Tempotrainer",

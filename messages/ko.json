@@ -171,6 +171,7 @@
   "action_metronome": "메트로놈",
   "action_print": "인쇄",
   "action_export_midi": "MIDI 내보내기",
+  "action_export_musicxml": "MusicXML 내보내기",
   "metronome_adaptive": "적응형",
   "metronome_subdivision": "박 세분화",
   "tempo_trainer": "템포 트레이너",

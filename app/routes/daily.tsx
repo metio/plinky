@@ -3,6 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
+import { ExportButton, ExportMusicXmlButton } from "../components/features/exportButton";
+import { PrintButton } from "../components/features/printButton";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
@@ -61,11 +63,25 @@ export default function DailyRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">
-                    {today
-                        ? m.daily_title({ number: today.number })
-                        : m.daily_title({ number: "…" })}
-                </h1>
+                <div className="flex items-start justify-between gap-2">
+                    <h1 className="text-2xl font-semibold">
+                        {today
+                            ? m.daily_title({ number: today.number })
+                            : m.daily_title({ number: "…" })}
+                    </h1>
+                    {/* The same take-it-with-you actions a play page's title line
+                    carries: print the phrase, or download it as MIDI/MusicXML. */}
+                    {today && (
+                        <div className="flex shrink-0 items-center gap-1">
+                            <PrintButton xml={today.xml} title={`Plinky #${today.number}`} />
+                            <ExportButton xml={today.xml} title={`Plinky #${today.number}`} />
+                            <ExportMusicXmlButton
+                                xml={today.xml}
+                                title={`Plinky #${today.number}`}
+                            />
+                        </div>
+                    )}
+                </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.daily_intro()}</p>
             </header>
 

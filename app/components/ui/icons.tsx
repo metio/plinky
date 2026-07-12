@@ -231,6 +231,16 @@ export function UploadIcon({ className }: IconProps) {
     );
 }
 
+// The upload tray mirrored: a file coming down to the device.
+export function DownloadIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            <path d="M12 4v12M8 12l4 4 4-4" />
+        </Icon>
+    );
+}
+
 // A bulleted list — an ordered playlist / assignment.
 export function ListIcon({ className }: IconProps) {
     return (

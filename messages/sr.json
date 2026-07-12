@@ -171,6 +171,7 @@
   "action_metronome": "Метроном",
   "action_print": "Штампај",
   "action_export_midi": "Извези MIDI",
+  "action_export_musicxml": "Извези MusicXML",
   "metronome_adaptive": "Прилагодљив",
   "metronome_subdivision": "Подели добу",
   "tempo_trainer": "Тренер темпа",

@@ -190,6 +190,7 @@
   "action_metronome": "Metronome",
   "action_print": "Print",
   "action_export_midi": "Export MIDI",
+  "action_export_musicxml": "Export MusicXML",
   "metronome_adaptive": "Adaptive",
   "metronome_subdivision": "Subdivide the beat",
   "tempo_trainer": "Tempo trainer",

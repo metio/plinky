@@ -171,6 +171,7 @@
   "action_metronome": "Metronóm",
   "action_print": "Nyomtatás",
   "action_export_midi": "MIDI exportálása",
+  "action_export_musicxml": "MusicXML exportálása",
   "metronome_adaptive": "Adaptív",
   "metronome_subdivision": "Ütés felosztása",
   "tempo_trainer": "Tempótréner",

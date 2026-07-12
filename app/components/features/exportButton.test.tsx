@@ -5,7 +5,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toMusicXml } from "../../../core/composition";
-import { ExportButton } from "./exportButton";
+import { ExportButton, ExportMusicXmlButton } from "./exportButton";
 
 const xml = toMusicXml({
     notes: [
@@ -61,5 +61,15 @@ describe("ExportButton", () => {
         render(<ExportButton xml="not musicxml" title="Broken" />);
         fireEvent.click(screen.getByRole("button", { name: /midi/i }));
         expect(URL.createObjectURL).not.toHaveBeenCalled();
+    });
+});
+
+describe("ExportMusicXmlButton", () => {
+    it("downloads the MusicXML itself, named from the title", async () => {
+        render(<ExportMusicXmlButton xml={xml} title="My Song" />);
+        fireEvent.click(screen.getByRole("button", { name: /musicxml/i }));
+        expect(downloadName).toMatch(/\.musicxml$/);
+        expect(downloadName).toContain("my-song");
+        expect(await exported!.text()).toBe(xml);
     });
 });

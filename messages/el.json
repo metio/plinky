@@ -171,6 +171,7 @@
   "action_metronome": "Μετρονόμος",
   "action_print": "Εκτύπωση",
   "action_export_midi": "Εξαγωγή MIDI",
+  "action_export_musicxml": "Εξαγωγή MusicXML",
   "metronome_adaptive": "Προσαρμοστικός",
   "metronome_subdivision": "Υποδιαίρεση του χτύπου",
   "tempo_trainer": "Προπονητής τέμπο",

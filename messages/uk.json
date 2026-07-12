@@ -171,6 +171,7 @@
   "action_metronome": "Метроном",
   "action_print": "Друк",
   "action_export_midi": "Експорт MIDI",
+  "action_export_musicxml": "Експортувати MusicXML",
   "metronome_adaptive": "Адаптивний",
   "metronome_subdivision": "Ділити долю",
   "tempo_trainer": "Тренажер темпу",

@@ -171,6 +171,7 @@
   "action_metronome": "Metrônomo",
   "action_print": "Imprimir",
   "action_export_midi": "Exportar MIDI",
+  "action_export_musicxml": "Exportar MusicXML",
   "metronome_adaptive": "Adaptativo",
   "metronome_subdivision": "Subdividir o tempo",
   "tempo_trainer": "Treinador de andamento",
