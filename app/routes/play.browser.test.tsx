@@ -80,6 +80,18 @@ describe("Play", () => {
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
     });
 
+    it("offers the MIDI connect prompt beside Practice while no device is attached", async () => {
+        // Connecting a piano is the product's load-bearing feature: the resting
+        // play view must always surface the connect button (the shared
+        // MidiConnectPrompt) when a supported browser has no device attached —
+        // the keyboard's status badge alone is not a call to action.
+        renderPlay(bundledId("twinkle"));
+        await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
+        expect(
+            await screen.findByRole("button", { name: "Connect MIDI" }, { timeout: 30000 }),
+        ).toBeTruthy();
+    }, 90000);
+
     it("switches hidden-notes practice on from a ?mode=ear deep link and marks it tried", async () => {
         const id = bundledId("twinkle");
         const props = { params: { scoreId: id } } as unknown as Route.ComponentProps;
