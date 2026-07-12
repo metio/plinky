@@ -11,11 +11,10 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { creditLine } from "../../core/videoScene";
 import { Show } from "../components/features/conditional";
 import { ExerciseForms } from "../components/features/exerciseForms";
-import { ExportButton, ExportMusicXmlButton } from "../components/features/exportButton";
 import { BacklogButton } from "../components/features/backlogButton";
 import { MarkLearnedButton } from "../components/features/markLearnedButton";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
-import { PrintButton } from "../components/features/printButton";
+import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { TransposeProvider } from "../components/features/transposeContext";
@@ -94,9 +93,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             of their own; a long title wraps in the left column while
                             these stay pinned top-right. */}
                             <div className="flex shrink-0 items-center gap-1">
-                                <PrintButton xml={score.xml} title={score.title} />
-                                <ExportButton xml={score.xml} title={score.title} />
-                                <ExportMusicXmlButton xml={score.xml} title={score.title} />
+                                <ExportMenu xml={score.xml} title={score.title} />
                                 <MarkLearnedButton id={score.id} />
                                 <BacklogButton id={score.id} />
                             </div>

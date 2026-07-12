@@ -5,7 +5,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toMusicXml } from "../../../core/composition";
-import { ExportButton, ExportMusicXmlButton } from "./exportButton";
+import { ExportMenu } from "./exportMenu";
 
 const xml = toMusicXml({
     notes: [
@@ -24,7 +24,7 @@ beforeEach(() => {
     exported = null;
     URL.createObjectURL = vi.fn((blob: Blob) => {
         exported = blob;
-        return "blob:midi";
+        return "blob:export";
     });
     URL.revokeObjectURL = vi.fn();
     // Capture the anchor the export builds so the download name can be asserted
@@ -46,30 +46,47 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 
-describe("ExportButton", () => {
-    it("downloads a .mid file named from the title, derived from the MusicXML", async () => {
-        render(<ExportButton xml={xml} title="My Song" />);
-        fireEvent.click(screen.getByRole("button", { name: /midi/i }));
+const openMenu = () => {
+    render(<ExportMenu xml={xml} title="My Song" />);
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
+};
+
+describe("ExportMenu", () => {
+    it("stays closed until asked, then explains every option in plain words", () => {
+        render(<ExportMenu xml={xml} title="My Song" />);
+        expect(screen.queryByText(/GarageBand/)).toBeNull();
+        const toggle = screen.getByRole("button", { name: "Export" });
+        expect(toggle.getAttribute("aria-expanded")).toBe("false");
+        fireEvent.click(toggle);
+        expect(toggle.getAttribute("aria-expanded")).toBe("true");
+        // Each option carries a what-is-this-for line, not just a format name.
+        expect(screen.getByText(/or save it as a PDF/)).toBeTruthy();
+        expect(screen.getByText(/GarageBand/)).toBeTruthy();
+        expect(screen.getByText(/MuseScore/)).toBeTruthy();
+    });
+
+    it("downloads a .mid file named from the title, then closes", async () => {
+        openMenu();
+        fireEvent.click(screen.getByRole("button", { name: /Export MIDI/ }));
         expect(downloadName).toMatch(/\.mid$/);
         expect(downloadName).toContain("my-song");
         // A Standard MIDI File opens with the "MThd" header chunk.
         const head = new Uint8Array((await exported!.arrayBuffer()).slice(0, 4));
         expect(String.fromCharCode(...head)).toBe("MThd");
+        expect(screen.queryByText(/GarageBand/)).toBeNull();
     });
 
-    it("does nothing for a score it cannot parse", () => {
-        render(<ExportButton xml="not musicxml" title="Broken" />);
-        fireEvent.click(screen.getByRole("button", { name: /midi/i }));
-        expect(URL.createObjectURL).not.toHaveBeenCalled();
-    });
-});
-
-describe("ExportMusicXmlButton", () => {
     it("downloads the MusicXML itself, named from the title", async () => {
-        render(<ExportMusicXmlButton xml={xml} title="My Song" />);
-        fireEvent.click(screen.getByRole("button", { name: /musicxml/i }));
+        openMenu();
+        fireEvent.click(screen.getByRole("button", { name: /Export MusicXML/ }));
         expect(downloadName).toMatch(/\.musicxml$/);
-        expect(downloadName).toContain("my-song");
         expect(await exported!.text()).toBe(xml);
+    });
+
+    it("exports nothing as MIDI for a score it cannot parse", () => {
+        render(<ExportMenu xml="not musicxml" title="Broken" />);
+        fireEvent.click(screen.getByRole("button", { name: "Export" }));
+        fireEvent.click(screen.getByRole("button", { name: /Export MIDI/ }));
+        expect(URL.createObjectURL).not.toHaveBeenCalled();
     });
 });

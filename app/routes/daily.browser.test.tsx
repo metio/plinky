@@ -34,11 +34,12 @@ describe("Daily", () => {
             </MemoryRouter>,
         );
         expect(await screen.findByRole("heading", { name: /Daily #\d+/ })).toBeTruthy();
-        // The phrase leaves the page like any piece: print it, or take it as
-        // MIDI / MusicXML from the title line.
-        expect(screen.getByRole("button", { name: "Print" })).toBeTruthy();
-        expect(screen.getByRole("button", { name: "Export MIDI" })).toBeTruthy();
-        expect(screen.getByRole("button", { name: "Export MusicXML" })).toBeTruthy();
+        // The phrase leaves the page like any piece: the title line's Export
+        // menu offers print / MIDI / MusicXML, each with a plain-words hint.
+        fireEvent.click(screen.getByRole("button", { name: "Export" }));
+        expect(screen.getByRole("button", { name: /Print/ })).toBeTruthy();
+        expect(screen.getByRole("button", { name: /Export MIDI/ })).toBeTruthy();
+        expect(screen.getByRole("button", { name: /Export MusicXML/ })).toBeTruthy();
     });
 
     it("renders today's generated phrase through the graded viewer", async () => {

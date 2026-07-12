@@ -122,9 +122,9 @@ one-tap **review session** walks you through everything that's fading, and you c
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
   streak to keep up. Once played, re-opening the day's challenge shows your result
-  again. Like any piece, the day's phrase can be **printed or downloaded as MIDI or
-  MusicXML** from the title line. A **Warm up** tab drills unlimited fresh phrases
-  to prepare for it.
+  again. Like any piece, the day's phrase leaves through the title line's **Export
+  menu** — print it, or download it as MIDI or MusicXML, each option explained in
+  plain words. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
   a staff to share or export (see below). The composing stage carries the same
   keyboard chrome as a play page — a connect-your-piano prompt, the computer-keys

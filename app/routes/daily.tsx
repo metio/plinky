@@ -3,8 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
-import { ExportButton, ExportMusicXmlButton } from "../components/features/exportButton";
-import { PrintButton } from "../components/features/printButton";
+import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
@@ -73,12 +72,7 @@ export default function DailyRoute() {
                     carries: print the phrase, or download it as MIDI/MusicXML. */}
                     {today && (
                         <div className="flex shrink-0 items-center gap-1">
-                            <PrintButton xml={today.xml} title={`Plinky #${today.number}`} />
-                            <ExportButton xml={today.xml} title={`Plinky #${today.number}`} />
-                            <ExportMusicXmlButton
-                                xml={today.xml}
-                                title={`Plinky #${today.number}`}
-                            />
+                            <ExportMenu xml={today.xml} title={`Plinky #${today.number}`} />
                         </div>
                     )}
                 </div>
