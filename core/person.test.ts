@@ -62,6 +62,14 @@ describe("personSlug", () => {
         expect(personSlug("")).toBe("");
         expect(personSlug("  ")).toBe("");
     });
+
+    it("refuses to make a person out of an attribution marker", () => {
+        // "Traditional" and "Anonymous" normalize for display but are not
+        // people: no slug, so no link and no page.
+        for (const marker of ["Trad.", "Traditional", "traditionnel", "anonymus", "Anon."]) {
+            expect(personSlug(marker)).toBe("");
+        }
+    });
 });
 
 describe("peopleFrom / personFor", () => {

@@ -72,11 +72,21 @@ export function canonicalComposer(raw: string): string {
     return ALIASES[name.toLowerCase()] ?? name;
 }
 
+// Attribution markers that name a tradition, not a human — they canonicalize
+// for display ("trad." reads as Traditional) but never become a person: no
+// link, no page.
+const NOT_A_PERSON = new Set(["Traditional", "Anonymous"]);
+
 // The person's URL segment: the canonical name lowercased, diacritics stripped,
 // anything non-alphanumeric folded to single hyphens — stable, readable, and
-// safe in a path. Empty when the composer is unknown.
+// safe in a path. Empty when the composer is unknown or is an attribution
+// marker rather than a person.
 export function personSlug(raw: string): string {
-    return canonicalComposer(raw)
+    const canonical = canonicalComposer(raw);
+    if (NOT_A_PERSON.has(canonical)) {
+        return "";
+    }
+    return canonical
         .normalize("NFKD")
         .replace(/\p{M}/gu, "")
         .toLowerCase()
