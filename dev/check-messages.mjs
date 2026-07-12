@@ -5,11 +5,14 @@
 // contract: a key present there but missing from another locale falls back to
 // English at runtime, so a visitor in that language silently reads English — the
 // gap this catches. It also flags the reverse, an orphan key left in a locale after
-// a rename or removal, which bloats the file and can hide a typo. Pure source
-// analysis over messages/*.json (no build, no dependencies), run via
-// `npm run messages:check` and its own CI job.
+// a rename or removal, which bloats the file and can hide a typo. And it guards the
+// contract's own hygiene: an English key no source file references is dead copy
+// that every future translation pass would still pay 26x for, so it fails too.
+// Pure source analysis over messages/*.json and app/ sources (no build, no
+// dependencies), run via `npm run messages:check` and its own CI job.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
 const settings = JSON.parse(readFileSync("./project.inlang/settings.json", "utf8"));
 const { baseLocale, locales } = settings;
@@ -27,6 +30,43 @@ function keysOf(locale) {
 
 const baseKeys = keysOf(baseLocale);
 const problems = [];
+
+// Every `m.<key>` reference in the app's own sources (the generated paraglide
+// output would count every key by definition, so it is skipped). Tests count as
+// references: they read the same catalogue through the same accessor.
+function referencedKeys() {
+    const referenced = new Set();
+    const accessor = /\bm\.([a-z0-9_]+)/g;
+    const stack = ["app"];
+    while (stack.length > 0) {
+        const dir = stack.pop();
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+            const path = join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name !== "paraglide") {
+                    stack.push(path);
+                }
+            } else if (/\.(ts|tsx)$/.test(entry.name)) {
+                const source = readFileSync(path, "utf8");
+                for (const match of source.matchAll(accessor)) {
+                    referenced.add(match[1]);
+                }
+            }
+        }
+    }
+    return referenced;
+}
+
+const referenced = referencedKeys();
+const unreferenced = [...baseKeys].filter((key) => !referenced.has(key));
+if (unreferenced.length > 0) {
+    console.error(
+        `x ${baseLocale}: ${unreferenced.length} key(s) no source references — dead copy that ` +
+            `every locale still carries: ${unreferenced.join(", ")}`,
+    );
+    console.error("Remove them from every messages/<locale>.json (or wire them up), then re-run.");
+    process.exit(1);
+}
 
 for (const locale of locales) {
     if (locale === baseLocale) {
