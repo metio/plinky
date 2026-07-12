@@ -100,14 +100,13 @@ export function DiscoveryChecklist() {
     const assignmentsStore = useAssignmentsStore();
     // A plugged-in piano completes the connect step wherever it happens — the
     // provider reconnects a remembered device on any page, so the mark can't
-    // depend on visiting Settings.
+    // depend on visiting Settings. Marked before the read below, so a live
+    // connect ticks the step in the same pass.
     const midiConnected = useMidiConnected();
     useEffect(() => {
         if (midiConnected) {
             onboarding.markDiscovered("midiConnected");
         }
-    }, [midiConnected, onboarding]);
-    useEffect(() => {
         const done = discoveries({
             prefs: prefsStore.load(),
             masteredCount: masteryStore.loadAll().length,
@@ -122,8 +121,6 @@ export function DiscoveryChecklist() {
             dismissed: hints.seen(DISCOVERY_DISMISSED),
             playTo: firstItem ? `/play/${firstItem.id}` : `/play/${FIRST_SONG_ID}`,
         });
-        // midiConnected re-runs this after a live connect marks the step, so the
-        // tick appears without a remount.
     }, [
         prefsStore,
         masteryStore,
