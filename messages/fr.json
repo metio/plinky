@@ -563,5 +563,7 @@
   "mic_denied": "L'accès au microphone a été refusé. Autorisez-le dans votre navigateur pour jouer ainsi.",
   "mic_error": "Le microphone n'a pas pu démarrer.",
   "mic_play_something": "Jouez une touche sur votre piano…",
-  "mic_heard": "Plinky a entendu :"
+  "mic_heard": "Plinky a entendu :",
+  "video_show_title": "Titre",
+  "video_show_watermark": "Filigrane"
 }

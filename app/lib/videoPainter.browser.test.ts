@@ -79,6 +79,78 @@ describe("takeScenePainter", () => {
     });
 });
 
+describe("takeScenePainter title and watermark toggles", () => {
+    // Count painted (non-background) pixels in a region — font-render-independent,
+    // unlike matching a specific text colour, which anti-aliasing thins out
+    // differently on each browser's font stack.
+    function countPainted(
+        context: OffscreenCanvasRenderingContext2D,
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+    ): number {
+        const { data } = context.getImageData(x, y, w, h);
+        let painted = 0;
+        for (let i = 0; i < data.length; i += 4) {
+            // Anything meaningfully lighter than the #0b0f1a background is ink.
+            if (data[i]! > 0x40 || data[i + 1]! > 0x40 || data[i + 2]! > 0x40) {
+                painted++;
+            }
+        }
+        return painted;
+    }
+
+    // The header band above the progress rail (rail sits at height*0.26): the
+    // title is left-aligned, the wordmark right-aligned, so each owns a half.
+    const bandTop = 0;
+    const bandHeight = Math.round(HEIGHT * 0.2);
+    const half = Math.round(WIDTH / 2);
+    const titleRegion = (c: OffscreenCanvasRenderingContext2D) =>
+        countPainted(c, 0, bandTop, half, bandHeight);
+    const wordmarkRegion = (c: OffscreenCanvasRenderingContext2D) =>
+        countPainted(c, half, bandTop, WIDTH - half, bandHeight);
+
+    function paint(opts: { showTitle?: boolean; showWordmark?: boolean }) {
+        const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
+        const context = canvas.getContext("2d")!;
+        takeScenePainter({
+            title: "Menuet",
+            credit: "Menuet · J. S. Bach · CC0",
+            notes: NOTES,
+            durationMs: LEAD_IN_MS + 4_000,
+            width: WIDTH,
+            height: HEIGHT,
+            ...opts,
+        })(context, 0);
+        return context;
+    }
+
+    it("burns in the title and wordmark by default, and drops each on demand", () => {
+        const both = paint({});
+        expect(titleRegion(both)).toBeGreaterThan(30);
+        expect(wordmarkRegion(both)).toBeGreaterThan(30);
+
+        // Title off: the left header goes blank, the wordmark stays.
+        const noTitle = paint({ showTitle: false });
+        expect(titleRegion(noTitle)).toBe(0);
+        expect(wordmarkRegion(noTitle)).toBeGreaterThan(30);
+
+        // Watermark off: the right header goes blank, the title stays.
+        const noMark = paint({ showWordmark: false });
+        expect(wordmarkRegion(noMark)).toBe(0);
+        expect(titleRegion(noMark)).toBeGreaterThan(30);
+    });
+
+    it("keeps the provenance credit even with both header labels off", () => {
+        // The catalogue is credit-required, so the bottom credit line survives
+        // regardless — the bottom band still carries painted text.
+        const context = paint({ showTitle: false, showWordmark: false });
+        const bottom = Math.round(HEIGHT * 0.9);
+        expect(countPainted(context, 0, bottom, WIDTH, HEIGHT - bottom)).toBeGreaterThan(30);
+    });
+});
+
 describe("takeScenePainter with a score panel", () => {
     // A stand-in score image: a mid-grey sheet, so panel pixels are telling.
     const sheet = new OffscreenCanvas(800, 300);

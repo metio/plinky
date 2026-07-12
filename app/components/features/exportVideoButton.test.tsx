@@ -99,6 +99,20 @@ describe("ExportVideoButton", () => {
         expect(exportMock.mock.calls[0]?.[0]?.fps).toBe(60);
     });
 
+    it("offers the title and watermark switches, on by default", async () => {
+        mount({ supported: async () => true, export: vi.fn() });
+        fireEvent.click(await screen.findByRole("button", { name: "Video" }));
+        const title = await screen.findByRole("switch", { name: "Title" });
+        const watermark = screen.getByRole("switch", { name: "Watermark" });
+        expect(title.getAttribute("aria-checked")).toBe("true");
+        expect(watermark.getAttribute("aria-checked")).toBe("true");
+        // Both are independent of the layout switches, so they stay put in portrait too.
+        fireEvent.click(title);
+        expect(title.getAttribute("aria-checked")).toBe("false");
+        fireEvent.click(screen.getByRole("tab", { name: "9:16" }));
+        expect(screen.getByRole("switch", { name: "Watermark" })).toBeTruthy();
+    });
+
     it("hides the keyboard switch where it has no effect", async () => {
         mount({ supported: async () => true, export: vi.fn() });
         fireEvent.click(await screen.findByRole("button", { name: "Video" }));

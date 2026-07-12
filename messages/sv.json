@@ -563,5 +563,7 @@
   "mic_denied": "Mikrofonåtkomst nekades. Tillåt den i webbläsaren för att spela så här.",
   "mic_error": "Mikrofonen kunde inte startas.",
   "mic_play_something": "Spela en tangent på ditt piano…",
-  "mic_heard": "Plinky hörde:"
+  "mic_heard": "Plinky hörde:",
+  "video_show_title": "Titel",
+  "video_show_watermark": "Vattenstämpel"
 }

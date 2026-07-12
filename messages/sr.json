@@ -563,5 +563,7 @@
   "mic_denied": "Pristup mikrofonu je odbijen. Dozvoli ga u pregledaču da bi ovako svirao.",
   "mic_error": "Mikrofon nije mogao da se pokrene.",
   "mic_play_something": "Odsviraj dirku na svom klaviru…",
-  "mic_heard": "Plinky je čuo:"
+  "mic_heard": "Plinky je čuo:",
+  "video_show_title": "Naslov",
+  "video_show_watermark": "Vodeni žig"
 }

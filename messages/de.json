@@ -563,5 +563,7 @@
   "mic_denied": "Der Mikrofonzugriff wurde abgelehnt. Erlaube ihn im Browser, um so zu spielen.",
   "mic_error": "Das Mikrofon konnte nicht gestartet werden.",
   "mic_play_something": "Spiele eine Taste auf deinem Klavier…",
-  "mic_heard": "Plinky hat gehört:"
+  "mic_heard": "Plinky hat gehört:",
+  "video_show_title": "Titel",
+  "video_show_watermark": "Wasserzeichen"
 }

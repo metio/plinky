@@ -563,5 +563,7 @@
   "mic_denied": "Prístup k mikrofónu bol zamietnutý. Povoľ ho v prehliadači, aby si mohol takto hrať.",
   "mic_error": "Mikrofón sa nepodarilo spustiť.",
   "mic_play_something": "Zahraj klávesu na svojom klavíri…",
-  "mic_heard": "Plinky počul:"
+  "mic_heard": "Plinky počul:",
+  "video_show_title": "Názov",
+  "video_show_watermark": "Vodoznak"
 }

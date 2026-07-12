@@ -563,5 +563,7 @@
   "mic_denied": "Microphone access was declined. Allow it in your browser to play this way.",
   "mic_error": "The microphone couldn't be started.",
   "mic_play_something": "Play a key on your piano…",
-  "mic_heard": "Plinky heard:"
+  "mic_heard": "Plinky heard:",
+  "video_show_title": "Title",
+  "video_show_watermark": "Watermark"
 }

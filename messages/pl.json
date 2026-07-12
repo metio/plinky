@@ -563,5 +563,7 @@
   "mic_denied": "Odmówiono dostępu do mikrofonu. Zezwól w przeglądarce, aby tak grać.",
   "mic_error": "Nie udało się uruchomić mikrofonu.",
   "mic_play_something": "Zagraj klawisz na swoim pianinie…",
-  "mic_heard": "Plinky usłyszał:"
+  "mic_heard": "Plinky usłyszał:",
+  "video_show_title": "Tytuł",
+  "video_show_watermark": "Znak wodny"
 }

@@ -563,5 +563,7 @@
   "mic_denied": "Mikrofon erişimi reddedildi. Böyle çalmak için tarayıcıda izin ver.",
   "mic_error": "Mikrofon başlatılamadı.",
   "mic_play_something": "Piyanonda bir tuşa bas…",
-  "mic_heard": "Plinky şunu duydu:"
+  "mic_heard": "Plinky şunu duydu:",
+  "video_show_title": "Başlık",
+  "video_show_watermark": "Filigran"
 }

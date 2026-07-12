@@ -563,5 +563,7 @@
   "mic_denied": "Qasja në mikrofon u refuzua. Lejoje në shfletues për të luajtur kështu.",
   "mic_error": "Mikrofoni nuk mundi të ndizej.",
   "mic_play_something": "Luaj një tast në pianon tënde…",
-  "mic_heard": "Plinky dëgjoi:"
+  "mic_heard": "Plinky dëgjoi:",
+  "video_show_title": "Titulli",
+  "video_show_watermark": "Filigrani"
 }

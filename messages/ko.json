@@ -563,5 +563,7 @@
   "mic_denied": "마이크 사용이 거부되었어요. 이렇게 연주하려면 브라우저에서 허용해 주세요.",
   "mic_error": "마이크를 시작할 수 없었어요.",
   "mic_play_something": "피아노 건반을 눌러 보세요…",
-  "mic_heard": "Plinky가 들은 음:"
+  "mic_heard": "Plinky가 들은 음:",
+  "video_show_title": "제목",
+  "video_show_watermark": "워터마크"
 }

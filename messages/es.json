@@ -563,5 +563,7 @@
   "mic_denied": "Se denegó el acceso al micrófono. Permítelo en tu navegador para tocar así.",
   "mic_error": "No se pudo iniciar el micrófono.",
   "mic_play_something": "Toca una tecla en tu piano…",
-  "mic_heard": "Plinky escuchó:"
+  "mic_heard": "Plinky escuchó:",
+  "video_show_title": "Título",
+  "video_show_watermark": "Marca de agua"
 }

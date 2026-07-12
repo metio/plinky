@@ -563,5 +563,7 @@
   "mic_denied": "Mikrofontilgang ble avslått. Tillat den i nettleseren for å spille slik.",
   "mic_error": "Mikrofonen kunne ikke startes.",
   "mic_play_something": "Spill en tangent på pianoet ditt…",
-  "mic_heard": "Plinky hørte:"
+  "mic_heard": "Plinky hørte:",
+  "video_show_title": "Tittel",
+  "video_show_watermark": "Vannmerke"
 }

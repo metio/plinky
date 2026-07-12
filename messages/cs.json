@@ -563,5 +563,7 @@
   "mic_denied": "Přístup k mikrofonu byl odepřen. Povol ho v prohlížeči, abys mohl takhle hrát.",
   "mic_error": "Mikrofon se nepodařilo spustit.",
   "mic_play_something": "Zahraj klávesu na svém pianu…",
-  "mic_heard": "Plinky slyšel:"
+  "mic_heard": "Plinky slyšel:",
+  "video_show_title": "Název",
+  "video_show_watermark": "Vodoznak"
 }

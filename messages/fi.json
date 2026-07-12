@@ -563,5 +563,7 @@
   "mic_denied": "Mikrofonin käyttö estettiin. Salli se selaimessa soittaaksesi näin.",
   "mic_error": "Mikrofonia ei voitu käynnistää.",
   "mic_play_something": "Soita kosketin pianollasi…",
-  "mic_heard": "Plinky kuuli:"
+  "mic_heard": "Plinky kuuli:",
+  "video_show_title": "Otsikko",
+  "video_show_watermark": "Vesileima"
 }

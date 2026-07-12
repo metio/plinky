@@ -563,5 +563,7 @@
   "mic_denied": "A mikrofon-hozzáférés el lett utasítva. Engedélyezd a böngészőben, hogy így játszhass.",
   "mic_error": "A mikrofont nem sikerült elindítani.",
   "mic_play_something": "Üss le egy billentyűt a zongorádon…",
-  "mic_heard": "A Plinky ezt hallotta:"
+  "mic_heard": "A Plinky ezt hallotta:",
+  "video_show_title": "Cím",
+  "video_show_watermark": "Vízjel"
 }

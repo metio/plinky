@@ -563,5 +563,7 @@
   "mic_denied": "マイクがつかえませんでした。ブラウザでゆるしてね。",
   "mic_error": "マイクをはじめられませんでした。",
   "mic_play_something": "ピアノのけんばんをひいてみて…",
-  "mic_heard": "Plinky にきこえた音:"
+  "mic_heard": "Plinky にきこえた音:",
+  "video_show_title": "タイトル",
+  "video_show_watermark": "透かし"
 }

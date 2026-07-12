@@ -563,5 +563,7 @@
   "mic_denied": "Microfoontoegang is geweigerd. Sta het toe in je browser om zo te spelen.",
   "mic_error": "De microfoon kon niet worden gestart.",
   "mic_play_something": "Speel een toets op je piano…",
-  "mic_heard": "Plinky hoorde:"
+  "mic_heard": "Plinky hoorde:",
+  "video_show_title": "Titel",
+  "video_show_watermark": "Watermerk"
 }

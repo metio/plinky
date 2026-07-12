@@ -563,5 +563,7 @@
   "mic_denied": "Mikrofonadgang blev afvist. Tillad den i din browser for at spille sådan.",
   "mic_error": "Mikrofonen kunne ikke startes.",
   "mic_play_something": "Spil en tangent på dit klaver…",
-  "mic_heard": "Plinky hørte:"
+  "mic_heard": "Plinky hørte:",
+  "video_show_title": "Titel",
+  "video_show_watermark": "Vandmærke"
 }

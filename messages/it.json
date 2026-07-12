@@ -563,5 +563,7 @@
   "mic_denied": "L'accesso al microfono è stato negato. Consentilo nel browser per suonare così.",
   "mic_error": "Impossibile avviare il microfono.",
   "mic_play_something": "Suona un tasto sul tuo pianoforte…",
-  "mic_heard": "Plinky ha sentito:"
+  "mic_heard": "Plinky ha sentito:",
+  "video_show_title": "Titolo",
+  "video_show_watermark": "Filigrana"
 }

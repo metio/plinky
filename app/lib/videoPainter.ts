@@ -66,6 +66,11 @@ export type ScenePainterInput = {
     // Treadmill: the score arrives engraved as one horizontal line, and the
     // panel scrolls it sideways under a fixed gaze instead of down the page.
     treadmill?: boolean;
+    // Whether the piece's title is burnt into the top-left. The provenance
+    // credit line is never affected — the catalogue is credit-required.
+    showTitle?: boolean;
+    // Whether the plinky.fun wordmark rides the top-right.
+    showWordmark?: boolean;
 };
 
 type Context2D = Pick<
@@ -111,6 +116,8 @@ export function takeScenePainter({
     score = null,
     keyboard = true,
     treadmill = false,
+    showTitle = true,
+    showWordmark = true,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
@@ -151,18 +158,24 @@ export function takeScenePainter({
 
         // The wordmark measures first so the title knows where it must stop —
         // on a narrow portrait frame a long title would otherwise run under it.
+        // With the wordmark off, the title reclaims that room.
         context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
-        const wordmarkWidth = context.measureText("plinky.fun").width;
-        context.textAlign = "left";
-        context.textBaseline = "top";
-        context.fillStyle = INK;
-        context.font = `600 ${Math.round(unit * 0.06)}px Inter, system-ui, sans-serif`;
-        const titleRoom = width - margin * 2 - wordmarkWidth - unit * 0.04;
-        context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
-        context.textAlign = "right";
-        context.fillStyle = MUTED;
-        context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
-        context.fillText("plinky.fun", width - margin, height * 0.09);
+        const wordmarkWidth = showWordmark ? context.measureText("plinky.fun").width : 0;
+        if (showTitle) {
+            context.textAlign = "left";
+            context.textBaseline = "top";
+            context.fillStyle = INK;
+            context.font = `600 ${Math.round(unit * 0.06)}px Inter, system-ui, sans-serif`;
+            const titleRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
+            context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
+        }
+        if (showWordmark) {
+            context.textAlign = "right";
+            context.textBaseline = "top";
+            context.fillStyle = MUTED;
+            context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
+            context.fillText("plinky.fun", width - margin, height * 0.09);
+        }
 
         // The progress rail between title and keys.
         const railY = height * 0.26;

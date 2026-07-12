@@ -563,5 +563,7 @@
   "mic_denied": "麦克风权限被拒绝。请在浏览器中允许后再这样弹奏。",
   "mic_error": "无法启动麦克风。",
   "mic_play_something": "在你的钢琴上弹一个键…",
-  "mic_heard": "Plinky 听到了:"
+  "mic_heard": "Plinky 听到了:",
+  "video_show_title": "标题",
+  "video_show_watermark": "水印"
 }

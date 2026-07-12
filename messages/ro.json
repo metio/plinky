@@ -563,5 +563,7 @@
   "mic_denied": "Accesul la microfon a fost refuzat. Permite-l în browser ca să cânți așa.",
   "mic_error": "Microfonul nu a putut fi pornit.",
   "mic_play_something": "Apasă o clapă pe pianul tău…",
-  "mic_heard": "Plinky a auzit:"
+  "mic_heard": "Plinky a auzit:",
+  "video_show_title": "Titlu",
+  "video_show_watermark": "Filigran"
 }

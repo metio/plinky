@@ -44,6 +44,8 @@ export function ExportVideoButton({
     const [fps, setFps] = useState<30 | 60>(30);
     const [showScore, setShowScore] = useState(true);
     const [showKeyboard, setShowKeyboard] = useState(true);
+    const [showTitle, setShowTitle] = useState(true);
+    const [showWordmark, setShowWordmark] = useState(true);
     // Treadmill: the score as one horizontal line scrolling under a fixed gaze
     // — the densest layout, made for the vertical feeds.
     const [treadmill, setTreadmill] = useState(true);
@@ -92,6 +94,8 @@ export function ExportVideoButton({
                         score,
                         keyboard: showKeyboard,
                         treadmill,
+                        showTitle,
+                        showWordmark,
                     }),
                     notes,
                 },
@@ -154,6 +158,12 @@ export function ExportVideoButton({
                         label={m.video_show_keyboard()}
                     />
                 )}
+                <Switch checked={showTitle} onChange={setShowTitle} label={m.video_show_title()} />
+                <Switch
+                    checked={showWordmark}
+                    onChange={setShowWordmark}
+                    label={m.video_show_watermark()}
+                />
                 <Button
                     variant="ghost"
                     onClick={save}
