@@ -42,8 +42,10 @@ export function KeyboardQuickControls({
     noteLabels: NoteLabels;
     onNoteLabels: (value: NoteLabels) => void;
     // When the keyboard lights the next note to play: always / after a miss / never.
-    noteHints: NoteHints;
-    onNoteHints: (value: NoteHints) => void;
+    // Optional: a free-play surface (compose) has no "next note" to hint, so it
+    // omits the pair and the cycle button stays off the bar.
+    noteHints?: NoteHints;
+    onNoteHints?: (value: NoteHints) => void;
 }) {
     return (
         <div className="flex items-center justify-end gap-1">
@@ -63,20 +65,22 @@ export function KeyboardQuickControls({
                     >
                         {labelGlyph[noteLabels]}
                     </button>
-                    <button
-                        type="button"
-                        onClick={() => onNoteHints(nextIn(HINTS_CYCLE, noteHints))}
-                        aria-label={`${m.settings_note_hints()}: ${
-                            noteHints === "always"
-                                ? m.note_hints_always()
-                                : noteHints === "miss"
-                                  ? m.note_hints_miss()
-                                  : m.note_hints_never()
-                        }`}
-                        className={CYCLE_BUTTON}
-                    >
-                        {hintGlyph[noteHints]}
-                    </button>
+                    {noteHints !== undefined && onNoteHints !== undefined && (
+                        <button
+                            type="button"
+                            onClick={() => onNoteHints(nextIn(HINTS_CYCLE, noteHints))}
+                            aria-label={`${m.settings_note_hints()}: ${
+                                noteHints === "always"
+                                    ? m.note_hints_always()
+                                    : noteHints === "miss"
+                                      ? m.note_hints_miss()
+                                      : m.note_hints_never()
+                            }`}
+                            className={CYCLE_BUTTON}
+                        >
+                            {hintGlyph[noteHints]}
+                        </button>
+                    )}
                 </>
             )}
             <ToggleIconButton

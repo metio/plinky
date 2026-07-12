@@ -20,7 +20,6 @@ import {
     MetronomeIcon,
 } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
-import { MidiConnectPrompt } from "./midiConnectPrompt";
 import { usePlaySession } from "./playSession";
 import { RunSetup } from "./runSetup";
 
@@ -207,10 +206,6 @@ export function PlayTransport() {
                 <div className="flex flex-wrap items-center gap-3">
                     {practiceButton}
                     <RunSetup />
-                    {/* Plugging in a piano is the product's core feature, so the
-                    connect prompt sits right beside Practice while no device is
-                    attached — the keyboard badge alone is too quiet a signpost. */}
-                    <MidiConnectPrompt />
                 </div>
             </FullScreen>
         </>

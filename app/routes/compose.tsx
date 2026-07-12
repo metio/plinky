@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { ComposeControls } from "../components/features/composeControls";
 import { ComposeExportBar } from "../components/features/composeExportBar";
 import { ComposeSettings } from "../components/features/composeSettings";
 import { ComposeStage } from "../components/features/composeStage";
 import { useOnboardingStore } from "../contexts/services";
+import { useFullscreen } from "../hooks/useFullscreen";
 import { useComposeFile } from "../hooks/useComposeFile";
 import { useCompositionExport } from "../hooks/useCompositionExport";
 import { useCompositionRecorder } from "../hooks/useCompositionRecorder";
@@ -112,6 +113,21 @@ export default function Compose() {
 
     const empty = notes.length === 0;
 
+    // Count in is compose's Practice: it drops into full screen, where the
+    // on-screen keys live; the stage's ✕ (or Esc) steps back out.
+    const stageRef = useRef<HTMLElement>(null);
+    const { fullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen(stageRef);
+    // Stepping out of full screen stops playback and any armed count-in, the way
+    // leaving the play surface ends a run — but only on the transition, so
+    // playing the take back at rest is untouched.
+    const wasFullscreen = useRef(false);
+    useEffect(() => {
+        if (wasFullscreen.current && !fullscreen) {
+            transport.stop();
+        }
+        wasFullscreen.current = fullscreen;
+    }, [fullscreen, transport.stop]);
+
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-2">
@@ -137,13 +153,19 @@ export default function Compose() {
             <ComposeStage
                 staffXml={staffXml}
                 keyWindow={keyWindow}
+                stageRef={stageRef}
+                fullscreen={fullscreen}
+                onExitFullscreen={exitFullscreen}
                 controls={
                     <ComposeControls
                         empty={empty}
                         playing={transport.playing}
                         countingIn={transport.countingIn}
                         checkpoint={recorder.checkpoint}
-                        onCountIn={transport.countIn}
+                        onCountIn={() => {
+                            enterFullscreen();
+                            transport.countIn();
+                        }}
                         onPlay={transport.play}
                         onStop={transport.stop}
                         onSetCheckpoint={recorder.setCheckpointNow}

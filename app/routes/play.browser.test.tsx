@@ -80,16 +80,14 @@ describe("Play", () => {
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
     });
 
-    it("offers the MIDI connect prompt beside Practice while no device is attached", async () => {
-        // Connecting a piano is the product's load-bearing feature: the resting
-        // play view must always surface the connect button (the shared
-        // MidiConnectPrompt) when a supported browser has no device attached —
-        // the keyboard's status badge alone is not a call to action.
+    it("keeps the play surface free of MIDI-connect chrome", async () => {
+        // Connecting a device is a one-time setup task that lives in Settings
+        // (with a getting-started step pointing there); a playing surface never
+        // grows a Connect button or the computer-keys disclosure.
         renderPlay(bundledId("twinkle"));
         await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
-        expect(
-            await screen.findByRole("button", { name: "Connect MIDI" }, { timeout: 30000 }),
-        ).toBeTruthy();
+        expect(screen.queryByRole("button", { name: "Connect MIDI" })).toBeNull();
+        expect(screen.queryByText(/No piano\?/)).toBeNull();
     }, 90000);
 
     it("switches hidden-notes practice on from a ?mode=ear deep link and marks it tried", async () => {

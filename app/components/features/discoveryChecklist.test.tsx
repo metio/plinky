@@ -6,6 +6,9 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { makeAssignment } from "../../../core/assignment";
+import { fakeMidi } from "../../adapters/fakeMidi";
+import { MidiProvider } from "../../contexts/midi";
+import { ServicesProvider } from "../../contexts/services";
 import { FIRST_SONG_ID } from "../../lib/catalog";
 import { DiscoveryChecklist } from "./discoveryChecklist";
 
@@ -14,10 +17,18 @@ afterEach(() => {
     localStorage.clear();
 });
 
+// The checklist watches the MIDI connection for its connect step, so it needs
+// the provider — over a fake, never the real Web MIDI.
 function mount() {
     return render(
         <MemoryRouter>
-            <DiscoveryChecklist />
+            {/* The store stays the default browser one — the tests seed via
+                localStorage — only the MIDI adapter is faked. */}
+            <ServicesProvider services={{ midi: fakeMidi() }}>
+                <MidiProvider>
+                    <DiscoveryChecklist />
+                </MidiProvider>
+            </ServicesProvider>
         </MemoryRouter>,
     );
 }
@@ -34,11 +45,12 @@ describe("DiscoveryChecklist", () => {
         mount();
         await screen.findByText("Getting started");
         const links = screen.getAllByRole("link");
-        // Setting yourself up leads — hand size, then the key mapping — and
-        // playing your first piece follows.
+        // Setting yourself up leads — the MIDI piano, hand size, then the key
+        // mapping — and playing your first piece follows.
         expect(links[0]?.getAttribute("href")).toBe("/en/settings");
         expect(links[1]?.getAttribute("href")).toBe("/en/settings");
-        expect(links[2]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}`);
+        expect(links[2]?.getAttribute("href")).toBe("/en/settings");
+        expect(links[3]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}`);
     });
 
     it("marks the straight-to-the-keys steps with the jump-in pill", async () => {

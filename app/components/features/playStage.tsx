@@ -8,7 +8,6 @@ import { CloseIcon } from "../ui/icons";
 import { FingeringStrip } from "./fingeringStrip";
 import { FocusStrip } from "./focusStrip";
 import { FullScreen, Show } from "./conditional";
-import { MidiConnectPrompt } from "./midiConnectPrompt";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { usePlaySession } from "./playSession";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
@@ -65,7 +64,6 @@ export function PlayStage() {
                         <span className="text-gray-600 dark:text-gray-400">
                             {m.play_progress()} {matcher.done} / {matcher.total}
                         </span>
-                        <MidiConnectPrompt />
                     </div>
                 </FullScreen>
                 {/* The race track rides along in full screen too — a thin bar below

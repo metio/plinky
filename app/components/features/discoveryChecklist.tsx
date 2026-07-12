@@ -21,6 +21,7 @@ import { FIRST_SONG_ID } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { CheckIcon, CloseIcon } from "../ui/icons";
 import { linkClasses } from "../ui/classes";
+import { useMidiConnected } from "./conditional";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { Show } from "./conditional";
 
@@ -39,6 +40,7 @@ const DISCOVERY: {
     to: string;
     quick?: boolean;
 }[] = [
+    { key: "midiConnected", icon: "🔌", label: m.discover_midi, to: "/settings" },
     { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
     { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },
     {
@@ -96,6 +98,15 @@ export function DiscoveryChecklist() {
     const onboarding = useOnboardingStore();
     const hints = useHintsStore();
     const assignmentsStore = useAssignmentsStore();
+    // A plugged-in piano completes the connect step wherever it happens — the
+    // provider reconnects a remembered device on any page, so the mark can't
+    // depend on visiting Settings.
+    const midiConnected = useMidiConnected();
+    useEffect(() => {
+        if (midiConnected) {
+            onboarding.markDiscovered("midiConnected");
+        }
+    }, [midiConnected, onboarding]);
     useEffect(() => {
         const done = discoveries({
             prefs: prefsStore.load(),
@@ -111,7 +122,18 @@ export function DiscoveryChecklist() {
             dismissed: hints.seen(DISCOVERY_DISMISSED),
             playTo: firstItem ? `/play/${firstItem.id}` : `/play/${FIRST_SONG_ID}`,
         });
-    }, [prefsStore, masteryStore, historyStore, daily, onboarding, hints, assignmentsStore]);
+        // midiConnected re-runs this after a live connect marks the step, so the
+        // tick appears without a remount.
+    }, [
+        prefsStore,
+        masteryStore,
+        historyStore,
+        daily,
+        onboarding,
+        hints,
+        assignmentsStore,
+        midiConnected,
+    ]);
 
     if (state.dismissed || state.progress.allDone) {
         return null;

@@ -126,10 +126,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   menu** — print it, or download it as MIDI or MusicXML, each option explained in
   plain words. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
-  a staff to share or export (see below). The composing stage carries the same
-  keyboard chrome as a play page — a connect-your-piano prompt, the computer-keys
-  hint, and a **full screen** mode that gives the sketch and the keys the whole
-  display.
+  a staff to share or export (see below). **Count in** works like a play page's
+  Practice: it drops into **full screen**, and only there do the on-screen keys
+  appear — with the same quick controls as play to relabel or fold them away.
 - **Two tabs per piece** — **Play** holds the score and everything you do with it:
   reading, listening, practising, ear training (the **Hidden notes** toggle) and the
   **fingering editor** in full screen (see above), so the drills happen on the real
@@ -170,8 +169,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   carries an optional *About this grade* note.
 
 On the **home page**, a gentle, dismissible **Getting started** checklist explains how
-Plinky works and walks the first session in order — set yourself up (hand size and key
-mapping first, so everything after is tailored to you), then play your first piece (your
+Plinky works and walks the first session in order — set yourself up (connect your MIDI
+piano in Settings, then hand size and key mapping, so everything after is tailored to
+you), then play your first piece (your
 first assignment when you have one) — before pointing out the app's other corners. The
 steps that put your fingers on keys right away carry a small **Jump right in** marker,
 the shortcut for anyone who'd rather play first and configure later. The **Today**
