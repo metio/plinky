@@ -28,7 +28,7 @@ import { compositionFromRun, type RunStep, type Take } from "../../../core/takes
 import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
-import { useMidiInput } from "../../contexts/midi";
+import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import {
     useHintsStore,
     useOnboardingStore,
@@ -356,13 +356,23 @@ function usePlaySessionValue({
             hidden.restore();
         }
     }, [hiddenNotes, hidden.restore]);
+    // The microphone as an input: while it listens, the player already hears
+    // their real piano, so echoing the note back through the synth only doubles
+    // the sound and feeds the app's own output into the mic. (The session already
+    // subscribes to this context via useMidiConnected, so reading it is free.)
+    const { micStatus } = useMidiConnection();
+    const micListening = micStatus === "listening";
+
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
         forgiving,
         onCorrect: (info: CorrectInfo) => {
-            for (const pitch of info.pitches) {
-                synth.playNote(pitch);
+            // Skip the note-echo under mic input — you hear your own piano.
+            if (!micListening) {
+                for (const pitch of info.pitches) {
+                    synth.playNote(pitch);
+                }
             }
             // A hidden note earned its reveal — lift the blank before the green
             // paint below, so the note appears already coloured.
