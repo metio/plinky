@@ -6,11 +6,7 @@ import { useSearchParams } from "react-router";
 import { ComposeControls } from "../components/features/composeControls";
 import { ComposeExportBar } from "../components/features/composeExportBar";
 import { ComposeSettings } from "../components/features/composeSettings";
-import { MidiConnect } from "../components/features/midiConnect";
-import { PianoKeyboard } from "../components/features/pianoKeyboard";
-import { StaffPreview } from "../components/features/staffPreview";
-import { KeyboardHint } from "../components/ui/keyboardHint";
-import { useMidiConnection } from "../contexts/midi";
+import { ComposeStage } from "../components/features/composeStage";
 import { useOnboardingStore } from "../contexts/services";
 import { useComposeFile } from "../hooks/useComposeFile";
 import { useCompositionExport } from "../hooks/useCompositionExport";
@@ -70,7 +66,6 @@ export default function Compose() {
         },
     });
 
-    const { octaveOffset } = useMidiConnection();
     // Click through the count-in and, once armed, through the take, so the player stays
     // in time and the captured onsets line up with the grid the staff is drawn on.
     useMetronome(metronomeOn || transport.countingIn, tempo, beatsPerBar);
@@ -137,39 +132,32 @@ export default function Compose() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.compose_intro()}</p>
             </header>
 
-            <ComposeControls
-                empty={empty}
-                playing={transport.playing}
-                countingIn={transport.countingIn}
-                checkpoint={recorder.checkpoint}
-                onCountIn={transport.countIn}
-                onPlay={transport.play}
-                onStop={transport.stop}
-                onSetCheckpoint={recorder.setCheckpointNow}
-                onResetToCheckpoint={() => {
-                    transport.stop();
-                    recorder.resetToCheckpoint();
-                }}
-                onClear={() => {
-                    transport.stop();
-                    recorder.clear();
-                }}
+            {/* Controls, sketch and keys live together in the stage so full screen
+                carries the whole recording loop with it. */}
+            <ComposeStage
+                staffXml={staffXml}
+                keyWindow={keyWindow}
+                controls={
+                    <ComposeControls
+                        empty={empty}
+                        playing={transport.playing}
+                        countingIn={transport.countingIn}
+                        checkpoint={recorder.checkpoint}
+                        onCountIn={transport.countIn}
+                        onPlay={transport.play}
+                        onStop={transport.stop}
+                        onSetCheckpoint={recorder.setCheckpointNow}
+                        onResetToCheckpoint={() => {
+                            transport.stop();
+                            recorder.resetToCheckpoint();
+                        }}
+                        onClear={() => {
+                            transport.stop();
+                            recorder.clear();
+                        }}
+                    />
+                }
             />
-
-            <section className="space-y-3">
-                <div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-                    {staffXml ? (
-                        <StaffPreview xml={staffXml} label={m.compose_staff_label()} />
-                    ) : (
-                        <p className="px-2 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
-                            {m.compose_staff_empty()}
-                        </p>
-                    )}
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {m.compose_sketch_note()}
-                </p>
-            </section>
 
             <ComposeSettings
                 title={title}
@@ -197,19 +185,6 @@ export default function Compose() {
                 onConfirmReplace={files.confirmReplace}
                 onCancelReplace={files.cancelReplace}
             />
-
-            <section className="space-y-3">
-                <PianoKeyboard from={keyWindow.from} to={keyWindow.to} />
-                <KeyboardHint octaveOffset={octaveOffset} />
-                <details className="text-sm">
-                    <summary className="cursor-pointer text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
-                        {m.compose_connect_midi()}
-                    </summary>
-                    <div className="pt-3">
-                        <MidiConnect />
-                    </div>
-                </details>
-            </section>
         </main>
     );
 }

@@ -124,7 +124,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   streak to keep up. Once played, re-opening the day's challenge shows your result
   again. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
-  a staff to share or export (see below).
+  a staff to share or export (see below). The composing stage carries the same
+  keyboard chrome as a play page — a connect-your-piano prompt, the computer-keys
+  hint, and a **full screen** mode that gives the sketch and the keys the whole
+  display.
 - **Two tabs per piece** — **Play** holds the score and everything you do with it:
   reading, listening, practising, ear training (the **Hidden notes** toggle) and the
   **fingering editor** in full screen (see above), so the drills happen on the real

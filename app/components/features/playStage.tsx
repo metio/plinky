@@ -3,12 +3,12 @@
 
 import { useCallback } from "react";
 import { m } from "../../paraglide/messages.js";
-import { Button } from "../ui/button";
 import { GhostTrack } from "../ui/ghostTrack";
 import { CloseIcon } from "../ui/icons";
 import { FingeringStrip } from "./fingeringStrip";
 import { FocusStrip } from "./focusStrip";
-import { FullScreen, Midi, Show } from "./conditional";
+import { FullScreen, Show } from "./conditional";
+import { MidiConnectPrompt } from "./midiConnectPrompt";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { usePlaySession } from "./playSession";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
@@ -26,8 +26,6 @@ export function PlayStage() {
         fullscreen,
         compact,
         connected,
-        status,
-        requestAccess,
         ghostRace,
         portrait,
         coarsePointer,
@@ -67,20 +65,7 @@ export function PlayStage() {
                         <span className="text-gray-600 dark:text-gray-400">
                             {m.play_progress()} {matcher.done} / {matcher.total}
                         </span>
-                        <Midi supported>
-                            <Show when={!connected}>
-                                <Button variant="primary" onClick={requestAccess}>
-                                    {status === "requesting"
-                                        ? m.midi_connecting()
-                                        : m.midi_connect()}
-                                </Button>
-                            </Show>
-                        </Midi>
-                        <Midi unsupported>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {m.midi_unsupported_keyboard()}
-                            </span>
-                        </Midi>
+                        <MidiConnectPrompt />
                     </div>
                 </FullScreen>
                 {/* The race track rides along in full screen too — a thin bar below

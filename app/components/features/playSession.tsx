@@ -27,7 +27,7 @@ import { compositionFromRun, type RunStep, type Take } from "../../../core/takes
 import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
-import { useMidiConnection, useMidiInput } from "../../contexts/midi";
+import { useMidiInput } from "../../contexts/midi";
 import {
     useHintsStore,
     useOnboardingStore,
@@ -386,7 +386,6 @@ function usePlaySessionValue({
             captureRelease(captureRef.current, event.note, event.timestamp);
         },
     });
-    const { status, requestAccess } = useMidiConnection();
     const connected = useMidiConnected();
 
     // The ghost race — a previous run replayed against the clock on the staff and the
@@ -855,8 +854,6 @@ function usePlaySessionValue({
         runTempoScale,
         // MIDI connection.
         connected,
-        status,
-        requestAccess,
         // Saved takes.
         takes: takesList.takes,
         // Actions the surface drives.
