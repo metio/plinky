@@ -168,7 +168,7 @@ export function FingeringStrip({
     };
 
     return (
-        <div className="space-y-2 rounded-md border border-gray-200 p-2 dark:border-gray-800">
+        <div className="mx-auto w-full max-w-3xl space-y-2 rounded-md border border-gray-200 p-2 dark:border-gray-800">
             <div className="flex flex-wrap items-center gap-2">
                 {staffCount >= 2 && (
                     <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
@@ -223,7 +223,7 @@ export function FingeringStrip({
             {positions.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400">{m.fingering_empty()}</p>
             ) : (
-                <div className="flex flex-wrap items-end gap-1.5">
+                <div className="flex flex-wrap items-end justify-center gap-1.5">
                     {positions.map((pos, p) => (
                         <div
                             // Fixed window; the position is its identity.
@@ -281,7 +281,7 @@ export function FingeringStrip({
                 </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
                 <fieldset className="flex items-center gap-1" aria-label={m.hand_left()}>
                     {fingerRow("left")}
                 </fieldset>

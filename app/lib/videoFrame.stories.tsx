@@ -122,6 +122,54 @@ export const PortraitLongTitle: Story = {
     render: () => <PortraitFrame title="Twinkle, Twinkle, Little Star (both hands)" />,
 };
 
+// A deterministic wide one-line sheet for the treadmill layout.
+function fakeLine(): {
+    image: HTMLCanvasElement;
+    steps: { x: number; y: number; width: number; height: number }[][];
+} {
+    const image = document.createElement("canvas");
+    image.width = 3000;
+    image.height = 140;
+    const ctx = image.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 3000, 140);
+    ctx.fillStyle = "#111827";
+    for (let line = 0; line < 5; line++) {
+        ctx.fillRect(20, 40 + line * 14, 2960, 2);
+    }
+    const steps = [0, 1, 2].map((step) => {
+        const x = 200 + step * 900;
+        ctx.beginPath();
+        ctx.ellipse(x + 11, 68, 11, 8, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(x + 20, 14, 2, 54);
+        return [{ x, y: 56, width: 24, height: 22 }];
+    });
+    return { image, steps };
+}
+
+// The treadmill export in 9:16: one dense horizontal line of music scrolling
+// under a fixed gaze — the phone-feed layout.
+export const TreadmillPortrait: Story = {
+    render: function Render() {
+        const canvasRef = useRef<HTMLCanvasElement>(null);
+        useEffect(() => {
+            const context = canvasRef.current?.getContext("2d");
+            if (context) {
+                const sheet = fakeLine();
+                takeScenePainter({
+                    ...TAKE,
+                    width: 360,
+                    height: 640,
+                    score: { image: sheet.image, width: 3000, height: 140, steps: sheet.steps },
+                    treadmill: true,
+                })(context, LEAD_IN_MS + 440);
+            }
+        }, []);
+        return <canvas ref={canvasRef} width={360} height={640} />;
+    },
+};
+
 function PortraitFrame({ title = TAKE.title }: { title?: string }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     useEffect(() => {

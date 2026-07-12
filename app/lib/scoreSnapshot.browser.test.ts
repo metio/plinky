@@ -77,3 +77,31 @@ describe("buildScoreSnapshot with the original score", () => {
         expect(fallback!.steps).toHaveLength(5);
     });
 });
+
+describe("treadmill snapshot", () => {
+    it("engraves one horizontal line — wider and shallower than the page layout", async () => {
+        // A long line of notes, enough to wrap into several systems on the page
+        // layout so the two engravings differ meaningfully in shape.
+        const long: Take = {
+            ...take,
+            composition: {
+                notes: Array.from({ length: 32 }, (_, index) => ({
+                    pitch: 60 + (index % 12),
+                    startMs: index * 400,
+                    durationMs: 300,
+                    velocity: 90,
+                })),
+                tempo: 120,
+                beatsPerBar: 4,
+            },
+        };
+        const page = await buildScoreSnapshot(long);
+        const line = await buildScoreSnapshot(long, null, true);
+        expect(page).not.toBeNull();
+        expect(line).not.toBeNull();
+        expect(line!.steps.length).toBe(page!.steps.length);
+        // The single line trades height for width.
+        expect(line!.width).toBeGreaterThan(page!.width);
+        expect(line!.height).toBeLessThan(page!.height);
+    });
+});

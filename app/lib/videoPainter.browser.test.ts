@@ -144,6 +144,64 @@ describe("takeScenePainter with a score panel", () => {
         expect(scoreOnly).toBeGreaterThan(withKeys * 1.5);
     });
 
+    it("scrolls a treadmill sheet sideways as the music advances", () => {
+        // A very wide, shallow sheet: only a horizontal window can show it. Two
+        // steps, far apart in x — early in the piece the window sits at the
+        // start, late it has slid toward the far step.
+        const wide = new OffscreenCanvas(4000, 120);
+        const wctx = wide.getContext("2d")!;
+        wctx.fillStyle = "#808080";
+        wctx.fillRect(0, 0, 4000, 120);
+        // A distinct stripe near the far end, visible only once the window slides.
+        wctx.fillStyle = "#404040";
+        wctx.fillRect(3600, 0, 400, 120);
+        // Sixteen evenly spaced steps: the window sizes itself to a phrase of
+        // them, so the far stripe only enters once the music nears the end.
+        const sheet = {
+            image: wide,
+            width: 4000,
+            height: 120,
+            steps: Array.from({ length: 16 }, (_, i) => [
+                { x: 100 + i * 246, y: 40, width: 30, height: 30 },
+            ]),
+        };
+        const notes = Array.from({ length: 16 }, (_, i) => ({
+            pitch: 60,
+            startMs: i * 200,
+            durationMs: 150,
+            velocity: 100,
+        }));
+        const paintTreadmill = (timeMs: number) => {
+            const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
+            const context = canvas.getContext("2d")!;
+            takeScenePainter({
+                title: "Menuet",
+                credit: "Menuet · J. S. Bach · CC0",
+                notes,
+                durationMs: LEAD_IN_MS + 16 * 200,
+                width: WIDTH,
+                height: HEIGHT,
+                score: sheet,
+                treadmill: true,
+            })(context, timeMs);
+            return context;
+        };
+        const countDark = (context: OffscreenCanvasRenderingContext2D) => {
+            const { data } = context.getImageData(0, 0, WIDTH, HEIGHT);
+            let count = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i] === 0x40 && data[i + 1] === 0x40 && data[i + 2] === 0x40) {
+                    count++;
+                }
+            }
+            return count;
+        };
+        // At the start the far stripe is out of the window; near the second
+        // step's onset the window has slid and the stripe fills part of it.
+        expect(countDark(paintTreadmill(0))).toBe(0);
+        expect(countDark(paintTreadmill(LEAD_IN_MS + 15 * 200))).toBeGreaterThan(1_000);
+    });
+
     it("tints the played step's noteheads once its onset passes", () => {
         // The tint blends accent over the grey sheet, eating grey pixels.
         const before = countGreyPixels(paintWithScore(0));

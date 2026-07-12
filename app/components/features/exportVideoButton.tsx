@@ -43,6 +43,9 @@ export function ExportVideoButton({
     const [fps, setFps] = useState<30 | 60>(30);
     const [showScore, setShowScore] = useState(true);
     const [showKeyboard, setShowKeyboard] = useState(true);
+    // Treadmill: the score as one horizontal line scrolling under a fixed gaze
+    // — the densest layout, made for the vertical feeds.
+    const [treadmill, setTreadmill] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -71,7 +74,7 @@ export function ExportVideoButton({
             // The take's own notation, rendered off-screen and rasterized once, so
             // the video shows the sheet music with each note tinted as it sounds.
             // A take the renderer can't draw exports keyboard-only instead.
-            const score = showScore ? await buildScoreSnapshot(take, original) : null;
+            const score = showScore ? await buildScoreSnapshot(take, original, treadmill) : null;
             const blob = await exporter.export(
                 {
                     width,
@@ -87,6 +90,7 @@ export function ExportVideoButton({
                         height,
                         score,
                         keyboard: showKeyboard,
+                        treadmill,
                     }),
                     notes,
                 },
@@ -128,6 +132,9 @@ export function ExportVideoButton({
                 label={m.video_fps()}
             />
             <Switch checked={showScore} onChange={setShowScore} label={m.video_show_score()} />
+            {showScore && (
+                <Switch checked={treadmill} onChange={setTreadmill} label={m.treadmill_toggle()} />
+            )}
             {/* Landscape can drop either layer (never both — with the score off the
                 keyboard is all that's left); portrait is score-only by design, so
                 the keyboard switch only appears where it has an effect. */}

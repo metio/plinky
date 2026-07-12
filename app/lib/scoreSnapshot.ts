@@ -34,18 +34,25 @@ export type OriginalScore = { xml: string; hand: Hand };
 export async function buildScoreSnapshot(
     take: Take,
     original: OriginalScore | null = null,
+    // Treadmill: engrave the piece as ONE horizontal staff line, for the export
+    // layout that scrolls the music sideways under a fixed gaze.
+    treadmill = false,
 ): Promise<ScoreSnapshot | null> {
     if (original) {
-        const snapshot = await snapshotFromXml(original.xml, original.hand);
+        const snapshot = await snapshotFromXml(original.xml, original.hand, treadmill);
         const takeSteps = new Set(take.composition.notes.map((note) => note.startMs)).size;
         if (snapshot && takeSteps <= snapshot.steps.length) {
             return snapshot;
         }
     }
-    return snapshotFromXml(toMusicXml(take.composition), "both");
+    return snapshotFromXml(toMusicXml(take.composition), "both", treadmill);
 }
 
-async function snapshotFromXml(xml: string, hand: Hand): Promise<ScoreSnapshot | null> {
+async function snapshotFromXml(
+    xml: string,
+    hand: Hand,
+    treadmill = false,
+): Promise<ScoreSnapshot | null> {
     const host = document.createElement("div");
     host.style.position = "absolute";
     host.style.left = "-99999px";
@@ -60,6 +67,7 @@ async function snapshotFromXml(xml: string, hand: Hand): Promise<ScoreSnapshot |
         const osmd = new OpenSheetMusicDisplay(host, {
             autoResize: false,
             drawingParameters: "compact",
+            renderSingleHorizontalStaffline: treadmill,
         });
         await osmd.load(xml);
         osmd.render();

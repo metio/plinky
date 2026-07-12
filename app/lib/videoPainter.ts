@@ -63,6 +63,9 @@ export type ScenePainterInput = {
     // Whether the on-screen keyboard is part of the stage. Off hands the whole
     // stage to the notation (ignored when there is no score to show instead).
     keyboard?: boolean;
+    // Treadmill: the score arrives engraved as one horizontal line, and the
+    // panel scrolls it sideways under a fixed gaze instead of down the page.
+    treadmill?: boolean;
 };
 
 type Context2D = Pick<
@@ -107,6 +110,7 @@ export function takeScenePainter({
     height,
     score = null,
     keyboard = true,
+    treadmill = false,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
@@ -221,21 +225,46 @@ export function takeScenePainter({
         const panelW = width - margin * 2;
         // Score-only frames give the panel the keyboard's room as well, down to
         // just above the credit line. A piece shorter than the band shrinks the
-        // card to the sheet and centres it, instead of trailing blank white.
+        // card to the sheet and centres it, instead of trailing blank white. A
+        // treadmill sheet is one shallow line: its band height comes from the
+        // sheet itself (scaled to the panel's width budget), centred in the band.
         const band = scoreOnly
             ? { y: height * 0.3, height: height * 0.6 }
             : { y: height * 0.3, height: height * 0.32 };
-        const { y: panelY, height: panelH } = scorePanelRect(band, panelW, sheet);
-        const scale = panelW / sheet.width;
-        const windowH = panelH / scale;
         const played = playedStepCount(onsets, currentOnsetMs);
         // The window glides between step centres with the music, never jumping.
         const centers = sheet.steps.map((group) => {
             const box = group[0];
-            return box ? box.y + box.height / 2 : 0;
+            return box ? (treadmill ? box.x + box.width / 2 : box.y + box.height / 2) : 0;
         });
-        const centerY = stepCenterAt(onsets, centers, timeMs - LEAD_IN_MS);
-        const top = scoreWindowTop(centerY, windowH, sheet.height);
+        const center = stepCenterAt(onsets, centers, timeMs - LEAD_IN_MS);
+
+        // The treadmill slides a horizontal window sized to show a musical
+        // phrase (~8 steps by their average spacing), never up-scaled past the
+        // band's height; the page layout scales by width and slides down.
+        let scale: number;
+        if (treadmill) {
+            const spacing =
+                centers.length > 1
+                    ? (centers[centers.length - 1]! - centers[0]!) / (centers.length - 1)
+                    : sheet.width;
+            const desiredWindow = Math.min(sheet.width, Math.max(spacing * 8, sheet.height * 4));
+            // Between two guardrails: never taller than the band, never shrunk
+            // below a readable strip — a sparse engraving zooms in rather than
+            // becoming a hairline.
+            const fit = Math.min(band.height / sheet.height, panelW / desiredWindow);
+            scale = Math.max(fit, Math.min(band.height, unit * 0.14) / sheet.height);
+        } else {
+            scale = panelW / sheet.width;
+        }
+        const panelH = treadmill
+            ? Math.min(band.height, sheet.height * scale)
+            : scorePanelRect(band, panelW, sheet).height;
+        const panelY = band.y + (band.height - panelH) / 2;
+        const windowW = treadmill ? panelW / scale : sheet.width;
+        const windowH = treadmill ? sheet.height : panelH / scale;
+        const left = treadmill ? scoreWindowTop(center, windowW, sheet.width) : 0;
+        const top = treadmill ? 0 : scoreWindowTop(center, windowH, sheet.height);
 
         context.save();
         context.fillStyle = INK;
@@ -243,17 +272,7 @@ export function takeScenePainter({
         context.roundRect(panelX, panelY, panelW, panelH, 8);
         context.fill();
         context.clip();
-        context.drawImage(
-            sheet.image,
-            0,
-            top,
-            sheet.width,
-            windowH,
-            panelX,
-            panelY,
-            panelW,
-            panelH,
-        );
+        context.drawImage(sheet.image, left, top, windowW, windowH, panelX, panelY, panelW, panelH);
         // Tint the played steps' noteheads; the freshest press reads strongest.
         for (let index = 0; index < played && index < sheet.steps.length; index++) {
             context.fillStyle = ACCENT;
@@ -261,7 +280,7 @@ export function takeScenePainter({
             for (const box of sheet.steps[index] ?? []) {
                 context.beginPath();
                 context.roundRect(
-                    panelX + (box.x - 1) * scale,
+                    panelX + (box.x - left - 1) * scale,
                     panelY + (box.y - top - 1) * scale,
                     (box.width + 2) * scale,
                     (box.height + 2) * scale,
