@@ -100,8 +100,12 @@ one-tap **review session** walks you through everything that's fading, and you c
 ## Modes
 
 - **Library** — the catalogue: bundled scales, arpeggios, and familiar tunes like
-  *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import. Search, star, filter
-  by kind, grade, or what's **due now**, and open one to practise. Each piece credits
+  *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import, in two tabs.
+  **Search** finds something to play: search, star, filter by kind, grade, or what's
+  **due now**, and open one to practise. **Manage** grows and safeguards the library:
+  add your own MusicXML score (drag-and-drop, with a staff preview and editable
+  details), download a backup of your imports — or the **whole local library
+  including Plinky's built-in pieces** — and restore from a bundle. Each piece credits
   its **licence and source** — the catalogue is drawn from
   [PDMX](https://github.com/pnlong/PDMX) and the CC0
   [OpenScore Lieder](https://github.com/OpenScore/Lieder) corpus, the

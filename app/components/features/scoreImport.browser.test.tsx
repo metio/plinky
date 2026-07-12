@@ -4,15 +4,15 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { browserStore } from "../adapters/browserStore";
-import { loadBundledScores, loadUserScores } from "../lib/catalog";
-import { generatePhrase } from "../../core/generator";
-import LibraryImportRoute from "./libraryImport";
+import { browserStore } from "../../adapters/browserStore";
+import { generatePhrase } from "../../../core/generator";
+import { loadBundledScores, loadUserScores } from "../../lib/catalog";
+import { ScoreImport } from "./scoreImport";
 
 const mount = () =>
     render(
         <MemoryRouter>
-            <LibraryImportRoute />
+            <ScoreImport />
         </MemoryRouter>,
     );
 
@@ -26,7 +26,7 @@ afterEach(() => {
     localStorage.clear();
 });
 
-describe("LibraryImportRoute", () => {
+describe("ScoreImport", () => {
     it("previews a dropped MusicXML file, then imports it with edited fields", async () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount();

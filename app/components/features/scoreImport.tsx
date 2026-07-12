@@ -1,28 +1,21 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../contexts/services";
 import { useState } from "react";
-import { Button, buttonClasses } from "../components/ui/button";
-import { fieldClasses, linkClasses } from "../components/ui/classes";
-import { UploadIcon } from "../components/ui/icons";
-import { LocalizedLink as Link } from "../components/ui/localizedLink";
-import { GradeChip } from "../components/features/scoreGrade";
-import { StaffPreview } from "../components/features/staffPreview";
-import { loadCatalog, type Score, saveUserScore } from "../lib/catalog";
-import { readScoreMeta } from "../../core/scoreMeta";
-import { readScoreFile } from "../../core/musicxmlFile";
-
-import { gradeOf } from "../../core/scoreDifficulty";
-import { songId } from "../../core/songId";
-import { routeMeta } from "../../core/site";
-import { m } from "../paraglide/messages.js";
-import type { XmlCodec } from "../../core/xml";
-import type { Route } from "./+types/libraryImport";
-
-export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.import_heading(), m.meta_import_description());
-}
+import { readScoreFile } from "../../../core/musicxmlFile";
+import { gradeOf } from "../../../core/scoreDifficulty";
+import { readScoreMeta } from "../../../core/scoreMeta";
+import { songId } from "../../../core/songId";
+import type { XmlCodec } from "../../../core/xml";
+import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../../contexts/services";
+import { loadCatalog, type Score, saveUserScore } from "../../lib/catalog";
+import { m } from "../../paraglide/messages.js";
+import { Button, buttonClasses } from "../ui/button";
+import { fieldClasses } from "../ui/classes";
+import { UploadIcon } from "../ui/icons";
+import { LocalizedLink as Link } from "../ui/localizedLink";
+import { GradeChip } from "./scoreGrade";
+import { StaffPreview } from "./staffPreview";
 
 // Accept anything that parses as MusicXML with at least one pitched note; OSMD
 // renders whatever it can, so the bar for import is just "has notes".
@@ -44,7 +37,11 @@ type Draft = {
 
 const FIELD = `w-full ${fieldClasses}`;
 
-export default function LibraryImportRoute() {
+// Add your own score: drag-and-drop (or pick) a MusicXML file, preview it on a
+// staff with its editable metadata, and confirm it into the local library.
+// Self-contained over the injected services, so the import page and the
+// library's Manage tab render the identical flow.
+export function ScoreImport() {
     const store = useStore();
     const onboarding = useOnboardingStore();
     const xmlCodec = useXmlCodec();
@@ -136,19 +133,7 @@ export default function LibraryImportRoute() {
         setDraft((current) => current && { ...current, ...patch });
 
     return (
-        <main className="mx-auto max-w-2xl space-y-6 p-6 font-sans">
-            <header className="space-y-2">
-                <h1 className="text-2xl font-semibold">{m.import_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.import_intro()}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.import_local_note()}{" "}
-                    <Link to="/settings" className={linkClasses}>
-                        {m.import_backup_link()}
-                    </Link>
-                    .
-                </p>
-            </header>
-
+        <div className="space-y-6">
             {savedId && (
                 <div
                     role="status"
@@ -280,10 +265,6 @@ export default function LibraryImportRoute() {
                     </div>
                 </div>
             )}
-
-            <Link to="/library" className={`block text-sm ${linkClasses}`}>
-                {m.import_back_to_library()}
-            </Link>
-        </main>
+        </div>
     );
 }

@@ -142,6 +142,14 @@ export function exportAllPack(kv: KeyValueStore): string {
     return serializePack(loadUserScores(kv));
 }
 
+// Everything held locally — the user's imports plus Plinky's bundled pieces — as
+// one bundle, so the built-in songs can leave the device too. The deep song
+// catalogue fetches on demand and isn't stored here, so it isn't included; each
+// of those pieces exports individually from its play page.
+export function exportFullPack(kv: KeyValueStore): string {
+    return serializePack(loadCatalog(kv));
+}
+
 // Merge a bundle's scores into local storage, overwriting by id so a re-imported
 // score refreshes. Throws if the bundle is invalid or won't store.
 export function importScoresPack(

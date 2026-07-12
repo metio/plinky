@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
     buildScore,
     exportAllPack,
+    exportFullPack,
     importScoresPack,
     loadBundledScores,
     loadCatalog,
@@ -82,6 +83,26 @@ describe("user scores under denied storage", () => {
         expect(() => withDeniedStorage(() => importScoresPack(browserStore, codec, pack))).toThrow(
             /Could not save/,
         );
+    });
+});
+
+describe("library export packs", () => {
+    it("backs up only the user's imports in the plain pack", () => {
+        saveUserScore(kv, buildScore(codec, xml("Mine"), []));
+        const pack = JSON.parse(exportAllPack(kv));
+        expect(pack.scores.map((s: { title: string }) => s.title)).toEqual(["Mine"]);
+    });
+
+    it("includes the bundled pieces alongside imports in the full pack", () => {
+        saveUserScore(kv, buildScore(codec, xml("Mine"), []));
+        const pack = JSON.parse(exportFullPack(kv));
+        const titles = pack.scores.map((s: { title: string }) => s.title);
+        expect(titles).toContain("Mine");
+        for (const bundled of loadBundledScores()) {
+            expect(titles).toContain(bundled.title);
+        }
+        // Each exported score is self-contained: the MusicXML rides along.
+        expect(pack.scores.every((s: { xml?: string }) => typeof s.xml === "string")).toBe(true);
     });
 });
 

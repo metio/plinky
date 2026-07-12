@@ -12,7 +12,7 @@ afterEach(cleanup);
 describe("helpAnchorFor", () => {
     it("maps a page path (with locale prefix) to its help section key", () => {
         expect(helpAnchorFor("/en/play/abc123")).toBe("play");
-        expect(helpAnchorFor("/de/library/import")).toBe("library");
+        expect(helpAnchorFor("/de/library")).toBe("library");
         expect(helpAnchorFor("/en/you")).toBe("you");
         expect(helpAnchorFor("/fr")).toBe("home");
     });

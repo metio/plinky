@@ -14,7 +14,6 @@ export default [
         route("compose", "routes/compose.tsx"),
         route("daily", "routes/daily.tsx"),
         route("library", "routes/library.tsx"),
-        route("library/import", "routes/libraryImport.tsx"),
         route("assignments", "routes/assignments.tsx"),
         route("you", "routes/you.tsx"),
         route("review", "routes/review.tsx"),

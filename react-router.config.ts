@@ -13,7 +13,6 @@ const BASE_PATHS = [
     "/compose",
     "/daily",
     "/library",
-    "/library/import",
     "/assignments",
     "/you",
     "/review",

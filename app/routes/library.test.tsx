@@ -29,6 +29,44 @@ const mount = (store: ReturnType<typeof memoryStore>) =>
 
 afterEach(cleanup);
 
+describe("Library tabs", () => {
+    it("keeps the backup and import tools on the Manage tab, off the search list", async () => {
+        const store = memoryStore();
+        saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
+        mount(store);
+        expect(await screen.findByText("My Tune")).toBeTruthy();
+        // Search shows the list, not the management tools.
+        expect(screen.queryByText("Scores & backup")).toBeNull();
+        fireEvent.click(screen.getByRole("tab", { name: "Manage" }));
+        expect(screen.getByText("Scores & backup")).toBeTruthy();
+        expect(screen.getByText(/Drop a MusicXML file here/)).toBeTruthy();
+        // The searchable list is out of the way while managing.
+        expect(screen.queryByText("My Tune")).toBeNull();
+        fireEvent.click(screen.getByRole("tab", { name: "Search" }));
+        expect(await screen.findByText("My Tune")).toBeTruthy();
+    });
+
+    it("jumps to Manage from the can't-find banner", async () => {
+        mount(memoryStore());
+        fireEvent.click(await screen.findByRole("button", { name: /Add it yourself/ }));
+        expect(screen.getByText("Scores & backup")).toBeTruthy();
+    });
+
+    it("opens straight on Manage from a ?tab=manage deep link", async () => {
+        renderWithServices(
+            <MemoryRouter initialEntries={["/library?tab=manage"]}>
+                <Library />
+            </MemoryRouter>,
+            {
+                store: memoryStore(),
+                exercises: source<ExerciseSource>(),
+                songs: source<SongSource>(),
+            },
+        );
+        expect(await screen.findByText("Scores & backup")).toBeTruthy();
+    });
+});
+
 describe("Library delete guard", () => {
     it("names the assignments still referencing a score on its delete confirm", async () => {
         const store = memoryStore();

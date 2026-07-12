@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef, useState } from "react";
-import { exportAllPack, importScoresPack, loadUserScores } from "../../lib/catalog";
+import { exportAllPack, exportFullPack, importScoresPack, loadUserScores } from "../../lib/catalog";
 import { downloadBlob } from "../../lib/download";
 import { useStore, useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -31,6 +31,12 @@ export function ScoreBackup() {
 
     const download = () => {
         downloadBlob(exportAllPack(store), "application/json", "plinky-scores.json");
+    };
+
+    // The full local library, bundled pieces included — for taking Plinky's
+    // built-in songs along, not just restoring your own.
+    const downloadFull = () => {
+        downloadBlob(exportFullPack(store), "application/json", "plinky-library.json");
     };
 
     const importFile = async (file: File | undefined) => {
@@ -64,6 +70,9 @@ export function ScoreBackup() {
             <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" onClick={download} disabled={count === 0}>
                     {m.backup_download()}
+                </Button>
+                <Button variant="secondary" onClick={downloadFull}>
+                    {m.backup_download_full()}
                 </Button>
                 <Button variant="secondary" onClick={() => fileRef.current?.click()}>
                     {m.backup_import()}

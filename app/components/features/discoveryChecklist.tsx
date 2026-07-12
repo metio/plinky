@@ -57,7 +57,7 @@ const DISCOVERY: {
         to: `/play/${FIRST_SONG_ID}?mode=fingering`,
     },
     { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
-    { key: "imported", icon: "📥", label: m.discover_import, to: "/library/import" },
+    { key: "imported", icon: "📥", label: m.discover_import, to: "/library?tab=manage" },
 ];
 
 const DISCOVERY_DISMISSED = "discovery-panel";
