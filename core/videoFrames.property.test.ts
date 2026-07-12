@@ -53,10 +53,17 @@ describe("videoFrames properties", () => {
                 const duration = videoDurationMs(notes);
                 const times = frameTimesMs(duration, fps);
                 expect(times.length).toBeGreaterThan(0);
-                // Strictly increasing and inside the duration.
+                // Strictly increasing — checked in a plain loop and asserted once,
+                // so a high-fps run doesn't pay vitest's expect() overhead across
+                // thousands of frames (the source of a timeout flake under load).
+                let strictlyIncreasing = true;
                 for (let i = 1; i < times.length; i++) {
-                    expect(times[i]!).toBeGreaterThan(times[i - 1]!);
+                    if (times[i]! <= times[i - 1]!) {
+                        strictlyIncreasing = false;
+                        break;
+                    }
                 }
+                expect(strictlyIncreasing).toBe(true);
                 expect(times.at(-1)!).toBeLessThan(duration);
                 // One more frame would start at or past the end.
                 expect((times.length * 1000) / fps).toBeGreaterThanOrEqual(duration);
