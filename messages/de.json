@@ -162,7 +162,6 @@
   "action_finger_numbers": "Fingersatznummern",
   "action_scroll_follow": "Der Note folgen",
   "rotate_hint": "Drehe dein Handy quer für eine größere Tastatur.",
-  "action_back_home": "Zurück zur Startseite",
   "mode_label": "Übungsmodus",
   "mode_play": "Spielen",
   "action_listen": "▶ Anhören",
@@ -455,7 +454,6 @@
   "takes_saved": "Aufnahme gespeichert",
   "takes_save_failed": "Diese Aufnahme konnte nicht gespeichert werden – der Speicher dieses Geräts ist voll oder blockiert.",
   "takes_share_ghost": "Fordere mit dieser Aufnahme eine Freundin oder einen Freund heraus",
-  "takes_share_last_run": "Fordere mit deinem letzten Durchlauf eine Freundin oder einen Freund heraus",
   "takes_link_copied": "Link kopiert",
   "midi_unsupported_keyboard": "Dieser Browser bietet keine Web-MIDI-API. Verwende Chrome, Edge oder Firefox auf dem Desktop oder unter Android – oder spiele unten auf deiner Computertastatur.",
   "midi_connect": "MIDI verbinden",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klaviatur",
   "run_setup": "Durchlauf einrichten",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Erste Zählzeit jedes Takts betonen"
+  "metronome_accent": "Erste Zählzeit jedes Takts betonen",
+  "video_export": "Video",
+  "daily_title": "Tages-Challenge #{number}"
 }

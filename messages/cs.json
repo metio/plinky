@@ -162,7 +162,6 @@
   "action_finger_numbers": "Čísla prstokladu",
   "action_scroll_follow": "Sledovat notu",
   "rotate_hint": "Otočte telefon na šířku pro větší klaviaturu.",
-  "action_back_home": "Zpět na úvod",
   "mode_label": "Režim cvičení",
   "mode_play": "Hrát",
   "action_listen": "▶ Poslechnout",
@@ -455,7 +454,6 @@
   "takes_saved": "Pokus uložen",
   "takes_save_failed": "Tento pokus se nepodařilo uložit — úložiště zařízení je plné nebo blokované.",
   "takes_share_ghost": "Vyzvěte kamaráda tímto pokusem",
-  "takes_share_last_run": "Vyzvěte kamaráda svým posledním pokusem",
   "takes_link_copied": "Odkaz zkopírován",
   "midi_unsupported_keyboard": "Tento prohlížeč nepodporuje Web MIDI API. Použijte Chrome, Edge nebo Firefox na počítači nebo Androidu — nebo hrajte na klávesnici počítače níže.",
   "midi_connect": "Připojit MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klaviatura",
   "run_setup": "Nastavte si pokus",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Zdůraznit první dobu každého taktu"
+  "metronome_accent": "Zdůraznit první dobu každého taktu",
+  "video_export": "Video",
+  "daily_title": "Denní výzva #{number}"
 }

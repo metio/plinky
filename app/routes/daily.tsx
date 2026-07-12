@@ -3,9 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
-import { linkClasses } from "../components/ui/classes";
-import { CoachMark } from "../components/features/coachMark";
-import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
@@ -65,8 +62,11 @@ export default function DailyRoute() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">
-                    {today ? `🎹 Plinky #${today.number}` : "🎹 Plinky #…"}
+                    {today
+                        ? m.daily_title({ number: today.number })
+                        : m.daily_title({ number: "…" })}
                 </h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.daily_intro()}</p>
             </header>
 
             <SegmentedControl
@@ -80,24 +80,19 @@ export default function DailyRoute() {
             />
 
             {mode === "challenge" ? (
-                <>
-                    {/* A one-time explainer, dismissible — so returning daily players
-                        get the score right under the tabs instead of re-reading it. */}
-                    <CoachMark id="daily-intro">{m.daily_intro()}</CoachMark>
-                    {today && (
-                        <ScoreViewer
-                            key={today.number}
-                            id={`daily-${today.number}`}
-                            xml={today.xml}
-                            title={`Plinky #${today.number}`}
-                            daily={today.number}
-                            initialTempo={today.tempo}
-                            lockTempo
-                            ephemeral
-                            seededResult={today.result}
-                        />
-                    )}
-                </>
+                today && (
+                    <ScoreViewer
+                        key={today.number}
+                        id={`daily-${today.number}`}
+                        xml={today.xml}
+                        title={`Plinky #${today.number}`}
+                        daily={today.number}
+                        initialTempo={today.tempo}
+                        lockTempo
+                        ephemeral
+                        seededResult={today.result}
+                    />
+                )
             ) : (
                 <>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{m.sprint_intro()}</p>
@@ -125,10 +120,6 @@ export default function DailyRoute() {
                     )}
                 </>
             )}
-
-            <Link to="/" className={`text-sm ${linkClasses}`}>
-                {m.action_back_home()}
-            </Link>
         </main>
     );
 }

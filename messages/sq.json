@@ -162,7 +162,6 @@
   "action_finger_numbers": "Numrat e pozicioneve të gishtave",
   "action_scroll_follow": "Ndiq notën",
   "rotate_hint": "Ktheje telefonin anash për një tastierë më të madhe.",
-  "action_back_home": "Kthehu te fillimi",
   "mode_label": "Regjimi i praktikës",
   "mode_play": "Luaj",
   "action_listen": "▶ Dëgjo",
@@ -455,7 +454,6 @@
   "takes_saved": "Prova u ruajt",
   "takes_save_failed": "S'u ruajt dot kjo provë — hapësira e kësaj pajisjeje është plot ose e bllokuar.",
   "takes_share_ghost": "Sfido një shok me këtë provë",
-  "takes_share_last_run": "Sfido një shok me provën tënde të fundit",
   "takes_link_copied": "Lidhja u kopjua",
   "midi_unsupported_keyboard": "Ky shfletues nuk e ofron Web MIDI API. Përdor Chrome, Edge ose Firefox në desktop ose Android — ose luaj me tastierën e kompjuterit më poshtë.",
   "midi_connect": "Lidh MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Tastiera",
   "run_setup": "Përgatit ekzekutimin",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Thekso rrahjen e parë të çdo mase"
+  "metronome_accent": "Thekso rrahjen e parë të çdo mase",
+  "video_export": "Video",
+  "daily_title": "Sfida ditore #{number}"
 }

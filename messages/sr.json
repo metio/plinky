@@ -162,7 +162,6 @@
   "action_finger_numbers": "Бројеви положаја прстију",
   "action_scroll_follow": "Прати ноту",
   "rotate_hint": "Окрени телефон постранце за већу клавијатуру.",
-  "action_back_home": "Назад на почетну",
   "mode_label": "Режим вежбања",
   "mode_play": "Свирај",
   "action_listen": "▶ Преслушај",
@@ -455,7 +454,6 @@
   "takes_saved": "Покушај сачуван",
   "takes_save_failed": "Није могуће сачувати овај покушај — меморија уређаја је пуна или блокирана.",
   "takes_share_ghost": "Изазови пријатеља овим покушајем",
-  "takes_share_last_run": "Изазови пријатеља својим последњим покушајем",
   "takes_link_copied": "Веза копирана",
   "midi_unsupported_keyboard": "Овај прегледач не подржава Web MIDI API. Користите Chrome, Edge или Firefox на рачунару или Android-у — или свирајте тастатуром рачунара испод.",
   "midi_connect": "Повежи MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Клавијатура",
   "run_setup": "Подеси извођење",
   "settings_metronome": "Метроном",
-  "metronome_accent": "Нагласи прву добу сваког такта"
+  "metronome_accent": "Нагласи прву добу сваког такта",
+  "video_export": "Видео",
+  "daily_title": "Дневни изазов #{number}"
 }

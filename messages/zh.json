@@ -162,7 +162,6 @@
   "action_finger_numbers": "指位编号",
   "action_scroll_follow": "跟随音符",
   "rotate_hint": "把手机横过来，键盘更大。",
-  "action_back_home": "返回首页",
   "mode_label": "练习模式",
   "mode_play": "演奏",
   "action_listen": "▶ 试听",
@@ -455,7 +454,6 @@
   "takes_saved": "录音已保存",
   "takes_save_failed": "无法保存这段录音——此设备的存储已满或被禁用。",
   "takes_share_ghost": "用这段录音向好友发起挑战",
-  "takes_share_last_run": "用你上一轮向好友发起挑战",
   "takes_link_copied": "链接已复制",
   "midi_unsupported_keyboard": "此浏览器不支持 Web MIDI API。请在桌面端或 Android 上使用 Chrome、Edge 或 Firefox——或使用下方的电脑键盘演奏。",
   "midi_connect": "连接 MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "键盘",
   "run_setup": "设置本次演奏",
   "settings_metronome": "节拍器",
-  "metronome_accent": "强调每小节的第一拍"
+  "metronome_accent": "强调每小节的第一拍",
+  "video_export": "视频",
+  "daily_title": "每日挑战 #{number}"
 }

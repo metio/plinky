@@ -46,8 +46,6 @@ export function TakesPanel({
     credit,
     activeReplayId,
     playing,
-    lastRunOnsets,
-    canShareLastRun,
     original = null,
     onReplay,
     onStop,
@@ -65,12 +63,6 @@ export function TakesPanel({
     // True while anything (a replay or Listen) owns the synth and cursor, so the
     // other takes' replay buttons disable rather than fight over them.
     playing: boolean;
-    // The onsets of your most recent run, sharable as a ghost even before you save a
-    // take; null until you've played the piece through once this visit.
-    lastRunOnsets: number[] | null;
-    // Whether to offer that share — suppressed when the current ghost was loaded from a
-    // friend's link rather than being your own run.
-    canShareLastRun: boolean;
     // The piece's notation + practised hand, for the exported video's score.
     original?: OriginalScore | null;
     onReplay: (take: Take) => void;
@@ -81,17 +73,6 @@ export function TakesPanel({
     const stem = fileStem(title);
     return (
         <div className="space-y-3">
-            {lastRunOnsets && canShareLastRun && (
-                <div className="flex justify-start">
-                    <ShareGhostButton
-                        id={id}
-                        title={title}
-                        onsets={lastRunOnsets}
-                        label={m.takes_share_last_run()}
-                        showLabel
-                    />
-                </div>
-            )}
             {takes.length === 0 ? (
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.takes_empty_hint()}</p>
             ) : (

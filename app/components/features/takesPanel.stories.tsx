@@ -51,8 +51,6 @@ const meta: Meta<typeof TakesPanel> = {
         credit: "Menuet · J. S. Bach · CC0",
         activeReplayId: null,
         playing: false,
-        lastRunOnsets: null,
-        canShareLastRun: false,
         onReplay: () => {},
         onStop: () => {},
         onDelete: () => {},

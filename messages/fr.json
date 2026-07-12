@@ -162,7 +162,6 @@
   "action_finger_numbers": "Numéros de doigté",
   "action_scroll_follow": "Suivre la note",
   "rotate_hint": "Tournez votre téléphone à l'horizontale pour un clavier plus grand.",
-  "action_back_home": "Retour à l'accueil",
   "mode_label": "Mode d'entraînement",
   "mode_play": "Jouer",
   "action_listen": "▶ Écouter",
@@ -455,7 +454,6 @@
   "takes_saved": "Prise enregistrée",
   "takes_save_failed": "Impossible d'enregistrer cette prise — le stockage de cet appareil est plein ou bloqué.",
   "takes_share_ghost": "Défiez un ami avec cette prise",
-  "takes_share_last_run": "Défiez un ami avec votre dernière partie",
   "takes_link_copied": "Lien copié",
   "midi_unsupported_keyboard": "Ce navigateur n'expose pas l'API Web MIDI. Utilisez Chrome, Edge ou Firefox sur ordinateur ou Android, ou jouez avec le clavier de votre ordinateur ci-dessous.",
   "midi_connect": "Connecter le MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Clavier",
   "run_setup": "Préparez votre prise",
   "settings_metronome": "Métronome",
-  "metronome_accent": "Accentuer le premier temps de chaque mesure"
+  "metronome_accent": "Accentuer le premier temps de chaque mesure",
+  "video_export": "Vidéo",
+  "daily_title": "Défi du jour #{number}"
 }

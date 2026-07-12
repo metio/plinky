@@ -162,7 +162,6 @@
   "action_finger_numbers": "指番号",
   "action_scroll_follow": "音符を追う",
   "rotate_hint": "スマホを横向きにすると鍵盤が大きくなります。",
-  "action_back_home": "ホームに戻る",
   "mode_label": "練習モード",
   "mode_play": "演奏",
   "action_listen": "▶ 聴く",
@@ -455,7 +454,6 @@
   "takes_saved": "演奏を保存しました",
   "takes_save_failed": "この演奏を保存できませんでした — このデバイスのストレージが満杯かブロックされています。",
   "takes_share_ghost": "この演奏で友だちに挑戦",
-  "takes_share_last_run": "最後の演奏で友だちに挑戦",
   "takes_link_copied": "リンクをコピーしました",
   "midi_unsupported_keyboard": "このブラウザはWeb MIDI APIに対応していません。デスクトップまたはAndroidのChrome、Edge、Firefoxをご利用ください — または下のパソコンのキーボードで演奏できます。",
   "midi_connect": "MIDIを接続",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "鍵盤",
   "run_setup": "演奏のセットアップ",
   "settings_metronome": "メトロノーム",
-  "metronome_accent": "各小節の1拍目を強調する"
+  "metronome_accent": "各小節の1拍目を強調する",
+  "video_export": "動画",
+  "daily_title": "デイリー #{number}"
 }

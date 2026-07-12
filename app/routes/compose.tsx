@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button, buttonClasses } from "../components/ui/button";
 import { fieldClasses } from "../components/ui/classes";
-import { CoachMark } from "../components/features/coachMark";
 import { ConfirmButton } from "../components/ui/confirmButton";
 import { KeyboardHint } from "../components/ui/keyboardHint";
 import { MidiConnect } from "../components/features/midiConnect";
@@ -353,9 +352,9 @@ export default function Compose() {
                             : m.compose_recording_count({ count: notes.length })}
                     </span>
                 </div>
-                {/* The full how-to as a one-time dismissible note, so it doesn't push the
-                    staff down the page on every visit. */}
-                <CoachMark id="compose-intro">{m.compose_intro()}</CoachMark>
+                {/* The how-to sits statically under the title, the same shape every
+                    page's intro takes. */}
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.compose_intro()}</p>
             </header>
 
             {/* The recording controls lead — the primary action is the first thing in

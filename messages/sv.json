@@ -162,7 +162,6 @@
   "action_finger_numbers": "Fingersättningsnummer",
   "action_scroll_follow": "Följ tonen",
   "rotate_hint": "Vänd telefonen på sidan för ett större tangentbord.",
-  "action_back_home": "Tillbaka till start",
   "mode_label": "Övningsläge",
   "mode_play": "Spela",
   "action_listen": "▶ Lyssna",
@@ -455,7 +454,6 @@
   "takes_saved": "Tagning sparad",
   "takes_save_failed": "Kunde inte spara tagningen — enhetens lagring är full eller blockerad.",
   "takes_share_ghost": "Utmana en vän med den här tagningen",
-  "takes_share_last_run": "Utmana en vän med din senaste körning",
   "takes_link_copied": "Länk kopierad",
   "midi_unsupported_keyboard": "Den här webbläsaren stöder inte Web MIDI API. Använd Chrome, Edge eller Firefox på dator eller Android — eller spela med datorns tangentbord nedan.",
   "midi_connect": "Anslut MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klaviatur",
   "run_setup": "Gör i ordning ditt försök",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Betona första slaget i varje takt"
+  "metronome_accent": "Betona första slaget i varje takt",
+  "video_export": "Video",
+  "daily_title": "Dagens utmaning #{number}"
 }

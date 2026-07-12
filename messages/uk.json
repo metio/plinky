@@ -162,7 +162,6 @@
   "action_finger_numbers": "Номери аплікатури",
   "action_scroll_follow": "Слідувати за нотою",
   "rotate_hint": "Поверніть телефон горизонтально для більшої клавіатури.",
-  "action_back_home": "На головну",
   "mode_label": "Режим практики",
   "mode_play": "Гра",
   "action_listen": "▶ Слухати",
@@ -455,7 +454,6 @@
   "takes_saved": "Спробу збережено",
   "takes_save_failed": "Не вдалося зберегти спробу — сховище пристрою заповнене чи заблоковане.",
   "takes_share_ghost": "Кинути виклик другові цією спробою",
-  "takes_share_last_run": "Кинути виклик другові останнім проходженням",
   "takes_link_copied": "Посилання скопійовано",
   "midi_unsupported_keyboard": "Цей браузер не підтримує Web MIDI API. Використовуйте Chrome, Edge або Firefox на комп’ютері чи Android — або грайте на клавіатурі комп’ютера нижче.",
   "midi_connect": "Підключити MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Клавіатура",
   "run_setup": "Налаштуйте прогін",
   "settings_metronome": "Метроном",
-  "metronome_accent": "Акцентувати першу долю кожного такту"
+  "metronome_accent": "Акцентувати першу долю кожного такту",
+  "video_export": "Відео",
+  "daily_title": "Щоденний виклик #{number}"
 }

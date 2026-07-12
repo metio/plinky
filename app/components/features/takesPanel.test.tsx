@@ -39,8 +39,6 @@ const base = {
     credit: "Song · Composer · CC0",
     activeReplayId: null,
     playing: false,
-    lastRunOnsets: null,
-    canShareLastRun: false,
     onReplay: () => {},
     onStop: () => {},
     onDelete: () => {},
@@ -53,27 +51,6 @@ describe("TakesPanel", () => {
         // saved it tells you how to get a run rather than being an empty mystery.
         expect(screen.getByText(/play a piece through/i)).toBeTruthy();
         expect(screen.queryByRole("button", { name: /replay/i })).toBeNull();
-    });
-
-    it("offers to share your last run once you've played, even with no take saved", () => {
-        render(<TakesPanel {...base} takes={[]} lastRunOnsets={[0, 250, 500]} canShareLastRun />);
-        expect(
-            screen.getByRole("button", { name: /challenge a friend with your last run/i }),
-        ).toBeTruthy();
-    });
-
-    it("hides the last-run share when the ghost came from a friend's link", () => {
-        render(
-            <TakesPanel
-                {...base}
-                takes={[]}
-                lastRunOnsets={[0, 250, 500]}
-                canShareLastRun={false}
-            />,
-        );
-        expect(
-            screen.queryByRole("button", { name: /challenge a friend with your last run/i }),
-        ).toBeNull();
     });
 
     it("lists each saved take with a replay control", () => {

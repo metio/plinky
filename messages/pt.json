@@ -162,7 +162,6 @@
   "action_finger_numbers": "Números das posições dos dedos",
   "action_scroll_follow": "Seguir a nota",
   "rotate_hint": "Vire o celular de lado para um teclado maior.",
-  "action_back_home": "Voltar ao início",
   "mode_label": "Modo de prática",
   "mode_play": "Tocar",
   "action_listen": "▶ Ouvir",
@@ -455,7 +454,6 @@
   "takes_saved": "Gravação salva",
   "takes_save_failed": "Não foi possível salvar esta gravação — o armazenamento deste dispositivo está cheio ou bloqueado.",
   "takes_share_ghost": "Desafie um amigo com esta gravação",
-  "takes_share_last_run": "Desafie um amigo com sua última execução",
   "takes_link_copied": "Link copiado",
   "midi_unsupported_keyboard": "Este navegador não expõe a Web MIDI API. Use o Chrome, Edge ou Firefox no computador ou Android — ou toque com o teclado do computador abaixo.",
   "midi_connect": "Conectar MIDI",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Teclado",
   "run_setup": "Prepare a sua execução",
   "settings_metronome": "Metrônomo",
-  "metronome_accent": "Acentuar o primeiro tempo de cada compasso"
+  "metronome_accent": "Acentuar o primeiro tempo de cada compasso",
+  "video_export": "Vídeo",
+  "daily_title": "Desafio diário #{number}"
 }

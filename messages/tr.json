@@ -162,7 +162,6 @@
   "action_finger_numbers": "Parmak konumu numaraları",
   "action_scroll_follow": "Notayı takip et",
   "rotate_hint": "Daha büyük bir klavye için telefonunu yan çevir.",
-  "action_back_home": "Ana sayfaya dön",
   "mode_label": "Çalışma modu",
   "mode_play": "Çal",
   "action_listen": "▶ Dinle",
@@ -455,7 +454,6 @@
   "takes_saved": "Kayıt saklandı",
   "takes_save_failed": "Bu kayıt saklanamadı — bu cihazın depolaması dolu ya da engellenmiş.",
   "takes_share_ghost": "Bu kayıtla bir arkadaşına meydan oku",
-  "takes_share_last_run": "Son turunla bir arkadaşına meydan oku",
   "takes_link_copied": "Bağlantı kopyalandı",
   "midi_unsupported_keyboard": "Bu tarayıcı Web MIDI API'sini desteklemiyor. Masaüstünde veya Android'de Chrome, Edge ya da Firefox kullanın — ya da aşağıda bilgisayar klavyenizle çalın.",
   "midi_connect": "MIDI bağla",
@@ -585,5 +583,7 @@
   "video_show_keyboard": "Klavye",
   "run_setup": "Çalışını ayarla",
   "settings_metronome": "Metronom",
-  "metronome_accent": "Her ölçünün ilk vuruşunu vurgula"
+  "metronome_accent": "Her ölçünün ilk vuruşunu vurgula",
+  "video_export": "Video",
+  "daily_title": "Günlük #{number}"
 }

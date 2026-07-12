@@ -21,6 +21,7 @@ import {
 } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlaySession } from "./playSession";
+import { RunSetup } from "./runSetup";
 
 // The play controls: a rich full-screen top bar (Listen, Practice/Stop, progress, restart,
 // the fingering and follow toggles, settings, hide-keyboard, exit) and, inline before play
@@ -200,7 +201,12 @@ export function PlayTransport() {
             the rest of the transport live in the full-screen top bar (above), reachable
             once play begins, so the resting /play view stays uncluttered. */}
             <FullScreen off>
-                <div className="flex flex-wrap items-center gap-3">{practiceButton}</div>
+                {/* Run setup sits right beside Practice — the disclosure's button
+                joins the action row, its panel wraps to a full-width line below. */}
+                <div className="flex flex-wrap items-center gap-3">
+                    {practiceButton}
+                    <RunSetup />
+                </div>
             </FullScreen>
         </>
     );
