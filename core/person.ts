@@ -74,19 +74,19 @@ export function canonicalComposer(raw: string): string {
 
 // Attribution markers that name a tradition, not a human — they canonicalize
 // for display ("trad." reads as Traditional) but never become a person: no
-// link, no page.
-const NOT_A_PERSON = new Set(["Traditional", "Anonymous"]);
+// link, no page. Matched as words anywhere in the credit, so an enriched
+// attribution ("Traditional — …, 1761") stays a non-person too.
+const NOT_A_PERSON = /\b(trad|traditional|traditionnel|anonymous|anonymus|anon)\b/i;
 
 // The person's URL segment: the canonical name lowercased, diacritics stripped,
 // anything non-alphanumeric folded to single hyphens — stable, readable, and
 // safe in a path. Empty when the composer is unknown or is an attribution
 // marker rather than a person.
 export function personSlug(raw: string): string {
-    const canonical = canonicalComposer(raw);
-    if (NOT_A_PERSON.has(canonical)) {
+    if (NOT_A_PERSON.test(raw)) {
         return "";
     }
-    return canonical
+    return canonicalComposer(raw)
         .normalize("NFKD")
         .replace(/\p{M}/gu, "")
         .toLowerCase()

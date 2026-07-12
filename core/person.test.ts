@@ -66,9 +66,19 @@ describe("personSlug", () => {
     it("refuses to make a person out of an attribution marker", () => {
         // "Traditional" and "Anonymous" normalize for display but are not
         // people: no slug, so no link and no page.
-        for (const marker of ["Trad.", "Traditional", "traditionnel", "anonymus", "Anon."]) {
+        for (const marker of [
+            "Trad.",
+            "Traditional",
+            "traditionnel",
+            "anonymus",
+            "Anon.",
+            "Traditional — “Ah ! vous dirai-je, maman” (France, 1761)",
+            "Irish Traditional music",
+        ]) {
             expect(personSlug(marker)).toBe("");
         }
+        // A person whose name merely contains the letters stays a person.
+        expect(personSlug("Conrad Anonsen")).toBe("conrad-anonsen");
     });
 });
 

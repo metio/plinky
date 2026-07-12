@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
   <work><work-title>Twinkle, Twinkle, Little Star</work-title></work>
-  <identification><creator type="composer">Traditional</creator></identification>
+  <identification><creator type="composer">Traditional — “Ah ! vous dirai-je, maman” (France, 1761)</creator></identification>
   <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
   <part id="P1">
     <measure number="1">
