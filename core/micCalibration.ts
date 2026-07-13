@@ -42,6 +42,11 @@ const MAX_FLOOR = 0.2;
 // held clear of the soft one so the velocity map can't collapse.
 const MIN_LEVEL = 0.003;
 const MAX_LEVEL = 0.5;
+// The soft anchor is capped below the band's ceiling so the loud anchor — which
+// sits at 1.5× the soft level — always has room to clear it. Without the headroom a
+// saturating soft reading would clamp to MAX_LEVEL and the loud anchor, clamped to
+// the same ceiling, would collapse onto it, dividing the velocity map by a zero span.
+const MAX_SOFT_LEVEL = MAX_LEVEL / 1.5;
 
 export type CalibrationState = {
     step: CalibrationStep;
@@ -152,12 +157,15 @@ export function deriveCalibration(state: CalibrationState): MicCalibration {
 
     const softMedian = median(state.softHits);
     const loudMedian = median(state.loudHits);
-    const softLevel = softMedian === null ? SILENCE_RMS : clamp(softMedian, MIN_LEVEL, MAX_LEVEL);
-    // The loud anchor sits at least a hair above the soft one, so the velocity
-    // map never divides by a zero span.
+    const softLevel =
+        softMedian === null ? SILENCE_RMS : clamp(softMedian, MIN_LEVEL, MAX_SOFT_LEVEL);
+    // The loud anchor sits at least a hair above the soft one, so the velocity map
+    // never divides by a zero span. Because the soft level is capped at MAX_SOFT_LEVEL,
+    // 1.5× it stays under MAX_LEVEL and the clamp can't pull the loud anchor back down
+    // onto the soft one.
     const loudLevel =
         loudMedian === null
-            ? Math.max(0.35, softLevel * 2)
+            ? clamp(Math.max(0.35, softLevel * 2), MIN_LEVEL, MAX_LEVEL)
             : clamp(Math.max(loudMedian, softLevel * 1.5), MIN_LEVEL, MAX_LEVEL);
 
     return { noiseFloor, softLevel, loudLevel, octaveShift };
