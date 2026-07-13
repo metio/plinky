@@ -589,6 +589,27 @@ describe("ScoreViewer", () => {
         expect(screen.getAllByRole("button", { name: /replay/i }).length).toBeGreaterThan(0);
     });
 
+    it("holds the take-save until the final note is released, so its hold isn't clipped", async () => {
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        mount(phrase, { beatsPerBar: 4 });
+        fireEvent.click(await awaitReady());
+        const key = await screen.findByLabelText("C5");
+        // Clear the first three positions cleanly.
+        for (let i = 0; i < 3; i++) {
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+        }
+        // Press the final note and keep it held: the run has completed, but the take is not
+        // saved yet — saving now would record the last note clipped to the completion beat.
+        fireEvent.pointerDown(key);
+        expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
+        expect(screen.queryByText("Run saved")).toBeNull();
+        // Releasing it saves the take, its hold recorded through to the real key-up.
+        fireEvent.pointerUp(key);
+        expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
+    });
+
     it("enters full screen to play even on a large screen, where Listen lives", async () => {
         // Force a roomy desktop viewport (no media query matches), the case that used to
         // stay inline. The play surface holds Listen and the in-play toggles, so a large
