@@ -8,6 +8,12 @@ import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
 // asserts on what would have sounded — no Web Audio globals to stub.
 export type FakeAudioEngine = AudioEngine & {
     strikes: NoteStrike[];
+    // Live-voice events, in order, so a test can assert what was pressed, released and how
+    // the pedal moved — the articulation the live play path drives.
+    voices: Array<
+        { kind: "press"; note: number; gain: number } | { kind: "release"; note: number }
+    >;
+    pedals: boolean[];
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
     resumed: number;
     unlocked: number;
@@ -18,6 +24,8 @@ export type FakeAudioEngine = AudioEngine & {
 export function fakeAudioEngine(): FakeAudioEngine {
     const engine: FakeAudioEngine = {
         strikes: [],
+        voices: [],
+        pedals: [],
         clicks: [],
         resumed: 0,
         unlocked: 0,
@@ -33,6 +41,15 @@ export function fakeAudioEngine(): FakeAudioEngine {
         },
         strike(strike) {
             engine.strikes.push(strike);
+        },
+        press(note, gain) {
+            engine.voices.push({ kind: "press", note, gain });
+        },
+        release(note) {
+            engine.voices.push({ kind: "release", note });
+        },
+        setPedal(down) {
+            engine.pedals.push(down);
         },
         click(time, kind, gain) {
             engine.clicks.push({ time, kind, gain });

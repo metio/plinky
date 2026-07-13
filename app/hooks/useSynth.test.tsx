@@ -22,7 +22,7 @@ function harness(prefsPatch: Partial<Prefs> = {}) {
         <ServicesProvider services={{ prefs, audio }}>{children}</ServicesProvider>
     );
     const { result } = renderHook(() => useSynth(), { wrapper });
-    return { audio, playNote: result.current.playNote };
+    return { audio, synth: result.current, playNote: result.current.playNote };
 }
 
 describe("useSynth", () => {
@@ -63,5 +63,28 @@ describe("useSynth", () => {
         playNote(60, { delay: -1 });
         expect(audio.strikes[0]?.delay).toBe(0.25);
         expect(audio.strikes[1]?.delay).toBe(0);
+    });
+
+    it("presses and releases a live voice, scaling the press gain with velocity", () => {
+        const { audio, synth } = harness({ volume: 50 });
+        synth.pressNote(60, { velocity: 127 });
+        synth.releaseNote(60);
+        expect(audio.voices).toEqual([
+            { kind: "press", note: 60, gain: 0.32 * 0.5 },
+            { kind: "release", note: 60 },
+        ]);
+        expect(audio.resumed).toBe(1);
+    });
+
+    it("opens no voice when muted, but still ends and pedals", () => {
+        // A muted press must not reach the engine's ramps; release and pedal always do —
+        // they are no-ops on a voice that never opened, and the pedal state must track.
+        const { audio, synth } = harness({ sound: false });
+        synth.pressNote(60);
+        expect(audio.voices.filter((v) => v.kind === "press")).toHaveLength(0);
+        synth.releaseNote(60);
+        synth.setPedal(true);
+        expect(audio.voices).toContainEqual({ kind: "release", note: 60 });
+        expect(audio.pedals).toEqual([true]);
     });
 });

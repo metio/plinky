@@ -48,6 +48,9 @@ declare global {
         __plinky?: {
             play: (note: number, velocity?: number) => void;
             release: (note: number) => void;
+            // Move the sustain pedal, as a real device's CC64 would — so a test can drive
+            // pedal-held sustain without crafting control-change bytes.
+            pedal: (down: boolean) => void;
             // Raw MIDI bytes through the same parse-and-emit pipeline a real
             // device feeds, so a browser test exercises the full path.
             midiBytes: (data: number[], timestamp?: number) => void;
@@ -215,6 +218,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             play: (note, velocity = 80) =>
                 emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
+            pedal: (down) => emitPedal(down, performance.now()),
             midiBytes: (data, timestamp = performance.now()) =>
                 makeHandler("Test bridge")(new Uint8Array(data), timestamp),
             midiState: () => ({
@@ -230,7 +234,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         return () => {
             window.__plinky = undefined;
         };
-    }, [emitNote, store, makeHandler]);
+    }, [emitNote, emitPedal, store, makeHandler]);
 
     // Microphone pitch events join the funnel carrying a loudness-derived
     // velocity, falling back to the keyboard's fixed one for an event without.

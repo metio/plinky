@@ -44,6 +44,9 @@ describe("Home", () => {
             resume: () => {},
             unlock: () => {},
             strike,
+            press: () => {},
+            release: () => {},
+            setPedal: () => {},
             click: () => {},
         };
         renderWithServices(

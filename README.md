@@ -25,8 +25,11 @@ Open any score and Plinky renders it as real notation, led by a single action:
 **Practice**. Pressing it drops into **full screen** — the score and keyboard to
 themselves, the screen kept awake (and on a phone the browser's URL bar reclaimed for
 the music) — and starts a note-by-note guide: read the note, play it, and the cursor
-advances, sounding back what you played. Full screen is where the rest of the play
-controls live, so it's the same generous surface on a phone or a wide desktop alike.
+advances, sounding it back the way you played it — a quick tap sounds **staccato**, a held
+key **sustains**, and how hard you strike sets how loud it sings. That works on a MIDI
+piano, the on-screen keys, or your computer keyboard, no pedal required. Full screen is
+where the rest of the play controls live, so it's the same generous surface on a phone or
+a wide desktop alike.
 There you'll also find **Listen**, which plays the piece back so you hear it first,
 lighting up each note as it sounds so your eye can follow along. Listen plays it the way
 it's written — **staccato** notes clipped short, **slurs** flowing legato, **accents**

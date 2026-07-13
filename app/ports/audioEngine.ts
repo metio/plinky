@@ -32,6 +32,17 @@ export interface AudioEngine {
     // pointer/key gesture, before any note has been struck. Best-effort.
     unlock(): void;
     strike(strike: NoteStrike): void;
+    // Start a sustaining live voice for a held key. Unlike strike (a fixed-length note for
+    // Listen and replay), a pressed voice rings until release() or the sustain pedal lifts,
+    // so the sound follows the player's own key hold — a quick release sounds staccato, a
+    // long hold sustains. Re-pressing a still-sounding note restarts it. `gain` is the final
+    // loudness (0..1), velocity and volume already applied.
+    press(note: number, gain: number): void;
+    // End a sustaining voice, ringing it out over a tail scaled to how long it was held —
+    // unless the sustain pedal is down, when it keeps ringing until the pedal lifts.
+    release(note: number): void;
+    // The sustain pedal for live voices: down holds released voices ringing, up drops them.
+    setPedal(down: boolean): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;
     // Whether the engine synthesized this pitch recently enough that a

@@ -68,6 +68,9 @@ describe("MicConnect", () => {
             resume: () => {},
             unlock: () => {},
             strike: () => {},
+            press: () => {},
+            release: () => {},
+            setPedal: () => {},
             click: () => {},
             recentlyStruck: (note: number) => note === 60,
         };

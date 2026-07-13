@@ -232,6 +232,77 @@ export function renderStrike(
     }
 }
 
+// Live sustaining voices, keyed by MIDI note — one per note at a time; re-pressing a held
+// note replaces it. A pressed voice holds its shelf until release rather than scheduling
+// its own end, so the sound follows the player's own key hold; the release tail is scaled
+// to how long it was actually held (ringTail), so a quick release sounds staccato and a
+// long hold rings on. These live on the shared context; the offline export uses renderStrike.
+type Voice = {
+    envelope: GainNode;
+    oscillators: OscillatorNode[];
+    frequency: number;
+    startedAt: number; // ctx.currentTime at press, for the held-scaled tail
+};
+const voices = new Map<number, Voice>();
+let pedalDown = false;
+// Notes whose key has lifted but which keep ringing because the sustain pedal is down.
+const pedalSustained = new Set<number>();
+
+// A held voice: the same partials, attack and darkening filter as a struck note, but with
+// no release scheduled — the shelf holds until fadeVoice rings it out.
+function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
+    const now = ctx.currentTime;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), now + 0.6);
+    filter.connect(master(ctx));
+
+    const envelope = ctx.createGain();
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.exponentialRampToValueAtTime(gain, now + 0.012);
+    envelope.gain.exponentialRampToValueAtTime(gain * 0.5, now + 0.18);
+    envelope.connect(filter);
+
+    const oscillators = PARTIALS.map((partial) => {
+        const oscillator = ctx.createOscillator();
+        oscillator.type = partial.type;
+        oscillator.frequency.value = frequency * partial.ratio;
+        oscillator.detune.value = (partial.ratio - 1) * 2;
+        const partialGain = ctx.createGain();
+        partialGain.gain.value = partial.gain;
+        oscillator.connect(partialGain);
+        partialGain.connect(envelope);
+        oscillator.start(now);
+        return oscillator;
+    });
+    return { envelope, oscillators, frequency, startedAt: now };
+}
+
+// Ring a voice out over `tail` seconds from wherever its envelope stands, then stop its
+// oscillators just after — a quick fade when a re-press replaces it, the held-scaled tail
+// on a real release.
+function fadeVoice(ctx: AudioContext, voice: Voice, tail: number): void {
+    const now = ctx.currentTime;
+    const gain = voice.envelope.gain;
+    gain.cancelScheduledValues(now);
+    gain.setValueAtTime(Math.max(0.0001, gain.value), now);
+    gain.exponentialRampToValueAtTime(0.0001, now + tail);
+    for (const oscillator of voice.oscillators) {
+        oscillator.stop(now + tail + 0.03);
+    }
+}
+
+// Release a note's voice, ringing it out over a tail scaled to how long it was held.
+function endVoice(ctx: AudioContext, note: number): void {
+    const voice = voices.get(note);
+    if (!voice) {
+        return;
+    }
+    fadeVoice(ctx, voice, ringTail(voice.frequency, ctx.currentTime - voice.startedAt));
+    voices.delete(note);
+}
+
 function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): void {
     const osc = ctx.createOscillator();
     const envelope = ctx.createGain();
@@ -281,6 +352,48 @@ export const webAudioEngine: AudioEngine = {
                 performance.now() + (Math.max(0, note.delay) + note.duration) * 1000,
             );
         }
+    },
+    press(note, gain) {
+        const ctx = context();
+        if (!ctx || gain <= 0) {
+            return;
+        }
+        const existing = voices.get(note);
+        if (existing) {
+            // A re-press of a still-sounding note: fade the old voice fast so the new
+            // strike lands cleanly rather than summing with a ghost of the last.
+            fadeVoice(ctx, existing, 0.03);
+        }
+        pedalSustained.delete(note);
+        voices.set(note, buildVoice(ctx, midiToFrequency(note), gain));
+        // The voice rings for at least ~1.5s; enough of a window for the mic echo probe,
+        // which mic input skips anyway (a mic player hears their own piano, not this).
+        struckUntil.set(note, performance.now() + 1500);
+    },
+    release(note) {
+        const ctx = context();
+        if (!ctx) {
+            return;
+        }
+        // Under the pedal the key lifting doesn't end the note — hold it until the pedal
+        // does. Otherwise ring it out over its held-scaled tail.
+        if (pedalDown && voices.has(note)) {
+            pedalSustained.add(note);
+            return;
+        }
+        endVoice(ctx, note);
+    },
+    setPedal(down) {
+        pedalDown = down;
+        const ctx = context();
+        if (down || !ctx) {
+            return;
+        }
+        // Pedal up: every voice that was only still sounding because of the pedal now ends.
+        for (const note of pedalSustained) {
+            endVoice(ctx, note);
+        }
+        pedalSustained.clear();
     },
     click(time, kind, gain) {
         const ctx = context();

@@ -20,6 +20,20 @@ describe("webAudioEngine", () => {
         }).not.toThrow();
     });
 
+    it("presses, releases and pedals live voices without throwing", () => {
+        expect(() => {
+            webAudioEngine.resume();
+            // Press, re-press (replaces), release under the pedal (held), then lift it.
+            webAudioEngine.press(64, 0.2);
+            webAudioEngine.press(64, 0.2);
+            webAudioEngine.setPedal(true);
+            webAudioEngine.release(64); // held by the pedal, not ended
+            webAudioEngine.setPedal(false); // now ended
+            // A release for a note that never pressed is a harmless no-op.
+            webAudioEngine.release(99);
+        }).not.toThrow();
+    });
+
     it("unlocks — resumes and primes a silent buffer — without throwing", () => {
         expect(() => {
             webAudioEngine.unlock();

@@ -18,7 +18,7 @@ import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
-import { isPreciseInput } from "../../../core/midi";
+import { isPreciseInput, MIC_DEVICE } from "../../../core/midi";
 import {
     captureCleared,
     capturePedal,
@@ -67,11 +67,6 @@ import { useTranspose } from "./transposeContext";
 
 // The one-time hint nudging a touch phone sideways for a wider keyboard.
 const ROTATE_HINT_ID = "rotate";
-
-// How long a correct-note echo rings when the sustain pedal is down. The echo is
-// fire-and-forget, so it can't be released on the pedal lift; a long ring under the
-// release tail is a faithful-enough stand-in for a held damper on the guide tone.
-const PEDAL_ECHO_SECONDS = 4;
 
 // Everything a piece needs to be played: the OSMD render surface, the transports (Listen,
 // self-paced Practice, tempo-locked keep-up), the ghost race, the loop, the tempo and
@@ -135,10 +130,6 @@ function usePlaySessionValue({
     // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
     // callback and the MIDI release handler both advance it between renders.
     const captureRef = useRef<RunCapture>(startCapture());
-    // Whether the sustain pedal is down, read when a correct note echoes so its guide
-    // tone rings on under the pedal the way a real piano would. The capture holds its
-    // own pedal state for the recording; this ref only shapes the live echo.
-    const pedalDownRef = useRef(false);
     const synth = useSynth();
     const scheduler = useScheduler();
     // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
@@ -394,13 +385,12 @@ function usePlaySessionValue({
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
             if (!micListening) {
+                // Press a live voice per cleared pitch — it rings until the key lifts (or
+                // the pedal does), so the guide tone follows the player's own articulation:
+                // a quick release sounds staccato, a long hold sustains, and it strikes as
+                // hard as the note was played.
                 for (const pitch of info.pitches) {
-                    // With the sustain pedal down, ring the guide tone on well past its
-                    // usual length so the echo sustains under the pedal like a real piano.
-                    synth.playNote(
-                        pitch,
-                        pedalDownRef.current ? { duration: PEDAL_ECHO_SECONDS } : undefined,
-                    );
+                    synth.pressNote(pitch, { velocity: info.velocity });
                 }
             }
             // A hidden note earned its reveal — lift the blank before the green
@@ -441,21 +431,23 @@ function usePlaySessionValue({
             }
             matcher.registerNote(event.note, event.timestamp, event.velocity);
         },
-        // A released key fills in the run note's real hold length. Only a precise device
-        // (a MIDI piano) reports a meaningful hold; on-screen and computer-keyboard input
-        // are left to the smoother onset-gap length so a quick tap doesn't read as staccato.
+        // A released key ends its live voice and fills in the run note's real hold length,
+        // so the sound and the recording both follow how long you actually held — a quick
+        // tap plays and records staccato, a long hold sustains. The microphone is left out:
+        // its note-off is the pitch detector's own timing, too noisy to read as
+        // articulation, and it opened no voice to end.
         onNoteOff: (event) => {
-            if (!isPreciseInput(event.device)) {
+            if (event.device === MIC_DEVICE) {
                 return;
             }
+            synth.releaseNote(event.note);
             captureRelease(captureRef.current, event.note, event.timestamp);
         },
-        // The sustain pedal holds released notes ringing in the recording (the damper
-        // model) so a pedalled take replays as played, and rings the live echo on while
-        // it's down. It never touches the matcher — the key press alone still decides
-        // when a note counts as played.
+        // The sustain pedal holds released voices ringing (in the sound and in the
+        // recording's damper model) so a pedalled take plays and replays as pedalled. It
+        // never touches the matcher — the key press alone still decides when a note counts.
         onPedal: (down, timestamp) => {
-            pedalDownRef.current = down;
+            synth.setPedal(down);
             capturePedal(captureRef.current, down, timestamp);
         },
     });
