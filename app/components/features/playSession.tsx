@@ -12,7 +12,9 @@ import {
     useState,
     useSyncExternalStore,
 } from "react";
+import { beamsVisible } from "../../../core/beams";
 import { cadence } from "../../../core/cadence";
+import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
@@ -183,6 +185,10 @@ function usePlaySessionValue({
     // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
     const reading = useReadingMode();
     const { barsPerRow, barNumbers, treadmill, showFingerings, scrollFollow } = reading;
+    // The piece's 1–8 difficulty grade, so "auto" beam mode can hide beam groups on the
+    // easy grades a beginner reads note-by-note. gradeOf is memoised by the content id, so
+    // this is a map lookup after the first render.
+    const grade = useMemo(() => gradeOf(xmlCodec, id, xml), [xmlCodec, id, xml]);
     // A phone-sized viewport — narrow (portrait) OR short (landscape, where the width
     // alone would read as desktop). Drives the focus strip and a shorter staff box so the
     // keyboard never buries the notes, in either orientation.
@@ -260,6 +266,7 @@ function usePlaySessionValue({
         barsPerRow,
         barNumbers,
         treadmill,
+        showBeams: beamsVisible(reading.beams, grade),
         showFingerings,
         scrollFollow,
         onReload: () => {

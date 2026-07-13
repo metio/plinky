@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type Dispatch, type SetStateAction, useState } from "react";
+import type { Beams } from "../../core/beams";
 import { usePrefsStore } from "../contexts/services";
 import { usePref } from "./usePref";
 
@@ -21,6 +22,11 @@ export type ReadingMode = {
     // per device.
     treadmill: boolean;
     setTreadmill: (value: boolean) => void;
+    // Whether fast notes are joined into beam groups: "auto" follows the piece's grade,
+    // "on"/"off" force it. Remembered per device; the effective visibility is decided
+    // per piece by beamsVisible.
+    beams: Beams;
+    setBeams: (value: Beams) => void;
     // Print the suggested fingering numbers on the staff. Seeded from the saved default,
     // flipped live in-play; the setter takes a functional update for the toggle button.
     showFingerings: boolean;
@@ -36,6 +42,7 @@ export function useReadingMode(): ReadingMode {
     const [barsPerRow, setBarsPerRow] = usePref(prefs, "barsPerRow");
     const [barNumbers, setBarNumbers] = usePref(prefs, "barNumbers");
     const [treadmill, setTreadmill] = usePref(prefs, "treadmill");
+    const [beams, setBeams] = usePref(prefs, "beams");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
     // OSMD draws them, so it stays session state rather than a persisted preference.
     const [showFingerings, setShowFingerings] = useState(() => prefs.load().showFingerings);
@@ -48,6 +55,8 @@ export function useReadingMode(): ReadingMode {
         setBarNumbers,
         treadmill,
         setTreadmill,
+        beams,
+        setBeams,
         showFingerings,
         setShowFingerings,
         scrollFollow,

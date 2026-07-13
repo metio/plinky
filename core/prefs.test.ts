@@ -11,6 +11,7 @@ const BASE: Prefs = {
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
     showFingerings: false,
+    beams: "auto",
     noteHints: "miss",
     noteLabels: "c",
     forgiving: false,
@@ -105,6 +106,12 @@ describe("parsePrefs", () => {
         expect(parsePrefs(null).noteLabels).toBe("c");
         expect(parsePrefs(stored({ noteLabels: "all" })).noteLabels).toBe("all");
         expect(parsePrefs(JSON.stringify({ noteLabels: "bogus" })).noteLabels).toBe("c");
+    });
+
+    it("defaults beams to auto and rejects an unknown value", () => {
+        expect(parsePrefs(null).beams).toBe("auto");
+        expect(parsePrefs(stored({ beams: "off" })).beams).toBe("off");
+        expect(parsePrefs(JSON.stringify({ beams: "bogus" })).beams).toBe("auto");
     });
 
     it("defaults the key map and keeps a customised one", () => {

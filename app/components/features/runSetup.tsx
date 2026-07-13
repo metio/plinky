@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Dispatch, SetStateAction } from "react";
+import { type Beams, BEAMS } from "../../../core/beams";
 import type { Hand } from "../../../core/matcher";
 import { BARS_PER_ROW, REVEAL_TRIES } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
@@ -17,6 +18,12 @@ const handLabel: Record<Hand, string> = {
     both: m.hand_both(),
     right: m.hand_right(),
     left: m.hand_left(),
+};
+
+const beamsLabel: Record<Beams, string> = {
+    auto: m.beams_auto(),
+    on: m.beams_on(),
+    off: m.beams_off(),
 };
 
 // The run-setup panel on the resting page: the settings that shape the run you
@@ -157,6 +164,13 @@ export function RunSetup() {
                     help={m.bars_per_row_caption()}
                 />
             )}
+            <ChoiceField
+                label={m.beams_label()}
+                value={reading.beams}
+                onChange={(id) => reading.setBeams(id as Beams)}
+                options={BEAMS.map((option) => ({ id: option, label: beamsLabel[option] }))}
+                help={m.beams_caption()}
+            />
             {!lockTempo && trainerOn && (
                 <div className="space-y-1">
                     <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">

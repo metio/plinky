@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { stripBeams } from "../../core/beams";
 import type { MeasureBox } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
 import { usePrefsStore, useXmlCodec } from "../contexts/services";
@@ -56,6 +57,7 @@ export function useOsmdScore(
         barsPerRow,
         barNumbers,
         treadmill,
+        showBeams,
         showFingerings,
         scrollFollow,
         onReload,
@@ -73,6 +75,10 @@ export function useOsmdScore(
         barNumbers: boolean;
         // One continuous horizontal staffline that scrolls, rather than wrapping to rows.
         treadmill: boolean;
+        // Whether fast notes are joined into beam groups; when false the score's <beam>
+        // elements are stripped before OSMD loads it, so short notes render with flags.
+        // The effective value is decided per piece by beamsVisible before it reaches here.
+        showBeams: boolean;
         // Whether the printed fingering is drawn — flipped in place without a reload.
         showFingerings: boolean;
         // Whether the staff scrolls to keep the played note in view.
@@ -195,12 +201,16 @@ export function useOsmdScore(
                 // per the rule above — so the toggle can redraw rather than reload.
                 const transposed =
                     transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose);
-                const source = annotateFingerings(
+                const annotated = annotateFingerings(
                     xmlCodec,
                     transposed,
                     prefsStore.load().handSpan,
                     showMine ? saved : undefined,
                 );
+                // Drop the beams last, so short notes render with flags instead of
+                // beat groups — an easier read for a beginner. Notes and durations are
+                // untouched, so playback, timing and matching are unaffected.
+                const source = showBeams ? annotated : stripBeams(xmlCodec, annotated);
                 return osmd.load(source).then(() => {
                     if (cancelled) {
                         return;
@@ -245,7 +255,7 @@ export function useOsmdScore(
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill]);
+    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill, showBeams]);
 
     // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
     // and any run in progress survive — the player can switch fingering on and off mid-play.
