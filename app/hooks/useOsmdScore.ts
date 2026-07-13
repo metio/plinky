@@ -55,6 +55,7 @@ export function useOsmdScore(
         showMine,
         saved,
         barsPerRow,
+        noteScale,
         barNumbers,
         treadmill,
         showBeams,
@@ -72,6 +73,8 @@ export function useOsmdScore(
         saved: FingerMap;
         // Bars forced onto each staff row (0 = fit to width).
         barsPerRow: number;
+        // Magnification applied to the whole rendered score (1 = normal), via OSMD's Zoom.
+        noteScale: number;
         barNumbers: boolean;
         // One continuous horizontal staffline that scrolls, rather than wrapping to rows.
         treadmill: boolean;
@@ -194,6 +197,10 @@ export function useOsmdScore(
                 // without a reload — see the fingering-toggle effect. Set from a ref so a
                 // reload driven by another input still honours the live toggle.
                 rules.RenderFingerings = showFingeringsRef.current;
+                // Magnify the whole score for a player who needs bigger glyphs; applied
+                // before render and re-applied on every reload, and it scales the notation
+                // in treadmill mode too, where bars-per-row has no effect.
+                osmd.Zoom = noteScale;
                 // Suggested fingering belongs on the staff, personalised to the player's
                 // reach, so the suggestion sits on the note being read, not mapped onto a
                 // key. Transpose first, then annotate, so the printed fingering is computed
@@ -255,7 +262,7 @@ export function useOsmdScore(
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [xml, transpose, showMine, saved, barsPerRow, barNumbers, treadmill, showBeams]);
+    }, [xml, transpose, showMine, saved, barsPerRow, noteScale, barNumbers, treadmill, showBeams]);
 
     // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
     // and any run in progress survive — the player can switch fingering on and off mid-play.

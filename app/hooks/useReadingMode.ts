@@ -15,6 +15,9 @@ export type ReadingMode = {
     // Bars forced onto each staff row (0 = fit to width), remembered per device.
     barsPerRow: number;
     setBarsPerRow: (value: number) => void;
+    // The score's magnification (1 = normal), remembered per device.
+    noteScale: number;
+    setNoteScale: (value: number) => void;
     // Number the first bar of each staff row, remembered per device.
     barNumbers: boolean;
     setBarNumbers: (value: boolean) => void;
@@ -40,6 +43,7 @@ export type ReadingMode = {
 export function useReadingMode(): ReadingMode {
     const prefs = usePrefsStore();
     const [barsPerRow, setBarsPerRow] = usePref(prefs, "barsPerRow");
+    const [noteScale, setNoteScale] = usePref(prefs, "noteScale");
     const [barNumbers, setBarNumbers] = usePref(prefs, "barNumbers");
     const [treadmill, setTreadmill] = usePref(prefs, "treadmill");
     const [beams, setBeams] = usePref(prefs, "beams");
@@ -51,6 +55,8 @@ export function useReadingMode(): ReadingMode {
     return {
         barsPerRow,
         setBarsPerRow,
+        noteScale,
+        setNoteScale,
         barNumbers,
         setBarNumbers,
         treadmill,

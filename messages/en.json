@@ -202,6 +202,8 @@
   "beams_on": "Show",
   "beams_off": "Hide",
   "beams_caption": "Beams join fast notes into beat groups. Hide them to read one note at a time while learning; Auto shows them on harder pieces where the beat grouping helps.",
+  "note_size_label": "Note size",
+  "note_size_caption": "Magnify the whole score for bigger, easier-to-read notes — handy on a small screen or when you're starting out.",
   "transpose": "Transpose",
   "transpose_down": "Transpose down a semitone",
   "transpose_up": "Transpose up a semitone",

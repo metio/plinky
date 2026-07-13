@@ -183,6 +183,8 @@
   "beams_on": "Vis",
   "beams_off": "Skjul",
   "beams_caption": "Bjelker knytter raske noter sammen i taktslagsgrupper. Skjul dem for å lese én note om gangen mens du lærer; Auto viser dem i vanskeligere stykker der grupperingen hjelper.",
+  "note_size_label": "Notestørrelse",
+  "note_size_caption": "Forstørr hele partituret for større og lettere lesbare noter – nyttig på en liten skjerm eller når du akkurat har begynt.",
   "transpose": "Transponer",
   "transpose_down": "Transponer ned en halvtone",
   "transpose_up": "Transponer opp en halvtone",

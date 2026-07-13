@@ -50,7 +50,9 @@ numbers** on each row's first bar make a passage easy to find (and line up with 
 loop's from/to), or you can turn them off for a cleaner staff. **Beams** — the bars
 that join fast notes into beat groups — can be hidden so a beginner reads one note at a
 time, shown, or left on **Auto**, which draws them on harder pieces where the beat
-grouping helps and drops them on the easy grades. A
+grouping helps and drops them on the easy grades. A **note-size** control magnifies the
+whole score — bigger, easier-to-read glyphs on a small screen or for a beginner, and it
+works in treadmill mode too. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
 Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on

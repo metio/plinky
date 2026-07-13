@@ -264,6 +264,7 @@ function usePlaySessionValue({
         showMine,
         saved,
         barsPerRow,
+        noteScale: reading.noteScale,
         barNumbers,
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),

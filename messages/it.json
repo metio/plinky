@@ -183,6 +183,8 @@
   "beams_on": "Mostra",
   "beams_off": "Nascondi",
   "beams_caption": "Le travature uniscono le note veloci in gruppi ritmici. Nascondile per leggere una nota alla volta mentre impari; Auto le mostra nei brani più difficili dove il raggruppamento ritmico aiuta.",
+  "note_size_label": "Dimensione delle note",
+  "note_size_caption": "Ingrandisci l'intera partitura per note più grandi e più facili da leggere — comodo su uno schermo piccolo o quando sei alle prime armi.",
   "transpose": "Trasporta",
   "transpose_down": "Trasporta giù di un semitono",
   "transpose_up": "Trasporta su di un semitono",

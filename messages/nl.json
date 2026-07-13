@@ -183,6 +183,8 @@
   "beams_on": "Tonen",
   "beams_off": "Verbergen",
   "beams_caption": "Waardestrepen verbinden snelle noten tot telgroepen. Verberg ze om tijdens het leren één noot tegelijk te lezen; Automatisch toont ze bij moeilijkere stukken waar de groepering helpt.",
+  "note_size_label": "Nootgrootte",
+  "note_size_caption": "Vergroot het hele stuk voor grotere, beter leesbare noten – handig op een klein scherm of als je net begint.",
   "transpose": "Transponeren",
   "transpose_down": "Een halve toon omlaag transponeren",
   "transpose_up": "Een halve toon omhoog transponeren",

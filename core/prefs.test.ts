@@ -19,6 +19,7 @@ const BASE: Prefs = {
     decayMode: "gentle",
     reviewCap: 8,
     barsPerRow: 0,
+    noteScale: 1,
     barNumbers: true,
     keyMap: DEFAULT_KEY_MAP,
     metronomeSubdivision: 1,
@@ -112,6 +113,12 @@ describe("parsePrefs", () => {
         expect(parsePrefs(null).beams).toBe("auto");
         expect(parsePrefs(stored({ beams: "off" })).beams).toBe("off");
         expect(parsePrefs(JSON.stringify({ beams: "bogus" })).beams).toBe("auto");
+    });
+
+    it("defaults note size to 1 and rejects an off-scale value", () => {
+        expect(parsePrefs(null).noteScale).toBe(1);
+        expect(parsePrefs(stored({ noteScale: 1.5 })).noteScale).toBe(1.5);
+        expect(parsePrefs(JSON.stringify({ noteScale: 3 })).noteScale).toBe(1);
     });
 
     it("defaults the key map and keeps a customised one", () => {

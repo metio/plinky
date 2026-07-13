@@ -183,6 +183,8 @@
   "beams_on": "Afficher",
   "beams_off": "Masquer",
   "beams_caption": "Les ligatures relient les notes rapides en groupes de temps. Masquez-les pour lire une note à la fois pendant l'apprentissage ; Auto les affiche sur les morceaux plus difficiles où le groupement rythmique aide.",
+  "note_size_label": "Taille des notes",
+  "note_size_caption": "Agrandissez toute la partition pour des notes plus grandes et plus faciles à lire — pratique sur un petit écran ou quand vous débutez.",
   "transpose": "Transposer",
   "transpose_down": "Transposer un demi-ton plus bas",
   "transpose_up": "Transposer un demi-ton plus haut",

@@ -183,6 +183,8 @@
   "beams_on": "Anzeigen",
   "beams_off": "Ausblenden",
   "beams_caption": "Balken fassen schnelle Noten zu Schlaggruppen zusammen. Blende sie aus, um beim Lernen Note für Note zu lesen; Auto zeigt sie bei schwierigeren Stücken, wo die Gruppierung nach Schlägen hilft.",
+  "note_size_label": "Notengröße",
+  "note_size_caption": "Vergrößert die gesamte Notendarstellung für größere, leichter lesbare Noten – praktisch auf einem kleinen Bildschirm oder wenn du gerade erst anfängst.",
   "transpose": "Transponieren",
   "transpose_down": "Einen Halbton tiefer transponieren",
   "transpose_up": "Einen Halbton höher transponieren",

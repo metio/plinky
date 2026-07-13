@@ -57,6 +57,10 @@ export type Prefs = {
     // bars per row means bigger, more readable notation — the lever a phone needs so the
     // notes aren't crammed too small to play. Stored per device.
     barsPerRow: number;
+    // A magnification applied to the whole rendered score (1 = normal). Unlike
+    // bars-per-row it scales the glyphs themselves, so it enlarges the notation even in
+    // treadmill mode and helps a learner (or anyone) who needs bigger notes. Per device.
+    noteScale: number;
     // Show a bar number above the first bar of each staff row, so a passage is easy to
     // point to and matches the loop's from/to inputs. When shown they sit at each row's
     // start rather than at OSMD's default cadence, which drifts with the layout — the
@@ -98,6 +102,10 @@ export const REVIEW_CAPS = [5, 8, 12, 20];
 
 // Bars-per-row choices: 0 = fit to width (the default), or force 2–4 for bigger bars.
 export const BARS_PER_ROW = [0, 2, 3, 4];
+
+// Note-size choices: the score's magnification. 1 = normal, up to 1.5× for a learner
+// who needs bigger glyphs (or a small screen held at arm's length).
+export const NOTE_SCALES = [1, 1.25, 1.5];
 
 // Metronome subdivision choices: clicks per beat (2 = eighths, 3 = triplets…).
 export const METRONOME_SUBDIVISIONS = [1, 2, 3, 4];
@@ -141,6 +149,7 @@ function defaults(): Prefs {
         decayMode: "gentle",
         reviewCap: REVIEW_CAP,
         barsPerRow: 0,
+        noteScale: 1,
         barNumbers: true,
         keyMap: cleanKeyMap(undefined),
         metronomeSubdivision: 1,
@@ -223,6 +232,7 @@ export function parsePrefs(raw: string | null): Prefs {
             barsPerRow: BARS_PER_ROW.includes(parsed.barsPerRow)
                 ? parsed.barsPerRow
                 : base.barsPerRow,
+            noteScale: NOTE_SCALES.includes(parsed.noteScale) ? parsed.noteScale : base.noteScale,
             barNumbers:
                 typeof parsed.barNumbers === "boolean" ? parsed.barNumbers : base.barNumbers,
             keyMap: cleanKeyMap(parsed.keyMap),
