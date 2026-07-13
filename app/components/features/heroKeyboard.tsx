@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef } from "react";
+import { holdScaleFor } from "../../../core/midi";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
@@ -32,7 +33,8 @@ export function HeroKeyboard() {
     // the trainer. Notes outside this octave (from a full MIDI keyboard) still sound.
     useMidiInput({
         onNoteOn: (event) => synth.pressNote(event.note, { velocity: event.velocity }),
-        onNoteOff: (event) => synth.releaseNote(event.note),
+        // A tap on the hero rings on a little (holdScaleFor) so even a quick click sings.
+        onNoteOff: (event) => synth.releaseNote(event.note, holdScaleFor(event.device)),
     });
 
     // A key still held when the hero unmounts never delivers its pointer-up, so its note

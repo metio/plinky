@@ -18,7 +18,9 @@ export type UseSynthResult = {
     // sound follows the player's own key hold. A quick release sounds staccato, a long hold
     // sustains — the articulation the player actually gave.
     pressNote: (note: number, options?: { velocity?: number }) => void;
-    releaseNote: (note: number) => void;
+    // holdScale (default 1) lets an imprecise input's short tap ring on; see the engine's
+    // release. A real MIDI key leaves it at 1.
+    releaseNote: (note: number, holdScale?: number) => void;
     // Move one of the three pedals for live voices.
     setPedal: (pedal: PedalKind, down: boolean) => void;
 };
@@ -77,7 +79,10 @@ export function useSynth(): UseSynthResult {
 
     // Release and pedal always reach the engine — a muted session opened no voice, so they
     // are harmless no-ops there, and the pedal state must track regardless of volume.
-    const releaseNote = useCallback((note: number) => audio.release(note), [audio]);
+    const releaseNote = useCallback(
+        (note: number, holdScale?: number) => audio.release(note, holdScale),
+        [audio],
+    );
     const setPedal = useCallback(
         (pedal: PedalKind, down: boolean) => audio.setPedal(pedal, down),
         [audio],

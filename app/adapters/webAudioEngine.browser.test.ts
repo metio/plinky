@@ -39,6 +39,10 @@ describe("webAudioEngine", () => {
             webAudioEngine.setPedal("sostenuto", false);
             // A release for a note that never pressed is a harmless no-op.
             webAudioEngine.release(99);
+            // A generous release (an imprecise input's tap let ring) schedules a longer
+            // envelope without throwing.
+            webAudioEngine.press(72, 0.2);
+            webAudioEngine.release(72, 1.8);
         }).not.toThrow();
     });
 

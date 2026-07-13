@@ -104,6 +104,19 @@ export const KEYBOARD_VELOCITY = 80;
 export function isPreciseInput(device: string): boolean {
     return device !== ON_SCREEN_DEVICE && device !== KEYBOARD_DEVICE && device !== MIC_DEVICE;
 }
+
+// A tap on the on-screen keys or a jab at a computer key is far shorter than a real key
+// press, so a note played that way rings clipped. The live voice for those inputs is let
+// ring as if the key had been held this much longer — enough to sound musical without
+// droning — so someone playing on an iPad with no piano still makes a note that sings. A
+// real MIDI key (and the microphone, which opens no live voice) is untouched at 1.
+export const IMPRECISE_HOLD_SCALE = 1.8;
+
+// The generous ring for imprecise input, or 1 (no change) for a real instrument. Mic
+// input opens no live voice, so it never reaches here; the two fallback keyboards do.
+export function holdScaleFor(device: string): number {
+    return device === ON_SCREEN_DEVICE || device === KEYBOARD_DEVICE ? IMPRECISE_HOLD_SCALE : 1;
+}
 export const MIN_OCTAVE_OFFSET = -3;
 export const MAX_OCTAVE_OFFSET = 3;
 

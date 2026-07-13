@@ -261,9 +261,9 @@ function stillHeld(note: number): boolean {
     return keyDown.has(note) || sustainDown || sostenutoHeld.has(note);
 }
 
-function maybeEnd(ctx: AudioContext, note: number): void {
+function maybeEnd(ctx: AudioContext, note: number, holdScale = 1): void {
     if (!stillHeld(note)) {
-        endVoice(ctx, note);
+        endVoice(ctx, note, holdScale);
     }
 }
 
@@ -298,27 +298,41 @@ function buildVoice(ctx: AudioContext, frequency: number, gain: number): Voice {
     return { envelope, oscillators, frequency, startedAt: now };
 }
 
+// The most extra body a generous release adds, so a lengthened tap sings without droning
+// into the next note however the scale is set.
+const MAX_HOLD_EXTRA = 0.28;
+
 // Ring a voice out over `tail` seconds from wherever its envelope stands, then stop its
 // oscillators just after — a quick fade when a re-press replaces it, the held-scaled tail
-// on a real release.
-function fadeVoice(ctx: AudioContext, voice: Voice, tail: number): void {
+// on a real release. `hold` keeps the shelf sounding that many seconds before the ring-out
+// begins, so an imprecise input's short press is let ring like a longer-held key.
+function fadeVoice(ctx: AudioContext, voice: Voice, tail: number, hold = 0): void {
     const now = ctx.currentTime;
     const gain = voice.envelope.gain;
+    const shelf = Math.max(0.0001, gain.value);
     gain.cancelScheduledValues(now);
-    gain.setValueAtTime(Math.max(0.0001, gain.value), now);
-    gain.exponentialRampToValueAtTime(0.0001, now + tail);
+    gain.setValueAtTime(shelf, now);
+    // Hold the shelf flat until the ring-out starts, then fade from there.
+    const fadeFrom = now + Math.max(0, hold);
+    gain.setValueAtTime(shelf, fadeFrom);
+    gain.exponentialRampToValueAtTime(0.0001, fadeFrom + tail);
     for (const oscillator of voice.oscillators) {
-        oscillator.stop(now + tail + 0.03);
+        oscillator.stop(fadeFrom + tail + 0.03);
     }
 }
 
 // Release a note's voice, ringing it out over a tail scaled to how long it was held.
-function endVoice(ctx: AudioContext, note: number): void {
+// holdScale > 1 lets a short imprecise-input tap ring as if held that many times longer —
+// a little extra body (capped) plus the correspondingly longer tail.
+function endVoice(ctx: AudioContext, note: number, holdScale = 1): void {
     const voice = voices.get(note);
     if (!voice) {
         return;
     }
-    fadeVoice(ctx, voice, ringTail(voice.frequency, ctx.currentTime - voice.startedAt));
+    const held = ctx.currentTime - voice.startedAt;
+    const effective = held * holdScale;
+    const extra = Math.min(Math.max(0, effective - held), MAX_HOLD_EXTRA);
+    fadeVoice(ctx, voice, ringTail(voice.frequency, effective), extra);
     voices.delete(note);
 }
 
@@ -393,14 +407,16 @@ export const webAudioEngine: AudioEngine = {
         // which mic input skips anyway (a mic player hears their own piano, not this).
         struckUntil.set(note, performance.now() + 1500);
     },
-    release(note) {
+    release(note, holdScale = 1) {
         const ctx = context();
         if (!ctx) {
             return;
         }
-        // The key lifting only ends the note when no pedal is holding it.
+        // The key lifting only ends the note when no pedal is holding it. A generous
+        // holdScale lets an imprecise input's short tap ring on; a pedal that later ends
+        // this note uses the default scale, so a pedalled note isn't double-lengthened.
         keyDown.delete(note);
-        maybeEnd(ctx, note);
+        maybeEnd(ctx, note, holdScale);
     },
     setPedal(kind, down) {
         const ctx = context();

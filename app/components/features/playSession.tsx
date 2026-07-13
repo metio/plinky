@@ -18,7 +18,7 @@ import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
-import { isPreciseInput, MIC_DEVICE } from "../../../core/midi";
+import { holdScaleFor, isPreciseInput, MIC_DEVICE } from "../../../core/midi";
 import {
     captureCleared,
     capturePedal,
@@ -454,7 +454,9 @@ function usePlaySessionValue({
             if (event.device === MIC_DEVICE) {
                 return;
             }
-            synth.releaseNote(event.note);
+            // On-screen taps and computer keys ring on a little so a short jab still sounds
+            // musical; a real MIDI key keeps its own articulation (holdScale 1).
+            synth.releaseNote(event.note, holdScaleFor(event.device));
             heldNotes.current.delete(event.note);
             syncHolding();
             captureRelease(captureRef.current, event.note, event.timestamp);

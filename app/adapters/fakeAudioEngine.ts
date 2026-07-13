@@ -12,7 +12,8 @@ export type FakeAudioEngine = AudioEngine & {
     // Live-voice events, in order, so a test can assert what was pressed, released and how
     // the pedal moved — the articulation the live play path drives.
     voices: Array<
-        { kind: "press"; note: number; gain: number } | { kind: "release"; note: number }
+        | { kind: "press"; note: number; gain: number }
+        | { kind: "release"; note: number; holdScale: number }
     >;
     pedals: Array<{ pedal: PedalKind; down: boolean }>;
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
@@ -46,8 +47,8 @@ export function fakeAudioEngine(): FakeAudioEngine {
         press(note, gain) {
             engine.voices.push({ kind: "press", note, gain });
         },
-        release(note) {
-            engine.voices.push({ kind: "release", note });
+        release(note, holdScale = 1) {
+            engine.voices.push({ kind: "release", note, holdScale });
         },
         setPedal(pedal, down) {
             engine.pedals.push({ pedal, down });

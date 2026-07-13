@@ -4,6 +4,8 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import {
+    holdScaleFor,
+    IMPRECISE_HOLD_SCALE,
     isPreciseInput,
     MIC_DEVICE,
     KEYBOARD_DEVICE,
@@ -152,5 +154,21 @@ describe("isPreciseInput", () => {
     it("treats the keyboard fallbacks as imprecise", () => {
         expect(isPreciseInput(ON_SCREEN_DEVICE)).toBe(false);
         expect(isPreciseInput(KEYBOARD_DEVICE)).toBe(false);
+    });
+});
+
+describe("holdScaleFor", () => {
+    it("rings the tap keyboards on so a short click still sings", () => {
+        expect(holdScaleFor(ON_SCREEN_DEVICE)).toBe(IMPRECISE_HOLD_SCALE);
+        expect(holdScaleFor(KEYBOARD_DEVICE)).toBe(IMPRECISE_HOLD_SCALE);
+        expect(IMPRECISE_HOLD_SCALE).toBeGreaterThan(1);
+    });
+
+    it("leaves a real MIDI key untouched", () => {
+        expect(holdScaleFor("Roland FP-30")).toBe(1);
+    });
+
+    it("leaves the microphone untouched — it opens no live voice", () => {
+        expect(holdScaleFor(MIC_DEVICE)).toBe(1);
     });
 });

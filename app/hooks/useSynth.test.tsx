@@ -71,9 +71,16 @@ describe("useSynth", () => {
         synth.releaseNote(60);
         expect(audio.voices).toEqual([
             { kind: "press", note: 60, gain: 0.32 * 0.5 },
-            { kind: "release", note: 60 },
+            { kind: "release", note: 60, holdScale: 1 },
         ]);
         expect(audio.resumed).toBe(1);
+    });
+
+    it("passes an imprecise input's generous hold scale through to the engine", () => {
+        const { audio, synth } = harness();
+        synth.pressNote(60);
+        synth.releaseNote(60, 1.8);
+        expect(audio.voices).toContainEqual({ kind: "release", note: 60, holdScale: 1.8 });
     });
 
     it("opens no voice when muted, but still ends and pedals", () => {
@@ -84,7 +91,7 @@ describe("useSynth", () => {
         expect(audio.voices.filter((v) => v.kind === "press")).toHaveLength(0);
         synth.releaseNote(60);
         synth.setPedal("sustain", true);
-        expect(audio.voices).toContainEqual({ kind: "release", note: 60 });
+        expect(audio.voices).toContainEqual({ kind: "release", note: 60, holdScale: 1 });
         expect(audio.pedals).toEqual([{ pedal: "sustain", down: true }]);
     });
 });
