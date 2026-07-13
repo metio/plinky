@@ -21,8 +21,10 @@ vi.mock("../lib/scoreCursor", () => ({
 }));
 
 // A score whose cursor ends after `steps` voice entries, each holding one
-// sounding quarter note (halfTone 48 ≈ C4 after the +12 octave shift).
-function fakeOsmd(steps: number) {
+// sounding quarter note (halfTone 48 ≈ C4 after the +12 octave shift). Extra note
+// fields (articulations, ties, slurs) and the iterator's active dynamics can be
+// injected to drive the expressive reader.
+function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, dynamics: unknown[] = []) {
     let position = 0;
     const cursor = {
         reset: vi.fn(() => {
@@ -40,12 +42,14 @@ function fakeOsmd(steps: number) {
             get CurrentMeasureIndex() {
                 return position;
             },
+            ActiveDynamicExpressions: dynamics,
         },
         NotesUnderCursor: () => [
             {
                 Length: { RealValue: 0.25 },
                 isRest: () => false,
                 halfTone: 48,
+                ...noteOver,
             },
         ],
     };
@@ -88,8 +92,9 @@ describe("useListenPlayback", () => {
 
         act(() => result.current.start(0));
         expect(result.current.playing).toBe(true);
-        // The first entry sounds immediately, sustained per the 120 BPM tempo.
-        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5 });
+        // The first entry sounds immediately, sustained per the 120 BPM tempo, at the
+        // default velocity since the score marks no dynamic.
+        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 90 });
 
         // Each quarter at 120 BPM is 500ms; after both entries the walk ends.
         act(() => void vi.advanceTimersByTime(500));
@@ -151,6 +156,42 @@ describe("useListenPlayback", () => {
         act(() => void vi.advanceTimersByTime(500));
         expect(result.current.playing).toBe(false);
         expect(result.current.activeReplayId).toBeNull();
+    });
+
+    it("plays the score's expression — staccato clips, accent strikes harder, dynamics set loudness", () => {
+        // A staccato note (articulationEnum 6) clips to half its length.
+        const staccato = mount(
+            fakeOsmd(1, { ParentVoiceEntry: { Articulations: [{ articulationEnum: 6 }] } }),
+        );
+        act(() => staccato.result.current.start(0));
+        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.25, velocity: 90 });
+        act(() => staccato.result.current.stop());
+        playNote.mockClear();
+
+        // An accent (articulationEnum 0) strikes harder than the default velocity.
+        const accent = mount(
+            fakeOsmd(1, { ParentVoiceEntry: { Articulations: [{ articulationEnum: 0 }] } }),
+        );
+        act(() => accent.result.current.start(0));
+        const [, accentOpts] = playNote.mock.calls[0]!;
+        expect(accentOpts.velocity).toBeGreaterThan(90);
+        act(() => accent.result.current.stop());
+        playNote.mockClear();
+
+        // A marked dynamic sets the loudness outright.
+        const soft = mount(fakeOsmd(1, {}, [{ MidiVolume: 40 }]));
+        act(() => soft.result.current.start(0));
+        expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 40 });
+        act(() => soft.result.current.stop());
+    });
+
+    it("does not re-strike a tie's continuation note", () => {
+        // A note tied FROM an earlier one (its tie starts on a different note) is held,
+        // not struck again — nothing sounds while the walk still advances.
+        const tied = mount(fakeOsmd(1, { NoteTie: { StartNote: {}, Notes: [{}] } }));
+        act(() => tied.result.current.start(0));
+        expect(playNote).not.toHaveBeenCalled();
+        act(() => tied.result.current.stop());
     });
 
     it("does nothing without a rendered score", () => {

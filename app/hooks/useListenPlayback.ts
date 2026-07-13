@@ -4,9 +4,11 @@
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
+import { performNote } from "../../core/expression";
 import { listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
+import { readActiveDynamic, readScoreExpression } from "../lib/scoreExpression";
 import {
     highlightCursorNotes,
     type PaintedNote,
@@ -135,18 +137,34 @@ export function useListenPlayback({
             markPainted();
             highlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
             const lengths: number[] = [];
+            // The dynamic in force at this position is the same for every note under the
+            // cursor, so read it once per step.
+            const dynamicVolume = readActiveDynamic(cursor.iterator);
             for (const note of cursor.NotesUnderCursor()) {
-                const quarters = note.Length.RealValue * 4;
-                if (!note.isRest() && note.halfTone > 0) {
-                    // `quarters` is a count of quarter notes; the synth wants seconds, which
-                    // depends on the tempo — one quarter is 60/BPM seconds. Without scaling,
-                    // the sustain is only right at 60 BPM and over-rings into a blur above it.
-                    synth.playNote(note.halfTone + 12, {
-                        duration: quarters * (60 / tempo()),
-                    });
+                const expression = readScoreExpression(note);
+                // A tie's later notes are already sounding from the tie start, so skip the
+                // re-strike; rests never sound.
+                if (!note.isRest() && note.halfTone > 0 && expression.strike) {
+                    // performNote turns the note's marks into how long and how loud it
+                    // sounds — staccato clips it, an accent strikes it harder, the marked
+                    // dynamic sets its loudness — scaled to seconds at the current tempo.
+                    const { durationSeconds, velocity } = performNote(
+                        {
+                            quarters: expression.soundQuarters,
+                            articulation: expression.articulation,
+                            accent: expression.accent,
+                            marcato: expression.marcato,
+                            slurred: expression.slurred,
+                            dynamicVolume,
+                        },
+                        tempo(),
+                    );
+                    synth.playNote(note.halfTone + 12, { duration: durationSeconds, velocity });
                 }
-                // Rests count too, so a written gap dwells its own length.
-                lengths.push(quarters);
+                // Rests count too, so a written gap dwells its own length. The cursor
+                // advances by the notated rhythm, so a clipped staccato still dwells its
+                // full beat — only the sound is shortened, not the reading pace.
+                lengths.push(expression.notatedQuarters);
             }
             cursor.next();
             centerCursor();
