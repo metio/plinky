@@ -6,10 +6,10 @@ import type { RecordedNote } from "../../core/composition";
 import { LEAD_IN_MS, TAIL_MS, videoDurationMs } from "../../core/videoFrames";
 import { renderTakeAudio } from "./offlineAudio";
 
-const note = (startMs: number, pitch = 60, velocity = 100): RecordedNote => ({
+const note = (startMs: number, pitch = 60, velocity = 100, durationMs = 400): RecordedNote => ({
     pitch,
     startMs,
-    durationMs: 400,
+    durationMs,
     velocity,
 });
 
@@ -54,12 +54,23 @@ describe("renderTakeAudio", () => {
         expect(peak(buffer, notatedEnd + 0.05, notatedEnd + 0.15)).toBeGreaterThan(0.01);
     });
 
-    it("sustains a bass note longer than a treble note", async () => {
-        // Same length and velocity, an octaves-apart pitch: measured well past their
-        // shared notated end, only the bass note is still ringing.
-        const bass = await renderTakeAudio([note(0, 40)], 24_000);
-        const treble = await renderTakeAudio([note(0, 84)], 24_000);
-        const late = [(LEAD_IN_MS + 400 + 500) / 1000, (LEAD_IN_MS + 400 + 650) / 1000] as const;
+    it("sustains a held bass note longer than a held treble note", async () => {
+        // Long notes, so the register tail is the binding constraint (not the note's own
+        // length): measured well past their shared notated end, only the bass rings on.
+        const bass = await renderTakeAudio([note(0, 40, 100, 2000)], 24_000);
+        const treble = await renderTakeAudio([note(0, 84, 100, 2000)], 24_000);
+        const late = [(LEAD_IN_MS + 2000 + 500) / 1000, (LEAD_IN_MS + 2000 + 650) / 1000] as const;
         expect(peak(bass, ...late)).toBeGreaterThan(peak(treble, ...late));
+    });
+
+    it("clips a short note's ring so a staccato stays crisp", async () => {
+        // Same pitch, one short (staccato) and one long (held). Measured the same distance
+        // past each note's own notated end, only the held note is still ringing — the short
+        // note's tail is capped to a crisp fraction of its length.
+        const staccato = await renderTakeAudio([note(0, 60, 100, 80)], 24_000);
+        const held = await renderTakeAudio([note(0, 60, 100, 800)], 24_000);
+        const past = (durMs: number) =>
+            [(LEAD_IN_MS + durMs + 150) / 1000, (LEAD_IN_MS + durMs + 300) / 1000] as const;
+        expect(peak(staccato, ...past(80))).toBeLessThan(peak(held, ...past(800)));
     });
 });

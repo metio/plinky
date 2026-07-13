@@ -138,6 +138,21 @@ export function releaseTail(frequency: number): number {
     return bassTail + (trebleTail - bassTail) * clamped;
 }
 
+// The tail is capped by the fraction of a note it warrants below, so a short note keeps a
+// crisp articulation instead of every note ringing out the same.
+const TAIL_PER_DURATION = 0.6;
+// A floor keeps even the shortest note's cutoff a smooth fade rather than a click.
+const MIN_TAIL = 0.04;
+
+// The ring-out a note actually gets: its register tail, but never longer than the note
+// itself warrants. A short note — a staccato, or a note in a fast passage — is clipped to
+// a crisp fraction of its own length so its articulation survives, while a held note rings
+// its full register tail and connects into the next. Exported so the shaping is testable.
+export function ringTail(frequency: number, duration: number): number {
+    const proportional = Math.max(0, duration) * TAIL_PER_DURATION;
+    return Math.max(MIN_TAIL, Math.min(releaseTail(frequency), proportional));
+}
+
 // A shared master limiter between every voice (and the metronome click) and the
 // speakers, so overlapping release tails and dense chords can't stack past 0 dBFS
 // into a clip, while a single note keeps its true dynamics untouched — the threshold
@@ -170,7 +185,7 @@ export function renderStrike(
 ): void {
     const now = ctx.currentTime + Math.max(0, delay);
     const frequency = midiToFrequency(note);
-    const tail = releaseTail(frequency);
+    const tail = ringTail(frequency, duration);
 
     // The played length holds the note's shelf; the filter keeps closing across the
     // whole ring — the shelf plus its release tail — so the tone darkens all the way

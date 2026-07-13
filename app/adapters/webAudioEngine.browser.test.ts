@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { releaseTail, webAudioEngine } from "./webAudioEngine";
+import { releaseTail, ringTail, webAudioEngine } from "./webAudioEngine";
 
 // Smoke the real Web Audio path under a browser: the engine opens its shared
 // context and the synthesis graphs build without throwing. What the strikes
@@ -44,6 +44,16 @@ describe("webAudioEngine", () => {
         expect(() =>
             webAudioEngine.strike({ note: 60, gain: 0, duration: 0.2, delay: 0 }),
         ).not.toThrow();
+    });
+
+    it("caps a note's ring by its own length so short notes stay crisp", () => {
+        const freq = 262; // ~C4
+        // A held note rings its full register tail; a short/staccato note is clipped well
+        // under it, and the very shortest still keeps a small click-free floor.
+        expect(ringTail(freq, 2)).toBe(releaseTail(freq));
+        expect(ringTail(freq, 0.1)).toBeLessThan(releaseTail(freq));
+        expect(ringTail(freq, 0.1)).toBeLessThan(ringTail(freq, 1));
+        expect(ringTail(freq, 0.001)).toBeGreaterThan(0);
     });
 
     it("rings a bass note out longer than a treble note", () => {
