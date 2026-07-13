@@ -3,6 +3,7 @@
 
 import type { Letter } from "./grade";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import type { MicCalibration } from "./pitch";
 import { type DecayMode, REVIEW_CAP } from "./review";
 
 // A hand's comfortable thumb-to-pinky reach in semitones, or null when unmeasured
@@ -80,6 +81,10 @@ export type Prefs = {
     hiddenNotes: boolean;
     // How many wrong attempts a hidden note allows before it reveals itself red.
     revealTries: number;
+    // The microphone tuned to this device's room, piano and mic by the calibration
+    // wizard, or null when the player has never run it (the detector's own defaults
+    // stand in). Stored per device — a different room needs a different tuning.
+    micCalibration: MicCalibration | null;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -139,6 +144,36 @@ function defaults(): Prefs {
         raceGhost: true,
         hiddenNotes: false,
         revealTries: 1,
+        micCalibration: null,
+    };
+}
+
+// A stored calibration is trusted only when every field is a finite number in a
+// sane band and the loud anchor clears the soft one — a corrupt or hand-edited
+// store falls back to null (the detector's defaults) rather than feeding a
+// nonsense floor or a collapsed velocity map into the live path.
+function cleanCalibration(value: unknown): MicCalibration | null {
+    if (!value || typeof value !== "object") {
+        return null;
+    }
+    const cal = value as Record<string, unknown>;
+    const finite = (x: unknown, low: number, high: number): x is number =>
+        typeof x === "number" && Number.isFinite(x) && x >= low && x <= high;
+    if (
+        !finite(cal.noiseFloor, 0.001, 0.3) ||
+        !finite(cal.softLevel, 0.001, 0.5) ||
+        !finite(cal.loudLevel, 0.001, 0.5) ||
+        !finite(cal.octaveShift, -2, 2) ||
+        !Number.isInteger(cal.octaveShift) ||
+        cal.loudLevel <= cal.softLevel
+    ) {
+        return null;
+    }
+    return {
+        noiseFloor: cal.noiseFloor,
+        softLevel: cal.softLevel,
+        loudLevel: cal.loudLevel,
+        octaveShift: cal.octaveShift,
     };
 }
 
@@ -202,6 +237,7 @@ export function parsePrefs(raw: string | null): Prefs {
             revealTries: REVEAL_TRIES.includes(parsed.revealTries)
                 ? parsed.revealTries
                 : base.revealTries,
+            micCalibration: cleanCalibration(parsed.micCalibration),
         };
     } catch {
         return base;

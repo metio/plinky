@@ -27,7 +27,10 @@ const BASE: Prefs = {
     raceGhost: true,
     hiddenNotes: false,
     revealTries: 1,
+    micCalibration: null,
 };
+
+const CALIBRATION = { noiseFloor: 0.02, softLevel: 0.03, loudLevel: 0.2, octaveShift: -1 };
 
 const stored = (patch: object) => JSON.stringify({ ...BASE, ...patch });
 
@@ -138,5 +141,41 @@ describe("hidden-notes prefs", () => {
     it("keeps the mode off unless a boolean says otherwise", () => {
         expect(parsePrefs(stored({ hiddenNotes: true })).hiddenNotes).toBe(true);
         expect(parsePrefs(stored({ hiddenNotes: "yes" })).hiddenNotes).toBe(false);
+    });
+});
+
+describe("mic calibration prefs", () => {
+    it("round-trips a well-formed calibration", () => {
+        expect(parsePrefs(stored({ micCalibration: CALIBRATION })).micCalibration).toEqual(
+            CALIBRATION,
+        );
+    });
+
+    it("drops a calibration whose velocity anchors collapsed", () => {
+        const collapsed = { ...CALIBRATION, softLevel: 0.2, loudLevel: 0.2 };
+        expect(parsePrefs(stored({ micCalibration: collapsed })).micCalibration).toBeNull();
+    });
+
+    it("drops a calibration with an out-of-range or non-integer octave shift", () => {
+        expect(
+            parsePrefs(stored({ micCalibration: { ...CALIBRATION, octaveShift: 5 } }))
+                .micCalibration,
+        ).toBeNull();
+        expect(
+            parsePrefs(stored({ micCalibration: { ...CALIBRATION, octaveShift: 0.5 } }))
+                .micCalibration,
+        ).toBeNull();
+    });
+
+    it("drops a calibration missing fields or carrying a NaN", () => {
+        expect(parsePrefs(stored({ micCalibration: { noiseFloor: 0.02 } })).micCalibration).toBeNull();
+        expect(
+            parsePrefs(stored({ micCalibration: { ...CALIBRATION, noiseFloor: Number.NaN } }))
+                .micCalibration,
+        ).toBeNull();
+    });
+
+    it("defaults to null when nothing is stored", () => {
+        expect(parsePrefs(null).micCalibration).toBeNull();
     });
 });

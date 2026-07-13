@@ -7,6 +7,7 @@ import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { useState } from "react";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { MicCalibrationWizard } from "./micCalibrationWizard";
 
 // Hear an acoustic piano and confirm it works: the listen button, the state of
 // the microphone, and a live read-out of the last note Plinky heard — so a
@@ -57,6 +58,16 @@ export function MicConnect() {
                     )}
                 </p>
             )}
+
+            {/* Tuning is its own guided flow: it takes over the microphone to
+            measure the room, so it lives below the plain listen check rather
+            than running alongside it. */}
+            <div className="border-gray-200 border-t pt-3 dark:border-gray-800">
+                <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                    {m.mic_calibrate_lead()}
+                </p>
+                <MicCalibrationWizard />
+            </div>
         </div>
     );
 }

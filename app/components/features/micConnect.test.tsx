@@ -5,6 +5,7 @@
 import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { fakePitch } from "../../adapters/fakePitch";
+import { memoryStore } from "../../adapters/memoryStore";
 import { MidiProvider, useMidiInput } from "../../contexts/midi";
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
@@ -84,6 +85,25 @@ describe("MicConnect", () => {
         act(() => pitch.emit({ kind: "on", note: 64 }));
         act(() => pitch.emit({ kind: "off", note: 60 }));
         expect(heard).toEqual([{ note: 64, device: "Microphone" }]);
+    });
+
+    it("hands the saved calibration to the live detector when listening starts", async () => {
+        const pitch = fakePitch();
+        const calibration = { noiseFloor: 0.02, softLevel: 0.03, loudLevel: 0.2, octaveShift: -1 };
+        // A device that already ran the wizard: its tuning is in the prefs store.
+        const store = memoryStore({
+            "plinky:prefs": JSON.stringify({ micCalibration: calibration }),
+        });
+        renderWithServices(
+            <MidiProvider>
+                <MicConnect />
+            </MidiProvider>,
+            { pitch, store },
+        );
+
+        fireEvent.click(screen.getByRole("button", { name: m.mic_listen() }));
+        await waitFor(() => expect(pitch.listening()).toBe(true));
+        expect(pitch.lastCalibration()).toEqual(calibration);
     });
 
     it("says so when the microphone is declined, without crashing the page", async () => {

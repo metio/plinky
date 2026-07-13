@@ -46,6 +46,24 @@ const CLARITY_THRESHOLD = 0.4;
 // Frames quieter than this are silence — nobody played anything.
 export const SILENCE_RMS = 0.01;
 
+// A player's measured tuning of the detector to their own room, piano and
+// microphone — the three constants that are "one size fits nobody". Every
+// detection function takes it optionally and falls back to the module defaults,
+// so an uncalibrated player's experience is unchanged. Produced by the
+// calibration wizard (see core/micCalibration.ts).
+export type MicCalibration = {
+    // RMS below which a frame is silence, set just above the room's own ambient
+    // noise — a noisy room needs a higher floor, a quiet laptop mic a lower one.
+    noiseFloor: number;
+    // The loudness of a note played softly and at a full strike: the two anchors
+    // the velocity band stretches between, so pp and ff both read true.
+    softLevel: number;
+    loudLevel: number;
+    // Whole octaves to add to every detected note, correcting a mic+piano that
+    // reads consistently an octave off (the detector's characteristic slip).
+    octaveShift: number;
+};
+
 export function rms(frame: Float32Array): number {
     let sum = 0;
     for (const sample of frame) {
@@ -59,8 +77,12 @@ export function rms(frame: Float32Array): number {
 // first drops (the global maximum tends to land an octave low on bright piano
 // tones), sharpened by parabolic interpolation — dependency-free, fast enough
 // per animation frame, and accurate to well under a semitone where it matters.
-export function detectPitch(frame: Float32Array, sampleRate: number): number | null {
-    if (rms(frame) < SILENCE_RMS) {
+export function detectPitch(
+    frame: Float32Array,
+    sampleRate: number,
+    noiseFloor = SILENCE_RMS,
+): number | null {
+    if (rms(frame) < noiseFloor) {
         return null;
     }
     const minLag = Math.floor(sampleRate / MAX_FREQ);
@@ -226,8 +248,13 @@ const FUNDAMENTAL_SHARE = 0.2;
 // robust judge of "is anything periodic sounding at all"); the notes themselves
 // are elected from the spectrum, each claimed note's harmonics removed before
 // the next round so overtones can't stand for their own.
-export function detectPitches(frame: Float32Array, sampleRate: number, maxNotes = 3): number[] {
-    if (detectPitch(frame, sampleRate) === null) {
+export function detectPitches(
+    frame: Float32Array,
+    sampleRate: number,
+    maxNotes = 3,
+    cal?: MicCalibration,
+): number[] {
+    if (detectPitch(frame, sampleRate, cal?.noiseFloor) === null) {
         return [];
     }
     const spectrum = magnitudeSpectrum(frame);
@@ -260,7 +287,10 @@ export function detectPitches(frame: Float32Array, sampleRate: number, maxNotes 
         notes.push(bestNote);
         subtractHarmonics(spectrum, binWidth, midiToFrequency(bestNote));
     }
-    return notes;
+    // Correct a mic+piano that reads consistently an octave off, once the notes
+    // are elected — the shift is a property of the reading, not the spectrum.
+    const shift = cal?.octaveShift ?? 0;
+    return shift === 0 ? notes : notes.map((note) => note + shift * 12);
 }
 
 export type PitchEvent = {
@@ -276,13 +306,21 @@ export type PitchEvent = {
 // note, a hammered chord doesn't clip — headroom over fidelity.
 const VELOCITY_FLOOR = 35;
 const VELOCITY_CEIL = 112;
-export function levelToVelocity(level: number): number {
-    if (level <= SILENCE_RMS) {
+// The default loudness anchors: ~0.01 RMS (just audible) reads as the floor,
+// ~0.35 (a hard strike near the mic) as the ceiling. A calibration replaces
+// them with the player's own measured soft and loud strikes.
+const DEFAULT_SOFT_RMS = SILENCE_RMS;
+const DEFAULT_LOUD_RMS = 0.35;
+export function levelToVelocity(level: number, cal?: MicCalibration): number {
+    // The player's own soft strike anchors the floor; guard against a degenerate
+    // calibration where the two anchors collapsed.
+    const soft = cal && cal.loudLevel > cal.softLevel ? cal.softLevel : DEFAULT_SOFT_RMS;
+    const loud = cal && cal.loudLevel > cal.softLevel ? cal.loudLevel : DEFAULT_LOUD_RMS;
+    if (level <= soft) {
         return VELOCITY_FLOOR;
     }
-    // ~0.01 RMS (just audible) → floor; ~0.35 (a hard strike near the mic) → ceiling.
-    const span = Math.log10(0.35 / SILENCE_RMS);
-    const position = Math.log10(level / SILENCE_RMS) / span;
+    const span = Math.log10(loud / soft);
+    const position = Math.log10(level / soft) / span;
     return Math.round(
         Math.min(VELOCITY_CEIL, Math.max(VELOCITY_FLOOR, VELOCITY_FLOOR + (VELOCITY_CEIL - VELOCITY_FLOOR) * position)),
     );
@@ -299,6 +337,9 @@ export type TrackerOptions = {
     // Most notes sounding at once — matches what the detector can honestly
     // tell apart, so the tracker can't pile up phantom voices.
     maxNotes?: number;
+    // The player's loudness anchors, so an "on" event's velocity is read against
+    // their own soft and hard strikes rather than the default band.
+    calibration?: MicCalibration;
 };
 
 // Folds a per-frame detection stream — now a chord's worth of notes per frame —
@@ -309,6 +350,7 @@ export function createNoteTracker(options: TrackerOptions = {}) {
     const onFrames = options.onFrames ?? 3;
     const offFrames = options.offFrames ?? 6;
     const maxNotes = options.maxNotes ?? 3;
+    const calibration = options.calibration;
     // note → frames seen in a row (and the loudest of them) while auditioning.
     const candidates = new Map<number, { run: number; peak: number }>();
     // note → frames missed in a row while sounding.
@@ -348,7 +390,11 @@ export function createNoteTracker(options: TrackerOptions = {}) {
                 if (audition.run >= onFrames && sounding.size < maxNotes) {
                     candidates.delete(note);
                     sounding.set(note, 0);
-                    events.push({ kind: "on", note, velocity: levelToVelocity(audition.peak) });
+                    events.push({
+                        kind: "on",
+                        note,
+                        velocity: levelToVelocity(audition.peak, calibration),
+                    });
                 }
             }
             return events;

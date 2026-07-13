@@ -9,6 +9,7 @@ import {
     detectPitch,
     frequencyToMidi,
     midiToFrequency,
+    SILENCE_RMS,
     STEP_SEMITONES,
 } from "./pitch";
 
@@ -204,5 +205,40 @@ describe("levelToVelocity", () => {
         const loud = tracker.flush();
         expect(loud).toHaveLength(1);
         expect(on?.velocity).toBe(levelToVelocity(0.2));
+    });
+
+    it("stretches the velocity band to a calibration's own soft and loud anchors", () => {
+        // A quiet mic whose hardest strike only reaches 0.06 RMS: without
+        // calibration that reads as a middling velocity; with it, 0.06 is the
+        // player's ceiling and reads as a hard strike.
+        const cal = { noiseFloor: 0.004, softLevel: 0.008, loudLevel: 0.06, octaveShift: 0 };
+        expect(levelToVelocity(0.06, cal)).toBeGreaterThan(levelToVelocity(0.06));
+        expect(levelToVelocity(0.06, cal)).toBe(112);
+        // The soft anchor is the floor.
+        expect(levelToVelocity(0.008, cal)).toBe(35);
+    });
+
+    it("ignores a degenerate calibration whose anchors collapsed", () => {
+        const bad = { noiseFloor: 0.01, softLevel: 0.1, loudLevel: 0.1, octaveShift: 0 };
+        expect(levelToVelocity(0.2, bad)).toBe(levelToVelocity(0.2));
+    });
+});
+
+describe("calibrated detection", () => {
+    it("obeys a calibration's noise floor over the default", () => {
+        // A frame just above the default floor but below a raised calibration
+        // floor reads as a note by default and as silence once calibrated.
+        const quiet = tone(midiToFrequency(60), 2048, 0.02);
+        expect(detectPitch(quiet, SAMPLE_RATE)).not.toBeNull();
+        expect(detectPitch(quiet, SAMPLE_RATE, 0.2)).toBeNull();
+    });
+
+    it("shifts every detected note by whole octaves", () => {
+        const cal = { noiseFloor: SILENCE_RMS, softLevel: 0.01, loudLevel: 0.35, octaveShift: 1 };
+        const frame = tone(midiToFrequency(48));
+        const raw = detectPitches(frame, SAMPLE_RATE);
+        expect(raw.length).toBeGreaterThan(0);
+        // Whatever the detector reads, the correction lifts it exactly an octave.
+        expect(detectPitches(frame, SAMPLE_RATE, 3, cal)).toEqual(raw.map((note) => note + 12));
     });
 });
