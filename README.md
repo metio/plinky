@@ -238,6 +238,10 @@ a student.
   room is wobblier than a wire, so mic runs are graded with the same generous,
   widened timing windows as the keyboard fallbacks — it should feel encouraging,
   never picky. Works everywhere a microphone does, including Safari and iOS.
+  For the clearest hearing, run **Tune to your piano** once from Settings: a short
+  guided wizard listens to your room, asks you to play middle C, then a soft and a
+  firm note, and remembers a tuning for that device — its noise floor, octave and
+  loudness — so soft notes aren't missed and a quiet or bright piano still reads true.
 - **With your computer keyboard** — the bottom letter row plays the left hand
   (`Z X C V B N M` the white keys, `S D G H J` the black) and the top row the
   right hand an octave up (`Q W E R T Y U` white, `2 3 5 6 7` black), each a full

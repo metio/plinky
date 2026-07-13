@@ -27,6 +27,7 @@ import {
     type MidiSupport,
 } from "../../core/midi";
 import { DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
+import type { CalibrationSample } from "../../core/micCalibration";
 import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
 import { useServices } from "./services";
@@ -85,6 +86,9 @@ type MidiContextValue = {
     micStatus: MicStatus;
     startMic: () => void;
     stopMic: () => void;
+    // Listen raw for the calibration wizard: per-frame loudness and pitch, no
+    // tuning applied and nothing fed to the note funnel.
+    startCalibration: (onSample: (sample: CalibrationSample) => void) => void;
 };
 
 const MidiContext = createContext<MidiContextValue | null>(null);
@@ -96,6 +100,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // bridge wipes — the provider renders inside ServicesProvider, so overrides
     // (a fake MIDI in tests) reach it too.
     const { midi, store, pitch, audio } = useServices();
+    const prefsStore = usePrefsStore();
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -222,42 +227,58 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     }, [pitch]);
     const startMic = useCallback(() => {
         setMicStatus("requesting");
+        // The player's own tuning, if they have run the wizard on this device, so
+        // the live detector hears their room's floor, octave and dynamics.
+        const calibration = prefsStore.load().micCalibration ?? undefined;
         // Notes the guard swallowed as our own speaker's echo, so their later
         // note-offs are swallowed too instead of releasing keys never pressed.
         const suppressed = new Set<number>();
         void pitch
-            .start((event) => {
-                if (event.kind === "on") {
-                    // The echo guard: while Listen playback, the metronome or the
-                    // completion flourish rings from the speaker, the detector will
-                    // hear it. A pitch (or its octave neighbour — the detector's one
-                    // characteristic slip) that WE recently synthesized is our own
-                    // sound coming back, not the player — drop it. Anything else
-                    // passes, so playing along over playback still works.
-                    const echoed = [event.note, event.note - 12, event.note + 12].some(
-                        (candidate) => audio.recentlyStruck?.(candidate, 300) === true,
-                    );
-                    if (echoed) {
-                        suppressed.add(event.note);
-                        return;
+            .start(
+                (event) => {
+                    if (event.kind === "on") {
+                        // The echo guard: while Listen playback, the metronome or the
+                        // completion flourish rings from the speaker, the detector will
+                        // hear it. A pitch (or its octave neighbour — the detector's one
+                        // characteristic slip) that WE recently synthesized is our own
+                        // sound coming back, not the player — drop it. Anything else
+                        // passes, so playing along over playback still works.
+                        const echoed = [event.note, event.note - 12, event.note + 12].some(
+                            (candidate) => audio.recentlyStruck?.(candidate, 300) === true,
+                        );
+                        if (echoed) {
+                            suppressed.add(event.note);
+                            return;
+                        }
+                        emitNote(
+                            "noteon",
+                            event.note,
+                            event.velocity ?? KEYBOARD_VELOCITY,
+                            1,
+                            MIC_DEVICE,
+                            performance.now(),
+                        );
+                    } else {
+                        if (suppressed.delete(event.note)) {
+                            return;
+                        }
+                        emitNote("noteoff", event.note, 0, 1, MIC_DEVICE, performance.now());
                     }
-                    emitNote(
-                        "noteon",
-                        event.note,
-                        event.velocity ?? KEYBOARD_VELOCITY,
-                        1,
-                        MIC_DEVICE,
-                        performance.now(),
-                    );
-                } else {
-                    if (suppressed.delete(event.note)) {
-                        return;
-                    }
-                    emitNote("noteoff", event.note, 0, 1, MIC_DEVICE, performance.now());
-                }
-            })
+                },
+                { calibration },
+            )
             .then(setMicStatus);
-    }, [pitch, emitNote, audio]);
+    }, [pitch, emitNote, audio, prefsStore]);
+    // The calibration wizard's private line to the microphone: the same central
+    // connection (so it can't fight the live listener), started RAW — no tuning,
+    // no note funnel — streaming per-frame telemetry for the wizard to measure.
+    const startCalibration = useCallback(
+        (onSample: (sample: CalibrationSample) => void) => {
+            setMicStatus("requesting");
+            void pitch.start(() => {}, { onSample }).then(setMicStatus);
+        },
+        [pitch],
+    );
     const stopMic = useCallback(() => {
         pitch.stop();
         setMicStatus(pitch.supported() ? "idle" : "unsupported");
@@ -371,7 +392,6 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // is refreshed when Settings saves a remap, so a new layout takes effect at once.
     const octaveRef = useRef(0);
     const keyMapRef = useRef<KeyMap>(DEFAULT_KEY_MAP);
-    const prefsStore = usePrefsStore();
     useEffect(() => {
         if (typeof window === "undefined") {
             return;
@@ -481,6 +501,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         micStatus,
         startMic,
         stopMic,
+        startCalibration,
     };
 
     return <MidiContext.Provider value={value}>{children}</MidiContext.Provider>;

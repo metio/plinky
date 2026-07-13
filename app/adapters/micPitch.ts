@@ -43,7 +43,7 @@ export function micPitch(): PitchInput {
             );
         },
 
-        async start(onEvent): Promise<PitchStartResult> {
+        async start(onEvent, options): Promise<PitchStartResult> {
             stop();
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
@@ -66,8 +66,10 @@ export function micPitch(): PitchInput {
                 analyser.fftSize = FFT_SIZE;
                 source.connect(analyser);
 
+                const calibration = options?.calibration;
+                const onSample = options?.onSample;
                 const frame = new Float32Array(analyser.fftSize);
-                const tracker = createNoteTracker();
+                const tracker = createNoteTracker({ calibration });
                 // The mic keeps sounding a note when stop() lands mid-sustain;
                 // flushing releases it so no key stays lit.
                 onDone = () => {
@@ -78,8 +80,13 @@ export function micPitch(): PitchInput {
                 const sampleRate = context.sampleRate;
                 const tick = () => {
                     analyser.getFloatTimeDomainData(frame);
-                    const notes = detectPitches(frame, sampleRate);
-                    for (const event of tracker.track(notes, rms(frame))) {
+                    const level = rms(frame);
+                    const notes = detectPitches(frame, sampleRate, 3, calibration);
+                    // The wizard reads raw loudness and pitch off the same graph
+                    // the note events flow from — one signal chain, so a tuning
+                    // measured here holds when the player actually plays.
+                    onSample?.({ rms: level, notes });
+                    for (const event of tracker.track(notes, level)) {
                         onEvent(event);
                     }
                     frameHandle = requestAnimationFrame(tick);
