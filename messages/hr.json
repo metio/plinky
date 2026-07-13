@@ -183,6 +183,8 @@
   "beams_on": "Prikaži",
   "beams_off": "Sakrij",
   "beams_caption": "Grede spajaju brze note u ritmičke skupine. Sakrij ih da čitaš notu po notu dok učiš; Automatski ih prikazuje na težim skladbama gdje ritmičko grupiranje pomaže.",
+  "note_size_label": "Veličina nota",
+  "note_size_caption": "Povećaj cijelu partituru za veće, lakše čitljive note — zgodno na malom zaslonu ili kad tek počinješ.",
   "transpose": "Transponiraj",
   "transpose_down": "Transponiraj niže za polustepen",
   "transpose_up": "Transponiraj više za polustepen",

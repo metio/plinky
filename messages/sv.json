@@ -183,6 +183,8 @@
   "beams_on": "Visa",
   "beams_off": "Dölj",
   "beams_caption": "Balkar binder samman snabba noter i taktgrupper. Dölj dem för att läsa en not i taget medan du lär dig; Auto visar dem i svårare stycken där taktgrupperingen hjälper.",
+  "note_size_label": "Notstorlek",
+  "note_size_caption": "Förstora hela notbilden för större och mer lättlästa noter — praktiskt på en liten skärm eller när du precis har börjat.",
   "transpose": "Transponera",
   "transpose_down": "Transponera ner en halvton",
   "transpose_up": "Transponera upp en halvton",

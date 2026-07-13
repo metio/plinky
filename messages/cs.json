@@ -183,6 +183,8 @@
   "beams_on": "Zobrazit",
   "beams_off": "Skrýt",
   "beams_caption": "Trámce spojují rychlé noty do skupin podle dob. Skryjte je, abyste při učení četli notu po notě; Automaticky je zobrazí u těžších skladeb, kde seskupení podle dob pomáhá.",
+  "note_size_label": "Velikost not",
+  "note_size_caption": "Zvětší celý notový zápis, aby byly noty větší a lépe čitelné – hodí se na malé obrazovce nebo když s hraním teprve začínáte.",
   "transpose": "Transponovat",
   "transpose_down": "Transponovat o půltón dolů",
   "transpose_up": "Transponovat o půltón nahoru",

@@ -4,7 +4,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { type Beams, BEAMS } from "../../../core/beams";
 import type { Hand } from "../../../core/matcher";
-import { BARS_PER_ROW, REVEAL_TRIES } from "../../../core/prefs";
+import { BARS_PER_ROW, NOTE_SCALES, REVEAL_TRIES } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { IconButton } from "../ui/button";
@@ -170,6 +170,16 @@ export function RunSetup() {
                 onChange={(id) => reading.setBeams(id as Beams)}
                 options={BEAMS.map((option) => ({ id: option, label: beamsLabel[option] }))}
                 help={m.beams_caption()}
+            />
+            <ChoiceField
+                label={m.note_size_label()}
+                value={String(reading.noteScale)}
+                onChange={(id) => reading.setNoteScale(Number(id))}
+                options={NOTE_SCALES.map((scale) => ({
+                    id: String(scale),
+                    label: `${Math.round(scale * 100)}%`,
+                }))}
+                help={m.note_size_caption()}
             />
             {!lockTempo && trainerOn && (
                 <div className="space-y-1">

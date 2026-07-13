@@ -183,6 +183,8 @@
   "beams_on": "Zobraziť",
   "beams_off": "Skryť",
   "beams_caption": "Trámce spájajú rýchle noty do skupín podľa doby. Skryte ich, aby ste pri učení čítali po jednej note; režim Automaticky ich zobrazí pri ťažších skladbách, kde zoskupenie podľa doby pomáha.",
+  "note_size_label": "Veľkosť nôt",
+  "note_size_caption": "Zväčšite celú partitúru pre väčšie a ľahšie čitateľné noty — hodí sa na malej obrazovke alebo keď začínate.",
   "transpose": "Transponovať",
   "transpose_down": "Transponovať o poltón nadol",
   "transpose_up": "Transponovať o poltón nahor",

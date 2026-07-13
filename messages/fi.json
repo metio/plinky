@@ -183,6 +183,8 @@
   "beams_on": "Näytä",
   "beams_off": "Piilota",
   "beams_caption": "Palkit yhdistävät nopeat nuotit iskuryhmiksi. Piilota ne lukeaksesi yhden nuotin kerrallaan harjoitellessasi; Automaattinen näyttää ne vaikeammissa kappaleissa, joissa iskuryhmittely auttaa.",
+  "note_size_label": "Nuottien koko",
+  "note_size_caption": "Suurenna koko nuottikuvaa isommiksi, helpommin luettaviksi nuoteiksi — kätevää pienellä näytöllä tai kun vasta aloittelet.",
   "transpose": "Transponoi",
   "transpose_down": "Transponoi alas puolisävelaskel",
   "transpose_up": "Transponoi ylös puolisävelaskel",

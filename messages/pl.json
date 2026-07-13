@@ -183,6 +183,8 @@
   "beams_on": "Pokaż",
   "beams_off": "Ukryj",
   "beams_caption": "Belki łączą szybkie nuty w grupy rytmiczne. Ukryj je, aby podczas nauki czytać nutę po nucie; Automatycznie pokazuje je w trudniejszych utworach, gdzie grupowanie pomaga.",
+  "note_size_label": "Rozmiar nut",
+  "note_size_caption": "Powiększ całą partyturę, aby nuty były większe i łatwiejsze do odczytania – przydatne na małym ekranie lub gdy dopiero zaczynasz.",
   "transpose": "Transponuj",
   "transpose_down": "Transponuj w dół o półton",
   "transpose_up": "Transponuj w górę o półton",

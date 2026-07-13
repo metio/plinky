@@ -183,6 +183,8 @@
   "beams_on": "Afișează",
   "beams_off": "Ascunde",
   "beams_caption": "Barele de grupare unesc notele rapide în grupuri pe timpi. Ascunde-le ca să citești câte o notă pe rând când înveți; modul Automat le afișează la piesele mai dificile, unde gruparea pe timpi ajută.",
+  "note_size_label": "Dimensiunea notelor",
+  "note_size_caption": "Mărește întreaga partitură pentru note mai mari și mai ușor de citit — util pe un ecran mic sau când abia începi.",
   "transpose": "Transpune",
   "transpose_down": "Transpune cu un semiton mai jos",
   "transpose_up": "Transpune cu un semiton mai sus",
