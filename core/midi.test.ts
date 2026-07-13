@@ -108,6 +108,27 @@ describe("parseMidiMessage", () => {
         expect(parseMidiMessage(new Uint8Array([0x90]))).toBeNull();
         expect(parseMidiMessage(null)).toBeNull();
     });
+
+    it("decodes the sustain pedal (CC64) as down in the upper half, up below", () => {
+        expect(parseMidiMessage(new Uint8Array([0xb0, 64, 127]))).toEqual({
+            kind: "pedal",
+            down: true,
+            channel: 1,
+        });
+        expect(parseMidiMessage(new Uint8Array([0xb0, 64, 64]))).toMatchObject({ down: true });
+        expect(parseMidiMessage(new Uint8Array([0xb0, 64, 63]))).toMatchObject({ down: false });
+        expect(parseMidiMessage(new Uint8Array([0xb1, 64, 0]))).toMatchObject({
+            kind: "pedal",
+            down: false,
+            channel: 2,
+        });
+    });
+
+    it("ignores control changes other than the sustain pedal", () => {
+        // The soft pedal (CC67) and every other controller decode to null.
+        expect(parseMidiMessage(new Uint8Array([0xb0, 67, 127]))).toBeNull();
+        expect(parseMidiMessage(new Uint8Array([0xb0, 1, 100]))).toBeNull();
+    });
 });
 
 describe("isPreciseInput", () => {

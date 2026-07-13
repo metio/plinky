@@ -134,8 +134,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   there to find before you've saved a thing: with nothing yet, it tells you how to make a run (play a piece through, then save
   it). Each piece keeps your last few, each showing the **grade and the accuracy, timing
   and flow** it earned so you can compare attempts at a glance: **replay** one and it plays
-  back onto the staff in your own timing — on a MIDI piano, even how long you held each key,
-  so your articulation comes back too — **download** it as MIDI or MusicXML, **save it as
+  back onto the staff in your own timing — on a MIDI piano, even how long you held each key
+  and every press of the **sustain pedal**, so a note you pedalled rings on in the replay
+  just as you played it — **download** it as MIDI or MusicXML, **save it as
   a video** (an MP4 of your take: the sheet music of what you played with each note
   tinting as it sounds, above the keyboard where each press lights its key in full
   and fades while held, so even fast repeats read clearly — with the piece's title, composer

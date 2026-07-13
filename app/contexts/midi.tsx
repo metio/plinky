@@ -36,6 +36,9 @@ import { resetDevice } from "../lib/resetDevice";
 export type NoteListener = {
     onNoteOn?: (event: MidiNoteEvent) => void;
     onNoteOff?: (event: MidiNoteEvent) => void;
+    // The sustain pedal changed: down holds released notes ringing, up drops them.
+    // Only a real MIDI device sends this — the keyboard fallbacks have no pedal.
+    onPedal?: (down: boolean, timestamp: number) => void;
 };
 
 declare global {
@@ -168,10 +171,22 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [],
     );
 
+    // The pedal funnel, alongside emitNote: the sustain pedal carries no note, so it
+    // reaches subscribers on its own channel rather than through the note pipeline.
+    const emitPedal = useCallback((down: boolean, timestamp: number) => {
+        for (const listener of subscribersRef.current) {
+            listener.onPedal?.(down, timestamp);
+        }
+    }, []);
+
     const makeHandler = useCallback(
         (deviceName: string) => (data: Uint8Array, timestamp: number) => {
             const parsed = parseMidiMessage(data);
             if (!parsed) {
+                return;
+            }
+            if (parsed.kind === "pedal") {
+                emitPedal(parsed.down, timestamp);
                 return;
             }
             emitNote(
@@ -183,7 +198,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 timestamp,
             );
         },
-        [emitNote],
+        [emitNote, emitPedal],
     );
 
     // The bridge reads state through a ref so it needs no re-attachment per render.
@@ -533,6 +548,7 @@ export function useMidiInput(handlers: NoteListener): void {
         return subscribe({
             onNoteOn: (event) => handlersRef.current.onNoteOn?.(event),
             onNoteOff: (event) => handlersRef.current.onNoteOff?.(event),
+            onPedal: (down, timestamp) => handlersRef.current.onPedal?.(down, timestamp),
         });
     }, [subscribe]);
 }
