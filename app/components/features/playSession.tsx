@@ -419,6 +419,12 @@ function usePlaySessionValue({
             markPainted();
         },
     });
+    // Keys the player is holding down right now. A finished run defers leaving full
+    // screen while any of these ring, so the last note plays out for as long as it is
+    // held instead of being cut off the instant the run completes.
+    const heldNotes = useRef(new Set<number>());
+    const [holdingNote, setHoldingNote] = useState(false);
+    const syncHolding = useCallback(() => setHoldingNote(heldNotes.current.size > 0), []);
     useMidiInput({
         onNoteOn: (event) => {
             // A play-along run owns the input: notes are caught against the clock, not fed
@@ -429,6 +435,13 @@ function usePlaySessionValue({
             }
             if (!isPreciseInput(event.device)) {
                 captureRef.current.imprecise = true;
+            }
+            // The mic's note-off is the detector's own timing, never a real key lift, so a
+            // mic note would stick in the held set and hold full screen open forever. Only
+            // keyed input, which releases cleanly, defers the exit.
+            if (event.device !== MIC_DEVICE) {
+                heldNotes.current.add(event.note);
+                syncHolding();
             }
             matcher.registerNote(event.note, event.timestamp, event.velocity);
         },
@@ -442,6 +455,8 @@ function usePlaySessionValue({
                 return;
             }
             synth.releaseNote(event.note);
+            heldNotes.current.delete(event.note);
+            syncHolding();
             captureRelease(captureRef.current, event.note, event.timestamp);
         },
         // The pedals shape the live sound; the sustain pedal also drives the recording's
@@ -640,12 +655,14 @@ function usePlaySessionValue({
     // strip — all hidden while full screen to keep the play surface clean — come into
     // view. Without this a completed full-screen run looks stuck: the score just ends
     // with nothing shown. The hook's fullscreenchange sync keeps state honest if the
-    // player has already left on their own.
+    // player has already left on their own. The exit waits while the player still holds
+    // a key so the final note rings out for as long as it is held rather than being cut
+    // off the instant the last note lands; releasing it drops out of full screen.
     useEffect(() => {
-        if (matcher.complete && fullscreen) {
+        if (matcher.complete && fullscreen && !holdingNote) {
             exitFullscreen();
         }
-    }, [matcher.complete, fullscreen, exitFullscreen]);
+    }, [matcher.complete, fullscreen, holdingNote, exitFullscreen]);
 
     // Leaving the play surface — the ✕, Esc, or a finished run dropping out — ends any
     // run in progress, but keeps the cursor where it is (stop hides, never rewinds), so
