@@ -5,6 +5,7 @@
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Take } from "../../../core/takes";
+import { takeFileStem } from "../../lib/takeFile";
 import type { VideoExporter } from "../../ports/videoExporter";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { ExportVideoButton } from "./exportVideoButton";
@@ -64,7 +65,7 @@ describe("ExportVideoButton", () => {
         mount({ supported: async () => true, export: exportMock });
         fireEvent.click(await screen.findByRole("button", { name: "Video" }));
         fireEvent.click(screen.getByRole("button", { name: "Save video" }));
-        await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
+        await waitFor(() => expect(downloadName).toBe(`${takeFileStem("Menuet", take)}.mp4`));
         expect(exportMock.mock.calls[0]?.[0]?.notes).toEqual(take.composition.notes);
         // The default orientation is landscape 720p.
         expect(exportMock.mock.calls[0]?.[0]?.width).toBe(1280);
@@ -79,7 +80,7 @@ describe("ExportVideoButton", () => {
         fireEvent.click(await screen.findByRole("button", { name: "Video" }));
         fireEvent.click(screen.getByRole("tab", { name: "9:16" }));
         fireEvent.click(screen.getByRole("button", { name: /Save a portrait video/ }));
-        await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
+        await waitFor(() => expect(downloadName).toBe(`${takeFileStem("Menuet", take)}.mp4`));
         expect(exportMock.mock.calls[0]?.[0]?.width).toBe(720);
         expect(exportMock.mock.calls[0]?.[0]?.height).toBe(1280);
     });
@@ -93,7 +94,7 @@ describe("ExportVideoButton", () => {
         fireEvent.click(screen.getByRole("tab", { name: "1080p" }));
         fireEvent.click(screen.getByRole("tab", { name: "60" }));
         fireEvent.click(screen.getByRole("button", { name: "Save video" }));
-        await waitFor(() => expect(downloadName).toBe("Menuet-take.mp4"));
+        await waitFor(() => expect(downloadName).toBe(`${takeFileStem("Menuet", take)}.mp4`));
         expect(exportMock.mock.calls[0]?.[0]?.width).toBe(1920);
         expect(exportMock.mock.calls[0]?.[0]?.height).toBe(1080);
         expect(exportMock.mock.calls[0]?.[0]?.fps).toBe(60);

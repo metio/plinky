@@ -4,7 +4,7 @@
 import { toMidiNotes, toMusicXml } from "../../../core/composition";
 import { downloadBlob } from "../../lib/download";
 import { buildMidiFile } from "../../../core/midiFile";
-import { fileStem } from "../../lib/printScore";
+import { takeFileStem } from "../../lib/takeFile";
 import { ghostOnsets, type Take } from "../../../core/takes";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
@@ -70,7 +70,6 @@ export function TakesPanel({
     onDelete: (takeId: string) => void;
 }) {
     const now = Date.now();
-    const stem = fileStem(title);
     return (
         <div className="space-y-3">
             {takes.length === 0 ? (
@@ -142,7 +141,7 @@ export function TakesPanel({
                                                     tempo: take.composition.tempo,
                                                 }),
                                                 "audio/midi",
-                                                `${stem}-take.mid`,
+                                                `${takeFileStem(title, take)}.mid`,
                                             )
                                         }
                                     >
@@ -154,7 +153,7 @@ export function TakesPanel({
                                             downloadBlob(
                                                 toMusicXml(take.composition),
                                                 "application/xml",
-                                                `${stem}-take.musicxml`,
+                                                `${takeFileStem(title, take)}.musicxml`,
                                             )
                                         }
                                     >

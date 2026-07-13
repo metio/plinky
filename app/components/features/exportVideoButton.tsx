@@ -7,6 +7,7 @@ import { videoDurationMs } from "../../../core/videoFrames";
 import { useVideoExporter } from "../../contexts/services";
 import { downloadBlob } from "../../lib/download";
 import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
+import { takeFileStem } from "../../lib/takeFile";
 import { takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -101,7 +102,7 @@ export function ExportVideoButton({
                 },
                 setProgress,
             );
-            downloadBlob(blob, "video/mp4", `${title}-take.mp4`);
+            downloadBlob(blob, "video/mp4", `${takeFileStem(title, take)}.mp4`);
         } finally {
             setProgress(null);
         }
