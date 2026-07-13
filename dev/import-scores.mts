@@ -12,8 +12,8 @@
 // run `npm run songs:bake` afterwards to finalise the octile boundaries + seed.
 //
 // Usage: `npm run scores:import [source-id]` (defaults to openscore-lieder). Each repo is
-// cloned into sources/<id>/<repo> (gitignored) on first run. Humdrum (**kern) corpora
-// are converted to MusicXML by dev/krn2mxl.py (music21) before ingesting.
+// cloned into sources/<id>/<repo> (gitignored) on first run; preconverted sources ingest
+// their .mxl straight from sources/<id>/_mxl.
 //
 
 import { rawDifficulty, MAX_GRADE } from "../core/scoreDifficulty.ts";
@@ -25,7 +25,7 @@ import { strFromU8, unzipSync } from "fflate";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 import { nonPianoVocalReason, nonSoloPianoReason } from "./scoreInstrument.mts";
 import { songId } from "../core/songId.ts";
-import { licenseDir } from "../core/attribution.ts";
+import { licenseDir, licenseInfo } from "../core/attribution.ts";
 
 
 const OUT = "public/songs";
@@ -35,12 +35,6 @@ type SourceConfig = {
     repos: string[]; // git URLs, each cloned to sources/<id>/<repo> when missing
     license: string; // the SPDX id every score from this source carries
     gate: (xml: string) => string | null; // instrument filter for this repertoire
-    // Humdrum **kern corpora ship .krn, converted to .mxl via music21 before ingest.
-    convert?: boolean;
-    // Which converter runs the .krn → .mxl step (default dev/krn2mxl.py). The Bach
-    // chorales need dev/chorale2piano.py, which reduces their four SATB voices to a
-    // two-staff piano grand staff.
-    convertScript?: string;
     // Set when the .mxl were produced by an out-of-band step that needs a heavier
     // toolchain than this importer's container (Mutopia: LilyPond, in dev/mutopia.*).
     // The importer then ingests sources/<id>/_mxl/*.mxl directly — no clone, no convert.
@@ -57,39 +51,18 @@ type SourceConfig = {
     reorderComposer?: boolean;
 };
 
-// The corpora we trust for licensing (curated projects). OpenScore Lieder is 19th-century
-// art song (voice over piano) → the piano-or-vocal gate. The KernScores keyboard corpora
-// are solo/duet piano → the strict solo-piano gate; they are CC-BY-NC-SA (see
-// attribution.ts), and only the repos carrying an explicit CC licence are listed (the
-// rights-reserved ones — Beethoven, Scriabin, Chopin, Hummel — are deliberately omitted).
+// The corpora we trust for licensing (curated projects), all commercially usable.
+// OpenScore Lieder is 19th-century art song (voice over piano) → the piano-or-vocal gate.
+// Mutopia and CPDL ship public-domain / CC-BY / CC-BY-SA editions → the strict solo-piano
+// gate, with a per-piece licence bucket encoded in each filename. A NonCommercial source
+// can't be added here: the ingest loop refuses any piece whose licence isn't commercialUse
+// (attribution.ts is the single source of truth), so a paid tier stays clear of NC content.
 const CONFIGS: Record<string, SourceConfig> = {
     "openscore-lieder": {
         repos: ["https://github.com/OpenScore/Lieder.git"],
         license: "CC0-1.0",
         gate: nonPianoVocalReason,
         titleField: "movement",
-    },
-    kern: {
-        repos: [
-            "https://github.com/craigsapp/scarlatti-keyboard-sonatas.git",
-            "https://github.com/craigsapp/mozart-piano-sonatas.git",
-            "https://github.com/craigsapp/haydn-piano-sonatas.git",
-            "https://github.com/craigsapp/joplin.git",
-        ],
-        license: "CC-BY-NC-SA-4.0",
-        gate: nonSoloPianoReason,
-        convert: true,
-        titleField: "work",
-        reorderComposer: true,
-    },
-    "bach-chorales": {
-        repos: ["https://github.com/craigsapp/bach-370-chorales.git"],
-        license: "CC-BY-NC-SA-4.0",
-        gate: nonSoloPianoReason,
-        convert: true,
-        convertScript: "dev/chorale2piano.py",
-        titleField: "work",
-        reorderComposer: true,
     },
     // Public-domain solo-keyboard pieces from the Mutopia Project, converted from
     // LilyPond to two-staff piano MusicXML by dev/mutopia-harvest.py (run separately in
@@ -114,30 +87,6 @@ const CONFIGS: Record<string, SourceConfig> = {
         // reorderName only rewrites the comma form, so this fixes those and leaves
         // the rest untouched.
         reorderComposer: true,
-    },
-    // Solo-piano classical scores from the ASAP dataset (CC-BY-NC-SA-4.0). ASAP ships
-    // plain .musicxml with no embedded title/composer; dev/asap-preconvert.mts injects
-    // those from its metadata.csv and writes .mxl into sources/asap/_mxl, so this ingests
-    // it as a preconverted source. The composer names are already "First Last".
-    asap: {
-        repos: [],
-        preconverted: true,
-        license: "CC-BY-NC-SA-4.0",
-        gate: nonSoloPianoReason,
-        titleField: "work",
-    },
-    // Solo-piano corpora from DCMLab (CC-BY-NC-SA). Their MuseScore .mscx carry embedded
-    // title/composer AND Roman-numeral analysis; dev/dcml-harvest.py converts each to
-    // MusicXML with MuseScore, strips the <harmony> analysis, and composes a distinct
-    // title (set + opus + movement) into <movement-title>, writing .mxl into
-    // sources/dcml/_mxl (run separately in dev/musescore.Containerfile). Ingested as a
-    // preconverted source; the composed title is read from the movement field.
-    dcml: {
-        repos: [],
-        preconverted: true,
-        license: "CC-BY-NC-SA-4.0",
-        gate: nonSoloPianoReason,
-        titleField: "movement",
     },
     // Public-domain choral editions from CPDL (ChoralWiki), reduced to a two-staff piano
     // grand staff by dev/cpdl-harvest.py (run separately — it scrapes + needs music21).
@@ -267,17 +216,8 @@ async function main() {
             console.log(`Cloning ${repoUrl} → ${repoDir} …`);
             execSync(`git clone --depth 1 ${repoUrl} ${repoDir}`, { stdio: "inherit" });
         }
-        let searchDir = repoDir;
-        if (cfg.convert) {
-            searchDir = `${repoDir}/_mxl`;
-            const script = cfg.convertScript ?? "dev/krn2mxl.py";
-            console.log(`Converting ${repoName} .krn → .mxl (${script}) …`);
-            execSync(`python3 ${script} ${repoDir} ${searchDir} ${repoName}`, {
-                stdio: "inherit",
-            });
-        }
         files.push(
-            ...execSync(`find ${searchDir} -name '*.mxl'`, { encoding: "utf8", maxBuffer: 64 << 20 })
+            ...execSync(`find ${repoDir} -name '*.mxl'`, { encoding: "utf8", maxBuffer: 64 << 20 })
                 .trim()
                 .split("\n")
                 .filter(Boolean),
@@ -301,7 +241,7 @@ async function main() {
     const takenIds = new Set(kept.map((song) => song.id));
 
     const added: (SongMeta & { src: string })[] = [];
-    const dropped = { gate: 0, dup: 0, unreadable: 0 };
+    const dropped = { gate: 0, dup: 0, unreadable: 0, noncommercial: 0 };
     for (const file of files) {
         let xml: string;
         try {
@@ -322,6 +262,12 @@ async function main() {
         const sourceName = file.split("/").pop() ?? file;
         const bucket = cfg.bucketLicense && sourceName.match(/^[a-z-]+-([a-z0-9]+)-/)?.[1];
         const license = (bucket && cfg.bucketLicense?.[bucket]) || cfg.license;
+        // A paid tier must exclude NonCommercial pieces, so they never enter the catalogue.
+        // attribution.ts's commercialUse flag is the single source of truth for that gate.
+        if (!licenseInfo(license)?.commercialUse) {
+            dropped.noncommercial++;
+            continue;
+        }
         // The id is a content fingerprint: stable across re-imports, identical for
         // identical music (which then collapses to one entry).
         const id = songId(xml);
@@ -354,7 +300,7 @@ async function main() {
         });
     }
     console.log(
-        `Kept ${added.length}; dropped gate=${dropped.gate} dup=${dropped.dup} unreadable=${dropped.unreadable}.`,
+        `Kept ${added.length}; dropped gate=${dropped.gate} dup=${dropped.dup} unreadable=${dropped.unreadable} noncommercial=${dropped.noncommercial}.`,
     );
 
     for (const song of added) {

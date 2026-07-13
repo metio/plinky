@@ -3,6 +3,5 @@
   "entry": ["app/routes/*.tsx"],
   "project": ["app/**/*.{ts,tsx}", "core/**/*.ts"],
   "ignoreDependencies": ["tailwindcss", "axe-core", "linkedom"],
-  "ignoreBinaries": ["python3"],
   "ignoreExportsUsedInFile": true
 }

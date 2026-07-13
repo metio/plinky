@@ -3,6 +3,7 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { licenseInfo } from "../../core/attribution";
 import type { SongMeta } from "../stores/songSource";
 
 // Guards the shipped song catalogue's contract: every song carries a difficulty cost,
@@ -29,5 +30,10 @@ describe("song manifest", () => {
         for (let i = 1; i < manifest.length; i++) {
             expect(manifest[i]!.grade).toBeGreaterThanOrEqual(manifest[i - 1]!.grade);
         }
+    });
+
+    it("ships only commercially usable licences, so a paid tier stays clear of NonCommercial pieces", () => {
+        const offenders = manifest.filter((song) => !licenseInfo(song.license)?.commercialUse);
+        expect(offenders.map((song) => `${song.id} (${song.license})`)).toEqual([]);
     });
 });

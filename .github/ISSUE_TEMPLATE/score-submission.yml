@@ -61,15 +61,14 @@ body:
       label: License
       description: >
         How others may use this score. CC0-1.0 is public-domain-style (most
-        reusable); CC-BY needs attribution; SA adds share-alike; NC blocks
-        commercial use; ND blocks derivatives.
+        reusable); CC-BY needs attribution; SA adds share-alike. Only these
+        commercially-usable, derivative-friendly licences are accepted — the
+        catalogue adds fingering and grading, so NonCommercial and NoDerivatives
+        scores can't be admitted.
       options:
         - "CC0-1.0"
         - "CC-BY-4.0"
         - "CC-BY-SA-4.0"
-        - "CC-BY-NC-4.0"
-        - "CC-BY-ND-4.0"
-        - "CC-BY-NC-SA-4.0"
     validations:
       required: true
   - type: checkboxes

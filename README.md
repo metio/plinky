@@ -106,19 +106,15 @@ one-tap **review session** walks you through everything that's fading, and you c
   add your own MusicXML score (drag-and-drop, with a staff preview and editable
   details), download a backup of your imports — or the **whole local library
   including Plinky's built-in pieces** — and restore from a bundle. Each piece credits
-  its **licence and source** — the catalogue is drawn from
+  its **licence and source**. Every piece is commercially usable — public-domain, CC0,
+  CC-BY or CC-BY-SA (shipped unmodified, so the ShareAlike terms stay satisfied) — so the
+  catalogue clears a paid tier. It is drawn from
   [PDMX](https://github.com/pnlong/PDMX) and the CC0
-  [OpenScore Lieder](https://github.com/OpenScore/Lieder) corpus, the
-  CC-BY-NC-SA [KernScores](https://github.com/craigsapp) corpora (Scarlatti, Mozart,
-  Haydn and Joplin, and Bach's 370 chorales reduced to a two-staff piano grand staff),
-  solo-keyboard pieces from the [Mutopia Project](https://www.mutopiaproject.org)
-  (public-domain, CC-BY and CC-BY-SA), and the CC-BY-NC-SA
-  [ASAP dataset](https://github.com/fosfrancesco/asap-dataset) and
-  [DCMLab](https://github.com/DCMLab) corpora of solo-piano classical scores
-  (Beethoven, Chopin, Schumann, Grieg, Liszt, Tchaikovsky and more), and public-domain
-  choral works from [CPDL](https://www.cpdl.org) (Palestrina, Victoria, Byrd, Tallis…)
-  reduced to a two-staff piano grand staff — each credited under its own licence, linked
-  from the play page.
+  [OpenScore Lieder](https://github.com/OpenScore/Lieder) corpus, solo-keyboard pieces
+  from the [Mutopia Project](https://www.mutopiaproject.org) (public-domain, CC-BY and
+  CC-BY-SA), and public-domain choral works from [CPDL](https://www.cpdl.org) (Palestrina,
+  Victoria, Byrd, Tallis…) reduced to a two-staff piano grand staff — each credited under
+  its own licence, linked from the play page.
 - **Daily challenge** — one freshly generated phrase, the same for everyone that day,
   graded and shareable as a "Plinky #N" grid; play it whenever you like, with no
   streak to keep up. An unplayed day arrives as a little present to open; once
