@@ -21,6 +21,10 @@ export type LicenseInfo = {
     // False for the NonCommercial (NC) variants: a paid tier must exclude these
     // pieces. The single source of truth for that gate — no separate manifest flag.
     commercialUse: boolean;
+    // False for the NoDerivatives (ND) variant: the catalogue adds fingering and
+    // grading (a derivative), so a no-derivatives licence can't be admitted. Combined
+    // with commercialUse, this decides whether a piece is eligible for the catalogue.
+    allowsDerivatives: boolean;
 };
 
 const DEED = "https://creativecommons.org/";
@@ -34,6 +38,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: false,
         publicDomain: true,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-4.0": {
         label: "CC BY 4.0",
@@ -41,6 +46,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-3.0": {
         label: "CC BY 3.0",
@@ -48,6 +54,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-2.5": {
         label: "CC BY 2.5",
@@ -55,6 +62,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-SA-4.0": {
         label: "CC BY-SA 4.0",
@@ -62,6 +70,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-SA-3.0": {
         label: "CC BY-SA 3.0",
@@ -69,6 +78,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-SA-2.5": {
         label: "CC BY-SA 2.5",
@@ -76,6 +86,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: true,
     },
     "CC-BY-NC-4.0": {
         label: "CC BY-NC 4.0",
@@ -83,6 +94,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: false,
+        allowsDerivatives: true,
     },
     "CC-BY-ND-4.0": {
         label: "CC BY-ND 4.0",
@@ -90,6 +102,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: true,
+        allowsDerivatives: false,
     },
     "CC-BY-NC-SA-4.0": {
         label: "CC BY-NC-SA 4.0",
@@ -97,6 +110,7 @@ const LICENSES: Record<string, Omit<LicenseInfo, "id">> = {
         requiresAttribution: true,
         publicDomain: false,
         commercialUse: false,
+        allowsDerivatives: true,
     },
 };
 

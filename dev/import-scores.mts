@@ -241,7 +241,7 @@ async function main() {
     const takenIds = new Set(kept.map((song) => song.id));
 
     const added: (SongMeta & { src: string })[] = [];
-    const dropped = { gate: 0, dup: 0, unreadable: 0, noncommercial: 0 };
+    const dropped = { gate: 0, dup: 0, unreadable: 0, ineligible: 0 };
     for (const file of files) {
         let xml: string;
         try {
@@ -262,10 +262,13 @@ async function main() {
         const sourceName = file.split("/").pop() ?? file;
         const bucket = cfg.bucketLicense && sourceName.match(/^[a-z-]+-([a-z0-9]+)-/)?.[1];
         const license = (bucket && cfg.bucketLicense?.[bucket]) || cfg.license;
-        // A paid tier must exclude NonCommercial pieces, so they never enter the catalogue.
-        // attribution.ts's commercialUse flag is the single source of truth for that gate.
-        if (!licenseInfo(license)?.commercialUse) {
-            dropped.noncommercial++;
+        // The catalogue admits only commercially usable, derivative-friendly pieces: a paid
+        // tier can't ship NonCommercial scores, and the fingering/grading we add is a
+        // derivative a NoDerivatives licence forbids. attribution.ts is the single source of
+        // truth for both, so a NonCommercial or NoDerivatives source can never enter here.
+        const info = licenseInfo(license);
+        if (!info?.commercialUse || !info.allowsDerivatives) {
+            dropped.ineligible++;
             continue;
         }
         // The id is a content fingerprint: stable across re-imports, identical for
@@ -300,7 +303,7 @@ async function main() {
         });
     }
     console.log(
-        `Kept ${added.length}; dropped gate=${dropped.gate} dup=${dropped.dup} unreadable=${dropped.unreadable} noncommercial=${dropped.noncommercial}.`,
+        `Kept ${added.length}; dropped gate=${dropped.gate} dup=${dropped.dup} unreadable=${dropped.unreadable} ineligible=${dropped.ineligible}.`,
     );
 
     for (const song of added) {

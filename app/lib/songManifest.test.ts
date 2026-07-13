@@ -32,8 +32,11 @@ describe("song manifest", () => {
         }
     });
 
-    it("ships only commercially usable licences, so a paid tier stays clear of NonCommercial pieces", () => {
-        const offenders = manifest.filter((song) => !licenseInfo(song.license)?.commercialUse);
+    it("ships only commercially usable, derivative-friendly licences, so a paid tier stays clear of NonCommercial and NoDerivatives pieces", () => {
+        const offenders = manifest.filter((song) => {
+            const info = licenseInfo(song.license);
+            return !info?.commercialUse || !info.allowsDerivatives;
+        });
         expect(offenders.map((song) => `${song.id} (${song.license})`)).toEqual([]);
     });
 });

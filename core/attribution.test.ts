@@ -56,6 +56,15 @@ describe("licenseInfo", () => {
         }
     });
 
+    it("marks the NoDerivatives variant as not permitting derivatives", () => {
+        // The catalogue adds fingering and grading, so ND pieces are ineligible; every
+        // other licence allows the derivative editing that makes them.
+        expect(licenseInfo("CC-BY-ND-4.0")?.allowsDerivatives).toBe(false);
+        for (const id of ["CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0", "CC-BY-NC-4.0", "CC-BY-NC-SA-4.0"]) {
+            expect(licenseInfo(id)?.allowsDerivatives, id).toBe(true);
+        }
+    });
+
     it("returns null for an unknown or missing id", () => {
         expect(licenseInfo("MIT")).toBeNull();
         expect(licenseInfo("")).toBeNull();
