@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: 0BSD
 
 import { render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { webMidi } from "../adapters/webMidi";
 import { ServicesProvider } from "./services";
-import { MidiProvider, useMidiConnection } from "./midi";
+import { MidiProvider, useMidiConnection, useMidiInput } from "./midi";
 
 // Real chromium, with the "midi" permission granted at the browser-context level
 // (vitest.config.ts) — so the genuine Web MIDI adapter runs its full permission,
@@ -26,6 +27,14 @@ function Probe() {
             <output aria-label="held">{heldNotes.join(",")}</output>
         </div>
     );
+}
+
+// A probe that subscribes to pedal events the way the play surface does, so a raw
+// CC64 message can be asserted end to end through the real context.
+function PedalProbe() {
+    const [pedal, setPedal] = useState("up");
+    useMidiInput({ onPedal: (down) => setPedal(down ? "down" : "up") });
+    return <output aria-label="pedal">{pedal}</output>;
 }
 
 describe("webMidi adapter in a real browser", () => {
@@ -91,9 +100,27 @@ describe("MidiProvider over the fake seam in a real browser", () => {
         input.emit([0x80, 64, 0]); // plain note-off
         await waitFor(() => expect(screen.getByLabelText("held").textContent).toBe(""));
 
-        input.emit([0xb0, 64, 127]); // a control change is not a note — ignored
+        input.emit([0xb0, 7, 127]); // a volume control change is not a note — ignored
         input.emit([0x90, 62, 80]); // a real note after it still lands alone
         await waitFor(() => expect(screen.getByLabelText("held").textContent).toBe("62"));
+    });
+
+    it("routes the sustain pedal (CC64) through to pedal subscribers", async () => {
+        const input = fakeMidiInput({ name: "Stage Piano" });
+        const midi = fakeMidi({ permission: "granted", inputs: [input] });
+        render(
+            <ServicesProvider services={{ midi }}>
+                <MidiProvider>
+                    <PedalProbe />
+                </MidiProvider>
+            </ServicesProvider>,
+        );
+        await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("up"));
+
+        input.emit([0xb0, 64, 127]); // sustain pedal pressed
+        await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("down"));
+        input.emit([0xb0, 64, 0]); // sustain pedal released
+        await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("up"));
     });
 });
 

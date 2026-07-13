@@ -49,25 +49,38 @@ export function pitchClass(note: number): string {
     return PITCH_CLASSES[((note % 12) + 12) % 12]!;
 }
 
-export type ParsedMessage = {
-    kind: MidiNoteEvent["kind"];
-    note: number;
-    velocity: number;
-    channel: number;
-};
+// The MIDI controller number of the sustain (damper) pedal — Control Change 64.
+export const SUSTAIN_PEDAL_CC = 64;
 
-// Decode a raw MIDI status/data triple into a note event, or null for messages
-// that are neither note-on nor note-off. A note-on with zero velocity is the
-// conventional "running status" way to release a key, so it reads as note-off.
+// A decoded MIDI message the app acts on: a note-on/off, or a sustain-pedal change.
+// Every other message (other control changes, pitch bend, aftertouch…) decodes to
+// null and is ignored.
+export type ParsedMessage =
+    | { kind: "noteon" | "noteoff"; note: number; velocity: number; channel: number }
+    | { kind: "pedal"; down: boolean; channel: number };
+
+// Decode a raw MIDI status/data triple into a note event or a pedal change, or null
+// for anything else. A note-on with zero velocity is the conventional "running status"
+// way to release a key, so it reads as note-off. A sustain-pedal control change reads
+// as down when its value is in the upper half (≥64), the MIDI convention.
 export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null {
     if (!data || data.length < 2) {
         return null;
     }
     const type = data[0]! & 0xf0;
     const channel = (data[0]! & 0x0f) + 1;
+
+    if (type === 0xb0) {
+        // Control change. Only the sustain pedal is acted on; every other controller
+        // (soft pedal, expression, bank select…) is ignored.
+        if (data[1]! !== SUSTAIN_PEDAL_CC) {
+            return null;
+        }
+        return { kind: "pedal", down: (data.length > 2 ? data[2]! : 0) >= 64, channel };
+    }
+
     const note = data[1]!;
     const velocity = data.length > 2 ? data[2]! : 0;
-
     const isNoteOn = type === 0x90 && velocity > 0;
     const isNoteOff = type === 0x80 || (type === 0x90 && velocity === 0);
     if (!isNoteOn && !isNoteOff) {

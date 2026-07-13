@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { type ClearedNote, captureCleared, captureRelease, liveTempo, startCapture } from "./runCapture";
+import {
+    type ClearedNote,
+    captureCleared,
+    capturePedal,
+    captureRelease,
+    liveTempo,
+    startCapture,
+} from "./runCapture";
 
 const cleared = (over: Partial<ClearedNote> = {}): ClearedNote => ({
     pitches: [60],
@@ -38,6 +45,39 @@ describe("runCapture", () => {
         captureCleared(capture, cleared());
         captureRelease(capture, 99, 2000);
         expect(capture.notes[0]?.heldMs).toBeUndefined();
+    });
+
+    it("keeps a note ringing when the key lifts under the sustain pedal", () => {
+        const capture = startCapture();
+        captureCleared(capture, cleared({ timestamp: 1000 }));
+        capturePedal(capture, true, 1100);
+        // The key lifts while the pedal is down: the note is held, not closed yet.
+        captureRelease(capture, 60, 1200);
+        expect(capture.notes[0]?.heldMs).toBeUndefined();
+        // Lifting the pedal ends it, so the recorded hold runs to the pedal release.
+        capturePedal(capture, false, 1800);
+        expect(capture.notes[0]?.heldMs).toBe(800);
+    });
+
+    it("closes a pedalled note at its re-strike when the pitch sounds again", () => {
+        const capture = startCapture();
+        captureCleared(capture, cleared({ ordinal: 0, timestamp: 1000 }));
+        capturePedal(capture, true, 1000);
+        captureRelease(capture, 60, 1100); // key up, still pedalled
+        // The same pitch is struck again — the first instance ended at this re-strike.
+        captureCleared(capture, cleared({ ordinal: 1, timestamp: 1500, timeMs: 500 }));
+        expect(capture.notes[0]?.heldMs).toBe(500);
+        // The second instance is now the one the pedal holds.
+        capturePedal(capture, false, 2000);
+        captureRelease(capture, 60, 2000);
+        expect(capture.notes[1]?.heldMs).toBe(500);
+    });
+
+    it("closes a hold normally when the key lifts with the pedal up", () => {
+        const capture = startCapture();
+        captureCleared(capture, cleared({ timestamp: 1000 }));
+        captureRelease(capture, 60, 1400);
+        expect(capture.notes[0]?.heldMs).toBe(400);
     });
 
     it("eases the live tempo toward the played pace, clamped to the slider range", () => {

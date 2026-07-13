@@ -26,6 +26,12 @@ export type RunCapture = {
     // Each still-held pitch mapped to the note it belongs to, so its release can
     // record how long the key was held.
     holds: ActiveHolds;
+    // Whether the sustain pedal is currently down, so a key released under it keeps
+    // sounding — the damper model, so a recorded (and replayed) take reflects the pedal.
+    pedalDown: boolean;
+    // Pitches whose key has lifted but which are still sounding because the pedal is
+    // down; their hold stays open until the pedal lifts or the note is re-struck.
+    pedalHeld: Set<number>;
     // Wall-clock of the run's first cleared note — the run clock's zero, and the
     // ghost race's starting gun. 0 until that note lands.
     startedAt: number;
@@ -37,7 +43,29 @@ export type RunCapture = {
 };
 
 export function startCapture(): RunCapture {
-    return { notes: [], holds: new Map(), startedAt: 0, baseOffsetMs: 0, imprecise: false };
+    return {
+        notes: [],
+        holds: new Map(),
+        pedalDown: false,
+        pedalHeld: new Set(),
+        startedAt: 0,
+        baseOffsetMs: 0,
+        imprecise: false,
+    };
+}
+
+// Close a still-open hold at `atMs`, recording its length onto the note it belongs
+// to — keeping the longest when a chord's pitches close separately. A stray pitch
+// (never opened) records nothing.
+function closeHold(capture: RunCapture, pitch: number, atMs: number): void {
+    const released = endHold(capture.holds, pitch, atMs);
+    if (!released) {
+        return;
+    }
+    const note = capture.notes[released.index];
+    if (note) {
+        note.heldMs = Math.max(note.heldMs ?? 0, released.heldMs);
+    }
 }
 
 // What the matcher reports for a cleared position — the structural subset of the
@@ -70,22 +98,41 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
     });
     const index = capture.notes.length - 1;
     for (const pitch of info.pitches) {
+        // Re-striking a pitch the pedal was still holding ends that earlier instance
+        // here — its ring lasted until this re-strike — before the new hold opens.
+        if (capture.pedalHeld.delete(pitch)) {
+            closeHold(capture, pitch, info.timestamp);
+        }
         beginHold(capture.holds, pitch, index, info.timestamp);
     }
 }
 
 // A released key fills in its note's real hold length. A chord's pitches release
 // one by one; the longest is kept so the note's recorded length is how long the
-// chord actually rang. A stray release (untracked pitch) records nothing.
+// chord actually rang. A stray release (untracked pitch) records nothing. While the
+// sustain pedal is down the key release doesn't end the note — the damper is up, so it
+// rings on; its hold is left open and marked pedal-held until the pedal lifts.
 export function captureRelease(capture: RunCapture, pitch: number, offMs: number): void {
-    const released = endHold(capture.holds, pitch, offMs);
-    if (!released) {
+    if (capture.pedalDown && capture.holds.has(pitch)) {
+        capture.pedalHeld.add(pitch);
         return;
     }
-    const note = capture.notes[released.index];
-    if (note) {
-        note.heldMs = Math.max(note.heldMs ?? 0, released.heldMs);
+    closeHold(capture, pitch, offMs);
+}
+
+// The sustain pedal changed. Pressing it arms the damper; lifting it drops every note
+// still ringing only because the pedal held it, ending each hold at the lift — so a
+// pedalled note's recorded length runs through to the pedal release, and the take
+// replays the way it was played.
+export function capturePedal(capture: RunCapture, down: boolean, atMs: number): void {
+    capture.pedalDown = down;
+    if (down) {
+        return;
     }
+    for (const pitch of capture.pedalHeld) {
+        closeHold(capture, pitch, atMs);
+    }
+    capture.pedalHeld.clear();
 }
 
 // The adaptive metronome's next tempo: read the player's pace from the gap
