@@ -11,8 +11,8 @@ import { useKeepUp } from "./useKeepUp";
 // browser; stub the colour helpers so the hook's paint-tracking is observable in
 // jsdom. highlightCursorNotes returns one painted part so a step counts as painted.
 vi.mock("../lib/scoreColor", () => ({
-    highlightCursorNotes: () => [{ parts: [{ element: {} }], marked: false }],
-    paintElement: () => {},
+    highlightCursorNotes: () => [{ element: {}, prior: null }],
+    litHalo: () => {},
 }));
 
 // A minimal cursor over a single note, standing in for the OSMD graphic.

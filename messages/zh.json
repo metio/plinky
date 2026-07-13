@@ -185,6 +185,8 @@
   "beams_caption": "符杠把快速音符连成节拍组。学习时可隐藏，一次读一个音符；自动会在节拍分组有帮助的较难曲目中显示。",
   "note_size_label": "音符大小",
   "note_size_caption": "放大整个乐谱，让音符更大、更易读——在小屏幕上或刚入门时很实用。",
+  "color_notes_toggle": "为音符着色",
+  "color_notes_hint": "按音名为每个符头着色——每个 C 都是红色，每个 D 都是橙色，以此类推——这样你在识记音符时就能凭颜色读谱。",
   "transpose": "移调",
   "transpose_down": "向下移调半音",
   "transpose_up": "向上移调半音",

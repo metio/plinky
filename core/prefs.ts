@@ -37,6 +37,10 @@ export type Prefs = {
     // the piece's difficulty — flags on the easy grades a beginner reads note-by-note,
     // beat-grouping beams once they help — and "on"/"off" force it either way.
     beams: Beams;
+    // Colour the noteheads by note name (a Boomwhacker reading aid), so a beginner reads
+    // pitch by hue. Off by default — standard black notation. The played/heard feedback
+    // rides behind the notes as a halo, so the colours stay readable as you play.
+    colorNotes: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
     // Keep going past a slip: when on, playing the next note advances the score even if a
@@ -142,6 +146,7 @@ function defaults(): Prefs {
         handSpan: { left: null, right: null },
         showFingerings: false,
         beams: "auto",
+        colorNotes: false,
         noteHints: "miss",
         noteLabels: "c",
         forgiving: false,
@@ -220,6 +225,8 @@ export function parsePrefs(raw: string | null): Prefs {
                     ? parsed.showFingerings
                     : base.showFingerings,
             beams: BEAMS.includes(parsed.beams) ? parsed.beams : base.beams,
+            colorNotes:
+                typeof parsed.colorNotes === "boolean" ? parsed.colorNotes : base.colorNotes,
             noteHints: NOTE_HINTS.includes(parsed.noteHints) ? parsed.noteHints : base.noteHints,
             noteLabels: NOTE_LABELS.includes(parsed.noteLabels)
                 ? parsed.noteLabels

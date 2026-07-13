@@ -777,10 +777,13 @@ describe("ScoreViewer", () => {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
         }
-        // Played noteheads are recoloured in the rendered SVG — this exercises the
-        // real OSMD graphical-note → SVG path the colouring depends on.
+        // Played notes are lit with a played-colour halo in the rendered SVG — this
+        // exercises the real OSMD graphical-note → SVG path the feedback depends on.
         await waitFor(
-            () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+            () =>
+                expect(
+                    container.querySelector(`.plinky-note-halo[fill="${PLAYED_COLOR}"]`),
+                ).toBeTruthy(),
             {
                 timeout: 30000,
             },
@@ -804,9 +807,12 @@ describe("ScoreViewer", () => {
         fireEvent.click(practiceButton);
         // The race track appears...
         expect(await screen.findByRole("img", { name: /race/i })).toBeTruthy();
-        // ...and the ghost colours its current note on the rendered staff.
+        // ...and the ghost lights its current note with a halo on the rendered staff.
         await waitFor(
-            () => expect(container.querySelector(`[fill="${GHOST_COLOR}"]`)).toBeTruthy(),
+            () =>
+                expect(
+                    container.querySelector(`.plinky-note-halo[fill="${GHOST_COLOR}"]`),
+                ).toBeTruthy(),
             { timeout: 30000 },
         );
     });
@@ -867,8 +873,8 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    Array.from(document.querySelectorAll("g[fill]")).some(
-                        (group) => group.getAttribute("fill") === WINDOW_COLOR,
+                    Array.from(document.querySelectorAll(".plinky-note-halo")).some(
+                        (halo) => halo.getAttribute("fill") === WINDOW_COLOR,
                     ),
                 { timeout: 15000 },
             )
@@ -884,8 +890,8 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    Array.from(document.querySelectorAll("g[fill]")).some(
-                        (group) => group.getAttribute("fill") === LISTENED_COLOR,
+                    Array.from(document.querySelectorAll(".plinky-note-halo")).some(
+                        (halo) => halo.getAttribute("fill") === LISTENED_COLOR,
                     ),
                 { timeout: 15000 },
             )
@@ -898,13 +904,19 @@ describe("ScoreViewer", () => {
         await enterAndListen();
         // Let playback advance far enough to leave a trail.
         await expect
-            .poll(() => document.querySelectorAll(`g[fill="${LISTENED_COLOR}"]`).length, {
-                timeout: 15000,
-            })
+            .poll(
+                () =>
+                    document.querySelectorAll(`.plinky-note-halo[fill="${LISTENED_COLOR}"]`).length,
+                {
+                    timeout: 15000,
+                },
+            )
             .toBeGreaterThan(0);
         fireEvent.click(screen.getByRole("button", { name: "Restart" }));
         // The trail wipes, so the blue tells the story of the fresh pass only…
-        expect(document.querySelectorAll(`g[fill="${LISTENED_COLOR}"]`).length).toBe(0);
+        expect(
+            document.querySelectorAll(`.plinky-note-halo[fill="${LISTENED_COLOR}"]`).length,
+        ).toBe(0);
         // …and Listen keeps playing, now from the first note.
         expect(screen.getByRole("button", { name: "Listen" }).getAttribute("aria-pressed")).toBe(
             "true",
@@ -916,17 +928,23 @@ describe("ScoreViewer", () => {
         mount(phrase, { beatsPerBar: 4 });
         await enterAndListen();
         await expect
-            .poll(() => document.querySelectorAll(`g[fill="${WINDOW_COLOR}"]`).length, {
-                timeout: 15000,
-            })
+            .poll(
+                () => document.querySelectorAll(`.plinky-note-halo[fill="${WINDOW_COLOR}"]`).length,
+                {
+                    timeout: 15000,
+                },
+            )
             .toBeGreaterThan(0);
-        const sounding = Array.from(document.querySelectorAll(`g[fill="${WINDOW_COLOR}"]`));
+        const sounding = Array.from(
+            document.querySelectorAll(`.plinky-note-halo[fill="${WINDOW_COLOR}"]`),
+        );
         // The Listen button is pressed while playing; clicking it again stops.
         fireEvent.click(screen.getByRole("button", { name: "Listen" }));
-        // The note under the cursor at the stop joins the trail — a handoff to
-        // Practice must not leave a single uncoloured gap between blue and green.
-        for (const group of sounding) {
-            expect(group.getAttribute("fill")).toBe(LISTENED_COLOR);
+        // The note under the cursor at the stop joins the trail — a handoff to Practice
+        // must not leave a single unlit gap between blue and green. The halo that was the
+        // active window is recoloured to the listened blue in place.
+        for (const halo of sounding) {
+            expect(halo.getAttribute("fill")).toBe(LISTENED_COLOR);
         }
     });
 
@@ -967,8 +985,8 @@ describe("ScoreViewer", () => {
         await expect
             .poll(
                 () =>
-                    Array.from(document.querySelectorAll("g[fill]")).some(
-                        (group) => group.getAttribute("fill") === WINDOW_COLOR,
+                    Array.from(document.querySelectorAll(".plinky-note-halo")).some(
+                        (halo) => halo.getAttribute("fill") === WINDOW_COLOR,
                     ),
                 { timeout: 15000 },
             )

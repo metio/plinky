@@ -10,8 +10,6 @@ export const PLAYED_COLOR = "#22c55e";
 // The colour marking where the racing ghost currently is, distinct from played
 // (green) and the score's own black so all three read apart at a glance.
 export const GHOST_COLOR = "#a855f7";
-// The score is always rendered on white, so an unplayed note is plain black.
-export const NOTE_COLOR = "#000000";
 // The active window in a read-only context staff — the bars currently being fingered
 // or heard, indigo to match the app's accent and stand out from the black notes.
 export const WINDOW_COLOR = "#6366f1";

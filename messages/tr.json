@@ -185,6 +185,8 @@
   "beams_caption": "Kirişler hızlı notaları vuruş gruplarında birleştirir. Öğrenirken notaları tek tek okumak için gizle; Otomatik, vuruş gruplamasının yardımcı olduğu daha zor parçalarda gösterir.",
   "note_size_label": "Nota boyutu",
   "note_size_caption": "Daha büyük ve okunması kolay notalar için tüm notayı büyüt — küçük ekranda veya yeni başlarken kullanışlı.",
+  "color_notes_toggle": "Notaları renklendir",
+  "color_notes_hint": "Her nota başını adına göre renklendir — her C kırmızı, her D turuncu, vb. — böylece notaları öğrenirken renklerine göre okuyabilirsin.",
   "transpose": "Transpoze et",
   "transpose_down": "Bir yarım ses aşağı transpoze et",
   "transpose_up": "Bir yarım ses yukarı transpoze et",

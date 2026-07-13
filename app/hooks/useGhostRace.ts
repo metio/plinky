@@ -6,10 +6,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { decodeGhost, ghostReached } from "../../core/ghost";
 import type { Hand } from "../../core/matcher";
-import { GHOST_COLOR, NOTE_COLOR, PLAYED_COLOR } from "../../core/scoreCanvas";
+import { GHOST_COLOR, PLAYED_COLOR } from "../../core/scoreCanvas";
 import { fastestTakeOnsets } from "../../core/takes";
 import { useServices } from "../contexts/services";
-import { collectNoteElements, paintElement } from "../lib/scoreColor";
+import { clearHalo, collectNoteElements, litHalo } from "../lib/scoreColor";
 
 // The ghost race: a previous run's note onsets replayed against the clock while
 // you practice, shown as a moving marker on the staff and a position on the race
@@ -89,18 +89,21 @@ export function useGhostRace({
         return () => scheduler.cancel(timer);
     }, [practicing, ghost, runStartedAt, scheduler]);
 
-    // Move the ghost's colour onto the note it has currently reached, restoring the
-    // one it leaves to green if the player has already played it there, else black.
-    // Captured note groups outlive a render, so this paints the real staff.
+    // Move the ghost's halo onto the note it has currently reached, restoring the one it
+    // leaves to green if the player has already played it there, else clearing it.
+    // Captured note groups outlive a render, so this lights the real staff.
     useEffect(() => {
         const steps = ghostNotesRef.current;
         if (steps.length === 0) {
             return;
         }
         const restore = (step: number) => {
-            const base = done > step ? PLAYED_COLOR : NOTE_COLOR;
             for (const element of steps[step] ?? []) {
-                paintElement(element, base);
+                if (done > step) {
+                    litHalo(element, PLAYED_COLOR);
+                } else {
+                    clearHalo(element);
+                }
             }
         };
         const previous = ghostMarkRef.current;
@@ -120,7 +123,7 @@ export function useGhostRace({
             restore(previous);
         }
         for (const element of steps[target] ?? []) {
-            paintElement(element, GHOST_COLOR);
+            litHalo(element, GHOST_COLOR);
         }
         ghostMarkRef.current = target;
     }, [ghostDone, ghost, practicing, complete, done]);

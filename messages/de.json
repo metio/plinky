@@ -185,6 +185,8 @@
   "beams_caption": "Balken fassen schnelle Noten zu Schlaggruppen zusammen. Blende sie aus, um beim Lernen Note für Note zu lesen; Auto zeigt sie bei schwierigeren Stücken, wo die Gruppierung nach Schlägen hilft.",
   "note_size_label": "Notengröße",
   "note_size_caption": "Vergrößert die gesamte Notendarstellung für größere, leichter lesbare Noten – praktisch auf einem kleinen Bildschirm oder wenn du gerade erst anfängst.",
+  "color_notes_toggle": "Noten einfärben",
+  "color_notes_hint": "Färbt jeden Notenkopf nach seinem Namen ein — jedes C rot, jedes D orange und so weiter — damit du die Noten an der Farbe erkennst, während du sie lernst.",
   "transpose": "Transponieren",
   "transpose_down": "Einen Halbton tiefer transponieren",
   "transpose_up": "Einen Halbton höher transponieren",

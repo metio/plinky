@@ -3,8 +3,8 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useEffect, useRef, useState } from "react";
-import { NOTE_COLOR, WINDOW_COLOR } from "../../../core/scoreCanvas";
-import { paintMeasureRange, scrollMeasureIntoView } from "../../lib/scoreColor";
+import { WINDOW_COLOR } from "../../../core/scoreCanvas";
+import { clearAllHalos, paintMeasureRange, scrollMeasureIntoView } from "../../lib/scoreColor";
 
 // A compact, always-visible strip of the piece pinned just above the on-screen keyboard
 // while practising: it shows the bar you're playing (and its neighbour) big and lit, and
@@ -55,7 +55,10 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
         if (!ready || !osmd || !container) {
             return;
         }
-        paintMeasureRange(osmd, 0, Number.POSITIVE_INFINITY, NOTE_COLOR);
+        const svg = container.querySelector("svg");
+        if (svg instanceof SVGSVGElement) {
+            clearAllHalos(svg);
+        }
         paintMeasureRange(osmd, bar, bar + 2, WINDOW_COLOR);
         scrollMeasureIntoView(osmd, bar, container);
     }, [bar, ready]);

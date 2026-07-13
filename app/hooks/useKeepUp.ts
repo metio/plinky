@@ -15,7 +15,7 @@ import {
 import { STAFF_FOR, type Hand } from "../../core/matcher";
 import { listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
-import { highlightCursorNotes, paintElement } from "../lib/scoreColor";
+import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
 import { stepLengths } from "../lib/scoreCursor";
 import { useTimerChain } from "./useTimerChain";
 
@@ -107,7 +107,7 @@ export function useKeepUp({
                 return;
             }
             for (const element of notesRef.current) {
-                paintElement(element, hit ? PLAYED_COLOR : SELECT_COLOR);
+                litHalo(element, hit ? PLAYED_COLOR : SELECT_COLOR);
             }
             setProgress(keepUpProgress(state));
         };
@@ -138,15 +138,12 @@ export function useKeepUp({
             stateRef.current = openKeepUpStep(stateRef.current, expected);
             // Light "play now" only when this step has notes for the practised hand. A
             // hands-separate run leaves the other hand's positions unscored (closeStep
-            // skips an empty step), so highlighting them would strand a blue mark the
-            // trail never lifts. Keep every rendered part — head, stem, beam — so the
-            // hit/miss colour later fills the whole note, not just its head.
+            // skips an empty step), so highlighting them would strand a mark the trail
+            // never lifts. Keep the noteheads so closeStep can recolour their halos hit/miss.
             notesRef.current =
                 expected.length === 0
                     ? []
-                    : highlightCursorNotes(osmd, WINDOW_COLOR).flatMap((painted) =>
-                          painted.parts.map((part) => part.element),
-                      );
+                    : highlightCursorNotes(osmd, WINDOW_COLOR).map((painted) => painted.element);
             // The highlight — and the hit/miss colour closeStep/registerNote later
             // paint over the same elements — dirties the score. Flag it so the next
             // run wipes the trail; this hook never restores it itself.
@@ -194,7 +191,7 @@ export function useKeepUp({
         stateRef.current = state;
         if (caught) {
             for (const element of notesRef.current) {
-                paintElement(element, PLAYED_COLOR);
+                litHalo(element, PLAYED_COLOR);
             }
         }
     };

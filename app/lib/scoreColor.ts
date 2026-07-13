@@ -3,18 +3,14 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type Hand, STAFF_FOR } from "../../core/matcher";
-import { type MeasureBox, NOTE_COLOR, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
+import { type MeasureBox, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
 // OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
-// cursor hands back the base type, so reach the accessors by shape. getSVGGElement is the
-// notehead group (a flag on an unbeamed short note rides inside it); getStemSVG is the
-// stem, a separate element by id; getBeamSVGs are the beams joining short notes, each also
-// a separate element by id — colouring the head group alone leaves the stem and beam black,
-// so a coloured note reads as only a coloured dot.
+// cursor hands back the base type, so reach the notehead group by shape. Feedback rides a
+// halo behind this group rather than recolouring it, so the stem and beam — and the
+// note's own pitch colour — are left untouched.
 type WithSvg = {
     getSVGGElement?: () => SVGGElement;
-    getStemSVG?: () => Element | null;
-    getBeamSVGs?: () => (Element | null)[];
 };
 
 function svgOf(gNote: unknown): SVGGElement | undefined {
@@ -23,59 +19,6 @@ function svgOf(gNote: unknown): SVGGElement | undefined {
     } catch {
         return undefined;
     }
-}
-
-function stemOf(gNote: unknown): SVGElement | undefined {
-    try {
-        const stem = (gNote as WithSvg).getStemSVG?.();
-        return stem instanceof SVGElement ? stem : undefined;
-    } catch {
-        return undefined;
-    }
-}
-
-function beamsOf(gNote: unknown): SVGElement[] {
-    try {
-        const beams = (gNote as WithSvg).getBeamSVGs?.() ?? [];
-        return beams.filter((beam): beam is SVGElement => beam instanceof SVGElement);
-    } catch {
-        return [];
-    }
-}
-
-// The rendered parts that make up one whole note: the notehead group and, when the note has
-// them, the stem and beams it carries. A note OSMD drew no glyph for has no notehead, and
-// counts as unrendered — no parts, so callers skip it whole. Elements are shared: a chord's
-// noteheads share one stem, and a beam spans the whole group, so the same element can appear
-// for several noteheads; painting or restoring it more than once is harmless.
-function partsOf(gNote: unknown): SVGElement[] {
-    const head = svgOf(gNote);
-    if (!head) {
-        return [];
-    }
-    const parts: SVGElement[] = [head];
-    const stem = stemOf(gNote);
-    if (stem) {
-        parts.push(stem);
-    }
-    parts.push(...beamsOf(gNote));
-    return parts;
-}
-
-// VexFlow gives each glyph its own explicit paint, so a colour set on the group doesn't
-// cascade — set it on the element and every descendant. Both fill and stroke are set, so
-// one call colours filled glyphs (noteheads, beams) and stroked ones (stems) alike.
-function setColors(element: SVGElement, fill: string, stroke: string): void {
-    element.setAttribute("fill", fill);
-    element.setAttribute("stroke", stroke);
-    for (const child of element.querySelectorAll("*")) {
-        child.setAttribute("fill", fill);
-        child.setAttribute("stroke", stroke);
-    }
-}
-
-export function paintElement(element: SVGElement, color: string): void {
-    setColors(element, color, color);
 }
 
 // Hidden-notes practice: blank a step's noteheads so the player works by ear. The
@@ -92,7 +35,7 @@ export function hideNoteElements(steps: SVGGElement[][]): void {
 export function revealNoteElements(step: SVGGElement[], color: string): void {
     for (const element of step) {
         element.removeAttribute("visibility");
-        paintElement(element, color);
+        litHalo(element, color);
     }
 }
 
@@ -144,9 +87,10 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
     return steps;
 }
 
-// Paints every note in a half-open range of measures (0-based, matching scoreToBars'
-// bar index) one colour, leaving the rest untouched — used to light up the active
-// window in a read-only context staff. Walks the cursor, so it leaves it reset+hidden.
+// Haloes every note in a half-open range of measures (0-based, matching scoreToBars'
+// bar index), leaving the rest untouched — used to light up the active window in a
+// read-only context staff. Walks the cursor, so it leaves it reset+hidden. The caller
+// clears the prior window (clearAllHalos) first.
 export function paintMeasureRange(
     osmd: OpenSheetMusicDisplay,
     from: number,
@@ -159,8 +103,9 @@ export function paintMeasureRange(
         const measure = osmd.cursor.iterator.CurrentMeasureIndex;
         if (measure >= from && measure < to) {
             for (const gNote of osmd.cursor.GNotesUnderCursor()) {
-                for (const part of partsOf(gNote)) {
-                    paintElement(part, color);
+                const element = svgOf(gNote);
+                if (element) {
+                    litHalo(element, color);
                 }
             }
         }
@@ -196,6 +141,67 @@ export function clientPointToSvg(
 ): { x: number; y: number } {
     const { rect, sx, sy } = svgScale(svg);
     return { x: (clientX - rect.left) * sx, y: (clientY - rect.top) * sy };
+}
+
+// The feedback layer. A note is lit "played", "wrong", "now sounding" or "heard" by a
+// translucent rounded rect placed behind its notehead — never by recolouring the
+// notehead itself, which the pitch-colour reading aid owns and which must keep its shape
+// (a hollow half-note must not fill in). One halo per notehead, tracked in a WeakMap so
+// it can be recoloured or lifted; the halos vanish with the SVG on the next render, and a
+// halo the bulk clear detached reads as absent through its `isConnected` check.
+const halos = new WeakMap<Element, SVGRectElement>();
+const HALO_CLASS = "plinky-note-halo";
+const HALO_PAD = 3;
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// The colour of a notehead's live halo, or null when it has none — lets the trail decide
+// whether a note already wears a persistent mark to keep, without touching the notehead.
+export function haloColor(element: SVGElement): string | null {
+    const halo = halos.get(element);
+    return halo?.isConnected ? halo.getAttribute("fill") : null;
+}
+
+// Light a notehead by placing (or recolouring) a halo behind it. The halo sits at the
+// back of the SVG so the notehead, stem and beam always draw over it.
+export function litHalo(element: SVGElement, color: string): void {
+    const svg = element.ownerSVGElement;
+    if (!svg) {
+        return;
+    }
+    const { rect: svgRect, sx, sy } = svgScale(svg);
+    const box = element.getBoundingClientRect();
+    let halo = halos.get(element);
+    if (!halo?.isConnected) {
+        halo = document.createElementNS(SVG_NS, "rect");
+        halo.setAttribute("class", HALO_CLASS);
+        halo.setAttribute("rx", "3");
+        halo.setAttribute("pointer-events", "none");
+        halos.set(element, halo);
+    }
+    halo.setAttribute("x", String((box.left - svgRect.left) * sx - HALO_PAD));
+    halo.setAttribute("y", String((box.top - svgRect.top) * sy - HALO_PAD));
+    halo.setAttribute("width", String(box.width * sx + HALO_PAD * 2));
+    halo.setAttribute("height", String(box.height * sy + HALO_PAD * 2));
+    halo.setAttribute("fill", color);
+    halo.setAttribute("fill-opacity", "0.4");
+    svg.insertBefore(halo, svg.firstChild);
+}
+
+// Lift a notehead's halo, if it has one.
+export function clearHalo(element: SVGElement): void {
+    const halo = halos.get(element);
+    if (halo) {
+        halo.remove();
+        halos.delete(element);
+    }
+}
+
+// Lift every note halo on a score — the reset the focus strip does before lighting the
+// current bar. Stale WeakMap entries self-heal through the isConnected check.
+export function clearAllHalos(svg: SVGSVGElement): void {
+    for (const halo of svg.querySelectorAll(`.${HALO_CLASS}`)) {
+        halo.remove();
+    }
 }
 
 // The rendered box of each measure, in the SVG's coordinate space, unioned over its notes
@@ -322,82 +328,56 @@ export function paintBarSelection(
     }
 }
 
-// One whole note captured before being highlighted: each of its parts (notehead group,
-// stem) with the exact fill and stroke it wore, plus whether it already carried a mark —
-// a practised green — rather than plain black. Grouping the parts lets the highlight lift
-// back to precisely what was there, and lets the trail decide once per note (from the
-// notehead) whether to keep the prior mark or lay its own, then apply that to the stem too.
-type PaintedPart = { element: SVGElement; fill: string; stroke: string };
-export type PaintedNote = { parts: PaintedPart[]; marked: boolean };
+// One notehead lifted to an "active" halo, remembering the halo colour it wore before —
+// null when it wore none. The prior lets the highlight lift back to exactly what was
+// there, and lets the trail decide whether the note already carried a persistent mark (a
+// practised green, a heard blue) to keep rather than overwrite.
+export type PaintedNote = { element: SVGElement; prior: string | null };
 
-function capturePart(element: SVGElement): PaintedPart {
-    return {
-        element,
-        fill: element.getAttribute("fill") ?? NOTE_COLOR,
-        stroke: element.getAttribute("stroke") ?? NOTE_COLOR,
-    };
-}
-
-function restorePart({ element, fill, stroke }: PaintedPart): void {
-    setColors(element, fill, stroke);
-}
-
-// Paints the playable notes at the cursor's current position an "active" colour — whole
-// note, stem and all — and returns them with their prior paint, so the caller can restore
-// them as the cursor moves on: the moving highlight that follows Listen playback. Like
-// paintPlayedNotes, it mutates the rendered SVG directly rather than re-rendering, which
-// would lose the cursor every note.
+// Haloes the playable notes at the cursor's current position an "active" colour, and
+// returns them with the halo they wore before, so the caller can restore them as the
+// cursor moves on: the moving highlight that follows Listen playback. It touches only the
+// halo layer, never the noteheads, so a pitch-coloured score keeps its colours as it plays.
 export function highlightCursorNotes(osmd: OpenSheetMusicDisplay, color: string): PaintedNote[] {
     const painted: PaintedNote[] = [];
-    // Capture every note's prior paint BEFORE painting any of them. A chord's noteheads are
-    // separate gNotes that share one stem and beam, so painting note-by-note would let a
-    // later notehead capture that shared element already in the highlight colour and record
-    // it as the "prior" — restoreNotes would then leave the stem/beam stuck highlighted.
-    // Capturing first means every note records the true original colour.
+    // Capture every note's prior halo BEFORE lighting any of them, so a chord's noteheads
+    // each record the true original colour rather than a sibling's fresh highlight.
     for (const gNote of osmd.cursor.GNotesUnderCursor()) {
         const note = gNote.sourceNote;
         if (note.isRest() || note.halfTone <= 0) {
             continue;
         }
-        const parts = partsOf(gNote).map(capturePart);
-        const head = parts[0];
-        if (!head) {
+        const element = svgOf(gNote);
+        if (!element) {
             continue;
         }
-        // The notehead is the first part; its prior fill tells whether the note already
-        // wore a mark, and the whole note follows that verdict.
-        painted.push({ parts, marked: head.fill !== NOTE_COLOR });
+        painted.push({ element, prior: haloColor(element) });
     }
-    for (const { parts } of painted) {
-        for (const { element } of parts) {
-            paintElement(element, color);
-        }
+    for (const { element } of painted) {
+        litHalo(element, color);
     }
     return painted;
 }
 
-// Restores notes lifted by highlightCursorNotes to the paint they wore before.
+// Restores notes lifted by highlightCursorNotes to the halo they wore before — its prior
+// mark, or none.
 export function restoreNotes(painted: PaintedNote[]): void {
-    for (const { parts } of painted) {
-        for (const part of parts) {
-            restorePart(part);
+    for (const { element, prior } of painted) {
+        if (prior === null) {
+            clearHalo(element);
+        } else {
+            litHalo(element, prior);
         }
     }
 }
 
-// Leaves a persistent trail on notes the highlight is moving off: paints an untouched note
-// (plain black) `color`, but keeps any prior mark — a practised green — so the trail records
-// where the piece was heard without erasing where it was played. Used by Listen to lay down
-// its blue trail as the cursor advances.
+// Leaves a persistent trail on notes the highlight is moving off: haloes an untouched note
+// `color`, but keeps any prior mark — a practised green — so the trail records where the
+// piece was heard without erasing where it was played. Used by Listen to lay its blue trail
+// as the cursor advances.
 export function trailNotes(painted: PaintedNote[], color: string): void {
-    for (const { parts, marked } of painted) {
-        for (const part of parts) {
-            if (marked) {
-                restorePart(part);
-            } else {
-                paintElement(part.element, color);
-            }
-        }
+    for (const { element, prior } of painted) {
+        litHalo(element, prior ?? color);
     }
 }
 
@@ -435,10 +415,11 @@ export function scrollMeasureIntoView(
     osmd.cursor.hide();
 }
 
-// Paints the noteheads at the cursor's current position whose pitch was just
-// played. It mutates the already-rendered SVG directly — colouring per note via
-// NoteheadColor would force a full re-render, which would flicker and lose the
-// cursor every note. A note with no rendered element yet is skipped.
+// Haloes the noteheads at the cursor's current position whose pitch was just played,
+// leaving a persistent mark of progress. It lights the halo layer directly rather than
+// re-rendering, which would flicker and lose the cursor every note, and never touches the
+// notehead, so a pitch-coloured note keeps its colour under the mark. A note with no
+// rendered element yet is skipped.
 export function paintPlayedNotes(
     osmd: OpenSheetMusicDisplay,
     pitches: number[],
@@ -448,8 +429,9 @@ export function paintPlayedNotes(
         if (!pitches.includes(gNote.sourceNote.halfTone + 12)) {
             continue;
         }
-        for (const part of partsOf(gNote)) {
-            paintElement(part, color);
+        const element = svgOf(gNote);
+        if (element) {
+            litHalo(element, color);
         }
     }
 }

@@ -4,6 +4,7 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { stripBeams } from "../../core/beams";
+import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import type { MeasureBox } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
 import { usePrefsStore, useXmlCodec } from "../contexts/services";
@@ -59,6 +60,7 @@ export function useOsmdScore(
         barNumbers,
         treadmill,
         showBeams,
+        colorNotes,
         showFingerings,
         scrollFollow,
         onReload,
@@ -82,6 +84,8 @@ export function useOsmdScore(
         // elements are stripped before OSMD loads it, so short notes render with flags.
         // The effective value is decided per piece by beamsVisible before it reaches here.
         showBeams: boolean;
+        // Colour the noteheads by note name (the Boomwhacker reading aid), off = black.
+        colorNotes: boolean;
         // Whether the printed fingering is drawn — flipped in place without a reload.
         showFingerings: boolean;
         // Whether the staff scrolls to keep the played note in view.
@@ -156,7 +160,7 @@ export function useOsmdScore(
         paintedRef.current = false;
         onReloadRef.current();
         import("opensheetmusicdisplay")
-            .then(({ OpenSheetMusicDisplay }) => {
+            .then(({ ColoringModes, OpenSheetMusicDisplay }) => {
                 if (cancelled || !containerRef.current) {
                     return;
                 }
@@ -172,6 +176,15 @@ export function useOsmdScore(
                     // One continuous horizontal staffline that scrolls right, rather than
                     // wrapping into rows — the treadmill reading mode.
                     renderSingleHorizontalStaffline: treadmill,
+                    // The Boomwhacker reading aid: colour each notehead (and its stem) by
+                    // note name so a beginner reads pitch by hue. OSMD's CustomColorSet
+                    // handles hollow vs. solid noteheads itself, and the feedback halos ride
+                    // behind the notes, so this leaves both untouched. Off is the default
+                    // black notation (XML colour).
+                    coloringEnabled: colorNotes,
+                    coloringMode: colorNotes ? ColoringModes.CustomColorSet : ColoringModes.XML,
+                    coloringSetCustom: colorNotes ? BOOMWHACKER_SET : undefined,
+                    colorStemsLikeNoteheads: colorNotes,
                 });
                 osmdRef.current = osmd;
                 const rules = (
@@ -262,7 +275,18 @@ export function useOsmdScore(
             osmdRef.current?.clear();
             containerRef.current?.replaceChildren();
         };
-    }, [xml, transpose, showMine, saved, barsPerRow, noteScale, barNumbers, treadmill, showBeams]);
+    }, [
+        xml,
+        transpose,
+        showMine,
+        saved,
+        barsPerRow,
+        noteScale,
+        barNumbers,
+        treadmill,
+        showBeams,
+        colorNotes,
+    ]);
 
     // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet
     // and any run in progress survive — the player can switch fingering on and off mid-play.

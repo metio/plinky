@@ -185,6 +185,8 @@
   "beams_caption": "Trámce spojují rychlé noty do skupin podle dob. Skryjte je, abyste při učení četli notu po notě; Automaticky je zobrazí u těžších skladeb, kde seskupení podle dob pomáhá.",
   "note_size_label": "Velikost not",
   "note_size_caption": "Zvětší celý notový zápis, aby byly noty větší a lépe čitelné – hodí se na malé obrazovce nebo když s hraním teprve začínáte.",
+  "color_notes_toggle": "Obarvit noty",
+  "color_notes_hint": "Obarví každou notovou hlavičku podle jejího názvu — každé C červeně, každé D oranžově a tak dále — takže noty poznáte podle barvy, dokud se je učíte.",
   "transpose": "Transponovat",
   "transpose_down": "Transponovat o půltón dolů",
   "transpose_up": "Transponovat o půltón nahoru",

@@ -185,6 +185,8 @@
   "beams_caption": "Bjelker knytter raske noter sammen i taktslagsgrupper. Skjul dem for å lese én note om gangen mens du lærer; Auto viser dem i vanskeligere stykker der grupperingen hjelper.",
   "note_size_label": "Notestørrelse",
   "note_size_caption": "Forstørr hele partituret for større og lettere lesbare noter – nyttig på en liten skjerm eller når du akkurat har begynt.",
+  "color_notes_toggle": "Fargelegg tonene",
+  "color_notes_hint": "Fargelegg hvert notehode etter tonenavnet – hver C rød, hver D oransje, og så videre – så du kan lese tonene etter farge mens du lærer dem.",
   "transpose": "Transponer",
   "transpose_down": "Transponer ned en halvtone",
   "transpose_up": "Transponer opp en halvtone",

@@ -185,6 +185,8 @@
   "beams_caption": "Las barras unen las notas rápidas en grupos de pulso. Ocúltalas para leer una nota a la vez mientras aprendes; Auto las muestra en piezas más difíciles, donde la agrupación por pulso ayuda.",
   "note_size_label": "Tamaño de las notas",
   "note_size_caption": "Amplía toda la partitura para que las notas sean más grandes y fáciles de leer: útil en una pantalla pequeña o cuando estás empezando.",
+  "color_notes_toggle": "Colorear las notas",
+  "color_notes_hint": "Colorea cada cabeza de nota según su nombre — cada do en rojo, cada re en naranja, y así sucesivamente — para que puedas leer las notas por el color mientras las aprendes.",
   "transpose": "Transportar",
   "transpose_down": "Transportar un semitono abajo",
   "transpose_up": "Transportar un semitono arriba",

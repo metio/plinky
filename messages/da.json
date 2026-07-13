@@ -185,6 +185,8 @@
   "beams_caption": "Bjælker samler hurtige noder i taktslagsgrupper. Skjul dem for at læse én node ad gangen, mens du lærer; Auto viser dem i sværere stykker, hvor grupperingen hjælper.",
   "note_size_label": "Nodestørrelse",
   "note_size_caption": "Forstør hele nodebilledet for større, lettere læselige noder – praktisk på en lille skærm, eller når du lige er begyndt.",
+  "color_notes_toggle": "Farvelæg noderne",
+  "color_notes_hint": "Farvelæg hvert nodehoved efter dets navn — hvert C rødt, hvert D orange og så videre — så du kan læse noderne på farven, mens du lærer dem.",
   "transpose": "Transponér",
   "transpose_down": "Transponér en halvtone ned",
   "transpose_up": "Transponér en halvtone op",

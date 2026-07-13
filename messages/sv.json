@@ -185,6 +185,8 @@
   "beams_caption": "Balkar binder samman snabba noter i taktgrupper. Dölj dem för att läsa en not i taget medan du lär dig; Auto visar dem i svårare stycken där taktgrupperingen hjälper.",
   "note_size_label": "Notstorlek",
   "note_size_caption": "Förstora hela notbilden för större och mer lättlästa noter — praktiskt på en liten skärm eller när du precis har börjat.",
+  "color_notes_toggle": "Färglägg noterna",
+  "color_notes_hint": "Färglägg varje nothuvud efter dess namn — varje C rött, varje D orange, och så vidare — så att du kan läsa noterna efter färg medan du lär dig dem.",
   "transpose": "Transponera",
   "transpose_down": "Transponera ner en halvton",
   "transpose_up": "Transponera upp en halvton",

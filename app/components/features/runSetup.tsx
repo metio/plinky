@@ -181,6 +181,12 @@ export function RunSetup() {
                 }))}
                 help={m.note_size_caption()}
             />
+            <SwitchField
+                label={m.color_notes_toggle()}
+                checked={reading.colorNotes}
+                onChange={reading.setColorNotes}
+                help={m.color_notes_hint()}
+            />
             {!lockTempo && trainerOn && (
                 <div className="space-y-1">
                     <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">

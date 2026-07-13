@@ -185,6 +185,8 @@
   "beams_caption": "Traversat bashkojnë notat e shpejta në grupe sipas rrahjeve. Fshihni ato për të lexuar një notë në një kohë gjatë të mësuarit; modaliteti Automatik i shfaq te pjesët më të vështira, ku grupimi sipas rrahjeve ndihmon.",
   "note_size_label": "Madhësia e notave",
   "note_size_caption": "Zmadho të gjithë partiturën për nota më të mëdha e më të lehta për t'u lexuar — e dobishme në një ekran të vogël ose kur sapo po fillon.",
+  "color_notes_toggle": "Ngjyros notat",
+  "color_notes_hint": "Ngjyros kokën e çdo note sipas emrit të saj — çdo C të kuqe, çdo D portokalli e kështu me radhë — që t'i lexosh notat sipas ngjyrës ndërsa po i mëson.",
   "transpose": "Transpozo",
   "transpose_down": "Transpozo poshtë një gjysmëton",
   "transpose_up": "Transpozo lart një gjysmëton",

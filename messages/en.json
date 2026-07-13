@@ -204,6 +204,8 @@
   "beams_caption": "Beams join fast notes into beat groups. Hide them to read one note at a time while learning; Auto shows them on harder pieces where the beat grouping helps.",
   "note_size_label": "Note size",
   "note_size_caption": "Magnify the whole score for bigger, easier-to-read notes — handy on a small screen or when you're starting out.",
+  "color_notes_toggle": "Colour the notes",
+  "color_notes_hint": "Colour each notehead by its name — every C red, every D orange, and so on — so you can read the notes by hue while you're learning them.",
   "transpose": "Transpose",
   "transpose_down": "Transpose down a semitone",
   "transpose_up": "Transpose up a semitone",

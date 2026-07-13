@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import { ColoringModes, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { collectSteps } from "../hooks/useScoreMatcher";
 import { generatePhrase } from "../../core/generator";
+import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import { PLAYED_COLOR } from "../../core/scoreCanvas";
 import { collectNoteElements, paintPlayedNotes } from "./scoreColor";
 
@@ -29,8 +30,11 @@ async function renderOsmd(xml: string): Promise<OpenSheetMusicDisplay> {
 
 const PHRASE = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
 
-// Two eighth notes joined by a beam, then a quarter. OSMD draws the beam as its own SVG
-// element outside the notehead group, so it exercises the beam-colouring path.
+// The class the feedback layer tags its per-note halos with.
+const HALO = ".plinky-note-halo";
+
+// Two eighth notes joined by a beam, then a quarter — a note whose beam and stem sit
+// outside the notehead group, so the test can confirm the halo never touches them.
 const BEAMED = `<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
   <part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
@@ -74,29 +78,50 @@ describe("collectNoteElements", () => {
 });
 
 describe("paintPlayedNotes (real OSMD)", () => {
-    it("colours a beamed note's beam, not only its head", async () => {
+    it("lights a played note with a halo behind it, leaving the note's own paint alone", async () => {
         const osmd = await renderOsmd(BEAMED);
-        // The cursor sits on the first beamed eighth (C4); paint the two beamed pitches.
+        // The cursor sits on the first beamed eighth (C4); light the two beamed pitches.
         osmd.cursor.show();
         osmd.cursor.reset();
         paintPlayedNotes(osmd, [60, 62]);
         osmd.cursor.reset();
         osmd.cursor.hide();
-        // OSMD tags each beam element's id with "-beam"; VexFlow fills the beam polygon, so
-        // its colour rides on fill (paintElement sets both fill and stroke regardless).
+        // A halo is placed for each played notehead, in the played colour.
+        const halos = [...document.querySelectorAll(HALO)];
+        expect(halos.length).toBeGreaterThan(0);
+        expect(halos.every((halo) => halo.getAttribute("fill") === PLAYED_COLOR)).toBe(true);
+        // The beam and noteheads are never recoloured — the halo rides behind them.
         const beams = [...document.querySelectorAll('[id*="-beam"]')];
         expect(beams.length).toBeGreaterThan(0);
-        const coloured = beams.some(
-            (beam) =>
-                beam.getAttribute("fill") === PLAYED_COLOR ||
-                beam.getAttribute("stroke") === PLAYED_COLOR,
+        expect(beams.every((beam) => beam.getAttribute("fill") !== PLAYED_COLOR)).toBe(true);
+    });
+});
+
+describe("Boomwhacker note colouring (real OSMD)", () => {
+    it("colours noteheads by name using the custom set", async () => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        containers.push(container);
+        const osmd = new OpenSheetMusicDisplay(container, {
+            autoResize: false,
+            coloringEnabled: true,
+            coloringMode: ColoringModes.CustomColorSet,
+            coloringSetCustom: BOOMWHACKER_SET,
+        });
+        await osmd.load(BEAMED); // holds C, D and E notes
+        osmd.render();
+        // At least one rendered glyph carries a colour from the Boomwhacker set — OSMD
+        // handles the notehead shape itself, so this only confirms the set reaches it.
+        const set = new Set(BOOMWHACKER_SET);
+        const coloured = [...container.querySelectorAll("[fill]")].some((el) =>
+            set.has((el.getAttribute("fill") ?? "").toLowerCase()),
         );
         expect(coloured).toBe(true);
     });
 });
 
 describe("hidden-notes hide/reveal (real OSMD)", () => {
-    it("blanks every notehead, reveals one step coloured, and restores the rest", async () => {
+    it("blanks every notehead, reveals one step lit, and restores the rest", async () => {
         const { hideNoteElements, revealNoteElements, unhideNoteElements } = await import(
             "./scoreColor"
         );
@@ -111,18 +136,23 @@ describe("hidden-notes hide/reveal (real OSMD)", () => {
             }
         }
 
-        // Revealing a step lifts the blank and paints the verdict colour.
+        // Revealing a step lifts the blank and lights the verdict as a halo — not by
+        // recolouring the notehead.
         revealNoteElements(steps[0]!, PLAYED_COLOR);
         for (const element of steps[0]!) {
             expect(element.getAttribute("visibility")).toBeNull();
-            expect(element.getAttribute("fill")).toBe(PLAYED_COLOR);
         }
+        expect(
+            [...document.querySelectorAll(HALO)].some(
+                (halo) => halo.getAttribute("fill") === PLAYED_COLOR,
+            ),
+        ).toBe(true);
         // The other steps stay blank until they resolve.
         expect(steps[1]![0]!.getAttribute("visibility")).toBe("hidden");
 
-        // Restoring unhides everything but keeps the earned colours.
+        // Restoring unhides everything but keeps the earned halo.
         unhideNoteElements(steps);
         expect(steps[1]![0]!.getAttribute("visibility")).toBeNull();
-        expect(steps[0]![0]!.getAttribute("fill")).toBe(PLAYED_COLOR);
+        expect(document.querySelectorAll(HALO).length).toBeGreaterThan(0);
     });
 });

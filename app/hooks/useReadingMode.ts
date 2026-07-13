@@ -30,6 +30,9 @@ export type ReadingMode = {
     // per piece by beamsVisible.
     beams: Beams;
     setBeams: (value: Beams) => void;
+    // Colour the noteheads by note name (the Boomwhacker reading aid), remembered per device.
+    colorNotes: boolean;
+    setColorNotes: (value: boolean) => void;
     // Print the suggested fingering numbers on the staff. Seeded from the saved default,
     // flipped live in-play; the setter takes a functional update for the toggle button.
     showFingerings: boolean;
@@ -47,6 +50,7 @@ export function useReadingMode(): ReadingMode {
     const [barNumbers, setBarNumbers] = usePref(prefs, "barNumbers");
     const [treadmill, setTreadmill] = usePref(prefs, "treadmill");
     const [beams, setBeams] = usePref(prefs, "beams");
+    const [colorNotes, setColorNotes] = usePref(prefs, "colorNotes");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
     // OSMD draws them, so it stays session state rather than a persisted preference.
     const [showFingerings, setShowFingerings] = useState(() => prefs.load().showFingerings);
@@ -63,6 +67,8 @@ export function useReadingMode(): ReadingMode {
         setTreadmill,
         beams,
         setBeams,
+        colorNotes,
+        setColorNotes,
         showFingerings,
         setShowFingerings,
         scrollFollow,

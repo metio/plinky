@@ -185,6 +185,8 @@
   "beams_caption": "Grede spajaju brze note u ritmičke skupine. Sakrij ih da čitaš notu po notu dok učiš; Automatski ih prikazuje na težim skladbama gdje ritmičko grupiranje pomaže.",
   "note_size_label": "Veličina nota",
   "note_size_caption": "Povećaj cijelu partituru za veće, lakše čitljive note — zgodno na malom zaslonu ili kad tek počinješ.",
+  "color_notes_toggle": "Oboji note",
+  "color_notes_hint": "Oboji svaku glavu note prema njezinu nazivu — svaki C crveno, svaki D narančasto i tako dalje — kako bi note mogao čitati po boji dok ih učiš.",
   "transpose": "Transponiraj",
   "transpose_down": "Transponiraj niže za polustepen",
   "transpose_up": "Transponiraj više za polustepen",

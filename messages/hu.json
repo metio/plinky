@@ -185,6 +185,8 @@
   "beams_caption": "A gerendák a gyors hangokat ütemcsoportokba kötik. Rejtsd el őket, hogy tanulás közben egyszerre egy hangot olvass; az Automatikus a nehezebb darabokon mutatja őket, ahol az ütemcsoportosítás segít.",
   "note_size_label": "Hangjegyek mérete",
   "note_size_caption": "Nagyítsd fel az egész kottát a nagyobb, könnyebben olvasható hangjegyekért — hasznos kis képernyőn vagy amikor még csak kezded.",
+  "color_notes_toggle": "Színezd a hangokat",
+  "color_notes_hint": "Színezd minden hangfejet a neve szerint — minden C piros, minden D narancssárga, és így tovább — hogy szín alapján olvashasd a hangokat, amíg tanulod őket.",
   "transpose": "Transzponálás",
   "transpose_down": "Transzponálás lefelé egy félhanggal",
   "transpose_up": "Transzponálás felfelé egy félhanggal",

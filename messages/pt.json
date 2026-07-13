@@ -185,6 +185,8 @@
   "beams_caption": "As barras de ligação unem notas rápidas em grupos de tempo. Oculte-as para ler uma nota de cada vez enquanto aprende; o modo Automático mostra-as em peças mais difíceis, onde o agrupamento por tempo ajuda.",
   "note_size_label": "Tamanho das notas",
   "note_size_caption": "Amplie toda a partitura para notas maiores e mais fáceis de ler — prático num ecrã pequeno ou quando está a começar.",
+  "color_notes_toggle": "Colorir as notas",
+  "color_notes_hint": "Colore cada cabeça de nota conforme o seu nome — cada dó vermelho, cada ré laranja, e assim por diante — para que possa ler as notas pela cor enquanto as aprende.",
   "transpose": "Transpor",
   "transpose_down": "Transpor um semitom para baixo",
   "transpose_up": "Transpor um semitom para cima",

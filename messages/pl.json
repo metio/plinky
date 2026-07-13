@@ -185,6 +185,8 @@
   "beams_caption": "Belki łączą szybkie nuty w grupy rytmiczne. Ukryj je, aby podczas nauki czytać nutę po nucie; Automatycznie pokazuje je w trudniejszych utworach, gdzie grupowanie pomaga.",
   "note_size_label": "Rozmiar nut",
   "note_size_caption": "Powiększ całą partyturę, aby nuty były większe i łatwiejsze do odczytania – przydatne na małym ekranie lub gdy dopiero zaczynasz.",
+  "color_notes_toggle": "Koloruj nuty",
+  "color_notes_hint": "Koloruj główkę każdej nuty według jej nazwy – każde C na czerwono, każde D na pomarańczowo i tak dalej – abyś mógł czytać nuty po kolorze, gdy się ich uczysz.",
   "transpose": "Transponuj",
   "transpose_down": "Transponuj w dół o półton",
   "transpose_up": "Transponuj w górę o półton",

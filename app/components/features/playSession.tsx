@@ -278,6 +278,7 @@ function usePlaySessionValue({
         barNumbers,
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),
+        colorNotes: reading.colorNotes,
         showFingerings,
         scrollFollow,
         onReload: () => {
