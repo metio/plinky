@@ -118,4 +118,28 @@ describe("readActiveDynamic", () => {
         };
         expect(readActiveDynamic(throwing)).toBeNull();
     });
+
+    it("skips OSMD's sparse per-staff undefined slots instead of dereferencing them", () => {
+        // OSMD keeps ActiveDynamicExpressions staff-indexed: a staff with no dynamic holds
+        // an undefined slot. Dereferencing it would throw and drop the real dynamic below.
+        expect(
+            readActiveDynamic({ ActiveDynamicExpressions: [undefined, { MidiVolume: 80 }] }),
+        ).toBe(80);
+        expect(readActiveDynamic({ ActiveDynamicExpressions: [undefined, undefined] })).toBeNull();
+    });
+
+    it("ignores a wedge's negative out-of-range sentinel instead of muting the note", () => {
+        // getInterpolatedDynamic returns −1 before the wedge and −2 after it; treat those as
+        // "no value here" and fall through, not as a loudness that clamps velocity to 1.
+        const after = {
+            CurrentSourceTimestamp: {},
+            ActiveDynamicExpressions: [{ getInterpolatedDynamic: () => -2 }, { MidiVolume: 64 }],
+        };
+        expect(readActiveDynamic(after)).toBe(64);
+        const before = {
+            CurrentSourceTimestamp: {},
+            ActiveDynamicExpressions: [{ getInterpolatedDynamic: () => -1 }],
+        };
+        expect(readActiveDynamic(before)).toBeNull();
+    });
 });

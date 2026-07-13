@@ -123,15 +123,26 @@ export function readActiveDynamic(iterator: unknown): number | null {
         const shape = (iterator ?? {}) as IteratorShape;
         const active = shape.ActiveDynamicExpressions ?? [];
         for (const raw of active) {
+            // OSMD keeps this array staff-indexed and sparse — a staff with no dynamic in
+            // force holds an undefined slot, so skip empties rather than dereference them.
+            if (!raw) {
+                continue;
+            }
             const expr = raw as ExpressionShape;
             if (typeof expr.getInterpolatedDynamic === "function") {
                 const value = expr.getInterpolatedDynamic(shape.CurrentSourceTimestamp);
-                if (typeof value === "number" && Number.isFinite(value)) {
+                // A wedge returns a negative sentinel (−1 before it starts, −2 after it
+                // ends) when the cursor is outside it — that is "no value here", not a
+                // loudness, so fall through rather than mute the note to velocity 1.
+                if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
                     return value;
                 }
             }
         }
         for (const raw of active) {
+            if (!raw) {
+                continue;
+            }
             const expr = raw as ExpressionShape;
             if (typeof expr.MidiVolume === "number" && Number.isFinite(expr.MidiVolume)) {
                 return expr.MidiVolume;
