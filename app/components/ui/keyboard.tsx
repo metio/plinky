@@ -12,6 +12,14 @@ function isWhite(note: number): boolean {
     return WHITE_PITCH_CLASSES.includes(((note % 12) + 12) % 12);
 }
 
+// The widest a white key is allowed to grow. The keys divide the container width
+// evenly (flex-1), so on a wide surface a few-key piece would otherwise stretch each
+// key squat and unpiano-like. Capping the keyboard to this per white key — and
+// centring it — keeps keys near the tall ~1:3 proportion of a real keyboard (the well
+// is ~144px tall) however few notes a piece spans, matching the exported video's look.
+// A narrow phone stays under the cap, so its keys fill the width as before.
+const MAX_WHITE_KEY_PX = 44;
+
 // The letter to print on a key, or null for none. "all" labels every key; "c" prints
 // only on the C keys, the landmark that orients a beginner (the white key just left of
 // each two-black-key group); "off" prints nothing.
@@ -87,6 +95,10 @@ export function Keyboard({
     // Guard against a range with no white keys (a degenerate single-black span):
     // dividing by zero would make every black key's left/width Infinity.
     const whiteWidth = whites.length ? 100 / whites.length : 0;
+    // Cap the keyboard so keys can't stretch past a tall proportion, then centre it. The
+    // black keys are positioned as a percentage of this same container, so capping the
+    // container (rather than the white keys alone) keeps white and black keys aligned.
+    const maxWidth = whites.length ? whites.length * MAX_WHITE_KEY_PX : undefined;
 
     const down = (note: number) => (event: React.PointerEvent) => {
         event.preventDefault();
@@ -134,7 +146,10 @@ export function Keyboard({
 
     return (
         <div className={`${KEYBED_WELL} ${well}`}>
-            <div className="relative h-36 w-full touch-none select-none">
+            <div
+                className="relative mx-auto h-36 w-full touch-none select-none"
+                style={{ maxWidth }}
+            >
                 {badge}
                 <div className="flex h-full w-full gap-px">
                     {whites.map((note, index) => (
