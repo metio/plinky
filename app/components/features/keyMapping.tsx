@@ -8,6 +8,7 @@ import {
     HANDS,
     type KeyMap,
     keyForSlot,
+    keyPlaysNote,
     NOTE_LABELS,
     rebind,
     rebindPedal,
@@ -54,6 +55,9 @@ export function KeyMapping() {
     const onboarding = useOnboardingStore();
     // The slot or pedal currently listening for a key, or null when idle.
     const [arming, setArming] = useState<Arming | null>(null);
+    // Set when a pedal bind is refused because the pressed key already plays a note, so the
+    // editor can say why rather than appearing to swallow the keystroke.
+    const [pedalClash, setPedalClash] = useState(false);
 
     // Engaging with the editor — arming a cap to rebind, or resetting to the standard
     // layout — ticks off the "set up your keys" discovery step, so a player content with
@@ -74,10 +78,11 @@ export function KeyMapping() {
             event.stopPropagation();
             if (event.key === "Escape") {
                 setArming(null);
+                setPedalClash(false);
                 return;
             }
             if (arming.kind === "pedal") {
-                // Backspace/Delete clears the pedal; a pedal takes almost any key, Space
+                // Backspace/Delete clears the pedal; a pedal takes almost any free key, Space
                 // included — the natural key for a foot pedal on a computer keyboard.
                 if (event.key === "Backspace" || event.key === "Delete") {
                     persist(rebindPedal(map, arming.pedal, null));
@@ -87,6 +92,14 @@ export function KeyMapping() {
                 if (event.key.length !== 1 || event.metaKey || event.ctrlKey) {
                     return;
                 }
+                // A pedal may only take a key no note uses — binding a note key would strand
+                // that note and be silently discarded on reload. Refuse and say why, keeping
+                // the cap armed so the player can try a free key.
+                if (keyPlaysNote(map, event.key)) {
+                    setPedalClash(true);
+                    return;
+                }
+                setPedalClash(false);
                 persist(rebindPedal(map, arming.pedal, event.key));
                 setArming(null);
                 return;
@@ -121,6 +134,7 @@ export function KeyMapping() {
                                     type="button"
                                     onClick={() => {
                                         markEngaged();
+                                        setPedalClash(false);
                                         setArming(armed ? null : { kind: "note", hand, semitone });
                                     }}
                                     aria-label={m.keymap_rebind({
@@ -159,6 +173,7 @@ export function KeyMapping() {
                                 type="button"
                                 onClick={() => {
                                     markEngaged();
+                                    setPedalClash(false);
                                     setArming(armed ? null : { kind: "pedal", pedal });
                                 }}
                                 aria-label={m.keymap_rebind_pedal({ pedal: PEDAL_LABEL[pedal]() })}
@@ -182,10 +197,16 @@ export function KeyMapping() {
                 <p className="text-xs text-gray-500 dark:text-gray-400">{m.keymap_pedals_help()}</p>
             </div>
             <div className="flex items-center gap-3">
-                {arming && (
-                    <span className="text-xs text-indigo-700 dark:text-indigo-300">
-                        {arming.kind === "pedal" ? m.keymap_press_pedal() : m.keymap_press()}
+                {pedalClash ? (
+                    <span className="text-xs text-red-600 dark:text-red-400">
+                        {m.keymap_pedal_taken()}
                     </span>
+                ) : (
+                    arming && (
+                        <span className="text-xs text-indigo-700 dark:text-indigo-300">
+                            {arming.kind === "pedal" ? m.keymap_press_pedal() : m.keymap_press()}
+                        </span>
+                    )
                 )}
                 <Button
                     variant="secondary"

@@ -135,6 +135,17 @@ export function capturePedal(capture: RunCapture, down: boolean, atMs: number): 
     capture.pedalHeld.clear();
 }
 
+// Close every still-open hold at `atMs` — the run has ended, so a key still down (the
+// final note held to the last beat) or a note still ringing under the pedal must record
+// its real length now, not fall back to a bare beat. Idempotent: a second call finds
+// nothing open. Call this before deriving the take from the capture.
+export function flushHolds(capture: RunCapture, atMs: number): void {
+    for (const pitch of [...capture.holds.keys()]) {
+        closeHold(capture, pitch, atMs);
+    }
+    capture.pedalHeld.clear();
+}
+
 // The adaptive metronome's next tempo: read the player's pace from the gap
 // between the last two notes and ease the shown tempo toward it, so a single
 // rushed note nudges rather than jerks the pulse. Clamped to the tempo slider's

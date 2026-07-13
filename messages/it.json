@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedali",
   "keymap_pedals_help": "Assegna un tasto a ciascun pedale — lo Spazio è adatto al pedale di risonanza. Tocca un pedale, poi premi un tasto (o Backspace per cancellare).",
   "keymap_rebind_pedal": "Riassegna il tasto del pedale {pedal}",
+  "keymap_pedal_taken": "Quel tasto suona già una nota: scegline uno libero.",
   "pedal_sustain": "Risonanza",
   "pedal_sostenuto": "Tonale",
   "pedal_soft": "Una corda",

@@ -4,10 +4,12 @@
 
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { DEFAULT_KEY_MAP, rebindPedal } from "../../core/keyMap";
+import type { PedalKind } from "../../core/pedals";
 import { type FakeMidi, fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { memoryStore } from "../adapters/memoryStore";
 import { ServicesProvider } from "./services";
-import { MidiProvider, useMidiConnection } from "./midi";
+import { MidiProvider, useMidiConnection, useMidiInput } from "./midi";
 
 // The provider takes its MIDI seam injected, so the whole flow — support probe,
 // permission resume, request, hot-plug, messages — runs against the fake with
@@ -171,5 +173,65 @@ describe("MidiProvider", () => {
         act(() => result.current.clearEvents());
         expect(result.current.events).toEqual([]);
         act(() => unsubscribe());
+    });
+
+    it("lifts a held MIDI pedal when its device disconnects", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const pedals: [PedalKind, boolean][] = [];
+        const useProbe = () => {
+            const c = useMidiConnection();
+            useMidiInput({ onPedal: (pedal, down) => pedals.push([pedal, down]) });
+            return c;
+        };
+        const { result } = renderHook(useProbe, { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        act(() => input.emit([0xb0, 64, 127])); // sustain pressed, still down
+        expect(pedals).toContainEqual(["sustain", true]);
+
+        // Unplugged before the pedal lifts, so it never sends the release.
+        midi.connection.inputs = () => [];
+        act(() => midi.connection.stateChange());
+        // The pedal is lifted on the disconnection rather than left latched down.
+        expect(pedals).toContainEqual(["sustain", false]);
+    });
+
+    it("releases a pedal bound to a shifted-glyph key even with Shift held at release", () => {
+        // Bind sustain to ";" — a shifted press reports ":" for event.key, so a key-based
+        // lookup would miss the release. Tracking the physical code keeps press and release
+        // paired.
+        const store = memoryStore();
+        store.set(
+            "plinky:prefs",
+            JSON.stringify({ keyMap: rebindPedal(DEFAULT_KEY_MAP, "sustain", ";") }),
+        );
+        const pedals: [PedalKind, boolean][] = [];
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <ServicesProvider services={{ midi: fakeMidi(), store }}>
+                <MidiProvider>{children}</MidiProvider>
+            </ServicesProvider>
+        );
+        const useProbe = () => {
+            const c = useMidiConnection();
+            useMidiInput({ onPedal: (pedal, down) => pedals.push([pedal, down]) });
+            return c;
+        };
+        renderHook(useProbe, { wrapper });
+
+        act(() =>
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: ";", code: "Semicolon" })),
+        );
+        // Shift went down after the pedal key, so the key-up reports the shifted glyph.
+        act(() =>
+            window.dispatchEvent(
+                new KeyboardEvent("keyup", { key: ":", code: "Semicolon", shiftKey: true }),
+            ),
+        );
+        expect(pedals).toEqual([
+            ["sustain", true],
+            ["sustain", false],
+        ]);
     });
 });

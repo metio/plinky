@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedále",
   "keymap_pedals_help": "Priraďte kláves každému pedálu — Medzerník sa hodí pre pedál dampra. Ťuknite na pedál a stlačte kláves (alebo Backspace na vymazanie).",
   "keymap_rebind_pedal": "Premapovať kláves pedála {pedal}",
+  "keymap_pedal_taken": "Tento kláves už hrá notu — vyberte voľný.",
   "pedal_sustain": "Damper",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Ľavý pedál",

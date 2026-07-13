@@ -8,6 +8,7 @@ import {
     isDefaultKeyMap,
     type KeyMap,
     keyForSlot,
+    keyPlaysNote,
     pedalForKey,
     rebind,
     rebindPedal,
@@ -140,15 +141,27 @@ describe("pedal bindings", () => {
         expect(pedalForKey(map, "x")).toBeNull();
     });
 
-    it("frees a key from a note slot and any other pedal when it becomes a pedal", () => {
-        // "m" plays a note by default; binding it to a pedal must drop it from the hand.
-        let map = rebindPedal(DEFAULT_KEY_MAP, "sostenuto", "m");
-        expect(map.left.m).toBeUndefined();
-        expect(map.pedals.sostenuto).toBe("m");
-        // Re-using the same key for a different pedal moves it, not duplicates it.
-        map = rebindPedal(map, "soft", "m");
+    it("refuses a note key, leaving both the note and the pedal untouched", () => {
+        // "m" plays a note by default. Stealing it for a pedal would leave the hand a slot
+        // short — which cleanKeyMap rejects wholesale on the next load, silently dropping the
+        // bind — so the request is refused: the note stays, the pedal stays unbound.
+        const map = rebindPedal(DEFAULT_KEY_MAP, "sostenuto", "m");
+        expect(map.left.m).toBe(11);
         expect(map.pedals.sostenuto).toBeNull();
-        expect(map.pedals.soft).toBe("m");
+    });
+
+    it("moves a free key from one pedal to another, never duplicating it", () => {
+        let map = rebindPedal(DEFAULT_KEY_MAP, "sostenuto", " ");
+        expect(map.pedals.sostenuto).toBe(" ");
+        map = rebindPedal(map, "soft", " ");
+        expect(map.pedals.sostenuto).toBeNull();
+        expect(map.pedals.soft).toBe(" ");
+    });
+
+    it("reports whether a key already plays a note", () => {
+        expect(keyPlaysNote(DEFAULT_KEY_MAP, "m")).toBe(true);
+        expect(keyPlaysNote(DEFAULT_KEY_MAP, "Q")).toBe(true); // case-folded
+        expect(keyPlaysNote(DEFAULT_KEY_MAP, " ")).toBe(false);
     });
 
     it("clears a pedal binding with null", () => {

@@ -472,6 +472,7 @@
   "keymap_pedals": "페달",
   "keymap_pedals_help": "각 페달에 키를 할당하세요 — 서스테인 페달에는 스페이스바가 잘 어울려요. 페달을 누른 다음 키를 누르세요(지우려면 Backspace).",
   "keymap_rebind_pedal": "{pedal} 페달 키 재설정",
+  "keymap_pedal_taken": "그 키는 이미 음에 사용 중입니다. 비어 있는 키를 고르세요.",
   "pedal_sustain": "서스테인",
   "pedal_sostenuto": "소스테누토",
   "pedal_soft": "소프트",

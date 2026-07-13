@@ -472,6 +472,7 @@
   "keymap_pedals": "Pédales",
   "keymap_pedals_help": "Attribuez une touche à chaque pédale — Espace convient à la pédale forte. Touchez une pédale, puis appuyez sur une touche (ou Retour arrière pour effacer).",
   "keymap_rebind_pedal": "Réattribuer la touche de la pédale {pedal}",
+  "keymap_pedal_taken": "Cette touche joue déjà une note — choisis-en une libre.",
   "pedal_sustain": "Forte",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Sourdine",

@@ -7,6 +7,7 @@ import {
     captureCleared,
     capturePedal,
     captureRelease,
+    flushHolds,
     liveTempo,
     startCapture,
 } from "./runCapture";
@@ -78,6 +79,32 @@ describe("runCapture", () => {
         captureCleared(capture, cleared({ timestamp: 1000 }));
         captureRelease(capture, 60, 1400);
         expect(capture.notes[0]?.heldMs).toBe(400);
+    });
+
+    it("flushes a note still held at the finish, recording its real length", () => {
+        const capture = startCapture();
+        captureCleared(capture, cleared({ timestamp: 1000 }));
+        // The key is never lifted — the run completes with it still down.
+        flushHolds(capture, 1900);
+        expect(capture.notes[0]?.heldMs).toBe(900);
+    });
+
+    it("flushes a note still ringing under a down pedal at the finish", () => {
+        const capture = startCapture();
+        captureCleared(capture, cleared({ timestamp: 1000 }));
+        capturePedal(capture, true, 1050);
+        captureRelease(capture, 60, 1200); // key up, held by the pedal
+        flushHolds(capture, 1700);
+        expect(capture.notes[0]?.heldMs).toBe(700);
+        expect(capture.pedalHeld.size).toBe(0);
+    });
+
+    it("is a no-op when every hold is already closed", () => {
+        const capture = startCapture();
+        captureCleared(capture, cleared({ timestamp: 1000 }));
+        captureRelease(capture, 60, 1400);
+        flushHolds(capture, 5000);
+        expect(capture.notes[0]?.heldMs).toBe(400); // unchanged, not re-stretched
     });
 
     it("eases the live tempo toward the played pace, clamped to the slider range", () => {

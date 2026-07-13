@@ -472,6 +472,7 @@
   "keymap_pedals": "ペダル",
   "keymap_pedals_help": "各ペダルにキーを割り当てましょう — サステインペダルにはスペースキーがぴったりです。ペダルをタップし、キーを押してください（消去はBackspace）。",
   "keymap_rebind_pedal": "{pedal}ペダルのキーを再割り当て",
+  "keymap_pedal_taken": "そのキーはすでに音に使われています。空いているキーを選んでください。",
   "pedal_sustain": "サステイン",
   "pedal_sostenuto": "ソステヌート",
   "pedal_soft": "ソフト",

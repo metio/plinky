@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedales",
   "keymap_pedals_help": "Asigna una tecla a cada pedal — la barra espaciadora va bien para el pedal de resonancia. Toca un pedal y luego pulsa una tecla (o Retroceso para borrar).",
   "keymap_rebind_pedal": "Reasignar la tecla del pedal {pedal}",
+  "keymap_pedal_taken": "Esa tecla ya toca una nota: elige una libre.",
   "pedal_sustain": "Resonancia",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Suave",

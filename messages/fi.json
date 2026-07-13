@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedaalit",
   "keymap_pedals_help": "Sido näppäin kuhunkin pedaaliin — Väli sopii forte-pedaalille. Napauta pedaalia ja paina sitten näppäintä (tai tyhjennä Askelpalauttimella).",
   "keymap_rebind_pedal": "Vaihda {pedal}-pedaalin näppäin",
+  "keymap_pedal_taken": "Tämä näppäin soittaa jo nuotin — valitse vapaa.",
   "pedal_sustain": "Forte",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

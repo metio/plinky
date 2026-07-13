@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedály",
   "keymap_pedals_help": "Přiřaďte klávesu ke každému pedálu — pro pedál prodloužení se hodí Mezerník. Klepněte na pedál a poté stiskněte klávesu (nebo Backspace pro vymazání).",
   "keymap_rebind_pedal": "Přemapovat klávesu pedálu {pedal}",
+  "keymap_pedal_taken": "Tato klávesa už hraje notu — vyberte volnou.",
   "pedal_sustain": "Prodloužení",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Ztlumení",

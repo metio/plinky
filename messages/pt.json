@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedais",
   "keymap_pedals_help": "Associe uma tecla a cada pedal — Espaço combina com o pedal de sustentação. Toque num pedal e depois pressione uma tecla (ou Backspace para limpar).",
   "keymap_rebind_pedal": "Remapear a tecla do pedal {pedal}",
+  "keymap_pedal_taken": "Essa tecla já toca uma nota — escolha uma livre.",
   "pedal_sustain": "Sustentação",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Surdina",

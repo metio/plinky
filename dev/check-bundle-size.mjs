@@ -26,7 +26,7 @@ const ON_DEMAND = /webCodecsVideo/;
 // (`PLINKY_LOCALE=en npm run build`), because the deploy ships one tree-shaken
 // bundle per language (dev/build-locales.mjs) — a German visitor never downloads
 // Korean. So this tracks real per-visitor weight, not the summed all-locales output.
-const BUDGET_TOTAL_KB = 562;
+const BUDGET_TOTAL_KB = 564;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -60,7 +60,12 @@ const BUDGET_TOTAL_KB = 562;
 // The microphone calibration wizard — the pure step machine, the raw-sample seam
 // through the pitch port, and the guided setup panel that tunes the detector's
 // noise floor, octave and velocity band to the player's own room — adds ~2 KB.
-const BUDGET_APP_KB = 252;
+//
+// The three-pedal support and its robustness pass — the live pedal-down tracking that
+// seeds a mid-hold run's recording and lifts a pedal on device disconnect, the
+// hold-flush that records a note still held at the finish, and the pedal-key editor that
+// rejects a key already playing a note — adds ~1 KB.
+const BUDGET_APP_KB = 254;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

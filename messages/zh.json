@@ -472,6 +472,7 @@
   "keymap_pedals": "踏板",
   "keymap_pedals_help": "为每个踏板绑定一个键——空格键适合延音踏板。点一个踏板，再按下一个键（或按退格键清除）。",
   "keymap_rebind_pedal": "重新分配{pedal}踏板的按键",
+  "keymap_pedal_taken": "该键已用于弹奏音符，请选择一个空闲的键。",
   "pedal_sustain": "延音",
   "pedal_sostenuto": "持音",
   "pedal_soft": "弱音",

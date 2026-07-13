@@ -419,10 +419,13 @@ export const webAudioEngine: AudioEngine = {
             }
             return;
         }
-        // Sostenuto: pressing it captures the notes sounding right now and holds only those;
-        // lifting it ends that captured set, save any a key or the sustain pedal still holds.
+        // Sostenuto: pressing it captures the notes whose keys are down right now — the
+        // raised dampers at that instant — and holds only those; later notes play normally.
+        // Capturing every sounding voice instead would wrongly sustain notes still ringing
+        // under the sustain pedal or a prior sostenuto. Lifting ends the captured set, save
+        // any a key or the sustain pedal still holds.
         if (down) {
-            sostenutoHeld = new Set(voices.keys());
+            sostenutoHeld = new Set(keyDown);
         } else {
             const held = sostenutoHeld;
             sostenutoHeld = new Set();

@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedale",
   "keymap_pedals_help": "Belege jedes Pedal mit einer Taste — die Leertaste passt zum Haltepedal. Tippe ein Pedal an und drücke dann eine Taste (oder Rücktaste zum Löschen).",
   "keymap_rebind_pedal": "Taste für {pedal} neu belegen",
+  "keymap_pedal_taken": "Diese Taste spielt bereits eine Note – wähle eine freie.",
   "pedal_sustain": "Haltepedal",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Pianopedal",

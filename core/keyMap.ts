@@ -64,8 +64,19 @@ export function pedalForKey(map: KeyMap, key: string): PedalKind | null {
     return PEDAL_KINDS.find((kind) => map.pedals[kind] === lower) ?? null;
 }
 
-// Bind `key` to a pedal (or clear it with null). A key does one job, so it is first freed
-// from any note slot and any other pedal it held, keeping every key unique across the layout.
+// Whether a key already plays a note under either hand — the guard a pedal bind must
+// pass, since a pedal may only take a key no note uses.
+export function keyPlaysNote(map: KeyMap, key: string): boolean {
+    const lower = key.toLowerCase();
+    return lower in map.left || lower in map.right;
+}
+
+// Bind `key` to a pedal (or clear it with null). A pedal may only take a key that plays
+// no note: stealing a note key would leave that hand a slot short, which cleanKeyMap
+// rejects wholesale on the next load — resetting the hand to defaults and dropping the
+// pedal with it. So a request to bind a note key is refused (the map returns unchanged);
+// callers check keyPlaysNote first to tell the player why. The key is still freed from
+// any other pedal it held, keeping every key unique across the layout.
 export function rebindPedal(map: KeyMap, kind: PedalKind, key: string | null): KeyMap {
     const next = cloneMap(map);
     if (key === null) {
@@ -73,8 +84,8 @@ export function rebindPedal(map: KeyMap, kind: PedalKind, key: string | null): K
         return next;
     }
     const lower = key.toLowerCase();
-    for (const hand of HANDS) {
-        delete next[hand][lower];
+    if (keyPlaysNote(next, lower)) {
+        return next;
     }
     for (const other of PEDAL_KINDS) {
         if (next.pedals[other] === lower) {

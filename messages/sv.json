@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedaler",
   "keymap_pedals_help": "Koppla en tangent till varje pedal — mellanslag passar sustainpedalen. Tryck på en pedal och tryck sedan på en tangent (eller Backsteg för att rensa).",
   "keymap_rebind_pedal": "Ändra tangent för {pedal}-pedalen",
+  "keymap_pedal_taken": "Den tangenten spelar redan en ton – välj en ledig.",
   "pedal_sustain": "Sustain",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

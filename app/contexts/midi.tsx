@@ -88,6 +88,9 @@ type MidiContextValue = {
     // Play a note from the on-screen keyboard through the same funnel as MIDI.
     pressKey: (note: number) => void;
     releaseKey: (note: number) => void;
+    // Whether a pedal is currently held (any source). A run starting mid-hold reads it
+    // to seed its recording, since Web MIDI streams only pedal changes, never the state.
+    pedalHeld: (pedal: PedalKind) => boolean;
     // The microphone as an input device: an acoustic piano heard through pitch
     // detection lands in the same funnel as a MIDI keyboard.
     micStatus: MicStatus;
@@ -175,13 +178,24 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [],
     );
 
+    // Which pedals are currently held, tracked across every source (MIDI CC and computer
+    // keys both flow through emitPedal). A run starting mid-hold reads this to seed its
+    // capture, and a device disconnecting reads it to lift only what was actually down.
+    const pedalsDownRef = useRef<Set<PedalKind>>(new Set());
+
     // The pedal funnel, alongside emitNote: a pedal carries no note, so it reaches
     // subscribers on its own channel rather than through the note pipeline.
     const emitPedal = useCallback((pedal: PedalKind, down: boolean, timestamp: number) => {
+        if (down) {
+            pedalsDownRef.current.add(pedal);
+        } else {
+            pedalsDownRef.current.delete(pedal);
+        }
         for (const listener of subscribersRef.current) {
             listener.onPedal?.(pedal, down, timestamp);
         }
     }, []);
+    const pedalHeld = useCallback((pedal: PedalKind) => pedalsDownRef.current.has(pedal), []);
 
     const makeHandler = useCallback(
         (deviceName: string) => (data: Uint8Array, timestamp: number) => {
@@ -351,9 +365,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             for (const note of heldNotesRef.current) {
                 emitNote("noteoff", note, 0, 1, "MIDI", performance.now());
             }
+            // A pedal held when its device vanishes never sends its release either, so it
+            // would latch down — every note played after would ring on. Lift whatever pedal
+            // was down (snapshotting first, since emitPedal mutates the set as it clears).
+            for (const pedal of [...pedalsDownRef.current]) {
+                emitPedal(pedal, false, performance.now());
+            }
         }
         setDevices(list);
-    }, [makeHandler, emitNote]);
+    }, [makeHandler, emitNote, emitPedal]);
 
     // Each request gets a sequence number; only the latest may wire itself in.
     // A stale resolve (an earlier click, or one landing after unmount) closes its
@@ -422,8 +442,10 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         loadKeyMap();
         const unsubscribePrefs = prefsStore.subscribe(loadKeyMap);
         const pressed = new Map<string, number>();
-        // Pedal keys currently held, each mapped to the pedal it works, so the keyup
-        // releases the same pedal even if the layout changes while it is down.
+        // Pedal keys currently held, keyed by physical code (event.code), each mapped to the
+        // pedal it works. The physical code is modifier-independent, so a pedal bound to a
+        // shifted-glyph key (e.g. ";") still releases on keyup even if Shift is held down at
+        // release — event.key would read ":" then and never match the press.
         const pedalKeysDown = new Map<string, PedalKind>();
 
         const isTextEntry = (target: EventTarget | null): boolean => {
@@ -459,9 +481,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
             const pedal = pedalForKey(keyMapRef.current, key);
             if (pedal) {
-                if (!pedalKeysDown.has(key)) {
+                if (!pedalKeysDown.has(event.code)) {
                     event.preventDefault();
-                    pedalKeysDown.set(key, pedal);
+                    pedalKeysDown.set(event.code, pedal);
                     emitPedal(pedal, true, event.timeStamp);
                 }
                 return;
@@ -481,9 +503,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
         const onKeyUp = (event: KeyboardEvent) => {
             const key = event.key.toLowerCase();
-            const pedal = pedalKeysDown.get(key);
+            const pedal = pedalKeysDown.get(event.code);
             if (pedal !== undefined) {
-                pedalKeysDown.delete(key);
+                pedalKeysDown.delete(event.code);
                 emitPedal(pedal, false, event.timeStamp);
                 return;
             }
@@ -542,6 +564,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         subscribe,
         pressKey,
         releaseKey,
+        pedalHeld,
         micStatus,
         startMic,
         stopMic,

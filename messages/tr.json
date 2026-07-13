@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedallar",
   "keymap_pedals_help": "Her pedala bir tuş ata — Boşluk sustain pedalına uygundur. Bir pedala dokun, sonra bir tuşa bas (ya da temizlemek için Geri Sil).",
   "keymap_rebind_pedal": "{pedal} pedalı tuşunu yeniden ata",
+  "keymap_pedal_taken": "Bu tuş zaten bir nota çalıyor — boş bir tane seç.",
   "pedal_sustain": "Sustain",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

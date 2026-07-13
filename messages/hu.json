@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedálok",
   "keymap_pedals_help": "Rendelj billentyűt minden pedálhoz — a Szóköz illik a hangkitartó pedálhoz. Koppints egy pedálra, majd nyomj le egy billentyűt (vagy a Backspace törli).",
   "keymap_rebind_pedal": "A(z) {pedal} pedál billentyűjének újrarendelése",
+  "keymap_pedal_taken": "Ez a billentyű már egy hangot szólaltat meg – válassz egy szabadot.",
   "pedal_sustain": "Hangkitartó",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

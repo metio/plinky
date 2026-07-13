@@ -256,9 +256,9 @@ a student.
   (`Z X C V B N M` the white keys, `S D G H J` the black) and the top row the
   right hand an octave up (`Q W E R T Y U` white, `2 3 5 6 7` black), each a full
   C-to-B octave, with an octave shift to move around; remap any of these keys to
-  your own layout in **Settings** — where you can also bind a key to each of the three
-  **pedals** (sustain, sostenuto, soft), so a computer-keyboard player can hold the
-  sustain pedal (Space suits it) just like a pianist. (Two-hand pieces span both staves,
+  your own layout in **Settings** — where you can also bind a spare key (one no note
+  uses, Space included) to each of the three **pedals** (sustain, sostenuto, soft), so a
+  computer-keyboard player can hold the sustain pedal just like a pianist. (Two-hand pieces span both staves,
   so a MIDI keyboard is the comfortable way to play those.)
 - **With the on-screen piano** — tap the keys shown under each score. On a wide-ranging
   piece the keyboard shows a moving window that follows the notes you're playing, so the

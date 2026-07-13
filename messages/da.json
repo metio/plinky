@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedaler",
   "keymap_pedals_help": "Bind en tangent til hver pedal — Mellemrum passer til fortepedalen. Tryk på en pedal, og tryk derefter på en tangent (eller Backspace for at rydde).",
   "keymap_rebind_pedal": "Ombind tangenten for {pedal}",
+  "keymap_pedal_taken": "Den tast spiller allerede en node — vælg en ledig.",
   "pedal_sustain": "Fortepedal",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Pianopedal",

@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedalet",
   "keymap_pedals_help": "Lidh një tast me çdo pedale — Space i shkon pedales së mbajtjes. Trokit një pedale, pastaj shtyp një tast (ose Backspace për ta pastruar).",
   "keymap_rebind_pedal": "Ricakto tastin e pedales {pedal}",
+  "keymap_pedal_taken": "Ai tast luan tashmë një notë — zgjidh një të lirë.",
   "pedal_sustain": "Mbajtja",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Butë",

@@ -23,6 +23,7 @@ import {
     captureCleared,
     capturePedal,
     captureRelease,
+    flushHolds,
     type RunCapture,
     startCapture,
 } from "../../../core/runCapture";
@@ -375,7 +376,7 @@ function usePlaySessionValue({
     // their real piano, so echoing the note back through the synth only doubles
     // the sound and feeds the app's own output into the mic. (The session already
     // subscribes to this context via useMidiConnected, so reading it is free.)
-    const { micStatus } = useMidiConnection();
+    const { micStatus, pedalHeld } = useMidiConnection();
     const micListening = micStatus === "listening";
 
     const matcher = useScoreMatcher(getOsmd, {
@@ -555,6 +556,11 @@ function usePlaySessionValue({
             return;
         }
         gradedRef.current = true;
+        // A note still held at the finish (the last note carried to the final beat, or one
+        // ringing under a still-down pedal) never received its key-up, so its hold is open.
+        // Close them at the completion instant so their real length is recorded, not a bare
+        // beat fallback.
+        flushHolds(captureRef.current, scheduler.now());
         const notes = captureRef.current.notes;
         // Everything the finished run shows and records — the grade, the timing tolerance,
         // the per-hand share grid and the tempo curve — is a pure function of the played
@@ -790,6 +796,13 @@ function usePlaySessionValue({
         // guard holds until the run's first note arrives — a stale start timestamp
         // would paint the ghost at the finish the moment Practice is pressed.
         captureRef.current = startCapture();
+        // The sustain pedal held down as the run begins is invisible to a fresh capture —
+        // Web MIDI streams pedal changes, never the standing state — so its first notes would
+        // record dry despite ringing under the damper. Seed the capture from the live pedal.
+        // (The timestamp is unused while the pedal stays down, so a placeholder is fine.)
+        if (pedalHeld("sustain")) {
+            capturePedal(captureRef.current, true, 0);
+        }
         gradeFromRunRef.current = false;
         gradedRef.current = false;
         keepUp.clearResult();

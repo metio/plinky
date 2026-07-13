@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedale",
   "keymap_pedals_help": "Poveži tipku sa svakim pedalom — Razmaknica odgovara pedalu za produženje tona. Dodirni pedal, zatim pritisni tipku (ili Backspace za brisanje).",
   "keymap_rebind_pedal": "Ponovno dodijeli tipku pedala {pedal}",
+  "keymap_pedal_taken": "Ta tipka već svira notu — odaberi slobodnu.",
   "pedal_sustain": "Produženje",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

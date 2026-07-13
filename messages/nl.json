@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedalen",
   "keymap_pedals_help": "Wijs elk pedaal een toets toe — de spatiebalk past bij het demperpedaal. Tik op een pedaal en druk dan op een toets (of Backspace om te wissen).",
   "keymap_rebind_pedal": "Toets voor het {pedal}-pedaal opnieuw toewijzen",
+  "keymap_pedal_taken": "Die toets speelt al een noot — kies een vrije.",
   "pedal_sustain": "Demper",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

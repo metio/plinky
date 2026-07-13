@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedaler",
   "keymap_pedals_help": "Bind en tangent til hver pedal — Mellomrom passer for demperpedalen. Trykk på en pedal, og trykk så en tangent (eller Tilbake for å tømme).",
   "keymap_rebind_pedal": "Endre binding for {pedal}-pedalen",
+  "keymap_pedal_taken": "Den tasten spiller allerede en tone – velg en ledig.",
   "pedal_sustain": "Demper",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",

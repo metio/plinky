@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedale",
   "keymap_pedals_help": "Asociază o tastă fiecărei pedale — Space se potrivește pedalei de susținere. Atinge o pedală, apoi apasă o tastă (sau Backspace pentru a șterge).",
   "keymap_rebind_pedal": "Reasociază tasta pedalei {pedal}",
+  "keymap_pedal_taken": "Tasta aceasta cântă deja o notă — alege una liberă.",
   "pedal_sustain": "Susținere",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Surdină",

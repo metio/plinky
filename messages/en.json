@@ -492,6 +492,7 @@
   "keymap_pedals": "Pedals",
   "keymap_pedals_help": "Bind a key to each pedal — Space suits the sustain pedal. Tap a pedal, then press a key (or Backspace to clear).",
   "keymap_rebind_pedal": "Rebind the {pedal} pedal key",
+  "keymap_pedal_taken": "That key already plays a note — pick a free one.",
   "pedal_sustain": "Sustain",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Soft",

@@ -472,6 +472,7 @@
   "keymap_pedals": "Pedały",
   "keymap_pedals_help": "Przypisz klawisz do każdego pedału — spacja pasuje do pedału tłumików. Dotknij pedału, a potem naciśnij klawisz (lub Backspace, aby wyczyścić).",
   "keymap_rebind_pedal": "Zmień przypisanie klawisza pedału {pedal}",
+  "keymap_pedal_taken": "Ten klawisz już gra nutę — wybierz wolny.",
   "pedal_sustain": "Tłumik",
   "pedal_sostenuto": "Sostenuto",
   "pedal_soft": "Una corda",
