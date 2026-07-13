@@ -25,6 +25,46 @@ const CONFINED = {
     VideoFrame: ["app/adapters/webCodecsVideo.ts"],
     AudioData: ["app/adapters/webCodecsVideo.ts"],
     OffscreenCanvas: ["app/adapters/webCodecsVideo.ts"],
+    // Scheduling globals belong to the Scheduler adapter, so every behavioural
+    // timer/interval/animation-frame runs through the injected capability and a
+    // test can drive time by hand (see app/ports/scheduler.ts). The allow-list is
+    // the genuine lower-level owners: the browser adapter itself; the SSR render
+    // timeout (Node, not the browser); the sw-update watcher's own injected timer
+    // env and the composition root that wires it; the mic adapter's audio-frame
+    // loop; the two imperative DOM one-liners (blob-URL revoke, print cleanup);
+    // and the pure UI primitives (ui-is-pure keeps them out of the services
+    // context, so a purely-cosmetic transition — a wrong-note flash, a value
+    // bump, a slide-in — owns its own timer instead of the Scheduler).
+    setTimeout: [
+        "app/adapters/browserScheduler.ts",
+        "app/entry.server.tsx",
+        "app/root.tsx",
+        "app/lib/swUpdate.ts",
+        "app/lib/download.ts",
+        "app/lib/printScore.ts",
+        "app/components/ui/keyboard.tsx",
+        "app/components/ui/stepper.tsx",
+    ],
+    clearTimeout: [
+        "app/adapters/browserScheduler.ts",
+        "app/entry.server.tsx",
+        "app/root.tsx",
+        "app/lib/swUpdate.ts",
+        "app/components/ui/keyboard.tsx",
+        "app/components/ui/stepper.tsx",
+    ],
+    setInterval: ["app/adapters/browserScheduler.ts"],
+    clearInterval: ["app/adapters/browserScheduler.ts"],
+    requestAnimationFrame: [
+        "app/adapters/browserScheduler.ts",
+        "app/adapters/micPitch.ts",
+        "app/components/ui/drawer.tsx",
+    ],
+    cancelAnimationFrame: [
+        "app/adapters/browserScheduler.ts",
+        "app/adapters/micPitch.ts",
+        "app/components/ui/drawer.tsx",
+    ],
 };
 
 function walk(dir) {

@@ -16,6 +16,8 @@ export function BumpValue({ value, className = "" }: { value: ReactNode; classNa
         if (previous.current !== value) {
             previous.current = value;
             setBumped(true);
+            // A cosmetic bump — a pure UI primitive (ui-is-pure) owns its own
+            // transition timer (allow-listed in dev/check-globals.mjs).
             const id = window.setTimeout(() => setBumped(false), 150);
             return () => window.clearTimeout(id);
         }

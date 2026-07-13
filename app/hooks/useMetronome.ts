@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef } from "react";
-import { useAudioEngine, usePrefsStore } from "../contexts/services";
+import { useAudioEngine, usePrefsStore, useScheduler } from "../contexts/services";
 
 // Plays an audible click while `enabled`: an accented downbeat, a plainer click on
 // every other beat, and — when `subdivision` > 1 — softer clicks dividing each beat
@@ -26,6 +26,7 @@ export function useMetronome(
     bpmRef.current = bpm;
     const prefsStore = usePrefsStore();
     const audio = useAudioEngine();
+    const scheduler = useScheduler();
 
     useEffect(() => {
         if (!enabled) {
@@ -71,7 +72,7 @@ export function useMetronome(
             }
         };
         schedule();
-        const timer = window.setInterval(schedule, 25);
-        return () => window.clearInterval(timer);
-    }, [enabled, beatsPerBar, subdivision, accent, audio, prefsStore]);
+        const timer = scheduler.every(25, schedule);
+        return () => scheduler.cancel(timer);
+    }, [enabled, beatsPerBar, subdivision, accent, audio, prefsStore, scheduler]);
 }

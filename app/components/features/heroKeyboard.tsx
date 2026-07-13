@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMidiInput } from "../../contexts/midi";
+import { useScheduler } from "../../contexts/services";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
 import { Keyboard } from "../ui/keyboard";
@@ -20,6 +21,7 @@ const TO = 72;
 // on load; that and the press are the only motion, both dropped for reduce-motion.
 export function HeroKeyboard() {
     const synth = useSynth();
+    const scheduler = useScheduler();
     const labels = useNoteLabels();
     const [lit, setLit] = useState<ReadonlySet<number>>(new Set());
     // Pending un-light timers, cleared on unmount so a press right before the component
@@ -28,16 +30,16 @@ export function HeroKeyboard() {
     useEffect(
         () => () => {
             for (const timer of timers.current) {
-                window.clearTimeout(timer);
+                scheduler.cancel(timer);
             }
         },
-        [],
+        [scheduler],
     );
 
     const plink = (note: number) => {
         synth.playNote(note, { velocity: 100, duration: 1.4 });
         setLit((prev) => new Set(prev).add(note));
-        const id = window.setTimeout(() => {
+        const id = scheduler.after(240, () => {
             setLit((prev) => {
                 const next = new Set(prev);
                 next.delete(note);
@@ -46,7 +48,7 @@ export function HeroKeyboard() {
             // Drop the fired timer so the pending list can't grow without bound over a
             // long session on the landing page; the unmount cleanup clears the rest.
             timers.current = timers.current.filter((pending) => pending !== id);
-        }, 240);
+        });
         timers.current.push(id);
     };
 

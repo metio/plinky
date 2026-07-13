@@ -32,6 +32,7 @@ import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import {
     useHintsStore,
     useOnboardingStore,
+    useScheduler,
     useServices,
     useXmlCodec,
 } from "../../contexts/services";
@@ -127,6 +128,7 @@ function usePlaySessionValue({
     // callback and the MIDI release handler both advance it between renders.
     const captureRef = useRef<RunCapture>(startCapture());
     const synth = useSynth();
+    const scheduler = useScheduler();
     // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
     // on the clock rather than waiting for you, so a note not cleared before it passes is a
     // miss. `guideNotes` sounds the notes as they pass for a follow-along; off, it's a
@@ -496,14 +498,14 @@ function usePlaySessionValue({
             return;
         }
         const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const frame = requestAnimationFrame(() => {
+        const frame = scheduler.frame(() => {
             gradePanelRef.current?.scrollIntoView({
                 behavior: smooth ? "smooth" : "auto",
                 block: "center",
             });
         });
-        return () => cancelAnimationFrame(frame);
-    }, [runResult.grade]);
+        return () => scheduler.cancelFrame(frame);
+    }, [runResult.grade, scheduler]);
 
     // Re-centre the treadmill as the matcher advances through the piece — the cursor
     // position isn't a value centerCursor reads, so depend on done/practicing to fire it.

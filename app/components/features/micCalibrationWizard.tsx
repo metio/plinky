@@ -15,6 +15,7 @@ import {
 } from "../../../core/micCalibration";
 import { noteName } from "../../../core/midi";
 import { useMidiConnection } from "../../contexts/midi";
+import { useScheduler } from "../../contexts/services";
 import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -48,6 +49,7 @@ const STEP_MESSAGE: Record<CalibrationStep, () => string> = {
 export function MicCalibrationWizard() {
     const { micStatus, startCalibration, stopMic } = useMidiConnection();
     const { prefs, update } = usePrefs();
+    const scheduler = useScheduler();
     const [open, setOpen] = useState(false);
     const [state, setState] = useState(() => beginCalibration(TARGET_NOTE));
     const [saved, setSaved] = useState(false);
@@ -81,11 +83,11 @@ export function MicCalibrationWizard() {
         if (!ready) {
             return;
         }
-        const id = window.setTimeout(() => setState((current) => nextStep(current)), DWELL_MS);
-        return () => window.clearTimeout(id);
+        const id = scheduler.after(DWELL_MS, () => setState((current) => nextStep(current)));
+        return () => scheduler.cancel(id);
         // `ready` alone drives this: it dips to false at every step change (the new
         // step's collector starts empty), so a fresh step always re-arms the dwell.
-    }, [ready]);
+    }, [ready, scheduler]);
 
     // At the end, derive and persist the calibration once, then release the mic.
     useEffect(() => {

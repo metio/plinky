@@ -39,6 +39,7 @@ export function useGhostRace({
     runStartedAt: () => number;
 }) {
     const services = useServices();
+    const { scheduler } = services;
     // The onsets being raced this run — and how far the ghost has reached as the
     // run's clock elapses.
     const [ghost, setGhost] = useState<number[] | null>(null);
@@ -84,9 +85,9 @@ export function useGhostRace({
                 setGhostDone(ghostReached(ghost, performance.now() - startedAt));
             }
         };
-        const timer = window.setInterval(tick, 50);
-        return () => window.clearInterval(timer);
-    }, [practicing, ghost, runStartedAt]);
+        const timer = scheduler.every(50, tick);
+        return () => scheduler.cancel(timer);
+    }, [practicing, ghost, runStartedAt, scheduler]);
 
     // Move the ghost's colour onto the note it has currently reached, restoring the
     // one it leaves to green if the player has already played it there, else black.

@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RecordedNote } from "../../core/composition";
 import { tailMs } from "../../core/recording";
+import { useScheduler } from "../contexts/services";
 import { useSynth } from "./useSynth";
 
 type TransportOptions = {
@@ -27,18 +28,19 @@ export function useCompositionTransport({
     onDownbeat,
 }: TransportOptions) {
     const { playNote } = useSynth();
+    const scheduler = useScheduler();
     const [playing, setPlaying] = useState(false);
     const [countingIn, setCountingIn] = useState(false);
     const timersRef = useRef<number[]>([]);
 
     const stop = useCallback(() => {
         for (const id of timersRef.current) {
-            window.clearTimeout(id);
+            scheduler.cancel(id);
         }
         timersRef.current = [];
         setPlaying(false);
         setCountingIn(false);
-    }, []);
+    }, [scheduler]);
 
     // Release any scheduled playback when the page goes away.
     useEffect(() => stop, [stop]);
@@ -50,17 +52,17 @@ export function useCompositionTransport({
         }
         setPlaying(true);
         for (const note of notes) {
-            const id = window.setTimeout(() => {
+            const id = scheduler.after(note.startMs, () => {
                 playNote(note.pitch, {
                     velocity: note.velocity,
                     duration: Math.max(0.05, note.durationMs / 1000),
                 });
-            }, note.startMs);
+            });
             timersRef.current.push(id);
         }
-        const end = window.setTimeout(() => setPlaying(false), tailMs(notes) + 200);
+        const end = scheduler.after(tailMs(notes) + 200, () => setPlaying(false));
         timersRef.current.push(end);
-    }, [notes, playNote, stop]);
+    }, [notes, playNote, stop, scheduler]);
 
     // Click one bar of lead-in, then hand the downbeat to the recorder so what's
     // played next sits on the grid, appending after any existing tail.
@@ -77,12 +79,12 @@ export function useCompositionTransport({
         setCountingIn(true);
         const barMs = beatsPerBar * (60_000 / tempo);
         timersRef.current.push(
-            window.setTimeout(() => {
+            scheduler.after(barMs, () => {
                 setCountingIn(false);
                 onDownbeatRef.current(performance.now());
-            }, barMs),
+            }),
         );
-    }, [beatsPerBar, tempo]);
+    }, [beatsPerBar, tempo, scheduler]);
 
     return { playing, play, stop, countingIn, countIn };
 }

@@ -46,6 +46,8 @@ export function Drawer({
             setShown(false);
             return;
         }
+        // A pure UI primitive (ui-is-pure) owns its own transition frame
+        // (allow-listed in dev/check-globals.mjs) rather than the Scheduler.
         const frame = requestAnimationFrame(() => setShown(true));
         return () => cancelAnimationFrame(frame);
     }, [open]);

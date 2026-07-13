@@ -7,8 +7,10 @@ import { webAudioEngine } from "../adapters/webAudioEngine";
 import { lazyVideoExporter } from "../adapters/lazyVideo";
 import { micPitch } from "../adapters/micPitch";
 import { webMidi } from "../adapters/webMidi";
+import { browserScheduler } from "../adapters/browserScheduler";
 import type { MidiAccessPort } from "../ports/midiAccess";
 import type { PitchInput } from "../ports/pitchInput";
+import type { Scheduler } from "../ports/scheduler";
 import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
@@ -77,6 +79,9 @@ export type AppServices = {
     // Where microphone pitch detection comes from (see PitchInput), so an
     // acoustic piano can be an input device too.
     pitch: PitchInput;
+    // How future work is scheduled (see Scheduler) — timers, intervals, and
+    // animation frames. A test injects a virtual clock to drive time by hand.
+    scheduler: Scheduler;
     // How MusicXML strings become walkable documents and back (see XmlCodec).
     xml: XmlCodec;
     // The fetched halves of the catalogue: the song manifest + on-demand .mxl,
@@ -133,6 +138,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         audio: overrides.audio ?? webAudioEngine,
         midi: overrides.midi ?? webMidi,
         pitch: overrides.pitch ?? micPitch(),
+        scheduler: overrides.scheduler ?? browserScheduler,
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
@@ -170,6 +176,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     audio: true,
     midi: true,
     pitch: true,
+    scheduler: true,
     xml: true,
     songs: true,
     exercises: true,
@@ -295,4 +302,8 @@ export function useBoardSource(): BoardSource {
 
 export function useVideoExporter(): VideoExporter {
     return useServices().video;
+}
+
+export function useScheduler(): Scheduler {
+    return useServices().scheduler;
 }

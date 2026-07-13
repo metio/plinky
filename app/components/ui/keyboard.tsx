@@ -71,6 +71,9 @@ export function Keyboard({
             return;
         }
         setFlash(wrong.note);
+        // A cosmetic fade — the ui-is-pure rule keeps this primitive free of the
+        // services context, so it owns its own transition timer (allow-listed in
+        // dev/check-globals.mjs) rather than the injected Scheduler.
         const id = window.setTimeout(() => setFlash(null), 450);
         return () => window.clearTimeout(id);
     }, [wrong]);

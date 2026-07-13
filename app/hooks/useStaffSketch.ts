@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { type Composition, toMusicXml } from "../../core/composition";
+import { useScheduler } from "../contexts/services";
 
 // The live staff sketch of a take: MusicXML re-engraved a beat after the last
 // note lands rather than on every keystroke, so a fast passage doesn't thrash
@@ -13,6 +14,7 @@ export function useStaffSketch(
     title: string,
     quantizeOn: boolean,
 ): string | null {
+    const scheduler = useScheduler();
     const [staffXml, setStaffXml] = useState<string | null>(null);
 
     useEffect(() => {
@@ -20,16 +22,16 @@ export function useStaffSketch(
             setStaffXml(null);
             return;
         }
-        const id = window.setTimeout(() => {
+        const id = scheduler.after(150, () => {
             setStaffXml(
                 toMusicXml(composition, {
                     title,
                     subdivisionsPerBeat: quantizeOn ? 2 : 4,
                 }),
             );
-        }, 150);
-        return () => window.clearTimeout(id);
-    }, [composition, title, quantizeOn]);
+        });
+        return () => scheduler.cancel(id);
+    }, [composition, title, quantizeOn, scheduler]);
 
     return staffXml;
 }
