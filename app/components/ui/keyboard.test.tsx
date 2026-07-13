@@ -69,6 +69,30 @@ describe("Keyboard", () => {
         expect(onRelease).toHaveBeenCalledWith(60);
     });
 
+    it("glides note to note when a held pointer slides across keys", () => {
+        const onPress = vi.fn();
+        const onRelease = vi.fn();
+        render(<Keyboard from={60} to={62} onPress={onPress} onRelease={onRelease} />);
+        const c = screen.getByLabelText("C4");
+        const d = screen.getByLabelText("D4");
+        // Press C, drag off it onto D (button still held), then lift on D.
+        fireEvent.pointerDown(c);
+        fireEvent.pointerLeave(c, { buttons: 1 });
+        fireEvent.pointerEnter(d, { buttons: 1 });
+        fireEvent.pointerUp(d);
+        expect(onPress).toHaveBeenNthCalledWith(1, 60);
+        expect(onRelease).toHaveBeenCalledWith(60);
+        expect(onPress).toHaveBeenNthCalledWith(2, 62);
+        expect(onRelease).toHaveBeenCalledWith(62);
+    });
+
+    it("does not press a key merely hovered with no button held", () => {
+        const onPress = vi.fn();
+        render(<Keyboard from={60} to={62} onPress={onPress} />);
+        fireEvent.pointerEnter(screen.getByLabelText("D4"), { buttons: 0 });
+        expect(onPress).not.toHaveBeenCalled();
+    });
+
     it("keeps a leading black key inside the keyboard", () => {
         render(<Keyboard from={61} to={67} />);
         const black = screen.getByLabelText("C#4");

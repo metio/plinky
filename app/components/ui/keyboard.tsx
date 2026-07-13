@@ -39,8 +39,9 @@ const NONE: ReadonlySet<number> = new Set();
 // so the instrument is literally the same component everywhere. Fully controlled:
 // the parent says which keys are lit (held or pressed → green), which note to play
 // next (expected → indigo) and the last wrong note (flashes red), and is told when
-// a key goes down or up. The hero feeds it a synth and a press-and-fade lit set;
-// the trainer feeds it the live MIDI/touch input.
+// a key goes down or up. A press held while the finger or mouse slides across the
+// keybed glides note to note, each key pressed as it is entered and released as it is
+// left. The hero feeds it a synth; the trainer feeds it the live MIDI/touch input.
 export function Keyboard({
     from,
     to,
@@ -102,7 +103,22 @@ export function Keyboard({
 
     const down = (note: number) => (event: React.PointerEvent) => {
         event.preventDefault();
+        // A touch (and some pens) implicitly captures the pointer to the key it started
+        // on, so a finger dragged across the keybed would keep firing on the first key
+        // and never enter its neighbours. Releasing the capture lets pointerenter/leave
+        // fire on each key the finger crosses, which is what turns a drag into a glide.
+        if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }
         onPress?.(note);
+    };
+    // Glide: with a button still held, sliding onto a key presses it (its neighbour is
+    // released by `leave`), so dragging a finger or the mouse along the keybed runs the
+    // notes in turn like a thumb dragged across a real piano.
+    const enter = (note: number) => (event: React.PointerEvent) => {
+        if (event.buttons !== 0) {
+            onPress?.(note);
+        }
     };
     // Enter/Space for keyboard players; pointer handles mouse and touch.
     const press = (note: number) => (event: React.KeyboardEvent) => {
@@ -160,6 +176,7 @@ export function Keyboard({
                             onPointerDown={down(note)}
                             onPointerUp={up(note)}
                             onPointerCancel={up(note)}
+                            onPointerEnter={enter(note)}
                             onPointerLeave={leave(note)}
                             onKeyDown={press(note)}
                             onKeyUp={release(note)}
@@ -195,6 +212,7 @@ export function Keyboard({
                             onPointerDown={down(note)}
                             onPointerUp={up(note)}
                             onPointerCancel={up(note)}
+                            onPointerEnter={enter(note)}
                             onPointerLeave={leave(note)}
                             onKeyDown={press(note)}
                             onKeyUp={release(note)}
