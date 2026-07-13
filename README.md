@@ -28,7 +28,10 @@ the music) — and starts a note-by-note guide: read the note, play it, and the 
 advances, sounding back what you played. Full screen is where the rest of the play
 controls live, so it's the same generous surface on a phone or a wide desktop alike.
 There you'll also find **Listen**, which plays the piece back so you hear it first,
-lighting up each note as it sounds so your eye can follow along. Listen and Practice
+lighting up each note as it sounds so your eye can follow along. Listen plays it the way
+it's written — **staccato** notes clipped short, **slurs** flowing legato, **accents**
+struck harder, and the **dynamics** (soft to loud) shaping each note — with tied notes
+held rather than re-struck. Listen and Practice
 **hand off to each other** — let the computer play a tricky passage then take over
 mid-phrase, or play a while and hand it back — and your place is kept, even if you
 step out of full screen and come back to it; the **restart** control (or finishing
