@@ -109,25 +109,34 @@ describe("parseMidiMessage", () => {
         expect(parseMidiMessage(null)).toBeNull();
     });
 
-    it("decodes the sustain pedal (CC64) as down in the upper half, up below", () => {
+    it("decodes the three pedals (CC64/66/67), down in the upper half, up below", () => {
         expect(parseMidiMessage(new Uint8Array([0xb0, 64, 127]))).toEqual({
             kind: "pedal",
+            pedal: "sustain",
             down: true,
             channel: 1,
+        });
+        expect(parseMidiMessage(new Uint8Array([0xb0, 66, 100]))).toMatchObject({
+            pedal: "sostenuto",
+            down: true,
+        });
+        expect(parseMidiMessage(new Uint8Array([0xb0, 67, 10]))).toMatchObject({
+            pedal: "soft",
+            down: false,
         });
         expect(parseMidiMessage(new Uint8Array([0xb0, 64, 64]))).toMatchObject({ down: true });
         expect(parseMidiMessage(new Uint8Array([0xb0, 64, 63]))).toMatchObject({ down: false });
         expect(parseMidiMessage(new Uint8Array([0xb1, 64, 0]))).toMatchObject({
-            kind: "pedal",
+            pedal: "sustain",
             down: false,
             channel: 2,
         });
     });
 
-    it("ignores control changes other than the sustain pedal", () => {
-        // The soft pedal (CC67) and every other controller decode to null.
-        expect(parseMidiMessage(new Uint8Array([0xb0, 67, 127]))).toBeNull();
+    it("ignores control changes that aren't one of the three pedals", () => {
+        // The modulation wheel (CC1) and every other non-pedal controller decode to null.
         expect(parseMidiMessage(new Uint8Array([0xb0, 1, 100]))).toBeNull();
+        expect(parseMidiMessage(new Uint8Array([0xb0, 7, 100]))).toBeNull();
     });
 });
 

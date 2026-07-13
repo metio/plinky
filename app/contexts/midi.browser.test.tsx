@@ -32,9 +32,9 @@ function Probe() {
 // A probe that subscribes to pedal events the way the play surface does, so a raw
 // CC64 message can be asserted end to end through the real context.
 function PedalProbe() {
-    const [pedal, setPedal] = useState("up");
-    useMidiInput({ onPedal: (down) => setPedal(down ? "down" : "up") });
-    return <output aria-label="pedal">{pedal}</output>;
+    const [state, setState] = useState("up");
+    useMidiInput({ onPedal: (pedal, down) => setState(`${pedal} ${down ? "down" : "up"}`) });
+    return <output aria-label="pedal">{state}</output>;
 }
 
 describe("webMidi adapter in a real browser", () => {
@@ -105,7 +105,7 @@ describe("MidiProvider over the fake seam in a real browser", () => {
         await waitFor(() => expect(screen.getByLabelText("held").textContent).toBe("62"));
     });
 
-    it("routes the sustain pedal (CC64) through to pedal subscribers", async () => {
+    it("routes all three pedals (CC64/66/67) through to pedal subscribers", async () => {
         const input = fakeMidiInput({ name: "Stage Piano" });
         const midi = fakeMidi({ permission: "granted", inputs: [input] });
         render(
@@ -118,9 +118,15 @@ describe("MidiProvider over the fake seam in a real browser", () => {
         await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("up"));
 
         input.emit([0xb0, 64, 127]); // sustain pedal pressed
-        await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("down"));
-        input.emit([0xb0, 64, 0]); // sustain pedal released
-        await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("up"));
+        await waitFor(() =>
+            expect(screen.getByLabelText("pedal").textContent).toBe("sustain down"),
+        );
+        input.emit([0xb0, 66, 127]); // sostenuto pedal pressed
+        await waitFor(() =>
+            expect(screen.getByLabelText("pedal").textContent).toBe("sostenuto down"),
+        );
+        input.emit([0xb0, 67, 0]); // soft pedal released
+        await waitFor(() => expect(screen.getByLabelText("pedal").textContent).toBe("soft up"));
     });
 });
 

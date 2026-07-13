@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useCallback, useMemo } from "react";
+import type { PedalKind } from "../../core/pedals";
 import { useAudioEngine, usePrefsStore } from "../contexts/services";
 
 export type PlayNoteOptions = {
@@ -18,8 +19,8 @@ export type UseSynthResult = {
     // sustains — the articulation the player actually gave.
     pressNote: (note: number, options?: { velocity?: number }) => void;
     releaseNote: (note: number) => void;
-    // The sustain pedal for live voices.
-    setPedal: (down: boolean) => void;
+    // Move one of the three pedals for live voices.
+    setPedal: (pedal: PedalKind, down: boolean) => void;
 };
 
 // Decides what a note should sound like — loudness from velocity and the volume
@@ -77,7 +78,10 @@ export function useSynth(): UseSynthResult {
     // Release and pedal always reach the engine — a muted session opened no voice, so they
     // are harmless no-ops there, and the pedal state must track regardless of volume.
     const releaseNote = useCallback((note: number) => audio.release(note), [audio]);
-    const setPedal = useCallback((down: boolean) => audio.setPedal(down), [audio]);
+    const setPedal = useCallback(
+        (pedal: PedalKind, down: boolean) => audio.setPedal(pedal, down),
+        [audio],
+    );
 
     // A stable result so callers can list the synth in an effect's dependencies without the
     // effect re-firing every render.

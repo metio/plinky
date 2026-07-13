@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { PedalKind } from "../../core/pedals";
 import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
 
 // An AudioEngine for tests: strikes and clicks are recorded instead of played,
@@ -13,7 +14,7 @@ export type FakeAudioEngine = AudioEngine & {
     voices: Array<
         { kind: "press"; note: number; gain: number } | { kind: "release"; note: number }
     >;
-    pedals: boolean[];
+    pedals: Array<{ pedal: PedalKind; down: boolean }>;
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
     resumed: number;
     unlocked: number;
@@ -48,8 +49,8 @@ export function fakeAudioEngine(): FakeAudioEngine {
         release(note) {
             engine.voices.push({ kind: "release", note });
         },
-        setPedal(down) {
-            engine.pedals.push(down);
+        setPedal(pedal, down) {
+            engine.pedals.push({ pedal, down });
         },
         click(time, kind, gain) {
             engine.clicks.push({ time, kind, gain });

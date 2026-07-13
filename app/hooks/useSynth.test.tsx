@@ -83,8 +83,8 @@ describe("useSynth", () => {
         synth.pressNote(60);
         expect(audio.voices.filter((v) => v.kind === "press")).toHaveLength(0);
         synth.releaseNote(60);
-        synth.setPedal(true);
+        synth.setPedal("sustain", true);
         expect(audio.voices).toContainEqual({ kind: "release", note: 60 });
-        expect(audio.pedals).toEqual([true]);
+        expect(audio.pedals).toEqual([{ pedal: "sustain", down: true }]);
     });
 });

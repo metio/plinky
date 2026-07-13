@@ -244,9 +244,28 @@ type Voice = {
     startedAt: number; // ctx.currentTime at press, for the held-scaled tail
 };
 const voices = new Map<number, Voice>();
-let pedalDown = false;
-// Notes whose key has lifted but which keep ringing because the sustain pedal is down.
-const pedalSustained = new Set<number>();
+// Notes whose key is physically down right now. A voice ends only once nothing holds it:
+// not the key, not the sustain pedal, not the sostenuto pedal.
+const keyDown = new Set<number>();
+let sustainDown = false;
+let softDown = false;
+// The notes the sostenuto pedal captured when it was pressed — it holds only those.
+let sostenutoHeld = new Set<number>();
+// How much the soft (una corda) pedal gentles a note struck while it is held.
+const SOFT_GAIN = 0.62;
+
+// Whether anything still holds a note sounding — its key, the sustain pedal, or the
+// sostenuto pedal's captured set. Every release path funnels through this, so the three
+// pedals compose without each needing to know about the others.
+function stillHeld(note: number): boolean {
+    return keyDown.has(note) || sustainDown || sostenutoHeld.has(note);
+}
+
+function maybeEnd(ctx: AudioContext, note: number): void {
+    if (!stillHeld(note)) {
+        endVoice(ctx, note);
+    }
+}
 
 // A held voice: the same partials, attack and darkening filter as a struck note, but with
 // no release scheduled — the shelf holds until fadeVoice rings it out.
@@ -364,8 +383,12 @@ export const webAudioEngine: AudioEngine = {
             // strike lands cleanly rather than summing with a ghost of the last.
             fadeVoice(ctx, existing, 0.03);
         }
-        pedalSustained.delete(note);
-        voices.set(note, buildVoice(ctx, midiToFrequency(note), gain));
+        keyDown.add(note);
+        // The soft pedal gentles a note struck while it is held.
+        voices.set(
+            note,
+            buildVoice(ctx, midiToFrequency(note), softDown ? gain * SOFT_GAIN : gain),
+        );
         // The voice rings for at least ~1.5s; enough of a window for the mic echo probe,
         // which mic input skips anyway (a mic player hears their own piano, not this).
         struckUntil.set(note, performance.now() + 1500);
@@ -375,25 +398,40 @@ export const webAudioEngine: AudioEngine = {
         if (!ctx) {
             return;
         }
-        // Under the pedal the key lifting doesn't end the note — hold it until the pedal
-        // does. Otherwise ring it out over its held-scaled tail.
-        if (pedalDown && voices.has(note)) {
-            pedalSustained.add(note);
-            return;
-        }
-        endVoice(ctx, note);
+        // The key lifting only ends the note when no pedal is holding it.
+        keyDown.delete(note);
+        maybeEnd(ctx, note);
     },
-    setPedal(down) {
-        pedalDown = down;
+    setPedal(kind, down) {
         const ctx = context();
-        if (down || !ctx) {
+        if (kind === "soft") {
+            // Affects only notes struck while it is down, so nothing to re-end here.
+            softDown = down;
             return;
         }
-        // Pedal up: every voice that was only still sounding because of the pedal now ends.
-        for (const note of pedalSustained) {
-            endVoice(ctx, note);
+        if (kind === "sustain") {
+            sustainDown = down;
+            if (!down && ctx) {
+                // Lifting the damper ends every voice nothing else is still holding.
+                for (const note of [...voices.keys()]) {
+                    maybeEnd(ctx, note);
+                }
+            }
+            return;
         }
-        pedalSustained.clear();
+        // Sostenuto: pressing it captures the notes sounding right now and holds only those;
+        // lifting it ends that captured set, save any a key or the sustain pedal still holds.
+        if (down) {
+            sostenutoHeld = new Set(voices.keys());
+        } else {
+            const held = sostenutoHeld;
+            sostenutoHeld = new Set();
+            if (ctx) {
+                for (const note of held) {
+                    maybeEnd(ctx, note);
+                }
+            }
+        }
     },
     click(time, kind, gain) {
         const ctx = context();

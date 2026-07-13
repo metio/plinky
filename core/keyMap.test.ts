@@ -8,7 +8,9 @@ import {
     isDefaultKeyMap,
     type KeyMap,
     keyForSlot,
+    pedalForKey,
     rebind,
+    rebindPedal,
 } from "./keyMap";
 
 describe("keyForSlot", () => {
@@ -26,7 +28,7 @@ describe("keyForSlot", () => {
     });
 
     it("returns null when nothing is bound to the slot", () => {
-        const map: KeyMap = { left: {}, right: {} };
+        const map: KeyMap = { left: {}, right: {}, pedals: { sustain: null, sostenuto: null, soft: null } };
         expect(keyForSlot(map, "left", 0)).toBeNull();
     });
 });
@@ -120,11 +122,54 @@ describe("isDefaultKeyMap", () => {
         const reordered: KeyMap = {
             left: { ...rest, z: 0 },
             right: DEFAULT_KEY_MAP.right,
+            pedals: { sustain: null, sostenuto: null, soft: null },
         };
         expect(isDefaultKeyMap(reordered)).toBe(true);
     });
 
     it("is false once a key is rebound", () => {
         expect(isDefaultKeyMap(rebind(DEFAULT_KEY_MAP, "right", 7, "."))).toBe(false);
+    });
+});
+
+describe("pedal bindings", () => {
+    it("binds a key to a pedal and reads it back", () => {
+        const map = rebindPedal(DEFAULT_KEY_MAP, "sustain", " ");
+        expect(map.pedals.sustain).toBe(" ");
+        expect(pedalForKey(map, " ")).toBe("sustain");
+        expect(pedalForKey(map, "x")).toBeNull();
+    });
+
+    it("frees a key from a note slot and any other pedal when it becomes a pedal", () => {
+        // "m" plays a note by default; binding it to a pedal must drop it from the hand.
+        let map = rebindPedal(DEFAULT_KEY_MAP, "sostenuto", "m");
+        expect(map.left.m).toBeUndefined();
+        expect(map.pedals.sostenuto).toBe("m");
+        // Re-using the same key for a different pedal moves it, not duplicates it.
+        map = rebindPedal(map, "soft", "m");
+        expect(map.pedals.sostenuto).toBeNull();
+        expect(map.pedals.soft).toBe("m");
+    });
+
+    it("clears a pedal binding with null", () => {
+        const bound = rebindPedal(DEFAULT_KEY_MAP, "sustain", " ");
+        expect(rebindPedal(bound, "sustain", null).pedals.sustain).toBeNull();
+    });
+
+    it("drops a stored pedal key that collides with a note or another pedal", () => {
+        const cleaned = cleanKeyMap({
+            left: DEFAULT_KEY_MAP.left,
+            right: DEFAULT_KEY_MAP.right,
+            // "z" is a note key (collision), " " and "shift" are free but the second
+            // sostenuto duplicate of " " must drop.
+            pedals: { sustain: "z", sostenuto: " ", soft: " " },
+        });
+        expect(cleaned.pedals.sustain).toBeNull(); // collided with the z note key
+        expect(cleaned.pedals.sostenuto).toBe(" ");
+        expect(cleaned.pedals.soft).toBeNull(); // duplicate of the sostenuto key
+    });
+
+    it("counts a bound pedal as a customised layout", () => {
+        expect(isDefaultKeyMap(rebindPedal(DEFAULT_KEY_MAP, "sustain", " "))).toBe(false);
     });
 });

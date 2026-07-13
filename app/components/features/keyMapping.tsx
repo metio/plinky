@@ -10,8 +10,10 @@ import {
     keyForSlot,
     NOTE_LABELS,
     rebind,
+    rebindPedal,
     SEMITONES,
 } from "../../../core/keyMap";
+import { type PedalKind, PEDAL_KINDS } from "../../../core/pedals";
 import { useOnboardingStore } from "../../contexts/services";
 import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
@@ -21,6 +23,16 @@ const HAND_LABEL: Record<Hand, () => string> = {
     left: m.keyboard_hint_left,
     right: m.keyboard_hint_right,
 };
+
+const PEDAL_LABEL: Record<PedalKind, () => string> = {
+    sustain: m.pedal_sustain,
+    sostenuto: m.pedal_sostenuto,
+    soft: m.pedal_soft,
+};
+
+// What the editor is currently listening for a key to bind — a hand's note slot, or a
+// pedal — or null when idle.
+type Arming = { kind: "note"; hand: Hand; semitone: number } | { kind: "pedal"; pedal: PedalKind };
 
 // The label shown on a key cap. The space key prints as a word so it isn't a blank
 // cap; everything else shows uppercased, the way it's printed on a real keyboard.
@@ -40,8 +52,8 @@ export function KeyMapping() {
     const { prefs, update } = usePrefs();
     const map = prefs.keyMap;
     const onboarding = useOnboardingStore();
-    // The slot currently listening for a key, or null when idle.
-    const [arming, setArming] = useState<{ hand: Hand; semitone: number } | null>(null);
+    // The slot or pedal currently listening for a key, or null when idle.
+    const [arming, setArming] = useState<Arming | null>(null);
 
     // Engaging with the editor — arming a cap to rebind, or resetting to the standard
     // layout — ticks off the "set up your keys" discovery step, so a player content with
@@ -61,6 +73,21 @@ export function KeyMapping() {
             event.preventDefault();
             event.stopPropagation();
             if (event.key === "Escape") {
+                setArming(null);
+                return;
+            }
+            if (arming.kind === "pedal") {
+                // Backspace/Delete clears the pedal; a pedal takes almost any key, Space
+                // included — the natural key for a foot pedal on a computer keyboard.
+                if (event.key === "Backspace" || event.key === "Delete") {
+                    persist(rebindPedal(map, arming.pedal, null));
+                    setArming(null);
+                    return;
+                }
+                if (event.key.length !== 1 || event.metaKey || event.ctrlKey) {
+                    return;
+                }
+                persist(rebindPedal(map, arming.pedal, event.key));
                 setArming(null);
                 return;
             }
@@ -84,14 +111,17 @@ export function KeyMapping() {
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                         {SEMITONES.map((semitone) => {
-                            const armed = arming?.hand === hand && arming.semitone === semitone;
+                            const armed =
+                                arming?.kind === "note" &&
+                                arming.hand === hand &&
+                                arming.semitone === semitone;
                             return (
                                 <button
                                     key={semitone}
                                     type="button"
                                     onClick={() => {
                                         markEngaged();
-                                        setArming(armed ? null : { hand, semitone });
+                                        setArming(armed ? null : { kind: "note", hand, semitone });
                                     }}
                                     aria-label={m.keymap_rebind({
                                         note: NOTE_LABELS[semitone]!,
@@ -116,10 +146,45 @@ export function KeyMapping() {
                     </div>
                 </div>
             ))}
+            <div className="space-y-1">
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {m.keymap_pedals()}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                    {PEDAL_KINDS.map((pedal) => {
+                        const armed = arming?.kind === "pedal" && arming.pedal === pedal;
+                        return (
+                            <button
+                                key={pedal}
+                                type="button"
+                                onClick={() => {
+                                    markEngaged();
+                                    setArming(armed ? null : { kind: "pedal", pedal });
+                                }}
+                                aria-label={m.keymap_rebind_pedal({ pedal: PEDAL_LABEL[pedal]() })}
+                                aria-pressed={armed}
+                                className={`flex w-20 flex-col items-center rounded-md border px-1 py-1 text-center ${
+                                    armed
+                                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950"
+                                        : "border-gray-300 hover:border-indigo-400 dark:border-gray-700"
+                                }`}
+                            >
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                    {PEDAL_LABEL[pedal]()}
+                                </span>
+                                <span className="font-mono text-sm font-semibold">
+                                    {armed ? "…" : keyCap(map.pedals[pedal])}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{m.keymap_pedals_help()}</p>
+            </div>
             <div className="flex items-center gap-3">
                 {arming && (
                     <span className="text-xs text-indigo-700 dark:text-indigo-300">
-                        {m.keymap_press()}
+                        {arming.kind === "pedal" ? m.keymap_press_pedal() : m.keymap_press()}
                     </span>
                 )}
                 <Button

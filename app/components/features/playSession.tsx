@@ -443,12 +443,15 @@ function usePlaySessionValue({
             synth.releaseNote(event.note);
             captureRelease(captureRef.current, event.note, event.timestamp);
         },
-        // The sustain pedal holds released voices ringing (in the sound and in the
-        // recording's damper model) so a pedalled take plays and replays as pedalled. It
-        // never touches the matcher — the key press alone still decides when a note counts.
-        onPedal: (down, timestamp) => {
-            synth.setPedal(down);
-            capturePedal(captureRef.current, down, timestamp);
+        // The pedals shape the live sound; the sustain pedal also drives the recording's
+        // damper model, so a pedalled take plays and replays as pedalled (sostenuto and soft
+        // colour the live sound but not the recorded note lengths). No pedal ever touches
+        // the matcher — the key press alone still decides when a note counts.
+        onPedal: (pedal, down, timestamp) => {
+            synth.setPedal(pedal, down);
+            if (pedal === "sustain") {
+                capturePedal(captureRef.current, down, timestamp);
+            }
         },
     });
     const connected = useMidiConnected();

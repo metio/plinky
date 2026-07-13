@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import type { PedalKind } from "../../core/pedals";
+
 // The sound seam. Everything audible goes through this interface, so the hooks
 // that decide WHAT to play (which note, how loud after the volume preference,
 // when on the beat grid) stay free of the Web Audio graph, and a test hands
@@ -39,10 +41,11 @@ export interface AudioEngine {
     // loudness (0..1), velocity and volume already applied.
     press(note: number, gain: number): void;
     // End a sustaining voice, ringing it out over a tail scaled to how long it was held —
-    // unless the sustain pedal is down, when it keeps ringing until the pedal lifts.
+    // unless a pedal is holding it, when it keeps ringing until the pedal lifts.
     release(note: number): void;
-    // The sustain pedal for live voices: down holds released voices ringing, up drops them.
-    setPedal(down: boolean): void;
+    // Move one of the three pedals. Sustain holds every released voice, sostenuto holds only
+    // the notes sounding when it was pressed, and soft gentles notes struck while it's down.
+    setPedal(pedal: PedalKind, down: boolean): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;
     // Whether the engine synthesized this pitch recently enough that a

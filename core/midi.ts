@@ -7,6 +7,7 @@
 // the type system treats the entry point as always present.
 
 import { DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import type { PedalKind } from "./pedals";
 
 export type MidiSupport = "unknown" | "unsupported" | "supported";
 
@@ -49,20 +50,20 @@ export function pitchClass(note: number): string {
     return PITCH_CLASSES[((note % 12) + 12) % 12]!;
 }
 
-// The MIDI controller number of the sustain (damper) pedal — Control Change 64.
-export const SUSTAIN_PEDAL_CC = 64;
+// The MIDI control-change number each pedal speaks on: sustain 64, sostenuto 66, soft 67.
+const PEDAL_CC: Record<number, PedalKind> = { 64: "sustain", 66: "sostenuto", 67: "soft" };
 
-// A decoded MIDI message the app acts on: a note-on/off, or a sustain-pedal change.
-// Every other message (other control changes, pitch bend, aftertouch…) decodes to
+// A decoded MIDI message the app acts on: a note-on/off, or one of the three pedals
+// changing. Every other message (expression, bank select, pitch bend…) decodes to
 // null and is ignored.
 export type ParsedMessage =
     | { kind: "noteon" | "noteoff"; note: number; velocity: number; channel: number }
-    | { kind: "pedal"; down: boolean; channel: number };
+    | { kind: "pedal"; pedal: PedalKind; down: boolean; channel: number };
 
 // Decode a raw MIDI status/data triple into a note event or a pedal change, or null
 // for anything else. A note-on with zero velocity is the conventional "running status"
-// way to release a key, so it reads as note-off. A sustain-pedal control change reads
-// as down when its value is in the upper half (≥64), the MIDI convention.
+// way to release a key, so it reads as note-off. A pedal control change reads as down
+// when its value is in the upper half (≥64), the MIDI convention.
 export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null {
     if (!data || data.length < 2) {
         return null;
@@ -71,12 +72,13 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     const channel = (data[0]! & 0x0f) + 1;
 
     if (type === 0xb0) {
-        // Control change. Only the sustain pedal is acted on; every other controller
-        // (soft pedal, expression, bank select…) is ignored.
-        if (data[1]! !== SUSTAIN_PEDAL_CC) {
+        // Control change. Only the three pedals are acted on; every other controller
+        // (expression, modulation, bank select…) is ignored.
+        const pedal = PEDAL_CC[data[1]!];
+        if (!pedal) {
             return null;
         }
-        return { kind: "pedal", down: (data.length > 2 ? data[2]! : 0) >= 64, channel };
+        return { kind: "pedal", pedal, down: (data.length > 2 ? data[2]! : 0) >= 64, channel };
     }
 
     const note = data[1]!;

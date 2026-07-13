@@ -26,8 +26,9 @@ import {
     type MidiStatus,
     type MidiSupport,
 } from "../../core/midi";
-import { DEFAULT_KEY_MAP, type KeyMap } from "../../core/keyMap";
+import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
+import type { PedalKind } from "../../core/pedals";
 import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
 import { useServices } from "./services";
@@ -36,9 +37,9 @@ import { resetDevice } from "../lib/resetDevice";
 export type NoteListener = {
     onNoteOn?: (event: MidiNoteEvent) => void;
     onNoteOff?: (event: MidiNoteEvent) => void;
-    // The sustain pedal changed: down holds released notes ringing, up drops them.
-    // Only a real MIDI device sends this — the keyboard fallbacks have no pedal.
-    onPedal?: (down: boolean, timestamp: number) => void;
+    // One of the three pedals changed. A real MIDI device sends these as control changes;
+    // a computer-keyboard player can bind a key to each (see keyMap.pedals).
+    onPedal?: (pedal: PedalKind, down: boolean, timestamp: number) => void;
 };
 
 declare global {
@@ -48,9 +49,9 @@ declare global {
         __plinky?: {
             play: (note: number, velocity?: number) => void;
             release: (note: number) => void;
-            // Move the sustain pedal, as a real device's CC64 would — so a test can drive
-            // pedal-held sustain without crafting control-change bytes.
-            pedal: (down: boolean) => void;
+            // Move one of the three pedals, as a real device's control change would — so a
+            // test can drive pedal-held sustain (and the others) without crafting CC bytes.
+            pedal: (pedal: PedalKind, down: boolean) => void;
             // Raw MIDI bytes through the same parse-and-emit pipeline a real
             // device feeds, so a browser test exercises the full path.
             midiBytes: (data: number[], timestamp?: number) => void;
@@ -174,11 +175,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [],
     );
 
-    // The pedal funnel, alongside emitNote: the sustain pedal carries no note, so it
-    // reaches subscribers on its own channel rather than through the note pipeline.
-    const emitPedal = useCallback((down: boolean, timestamp: number) => {
+    // The pedal funnel, alongside emitNote: a pedal carries no note, so it reaches
+    // subscribers on its own channel rather than through the note pipeline.
+    const emitPedal = useCallback((pedal: PedalKind, down: boolean, timestamp: number) => {
         for (const listener of subscribersRef.current) {
-            listener.onPedal?.(down, timestamp);
+            listener.onPedal?.(pedal, down, timestamp);
         }
     }, []);
 
@@ -189,7 +190,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 return;
             }
             if (parsed.kind === "pedal") {
-                emitPedal(parsed.down, timestamp);
+                emitPedal(parsed.pedal, parsed.down, timestamp);
                 return;
             }
             emitNote(
@@ -218,7 +219,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             play: (note, velocity = 80) =>
                 emitNote("noteon", note, velocity, 1, "Test bridge", performance.now()),
             release: (note) => emitNote("noteoff", note, 0, 1, "Test bridge", performance.now()),
-            pedal: (down) => emitPedal(down, performance.now()),
+            pedal: (pedal, down) => emitPedal(pedal, down, performance.now()),
             midiBytes: (data, timestamp = performance.now()) =>
                 makeHandler("Test bridge")(new Uint8Array(data), timestamp),
             midiState: () => ({
@@ -421,6 +422,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         loadKeyMap();
         const unsubscribePrefs = prefsStore.subscribe(loadKeyMap);
         const pressed = new Map<string, number>();
+        // Pedal keys currently held, each mapped to the pedal it works, so the keyup
+        // releases the same pedal even if the layout changes while it is down.
+        const pedalKeysDown = new Map<string, PedalKind>();
 
         const isTextEntry = (target: EventTarget | null): boolean => {
             const el = target as HTMLElement | null;
@@ -453,6 +457,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
+            const pedal = pedalForKey(keyMapRef.current, key);
+            if (pedal) {
+                if (!pedalKeysDown.has(key)) {
+                    event.preventDefault();
+                    pedalKeysDown.set(key, pedal);
+                    emitPedal(pedal, true, event.timeStamp);
+                }
+                return;
+            }
+
             const note = keyToNote(key, octaveRef.current, keyMapRef.current);
             if (note === null || pressed.has(key)) {
                 return;
@@ -467,6 +481,12 @@ export function MidiProvider({ children }: { children: ReactNode }) {
 
         const onKeyUp = (event: KeyboardEvent) => {
             const key = event.key.toLowerCase();
+            const pedal = pedalKeysDown.get(key);
+            if (pedal !== undefined) {
+                pedalKeysDown.delete(key);
+                emitPedal(pedal, false, event.timeStamp);
+                return;
+            }
             const note = pressed.get(key);
             if (note === undefined) {
                 return;
@@ -484,6 +504,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             for (const note of heldNotesRef.current) {
                 emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, performance.now());
             }
+            // Lift any pedal held by a computer key too, so a pedal doesn't stick down.
+            for (const pedal of pedalKeysDown.values()) {
+                emitPedal(pedal, false, performance.now());
+            }
+            pedalKeysDown.clear();
         };
 
         window.addEventListener("keydown", onKeyDown);
@@ -495,7 +520,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             window.removeEventListener("keyup", onKeyUp);
             window.removeEventListener("blur", releaseAll);
         };
-    }, [emitNote, prefsStore]);
+    }, [emitNote, emitPedal, prefsStore]);
 
     useEffect(() => {
         return () => {
@@ -552,7 +577,8 @@ export function useMidiInput(handlers: NoteListener): void {
         return subscribe({
             onNoteOn: (event) => handlersRef.current.onNoteOn?.(event),
             onNoteOff: (event) => handlersRef.current.onNoteOff?.(event),
-            onPedal: (down, timestamp) => handlersRef.current.onPedal?.(down, timestamp),
+            onPedal: (pedal, down, timestamp) =>
+                handlersRef.current.onPedal?.(pedal, down, timestamp),
         });
     }, [subscribe]);
 }
