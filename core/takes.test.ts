@@ -156,6 +156,42 @@ describe("compositionFromRun", () => {
         expect(composition.notes[0]?.durationMs).toBeGreaterThanOrEqual(60);
     });
 
+    it("caps an imprecise run's rested hold at the note's own slot", () => {
+        // A finger rested on a touch key for 5s while hunting for the next note: without a
+        // cap the note would ring the whole 5s. The gap to the next onset is 300ms, so an
+        // imprecise run clamps the hold there rather than letting it run away.
+        const composition = compositionFromRun(
+            [{ pitches: [60], startMs: 0, velocity: 90, heldMs: 5000 }, step([62], 300)],
+            120,
+            4,
+            true,
+        );
+        expect(composition.notes[0]?.durationMs).toBe(300);
+    });
+
+    it("keeps an imprecise run's quick tap staccato, shorter than the slot", () => {
+        // A 90ms tap is well inside the 300ms slot, so the cap leaves it alone — a tap still
+        // reads staccato on touch, only a runaway hold is clamped.
+        const composition = compositionFromRun(
+            [{ pitches: [60], startMs: 0, velocity: 90, heldMs: 90 }, step([62], 300)],
+            120,
+            4,
+            true,
+        );
+        expect(composition.notes[0]?.durationMs).toBe(90);
+    });
+
+    it("trusts a precise MIDI hold verbatim, past the onset gap", () => {
+        // The same 5s hold on a MIDI keyboard is a deliberate long note — the default
+        // precise path keeps it whole.
+        const composition = compositionFromRun(
+            [{ pitches: [60], startMs: 0, velocity: 90, heldMs: 5000 }, step([62], 300)],
+            120,
+            4,
+        );
+        expect(composition.notes[0]?.durationMs).toBe(5000);
+    });
+
     it("derives each note's length from the gap to the next onset", () => {
         const composition = compositionFromRun([step([60], 0), step([62], 300)], 120, 4);
         expect(composition.notes.map((n) => [n.pitch, n.startMs, n.durationMs])).toEqual([

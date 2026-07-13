@@ -748,7 +748,12 @@ function usePlaySessionValue({
             letter: grade?.letter ?? "",
             complete: matcher.complete,
             metrics: grade,
-            composition: compositionFromRun(steps, tempo, beatsPerBar ?? 4),
+            composition: compositionFromRun(
+                steps,
+                tempo,
+                beatsPerBar ?? 4,
+                captureRef.current.imprecise,
+            ),
         };
         runResult.markSaved(takesList.save(take));
     };

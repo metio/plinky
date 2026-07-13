@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useEffect, useRef } from "react";
 import { useMidiConnection } from "../../contexts/midi";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
@@ -27,6 +28,23 @@ export function PianoKeyboard({
 }) {
     const { heldNotes, pressKey, releaseKey } = useMidiConnection();
     const labels = useNoteLabels();
+
+    // A key still held when this surface tears down (a run ending, leaving full
+    // screen) never delivers its pointer-up, so its note would stay lit and its
+    // voice would ring on. Release whatever is held as the keybed unmounts. The
+    // latest held set is read through a ref so the cleanup isn't pinned to a stale
+    // render.
+    const heldRef = useRef(heldNotes);
+    heldRef.current = heldNotes;
+    useEffect(
+        () => () => {
+            for (const note of heldRef.current) {
+                releaseKey(note);
+            }
+        },
+        [releaseKey],
+    );
+
     return (
         <Keyboard
             from={from}

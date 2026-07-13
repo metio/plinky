@@ -105,6 +105,12 @@ export function compositionFromRun(
     steps: RunStep[],
     tempo: number,
     beatsPerBar: number,
+    // An imprecise input (touch, mouse, computer keyboard) can rest a finger on a key,
+    // and its hold-time would then stretch one note through the whole hunt for the next.
+    // For such a run the recorded hold is capped at the note's own slot: a quick tap still
+    // falls short and reads staccato, a rested key connects to the next note at most. A
+    // precise MIDI hold is trusted verbatim — a deliberately long note is real.
+    imprecise = false,
 ): Composition {
     const beatMs = 60_000 / tempo;
     const notes: RecordedNote[] = [];
@@ -118,7 +124,8 @@ export function compositionFromRun(
         if (notatedGapMs !== undefined && notatedGapMs > 0) {
             gapMs = Math.min(gapMs, notatedGapMs);
         }
-        const durationMs = Math.max(MIN_DURATION_MS, step.heldMs ?? gapMs);
+        const held = imprecise && step.heldMs !== undefined ? Math.min(step.heldMs, gapMs) : step.heldMs;
+        const durationMs = Math.max(MIN_DURATION_MS, held ?? gapMs);
         for (const pitch of step.pitches) {
             notes.push({ pitch, startMs: step.startMs, durationMs, velocity: step.velocity });
         }

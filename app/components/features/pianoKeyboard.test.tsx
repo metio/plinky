@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useEffect } from "react";
 import { afterEach, describe, expect, it } from "vitest";
-import { MidiProvider } from "../../contexts/midi";
+import { MidiProvider, useMidiConnection } from "../../contexts/midi";
 import { PianoKeyboard } from "./pianoKeyboard";
 
 afterEach(cleanup);
@@ -61,5 +62,40 @@ describe("PianoKeyboard", () => {
         const blackKey = screen.getByLabelText("C#4");
         expect(Number.isFinite(Number.parseFloat(blackKey.style.left))).toBe(true);
         expect(Number.isFinite(Number.parseFloat(blackKey.style.width))).toBe(true);
+    });
+
+    it("releases a held key when the keybed unmounts", () => {
+        // A key held as the surface tears down (a run ending, leaving full screen) never
+        // gets its pointer-up, so its note-off must be sent on unmount or the voice rings on.
+        const events: { kind: string; note: number }[] = [];
+        function Probe() {
+            const { subscribe } = useMidiConnection();
+            useEffect(
+                () =>
+                    subscribe({
+                        onNoteOn: (e) => events.push({ kind: e.kind, note: e.note }),
+                        onNoteOff: (e) => events.push({ kind: e.kind, note: e.note }),
+                    }),
+                [subscribe],
+            );
+            return null;
+        }
+        const view = render(
+            <MidiProvider>
+                <Probe />
+                <PianoKeyboard from={60} to={62} />
+            </MidiProvider>,
+        );
+        // Press and hold C4 — a pointer-down with no matching pointer-up.
+        fireEvent.pointerDown(screen.getByLabelText("C4"));
+        expect(events).toContainEqual({ kind: "noteon", note: 60 });
+
+        // Unmount only the keybed; the funnel (and the Probe) stay to catch its parting note-off.
+        view.rerender(
+            <MidiProvider>
+                <Probe />
+            </MidiProvider>,
+        );
+        expect(events).toContainEqual({ kind: "noteoff", note: 60 });
     });
 });
