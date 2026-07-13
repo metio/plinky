@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { webAudioEngine } from "./webAudioEngine";
+import { releaseTail, webAudioEngine } from "./webAudioEngine";
 
 // Smoke the real Web Audio path under a browser: the engine opens its shared
 // context and the synthesis graphs build without throwing. What the strikes
@@ -44,5 +44,15 @@ describe("webAudioEngine", () => {
         expect(() =>
             webAudioEngine.strike({ note: 60, gain: 0, duration: 0.2, delay: 0 }),
         ).not.toThrow();
+    });
+
+    it("rings a bass note out longer than a treble note", () => {
+        // The release tail scales with register — low strings sustain far longer than
+        // high ones — and is clamped past the ~A2..~A6 endpoints.
+        expect(releaseTail(110)).toBeGreaterThan(releaseTail(1760));
+        expect(releaseTail(220)).toBeGreaterThan(releaseTail(880));
+        // Clamped: nothing rings longer than the bass floor or shorter than the treble cap.
+        expect(releaseTail(40)).toBeCloseTo(releaseTail(110));
+        expect(releaseTail(4000)).toBeCloseTo(releaseTail(1760));
     });
 });

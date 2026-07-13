@@ -45,4 +45,21 @@ describe("renderTakeAudio", () => {
         const window = [LEAD_IN_MS / 1000, (LEAD_IN_MS + 300) / 1000] as const;
         expect(peak(loud, ...window)).toBeGreaterThan(peak(soft, ...window) * 2);
     });
+
+    it("rings on past a note's notated length so neighbours overlap into legato", async () => {
+        // A single 400 ms note starting at the note clock's zero: its notated end lands
+        // LEAD_IN_MS + 400 into the buffer. The release tail keeps it sounding past that.
+        const buffer = await renderTakeAudio([note(0)], 24_000);
+        const notatedEnd = (LEAD_IN_MS + 400) / 1000;
+        expect(peak(buffer, notatedEnd + 0.05, notatedEnd + 0.15)).toBeGreaterThan(0.01);
+    });
+
+    it("sustains a bass note longer than a treble note", async () => {
+        // Same length and velocity, an octaves-apart pitch: measured well past their
+        // shared notated end, only the bass note is still ringing.
+        const bass = await renderTakeAudio([note(0, 40)], 24_000);
+        const treble = await renderTakeAudio([note(0, 84)], 24_000);
+        const late = [(LEAD_IN_MS + 400 + 500) / 1000, (LEAD_IN_MS + 400 + 650) / 1000] as const;
+        expect(peak(bass, ...late)).toBeGreaterThan(peak(treble, ...late));
+    });
 });

@@ -110,14 +110,56 @@ function prime(ctx: AudioContext): void {
 // A piano-like voice synthesized in the Web Audio graph (no sample assets, so it
 // stays small and works offline): a stack of harmonic partials whose higher
 // overtones are quieter and slightly inharmonic, shaped by a hammer-strike
-// envelope (near-instant attack, fast initial decay, longer release) and a
-// low-pass filter that closes over time so the tone darkens as it rings out.
+// envelope (soft attack, fast initial decay to a sustain shelf, then a release
+// tail that rings on past the note's notated length) and a low-pass filter that
+// closes over time so the tone darkens as it rings out.
 const PARTIALS: { ratio: number; gain: number; type: OscillatorType }[] = [
     { ratio: 1, gain: 1, type: "triangle" },
     { ratio: 2, gain: 0.45, type: "sine" },
     { ratio: 3, gain: 0.2, type: "sine" },
     { ratio: 4, gain: 0.1, type: "sine" },
 ];
+
+// A real string keeps ringing after the key's notated length is over, and that
+// overlap into the following note is what the ear reads as legato rather than a row
+// of disconnected plucks. Each voice therefore holds its sustain shelf for the
+// note's own `duration`, then rings out over this extra tail past it. Bass strings
+// ring far longer than treble, so the tail scales with register: interpolated on a
+// log-frequency scale between a long bass tail and a short treble one, clamped past
+// the ~A2..~A6 endpoints. Exported so the envelope's ring-out is unit-testable.
+export function releaseTail(frequency: number): number {
+    const lowHz = 110; // ~A2
+    const highHz = 1760; // ~A6
+    const bassTail = 0.9;
+    const trebleTail = 0.35;
+    const span = Math.log2(highHz) - Math.log2(lowHz);
+    const t = (Math.log2(frequency) - Math.log2(lowHz)) / span;
+    const clamped = Math.max(0, Math.min(1, t));
+    return bassTail + (trebleTail - bassTail) * clamped;
+}
+
+// A shared master limiter between every voice (and the metronome click) and the
+// speakers, so overlapping release tails and dense chords can't stack past 0 dBFS
+// into a clip, while a single note keeps its true dynamics untouched — the threshold
+// sits just below full scale, so only genuine overload is caught. One per context:
+// the shared live one, or the fresh offline one each video export builds, cached
+// against it so it is wired only once.
+const masters = new WeakMap<BaseAudioContext, AudioNode>();
+function master(ctx: BaseAudioContext): AudioNode {
+    const existing = masters.get(ctx);
+    if (existing) {
+        return existing;
+    }
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -1;
+    limiter.knee.value = 0;
+    limiter.ratio.value = 20;
+    limiter.attack.value = 0.003;
+    limiter.release.value = 0.1;
+    limiter.connect(ctx.destination);
+    masters.set(ctx, limiter);
+    return limiter;
+}
 
 // The voice is written against BaseAudioContext so the same synthesis renders
 // live (AudioContext) and into a file (OfflineAudioContext, for video export) —
@@ -128,19 +170,35 @@ export function renderStrike(
 ): void {
     const now = ctx.currentTime + Math.max(0, delay);
     const frequency = midiToFrequency(note);
+    const tail = releaseTail(frequency);
+
+    // The played length holds the note's shelf; the filter keeps closing across the
+    // whole ring — the shelf plus its release tail — so the tone darkens all the way
+    // out rather than snapping bright-to-gone at the notated end.
+    const attackEnd = now + 0.012; // soft enough to lose the click, quick enough to feel struck
+    const decayEnd = now + 0.18; // fast initial fall to the sustain shelf
+    const holdUntil = now + duration; // the note's own notated length, held at the shelf
+    const sustain = gain * 0.5;
+    const releaseEnd = Math.max(holdUntil, decayEnd) + tail;
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(Math.min(frequency * 8, 12000), now);
-    filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), now + duration);
-    filter.connect(ctx.destination);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(frequency * 2, 400), releaseEnd);
+    filter.connect(master(ctx));
 
     const envelope = ctx.createGain();
     // Exponential ramps cannot reach zero, so the envelope rides just above it.
     envelope.gain.setValueAtTime(0.0001, now);
-    envelope.gain.exponentialRampToValueAtTime(gain, now + 0.006);
-    envelope.gain.exponentialRampToValueAtTime(gain * 0.5, now + 0.18);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    envelope.gain.exponentialRampToValueAtTime(gain, attackEnd);
+    envelope.gain.exponentialRampToValueAtTime(sustain, decayEnd);
+    // Hold the shelf until the notated end when the note outlasts the decay, so the
+    // release tail begins at `duration` rather than part-way through the note. A note
+    // shorter than the decay never reaches the hold and releases straight on.
+    if (holdUntil > decayEnd) {
+        envelope.gain.setValueAtTime(sustain, holdUntil);
+    }
+    envelope.gain.exponentialRampToValueAtTime(0.0001, releaseEnd);
     envelope.connect(filter);
 
     for (const partial of PARTIALS) {
@@ -153,7 +211,9 @@ export function renderStrike(
         oscillator.connect(partialGain);
         partialGain.connect(envelope);
         oscillator.start(now);
-        oscillator.stop(now + duration);
+        // Keep the oscillator alive a hair past the tail so its stop never clips the
+        // ring-out the envelope is still fading.
+        oscillator.stop(releaseEnd + 0.03);
     }
 }
 
@@ -166,7 +226,7 @@ function click(ctx: AudioContext, time: number, kind: ClickKind, gain: number): 
     envelope.gain.exponentialRampToValueAtTime(gain, time + 0.001);
     envelope.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
     osc.connect(envelope);
-    envelope.connect(ctx.destination);
+    envelope.connect(master(ctx));
     osc.start(time);
     osc.stop(time + 0.06);
 }
