@@ -298,6 +298,9 @@ function usePlaySessionValue({
                 loop.reseedWholeSong(bars);
             }
         },
+        // The in-place fingering redraw rebuilt the noteheads mid-run: re-apply the ear-mode
+        // conceal so a hidden run's blanked answers aren't exposed by the fresh render.
+        onFingeringRedraw: () => hidden.reconceal(),
     });
     const { getOsmd, ready, staffCount, measureCount, measureBoxes, centerCursor, markPainted } =
         score;
@@ -696,8 +699,7 @@ function usePlaySessionValue({
         }
         listenPlayback.stop();
         if (score.painted()) {
-            getOsmd()?.render();
-            score.resetPaint();
+            score.wipePaint();
         }
         listenPlayback.start(0);
     };
@@ -726,8 +728,7 @@ function usePlaySessionValue({
         hidden.restore();
         clearSelfPacedResult();
         if (score.painted()) {
-            osmd.render();
-            score.resetPaint();
+            score.wipePaint();
         }
         keepUp.start({ hand: staffCount < 2 ? "both" : hand, guideNotes });
     };
@@ -802,8 +803,7 @@ function usePlaySessionValue({
         // resumed run (taking over from Listen) keeps them, so the blue Listen trail and
         // any earlier green survive and the score shows how the whole piece was played.
         if (!partial && score.painted()) {
-            getOsmd()?.render();
-            score.resetPaint();
+            score.wipePaint();
             // A fresh render rebuilt the SVG, so any previous blanks are gone with it;
             // forget them and blank the new elements below.
             hidden.restore();

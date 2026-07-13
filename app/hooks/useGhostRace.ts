@@ -97,8 +97,15 @@ export function useGhostRace({
         if (steps.length === 0) {
             return;
         }
+        // A note blanked for ear-mode practice (visibility hidden) must not be lit — the
+        // ghost runs ahead on the clock, so a halo behind a concealed note would give its
+        // position away before the player has found it.
+        const concealed = (element: SVGGElement) => element.getAttribute("visibility") === "hidden";
         const restore = (step: number) => {
             for (const element of steps[step] ?? []) {
+                if (concealed(element)) {
+                    continue;
+                }
                 if (done > step) {
                     litHalo(element, PLAYED_COLOR);
                 } else {
@@ -123,7 +130,9 @@ export function useGhostRace({
             restore(previous);
         }
         for (const element of steps[target] ?? []) {
-            litHalo(element, GHOST_COLOR);
+            if (!concealed(element)) {
+                litHalo(element, GHOST_COLOR);
+            }
         }
         ghostMarkRef.current = target;
     }, [ghostDone, ghost, practicing, complete, done]);

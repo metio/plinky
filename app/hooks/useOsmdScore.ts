@@ -43,6 +43,8 @@ export type OsmdScore = {
     markPainted: () => void;
     painted: () => boolean;
     resetPaint: () => void;
+    // Re-render to wipe the injected feedback halos, repainting the loop overlay too.
+    wipePaint: () => void;
     // Bumped after every successful render (a reload or an in-place fingering redraw), so
     // an overlay that OSMD's fresh SVG drops — the loop selection — can be repainted.
     renderVersion: number;
@@ -65,6 +67,7 @@ export function useOsmdScore(
         scrollFollow,
         onReload,
         onRendered,
+        onFingeringRedraw,
     }: {
         xml: string;
         // Semitone shift; rewrites the MusicXML before OSMD loads it, so playback, the
@@ -97,6 +100,10 @@ export function useOsmdScore(
         // (as opposed to a relayout of the same one) so the caller can reseed piece-bound
         // state (the practised hand, the loop range) only when the piece itself changes.
         onRendered: (info: { bars: number; freshPiece: boolean }) => void;
+        // After the in-place fingering redraw rebuilds the noteheads (mid-run, no reload),
+        // so the caller can re-apply any SVG-injected run paint the fresh render dropped —
+        // the ear-mode conceal above all, whose blanks would otherwise expose the answers.
+        onFingeringRedraw: () => void;
     },
 ): OsmdScore {
     const prefsStore = usePrefsStore();
@@ -127,6 +134,8 @@ export function useOsmdScore(
     onReloadRef.current = onReload;
     const onRenderedRef = useRef(onRendered);
     onRenderedRef.current = onRendered;
+    const onFingeringRedrawRef = useRef(onFingeringRedraw);
+    onFingeringRedrawRef.current = onFingeringRedraw;
 
     const getOsmd = useCallback(() => osmdRef.current, []);
     const measureBoxes = useCallback(() => measureBoxesRef.current, []);
@@ -136,6 +145,21 @@ export function useOsmdScore(
     const painted = useCallback(() => paintedRef.current, []);
     const resetPaint = useCallback(() => {
         paintedRef.current = false;
+    }, []);
+
+    // Wipe the injected paint (feedback halos) by re-rendering the score's SVG, then bump
+    // the render version. A bare render() rebuilds the SVG and so also drops any other
+    // overlay injected into it — the loop's selection rects — and the version bump is what
+    // tells their owner (useLoopSelection) to repaint them. Callers that render directly to
+    // clear stale halos must go through this, or the loop overlay silently vanishes.
+    const wipePaint = useCallback(() => {
+        const osmd = osmdRef.current;
+        if (!osmd) {
+            return;
+        }
+        osmd.render();
+        paintedRef.current = false;
+        setRenderVersion((version) => version + 1);
     }, []);
 
     const centerCursor = useCallback(() => {
@@ -321,6 +345,10 @@ export function useOsmdScore(
         measureBoxesRef.current =
             svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
         paintedRef.current = false;
+        // The fresh render rebuilt every notehead, dropping any run paint injected into the
+        // old SVG — re-apply it (the ear-mode conceal most of all, so hidden answers stay
+        // hidden) before the cursor and overlay are restored.
+        onFingeringRedrawRef.current();
         // Step the reset cursor back to where it stood — OSMD has no direct seek — and show
         // it again where a run or Listen was using it, re-centring the treadmill.
         if (wasVisible) {
@@ -342,6 +370,7 @@ export function useOsmdScore(
         markPainted,
         painted,
         resetPaint,
+        wipePaint,
         renderVersion,
     };
 }

@@ -23,6 +23,10 @@ export function useHiddenNotes(
 ) {
     const stepsRef = useRef<SVGGElement[][]>([]);
     const activeRef = useRef(false);
+    // Which step indices have been revealed, and in which colour (found green / missed red)
+    // — so a re-render that rebuilds the noteheads can restore the exact conceal state
+    // rather than leaving every blanked answer exposed.
+    const revealedRef = useRef<Map<number, string>>(new Map());
     const optionsRef = useRef(options);
     optionsRef.current = options;
 
@@ -38,21 +42,40 @@ export function useHiddenNotes(
             return;
         }
         stepsRef.current = collectNoteElements(osmd, optionsRef.current.hand);
+        revealedRef.current.clear();
         hideNoteElements(stepsRef.current);
         activeRef.current = true;
     }, [getOsmd]);
 
     const revealCorrect = useCallback((index: number) => {
         if (activeRef.current) {
+            revealedRef.current.set(index, PLAYED_COLOR);
             revealNoteElements(stepsRef.current[index] ?? [], PLAYED_COLOR);
         }
     }, []);
 
     const revealMissed = useCallback((index: number, misses: number) => {
         if (activeRef.current && misses >= optionsRef.current.tries) {
+            revealedRef.current.set(index, MISSED_COLOR);
             revealNoteElements(stepsRef.current[index] ?? [], MISSED_COLOR);
         }
     }, []);
+
+    // Re-apply the conceal after the score's noteheads were rebuilt (an in-place render,
+    // e.g. toggling the printed fingering mid-run): the old elements are detached, so
+    // re-collect the fresh ones, blank them all, then re-reveal exactly the steps already
+    // earned in their colour. Without this a mid-run render would expose every hidden answer.
+    const reconceal = useCallback(() => {
+        const osmd = getOsmd();
+        if (!activeRef.current || !osmd) {
+            return;
+        }
+        stepsRef.current = collectNoteElements(osmd, optionsRef.current.hand);
+        hideNoteElements(stepsRef.current);
+        for (const [index, color] of revealedRef.current) {
+            revealNoteElements(stepsRef.current[index] ?? [], color);
+        }
+    }, [getOsmd]);
 
     // Lift every blank — leaving the mode, ending the run, or unmounting must
     // never strand invisible music on the staff.
@@ -60,9 +83,10 @@ export function useHiddenNotes(
         if (activeRef.current) {
             unhideNoteElements(stepsRef.current);
             stepsRef.current = [];
+            revealedRef.current.clear();
             activeRef.current = false;
         }
     }, []);
 
-    return { conceal, revealCorrect, revealMissed, restore };
+    return { conceal, revealCorrect, revealMissed, reconceal, restore };
 }
