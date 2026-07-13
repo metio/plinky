@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { type Beams, BEAMS } from "./beams";
 import type { Letter } from "./grade";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
 import type { MicCalibration } from "./pitch";
@@ -32,6 +33,10 @@ export type Prefs = {
     // want the hint, the way they'd read fingering off printed sheet music only when
     // stuck.
     showFingerings: boolean;
+    // Whether the score joins fast notes into beam groups. "auto" (the default) follows
+    // the piece's difficulty — flags on the easy grades a beginner reads note-by-note,
+    // beat-grouping beams once they help — and "on"/"off" force it either way.
+    beams: Beams;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
     // Keep going past a slip: when on, playing the next note advances the score even if a
@@ -128,6 +133,7 @@ function defaults(): Prefs {
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
         showFingerings: false,
+        beams: "auto",
         noteHints: "miss",
         noteLabels: "c",
         forgiving: false,
@@ -204,6 +210,7 @@ export function parsePrefs(raw: string | null): Prefs {
                 typeof parsed.showFingerings === "boolean"
                     ? parsed.showFingerings
                     : base.showFingerings,
+            beams: BEAMS.includes(parsed.beams) ? parsed.beams : base.beams,
             noteHints: NOTE_HINTS.includes(parsed.noteHints) ? parsed.noteHints : base.noteHints,
             noteLabels: NOTE_LABELS.includes(parsed.noteLabels)
                 ? parsed.noteLabels

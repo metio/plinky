@@ -47,7 +47,10 @@ also force a **set number of bars per row** for bigger, more readable notation o
 small screen, or switch to **treadmill** reading — the piece laid out as one continuous
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. **Bar
 numbers** on each row's first bar make a passage easy to find (and line up with the
-loop's from/to), or you can turn them off for a cleaner staff. A
+loop's from/to), or you can turn them off for a cleaner staff. **Beams** — the bars
+that join fast notes into beat groups — can be hidden so a beginner reads one note at a
+time, shown, or left on **Auto**, which draws them on harder pieces where the beat
+grouping helps and drops them on the easy grades. A
 wrong key flashes red; whether the correct key then lights up is your call — read
 the music unaided, get a nudge only after a slip, or always show the next note.
 Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
