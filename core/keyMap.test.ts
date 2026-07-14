@@ -60,6 +60,17 @@ describe("rebind", () => {
         expect("z" in next.left).toBe(false);
     });
 
+    it("frees the key from a pedal it worked, so it can't fire both", () => {
+        // Bind a spare key to the sustain pedal, then rebind that same key to a note.
+        const withPedal = rebindPedal(DEFAULT_KEY_MAP, "sustain", "l");
+        expect(withPedal.pedals.sustain).toBe("l");
+        const next = rebind(withPedal, "left", 0, "l");
+        expect(next.left.l).toBe(0);
+        // The pedal must let the key go, or keydown (which checks pedals first) would
+        // swallow the keystroke and the note would never sound.
+        expect(next.pedals.sustain).toBeNull();
+    });
+
     it("does not mutate the input", () => {
         const before = JSON.stringify(DEFAULT_KEY_MAP);
         rebind(DEFAULT_KEY_MAP, "left", 0, "l");

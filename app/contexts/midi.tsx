@@ -125,6 +125,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // The latest held notes, read by the window-blur handler to release them all.
     const heldNotesRef = useRef(heldNotes);
     heldNotesRef.current = heldNotes;
+    // The device each currently-held note came from, so an involuntary release (window
+    // blur, a device unplugged) can end each note on its own device and apply the right
+    // hold-scale — a real piano note stays precise, an on-screen/keyboard note keeps its
+    // gentle ring-out — instead of flattening every source to one.
+    const heldDevicesRef = useRef(new Map<number, string>());
 
     const subscribe = useCallback((listener: NoteListener) => {
         subscribersRef.current.add(listener);
@@ -166,6 +171,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 }
                 return prev.filter((held) => held !== note);
             });
+            if (kind === "noteon") {
+                heldDevicesRef.current.set(note, device);
+            } else {
+                heldDevicesRef.current.delete(note);
+            }
 
             for (const listener of subscribersRef.current) {
                 if (kind === "noteon") {
@@ -363,14 +373,20 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         // A device unplugged mid-hold never sends its note-offs, so a held note would stay
         // stuck on — in the debug panel, on the on-screen keyboard, and in any run's hold
         // that never resolves. When an input that was connected has gone (or flipped to
-        // disconnected), release every held note. A held pitch isn't attributed to a device,
-        // so this releases all of them on any disconnection — a stray note-off is far less
-        // bad than a stuck note.
+        // disconnected), release every held note on the device that sounded it, so a real
+        // piano note ends precisely while an on-screen note keeps its ring-out.
         const dropped = [...connectedInputsRef.current].some((id) => !nowConnected.has(id));
         connectedInputsRef.current = nowConnected;
         if (dropped) {
             for (const note of heldNotesRef.current) {
-                emitNote("noteoff", note, 0, 1, "MIDI", performance.now());
+                emitNote(
+                    "noteoff",
+                    note,
+                    0,
+                    1,
+                    heldDevicesRef.current.get(note) ?? "MIDI",
+                    performance.now(),
+                );
             }
             // A pedal held when its device vanishes never sends its release either, so it
             // would latch down — every note played after would ring on. Lift whatever pedal
@@ -497,30 +513,32 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             }
 
             const note = keyToNote(key, octaveRef.current, keyMapRef.current);
-            if (note === null || pressed.has(key)) {
+            // Track the held key by its physical code, not the glyph: a modifier pressed
+            // or released mid-hold (or a dead-key layout) can change the glyph the keyup
+            // reports, and a glyph-keyed lookup would then miss and strand the note on.
+            if (note === null || pressed.has(event.code)) {
                 return;
             }
             if (note < 0 || note > 127) {
                 return;
             }
             event.preventDefault();
-            pressed.set(key, note);
+            pressed.set(event.code, note);
             emitNote("noteon", note, KEYBOARD_VELOCITY, 1, KEYBOARD_DEVICE, event.timeStamp);
         };
 
         const onKeyUp = (event: KeyboardEvent) => {
-            const key = event.key.toLowerCase();
             const pedal = pedalKeysDown.get(event.code);
             if (pedal !== undefined) {
                 pedalKeysDown.delete(event.code);
                 emitPedal(pedal, false, event.timeStamp);
                 return;
             }
-            const note = pressed.get(key);
+            const note = pressed.get(event.code);
             if (note === undefined) {
                 return;
             }
-            pressed.delete(key);
+            pressed.delete(event.code);
             emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, event.timeStamp);
         };
 
@@ -531,11 +549,17 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         const releaseAll = () => {
             pressed.clear();
             for (const note of heldNotesRef.current) {
-                // Release with the precise "MIDI" device (hold scale 1), matching the
-                // device-disconnect path: a note held on a real piano when focus is lost
-                // must not have the imprecise keyboard ring-out retroactively lengthen
-                // its sound and its recorded hold.
-                emitNote("noteoff", note, 0, 1, "MIDI", performance.now());
+                // End each note on the device that sounded it: a real piano note held
+                // when focus is lost stays precise (no lengthened hold), while an
+                // on-screen or computer-keyboard note keeps its gentle ring-out.
+                emitNote(
+                    "noteoff",
+                    note,
+                    0,
+                    1,
+                    heldDevicesRef.current.get(note) ?? "MIDI",
+                    performance.now(),
+                );
             }
             // Lift any pedal held by a computer key too, so a pedal doesn't stick down.
             for (const pedal of pedalKeysDown.values()) {

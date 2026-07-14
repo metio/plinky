@@ -106,14 +106,21 @@ export function keyForSlot(map: KeyMap, hand: Hand, semitone: number): string | 
     return null;
 }
 
-// Bind `key` to (hand, semitone). A key plays only one note, so it is first removed
-// from any slot it held in either hand; the slot's previous key is dropped too. The
-// result keeps each key unique across the whole layout.
+// Bind `key` to (hand, semitone). A key plays only one thing, so it is first removed
+// from any slot it held in either hand AND from any pedal it worked; the slot's previous
+// key is dropped too. The result keeps each key unique across the whole layout — without
+// freeing it from a pedal, that pedal (checked first on keydown) would swallow the key
+// and the note would never sound.
 export function rebind(map: KeyMap, hand: Hand, semitone: number, key: string): KeyMap {
     const lower = key.toLowerCase();
     const next = cloneMap(map);
     for (const h of HANDS) {
         delete next[h][lower];
+    }
+    for (const kind of PEDAL_KINDS) {
+        if (next.pedals[kind] === lower) {
+            next.pedals[kind] = null;
+        }
     }
     for (const [existing, value] of Object.entries(next[hand])) {
         if (value === semitone) {

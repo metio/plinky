@@ -196,7 +196,7 @@ describe("Keyboard", () => {
         // Give the key a real box so velocityAt can read a fraction of its height.
         c.getBoundingClientRect = () => ({ top: 0, height: 100, left: 0, width: 20 }) as DOMRect;
         fireEvent.pointerDown(c, { pointerId: 1, clientY: 100 }); // struck at the tip → loud
-        const velocity = onPress.mock.calls[0][1];
+        const velocity = onPress.mock.calls[0]![1];
         expect(velocity).toBe(120);
     });
 

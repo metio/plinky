@@ -8,6 +8,7 @@ import { DEFAULT_KEY_MAP, rebindPedal } from "../../core/keyMap";
 import type { PedalKind } from "../../core/pedals";
 import { type FakeMidi, fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { memoryStore } from "../adapters/memoryStore";
+import { ON_SCREEN_DEVICE } from "../../core/midi";
 import { ServicesProvider } from "./services";
 import { MidiProvider, useMidiConnection, useMidiInput } from "./midi";
 
@@ -150,6 +151,30 @@ describe("MidiProvider", () => {
         expect(result.current.heldNotes).toContain(67);
         act(() => window.dispatchEvent(new Event("blur")));
         expect(result.current.heldNotes).not.toContain(67);
+    });
+
+    it("ends a blur-released on-screen note on its own device, keeping its ring-out", () => {
+        const { result } = renderHook(() => useMidiConnection(), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        act(() => result.current.pressKey(67));
+        act(() => window.dispatchEvent(new Event("blur")));
+        // The release carries the on-screen device (its gentle hold-scale), not a
+        // flattened precise "MIDI" that would clip the note's ring-out and recorded hold.
+        expect(result.current.events[0]?.kind).toBe("noteoff");
+        expect(result.current.events[0]?.device).toBe(ON_SCREEN_DEVICE);
+    });
+
+    it("releases a computer-keyboard note by physical key even if the glyph changed", () => {
+        const { result } = renderHook(() => useMidiConnection(), {
+            wrapper: wrapperWith(fakeMidi()),
+        });
+        // Press 'z' (KeyZ). A modifier engaged before release reports a different glyph,
+        // but the same physical key must still release the note rather than strand it.
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", code: "KeyZ" })));
+        expect(result.current.heldNotes).toContain(60);
+        act(() => window.dispatchEvent(new KeyboardEvent("keyup", { key: "Ω", code: "KeyZ" })));
+        expect(result.current.heldNotes).not.toContain(60);
     });
 
     it("plays from the on-screen keyboard bridge, notifies subscribers, and clears events", () => {
