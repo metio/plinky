@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Ferdig",
   "mic_calibrate_cancel": "Avbryt",
   "video_show_title": "Tittel",
-  "video_show_watermark": "Vannmerke"
+  "video_show_watermark": "Vannmerke",
+  "keyboard_label": "Pianotastatur",
+  "keyboard_wrong_note": "Feil tone: {note}"
 }

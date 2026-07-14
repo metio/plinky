@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Готово",
   "mic_calibrate_cancel": "Отмена",
   "video_show_title": "Название",
-  "video_show_watermark": "Водяной знак"
+  "video_show_watermark": "Водяной знак",
+  "keyboard_label": "Клавиатура пианино",
+  "keyboard_wrong_note": "Неверная нота: {note}"
 }

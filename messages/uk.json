@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Готово",
   "mic_calibrate_cancel": "Скасувати",
   "video_show_title": "Назва",
-  "video_show_watermark": "Водяний знак"
+  "video_show_watermark": "Водяний знак",
+  "keyboard_label": "Клавіатура фортепіано",
+  "keyboard_wrong_note": "Неправильна нота: {note}"
 }

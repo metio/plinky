@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Τέλος",
   "mic_calibrate_cancel": "Ακύρωση",
   "video_show_title": "Τίτλος",
-  "video_show_watermark": "Υδατογράφημα"
+  "video_show_watermark": "Υδατογράφημα",
+  "keyboard_label": "Πληκτρολόγιο πιάνου",
+  "keyboard_wrong_note": "Λάθος νότα: {note}"
 }

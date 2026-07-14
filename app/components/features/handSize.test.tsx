@@ -27,8 +27,8 @@ describe("HandSize", () => {
         expect(screen.getAllByText("Not set")).toHaveLength(2);
 
         fireEvent.click(screen.getAllByText("Set")[0]!); // left hand
-        tap("C4"); // thumb
-        tap("A4"); // pinky → a major sixth (9 semitones)
+        tap("C 4"); // thumb
+        tap("A 4"); // pinky → a major sixth (9 semitones)
         expect(screen.getByText(/C4 → A4 · 9 semitones/)).toBeTruthy();
 
         fireEvent.click(screen.getByText("Save"));
@@ -40,8 +40,8 @@ describe("HandSize", () => {
     it("clears a measured hand back to unset", () => {
         const { services } = mount();
         fireEvent.click(screen.getAllByText("Set")[1]!); // right hand
-        tap("C4");
-        tap("A4");
+        tap("C 4");
+        tap("A 4");
         fireEvent.click(screen.getByText("Save"));
         expect(services.prefs.load().handSpan).toEqual({ left: null, right: 9 });
 

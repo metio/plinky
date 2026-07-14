@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Klar",
   "mic_calibrate_cancel": "Avbryt",
   "video_show_title": "Titel",
-  "video_show_watermark": "Vattenstämpel"
+  "video_show_watermark": "Vattenstämpel",
+  "keyboard_label": "Pianoklaviatur",
+  "keyboard_wrong_note": "Fel ton: {note}"
 }

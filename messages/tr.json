@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Bitti",
   "mic_calibrate_cancel": "İptal",
   "video_show_title": "Başlık",
-  "video_show_watermark": "Filigran"
+  "video_show_watermark": "Filigran",
+  "keyboard_label": "Piyano klavyesi",
+  "keyboard_wrong_note": "Yanlış nota: {note}"
 }

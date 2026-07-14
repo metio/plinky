@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMidiConnection } from "../../contexts/midi";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
@@ -26,8 +26,24 @@ export function PianoKeyboard({
     // keys use the whole page.
     well?: string;
 }) {
-    const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const { heldNotes, pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
     const labels = useNoteLabels();
+
+    // Reflect the sustain pedal on the keybed. The held-pedal set lives in a ref (no
+    // re-render on change), so subscribe to pedal events and mirror sustain into state,
+    // seeded from the current value in case it is already down at mount.
+    const [sustained, setSustained] = useState(() => pedalHeld("sustain"));
+    useEffect(
+        () =>
+            subscribe({
+                onPedal: (pedal, down) => {
+                    if (pedal === "sustain") {
+                        setSustained(down);
+                    }
+                },
+            }),
+        [subscribe],
+    );
 
     // A key still held when this surface tears down (a run ending, leaving full
     // screen) never delivers its pointer-up, so its note would stay lit and its
@@ -54,6 +70,7 @@ export function PianoKeyboard({
             expected={expected}
             wrong={wrong}
             labels={labels}
+            sustained={sustained}
             badge={<MidiBadge />}
             onPress={pressKey}
             onRelease={releaseKey}

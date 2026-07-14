@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Kész",
   "mic_calibrate_cancel": "Mégse",
   "video_show_title": "Cím",
-  "video_show_watermark": "Vízjel"
+  "video_show_watermark": "Vízjel",
+  "keyboard_label": "Zongorabillentyűzet",
+  "keyboard_wrong_note": "Rossz hang: {note}"
 }

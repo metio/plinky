@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "U krye",
   "mic_calibrate_cancel": "Anulo",
   "video_show_title": "Titulli",
-  "video_show_watermark": "Filigrani"
+  "video_show_watermark": "Filigrani",
+  "keyboard_label": "Tastiera e pianos",
+  "keyboard_wrong_note": "Notë e gabuar: {note}"
 }

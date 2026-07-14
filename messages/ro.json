@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Gata",
   "mic_calibrate_cancel": "Anulează",
   "video_show_title": "Titlu",
-  "video_show_watermark": "Filigran"
+  "video_show_watermark": "Filigran",
+  "keyboard_label": "Claviatură de pian",
+  "keyboard_wrong_note": "Notă greșită: {note}"
 }

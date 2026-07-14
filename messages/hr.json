@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Gotovo",
   "mic_calibrate_cancel": "Odustani",
   "video_show_title": "Naslov",
-  "video_show_watermark": "Vodeni žig"
+  "video_show_watermark": "Vodeni žig",
+  "keyboard_label": "Klavijatura",
+  "keyboard_wrong_note": "Pogrešna nota: {note}"
 }

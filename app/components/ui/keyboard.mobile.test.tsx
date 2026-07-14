@@ -53,12 +53,16 @@ describe("Keyboard touch", () => {
         const { getByLabelText } = mount(
             <Keyboard from={60} to={64} onPress={onPress} onRelease={onRelease} />,
         );
-        const c = getByLabelText("C4");
+        const c = getByLabelText("C 4");
         const at = centerOf(c);
         touch("pointerdown", c, at);
         touch("pointerup", c, at, false);
         expect(onPress).toHaveBeenCalledTimes(1);
-        expect(onPress).toHaveBeenCalledWith(60);
+        expect(onPress.mock.calls[0]![0]).toBe(60);
+        // A real tap carries a position-derived velocity in a musical range.
+        const velocity = onPress.mock.calls[0]![1];
+        expect(velocity).toBeGreaterThanOrEqual(45);
+        expect(velocity).toBeLessThanOrEqual(120);
         expect(onRelease).toHaveBeenCalledWith(60);
     });
 
@@ -68,9 +72,9 @@ describe("Keyboard touch", () => {
         const { getByLabelText } = mount(
             <Keyboard from={60} to={64} onPress={onPress} onRelease={onRelease} />,
         );
-        const c = getByLabelText("C4");
-        const d = getByLabelText("D4");
-        const e = getByLabelText("E4");
+        const c = getByLabelText("C 4");
+        const d = getByLabelText("D 4");
+        const e = getByLabelText("E 4");
         // Press C, slide across D to E, lift on E.
         touch("pointerdown", c, centerOf(c));
         touch("pointermove", c, centerOf(d));

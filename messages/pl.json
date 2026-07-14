@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Gotowe",
   "mic_calibrate_cancel": "Anuluj",
   "video_show_title": "Tytuł",
-  "video_show_watermark": "Znak wodny"
+  "video_show_watermark": "Znak wodny",
+  "keyboard_label": "Klawiatura fortepianu",
+  "keyboard_wrong_note": "Zła nuta: {note}"
 }

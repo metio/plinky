@@ -59,7 +59,7 @@ describe("Settings", () => {
         choose(m.settings_note_labels, m.note_labels_all);
         expect(services.prefs.load().noteLabels).toBe("all");
         // The example octave now prints a label on a non-C key too.
-        expect(screen.getByLabelText("D4").textContent).toContain("D");
+        expect(screen.getByLabelText("D 4").textContent).toContain("D");
     });
 
     it("stays in sync with a save made by a nested panel", () => {

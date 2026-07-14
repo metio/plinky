@@ -86,7 +86,7 @@ type MidiContextValue = {
     clearEvents: () => void;
     subscribe: (listener: NoteListener) => () => void;
     // Play a note from the on-screen keyboard through the same funnel as MIDI.
-    pressKey: (note: number) => void;
+    pressKey: (note: number, velocity?: number) => void;
     releaseKey: (note: number) => void;
     // Whether a pedal is currently held (any source). A run starting mid-hold reads it
     // to seed its recording, since Web MIDI streams only pedal changes, never the state.
@@ -322,8 +322,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     useEffect(() => () => pitch.stop(), [pitch]);
 
     const pressKey = useCallback(
-        (note: number) =>
-            emitNote("noteon", note, KEYBOARD_VELOCITY, 1, ON_SCREEN_DEVICE, performance.now()),
+        (note: number, velocity?: number) =>
+            emitNote(
+                "noteon",
+                note,
+                velocity ?? KEYBOARD_VELOCITY,
+                1,
+                ON_SCREEN_DEVICE,
+                performance.now(),
+            ),
         [emitNote],
     );
     const releaseKey = useCallback(

@@ -128,15 +128,15 @@ describe("ScoreViewer", () => {
         mount(phrase, { beatsPerBar: 4 });
         const practice = await awaitReady();
         fireEvent.click(practice); // enters full screen and starts the run
-        expect(await screen.findByLabelText("C5")).toBeTruthy();
+        expect(await screen.findByLabelText("C 5")).toBeTruthy();
         // Stopping the run must not take the keyboard with it — full screen is
         // still the playing surface, and Show keys must always have keys to show.
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
-        expect(screen.getByLabelText("C5")).toBeTruthy();
+        expect(screen.getByLabelText("C 5")).toBeTruthy();
         fireEvent.click(screen.getByRole("button", { name: "Hide keys" }));
-        expect(screen.queryByLabelText("C5")).toBeNull();
+        expect(screen.queryByLabelText("C 5")).toBeNull();
         fireEvent.click(screen.getByRole("button", { name: "Show keys" }));
-        expect(screen.getByLabelText("C5")).toBeTruthy();
+        expect(screen.getByLabelText("C 5")).toBeTruthy();
     });
 
     it("frames the keyboard to the piece's own range, not a fixed two octaves", async () => {
@@ -147,9 +147,9 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        expect(await screen.findByLabelText("C5")).toBeTruthy();
-        expect(screen.queryByLabelText("C4")).toBeNull();
-        expect(screen.queryByLabelText("C6")).toBeNull();
+        expect(await screen.findByLabelText("C 5")).toBeTruthy();
+        expect(screen.queryByLabelText("C 4")).toBeNull();
+        expect(screen.queryByLabelText("C 6")).toBeNull();
     });
 
     it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
@@ -502,7 +502,7 @@ describe("ScoreViewer", () => {
         // exit (X) appears, and the grade's Accuracy readout is hidden while full screen.
         fireEvent.click(practice);
         expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -555,7 +555,7 @@ describe("ScoreViewer", () => {
             timeout: 30000,
         });
         fireEvent.click(practice);
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -572,7 +572,7 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -594,7 +594,7 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         // Clear the first three positions cleanly.
         for (let i = 0; i < 3; i++) {
             fireEvent.pointerDown(key);
@@ -643,7 +643,7 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady()); // Practice: a full-screen run over all four notes
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 2; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -653,7 +653,7 @@ describe("ScoreViewer", () => {
         // it rewound, four fresh notes would be needed and the run would never complete.
         fireEvent.click(screen.getByRole("button", { name: "Listen" }));
         fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
-        const resumed = await screen.findByLabelText("C5");
+        const resumed = await screen.findByLabelText("C 5");
         for (let i = 0; i < 2; i++) {
             fireEvent.pointerDown(resumed);
             fireEvent.pointerUp(resumed);
@@ -667,7 +667,7 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady()); // Practice: a full-screen run over all four notes
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 2; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -676,7 +676,7 @@ describe("ScoreViewer", () => {
         // left off, so the two remaining notes finish it — a rewound run would need four.
         fireEvent.click(screen.getByRole("button", { name: "Exit full screen" }));
         fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
-        const resumed = await screen.findByLabelText("C5");
+        const resumed = await screen.findByLabelText("C 5");
         for (let i = 0; i < 2; i++) {
             fireEvent.pointerDown(resumed);
             fireEvent.pointerUp(resumed);
@@ -772,7 +772,7 @@ describe("ScoreViewer", () => {
             timeout: 30000,
         });
         fireEvent.click(practice);
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -793,7 +793,7 @@ describe("ScoreViewer", () => {
             timeout: 30000,
         });
         fireEvent.click(practiceButton);
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -854,7 +854,7 @@ describe("ScoreViewer", () => {
         });
         // Run 1: play the four C5 notes to completion, which seeds the run's start clock.
         fireEvent.click(practiceButton);
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -975,7 +975,7 @@ describe("ScoreViewer", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         const { container } = mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 2; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);

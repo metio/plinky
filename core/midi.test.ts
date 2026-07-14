@@ -80,6 +80,17 @@ describe("keyToNote", () => {
         expect(keyToNote("a", 0, custom)).toBe(60); // 'a' now plays the left hand's C4
         expect(keyToNote("z", 0, custom)).toBeNull(); // the default 'z' is no longer bound
     });
+
+    it("lower-cases the key so a shifted glyph still resolves", () => {
+        expect(keyToNote("Z", 0)).toBe(60);
+        expect(keyToNote("Q", 0)).toBe(72);
+    });
+
+    it("returns null rather than sounding a note above the 88-key piano", () => {
+        // The top row at the maximum offset would land past C8 (108); no piano has it.
+        expect(keyToNote("u", 3)).toBeNull(); // B5 + 3 octaves = 119
+        expect(keyToNote("q", 3)).toBe(108); // C5 + 3 octaves = C8, the top key, still valid
+    });
 });
 
 describe("parseMidiMessage", () => {

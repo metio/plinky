@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Klaar",
   "mic_calibrate_cancel": "Annuleren",
   "video_show_title": "Titel",
-  "video_show_watermark": "Watermerk"
+  "video_show_watermark": "Watermerk",
+  "keyboard_label": "Pianoklavier",
+  "keyboard_wrong_note": "Verkeerde noot: {note}"
 }

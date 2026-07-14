@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Færdig",
   "mic_calibrate_cancel": "Annuller",
   "video_show_title": "Titel",
-  "video_show_watermark": "Vandmærke"
+  "video_show_watermark": "Vandmærke",
+  "keyboard_label": "Klaviatur",
+  "keyboard_wrong_note": "Forkert node: {note}"
 }

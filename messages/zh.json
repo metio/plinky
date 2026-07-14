@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "完成",
   "mic_calibrate_cancel": "取消",
   "video_show_title": "标题",
-  "video_show_watermark": "水印"
+  "video_show_watermark": "水印",
+  "keyboard_label": "钢琴键盘",
+  "keyboard_wrong_note": "错误的音符：{note}"
 }

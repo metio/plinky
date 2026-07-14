@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Done",
   "mic_calibrate_cancel": "Cancel",
   "video_show_title": "Title",
-  "video_show_watermark": "Watermark"
+  "video_show_watermark": "Watermark",
+  "keyboard_label": "Piano keyboard",
+  "keyboard_wrong_note": "Wrong note: {note}"
 }

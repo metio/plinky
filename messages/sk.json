@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Hotovo",
   "mic_calibrate_cancel": "Zrušiť",
   "video_show_title": "Názov",
-  "video_show_watermark": "Vodoznak"
+  "video_show_watermark": "Vodoznak",
+  "keyboard_label": "Klaviatúra",
+  "keyboard_wrong_note": "Nesprávna nota: {note}"
 }

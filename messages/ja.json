@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "完了",
   "mic_calibrate_cancel": "キャンセル",
   "video_show_title": "タイトル",
-  "video_show_watermark": "透かし"
+  "video_show_watermark": "透かし",
+  "keyboard_label": "ピアノの鍵盤",
+  "keyboard_wrong_note": "違う音: {note}"
 }

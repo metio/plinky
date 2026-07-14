@@ -27,9 +27,11 @@ themselves, the screen kept awake (and on a phone the browser's URL bar reclaime
 the music) — and starts a note-by-note guide: read the note, play it, and the cursor
 advances, sounding it back the way you played it — a quick tap sounds **staccato**, a held
 key **sustains**, and how hard you strike sets how loud it sings. That works on a MIDI
-piano, the on-screen keys, or your computer keyboard, no pedal required. Hold a key on the
-on-screen piano and slide across the keybed and the notes glide from one to the next, the
-way a thumb dragged across real keys does. Full screen is
+piano, the on-screen keys, or your computer keyboard, no pedal required. On the on-screen
+piano, striking a key nearer its tip plays it louder, so even a tap has dynamics. Hold a
+key on the on-screen piano and slide across the keybed and the notes glide from one to the
+next, the way a thumb dragged across real keys does — and the whole keybed plays with a
+screen reader and arrow keys too, not only a mouse or finger. Full screen is
 where the rest of the play controls live, so it's the same generous surface on a phone or
 a wide desktop alike.
 There you'll also find **Listen**, which plays the piece back so you hear it first,

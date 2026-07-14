@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Hecho",
   "mic_calibrate_cancel": "Cancelar",
   "video_show_title": "Título",
-  "video_show_watermark": "Marca de agua"
+  "video_show_watermark": "Marca de agua",
+  "keyboard_label": "Teclado de piano",
+  "keyboard_wrong_note": "Nota incorrecta: {note}"
 }

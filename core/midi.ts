@@ -127,16 +127,28 @@ const RIGHT_HAND_BASE_NOTE = 72; // C5 — one octave above the left hand
 // key is not part of the layout. The two-row virtual-piano split (a full octave per
 // hand) is the default, but a player can rebind keys (see keyMap), so the live
 // mapping is passed in.
+// The top of an 88-key piano (C8); notes above it are off the instrument and must not
+// sound. A0 (21) is the bottom, but the layout never reaches below it.
+const MAX_PIANO_NOTE = 108;
+
 export function keyToNote(
     key: string,
     octaveOffset: number,
     keyMap: KeyMap = DEFAULT_KEY_MAP,
 ): number | null {
-    if (key in keyMap.left) {
-        return LEFT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.left[key]!;
+    // Lower-case to match how the map is keyed, so a key arriving upper-cased (Shift, or
+    // a platform that reports the shifted glyph) still resolves — as pedalForKey does.
+    const lower = key.toLowerCase();
+    let note: number | null = null;
+    if (lower in keyMap.left) {
+        note = LEFT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.left[lower]!;
+    } else if (lower in keyMap.right) {
+        note = RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.right[lower]!;
     }
-    if (key in keyMap.right) {
-        return RIGHT_HAND_BASE_NOTE + octaveOffset * 12 + keyMap.right[key]!;
+    // A high octave offset can push the top row past the keyboard; drop phantom notes
+    // rather than sound pitches no piano has.
+    if (note === null || note < 0 || note > MAX_PIANO_NOTE) {
+        return null;
     }
-    return null;
+    return note;
 }

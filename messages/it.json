@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Fatto",
   "mic_calibrate_cancel": "Annulla",
   "video_show_title": "Titolo",
-  "video_show_watermark": "Filigrana"
+  "video_show_watermark": "Filigrana",
+  "keyboard_label": "Tastiera del pianoforte",
+  "keyboard_wrong_note": "Nota sbagliata: {note}"
 }

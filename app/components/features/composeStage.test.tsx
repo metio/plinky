@@ -59,15 +59,15 @@ describe("ComposeStage", () => {
 
     it("folds the keyboard away and back with the quick control", () => {
         mount(true);
-        expect(screen.getByLabelText("C4")).toBeTruthy();
+        expect(screen.getByLabelText("C 4")).toBeTruthy();
 
         fireEvent.click(screen.getByLabelText("Hide keys"));
         // The keys leave the layout entirely — their strip belongs to the staff
         // now — while the toggle stays on the sketch's corner as the way back.
-        expect(screen.queryByLabelText("C4")).toBeNull();
+        expect(screen.queryByLabelText("C 4")).toBeNull();
         expect(screen.getByLabelText("Show keys")).toBeTruthy();
 
         fireEvent.click(screen.getByLabelText("Show keys"));
-        expect(screen.getByLabelText("C4")).toBeTruthy();
+        expect(screen.getByLabelText("C 4")).toBeTruthy();
     });
 });

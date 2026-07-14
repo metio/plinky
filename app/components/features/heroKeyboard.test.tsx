@@ -22,14 +22,14 @@ describe("HeroKeyboard", () => {
         renderHero();
         // C4–C5: 8 white + 5 black keys, each a labelled button.
         expect(screen.getAllByRole("button")).toHaveLength(13);
-        expect(screen.getByLabelText("C4")).toBeTruthy();
-        expect(screen.getByLabelText("C5")).toBeTruthy();
+        expect(screen.getByLabelText("C 4")).toBeTruthy();
+        expect(screen.getByLabelText("C 5")).toBeTruthy();
     });
 
     it("lights a key when it is pressed", () => {
         // No AudioContext under jsdom, so the synth no-ops — the press still lights up.
         renderHero();
-        const key = screen.getByLabelText("C4");
+        const key = screen.getByLabelText("C 4");
         fireEvent.pointerDown(key);
         expect(key.className).toContain("bg-green-200");
     });
@@ -52,6 +52,6 @@ describe("HeroKeyboard", () => {
             </MidiProvider>,
         );
         fireEvent.click(screen.getByText("play"));
-        expect(screen.getByLabelText("C4").className).toContain("bg-green-200");
+        expect(screen.getByLabelText("C 4").className).toContain("bg-green-200");
     });
 });

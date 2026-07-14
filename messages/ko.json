@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "완료",
   "mic_calibrate_cancel": "취소",
   "video_show_title": "제목",
-  "video_show_watermark": "워터마크"
+  "video_show_watermark": "워터마크",
+  "keyboard_label": "피아노 건반",
+  "keyboard_wrong_note": "틀린 음: {note}"
 }

@@ -168,7 +168,7 @@ describe("ScoreViewer on a phone", () => {
         const score = mount(phrase, { beatsPerBar: 4 }).container;
         const img = await screen.findByRole("img", { name: "T" });
         fireEvent.click(await awaitReady());
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         // A two-bar, four-per-bar phrase clears in eight presses of its single degree.
         for (let i = 0; i < 8; i++) {
             fireEvent.pointerDown(key);
@@ -190,7 +190,7 @@ describe("ScoreViewer on a phone", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         const { container } = mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);
@@ -206,7 +206,7 @@ describe("ScoreViewer on a phone", () => {
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        const key = await screen.findByLabelText("C5");
+        const key = await screen.findByLabelText("C 5");
         for (let i = 0; i < 4; i++) {
             fireEvent.pointerDown(key);
             fireEvent.pointerUp(key);

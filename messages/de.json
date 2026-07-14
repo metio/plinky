@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Fertig",
   "mic_calibrate_cancel": "Abbrechen",
   "video_show_title": "Titel",
-  "video_show_watermark": "Wasserzeichen"
+  "video_show_watermark": "Wasserzeichen",
+  "keyboard_label": "Klaviatur",
+  "keyboard_wrong_note": "Falsche Note: {note}"
 }

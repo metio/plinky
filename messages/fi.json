@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Valmis",
   "mic_calibrate_cancel": "Peruuta",
   "video_show_title": "Otsikko",
-  "video_show_watermark": "Vesileima"
+  "video_show_watermark": "Vesileima",
+  "keyboard_label": "Pianon koskettimisto",
+  "keyboard_wrong_note": "Väärä nuotti: {note}"
 }

@@ -595,5 +595,7 @@
   "mic_calibrate_finish": "Terminé",
   "mic_calibrate_cancel": "Annuler",
   "video_show_title": "Titre",
-  "video_show_watermark": "Filigrane"
+  "video_show_watermark": "Filigrane",
+  "keyboard_label": "Clavier de piano",
+  "keyboard_wrong_note": "Mauvaise note : {note}"
 }
