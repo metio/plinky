@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type React from "react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { noteName, pitchClass } from "../../../core/midi";
 import type { NoteLabels } from "../../../core/prefs";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
@@ -101,6 +101,11 @@ export function Keyboard({
     // container (rather than the white keys alone) keeps white and black keys aligned.
     const maxWidth = whites.length ? whites.length * MAX_WHITE_KEY_PX : undefined;
 
+    // The key each active pointer is currently sounding, keyed by pointerId so a chord
+    // of simultaneous touches each glides independently. It gates the glide `enter` so a
+    // pointer can't press the same key twice.
+    const pointerNote = useRef(new Map<number, number>());
+
     const down = (note: number) => (event: React.PointerEvent) => {
         event.preventDefault();
         // A touch (and some pens) implicitly captures the pointer to the key it started
@@ -110,13 +115,18 @@ export function Keyboard({
         if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
             event.currentTarget.releasePointerCapture(event.pointerId);
         }
+        pointerNote.current.set(event.pointerId, note);
         onPress?.(note);
     };
     // Glide: with a button still held, sliding onto a key presses it (its neighbour is
     // released by `leave`), so dragging a finger or the mouse along the keybed runs the
-    // notes in turn like a thumb dragged across a real piano.
+    // notes in turn like a thumb dragged across a real piano. Releasing the pointer
+    // capture in `down` makes touch re-hit-test and fire a synthetic pointerenter on the
+    // key just pressed; ignoring an enter on the note this pointer already sounds keeps a
+    // plain tap from playing twice.
     const enter = (note: number) => (event: React.PointerEvent) => {
-        if (event.buttons !== 0) {
+        if (event.buttons !== 0 && pointerNote.current.get(event.pointerId) !== note) {
+            pointerNote.current.set(event.pointerId, note);
             onPress?.(note);
         }
     };
@@ -127,7 +137,10 @@ export function Keyboard({
             onPress?.(note);
         }
     };
-    const up = (note: number) => () => onRelease?.(note);
+    const up = (note: number) => (event: React.PointerEvent) => {
+        pointerNote.current.delete(event.pointerId);
+        onRelease?.(note);
+    };
     // The keyup half of `press`: a key held via Enter/Space must release the note,
     // or a keyboard-only player leaves it sounding and lit until the window blurs.
     const release = (note: number) => (event: React.KeyboardEvent) => {
