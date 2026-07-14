@@ -104,6 +104,22 @@ export function Keyboard({
     // The key each active pointer is currently sounding, keyed by pointerId so a chord
     // of simultaneous touches each glides independently.
     const pointerNote = useRef(new Map<number, number>());
+    // When a pointer last went down, and when a key was last used, so the compatibility
+    // `click` that trails a real press or an Enter/Space activation can be told apart
+    // from a screen reader's synthesized activation.
+    const lastPointerDown = useRef(Number.NEGATIVE_INFINITY);
+    const lastKeyActivity = useRef(Number.NEGATIVE_INFINITY);
+    // Pending auto-release timers for click-activated notes, cleared on unmount.
+    const clickTimers = useRef<Set<number>>(new Set());
+    useEffect(() => {
+        const timers = clickTimers.current;
+        return () => {
+            for (const id of timers) {
+                window.clearTimeout(id);
+            }
+            timers.clear();
+        };
+    }, []);
 
     // The note under a screen point, or null for a gap or off the keybed. Black keys
     // overlay the whites, so a hit-test naturally prefers a black key where they meet.
@@ -144,6 +160,7 @@ export function Keyboard({
         // as the finger slides across keys and past the edge; each move is hit-tested to
         // the key beneath it. This is what turns a drag into a glide — reliably on touch,
         // where per-key enter/leave events don't fire dependably mid-drag.
+        lastPointerDown.current = event.timeStamp;
         try {
             event.currentTarget.setPointerCapture?.(event.pointerId);
         } catch {
@@ -166,6 +183,7 @@ export function Keyboard({
     const press = (note: number) => (event: React.KeyboardEvent) => {
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
+            lastKeyActivity.current = event.timeStamp;
             onPress?.(note);
         }
     };
@@ -173,8 +191,30 @@ export function Keyboard({
     // or a keyboard-only player leaves it sounding and lit until the window blurs.
     const release = (note: number) => (event: React.KeyboardEvent) => {
         if (event.key === "Enter" || event.key === " ") {
+            lastKeyActivity.current = event.timeStamp;
             onRelease?.(note);
         }
+    };
+    // A screen reader (VoiceOver, TalkBack) activates a control with a synthesized
+    // click — no pointer sequence and no key press — which the pointer and keyboard
+    // handlers never see. Those clicks carry detail 0; a real mouse/touch click carries
+    // a positive detail and is trailed just after a pointerdown. Sound a brief note for
+    // the synthesized kind so an assistive-tech user can play a key too. A press has no
+    // AT gesture, so it self-releases shortly after.
+    const activate = (note: number) => (event: React.MouseEvent) => {
+        const trailingRealClick =
+            event.detail !== 0 ||
+            event.timeStamp - lastPointerDown.current < 700 ||
+            event.timeStamp - lastKeyActivity.current < 700;
+        if (trailingRealClick) {
+            return;
+        }
+        onPress?.(note);
+        const id = window.setTimeout(() => {
+            clickTimers.current.delete(id);
+            onRelease?.(note);
+        }, 180);
+        clickTimers.current.add(id);
     };
 
     const whiteState = (note: number) =>
@@ -212,6 +252,7 @@ export function Keyboard({
                             type="button"
                             aria-label={noteName(note)}
                             data-note={note}
+                            onClick={activate(note)}
                             onKeyDown={press(note)}
                             onKeyUp={release(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
@@ -244,6 +285,7 @@ export function Keyboard({
                             type="button"
                             aria-label={noteName(note)}
                             data-note={note}
+                            onClick={activate(note)}
                             onKeyDown={press(note)}
                             onKeyUp={release(note)}
                             style={{ left: `${left}%`, width: `${width}%` }}

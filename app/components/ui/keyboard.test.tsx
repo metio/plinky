@@ -136,6 +136,47 @@ describe("Keyboard", () => {
         restore();
     });
 
+    it("sounds a brief note for a screen reader's synthesized click", () => {
+        vi.useFakeTimers();
+        const onPress = vi.fn();
+        const onRelease = vi.fn();
+        render(<Keyboard from={60} to={62} onPress={onPress} onRelease={onRelease} />);
+        // An assistive-tech activation arrives as a click with detail 0 and no pointer.
+        fireEvent.click(screen.getByLabelText("C4"), { detail: 0 });
+        expect(onPress).toHaveBeenCalledWith(60);
+        expect(onRelease).not.toHaveBeenCalled();
+        // It self-releases shortly after, since AT gives no key-up gesture.
+        vi.advanceTimersByTime(200);
+        expect(onRelease).toHaveBeenCalledWith(60);
+        vi.useRealTimers();
+    });
+
+    it("ignores the compatibility click that trails a real pointer tap", () => {
+        const onPress = vi.fn();
+        render(<Keyboard from={60} to={62} onPress={onPress} />);
+        const c = screen.getByLabelText("C4");
+        const restore = stubHitTest(c);
+        // A mouse/touch tap: pointer down/up sounds the note once; the trailing click
+        // (positive detail) must not sound it again.
+        fireEvent.pointerDown(c, { pointerId: 1 });
+        fireEvent.pointerUp(c, { pointerId: 1 });
+        fireEvent.click(c, { detail: 1 });
+        expect(onPress).toHaveBeenCalledTimes(1);
+        restore();
+    });
+
+    it("does not double-sound when Enter also emits a click", () => {
+        const onPress = vi.fn();
+        render(<Keyboard from={60} to={62} onPress={onPress} />);
+        const c = screen.getByLabelText("C4");
+        fireEvent.keyDown(c, { key: "Enter" });
+        fireEvent.keyUp(c, { key: "Enter" });
+        // A keyboard activation can also emit a detail-0 click; the recent key use
+        // suppresses the fallback so the note isn't sounded twice.
+        fireEvent.click(c, { detail: 0 });
+        expect(onPress).toHaveBeenCalledTimes(1);
+    });
+
     it("keeps a leading black key inside the keyboard", () => {
         render(<Keyboard from={61} to={67} />);
         const black = screen.getByLabelText("C#4");
