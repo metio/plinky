@@ -50,18 +50,31 @@ export function useFullscreen(ref: RefObject<HTMLElement | null>) {
         }
         let cancelled = false;
         const nav = navigator as WakeLockNavigator;
-        nav.wakeLock
-            ?.request("screen")
-            .then((lock) => {
-                if (cancelled) {
-                    lock.release().catch(() => {});
-                } else {
-                    wakeLock.current = lock;
-                }
-            })
-            .catch(() => {});
+        const acquire = () => {
+            nav.wakeLock
+                ?.request("screen")
+                .then((lock) => {
+                    if (cancelled) {
+                        lock.release().catch(() => {});
+                    } else {
+                        wakeLock.current = lock;
+                    }
+                })
+                .catch(() => {});
+        };
+        acquire();
+        // The Wake Lock API auto-releases its sentinel whenever the document is hidden
+        // (a tab switch, the phone screen turning off then on). Re-acquire on return so
+        // the screen keeps staying awake for the rest of the piece.
+        const onVisible = () => {
+            if (!cancelled && document.visibilityState === "visible") {
+                acquire();
+            }
+        };
+        document.addEventListener("visibilitychange", onVisible);
         return () => {
             cancelled = true;
+            document.removeEventListener("visibilitychange", onVisible);
             wakeLock.current?.release().catch(() => {});
             wakeLock.current = null;
         };

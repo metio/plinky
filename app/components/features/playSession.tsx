@@ -186,9 +186,27 @@ function usePlaySessionValue({
     // The fingering the player worked out for this piece (Fingering mode). When they
     // have some, the staff can show theirs instead of the app's suggestion — defaulting
     // to theirs, since they chose it on purpose.
-    const saved = useMemo(() => services.fingering.load(id), [id, services.fingering]);
+    // Re-read on every fingering write (the strip saves through the same store), so
+    // fingering worked out this session reaches the score without a remount.
+    const [fingeringTick, setFingeringTick] = useState(0);
+    useEffect(
+        () => services.fingering.subscribe(() => setFingeringTick((tick) => tick + 1)),
+        [services.fingering],
+    );
+    // biome-ignore lint/correctness/useExhaustiveDependencies: fingeringTick is the re-read trigger when the strip saves through the same store
+    const saved = useMemo(
+        () => services.fingering.load(id),
+        [id, services.fingering, fingeringTick],
+    );
     const hasSaved = Object.keys(saved).length > 0;
     const [showMine, setShowMine] = useState(hasSaved);
+    // Once a fingering exists, default to showing theirs — the moment it's first worked
+    // out this session, not only on a fresh mount.
+    useEffect(() => {
+        if (hasSaved) {
+            setShowMine(true);
+        }
+    }, [hasSaved]);
     const { prefs: prefsStore } = services;
     const xmlCodec = useXmlCodec();
     // How the score is laid out and read — bars per row, bar numbers, treadmill, on-staff

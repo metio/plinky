@@ -33,11 +33,14 @@ type Event = { tick: number; bytes: number[]; order: number };
 
 export function buildMidiFile(
     notes: MidiNote[],
-    options: { tempo?: number; ppq?: number } = {},
+    options: { tempo?: number; ppq?: number; beatsPerBar?: number } = {},
 ): Uint8Array<ArrayBuffer> {
     const ppq = options.ppq ?? 480;
     const tempo = options.tempo && options.tempo > 0 ? options.tempo : 100;
     const microsecondsPerQuarter = Math.round(60_000_000 / tempo);
+    // A quarter-note beat (denominator power 2) keeps the meter round-trippable:
+    // parseMidiFile recovers beatsPerBar from the numerator directly.
+    const beatsPerBar = Math.max(1, Math.min(255, Math.round(options.beatsPerBar ?? 4)));
 
     // Note-off before note-on at the same tick (order 0 vs 1) so a repeated pitch is
     // released before it sounds again rather than being cut short.
@@ -70,6 +73,9 @@ export function buildMidiFile(
         (microsecondsPerQuarter >> 8) & 0xff,
         microsecondsPerQuarter & 0xff,
     );
+    // Time-signature meta event: numerator, denominator as a power of two (2 → quarter
+    // note), MIDI clocks per metronome click, 32nd notes per quarter.
+    track.push(...varLen(0), 0xff, 0x58, 0x04, beatsPerBar, 0x02, 0x18, 0x08);
     let lastTick = 0;
     for (const event of events) {
         track.push(...varLen(event.tick - lastTick), ...event.bytes);

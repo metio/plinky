@@ -72,7 +72,16 @@ export function createDailyStore(kv: KeyValueStore): DailyStore {
             const { number: _tag, ...rest } = stored;
             return rest;
         },
-        saveResult: (number, value) => result.save({ number, ...value }),
+        saveResult(number, value) {
+            // Forward-only, mirroring recordDone: replaying an older daily must not
+            // clobber a newer day's stored result, which would blank today's completed
+            // view (loadResult keys strictly on the number).
+            const stored = result.load();
+            if (stored && number < stored.number) {
+                return true;
+            }
+            return result.save({ number, ...value });
+        },
         subscribe: mergeSubscribe(done.subscribe, result.subscribe),
     };
 }

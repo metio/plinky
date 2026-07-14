@@ -46,10 +46,14 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
         return null;
     }
 
-    let divisions = Number(text(doc.documentElement, "divisions") ?? "1") || 1;
+    // Only a positive value is meaningful: a negative divisions reverses the clock and
+    // a negative tempo drives msPerQuarter negative, both poisoning every onset.
+    const declaredDivisions = Number(text(doc.documentElement, "divisions") ?? "1");
+    let divisions = declaredDivisions > 0 ? declaredDivisions : 1;
     const tempoAttr = doc.querySelector("sound[tempo]")?.getAttribute("tempo");
     const perMinute = text(doc.documentElement, "per-minute");
-    const tempo = Number(tempoAttr ?? perMinute ?? DEFAULT_TEMPO) || DEFAULT_TEMPO;
+    const declaredTempo = Number(tempoAttr ?? perMinute ?? DEFAULT_TEMPO);
+    const tempo = declaredTempo > 0 ? declaredTempo : DEFAULT_TEMPO;
     const beats = Number(text(doc.documentElement, "time > beats") ?? DEFAULT_BEATS_PER_BAR);
     const beatsPerBar = beats > 0 ? beats : DEFAULT_BEATS_PER_BAR;
 
@@ -66,8 +70,10 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
         velocity: number;
     };
     const built: Building[] = [];
-    // The note currently extending a tie, per pitch, so its stop half lengthens it.
-    const openTies = new Map<number, Building>();
+    // The note currently extending a tie, keyed by voice/staff and pitch so its stop
+    // half lengthens it. Two voices legally tie the same pitch at once (grand staff),
+    // so pitch alone would let one voice's stop hijack the other's held note.
+    const openTies = new Map<string, Building>();
 
     let cursor = 0; // absolute time in quarter notes
     let lastStart = 0; // onset of the previous non-chord note, for chord members
@@ -76,7 +82,10 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
         // A measure may restate the divisions-per-quarter for the notes that follow.
         const measureDivisions = text(measure, "divisions");
         if (measureDivisions) {
-            divisions = Number(measureDivisions) || divisions;
+            const restated = Number(measureDivisions);
+            if (restated > 0) {
+                divisions = restated;
+            }
         }
         // Durations are written in divisions of the quarter note currently in force.
         const toQuarters = (divs: number) => divs / divisions;
@@ -96,14 +105,17 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
                     if (midi !== null) {
                         const tieStop = element.querySelector('tie[type="stop"]') !== null;
                         const tieStart = element.querySelector('tie[type="start"]') !== null;
-                        const held = tieStop ? openTies.get(midi) : undefined;
+                        const voice = text(element, "voice") ?? "";
+                        const staff = text(element, "staff") ?? "";
+                        const tieKey = `${voice}/${staff}/${midi}`;
+                        const held = tieStop ? openTies.get(tieKey) : undefined;
                         if (held) {
                             // Extend the held note through this tied continuation.
                             held.durationQuarters = start + durationQuarters - held.startQuarters;
                             if (tieStart) {
-                                openTies.set(midi, held);
+                                openTies.set(tieKey, held);
                             } else {
-                                openTies.delete(midi);
+                                openTies.delete(tieKey);
                             }
                         } else {
                             const note: Building = {
@@ -114,7 +126,7 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
                             };
                             built.push(note);
                             if (tieStart) {
-                                openTies.set(midi, note);
+                                openTies.set(tieKey, note);
                             }
                         }
                     }

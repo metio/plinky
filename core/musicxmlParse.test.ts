@@ -42,6 +42,51 @@ describe("parseMusicXml", () => {
         expect(parsed!.notes.every((n) => Number.isFinite(n.pitch))).toBe(true);
     });
 
+    it("rejects a negative tempo, keeping onsets forward in time", () => {
+        const xml = `<score-partwise>
+            <direction><sound tempo="-120"/></direction>
+            <part id="P1"><measure number="1">
+            <attributes><divisions>1</divisions></attributes>
+            <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note>
+            <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration></note>
+        </measure></part></score-partwise>`;
+        const parsed = parseMusicXml(domXmlCodec, xml);
+        expect(parsed!.tempo).toBeGreaterThan(0);
+        expect(parsed!.notes.every((n) => n.startMs >= 0)).toBe(true);
+        expect(parsed!.notes[1]!.startMs).toBeGreaterThanOrEqual(parsed!.notes[0]!.startMs);
+    });
+
+    it("rejects a negative <divisions>, keeping durations positive", () => {
+        const xml = `<score-partwise><part id="P1"><measure number="1">
+            <attributes><divisions>-2</divisions></attributes>
+            <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration></note>
+        </measure></part></score-partwise>`;
+        const parsed = parseMusicXml(domXmlCodec, xml);
+        expect(parsed!.notes[0]!.durationMs).toBeGreaterThan(0);
+    });
+
+    it("keeps two voices' same-pitch ties separate", () => {
+        // Voice 1 ties C4 across the bar; voice 2 plays an untied C4 in between. Keying
+        // open ties by pitch alone would let voice 2's note hijack voice 1's tie.
+        const xml = `<score-partwise><part id="P1"><measure number="1">
+            <attributes><divisions>1</divisions></attributes>
+            <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>
+                <voice>1</voice><tie type="start"/></note>
+            <backup><duration>1</duration></backup>
+            <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>
+                <voice>2</voice></note>
+        </measure><measure number="2">
+            <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>
+                <voice>1</voice><tie type="stop"/></note>
+        </measure></part></score-partwise>`;
+        const parsed = parseMusicXml(domXmlCodec, xml);
+        // Two distinct notes: voice 1's tied note (extended) and voice 2's short note.
+        expect(parsed!.notes.length).toBe(2);
+        const durations = parsed!.notes.map((n) => Math.round(n.durationMs)).sort((a, b) => a - b);
+        // The shorter belongs to voice 2; the longer is voice 1 extended by its tie stop.
+        expect(durations[1]!).toBeGreaterThan(durations[0]!);
+    });
+
     it("reads a block chord back as simultaneous notes", () => {
         const composition: Composition = {
             notes: [

@@ -79,6 +79,15 @@ describe("dailyStore.loadResult / saveResult", () => {
         expect(daily.loadResult(6)?.grade.letter).toBe("S");
     });
 
+    it("does not let replaying an older day clobber a newer completion", () => {
+        const daily = createDailyStore(memoryStore());
+        daily.saveResult(6, { ...RESULT, grade: { ...RESULT.grade, letter: "S" } });
+        // Replaying and finishing daily #5 must not erase the stored #6 result.
+        expect(daily.saveResult(5, RESULT)).toBe(true);
+        expect(daily.loadResult(6)?.grade.letter).toBe("S");
+        expect(daily.loadResult(5)).toBeNull();
+    });
+
     it("returns null for a malformed store rather than throwing", () => {
         expect(
             createDailyStore(memoryStore({ "plinky:daily-result": "{ not json" })).loadResult(5),

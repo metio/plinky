@@ -149,4 +149,25 @@ describe("songSource.ensureSeeded", () => {
         await source.ensureSeeded();
         expect(fetches).toBe(0);
     });
+
+    it("retries seeding after a transient non-OK response instead of latching empty", async () => {
+        const kv = memoryStore();
+        const favorites = createFavoritesStore(kv);
+        let attempt = 0;
+        const fetchUrl: Fetcher = (url) => {
+            if (url.endsWith("seed.json")) {
+                attempt++;
+                // First load hits a 503 (mid-deploy); the server recovers next load.
+                return attempt === 1
+                    ? Promise.resolve(new Response(null, { status: 503 }))
+                    : Promise.resolve(Response.json(["s1", "s2"]));
+            }
+            return Promise.resolve(new Response(null, { status: 404 }));
+        };
+        const source = createSongSource(fetchUrl, kv, favorites);
+        await source.ensureSeeded();
+        expect(favorites.load().size).toBe(0);
+        await source.ensureSeeded();
+        expect([...favorites.load()].sort()).toEqual(["s1", "s2"]);
+    });
 });
