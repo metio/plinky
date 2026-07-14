@@ -8,6 +8,17 @@ import { Keyboard } from "./keyboard";
 
 afterEach(cleanup);
 
+// jsdom does no layout, so document.elementFromPoint is absent; stand it in with the
+// key the finger is meant to be over, and restore the original binding afterwards.
+function stubHitTest(element: Element): () => void {
+    const owner = document as unknown as { elementFromPoint?: (x: number, y: number) => Element };
+    const original = owner.elementFromPoint;
+    owner.elementFromPoint = () => element;
+    return () => {
+        owner.elementFromPoint = original;
+    };
+}
+
 describe("Keyboard", () => {
     it("labels every key in the range", () => {
         render(<Keyboard from={60} to={62} />);
@@ -69,18 +80,19 @@ describe("Keyboard", () => {
         expect(onRelease).toHaveBeenCalledWith(60);
     });
 
-    it("presses only once for a touch tap that re-fires enter on the same key", () => {
-        // Touch releases the implicit pointer capture in `down`, so the browser
-        // re-hit-tests and fires a synthetic pointerenter (buttons held) on the very
-        // key just pressed. That must not sound the note a second time.
+    it("presses only once for a tap, even with pointer jitter on the same key", () => {
+        // A tap can emit a move or two before the release; a hit-test that stays on the
+        // same key must not re-sound it — this is what kept touch taps from doubling.
         const onPress = vi.fn();
         render(<Keyboard from={60} to={62} onPress={onPress} />);
         const c = screen.getByLabelText("C4");
+        const restore = stubHitTest(c);
         fireEvent.pointerDown(c, { pointerId: 1 });
-        fireEvent.pointerEnter(c, { pointerId: 1, buttons: 1 });
+        fireEvent.pointerMove(c, { pointerId: 1, clientX: 5, clientY: 5 });
         fireEvent.pointerUp(c, { pointerId: 1 });
         expect(onPress).toHaveBeenCalledTimes(1);
         expect(onPress).toHaveBeenCalledWith(60);
+        restore();
     });
 
     it("sounds each finger of a two-touch chord once", () => {
@@ -89,9 +101,7 @@ describe("Keyboard", () => {
         const c = screen.getByLabelText("C4");
         const e = screen.getByLabelText("E4");
         fireEvent.pointerDown(c, { pointerId: 1 });
-        fireEvent.pointerEnter(c, { pointerId: 1, buttons: 1 });
         fireEvent.pointerDown(e, { pointerId: 2 });
-        fireEvent.pointerEnter(e, { pointerId: 2, buttons: 1 });
         expect(onPress).toHaveBeenCalledTimes(2);
         expect(onPress).toHaveBeenCalledWith(60);
         expect(onPress).toHaveBeenCalledWith(64);
@@ -103,22 +113,27 @@ describe("Keyboard", () => {
         render(<Keyboard from={60} to={62} onPress={onPress} onRelease={onRelease} />);
         const c = screen.getByLabelText("C4");
         const d = screen.getByLabelText("D4");
-        // Press C, drag off it onto D (button still held), then lift on D.
+        // Press C, then drag onto D: each move is hit-tested to the key under the finger,
+        // which jsdom can't compute from layout, so stand in for elementFromPoint.
+        const restore = stubHitTest(d);
         fireEvent.pointerDown(c);
-        fireEvent.pointerLeave(c, { buttons: 1 });
-        fireEvent.pointerEnter(d, { buttons: 1 });
+        fireEvent.pointerMove(c, { clientX: 30, clientY: 10 });
         fireEvent.pointerUp(d);
         expect(onPress).toHaveBeenNthCalledWith(1, 60);
         expect(onRelease).toHaveBeenCalledWith(60);
         expect(onPress).toHaveBeenNthCalledWith(2, 62);
         expect(onRelease).toHaveBeenCalledWith(62);
+        restore();
     });
 
-    it("does not press a key merely hovered with no button held", () => {
+    it("does not sound a key when a pointer moves over it with none held down", () => {
         const onPress = vi.fn();
         render(<Keyboard from={60} to={62} onPress={onPress} />);
-        fireEvent.pointerEnter(screen.getByLabelText("D4"), { buttons: 0 });
+        const d = screen.getByLabelText("D4");
+        const restore = stubHitTest(d);
+        fireEvent.pointerMove(d, { clientX: 30, clientY: 10 });
         expect(onPress).not.toHaveBeenCalled();
+        restore();
     });
 
     it("keeps a leading black key inside the keyboard", () => {

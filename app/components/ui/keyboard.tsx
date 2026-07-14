@@ -102,56 +102,77 @@ export function Keyboard({
     const maxWidth = whites.length ? whites.length * MAX_WHITE_KEY_PX : undefined;
 
     // The key each active pointer is currently sounding, keyed by pointerId so a chord
-    // of simultaneous touches each glides independently. It gates the glide `enter` so a
-    // pointer can't press the same key twice.
+    // of simultaneous touches each glides independently.
     const pointerNote = useRef(new Map<number, number>());
 
-    const down = (note: number) => (event: React.PointerEvent) => {
-        event.preventDefault();
-        // A touch (and some pens) implicitly captures the pointer to the key it started
-        // on, so a finger dragged across the keybed would keep firing on the first key
-        // and never enter its neighbours. Releasing the capture lets pointerenter/leave
-        // fire on each key the finger crosses, which is what turns a drag into a glide.
-        if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-            event.currentTarget.releasePointerCapture(event.pointerId);
+    // The note under a screen point, or null for a gap or off the keybed. Black keys
+    // overlay the whites, so a hit-test naturally prefers a black key where they meet.
+    const noteAtPoint = (x: number, y: number): number | null => {
+        const key = document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-note]");
+        const note = key ? Number(key.dataset.note) : Number.NaN;
+        return Number.isFinite(note) ? note : null;
+    };
+
+    // Move a pointer onto a note: release the one it was sounding, sound the new one.
+    // Same note (a hit-test that didn't cross a key boundary) is a no-op, so a plain
+    // tap sounds exactly once and a glide sounds each key it crosses exactly once.
+    const moveTo = (pointerId: number, note: number | null) => {
+        const prev = pointerNote.current.get(pointerId);
+        if (prev === note) {
+            return;
         }
-        pointerNote.current.set(event.pointerId, note);
+        if (prev !== undefined) {
+            onRelease?.(prev);
+        }
+        if (note === null) {
+            pointerNote.current.delete(pointerId);
+            return;
+        }
+        pointerNote.current.set(pointerId, note);
         onPress?.(note);
     };
-    // Glide: with a button still held, sliding onto a key presses it (its neighbour is
-    // released by `leave`), so dragging a finger or the mouse along the keybed runs the
-    // notes in turn like a thumb dragged across a real piano. Releasing the pointer
-    // capture in `down` makes touch re-hit-test and fire a synthetic pointerenter on the
-    // key just pressed; ignoring an enter on the note this pointer already sounds keeps a
-    // plain tap from playing twice.
-    const enter = (note: number) => (event: React.PointerEvent) => {
-        if (event.buttons !== 0 && pointerNote.current.get(event.pointerId) !== note) {
-            pointerNote.current.set(event.pointerId, note);
-            onPress?.(note);
+
+    const down = (event: React.PointerEvent) => {
+        // The press starts on the key it lands on; the event target carries the note
+        // directly (a hit-test needs layout that jsdom lacks).
+        const note = (event.target as Element).closest<HTMLElement>("[data-note]");
+        if (!note) {
+            return;
         }
+        event.preventDefault();
+        // Capture the pointer to the whole keybed so every move keeps arriving here even
+        // as the finger slides across keys and past the edge; each move is hit-tested to
+        // the key beneath it. This is what turns a drag into a glide — reliably on touch,
+        // where per-key enter/leave events don't fire dependably mid-drag.
+        try {
+            event.currentTarget.setPointerCapture?.(event.pointerId);
+        } catch {
+            // A pointer the browser no longer tracks can't be captured; the glide simply
+            // falls back to whatever events still arrive.
+        }
+        moveTo(event.pointerId, Number(note.dataset.note));
     };
-    // Enter/Space for keyboard players; pointer handles mouse and touch.
+    const move = (event: React.PointerEvent) => {
+        if (!pointerNote.current.has(event.pointerId)) {
+            return;
+        }
+        moveTo(event.pointerId, noteAtPoint(event.clientX, event.clientY));
+    };
+    const up = (event: React.PointerEvent) => {
+        moveTo(event.pointerId, null);
+    };
+
+    // Enter/Space for keyboard players; the pointer handlers cover mouse and touch.
     const press = (note: number) => (event: React.KeyboardEvent) => {
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
             onPress?.(note);
         }
     };
-    const up = (note: number) => (event: React.PointerEvent) => {
-        pointerNote.current.delete(event.pointerId);
-        onRelease?.(note);
-    };
     // The keyup half of `press`: a key held via Enter/Space must release the note,
     // or a keyboard-only player leaves it sounding and lit until the window blurs.
     const release = (note: number) => (event: React.KeyboardEvent) => {
         if (event.key === "Enter" || event.key === " ") {
-            onRelease?.(note);
-        }
-    };
-    // Releasing on leave only while a button is held avoids stuck notes when
-    // dragging across keys.
-    const leave = (note: number) => (event: React.PointerEvent) => {
-        if (event.buttons !== 0) {
             onRelease?.(note);
         }
     };
@@ -178,6 +199,10 @@ export function Keyboard({
             <div
                 className="relative mx-auto h-36 w-full touch-none select-none"
                 style={{ maxWidth }}
+                onPointerDown={down}
+                onPointerMove={move}
+                onPointerUp={up}
+                onPointerCancel={up}
             >
                 {badge}
                 <div className="flex h-full w-full gap-px">
@@ -186,11 +211,7 @@ export function Keyboard({
                             key={note}
                             type="button"
                             aria-label={noteName(note)}
-                            onPointerDown={down(note)}
-                            onPointerUp={up(note)}
-                            onPointerCancel={up(note)}
-                            onPointerEnter={enter(note)}
-                            onPointerLeave={leave(note)}
+                            data-note={note}
                             onKeyDown={press(note)}
                             onKeyUp={release(note)}
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
@@ -222,11 +243,7 @@ export function Keyboard({
                             key={note}
                             type="button"
                             aria-label={noteName(note)}
-                            onPointerDown={down(note)}
-                            onPointerUp={up(note)}
-                            onPointerCancel={up(note)}
-                            onPointerEnter={enter(note)}
-                            onPointerLeave={leave(note)}
+                            data-note={note}
                             onKeyDown={press(note)}
                             onKeyUp={release(note)}
                             style={{ left: `${left}%`, width: `${width}%` }}
