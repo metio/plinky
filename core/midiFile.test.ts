@@ -52,6 +52,18 @@ describe("buildMidiFile", () => {
         expect([...file.slice(-3)]).toEqual([0xff, 0x2f, 0x00]);
     });
 
+    it("emits a time-signature meta event carrying the beats per bar", () => {
+        const file = buildMidiFile([{ midi: 60, startQuarters: 0, durationQuarters: 1 }], {
+            beatsPerBar: 3,
+        });
+        const at = [...file].findIndex(
+            (b, i) => b === 0xff && file[i + 1] === 0x58 && file[i + 2] === 0x04,
+        );
+        expect(at).toBeGreaterThanOrEqual(0);
+        expect(file[at + 3]).toBe(3); // numerator = beats per bar
+        expect(file[at + 4]).toBe(2); // denominator power of two → quarter-note beat
+    });
+
     it("keeps a zero-duration note's note-on before its note-off so it doesn't hang", () => {
         const file = buildMidiFile([{ midi: 60, startQuarters: 0, durationQuarters: 0 }]);
         const onAt = [...file].indexOf(0x90);

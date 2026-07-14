@@ -524,7 +524,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         const releaseAll = () => {
             pressed.clear();
             for (const note of heldNotesRef.current) {
-                emitNote("noteoff", note, 0, 1, KEYBOARD_DEVICE, performance.now());
+                // Release with the precise "MIDI" device (hold scale 1), matching the
+                // device-disconnect path: a note held on a real piano when focus is lost
+                // must not have the imprecise keyboard ring-out retroactively lengthen
+                // its sound and its recorded hold.
+                emitNote("noteoff", note, 0, 1, "MIDI", performance.now());
             }
             // Lift any pedal held by a computer key too, so a pedal doesn't stick down.
             for (const pedal of pedalKeysDown.values()) {

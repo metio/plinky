@@ -10,7 +10,10 @@ import { parseMidiFile } from "./midiParse";
 // Renders a composition to a MIDI file and reads it back, the path a downloaded take
 // takes to another device.
 function roundTrip(composition: Composition): Composition | null {
-    const bytes = buildMidiFile(toMidiNotes(composition), { tempo: composition.tempo });
+    const bytes = buildMidiFile(toMidiNotes(composition), {
+        tempo: composition.tempo,
+        beatsPerBar: composition.beatsPerBar,
+    });
     return parseMidiFile(bytes);
 }
 
@@ -52,6 +55,33 @@ describe("parseMidiFile", () => {
             beatsPerBar: 4,
         });
         expect(parsed!.tempo).toBeCloseTo(90, 0);
+    });
+
+    it("preserves a non-4/4 meter across the round-trip", () => {
+        const parsed = roundTrip({
+            notes: [{ pitch: 60, startMs: 0, durationMs: 500, velocity: 80 }],
+            tempo: 120,
+            beatsPerBar: 3,
+        });
+        expect(parsed!.beatsPerBar).toBe(3);
+    });
+
+    it("falls back to the default tempo on a zero-valued tempo meta", () => {
+        // MThd + one MTrk: delta 0, tempo meta FF 51 03 00 00 00 (zero), a note-on/off
+        // pair, end-of-track. A zero tempo would otherwise drive tempo to Infinity.
+        const bytes = new Uint8Array([
+            0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x01, 0xe0,
+            0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x13,
+            0x00, 0xff, 0x51, 0x03, 0x00, 0x00, 0x00,
+            0x00, 0x90, 0x3c, 0x40,
+            0x60, 0x80, 0x3c, 0x00,
+            0x00, 0xff, 0x2f, 0x00,
+        ]);
+        const parsed = parseMidiFile(bytes);
+        expect(parsed).not.toBeNull();
+        expect(Number.isFinite(parsed!.tempo)).toBe(true);
+        expect(parsed!.tempo).toBe(120);
+        expect(parsed!.notes[0]!.durationMs).toBeGreaterThan(0);
     });
 
     it("returns null for bytes that are not a MIDI file", () => {

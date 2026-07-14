@@ -117,7 +117,13 @@ export function createSongSource(
             kv.remove(PROBE_KEY);
             try {
                 const response = await fetchUrl(SEED_URL);
-                const seed = response.ok ? ((await response.json()) as string[]) : [];
+                // A non-OK response (a 5xx mid-deploy, a captive-portal page) is
+                // transient: latching the flag here would strand the device with an
+                // empty library forever, so leave it unset and retry next load.
+                if (!response.ok) {
+                    return;
+                }
+                const seed = (await response.json()) as string[];
                 for (const id of seed) {
                     if (!favorites.has(id)) {
                         favorites.toggle(id);

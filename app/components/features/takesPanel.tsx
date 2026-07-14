@@ -139,6 +139,7 @@ export function TakesPanel({
                                             downloadBlob(
                                                 buildMidiFile(toMidiNotes(take.composition), {
                                                     tempo: take.composition.tempo,
+                                                    beatsPerBar: take.composition.beatsPerBar,
                                                 }),
                                                 "audio/midi",
                                                 `${takeFileStem(title, take)}.mid`,

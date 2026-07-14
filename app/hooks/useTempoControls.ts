@@ -79,7 +79,10 @@ export function useTempoControls({
     // trainer setting from a ref, so an empty dependency list is correct.
     const bumpTempo = useCallback(() => {
         if (trainerRef.current.on) {
-            setTempo((current) => Math.min(current + 5, trainerRef.current.target));
+            // Ramp up toward the target only; when the slider is already at or above it,
+            // leave the tempo alone rather than snapping it down.
+            const target = trainerRef.current.target;
+            setTempo((current) => (current >= target ? current : Math.min(current + 5, target)));
         }
     }, []);
 

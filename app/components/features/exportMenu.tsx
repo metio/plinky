@@ -44,7 +44,10 @@ export function ExportMenu({
             return;
         }
         downloadBlob(
-            buildMidiFile(toMidiNotes(composition), { tempo: composition.tempo }),
+            buildMidiFile(toMidiNotes(composition), {
+                tempo: composition.tempo,
+                beatsPerBar: composition.beatsPerBar,
+            }),
             "audio/midi",
             `${fileStem(title)}.mid`,
         );

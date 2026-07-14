@@ -109,8 +109,13 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
                     // Running status: this byte is the first data byte, status repeats.
                     reader.pos--;
                     status = runningStatus;
-                } else {
+                } else if (status < 0xf0) {
+                    // Only channel-voice messages carry running status; per the SMF
+                    // spec a System message (meta 0xff, sysex 0xf0/0xf7) cancels it, so
+                    // a following data-first byte isn't misread as a repeat of it.
                     runningStatus = status;
+                } else {
+                    runningStatus = 0;
                 }
                 const type = status & 0xf0;
                 const channel = status & 0x0f;
@@ -120,8 +125,17 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
                     const metaLength = reader.varLen();
                     const data = reader.bytesOf(metaLength);
                     if (metaType === 0x51 && metaLength === 3 && !tempoSeen) {
-                        microsecondsPerQuarter = (data[0]! << 16) | (data[1]! << 8) | data[2]!;
-                        tempoSeen = true;
+                        // A truncated file yields fewer than three bytes, and a zero
+                        // value would drive tempo to Infinity and collapse every note
+                        // to a zero-length onset; keep the default in both cases.
+                        const value =
+                            data.length === 3
+                                ? (data[0]! << 16) | (data[1]! << 8) | data[2]!
+                                : 0;
+                        if (value > 0) {
+                            microsecondsPerQuarter = value;
+                            tempoSeen = true;
+                        }
                     } else if (metaType === 0x58 && metaLength >= 2 && !timeSignatureSeen) {
                         // Numerator, then a power-of-two denominator; a quarter-note beat
                         // means scaling the count to quarters.

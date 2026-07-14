@@ -29,7 +29,10 @@ export function useCompositionExport(composition: Composition, title: string) {
     }, [composition, flashCopied]);
 
     const downloadMidi = useCallback(() => {
-        const data = buildMidiFile(toMidiNotes(composition), { tempo: composition.tempo });
+        const data = buildMidiFile(toMidiNotes(composition), {
+            tempo: composition.tempo,
+            beatsPerBar: composition.beatsPerBar,
+        });
         downloadBlob(data, "audio/midi", `${fileStem(title)}.mid`);
     }, [composition, title]);
 
