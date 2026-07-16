@@ -9,6 +9,7 @@ import { browserStore } from "../adapters/browserStore";
 import { loadBundledScores } from "../lib/catalog";
 import { createAssignmentsStore } from "../stores/assignmentsStore";
 import AssignmentsRoute from "./assignments";
+import { m } from "../paraglide/messages.js";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
 const bundledId = (titleFragment: string): string =>
@@ -93,8 +94,7 @@ describe("AssignmentsRoute", () => {
     it("explains what a save still needs until it is possible", async () => {
         mount();
         openBuilder();
-        const hint = /To save, give the assignment a name/;
-        expect(screen.getByText(hint)).toBeTruthy();
+        expect(screen.getByText(m.assignments_save_hint())).toBeTruthy();
         fireEvent.change(screen.getByLabelText("Assignment name"), {
             target: { value: "My set" },
         });
@@ -103,7 +103,7 @@ describe("AssignmentsRoute", () => {
         });
         fireEvent.click(await screen.findByText("Add"));
         // Name and a piece are both present, so the hint yields to an active Save.
-        expect(screen.queryByText(hint)).toBeNull();
+        expect(screen.queryByText(m.assignments_save_hint())).toBeNull();
         expect(screen.getByText<HTMLButtonElement>("Save").disabled).toBe(false);
     });
 

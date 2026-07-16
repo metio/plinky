@@ -125,7 +125,11 @@ export function RunResult({
                             ? m.daily_share_boast({ number: daily, grade: grade.letter })
                             : m.share_boast({ title })
                     }
-                    heading={daily != null ? `🎹 Plinky ${daily} ${grade.letter}` : title}
+                    heading={
+                        daily != null
+                            ? m.daily_share_boast({ number: daily, grade: grade.letter })
+                            : title
+                    }
                 />
             )}
         </>

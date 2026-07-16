@@ -11,6 +11,7 @@ import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
 import { FIRST_SONG_ID } from "../../lib/catalog";
 import { DiscoveryChecklist } from "./discoveryChecklist";
+import { m } from "../../paraglide/messages.js";
 
 afterEach(() => {
     cleanup();
@@ -38,7 +39,7 @@ describe("DiscoveryChecklist", () => {
         // Empty device → nothing discovered yet → the checklist shows.
         mount();
         expect(await screen.findByText("Getting started")).toBeTruthy();
-        expect(screen.getByRole("link", { name: /Record your own tune/i })).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.discover_compose() })).toBeTruthy();
     });
 
     it("puts settings first, then the first piece to play", async () => {

@@ -5,6 +5,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { UpdateBanner } from "./updateBanner";
+import { m } from "../../paraglide/messages.js";
 
 afterEach(cleanup);
 
@@ -16,7 +17,7 @@ describe("UpdateBanner", () => {
 
     it("announces the new version when one is ready", () => {
         render(<UpdateBanner updateReady={true} onReload={() => {}} />);
-        expect(screen.getByRole("status").textContent).toContain("new version");
+        expect(screen.getByRole("status").textContent).toContain(m.update_available());
     });
 
     it("applies the update on Reload", () => {

@@ -5,6 +5,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LibraryFilters } from "./libraryFilters";
+import { m } from "../../paraglide/messages.js";
 
 const noop = () => {};
 
@@ -62,7 +63,7 @@ describe("LibraryFilters", () => {
     it("announces the favorites toggle state", () => {
         const onToggleFavoritesOnly = vi.fn();
         mount({ favoritesOnly: true, onToggleFavoritesOnly });
-        const chip = screen.getByRole("button", { name: /favorites/i });
+        const chip = screen.getByRole("button", { name: m.scores_filter_favorites() });
         expect(chip.getAttribute("aria-pressed")).toBe("true");
         fireEvent.click(chip);
         expect(onToggleFavoritesOnly).toHaveBeenCalledTimes(1);

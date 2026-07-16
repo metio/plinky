@@ -312,6 +312,11 @@ Plinky speaks 26 languages, and contributions are welcome — see
 [TRANSLATING.md](TRANSLATING.md) for how to add a translation. Untranslated strings
 fall back to English, so every language always works while it catches up.
 
+Plinky talks like a piano teacher who is glad you showed up: it invites rather than
+instructs, and never nags about a missed day. [VOICE.md](VOICE.md) is the contract
+every string keeps — worth a read before writing copy or translating it, since the
+register is part of the string.
+
 ## News banner
 
 The home page can show a small "what's new" picture that links somewhere — a new

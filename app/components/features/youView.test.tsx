@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradeCatalogItem, GradedMastery } from "../../lib/gradeProgress";
 import type { Mastery } from "../../../core/mastery";
 import { YouView } from "./youView";
+import { m } from "../../paraglide/messages.js";
 
 const { masteryMock, catalogueMock } = vi.hoisted(() => ({
     masteryMock: vi.fn<() => Promise<GradedMastery[]>>(),
@@ -62,7 +63,7 @@ describe("YouView", () => {
         // Standing (Grade 1 shows in the headline and the roadmap row) and the
         // retrospective stats merged in from /progress.
         expect(screen.getAllByText("Grade 1").length).toBeGreaterThan(0);
-        expect(screen.getByText("Days practiced")).toBeTruthy();
+        expect(screen.getByText(m.progress_days_practiced())).toBeTruthy();
     });
 
     it("no longer carries the discovery checklist — it lives on the home page now", async () => {

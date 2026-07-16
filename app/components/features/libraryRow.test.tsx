@@ -7,6 +7,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LibraryItem } from "../../../core/library";
 import { LibraryRow } from "./libraryRow";
+import { m } from "../../paraglide/messages.js";
 
 const item = (parts: Partial<LibraryItem> = {}): LibraryItem => ({
     id: "piece-1",
@@ -86,7 +87,7 @@ describe("LibraryRow", () => {
                 <LibraryRow item={item()} {...defaults} onToggleStar={onToggleStar} />
             </ul>,
         );
-        fireEvent.click(screen.getByLabelText("Add to favorites"));
+        fireEvent.click(screen.getByLabelText(m.scores_favorite()));
         expect(onToggleStar).toHaveBeenCalledTimes(1);
     });
 

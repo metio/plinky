@@ -26,7 +26,10 @@ const ON_DEMAND = /webCodecsVideo/;
 // (`PLINKY_LOCALE=en npm run build`), because the deploy ships one tree-shaken
 // bundle per language (dev/build-locales.mjs) — a German visitor never downloads
 // Korean. So this tracks real per-visitor weight, not the summed all-locales output.
-const BUDGET_TOTAL_KB = 564;
+// The UI copy is inlined per locale, so the warmth of the writing has a byte cost:
+// an invitation ("Give it a go, see how it lands") runs longer than the instruction
+// it replaces. 565 buys that voice roughly 1 KB of room over the measured 564.1.
+const BUDGET_TOTAL_KB = 565;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and

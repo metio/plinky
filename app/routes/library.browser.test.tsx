@@ -13,6 +13,7 @@ import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
 
 import AssignmentsRoute from "./assignments";
 import Library from "./library";
+import { m } from "../paraglide/messages.js";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
 const bundledId = (titleFragment: string): string =>
@@ -80,12 +81,12 @@ describe("Library", () => {
     it("stars and unstars a piece", async () => {
         renderLibrary();
         await screen.findByText("Ode to Joy");
-        const star = screen.getAllByLabelText("Add to favorites")[0];
+        const star = screen.getAllByLabelText(m.scores_favorite())[0];
         if (!star) {
             throw new Error("no favorite control");
         }
         fireEvent.click(star);
-        expect(await screen.findByLabelText("Remove from favorites")).toBeTruthy();
+        expect(await screen.findByLabelText(m.scores_unfavorite())).toBeTruthy();
     });
 
     it("removes an imported score only after the delete is confirmed", async () => {

@@ -5,6 +5,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { ActivityStats, YouStanding } from "./youStanding";
+import { m } from "../../paraglide/messages.js";
 
 afterEach(cleanup);
 
@@ -26,7 +27,7 @@ describe("YouStanding", () => {
 describe("ActivityStats", () => {
     it("shows both lifetime tiles", () => {
         render(<ActivityStats daysPracticed={12} totalNotes={3456} />);
-        expect(screen.getByText("Days practiced")).toBeTruthy();
+        expect(screen.getByText(m.progress_days_practiced())).toBeTruthy();
         expect(screen.getByText("12")).toBeTruthy();
         expect(screen.getByText("3456")).toBeTruthy();
     });

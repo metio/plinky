@@ -25,5 +25,8 @@ key must exist in `en.json`.
 - **"Plinky"** unchanged — it's the name, not a word to translate.
 - Placeholders such as `{count}` or `{title}` exactly as written, braces included.
 - Emoji, and any leading or trailing spaces.
-- The tone: short, friendly, and encouraging, like the English source.
+- The tone: warm and inviting, like the English source — [VOICE.md](VOICE.md) spells
+  out what that means, and the register is part of the string. Match the warmth in
+  your language's own idiom rather than transliterating the English; a language whose
+  politeness or particles carry warmth better than punctuation should use those.
 - Music vocabulary in its conventional form for the language.

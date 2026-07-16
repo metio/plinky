@@ -16,7 +16,7 @@ export default meta;
 type Story = StoryObj<typeof ShareButtons>;
 
 const grid: Grid = [["best", "best", "good", "ok", "good", "best"]];
-const boast = "🎹 Plinky 42 A";
+const boast = "Plinky 42 A";
 
 export const Default: Story = {
     args: {
