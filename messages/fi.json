@@ -71,6 +71,7 @@
   "review_shelve": "Siirrä hyllylle",
   "review_end": "Lopeta istunto",
   "review_empty": "Ei mitään kerrattavaa — kaikki on tuoretta!",
+  "review_explore": "Katso, miten kertaus toimii",
   "review_complete_heading": "Kertaus valmis!",
   "review_complete_summary": "{refreshed} kerrattu · {shelved} hyllytetty.",
   "review_back": "Takaisin edistymiseesi",

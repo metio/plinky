@@ -71,6 +71,7 @@
   "review_shelve": "Læg til side",
   "review_end": "Afslut session",
   "review_empty": "Intet at gennemgå — alt er friskt!",
+  "review_explore": "Se, hvordan gennemgang fungerer",
   "review_complete_heading": "Gennemgang fuldført!",
   "review_complete_summary": "{refreshed} genopfrisket · {shelved} lagt til side.",
   "review_back": "Tilbage til dit fremskridt",

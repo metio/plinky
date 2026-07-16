@@ -71,6 +71,7 @@
   "review_shelve": "Shelve",
   "review_end": "End session",
   "review_empty": "Nothing to review — everything's fresh!",
+  "review_explore": "See how review works",
   "review_complete_heading": "Review complete!",
   "review_complete_summary": "{refreshed} refreshed · {shelved} shelved.",
   "review_back": "Back to your progress",

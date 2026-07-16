@@ -56,14 +56,23 @@ export function ReviewSession() {
     const total = queue.length;
     const done = index >= total;
 
+    // Nothing due is the state a new player arrives in, so this doubles as the
+    // feature's explainer: what a review session is, and somewhere to go next.
+    // Landing here early should reward the curiosity, not dead-end it.
     if (total === 0) {
         return (
             <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
                 <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.review_empty()}</p>
-                <Link to="/you" className={BACK}>
-                    {m.review_back()}
-                </Link>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{m.refresh_why()}</p>
+                <div className="flex flex-wrap items-center gap-4">
+                    <Link to="/library" className={BACK}>
+                        {m.today_browse()}
+                    </Link>
+                    <Link to="/you" className={BACK}>
+                        {m.review_back()}
+                    </Link>
+                </div>
             </main>
         );
     }

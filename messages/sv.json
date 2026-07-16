@@ -71,6 +71,7 @@
   "review_shelve": "Lägg undan",
   "review_end": "Avsluta passet",
   "review_empty": "Inget att repetera — allt är färskt!",
+  "review_explore": "Se hur repetition fungerar",
   "review_complete_heading": "Repetitionen klar!",
   "review_complete_summary": "{refreshed} uppfräschade · {shelved} undanlagda.",
   "review_back": "Tillbaka till dina framsteg",

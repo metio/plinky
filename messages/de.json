@@ -71,6 +71,7 @@
   "review_shelve": "Zurückstellen",
   "review_end": "Sitzung beenden",
   "review_empty": "Nichts zu wiederholen – alles frisch!",
+  "review_explore": "So funktioniert die Wiederholung",
   "review_complete_heading": "Wiederholung abgeschlossen!",
   "review_complete_summary": "{refreshed} aufgefrischt · {shelved} zurückgestellt.",
   "review_back": "Zurück zu deinem Fortschritt",

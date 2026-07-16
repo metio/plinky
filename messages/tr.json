@@ -71,6 +71,7 @@
   "review_shelve": "Rafa kaldır",
   "review_end": "Seansı bitir",
   "review_empty": "Tekrar edilecek bir şey yok — her şey taze!",
+  "review_explore": "Tekrarın nasıl çalıştığını gör",
   "review_complete_heading": "Tekrar tamamlandı!",
   "review_complete_summary": "{refreshed} tazelendi · {shelved} rafa kaldırıldı.",
   "review_back": "İlerlemene dön",

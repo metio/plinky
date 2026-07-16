@@ -71,6 +71,7 @@
   "review_shelve": "보류",
   "review_end": "세션 종료",
   "review_empty": "복습할 것이 없어요 — 모두 생생해요!",
+  "review_explore": "복습이 어떻게 이루어지는지 보기",
   "review_complete_heading": "복습 완료!",
   "review_complete_summary": "{refreshed}개 복습 · {shelved}개 보류.",
   "review_back": "내 진행 상황으로 돌아가기",

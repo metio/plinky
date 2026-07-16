@@ -71,6 +71,7 @@
   "review_shelve": "Félretétel",
   "review_end": "Gyakorlás befejezése",
   "review_empty": "Nincs mit ismételni — minden friss!",
+  "review_explore": "Nézd meg, hogyan működik az ismétlés",
   "review_complete_heading": "Ismétlés kész!",
   "review_complete_summary": "{refreshed} felfrissítve · {shelved} félretéve.",
   "review_back": "Vissza a haladásodhoz",

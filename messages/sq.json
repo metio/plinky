@@ -71,6 +71,7 @@
   "review_shelve": "Vëre në raft",
   "review_end": "Përfundo seancën",
   "review_empty": "Asgjë për të përsëritur — gjithçka është e freskët!",
+  "review_explore": "Shiko si funksionon përsëritja",
   "review_complete_heading": "Përsëritja mbaroi!",
   "review_complete_summary": "{refreshed} të freskuara · {shelved} në raft.",
   "review_back": "Kthehu te përparimi yt",

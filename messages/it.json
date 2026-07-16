@@ -71,6 +71,7 @@
   "review_shelve": "Metti da parte",
   "review_end": "Termina sessione",
   "review_empty": "Niente da ripassare — è tutto fresco!",
+  "review_explore": "Scopri come funziona il ripasso",
   "review_complete_heading": "Ripasso completato!",
   "review_complete_summary": "{refreshed} rinfrescati · {shelved} messi da parte.",
   "review_back": "Torna ai tuoi progressi",

@@ -71,6 +71,7 @@
   "review_shelve": "棚上げ",
   "review_end": "セッションを終了",
   "review_empty": "復習するものはありません — すべて新鮮です！",
+  "review_explore": "復習の仕組みを見てみる",
   "review_complete_heading": "復習完了！",
   "review_complete_summary": "{refreshed} 曲を更新 · {shelved} 曲を棚上げ。",
   "review_back": "進捗に戻る",

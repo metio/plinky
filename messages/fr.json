@@ -71,6 +71,7 @@
   "review_shelve": "Mettre de côté",
   "review_end": "Terminer la séance",
   "review_empty": "Rien à réviser — tout est à jour !",
+  "review_explore": "Découvrez comment fonctionne la révision",
   "review_complete_heading": "Révision terminée !",
   "review_complete_summary": "{refreshed} rafraîchis · {shelved} mis de côté.",
   "review_back": "Retour à votre progression",

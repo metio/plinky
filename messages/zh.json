@@ -71,6 +71,7 @@
   "review_shelve": "暂时搁置",
   "review_end": "结束本次复习",
   "review_empty": "没有需要复习的——全都熟练！",
+  "review_explore": "看看复习是怎么运作的",
   "review_complete_heading": "复习完成！",
   "review_complete_summary": "{refreshed} 首已巩固 · {shelved} 首已搁置。",
   "review_back": "返回你的进度",

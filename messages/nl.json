@@ -71,6 +71,7 @@
   "review_shelve": "Opzijleggen",
   "review_end": "Sessie beëindigen",
   "review_empty": "Niets te herhalen — alles is fris!",
+  "review_explore": "Bekijk hoe herhaling werkt",
   "review_complete_heading": "Herhaling voltooid!",
   "review_complete_summary": "{refreshed} opgefrist · {shelved} opzijgelegd.",
   "review_back": "Terug naar je voortgang",

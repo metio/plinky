@@ -71,6 +71,7 @@
   "review_shelve": "Arquivar",
   "review_end": "Encerrar sessão",
   "review_empty": "Nada para revisar — está tudo em dia!",
+  "review_explore": "Vê como funciona a revisão",
   "review_complete_heading": "Revisão concluída!",
   "review_complete_summary": "{refreshed} revisadas · {shelved} arquivadas.",
   "review_back": "Voltar ao teu progresso",

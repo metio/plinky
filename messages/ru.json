@@ -71,6 +71,7 @@
   "review_shelve": "Отложить",
   "review_end": "Завершить сеанс",
   "review_empty": "Нечего повторять — всё свежо!",
+  "review_explore": "Посмотреть, как работает повторение",
   "review_complete_heading": "Повторение завершено!",
   "review_complete_summary": "Повторено: {refreshed} · Отложено: {shelved}.",
   "review_back": "Назад к прогрессу",

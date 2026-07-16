@@ -71,6 +71,7 @@
   "review_shelve": "Odložit",
   "review_end": "Ukončit kolo",
   "review_empty": "Není co opakovat — vše je čerstvé!",
+  "review_explore": "Podívejte se, jak funguje opakování",
   "review_complete_heading": "Opakování dokončeno!",
   "review_complete_summary": "{refreshed} oživeno · {shelved} odloženo.",
   "review_back": "Zpět na váš pokrok",

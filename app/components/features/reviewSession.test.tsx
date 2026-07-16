@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GradedMastery } from "../../lib/gradeProgress";
 import type { Mastery } from "../../../core/mastery";
 
+import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { ReviewSession } from "./reviewSession";
 
@@ -102,6 +103,18 @@ describe("ReviewSession", () => {
     it("says so when nothing is due", async () => {
         masteryMock.mockResolvedValue([]);
         renderSession();
-        expect(await screen.findByText(/nothing to review/i)).toBeTruthy();
+        expect(await screen.findByText(m.review_empty())).toBeTruthy();
+    });
+
+    it("explains what review is for and offers somewhere to go, rather than dead-ending", async () => {
+        masteryMock.mockResolvedValue([]);
+        renderSession();
+        // Arriving with nothing due is how a new player meets this feature, so the
+        // page has to teach it rather than just report an absence.
+        expect(await screen.findByText(m.refresh_why())).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.today_browse() }).getAttribute("href")).toContain(
+            "/library",
+        );
+        expect(screen.getByRole("link", { name: m.review_back() })).toBeTruthy();
     });
 });

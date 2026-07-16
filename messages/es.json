@@ -71,6 +71,7 @@
   "review_shelve": "Aparcar",
   "review_end": "Terminar sesión",
   "review_empty": "Nada que repasar: ¡todo está al día!",
+  "review_explore": "Descubre cómo funciona el repaso",
   "review_complete_heading": "¡Repaso completado!",
   "review_complete_summary": "{refreshed} repasadas · {shelved} aparcadas.",
   "review_back": "Volver a tu progreso",

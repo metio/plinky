@@ -71,6 +71,7 @@
   "review_shelve": "Одложи",
   "review_end": "Заврши сесију",
   "review_empty": "Нема шта да се понавља — све је свеже!",
+  "review_explore": "Погледај како функционише понављање",
   "review_complete_heading": "Понављање завршено!",
   "review_complete_summary": "{refreshed} освежено · {shelved} одложено.",
   "review_back": "Назад на твој напредак",
