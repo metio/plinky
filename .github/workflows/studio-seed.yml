@@ -1,6 +1,11 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
 name: Seed Studio Content
+# Imports the help-page text and alt (seed/help.ndjson, every locale) into Sanity.
+# The import replaces each block wholesale, so the pictures — which live only in
+# Sanity, uploaded as assets — are dropped: run "Help Screenshots" afterwards to
+# shoot and re-attach them. That run reads its alt text back out of the same seed
+# file, so the translations survive it.
 on:
   workflow_dispatch:
 permissions:

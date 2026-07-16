@@ -4,15 +4,22 @@
 // Illustrates the help page with real screenshots: serves the built site, drives
 // Chromium to each app section, screenshots it, uploads each picture as a Sanity
 // image asset, and patches the section's seeded help block (`help-<key>-intro`)
-// to carry it (plus English alt text). Requires a token with the Editor role in
-// SANITY_AUTH_TOKEN; project and dataset come from SANITY_STUDIO_PROJECT_ID /
-// SANITY_STUDIO_DATASET. Rerunning replaces the pictures — the text is untouched.
+// to carry it, alongside the alt text in every locale. Requires a token with the
+// Editor role in SANITY_AUTH_TOKEN; project and dataset come from
+// SANITY_STUDIO_PROJECT_ID / SANITY_STUDIO_DATASET. Rerunning replaces the
+// pictures — the body text is untouched.
+//
+// The alt text is read from seed/help.ndjson rather than kept here, so the seed
+// stays the one source of truth for every translated string on the help page: a
+// patch that carried its own English-only alt would silently drop 25 locales'
+// translations each time this runs.
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { chromium } from "playwright";
 
 const ROOT = "build/client";
+const SEED_PATH = "studio/seed/help.ndjson";
 const PORT = Number(process.env.PORT) || 8098;
 
 const PROJECT = process.env.SANITY_STUDIO_PROJECT_ID;
@@ -31,69 +38,69 @@ const playId = readdirSync(join(ROOT, "en", "play"), { withFileTypes: true }).fi
     entry.isDirectory(),
 )?.name;
 
-// One screenshot per help section: the page it explains, and the alt text the
-// picture carries. `selector` waits for the page's real content before shooting;
-// the play page is ready once the score's SVG exists.
+// The seeded help blocks, by section key — the source of the alt text this
+// script patches back alongside each picture.
+const SEED = new Map(
+    readFileSync(SEED_PATH, "utf8")
+        .split("\n")
+        .filter((line) => line.trim())
+        .map((line) => JSON.parse(line))
+        .map((doc) => [doc._id.replace(/^help-|-intro$/g, ""), doc]),
+);
+
+// One screenshot per help section: the page it explains. `selector` waits for the
+// page's real content before shooting; the play page is ready once the score's
+// SVG exists. Alt text comes from the seed, in every locale.
 const SECTIONS = [
     {
         key: "gettingStarted",
         path: "/en/",
         selector: "main",
-        alt: "The Plinky home page with the playable keyboard and the getting-started checklist",
     },
     {
         key: "home",
         path: "/en/",
         selector: "main",
-        alt: "The Plinky home page",
     },
     {
         key: "play",
         path: `/en/play/${playId}`,
         selector: "svg",
-        alt: "The play page showing a piece's score above the on-screen keyboard",
     },
     {
         key: "library",
         path: "/en/library",
         selector: "main",
-        alt: "The library listing pieces with kind and grade filters",
     },
     {
         key: "daily",
         path: "/en/daily",
         selector: "main",
-        alt: "The daily challenge page",
     },
     {
         key: "compose",
         path: "/en/compose",
         selector: "main",
-        alt: "The compose page, ready to record playing into notation",
     },
     {
         key: "assignments",
         path: "/en/assignments",
         selector: "main",
-        alt: "The assignments page with its list and builder tabs",
     },
     {
         key: "you",
         path: "/en/you",
         selector: "main",
-        alt: "The You page with grades and practice stats",
     },
     {
         key: "review",
         path: "/en/review",
         selector: "main",
-        alt: "The review session page",
     },
     {
         key: "settings",
         path: "/en/settings",
         selector: "main",
-        alt: "The settings page with keyboard, MIDI, and appearance options",
     },
 ];
 
@@ -141,7 +148,13 @@ async function uploadImage(png, filename) {
     return (await response.json()).document._id;
 }
 
-async function patchBlock(key, assetId, alt) {
+async function patchBlock(key, assetId) {
+    const alt = SEED.get(key)?.alt;
+    if (!alt) {
+        throw new Error(
+            `no seeded help block for ${key} — is studio/seed/help.ndjson in step with SECTIONS?`,
+        );
+    }
     const response = await fetch(`${api}/data/mutate/${DATASET}`, {
         method: "POST",
         headers: { authorization: `Bearer ${TOKEN}`, "content-type": "application/json" },
@@ -155,7 +168,7 @@ async function patchBlock(key, assetId, alt) {
                                 _type: "image",
                                 asset: { _type: "reference", _ref: assetId },
                             },
-                            alt: [{ _key: "en", _type: "localizedValue", value: alt }],
+                            alt,
                         },
                     },
                 },
@@ -190,7 +203,7 @@ for (const section of SECTIONS) {
             continue;
         }
         const assetId = await uploadImage(png, `help-${section.key}.png`);
-        await patchBlock(section.key, assetId, section.alt);
+        await patchBlock(section.key, assetId);
         console.log(`${section.key}: uploaded + patched (${assetId})`);
     } catch (error) {
         failed = true;
