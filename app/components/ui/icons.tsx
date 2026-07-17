@@ -294,6 +294,17 @@ export function HomeIcon({ className }: IconProps) {
 }
 
 // A book — "the library".
+// An ear: the outer helix sweeping down to the lobe, with the inner curl. Ear training
+// is the one place in Plinky where looking at the screen won't help you.
+export function EarIcon({ className }: IconProps) {
+    return (
+        <Icon className={className}>
+            <path d="M7 9a5 5 0 0 1 10 0c0 2.5-2 3.6-3.2 4.7-.9.8-1.3 1.5-1.3 2.6a2.5 2.5 0 0 1-5 0" />
+            <path d="M10.4 9.6a1.8 1.8 0 0 1 3.4.4c0 1-.7 1.5-1.3 2" />
+        </Icon>
+    );
+}
+
 export function BookIcon({ className }: IconProps) {
     return (
         <Icon className={className}>

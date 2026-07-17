@@ -142,10 +142,18 @@ one-tap **review session** walks you through everything that's fading, and you c
   a staff to share or export (see below). **Count in** works like a play page's
   Practice: it drops into **full screen**, and only there do the on-screen keys
   appear — with the same quick controls as play to relabel or fold them away.
+- **Ear training** — a page of its own at `/ear`, for the days you're nowhere near a
+  piano. **Intervals** plays two notes and you name the distance between them on a
+  ladder whose rungs sit at the distance they name, so the answer has a height as well
+  as a word; the levels start on fifths and octaves and fill the ladder in as you go.
+  **Perfect pitch** plays one note and you name it on a keyboard. Every round can be
+  replayed as often as you like, and a miss shows what played rather than marking you
+  down.
 - **Two tabs per piece** — **Play** holds the score and everything you do with it:
-  reading, listening, practising, ear training (the **Hidden notes** toggle) and the
-  **fingering editor** in full screen (see above), so the drills happen on the real
-  music instead of in separate tabs. **Runs** keeps your saved performances.
+  reading, listening, practising, playing by ear (the **Hidden notes** toggle, which
+  blanks the noteheads and reveals each one as you find it) and the **fingering
+  editor** in full screen (see above), so the drills happen on the real music instead
+  of in separate tabs. **Runs** keeps your saved performances.
 - **Your runs** — every play page has a **Runs** tab (and a button beside Practice
   that jumps to it) giving your saved performances the whole page, so the feature is
   there to find before you've saved a thing: with nothing yet, it tells you how to make a run (play a piece through, then save

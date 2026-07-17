@@ -29,12 +29,11 @@ function renderHome() {
 describe("Home", () => {
     it("offers the destination cards, and not the daily (it lives in the Today panel)", () => {
         renderHome();
-        for (const label of ["Library →", "Assignments →", "Compose →"]) {
+        for (const label of ["Library →", "Assignments →", "Compose →", "Ear training →"]) {
             expect(screen.getByText(label)).toBeTruthy();
         }
-        // The daily is in the Today panel; ear/fingering are now modes on /play.
+        // The daily is in the Today panel, so it is deliberately not a card of its own.
         expect(screen.queryByText("Daily challenge →")).toBeNull();
-        expect(screen.queryByText("Ear training →")).toBeNull();
     });
 
     it("plinks a rising note on mouse hover over the feature cards, but not on touch", () => {

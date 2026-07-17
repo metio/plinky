@@ -12,6 +12,7 @@ const BASE_PATHS = [
     "/",
     "/compose",
     "/daily",
+    "/ear",
     "/library",
     "/assignments",
     "/you",
