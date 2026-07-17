@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { describe, expect, it } from "vitest";
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import { beforeAll, describe, expect, it } from "vitest";
 import { LEAD_IN_MS } from "../../core/videoFrames";
-import { takeScenePainter } from "./videoPainter";
+import { FONT_FAMILY, takeScenePainter } from "./videoPainter";
 
 const WIDTH = 640;
 const HEIGHT = 360;
@@ -48,6 +49,32 @@ function countAccentPixels(context: OffscreenCanvasRenderingContext2D, tolerance
     }
     return count;
 }
+
+// The exporter paints into a canvas owned by the running app, where the app's
+// face is already registered; a bare test document has no faces at all, so
+// register the same one the app ships to reproduce those conditions.
+describe("the burnt-in text", () => {
+    beforeAll(async () => {
+        const face = new FontFace("Inter Variable", `url(${interLatin})`);
+        await face.load();
+        document.fonts.add(face);
+    });
+
+    // A canvas silently falls through to the next family when the one it names
+    // is not registered, which would tie exported text to whatever the
+    // recording machine has installed. Measuring is how that shows: if the
+    // painter's family resolves, its metrics differ from the bare fallback.
+    it("draws in the app's own face rather than falling back to the system one", () => {
+        const context = new OffscreenCanvas(WIDTH, HEIGHT).getContext("2d")!;
+        const measure = (family: string) => {
+            context.font = `500 40px ${family}`;
+            return context.measureText("plinky.fun").width;
+        };
+
+        expect(document.fonts.check(`500 40px "Inter Variable"`)).toBe(true);
+        expect(measure(FONT_FAMILY)).not.toBeCloseTo(measure("system-ui, sans-serif"), 1);
+    });
+});
 
 describe("takeScenePainter", () => {
     it("lights a key while its note sounds and rests it after", () => {

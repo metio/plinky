@@ -38,8 +38,21 @@ const BACKGROUND = "#0b0f1a";
 const INK = "#f9fafb";
 const MUTED = "#9ca3af";
 const ACCENT = "#6366f1";
+
 const WHITE_KEY = "#f3f4f6";
 const BLACK_KEY = "#111827";
+
+// The exact family the app registers (see the fontsource import in root.tsx and
+// --font-sans in app.css). A canvas resolves font strings against the loaded
+// faces only — a family name nothing registered silently falls through to the
+// next entry, which would tie an exported video's text to whatever the
+// recording machine happened to install.
+export const FONT_FAMILY = '"Inter Variable", system-ui, sans-serif';
+
+// A canvas font string at `unit`-relative size, so text scales with the frame.
+function fontAt(weight: number, scale: number, unit: number): string {
+    return `${weight} ${Math.round(unit * scale)}px ${FONT_FAMILY}`;
+}
 
 // The pre-rendered notation the frame can carry: the score rasterized once,
 // plus each step's notehead boxes on it (in image pixels, playing order).
@@ -159,13 +172,13 @@ export function takeScenePainter({
         // The wordmark measures first so the title knows where it must stop —
         // on a narrow portrait frame a long title would otherwise run under it.
         // With the wordmark off, the title reclaims that room.
-        context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
+        context.font = fontAt(500, 0.035, unit);
         const wordmarkWidth = showWordmark ? context.measureText("plinky.fun").width : 0;
         if (showTitle) {
             context.textAlign = "left";
             context.textBaseline = "top";
             context.fillStyle = INK;
-            context.font = `600 ${Math.round(unit * 0.06)}px Inter, system-ui, sans-serif`;
+            context.font = fontAt(600, 0.06, unit);
             const titleRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
             context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
         }
@@ -173,7 +186,7 @@ export function takeScenePainter({
             context.textAlign = "right";
             context.textBaseline = "top";
             context.fillStyle = MUTED;
-            context.font = `500 ${Math.round(unit * 0.035)}px Inter, system-ui, sans-serif`;
+            context.font = fontAt(500, 0.035, unit);
             context.fillText("plinky.fun", width - margin, height * 0.09);
         }
 
@@ -221,7 +234,7 @@ export function takeScenePainter({
         context.textAlign = "left";
         context.textBaseline = "alphabetic";
         context.fillStyle = MUTED;
-        context.font = `400 ${Math.round(unit * 0.032)}px Inter, system-ui, sans-serif`;
+        context.font = fontAt(400, 0.032, unit);
         context.fillText(credit, margin, height * 0.95);
     }
 

@@ -22,6 +22,11 @@ const EMOJI_STORIES = new Set([
     "discoveryChecklist.stories.tsx > Partly Done",
 ]);
 
+// Resolves once the browser has painted pending style and layout work: the
+// first frame runs after the next paint, the second confirms it is on screen.
+const painted = () =>
+    new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
 // Every story doubles as a visual regression test in both themes: after it
 // renders (and any play function has run), the rendered document is compared
 // against a committed per-story baseline, then the `.dark` class — the same
@@ -42,13 +47,23 @@ afterEach(async (ctx) => {
     await document.fonts.load("400 16px 'Inter Variable'");
     await document.fonts.load("600 16px 'Inter Variable'");
     await document.fonts.ready;
-    // The capture is retried until two consecutive frames match; a loaded
-    // CI runner can still be painting well past the 5s default.
+    // fonts.ready resolves when the face has *loaded*, not when the text has
+    // been laid out and painted with it. Wait for the swap to reach the screen:
+    // the first capture then matches the baseline outright, which is what keeps
+    // a story to a single screenshot round-trip. A capture that misses the swap
+    // disagrees with the baseline and forces the comparator into repeated
+    // frame-to-frame retries — on a busy machine those retries, not the
+    // painting, are what exhaust the timeout.
+    await painted();
+    // Headroom for the retries a genuinely slow render still needs.
     const options = { timeout: 15_000 };
     const body = page.elementLocator(document.body);
     try {
         await expect(body).toMatchScreenshot(options);
         document.documentElement.classList.add("dark");
+        // The theme flip restyles the whole tree; the same first-capture rule
+        // applies, so let it reach the screen before comparing.
+        await painted();
         await expect(body).toMatchScreenshot(`${ctx.task.name}-dark`, options);
     } finally {
         document.documentElement.classList.remove("dark");
