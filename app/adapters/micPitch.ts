@@ -14,6 +14,15 @@ import type { PitchInput, PitchStartResult } from "../ports/pitchInput";
 // correlate, short enough that detection tracks live playing.
 const FFT_SIZE = 2048;
 
+// Why the mic never opened, in the two words the caller acts on. A refusal is
+// the player's own choice and the UI asks again on the next attempt; everything
+// else — no device, a device already held, a context that can't capture — is an
+// error the UI reports. Only NotAllowedError means the player said no; a bare
+// failure carries no such promise, so it degrades to "error".
+export function classifyMicError(error: unknown): Extract<PitchStartResult, "denied" | "error"> {
+    return error instanceof DOMException && error.name === "NotAllowedError" ? "denied" : "error";
+}
+
 export function micPitch(): PitchInput {
     let stream: MediaStream | null = null;
     let context: AudioContext | null = null;
@@ -54,9 +63,7 @@ export function micPitch(): PitchInput {
                     },
                 });
             } catch (error) {
-                return error instanceof DOMException && error.name === "NotAllowedError"
-                    ? "denied"
-                    : "error";
+                return classifyMicError(error);
             }
 
             try {
