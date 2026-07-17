@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { IntervalId } from "../../core/theory";
+import { type IntervalId, intervalIdOf, SEMITONES_PER_OCTAVE } from "../../core/theory";
 import { m } from "../paraglide/messages.js";
 
 // core/theory names things with identifiers so it can stay pure and language-neutral.
@@ -27,4 +27,23 @@ export const INTERVAL_NAMES: Record<IntervalId, () => string> = {
 
 export function intervalName(interval: IntervalId): string {
     return INTERVAL_NAMES[interval]();
+}
+
+// Names a literal distance in semitones — a measured hand reach, not an interval heard
+// in a quiz — so unlike intervalIdOf it must NOT fold a compound down to its simple
+// form: a hand that spans a tenth reaches a tenth, not a third. Within an octave it is
+// the plain interval name; wider, it composes the already-translated octave word with
+// the simple remainder ("Octave + Major third"), so no locale needs a new string and
+// the "+" sidesteps every language's grammar for joining the two. Beyond two octaves
+// the number carries it — a reach that large is only a stray MIDI value — so the gloss
+// is dropped and the caller's semitone count stands alone.
+export function spanName(semitones: number): string | null {
+    const size = Math.abs(Math.round(semitones));
+    if (size <= SEMITONES_PER_OCTAVE) {
+        return intervalName(intervalIdOf(size));
+    }
+    if (size < SEMITONES_PER_OCTAVE * 2) {
+        return `${INTERVAL_NAMES.octave()} + ${intervalName(intervalIdOf(size))}`;
+    }
+    return null;
 }
