@@ -28,8 +28,12 @@ const ON_DEMAND = /webCodecsVideo/;
 // Korean. So this tracks real per-visitor weight, not the summed all-locales output.
 // The UI copy is inlined per locale, so the warmth of the writing has a byte cost:
 // an invitation ("Give it a go, see how it lands") runs longer than the instruction
-// it replaces. 565 buys that voice roughly 1 KB of room over the measured 564.1.
-const BUDGET_TOTAL_KB = 565;
+// it replaces. 565 bought that voice roughly 1 KB of room over the measured 564.1.
+//
+// The /ear page — the pure theory vocabulary and question generators, the interval
+// ladder and answer keyboard, the listening stage, and 39 strings inlined per locale
+// — adds ~4.5 KB, measured at 569.5. 570 keeps the same roughly-1-KB margin.
+const BUDGET_TOTAL_KB = 570;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -73,7 +77,11 @@ const BUDGET_TOTAL_KB = 565;
 // why pieces resurface, the link into the session, and the explainer the session shows
 // in place of a dead end — adds ~0.5 KB. A feature nobody can find is cheaper still,
 // which is not an argument for keeping it that way.
-const BUDGET_APP_KB = 255;
+//
+// Ear training as a page of its own — a second way to practise that needs no piano,
+// so it carries its own route, two answer surfaces and its share of the copy — adds
+// ~4.4 KB of app code, measured at 259.4.
+const BUDGET_APP_KB = 260;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
