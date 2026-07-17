@@ -127,6 +127,28 @@ export function clampVolume(value: number): number {
     return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+// The three field coercions every stored preference is built from. Each one owns the
+// single decision "is this stored value usable, or does the default stand?", so a new
+// preference reuses a tested branch instead of adding its own.
+
+// Reads a stored boolean; anything else (absent, wrong type, truthy string) defaults.
+function bool(value: unknown, fallback: boolean): boolean {
+    return typeof value === "boolean" ? value : fallback;
+}
+
+// Reads a stored value constrained to a closed set of choices. The set is the
+// authority: a value outside it — a retired choice, a hand-edited store — defaults.
+function oneOf<T>(value: unknown, allowed: readonly T[], fallback: T): T {
+    return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+// Reads a stored number onto a continuous range, rounding and clamping into band.
+// A non-finite value has no sensible place on the range, so it defaults rather than
+// clamping to an edge.
+function num(value: unknown, clamp: (value: number) => number, fallback: number): number {
+    return typeof value === "number" && Number.isFinite(value) ? clamp(value) : fallback;
+}
+
 // A reach below a fifth or beyond two octaves is taken as bad data and dropped to
 // null, so a corrupt store can't feed nonsense into the fingering model.
 function cleanSpan(value: unknown): number | null {
@@ -214,53 +236,34 @@ export function parsePrefs(raw: string | null): Prefs {
     try {
         const parsed = JSON.parse(raw ?? "{}");
         return {
-            sound: typeof parsed.sound === "boolean" ? parsed.sound : base.sound,
-            volume: typeof parsed.volume === "number" ? clampVolume(parsed.volume) : base.volume,
-            masteryThreshold: LETTERS.includes(parsed.masteryThreshold)
-                ? parsed.masteryThreshold
-                : base.masteryThreshold,
+            sound: bool(parsed.sound, base.sound),
+            volume: num(parsed.volume, clampVolume, base.volume),
+            masteryThreshold: oneOf(parsed.masteryThreshold, LETTERS, base.masteryThreshold),
             handSpan: cleanHandSpan(parsed.handSpan),
-            showFingerings:
-                typeof parsed.showFingerings === "boolean"
-                    ? parsed.showFingerings
-                    : base.showFingerings,
-            beams: BEAMS.includes(parsed.beams) ? parsed.beams : base.beams,
-            colorNotes:
-                typeof parsed.colorNotes === "boolean" ? parsed.colorNotes : base.colorNotes,
-            noteHints: NOTE_HINTS.includes(parsed.noteHints) ? parsed.noteHints : base.noteHints,
-            noteLabels: NOTE_LABELS.includes(parsed.noteLabels)
-                ? parsed.noteLabels
-                : base.noteLabels,
-            forgiving: typeof parsed.forgiving === "boolean" ? parsed.forgiving : base.forgiving,
-            fingerHints:
-                typeof parsed.fingerHints === "boolean" ? parsed.fingerHints : base.fingerHints,
-            decayMode: DECAY_MODES.includes(parsed.decayMode) ? parsed.decayMode : base.decayMode,
-            reviewCap: REVIEW_CAPS.includes(parsed.reviewCap) ? parsed.reviewCap : base.reviewCap,
-            barsPerRow: BARS_PER_ROW.includes(parsed.barsPerRow)
-                ? parsed.barsPerRow
-                : base.barsPerRow,
-            noteScale: NOTE_SCALES.includes(parsed.noteScale) ? parsed.noteScale : base.noteScale,
-            barNumbers:
-                typeof parsed.barNumbers === "boolean" ? parsed.barNumbers : base.barNumbers,
+            showFingerings: bool(parsed.showFingerings, base.showFingerings),
+            beams: oneOf(parsed.beams, BEAMS, base.beams),
+            colorNotes: bool(parsed.colorNotes, base.colorNotes),
+            noteHints: oneOf(parsed.noteHints, NOTE_HINTS, base.noteHints),
+            noteLabels: oneOf(parsed.noteLabels, NOTE_LABELS, base.noteLabels),
+            forgiving: bool(parsed.forgiving, base.forgiving),
+            fingerHints: bool(parsed.fingerHints, base.fingerHints),
+            decayMode: oneOf(parsed.decayMode, DECAY_MODES, base.decayMode),
+            reviewCap: oneOf(parsed.reviewCap, REVIEW_CAPS, base.reviewCap),
+            barsPerRow: oneOf(parsed.barsPerRow, BARS_PER_ROW, base.barsPerRow),
+            noteScale: oneOf(parsed.noteScale, NOTE_SCALES, base.noteScale),
+            barNumbers: bool(parsed.barNumbers, base.barNumbers),
             keyMap: cleanKeyMap(parsed.keyMap),
-            metronomeSubdivision: METRONOME_SUBDIVISIONS.includes(parsed.metronomeSubdivision)
-                ? parsed.metronomeSubdivision
-                : base.metronomeSubdivision,
-            metronomeAccent:
-                typeof parsed.metronomeAccent === "boolean"
-                    ? parsed.metronomeAccent
-                    : base.metronomeAccent,
-            metronomeAdaptive:
-                typeof parsed.metronomeAdaptive === "boolean"
-                    ? parsed.metronomeAdaptive
-                    : base.metronomeAdaptive,
-            treadmill: typeof parsed.treadmill === "boolean" ? parsed.treadmill : base.treadmill,
-            raceGhost: typeof parsed.raceGhost === "boolean" ? parsed.raceGhost : base.raceGhost,
-            hiddenNotes:
-                typeof parsed.hiddenNotes === "boolean" ? parsed.hiddenNotes : base.hiddenNotes,
-            revealTries: REVEAL_TRIES.includes(parsed.revealTries)
-                ? parsed.revealTries
-                : base.revealTries,
+            metronomeSubdivision: oneOf(
+                parsed.metronomeSubdivision,
+                METRONOME_SUBDIVISIONS,
+                base.metronomeSubdivision,
+            ),
+            metronomeAccent: bool(parsed.metronomeAccent, base.metronomeAccent),
+            metronomeAdaptive: bool(parsed.metronomeAdaptive, base.metronomeAdaptive),
+            treadmill: bool(parsed.treadmill, base.treadmill),
+            raceGhost: bool(parsed.raceGhost, base.raceGhost),
+            hiddenNotes: bool(parsed.hiddenNotes, base.hiddenNotes),
+            revealTries: oneOf(parsed.revealTries, REVEAL_TRIES, base.revealTries),
             micCalibration: cleanCalibration(parsed.micCalibration),
         };
     } catch {
