@@ -46,6 +46,9 @@ export default defineConfig({
             // runtime modules for the instrumenter to parse.
             exclude: ["app/paraglide/**", "**/*.d.ts"],
             reporter: ["text", "html", "lcov"],
+            // A failing test would otherwise discard the whole run's coverage,
+            // so one flake costs a four-minute measurement and reports nothing.
+            reportOnFailure: true,
             // Ratchet: CI fails if any metric drops below these. Raise them as
             // coverage grows; never lower them merely to make a red build pass.
             // Baselined ~4 points under the measured node+browser numbers
