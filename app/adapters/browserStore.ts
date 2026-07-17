@@ -19,47 +19,69 @@ function guarded<T>(run: (store: Storage) => T, fallback: T): T {
     }
 }
 
-// One latch for "this device is not persisting writes": flips on the first
-// refused write (quota exceeded, storage denied) and stays on. The layout's
-// storage banner subscribes to it, so a failure anywhere surfaces once instead
-// of every save site growing its own warning. Individual callers still get the
-// boolean verdict per write; this is the aggregate signal.
-let writeFailed = false;
-const healthEmitter = createEmitter();
-
-export const storageHealth = {
-    failed: (): boolean => writeFailed,
-    subscribe: healthEmitter.subscribe,
+// The aggregate "is this device persisting writes?" signal the storage banner
+// subscribes to. failed() latches: a device that refused one write has told us
+// what we need to know, and un-latching would flicker the banner off the moment
+// an unrelated write happened to land.
+export type BrowserStorageHealth = {
+    failed(): boolean;
+    subscribe(listener: () => void): () => void;
 };
 
-function markWriteFailed(): void {
-    if (writeFailed) {
-        return;
-    }
-    writeFailed = true;
-    healthEmitter.notify();
+// A store and the health latch fed by its own writes — one pair, created
+// together, because the latch is only meaningful for the writes it observed.
+// Each call yields an independent pair; the app instantiates exactly one below.
+export function createBrowserStore(): { store: KeyValueStore; health: BrowserStorageHealth } {
+    // Flips on the first refused write (quota exceeded, storage denied) and
+    // stays on, so a failure anywhere surfaces once instead of every save site
+    // growing its own warning. Individual callers still get the boolean verdict
+    // per write; this is the aggregate signal.
+    let writeFailed = false;
+    const healthEmitter = createEmitter();
+
+    const markWriteFailed = (): void => {
+        if (writeFailed) {
+            return;
+        }
+        writeFailed = true;
+        healthEmitter.notify();
+    };
+
+    // A refused write is a signal, not a circuit breaker: every operation keeps
+    // attempting the real storage afterwards, because the condition that
+    // refused it (a full quota, a denied context) can lift.
+    const store: KeyValueStore = {
+        get: (key) => guarded((backing) => backing.getItem(key), null),
+        set: (key, value) => {
+            const stored = guarded((backing) => {
+                backing.setItem(key, value);
+                return true;
+            }, false);
+            if (!stored) {
+                markWriteFailed();
+            }
+            return stored;
+        },
+        remove: (key) => {
+            const removed = guarded((backing) => {
+                backing.removeItem(key);
+                return true;
+            }, false);
+            if (!removed) {
+                markWriteFailed();
+            }
+        },
+        keys: () => guarded((backing) => Object.keys(backing), []),
+    };
+
+    return {
+        store,
+        health: { failed: () => writeFailed, subscribe: healthEmitter.subscribe },
+    };
 }
 
-export const browserStore: KeyValueStore = {
-    get: (key) => guarded((store) => store.getItem(key), null),
-    set: (key, value) => {
-        const stored = guarded((store) => {
-            store.setItem(key, value);
-            return true;
-        }, false);
-        if (!stored) {
-            markWriteFailed();
-        }
-        return stored;
-    },
-    remove: (key) => {
-        const removed = guarded((store) => {
-            store.removeItem(key);
-            return true;
-        }, false);
-        if (!removed) {
-            markWriteFailed();
-        }
-    },
-    keys: () => guarded((store) => Object.keys(store), []),
-};
+// The app's one browser-backed store. Both composition roots read the same
+// instance — services.tsx hands the store to every feature, root.tsx hands the
+// health to the banner — so the banner reflects the writes the app actually
+// made.
+export const { store: browserStore, health: storageHealth } = createBrowserStore();

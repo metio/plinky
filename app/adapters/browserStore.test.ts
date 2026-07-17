@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { withDeniedStorage } from "../testing/deniedStorage";
-import { browserStore, storageHealth } from "./browserStore";
+import { browserStore, createBrowserStore, storageHealth } from "./browserStore";
 
 afterEach(() => {
     localStorage.clear();
@@ -18,34 +18,70 @@ describe("browserStore", () => {
         browserStore.remove("plinky:x");
         expect(browserStore.get("plinky:x")).toBeNull();
     });
-});
 
-// The latch flips once and stays flipped for this module's lifetime, so these
-// tests run before anything else provokes a write failure, and each step below
-// builds on the state the previous one left behind.
-describe("storageHealth", () => {
-    it("starts healthy, notifies each subscriber once on the first refused write, and latches", () => {
-        expect(storageHealth.failed()).toBe(false);
-
-        const kept = vi.fn();
-        const dropped = vi.fn();
-        storageHealth.subscribe(kept);
-        storageHealth.subscribe(dropped)();
-
+    it("exposes one shared instance behind the module's store and health", () => {
         expect(withDeniedStorage(() => browserStore.set("plinky:x", "1"))).toBe(false);
         expect(storageHealth.failed()).toBe(true);
+    });
+});
+
+describe("createBrowserStore", () => {
+    it("starts healthy and hands out an independent latch per instance", () => {
+        const first = createBrowserStore();
+        const second = createBrowserStore();
+
+        expect(first.health.failed()).toBe(false);
+        expect(second.health.failed()).toBe(false);
+
+        withDeniedStorage(() => first.store.set("plinky:x", "1"));
+
+        expect(first.health.failed()).toBe(true);
+        expect(second.health.failed()).toBe(false);
+    });
+
+    it("notifies each subscriber once on the first refused write, then latches", () => {
+        const { store, health } = createBrowserStore();
+        const kept = vi.fn();
+        const dropped = vi.fn();
+        health.subscribe(kept);
+        health.subscribe(dropped)();
+
+        expect(withDeniedStorage(() => store.set("plinky:x", "1"))).toBe(false);
+        expect(health.failed()).toBe(true);
         expect(kept).toHaveBeenCalledTimes(1);
         expect(dropped).not.toHaveBeenCalled();
 
-        // Latched: a further failure changes nothing and stays silent.
-        expect(withDeniedStorage(() => browserStore.set("plinky:x", "1"))).toBe(false);
+        expect(withDeniedStorage(() => store.set("plinky:x", "1"))).toBe(false);
         expect(kept).toHaveBeenCalledTimes(1);
     });
 
-    it("keeps the adapter fully working after a past failure — a signal, not a circuit breaker", () => {
-        expect(storageHealth.failed()).toBe(true);
-        expect(browserStore.set("plinky:x", "2")).toBe(true);
-        expect(browserStore.get("plinky:x")).toBe("2");
+    it("latches on a refused remove, not only a refused set", () => {
+        const { store, health } = createBrowserStore();
+        const listener = vi.fn();
+        health.subscribe(listener);
+
+        withDeniedStorage(() => {
+            store.remove("plinky:x");
+        });
+
+        expect(health.failed()).toBe(true);
+        expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves the latch alone when writes land", () => {
+        const { store, health } = createBrowserStore();
+        expect(store.set("plinky:x", "1")).toBe(true);
+        store.remove("plinky:x");
+        expect(health.failed()).toBe(false);
+    });
+
+    it("keeps the store fully working after a past failure — a signal, not a circuit breaker", () => {
+        const { store, health } = createBrowserStore();
+        withDeniedStorage(() => store.set("plinky:x", "1"));
+
+        expect(health.failed()).toBe(true);
+        expect(store.set("plinky:x", "2")).toBe(true);
+        expect(store.get("plinky:x")).toBe("2");
     });
 });
 
@@ -54,11 +90,12 @@ describe("storageHealth", () => {
 // instead of crashing the caller — the single guard the whole app relies on.
 describe("browserStore under denied storage", () => {
     it("degrades to empty results when storage is blocked, never throwing", () => {
+        const { store } = createBrowserStore();
         withDeniedStorage(() => {
-            expect(() => browserStore.set("plinky:x", "1")).not.toThrow();
-            expect(browserStore.get("plinky:x")).toBeNull();
-            expect(browserStore.keys()).toEqual([]);
-            expect(() => browserStore.remove("plinky:x")).not.toThrow();
+            expect(() => store.set("plinky:x", "1")).not.toThrow();
+            expect(store.get("plinky:x")).toBeNull();
+            expect(store.keys()).toEqual([]);
+            expect(() => store.remove("plinky:x")).not.toThrow();
         });
     });
 });
