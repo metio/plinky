@@ -2,8 +2,15 @@
 // SPDX-License-Identifier: 0BSD
 
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
-import type { VideoExporter, VideoExportInput } from "../ports/videoExporter";
+import type { VideoExporter } from "../ports/videoExporter";
 import { frameTimesMs } from "../../core/videoFrames";
+import {
+    type AudioCodecChoice,
+    audioConfig,
+    pickAudioCodec,
+    planarSlice,
+    videoConfig,
+} from "../../core/videoEncoding";
 import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
 
 // The WebCodecs implementation of the video-file seam: frames painted onto an
@@ -12,77 +19,23 @@ import { EXPORT_SAMPLE_RATE, renderTakeAudio } from "./offlineAudio";
 // container that pastes into every chat and social feed. Everything runs
 // faster than real time and off the page's audio context. Chromium carries
 // both encoders today; supported() asks the engine about the exact
-// configurations, so anything less capable simply reports unsupported.
+// configurations, so anything less capable simply reports unsupported. The
+// configurations themselves are pure arithmetic and live in core/videoEncoding;
+// this file is the part that talks to the platform.
 
-// H.264 High profile — level 4.0 comfortably covers 720p (and 1080p30);
-// 1080p60 needs level 4.2. Both hardware-decode everywhere a video might be
-// shared.
-const VIDEO_CODEC_L40 = "avc1.640028";
-const VIDEO_CODEC_L42 = "avc1.64002a";
-// AAC-LC, the plain stereo audio every player expects inside an MP4 — but the
-// AAC encoder is licensed and plain Chromium ships without it, so Opus (which
-// mp4-muxer can also carry in an MP4, and every modern player decodes) is the
-// fallback that keeps the export working there. Real Chrome gets AAC.
-const AUDIO_CODECS = [
-    { codec: "mp4a.40.2", container: "aac" as const },
-    { codec: "opus", container: "opus" as const },
-];
-const AUDIO_BITRATE = 192_000;
-// The 720p30 reference bitrate; more pixels or frames scale it up so 1080p60
-// doesn't smear at a 720p budget.
-const VIDEO_BITRATE = 6_000_000;
 // A keyframe every two seconds keeps seeking snappy without bloating the file.
 const KEYFRAME_INTERVAL_MS = 2_000;
 // Feed audio in ~85ms slabs — small enough to interleave well with frames.
 const AUDIO_CHUNK_FRAMES = 4_096;
 
-function videoConfig(input: Pick<VideoExportInput, "width" | "height" | "fps">) {
-    const load = (input.width * input.height * input.fps) / (1280 * 720 * 30);
-    return {
-        codec: load > 3 ? VIDEO_CODEC_L42 : VIDEO_CODEC_L40,
-        width: input.width,
-        height: input.height,
-        bitrate: Math.round(VIDEO_BITRATE * Math.max(1, load)),
-        framerate: input.fps,
-    } satisfies VideoEncoderConfig;
-}
-
-function audioConfig(codec: string, audio: Pick<AudioBuffer, "sampleRate" | "numberOfChannels">) {
-    return {
-        codec,
-        sampleRate: audio.sampleRate,
-        numberOfChannels: audio.numberOfChannels,
-        bitrate: AUDIO_BITRATE,
-    } satisfies AudioEncoderConfig;
-}
-
-// The first audio codec this engine can actually encode, or null.
-async function pickAudioCodec(): Promise<(typeof AUDIO_CODECS)[number] | null> {
-    for (const entry of AUDIO_CODECS) {
-        try {
-            const check = await AudioEncoder.isConfigSupported(
-                audioConfig(entry.codec, { sampleRate: EXPORT_SAMPLE_RATE, numberOfChannels: 2 }),
-            );
-            if (check.supported) {
-                return entry;
-            }
-        } catch {
-            // An unknown codec string throws; try the next one.
-        }
-    }
-    return null;
-}
-
-// The AudioBuffer's channels, re-laid as the planar float frames AudioData
-// expects, sliced from `from` for `count` frames.
-function planarSlice(audio: AudioBuffer, from: number, count: number): Float32Array<ArrayBuffer> {
-    const channels = audio.numberOfChannels;
-    const out = new Float32Array(count * channels);
-    for (let channel = 0; channel < channels; channel++) {
-        out.set(audio.getChannelData(channel).subarray(from, from + count), channel * count);
-    }
-    return out;
-}
+// Whether this engine encodes the candidate, asked of the real AudioEncoder at
+// the stereo rate every export renders at.
+const probeAudioCodec = async (choice: AudioCodecChoice): Promise<boolean> => {
+    const check = await AudioEncoder.isConfigSupported(
+        audioConfig(choice.codec, { sampleRate: EXPORT_SAMPLE_RATE, numberOfChannels: 2 }),
+    );
+    return check.supported === true;
+};
 
 export const webCodecsVideoExporter: VideoExporter = {
     async supported() {
@@ -93,7 +46,7 @@ export const webCodecsVideoExporter: VideoExporter = {
             const video = await VideoEncoder.isConfigSupported(
                 videoConfig({ width: 1280, height: 720, fps: 30 }),
             );
-            return video.supported === true && (await pickAudioCodec()) !== null;
+            return video.supported === true && (await pickAudioCodec(probeAudioCodec)) !== null;
         } catch {
             return false;
         }
@@ -101,7 +54,7 @@ export const webCodecsVideoExporter: VideoExporter = {
 
     async export(input, onProgress) {
         const audio = await renderTakeAudio(input.notes);
-        const audioCodec = await pickAudioCodec();
+        const audioCodec = await pickAudioCodec(probeAudioCodec);
         if (!audioCodec) {
             throw new Error("no encodable audio codec; supported() would have said no");
         }
