@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type Achievement, collectAchievements, type StarKind } from "../../core/achievements";
-import { EAR_ITEMS, isEarItem } from "../../core/earCatalog";
+import { EAR_ITEMS } from "../../core/earCatalog";
+import type { ItemKind } from "../../core/practisable";
 import { letterFor } from "../../core/grade";
 import type { PracticeSummary } from "../../core/history";
 import type { DecayMode } from "../../core/review";
@@ -35,7 +36,7 @@ export type YouData = {
     // The gentlest unmastered pieces of the working grade — what to play next.
     upNext: GradeCatalogItem[];
     // Pieces due a refresh, resolved to titles for linking.
-    reviews: Array<{ id: string; title: string }>;
+    reviews: Array<{ id: string; title: string; kind: ItemKind }>;
     // How many catalogue pieces each grade holds.
     poolSizes: Map<number, number>;
     summary: PracticeSummary | null;
@@ -81,10 +82,10 @@ export function buildYouData(input: YouInput): YouData {
         skill: skillRating(items, mode, now),
         workingGrade,
         upNext: gradeSuggestions(catalogue, workingGrade, masteredIds, SUGGESTION_COUNT),
-        reviews: dueReviews(items, now, input.reviewCap).map((id) => ({
-            id,
-            title: byId.get(id)?.title ?? id,
-        })),
+        reviews: dueReviews(items, now, input.reviewCap).map((id) => {
+            const item = byId.get(id);
+            return { id, title: item?.title ?? id, kind: item?.kind ?? "piece" };
+        }),
         poolSizes: poolSizes(catalogue),
         summary: input.summary,
         fingerprint: input.fingerprint,
@@ -104,7 +105,7 @@ function earnedAchievements(input: YouInput, level: number): Achievement[] {
             stars.add(tier);
         }
     }
-    const earItems = items.filter((item) => isEarItem(item.id));
+    const earItems = items.filter((item) => item.kind === "ear");
     return collectAchievements({
         reachedGrade: Math.max(input.reachedGrade, level),
         hasS: items.some((item) => letterFor(item.mastery.bestScore) === "S"),

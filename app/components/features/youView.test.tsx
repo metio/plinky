@@ -44,12 +44,13 @@ describe("YouView", () => {
                 title: `g1-${i}`,
                 grade: 1,
                 cost: 1,
+                kind: "piece",
                 mastery: fresh,
             })),
         );
         catalogueMock.mockResolvedValue([
-            { id: "g2-hard", title: "Harder Two", grade: 2, cost: 3 },
-            { id: "g2-easy", title: "Gentle Two", grade: 2, cost: 1 },
+            { id: "g2-hard", title: "Harder Two", grade: 2, cost: 3, kind: "piece" },
+            { id: "g2-easy", title: "Gentle Two", grade: 2, cost: 1, kind: "piece" },
         ]);
 
         render(
@@ -68,7 +69,9 @@ describe("YouView", () => {
 
     it("no longer carries the discovery checklist — it lives on the home page now", async () => {
         masteryMock.mockResolvedValue([]);
-        catalogueMock.mockResolvedValue([{ id: "g1", title: "First Piece", grade: 1, cost: 1 }]);
+        catalogueMock.mockResolvedValue([
+            { id: "g1", title: "First Piece", grade: 1, cost: 1, kind: "piece" },
+        ]);
 
         render(
             <MemoryRouter>

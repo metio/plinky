@@ -52,12 +52,13 @@ describe("useYouData", () => {
                 title: `g1-${i}`,
                 grade: 1,
                 cost: 1,
+                kind: "piece",
                 mastery: fresh,
             })),
         );
         catalogueMock.mockResolvedValue([
-            { id: "g2-hard", title: "Harder Two", grade: 2, cost: 3 },
-            { id: "g2-easy", title: "Gentle Two", grade: 2, cost: 1 },
+            { id: "g2-hard", title: "Harder Two", grade: 2, cost: 3, kind: "piece" },
+            { id: "g2-easy", title: "Gentle Two", grade: 2, cost: 1, kind: "piece" },
         ]);
 
         const { result } = renderHook(() => useYouData(), { wrapper });
@@ -80,6 +81,7 @@ describe("useYouData", () => {
                 title: "Für Elise",
                 grade: 1,
                 cost: 1,
+                kind: "piece",
                 mastery: { ...fresh, reviewAt: Date.now() - 86_400_000 },
             },
         ]);
@@ -87,6 +89,8 @@ describe("useYouData", () => {
 
         const { result } = renderHook(() => useYouData(), { wrapper });
         await waitFor(() => expect(result.current).not.toBeNull());
-        expect(result.current?.reviews).toEqual([{ id: "stale", title: "Für Elise" }]);
+        expect(result.current?.reviews).toEqual([
+            { id: "stale", title: "Für Elise", kind: "piece" },
+        ]);
     });
 });

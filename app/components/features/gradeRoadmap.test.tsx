@@ -26,6 +26,7 @@ const items: GradedMastery[] = Array.from({ length: 5 }, (_, i) => ({
     title: `g1-${i}`,
     grade: 1,
     cost: 1,
+    kind: "piece",
     mastery: fresh,
 }));
 

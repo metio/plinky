@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { svgMilestone } from "../../../core/milestoneCard";
+import { practiceHref } from "../../../core/practisable";
 import { useYouData } from "../../hooks/useYouData";
 import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";
@@ -68,7 +69,7 @@ export function YouView() {
                     <ul className="space-y-1 text-sm">
                         {upNext.map((item) => (
                             <li key={item.id}>
-                                <Link to={`/play/${item.id}`} className={linkClasses}>
+                                <Link to={practiceHref(item)} className={linkClasses}>
                                     {item.title}
                                 </Link>
                             </li>

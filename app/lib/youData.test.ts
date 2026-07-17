@@ -21,7 +21,7 @@ const mastered: Mastery = {
 };
 
 function piece(id: string, grade: number, mastery: Partial<Mastery> = {}): GradedMastery {
-    return { id, title: id, grade, cost: 1, mastery: { ...mastered, ...mastery } };
+    return { id, title: id, grade, cost: 1, kind: "piece", mastery: { ...mastered, ...mastery } };
 }
 
 // A grade's worth of mastered pieces — the unit the star tiers count in.
@@ -68,10 +68,10 @@ describe("buildYouData", () => {
 
     it("suggests the gentlest unmastered pieces of the working grade", () => {
         const catalogue: GradeCatalogItem[] = [
-            { id: "g1-hard", title: "Harder", grade: 1, cost: 5 },
-            { id: "g1-easy", title: "Gentle", grade: 1, cost: 1 },
-            { id: "g1-mid", title: "Middling", grade: 1, cost: 3 },
-            { id: "g2-off", title: "Wrong grade", grade: 2, cost: 1 },
+            { id: "g1-hard", title: "Harder", grade: 1, cost: 5, kind: "piece" },
+            { id: "g1-easy", title: "Gentle", grade: 1, cost: 1, kind: "piece" },
+            { id: "g1-mid", title: "Middling", grade: 1, cost: 3, kind: "piece" },
+            { id: "g2-off", title: "Wrong grade", grade: 2, cost: 1, kind: "piece" },
         ];
         const data = buildYouData(input({ catalogue }));
         expect(data.upNext.map((item) => item.id)).toEqual(["g1-easy", "g1-mid", "g1-hard"]);
@@ -79,8 +79,8 @@ describe("buildYouData", () => {
 
     it("leaves a mastered piece out of the suggestions", () => {
         const catalogue: GradeCatalogItem[] = [
-            { id: "done", title: "Done", grade: 1, cost: 1 },
-            { id: "todo", title: "Todo", grade: 1, cost: 2 },
+            { id: "done", title: "Done", grade: 1, cost: 1, kind: "piece" },
+            { id: "todo", title: "Todo", grade: 1, cost: 2, kind: "piece" },
         ];
         // Neither run reaches the ability bar, so the player still works at grade 1 —
         // the grade these pieces sit in. A backlogged piece is not mastered, so it
@@ -100,7 +100,7 @@ describe("buildYouData", () => {
             piece("fresh", 1, { reviewAt: NOW + DAY }),
         ];
         const data = buildYouData(input({ items }));
-        expect(data.reviews).toEqual([{ id: "stale", title: "stale" }]);
+        expect(data.reviews).toEqual([{ id: "stale", title: "stale", kind: "piece" }]);
     });
 
     it("holds the review queue to the player's cap", () => {
@@ -110,9 +110,9 @@ describe("buildYouData", () => {
 
     it("counts the catalogue pool per grade", () => {
         const catalogue: GradeCatalogItem[] = [
-            { id: "a", title: "A", grade: 1, cost: 1 },
-            { id: "b", title: "B", grade: 1, cost: 1 },
-            { id: "c", title: "C", grade: 3, cost: 1 },
+            { id: "a", title: "A", grade: 1, cost: 1, kind: "piece" },
+            { id: "b", title: "B", grade: 1, cost: 1, kind: "piece" },
+            { id: "c", title: "C", grade: 3, cost: 1, kind: "piece" },
         ];
         const sizes = buildYouData(input({ catalogue })).poolSizes;
         expect(sizes.get(1)).toBe(2);

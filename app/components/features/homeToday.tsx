@@ -102,12 +102,20 @@ export function HomeToday() {
                 (id) => services.mastery.load(id)?.learned === true,
                 (id) => known.isMissing(id),
             );
+            // The due ids resolve back to their kind through the loaded items, so the
+            // task knows whether opening one means a score or an ear drill.
+            const kindById = new Map(items.map((i) => [i.id, i.kind]));
             setTasks(
                 todayTasks({
-                    dueIds: dueReviews(items, now, prefs.reviewCap),
+                    due: dueReviews(items, now, prefs.reviewCap).map((id) => ({
+                        id,
+                        kind: kindById.get(id) ?? "piece",
+                    })),
                     dailyDoneToday,
                     assignment,
-                    suggestion: suggestion ? { id: suggestion.id, title: suggestion.title } : null,
+                    suggestion: suggestion
+                        ? { id: suggestion.id, title: suggestion.title, kind: suggestion.kind }
+                        : null,
                 }),
             );
         });

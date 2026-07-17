@@ -41,6 +41,7 @@ const mastered = (grade: number, count: number): GradedMastery[] =>
         title: `g${grade}-${i}`,
         grade,
         cost: grade,
+        kind: "piece",
         mastery: fresh,
     }));
 

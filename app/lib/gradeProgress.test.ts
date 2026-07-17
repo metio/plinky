@@ -40,7 +40,7 @@ const due = () => mastery({ intervalDays: 10, reviewAt: NOW - 2 * DAY });
 const lapsed = () => mastery({ intervalDays: 10, reviewAt: NOW - 20 * DAY });
 
 function item(id: string, grade: number, cost: number, m: Mastery): GradedMastery {
-    return { id, title: id, grade, cost, mastery: m };
+    return { id, title: id, grade, cost, kind: "piece", mastery: m };
 }
 
 function learnedGrade(grade: number, count: number): GradedMastery[] {
@@ -126,12 +126,12 @@ describe("dueReviews", () => {
         expect(dueReviews(items, NOW, 1)).toEqual(["oldest"]);
     });
 
-    it("holds ear items out of the queue, which renders a score they haven't got", () => {
+    it("includes a due ear item — the session drives its drill, most overdue first", () => {
         const items = [
             item("ear-intervals-0", 1, 1, mastery({ reviewAt: NOW - 30 * DAY })),
             item("a-piece", 1, 1, mastery({ reviewAt: NOW - 5 * DAY })),
         ];
-        expect(dueReviews(items, NOW)).toEqual(["a-piece"]);
+        expect(dueReviews(items, NOW)).toEqual(["ear-intervals-0", "a-piece"]);
     });
 });
 
@@ -166,6 +166,7 @@ describe("skillRating", () => {
 const cat = (id: string, grade: number, cost: number): GradeCatalogItem => ({
     id,
     title: id,
+    kind: "piece",
     grade,
     cost,
 });
@@ -204,10 +205,10 @@ describe("gradeSuggestions", () => {
         expect(suggestions.map((item) => item.id)).toEqual(["zero", "real"]);
     });
 
-    it("never suggests an ear item, since the suggestion opens a score in /play", () => {
+    it("suggests an ear item like any other — its link is chosen by kind, not filtered", () => {
         const catalogue = [cat("ear-intervals-0", 1, 1), cat("a-piece", 1, 2)];
         const suggestions = gradeSuggestions(catalogue, 1, new Set(), 5);
-        expect(suggestions.map((item) => item.id)).toEqual(["a-piece"]);
+        expect(suggestions.map((item) => item.id)).toEqual(["ear-intervals-0", "a-piece"]);
     });
 });
 

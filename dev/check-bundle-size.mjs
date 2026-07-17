@@ -37,7 +37,12 @@ const ON_DEMAND = /webCodecsVideo/;
 // Wiring ear rounds into the grades — the ear catalogue that places each exercise on the
 // ladder, the bounded session that records mastery, three ear achievements, and 5 more
 // strings per locale — adds ~1.6 KB, measured at 571.1. 572 keeps the margin.
-const BUDGET_TOTAL_KB = 572;
+//
+// The first-class item kind (a piece opens a score, an ear item runs a drill) that
+// retired the id-prefix sniffing — the shared practiceHref, the ear-review drill in the
+// review session, and the /ear deep-link — adds ~0.9 KB, measured at 572.0. 573 restores
+// the margin.
+const BUDGET_TOTAL_KB = 573;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and

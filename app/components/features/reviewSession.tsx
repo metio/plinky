@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import { earItemById } from "../../../core/earCatalog";
+import type { ItemKind } from "../../../core/practisable";
 import { useScore } from "../../hooks/useScore";
 import { Button } from "../ui/button";
 import { linkClasses } from "../ui/classes";
@@ -9,6 +11,7 @@ import { dueReviews, loadGradedMastery } from "../../lib/gradeProgress";
 import { setBacklog } from "../../../core/mastery";
 import { usePrefsStore, useServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
+import { EarSession } from "./earSession";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ScoreViewer } from "./scoreViewer";
 
@@ -18,23 +21,35 @@ const BACK = `text-sm ${linkClasses}`;
 // shelve for anything you're not working on right now. The queue is snapshotted on
 // mount so it stays stable even as playing a piece pushes its next-review date out
 // and removes it from the live due set.
+type Due = { id: string; title: string; kind: ItemKind };
+
 export function ReviewSession() {
     const prefsStore = usePrefsStore();
     const services = useServices();
-    const [queue, setQueue] = useState<string[] | null>(null);
+    const [queue, setQueue] = useState<Due[] | null>(null);
     const [index, setIndex] = useState(0);
     const [refreshed, setRefreshed] = useState(0);
     const [shelved, setShelved] = useState(0);
-    // Whether the piece on screen has actually been played this session — only then
+    // Whether the item on screen has actually been practised this session — only then
     // does moving on count it as refreshed, so the summary tells the truth and a
-    // skipped piece stays due rather than being silently marked done.
+    // skipped item stays due rather than being silently marked done.
     const [playedCurrent, setPlayedCurrent] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
         loadGradedMastery(services.mastery, services).then((items) => {
             if (!cancelled) {
-                setQueue(dueReviews(items, Date.now(), prefsStore.load().reviewCap));
+                // The queue is snapshotted with each item's kind, so it drives the right
+                // surface (a score, or an ear drill) even after practising one reschedules
+                // it out of the live due set.
+                const byId = new Map(items.map((item) => [item.id, item]));
+                const due = dueReviews(items, Date.now(), prefsStore.load().reviewCap).flatMap(
+                    (id) => {
+                        const item = byId.get(id);
+                        return item ? [{ id, title: item.title, kind: item.kind }] : [];
+                    },
+                );
+                setQueue(due);
             }
         });
         return () => {
@@ -43,7 +58,7 @@ export function ReviewSession() {
     }, [prefsStore.load, services]);
 
     const current = queue?.[index];
-    const resolved = useScore(current ?? "");
+    const resolved = useScore(current?.kind === "piece" ? current.id : "");
     // An unreachable piece renders like one still loading; the session's Skip
     // button already lets the player move past it.
     const score = resolved === "unavailable" ? undefined : resolved;
@@ -106,13 +121,18 @@ export function ReviewSession() {
     const shelve = () => {
         if (current) {
             services.mastery.save(
-                current,
-                setBacklog(services.mastery.load(current), true, Date.now()),
+                current.id,
+                setBacklog(services.mastery.load(current.id), true, Date.now()),
             );
         }
         setShelved((n) => n + 1);
         advance();
     };
+
+    // An ear item drives a drill instead of a score; its (exercise, level) come from the
+    // id, and finishing its session records — and so reschedules — the review, just as a
+    // played run does for a piece.
+    const ear = current?.kind === "ear" ? earItemById(current.id) : undefined;
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -132,19 +152,32 @@ export function ReviewSession() {
                 </div>
             </header>
 
-            {score && (
+            {ear ? (
                 <>
-                    <h2 className="text-lg font-medium">{score.title}</h2>
-                    <ScoreViewer
-                        key={score.id}
-                        id={score.id}
-                        xml={score.xml}
-                        title={score.title}
-                        initialTempo={score.tempo}
-                        beatsPerBar={score.beatsPerBar}
-                        onRunComplete={() => setPlayedCurrent(true)}
+                    <h2 className="text-lg font-medium">{current?.title}</h2>
+                    <EarSession
+                        key={ear.id}
+                        exercise={ear.exercise}
+                        level={ear.level ?? 0}
+                        autoStart={true}
+                        onComplete={() => setPlayedCurrent(true)}
                     />
                 </>
+            ) : (
+                score && (
+                    <>
+                        <h2 className="text-lg font-medium">{score.title}</h2>
+                        <ScoreViewer
+                            key={score.id}
+                            id={score.id}
+                            xml={score.xml}
+                            title={score.title}
+                            initialTempo={score.tempo}
+                            beatsPerBar={score.beatsPerBar}
+                            onRunComplete={() => setPlayedCurrent(true)}
+                        />
+                    </>
+                )
             )}
 
             <div className="flex flex-wrap items-center gap-2">

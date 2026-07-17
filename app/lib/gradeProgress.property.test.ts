@@ -30,6 +30,7 @@ const arbItem: fc.Arbitrary<GradedMastery> = fc.record({
     title: fc.string(),
     grade: fc.integer({ min: 1, max: MAX_GRADE }),
     cost: fc.double({ min: 0, max: 10, noNaN: true, noDefaultInfinity: true }),
+    kind: fc.constantFrom("piece", "ear"),
     mastery: arbMastery,
 });
 

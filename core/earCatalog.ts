@@ -59,9 +59,8 @@ export function earItemFor(exercise: EarExerciseId, level: number): EarItem | un
     return EAR_ITEMS.find((item) => item.exercise === exercise);
 }
 
-// Whether an id belongs to an ear item, for the seams that must tell an ear item from a
-// piece — the review queue holds it out (an ear item has no score to render yet), and a
-// future ear-review slice will let it back in.
-export function isEarItem(id: string): boolean {
-    return id.startsWith("ear-");
+// The item behind an id, so a due ear review can drive the right drill and the practice
+// link can resolve its kind — the inverse of earItemFor.
+export function earItemById(id: string): EarItem | undefined {
+    return EAR_ITEMS.find((item) => item.id === id);
 }

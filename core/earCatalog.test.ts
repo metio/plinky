@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { EAR_ITEMS, earItemFor, isEarItem } from "./earCatalog";
+import { EAR_ITEMS, earItemFor } from "./earCatalog";
 import { INTERVAL_LEVELS } from "./earExercise";
 import { MAX_GRADE } from "./scoreDifficulty";
 
@@ -18,7 +18,7 @@ describe("ear catalogue", () => {
         const ids = EAR_ITEMS.map((item) => item.id);
         expect(new Set(ids).size).toBe(ids.length);
         for (const id of ids) {
-            expect(isEarItem(id)).toBe(true);
+            expect(id.startsWith("ear-")).toBe(true);
         }
     });
 
@@ -49,9 +49,4 @@ describe("ear catalogue", () => {
         expect(earItemFor("perfect-pitch", 3)?.id).toBe("ear-perfect-pitch");
     });
 
-    it("tells an ear id from a piece id", () => {
-        expect(isEarItem("ear-intervals-1")).toBe(true);
-        expect(isEarItem("47xd2XDpYFCy")).toBe(false);
-        expect(isEarItem("scale-c-major")).toBe(false);
-    });
 });

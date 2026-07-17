@@ -10,7 +10,7 @@ import { RefreshQueue } from "./refreshQueue";
 
 afterEach(cleanup);
 
-const mount = (reviews: Array<{ id: string; title: string }>) =>
+const mount = (reviews: Array<{ id: string; title: string; kind: "piece" | "ear" }>) =>
     render(
         <MemoryRouter>
             <RefreshQueue reviews={reviews} />
@@ -34,8 +34,8 @@ describe("RefreshQueue", () => {
 
     it("offers the guided session and links each due piece", () => {
         mount([
-            { id: "a", title: "Minuet" },
-            { id: "b", title: "Ode to Joy" },
+            { id: "a", title: "Minuet", kind: "piece" },
+            { id: "b", title: "Ode to Joy", kind: "piece" },
         ]);
         expect(screen.getByRole("link", { name: m.review_start({ count: 2 }) })).toBeTruthy();
         expect(screen.getByRole("link", { name: "Minuet" }).getAttribute("href")).toContain(
@@ -45,7 +45,7 @@ describe("RefreshQueue", () => {
     });
 
     it("keeps the why on screen when pieces are due, without doubling the entry points", () => {
-        mount([{ id: "a", title: "Minuet" }]);
+        mount([{ id: "a", title: "Minuet", kind: "piece" }]);
         expect(screen.getByText(m.refresh_why())).toBeTruthy();
         expect(screen.queryByRole("link", { name: m.review_explore() })).toBeNull();
     });

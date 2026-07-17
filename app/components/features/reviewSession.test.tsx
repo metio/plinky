@@ -5,8 +5,10 @@
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { GradedMastery } from "../../lib/gradeProgress";
+import { EAR_SESSION_ROUNDS } from "../../../core/earCatalog";
 import type { Mastery } from "../../../core/mastery";
+import { fakeAudioEngine } from "../../adapters/fakeAudioEngine";
+import type { GradedMastery } from "../../lib/gradeProgress";
 
 import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
@@ -47,12 +49,22 @@ const due: Mastery = {
 };
 
 function queueOf(...ids: string[]): GradedMastery[] {
-    return ids.map((id) => ({ id, title: id, grade: 1, cost: 1, mastery: due }));
+    return ids.map((id) => ({ id, title: id, grade: 1, cost: 1, kind: "piece", mastery: due }));
 }
+
+const earItem = (id: string, title: string): GradedMastery => ({
+    id,
+    title,
+    grade: 1,
+    cost: 1,
+    kind: "ear",
+    mastery: due,
+});
 
 afterEach(() => {
     cleanup();
     masteryMock.mockReset();
+    vi.restoreAllMocks();
 });
 
 function renderSession() {
@@ -60,6 +72,7 @@ function renderSession() {
         <MemoryRouter>
             <ReviewSession />
         </MemoryRouter>,
+        { audio: fakeAudioEngine() },
     );
 }
 
@@ -98,6 +111,35 @@ describe("ReviewSession", () => {
 
         expect(services.mastery.load("a")?.backlog).toBe(true);
         expect(await screen.findByText("Piece 2 of 2")).toBeTruthy();
+    });
+
+    it("drives an ear drill for a due ear item, not a score", async () => {
+        vi.spyOn(Math, "random").mockReturnValue(0);
+        masteryMock.mockResolvedValue([earItem("ear-intervals-0", "Intervals · Fifths")]);
+        renderSession();
+
+        // The ear drill's answer surface, titled by the item — not the score viewer.
+        expect(await screen.findByRole("group", { name: m.ear_ladder_label() })).toBeTruthy();
+        expect(screen.getByText("Intervals · Fifths")).toBeTruthy();
+        expect(screen.queryByText(/^viewer:/)).toBeNull();
+    });
+
+    it("counts an ear item refreshed once its drill is finished", async () => {
+        vi.spyOn(Math, "random").mockReturnValue(0);
+        masteryMock.mockResolvedValue([earItem("ear-intervals-0", "Intervals · Fifths")]);
+        renderSession();
+
+        await screen.findByRole("group", { name: m.ear_ladder_label() });
+        // A drill auto-starts, so the whole session is answered in place; only when it
+        // finishes does the advance become Next rather than Skip.
+        for (let round = 0; round < EAR_SESSION_ROUNDS; round++) {
+            fireEvent.click(screen.getByRole("button", { name: m.theory_interval_unison() }));
+            if (round < EAR_SESSION_ROUNDS - 1) {
+                fireEvent.click(screen.getByRole("button", { name: m.ear_next() }));
+            }
+        }
+        fireEvent.click(await screen.findByText("Next →"));
+        expect(await screen.findByText(/review complete/i)).toBeTruthy();
     });
 
     it("says so when nothing is due", async () => {

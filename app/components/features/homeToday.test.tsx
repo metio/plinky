@@ -49,7 +49,7 @@ describe("HomeToday", () => {
     it("hands a brand-new player the starter assignment's first step", async () => {
         masteryMock.mockResolvedValue([]); // brand-new player, Grade 0
         catalogueMock.mockResolvedValue([
-            { id: "g1-easy", title: "First Steps Song", grade: 1, cost: 1 },
+            { id: "g1-easy", title: "First Steps Song", grade: 1, cost: 1, kind: "piece" },
         ]);
         mount();
         expect(await screen.findByText("Today")).toBeTruthy();
@@ -65,7 +65,7 @@ describe("HomeToday", () => {
     it("returns to the gentlest suggestion once the starter is finished", async () => {
         masteryMock.mockResolvedValue([]);
         catalogueMock.mockResolvedValue([
-            { id: "g1-easy", title: "First Steps Song", grade: 1, cost: 1 },
+            { id: "g1-easy", title: "First Steps Song", grade: 1, cost: 1, kind: "piece" },
         ]);
         const { services } = mount();
         for (const score of loadBundledScores()) {

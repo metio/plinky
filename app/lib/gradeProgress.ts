@@ -3,7 +3,7 @@
 
 import { loadBundledScores, loadUserScores } from "./catalog";
 import { earCatalogItems } from "./earProgress";
-import { isEarItem } from "../../core/earCatalog";
+import type { ItemKind } from "../../core/practisable";
 import type { Letter } from "../../core/grade";
 import type { XmlCodec } from "../../core/xml";
 import type { KeyValueStore } from "../ports/keyValueStore";
@@ -33,6 +33,7 @@ export type GradedMastery = {
     title: string;
     grade: number;
     cost: number;
+    kind: ItemKind;
     mastery: Mastery;
 };
 
@@ -117,11 +118,8 @@ export function dueReviews(
     return (
         items
             .filter((item) => isDue(item.mastery, now))
-            // The review session renders a piece's score, which an ear item hasn't got, so
-            // ear items are held out of the queue for now. Their review IS scheduled (mastery
-            // records reviewAt for every learned item), waiting for the ear-review slice that
-            // teaches the session to drive an ear drill.
-            .filter((item) => !isEarItem(item.id))
+            // Ear items belong here: the review session drives an ear drill for one, the
+            // same way it opens a score for a piece.
             .sort((a, b) => a.mastery.reviewAt - b.mastery.reviewAt)
             .slice(0, cap)
             .map((item) => item.id)
@@ -144,17 +142,28 @@ export function skillRating(items: GradedMastery[], mode: DecayMode, now: number
 }
 
 // A catalogue item on the ladder, independent of any mastery — the pool a grade
-// draws from.
-export type GradeCatalogItem = { id: string; title: string; grade: number; cost: number };
+// draws from. Its kind says how it is practised (a piece opens a score, an ear exercise
+// runs a drill), so every reader dispatches on the field instead of the id.
+export type GradeCatalogItem = {
+    id: string;
+    title: string;
+    grade: number;
+    cost: number;
+    kind: ItemKind;
+};
 
 // Where the fetched manifests come from — structurally the song/exercise
 // sources, taken as a parameter so the caller decides which services back the
 // catalogue.
+// What a source manifest carries per item — a ladder item minus its kind, since a
+// manifest only ever describes pieces. buildCatalogue stamps the kind on.
+export type ManifestItem = { id: string; title: string; grade: number; cost: number };
+
 export type CatalogSources = {
     // Null signals a failed fetch (see the source contracts); the catalogue
     // treats it as contributing nothing this pass.
-    songs: { manifest(): Promise<GradeCatalogItem[] | null> };
-    exercises: { manifest(): Promise<GradeCatalogItem[] | null> };
+    songs: { manifest(): Promise<ManifestItem[] | null> };
+    exercises: { manifest(): Promise<ManifestItem[] | null> };
     // Grading a bundled or imported score parses its MusicXML through this codec.
     xml: XmlCodec;
     // Imported scores live in persistent storage; bundled ones ship with the app.
@@ -173,15 +182,10 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
         sources.exercises.manifest().then((list) => list ?? []),
     ]);
     for (const song of songs) {
-        index.set(song.id, { id: song.id, title: song.title, grade: song.grade, cost: song.cost });
+        index.set(song.id, { ...song, kind: "piece" });
     }
     for (const exercise of exercises) {
-        index.set(exercise.id, {
-            id: exercise.id,
-            title: exercise.title,
-            grade: exercise.grade,
-            cost: exercise.cost,
-        });
+        index.set(exercise.id, { ...exercise, kind: "piece" });
     }
     // Ear items are a fixed, static pool — no manifest to fetch, no MusicXML to grade —
     // so they join the ladder directly. Placing them here is what makes an ear round
@@ -206,6 +210,7 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
             title: score.title,
             grade: gradeOf(sources.xml, score.id, score.xml),
             cost: rawDifficulty(sources.xml, score.xml),
+            kind: "piece",
         });
     }
     return index;
@@ -234,7 +239,7 @@ export async function loadGradedMastery(
     for (const { id, value: state } of mastery) {
         const meta = index.get(id);
         if (meta) {
-            out.push({ id, title: meta.title, grade: meta.grade, cost: meta.cost, mastery: state });
+            out.push({ ...meta, mastery: state });
         }
     }
     return out;
@@ -268,13 +273,10 @@ export function gradeSuggestions(
     return (
         catalogue
             .filter((item) => item.grade === grade && !mastered.has(item.id))
-            // The suggestion links to /play, so an ear item — which has no score to open
-            // there — is held out; ear practice is surfaced by the /ear page itself. Ear
-            // items still count toward the grade, its pool and the skill rating.
-            .filter((item) => !isEarItem(item.id))
             // Easiest first by cost. Unplayable scores are kept out of the catalogue, so
             // a cost of 0 reliably means "gentlest" rather than "couldn't measure" — the
-            // beginner-friendly pieces that score 0 lead their grade.
+            // beginner-friendly pieces that score 0 lead their grade. An ear item stays in:
+            // the link that opens it is chosen by its kind, so it needs no special case.
             .sort((a, b) => a.cost - b.cost)
             .slice(0, count)
     );
