@@ -273,3 +273,62 @@ export function nextAssignmentStep(
     }
     return null;
 }
+
+// The basket mechanics a builder's draft runs on. Each takes the current items and
+// returns the next list, never mutating the input — so a draft holds them in state
+// and the rules are checked without a React mount.
+
+// A piece already in the basket is not added twice: the list is an ordered set of
+// ids, and a duplicate step would score the same piece against itself.
+export function addItem(items: AssignmentItem[], id: string): AssignmentItem[] {
+    return items.some((item) => item.id === id) ? items : [...items, { id }];
+}
+
+export function removeItem(items: AssignmentItem[], index: number): AssignmentItem[] {
+    return items.filter((_, i) => i !== index);
+}
+
+// Swap an item with the one `delta` steps away. A move off either end has nowhere
+// to land, so the list is returned unchanged.
+export function moveItem(items: AssignmentItem[], index: number, delta: number): AssignmentItem[] {
+    const target = index + delta;
+    if (index < 0 || index >= items.length || target < 0 || target >= items.length) {
+        return items;
+    }
+    const next = [...items];
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    return next;
+}
+
+// Set an item's target tempo from a form field. An empty or unparseable field
+// clears the target rather than storing a NaN the playback math would divide by.
+export function withItemTempo(
+    items: AssignmentItem[],
+    index: number,
+    value: string,
+): AssignmentItem[] {
+    return items.map((item, i) => {
+        if (i !== index) {
+            return item;
+        }
+        const tempo = Number(value);
+        const { tempo: _drop, ...rest } = item;
+        return value && Number.isFinite(tempo) ? { ...rest, tempo } : rest;
+    });
+}
+
+// Set an item's teacher note. A blank field carries no instruction, so the note is
+// dropped instead of stored as whitespace.
+export function withItemNote(
+    items: AssignmentItem[],
+    index: number,
+    value: string,
+): AssignmentItem[] {
+    return items.map((item, i) => {
+        if (i !== index) {
+            return item;
+        }
+        const { note: _drop, ...rest } = item;
+        return value.trim() ? { ...rest, note: value } : rest;
+    });
+}

@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    addItem,
     type Assignment,
     assignmentsReferencing,
     availableItemCount,
@@ -11,11 +12,15 @@ import {
     makeAssignment,
     MAX_DESCRIPTION_LENGTH,
     missingAssignmentIds,
+    moveItem,
     newAssignmentId,
     nextAssignmentStep,
     parseAssignment,
     pruneAssignment,
+    removeItem,
     serializeAssignment,
+    withItemNote,
+    withItemTempo,
 } from "./assignment";
 
 const sample = (): Assignment =>
@@ -239,5 +244,120 @@ describe("description length", () => {
         });
         expect(assignment.description).toHaveLength(MAX_DESCRIPTION_LENGTH);
         expect(assignment.items[0]?.note).toHaveLength(200);
+    });
+});
+
+describe("basket mechanics", () => {
+    const basket = [{ id: "a" }, { id: "b" }, { id: "c" }];
+
+    describe("addItem", () => {
+        it("appends a piece to the end of the basket", () => {
+            expect(addItem([{ id: "a" }], "b")).toEqual([{ id: "a" }, { id: "b" }]);
+        });
+
+        it("adds nothing for a piece already in the basket", () => {
+            expect(addItem(basket, "b")).toBe(basket);
+        });
+
+        it("leaves the input untouched", () => {
+            const items = [{ id: "a" }];
+            addItem(items, "b");
+            expect(items).toEqual([{ id: "a" }]);
+        });
+    });
+
+    describe("removeItem", () => {
+        it("drops the item at the index, keeping the rest in order", () => {
+            expect(removeItem(basket, 1)).toEqual([{ id: "a" }, { id: "c" }]);
+        });
+
+        it("drops nothing for an index off the end", () => {
+            expect(removeItem(basket, 9)).toEqual(basket);
+        });
+
+        it("removes only the named position when two steps share a piece", () => {
+            // makeAssignment permits repeats even though the builder's add does not.
+            expect(removeItem([{ id: "a" }, { id: "a" }], 0)).toEqual([{ id: "a" }]);
+        });
+    });
+
+    describe("moveItem", () => {
+        it("swaps an item with its neighbour in either direction", () => {
+            expect(moveItem(basket, 1, -1)).toEqual([{ id: "b" }, { id: "a" }, { id: "c" }]);
+            expect(moveItem(basket, 1, 1)).toEqual([{ id: "a" }, { id: "c" }, { id: "b" }]);
+        });
+
+        it("carries an item's tempo and note along with it", () => {
+            const items = [{ id: "a", tempo: 90, note: "slowly" }, { id: "b" }];
+            expect(moveItem(items, 0, 1)).toEqual([
+                { id: "b" },
+                { id: "a", tempo: 90, note: "slowly" },
+            ]);
+        });
+
+        it.each([
+            ["off the front", 0, -1],
+            ["off the end", 2, 1],
+            ["from an index below the list", -1, 1],
+            ["from an index past the list", 5, -1],
+        ])("moves nothing %s", (_case, index, delta) => {
+            expect(moveItem(basket, index, delta)).toBe(basket);
+        });
+
+        it("leaves the input untouched", () => {
+            const items = [{ id: "a" }, { id: "b" }];
+            moveItem(items, 0, 1);
+            expect(items).toEqual([{ id: "a" }, { id: "b" }]);
+        });
+    });
+
+    describe("withItemTempo", () => {
+        it("sets a target tempo on the named item only", () => {
+            expect(withItemTempo(basket, 1, "120")).toEqual([
+                { id: "a" },
+                { id: "b", tempo: 120 },
+                { id: "c" },
+            ]);
+        });
+
+        it.each([
+            ["an empty field", ""],
+            ["a field that is not a number", "fast"],
+        ])("clears the target for %s", (_case, value) => {
+            const items = [{ id: "a", tempo: 120 }];
+            expect(withItemTempo(items, 0, value)).toEqual([{ id: "a" }]);
+        });
+
+        it("keeps the item's note while its tempo changes", () => {
+            const items = [{ id: "a", note: "watch the rests" }];
+            expect(withItemTempo(items, 0, "80")).toEqual([
+                { id: "a", note: "watch the rests", tempo: 80 },
+            ]);
+        });
+    });
+
+    describe("withItemNote", () => {
+        it("sets an instruction on the named item only", () => {
+            expect(withItemNote(basket, 0, "legato")).toEqual([
+                { id: "a", note: "legato" },
+                { id: "b" },
+                { id: "c" },
+            ]);
+        });
+
+        it.each([
+            ["an empty field", ""],
+            ["a field of only whitespace", "   "],
+        ])("clears the instruction for %s", (_case, value) => {
+            const items = [{ id: "a", note: "legato" }];
+            expect(withItemNote(items, 0, value)).toEqual([{ id: "a" }]);
+        });
+
+        it("keeps the item's tempo while its note changes", () => {
+            const items = [{ id: "a", tempo: 90 }];
+            expect(withItemNote(items, 0, "legato")).toEqual([
+                { id: "a", tempo: 90, note: "legato" },
+            ]);
+        });
     });
 });
