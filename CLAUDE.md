@@ -12,11 +12,11 @@ is described in [ARCHITECTURE.md](ARCHITECTURE.md) and **enforced** by
 
 ## The dev environment
 
-The toolchain is a nix flake (`flake.nix`) that consumes the shared
-[metio/ci](https://github.com/metio/ci) devShell — node, chromium + firefox (for
-the vitest browser + a11y gates), and the shared lint gate (reuse, typos, yamllint,
-actionlint, markdownlint). Run any command through it so local and CI resolve
-the identical versions pinned in `flake.lock`:
+The toolchain is a nix flake (`flake.nix`) built on the shared
+[metio/nix-devshell](https://github.com/metio/nix-devshell) — node, chromium +
+firefox (for the vitest browser + a11y gates), and the shared lint gate (reuse,
+typos, yamllint, actionlint, markdownlint). Run any command through it so
+local and CI resolve the identical versions pinned in `flake.lock`:
 
 ```sh
 nix develop --command npm test      # one-off
@@ -24,7 +24,10 @@ nix develop                         # or enter the shell, then run commands bare
 ```
 
 CI mirrors this exactly: every job in `.github/workflows/verify.yml` is
-`nix develop --command …` behind the `metio/ci/nix-devshell` action. The
+`nix develop --command …` behind the `metio/nix-devshell` action, and the
+`Frontend` job delegates to `metio/ci`'s reusable `frontend.yml`, which is where
+the shared lint gate, coverage, a11y and Lighthouse run — they are easy to
+forget precisely because this repo's own workflow never names them. The
 `playwright` npm version is held to the flake's `playwright-driver`, so bump
 both together.
 
@@ -35,9 +38,11 @@ per-locale `PLINKY_LOCALE=en` build the size budget measures, `ci-reuse` is
 and the same name works bare inside `nix develop` — the `ci-` prefix leaves the raw
 tool free for its other modes. A CI gate job must invoke its check through a
 `ci-*` wrapper, never a raw command inline; `npm run ci:parity` is a blocking gate
-that enforces this and that every wrapper a job names exists in `flake.nix`. (The
-shared metio lint-gate wrappers live here for now; promoting them into
-`ci.lib.mkDevShell` so every repo inherits one definition is the follow-up.)
+that enforces this and that every wrapper a job names exists in `flake.nix`. The
+shared lint-gate wrappers (`ci-reuse`, `ci-typos`, `ci-yaml`, `ci-actionlint`,
+`ci-markdown`) are not defined here — they come from
+`devshell.lib.mkDevShell`, so every metio repo inherits one definition, and this
+flake only defines the gates that are Plinky's own.
 
 ## The gate
 
