@@ -9,16 +9,21 @@
 // playing and every replay, and a test can assert what was asked without hearing it.
 
 import {
+    type ChordQuality,
+    chordPitches,
+    chordSpan,
     type IntervalId,
     INTERVAL_IDS,
     type NoteNameId,
     NATURAL_PITCH_CLASSES,
     noteNameOf,
     pitchClassOf,
+    type ScaleId,
+    scalePitches,
     SEMITONES_PER_OCTAVE,
 } from "./theory";
 
-export type EarExerciseId = "perfect-pitch" | "intervals";
+export type EarExerciseId = "perfect-pitch" | "intervals" | "chords" | "scales";
 
 // Matches the shape the audio port already strikes with: a note, when to sound it, how
 // hard, and for how long. The engine needs no new audio capability.
@@ -90,6 +95,60 @@ export type PerfectPitchConfig = {
     highest: number;
 };
 
+// Chord qualities climb from the major/minor contrast a beginner hears first, out to the
+// four triads, then the sevenths, then the lot. Each level keeps the ones before.
+export const CHORD_LEVELS: ChordQuality[][] = [
+    ["major", "minor"],
+    ["major", "minor", "diminished", "augmented"],
+    ["major", "minor", "diminished", "augmented", "dominant-seventh", "minor-seventh", "major-seventh"],
+    [
+        "major",
+        "minor",
+        "diminished",
+        "augmented",
+        "dominant-seventh",
+        "minor-seventh",
+        "major-seventh",
+        "half-diminished-seventh",
+        "diminished-seventh",
+    ],
+];
+
+// Scales climb from the major/minor pair, through the minor variants, then the modes,
+// then the colourful rest. Each level keeps the ones before.
+export const SCALE_LEVELS: ScaleId[][] = [
+    ["major", "natural-minor"],
+    ["major", "natural-minor", "harmonic-minor", "melodic-minor"],
+    ["major", "natural-minor", "harmonic-minor", "melodic-minor", "dorian", "phrygian", "lydian", "mixolydian"],
+    [
+        "major",
+        "natural-minor",
+        "harmonic-minor",
+        "melodic-minor",
+        "dorian",
+        "phrygian",
+        "lydian",
+        "mixolydian",
+        "major-pentatonic",
+        "minor-pentatonic",
+        "blues",
+        "whole-tone",
+        "chromatic",
+    ],
+];
+
+export type ChordConfig = {
+    qualities: ChordQuality[];
+    lowest: number;
+    highest: number;
+};
+
+export type ScaleConfig = {
+    scales: ScaleId[];
+    lowest: number;
+    highest: number;
+};
+
 // ---------------------------------------------------------------------------
 // Questions
 // ---------------------------------------------------------------------------
@@ -109,7 +168,29 @@ export type IntervalQuestion = {
     direction: IntervalDirection;
 };
 
-export type EarQuestion = PerfectPitchQuestion | IntervalQuestion;
+export type ChordQuestion = {
+    kind: "chords";
+    notes: EarNote[];
+    answer: ChordQuality;
+    choices: ChordQuality[];
+};
+
+export type ScaleQuestion = {
+    kind: "scales";
+    notes: EarNote[];
+    answer: ScaleId;
+    choices: ScaleId[];
+};
+
+export type EarQuestion =
+    | PerfectPitchQuestion
+    | IntervalQuestion
+    | ChordQuestion
+    | ScaleQuestion;
+
+// The gap between successive notes of a scale — quicker than a melodic interval, so the
+// run reads as one shape rather than a string of separate notes.
+const SCALE_STEP_GAP = 0.42;
 
 // Every allowed answer is always offered. Narrowing the choices to a handful would make
 // a round guessable by elimination, which grades the shortlist rather than the ear.
@@ -180,6 +261,68 @@ export function generateInterval(config: IntervalConfig, rng: () => number): Int
         choices: [...intervals],
         direction: config.direction,
     };
+}
+
+export function generateChord(config: ChordConfig, rng: () => number): ChordQuestion {
+    const qualities = config.qualities.length > 0 ? config.qualities : CHORD_LEVELS[0]!;
+    const answer = pick(qualities, rng);
+    // The root leaves room for the chord's top note inside the range.
+    const high = config.highest - chordSpan(answer);
+    const span = Math.max(0, high - config.lowest);
+    const root = config.lowest + Math.floor(rng() * (span + 1));
+    // A chord is heard as one sound, so every note starts together and rings a while.
+    const notes: EarNote[] = chordPitches(root, answer).map((note) => ({
+        note,
+        at: 0,
+        velocity: VELOCITY,
+        duration: NOTE_SECONDS * 1.8,
+    }));
+    return { kind: "chords", notes, answer, choices: [...qualities] };
+}
+
+export function generateScale(config: ScaleConfig, rng: () => number): ScaleQuestion {
+    const scales = config.scales.length > 0 ? config.scales : SCALE_LEVELS[0]!;
+    const answer = pick(scales, rng);
+    // The tonic leaves room for the closing octave inside the range.
+    const high = config.highest - SEMITONES_PER_OCTAVE;
+    const span = Math.max(0, high - config.lowest);
+    const tonic = config.lowest + Math.floor(rng() * (span + 1));
+    // The scale climbs one note after another, each a step behind the last.
+    const notes: EarNote[] = scalePitches(tonic, answer).map((note, index) => ({
+        note,
+        at: index * SCALE_STEP_GAP,
+        velocity: VELOCITY,
+        duration: SCALE_STEP_GAP,
+    }));
+    return { kind: "scales", notes, answer, choices: [...scales] };
+}
+
+// The question for an exercise at a level, over the default register. The one place the
+// exercise id maps to its generator and its level-set, so a caller names an exercise and
+// a level and gets a playable question — the surface it drives falls out of the kind.
+export function generateQuestion(
+    exercise: EarExerciseId,
+    level: number,
+    rng: () => number,
+): EarQuestion {
+    const range = { lowest: DEFAULT_LOWEST, highest: DEFAULT_HIGHEST };
+    switch (exercise) {
+        case "perfect-pitch":
+            return generatePerfectPitch({ naturalsOnly: true, ...range }, rng);
+        case "chords":
+            return generateChord({ qualities: CHORD_LEVELS[level] ?? CHORD_LEVELS[0]!, ...range }, rng);
+        case "scales":
+            return generateScale({ scales: SCALE_LEVELS[level] ?? SCALE_LEVELS[0]!, ...range }, rng);
+        default:
+            return generateInterval(
+                {
+                    intervals: INTERVAL_LEVELS[level] ?? INTERVAL_LEVELS[0]!,
+                    direction: "ascending",
+                    ...range,
+                },
+                rng,
+            );
+    }
 }
 
 // ---------------------------------------------------------------------------

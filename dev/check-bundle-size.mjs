@@ -42,7 +42,12 @@ const ON_DEMAND = /webCodecsVideo/;
 // retired the id-prefix sniffing — the shared practiceHref, the ear-review drill in the
 // review session, and the /ear deep-link — adds ~0.9 KB, measured at 572.0. 573 restores
 // the margin.
-const BUDGET_TOTAL_KB = 573;
+//
+// The chords and scales ear exercises — the chord/scale theory tables and their two
+// generators, the naming choice grid, and 33 more strings (the two exercises, their
+// levels, and the chord/scale/mode names) inlined per locale — add ~1.5 KB, measured at
+// 573.6. 575 restores the margin.
+const BUDGET_TOTAL_KB = 575;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -93,7 +98,10 @@ const BUDGET_TOTAL_KB = 573;
 //
 // Ear rounds joining the grades — the session-recording and the ear catalogue on the
 // You-page read path, plus the ear achievements — adds ~1 KB of app code, at 261.0.
-const BUDGET_APP_KB = 262;
+//
+// The chords and scales exercises — the naming choice grid and the two generators on the
+// session's path — add ~1.5 KB of app code, measured at 263.5.
+const BUDGET_APP_KB = 264;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

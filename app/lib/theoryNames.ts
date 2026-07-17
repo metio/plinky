@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type IntervalId, intervalIdOf, SEMITONES_PER_OCTAVE } from "../../core/theory";
+import {
+    type ChordQuality,
+    type IntervalId,
+    intervalIdOf,
+    type ScaleId,
+    SEMITONES_PER_OCTAVE,
+} from "../../core/theory";
 import { m } from "../paraglide/messages.js";
 
 // core/theory names things with identifiers so it can stay pure and language-neutral.
@@ -27,6 +33,42 @@ export const INTERVAL_NAMES: Record<IntervalId, () => string> = {
 
 export function intervalName(interval: IntervalId): string {
     return INTERVAL_NAMES[interval]();
+}
+
+export const CHORD_NAMES: Record<ChordQuality, () => string> = {
+    major: m.theory_chord_major,
+    minor: m.theory_chord_minor,
+    diminished: m.theory_chord_diminished,
+    augmented: m.theory_chord_augmented,
+    "dominant-seventh": m.theory_chord_dominant_seventh,
+    "major-seventh": m.theory_chord_major_seventh,
+    "minor-seventh": m.theory_chord_minor_seventh,
+    "half-diminished-seventh": m.theory_chord_half_diminished_seventh,
+    "diminished-seventh": m.theory_chord_diminished_seventh,
+};
+
+export function chordName(quality: ChordQuality): string {
+    return CHORD_NAMES[quality]();
+}
+
+export const SCALE_NAMES: Record<ScaleId, () => string> = {
+    major: m.theory_scale_major,
+    "natural-minor": m.theory_scale_natural_minor,
+    "harmonic-minor": m.theory_scale_harmonic_minor,
+    "melodic-minor": m.theory_scale_melodic_minor,
+    dorian: m.theory_scale_dorian,
+    phrygian: m.theory_scale_phrygian,
+    lydian: m.theory_scale_lydian,
+    mixolydian: m.theory_scale_mixolydian,
+    "major-pentatonic": m.theory_scale_major_pentatonic,
+    "minor-pentatonic": m.theory_scale_minor_pentatonic,
+    blues: m.theory_scale_blues,
+    "whole-tone": m.theory_scale_whole_tone,
+    chromatic: m.theory_scale_chromatic,
+};
+
+export function scaleName(scale: ScaleId): string {
+    return SCALE_NAMES[scale]();
 }
 
 // Names a literal distance in semitones — a measured hand reach, not an interval heard

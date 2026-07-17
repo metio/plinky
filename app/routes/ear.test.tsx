@@ -67,4 +67,15 @@ describe("ear route", () => {
         renderAt("/ear?exercise=intervals&level=99");
         expect(chosen(m.ear_level_label)).toBe(m.ear_level_fifths());
     });
+
+    it("offers chords and scales, each with its own level names", () => {
+        renderAt("/ear?exercise=chords&level=1");
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_chords());
+        expect(chosen(m.ear_level_label)).toBe(m.ear_chord_level_triads());
+
+        cleanup();
+        renderAt("/ear?exercise=scales&level=2");
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_scales());
+        expect(chosen(m.ear_level_label)).toBe(m.ear_scale_level_modes());
+    });
 });

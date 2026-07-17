@@ -3,11 +3,16 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    CHORD_QUALITIES,
+    chordPitches,
+    chordSpan,
     INTERVAL_IDS,
-    NATURAL_PITCH_CLASSES,
     intervalIdOf,
+    NATURAL_PITCH_CLASSES,
     noteNameOf,
     pitchClassOf,
+    SCALE_IDS,
+    scalePitches,
     semitonesOf,
 } from "./theory";
 
@@ -72,6 +77,49 @@ describe("semitonesOf", () => {
     it("round-trips every interval through its size", () => {
         for (const interval of INTERVAL_IDS) {
             expect(intervalIdOf(semitonesOf(interval))).toBe(interval);
+        }
+    });
+});
+
+describe("chords", () => {
+    it("stacks a major triad as root, major third, perfect fifth", () => {
+        expect(chordPitches(60, "major")).toEqual([60, 64, 67]);
+    });
+
+    it("stacks a dominant seventh with its minor seventh on top", () => {
+        expect(chordPitches(60, "dominant-seventh")).toEqual([60, 64, 67, 70]);
+    });
+
+    it("reports each quality's span as the reach of its top note", () => {
+        expect(chordSpan("major")).toBe(7);
+        expect(chordSpan("augmented")).toBe(8);
+        expect(chordSpan("major-seventh")).toBe(11);
+    });
+
+    it("keeps every quality's notes ascending from the root", () => {
+        for (const quality of CHORD_QUALITIES) {
+            const pitches = chordPitches(60, quality);
+            expect(pitches[0]).toBe(60);
+            expect([...pitches].sort((a, b) => a - b)).toEqual(pitches);
+        }
+    });
+});
+
+describe("scales", () => {
+    it("climbs a major scale and closes on the octave", () => {
+        expect(scalePitches(60, "major")).toEqual([60, 62, 64, 65, 67, 69, 71, 72]);
+    });
+
+    it("gives the chromatic scale all twelve steps plus the octave", () => {
+        expect(scalePitches(60, "chromatic")).toHaveLength(13);
+    });
+
+    it("ascends and closes on the octave for every scale", () => {
+        for (const scale of SCALE_IDS) {
+            const pitches = scalePitches(60, scale);
+            expect(pitches[0]).toBe(60);
+            expect(pitches.at(-1)).toBe(72);
+            expect([...pitches].sort((a, b) => a - b)).toEqual(pitches);
         }
     });
 });

@@ -11,7 +11,7 @@
 // GRADE_THRESHOLDS), so an ear item and a piece of the same grade are genuinely
 // comparable and the skill rating can average across both.
 
-import { type EarExerciseId, INTERVAL_LEVELS } from "./earExercise";
+import { CHORD_LEVELS, type EarExerciseId, INTERVAL_LEVELS, SCALE_LEVELS } from "./earExercise";
 
 // A bounded run of rounds. Grading needs a settled accuracy, and an endless stream never
 // settles — ten rounds is long enough to mean something and short enough to fit the gap
@@ -36,27 +36,37 @@ export type EarItem = {
 // a beginner tells apart; the seconds and sixths carry the colour that has to be learned;
 // naming a bare note with no reference is the hardest of these and sits well up the
 // ladder.
-const INTERVAL_GRADES = [1, 2, 3, 4];
-const INTERVAL_COSTS = [1.3, 2.0, 2.6, 3.2];
+// One item per level, per exercise. The grades climb both across levels (harder sets) and
+// across exercises: telling major from minor is roughly a chord's easiest ask, while the
+// modes and the full seventh set sit well up the ladder. Chord and scale reading are a
+// touch harder than the matching interval level, so they start a grade higher.
+const LADDERS: { exercise: EarExerciseId; levels: unknown[]; grades: number[]; costs: number[] }[] =
+    [
+        { exercise: "intervals", levels: INTERVAL_LEVELS, grades: [1, 2, 3, 4], costs: [1.3, 2.0, 2.6, 3.2] },
+        { exercise: "chords", levels: CHORD_LEVELS, grades: [2, 3, 4, 5], costs: [1.8, 2.4, 3.0, 3.6] },
+        { exercise: "scales", levels: SCALE_LEVELS, grades: [2, 4, 5, 6], costs: [1.8, 3.0, 3.6, 4.2] },
+    ];
 
 export const EAR_ITEMS: EarItem[] = [
-    ...INTERVAL_LEVELS.map((_level, index) => ({
-        id: `ear-intervals-${index}`,
-        exercise: "intervals" as EarExerciseId,
-        level: index,
-        grade: INTERVAL_GRADES[index] ?? INTERVAL_GRADES.at(-1) ?? 4,
-        cost: INTERVAL_COSTS[index] ?? INTERVAL_COSTS.at(-1) ?? 3.2,
-    })),
+    ...LADDERS.flatMap(({ exercise, levels, grades, costs }) =>
+        levels.map((_level, index) => ({
+            id: `ear-${exercise}-${index}`,
+            exercise,
+            level: index,
+            grade: grades[index] ?? grades.at(-1) ?? 4,
+            cost: costs[index] ?? costs.at(-1) ?? 3.2,
+        })),
+    ),
     { id: "ear-perfect-pitch", exercise: "perfect-pitch", level: null, grade: 5, cost: 3.6 },
 ];
 
-// The gradeable item a session trains — the answer surface a player picked. An interval
-// session trains its level; perfect pitch is level-independent.
+// The gradeable item a session trains — the answer surface a player picked. A level-based
+// exercise trains its level; perfect pitch (level null) is level-independent, so it
+// matches whatever level is passed.
 export function earItemFor(exercise: EarExerciseId, level: number): EarItem | undefined {
-    if (exercise === "intervals") {
-        return EAR_ITEMS.find((item) => item.exercise === "intervals" && item.level === level);
-    }
-    return EAR_ITEMS.find((item) => item.exercise === exercise);
+    return EAR_ITEMS.find(
+        (item) => item.exercise === exercise && (item.level === null || item.level === level),
+    );
 }
 
 // The item behind an id, so a due ear review can drive the right drill and the practice

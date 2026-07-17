@@ -138,4 +138,34 @@ describe("EarSession", () => {
         press("G");
         expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
     });
+
+    it("names a chord's quality from a choice grid, recorded to the chord item", () => {
+        const { services } = mount({ exercise: "chords" });
+        // Math.random pinned to 0 asks for the first quality of the level: major.
+        press(m.ear_start());
+        expect(screen.getByRole("group", { name: m.ear_chord_choices() })).toBeTruthy();
+        press(m.theory_chord_major());
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+
+        for (let round = 1; round < EAR_SESSION_ROUNDS; round++) {
+            press(m.ear_next());
+            press(m.theory_chord_major());
+        }
+        expect(services.mastery.load("ear-chords-0")?.bestScore).toBe(100);
+    });
+
+    it("names a scale from a choice grid, recorded to the scale item", () => {
+        const { services } = mount({ exercise: "scales" });
+        // Math.random pinned to 0 asks for the first scale of the level: major.
+        press(m.ear_start());
+        expect(screen.getByRole("group", { name: m.ear_scale_choices() })).toBeTruthy();
+        press(m.theory_scale_major());
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+
+        for (let round = 1; round < EAR_SESSION_ROUNDS; round++) {
+            press(m.ear_next());
+            press(m.theory_scale_major());
+        }
+        expect(services.mastery.load("ear-scales-0")?.bestScore).toBe(100);
+    });
 });

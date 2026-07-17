@@ -7,22 +7,28 @@ import {
     type EarExerciseId,
     type EarQuestion,
     type EarRound,
-    DEFAULT_HIGHEST,
-    DEFAULT_LOWEST,
-    generateInterval,
-    generatePerfectPitch,
-    INTERVAL_LEVELS,
+    generateQuestion,
     isCorrect,
     scoreRounds,
 } from "../../../core/earExercise";
 import { applyRun, letterMin } from "../../../core/mastery";
-import type { IntervalId, NoteNameId } from "../../../core/theory";
+import type { ChordQuality, IntervalId, NoteNameId, ScaleId } from "../../../core/theory";
 import { useMasteryStore, usePrefsStore } from "../../contexts/services";
+import { chordName, scaleName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { EarChoices } from "./earChoices";
 import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
 import { EarStage } from "./earStage";
+
+// The one-line prompt on the resting start card, per exercise.
+const BLURB: Record<EarExerciseId, () => string> = {
+    intervals: m.ear_intervals_blurb,
+    "perfect-pitch": m.ear_pitch_blurb,
+    chords: m.ear_chords_blurb,
+    scales: m.ear_scales_blurb,
+};
 
 // A bounded run of one ear exercise: it plays a question, takes an answer, and after
 // EAR_SESSION_ROUNDS folds the run's accuracy into the item's mastery — the same score a
@@ -65,22 +71,7 @@ export function EarSession({
 
     const next = useCallback(() => {
         setGiven(null);
-        setQuestion(
-            exercise === "intervals"
-                ? generateInterval(
-                      {
-                          intervals: INTERVAL_LEVELS[level] ?? INTERVAL_LEVELS[0]!,
-                          direction: "ascending",
-                          lowest: DEFAULT_LOWEST,
-                          highest: DEFAULT_HIGHEST,
-                      },
-                      Math.random,
-                  )
-                : generatePerfectPitch(
-                      { naturalsOnly: true, lowest: DEFAULT_LOWEST, highest: DEFAULT_HIGHEST },
-                      Math.random,
-                  ),
-        );
+        setQuestion(generateQuestion(exercise, level, Math.random));
     }, [exercise, level]);
 
     // A review drill has already been chosen, so it opens straight on its first question.
@@ -137,9 +128,7 @@ export function EarSession({
     if (question === null) {
         return (
             <div className="space-y-4 rounded-xl border border-gray-200 p-8 text-center dark:border-gray-800">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {exercise === "intervals" ? m.ear_intervals_blurb() : m.ear_pitch_blurb()}
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{BLURB[exercise]()}</p>
                 <Button variant="primary" onClick={next}>
                     {m.ear_start()}
                 </Button>
@@ -158,12 +147,30 @@ export function EarSession({
                     given={settled ? (given as IntervalId) : null}
                     onChoose={answer}
                 />
-            ) : (
+            ) : question.kind === "perfect-pitch" ? (
                 <EarKeyboard
                     choices={question.choices}
                     answer={settled ? question.answer : null}
                     given={settled ? (given as NoteNameId) : null}
                     onChoose={answer}
+                />
+            ) : question.kind === "chords" ? (
+                <EarChoices
+                    choices={question.choices}
+                    answer={settled ? question.answer : null}
+                    given={settled ? (given as ChordQuality) : null}
+                    onChoose={answer}
+                    nameOf={chordName}
+                    label={m.ear_chord_choices()}
+                />
+            ) : (
+                <EarChoices
+                    choices={question.choices}
+                    answer={settled ? question.answer : null}
+                    given={settled ? (given as ScaleId) : null}
+                    onChoose={answer}
+                    nameOf={scaleName}
+                    label={m.ear_scale_choices()}
                 />
             )}
 

@@ -4,18 +4,27 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
+    CHORD_LEVELS,
+    DEFAULT_HIGHEST,
+    DEFAULT_LOWEST,
     type IntervalDirection,
+    generateChord,
     generateInterval,
     generatePerfectPitch,
+    generateQuestion,
+    generateScale,
     INTERVAL_LEVELS,
     isCorrect,
+    SCALE_LEVELS,
     scoreRounds,
 } from "./earExercise";
 import {
+    chordPitches,
     INTERVAL_IDS,
     NATURAL_PITCH_CLASSES,
     noteNameOf,
     pitchClassOf,
+    scalePitches,
     semitonesOf,
 } from "./theory";
 
@@ -194,5 +203,82 @@ describe("scoreRounds properties", () => {
 
     it("reads an empty session as nothing asked rather than a divide by zero", () => {
         expect(scoreRounds([])).toEqual({ asked: 0, correct: 0, accuracy: 0 });
+    });
+});
+
+const chordLevels = fc.integer({ min: 0, max: CHORD_LEVELS.length - 1 });
+const scaleLevels = fc.integer({ min: 0, max: SCALE_LEVELS.length - 1 });
+const RANGE = { lowest: DEFAULT_LOWEST, highest: DEFAULT_HIGHEST };
+
+describe("chord question properties", () => {
+    it("sounds exactly the chord's notes, all at once", () => {
+        fc.assert(
+            fc.property(rolls, chordLevels, (values, level) => {
+                const q = generateChord({ qualities: CHORD_LEVELS[level]!, ...RANGE }, rngOf(values));
+                // Every note starts together — a chord is heard as one sound.
+                expect(q.notes.every((note) => note.at === 0)).toBe(true);
+                const root = Math.min(...q.notes.map((note) => note.note));
+                expect(q.notes.map((note) => note.note).sort((a, b) => a - b)).toEqual(
+                    chordPitches(root, q.answer),
+                );
+            }),
+        );
+    });
+
+    it("keeps every note in range and always offers the answer", () => {
+        fc.assert(
+            fc.property(rolls, chordLevels, (values, level) => {
+                const q = generateChord({ qualities: CHORD_LEVELS[level]!, ...RANGE }, rngOf(values));
+                for (const note of q.notes) {
+                    expect(note.note).toBeGreaterThanOrEqual(DEFAULT_LOWEST);
+                    expect(note.note).toBeLessThanOrEqual(DEFAULT_HIGHEST);
+                }
+                expect(q.choices).toContain(q.answer);
+                expect(isCorrect(q, q.answer)).toBe(true);
+            }),
+        );
+    });
+});
+
+describe("scale question properties", () => {
+    it("sounds the scale as a rising sequence closing on the octave", () => {
+        fc.assert(
+            fc.property(rolls, scaleLevels, (values, level) => {
+                const q = generateScale({ scales: SCALE_LEVELS[level]!, ...RANGE }, rngOf(values));
+                const tonic = q.notes[0]!.note;
+                expect(q.notes.map((note) => note.note)).toEqual(scalePitches(tonic, q.answer));
+                // Each note begins after the one before — a climbing line, not a chord.
+                for (let i = 1; i < q.notes.length; i++) {
+                    expect(q.notes[i]!.at).toBeGreaterThan(q.notes[i - 1]!.at);
+                }
+            }),
+        );
+    });
+
+    it("keeps every note in range and always offers the answer", () => {
+        fc.assert(
+            fc.property(rolls, scaleLevels, (values, level) => {
+                const q = generateScale({ scales: SCALE_LEVELS[level]!, ...RANGE }, rngOf(values));
+                for (const note of q.notes) {
+                    expect(note.note).toBeGreaterThanOrEqual(DEFAULT_LOWEST);
+                    expect(note.note).toBeLessThanOrEqual(DEFAULT_HIGHEST);
+                }
+                expect(q.choices).toContain(q.answer);
+            }),
+        );
+    });
+});
+
+describe("generateQuestion dispatch", () => {
+    it("routes each exercise to a question of its own kind", () => {
+        fc.assert(
+            fc.property(rolls, (values) => {
+                const rng = () => rngOf(values)();
+                expect(generateQuestion("intervals", 0, rng).kind).toBe("intervals");
+                expect(generateQuestion("perfect-pitch", 0, rng).kind).toBe("perfect-pitch");
+                expect(generateQuestion("chords", 0, rng).kind).toBe("chords");
+                expect(generateQuestion("scales", 0, rng).kind).toBe("scales");
+            }),
+        );
     });
 });

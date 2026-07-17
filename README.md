@@ -146,7 +146,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   piano. **Intervals** plays two notes and you name the distance between them on a
   ladder whose rungs sit at the distance they name, so the answer has a height as well
   as a word; the levels start on fifths and octaves and fill the ladder in as you go.
-  **Perfect pitch** plays one note and you name it on a keyboard. Every round can be
+  **Chords** plays a chord and you name its quality; **Scales** plays a scale and you
+  name which one it is — both from a grid of choices, climbing from the major/minor pair
+  out to the sevenths, the modes and beyond. **Perfect pitch** plays one note and you
+  name it on a keyboard. Every round can be
   replayed as often as you like, and a miss shows what played rather than marking you
   down. A round is ten questions, and finishing one **counts toward your grades** the
   same way playing a piece does — each exercise sits on the grade ladder, so ear practice

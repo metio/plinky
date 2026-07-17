@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
 import type { EarExerciseId } from "../../core/earExercise";
-import { INTERVAL_LEVELS } from "../../core/earExercise";
 import { routeMeta } from "../../core/site";
 import { EarSession } from "../components/features/earSession";
 import { ChoiceField } from "../components/ui/fields";
@@ -17,20 +16,33 @@ export function meta(_args: Route.MetaArgs) {
 
 const EXERCISES: { id: EarExerciseId; label: () => string }[] = [
     { id: "intervals", label: m.ear_exercise_intervals },
+    { id: "chords", label: m.ear_exercise_chords },
+    { id: "scales", label: m.ear_exercise_scales },
     { id: "perfect-pitch", label: m.ear_exercise_perfect_pitch },
 ];
 
-// Named by what they add rather than numbered: "Thirds & fourths" says what the round
-// holds, where "Level 2" only says it comes after level 1.
-const LEVELS: { id: string; label: () => string }[] = [
-    { id: "0", label: m.ear_level_fifths },
-    { id: "1", label: m.ear_level_thirds },
-    { id: "2", label: m.ear_level_seconds },
-    { id: "3", label: m.ear_level_all },
-];
+// Each level is named by what it adds rather than numbered: "Thirds & fourths" says what
+// the round holds, where "Level 2" only says it comes after level 1. Perfect pitch has no
+// levels. Chords and scales share the "Major & minor" and "Everything" ends.
+const LEVELS: Record<EarExerciseId, (() => string)[]> = {
+    intervals: [m.ear_level_fifths, m.ear_level_thirds, m.ear_level_seconds, m.ear_level_all],
+    chords: [
+        m.ear_level_major_minor,
+        m.ear_chord_level_triads,
+        m.ear_chord_level_sevenths,
+        m.ear_level_all,
+    ],
+    scales: [
+        m.ear_level_major_minor,
+        m.ear_scale_level_minors,
+        m.ear_scale_level_modes,
+        m.ear_level_all,
+    ],
+    "perfect-pitch": [],
+};
 
 function isExercise(value: string | null): value is EarExerciseId {
-    return value === "intervals" || value === "perfect-pitch";
+    return value !== null && value in LEVELS;
 }
 
 export default function Ear() {
@@ -38,15 +50,16 @@ export default function Ear() {
     // otherwise the page rests on the first interval level.
     const [params] = useSearchParams();
     const param = params.get("exercise");
+    const initial: EarExerciseId = isExercise(param) ? param : "intervals";
     const paramLevel = Number(params.get("level"));
-    const [exercise, setExercise] = useState<EarExerciseId>(
-        isExercise(param) ? param : "intervals",
-    );
+    const [exercise, setExercise] = useState<EarExerciseId>(initial);
     const [level, setLevel] = useState(
-        Number.isInteger(paramLevel) && paramLevel >= 0 && paramLevel < INTERVAL_LEVELS.length
+        Number.isInteger(paramLevel) && paramLevel >= 0 && paramLevel < LEVELS[initial].length
             ? String(paramLevel)
             : "0",
     );
+
+    const levels = LEVELS[exercise];
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -62,12 +75,12 @@ export default function Ear() {
                 options={EXERCISES.map((item) => ({ id: item.id, label: item.label() }))}
             />
 
-            {exercise === "intervals" ? (
+            {levels.length > 0 ? (
                 <ChoiceField
                     label={m.ear_level_label()}
                     value={level}
                     onChange={setLevel}
-                    options={LEVELS.map((item) => ({ id: item.id, label: item.label() }))}
+                    options={levels.map((label, index) => ({ id: String(index), label: label() }))}
                     help={m.ear_level_help()}
                 />
             ) : null}

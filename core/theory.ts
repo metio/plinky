@@ -139,3 +139,91 @@ export function intervalIdOf(semitones: number): IntervalId {
     }
     return INTERVAL_IDS[simple] ?? "unison";
 }
+
+// ---------------------------------------------------------------------------
+// Chords
+// ---------------------------------------------------------------------------
+
+export type ChordQuality =
+    | "major"
+    | "minor"
+    | "diminished"
+    | "augmented"
+    | "dominant-seventh"
+    | "major-seventh"
+    | "minor-seventh"
+    | "half-diminished-seventh"
+    | "diminished-seventh";
+
+// The semitones a chord stacks above its root — the whole definition of its quality.
+// A quality is what it sounds like whatever the root, so the ear names the stack.
+const CHORD_STACKS: Record<ChordQuality, number[]> = {
+    major: [0, 4, 7],
+    minor: [0, 3, 7],
+    diminished: [0, 3, 6],
+    augmented: [0, 4, 8],
+    "dominant-seventh": [0, 4, 7, 10],
+    "major-seventh": [0, 4, 7, 11],
+    "minor-seventh": [0, 3, 7, 10],
+    "half-diminished-seventh": [0, 3, 6, 10],
+    "diminished-seventh": [0, 3, 6, 9],
+};
+
+export const CHORD_QUALITIES = Object.keys(CHORD_STACKS) as ChordQuality[];
+
+// The sounding notes of a chord in root position, from a root MIDI note.
+export function chordPitches(root: number, quality: ChordQuality): number[] {
+    return CHORD_STACKS[quality].map((step) => root + step);
+}
+
+// How far the top of a chord sits above its root — the room the generator must leave.
+export function chordSpan(quality: ChordQuality): number {
+    return Math.max(...CHORD_STACKS[quality]);
+}
+
+// ---------------------------------------------------------------------------
+// Scales
+// ---------------------------------------------------------------------------
+
+export type ScaleId =
+    | "major"
+    | "natural-minor"
+    | "harmonic-minor"
+    | "melodic-minor"
+    | "dorian"
+    | "phrygian"
+    | "lydian"
+    | "mixolydian"
+    | "major-pentatonic"
+    | "minor-pentatonic"
+    | "blues"
+    | "whole-tone"
+    | "chromatic";
+
+// Semitones above the tonic, ascending, without the closing octave — the shape a scale
+// is defined by. scalePitches adds the octave back so the run resolves.
+const SCALE_STEPS: Record<ScaleId, number[]> = {
+    major: [0, 2, 4, 5, 7, 9, 11],
+    "natural-minor": [0, 2, 3, 5, 7, 8, 10],
+    "harmonic-minor": [0, 2, 3, 5, 7, 8, 11],
+    // The ascending form; the descending melodic minor is natural minor, a property of
+    // how it's played rather than of the scale's identity.
+    "melodic-minor": [0, 2, 3, 5, 7, 9, 11],
+    dorian: [0, 2, 3, 5, 7, 9, 10],
+    phrygian: [0, 1, 3, 5, 7, 8, 10],
+    lydian: [0, 2, 4, 6, 7, 9, 11],
+    mixolydian: [0, 2, 4, 5, 7, 9, 10],
+    "major-pentatonic": [0, 2, 4, 7, 9],
+    "minor-pentatonic": [0, 3, 5, 7, 10],
+    blues: [0, 3, 5, 6, 7, 10],
+    "whole-tone": [0, 2, 4, 6, 8, 10],
+    chromatic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+};
+
+export const SCALE_IDS = Object.keys(SCALE_STEPS) as ScaleId[];
+
+// The scale as sounding notes from a tonic, closing on the octave above — a scale that
+// stopped on its leading note would sound unfinished.
+export function scalePitches(tonic: number, scale: ScaleId): number[] {
+    return [...SCALE_STEPS[scale].map((step) => tonic + step), tonic + SEMITONES_PER_OCTAVE];
+}
