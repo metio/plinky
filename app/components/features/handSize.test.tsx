@@ -29,7 +29,8 @@ describe("HandSize", () => {
         fireEvent.click(screen.getAllByText("Set")[0]!); // left hand
         tap("C 4"); // thumb
         tap("A 4"); // pinky → a major sixth (9 semitones)
-        expect(screen.getByText(/C4 → A4 · 9 semitones/)).toBeTruthy();
+        // The interval gloss is now a translated name, not a hardcoded English string.
+        expect(screen.getByText(/C4 → A4 · 9 semitones · Major sixth/)).toBeTruthy();
 
         fireEvent.click(screen.getByText("Save"));
         // Only the right hand remains unset, and the left span is stored.

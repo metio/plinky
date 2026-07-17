@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import { useMidiInput } from "../../contexts/midi";
-import { intervalName } from "../../../core/intervals";
 import { noteName } from "../../../core/midi";
+import { spanName } from "../../lib/theoryNames";
 import type { HandSpan } from "../../../core/prefs";
 import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
@@ -65,7 +65,11 @@ export function HandSize() {
         readout = `${noteName(thumb)} — ${m.hand_size_tap_pinky()}`;
     } else {
         const span = Math.abs(pinky - thumb);
-        readout = `${noteName(thumb)} → ${noteName(pinky)} · ${m.hand_size_semitones({ count: span })} · ${intervalName(span)}`;
+        // The semitone count always shows; the interval name is an extra gloss that a
+        // very wide reach (a stray MIDI value) drops, so the count stands alone.
+        const name = spanName(span);
+        const glossed = `${noteName(thumb)} → ${noteName(pinky)} · ${m.hand_size_semitones({ count: span })}`;
+        readout = name ? `${glossed} · ${name}` : glossed;
     }
 
     return (
@@ -86,8 +90,8 @@ export function HandSize() {
                                 <span className="font-medium">{sideLabel[side]}</span>{" "}
                                 {span !== null ? (
                                     <span className="text-gray-500 dark:text-gray-400">
-                                        {m.hand_size_semitones({ count: span })} ·{" "}
-                                        {intervalName(span)}
+                                        {m.hand_size_semitones({ count: span })}
+                                        {spanName(span) ? ` · ${spanName(span)}` : ""}
                                     </span>
                                 ) : (
                                     <span className="text-gray-500 dark:text-gray-400">
