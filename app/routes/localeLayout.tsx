@@ -34,8 +34,8 @@ export default function LocaleLayout() {
     // An unknown locale prefix — a typo, a stale link, a bot probing paths — can't
     // select a language, so redirect to the same page under the resolved locale rather
     // than dead-ending: the visitor keeps the page they asked for. localizeHref picks the
-    // target the way the bare "/" does (the browser's preferred language, English by
-    // default); the bad first segment is dropped and the rest re-localized. During
+    // target the way the bare "/" does (the language last chosen, else the browser's,
+    // else English); the bad first segment is dropped and the rest re-localized. During
     // prerender there is no navigator to resolve against — and an unknown locale is never
     // prerendered — so defer the redirect to the client, exactly as the root redirect does.
     if (!valid) {

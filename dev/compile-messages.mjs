@@ -27,8 +27,8 @@ if (staticLocale && !locales.includes(staticLocale)) {
 
 // One canonical pattern, with a prefixed localized form per locale. There is no
 // unprefixed catch-all, so a bare path (e.g. "/") matches no locale and falls
-// through to the preferredLanguage strategy — which is what drives the root
-// redirect to the visitor's language.
+// through to the strategies below — which is what drives the root redirect to
+// the visitor's language.
 const urlPatterns = [
     {
         pattern: ":protocol://:domain(.*)::port?/:path(.*)?",
@@ -42,7 +42,14 @@ const urlPatterns = [
 await compile({
     project: "./project.inlang",
     outdir: "./app/paraglide",
-    strategy: ["url", "preferredLanguage", "baseLocale"],
+    // Order is the whole behaviour. `url` first: a /de/ link renders German for
+    // whoever opens it, so a shared link is honest regardless of the reader's own
+    // choice. `localStorage` next, so a bare "/" reopens in the language the player
+    // picked — setLocale writes it (it does not short-circuit on a pinned static
+    // locale, so the write works from a per-locale build too), and only the
+    // all-locales root build ever has to read it. `preferredLanguage` then serves a
+    // first-time visitor, who has nothing stored yet.
+    strategy: ["url", "localStorage", "preferredLanguage", "baseLocale"],
     urlPatterns,
     emitTsDeclarations: true,
     // Per-locale builds: `PLINKY_LOCALE=de npm run build` pins the compiled
