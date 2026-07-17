@@ -95,3 +95,14 @@ export function findHotspots(
     }
     return hotspots;
 }
+
+// How much the trainer nudges the tempo up after a cleared run — gentle enough
+// that the next run still feels like the one just played.
+export const TRAINER_STEP = 5;
+
+// The trainer's ramp: one step toward the target after a run, never overshooting it.
+// A slider already at or above the target is left alone — the ramp only ever raises
+// the tempo, so reaching for a slower target cannot snap the player back down.
+export function rampedTempo(current: number, target: number): number {
+    return current >= target ? current : Math.min(current + TRAINER_STEP, target);
+}

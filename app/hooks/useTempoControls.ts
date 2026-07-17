@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePrefsStore } from "../contexts/services";
 import { usePref } from "./usePref";
 import { type RunCapture, liveTempo as nextLiveTempo } from "../../core/runCapture";
+import { rampedTempo } from "../../core/tempo";
 
 // The play surface's tempo settings, held as one unit: the slider tempo, the adaptive
 // "live" tempo that eases toward the player's own pace, the metronome's own toggles
@@ -79,10 +80,8 @@ export function useTempoControls({
     // trainer setting from a ref, so an empty dependency list is correct.
     const bumpTempo = useCallback(() => {
         if (trainerRef.current.on) {
-            // Ramp up toward the target only; when the slider is already at or above it,
-            // leave the tempo alone rather than snapping it down.
             const target = trainerRef.current.target;
-            setTempo((current) => (current >= target ? current : Math.min(current + 5, target)));
+            setTempo((current) => rampedTempo(current, target));
         }
     }, []);
 

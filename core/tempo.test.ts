@@ -2,7 +2,15 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { findHotspots, instantaneousBpm, median, tempoSeries, type TempoPoint } from "./tempo";
+import {
+    findHotspots,
+    instantaneousBpm,
+    median,
+    rampedTempo,
+    tempoSeries,
+    type TempoPoint,
+    TRAINER_STEP,
+} from "./tempo";
 
 describe("instantaneousBpm", () => {
     it("returns the reference tempo when played exactly on time", () => {
@@ -83,3 +91,22 @@ describe("findHotspots", () => {
         expect(findHotspots(points([100, 98, 102, 99]), 100)).toEqual([]);
     });
 });
+
+describe("rampedTempo", () => {
+    it("steps toward the target after a cleared run", () => {
+        expect(rampedTempo(100, 140)).toBe(100 + TRAINER_STEP);
+    });
+
+    it("lands exactly on the target rather than overshooting it", () => {
+        expect(rampedTempo(138, 140)).toBe(140);
+    });
+
+    it.each([
+        ["already at the target", 140, 140],
+        ["past the target", 160, 140],
+    ])("leaves a slider %s alone", (_case, current, target) => {
+        // The ramp only ever raises the tempo — a lower target must not snap the
+        // player back down mid-practice.
+        expect(rampedTempo(current, target)).toBe(current);
+    });
+})
