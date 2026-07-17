@@ -81,7 +81,7 @@ export function useCompositionTransport({
         timersRef.current.push(
             scheduler.after(barMs, () => {
                 setCountingIn(false);
-                onDownbeatRef.current(performance.now());
+                onDownbeatRef.current(scheduler.now());
             }),
         );
     }, [beatsPerBar, tempo, scheduler]);

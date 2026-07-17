@@ -4,7 +4,7 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { decodeGhost, ghostReached } from "../../core/ghost";
+import { decodeGhost, ghostReached, ghostToRace } from "../../core/ghost";
 import type { Hand } from "../../core/matcher";
 import { GHOST_COLOR, PLAYED_COLOR } from "../../core/scoreCanvas";
 import { fastestTakeOnsets } from "../../core/takes";
@@ -82,7 +82,7 @@ export function useGhostRace({
         const tick = () => {
             const startedAt = runStartedAt();
             if (startedAt > 0) {
-                setGhostDone(ghostReached(ghost, performance.now() - startedAt));
+                setGhostDone(ghostReached(ghost, scheduler.now() - startedAt));
             }
         };
         const timer = scheduler.every(50, tick);
@@ -137,12 +137,9 @@ export function useGhostRace({
         ghostMarkRef.current = target;
     }, [ghostDone, ghost, practicing, complete, done]);
 
-    // Arm the race for a starting run: pick the ghost to chase — your fastest
-    // complete take, falling back to the last run (or a friend's shared ghost) —
-    // and capture each step's rendered notes (post-render) so its colour can mark,
-    // and move along, the actual staff. A partial run (a takeover from Listen) has
-    // no full-piece ghost to race — chasing one from the middle would desync the
-    // marker — and an ephemeral piece keeps no ghost at all.
+    // Arm the race for a starting run: resolve the ghost to chase, then capture each
+    // step's rendered notes (post-render) so its colour can mark, and move along, the
+    // actual staff.
     const arm = useCallback(
         ({
             partial,
@@ -155,12 +152,14 @@ export function useGhostRace({
             raceGhost: boolean;
             hand: Hand;
         }) => {
-            const racing =
-                partial || ephemeral || !raceGhost
-                    ? null
-                    : (fastestTakeOnsets(services.takes.list(id)) ??
-                      storedGhost ??
-                      services.ghosts.load(id));
+            const racing = ghostToRace({
+                partial,
+                ephemeral,
+                raceGhost,
+                fastestTake: () => fastestTakeOnsets(services.takes.list(id)),
+                stored: () => storedGhost,
+                saved: () => services.ghosts.load(id),
+            });
             setGhost(racing);
             setGhostDone(0);
             ghostMarkRef.current = -1;

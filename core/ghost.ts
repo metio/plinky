@@ -64,6 +64,39 @@ export function decodeGhost(code: string): number[] | null {
     return isAscending(onsets) ? onsets : null;
 }
 
+// Which ghost a starting run races, given the candidates in preference order: the
+// player's own fastest complete take beats a ghost held for the score (their last
+// run, or a friend's shared one), which beats the ghost in storage.
+//
+// Three conditions yield no race at all. A partial run — a takeover from Listen —
+// starts mid-piece, and a ghost timed from the first note would desync the marker
+// against it. An ephemeral piece keeps no ghost to chase. And `raceGhost` is the
+// player's own choice to race, so it vetoes every candidate.
+//
+// The candidates arrive as thunks because resolving one reads storage: a run that
+// races nothing must not pay for a lookup its answer ignores, and a lower-precedence
+// candidate goes unread whenever a higher one supplies the ghost.
+export function ghostToRace({
+    partial,
+    ephemeral,
+    raceGhost,
+    fastestTake,
+    stored,
+    saved,
+}: {
+    partial: boolean;
+    ephemeral?: boolean;
+    raceGhost: boolean;
+    fastestTake: () => number[] | null;
+    stored: () => number[] | null;
+    saved: () => number[] | null;
+}): number[] | null {
+    if (partial || ephemeral || !raceGhost) {
+        return null;
+    }
+    return fastestTake() ?? stored() ?? saved();
+}
+
 // How many notes the ghost has reached by a given elapsed time. The onsets ascend,
 // so the first one still in the future ends the count.
 export function ghostReached(onsets: number[], elapsedMs: number): number {

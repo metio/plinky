@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { describe, expect, it } from "vitest";
-import { decodeGhost, encodeGhost, ghostReached } from "./ghost";
+import { describe, expect, it, vi } from "vitest";
+import { decodeGhost, encodeGhost, ghostReached, ghostToRace } from "./ghost";
 import { packToCode } from "./shareCode";
 
 describe("ghost codec", () => {
@@ -37,6 +37,76 @@ describe("ghost codec", () => {
         expect(code.length).toBeLessThan(legacyLength / 3);
         expect(code.length).toBeLessThan(8000);
         expect(decodeGhost(code)).toEqual(onsets);
+    });
+
+    describe("ghostToRace", () => {
+        const take = [0, 100];
+        const stored = [0, 200];
+        const saved = [0, 300];
+        const candidates = {
+            fastestTake: () => take,
+            stored: () => stored,
+            saved: () => saved,
+        };
+
+        it("prefers the fastest take, then the stored ghost, then the saved one", () => {
+            expect(ghostToRace({ partial: false, raceGhost: true, ...candidates })).toEqual(take);
+            expect(
+                ghostToRace({
+                    partial: false,
+                    raceGhost: true,
+                    ...candidates,
+                    fastestTake: () => null,
+                }),
+            ).toEqual(stored);
+            expect(
+                ghostToRace({
+                    partial: false,
+                    raceGhost: true,
+                    ...candidates,
+                    fastestTake: () => null,
+                    stored: () => null,
+                }),
+            ).toEqual(saved);
+        });
+
+        it("races nothing when every candidate is empty", () => {
+            expect(
+                ghostToRace({
+                    partial: false,
+                    raceGhost: true,
+                    fastestTake: () => null,
+                    stored: () => null,
+                    saved: () => null,
+                }),
+            ).toBeNull();
+        });
+
+        it.each([
+            ["a partial run starts mid-piece", { partial: true, raceGhost: true }],
+            ["an ephemeral piece keeps no ghost", { partial: false, ephemeral: true, raceGhost: true }],
+            ["the player declined the race", { partial: false, raceGhost: false }],
+        ])("races nothing when %s", (_reason, options) => {
+            expect(ghostToRace({ ...options, ...candidates })).toBeNull();
+        });
+
+        it("leaves a lower-precedence candidate unread when a higher one answers", () => {
+            const savedProbe = vi.fn(() => saved);
+            ghostToRace({ partial: false, raceGhost: true, ...candidates, saved: savedProbe });
+            expect(savedProbe).not.toHaveBeenCalled();
+        });
+
+        it("reads no candidate at all when nothing is raced", () => {
+            const probe = vi.fn(() => take);
+            ghostToRace({
+                partial: true,
+                raceGhost: true,
+                fastestTake: probe,
+                stored: probe,
+                saved: probe,
+            });
+            expect(probe).not.toHaveBeenCalled();
+        });
     });
 
     it("counts the notes a ghost has reached by an elapsed time", () => {
