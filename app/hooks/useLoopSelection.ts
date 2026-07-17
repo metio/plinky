@@ -10,6 +10,7 @@ import {
     useRef,
     useState,
 } from "react";
+import { loopClick } from "../../core/loop";
 import { type MeasureBox, measureAtPoint } from "../../core/scoreCanvas";
 import { clearBarSelection, clientPointToSvg, paintBarSelection } from "../lib/scoreColor";
 
@@ -154,20 +155,18 @@ export function useLoopSelection({
             if (measure === null) {
                 return;
             }
-            const bar = measure + 1;
-            if (!loopRef.current.on) {
-                onBareClickRef.current?.(bar);
+            const outcome = loopClick({
+                on: loopRef.current.on,
+                anchor: anchorRef.current,
+                bar: measure + 1,
+            });
+            if (outcome.kind === "bare") {
+                onBareClickRef.current?.(outcome.bar);
                 return;
             }
-            if (anchorRef.current === null) {
-                anchorRef.current = bar;
-                setFrom(bar);
-                setTo(bar);
-            } else {
-                setFrom(Math.min(anchorRef.current, bar));
-                setTo(Math.max(anchorRef.current, bar));
-                anchorRef.current = null;
-            }
+            setFrom(outcome.from);
+            setTo(outcome.to);
+            anchorRef.current = outcome.anchor;
         },
         [containerRef, measureBoxes],
     );
