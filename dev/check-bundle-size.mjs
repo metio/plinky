@@ -68,7 +68,12 @@ const BUDGET_TOTAL_KB = 565;
 // seeds a mid-hold run's recording and lifts a pedal on device disconnect, the
 // hold-flush that records a note still held at the finish, and the pedal-key editor that
 // rejects a key already playing a note — adds ~1 KB.
-const BUDGET_APP_KB = 254;
+//
+// Making the review session reachable with nothing due — the always-on explanation of
+// why pieces resurface, the link into the session, and the explainer the session shows
+// in place of a dead end — adds ~0.5 KB. A feature nobody can find is cheaper still,
+// which is not an argument for keeping it that way.
+const BUDGET_APP_KB = 255;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
