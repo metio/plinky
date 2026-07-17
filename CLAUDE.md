@@ -41,14 +41,31 @@ shared metio lint-gate wrappers live here for now; promoting them into
 
 ## The gate
 
-Run the full local gate and check exit codes before pushing (each through
-`nix develop --command`); CI runs the same jobs plus markdown lint, REUSE,
-typos and coverage:
+**Run every gate locally before pushing, and check the exit code of each one.**
+Not a subset, not "the ones the change looks related to" — a gate you skip is a
+gate CI runs for you, slower and after the push. The whole point of the flake is
+that local and CI resolve identical tools, so there is no gate here that is
+"CI's job".
+
+The only acceptable reason to skip one is that this host physically cannot run
+it. This is a Fedora Atomic (ostree) machine with rootless Podman and
+nix-portable, so a gate needing `kind`, a privileged container, a system-level
+nix daemon, or real MIDI/audio hardware could qualify. **Plinky has no such gate
+today** — everything below runs here, so the local list and CI are the same list.
+If that ever changes, name the excluded gate and the host reason right here.
+
+Check exit codes directly — `$?` after a pipe reports the *last* command's
+status, so `npm run x | tail` reports `tail`'s success and hides the failure.
+Use `nix develop --command <cmd> > /tmp/x.log 2>&1; echo "EXIT: $?"`.
+
+The repo's own gates:
 
 ```sh
 npm run typecheck
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
+npm run test:storybook # every story, light and dark, against its baseline
+npm run coverage      # ratchet thresholds — a drop fails the build
 npm run arch          # layer rules + confined globals
 npm run tailwind      # every class name compiles against app.css (blocking)
 npm run messages:check # every locale carries every message (blocking)
@@ -58,6 +75,22 @@ npx biome check       # lint + format
 npm run nav           # navigation-depth budget
 npm run build         # includes the prerender
 npm run size          # bundle budget
+npm run a11y:light    # axe over the built site (needs the build above)
+npm run a11y:dark
+```
+
+The shared metio lint gate runs in CI through `metio/ci`'s reusable
+`frontend.yml`, which is why it is easy to forget it exists — its wrappers come
+from `devshell.lib.mkDevShell` and run here exactly as they run there. Prose
+comments and locale strings are the bulk of most diffs, so `ci-typos` earns its
+place:
+
+```sh
+nix develop --command ci-typos
+nix develop --command ci-reuse
+nix develop --command ci-yaml
+nix develop --command ci-actionlint
+nix develop --command ci-markdown
 ```
 
 `typecheck` and `lint` first verify (via `dev/check-node-modules.mjs`) that the
