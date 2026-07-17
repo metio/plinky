@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Velika seksta",
   "theory_interval_minor_seventh": "Mala septima",
   "theory_interval_major_seventh": "Velika septima",
-  "theory_interval_octave": "Čista oktava"
+  "theory_interval_octave": "Čista oktava",
+  "ear_session_recorded": "Runda je gotova — broji se u tvoje ocjene.",
+  "ear_again": "Vježbaj ponovno",
+  "achievement_ear_first": "Uho otvoreno",
+  "achievement_ear_flawless": "Besprijekoran sluh",
+  "achievement_ear_mastered": "Sve vježbe sluha svladane"
 }

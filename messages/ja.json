@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "長6度",
   "theory_interval_minor_seventh": "短7度",
   "theory_interval_major_seventh": "長7度",
-  "theory_interval_octave": "オクターブ"
+  "theory_interval_octave": "オクターブ",
+  "ear_session_recorded": "1ラウンド完了。成績にちゃんと加わります。",
+  "ear_again": "もう一度練習する",
+  "achievement_ear_first": "開いた耳",
+  "achievement_ear_flawless": "完璧な耳",
+  "achievement_ear_mastered": "耳のトレーニングを制覇"
 }

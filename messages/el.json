@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Μεγάλη έκτη",
   "theory_interval_minor_seventh": "Μικρή εβδόμη",
   "theory_interval_major_seventh": "Μεγάλη εβδόμη",
-  "theory_interval_octave": "Οκτάβα"
+  "theory_interval_octave": "Οκτάβα",
+  "ear_session_recorded": "Ένας γύρος ολοκληρώθηκε — μετράει στους βαθμούς σου.",
+  "ear_again": "Εξασκήσου ξανά",
+  "achievement_ear_first": "Ανοιχτό αυτί",
+  "achievement_ear_flawless": "Άψογο αυτί",
+  "achievement_ear_mastered": "Όλες οι ασκήσεις ακοής κατακτημένες"
 }

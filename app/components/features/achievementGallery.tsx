@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { Achievement } from "../../../core/achievements";
+import type { Achievement, EarBadge } from "../../../core/achievements";
 import { m } from "../../paraglide/messages.js";
 import { SettingsSection } from "../ui/settingsSection";
 
@@ -29,8 +29,16 @@ function badgeFace(badge: Achievement): { emoji: string; label: string } {
             return { emoji: "📅", label: m.achievement_days({ count: badge.target }) };
         case "notes":
             return { emoji: "🎵", label: m.achievement_notes({ count: badge.target }) };
+        case "ear":
+            return EAR_FACE[badge.badge];
     }
 }
+
+const EAR_FACE: Record<EarBadge, { emoji: string; label: string }> = {
+    first: { emoji: "👂", label: m.achievement_ear_first() },
+    flawless: { emoji: "🎯", label: m.achievement_ear_flawless() },
+    mastered: { emoji: "🏆", label: m.achievement_ear_mastered() },
+};
 
 // The trophy shelf: every badge in one grid, earned ones lit, the rest dimmed
 // as visible goals. Badges are cumulative and permanent — a break never takes

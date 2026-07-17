@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Seksta wielka",
   "theory_interval_minor_seventh": "Septyma mała",
   "theory_interval_major_seventh": "Septyma wielka",
-  "theory_interval_octave": "Oktawa"
+  "theory_interval_octave": "Oktawa",
+  "ear_session_recorded": "Runda zaliczona — liczy się do twoich ocen.",
+  "ear_again": "Ćwicz jeszcze raz",
+  "achievement_ear_first": "Ucho otwarte",
+  "achievement_ear_flawless": "Bezbłędny słuch",
+  "achievement_ear_mastered": "Wszystkie ćwiczenia słuchowe opanowane"
 }

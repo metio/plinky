@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Sextă mare",
   "theory_interval_minor_seventh": "Septimă mică",
   "theory_interval_major_seventh": "Septimă mare",
-  "theory_interval_octave": "Octavă"
+  "theory_interval_octave": "Octavă",
+  "ear_session_recorded": "O rundă gata — se adaugă la notele tale.",
+  "ear_again": "Exersează din nou",
+  "achievement_ear_first": "Ureche deschisă",
+  "achievement_ear_flawless": "Ureche impecabilă",
+  "achievement_ear_mastered": "Toate exercițiile de auz stăpânite"
 }

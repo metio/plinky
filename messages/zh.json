@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "大六度",
   "theory_interval_minor_seventh": "小七度",
   "theory_interval_major_seventh": "大七度",
-  "theory_interval_octave": "纯八度"
+  "theory_interval_octave": "纯八度",
+  "ear_session_recorded": "一轮结束，会记入你的成绩。",
+  "ear_again": "再练一次",
+  "achievement_ear_first": "耳朵开窍",
+  "achievement_ear_flawless": "完美听感",
+  "achievement_ear_mastered": "精通全部听音练习"
 }

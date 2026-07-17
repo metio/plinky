@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Major sixth",
   "theory_interval_minor_seventh": "Minor seventh",
   "theory_interval_major_seventh": "Major seventh",
-  "theory_interval_octave": "Octave"
+  "theory_interval_octave": "Octave",
+  "ear_session_recorded": "That's a round done — it counts toward your grades.",
+  "ear_again": "Practise again",
+  "achievement_ear_first": "Ear opened",
+  "achievement_ear_flawless": "Flawless ear",
+  "achievement_ear_mastered": "Every ear exercise mastered"
 }

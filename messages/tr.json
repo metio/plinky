@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Büyük altılı",
   "theory_interval_minor_seventh": "Küçük yedili",
   "theory_interval_major_seventh": "Büyük yedili",
-  "theory_interval_octave": "Oktav"
+  "theory_interval_octave": "Oktav",
+  "ear_session_recorded": "Bir tur tamamlandı — notlarına sayılıyor.",
+  "ear_again": "Tekrar çalış",
+  "achievement_ear_first": "Kulak açıldı",
+  "achievement_ear_flawless": "Kusursuz kulak",
+  "achievement_ear_mastered": "Tüm kulak alıştırmaları tamamlandı"
 }

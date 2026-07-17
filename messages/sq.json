@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Sekstë e madhe",
   "theory_interval_minor_seventh": "Septimë e vogël",
   "theory_interval_major_seventh": "Septimë e madhe",
-  "theory_interval_octave": "Oktavë"
+  "theory_interval_octave": "Oktavë",
+  "ear_session_recorded": "Një raund u krye — llogaritet për notat e tua.",
+  "ear_again": "Praktiko sërish",
+  "achievement_ear_first": "Veshi u hap",
+  "achievement_ear_flawless": "Vesh i përsosur",
+  "achievement_ear_mastered": "Të gjitha ushtrimet e veshit u zotëruan"
 }

@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Große Sexte",
   "theory_interval_minor_seventh": "Kleine Septime",
   "theory_interval_major_seventh": "Große Septime",
-  "theory_interval_octave": "Oktave"
+  "theory_interval_octave": "Oktave",
+  "ear_session_recorded": "Eine Runde geschafft – sie zählt für deine Noten.",
+  "ear_again": "Nochmal üben",
+  "achievement_ear_first": "Ohr geöffnet",
+  "achievement_ear_flawless": "Fehlerfreies Gehör",
+  "achievement_ear_mastered": "Alle Höröbungen gemeistert"
 }

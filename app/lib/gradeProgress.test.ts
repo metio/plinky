@@ -125,6 +125,14 @@ describe("dueReviews", () => {
         expect(dueReviews(items, NOW)).toEqual(["oldest", "mid", "soon"]);
         expect(dueReviews(items, NOW, 1)).toEqual(["oldest"]);
     });
+
+    it("holds ear items out of the queue, which renders a score they haven't got", () => {
+        const items = [
+            item("ear-intervals-0", 1, 1, mastery({ reviewAt: NOW - 30 * DAY })),
+            item("a-piece", 1, 1, mastery({ reviewAt: NOW - 5 * DAY })),
+        ];
+        expect(dueReviews(items, NOW)).toEqual(["a-piece"]);
+    });
 });
 
 describe("skillRating", () => {
@@ -194,6 +202,12 @@ describe("gradeSuggestions", () => {
         const catalogue = [cat("zero", 1, 0), cat("real", 1, 2)];
         const suggestions = gradeSuggestions(catalogue, 1, new Set(), 2);
         expect(suggestions.map((item) => item.id)).toEqual(["zero", "real"]);
+    });
+
+    it("never suggests an ear item, since the suggestion opens a score in /play", () => {
+        const catalogue = [cat("ear-intervals-0", 1, 1), cat("a-piece", 1, 2)];
+        const suggestions = gradeSuggestions(catalogue, 1, new Set(), 5);
+        expect(suggestions.map((item) => item.id)).toEqual(["a-piece"]);
     });
 });
 

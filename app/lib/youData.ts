@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type Achievement, collectAchievements, type StarKind } from "../../core/achievements";
+import { EAR_ITEMS, isEarItem } from "../../core/earCatalog";
 import { letterFor } from "../../core/grade";
 import type { PracticeSummary } from "../../core/history";
 import type { DecayMode } from "../../core/review";
@@ -103,6 +104,7 @@ function earnedAchievements(input: YouInput, level: number): Achievement[] {
             stars.add(tier);
         }
     }
+    const earItems = items.filter((item) => isEarItem(item.id));
     return collectAchievements({
         reachedGrade: Math.max(input.reachedGrade, level),
         hasS: items.some((item) => letterFor(item.mastery.bestScore) === "S"),
@@ -110,5 +112,14 @@ function earnedAchievements(input: YouInput, level: number): Achievement[] {
         stars,
         daysPracticed: summary?.daysPracticed ?? 0,
         totalNotes: summary?.totalNotes ?? 0,
+        // A touched ear item means a session finished; a best of 100 is a flawless run;
+        // mastered means every ear exercise is learned, so the whole set must be present.
+        earTrained: earItems.length > 0,
+        earFlawless: earItems.some((item) => item.mastery.bestScore >= 100),
+        earMastered:
+            EAR_ITEMS.length > 0 &&
+            EAR_ITEMS.every((ear) =>
+                earItems.some((item) => item.id === ear.id && item.mastery.learned),
+            ),
     });
 }

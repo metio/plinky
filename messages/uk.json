@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Велика секста",
   "theory_interval_minor_seventh": "Мала септима",
   "theory_interval_major_seventh": "Велика септима",
-  "theory_interval_octave": "Чиста октава"
+  "theory_interval_octave": "Чиста октава",
+  "ear_session_recorded": "Раунд завершено — його зараховано до твоїх оцінок.",
+  "ear_again": "Тренуватися знову",
+  "achievement_ear_first": "Слух відкрито",
+  "achievement_ear_flawless": "Бездоганний слух",
+  "achievement_ear_mastered": "Усі вправи на слух опановано"
 }

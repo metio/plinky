@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Suuri seksti",
   "theory_interval_minor_seventh": "Pieni septimi",
   "theory_interval_major_seventh": "Suuri septimi",
-  "theory_interval_octave": "Oktaavi"
+  "theory_interval_octave": "Oktaavi",
+  "ear_session_recorded": "Kierros valmis — se kerryttää arvosanojasi.",
+  "ear_again": "Harjoittele uudelleen",
+  "achievement_ear_first": "Korva avattu",
+  "achievement_ear_flawless": "Virheetön korva",
+  "achievement_ear_mastered": "Kaikki korvaharjoitukset hallussa"
 }

@@ -148,7 +148,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   as a word; the levels start on fifths and octaves and fill the ladder in as you go.
   **Perfect pitch** plays one note and you name it on a keyboard. Every round can be
   replayed as often as you like, and a miss shows what played rather than marking you
-  down.
+  down. A round is ten questions, and finishing one **counts toward your grades** the
+  same way playing a piece does — each exercise sits on the grade ladder, so ear practice
+  lifts the same standing and skill rating. Three collectible achievements come with it:
+  opening your ear, a flawless round, and mastering every ear exercise.
 - **Two tabs per piece** — **Play** holds the score and everything you do with it:
   reading, listening, practising, playing by ear (the **Hidden notes** toggle, which
   blanks the noteheads and reveals each one as you find it) and the **fingering

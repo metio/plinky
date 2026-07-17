@@ -10,13 +10,16 @@ import { MAX_GRADE } from "./scoreDifficulty";
 
 export type StarKind = "bronze" | "silver" | "gold";
 
+export type EarBadge = "first" | "flawless" | "mastered";
+
 export type Achievement =
     | { id: string; kind: "grade"; grade: number; earned: boolean }
     | { id: string; kind: "star"; tier: StarKind; earned: boolean }
     | { id: string; kind: "firstS"; earned: boolean }
     | { id: string; kind: "flawless"; earned: boolean }
     | { id: string; kind: "days"; target: number; earned: boolean }
-    | { id: string; kind: "notes"; target: number; earned: boolean };
+    | { id: string; kind: "notes"; target: number; earned: boolean }
+    | { id: string; kind: "ear"; badge: EarBadge; earned: boolean };
 
 export type AchievementFacts = {
     // The highest grade ever celebrated — recorded once, never lowered, so the
@@ -29,11 +32,18 @@ export type AchievementFacts = {
     stars: ReadonlySet<StarKind>;
     daysPracticed: number;
     totalNotes: number;
+    // Whether the player has finished an ear-training session at all, hit a flawless
+    // one, and mastered every ear exercise. All three only ever grow — a best ear score
+    // never drops and a mastered exercise stays mastered — so the badges are safe.
+    earTrained: boolean;
+    earFlawless: boolean;
+    earMastered: boolean;
 };
 
 const DAY_TARGETS = [10, 100];
 const NOTE_TARGETS = [1_000, 10_000];
 const STAR_ORDER: StarKind[] = ["bronze", "silver", "gold"];
+const EAR_BADGES: EarBadge[] = ["first", "flawless", "mastered"];
 
 export function collectAchievements(facts: AchievementFacts): Achievement[] {
     return [
@@ -65,6 +75,17 @@ export function collectAchievements(facts: AchievementFacts): Achievement[] {
             kind: "notes" as const,
             target,
             earned: facts.totalNotes >= target,
+        })),
+        ...EAR_BADGES.map((badge) => ({
+            id: `ear-${badge}`,
+            kind: "ear" as const,
+            badge,
+            earned:
+                badge === "first"
+                    ? facts.earTrained
+                    : badge === "flawless"
+                      ? facts.earFlawless
+                      : facts.earMastered,
         })),
     ];
 }

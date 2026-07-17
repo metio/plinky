@@ -11,13 +11,16 @@ const NOTHING: AchievementFacts = {
     stars: new Set(),
     daysPracticed: 0,
     totalNotes: 0,
+    earTrained: false,
+    earFlawless: false,
+    earMastered: false,
 };
 
 describe("collectAchievements", () => {
     it("lays out the full set unearned for a fresh player", () => {
         const badges = collectAchievements(NOTHING);
-        // 8 grades + 3 stars + first S + flawless + 2 day + 2 note targets.
-        expect(badges).toHaveLength(17);
+        // 8 grades + 3 stars + first S + flawless + 2 day + 2 note + 3 ear badges.
+        expect(badges).toHaveLength(20);
         expect(badges.every((badge) => !badge.earned)).toBe(true);
     });
 
@@ -55,5 +58,17 @@ describe("collectAchievements", () => {
             badges.filter((badge) => badge.earned).map((badge) => badge.id),
         );
         expect(earned).toEqual(new Set(["first-s", "flawless", "star-bronze", "star-gold"]));
+    });
+
+    it("earns each ear badge from its own fact", () => {
+        const earnedIds = (facts: Partial<AchievementFacts>) =>
+            new Set(
+                collectAchievements({ ...NOTHING, ...facts })
+                    .filter((badge) => badge.kind === "ear" && badge.earned)
+                    .map((badge) => badge.id),
+            );
+        expect(earnedIds({ earTrained: true })).toEqual(new Set(["ear-first"]));
+        expect(earnedIds({ earFlawless: true })).toEqual(new Set(["ear-flawless"]));
+        expect(earnedIds({ earMastered: true })).toEqual(new Set(["ear-mastered"]));
     });
 });

@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "장6도",
   "theory_interval_minor_seventh": "단7도",
   "theory_interval_major_seventh": "장7도",
-  "theory_interval_octave": "옥타브"
+  "theory_interval_octave": "옥타브",
+  "ear_session_recorded": "한 라운드를 마쳤어요. 성적에도 반영돼요.",
+  "ear_again": "다시 연습하기",
+  "achievement_ear_first": "열린 귀",
+  "achievement_ear_flawless": "완벽한 귀",
+  "achievement_ear_mastered": "모든 청음 연습 완료"
 }

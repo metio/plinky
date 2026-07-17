@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Stor sekst",
   "theory_interval_minor_seventh": "Lille septim",
   "theory_interval_major_seventh": "Stor septim",
-  "theory_interval_octave": "Oktav"
+  "theory_interval_octave": "Oktav",
+  "ear_session_recorded": "En runde klaret — den tæller med i dine karakterer.",
+  "ear_again": "Øv igen",
+  "achievement_ear_first": "Øret åbnet",
+  "achievement_ear_flawless": "Fejlfrit øre",
+  "achievement_ear_mastered": "Alle høreøvelser mestret"
 }

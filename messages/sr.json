@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Велика секста",
   "theory_interval_minor_seventh": "Мала септима",
   "theory_interval_major_seventh": "Велика септима",
-  "theory_interval_octave": "Октава"
+  "theory_interval_octave": "Октава",
+  "ear_session_recorded": "Рунда завршена — рачуна се за твоје оцене.",
+  "ear_again": "Вежбај поново",
+  "achievement_ear_first": "Ухо отворено",
+  "achievement_ear_flawless": "Беспрекоран слух",
+  "achievement_ear_mastered": "Све вежбе слуха савладане"
 }

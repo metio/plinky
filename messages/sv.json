@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Stor sext",
   "theory_interval_minor_seventh": "Liten septim",
   "theory_interval_major_seventh": "Stor septim",
-  "theory_interval_octave": "Oktav"
+  "theory_interval_octave": "Oktav",
+  "ear_session_recorded": "En runda klar — den räknas mot dina betyg.",
+  "ear_again": "Öva igen",
+  "achievement_ear_first": "Örat öppnat",
+  "achievement_ear_flawless": "Felfritt öra",
+  "achievement_ear_mastered": "Alla hörövningar bemästrade"
 }

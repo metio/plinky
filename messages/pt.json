@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Sexta maior",
   "theory_interval_minor_seventh": "Sétima menor",
   "theory_interval_major_seventh": "Sétima maior",
-  "theory_interval_octave": "Oitava"
+  "theory_interval_octave": "Oitava",
+  "ear_session_recorded": "Ronda concluída — conta para as tuas notas.",
+  "ear_again": "Praticar outra vez",
+  "achievement_ear_first": "Ouvido desperto",
+  "achievement_ear_flawless": "Ouvido impecável",
+  "achievement_ear_mastered": "Todos os exercícios de ouvido dominados"
 }

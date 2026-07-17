@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Sesta maggiore",
   "theory_interval_minor_seventh": "Settima minore",
   "theory_interval_major_seventh": "Settima maggiore",
-  "theory_interval_octave": "Ottava"
+  "theory_interval_octave": "Ottava",
+  "ear_session_recorded": "Un giro completato: conta per i tuoi voti.",
+  "ear_again": "Esercitati ancora",
+  "achievement_ear_first": "Orecchio aperto",
+  "achievement_ear_flawless": "Orecchio impeccabile",
+  "achievement_ear_mastered": "Tutti gli esercizi d'orecchio superati"
 }

@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Nagy szext",
   "theory_interval_minor_seventh": "Kis szeptim",
   "theory_interval_major_seventh": "Nagy szeptim",
-  "theory_interval_octave": "Oktáv"
+  "theory_interval_octave": "Oktáv",
+  "ear_session_recorded": "Egy kör kész — beleszámít az osztályzataidba.",
+  "ear_again": "Gyakorolj újra",
+  "achievement_ear_first": "Megnyílt fül",
+  "achievement_ear_flawless": "Hibátlan fül",
+  "achievement_ear_mastered": "Minden hallásgyakorlat elsajátítva"
 }

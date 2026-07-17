@@ -33,7 +33,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // The /ear page — the pure theory vocabulary and question generators, the interval
 // ladder and answer keyboard, the listening stage, and 39 strings inlined per locale
 // — adds ~4.5 KB, measured at 569.5. 570 keeps the same roughly-1-KB margin.
-const BUDGET_TOTAL_KB = 570;
+//
+// Wiring ear rounds into the grades — the ear catalogue that places each exercise on the
+// ladder, the bounded session that records mastery, three ear achievements, and 5 more
+// strings per locale — adds ~1.6 KB, measured at 571.1. 572 keeps the margin.
+const BUDGET_TOTAL_KB = 572;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -81,7 +85,10 @@ const BUDGET_TOTAL_KB = 570;
 // Ear training as a page of its own — a second way to practise that needs no piano,
 // so it carries its own route, two answer surfaces and its share of the copy — adds
 // ~4.4 KB of app code, measured at 259.4.
-const BUDGET_APP_KB = 260;
+//
+// Ear rounds joining the grades — the session-recording and the ear catalogue on the
+// You-page read path, plus the ear achievements — adds ~1 KB of app code, at 261.0.
+const BUDGET_APP_KB = 262;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

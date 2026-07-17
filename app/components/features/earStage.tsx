@@ -66,7 +66,7 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
     return (
         <div className="flex flex-col items-center gap-6 rounded-xl bg-gray-950 px-6 py-10 dark:bg-gray-900">
             <div className="flex h-16 items-center justify-center gap-4">
-                {notes.map((note, index) => {
+                {notes.map((_note, index) => {
                     const sounding = lit.includes(index);
                     return (
                         <span

@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Sixte majeure",
   "theory_interval_minor_seventh": "Septième mineure",
   "theory_interval_major_seventh": "Septième majeure",
-  "theory_interval_octave": "Octave"
+  "theory_interval_octave": "Octave",
+  "ear_session_recorded": "Une manche de faite — elle compte pour tes notes.",
+  "ear_again": "S'entraîner encore",
+  "achievement_ear_first": "Oreille éveillée",
+  "achievement_ear_flawless": "Oreille parfaite",
+  "achievement_ear_mastered": "Tous les exercices d'oreille maîtrisés"
 }

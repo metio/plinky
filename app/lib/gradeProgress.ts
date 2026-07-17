@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { loadBundledScores, loadUserScores } from "./catalog";
+import { earCatalogItems } from "./earProgress";
+import { isEarItem } from "../../core/earCatalog";
 import type { Letter } from "../../core/grade";
 import type { XmlCodec } from "../../core/xml";
 import type { KeyValueStore } from "../ports/keyValueStore";
@@ -112,11 +114,18 @@ export function dueReviews(
     now: number,
     cap: number = REVIEW_CAP,
 ): string[] {
-    return items
-        .filter((item) => isDue(item.mastery, now))
-        .sort((a, b) => a.mastery.reviewAt - b.mastery.reviewAt)
-        .slice(0, cap)
-        .map((item) => item.id);
+    return (
+        items
+            .filter((item) => isDue(item.mastery, now))
+            // The review session renders a piece's score, which an ear item hasn't got, so
+            // ear items are held out of the queue for now. Their review IS scheduled (mastery
+            // records reviewAt for every learned item), waiting for the ear-review slice that
+            // teaches the session to drive an ear drill.
+            .filter((item) => !isEarItem(item.id))
+            .sort((a, b) => a.mastery.reviewAt - b.mastery.reviewAt)
+            .slice(0, cap)
+            .map((item) => item.id)
+    );
 }
 
 // An unbounded ability number: the average cost of your hardest mastered pieces,
@@ -173,6 +182,12 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
             grade: exercise.grade,
             cost: exercise.cost,
         });
+    }
+    // Ear items are a fixed, static pool — no manifest to fetch, no MusicXML to grade —
+    // so they join the ladder directly. Placing them here is what makes an ear round
+    // count toward standing, skill and the grade pools.
+    for (const item of earCatalogItems()) {
+        index.set(item.id, item);
     }
     for (const score of [...loadBundledScores(), ...loadUserScores(sources.store)]) {
         if (index.has(score.id)) {
@@ -253,6 +268,10 @@ export function gradeSuggestions(
     return (
         catalogue
             .filter((item) => item.grade === grade && !mastered.has(item.id))
+            // The suggestion links to /play, so an ear item — which has no score to open
+            // there — is held out; ear practice is surfaced by the /ear page itself. Ear
+            // items still count toward the grade, its pool and the skill rating.
+            .filter((item) => !isEarItem(item.id))
             // Easiest first by cost. Unplayable scores are kept out of the catalogue, so
             // a cost of 0 reliably means "gentlest" rather than "couldn't measure" — the
             // beginner-friendly pieces that score 0 lead their grade.

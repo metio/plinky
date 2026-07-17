@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Большая секста",
   "theory_interval_minor_seventh": "Малая септима",
   "theory_interval_major_seventh": "Большая септима",
-  "theory_interval_octave": "Октава"
+  "theory_interval_octave": "Октава",
+  "ear_session_recorded": "Раунд пройден — он засчитан в ваши оценки.",
+  "ear_again": "Позаниматься ещё",
+  "achievement_ear_first": "Слух открыт",
+  "achievement_ear_flawless": "Безупречный слух",
+  "achievement_ear_mastered": "Все упражнения на слух освоены"
 }

@@ -19,6 +19,9 @@ describe("AchievementGallery", () => {
             stars: new Set(["bronze"]),
             daysPracticed: 12,
             totalNotes: 500,
+            earTrained: true,
+            earFlawless: false,
+            earMastered: false,
         });
         render(<AchievementGallery achievements={achievements} />);
 
@@ -26,8 +29,9 @@ describe("AchievementGallery", () => {
         // Every badge renders — earned or not — so the goals are visible.
         expect(screen.getAllByRole("listitem")).toHaveLength(achievements.length);
         // Earned and locked states are announced, not only colour-coded.
-        expect(screen.getAllByText(m.achievement_earned())).toHaveLength(5);
-        expect(screen.getAllByText(m.achievement_locked())).toHaveLength(achievements.length - 5);
+        // grade-1, grade-2, first-s, star-bronze, days-10, and the ear "first" badge.
+        expect(screen.getAllByText(m.achievement_earned())).toHaveLength(6);
+        expect(screen.getAllByText(m.achievement_locked())).toHaveLength(achievements.length - 6);
         // The visual mute sits on the decorative emoji only — dimming the label
         // would sink it below the contrast floor the axe gate enforces.
         const firstS = screen.getByText(m.achievement_first_s()).closest("li");

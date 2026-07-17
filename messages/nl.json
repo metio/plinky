@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Grote sext",
   "theory_interval_minor_seventh": "Kleine septiem",
   "theory_interval_major_seventh": "Grote septiem",
-  "theory_interval_octave": "Octaaf"
+  "theory_interval_octave": "Octaaf",
+  "ear_session_recorded": "Een ronde gedaan — die telt mee voor je cijfers.",
+  "ear_again": "Opnieuw oefenen",
+  "achievement_ear_first": "Oor geopend",
+  "achievement_ear_flawless": "Feilloos gehoor",
+  "achievement_ear_mastered": "Alle luisteroefeningen onder de knie"
 }

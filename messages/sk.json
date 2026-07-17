@@ -637,5 +637,10 @@
   "theory_interval_major_sixth": "Veľká sexta",
   "theory_interval_minor_seventh": "Malá septima",
   "theory_interval_major_seventh": "Veľká septima",
-  "theory_interval_octave": "Oktáva"
+  "theory_interval_octave": "Oktáva",
+  "ear_session_recorded": "Kolo je hotové — počíta sa do tvojich známok.",
+  "ear_again": "Precvičiť znova",
+  "achievement_ear_first": "Otvorené ucho",
+  "achievement_ear_flawless": "Bezchybné ucho",
+  "achievement_ear_mastered": "Všetky sluchové cvičenia zvládnuté"
 }
