@@ -300,7 +300,7 @@ export function moveItem(items: AssignmentItem[], index: number, delta: number):
     return next;
 }
 
-// Set an item's target tempo from a form field. An empty or unparseable field
+// Set an item's target tempo from a form field. An empty or unparsable field
 // clears the target rather than storing a NaN the playback math would divide by.
 export function withItemTempo(
     items: AssignmentItem[],
