@@ -67,6 +67,23 @@ const CONFINED = {
     ],
 };
 
+// The ambient sources core/ may never read. These are not confined to an adapter the
+// way `localStorage` is — the layers above core legitimately read the clock and reach
+// for randomness at the point a run actually happens. The invariant is narrower and
+// belongs to core alone: a pure function is deterministic, so time and randomness
+// arrive as parameters (`now: number`, `rng: () => number`) rather than being read
+// from the environment. A default parameter value is the tempting way to smuggle one
+// back in, which is precisely what this catches: a caller that omits the argument
+// silently binds core to the ambient clock, and every test of it inherits today's date.
+//
+// Date arithmetic is not a clock read: `new Date(dateKey)` derives a date from an
+// explicit argument and stays deterministic, so only the zero-argument form is banned.
+const CORE_BANNED = [
+    { name: "Math.random", pattern: /\bMath\.random\b/, hint: "take an `rng: () => number` parameter" },
+    { name: "Date.now", pattern: /\bDate\.now\b/, hint: "take a `now: number` parameter" },
+    { name: "new Date()", pattern: /\bnew Date\(\s*\)/, hint: "take a `now: Date` parameter" },
+];
+
 function walk(dir) {
     const out = [];
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -136,8 +153,20 @@ for (const global of Object.keys(CONFINED)) {
     }
 }
 
+for (const [file, source] of stripped) {
+    if (!file.startsWith("core")) {
+        continue;
+    }
+    for (const { name, pattern, hint } of CORE_BANNED) {
+        if (pattern.test(source)) {
+            violations.push(`${file} reads \`${name}\` — core is pure: ${hint}`);
+        }
+    }
+}
+
 if (violations.length > 0) {
     console.error("Confined-global violations:\n" + violations.map((v) => `  ${v}`).join("\n"));
     process.exit(1);
 }
 console.log(`check-globals: ${Object.keys(CONFINED).join(", ")} confined to their adapters.`);
+console.log("check-globals: core/ reads no clock and no randomness.");

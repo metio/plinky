@@ -106,7 +106,7 @@ function variedLine(
     return notes;
 }
 
-export function generatePhrase(options: SprintOptions, rng: () => number = Math.random): string {
+export function generatePhrase(options: SprintOptions, rng: () => number): string {
     const {
         bars,
         beatsPerBar,

@@ -9,6 +9,14 @@ import { foldPractice, type History, parseHistory, summarizePractice } from "./h
 // conservation (no note is lost or invented) and the seven-day window's shape
 // over arbitrary histories, dates and run sizes.
 
+// Bounded a few days inside the key range, so a seven-day window reaching back from
+// any generated day still lands on representable dates.
+const anyDate = fc.date({
+    min: new Date("2020-01-05T00:00:00Z"),
+    max: new Date("2030-12-25T00:00:00Z"),
+    noInvalidDate: true,
+});
+
 const dateKey = fc
     .date({
         min: new Date("2020-01-01T00:00:00Z"),
@@ -46,11 +54,7 @@ describe("history properties", () => {
         fc.assert(
             fc.property(
                 historyArb,
-                fc.date({
-                    min: new Date("2020-01-05T00:00:00Z"),
-                    max: new Date("2030-12-25T00:00:00Z"),
-                    noInvalidDate: true,
-                }),
+                anyDate,
                 (history, now) => {
                     const { recent } = summarizePractice(history, now);
                     expect(recent).toHaveLength(7);
@@ -69,10 +73,12 @@ describe("history properties", () => {
         );
     });
 
-    it("counts days practiced as the days with a positive tally", () => {
+    it("counts days practiced as the days with a positive tally, whatever day it is", () => {
         fc.assert(
-            fc.property(historyArb, (history) => {
-                const { daysPracticed, totalNotes } = summarizePractice(history);
+            fc.property(historyArb, anyDate, (history, now) => {
+                // The lifetime aggregates span the whole map, so the day they are read
+                // on cannot move them — only the seven-day window follows the clock.
+                const { daysPracticed, totalNotes } = summarizePractice(history, now);
                 expect(daysPracticed).toBe(Object.values(history).filter((n) => n > 0).length);
                 expect(totalNotes).toBe(total(history));
             }),

@@ -11,5 +11,7 @@ import { useHistoryStore } from "../contexts/services";
 export function usePracticeSummary(): PracticeSummary | null {
     const store = useHistoryStore();
     const history = useSyncExternalStore(store.subscribe, store.load, () => null);
-    return useMemo(() => (history ? summarizePractice(history) : null), [history]);
+    // The seven-day window is anchored to the render's clock: a summary recomputed
+    // after midnight rolls onto the new day.
+    return useMemo(() => (history ? summarizePractice(history, new Date()) : null), [history]);
 }

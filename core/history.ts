@@ -55,7 +55,7 @@ function shiftDay(dateKey: string, delta: number): string {
     return date.toISOString().slice(0, 10);
 }
 
-export function summarizePractice(history: History, now: Date = new Date()): PracticeSummary {
+export function summarizePractice(history: History, now: Date): PracticeSummary {
     const totalNotes = Object.values(history).reduce((sum, notes) => sum + notes, 0);
     const daysPracticed = Object.values(history).filter((notes) => notes > 0).length;
     const today = todayKey(now);

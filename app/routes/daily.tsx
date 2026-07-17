@@ -44,7 +44,9 @@ export default function DailyRoute() {
     }, [daily]);
 
     const regenerate = (hands: boolean) => {
-        setWarmupXml(generatePhrase({ ...WARMUP, twoHands: hands }));
+        // The warm-up is deliberately unseeded — a different phrase every run, unlike
+        // the day's challenge, which every player must share.
+        setWarmupXml(generatePhrase({ ...WARMUP, twoHands: hands }, Math.random));
         setRun((value) => value + 1);
     };
     // Generate the first warm-up phrase only when the player opens that tab.
