@@ -118,6 +118,10 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     // store the UI subscribes to — seeding lands where the library reads.
     const favorites = overrides.favorites ?? createFavoritesStore(store);
     const fetcher = overrides.fetcher ?? httpFetcher;
+    // The mic samples on the Scheduler's frames, so it takes the same one the
+    // rest of the app is given — a test that injects a fake clock drives the
+    // mic's loop with it too, rather than the mic quietly keeping its own.
+    const scheduler = overrides.scheduler ?? browserScheduler;
     return {
         store,
         prefs: overrides.prefs ?? createPrefsStore(store),
@@ -137,8 +141,8 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
         midi: overrides.midi ?? webMidi,
-        pitch: overrides.pitch ?? micPitch(),
-        scheduler: overrides.scheduler ?? browserScheduler,
+        pitch: overrides.pitch ?? micPitch(scheduler),
+        scheduler,
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),

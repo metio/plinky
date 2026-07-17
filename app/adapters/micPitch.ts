@@ -3,12 +3,18 @@
 
 import { createNoteTracker, detectPitches, rms } from "../../core/pitch";
 import type { PitchInput, PitchStartResult } from "../ports/pitchInput";
+import type { Scheduler, SchedulerHandle } from "../ports/scheduler";
 
 // The real microphone: getUserMedia into an AnalyserNode, a frame of samples
 // per animation frame through the pure detector, and the tracker's settled
 // events out. Raw audio on purpose — echo cancellation and noise suppression
 // are tuned for speech and eat piano partials — and everything torn down on
 // stop so the mic indicator never lingers.
+//
+// The sampling loop runs on the injected Scheduler rather than the raw frame
+// callback, so a test can hand it a frame at a time and assert what the tracker
+// emitted — the analyser and the detector are the only parts left needing a
+// real browser.
 
 // 2048 samples at 44.1/48 kHz ≈ 43–46 ms — enough periods of a low note to
 // correlate, short enough that detection tracks live playing.
@@ -23,15 +29,15 @@ export function classifyMicError(error: unknown): Extract<PitchStartResult, "den
     return error instanceof DOMException && error.name === "NotAllowedError" ? "denied" : "error";
 }
 
-export function micPitch(): PitchInput {
+export function micPitch(scheduler: Scheduler): PitchInput {
     let stream: MediaStream | null = null;
     let context: AudioContext | null = null;
-    let frameHandle: number | null = null;
+    let frameHandle: SchedulerHandle | null = null;
     let onDone: (() => void) | null = null;
 
     const stop = () => {
         if (frameHandle !== null) {
-            cancelAnimationFrame(frameHandle);
+            scheduler.cancelFrame(frameHandle);
             frameHandle = null;
         }
         onDone?.();
@@ -96,9 +102,9 @@ export function micPitch(): PitchInput {
                     for (const event of tracker.track(notes, level)) {
                         onEvent(event);
                     }
-                    frameHandle = requestAnimationFrame(tick);
+                    frameHandle = scheduler.frame(tick);
                 };
-                frameHandle = requestAnimationFrame(tick);
+                frameHandle = scheduler.frame(tick);
                 return "listening";
             } catch {
                 stop();

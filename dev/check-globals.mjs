@@ -48,11 +48,11 @@ const CONFINED = {
     // test can drive time by hand (see app/ports/scheduler.ts). The allow-list is
     // the genuine lower-level owners: the browser adapter itself; the SSR render
     // timeout (Node, not the browser); the sw-update watcher's own injected timer
-    // env and the composition root that wires it; the mic adapter's audio-frame
-    // loop; the two imperative DOM one-liners (blob-URL revoke, print cleanup);
-    // and the pure UI primitives (ui-is-pure keeps them out of the services
-    // context, so a purely-cosmetic transition — a wrong-note flash, a value
-    // bump, a slide-in — owns its own timer instead of the Scheduler).
+    // env and the composition root that wires it; the two imperative DOM
+    // one-liners (blob-URL revoke, print cleanup); and the pure UI primitives
+    // (ui-is-pure keeps them out of the services context, so a purely-cosmetic
+    // transition — a wrong-note flash, a value bump, a slide-in — owns its own
+    // timer instead of the Scheduler).
     setTimeout: [
         "app/adapters/browserScheduler.ts",
         "app/entry.server.tsx",
@@ -73,16 +73,8 @@ const CONFINED = {
     ],
     setInterval: ["app/adapters/browserScheduler.ts"],
     clearInterval: ["app/adapters/browserScheduler.ts"],
-    requestAnimationFrame: [
-        "app/adapters/browserScheduler.ts",
-        "app/adapters/micPitch.ts",
-        "app/components/ui/drawer.tsx",
-    ],
-    cancelAnimationFrame: [
-        "app/adapters/browserScheduler.ts",
-        "app/adapters/micPitch.ts",
-        "app/components/ui/drawer.tsx",
-    ],
+    requestAnimationFrame: ["app/adapters/browserScheduler.ts", "app/components/ui/drawer.tsx"],
+    cancelAnimationFrame: ["app/adapters/browserScheduler.ts", "app/components/ui/drawer.tsx"],
 };
 
 // The ambient sources core/ may never read. These are not confined to an adapter the
