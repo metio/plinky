@@ -25,6 +25,24 @@ const CONFINED = {
     VideoFrame: ["app/adapters/webCodecsVideo.ts"],
     AudioData: ["app/adapters/webCodecsVideo.ts"],
     OffscreenCanvas: ["app/adapters/webCodecsVideo.ts"],
+    // The monotonic clock reads through the Scheduler's now(), for the same
+    // reason its timers do: a hook that takes the capability and then reads the
+    // wall clock cannot be driven by fakeScheduler.advance(), and the drift is
+    // invisible — the hook still looks injected. The allow-list is the code that
+    // genuinely owns a clock rather than consuming one: the Scheduler adapter
+    // that implements now(); the audio engine, whose strike decay and release
+    // tails are measured against the same scale its own nodes are scheduled on;
+    // the MIDI context, because Web MIDI stamps its events on the performance
+    // scale and an event's own timestamp is the honest one to carry; and
+    // useScoreMatcher's registerNote, whose timestamp default no caller in the
+    // app takes — playSession always passes the event's stamp — leaving it a
+    // convenience the tests spend, not a clock the app reads.
+    performance: [
+        "app/adapters/browserScheduler.ts",
+        "app/adapters/webAudioEngine.ts",
+        "app/contexts/midi.tsx",
+        "app/hooks/useScoreMatcher.ts",
+    ],
     // Scheduling globals belong to the Scheduler adapter, so every behavioural
     // timer/interval/animation-frame runs through the injected capability and a
     // test can drive time by hand (see app/ports/scheduler.ts). The allow-list is
