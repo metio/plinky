@@ -3,10 +3,15 @@
 
 import { useState } from "react";
 import {
+    addItem as addToItems,
     type Assignment,
     type AssignmentItem,
     makeAssignment,
+    moveItem as moveInItems,
     newAssignmentId,
+    removeItem as removeFromItems,
+    withItemNote,
+    withItemTempo,
 } from "../../core/assignment";
 import { moveTo } from "../../core/reorder";
 
@@ -33,44 +38,15 @@ export function useAssignmentDraft() {
     };
     const showMore = () => setVisible((count) => count + PICKER_PAGE);
 
-    const addItem = (id: string) =>
-        setItems((current) =>
-            current.some((item) => item.id === id) ? current : [...current, { id }],
-        );
-    const removeItem = (index: number) =>
-        setItems((current) => current.filter((_, i) => i !== index));
+    const addItem = (id: string) => setItems((current) => addToItems(current, id));
+    const removeItem = (index: number) => setItems((current) => removeFromItems(current, index));
     const moveItem = (index: number, delta: number) =>
-        setItems((current) => {
-            const next = [...current];
-            const target = index + delta;
-            if (target < 0 || target >= next.length) {
-                return current;
-            }
-            [next[index], next[target]] = [next[target]!, next[index]!];
-            return next;
-        });
+        setItems((current) => moveInItems(current, index, delta));
     const reorder = (from: number, to: number) => setItems((current) => moveTo(current, from, to));
     const setItemTempo = (index: number, value: string) =>
-        setItems((current) =>
-            current.map((item, i) => {
-                if (i !== index) {
-                    return item;
-                }
-                const tempo = Number(value);
-                const { tempo: _drop, ...rest } = item;
-                return value && Number.isFinite(tempo) ? { ...rest, tempo } : rest;
-            }),
-        );
+        setItems((current) => withItemTempo(current, index, value));
     const setItemNote = (index: number, value: string) =>
-        setItems((current) =>
-            current.map((item, i) => {
-                if (i !== index) {
-                    return item;
-                }
-                const { note: _drop, ...rest } = item;
-                return value.trim() ? { ...rest, note: value } : rest;
-            }),
-        );
+        setItems((current) => withItemNote(current, index, value));
 
     // The draft as a saveable assignment. An edit keeps its id so the save lands
     // on the stored assignment even when the name changed; a new draft derives a
