@@ -49,6 +49,23 @@ describe("calibration steps", () => {
         expect(nextStep(state).step).toBe("done");
     });
 
+    it("ignores frames that arrive once calibration is done", () => {
+        // The mic keeps delivering frames until the wizard tears the stream down, so
+        // late arrivals must not disturb a finished run's measurements.
+        let state = beginCalibration();
+        for (let i = 0; i < 4; i++) {
+            state = nextStep(state);
+        }
+        expect(state.step).toBe("done");
+        expect(observe(state, { rms: 0.3, notes: [60] })).toEqual(state);
+        // Done needs no frames, so it reads as complete — a full bar, not an empty one.
+        expect(stepProgress(state)).toBe(1);
+        // Nothing is left to move on to, so the wizard cannot advance past done.
+        expect(stepReady(state)).toBe(false);
+        // The heard note belongs to the note step; done has no reading to show.
+        expect(heardNote(state)).toBeNull();
+    });
+
     it("only counts note-bearing frames toward the loudness steps", () => {
         let state = beginCalibration();
         state = nextStep(nextStep(state)); // → soft

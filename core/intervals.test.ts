@@ -17,6 +17,13 @@ describe("intervalName", () => {
         expect(intervalName(24)).toBe("two octaves");
     });
 
+    it("falls back to a bare semitone count past two octaves", () => {
+        // No one names a span this wide, and it is past any hand's reach — the number
+        // still reads correctly rather than coming out blank or undefined.
+        expect(intervalName(25)).toBe("25 semitones");
+        expect(intervalName(88)).toBe("88 semitones");
+    });
+
     it("is sign-agnostic and rounds", () => {
         expect(intervalName(-9)).toBe("a major sixth");
         expect(intervalName(9.4)).toBe("a major sixth");

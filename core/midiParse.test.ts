@@ -128,6 +128,95 @@ describe("parseMidiFile", () => {
         expect(parseMidiFile(file(...smpteHeader, ...track(ONE_NOTE.length, ONE_NOTE)))).toBeNull();
     });
 
+    it("returns null when a chunk after the header is not a track", () => {
+        // The header promises a track; the bytes that follow are some other chunk.
+        const alien = [0x4d, 0x54, 0x78, 0x78, 0, 0, 0, 4, 0, 0, 0, 0];
+        expect(parseMidiFile(file(...HEADER, ...alien))).toBeNull();
+    });
+
+    it("skips a sysex event and keeps reading the notes after it", () => {
+        // F0 <length> <bytes>: a device-specific blob carrying no musical content. Its
+        // length prefix is what says where it ends — misreading it would desynchronize
+        // the stream and turn every following event into garbage.
+        const events = [
+            0x00, 0xf0, 0x03, 0x7e, 0x7f, 0x09, // sysex, three bytes
+            ...ONE_NOTE,
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes.map((n) => n.pitch)).toEqual([60]);
+    });
+
+    it("steps over channel messages that carry one data byte", () => {
+        // Program change (0xC0) and channel pressure (0xD0) each carry a single data
+        // byte. Consuming two would swallow the next event's delta time.
+        const events = [
+            0x00, 0xc0, 0x05, // program change
+            0x00, 0xd0, 0x40, // channel pressure
+            ...ONE_NOTE,
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes.map((n) => n.pitch)).toEqual([60]);
+    });
+
+    it("steps over channel messages that carry two data bytes", () => {
+        // Control change (0xB0 — sustain, expression) and pitch bend (0xE0) each carry
+        // two. A DAW export is full of them, so a wrong step here corrupts every note
+        // that follows rather than failing loudly.
+        const events = [
+            0x00, 0xb0, 0x40, 0x7f, // control change: sustain down
+            0x00, 0xe0, 0x00, 0x40, // pitch bend: centre
+            ...ONE_NOTE,
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes.map((n) => n.pitch)).toEqual([60]);
+    });
+
+    it("matches repeats of one pitch in the order they were struck", () => {
+        // The same key struck twice before either release: the first note-off closes the
+        // first note, so a held repeat cannot borrow the later onset's start.
+        const events = [
+            0x00, 0x90, 0x3c, 0x40, //       note-on C4
+            0x30, 0x90, 0x3c, 0x50, //       note-on C4 again, 48 ticks later
+            0x30, 0x80, 0x3c, 0x00, //       note-off C4 closes the first
+            0x30, 0x80, 0x3c, 0x00, //       note-off C4 closes the second
+            0x00, 0xff, 0x2f, 0x00,
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes.map((n) => n.velocity)).toEqual([0x40, 0x50]);
+        // 96 ticks for the first, 96 for the second: each closed by its own note-off.
+        expect(parsed!.notes.map((n) => Math.round(n.durationMs))).toEqual([500, 500]);
+    });
+
+    it("drops a note-on that is never released", () => {
+        // A stuck note has no duration to give it, so it cannot be rendered.
+        const events = [
+            0x00, 0x90, 0x3c, 0x40, // note-on C4, never released
+            0x00, 0x90, 0x40, 0x40, // note-on E4
+            0x60, 0x80, 0x40, 0x00, // note-off E4
+            0x00, 0xff, 0x2f, 0x00,
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes.map((n) => n.pitch)).toEqual([64]);
+    });
+
+    it("returns null for a file whose only track holds no notes", () => {
+        const events = [0x00, 0xff, 0x2f, 0x00];
+        expect(parseMidiFile(file(...HEADER, ...track(events.length, events)))).toBeNull();
+    });
+
+    it("gives a zero-length note a floor duration rather than dropping it", () => {
+        // Note-on and note-off at the same tick: a real capture of the shortest possible
+        // tap. A zero duration would make it silent (and unrenderable) instead.
+        const events = [
+            0x00, 0x90, 0x3c, 0x40,
+            0x00, 0x80, 0x3c, 0x00, // note-off at the same tick
+            0x00, 0xff, 0x2f, 0x00,
+        ];
+        const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+        expect(parsed!.notes).toHaveLength(1);
+        expect(parsed!.notes[0]!.durationMs).toBeGreaterThan(0);
+    });
+
     it("reads notes that share a status byte via running status", () => {
         // Two note-ons then two note-offs, each second event omitting its status byte and
         // inheriting the previous one — what any DAW writes to save space.
