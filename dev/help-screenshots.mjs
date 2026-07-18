@@ -78,6 +78,11 @@ const SECTIONS = [
         selector: "main",
     },
     {
+        key: "ear",
+        path: "/en/ear",
+        selector: "main",
+    },
+    {
         key: "compose",
         path: "/en/compose",
         selector: "main",

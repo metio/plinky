@@ -27,6 +27,7 @@ const SECTIONS: { key: string; title: () => string }[] = [
     { key: "play", title: m.help_section_play },
     { key: "library", title: m.nav_library },
     { key: "daily", title: m.nav_daily },
+    { key: "ear", title: m.ear_title },
     { key: "compose", title: m.nav_compose },
     { key: "assignments", title: m.help_section_assignments },
     { key: "you", title: m.nav_you },
