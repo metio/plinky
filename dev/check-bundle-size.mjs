@@ -3,7 +3,10 @@
 
 // Verifies the built client JavaScript stays within budget, so the bundle can't
 // grow unnoticed — and that no dev-only surface leaks into what visitors run.
-// Run after `npm run build` (the CI build job and `npm run size`).
+// Run after a SINGLE-locale build (`nix develop --command ci-build`, i.e.
+// `PLINKY_LOCALE=en npm run build`) — the same build CI and the deploy measure. A
+// plain all-locales `npm run build` is caught below and rejected, because its
+// summed multi-language bundle is ~3× the per-visitor weight the budget tracks.
 //
 // Budgets are gzipped sizes and a ratchet: lower them as you trim; raise them
 // deliberately when a feature genuinely needs the bytes. OpenSheetMusicDisplay is
@@ -11,10 +14,37 @@
 // is budgeted apart from our own code — that keeps an app-code regression visible
 // instead of lost behind OSMD's bulk.
 
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 
-const DIR = "build/client/assets";
+const CLIENT = "build/client";
+const DIR = `${CLIENT}/assets`;
+
+// The budget tracks what ONE visitor downloads — a single tree-shaken locale, the
+// way the deploy ships it (dev/build-locales.mjs). A plain `npm run build`
+// prerenders every language into build/client/<locale>/ and bundles all 26 copies
+// of the UI copy; measuring that reports ~3× the real weight and trips the budget
+// for the wrong reason. Detect it from the prerendered locale directories and say
+// exactly what to build instead, so the failure explains itself.
+const knownLocales = new Set(
+    JSON.parse(readFileSync("./project.inlang/settings.json", "utf8")).locales,
+);
+const builtLocales = existsSync(CLIENT)
+    ? readdirSync(CLIENT).filter(
+          (name) => knownLocales.has(name) && statSync(`${CLIENT}/${name}`).isDirectory(),
+      )
+    : [];
+if (builtLocales.length > 1) {
+    console.error(
+        `build/client holds ${builtLocales.length} prerendered locales — this is an ` +
+            "all-locales `npm run build`, which the size gate can't measure (a visitor downloads " +
+            "one language, not all of them).\n" +
+            "Build a single locale the way CI and the deploy do:\n" +
+            "  nix develop --command ci-build   # bakes in PLINKY_LOCALE=en npm run build\n" +
+            "then re-run `npm run size`.",
+    );
+    process.exit(1);
+}
 const VENDOR = /opensheetmusicdisplay/;
 // Chunks fetched only by a rare, deliberate act — the video export's encoder
 // (WebCodecs adapter + mp4-muxer) loads on first use, never on a page visit —

@@ -343,17 +343,25 @@ register is part of the string.
 The home page can show a small "what's new" picture that links somewhere — a new
 piece, an announcement, a seasonal note. It's optional and edited outside the code
 so anyone can change it live, with no redeploy: the running app fetches the current
-item from a [Sanity](https://www.sanity.io) project at load time. The document
+items from a [Sanity](https://www.sanity.io) project at load time. The document
 schemas live in [studio/](studio/), and every change to them redeploys the hosted
 Studio from CI.
+
+Publish more than one item (up to three, newest first) and the banner becomes a
+gentle carousel: it advances on its own every few seconds, and a reader can step
+through it with the chevrons, the position dots, or a swipe. The moment they
+navigate by hand it stops advancing on its own, so it never pulls a picture out
+from under someone who is reading it — and it doesn't auto-advance at all when the
+device asks for reduced motion.
 
 To connect it, copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`
 and `VITE_SANITY_DATASET`. In Sanity, add a `news` document type with an `image`
 (plus `alt` text), a `link` URL, an optional `headline`, and a `show` boolean, and a
 singleton `siteSettings` document with a `newsEnabled` boolean — the master switch
 for the whole board. The editor uploads a picture and publishes, and the banner
-appears; flipping `newsEnabled` off (or a single item's `show` off) hides it again,
-all without a redeploy. Only `https` image and link URLs are shown, and a missing or
+appears; the most-recently-updated shown items rotate, newest first. Flipping
+`newsEnabled` off (or a single item's `show` off) hides them again, all without a
+redeploy. Only `https` image and link URLs are shown, and a missing or
 unreachable source simply shows nothing — the banner never blocks or breaks the
 page. Leave the variables unset and no banner appears and no network call is made.
 

@@ -12,11 +12,16 @@ const item = {
 };
 
 describe("fakeNews", () => {
-    it("resolves to the given item", async () => {
-        expect(await fakeNews(item).fetchActive()).toEqual(item);
+    it("wraps a single item in a list", async () => {
+        expect(await fakeNews(item).fetchActive()).toEqual([item]);
     });
 
-    it("resolves to null by default", async () => {
-        expect(await fakeNews().fetchActive()).toBeNull();
+    it("passes a list through unchanged", async () => {
+        const second = { ...item, id: "n2" };
+        expect(await fakeNews([item, second]).fetchActive()).toEqual([item, second]);
+    });
+
+    it("resolves to an empty list by default", async () => {
+        expect(await fakeNews().fetchActive()).toEqual([]);
     });
 });

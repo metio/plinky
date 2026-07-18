@@ -11,6 +11,20 @@
 
 import { spawn } from "node:child_process";
 
+// A plain `npm run build` — no PLINKY_LOCALE, no PLINKY_ROOT_ONLY — is the
+// all-locales dev build: every language in one tree, for local preview. It is not
+// what ships (the deploy builds one locale per language via dev/build-locales.mjs)
+// and not what the size gate measures. Say so, because reaching for it before
+// `npm run size` measures ~3× the per-visitor weight and trips the budget — use
+// `nix develop --command ci-build` for that path instead.
+if (!process.env.PLINKY_LOCALE && !process.env.PLINKY_ROOT_ONLY) {
+    console.log(
+        "ℹ all-locales dev build (every language in one tree — local preview only).\n" +
+            "  For the bundle-size / a11y gates build a single locale: " +
+            "`nix develop --command ci-build`, then `npm run size`.",
+    );
+}
+
 const MAX_ATTEMPTS = 5;
 // The flake: "Request failed for /da/:" with an empty message, or a timeout — both are the
 // preview-server connection giving out, never a real route error (those carry a status).

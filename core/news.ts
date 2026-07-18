@@ -63,3 +63,25 @@ export function parseNews(raw: unknown): NewsItem | null {
     }
     return item;
 }
+
+// Validate a list payload (an array of raw items, already in the caller's display
+// order) into NewsItems: unsafe or malformed entries are dropped, and the result
+// is capped to `max` so the banner rotates through a small, bounded set. A
+// non-array payload — including the single-item shape an older query returned —
+// yields an empty list.
+export function parseNewsList(raw: unknown, max = 3): NewsItem[] {
+    if (!Array.isArray(raw)) {
+        return [];
+    }
+    const items: NewsItem[] = [];
+    for (const entry of raw) {
+        const item = parseNews(entry);
+        if (item) {
+            items.push(item);
+            if (items.length >= max) {
+                break;
+            }
+        }
+    }
+    return items;
+}

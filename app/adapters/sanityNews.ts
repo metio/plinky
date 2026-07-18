@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { type NewsItem, parseNews } from "../../core/news";
+import { type NewsItem, parseNewsList } from "../../core/news";
 import type { Fetcher } from "../ports/fetcher";
 import type { NewsSource } from "../ports/news";
 import {
@@ -19,16 +19,21 @@ import {
 // The expected Sanity content: a singleton `siteSettings` document with a
 // `newsEnabled` boolean (the master switch for the whole board), and `news`
 // documents each with an image field `image`, an `alt` string, a `link` URL, an
-// optional `headline`, and a boolean `show`. The default query returns the
-// most-recently-updated shown item together with the master switch, projecting
-// the image asset to a direct https CDN URL. News is hidden when the switch is
-// explicitly off, so the board works with just a shown item and no settings doc.
+// optional `headline`, and a boolean `show`. The default query returns the most-
+// recently-updated shown items (newest first, capped) together with the master
+// switch, projecting each image asset to a direct https CDN URL. News is hidden
+// when the switch is explicitly off, so the board works with just a shown item
+// and no settings doc.
 
 export type { SanityConfig };
 
+// The banner rotates through at most this many items; the query slices to it so
+// the network only ever carries the handful the UI can show.
+const MAX_ITEMS = 3;
+
 const DEFAULT_QUERY =
     '{"enabled": *[_type == "siteSettings"][0].newsEnabled, ' +
-    '"item": *[_type == "news" && show == true] | order(_updatedAt desc)[0]{' +
+    `"items": *[_type == "news" && show == true] | order(_updatedAt desc)[0...${MAX_ITEMS}]{` +
     '"id": _id, "imageUrl": image.asset->url, "imageAlt": coalesce(alt, ""), ' +
     '"linkUrl": link, headline, aspect}}';
 
@@ -50,22 +55,22 @@ export function createSanityNews(
     config: SanityConfig | null = sanityConfigFromEnv(),
 ): NewsSource {
     return {
-        async fetchActive(): Promise<NewsItem | null> {
+        async fetchActive(): Promise<NewsItem[]> {
             if (!config) {
-                return null;
+                return [];
             }
             const result = await fetchSanityResult(fetchUrl, sanityQueryUrl(config));
             if (typeof result !== "object" || result === null) {
-                return null;
+                return [];
             }
-            const { enabled, item } = result as { enabled?: unknown; item?: unknown };
+            const { enabled, items } = result as { enabled?: unknown; items?: unknown };
             // The siteSettings master switch: the board is hidden only when
             // `newsEnabled` is explicitly false, so it works with just a shown
             // item even before any settings document exists.
             if (enabled === false) {
-                return null;
+                return [];
             }
-            return parseNews(item);
+            return parseNewsList(items, MAX_ITEMS);
         },
     };
 }

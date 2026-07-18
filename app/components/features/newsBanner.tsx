@@ -1,87 +1,228 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useState } from "react";
-import { useHintsStore } from "../../contexts/services";
+import { useEffect, useRef, useState } from "react";
+import { useHintsStore, useScheduler } from "../../contexts/services";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useNews } from "../../hooks/useNews";
 import { m } from "../../paraglide/messages.js";
-import { CloseIcon } from "../ui/icons";
+import { ChevronIcon, CloseIcon } from "../ui/icons";
 
-// A small "what's new" slot on the home page: one editor-published picture that
-// links somewhere, fetched live from the content service so it changes without a
+// A small "what's new" slot on the home page: editor-published pictures that each
+// link somewhere, fetched live from the content service so they change without a
 // redeploy. Renders nothing until (and unless) an item resolves, so a fetch
-// failure or an unconfigured source is invisible. The ✕ dismisses this item for
+// failure or an unconfigured source is invisible. The ✕ dismisses one item for
 // good — dismissal is keyed by the item's id (reusing the seen-hints store), so a
 // newly published item shows again.
-export function NewsBanner() {
-    const item = useNews();
-    const hints = useHintsStore();
-    const [dismissed, setDismissed] = useState(false);
-    // The picture's own width/height ratio, learned once it loads, so the box
-    // matches the image exactly — the whole picture shows with no crop and no
-    // letterbox bars. Until then the box reserves an approximate ratio so the
-    // image does not shift the page as its bytes arrive.
-    const [loadedRatio, setLoadedRatio] = useState<number | undefined>(undefined);
+//
+// With more than one shown item it becomes a gentle carousel: it advances on its
+// own every ROTATE_MS, and a reader can step through it by chevron, dot, or swipe.
+// The moment they navigate by hand, auto-advance stops for the rest of the visit —
+// they went looking for something, and pulling the page out from under them would
+// be exactly the kind of nagging Plinky avoids.
 
+// How long each item lingers before the carousel advances on its own. Long enough
+// to read a headline, unhurried on purpose.
+const ROTATE_MS = 7000;
+// A horizontal drag past this many pixels counts as a swipe, not a tap on the
+// link — small enough to feel responsive, large enough that a jittery tap doesn't
+// trip it.
+const SWIPE_PX = 40;
+
+export function NewsBanner() {
+    const items = useNews();
+    const hints = useHintsStore();
+    const scheduler = useScheduler();
+    const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+    const [dismissed, setDismissed] = useState<ReadonlySet<string>>(() => new Set());
+    // Which item shows, as an ever-incrementing counter taken modulo the visible
+    // count — so it stays valid as items are dismissed and the list shrinks.
+    const [index, setIndex] = useState(0);
+    // Once the reader steps through by hand they are reading, not glancing, so
+    // auto-advance stops for the rest of the visit and never steals their place.
+    const [paused, setPaused] = useState(false);
+    // The shown picture's own width/height ratio, learned on load and tagged with
+    // the item it belongs to, so a rotation never applies one image's ratio to the
+    // next.
+    const [loaded, setLoaded] = useState<{ id: string; ratio: number } | undefined>(undefined);
+    // Where a pointer press began, so pointer-up can tell a swipe from a tap and,
+    // on a swipe, keep the tap from also following the link.
+    const pressX = useRef<number | null>(null);
+    const swiped = useRef(false);
+
+    const visible = items.filter((it) => !dismissed.has(it.id) && !hints.seen(`news:${it.id}`));
+    const count = visible.length;
+    const current = count === 0 ? 0 : index % count;
+
+    // Auto-advance only while there is more than one item, the reader has not taken
+    // over, and the device isn't asking for reduced motion. The scheduler seam lets
+    // a test drive the timer with a virtual clock.
+    useEffect(() => {
+        if (paused || reducedMotion || count < 2) {
+            return;
+        }
+        const handle = scheduler.every(ROTATE_MS, () => setIndex((i) => i + 1));
+        return () => scheduler.cancel(handle);
+    }, [scheduler, paused, reducedMotion, count]);
+
+    if (count === 0) {
+        return null;
+    }
+    const item = visible[current];
     if (!item) {
         return null;
     }
-    const dismissKey = `news:${item.id}`;
-    if (dismissed || hints.seen(dismissKey)) {
-        return null;
-    }
 
-    const aspect = loadedRatio ?? (item.aspect && item.aspect > 0 ? item.aspect : 16 / 9);
-    const dismiss = () => {
-        hints.markSeen(dismissKey);
-        setDismissed(true);
+    const measured = loaded?.id === item.id ? loaded.ratio : undefined;
+    const aspect = measured ?? (item.aspect && item.aspect > 0 ? item.aspect : 16 / 9);
+
+    // Manual navigation: land on the chosen item and stop auto-advancing. The
+    // offset arithmetic keeps the counter positive so a step back from the first
+    // item wraps to the last.
+    const goTo = (next: number) => {
+        setIndex(((next % count) + count) % count);
+        setPaused(true);
     };
+    const step = (delta: number) => goTo(current + delta);
+
+    const dismiss = () => {
+        hints.markSeen(`news:${item.id}`);
+        setDismissed((prev) => new Set(prev).add(item.id));
+        // The list shrinks under the same counter, surfacing the neighbouring item
+        // in this slot — no index juggling, and dismissing isn't "reading", so
+        // auto-advance keeps running.
+    };
+
+    const onPointerDown = (event: React.PointerEvent) => {
+        pressX.current = event.clientX;
+        swiped.current = false;
+    };
+    const onPointerUp = (event: React.PointerEvent) => {
+        const start = pressX.current;
+        pressX.current = null;
+        if (start === null || count < 2) {
+            return;
+        }
+        const dx = event.clientX - start;
+        if (Math.abs(dx) >= SWIPE_PX) {
+            swiped.current = true;
+            step(dx < 0 ? 1 : -1);
+        }
+    };
+    // A drag that ended as a swipe must not also follow the link it dragged across.
+    const onClickCapture = (event: React.MouseEvent) => {
+        if (swiped.current) {
+            event.preventDefault();
+            swiped.current = false;
+        }
+    };
+
+    const pill =
+        "rounded-full bg-black/40 p-1 leading-none text-white backdrop-blur transition hover:bg-black/60 focus-visible:bg-black/60";
 
     return (
         <section
             aria-label={m.news_label()}
-            className="relative overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+            className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
         >
-            <button
-                type="button"
-                onClick={dismiss}
-                aria-label={m.action_dismiss()}
-                className="absolute right-2 top-2 z-10 rounded-full bg-black/40 p-1 leading-none text-white backdrop-blur transition hover:bg-black/60"
-            >
-                <CloseIcon className="h-4 w-4" />
-            </button>
-            <a
-                href={item.linkUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block"
+            <div
+                className="relative w-full touch-pan-y bg-gray-100 dark:bg-gray-800"
+                style={{ aspectRatio: String(aspect) }}
+                onPointerDown={onPointerDown}
+                onPointerUp={onPointerUp}
+                onClickCapture={onClickCapture}
             >
                 {/* The box takes the image's own ratio once known (approximate
                     until then), and object-contain shows the whole picture — no
                     edges cropped. */}
-                <div
-                    style={{ aspectRatio: String(aspect) }}
-                    className="w-full bg-gray-100 dark:bg-gray-800"
+                <a
+                    href={item.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block h-full w-full"
+                    aria-label={item.headline || item.imageAlt}
                 >
                     <img
                         src={item.imageUrl}
                         alt={item.imageAlt}
                         loading="lazy"
+                        draggable={false}
                         onLoad={(event) => {
                             const { naturalWidth, naturalHeight } = event.currentTarget;
                             if (naturalWidth > 0 && naturalHeight > 0) {
-                                setLoadedRatio(naturalWidth / naturalHeight);
+                                setLoaded({ id: item.id, ratio: naturalWidth / naturalHeight });
                             }
                         }}
                         className="h-full w-full object-contain"
                     />
-                </div>
-                {item.headline && (
-                    <p className="px-4 py-3 text-sm font-medium text-gray-800 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
-                        {item.headline}
-                    </p>
+                </a>
+
+                <button
+                    type="button"
+                    onClick={dismiss}
+                    aria-label={m.action_dismiss()}
+                    className={`absolute right-2 top-2 z-10 ${pill}`}
+                >
+                    <CloseIcon className="h-4 w-4" />
+                </button>
+
+                {count > 1 && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => step(-1)}
+                            aria-label={m.news_previous()}
+                            className={`absolute left-2 top-1/2 z-10 -translate-y-1/2 ${pill}`}
+                        >
+                            <ChevronIcon className="h-4 w-4 rotate-180" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => step(1)}
+                            aria-label={m.news_next()}
+                            className={`absolute right-2 top-1/2 z-10 -translate-y-1/2 ${pill}`}
+                        >
+                            <ChevronIcon className="h-4 w-4" />
+                        </button>
+                        {/* Position as struck notes: the current item is an indigo
+                            "plink" bar, the rest muted dots, on a translucent pill
+                            so they read over any picture. */}
+                        <div className="absolute inset-x-0 bottom-2 z-10 flex justify-center">
+                            <div className="flex items-center gap-1.5 rounded-full bg-black/35 px-2 py-1.5 backdrop-blur">
+                                {visible.map((it, i) => (
+                                    <button
+                                        key={it.id}
+                                        type="button"
+                                        onClick={() => goTo(i)}
+                                        aria-label={m.news_go_to({ position: i + 1 })}
+                                        aria-current={i === current}
+                                        className="flex h-3 items-center px-0.5"
+                                    >
+                                        <span
+                                            className={`h-1.5 rounded-full motion-safe:transition-all ${
+                                                i === current
+                                                    ? "w-4 bg-indigo-300"
+                                                    : "w-1.5 bg-white/45"
+                                            }`}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
                 )}
-            </a>
+            </div>
+
+            {item.headline && (
+                <a
+                    href={item.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 text-sm font-medium text-gray-800 transition group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300"
+                >
+                    {item.headline}
+                </a>
+            )}
         </section>
     );
 }

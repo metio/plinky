@@ -78,11 +78,20 @@ npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
 npx biome check       # lint + format
 npm run nav           # navigation-depth budget
-npm run build         # includes the prerender
-npm run size          # bundle budget
-npm run a11y:light    # axe over the built site (needs the build above)
+nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
+npm run size          # bundle budget — measures the ci-build output
+npm run a11y:light    # axe over the built site (needs the ci-build above)
 npm run a11y:dark
 ```
+
+**Build for the size/a11y gates with `ci-build`, not `npm run build`.** `ci-build`
+bakes in `PLINKY_LOCALE=en npm run build` — one tree-shaken locale, exactly what
+the deploy ships and what the size budget tracks. A plain `npm run build` prerenders
+all 26 locales into one tree (a local-preview convenience that ships nowhere); run
+`npm run size` against *that* and it measures ~3× the per-visitor weight and fails
+for the wrong reason. `size` now detects this and tells you to switch to `ci-build`,
+and `npm run build` prints the same reminder — but reach for `ci-build` first and
+neither fires.
 
 The shared metio lint gate runs in CI through `metio/ci`'s reusable
 `frontend.yml`, which is why it is easy to forget it exists — its wrappers come

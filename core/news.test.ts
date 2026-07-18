@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { isHttpsUrl, parseNews } from "./news";
+import { isHttpsUrl, parseNews, parseNewsList } from "./news";
 
 const valid = {
     id: "n1",
@@ -56,5 +56,27 @@ describe("parseNews", () => {
         expect(parseNews(null)).toBeNull();
         expect(parseNews("news")).toBeNull();
         expect(parseNews(undefined)).toBeNull();
+    });
+});
+
+describe("parseNewsList", () => {
+    it("keeps the safe items in order and drops the unsafe ones", () => {
+        const list = parseNewsList([
+            { ...valid, id: "a" },
+            { ...valid, id: "b", imageUrl: "http://cdn.example.com/x.png" },
+            { ...valid, id: "c" },
+        ]);
+        expect(list.map((item) => item.id)).toEqual(["a", "c"]);
+    });
+
+    it("caps the list to the given maximum, taking the first safe items", () => {
+        const raw = Array.from({ length: 5 }, (_, i) => ({ ...valid, id: `n${i}` }));
+        expect(parseNewsList(raw, 3).map((item) => item.id)).toEqual(["n0", "n1", "n2"]);
+    });
+
+    it("returns an empty list for a non-array payload", () => {
+        expect(parseNewsList(null)).toEqual([]);
+        expect(parseNewsList(valid)).toEqual([]);
+        expect(parseNewsList("news")).toEqual([]);
     });
 });

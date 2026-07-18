@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { afterEach, describe, expect, it } from "vitest";
 import { httpFetcher } from "../../adapters/httpFetcher";
 import { createSanityNews } from "../../adapters/sanityNews";
 import type { SanityConfig } from "../../adapters/sanity";
+import { m } from "../../paraglide/messages.js";
 import { server } from "../../test-setup.node";
+import { fakeScheduler } from "../../testing/fakeScheduler";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { NewsBanner } from "./newsBanner";
 
@@ -38,7 +40,7 @@ const item = {
 
 describe("NewsBanner against a mocked Sanity API", () => {
     it("shows the published item as a linked picture with its headline", async () => {
-        server.use(http.get(QUERY_URL, () => HttpResponse.json({ result: { item } })));
+        server.use(http.get(QUERY_URL, () => HttpResponse.json({ result: { items: [item] } })));
         renderWithServices(<NewsBanner />, news);
         const img = await screen.findByAltText("A new piece");
         expect(img.getAttribute("src")).toBe(item.imageUrl);
@@ -48,7 +50,9 @@ describe("NewsBanner against a mocked Sanity API", () => {
 
     it("renders nothing when the master switch is off", async () => {
         server.use(
-            http.get(QUERY_URL, () => HttpResponse.json({ result: { enabled: false, item } })),
+            http.get(QUERY_URL, () =>
+                HttpResponse.json({ result: { enabled: false, items: [item] } }),
+            ),
         );
         const { container } = renderWithServices(<NewsBanner />, news);
         // Give the fetch a beat; the banner must stay absent, not flash in.
@@ -60,5 +64,29 @@ describe("NewsBanner against a mocked Sanity API", () => {
         server.use(http.get(QUERY_URL, () => new HttpResponse(null, { status: 500 })));
         const { container } = renderWithServices(<NewsBanner />, news);
         await waitFor(() => expect(container.querySelector("section")).toBeNull());
+    });
+
+    it("rotates through several published items and hands control to the reader", async () => {
+        const second = {
+            ...item,
+            id: "n2",
+            imageUrl: "https://cdn.sanity.io/images/two.png",
+            imageAlt: "Another piece",
+            headline: "One more this week",
+        };
+        server.use(
+            http.get(QUERY_URL, () => HttpResponse.json({ result: { items: [item, second] } })),
+        );
+        const scheduler = fakeScheduler();
+        renderWithServices(<NewsBanner />, { ...news, scheduler });
+        await screen.findByAltText("A new piece");
+        // It advances on its own...
+        act(() => scheduler.advance(7000));
+        expect(screen.queryByAltText("Another piece")).not.toBeNull();
+        // ...until the reader steps back, after which the clock no longer moves it.
+        act(() => void screen.getByRole("button", { name: m.news_previous() }).click());
+        expect(screen.queryByAltText("A new piece")).not.toBeNull();
+        act(() => scheduler.advance(7000 * 3));
+        expect(screen.queryByAltText("A new piece")).not.toBeNull();
     });
 });

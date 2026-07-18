@@ -25,21 +25,22 @@ const wrap =
     );
 
 describe("useNews", () => {
-    it("returns the active item once the source resolves", async () => {
-        const { result } = renderHook(() => useNews(), { wrapper: wrap(fakeNews(ITEM)) });
-        await waitFor(() => expect(result.current?.id).toBe("n1"));
+    it("returns the active items once the source resolves", async () => {
+        const second = { ...ITEM, id: "n2" };
+        const { result } = renderHook(() => useNews(), { wrapper: wrap(fakeNews([ITEM, second])) });
+        await waitFor(() => expect(result.current.map((i) => i.id)).toEqual(["n1", "n2"]));
     });
 
-    it("stays null when there is nothing live", async () => {
+    it("stays empty when there is nothing live", async () => {
         const { result } = renderHook(() => useNews(), { wrapper: wrap(fakeNews(null)) });
         await new Promise((resolve) => setTimeout(resolve, 0));
-        expect(result.current).toBeNull();
+        expect(result.current).toEqual([]);
     });
 
-    it("swallows a failing fetch and stays null so the banner never breaks the page", async () => {
+    it("swallows a failing fetch and stays empty so the banner never breaks the page", async () => {
         const failing: NewsSource = { fetchActive: () => Promise.reject(new Error("down")) };
         const { result } = renderHook(() => useNews(), { wrapper: wrap(failing) });
         await new Promise((resolve) => setTimeout(resolve, 0));
-        expect(result.current).toBeNull();
+        expect(result.current).toEqual([]);
     });
 });

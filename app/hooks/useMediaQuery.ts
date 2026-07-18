@@ -10,6 +10,11 @@ import { useEffect, useState } from "react";
 export function useMediaQuery(query: string): boolean {
     const [matches, setMatches] = useState(false);
     useEffect(() => {
+        // matchMedia is absent in jsdom (and any non-browser host), so a component
+        // that reads a query stays on its safe default there instead of throwing.
+        if (typeof window.matchMedia !== "function") {
+            return;
+        }
         const list = window.matchMedia(query);
         const update = () => setMatches(list.matches);
         update();
