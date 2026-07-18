@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "node dev/patch-prerender-retry.mjs",
     "messages": "node dev/compile-messages.mjs",
     "messages:check": "node dev/check-messages.mjs",
     "ci:parity": "node dev/check-ci-parity.mjs",
