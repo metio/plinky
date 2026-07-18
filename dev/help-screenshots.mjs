@@ -154,8 +154,8 @@ async function uploadImage(png, filename) {
 }
 
 async function patchBlock(key, assetId) {
-    const alt = SEED.get(key)?.alt;
-    if (!alt) {
+    const block = SEED.get(key);
+    if (!block) {
         throw new Error(
             `no seeded help block for ${key} — is studio/seed/help.ndjson in step with SECTIONS?`,
         );
@@ -165,15 +165,23 @@ async function patchBlock(key, assetId) {
         headers: { authorization: `Bearer ${TOKEN}`, "content-type": "application/json" },
         body: JSON.stringify({
             mutations: [
+                // Create the document from the seed if it isn't in the dataset yet — the
+                // first shoot of a newly added section, before Seed Studio Content has
+                // imported it, would otherwise fail to patch a document that doesn't exist.
+                // createIfNotExists never touches an existing document, so a Studio text
+                // edit is safe; only a missing block is filled from the seed file, and its
+                // picture attaches in the same run. So a new section needs no seed-first
+                // dance — the screenshot job stands the whole block up on its own.
+                { createIfNotExists: block },
                 {
                     patch: {
-                        id: `help-${key}-intro`,
+                        id: block._id,
                         set: {
                             image: {
                                 _type: "image",
                                 asset: { _type: "reference", _ref: assetId },
                             },
-                            alt,
+                            alt: block.alt,
                         },
                     },
                 },
