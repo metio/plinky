@@ -682,5 +682,19 @@
   "ear_progression_undo": "Cofnij ostatni akord",
   "ear_prog_level_primary": "Akordy główne",
   "ear_prog_level_pop": "Popowa czwórka",
-  "ear_prog_level_triads": "Wszystkie trójdźwięki"
+  "ear_prog_level_triads": "Wszystkie trójdźwięki",
+  "ear_exercise_scale_degrees": "Stopnie skali",
+  "ear_exercise_intervals_context": "Interwały w kontekście",
+  "ear_exercise_melodic": "Dyktando melodyczne",
+  "ear_scale_degrees_blurb": "Krótka kadencja ustala tonację, potem jeden dźwięk. Nazwij, gdzie leży w tonacji — pierwszy stopień, trzeci, piąty?",
+  "ear_intervals_context_blurb": "Kadencja ustala tonację, potem dwa dźwięki. Nazwij interwał między nimi, słyszany z tonacją, o którą możesz się oprzeć.",
+  "ear_melodic_blurb": "Kadencja ustala tonację, potem krótka melodia. Zapisz ją stopień po stopniu, po kolei.",
+  "ear_degree_choices": "Wybór stopni skali",
+  "ear_melodic_choices": "Odpowiedź melodyczna",
+  "ear_sd_level_triad": "Trójdźwięk toniczny",
+  "ear_sd_level_diatonic": "Wszystkie siedem stopni",
+  "ear_sd_level_chromatic": "Z chromatyką",
+  "ear_md_level_short": "Trzy dźwięki",
+  "ear_md_level_medium": "Cztery dźwięki",
+  "ear_md_level_long": "Pięć dźwięków"
 }

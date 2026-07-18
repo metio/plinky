@@ -682,5 +682,19 @@
   "ear_progression_undo": "Letzten Akkord zurücknehmen",
   "ear_prog_level_primary": "Die Hauptdreiklänge",
   "ear_prog_level_pop": "Die vier Popakkorde",
-  "ear_prog_level_triads": "Alle Dreiklänge"
+  "ear_prog_level_triads": "Alle Dreiklänge",
+  "ear_exercise_scale_degrees": "Tonstufen",
+  "ear_exercise_intervals_context": "Intervalle im Kontext",
+  "ear_exercise_melodic": "Melodiediktat",
+  "ear_scale_degrees_blurb": "Eine kurze Kadenz gibt die Tonart vor, dann ein einzelner Ton. Benenne, wo er in der Tonart liegt — die erste Stufe, die dritte, die fünfte?",
+  "ear_intervals_context_blurb": "Eine Kadenz gibt die Tonart vor, dann zwei Töne. Benenne das Intervall dazwischen, mit der Tonart als Stütze.",
+  "ear_melodic_blurb": "Eine Kadenz gibt die Tonart vor, dann eine kleine Melodie. Schreib sie Stufe für Stufe auf, der Reihe nach.",
+  "ear_degree_choices": "Auswahl der Tonstufe",
+  "ear_melodic_choices": "Melodieantwort",
+  "ear_sd_level_triad": "Der Tonika-Dreiklang",
+  "ear_sd_level_diatonic": "Alle sieben Stufen",
+  "ear_sd_level_chromatic": "Mit den chromatischen Tönen",
+  "ear_md_level_short": "Drei Töne",
+  "ear_md_level_medium": "Vier Töne",
+  "ear_md_level_long": "Fünf Töne"
 }

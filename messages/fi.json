@@ -682,5 +682,19 @@
   "ear_progression_undo": "Kumoa viimeinen sointu",
   "ear_prog_level_primary": "Pääsoinnut",
   "ear_prog_level_pop": "Popin neljä",
-  "ear_prog_level_triads": "Kaikki kolmisoinnut"
+  "ear_prog_level_triads": "Kaikki kolmisoinnut",
+  "ear_exercise_scale_degrees": "Sävelasteet",
+  "ear_exercise_intervals_context": "Intervallit sävellajissa",
+  "ear_exercise_melodic": "Melodiadiktaatti",
+  "ear_scale_degrees_blurb": "Lyhyt kadenssi virittää sävellajin, sitten yksi sävel. Nimeä, mikä aste se on — ensimmäinen, kolmas, viides?",
+  "ear_intervals_context_blurb": "Kadenssi virittää sävellajin, sitten kaksi säveltä. Nimeä niiden väliin jäävä intervalli, tukenasi tuttu sävellaji.",
+  "ear_melodic_blurb": "Kadenssi virittää sävellajin, sitten pieni sävelmä. Kirjoita se muistiin aste asteelta, järjestyksessä.",
+  "ear_degree_choices": "Sävelastevaihtoehdot",
+  "ear_melodic_choices": "Melodian vastaus",
+  "ear_sd_level_triad": "Toonikakolmisointu",
+  "ear_sd_level_diatonic": "Kaikki seitsemän astetta",
+  "ear_sd_level_chromatic": "Kromaattiset mukana",
+  "ear_md_level_short": "Kolme säveltä",
+  "ear_md_level_medium": "Neljä säveltä",
+  "ear_md_level_long": "Viisi säveltä"
 }

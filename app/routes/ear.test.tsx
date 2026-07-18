@@ -84,4 +84,21 @@ describe("ear route", () => {
         expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_progressions());
         expect(chosen(m.ear_level_label)).toBe(m.ear_prog_level_primary());
     });
+
+    it("offers the functional exercises with their own level names", () => {
+        renderAt("/ear?exercise=scale-degrees&level=1");
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_scale_degrees());
+        expect(chosen(m.ear_level_label)).toBe(m.ear_sd_level_diatonic());
+
+        cleanup();
+        renderAt("/ear?exercise=melodic-dictation&level=2");
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_melodic());
+        expect(chosen(m.ear_level_label)).toBe(m.ear_md_level_long());
+
+        cleanup();
+        // Intervals in context reuses the interval level names.
+        renderAt("/ear?exercise=intervals-context&level=0");
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_intervals_context());
+        expect(chosen(m.ear_level_label)).toBe(m.ear_level_fifths());
+    });
 });

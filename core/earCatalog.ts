@@ -15,7 +15,9 @@ import {
     CHORD_LEVELS,
     type EarExerciseId,
     INTERVAL_LEVELS,
+    MELODIC_LEVELS,
     PROGRESSION_LEVELS,
+    SCALE_DEGREE_LEVELS,
     SCALE_LEVELS,
 } from "./earExercise";
 
@@ -54,6 +56,11 @@ const LADDERS: { exercise: EarExerciseId; levels: unknown[]; grades: number[]; c
         // Holding a whole progression in the ear and naming each chord is the hardest of
         // these, so it starts higher and climbs furthest.
         { exercise: "progressions", levels: PROGRESSION_LEVELS, grades: [3, 4, 5, 6], costs: [2.2, 2.8, 3.4, 4.0] },
+        // The functional exercises — hearing notes against a key the cadence sets — are the
+        // deep end: naming a degree, then an interval in context, then a whole melody.
+        { exercise: "scale-degrees", levels: SCALE_DEGREE_LEVELS, grades: [3, 5, 7], costs: [2.4, 3.6, 5.0] },
+        { exercise: "intervals-context", levels: INTERVAL_LEVELS, grades: [3, 4, 5, 6], costs: [2.4, 3.0, 3.6, 4.2] },
+        { exercise: "melodic-dictation", levels: MELODIC_LEVELS, grades: [5, 6, 7], costs: [3.6, 4.4, 5.2] },
     ];
 
 export const EAR_ITEMS: EarItem[] = [

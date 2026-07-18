@@ -257,3 +257,77 @@ export function degreePitches(tonic: number, degree: ChordDegree): number[] {
     const { quality, step } = DIATONIC_TRIADS[degree];
     return chordPitches(tonic + step, quality);
 }
+
+// ---------------------------------------------------------------------------
+// Scale degrees (single notes within a key)
+// ---------------------------------------------------------------------------
+
+// A note named by its place in the key rather than its letter — the functional ear hears
+// "the third" or "the fifth", not "E" or "G". The number is the identity, so like a Roman
+// numeral it is notation and reads the same in every language: the diatonic degrees are
+// plain numbers, the chromatic ones a flat before the number.
+export type ScaleDegree =
+    | "1"
+    | "♭2"
+    | "2"
+    | "♭3"
+    | "3"
+    | "4"
+    | "♯4"
+    | "5"
+    | "♭6"
+    | "6"
+    | "♭7"
+    | "7";
+
+// Semitones each degree sits above the tonic — the major scale for the diatonic seven,
+// the remaining chromatic steps named as flats (and the raised fourth, the one sharp the
+// ear meets often enough to want its own name).
+const DEGREE_SEMITONES: Record<ScaleDegree, number> = {
+    "1": 0,
+    "♭2": 1,
+    "2": 2,
+    "♭3": 3,
+    "3": 4,
+    "4": 5,
+    "♯4": 6,
+    "5": 7,
+    "♭6": 8,
+    "6": 9,
+    "♭7": 10,
+    "7": 11,
+};
+
+// The seven notes of the major scale, in order.
+export const DIATONIC_DEGREES: ScaleDegree[] = ["1", "2", "3", "4", "5", "6", "7"];
+
+// All twelve, chromatic notes included.
+export const CHROMATIC_DEGREES: ScaleDegree[] = [
+    "1",
+    "♭2",
+    "2",
+    "♭3",
+    "3",
+    "4",
+    "♯4",
+    "5",
+    "♭6",
+    "6",
+    "♭7",
+    "7",
+];
+
+// The tonic triad's notes, the first degrees a beginner tells apart.
+export const TRIAD_DEGREES: ScaleDegree[] = ["1", "3", "5"];
+
+// The sounding note of a degree in a key — its semitones above the tonic, in the octave
+// above so it sits clear of the cadence that set the key.
+export function degreeNote(tonic: number, degree: ScaleDegree): number {
+    return tonic + SEMITONES_PER_OCTAVE + DEGREE_SEMITONES[degree];
+}
+
+// The degree a note is, relative to a tonic — the inverse, folded into one octave.
+export function degreeOf(tonic: number, note: number): ScaleDegree {
+    const semitones = pitchClassOf(note - tonic);
+    return CHROMATIC_DEGREES[semitones] ?? "1";
+}

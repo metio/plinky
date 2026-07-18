@@ -150,7 +150,11 @@ one-tap **review session** walks you through everything that's fading, and you c
   name which one it is — both from a grid of choices, climbing from the major/minor pair
   out to the sevenths, the modes and beyond. **Chord progressions** plays a run of chords
   in a key and you name each in order by its Roman numeral, building the sequence chord by
-  chord. **Perfect pitch** plays one note and you name it on a keyboard. Every round can be
+  chord. Three **functional** exercises play a short cadence to plant a key first, then ask
+  you to hear against it: **Scale degrees** (name where one note sits in the key),
+  **Intervals in context** (name an interval with the key to lean on), and **Melodic
+  dictation** (write a little tune down degree by degree). **Perfect pitch** plays one note
+  and you name it on a keyboard. Every round can be
   replayed as often as you like, and a miss shows what played rather than marking you
   down. A round is ten questions, and finishing one **counts toward your grades** the
   same way playing a piece does — each exercise sits on the grade ladder, so ear practice

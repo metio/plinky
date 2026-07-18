@@ -682,5 +682,19 @@
   "ear_progression_undo": "Fortryd den sidste akkord",
   "ear_prog_level_primary": "Hovedakkorderne",
   "ear_prog_level_pop": "De fire popakkorder",
-  "ear_prog_level_triads": "Alle treklange"
+  "ear_prog_level_triads": "Alle treklange",
+  "ear_exercise_scale_degrees": "Skalatrin",
+  "ear_exercise_intervals_context": "Intervaller i kontekst",
+  "ear_exercise_melodic": "Melodidiktat",
+  "ear_scale_degrees_blurb": "En kort kadence sætter tonearten, så én tone. Sig, hvor den ligger i tonearten — første trin, tredje, femte?",
+  "ear_intervals_context_blurb": "En kadence sætter tonearten, så to toner. Navngiv intervallet mellem dem, hørt med tonearten at læne sig op ad.",
+  "ear_melodic_blurb": "En kadence sætter tonearten, så en lille melodi. Skriv den ned trin for trin, i rækkefølge.",
+  "ear_degree_choices": "Valg af skalatrin",
+  "ear_melodic_choices": "Melodisvar",
+  "ear_sd_level_triad": "Tonikatreklangen",
+  "ear_sd_level_diatonic": "Alle syv trin",
+  "ear_sd_level_chromatic": "Med kromatikken",
+  "ear_md_level_short": "Tre toner",
+  "ear_md_level_medium": "Fire toner",
+  "ear_md_level_long": "Fem toner"
 }

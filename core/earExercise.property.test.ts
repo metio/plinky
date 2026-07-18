@@ -12,17 +12,24 @@ import {
     generateInterval,
     generatePerfectPitch,
     generateQuestion,
+    generateIntervalContext,
+    generateMelodic,
     generateProgression,
     generateScale,
+    generateScaleDegree,
     INTERVAL_LEVELS,
+    MELODIC_LEVELS,
     PROGRESSION_LENGTH,
     PROGRESSION_LEVELS,
+    SCALE_DEGREE_LEVELS,
     isCorrect,
     SCALE_LEVELS,
     scoreRounds,
 } from "./earExercise";
 import {
     chordPitches,
+    degreeNote,
+    degreeOf,
     degreePitches,
     INTERVAL_IDS,
     NATURAL_PITCH_CLASSES,
@@ -283,6 +290,9 @@ describe("generateQuestion dispatch", () => {
                 expect(generateQuestion("chords", 0, rng).kind).toBe("chords");
                 expect(generateQuestion("scales", 0, rng).kind).toBe("scales");
                 expect(generateQuestion("progressions", 0, rng).kind).toBe("progressions");
+                expect(generateQuestion("scale-degrees", 0, rng).kind).toBe("scale-degrees");
+                expect(generateQuestion("intervals-context", 0, rng).kind).toBe("intervals-context");
+                expect(generateQuestion("melodic-dictation", 0, rng).kind).toBe("melodic-dictation");
             }),
         );
     });
@@ -353,6 +363,61 @@ describe("chord progression question properties", () => {
                 );
                 expect(q.answer).toBe(q.sequence.join("-"));
                 expect(q.choices).toEqual(PROGRESSION_LEVELS[level]);
+            }),
+        );
+    });
+});
+
+const sdLevels = fc.integer({ min: 0, max: SCALE_DEGREE_LEVELS.length - 1 });
+const mdLevels = fc.integer({ min: 0, max: MELODIC_LEVELS.length - 1 });
+
+describe("functional exercise properties (a cadence sets the key)", () => {
+    it("scale degrees: names the note it sounds after the cadence", () => {
+        fc.assert(
+            fc.property(rolls, sdLevels, (values, level) => {
+                const q = generateScaleDegree({ degrees: SCALE_DEGREE_LEVELS[level]! }, rngOf(values));
+                expect(q.choices).toContain(q.answer);
+                // The cadence sounds first (I = the lowest chord's root is the tonic), then
+                // exactly one question note, the highest and last thing heard.
+                const notes = [...q.notes].sort((a, b) => a.at - b.at);
+                const questionNote = notes.at(-1)!;
+                const tonic = Math.min(...q.notes.map((n) => n.note));
+                expect(questionNote.note).toBe(degreeNote(tonic, q.answer));
+                for (const note of q.notes) {
+                    expect(note.note).toBeGreaterThanOrEqual(DEFAULT_LOWEST - 8); // cadence sits low
+                    expect(note.note).toBeLessThanOrEqual(DEFAULT_HIGHEST);
+                }
+            }),
+        );
+    });
+
+    it("intervals in context: two question notes the answer's distance apart, after a cadence", () => {
+        fc.assert(
+            fc.property(rolls, levels, (values, level) => {
+                const q = generateIntervalContext({ intervals: INTERVAL_LEVELS[level]! }, rngOf(values));
+                expect(q.choices).toContain(q.answer);
+                // The last two onsets are the interval pair; they differ by the answer.
+                const onsets = [...new Set(q.notes.map((n) => n.at))].sort((a, b) => a - b);
+                const first = q.notes.find((n) => n.at === onsets.at(-2))!;
+                const second = q.notes.find((n) => n.at === onsets.at(-1))!;
+                expect(second.note - first.note).toBe(semitonesOf(q.answer));
+            }),
+        );
+    });
+
+    it("melodic dictation: a diatonic line starting on the tonic, its length the level's", () => {
+        fc.assert(
+            fc.property(rolls, mdLevels, (values, level) => {
+                const q = generateMelodic({ length: MELODIC_LEVELS[level]! }, rngOf(values));
+                expect(q.sequence).toHaveLength(MELODIC_LEVELS[level]!);
+                expect(q.sequence[0]).toBe("1");
+                expect(q.answer).toBe(q.sequence.join("-"));
+                const tonic = Math.min(...q.notes.map((n) => n.note));
+                // Each melody note reads back as its degree in the key it was drawn from.
+                const melody = [...q.notes].sort((a, b) => a.at - b.at).slice(-MELODIC_LEVELS[level]!);
+                melody.forEach((note, index) => {
+                    expect(degreeOf(tonic, note.note)).toBe(q.sequence[index]);
+                });
             }),
         );
     });

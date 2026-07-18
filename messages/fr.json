@@ -682,5 +682,19 @@
   "ear_progression_undo": "Annuler le dernier accord",
   "ear_prog_level_primary": "Les accords principaux",
   "ear_prog_level_pop": "Les quatre accords pop",
-  "ear_prog_level_triads": "Toutes les triades"
+  "ear_prog_level_triads": "Toutes les triades",
+  "ear_exercise_scale_degrees": "Degrés",
+  "ear_exercise_intervals_context": "Intervalles en contexte",
+  "ear_exercise_melodic": "Dictée mélodique",
+  "ear_scale_degrees_blurb": "Une courte cadence installe la tonalité, puis une note. Dis où elle se place dans la tonalité — le premier degré, le troisième, le cinquième ?",
+  "ear_intervals_context_blurb": "Une cadence installe la tonalité, puis deux notes. Nomme l'intervalle qui les sépare, avec la tonalité pour appui.",
+  "ear_melodic_blurb": "Une cadence installe la tonalité, puis un petit air. Note-le degré par degré, dans l'ordre.",
+  "ear_degree_choices": "Choix du degré",
+  "ear_melodic_choices": "Réponse mélodique",
+  "ear_sd_level_triad": "L'accord de tonique",
+  "ear_sd_level_diatonic": "Les sept degrés",
+  "ear_sd_level_chromatic": "Avec les chromatismes",
+  "ear_md_level_short": "Trois notes",
+  "ear_md_level_medium": "Quatre notes",
+  "ear_md_level_long": "Cinq notes"
 }

@@ -682,5 +682,19 @@
   "ear_progression_undo": "Laatste akkoord ongedaan maken",
   "ear_prog_level_primary": "De hoofdakkoorden",
   "ear_prog_level_pop": "De vier popakkoorden",
-  "ear_prog_level_triads": "Alle drieklanken"
+  "ear_prog_level_triads": "Alle drieklanken",
+  "ear_exercise_scale_degrees": "Toontrappen",
+  "ear_exercise_intervals_context": "Intervallen in context",
+  "ear_exercise_melodic": "Melodisch dictee",
+  "ear_scale_degrees_blurb": "Een korte cadens zet de toonsoort, dan één noot. Benoem waar hij in de toonsoort ligt — de eerste trap, de derde, de vijfde?",
+  "ear_intervals_context_blurb": "Een cadens zet de toonsoort, dan twee noten. Benoem het interval ertussen, met de toonsoort om op te leunen.",
+  "ear_melodic_blurb": "Een cadens zet de toonsoort, dan een klein wijsje. Schrijf het trap voor trap op, op volgorde.",
+  "ear_degree_choices": "Keuze van de toontrap",
+  "ear_melodic_choices": "Melodieantwoord",
+  "ear_sd_level_triad": "De tonica-drieklank",
+  "ear_sd_level_diatonic": "Alle zeven trappen",
+  "ear_sd_level_chromatic": "Met de chromatische tonen",
+  "ear_md_level_short": "Drie noten",
+  "ear_md_level_medium": "Vier noten",
+  "ear_md_level_long": "Vijf noten"
 }

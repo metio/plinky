@@ -188,4 +188,53 @@ describe("EarSession", () => {
         }
         expect(services.mastery.load("ear-progressions-0")?.bestScore).toBe(100);
     });
+
+    it("names a scale degree after the key-setting cadence, recorded to its item", () => {
+        const { services } = mount({ exercise: "scale-degrees" });
+        // rng=0 asks for the first of the tonic triad: degree 1.
+        press(m.ear_start());
+        expect(screen.getByRole("group", { name: m.ear_degree_choices() })).toBeTruthy();
+        press("1");
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+
+        for (let round = 1; round < EAR_SESSION_ROUNDS; round++) {
+            press(m.ear_next());
+            press("1");
+        }
+        expect(services.mastery.load("ear-scale-degrees-0")?.bestScore).toBe(100);
+    });
+
+    it("names an interval in context on the ladder, recorded to its item", () => {
+        const { services } = mount({ exercise: "intervals-context" });
+        // rng=0 asks for a unison, the first of the easiest interval set.
+        press(m.ear_start());
+        expect(screen.getByRole("group", { name: m.ear_ladder_label() })).toBeTruthy();
+        press(m.theory_interval_unison());
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+
+        for (let round = 1; round < EAR_SESSION_ROUNDS; round++) {
+            press(m.ear_next());
+            press(m.theory_interval_unison());
+        }
+        expect(services.mastery.load("ear-intervals-context-0")?.bestScore).toBe(100);
+    });
+
+    it("writes a melody degree by degree, recorded to its item", () => {
+        const { services } = mount({ exercise: "melodic-dictation" });
+        // rng=0 builds the three-note line 1–2–1.
+        const answer = () => {
+            for (const degree of ["1", "2", "1"]) {
+                press(degree);
+            }
+        };
+        press(m.ear_start());
+        answer();
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+
+        for (let round = 1; round < EAR_SESSION_ROUNDS; round++) {
+            press(m.ear_next());
+            answer();
+        }
+        expect(services.mastery.load("ear-melodic-dictation-0")?.bestScore).toBe(100);
+    });
 });

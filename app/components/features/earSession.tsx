@@ -12,7 +12,13 @@ import {
     scoreRounds,
 } from "../../../core/earExercise";
 import { applyRun, letterMin } from "../../../core/mastery";
-import type { ChordQuality, IntervalId, NoteNameId, ScaleId } from "../../../core/theory";
+import type {
+    ChordQuality,
+    IntervalId,
+    NoteNameId,
+    ScaleDegree,
+    ScaleId,
+} from "../../../core/theory";
 import { useMasteryStore, usePrefsStore } from "../../contexts/services";
 import { chordName, scaleName } from "../../lib/theoryNames";
 import { m } from "../../paraglide/messages.js";
@@ -20,7 +26,7 @@ import { Button } from "../ui/button";
 import { EarChoices } from "./earChoices";
 import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
-import { EarProgression } from "./earProgression";
+import { EarSequence } from "./earSequence";
 import { EarStage } from "./earStage";
 
 // The one-line prompt on the resting start card, per exercise.
@@ -30,7 +36,13 @@ const BLURB: Record<EarExerciseId, () => string> = {
     chords: m.ear_chords_blurb,
     scales: m.ear_scales_blurb,
     progressions: m.ear_progressions_blurb,
+    "scale-degrees": m.ear_scale_degrees_blurb,
+    "intervals-context": m.ear_intervals_context_blurb,
+    "melodic-dictation": m.ear_melodic_blurb,
 };
+
+// A scale degree is its own label — notation, no translation, like a note letter.
+const degreeLabel = (degree: ScaleDegree) => degree;
 
 // A bounded run of one ear exercise: it plays a question, takes an answer, and after
 // EAR_SESSION_ROUNDS folds the run's accuracy into the item's mastery — the same score a
@@ -179,15 +191,37 @@ export function EarSession({
                     nameOf={scaleName}
                     label={m.ear_scale_choices()}
                 />
+            ) : question.kind === "intervals-context" ? (
+                // Intervals heard in a key — the same ladder, after a cadence.
+                <EarLadder
+                    choices={question.choices}
+                    answer={settled ? question.answer : null}
+                    given={settled ? (given as IntervalId) : null}
+                    onChoose={answer}
+                />
+            ) : question.kind === "scale-degrees" ? (
+                <EarChoices
+                    choices={question.choices}
+                    answer={settled ? question.answer : null}
+                    given={settled ? (given as ScaleDegree) : null}
+                    onChoose={answer}
+                    nameOf={degreeLabel}
+                    label={m.ear_degree_choices()}
+                />
             ) : (
-                <EarProgression
+                // Chord progressions and melodic dictation both build a sequence answer.
+                <EarSequence
                     // Remounts each question so the sequence entry starts empty.
                     key={questionSeq}
                     sequence={question.sequence}
                     choices={question.choices}
                     settled={settled}
                     onComplete={answer}
-                    label={m.ear_progression_choices()}
+                    label={
+                        question.kind === "melodic-dictation"
+                            ? m.ear_melodic_choices()
+                            : m.ear_progression_choices()
+                    }
                 />
             )}
 

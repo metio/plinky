@@ -682,5 +682,19 @@
   "ear_progression_undo": "撤销最后一个和弦",
   "ear_prog_level_primary": "主要和弦",
   "ear_prog_level_pop": "流行四和弦",
-  "ear_prog_level_triads": "所有三和弦"
+  "ear_prog_level_triads": "所有三和弦",
+  "ear_exercise_scale_degrees": "音级",
+  "ear_exercise_intervals_context": "情境音程",
+  "ear_exercise_melodic": "旋律听写",
+  "ear_scale_degrees_blurb": "一小段终止式定下调性，接着响起一个音。说出它在调里的位置——第一级、第三级，还是第五级？",
+  "ear_intervals_context_blurb": "终止式定下调性，接着响起两个音。有调性可以依靠，说出它们之间的音程。",
+  "ear_melodic_blurb": "终止式定下调性，接着是一小段旋律。按顺序，一级一级把它写下来。",
+  "ear_degree_choices": "音级选项",
+  "ear_melodic_choices": "旋律答案",
+  "ear_sd_level_triad": "主三和弦",
+  "ear_sd_level_diatonic": "全部七个音级",
+  "ear_sd_level_chromatic": "加上变化音",
+  "ear_md_level_short": "三个音",
+  "ear_md_level_medium": "四个音",
+  "ear_md_level_long": "五个音"
 }

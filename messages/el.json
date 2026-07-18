@@ -682,5 +682,19 @@
   "ear_progression_undo": "Αναίρεση της τελευταίας συγχορδίας",
   "ear_prog_level_primary": "Οι κύριες συγχορδίες",
   "ear_prog_level_pop": "Οι τέσσερις της ποπ",
-  "ear_prog_level_triads": "Όλες οι τρίφωνες συγχορδίες"
+  "ear_prog_level_triads": "Όλες οι τρίφωνες συγχορδίες",
+  "ear_exercise_scale_degrees": "Βαθμίδες της κλίμακας",
+  "ear_exercise_intervals_context": "Διαστήματα σε τονικότητα",
+  "ear_exercise_melodic": "Μελωδική υπαγόρευση",
+  "ear_scale_degrees_blurb": "Μια σύντομη πτώση ορίζει την τονικότητα, μετά μία νότα. Πες σε ποια βαθμίδα βρίσκεται — πρώτη, τρίτη, πέμπτη;",
+  "ear_intervals_context_blurb": "Μια πτώση ορίζει την τονικότητα, μετά δύο νότες. Πες το διάστημα ανάμεσά τους, με την τονικότητα να σε στηρίζει.",
+  "ear_melodic_blurb": "Μια πτώση ορίζει την τονικότητα, μετά μια μικρή μελωδία. Γράψ' την βαθμίδα προς βαθμίδα, με τη σειρά.",
+  "ear_degree_choices": "Επιλογές βαθμίδας",
+  "ear_melodic_choices": "Απάντηση μελωδίας",
+  "ear_sd_level_triad": "Η τονική συγχορδία",
+  "ear_sd_level_diatonic": "Και οι επτά βαθμίδες",
+  "ear_sd_level_chromatic": "Με τα χρωματικά",
+  "ear_md_level_short": "Τρεις νότες",
+  "ear_md_level_medium": "Τέσσερις νότες",
+  "ear_md_level_long": "Πέντε νότες"
 }

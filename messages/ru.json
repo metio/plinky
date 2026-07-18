@@ -682,5 +682,19 @@
   "ear_progression_undo": "Отменить последний аккорд",
   "ear_prog_level_primary": "Главные аккорды",
   "ear_prog_level_pop": "Поп-четвёрка",
-  "ear_prog_level_triads": "Все трезвучия"
+  "ear_prog_level_triads": "Все трезвучия",
+  "ear_exercise_scale_degrees": "Ступени лада",
+  "ear_exercise_intervals_context": "Интервалы в контексте",
+  "ear_exercise_melodic": "Мелодический диктант",
+  "ear_scale_degrees_blurb": "Короткая каденция задаёт тональность, затем один звук. Назови, где он в ладу — первая ступень, третья, пятая?",
+  "ear_intervals_context_blurb": "Каденция задаёт тональность, затем два звука. Назови интервал между ними — тональность рядом, чтобы на неё опереться.",
+  "ear_melodic_blurb": "Каденция задаёт тональность, затем короткая мелодия. Запиши её по ступеням, по порядку.",
+  "ear_degree_choices": "Выбор ступеней лада",
+  "ear_melodic_choices": "Ответ мелодии",
+  "ear_sd_level_triad": "Тоническое трезвучие",
+  "ear_sd_level_diatonic": "Все семь ступеней",
+  "ear_sd_level_chromatic": "С хроматизмами",
+  "ear_md_level_short": "Три звука",
+  "ear_md_level_medium": "Четыре звука",
+  "ear_md_level_long": "Пять звуков"
 }

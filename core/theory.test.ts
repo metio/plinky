@@ -5,9 +5,13 @@ import { describe, expect, it } from "vitest";
 import {
     CHORD_DEGREES,
     CHORD_QUALITIES,
+    CHROMATIC_DEGREES,
     chordPitches,
     chordSpan,
+    degreeNote,
+    degreeOf,
     degreePitches,
+    DIATONIC_DEGREES,
     INTERVAL_IDS,
     intervalIdOf,
     NATURAL_PITCH_CLASSES,
@@ -138,5 +142,29 @@ describe("diatonic degrees", () => {
     it("places the dominant a fifth above and the leading-tone triad diminished", () => {
         expect(degreePitches(60, "V")).toEqual([67, 71, 74]);
         expect(degreePitches(60, "vii\u00b0")).toEqual([71, 74, 77]);
+    });
+});
+
+describe("scale degrees", () => {
+    it("sounds a degree an octave above the tonic", () => {
+        expect(degreeNote(60, "1")).toBe(72);
+        expect(degreeNote(60, "5")).toBe(79);
+        expect(degreeNote(60, "\u266d3")).toBe(75); // flat-3 = 3 semitones
+    });
+
+    it("reads a note back to its degree, folded into the key", () => {
+        expect(degreeOf(60, 72)).toBe("1");
+        expect(degreeOf(60, 76)).toBe("3");
+        expect(degreeOf(60, 67)).toBe("5"); // below the tonic folds up
+    });
+
+    it("round-trips every chromatic degree through the note and back", () => {
+        for (const degree of CHROMATIC_DEGREES) {
+            expect(degreeOf(60, degreeNote(60, degree))).toBe(degree);
+        }
+    });
+
+    it("lists the seven diatonic degrees as the major scale", () => {
+        expect(DIATONIC_DEGREES).toEqual(["1", "2", "3", "4", "5", "6", "7"]);
     });
 });

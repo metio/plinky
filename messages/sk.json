@@ -682,5 +682,19 @@
   "ear_progression_undo": "Vrátiť posledný akord",
   "ear_prog_level_primary": "Hlavné akordy",
   "ear_prog_level_pop": "Popová štvorka",
-  "ear_prog_level_triads": "Všetky kvintakordy"
+  "ear_prog_level_triads": "Všetky kvintakordy",
+  "ear_exercise_scale_degrees": "Stupne stupnice",
+  "ear_exercise_intervals_context": "Intervaly v kontexte",
+  "ear_exercise_melodic": "Melodický diktát",
+  "ear_scale_degrees_blurb": "Krátka kadencia určí tóninu, potom zaznie jeden tón. Pomenuj, koľký je to stupeň — prvý, tretí, piaty?",
+  "ear_intervals_context_blurb": "Kadencia určí tóninu, potom zaznejú dva tóny. Pomenuj interval medzi nimi, s tóninou, o ktorú sa môžeš oprieť.",
+  "ear_melodic_blurb": "Kadencia určí tóninu, potom malá melódia. Zapíš ju stupeň po stupni, po poriadku.",
+  "ear_degree_choices": "Voľby stupňov stupnice",
+  "ear_melodic_choices": "Odpoveď melódie",
+  "ear_sd_level_triad": "Tonický kvintakord",
+  "ear_sd_level_diatonic": "Všetkých sedem stupňov",
+  "ear_sd_level_chromatic": "S chromatikou",
+  "ear_md_level_short": "Tri tóny",
+  "ear_md_level_medium": "Štyri tóny",
+  "ear_md_level_long": "Päť tónov"
 }

@@ -13,16 +13,21 @@ import {
     type ChordQuality,
     chordPitches,
     chordSpan,
+    CHROMATIC_DEGREES,
+    degreeNote,
     degreePitches,
+    DIATONIC_DEGREES,
     type IntervalId,
     INTERVAL_IDS,
     type NoteNameId,
     NATURAL_PITCH_CLASSES,
     noteNameOf,
     pitchClassOf,
+    type ScaleDegree,
     type ScaleId,
     scalePitches,
     SEMITONES_PER_OCTAVE,
+    TRIAD_DEGREES,
 } from "./theory";
 
 export type EarExerciseId =
@@ -30,7 +35,10 @@ export type EarExerciseId =
     | "intervals"
     | "chords"
     | "scales"
-    | "progressions";
+    | "progressions"
+    | "scale-degrees"
+    | "intervals-context"
+    | "melodic-dictation";
 
 // Matches the shape the audio port already strikes with: a note, when to sound it, how
 // hard, and for how long. The engine needs no new audio capability.
@@ -179,6 +187,25 @@ export type ProgressionConfig = {
     highest: number;
 };
 
+// Scale degrees climb from the tonic triad a beginner tells apart, through the whole major
+// scale, out to the chromatic notes between.
+export const SCALE_DEGREE_LEVELS: ScaleDegree[][] = [
+    TRIAD_DEGREES,
+    DIATONIC_DEGREES,
+    CHROMATIC_DEGREES,
+];
+
+export type ScaleDegreeConfig = { degrees: ScaleDegree[] };
+
+// Intervals in context reuse the interval ladder — the level sets are the same — but the
+// notes arrive after a cadence, so the ear places them in a key.
+export type IntervalContextConfig = { intervals: IntervalId[] };
+
+// Melodic dictation lengthens the line to hear: three notes, then four, then five.
+export const MELODIC_LEVELS: number[] = [3, 4, 5];
+
+export type MelodicConfig = { length: number };
+
 // ---------------------------------------------------------------------------
 // Questions
 // ---------------------------------------------------------------------------
@@ -223,12 +250,41 @@ export type ProgressionQuestion = {
     choices: ChordDegree[];
 };
 
+// After a key-setting cadence, one note to name by its degree.
+export type ScaleDegreeQuestion = {
+    kind: "scale-degrees";
+    notes: EarNote[];
+    answer: ScaleDegree;
+    choices: ScaleDegree[];
+};
+
+// After a cadence, two notes to name the interval between — intervals heard in a key.
+export type IntervalContextQuestion = {
+    kind: "intervals-context";
+    notes: EarNote[];
+    answer: IntervalId;
+    choices: IntervalId[];
+};
+
+// After a cadence, a melody to write down degree by degree — a sequence answer like the
+// chord progression, carrying the joined answer alongside its degrees.
+export type MelodicQuestion = {
+    kind: "melodic-dictation";
+    notes: EarNote[];
+    answer: string;
+    sequence: ScaleDegree[];
+    choices: ScaleDegree[];
+};
+
 export type EarQuestion =
     | PerfectPitchQuestion
     | IntervalQuestion
     | ChordQuestion
     | ScaleQuestion
-    | ProgressionQuestion;
+    | ProgressionQuestion
+    | ScaleDegreeQuestion
+    | IntervalContextQuestion
+    | MelodicQuestion;
 
 // The gap between successive notes of a scale — quicker than a melodic interval, so the
 // run reads as one shape rather than a string of separate notes.
@@ -237,6 +293,38 @@ const SCALE_STEP_GAP = 0.42;
 // The gap between chords of a progression — slower than a scale's notes, since a whole
 // chord needs a moment to land before the next one moves.
 const PROGRESSION_CHORD_GAP = 1.1;
+
+// The functional exercises hear notes relative to a key, so a low tonic leaves an octave
+// of room above for the question notes while the key-setting cadence sits below.
+const FUNCTIONAL_TONIC_LOW = 48; // C3
+const FUNCTIONAL_TONIC_HIGH = 55; // G3
+const MELODIC_NOTE_GAP = 0.55;
+// The pause between the key-setting cadence and the question it frames.
+const AFTER_CADENCE_GAP = 0.5;
+
+function pickTonic(rng: () => number): number {
+    const span = FUNCTIONAL_TONIC_HIGH - FUNCTIONAL_TONIC_LOW;
+    return FUNCTIONAL_TONIC_LOW + Math.floor(rng() * (span + 1));
+}
+
+// A short I–IV–V–I cadence that plants a key in the ear before a functional question —
+// the reference every "relative to the key" exercise leans on. It sounds a touch softer
+// than the question, so the question stands out as the thing to name, and reports when it
+// finishes so the question can follow.
+const CADENCE_DEGREES: ChordDegree[] = ["I", "IV", "V", "I"];
+const CADENCE_CHORD_GAP = 0.6;
+
+function keyCadence(tonic: number, startAt: number): { notes: EarNote[]; endsAt: number } {
+    const notes = CADENCE_DEGREES.flatMap((degree, index) =>
+        degreePitches(tonic, degree).map((note) => ({
+            note,
+            at: startAt + index * CADENCE_CHORD_GAP,
+            velocity: VELOCITY - 12,
+            duration: CADENCE_CHORD_GAP,
+        })),
+    );
+    return { notes, endsAt: startAt + CADENCE_DEGREES.length * CADENCE_CHORD_GAP };
+}
 
 // Every allowed answer is always offered. Narrowing the choices to a handful would make
 // a round guessable by elimination, which grades the shortlist rather than the ear.
@@ -387,6 +475,72 @@ export function generateProgression(
     };
 }
 
+export function generateScaleDegree(
+    config: ScaleDegreeConfig,
+    rng: () => number,
+): ScaleDegreeQuestion {
+    const degrees = config.degrees.length > 0 ? config.degrees : SCALE_DEGREE_LEVELS[0]!;
+    const tonic = pickTonic(rng);
+    const cadence = keyCadence(tonic, 0);
+    const answer = pick(degrees, rng);
+    const note: EarNote = {
+        note: degreeNote(tonic, answer),
+        at: cadence.endsAt + AFTER_CADENCE_GAP,
+        velocity: VELOCITY,
+        duration: NOTE_SECONDS,
+    };
+    return { kind: "scale-degrees", notes: [...cadence.notes, note], answer, choices: degrees };
+}
+
+export function generateIntervalContext(
+    config: IntervalContextConfig,
+    rng: () => number,
+): IntervalContextQuestion {
+    const intervals = config.intervals.length > 0 ? config.intervals : INTERVAL_LEVELS[0]!;
+    const tonic = pickTonic(rng);
+    const cadence = keyCadence(tonic, 0);
+    const answer = pick(intervals, rng);
+    const semitones = INTERVAL_IDS.indexOf(answer);
+    // The pair sits an octave above the tonic, with room for the interval below the top of
+    // the range — heard in sequence, rising, after the cadence.
+    const base = tonic + SEMITONES_PER_OCTAVE;
+    const room = Math.max(0, DEFAULT_HIGHEST - semitones - base);
+    const root = base + Math.floor(rng() * (room + 1));
+    const start = cadence.endsAt + AFTER_CADENCE_GAP;
+    const notes: EarNote[] = [
+        { note: root, at: start, velocity: VELOCITY, duration: NOTE_SECONDS },
+        { note: root + semitones, at: start + MELODIC_GAP, velocity: VELOCITY, duration: NOTE_SECONDS },
+    ];
+    return { kind: "intervals-context", notes: [...cadence.notes, ...notes], answer, choices: intervals };
+}
+
+export function generateMelodic(config: MelodicConfig, rng: () => number): MelodicQuestion {
+    const tonic = pickTonic(rng);
+    const cadence = keyCadence(tonic, 0);
+    // The line starts on the tonic to anchor the key, then moves by diatonic steps, never
+    // repeating a note twice in a row.
+    const sequence: ScaleDegree[] = ["1"];
+    for (let position = 1; position < config.length; position++) {
+        const previous = sequence[position - 1];
+        const candidates = DIATONIC_DEGREES.filter((degree) => degree !== previous);
+        sequence.push(pick(candidates, rng));
+    }
+    const start = cadence.endsAt + AFTER_CADENCE_GAP;
+    const melody: EarNote[] = sequence.map((degree, index) => ({
+        note: degreeNote(tonic, degree),
+        at: start + index * MELODIC_NOTE_GAP,
+        velocity: VELOCITY,
+        duration: MELODIC_NOTE_GAP,
+    }));
+    return {
+        kind: "melodic-dictation",
+        notes: [...cadence.notes, ...melody],
+        answer: sequence.join("-"),
+        sequence,
+        choices: DIATONIC_DEGREES,
+    };
+}
+
 // The question for an exercise at a level, over the default register. The one place the
 // exercise id maps to its generator and its level-set, so a caller names an exercise and
 // a level and gets a playable question — the surface it drives falls out of the kind.
@@ -412,6 +566,18 @@ export function generateQuestion(
                 },
                 rng,
             );
+        case "scale-degrees":
+            return generateScaleDegree(
+                { degrees: SCALE_DEGREE_LEVELS[level] ?? SCALE_DEGREE_LEVELS[0]! },
+                rng,
+            );
+        case "intervals-context":
+            return generateIntervalContext(
+                { intervals: INTERVAL_LEVELS[level] ?? INTERVAL_LEVELS[0]! },
+                rng,
+            );
+        case "melodic-dictation":
+            return generateMelodic({ length: MELODIC_LEVELS[level] ?? MELODIC_LEVELS[0]! }, rng);
         default:
             return generateInterval(
                 {

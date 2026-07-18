@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
-import type { ChordDegree } from "../../../core/theory";
 import { UndoIcon } from "../ui/icons";
 import { IconButton } from "../ui/button";
 import { m } from "../../paraglide/messages.js";
 
-// The answer surface for chord progressions, the one exercise whose answer is a SEQUENCE
-// rather than a single pick. The player names the chords in order, tapping a Roman numeral
-// for each; the built-up sequence shows above the keypad, and once every slot is filled it
-// is handed back as one answer. The Roman numerals are the buttons' own labels — they are
-// notation, the same in every language, so they need no translation.
+// The answer surface for the exercises whose answer is a SEQUENCE rather than a single
+// pick — a chord progression named by Roman numeral, a melody named by scale degree. The
+// player names each item in order from a keypad; the built-up sequence shows above it, and
+// once every slot is filled it is handed back as one answer. The labels are the items
+// themselves — Roman numerals, degree numbers — which are notation, the same in every
+// language, so they need no translation.
 //
 // The surface owns the in-progress sequence and emits only when it is complete, so the
 // session that hosts it sees a single settled answer and needs to know nothing about the
@@ -33,24 +33,24 @@ function slotClasses(state: "correct" | "wrong" | "current" | "filled" | "empty"
     }
 }
 
-export function EarProgression({
+export function EarSequence<T extends string>({
     sequence,
     choices,
     settled,
     onComplete,
     label,
 }: {
-    // The correct progression, chord by chord — its length is how many the player names.
-    sequence: ChordDegree[];
-    // The level's chord vocabulary, the keypad to answer from.
-    choices: ChordDegree[];
+    // The correct answer, item by item — its length is how many the player names.
+    sequence: T[];
+    // The level's vocabulary, the keypad to answer from.
+    choices: T[];
     settled: boolean;
     onComplete: (joined: string) => void;
     label: string;
 }) {
-    const [entered, setEntered] = useState<ChordDegree[]>([]);
+    const [entered, setEntered] = useState<T[]>([]);
 
-    const choose = (degree: ChordDegree) => {
+    const choose = (degree: T) => {
         if (settled || entered.length >= sequence.length) {
             return;
         }

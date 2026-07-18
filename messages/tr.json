@@ -682,5 +682,19 @@
   "ear_progression_undo": "Son akoru geri al",
   "ear_prog_level_primary": "Ana akorlar",
   "ear_prog_level_pop": "Pop dörtlüsü",
-  "ear_prog_level_triads": "Tüm üçlüler"
+  "ear_prog_level_triads": "Tüm üçlüler",
+  "ear_exercise_scale_degrees": "Gam dereceleri",
+  "ear_exercise_intervals_context": "Tonda aralıklar",
+  "ear_exercise_melodic": "Melodik dikte",
+  "ear_scale_degrees_blurb": "Kısa bir kadans tonu belirler, sonra tek bir nota gelir. Onun tonun neresinde durduğunu söyle — birinci derece mi, üçüncü mü, beşinci mi?",
+  "ear_intervals_context_blurb": "Bir kadans tonu belirler, sonra iki nota gelir. Aralarındaki aralığı söyle; tutunabileceğin ton hep yanında.",
+  "ear_melodic_blurb": "Bir kadans tonu belirler, sonra küçük bir ezgi gelir. Onu derece derece, sırayla yaz.",
+  "ear_degree_choices": "Gam derecesi seçenekleri",
+  "ear_melodic_choices": "Ezgi yanıtı",
+  "ear_sd_level_triad": "Tonik üçlüsü",
+  "ear_sd_level_diatonic": "Yedi derecenin tümü",
+  "ear_sd_level_chromatic": "Kromatiklerle birlikte",
+  "ear_md_level_short": "Üç nota",
+  "ear_md_level_medium": "Dört nota",
+  "ear_md_level_long": "Beş nota"
 }

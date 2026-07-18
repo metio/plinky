@@ -682,5 +682,19 @@
   "ear_progression_undo": "Poništi zadnji akord",
   "ear_prog_level_primary": "Glavni akordi",
   "ear_prog_level_pop": "Pop četvorka",
-  "ear_prog_level_triads": "Svi trozvuci"
+  "ear_prog_level_triads": "Svi trozvuci",
+  "ear_exercise_scale_degrees": "Stupnjevi ljestvice",
+  "ear_exercise_intervals_context": "Intervali u tonalitetu",
+  "ear_exercise_melodic": "Melodijski diktat",
+  "ear_scale_degrees_blurb": "Kratka kadenca postavlja tonalitet, zatim jedna nota. Reci gdje stoji u ljestvici — prvi stupanj, treći, peti?",
+  "ear_intervals_context_blurb": "Kadenca postavlja tonalitet, zatim dvije note. Imenuj interval među njima, uz tonalitet za koji se možeš uhvatiti.",
+  "ear_melodic_blurb": "Kadenca postavlja tonalitet, zatim mala melodija. Zapiši je stupanj po stupanj, redom.",
+  "ear_degree_choices": "Odabir stupnja ljestvice",
+  "ear_melodic_choices": "Odgovor za melodiju",
+  "ear_sd_level_triad": "Tonički trozvuk",
+  "ear_sd_level_diatonic": "Svih sedam stupnjeva",
+  "ear_sd_level_chromatic": "S kromatikom",
+  "ear_md_level_short": "Tri note",
+  "ear_md_level_medium": "Četiri note",
+  "ear_md_level_long": "Pet nota"
 }

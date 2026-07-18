@@ -3,14 +3,14 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ChordDegree } from "../../../core/theory";
-import { EarProgression } from "./earProgression";
+import { EarSequence } from "./earSequence";
 
-const meta: Meta<typeof EarProgression> = {
-    title: "Features/EarProgression",
-    component: EarProgression,
+const meta: Meta<typeof EarSequence> = {
+    title: "Features/EarSequence",
+    component: EarSequence,
 };
 export default meta;
-type Story = StoryObj<typeof EarProgression>;
+type Story = StoryObj<typeof EarSequence>;
 
 const SEQUENCE: ChordDegree[] = ["I", "IV", "V", "I"];
 const VOCAB: ChordDegree[] = ["I", "IV", "V"];

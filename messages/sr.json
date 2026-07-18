@@ -682,5 +682,19 @@
   "ear_progression_undo": "Опозови последњи акорд",
   "ear_prog_level_primary": "Главни акорди",
   "ear_prog_level_pop": "Поп четворка",
-  "ear_prog_level_triads": "Сви трозвуци"
+  "ear_prog_level_triads": "Сви трозвуци",
+  "ear_exercise_scale_degrees": "Ступњеви скале",
+  "ear_exercise_intervals_context": "Интервали у контексту",
+  "ear_exercise_melodic": "Мелодијски диктат",
+  "ear_scale_degrees_blurb": "Кратка каденца поставља тоналитет, затим једна нота. Реци где стоји у тоналитету — први ступањ, трећи, пети?",
+  "ear_intervals_context_blurb": "Каденца поставља тоналитет, затим две ноте. Именуј интервал међу њима, уз тоналитет на који можеш да се ослониш.",
+  "ear_melodic_blurb": "Каденца поставља тоналитет, затим кратка мелодија. Запиши је ступањ по ступањ, редом.",
+  "ear_degree_choices": "Избор ступња скале",
+  "ear_melodic_choices": "Одговор мелодије",
+  "ear_sd_level_triad": "Тонични трозвук",
+  "ear_sd_level_diatonic": "Свих седам ступњева",
+  "ear_sd_level_chromatic": "Са хроматиком",
+  "ear_md_level_short": "Три ноте",
+  "ear_md_level_medium": "Четири ноте",
+  "ear_md_level_long": "Пет нота"
 }

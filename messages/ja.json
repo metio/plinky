@@ -682,5 +682,19 @@
   "ear_progression_undo": "最後のコードを取り消す",
   "ear_prog_level_primary": "主要三和音",
   "ear_prog_level_pop": "ポップの四和音",
-  "ear_prog_level_triads": "すべての三和音"
+  "ear_prog_level_triads": "すべての三和音",
+  "ear_exercise_scale_degrees": "音度",
+  "ear_exercise_intervals_context": "コンテキストの音程",
+  "ear_exercise_melodic": "旋律書き取り",
+  "ear_scale_degrees_blurb": "短い終止形が調を決めて、それから音がひとつ。その音が調のなかでどこにあるか答えてね — 第一音、第三音、第五音？",
+  "ear_intervals_context_blurb": "終止形が調を決めて、それから2つの音。頼れる調のなかで、2音のあいだの音程を答えてね。",
+  "ear_melodic_blurb": "終止形が調を決めて、それから短い旋律。音度ごとに、順番に書き取ってみて。",
+  "ear_degree_choices": "音度の選択肢",
+  "ear_melodic_choices": "旋律の答え",
+  "ear_sd_level_triad": "主和音の三音",
+  "ear_sd_level_diatonic": "七つの音度すべて",
+  "ear_sd_level_chromatic": "半音を加えて",
+  "ear_md_level_short": "3つの音",
+  "ear_md_level_medium": "4つの音",
+  "ear_md_level_long": "5つの音"
 }

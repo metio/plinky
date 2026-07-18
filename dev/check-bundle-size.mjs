@@ -47,7 +47,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // generators, the naming choice grid, and 33 more strings (the two exercises, their
 // levels, and the chord/scale/mode names) inlined per locale — add ~1.5 KB, measured at
 // 573.6. 575 restores the margin.
-const BUDGET_TOTAL_KB = 575;
+//
+// The three functional exercises — the key-setting cadence, the scale-degree/interval-in-
+// context/melodic-dictation generators, and 14 more strings per locale — add ~2 KB,
+// measured at 575.5. 577 restores the margin.
+const BUDGET_TOTAL_KB = 577;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -104,7 +108,11 @@ const BUDGET_TOTAL_KB = 575;
 //
 // The chord-progressions exercise — the sequence-entry surface (slots + keypad + undo)
 // and the progression generator — adds ~1 KB of app code, measured at 264.5.
-const BUDGET_APP_KB = 265;
+//
+// The three functional exercises — dispatching a degree grid, the interval ladder and the
+// generalized sequence entry, plus the shared exercise/level label maps — add ~1 KB of app
+// code, measured at 265.4.
+const BUDGET_APP_KB = 267;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

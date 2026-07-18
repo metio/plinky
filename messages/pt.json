@@ -682,5 +682,19 @@
   "ear_progression_undo": "Anular o último acorde",
   "ear_prog_level_primary": "Os acordes principais",
   "ear_prog_level_pop": "Os quatro do pop",
-  "ear_prog_level_triads": "Todas as tríades"
+  "ear_prog_level_triads": "Todas as tríades",
+  "ear_exercise_scale_degrees": "Graus da escala",
+  "ear_exercise_intervals_context": "Intervalos em contexto",
+  "ear_exercise_melodic": "Ditado melódico",
+  "ear_scale_degrees_blurb": "Uma cadência breve fixa a tonalidade, depois uma nota. Diz onde ela fica na tonalidade — o primeiro grau, o terceiro, o quinto?",
+  "ear_intervals_context_blurb": "Uma cadência fixa a tonalidade, depois duas notas. Nomeia o intervalo entre elas, ouvido com a tonalidade a servir de apoio.",
+  "ear_melodic_blurb": "Uma cadência fixa a tonalidade, depois uma pequena melodia. Escreve-a grau a grau, pela ordem.",
+  "ear_degree_choices": "Opções de grau da escala",
+  "ear_melodic_choices": "Resposta da melodia",
+  "ear_sd_level_triad": "A tríade da tónica",
+  "ear_sd_level_diatonic": "Os sete graus",
+  "ear_sd_level_chromatic": "Com os cromatismos",
+  "ear_md_level_short": "Três notas",
+  "ear_md_level_medium": "Quatro notas",
+  "ear_md_level_long": "Cinco notas"
 }

@@ -682,5 +682,19 @@
   "ear_progression_undo": "Скасувати останній акорд",
   "ear_prog_level_primary": "Головні акорди",
   "ear_prog_level_pop": "Поп-четвірка",
-  "ear_prog_level_triads": "Усі тризвуки"
+  "ear_prog_level_triads": "Усі тризвуки",
+  "ear_exercise_scale_degrees": "Ступені гами",
+  "ear_exercise_intervals_context": "Інтервали в тональності",
+  "ear_exercise_melodic": "Мелодичний диктант",
+  "ear_scale_degrees_blurb": "Коротка каденція задає тональність, потім звучить одна нота. Назви, де вона стоїть у гамі — перший ступінь, третій, п'ятий?",
+  "ear_intervals_context_blurb": "Каденція задає тональність, потім дві ноти. Назви інтервал між ними — тональність поруч, щоб на неї спертися.",
+  "ear_melodic_blurb": "Каденція задає тональність, потім лунає невелика мелодія. Запиши її ступінь за ступенем, по порядку.",
+  "ear_degree_choices": "Вибір ступеня гами",
+  "ear_melodic_choices": "Відповідь для мелодії",
+  "ear_sd_level_triad": "Тонічний тризвук",
+  "ear_sd_level_diatonic": "Усі сім ступенів",
+  "ear_sd_level_chromatic": "З хроматизмами",
+  "ear_md_level_short": "Три ноти",
+  "ear_md_level_medium": "Чотири ноти",
+  "ear_md_level_long": "П'ять нот"
 }

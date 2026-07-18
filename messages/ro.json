@@ -682,5 +682,19 @@
   "ear_progression_undo": "Anulează ultimul acord",
   "ear_prog_level_primary": "Acordurile principale",
   "ear_prog_level_pop": "Cele patru acorduri pop",
-  "ear_prog_level_triads": "Toate trisonurile"
+  "ear_prog_level_triads": "Toate trisonurile",
+  "ear_exercise_scale_degrees": "Treptele gamei",
+  "ear_exercise_intervals_context": "Intervale în tonalitate",
+  "ear_exercise_melodic": "Dictare melodică",
+  "ear_scale_degrees_blurb": "O cadență scurtă fixează tonalitatea, apoi o singură notă. Spune unde se așază în gamă — treapta întâi, a treia, a cincea?",
+  "ear_intervals_context_blurb": "O cadență fixează tonalitatea, apoi două note. Spune intervalul dintre ele, auzit cu tonalitatea alături, de care să te ții.",
+  "ear_melodic_blurb": "O cadență fixează tonalitatea, apoi o melodie scurtă. Scrie-o treaptă cu treaptă, în ordine.",
+  "ear_degree_choices": "Opțiuni pentru treapta gamei",
+  "ear_melodic_choices": "Răspuns pentru melodie",
+  "ear_sd_level_triad": "Trisonul tonic",
+  "ear_sd_level_diatonic": "Toate cele șapte trepte",
+  "ear_sd_level_chromatic": "Cu cromatismele",
+  "ear_md_level_short": "Trei note",
+  "ear_md_level_medium": "Patru note",
+  "ear_md_level_long": "Cinci note"
 }

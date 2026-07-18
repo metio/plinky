@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ChordDegree } from "../../../core/theory";
 import { m } from "../../paraglide/messages.js";
-import { EarProgression } from "./earProgression";
+import { EarSequence } from "./earSequence";
 
 afterEach(cleanup);
 
@@ -15,10 +15,10 @@ const VOCAB: ChordDegree[] = ["I", "IV", "V"];
 
 const press = (name: string) => fireEvent.click(screen.getByRole("button", { name }));
 
-describe("EarProgression", () => {
+describe("EarSequence", () => {
     it("offers a keypad of the level's chords", () => {
         render(
-            <EarProgression
+            <EarSequence
                 sequence={SEQUENCE}
                 choices={VOCAB}
                 settled={false}
@@ -34,7 +34,7 @@ describe("EarProgression", () => {
     it("emits the joined sequence only once every chord is entered", () => {
         const onComplete = vi.fn();
         render(
-            <EarProgression
+            <EarSequence
                 sequence={SEQUENCE}
                 choices={VOCAB}
                 settled={false}
@@ -53,7 +53,7 @@ describe("EarProgression", () => {
     it("undoes the last chord before the sequence is complete", () => {
         const onComplete = vi.fn();
         render(
-            <EarProgression
+            <EarSequence
                 sequence={SEQUENCE}
                 choices={VOCAB}
                 settled={false}
@@ -79,12 +79,12 @@ describe("EarProgression", () => {
             onComplete: () => {},
             label: "progression",
         };
-        const { rerender } = render(<EarProgression {...props} settled={false} />);
+        const { rerender } = render(<EarSequence {...props} settled={false} />);
         press("I");
         press("V"); // wrong: should have been IV
         press("V");
         press("I");
-        rerender(<EarProgression {...props} settled={true} />);
+        rerender(<EarSequence {...props} settled={true} />);
 
         // "IV" now appears twice: the keypad button, and the reveal in the wrong slot
         // (which was answered V) — before settling it was only the keypad.

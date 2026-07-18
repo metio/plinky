@@ -682,5 +682,19 @@
   "ear_progression_undo": "마지막 코드 되돌리기",
   "ear_prog_level_primary": "주요 3화음",
   "ear_prog_level_pop": "팝의 네 화음",
-  "ear_prog_level_triads": "모든 3화음"
+  "ear_prog_level_triads": "모든 3화음",
+  "ear_exercise_scale_degrees": "음계 계이름",
+  "ear_exercise_intervals_context": "맥락 속 음정",
+  "ear_exercise_melodic": "가락 받아쓰기",
+  "ear_scale_degrees_blurb": "짧은 종지가 조성을 정하고, 그다음 음 하나가 울려요. 그 음이 조성 안에서 어디에 있는지 골라 보세요 — 첫째 음, 셋째 음, 다섯째 음?",
+  "ear_intervals_context_blurb": "종지가 조성을 정하고, 그다음 두 음이 울려요. 기댈 수 있는 조성과 함께, 두 음 사이의 음정을 골라 보세요.",
+  "ear_melodic_blurb": "종지가 조성을 정하고, 그다음 짧은 가락이 흘러요. 계이름 하나하나, 순서대로 받아써 보세요.",
+  "ear_degree_choices": "음계 계이름 선택지",
+  "ear_melodic_choices": "가락 답",
+  "ear_sd_level_triad": "으뜸화음 세 음",
+  "ear_sd_level_diatonic": "일곱 계이름 모두",
+  "ear_sd_level_chromatic": "반음까지 더해",
+  "ear_md_level_short": "세 음",
+  "ear_md_level_medium": "네 음",
+  "ear_md_level_long": "다섯 음"
 }

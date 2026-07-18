@@ -682,5 +682,19 @@
   "ear_progression_undo": "Zhbëj akordin e fundit",
   "ear_prog_level_primary": "Akordet kryesore",
   "ear_prog_level_pop": "Katërshja pop",
-  "ear_prog_level_triads": "Të gjitha triadat"
+  "ear_prog_level_triads": "Të gjitha triadat",
+  "ear_exercise_scale_degrees": "Shkallët e gamës",
+  "ear_exercise_intervals_context": "Intervalet në tonalitet",
+  "ear_exercise_melodic": "Diktim melodik",
+  "ear_scale_degrees_blurb": "Një kadencë e shkurtër vendos tonalitetin, pastaj një notë e vetme. Thuaj ku qëndron në gamë — shkalla e parë, e treta, e pesta?",
+  "ear_intervals_context_blurb": "Një kadencë vendos tonalitetin, pastaj dy nota. Thuaj intervalin mes tyre, të dëgjuar me tonalitetin pranë për t'u mbajtur.",
+  "ear_melodic_blurb": "Një kadencë vendos tonalitetin, pastaj një melodi e vogël. Shkruaje shkallë pas shkalle, me radhë.",
+  "ear_degree_choices": "Zgjedhjet e shkallës së gamës",
+  "ear_melodic_choices": "Përgjigjja për melodinë",
+  "ear_sd_level_triad": "Triada tonike",
+  "ear_sd_level_diatonic": "Të shtatë shkallët",
+  "ear_sd_level_chromatic": "Me kromatikat",
+  "ear_md_level_short": "Tri nota",
+  "ear_md_level_medium": "Katër nota",
+  "ear_md_level_long": "Pesë nota"
 }

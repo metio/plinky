@@ -682,5 +682,19 @@
   "ear_progression_undo": "Undo the last chord",
   "ear_prog_level_primary": "The primary chords",
   "ear_prog_level_pop": "The pop four",
-  "ear_prog_level_triads": "All the triads"
+  "ear_prog_level_triads": "All the triads",
+  "ear_exercise_scale_degrees": "Scale degrees",
+  "ear_exercise_intervals_context": "Intervals in context",
+  "ear_exercise_melodic": "Melodic dictation",
+  "ear_scale_degrees_blurb": "A short cadence sets the key, then one note. Name where it sits in the key — the first degree, the third, the fifth?",
+  "ear_intervals_context_blurb": "A cadence sets the key, then two notes. Name the interval between them, heard with the key to lean on.",
+  "ear_melodic_blurb": "A cadence sets the key, then a little tune. Write it down degree by degree, in order.",
+  "ear_degree_choices": "Scale degree choices",
+  "ear_melodic_choices": "Melody answer",
+  "ear_sd_level_triad": "The tonic triad",
+  "ear_sd_level_diatonic": "All seven degrees",
+  "ear_sd_level_chromatic": "With the chromatics",
+  "ear_md_level_short": "Three notes",
+  "ear_md_level_medium": "Four notes",
+  "ear_md_level_long": "Five notes"
 }

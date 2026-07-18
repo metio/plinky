@@ -682,5 +682,19 @@
   "ear_progression_undo": "Utolsó akkord visszavonása",
   "ear_prog_level_primary": "A fő akkordok",
   "ear_prog_level_pop": "A pop négyes",
-  "ear_prog_level_triads": "Az összes hármashangzat"
+  "ear_prog_level_triads": "Az összes hármashangzat",
+  "ear_exercise_scale_degrees": "Skálafokok",
+  "ear_exercise_intervals_context": "Hangközök hangnemben",
+  "ear_exercise_melodic": "Dallamdiktálás",
+  "ear_scale_degrees_blurb": "Egy rövid zárlat kijelöli a hangnemet, aztán egy hang. Nevezd meg, hányadik fok — az első, a harmadik, az ötödik?",
+  "ear_intervals_context_blurb": "Egy zárlat kijelöli a hangnemet, aztán két hang. Nevezd meg a köztük lévő hangközt, a hangnem támaszával.",
+  "ear_melodic_blurb": "Egy zárlat kijelöli a hangnemet, aztán egy kis dallam. Írd le fokról fokra, sorban.",
+  "ear_degree_choices": "Skálafok-választás",
+  "ear_melodic_choices": "Dallamválasz",
+  "ear_sd_level_triad": "A tonikai hármashangzat",
+  "ear_sd_level_diatonic": "Mind a hét fok",
+  "ear_sd_level_chromatic": "A kromatikus hangokkal",
+  "ear_md_level_short": "Három hang",
+  "ear_md_level_medium": "Négy hang",
+  "ear_md_level_long": "Öt hang"
 }
