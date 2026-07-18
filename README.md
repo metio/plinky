@@ -148,8 +148,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   as a word; the levels start on fifths and octaves and fill the ladder in as you go.
   **Chords** plays a chord and you name its quality; **Scales** plays a scale and you
   name which one it is — both from a grid of choices, climbing from the major/minor pair
-  out to the sevenths, the modes and beyond. **Perfect pitch** plays one note and you
-  name it on a keyboard. Every round can be
+  out to the sevenths, the modes and beyond. **Chord progressions** plays a run of chords
+  in a key and you name each in order by its Roman numeral, building the sequence chord by
+  chord. **Perfect pitch** plays one note and you name it on a keyboard. Every round can be
   replayed as often as you like, and a miss shows what played rather than marking you
   down. A round is ten questions, and finishing one **counts toward your grades** the
   same way playing a piece does — each exercise sits on the grade ladder, so ear practice

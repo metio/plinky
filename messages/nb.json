@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Mollpentaton",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Heltoneskala",
-  "theory_scale_chromatic": "Kromatisk"
+  "theory_scale_chromatic": "Kromatisk",
+  "ear_exercise_progressions": "Akkordprogresjoner",
+  "ear_progressions_blurb": "En rekke akkorder i en toneart. Navngi hver enkelt du hører, i rekkefølge — den begynner og slutter på tonika, så tonearten alltid er der å holde fast ved.",
+  "ear_progression_choices": "Svar – akkordprogresjon",
+  "ear_progression_undo": "Angre den siste akkorden",
+  "ear_prog_level_primary": "Hovedakkordene",
+  "ear_prog_level_pop": "De fire popakkordene",
+  "ear_prog_level_triads": "Alle treklanger"
 }

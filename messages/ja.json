@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "マイナーペンタトニック",
   "theory_scale_blues": "ブルース音階",
   "theory_scale_whole_tone": "全音音階",
-  "theory_scale_chromatic": "半音階"
+  "theory_scale_chromatic": "半音階",
+  "ear_exercise_progressions": "コード進行",
+  "ear_progressions_blurb": "ある調のなかで続くコードの流れです。聞こえたコードを順番に答えてみましょう。主和音で始まり主和音で終わるので、調はいつでもそこにあって頼りになります。",
+  "ear_progression_choices": "コード進行の答え",
+  "ear_progression_undo": "最後のコードを取り消す",
+  "ear_prog_level_primary": "主要三和音",
+  "ear_prog_level_pop": "ポップの四和音",
+  "ear_prog_level_triads": "すべての三和音"
 }

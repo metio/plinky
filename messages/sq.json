@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Pentatonik minor",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Me tone të plotë",
-  "theory_scale_chromatic": "Kromatik"
+  "theory_scale_chromatic": "Kromatik",
+  "ear_exercise_progressions": "Progresione akordesh",
+  "ear_progressions_blurb": "Një varg akordesh në një tonalitet. Emërto secilin që dëgjon, me radhë — nis dhe mbaron te akordi bazë, kështu që tonaliteti është gjithmonë aty për t'u mbajtur.",
+  "ear_progression_choices": "Përgjigjja për progresionin e akordeve",
+  "ear_progression_undo": "Zhbëj akordin e fundit",
+  "ear_prog_level_primary": "Akordet kryesore",
+  "ear_prog_level_pop": "Katërshja pop",
+  "ear_prog_level_triads": "Të gjitha triadat"
 }

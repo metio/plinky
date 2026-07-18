@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Pentatonika molowa",
   "theory_scale_blues": "Bluesowa",
   "theory_scale_whole_tone": "Całotonowa",
-  "theory_scale_chromatic": "Chromatyczna"
+  "theory_scale_chromatic": "Chromatyczna",
+  "ear_exercise_progressions": "Progresje akordów",
+  "ear_progressions_blurb": "Ciąg akordów w danej tonacji. Nazwij każdy, który usłyszysz, po kolei — zaczyna się i kończy na akordzie tonicznym, więc tonacja jest zawsze obok, żeby się jej trzymać.",
+  "ear_progression_choices": "Odpowiedź – progresja akordów",
+  "ear_progression_undo": "Cofnij ostatni akord",
+  "ear_prog_level_primary": "Akordy główne",
+  "ear_prog_level_pop": "Popowa czwórka",
+  "ear_prog_level_triads": "Wszystkie trójdźwięki"
 }

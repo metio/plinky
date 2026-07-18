@@ -11,7 +11,13 @@
 // GRADE_THRESHOLDS), so an ear item and a piece of the same grade are genuinely
 // comparable and the skill rating can average across both.
 
-import { CHORD_LEVELS, type EarExerciseId, INTERVAL_LEVELS, SCALE_LEVELS } from "./earExercise";
+import {
+    CHORD_LEVELS,
+    type EarExerciseId,
+    INTERVAL_LEVELS,
+    PROGRESSION_LEVELS,
+    SCALE_LEVELS,
+} from "./earExercise";
 
 // A bounded run of rounds. Grading needs a settled accuracy, and an endless stream never
 // settles — ten rounds is long enough to mean something and short enough to fit the gap
@@ -45,6 +51,9 @@ const LADDERS: { exercise: EarExerciseId; levels: unknown[]; grades: number[]; c
         { exercise: "intervals", levels: INTERVAL_LEVELS, grades: [1, 2, 3, 4], costs: [1.3, 2.0, 2.6, 3.2] },
         { exercise: "chords", levels: CHORD_LEVELS, grades: [2, 3, 4, 5], costs: [1.8, 2.4, 3.0, 3.6] },
         { exercise: "scales", levels: SCALE_LEVELS, grades: [2, 4, 5, 6], costs: [1.8, 3.0, 3.6, 4.2] },
+        // Holding a whole progression in the ear and naming each chord is the hardest of
+        // these, so it starts higher and climbs furthest.
+        { exercise: "progressions", levels: PROGRESSION_LEVELS, grades: [3, 4, 5, 6], costs: [2.2, 2.8, 3.4, 4.0] },
     ];
 
 export const EAR_ITEMS: EarItem[] = [

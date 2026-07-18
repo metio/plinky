@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Mineur-pentatoniek",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Heletoonsladder",
-  "theory_scale_chromatic": "Chromatisch"
+  "theory_scale_chromatic": "Chromatisch",
+  "ear_exercise_progressions": "Akkoordprogressies",
+  "ear_progressions_blurb": "Een reeks akkoorden in een toonsoort. Benoem elk akkoord dat je hoort, op volgorde — het begint en eindigt op het grondakkoord, dus de toonsoort is er altijd om je op te vangen.",
+  "ear_progression_choices": "Antwoord voor de akkoordprogressie",
+  "ear_progression_undo": "Laatste akkoord ongedaan maken",
+  "ear_prog_level_primary": "De hoofdakkoorden",
+  "ear_prog_level_pop": "De vier popakkoorden",
+  "ear_prog_level_triads": "Alle drieklanken"
 }

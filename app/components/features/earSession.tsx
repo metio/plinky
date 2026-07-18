@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import { EarChoices } from "./earChoices";
 import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
+import { EarProgression } from "./earProgression";
 import { EarStage } from "./earStage";
 
 // The one-line prompt on the resting start card, per exercise.
@@ -28,6 +29,7 @@ const BLURB: Record<EarExerciseId, () => string> = {
     "perfect-pitch": m.ear_pitch_blurb,
     chords: m.ear_chords_blurb,
     scales: m.ear_scales_blurb,
+    progressions: m.ear_progressions_blurb,
 };
 
 // A bounded run of one ear exercise: it plays a question, takes an answer, and after
@@ -61,6 +63,10 @@ export function EarSession({
     const [question, setQuestion] = useState<EarQuestion | null>(null);
     const [given, setGiven] = useState<string | null>(null);
     const [rounds, setRounds] = useState<EarRound[]>([]);
+    // A per-question counter, so a stateful answer surface (the progression's sequence
+    // entry) remounts fresh for each question — stable across a round's answer and its
+    // feedback, unlike the round count which ticks the moment a round is answered.
+    const [questionSeq, setQuestionSeq] = useState(0);
     // A completed run records once. The guard survives the re-render (and StrictMode's
     // double-invoked effect) where a piece of state would let it fire twice and
     // double-advance the review schedule.
@@ -71,6 +77,7 @@ export function EarSession({
 
     const next = useCallback(() => {
         setGiven(null);
+        setQuestionSeq((seq) => seq + 1);
         setQuestion(generateQuestion(exercise, level, Math.random));
     }, [exercise, level]);
 
@@ -163,7 +170,7 @@ export function EarSession({
                     nameOf={chordName}
                     label={m.ear_chord_choices()}
                 />
-            ) : (
+            ) : question.kind === "scales" ? (
                 <EarChoices
                     choices={question.choices}
                     answer={settled ? question.answer : null}
@@ -171,6 +178,16 @@ export function EarSession({
                     onChoose={answer}
                     nameOf={scaleName}
                     label={m.ear_scale_choices()}
+                />
+            ) : (
+                <EarProgression
+                    // Remounts each question so the sequence entry starts empty.
+                    key={questionSeq}
+                    sequence={question.sequence}
+                    choices={question.choices}
+                    settled={settled}
+                    onComplete={answer}
+                    label={m.ear_progression_choices()}
                 />
             )}
 

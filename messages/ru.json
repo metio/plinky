@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Минорная пентатоника",
   "theory_scale_blues": "Блюзовая",
   "theory_scale_whole_tone": "Целотоновая",
-  "theory_scale_chromatic": "Хроматическая"
+  "theory_scale_chromatic": "Хроматическая",
+  "ear_exercise_progressions": "Аккордовые последовательности",
+  "ear_progressions_blurb": "Череда аккордов в тональности. Называй каждый по порядку — она начинается и заканчивается на тонике, так что тональность всегда рядом, за неё можно держаться.",
+  "ear_progression_choices": "Ответ — аккордовая последовательность",
+  "ear_progression_undo": "Отменить последний аккорд",
+  "ear_prog_level_primary": "Главные аккорды",
+  "ear_prog_level_pop": "Поп-четвёрка",
+  "ear_prog_level_triads": "Все трезвучия"
 }

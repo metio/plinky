@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Pentatonique mineure",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Par tons",
-  "theory_scale_chromatic": "Chromatique"
+  "theory_scale_chromatic": "Chromatique",
+  "ear_exercise_progressions": "Progressions d'accords",
+  "ear_progressions_blurb": "Une suite d'accords dans une tonalité. Nomme chacun que tu entends, dans l'ordre — elle commence et finit sur l'accord de tonique, la tonalité est donc toujours là pour te guider.",
+  "ear_progression_choices": "Réponse de la progression d'accords",
+  "ear_progression_undo": "Annuler le dernier accord",
+  "ear_prog_level_primary": "Les accords principaux",
+  "ear_prog_level_pop": "Les quatre accords pop",
+  "ear_prog_level_triads": "Toutes les triades"
 }

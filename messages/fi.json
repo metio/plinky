@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Mollipentatoninen",
   "theory_scale_blues": "Bluesasteikko",
   "theory_scale_whole_tone": "Kokosävelasteikko",
-  "theory_scale_chromatic": "Kromaattinen"
+  "theory_scale_chromatic": "Kromaattinen",
+  "ear_exercise_progressions": "Sointukulut",
+  "ear_progressions_blurb": "Sarja sointuja sävellajissa. Nimeä jokainen kuulemasi sointu järjestyksessä — se alkaa ja päättyy kotisointuun, joten sävellaji on aina läsnä tukenasi.",
+  "ear_progression_choices": "Sointukulun vastaus",
+  "ear_progression_undo": "Kumoa viimeinen sointu",
+  "ear_prog_level_primary": "Pääsoinnut",
+  "ear_prog_level_pop": "Popin neljä",
+  "ear_prog_level_triads": "Kaikki kolmisoinnut"
 }

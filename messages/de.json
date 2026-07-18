@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Moll-Pentatonik",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Ganztonleiter",
-  "theory_scale_chromatic": "Chromatisch"
+  "theory_scale_chromatic": "Chromatisch",
+  "ear_exercise_progressions": "Akkordfolgen",
+  "ear_progressions_blurb": "Eine Folge von Akkorden in einer Tonart. Benenne jeden, den du hörst, der Reihe nach — sie beginnt und endet auf dem Grundakkord, die Tonart trägt dich also die ganze Zeit.",
+  "ear_progression_choices": "Antwort zur Akkordfolge",
+  "ear_progression_undo": "Letzten Akkord zurücknehmen",
+  "ear_prog_level_primary": "Die Hauptdreiklänge",
+  "ear_prog_level_pop": "Die vier Popakkorde",
+  "ear_prog_level_triads": "Alle Dreiklänge"
 }

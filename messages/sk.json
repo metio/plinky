@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Molová pentatonika",
   "theory_scale_blues": "Bluesová stupnica",
   "theory_scale_whole_tone": "Celotónová",
-  "theory_scale_chromatic": "Chromatická"
+  "theory_scale_chromatic": "Chromatická",
+  "ear_exercise_progressions": "Akordové postupy",
+  "ear_progressions_blurb": "Rad akordov v tónine. Pomenuj každý, ktorý počuješ, po poradí — začína a končí na domácom akorde, takže tónina je tu vždy, aby ťa podržala.",
+  "ear_progression_choices": "Odpoveď akordového postupu",
+  "ear_progression_undo": "Vrátiť posledný akord",
+  "ear_prog_level_primary": "Hlavné akordy",
+  "ear_prog_level_pop": "Popová štvorka",
+  "ear_prog_level_triads": "Všetky kvintakordy"
 }

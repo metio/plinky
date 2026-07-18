@@ -12,14 +12,18 @@ import {
     generateInterval,
     generatePerfectPitch,
     generateQuestion,
+    generateProgression,
     generateScale,
     INTERVAL_LEVELS,
+    PROGRESSION_LENGTH,
+    PROGRESSION_LEVELS,
     isCorrect,
     SCALE_LEVELS,
     scoreRounds,
 } from "./earExercise";
 import {
     chordPitches,
+    degreePitches,
     INTERVAL_IDS,
     NATURAL_PITCH_CLASSES,
     noteNameOf,
@@ -278,6 +282,77 @@ describe("generateQuestion dispatch", () => {
                 expect(generateQuestion("perfect-pitch", 0, rng).kind).toBe("perfect-pitch");
                 expect(generateQuestion("chords", 0, rng).kind).toBe("chords");
                 expect(generateQuestion("scales", 0, rng).kind).toBe("scales");
+                expect(generateQuestion("progressions", 0, rng).kind).toBe("progressions");
+            }),
+        );
+    });
+});
+
+const progLevels = fc.integer({ min: 0, max: PROGRESSION_LEVELS.length - 1 });
+
+describe("chord progression question properties", () => {
+    it("starts and ends on I, of the configured length", () => {
+        fc.assert(
+            fc.property(rolls, progLevels, (values, level) => {
+                const q = generateProgression(
+                    { degrees: PROGRESSION_LEVELS[level]!, length: PROGRESSION_LENGTH, ...RANGE },
+                    rngOf(values),
+                );
+                expect(q.sequence).toHaveLength(PROGRESSION_LENGTH);
+                expect(q.sequence[0]).toBe("I");
+                expect(q.sequence.at(-1)).toBe("I");
+            }),
+        );
+    });
+
+    it("never repeats a chord twice in a row and draws only from the level's vocabulary", () => {
+        fc.assert(
+            fc.property(rolls, progLevels, (values, level) => {
+                const vocab = PROGRESSION_LEVELS[level]!;
+                const q = generateProgression(
+                    { degrees: vocab, length: PROGRESSION_LENGTH, ...RANGE },
+                    rngOf(values),
+                );
+                for (let i = 0; i < q.sequence.length; i++) {
+                    expect(vocab).toContain(q.sequence[i]);
+                    if (i > 0) expect(q.sequence[i]).not.toBe(q.sequence[i - 1]);
+                }
+            }),
+        );
+    });
+
+    it("sounds each chord in turn, exactly its degree's notes, all in range", () => {
+        fc.assert(
+            fc.property(rolls, progLevels, (values, level) => {
+                const q = generateProgression(
+                    { degrees: PROGRESSION_LEVELS[level]!, length: PROGRESSION_LENGTH, ...RANGE },
+                    rngOf(values),
+                );
+                const tonic = Math.min(...q.notes.map((n) => n.note)); // I's root is lowest
+                // The onsets group into one time per chord, ascending.
+                const onsets = [...new Set(q.notes.map((n) => n.at))].sort((a, b) => a - b);
+                expect(onsets).toHaveLength(PROGRESSION_LENGTH);
+                q.sequence.forEach((degree, index) => {
+                    const chord = q.notes.filter((n) => n.at === onsets[index]).map((n) => n.note);
+                    expect(chord.sort((a, b) => a - b)).toEqual(degreePitches(tonic, degree));
+                });
+                for (const note of q.notes) {
+                    expect(note.note).toBeGreaterThanOrEqual(DEFAULT_LOWEST);
+                    expect(note.note).toBeLessThanOrEqual(DEFAULT_HIGHEST);
+                }
+            }),
+        );
+    });
+
+    it("joins the sequence into the answer the session checks", () => {
+        fc.assert(
+            fc.property(rolls, progLevels, (values, level) => {
+                const q = generateProgression(
+                    { degrees: PROGRESSION_LEVELS[level]!, length: PROGRESSION_LENGTH, ...RANGE },
+                    rngOf(values),
+                );
+                expect(q.answer).toBe(q.sequence.join("-"));
+                expect(q.choices).toEqual(PROGRESSION_LEVELS[level]);
             }),
         );
     });

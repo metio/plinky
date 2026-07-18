@@ -168,4 +168,24 @@ describe("EarSession", () => {
         }
         expect(services.mastery.load("ear-scales-0")?.bestScore).toBe(100);
     });
+
+    it("names a progression chord by chord, recorded to the progression item", () => {
+        const { services } = mount({ exercise: "progressions" });
+        // Math.random pinned to 0 builds I–IV–V–I from the primary triads.
+        const answer = () => {
+            for (const degree of ["I", "IV", "V", "I"]) {
+                press(degree);
+            }
+        };
+        press(m.ear_start());
+        answer();
+        // The round settles only once the whole sequence is entered.
+        expect(screen.getByText(m.ear_verdict_right())).toBeTruthy();
+
+        for (let round = 1; round < EAR_SESSION_ROUNDS; round++) {
+            press(m.ear_next());
+            answer();
+        }
+        expect(services.mastery.load("ear-progressions-0")?.bestScore).toBe(100);
+    });
 });

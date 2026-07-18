@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Pentatónica menor",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Tons inteiros",
-  "theory_scale_chromatic": "Cromática"
+  "theory_scale_chromatic": "Cromática",
+  "ear_exercise_progressions": "Progressões de acordes",
+  "ear_progressions_blurb": "Uma sequência de acordes numa tonalidade. Nomeia cada um que ouves, pela ordem — começa e acaba no acorde de tónica, por isso a tonalidade está sempre lá para te guiares.",
+  "ear_progression_choices": "Resposta da progressão de acordes",
+  "ear_progression_undo": "Anular o último acorde",
+  "ear_prog_level_primary": "Os acordes principais",
+  "ear_prog_level_pop": "Os quatro do pop",
+  "ear_prog_level_triads": "Todas as tríades"
 }

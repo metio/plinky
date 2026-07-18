@@ -101,7 +101,10 @@ const BUDGET_TOTAL_KB = 575;
 //
 // The chords and scales exercises — the naming choice grid and the two generators on the
 // session's path — add ~1.5 KB of app code, measured at 263.5.
-const BUDGET_APP_KB = 264;
+//
+// The chord-progressions exercise — the sequence-entry surface (slots + keypad + undo)
+// and the progression generator — adds ~1 KB of app code, measured at 264.5.
+const BUDGET_APP_KB = 265;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

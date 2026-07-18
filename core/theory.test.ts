@@ -3,9 +3,11 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    CHORD_DEGREES,
     CHORD_QUALITIES,
     chordPitches,
     chordSpan,
+    degreePitches,
     INTERVAL_IDS,
     intervalIdOf,
     NATURAL_PITCH_CLASSES,
@@ -121,5 +123,20 @@ describe("scales", () => {
             expect(pitches.at(-1)).toBe(72);
             expect([...pitches].sort((a, b) => a - b)).toEqual(pitches);
         }
+    });
+});
+
+describe("diatonic degrees", () => {
+    it("names all seven triads of a major key", () => {
+        expect(CHORD_DEGREES).toEqual(["I", "ii", "iii", "IV", "V", "vi", "vii\u00b0"]);
+    });
+
+    it("builds the tonic triad from the key's tonic", () => {
+        expect(degreePitches(60, "I")).toEqual([60, 64, 67]);
+    });
+
+    it("places the dominant a fifth above and the leading-tone triad diminished", () => {
+        expect(degreePitches(60, "V")).toEqual([67, 71, 74]);
+        expect(degreePitches(60, "vii\u00b0")).toEqual([71, 74, 77]);
     });
 });

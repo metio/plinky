@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "단5음음계",
   "theory_scale_blues": "블루스 음계",
   "theory_scale_whole_tone": "온음음계",
-  "theory_scale_chromatic": "반음계"
+  "theory_scale_chromatic": "반음계",
+  "ear_exercise_progressions": "코드 진행",
+  "ear_progressions_blurb": "한 조성 안에서 이어지는 코드의 흐름이에요. 들리는 대로 순서대로 이름을 붙여 보세요. 으뜸화음으로 시작해 으뜸화음으로 끝나니, 조성은 언제나 그 자리에서 기댈 수 있어요.",
+  "ear_progression_choices": "코드 진행 답",
+  "ear_progression_undo": "마지막 코드 되돌리기",
+  "ear_prog_level_primary": "주요 3화음",
+  "ear_prog_level_pop": "팝의 네 화음",
+  "ear_prog_level_triads": "모든 3화음"
 }

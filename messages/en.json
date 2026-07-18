@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Minor pentatonic",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Whole tone",
-  "theory_scale_chromatic": "Chromatic"
+  "theory_scale_chromatic": "Chromatic",
+  "ear_exercise_progressions": "Chord progressions",
+  "ear_progressions_blurb": "A run of chords in a key. Name each one you hear, in order — it starts and ends on the home chord, so the key is always there to hold onto.",
+  "ear_progression_choices": "Chord progression answer",
+  "ear_progression_undo": "Undo the last chord",
+  "ear_prog_level_primary": "The primary chords",
+  "ear_prog_level_pop": "The pop four",
+  "ear_prog_level_triads": "All the triads"
 }

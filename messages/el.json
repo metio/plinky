@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Ελάσσονα πεντατονική",
   "theory_scale_blues": "Μπλουζ κλίμακα",
   "theory_scale_whole_tone": "Ολοτονική",
-  "theory_scale_chromatic": "Χρωματική"
+  "theory_scale_chromatic": "Χρωματική",
+  "ear_exercise_progressions": "Διαδοχές συγχορδιών",
+  "ear_progressions_blurb": "Μια σειρά συγχορδιών σε μια τονικότητα. Ονόμασε καθεμιά που ακούς, με τη σειρά — ξεκινά και τελειώνει στη συγχορδία της τονικής, οπότε η τονικότητα είναι πάντα εκεί να σε κρατά.",
+  "ear_progression_choices": "Απάντηση διαδοχής συγχορδιών",
+  "ear_progression_undo": "Αναίρεση της τελευταίας συγχορδίας",
+  "ear_prog_level_primary": "Οι κύριες συγχορδίες",
+  "ear_prog_level_pop": "Οι τέσσερις της ποπ",
+  "ear_prog_level_triads": "Όλες οι τρίφωνες συγχορδίες"
 }
