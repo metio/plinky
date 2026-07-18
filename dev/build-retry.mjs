@@ -15,6 +15,12 @@
 // prints no such line) is NOT retried — it exits immediately.
 
 import { spawn } from "node:child_process";
+import { applyPrerenderRetryPatch } from "./patch-prerender-retry.mjs";
+
+// Assert the per-request prerender retry before building — every build (build, build:client,
+// build:locales) funnels through here, so this makes the fix hold even where deps were
+// installed with --ignore-scripts and the postinstall hook was skipped.
+console.log(`build-retry: prerender retry patch — ${applyPrerenderRetryPatch()}`);
 
 // A plain `npm run build` — no PLINKY_LOCALE, no PLINKY_ROOT_ONLY — is the
 // all-locales dev build: every language in one tree, for local preview. It is not
