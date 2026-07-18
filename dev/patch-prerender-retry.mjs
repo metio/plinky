@@ -26,29 +26,31 @@ const TARGET = "node_modules/@react-router/dev/dist/vite.js";
 const FROM = "retryCount = 0, retryDelay = 500, maxRedirects = 0, timeout = 1e4";
 const TO = "retryCount = 3, retryDelay = 1000, maxRedirects = 0, timeout = 2e4";
 
-if (!existsSync(TARGET)) {
-    // A partial or pruned install — nothing to patch. Don't break the install.
-    console.warn(`patch-prerender-retry: ${TARGET} not found; skipping.`);
-    process.exit(0);
+// Applies the patch idempotently, returning a short status. Callable from build-retry.mjs
+// so every build re-asserts it — robust even where deps were installed with
+// --ignore-scripts, which would skip the postinstall hook.
+export function applyPrerenderRetryPatch() {
+    if (!existsSync(TARGET)) {
+        return `not found (${TARGET}); skipped`;
+    }
+    const src = readFileSync(TARGET, "utf8");
+    if (src.includes(TO)) {
+        return "already applied";
+    }
+    if (!src.includes(FROM)) {
+        // A @react-router/dev bump moved or reshaped this code. Don't throw — installs and
+        // builds still work (build-retry.mjs's whole-build retry still guards the flake) —
+        // but shout so the patch gets re-pointed.
+        return (
+            "NOT APPLIED — prerender options not found; @react-router/dev likely changed. " +
+            "Re-point dev/patch-prerender-retry.mjs at the new code."
+        );
+    }
+    writeFileSync(TARGET, src.replace(FROM, TO));
+    return "applied (retryCount 0→3)";
 }
 
-const src = readFileSync(TARGET, "utf8");
-
-if (src.includes(TO)) {
-    console.log("patch-prerender-retry: already applied.");
-    process.exit(0);
+// Run directly (postinstall): apply once and report. Never fails the install.
+if (import.meta.url === `file://${process.argv[1]}`) {
+    console.log(`patch-prerender-retry: ${applyPrerenderRetryPatch()}`);
 }
-
-if (!src.includes(FROM)) {
-    // A @react-router/dev bump moved or reshaped this code. Exit 0 so installs still work
-    // (build-retry.mjs still guards the flake), but shout so the patch gets re-pinned.
-    console.warn(
-        "patch-prerender-retry: prerender options not found — @react-router/dev likely " +
-            "changed. The per-request retry is NOT applied; re-point dev/patch-prerender-retry.mjs " +
-            "at the new code. build-retry.mjs remains the whole-build backstop meanwhile.",
-    );
-    process.exit(0);
-}
-
-writeFileSync(TARGET, src.replace(FROM, TO));
-console.log("patch-prerender-retry: raised prerender per-request retry (retryCount 0→3).");
