@@ -3,11 +3,16 @@
 
 // Runs `react-router build`, retrying ONLY the transient prerender flake. React Router
 // prerenders every localized route by fetching it from an in-process Vite preview server;
-// that server occasionally resets a connection under the fan-out, and the prerenderer's
-// retryCount defaults to 0 (not user-configurable here), so a single reset fails the whole
-// build with "Prerender: Request failed for /<locale>/:" and an empty message. Retrying the
-// build clears it. A genuine failure (a real prerender error carries a status/message, or a
-// compile/type error prints no such line) is NOT retried — it exits immediately.
+// that server occasionally resets a lone connection ("Prerender: Request failed for
+// /<locale>/:" with an empty message) or lets a request run long ("Request timed out").
+//
+// The primary fix is dev/patch-prerender-retry.mjs (a postinstall patch), which raises the
+// prerenderer's own per-request retryCount from 0 so a reset retries that single request
+// in-place — that alone clears the flake without restarting the build. This whole-build
+// retry stays as a backstop: it catches anything the per-request retry can't (and would
+// carry the flake if a @react-router/dev bump ever moved the code the patch edits). A
+// genuine failure (a real prerender error carries a status/message, or a compile/type error
+// prints no such line) is NOT retried — it exits immediately.
 
 import { spawn } from "node:child_process";
 
