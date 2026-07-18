@@ -19,6 +19,7 @@ const BASE_PATHS = [
     "/review",
     "/settings",
     "/help",
+    "/about",
     "/board",
 ];
 

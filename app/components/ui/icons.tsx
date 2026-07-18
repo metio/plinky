@@ -221,6 +221,18 @@ export function StarIcon({ className, filled = false }: IconProps & { filled?: b
     );
 }
 
+// A heart — the warmth behind Plinky, and the way to the people who made it.
+export function HeartIcon({ className, filled = false }: IconProps & { filled?: boolean }) {
+    return (
+        <Icon className={className}>
+            <path
+                d="M12 20.5C12 20.5 3.5 14.6 3.5 8.9A4.4 4.4 0 0 1 12 6.9A4.4 4.4 0 0 1 20.5 8.9C20.5 14.6 12 20.5 12 20.5Z"
+                fill={filled ? "currentColor" : "none"}
+            />
+        </Icon>
+    );
+}
+
 // A push-pin, head-on with its needle — "pinned to the board".
 export function PinIcon({ className }: IconProps) {
     return (

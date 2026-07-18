@@ -1,8 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { Link } from "react-router";
 import { m } from "../../paraglide/messages.js";
+import { localizeHref } from "../../paraglide/runtime.js";
 import { type Brand, BrandIcon } from "./brandIcons";
+import { HeartIcon } from "./icons";
 
 const CHANNELS: { brand: Brand; label: string; href: string }[] = [
     { brand: "instagram", label: "Instagram", href: "https://www.instagram.com/plinky.piano" },
@@ -21,9 +24,21 @@ export function SiteFooter() {
     return (
         <footer className="mt-12 border-t border-gray-200 px-6 py-4 font-sans dark:border-gray-800">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.footer_follow()}
-                </span>
+                <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                    {/* The heart is the quiet way to the people behind Plinky; it
+                        fills in on hover, a small warm tell. */}
+                    <Link
+                        to={localizeHref("/about")}
+                        aria-label={m.nav_about()}
+                        className="group rounded-md p-1 text-gray-400 hover:text-rose-500 focus-visible:ring-2 focus-visible:ring-rose-400 dark:text-gray-500 dark:hover:text-rose-400"
+                    >
+                        <HeartIcon
+                            filled
+                            className="h-5 w-5 opacity-70 transition group-hover:opacity-100"
+                        />
+                    </Link>
+                    <span>{m.footer_follow()}</span>
+                </div>
                 <div className="flex items-center gap-1">
                     {CHANNELS.map((channel) => (
                         <a
