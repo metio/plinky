@@ -42,6 +42,7 @@ import {
 } from "../../contexts/services";
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useGhostRace } from "../../hooks/useGhostRace";
+import { useHoldIndicator } from "../../hooks/useHoldIndicator";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
 import { useLoopSelection } from "../../hooks/useLoopSelection";
@@ -141,6 +142,9 @@ function usePlaySessionValue({
     const captureRef = useRef<RunCapture>(startCapture());
     const synth = useSynth();
     const scheduler = useScheduler();
+    // The shrinking hold-duration fill on the on-screen keys — armed per correct
+    // note below, cleared whenever a run stops.
+    const holdIndicator = useHoldIndicator();
     // Tempo-enforced "keep up" mode: Practice runs at a fixed tempo, the cursor advancing
     // on the clock rather than waiting for you, so a note not cleared before it passes is a
     // miss. `guideNotes` sounds the notes as they pass for a follow-along; off, it's a
@@ -429,6 +433,12 @@ function usePlaySessionValue({
             if (osmd) {
                 paintPlayedNotes(osmd, info.pitches);
                 markPainted();
+            }
+            // Show how long to keep holding, but only in the full-guidance hint mode
+            // — the same beginner crutch the pre-highlight belongs to. A sight-reader
+            // who dialled hints down gets no afterglow.
+            if (noteHints === "always") {
+                holdIndicator.begin(info.pitches, info.holdMs);
             }
             // Record the cleared note — its ideal and actual timing, and a hold per
             // pitch for the release to close — for the grade, the per-note strip, the
@@ -907,6 +917,13 @@ function usePlaySessionValue({
         noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
             ? matcher.expected
             : [];
+    // A run ending — stop, restart or completion all drop `practicing` — leaves no
+    // note left to hold, so drain any fills still shrinking.
+    useEffect(() => {
+        if (!matcher.practicing) {
+            holdIndicator.clear();
+        }
+    }, [matcher.practicing, holdIndicator.clear]);
 
     // The run's tempo re-referenced to the piece's own, so the results panel reads the
     // lagging hand at the same scale the share grid was built with.
@@ -954,6 +971,7 @@ function usePlaySessionValue({
         reading,
         keyRange,
         hintNotes,
+        holdFractions: holdIndicator.holdFractions,
         noteHints,
         setNoteHints,
         focusXml,

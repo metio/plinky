@@ -52,6 +52,14 @@ describe("Keyboard", () => {
         expect(screen.getByLabelText("E 4").className).toContain("bg-indigo-50");
     });
 
+    it("fills a held note's key to its remaining hold fraction", () => {
+        render(<Keyboard from={60} to={67} holds={new Map([[60, 0.4]])} />);
+        const fill = screen.getByLabelText("C 4").querySelector<HTMLElement>("[style*='height']");
+        expect(fill?.style.height).toBe("40%");
+        // A note with no hold shows no fill.
+        expect(screen.getByLabelText("E 4").querySelector("[style*='height']")).toBeNull();
+    });
+
     it("flashes a wrong key red", async () => {
         render(<Keyboard from={60} to={67} wrong={{ note: 62, seq: 1 }} />);
         await waitFor(() => expect(screen.getByLabelText("D 4").className).toContain("bg-red-200"));

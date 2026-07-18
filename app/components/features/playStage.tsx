@@ -31,6 +31,7 @@ export function PlayStage() {
         hideKeyboard,
         fingerStrip,
         hintNotes,
+        holdFractions,
         keyRange,
         id,
         xml,
@@ -117,6 +118,7 @@ export function PlayStage() {
                         <PianoKeyboard
                             expected={hintNotes}
                             wrong={matcher.lastWrong}
+                            holds={holdFractions}
                             from={keyRange.from}
                             to={keyRange.to}
                             // Full screen is the playing surface — let the keys use

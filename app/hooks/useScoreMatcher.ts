@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
+import { readScoreExpression } from "../lib/scoreExpression";
 import {
     currentBar,
     expectedPitches,
@@ -66,6 +67,25 @@ export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): 
     return collectMatchSteps(osmd, hand).map((step) => step.pitches);
 }
 
+// The longest written length, in quarter notes, among the hand's notes sounding
+// under the cursor — the note's own duration, read straight off the engraved
+// score. Zero when nothing playable sits here. Feeds the hold-duration indicator:
+// how long the just-played key is meant to keep ringing.
+function notatedQuartersAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): number {
+    let quarters = 0;
+    for (const note of osmd.cursor.NotesUnderCursor()) {
+        if (note.isRest() || note.halfTone <= 0) {
+            continue;
+        }
+        const staff = note.ParentStaff?.idInMusicSheet;
+        if (hand !== "both" && staff !== STAFF_FOR[hand]) {
+            continue;
+        }
+        quarters = Math.max(quarters, readScoreExpression(note).notatedQuarters);
+    }
+    return quarters;
+}
+
 // Walk the reset cursor forward to the first playable position at or after `from`,
 // so the visual cursor and the reducer agree from note one.
 function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): void {
@@ -101,6 +121,10 @@ export type CorrectInfo = {
     index: number;
     timestamp: number;
     timeMs: number;
+    // The note's written length in milliseconds at the run's tempo — how long it
+    // is meant to keep sounding, for the hold-duration indicator. Zero when the
+    // score marks no length.
+    holdMs: number;
     velocity: number;
     // How many wrong notes were played at this position before it was cleared —
     // zero means a clean first try, the signal Flow and per-segment accuracy are
@@ -270,6 +294,11 @@ export function useScoreMatcher(
                     index: runStartIndexRef.current + event.ordinal,
                     timestamp,
                     timeMs: event.step.whole * 4 * (60000 / runTempoRef.current),
+                    // The cursor still sits on the cleared position (it advances
+                    // just below), so its notes give the written length to hold.
+                    holdMs:
+                        notatedQuartersAtCursor(osmd, runHandRef.current) *
+                        (60000 / runTempoRef.current),
                     velocity,
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,

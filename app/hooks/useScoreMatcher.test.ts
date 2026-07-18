@@ -41,6 +41,9 @@ function fakeOsmd(positions: Position[]): { osmd: OpenSheetMusicDisplay; shown: 
                     isRest: () => false,
                     halfTone: midiToHalfTone(midi),
                     ParentStaff: { idInMusicSheet: staff },
+                    // Every fake position is one quarter note long, so holdMs reads a
+                    // known written length off the score.
+                    Length: { RealValue: 0.25 },
                 };
             });
         },
@@ -290,6 +293,15 @@ describe("useScoreMatcher", () => {
         const times = onCorrect.mock.calls.map((call) => (call[0] as CorrectInfo).timeMs);
         // RealValue 0.25 * 4 * (60000 / 100) = 600 for the second note at tempo 100.
         expect(times[1]).toBeCloseTo(600);
+    });
+
+    it("reports the note's written length as holdMs at the run tempo", () => {
+        const onCorrect = vi.fn();
+        const { result } = render([[60]], { onCorrect, tempo: 120 });
+        act(() => result.current.start());
+        act(() => result.current.registerNote(60));
+        // A quarter note (RealValue 0.25 → 1 quarter) at 120 BPM = 500 ms.
+        expect((onCorrect.mock.calls[0]![0] as CorrectInfo).holdMs).toBeCloseTo(500);
     });
 });
 

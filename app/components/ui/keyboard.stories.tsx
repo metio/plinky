@@ -30,3 +30,16 @@ export const HeldKeys: Story = {
 export const WrongFlash: Story = {
     args: { wrong: { note: 62, seq: 1 } },
 };
+
+// The hold-duration fill mid-shrink: a note struck a moment ago (tall fill) and one
+// nearly released (short fill), on a white key and a black key, so the "keep holding"
+// cue is captured in both shapes.
+export const HoldDuration: Story = {
+    args: {
+        lit: new Set([60]),
+        holds: new Map([
+            [60, 0.75],
+            [66, 0.25],
+        ]),
+    },
+};

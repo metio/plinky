@@ -13,12 +13,15 @@ import { MidiBadge } from "./midiBadge";
 export function PianoKeyboard({
     expected = [],
     wrong = null,
+    holds,
     from = 60,
     to = 84,
     well,
 }: {
     expected?: number[];
     wrong?: { note: number; seq: number } | null;
+    // Remaining fraction per just-played note for the hold-duration fill.
+    holds?: ReadonlyMap<number, number>;
     from?: number;
     to?: number;
     // The keybed's width and centring. Omitted falls back to the shared
@@ -69,6 +72,7 @@ export function PianoKeyboard({
             lit={new Set(heldNotes)}
             expected={expected}
             wrong={wrong}
+            holds={holds}
             labels={labels}
             sustained={sustained}
             badge={<MidiBadge />}

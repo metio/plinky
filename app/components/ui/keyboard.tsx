@@ -52,6 +52,21 @@ function spokenNote(note: number): string {
 }
 
 const NONE: ReadonlySet<number> = new Set();
+const NO_HOLDS: ReadonlyMap<number, number> = new Map();
+
+// The shrinking fill that shows how long a just-played note is meant to be held:
+// a translucent indigo bar rising the key's height, draining from full at the
+// strike to empty at the note's written release. Pinned behind the label so the
+// letter stays legible, and pointer-transparent so it never steals a press.
+function HoldFill({ fraction }: { fraction: number }) {
+    return (
+        <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 bg-indigo-400/45 dark:bg-indigo-400/40"
+            style={{ height: `${Math.min(1, Math.max(0, fraction)) * 100}%` }}
+        />
+    );
+}
 
 // The single on-screen piano, shared by the landing hero and every practice mode,
 // so the instrument is literally the same component everywhere. Fully controlled:
@@ -70,6 +85,7 @@ export function Keyboard({
     labels = "off",
     well = "mx-auto w-full max-w-xl",
     sustained = false,
+    holds = NO_HOLDS,
     badge,
     onPress,
     onRelease,
@@ -78,6 +94,9 @@ export function Keyboard({
     to: number;
     lit?: ReadonlySet<number>;
     expected?: number[];
+    // How much of each just-played note's written length remains (1 at the strike,
+    // 0 at its release), keyed by note — drives the shrinking hold-duration fill.
+    holds?: ReadonlyMap<number, number>;
     // Print note names on the keys for a player still learning where the notes are.
     labels?: NoteLabels;
     // The last wrong note plus a bump counter, so a repeated miss re-flashes.
@@ -418,6 +437,7 @@ export function Keyboard({
                             style={rise ? { animationDelay: `${index * 45}ms` } : undefined}
                             className={`${WHITE_KEY} flex-1 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${whiteState(note)}`}
                         >
+                            {holds.has(note) && <HoldFill fraction={holds.get(note)!} />}
                             {keyLabel(note, labels) && (
                                 <span
                                     aria-hidden="true"
@@ -458,6 +478,7 @@ export function Keyboard({
                             }}
                             className={`${BLACK_KEY} h-2/3 ${rise ? "animate-key-rise motion-reduce:animate-none" : ""} ${blackState(note)}`}
                         >
+                            {holds.has(note) && <HoldFill fraction={holds.get(note)!} />}
                             {keyLabel(note, labels) && (
                                 <span
                                     aria-hidden="true"

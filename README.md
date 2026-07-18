@@ -67,7 +67,9 @@ D orange — so you read pitch by hue while you're learning; the played/heard fe
 behind the notes as a soft highlight, so the colours stay clear as you play. A
 wrong key flashes red; whether the correct key then lights up is your call — by
 default it always shows the next note, or you can ask for a nudge only after a slip,
-or read the music unaided.
+or read the music unaided. When the next note is shown, playing it leaves a fading
+fill on the key for as long as the note is written to last, so you can see how long
+to keep holding — not just which key to press.
 Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
 **Loop** and the piece repeats whole; to drill just a passage, **tap two bars on the
 score** — they fill **red** so the stretch you're repeating is clear, and the range
