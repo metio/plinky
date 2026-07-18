@@ -53,13 +53,14 @@ describe("Settings", () => {
 
     it("relabels the example piano when the note-labels choice changes", () => {
         const { services } = mount();
-        // The default labels only the C keys as landmarks.
-        expect(services.prefs.load().noteLabels).toBe("c");
-
-        choose(m.settings_note_labels, m.note_labels_all);
+        // The default labels every key, so a non-C key carries its letter.
         expect(services.prefs.load().noteLabels).toBe("all");
-        // The example octave now prints a label on a non-C key too.
         expect(screen.getByLabelText("D 4").textContent).toContain("D");
+
+        choose(m.settings_note_labels, m.note_labels_c);
+        expect(services.prefs.load().noteLabels).toBe("c");
+        // Only the C landmarks stay labelled now.
+        expect(screen.getByLabelText("D 4").textContent).not.toContain("D");
     });
 
     it("stays in sync with a save made by a nested panel", () => {

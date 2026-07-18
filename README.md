@@ -65,8 +65,9 @@ whole score — bigger, easier-to-read glyphs on a small screen or for a beginne
 works in treadmill mode too. And you can **colour the notes** by name — every C red, every
 D orange — so you read pitch by hue while you're learning; the played/heard feedback rides
 behind the notes as a soft highlight, so the colours stay clear as you play. A
-wrong key flashes red; whether the correct key then lights up is your call — read
-the music unaided, get a nudge only after a slip, or always show the next note.
+wrong key flashes red; whether the correct key then lights up is your call — by
+default it always shows the next note, or you can ask for a nudge only after a slip,
+or read the music unaided.
 Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
 **Loop** and the piece repeats whole; to drill just a passage, **tap two bars on the
 score** — they fill **red** so the stretch you're repeating is clear, and the range
@@ -292,8 +293,8 @@ a student.
 
 Still learning where the notes are? The keys can carry their **note names** — every key,
 or just the C keys as orientation landmarks (the white key left of each pair of black
-keys), or none once the map is second nature — set under **Settings**. The C landmarks
-show by default.
+keys), or none once the map is second nature — set under **Settings**. Every key is
+labelled by default, so a first-timer can find any note straight away.
 
 Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your

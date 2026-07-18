@@ -13,8 +13,8 @@ const BASE: Prefs = {
     showFingerings: false,
     beams: "auto",
     colorNotes: false,
-    noteHints: "miss",
-    noteLabels: "c",
+    noteHints: "always",
+    noteLabels: "all",
     forgiving: false,
     fingerHints: true,
     decayMode: "gentle",
@@ -98,16 +98,16 @@ describe("parsePrefs", () => {
         expect(parsePrefs(stored({ showFingerings: true })).showFingerings).toBe(true);
     });
 
-    it("defaults note hints to after-a-mistake and rejects an unknown value", () => {
-        expect(parsePrefs(null).noteHints).toBe("miss");
+    it("defaults note hints to always-on and rejects an unknown value", () => {
+        expect(parsePrefs(null).noteHints).toBe("always");
         expect(parsePrefs(stored({ noteHints: "never" })).noteHints).toBe("never");
-        expect(parsePrefs(JSON.stringify({ noteHints: "bogus" })).noteHints).toBe("miss");
+        expect(parsePrefs(JSON.stringify({ noteHints: "bogus" })).noteHints).toBe("always");
     });
 
-    it("defaults note labels to the C landmark and rejects an unknown value", () => {
-        expect(parsePrefs(null).noteLabels).toBe("c");
-        expect(parsePrefs(stored({ noteLabels: "all" })).noteLabels).toBe("all");
-        expect(parsePrefs(JSON.stringify({ noteLabels: "bogus" })).noteLabels).toBe("c");
+    it("defaults note labels to every key and rejects an unknown value", () => {
+        expect(parsePrefs(null).noteLabels).toBe("all");
+        expect(parsePrefs(stored({ noteLabels: "off" })).noteLabels).toBe("off");
+        expect(parsePrefs(JSON.stringify({ noteLabels: "bogus" })).noteLabels).toBe("all");
     });
 
     it("defaults beams to auto and rejects an unknown value", () => {
