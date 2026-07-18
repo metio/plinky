@@ -51,8 +51,8 @@ const FEATURES = [
         Icon: NotesIcon,
         note: 67,
     },
-    { to: "/board", label: m.board_title, blurb: m.home_board_blurb, Icon: PinIcon, note: 72 },
-    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 76 },
+    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 72 },
+    { to: "/board", label: m.board_title, blurb: m.home_board_blurb, Icon: PinIcon, note: 76 },
 ];
 
 export default function Home() {
