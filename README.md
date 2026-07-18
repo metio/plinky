@@ -383,6 +383,15 @@ no blocks shows a short "on the way" note. Only `https` image and link URLs are 
 and an unreachable source falls back to the section skeleton — help never breaks the
 page. It reuses the news banner's `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
 
+## About page
+
+A small heart in the footer opens `/about` — the two people behind Plinky. Marisol
+"La Jefa" heads the whole operation and gives Plinky its warmth and welcome;
+Sebastian writes the code. The page is a plain prerendered route (their portraits
+live in `public/`, the copy is translated with the rest of the UI), with a short
+note on why Plinky is a calm place to play rather than one more thing to keep a
+streak on.
+
 ## The board
 
 The board is Plinky's pin-board of artists worth following — pianists and
