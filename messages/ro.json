@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Pentatonică minoră",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Tonuri întregi",
-  "theory_scale_chromatic": "Cromatică"
+  "theory_scale_chromatic": "Cromatică",
+  "ear_exercise_progressions": "Progresii de acorduri",
+  "ear_progressions_blurb": "Un șir de acorduri într-o tonalitate. Numește fiecare acord pe care îl auzi, în ordine — începe și se termină pe acordul de bază, așa că tonalitatea e mereu acolo, de care să te ții.",
+  "ear_progression_choices": "Răspuns pentru progresia de acorduri",
+  "ear_progression_undo": "Anulează ultimul acord",
+  "ear_prog_level_primary": "Acordurile principale",
+  "ear_prog_level_pop": "Cele patru acorduri pop",
+  "ear_prog_level_triads": "Toate trisonurile"
 }

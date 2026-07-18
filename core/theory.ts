@@ -227,3 +227,33 @@ export const SCALE_IDS = Object.keys(SCALE_STEPS) as ScaleId[];
 export function scalePitches(tonic: number, scale: ScaleId): number[] {
     return [...SCALE_STEPS[scale].map((step) => tonic + step), tonic + SEMITONES_PER_OCTAVE];
 }
+
+// ---------------------------------------------------------------------------
+// Diatonic degrees (chords within a key)
+// ---------------------------------------------------------------------------
+
+// The seven triads a major key is built from, named by Roman numeral. The numeral is
+// itself the identity — case carries the quality (upper is major, lower is minor) and the
+// ° marks the diminished — and it reads the same in every language, so unlike a chord's
+// spelled-out quality it is notation, not a word to translate.
+export type ChordDegree = "I" | "ii" | "iii" | "IV" | "V" | "vi" | "vii°";
+
+export const CHORD_DEGREES: ChordDegree[] = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
+
+// Each degree's triad quality and the semitones its root sits above the key's tonic.
+const DIATONIC_TRIADS: Record<ChordDegree, { quality: ChordQuality; step: number }> = {
+    I: { quality: "major", step: 0 },
+    ii: { quality: "minor", step: 2 },
+    iii: { quality: "minor", step: 4 },
+    IV: { quality: "major", step: 5 },
+    V: { quality: "major", step: 7 },
+    vi: { quality: "minor", step: 9 },
+    "vii°": { quality: "diminished", step: 11 },
+};
+
+// The sounding notes of a degree's triad in a key with the given tonic — its root placed
+// in the key, then stacked as its quality.
+export function degreePitches(tonic: number, degree: ChordDegree): number[] {
+    const { quality, step } = DIATONIC_TRIADS[degree];
+    return chordPitches(tonic + step, quality);
+}

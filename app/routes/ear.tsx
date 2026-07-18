@@ -18,6 +18,7 @@ const EXERCISES: { id: EarExerciseId; label: () => string }[] = [
     { id: "intervals", label: m.ear_exercise_intervals },
     { id: "chords", label: m.ear_exercise_chords },
     { id: "scales", label: m.ear_exercise_scales },
+    { id: "progressions", label: m.ear_exercise_progressions },
     { id: "perfect-pitch", label: m.ear_exercise_perfect_pitch },
 ];
 
@@ -36,6 +37,12 @@ const LEVELS: Record<EarExerciseId, (() => string)[]> = {
         m.ear_level_major_minor,
         m.ear_scale_level_minors,
         m.ear_scale_level_modes,
+        m.ear_level_all,
+    ],
+    progressions: [
+        m.ear_prog_level_primary,
+        m.ear_prog_level_pop,
+        m.ear_prog_level_triads,
         m.ear_level_all,
     ],
     "perfect-pitch": [],

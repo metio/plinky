@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Молска пентатоника",
   "theory_scale_blues": "Блуз",
   "theory_scale_whole_tone": "Целостепена",
-  "theory_scale_chromatic": "Хроматска"
+  "theory_scale_chromatic": "Хроматска",
+  "ear_exercise_progressions": "Акордске прогресије",
+  "ear_progressions_blurb": "Низ акорада у једном тоналитету. Именуј сваки који чујеш, редом — почиње и завршава се на тоничном акорду, па је тоналитет увек ту да га се држиш.",
+  "ear_progression_choices": "Одговор акордске прогресије",
+  "ear_progression_undo": "Опозови последњи акорд",
+  "ear_prog_level_primary": "Главни акорди",
+  "ear_prog_level_pop": "Поп четворка",
+  "ear_prog_level_triads": "Сви трозвуци"
 }

@@ -9,9 +9,11 @@
 // playing and every replay, and a test can assert what was asked without hearing it.
 
 import {
+    type ChordDegree,
     type ChordQuality,
     chordPitches,
     chordSpan,
+    degreePitches,
     type IntervalId,
     INTERVAL_IDS,
     type NoteNameId,
@@ -23,7 +25,12 @@ import {
     SEMITONES_PER_OCTAVE,
 } from "./theory";
 
-export type EarExerciseId = "perfect-pitch" | "intervals" | "chords" | "scales";
+export type EarExerciseId =
+    | "perfect-pitch"
+    | "intervals"
+    | "chords"
+    | "scales"
+    | "progressions";
 
 // Matches the shape the audio port already strikes with: a note, when to sound it, how
 // hard, and for how long. The engine needs no new audio capability.
@@ -149,6 +156,29 @@ export type ScaleConfig = {
     highest: number;
 };
 
+// Progressions climb by widening the vocabulary of chords they draw from: the three
+// primary triads, then the pop four with vi, then every major-key triad, then all seven
+// including the diminished vii°. Every level keeps the ones before, and every progression
+// begins and ends on I, so the key is always audible however hard the middle gets.
+export const PROGRESSION_LEVELS: ChordDegree[][] = [
+    ["I", "IV", "V"],
+    ["I", "IV", "V", "vi"],
+    ["I", "ii", "iii", "IV", "V", "vi"],
+    ["I", "ii", "iii", "IV", "V", "vi", "vii°"],
+];
+
+// How many chords a progression holds — enough to make a phrase, short enough that naming
+// every one stays within reach.
+export const PROGRESSION_LENGTH = 4;
+
+export type ProgressionConfig = {
+    degrees: ChordDegree[];
+    length: number;
+    // The tonic register the progression is voiced around.
+    lowest: number;
+    highest: number;
+};
+
 // ---------------------------------------------------------------------------
 // Questions
 // ---------------------------------------------------------------------------
@@ -182,15 +212,31 @@ export type ScaleQuestion = {
     choices: ScaleId[];
 };
 
+export type ProgressionQuestion = {
+    kind: "progressions";
+    notes: EarNote[];
+    // The joined degree sequence ("I-IV-V-I"), so the session's plain equality check and
+    // its per-round record work unchanged; `sequence` carries the same answer chord by
+    // chord for the surface's per-slot feedback.
+    answer: string;
+    sequence: ChordDegree[];
+    choices: ChordDegree[];
+};
+
 export type EarQuestion =
     | PerfectPitchQuestion
     | IntervalQuestion
     | ChordQuestion
-    | ScaleQuestion;
+    | ScaleQuestion
+    | ProgressionQuestion;
 
 // The gap between successive notes of a scale — quicker than a melodic interval, so the
 // run reads as one shape rather than a string of separate notes.
 const SCALE_STEP_GAP = 0.42;
+
+// The gap between chords of a progression — slower than a scale's notes, since a whole
+// chord needs a moment to land before the next one moves.
+const PROGRESSION_CHORD_GAP = 1.1;
 
 // Every allowed answer is always offered. Narrowing the choices to a handful would make
 // a round guessable by elimination, which grades the shortlist rather than the ear.
@@ -297,6 +343,50 @@ export function generateScale(config: ScaleConfig, rng: () => number): ScaleQues
     return { kind: "scales", notes, answer, choices: [...scales] };
 }
 
+export function generateProgression(
+    config: ProgressionConfig,
+    rng: () => number,
+): ProgressionQuestion {
+    const degrees = config.degrees.length > 0 ? config.degrees : PROGRESSION_LEVELS[0]!;
+    // The tonic sits where every degree's triad fits the range: I's root is the lowest
+    // note, and vii°'s stack the highest, seventeen semitones above the tonic.
+    const high = config.highest - 17;
+    const span = Math.max(0, high - config.lowest);
+    const tonic = config.lowest + Math.floor(rng() * (span + 1));
+
+    // Always I to I, so the key is heard at the start and resolved at the end; the middle
+    // chords are drawn from the level's vocabulary, never repeating one twice in a row —
+    // and the chord before the closing I is never itself I, so the resolution lands.
+    const sequence: ChordDegree[] = ["I"];
+    for (let position = 1; position < config.length - 1; position++) {
+        const previous = sequence[position - 1];
+        const beforeClose = position === config.length - 2;
+        const candidates = degrees.filter(
+            (degree) => degree !== previous && !(beforeClose && degree === "I"),
+        );
+        sequence.push(candidates.length > 0 ? pick(candidates, rng) : previous!);
+    }
+    sequence.push("I");
+
+    // Each chord is a block, one after the next a beat apart.
+    const notes: EarNote[] = sequence.flatMap((degree, index) =>
+        degreePitches(tonic, degree).map((note) => ({
+            note,
+            at: index * PROGRESSION_CHORD_GAP,
+            velocity: VELOCITY,
+            duration: PROGRESSION_CHORD_GAP,
+        })),
+    );
+
+    return {
+        kind: "progressions",
+        notes,
+        answer: sequence.join("-"),
+        sequence,
+        choices: [...degrees],
+    };
+}
+
 // The question for an exercise at a level, over the default register. The one place the
 // exercise id maps to its generator and its level-set, so a caller names an exercise and
 // a level and gets a playable question — the surface it drives falls out of the kind.
@@ -313,6 +403,15 @@ export function generateQuestion(
             return generateChord({ qualities: CHORD_LEVELS[level] ?? CHORD_LEVELS[0]!, ...range }, rng);
         case "scales":
             return generateScale({ scales: SCALE_LEVELS[level] ?? SCALE_LEVELS[0]!, ...range }, rng);
+        case "progressions":
+            return generateProgression(
+                {
+                    degrees: PROGRESSION_LEVELS[level] ?? PROGRESSION_LEVELS[0]!,
+                    length: PROGRESSION_LENGTH,
+                    ...range,
+                },
+                rng,
+            );
         default:
             return generateInterval(
                 {

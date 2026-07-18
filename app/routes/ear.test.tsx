@@ -78,4 +78,10 @@ describe("ear route", () => {
         expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_scales());
         expect(chosen(m.ear_level_label)).toBe(m.ear_scale_level_modes());
     });
+
+    it("offers chord progressions with their own level names", () => {
+        renderAt("/ear?exercise=progressions&level=0");
+        expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_progressions());
+        expect(chosen(m.ear_level_label)).toBe(m.ear_prog_level_primary());
+    });
 });

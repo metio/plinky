@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Мінорна пентатоніка",
   "theory_scale_blues": "Блюзова гама",
   "theory_scale_whole_tone": "Цілотонова гама",
-  "theory_scale_chromatic": "Хроматична гама"
+  "theory_scale_chromatic": "Хроматична гама",
+  "ear_exercise_progressions": "Акордові послідовності",
+  "ear_progressions_blurb": "Низка акордів у тональності. Назви по порядку кожен, який чуєш — вона починається й завершується на тонічному акорді, тож тональність завжди поруч, щоб на неї спертися.",
+  "ear_progression_choices": "Відповідь для акордової послідовності",
+  "ear_progression_undo": "Скасувати останній акорд",
+  "ear_prog_level_primary": "Головні акорди",
+  "ear_prog_level_pop": "Поп-четвірка",
+  "ear_prog_level_triads": "Усі тризвуки"
 }

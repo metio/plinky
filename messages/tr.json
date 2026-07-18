@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Minör pentatonik",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Tam ton",
-  "theory_scale_chromatic": "Kromatik"
+  "theory_scale_chromatic": "Kromatik",
+  "ear_exercise_progressions": "Akor ilerlemeleri",
+  "ear_progressions_blurb": "Bir tonda art arda gelen akorlar. Duyduğun her akoru sırayla adlandır — ana akorla başlayıp ana akorla biter, yani ton her zaman tutunabileceğin yerdedir.",
+  "ear_progression_choices": "Akor ilerlemesi yanıtı",
+  "ear_progression_undo": "Son akoru geri al",
+  "ear_prog_level_primary": "Ana akorlar",
+  "ear_prog_level_pop": "Pop dörtlüsü",
+  "ear_prog_level_triads": "Tüm üçlüler"
 }

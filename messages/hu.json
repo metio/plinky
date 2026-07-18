@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Moll pentaton",
   "theory_scale_blues": "Blues skála",
   "theory_scale_whole_tone": "Egészhangú",
-  "theory_scale_chromatic": "Kromatikus"
+  "theory_scale_chromatic": "Kromatikus",
+  "ear_exercise_progressions": "Akkordmenetek",
+  "ear_progressions_blurb": "Akkordok sora egy hangnemben. Nevezd meg mindegyiket, amit hallasz, sorban — az alaphangzaton indul és zárul, így a hangnem mindig ott van, hogy megkapaszkodj benne.",
+  "ear_progression_choices": "Akkordmenet válasza",
+  "ear_progression_undo": "Utolsó akkord visszavonása",
+  "ear_prog_level_primary": "A fő akkordok",
+  "ear_prog_level_pop": "A pop négyes",
+  "ear_prog_level_triads": "Az összes hármashangzat"
 }

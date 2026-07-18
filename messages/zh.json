@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "小调五声音阶",
   "theory_scale_blues": "布鲁斯音阶",
   "theory_scale_whole_tone": "全音阶",
-  "theory_scale_chromatic": "半音阶"
+  "theory_scale_chromatic": "半音阶",
+  "ear_exercise_progressions": "和弦进行",
+  "ear_progressions_blurb": "在一个调里接连响起的和弦。把听到的每一个按顺序说出来，它从主和弦开始，也在主和弦结束，所以调性始终都在，随时可以依靠。",
+  "ear_progression_choices": "和弦进行答案",
+  "ear_progression_undo": "撤销最后一个和弦",
+  "ear_prog_level_primary": "主要和弦",
+  "ear_prog_level_pop": "流行四和弦",
+  "ear_prog_level_triads": "所有三和弦"
 }

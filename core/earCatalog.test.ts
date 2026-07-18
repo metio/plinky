@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { EAR_ITEMS, earItemFor } from "./earCatalog";
-import { CHORD_LEVELS, INTERVAL_LEVELS, SCALE_LEVELS } from "./earExercise";
+import { CHORD_LEVELS, INTERVAL_LEVELS, PROGRESSION_LEVELS, SCALE_LEVELS } from "./earExercise";
 import { MAX_GRADE } from "./scoreDifficulty";
 
 describe("ear catalogue", () => {
@@ -13,6 +13,7 @@ describe("ear catalogue", () => {
         expect(count("intervals")).toBe(INTERVAL_LEVELS.length);
         expect(count("chords")).toBe(CHORD_LEVELS.length);
         expect(count("scales")).toBe(SCALE_LEVELS.length);
+        expect(count("progressions")).toBe(PROGRESSION_LEVELS.length);
         expect(count("perfect-pitch")).toBe(1);
     });
 
@@ -33,7 +34,7 @@ describe("ear catalogue", () => {
     });
 
     it("never lowers the grade as the levels of a laddered exercise climb", () => {
-        for (const exercise of ["intervals", "chords", "scales"]) {
+        for (const exercise of ["intervals", "chords", "scales", "progressions"]) {
             const items = EAR_ITEMS.filter((item) => item.exercise === exercise).sort(
                 (a, b) => (a.level ?? 0) - (b.level ?? 0),
             );
@@ -47,6 +48,7 @@ describe("ear catalogue", () => {
         expect(earItemFor("intervals", 0)?.id).toBe("ear-intervals-0");
         expect(earItemFor("chords", 2)?.id).toBe("ear-chords-2");
         expect(earItemFor("scales", 3)?.id).toBe("ear-scales-3");
+        expect(earItemFor("progressions", 1)?.id).toBe("ear-progressions-1");
     });
 
     it("resolves a perfect-pitch session whatever level is passed", () => {

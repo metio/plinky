@@ -675,5 +675,12 @@
   "theory_scale_minor_pentatonic": "Mollpentatonisk",
   "theory_scale_blues": "Blues",
   "theory_scale_whole_tone": "Heltonsskala",
-  "theory_scale_chromatic": "Kromatisk"
+  "theory_scale_chromatic": "Kromatisk",
+  "ear_exercise_progressions": "Ackordföljder",
+  "ear_progressions_blurb": "En rad ackord i en tonart. Namnge varje ackord du hör, i tur och ordning — den börjar och slutar på tonikan, så tonarten finns alltid där att hålla fast vid.",
+  "ear_progression_choices": "Svar – ackordföljd",
+  "ear_progression_undo": "Ångra det senaste ackordet",
+  "ear_prog_level_primary": "Huvudackorden",
+  "ear_prog_level_pop": "Popfyran",
+  "ear_prog_level_triads": "Alla treklanger"
 }
