@@ -88,7 +88,8 @@ span, and you tap a note then one of the **ten fingers** below to override it â€
 per piece, with the green/amber/red flow feedback always on. While it's open the score
 washes its bars red by **fingering difficulty**, a heat-map that shows at a glance
 where the piece actually gets hard â€” spot the deep-red bars, tap them into a loop, and
-drill exactly there.
+drill exactly there. A genuinely easy piece stays clear (nothing to flag), while a
+uniformly hard one glows throughout rather than washing out.
 
 Practice is self-paced by default, but flip on **Keep up** and it becomes tempo-locked:
 after a one-bar count-in, the cursor advances on the beat whether or not you're ready, and

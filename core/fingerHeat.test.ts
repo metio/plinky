@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { barCosts, barHeat, normalizeHeat } from "./fingerHeat";
+import { absoluteHeat, barCosts, barHeat, normalizeHeat } from "./fingerHeat";
 
 // A comfortable stepwise bar versus a bar of wide leaps: the leaps must cost
 // more, whatever the exact cost-model numbers are.
@@ -34,11 +34,33 @@ describe("normalizeHeat", () => {
     });
 });
 
+describe("absoluteHeat", () => {
+    it("maps cost to 0..1 on a fixed scale, clamped", () => {
+        // ABSOLUTE_HOT_COST is 8: half of it reads half-hot, at/over it reads full.
+        expect(absoluteHeat([0, 4, 8, 100])).toEqual([0, 0.5, 1, 1]);
+    });
+});
+
 describe("barHeat", () => {
-    it("heats the hardest bar to 1 and keeps rest bars cold", () => {
+    it("heats the hardest bar to 1 and keeps a comfortable bar cold", () => {
         const heat = barHeat([EASY, [], HARD], "right");
         expect(heat[1]).toBe(0);
         expect(heat[2]).toBe(1);
+        // EASY costs ~0, so it stays cold even with the absolute floor.
         expect(heat[0]!).toBeLessThan(0.5);
+    });
+
+    it("stays cold for a uniformly easy piece", () => {
+        // A nursery-melody shape: every bar equally, trivially fingerable.
+        const heat = barHeat([EASY, EASY, EASY], "right");
+        expect(heat).toEqual([0, 0, 0]);
+    });
+
+    it("still glows for a uniformly HARD piece instead of washing to zero", () => {
+        // Every bar equally hard: relative normalization alone would blank it,
+        // but the absolute floor keeps it hot — the whole point of the floor.
+        const heat = barHeat([HARD, HARD], "right");
+        expect(heat[0]!).toBeGreaterThan(0.5);
+        expect(heat[1]!).toBeGreaterThan(0.5);
     });
 });
