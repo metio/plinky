@@ -119,11 +119,13 @@ const nodesFor = (targets) => new Set([...targets].map(toNode).filter(Boolean));
 // --- Build the graph ---------------------------------------------------------------
 
 // Affordances present on every page: the bottom-tab/header nav (navBar), the header's
-// help link (helpLink), plus the header's own gear and logo (root.tsx's direct links).
+// help link (helpLink), the footer (siteFooter — the layout renders it under every
+// page), plus the header's own gear and logo (root.tsx's direct links).
 const global = nodesFor(
     new Set([
         ...crawl(resolve(APP, "components/ui/navBar.tsx"), new Set()),
         ...crawl(resolve(APP, "components/features/helpLink.tsx"), new Set()),
+        ...crawl(resolve(APP, "components/ui/siteFooter.tsx"), new Set()),
         ...targetsIn(readFileSync(resolve(APP, "root.tsx"), "utf8")),
     ]),
 );
