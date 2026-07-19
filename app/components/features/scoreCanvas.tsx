@@ -40,6 +40,14 @@ export function ScoreCanvas() {
     // staff is hidden, not unmounted. Only while a run is on: at rest the score shows so
     // the piece can be read, looped and set up.
     const highwayActive = reading.highway && matcher.practicing;
+    // The score slot's size: full screen hands it the spare height (flex-1); a phone gets
+    // a fixed slice so the keys still fit; otherwise a tall band that scrolls if taller.
+    // The highway takes this same slot so it stands exactly where the staff did.
+    const slotSize = fullscreen
+        ? "min-h-0 flex-1"
+        : compact
+          ? "h-[40dvh]"
+          : "min-h-[50vh] max-h-[70vh]";
     return (
         // OSMD renders to its container's full offset width, which includes any border or
         // padding on that element; were either on the element OSMD owns, the rendered system
@@ -63,16 +71,23 @@ export function ScoreCanvas() {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-2 rounded-lg border border-stone-300/70"
             />
-            {/* The tall highway covers the staff while playing in highway mode. Placed
-            before the quick controls so those still paint on top of it; the OSMD box
-            below stays laid out and functional, just hidden behind this. */}
+            {/* In highway mode the highway takes the staff's slot as an in-flow panel,
+            so it gets its height the same way the staff did (the flex-1 / min-h band
+            below) rather than depending on an absolute layer stretching. It is an opaque
+            field, so nothing shows through around the centred lane; the staff's own box
+            is pulled out of flow and hidden (see the container below), kept mounted only
+            so OSMD stays rendered and the matcher's cursor keeps walking it. */}
             {highwayActive && (
-                <div className="pointer-events-none absolute inset-3 overflow-hidden rounded-md">
-                    <NotesHighway
-                        upcoming={matcher.upcoming}
-                        from={keyRange.from}
-                        to={keyRange.to}
-                    />
+                <div
+                    className={`relative overflow-hidden rounded-md bg-gray-100 dark:bg-gray-900 ${slotSize}`}
+                >
+                    <div className="absolute inset-0">
+                        <NotesHighway
+                            upcoming={matcher.upcoming}
+                            from={keyRange.from}
+                            to={keyRange.to}
+                        />
+                    </div>
                 </div>
             )}
             {fullscreen && !fingerStrip && (
@@ -113,11 +128,24 @@ export function ScoreCanvas() {
                 // controls and keyboard below it down the page (a CLS hit that
                 // Lighthouse amplifies under CPU throttling). The max-height keeps
                 // it from crowding the keyboard off-screen; taller scores scroll.
-                className={`no-scrollbar overflow-auto ${
-                    ready && measureCount > 1 && !listenPlayback.playing && !matcher.practicing
-                        ? "cursor-pointer"
-                        : ""
-                } ${fullscreen ? "min-h-0 flex-1" : compact ? "h-[40dvh]" : "min-h-[50vh] max-h-[70vh]"}`}
+                //
+                // In highway mode this box is pulled out of flow — a 1px, clipped,
+                // transparent strip spanning the frame's width — so it keeps its layout
+                // width (OSMD lays the score out and the cursor keeps walking) while
+                // taking no visible space and painting nothing. The highway panel above
+                // stands in the slot instead.
+                className={
+                    highwayActive
+                        ? "no-scrollbar pointer-events-none absolute inset-x-3 top-3 h-px overflow-hidden opacity-0"
+                        : `no-scrollbar overflow-auto ${
+                              ready &&
+                              measureCount > 1 &&
+                              !listenPlayback.playing &&
+                              !matcher.practicing
+                                  ? "cursor-pointer"
+                                  : ""
+                          } ${slotSize}`
+                }
             />
             {loadError && (
                 <p className="p-2 text-sm text-red-600 dark:text-red-400">{m.score_load_error()}</p>
