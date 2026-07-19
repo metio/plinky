@@ -34,11 +34,28 @@
           }
         },
         {
-          "comment": "Every page that does not load the OSMD vendor chunk. The script cap is a tight ratchet on the shared/app code shipped to a normal page. Lighthouse builds a single locale (per-visitor weight); this cap sits just under the former all-locales figure and can tighten further toward the measured per-locale number.",
-          "matchingUrlPattern": "^(?!.*/play/).*$",
+          "comment": "Every indexable page that does not load the OSMD vendor chunk (the personal you/settings pages are matched separately below). The script cap is a tight ratchet on the shared/app code shipped to a normal page. Lighthouse builds a single locale (per-visitor weight); this cap sits just under the former all-locales figure and can tighten further toward the measured per-locale number.",
+          "matchingUrlPattern": "^(?!.*/(play|you|settings)/).*$",
           "assertions": {
             "categories:best-practices": ["error", { "minScore": 0.9 }],
             "categories:seo": ["error", { "minScore": 0.9 }],
+            "categories:performance": ["warn", { "minScore": 0.9 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+            "resource-summary:script:size": ["error", { "maxNumericValue": 235520 }],
+            "service-worker": "off",
+            "uses-responsive-images": "off",
+            "redirects-http": "off",
+            "is-on-https": "off",
+            "uses-http2": "off",
+            "canonical": "off"
+          }
+        },
+        {
+          "comment": "The personal/utility pages (You, Settings) carry a deliberate noindex, so Lighthouse's is-crawlable audit tanks their SEO category by design — turn that assertion off for them while keeping the same performance, layout-shift, best-practices, and script-size gates as the other non-OSMD pages. They stay in the audit list for that coverage.",
+          "matchingUrlPattern": ".*/(you|settings)/.*",
+          "assertions": {
+            "categories:best-practices": ["error", { "minScore": 0.9 }],
+            "categories:seo": "off",
             "categories:performance": ["warn", { "minScore": 0.9 }],
             "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
             "resource-summary:script:size": ["error", { "maxNumericValue": 235520 }],
