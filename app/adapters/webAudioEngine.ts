@@ -452,6 +452,23 @@ export const webAudioEngine: AudioEngine = {
             }
         }
     },
+    allNotesOff() {
+        const ctx = context();
+        if (ctx) {
+            // Ring each voice out fast so the panic is a clean stop, not a click, then
+            // drop it — the oscillators stop just after the short fade.
+            for (const voice of voices.values()) {
+                fadeVoice(ctx, voice, 0.08);
+            }
+        }
+        // Clear all state regardless of context so a later press starts fresh and no
+        // stale key/pedal flag keeps a future voice alive.
+        voices.clear();
+        keyDown.clear();
+        sustainDown = false;
+        softDown = false;
+        sostenutoHeld = new Set();
+    },
     click(time, kind, gain) {
         const ctx = context();
         if (ctx && gain > 0) {

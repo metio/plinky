@@ -19,6 +19,9 @@ export type FakeAudioEngine = AudioEngine & {
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
     resumed: number;
     unlocked: number;
+    // How many times the panic (allNotesOff) fired — a test asserts a play surface
+    // silences everything on teardown.
+    silenced: number;
     // The fake audio clock, advanced by the test.
     time: number;
 };
@@ -31,6 +34,7 @@ export function fakeAudioEngine(): FakeAudioEngine {
         clicks: [],
         resumed: 0,
         unlocked: 0,
+        silenced: 0,
         time: 0,
         now() {
             return engine.time;
@@ -52,6 +56,9 @@ export function fakeAudioEngine(): FakeAudioEngine {
         },
         setPedal(pedal, down) {
             engine.pedals.push({ pedal, down });
+        },
+        allNotesOff() {
+            engine.silenced += 1;
         },
         click(time, kind, gain) {
             engine.clicks.push({ time, kind, gain });

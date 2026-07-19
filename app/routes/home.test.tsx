@@ -46,6 +46,7 @@ describe("Home", () => {
             press: () => {},
             release: () => {},
             setPedal: () => {},
+            allNotesOff: () => {},
             click: () => {},
         };
         renderWithServices(

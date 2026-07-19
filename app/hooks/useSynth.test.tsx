@@ -49,6 +49,14 @@ describe("useSynth", () => {
         expect(audio.strikes).toHaveLength(0);
     });
 
+    it("panics all voices through the engine, even muted", () => {
+        // silenceAll clears voice and pedal state, which must happen regardless of the
+        // volume preference — a muted session opened no voice, but the panic still runs.
+        const { audio, synth } = harness({ sound: false });
+        synth.silenceAll();
+        expect(audio.silenced).toBe(1);
+    });
+
     it("stays silent at volume 0", () => {
         // An exponential gain ramp to 0 is a RangeError in the engine, so a
         // zero-gain strike must never reach it.

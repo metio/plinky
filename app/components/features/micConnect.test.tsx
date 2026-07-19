@@ -71,6 +71,7 @@ describe("MicConnect", () => {
             press: () => {},
             release: () => {},
             setPedal: () => {},
+            allNotesOff: () => {},
             click: () => {},
             recentlyStruck: (note: number) => note === 60,
         };

@@ -23,6 +23,9 @@ export type UseSynthResult = {
     releaseNote: (note: number, holdScale?: number) => void;
     // Move one of the three pedals for live voices.
     setPedal: (pedal: PedalKind, down: boolean) => void;
+    // Silence every live voice and drop all held/pedal state — the panic a play surface
+    // calls on teardown so a guide voice can never ring on past the run.
+    silenceAll: () => void;
 };
 
 // Decides what a note should sound like — loudness from velocity and the volume
@@ -87,11 +90,14 @@ export function useSynth(): UseSynthResult {
         (pedal: PedalKind, down: boolean) => audio.setPedal(pedal, down),
         [audio],
     );
+    // Reaches the engine regardless of the volume preference — it clears voices and
+    // pedal state, which must happen even for a muted session that opened none.
+    const silenceAll = useCallback(() => audio.allNotesOff(), [audio]);
 
     // A stable result so callers can list the synth in an effect's dependencies without the
     // effect re-firing every render.
     return useMemo(
-        () => ({ playNote, pressNote, releaseNote, setPedal }),
-        [playNote, pressNote, releaseNote, setPedal],
+        () => ({ playNote, pressNote, releaseNote, setPedal, silenceAll }),
+        [playNote, pressNote, releaseNote, setPedal, silenceAll],
     );
 }

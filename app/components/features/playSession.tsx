@@ -420,8 +420,16 @@ function usePlaySessionValue({
                 // the pedal does), so the guide tone follows the player's own articulation:
                 // a quick release sounds staccato, a long hold sustains, and it strikes as
                 // hard as the note was played.
+                //
+                // Only for a pitch whose key is STILL down. A position clears when its last
+                // pitch is played, but the matcher never sees note-offs, so a chord rolled
+                // (or the forgiving skip crediting an earlier hit) can clear while an earlier
+                // pitch's key is already up. Pressing a voice for that pitch would open one
+                // with no key-up left to release it — it would ring on forever.
                 for (const pitch of info.pitches) {
-                    synth.pressNote(pitch, { velocity: info.velocity });
+                    if (heldNotes.current.has(pitch)) {
+                        synth.pressNote(pitch, { velocity: info.velocity });
+                    }
                 }
             }
             // A hidden note earned its reveal — lift the blank before the green
@@ -737,8 +745,17 @@ function usePlaySessionValue({
             matcher.stop();
             // Stepping out mid-run must never leave the resting score half blank.
             hidden.restore();
+            // Silence any guide voice still ringing — leaving the surface ends the run,
+            // so nothing should sound on. A safety net over the held-key press gate: even
+            // an orphaned or pedal-sustained voice can't outlive the surface.
+            synth.silenceAll();
         }
     }, [fullscreen]);
+
+    // The audio engine's voices live for the whole process (a module singleton), so
+    // navigating away from the play route must silence them too — the effect above only
+    // fires on a fullscreen change, never on unmount.
+    useEffect(() => () => synth.silenceAll(), [synth]);
 
     // Playing goes full screen on every device. The play surface holds controls that live
     // only there — Listen, the finger-number and follow-the-note toggles, the on-staff

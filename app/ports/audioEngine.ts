@@ -49,6 +49,11 @@ export interface AudioEngine {
     // Move one of the three pedals. Sustain holds every released voice, sostenuto holds only
     // the notes sounding when it was pressed, and soft gentles notes struck while it's down.
     setPedal(pedal: PedalKind, down: boolean): void;
+    // Silence every live voice at once and drop all held-key and pedal state — a panic for
+    // when a play surface tears down or a run ends, so no voice can ring on. The engine
+    // state is a process-lifetime singleton, so nothing else guarantees this on unmount or
+    // route change. Idempotent; safe with no audio context.
+    allNotesOff(): void;
     // A click at an absolute audio-clock time, `gain` already volume-adjusted.
     click(time: number, kind: ClickKind, gain: number): void;
     // Whether the engine synthesized this pitch recently enough that a
