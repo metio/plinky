@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Skraverede takter er sværere at spille — jo dybere rød, desto vanskeligere passage.",
   "mode_runs": "Forsøg",
   "video_orientation": "Videoformat",
+  "video_style": "Stil",
+  "video_format_staff": "Notesystem",
   "video_quality": "Kvalitet",
   "video_fps": "Billedhastighed",
   "video_show_score": "Noder",

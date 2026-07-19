@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Shaded bars are harder to finger — the deeper the red, the trickier the passage.",
   "mode_runs": "Runs",
   "video_orientation": "Video format",
+  "video_style": "Style",
+  "video_format_staff": "Staff",
   "video_quality": "Quality",
   "video_fps": "Frame rate",
   "video_show_score": "Score",

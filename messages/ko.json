@@ -560,6 +560,8 @@
   "fingering_heat_legend": "음영이 있는 마디는 운지가 더 어렵습니다 — 빨간색이 짙을수록 까다로운 부분입니다.",
   "mode_runs": "연주 기록",
   "video_orientation": "동영상 형식",
+  "video_style": "스타일",
+  "video_format_staff": "오선보",
   "video_quality": "화질",
   "video_fps": "프레임 속도",
   "video_show_score": "악보",

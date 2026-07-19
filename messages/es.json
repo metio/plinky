@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Los compases sombreados son más difíciles de digitar — cuanto más rojo, más complicado el pasaje.",
   "mode_runs": "Intentos",
   "video_orientation": "Formato de vídeo",
+  "video_style": "Estilo",
+  "video_format_staff": "Pentagrama",
   "video_quality": "Calidad",
   "video_fps": "Fotogramas",
   "video_show_score": "Partitura",

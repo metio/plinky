@@ -84,7 +84,10 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // The About page — the two founder cards and the "why we made it" note, plus its nine
 // strings inlined per locale — adds ~0.8 KB, measured at 577.8. 579 restores the margin.
-const BUDGET_TOTAL_KB = 579;
+//
+// The notes-highway (on-screen reading mode + highway video-export format, with its five
+// new strings inlined per locale) — adds ~0.5 KB, measured at 579.5. 580 restores the margin.
+const BUDGET_TOTAL_KB = 580;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -149,7 +152,13 @@ const BUDGET_TOTAL_KB = 579;
 // The About page — a prerendered route with the two founder cards, the heart-shaped footer
 // link into it, and the duet mark — adds ~1.6 KB of app code, measured at 267.6. 269 keeps
 // the margin.
-const BUDGET_APP_KB = 269;
+//
+// The notes-highway — the on-screen falling-blocks reading mode (shared key-lane geometry,
+// the matcher look-ahead, the NotesHighway panel) and the highway video-export format (the
+// pure highwayBlocks layout and the takeHighwayPainter, offset by extracting the video
+// painter's shared chrome/key helpers) plus its Style toggle and strings — adds ~1.5 KB of
+// app code, measured at 269.4. 270 keeps the margin.
+const BUDGET_APP_KB = 270;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

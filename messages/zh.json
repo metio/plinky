@@ -560,6 +560,8 @@
   "fingering_heat_legend": "着色的小节更难安排指法 — 红色越深，段落越棘手。",
   "mode_runs": "演奏记录",
   "video_orientation": "视频格式",
+  "video_style": "样式",
+  "video_format_staff": "五线谱",
   "video_quality": "画质",
   "video_fps": "帧率",
   "video_show_score": "乐谱",

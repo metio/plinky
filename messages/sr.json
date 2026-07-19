@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Осенчени тактови теже се свирају — што је црвена дубља, то је деоница захтевнија.",
   "mode_runs": "Извођења",
   "video_orientation": "Формат видеа",
+  "video_style": "Стил",
+  "video_format_staff": "Нотни систем",
   "video_quality": "Квалитет",
   "video_fps": "Број кадрова",
   "video_show_score": "Ноте",

@@ -8,7 +8,7 @@ import { useVideoExporter } from "../../contexts/services";
 import { downloadBlob } from "../../lib/download";
 import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
 import { takeFileStem } from "../../lib/takeFile";
-import { takeScenePainter } from "../../lib/videoPainter";
+import { takeHighwayPainter, takeScenePainter } from "../../lib/videoPainter";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
@@ -40,6 +40,9 @@ export function ExportVideoButton({
     const exporter = useVideoExporter();
     const [supported, setSupported] = useState(false);
     const [progress, setProgress] = useState<number | null>(null);
+    // Staff renders the notation (and/or keyboard); Highway drops the staff for
+    // Synthesia-style falling blocks over the keys.
+    const [format, setFormat] = useState<"staff" | "highway">("staff");
     const [orientation, setOrientation] = useState<"landscape" | "portrait">("landscape");
     const [quality, setQuality] = useState<keyof typeof SIZES>("720");
     const [fps, setFps] = useState<30 | 60>(30);
@@ -77,29 +80,39 @@ export function ExportVideoButton({
             const durationMs = videoDurationMs(notes);
             // The take's own notation, rendered off-screen and rasterized once, so
             // the video shows the sheet music with each note tinted as it sounds.
-            // A take the renderer can't draw exports keyboard-only instead.
-            const score = showScore ? await buildScoreSnapshot(take, original, treadmill) : null;
+            // A take the renderer can't draw exports keyboard-only instead. The
+            // highway format never uses the staff.
+            const score =
+                format === "staff" && showScore
+                    ? await buildScoreSnapshot(take, original, treadmill)
+                    : null;
+            const paint =
+                format === "highway"
+                    ? takeHighwayPainter({
+                          title,
+                          credit,
+                          notes,
+                          durationMs,
+                          width,
+                          height,
+                          showTitle,
+                          showWordmark,
+                      })
+                    : takeScenePainter({
+                          title,
+                          credit,
+                          notes,
+                          durationMs,
+                          width,
+                          height,
+                          score,
+                          keyboard: showKeyboard,
+                          treadmill,
+                          showTitle,
+                          showWordmark,
+                      });
             const blob = await exporter.export(
-                {
-                    width,
-                    height,
-                    fps,
-                    durationMs,
-                    paint: takeScenePainter({
-                        title,
-                        credit,
-                        notes,
-                        durationMs,
-                        width,
-                        height,
-                        score,
-                        keyboard: showKeyboard,
-                        treadmill,
-                        showTitle,
-                        showWordmark,
-                    }),
-                    notes,
-                },
+                { width, height, fps, durationMs, paint, notes },
                 setProgress,
             );
             downloadBlob(blob, "video/mp4", `${takeFileStem(title, take)}.mp4`);
@@ -114,6 +127,15 @@ export function ExportVideoButton({
         // clearly grouped card below.
         <Disclosure summary={m.video_export()}>
             <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-gray-200 p-2 dark:border-gray-800">
+                <SegmentedControl
+                    options={[
+                        { id: "staff", label: m.video_format_staff() },
+                        { id: "highway", label: m.highway_toggle() },
+                    ]}
+                    value={format}
+                    onChange={(id) => setFormat(id as "staff" | "highway")}
+                    label={m.video_style()}
+                />
                 <SegmentedControl
                     options={[
                         { id: "landscape", label: "16:9" },
@@ -141,23 +163,33 @@ export function ExportVideoButton({
                     onChange={(id) => setFps(Number(id) as 30 | 60)}
                     label={m.video_fps()}
                 />
-                <Switch checked={showScore} onChange={setShowScore} label={m.video_show_score()} />
-                {showScore && (
-                    <Switch
-                        checked={treadmill}
-                        onChange={setTreadmill}
-                        label={m.treadmill_toggle()}
-                    />
-                )}
-                {/* Landscape can drop either layer (never both — with the score off the
-                keyboard is all that's left); portrait is score-only by design, so
-                the keyboard switch only appears where it has an effect. */}
-                {orientation === "landscape" && showScore && (
-                    <Switch
-                        checked={showKeyboard}
-                        onChange={setShowKeyboard}
-                        label={m.video_show_keyboard()}
-                    />
+                {/* Staff-format layers only — the highway is always blocks over the
+                keyboard, so the score/treadmill/keyboard switches don't apply. */}
+                {format === "staff" && (
+                    <>
+                        <Switch
+                            checked={showScore}
+                            onChange={setShowScore}
+                            label={m.video_show_score()}
+                        />
+                        {showScore && (
+                            <Switch
+                                checked={treadmill}
+                                onChange={setTreadmill}
+                                label={m.treadmill_toggle()}
+                            />
+                        )}
+                        {/* Landscape can drop either layer (never both — with the score
+                        off the keyboard is all that's left); portrait is score-only by
+                        design, so the keyboard switch only appears where it has an effect. */}
+                        {orientation === "landscape" && showScore && (
+                            <Switch
+                                checked={showKeyboard}
+                                onChange={setShowKeyboard}
+                                label={m.video_show_keyboard()}
+                            />
+                        )}
+                    </>
                 )}
                 <Switch checked={showTitle} onChange={setShowTitle} label={m.video_show_title()} />
                 <Switch

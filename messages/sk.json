@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Podfarbené takty sa hrajú ťažšie — čím sýtejšia červená, tým zradnejšia pasáž.",
   "mode_runs": "Pokusy",
   "video_orientation": "Formát videa",
+  "video_style": "Štýl",
+  "video_format_staff": "Notová osnova",
   "video_quality": "Kvalita",
   "video_fps": "Snímková frekvencia",
   "video_show_score": "Noty",

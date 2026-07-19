@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Τα σκιασμένα μέτρα είναι πιο δύσκολα — όσο πιο βαθύ το κόκκινο, τόσο πιο απαιτητικό το πέρασμα.",
   "mode_runs": "Εκτελέσεις",
   "video_orientation": "Μορφή βίντεο",
+  "video_style": "Στυλ",
+  "video_format_staff": "Πεντάγραμμο",
   "video_quality": "Ποιότητα",
   "video_fps": "Ρυθμός καρέ",
   "video_show_score": "Παρτιτούρα",

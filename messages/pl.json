@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Zacieniowane takty są trudniejsze do zagrania — im głębsza czerwień, tym bardziej podchwytliwy fragment.",
   "mode_runs": "Przebiegi",
   "video_orientation": "Format wideo",
+  "video_style": "Styl",
+  "video_format_staff": "Pięciolinia",
   "video_quality": "Jakość",
   "video_fps": "Klatki na sekundę",
   "video_show_score": "Nuty",

@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { attributionFor } from "./attribution";
 import {
     creditLine,
+    highwayBlocks,
     playedStepCount,
     sceneKeys,
     sceneRange,
@@ -71,6 +72,43 @@ describe("creditLine", () => {
         const attributed = creditLine("Menuet", attributionFor({ license: "CC-BY-4.0" }));
         expect(attributed).not.toContain("Public domain");
         expect(attributed).toMatch(/CC.BY/i);
+    });
+});
+
+describe("highwayBlocks", () => {
+    const keys = sceneKeys(60, 83);
+    const note = (pitch: number, startMs: number, durationMs: number) => ({
+        pitch,
+        startMs,
+        durationMs,
+    });
+
+    it("places a block in its key's lane, sized by duration", () => {
+        // A note at 60 starting 1000ms ahead, lasting 500ms, window 2000ms.
+        const [block] = highwayBlocks([note(60, 1000, 500)], keys, 0, 2000);
+        const lane = keys.find((k) => k.pitch === 60)!;
+        expect(block!.x).toBe(lane.x);
+        expect(block!.width).toBe(lane.width);
+        expect(block!.onsetFrac).toBeCloseTo(0.5); // 1000/2000
+        expect(block!.endFrac).toBeCloseTo(0.75); // 1500/2000
+    });
+
+    it("hides a note that has fully passed the keys and one not yet in the window", () => {
+        const notes = [note(60, 0, 200), note(62, 5000, 200)];
+        // At t=400 the first note (ended at 200) is past; the second (at 5000) is
+        // beyond a 2000ms window.
+        expect(highwayBlocks(notes, keys, 400, 2000)).toEqual([]);
+    });
+
+    it("keeps a currently-sounding note visible with its onset below the line", () => {
+        // Struck at 1000, 800ms long; at t=1200 it is sounding (onset passed).
+        const [block] = highwayBlocks([note(60, 1000, 800)], keys, 1200, 2000);
+        expect(block!.onsetFrac).toBeLessThan(0); // past the strike line
+        expect(block!.endFrac).toBeGreaterThan(0); // tail still above it
+    });
+
+    it("drops a pitch with no key in range", () => {
+        expect(highwayBlocks([note(200, 0, 100)], keys, 0, 2000)).toEqual([]);
     });
 });
 

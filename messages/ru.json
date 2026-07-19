@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Затенённые такты сложнее для аппликатуры — чем гуще красный, тем каверзнее пассаж.",
   "mode_runs": "Прогоны",
   "video_orientation": "Формат видео",
+  "video_style": "Стиль",
+  "video_format_staff": "Нотный стан",
   "video_quality": "Качество",
   "video_fps": "Частота кадров",
   "video_show_score": "Ноты",

@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Skuggade takter är svårare att spela — ju djupare rött, desto knepigare passage.",
   "mode_runs": "Försök",
   "video_orientation": "Videoformat",
+  "video_style": "Stil",
+  "video_format_staff": "Notsystem",
   "video_quality": "Kvalitet",
   "video_fps": "Bildfrekvens",
   "video_show_score": "Noter",

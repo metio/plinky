@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Os compassos sombreados são mais difíceis de dedilhar — quanto mais forte o vermelho, mais complicada a passagem.",
   "mode_runs": "Execuções",
   "video_orientation": "Formato do vídeo",
+  "video_style": "Estilo",
+  "video_format_staff": "Pauta",
   "video_quality": "Qualidade",
   "video_fps": "Taxa de quadros",
   "video_show_score": "Partitura",

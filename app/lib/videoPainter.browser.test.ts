@@ -4,7 +4,7 @@
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import { beforeAll, describe, expect, it } from "vitest";
 import { LEAD_IN_MS } from "../../core/videoFrames";
-import { FONT_FAMILY, takeScenePainter } from "./videoPainter";
+import { FONT_FAMILY, takeHighwayPainter, takeScenePainter } from "./videoPainter";
 
 const WIDTH = 640;
 const HEIGHT = 360;
@@ -306,5 +306,49 @@ describe("takeScenePainter with a score panel", () => {
         const before = countGreyPixels(paintWithScore(0));
         const after = countGreyPixels(paintWithScore(LEAD_IN_MS + 100));
         expect(before).toBeGreaterThan(after + 100);
+    });
+});
+
+describe("takeHighwayPainter", () => {
+    const paintHighwayAt = (timeMs: number): OffscreenCanvasRenderingContext2D => {
+        const canvas = new OffscreenCanvas(WIDTH, HEIGHT);
+        const context = canvas.getContext("2d")!;
+        takeHighwayPainter({
+            title: "Menuet",
+            credit: "Menuet · J. S. Bach · CC0",
+            notes: NOTES,
+            durationMs: LEAD_IN_MS + 4_000,
+            width: WIDTH,
+            height: HEIGHT,
+        })(context, timeMs);
+        return context;
+    };
+
+    // Painted (non-background) pixels in the fall region between the title and
+    // the keys (0.3H..0.72H) — the falling blocks live here.
+    const fallRegion = (context: OffscreenCanvasRenderingContext2D): number => {
+        const top = Math.round(HEIGHT * 0.32);
+        const { data } = context.getImageData(0, top, WIDTH, Math.round(HEIGHT * 0.36));
+        let painted = 0;
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i]! > 0x40 || data[i + 1]! > 0x40 || data[i + 2]! > 0x40) {
+                painted++;
+            }
+        }
+        return painted;
+    };
+
+    it("shows a falling block while a note approaches, and clears it once past", () => {
+        // The first note lands at LEAD_IN_MS; 500ms before, its block is falling.
+        const approaching = fallRegion(paintHighwayAt(LEAD_IN_MS - 500));
+        // By 3000ms after the notes' clock start both notes have passed the keys.
+        const empty = fallRegion(paintHighwayAt(LEAD_IN_MS + 3_000));
+        expect(approaching).toBeGreaterThan(empty + 500);
+    });
+
+    it("lights the key when its note lands on the strike line", () => {
+        const during = countAccentPixels(paintHighwayAt(LEAD_IN_MS + 40));
+        const silent = countAccentPixels(paintHighwayAt(LEAD_IN_MS + 1_700));
+        expect(during).toBeGreaterThan(silent + 300);
     });
 });

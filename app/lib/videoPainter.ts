@@ -4,6 +4,7 @@
 import type { RecordedNote } from "../../core/composition";
 import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";
 import {
+    highwayBlocks,
     playedStepCount,
     type SceneKey,
     sceneKeys,
@@ -119,6 +120,97 @@ function ellipsize(context: Context2D, text: string, room: number): string {
     return `${text.slice(0, keep)}…`;
 }
 
+// The stage furniture shared by every format: the piece's title, the wordmark,
+// and the credit line — measured and placed the same way whatever fills the
+// middle (staff or highway).
+type ChromeConfig = {
+    title: string;
+    credit: string;
+    width: number;
+    height: number;
+    unit: number;
+    margin: number;
+    durationMs: number;
+    showTitle: boolean;
+    showWordmark: boolean;
+};
+
+// The dark background, the optional title (left) and wordmark (right), and the
+// progress rail between them and the stage.
+function paintChrome(context: Context2D, cfg: ChromeConfig, timeMs: number): void {
+    const { title, width, height, unit, margin, durationMs, showTitle, showWordmark } = cfg;
+    context.fillStyle = BACKGROUND;
+    context.fillRect(0, 0, width, height);
+    // The wordmark measures first so the title knows where it must stop — on a
+    // narrow portrait frame a long title would otherwise run under it. With the
+    // wordmark off, the title reclaims that room.
+    context.font = fontAt(500, 0.035, unit);
+    const wordmarkWidth = showWordmark ? context.measureText("plinky.fun").width : 0;
+    if (showTitle) {
+        context.textAlign = "left";
+        context.textBaseline = "top";
+        context.fillStyle = INK;
+        context.font = fontAt(600, 0.06, unit);
+        const titleRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
+        context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
+    }
+    if (showWordmark) {
+        context.textAlign = "right";
+        context.textBaseline = "top";
+        context.fillStyle = MUTED;
+        context.font = fontAt(500, 0.035, unit);
+        context.fillText("plinky.fun", width - margin, height * 0.09);
+    }
+    const railY = height * 0.26;
+    context.fillStyle = "#1f2937";
+    context.fillRect(margin, railY, width - margin * 2, 4);
+    context.fillStyle = ACCENT;
+    context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
+}
+
+// The provenance line along the foot — a shared file carries its credit.
+function paintCredit(context: Context2D, cfg: ChromeConfig): void {
+    context.textAlign = "left";
+    context.textBaseline = "alphabetic";
+    context.fillStyle = MUTED;
+    context.font = fontAt(400, 0.032, cfg.unit);
+    context.fillText(cfg.credit, cfg.margin, cfg.height * 0.95);
+}
+
+// Where the keyboard sits, so one key-drawing routine serves both formats.
+type KeyLayout = { margin: number; width: number; keyboardTop: number; keyboardHeight: number };
+
+// A sounding key is the resting colour blended toward the accent by its glow —
+// full at the press, decaying while held — so a repeated press of the same key
+// visibly re-lights it instead of merging into one long hold.
+function paintKey(context: Context2D, key: SceneKey, glow: number | null, l: KeyLayout): void {
+    const x = l.margin + key.x * (l.width - l.margin * 2);
+    const w = key.width * (l.width - l.margin * 2);
+    const h = key.black ? l.keyboardHeight * 0.62 : l.keyboardHeight;
+    const rest = key.black ? BLACK_KEY : WHITE_KEY;
+    context.fillStyle = glow === null ? rest : mixHex(rest, ACCENT, glow);
+    context.beginPath();
+    context.roundRect(x + w * 0.04, l.keyboardTop, w * 0.92, h, 4);
+    context.fill();
+}
+
+// The freshest press glow per sounding pitch, so a re-press during a long hold
+// still snaps back to full instead of merging into the decaying hold.
+function keyGlows(down: readonly { pitch: number; heldMs: number }[]): Map<number, number> {
+    const held = new Map<number, number>();
+    for (const entry of down) {
+        const freshest = held.get(entry.pitch);
+        if (freshest === undefined || entry.heldMs < freshest) {
+            held.set(entry.pitch, entry.heldMs);
+        }
+    }
+    const glows = new Map<number, number>();
+    for (const [pitch, heldMs] of held) {
+        glows.set(pitch, pressGlow(heldMs));
+    }
+    return glows;
+}
+
 export function takeScenePainter({
     title,
     credit,
@@ -149,94 +241,46 @@ export function takeScenePainter({
     // The run's distinct onsets in playing order — step i of the snapshot sounded
     // at onsets[i], mirroring how the matcher and the take both count steps.
     const onsets = [...new Set(notes.map((note) => note.startMs))].sort((a, b) => a - b);
-
-    // A sounding key is painted as the resting colour blended toward the accent
-    // by its glow — full at the press, decaying while held — so a repeated press
-    // of the same key visibly re-lights it instead of merging into one long hold.
-    const drawKey = (context: Context2D, key: SceneKey, glow: number | null) => {
-        const x = margin + key.x * (width - margin * 2);
-        const w = key.width * (width - margin * 2);
-        const h = key.black ? keyboardHeight * 0.62 : keyboardHeight;
-        const rest = key.black ? BLACK_KEY : WHITE_KEY;
-        context.fillStyle = glow === null ? rest : mixHex(rest, ACCENT, glow);
-        context.beginPath();
-        context.roundRect(x + w * 0.04, keyboardTop, w * 0.92, h, 4);
-        context.fill();
+    const cfg: ChromeConfig = {
+        title,
+        credit,
+        width,
+        height,
+        unit,
+        margin,
+        durationMs,
+        showTitle,
+        showWordmark,
     };
+    const keyLayout: KeyLayout = { margin, width, keyboardTop, keyboardHeight };
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
-        context.fillStyle = BACKGROUND;
-        context.fillRect(0, 0, width, height);
-
-        // The wordmark measures first so the title knows where it must stop —
-        // on a narrow portrait frame a long title would otherwise run under it.
-        // With the wordmark off, the title reclaims that room.
-        context.font = fontAt(500, 0.035, unit);
-        const wordmarkWidth = showWordmark ? context.measureText("plinky.fun").width : 0;
-        if (showTitle) {
-            context.textAlign = "left";
-            context.textBaseline = "top";
-            context.fillStyle = INK;
-            context.font = fontAt(600, 0.06, unit);
-            const titleRoom = width - margin * 2 - wordmarkWidth - (showWordmark ? unit * 0.04 : 0);
-            context.fillText(ellipsize(context, title, titleRoom), margin, height * 0.08);
-        }
-        if (showWordmark) {
-            context.textAlign = "right";
-            context.textBaseline = "top";
-            context.fillStyle = MUTED;
-            context.font = fontAt(500, 0.035, unit);
-            context.fillText("plinky.fun", width - margin, height * 0.09);
-        }
-
-        // The progress rail between title and keys.
-        const railY = height * 0.26;
-        context.fillStyle = "#1f2937";
-        context.fillRect(margin, railY, width - margin * 2, 4);
-        context.fillStyle = ACCENT;
-        context.fillRect(margin, railY, (width - margin * 2) * (timeMs / durationMs), 4);
+        paintChrome(context, cfg, timeMs);
 
         if (score) {
             drawScore(context, score, frame.currentOnsetMs, timeMs);
         }
 
         if (scoreOnly) {
-            drawCredit(context);
+            paintCredit(context, cfg);
             return;
         }
 
         // White keys first so the black keys straddle on top; sounding keys lit
         // by the freshest press of their pitch, so a re-press during a long hold
         // still snaps back to full.
-        const held = new Map<number, number>();
-        for (const entry of frame.down) {
-            const freshest = held.get(entry.pitch);
-            if (freshest === undefined || entry.heldMs < freshest) {
-                held.set(entry.pitch, entry.heldMs);
-            }
-        }
-        const glowOf = (pitch: number) => {
-            const heldMs = held.get(pitch);
-            return heldMs === undefined ? null : pressGlow(heldMs);
-        };
+        const glows = keyGlows(frame.down);
+        const glowOf = (pitch: number) => glows.get(pitch) ?? null;
         for (const key of keys.filter((entry) => !entry.black)) {
-            drawKey(context, key, glowOf(key.pitch));
+            paintKey(context, key, glowOf(key.pitch), keyLayout);
         }
         for (const key of keys.filter((entry) => entry.black)) {
-            drawKey(context, key, glowOf(key.pitch));
+            paintKey(context, key, glowOf(key.pitch), keyLayout);
         }
 
-        drawCredit(context);
+        paintCredit(context, cfg);
     };
-
-    function drawCredit(context: Context2D) {
-        context.textAlign = "left";
-        context.textBaseline = "alphabetic";
-        context.fillStyle = MUTED;
-        context.font = fontAt(400, 0.032, unit);
-        context.fillText(credit, margin, height * 0.95);
-    }
 
     // The notation panel: a light card holding a window of the score image that
     // follows the current step down the page, with every played step's noteheads
@@ -318,4 +362,96 @@ export function takeScenePainter({
         context.restore();
         context.globalAlpha = 1;
     }
+}
+
+// A deep-to-accent block colour so a note reads as descending "into" the strike
+// line, brightening as it lands.
+const HIGHWAY_FAR = "#3730a3";
+// How far ahead (ms on the notes' clock) a note first appears at the top of the
+// fall region before it lands on the keys.
+const HIGHWAY_WINDOW_MS = 2_500;
+
+// The notes-highway video: falling blocks descend their key's lane and land on
+// the lit keyboard at the moment they sound — the video twin of the on-screen
+// highway, but time-based (a take carries every note's onset and duration, so a
+// block falls in real time and its height is the note's real length). No staff;
+// the keyboard sits at the foot with the blocks above it. The take records no
+// hand, so blocks share one accent colour rather than the on-screen two.
+export function takeHighwayPainter({
+    title,
+    credit,
+    notes,
+    durationMs,
+    width,
+    height,
+    showTitle = true,
+    showWordmark = true,
+}: {
+    title: string;
+    credit: string;
+    notes: RecordedNote[];
+    durationMs: number;
+    width: number;
+    height: number;
+    showTitle?: boolean;
+    showWordmark?: boolean;
+}): (context: Context2D, timeMs: number) => void {
+    const { from, to } = sceneRange(notes.map((note) => note.pitch));
+    const keys = sceneKeys(from, to);
+    const margin = Math.round(width * 0.05);
+    const unit = Math.min(width, height);
+    // The keyboard sits at the foot; the blocks fall through the band above it,
+    // from just below the title down to the keys' top (the strike line).
+    const keyboardTop = height * 0.72;
+    const keyboardHeight = height * 0.24;
+    const laneTop = height * 0.3;
+    const regionHeight = keyboardTop - laneTop;
+    const cfg: ChromeConfig = {
+        title,
+        credit,
+        width,
+        height,
+        unit,
+        margin,
+        durationMs,
+        showTitle,
+        showWordmark,
+    };
+    const keyLayout: KeyLayout = { margin, width, keyboardTop, keyboardHeight };
+
+    return (context, timeMs) => {
+        const frame = frameAt(notes, timeMs);
+        const clock = timeMs - LEAD_IN_MS;
+        paintChrome(context, cfg, timeMs);
+
+        // The falling blocks: each note's lane, top at its far (end) edge, bottom
+        // at its onset edge clamped to the strike line, brightening as it lands.
+        for (const block of highwayBlocks(notes, keys, clock, HIGHWAY_WINDOW_MS)) {
+            const x = margin + block.x * (width - margin * 2);
+            const w = block.width * (width - margin * 2);
+            const top = keyboardTop - Math.min(1, block.endFrac) * regionHeight;
+            const bottom = keyboardTop - Math.max(0, block.onsetFrac) * regionHeight;
+            const nearness = Math.max(0, Math.min(1, 1 - block.onsetFrac));
+            context.fillStyle = mixHex(HIGHWAY_FAR, ACCENT, nearness);
+            context.beginPath();
+            context.roundRect(x + w * 0.04, top, w * 0.92, Math.max(2, bottom - top), 4);
+            context.fill();
+        }
+
+        // The strike line where blocks meet the keys.
+        context.fillStyle = "#334155";
+        context.fillRect(margin, keyboardTop - 2, width - margin * 2, 2);
+
+        // The keyboard, sounding keys lit by their freshest press.
+        const glows = keyGlows(frame.down);
+        const glowOf = (pitch: number) => glows.get(pitch) ?? null;
+        for (const key of keys.filter((entry) => !entry.black)) {
+            paintKey(context, key, glowOf(key.pitch), keyLayout);
+        }
+        for (const key of keys.filter((entry) => entry.black)) {
+            paintKey(context, key, glowOf(key.pitch), keyLayout);
+        }
+
+        paintCredit(context, cfg);
+    };
 }

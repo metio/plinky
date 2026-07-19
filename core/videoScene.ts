@@ -69,6 +69,49 @@ export function sceneKeys(from: number, to: number): SceneKey[] {
     return keys;
 }
 
+// A note in flight on the notes-highway video: its key's lane (x/width in 0..1,
+// from sceneKeys) and where its ends sit as fractions of the look-ahead window —
+// 0 at the strike line (the keys, "now"), 1 at the far edge (windowMs ahead).
+// `onsetFrac` is the leading edge that lands first (the note's start), `endFrac`
+// the trailing edge (start + duration), so a longer note is a taller block. A
+// sounding note has onsetFrac < 0 (already past the line); the painter clamps to
+// the drawable region.
+export type HighwayBlock = {
+    pitch: number;
+    x: number;
+    width: number;
+    onsetFrac: number;
+    endFrac: number;
+};
+
+// The notes visible on the highway at time `tMs` (the notes' own clock): those
+// whose block overlaps the window [line, windowMs ahead] — not yet fully past the
+// keys (endFrac > 0) and already descending into view (onsetFrac < 1). Time-based,
+// so blocks fall and are sized by real duration, unlike the position-indexed
+// on-screen highway.
+export function highwayBlocks(
+    notes: readonly { pitch: number; startMs: number; durationMs: number }[],
+    keys: readonly SceneKey[],
+    tMs: number,
+    windowMs: number,
+): HighwayBlock[] {
+    const lane = new Map(keys.map((key) => [key.pitch, key]));
+    const blocks: HighwayBlock[] = [];
+    for (const note of notes) {
+        const key = lane.get(note.pitch);
+        if (!key) {
+            continue;
+        }
+        const onsetFrac = (note.startMs - tMs) / windowMs;
+        const endFrac = (note.startMs + note.durationMs - tMs) / windowMs;
+        if (endFrac <= 0 || onsetFrac >= 1) {
+            continue;
+        }
+        blocks.push({ pitch: note.pitch, x: key.x, width: key.width, onsetFrac, endFrac });
+    }
+    return blocks;
+}
+
 // The credit line burnt into the video: the composer, the source, and the
 // licence — a shared file must carry the piece's provenance with it, and the
 // wordmark's "plinky.fun" is rendered separately by the painter.

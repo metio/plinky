@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Skraverte takter er vanskeligere å spille — jo dypere rødt, desto mer krevende passasje.",
   "mode_runs": "Forsøk",
   "video_orientation": "Videoformat",
+  "video_style": "Stil",
+  "video_format_staff": "Notesystem",
   "video_quality": "Kvalitet",
   "video_fps": "Bildefrekvens",
   "video_show_score": "Noter",

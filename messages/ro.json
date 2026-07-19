@@ -560,6 +560,8 @@
   "fingering_heat_legend": "Măsurile umbrite sunt mai greu de cântat — cu cât roșul e mai intens, cu atât pasajul e mai dificil.",
   "mode_runs": "Interpretări",
   "video_orientation": "Format video",
+  "video_style": "Stil",
+  "video_format_staff": "Portativ",
   "video_quality": "Calitate",
   "video_fps": "Rată de cadre",
   "video_show_score": "Partitură",

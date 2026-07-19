@@ -187,7 +187,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   tinting as it sounds, above the keyboard where each press lights its key in full
   and fades while held, so even fast repeats read clearly — with the piece's title, composer
   and licence burnt in, ready for any chat or feed — offered on browsers that can encode
-  one, Chrome and friends today — pick **16:9 or 9:16** right beside Save, and switch the
+  one, Chrome and friends today — pick **16:9 or 9:16** right beside Save, choose the
+  **style** — the **Staff** sheet music or a **notes-highway** of blocks falling onto the
+  keys (Synthesia-style, sized by how long each note is held) — and switch the
   **title** or the **plinky.fun watermark** off if you'd rather (the composer-and-licence
   credit always stays)), **challenge a
   friend** to race it by link, or delete it. From the top of the tab you can **challenge
