@@ -61,6 +61,10 @@ describe("NewsBanner", () => {
         const scheduler = fakeScheduler();
         renderWithServices(<NewsBanner />, { news: fakeNews([first, second]), scheduler });
         await screen.findByAltText("First");
+        // The auto-advance timer is armed in a passive effect once the items load;
+        // flush that effect before driving the clock, or the advance can cross an
+        // interval that was never armed and nothing rotates.
+        await act(async () => {});
         act(() => scheduler.advance(ROTATE_MS));
         expect(screen.queryByAltText("Second")).not.toBeNull();
         expect(screen.queryByAltText("First")).toBeNull();
@@ -70,8 +74,11 @@ describe("NewsBanner", () => {
         const scheduler = fakeScheduler();
         renderWithServices(<NewsBanner />, { news: fakeNews([first, second]), scheduler });
         await screen.findByAltText("First");
+        await act(async () => {});
         act(() => scheduler.advance(ROTATE_MS * 2));
+        // Two intervals: forward to the second item and wrap back to the first.
         expect(screen.queryByAltText("First")).not.toBeNull();
+        expect(screen.queryByAltText("Second")).toBeNull();
     });
 
     it("stops auto-advancing once the reader navigates by chevron", async () => {
