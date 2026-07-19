@@ -38,6 +38,7 @@ function expectValid(prefs: Prefs): void {
     expect(typeof prefs.metronomeAccent).toBe("boolean");
     expect(typeof prefs.metronomeAdaptive).toBe("boolean");
     expect(typeof prefs.treadmill).toBe("boolean");
+    expect(typeof prefs.highway).toBe("boolean");
     expect(typeof prefs.raceGhost).toBe("boolean");
     expect(typeof prefs.hiddenNotes).toBe("boolean");
 
@@ -124,6 +125,7 @@ describe("parsePrefs properties", () => {
                         "metronomeAccent",
                         "metronomeAdaptive",
                         "treadmill",
+                        "highway",
                         "raceGhost",
                         "hiddenNotes",
                         "revealTries",

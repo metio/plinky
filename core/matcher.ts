@@ -69,6 +69,22 @@ export function expectedPitches(state: MatcherState): number[] {
     return state.steps[state.index]?.pitches ?? [];
 }
 
+// The next few positions to play, from the current one onward — what a look-ahead
+// view (the notes highway) shows above the keys. Each carries its whole-run index
+// so a view can key blocks stably as the run advances, and the staves it sits on
+// so a two-hand piece can colour the hands apart. Fewer than `count` near the end.
+export type UpcomingStep = { index: number; pitches: number[]; staves: number[] };
+
+export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[] {
+    return state.steps
+        .slice(state.index, state.index + count)
+        .map((step, offset) => ({
+            index: state.index + offset,
+            pitches: step.pitches,
+            staves: step.staves,
+        }));
+}
+
 // The 0-based bar the current position sits in; the final bar once complete.
 export function currentBar(state: MatcherState): number {
     const step = state.steps[Math.min(state.index, state.steps.length - 1)];

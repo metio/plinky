@@ -22,6 +22,20 @@ const EMOJI_STORIES = new Set([
     "discoveryChecklist.stories.tsx > Partly Done",
 ]);
 
+// Stories whose thin, absolutely-positioned colour blocks rasterise
+// machine-dependently: in light mode the headless-Chromium GPU path clips some
+// saturated indigo/teal fills through OKLCH→sRGB with the blue channel zeroed
+// (rendering them olive), and which blocks it hits depends on their sub-pixel Y
+// position, not their colour class — so a committed baseline would be both wrong
+// to the eye and unstable across machines. Real browsers render them correctly.
+// These stories still render, run and count for coverage; only the pixel
+// comparison is skipped.
+const RASTER_UNSTABLE_STORIES = new Set([
+    "notesHighway.stories.tsx > Right Hand",
+    "notesHighway.stories.tsx > Two Hands",
+    "notesHighway.stories.tsx > Chord",
+]);
+
 // Resolves once the browser has painted pending style and layout work: the
 // first frame runs after the next paint, the second confirms it is on screen.
 const painted = () =>
@@ -38,7 +52,7 @@ const painted = () =>
 // `npm run test:storybook -- -u`.
 afterEach(async (ctx) => {
     const key = `${ctx.task.file.name.split("/").pop()} > ${ctx.task.name}`;
-    if (EMOJI_STORIES.has(key)) {
+    if (EMOJI_STORIES.has(key) || RASTER_UNSTABLE_STORIES.has(key)) {
         return;
     }
     // fonts.ready resolves once no loads are *pending* — a face nothing has

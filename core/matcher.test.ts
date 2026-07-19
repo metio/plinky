@@ -11,6 +11,7 @@ import {
     STAFF_FOR,
     startMatch,
     stepRange,
+    upcomingSteps,
 } from "./matcher";
 
 const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep => ({
@@ -32,6 +33,35 @@ describe("startMatch", () => {
     it("expects the first step's pitches", () => {
         const state = startMatch([step([60]), step([62])]);
         expect(expectedPitches(state)).toEqual([60]);
+    });
+});
+
+describe("upcomingSteps", () => {
+    it("returns the next positions from the current one with run indices and staves", () => {
+        const state = startMatch([
+            step([60], { staves: [0] }),
+            step([48], { staves: [1] }),
+            step([64, 67], { staves: [0] }),
+        ]);
+        expect(upcomingSteps(state, 2)).toEqual([
+            { index: 0, pitches: [60], staves: [0] },
+            { index: 1, pitches: [48], staves: [1] },
+        ]);
+    });
+
+    it("advances its window and its indices as the run progresses", () => {
+        const start = startMatch([step([60]), step([62]), step([64])]);
+        const { state: next } = matchNote(start, 60);
+        expect(upcomingSteps(next, 6)).toEqual([
+            { index: 1, pitches: [62], staves: [0] },
+            { index: 2, pitches: [64], staves: [0] },
+        ]);
+    });
+
+    it("is empty once the run is complete", () => {
+        const state = startMatch([step([60])]);
+        const { state: done } = matchNote(state, 60);
+        expect(upcomingSteps(done, 6)).toEqual([]);
     });
 });
 

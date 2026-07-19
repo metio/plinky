@@ -147,6 +147,12 @@ export function RunSetup() {
                 help={m.treadmill_hint()}
             />
             <SwitchField
+                label={m.highway_toggle()}
+                checked={reading.highway}
+                onChange={reading.setHighway}
+                help={m.highway_hint()}
+            />
+            <SwitchField
                 label={m.bar_numbers_toggle()}
                 checked={reading.barNumbers}
                 onChange={reading.setBarNumbers}

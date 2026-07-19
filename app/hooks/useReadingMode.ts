@@ -25,6 +25,10 @@ export type ReadingMode = {
     // per device.
     treadmill: boolean;
     setTreadmill: (value: boolean) => void;
+    // Show the upcoming notes as blocks above the keys (the notes highway), remembered
+    // per device.
+    highway: boolean;
+    setHighway: (value: boolean) => void;
     // Whether fast notes are joined into beam groups: "auto" follows the piece's grade,
     // "on"/"off" force it. Remembered per device; the effective visibility is decided
     // per piece by beamsVisible.
@@ -49,6 +53,7 @@ export function useReadingMode(): ReadingMode {
     const [noteScale, setNoteScale] = usePref(prefs, "noteScale");
     const [barNumbers, setBarNumbers] = usePref(prefs, "barNumbers");
     const [treadmill, setTreadmill] = usePref(prefs, "treadmill");
+    const [highway, setHighway] = usePref(prefs, "highway");
     const [beams, setBeams] = usePref(prefs, "beams");
     const [colorNotes, setColorNotes] = usePref(prefs, "colorNotes");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
@@ -65,6 +70,8 @@ export function useReadingMode(): ReadingMode {
         setBarNumbers,
         treadmill,
         setTreadmill,
+        highway,
+        setHighway,
         beams,
         setBeams,
         colorNotes,

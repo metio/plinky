@@ -15,6 +15,7 @@ const BASE: Prefs = {
     colorNotes: false,
     noteHints: "always",
     noteLabels: "all",
+    highway: false,
     forgiving: false,
     fingerHints: true,
     decayMode: "gentle",

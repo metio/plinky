@@ -14,7 +14,12 @@ import {
     STAFF_FOR,
     startMatch,
     stepRange,
+    type UpcomingStep,
+    upcomingSteps,
 } from "../../core/matcher";
+
+// How many positions ahead the notes-highway look-ahead surfaces.
+const HIGHWAY_LOOKAHEAD = 6;
 
 export type { Hand } from "../../core/matcher";
 
@@ -157,6 +162,9 @@ export function useScoreMatcher(
 ) {
     const [practicing, setPracticing] = useState(false);
     const [expected, setExpected] = useState<number[]>([]);
+    // The next few positions to play, for the notes-highway look-ahead — updated
+    // wherever `expected` is, so the two never drift.
+    const [upcoming, setUpcoming] = useState<UpcomingStep[]>([]);
     const [done, setDone] = useState(0);
     const [total, setTotal] = useState(0);
     const [wrong, setWrong] = useState(0);
@@ -253,6 +261,7 @@ export function useScoreMatcher(
             setComplete(false);
             setRange(stepRange(steps));
             setExpected(expectedPitches(state));
+            setUpcoming(upcomingSteps(state, HIGHWAY_LOOKAHEAD));
             setPracticing(true);
         },
         [getOsmd],
@@ -322,10 +331,12 @@ export function useScoreMatcher(
                 setMissedHere(false);
                 setBar(currentBar(fresh));
                 setExpected(expectedPitches(fresh));
+                setUpcoming(upcomingSteps(fresh, HIGHWAY_LOOKAHEAD));
                 return;
             }
             setBar(currentBar(next));
             setExpected(expectedPitches(next));
+            setUpcoming(upcomingSteps(next, HIGHWAY_LOOKAHEAD));
             if (next.complete) {
                 osmd.cursor.hide();
                 practicingRef.current = false;
@@ -339,6 +350,7 @@ export function useScoreMatcher(
     return {
         practicing,
         expected,
+        upcoming,
         done,
         total,
         wrong,
