@@ -33,12 +33,14 @@ import type { Letter } from "../../core/grade";
 import type { DecayMode } from "../../core/review";
 import { METRONOME_SUBDIVISIONS } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, REVIEW_CAPS } from "../../core/prefs";
-import { routeMeta } from "../../core/site";
+import { noindexMeta, routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.nav_settings(), m.meta_settings_description());
+    // A utility page for the visitor's own device — no place in the index, so
+    // noindex it (and it is left out of the sitemap).
+    return [...routeMeta(m.nav_settings(), m.meta_settings_description()), noindexMeta()];
 }
 
 const ICON = "h-5 w-5";

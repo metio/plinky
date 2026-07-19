@@ -10,9 +10,16 @@ import { m } from "../paraglide/messages.js";
 import { choose } from "../testing/controls";
 import { switchOn, toggle } from "../testing/controls";
 import { renderWithServices } from "../testing/renderWithServices";
-import Settings from "./settings";
+import Settings, { meta } from "./settings";
 
 afterEach(cleanup);
+
+describe("Settings meta", () => {
+    it("keeps the personal settings page out of the search index", () => {
+        const tags = meta({} as Parameters<typeof meta>[0]) as Record<string, string>[];
+        expect(tags).toContainEqual({ name: "robots", content: "noindex, follow" });
+    });
+});
 
 const mount = () =>
     renderWithServices(

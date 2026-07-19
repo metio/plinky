@@ -45,9 +45,10 @@ function pagesUnder(dir, rel) {
     return found;
 }
 
-// Canonical paths kept out of the sitemap: the legal notices carry a noindex, so
-// listing them would tell search engines to index what their own head forbids.
-const NOINDEX = new Set(["impressum", "datenschutz"]);
+// Canonical paths kept out of the sitemap: they carry a noindex in their head
+// (legal notices, and the personal/utility surfaces), so listing them would tell
+// search engines to index what those pages themselves forbid.
+const NOINDEX = new Set(["impressum", "datenschutz", "you", "review", "settings"]);
 
 // Group localized pages by their canonical (locale-stripped) path.
 const groups = new Map();

@@ -27,7 +27,7 @@ import { browserStore } from "../adapters/browserStore";
 import { resolveScore } from "../lib/catalog";
 import { parseExerciseId } from "../../core/exerciseGen";
 
-import { musicCompositionData, routeMeta } from "../../core/site";
+import { breadcrumbData, musicCompositionData, routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
@@ -43,9 +43,21 @@ export function meta({ params }: Route.MetaArgs) {
     const description = score.composer
         ? m.meta_play_description_by({ title: score.title, composer: score.composer })
         : m.meta_play_description({ title: score.title });
+    const locale = getLocale();
+    // The piece's place in the catalogue: Home › Library › [Composer] › Piece. The
+    // composer crumb links to their page when the credit resolves to a real person,
+    // matching the prerendered /person/:slug and the on-page composer link.
+    const slug = score.composer ? personSlug(score.composer) : "";
+    const trail = [
+        { name: m.nav_home(), path: "/" },
+        { name: m.nav_library(), path: "/library/" },
+        ...(slug ? [{ name: canonicalComposer(score.composer), path: `/person/${slug}/` }] : []),
+        { name: score.title, path: `/play/${score.id}/` },
+    ];
     return [
         ...routeMeta(score.title, description),
-        { "script:ld+json": musicCompositionData(score.title, score.composer, getLocale()) },
+        { "script:ld+json": musicCompositionData(score.title, score.composer, locale) },
+        { "script:ld+json": breadcrumbData(locale, trail) },
     ];
 }
 
