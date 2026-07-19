@@ -27,6 +27,11 @@ export type MatchStep = {
     whole: number;
     // The 0-based bar the position sits in, for a focus view.
     bar: number;
+    // The longest written length here, in quarter notes — how long the key is
+    // meant to keep ringing. Collected with the position so the hold-duration
+    // indicator reads it off the step model, never the live cursor. Zero when
+    // the score marks no length.
+    holdQuarters: number;
 };
 
 export type MatcherState = {

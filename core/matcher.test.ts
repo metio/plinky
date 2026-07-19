@@ -19,6 +19,7 @@ const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep 
     staves: [0],
     whole: 0,
     bar: 0,
+    holdQuarters: 0,
     ...overrides,
 });
 
