@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
     breadcrumbData,
     musicCompositionData,
+    noindexMeta,
     ogLocale,
     pageTitle,
     personData,
@@ -63,6 +64,12 @@ describe("musicCompositionData", () => {
 
     it("omits the composer when unknown", () => {
         expect(musicCompositionData("Etude", "", "en")).not.toHaveProperty("composer");
+    });
+});
+
+describe("noindexMeta", () => {
+    it("marks the page noindex but still crawlable for its links", () => {
+        expect(noindexMeta()).toEqual({ name: "robots", content: "noindex, follow" });
     });
 });
 

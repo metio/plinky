@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { ReactNode } from "react";
-import { routeMeta } from "../../core/site";
+import { noindexMeta, routeMeta } from "../../core/site";
 import type { Route } from "./+types/datenschutz";
 
 // The privacy policy German/EU law requires (GDPR / DSGVO). Like the Impressum
@@ -14,7 +14,12 @@ import type { Route } from "./+types/datenschutz";
 // generator (e.g. eRecht24) or a lawyer, and UPDATE it before enabling analytics
 // or ads (those add cookie consent, Consent Mode, and new processing to disclose).
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Datenschutzerklärung", "Wie Plinky mit deinen Daten umgeht.");
+    // A privacy policy has no place in search results; it stays reachable from every
+    // footer, so noindex it (and it is left out of the sitemap).
+    return [
+        ...routeMeta("Datenschutzerklärung", "Wie Plinky mit deinen Daten umgeht."),
+        noindexMeta(),
+    ];
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {

@@ -5,9 +5,16 @@
 import { cleanup, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { renderWithServices } from "../testing/renderWithServices";
-import Impressum from "./impressum";
+import Impressum, { meta } from "./impressum";
 
 afterEach(cleanup);
+
+describe("Impressum meta", () => {
+    it("keeps the legal notice out of the search index", () => {
+        const tags = meta({} as Parameters<typeof meta>[0]) as Record<string, string>[];
+        expect(tags).toContainEqual({ name: "robots", content: "noindex, follow" });
+    });
+});
 
 describe("Impressum", () => {
     it("names the operator with a reachable address and email", () => {

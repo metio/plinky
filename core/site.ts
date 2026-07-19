@@ -33,6 +33,14 @@ export function routeMeta(headline: string, description: string) {
         ...socialMeta(headline, description),
     ];
 }
+// Keeps a page out of search results while still letting crawlers follow its
+// links (noindex, follow) — for pages that must stay reachable but have no place
+// in the index: the legal notices, and personal/utility surfaces. Append it to a
+// route's meta; such pages are also left out of the sitemap.
+export function noindexMeta() {
+    return { name: "robots", content: "noindex, follow" };
+}
+
 export const SITE_DESCRIPTION =
     "Practice piano in your browser with a MIDI keyboard or your computer keyboard — sight-reading, rhythm, tempo, ear-training, and loop drills, with your scores kept on your device.";
 
