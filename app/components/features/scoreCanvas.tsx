@@ -35,15 +35,26 @@ export function ScoreCanvas() {
     return (
         // OSMD renders to its container's full offset width, which includes any border or
         // padding on that element; were either on the element OSMD owns, the rendered system
-        // would overflow by exactly that amount and show a spurious scrollbar. So the border
+        // would overflow by exactly that amount and show a spurious scrollbar. So the frame
         // and breathing room live on the wrapper, and the inner element OSMD measures is
         // clean. Wide scores still scroll horizontally, and that region must be focusable for
         // keyboard users (axe scrollable-region-focusable).
+        //
+        // The frame reads as a lifted page on a stand rather than a boxed div: a warm
+        // paper field, a soft two-layer drop shadow, and a hairline rule inset from the
+        // rounded edge — the plate border of an engraved music edition. `relative` anchors
+        // that decorative rule.
         <div
-            className={`rounded-md border border-gray-200 bg-white p-2 dark:border-gray-800 ${
-                fullscreen ? "relative flex min-h-0 flex-1 flex-col" : ""
+            className={`relative rounded-xl bg-stone-50 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)] ${
+                fullscreen ? "flex min-h-0 flex-1 flex-col" : ""
             }`}
         >
+            {/* The engraver's plate rule: a single hairline inset within the padding,
+            between the page edge and the staff. Decorative, so it never takes a press. */}
+            <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-2 rounded-lg border border-stone-300/70"
+            />
             {fullscreen && !fingerStrip && (
                 <KeyboardQuickControls
                     floating
