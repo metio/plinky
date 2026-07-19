@@ -26,10 +26,14 @@ export type { Hand } from "../../core/matcher";
 
 // The MIDI pitches at the cursor's position (chords give several; rests and tied
 // continuations give none), narrowed to the chosen hand, with the staves they sit
-// on and the notated onset — one entry of the step model the pure matcher runs on.
+// on, the notated onset, and the longest written length here in quarter notes —
+// one entry of the step model the pure matcher runs on. Collecting the hold length
+// with the position means the run reads it off the step model, never the live
+// cursor, so the cursor stays purely a visual mirror during a run.
 function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, "bar"> {
     const pitches: number[] = [];
     const staves = new Set<number>();
+    let holdQuarters = 0;
     for (const note of osmd.cursor.NotesUnderCursor()) {
         if (note.isRest() || note.halfTone <= 0) {
             continue;
@@ -42,11 +46,13 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
         if (staff !== undefined) {
             staves.add(staff);
         }
+        holdQuarters = Math.max(holdQuarters, readScoreExpression(note).notatedQuarters);
     }
     return {
         pitches,
         staves: [...staves].sort((a, b) => a - b),
         whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+        holdQuarters,
     };
 }
 
@@ -71,25 +77,6 @@ function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): MatchStep[]
 // lines up with the run's progress. Leaves the cursor reset for the caller.
 export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): number[][] {
     return collectMatchSteps(osmd, hand).map((step) => step.pitches);
-}
-
-// The longest written length, in quarter notes, among the hand's notes sounding
-// under the cursor — the note's own duration, read straight off the engraved
-// score. Zero when nothing playable sits here. Feeds the hold-duration indicator:
-// how long the just-played key is meant to keep ringing.
-function notatedQuartersAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): number {
-    let quarters = 0;
-    for (const note of osmd.cursor.NotesUnderCursor()) {
-        if (note.isRest() || note.halfTone <= 0) {
-            continue;
-        }
-        const staff = note.ParentStaff?.idInMusicSheet;
-        if (hand !== "both" && staff !== STAFF_FOR[hand]) {
-            continue;
-        }
-        quarters = Math.max(quarters, readScoreExpression(note).notatedQuarters);
-    }
-    return quarters;
 }
 
 // Walk the reset cursor forward to the first playable position at or after `from`,
@@ -304,11 +291,9 @@ export function useScoreMatcher(
                     index: runStartIndexRef.current + event.ordinal,
                     timestamp,
                     timeMs: event.step.whole * 4 * (60000 / runTempoRef.current),
-                    // The cursor still sits on the cleared position (it advances
-                    // just below), so its notes give the written length to hold.
-                    holdMs:
-                        notatedQuartersAtCursor(osmd, runHandRef.current) *
-                        (60000 / runTempoRef.current),
+                    // The written length to hold, taken from the cleared step itself,
+                    // so it stays right regardless of where the visual cursor sits.
+                    holdMs: event.step.holdQuarters * (60000 / runTempoRef.current),
                     velocity,
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,
