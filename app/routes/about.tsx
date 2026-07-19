@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useState } from "react";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/about";
@@ -41,6 +42,10 @@ function DuetMark() {
 }
 
 export default function About() {
+    // A hidden fondness: tapping Sol's portrait counts up, remounting the animated
+    // bits so the peck replays each time. Zero on load means nothing animates until
+    // someone finds it.
+    const [kiss, setKiss] = useState(0);
     return (
         <main className="mx-auto max-w-3xl space-y-10 p-6 font-sans">
             <header className="space-y-2">
@@ -52,32 +57,79 @@ export default function About() {
             </header>
 
             <section className="grid gap-4 sm:grid-cols-2">
-                {FOUNDERS.map((founder) => (
-                    <article
-                        key={founder.name}
-                        className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900"
-                    >
+                {FOUNDERS.map((founder, index) => {
+                    // Sol leads (index 0): her portrait sparks the peck — she blushes
+                    // and a kiss drifts up; Sebastian's card leans in from beside her.
+                    const lead = index === 0;
+                    const portrait = (
                         <img
+                            key={kiss}
                             src={founder.image}
                             alt={founder.name}
                             width={112}
                             height={112}
                             loading="lazy"
-                            className="h-28 w-28 rounded-full bg-gray-100 object-cover ring-2 ring-indigo-100 dark:bg-gray-800 dark:ring-indigo-900/50"
+                            className={`h-28 w-28 rounded-full bg-gray-100 object-cover ring-2 ring-indigo-100 dark:bg-gray-800 dark:ring-indigo-900/50 ${
+                                kiss > 0
+                                    ? lead
+                                        ? "motion-safe:animate-smooch"
+                                        : "motion-safe:animate-lean"
+                                    : ""
+                            }`}
                         />
-                        <div className="space-y-1">
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                {founder.name}
-                            </h2>
-                            <span className="inline-block rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
-                                {founder.role}
-                            </span>
-                        </div>
-                        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                            {founder.bio()}
-                        </p>
-                    </article>
-                ))}
+                    );
+                    return (
+                        <article
+                            key={founder.name}
+                            className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900"
+                        >
+                            {lead ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setKiss((count) => count + 1)}
+                                    className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                                >
+                                    {portrait}
+                                    {/* A rose blush blooms over her cheek. */}
+                                    <span
+                                        key={`blush-${kiss}`}
+                                        aria-hidden="true"
+                                        style={{
+                                            background:
+                                                "radial-gradient(circle at 68% 62%, rgba(244,63,94,0.8), transparent 55%)",
+                                        }}
+                                        className={`pointer-events-none absolute inset-0 rounded-full opacity-0 mix-blend-multiply ${
+                                            kiss > 0 ? "motion-safe:animate-blush" : ""
+                                        }`}
+                                    />
+                                    {/* The peck, drifting up and away. */}
+                                    <span
+                                        key={`kiss-${kiss}`}
+                                        aria-hidden="true"
+                                        className={`pointer-events-none absolute right-3 top-6 text-xl opacity-0 ${
+                                            kiss > 0 ? "motion-safe:animate-kiss" : ""
+                                        }`}
+                                    >
+                                        💋
+                                    </span>
+                                </button>
+                            ) : (
+                                portrait
+                            )}
+                            <div className="space-y-1">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                    {founder.name}
+                                </h2>
+                                <span className="inline-block rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                                    {founder.role}
+                                </span>
+                            </div>
+                            <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                                {founder.bio()}
+                            </p>
+                        </article>
+                    );
+                })}
             </section>
 
             <section className="space-y-3 border-t border-gray-200 pt-8 dark:border-gray-800">

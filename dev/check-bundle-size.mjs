@@ -87,7 +87,10 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // The notes-highway (on-screen reading mode + highway video-export format, with its five
 // new strings inlined per locale) — adds ~0.5 KB, measured at 579.5. 580 restores the margin.
-const BUDGET_TOTAL_KB = 580;
+//
+// The About page's contact section (five new strings inlined per locale) plus its
+// accessibility note and the peck Easter egg — add ~0.2 KB, measured at 580.2. 581.
+const BUDGET_TOTAL_KB = 581;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -158,7 +161,11 @@ const BUDGET_TOTAL_KB = 580;
 // pure highwayBlocks layout and the takeHighwayPainter, offset by extracting the video
 // painter's shared chrome/key helpers) plus its Style toggle and strings — adds ~1.5 KB of
 // app code, measured at 269.4. 270 keeps the margin.
-const BUDGET_APP_KB = 270;
+//
+// The About page's contact section, the "everyone can play" accessibility note, and
+// the tap-Sol's-portrait peck Easter egg (a little state + animated overlay) — add
+// ~0.7 KB of app code, measured at 270.1. 271 keeps the margin.
+const BUDGET_APP_KB = 271;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
