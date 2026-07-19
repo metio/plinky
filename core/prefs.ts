@@ -172,7 +172,7 @@ function defaults(): Prefs {
         handSpan: { left: null, right: null },
         showFingerings: false,
         beams: "auto",
-        colorNotes: false,
+        colorNotes: true,
         noteHints: "always",
         noteLabels: "all",
         forgiving: false,

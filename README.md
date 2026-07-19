@@ -66,8 +66,9 @@ that join fast notes into beat groups — can be hidden so a beginner reads one 
 time, shown, or left on **Auto**, which draws them on harder pieces where the beat
 grouping helps and drops them on the easy grades. A **note-size** control magnifies the
 whole score — bigger, easier-to-read glyphs on a small screen or for a beginner, and it
-works in treadmill mode too. And you can **colour the notes** by name — every C red, every
-D orange — so you read pitch by hue while you're learning; the played/heard feedback rides
+works in treadmill mode too. The notes are **coloured** by name out of the box — every C red,
+every D orange — so a beginner reads pitch by hue while the names sink in; turn it off once
+you don't need it. The played/heard feedback rides
 behind the notes as a soft highlight, so the colours stay clear as you play. A
 wrong key flashes red; whether the correct key then lights up is your call — by
 default it always shows the next note, or you can ask for a nudge only after a slip,

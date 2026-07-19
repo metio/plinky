@@ -12,7 +12,7 @@ const BASE: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: false,
     beams: "auto",
-    colorNotes: false,
+    colorNotes: true,
     noteHints: "always",
     noteLabels: "all",
     highway: false,
@@ -117,10 +117,10 @@ describe("parsePrefs", () => {
         expect(parsePrefs(JSON.stringify({ beams: "bogus" })).beams).toBe("auto");
     });
 
-    it("defaults note colouring off and keeps the stored toggle", () => {
-        expect(parsePrefs(null).colorNotes).toBe(false);
-        expect(parsePrefs(stored({ colorNotes: true })).colorNotes).toBe(true);
-        expect(parsePrefs(JSON.stringify({ colorNotes: "yes" })).colorNotes).toBe(false);
+    it("defaults note colouring on and keeps the stored toggle", () => {
+        expect(parsePrefs(null).colorNotes).toBe(true);
+        expect(parsePrefs(stored({ colorNotes: false })).colorNotes).toBe(false);
+        expect(parsePrefs(JSON.stringify({ colorNotes: "yes" })).colorNotes).toBe(true);
     });
 
     it("defaults note size to 1 and rejects an off-scale value", () => {
