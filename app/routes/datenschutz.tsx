@@ -74,8 +74,8 @@ export default function Datenschutz() {
 
             <Section title="Lokale Speicherung im Browser">
                 <p>
-                    Für den Betrieb der App nutzen wir den lokalen Speicher deines Browsers
-                    (Local Storage) — etwa für deine Einstellungen, deinen Übungsfortschritt und
+                    Für den Betrieb der App nutzen wir den lokalen Speicher deines Browsers (Local
+                    Storage) — etwa für deine Einstellungen, deinen Übungsfortschritt und
                     gespeicherte Aufnahmen. Diese Daten verbleiben auf deinem Gerät, werden nicht an
                     uns übertragen und lassen sich jederzeit über die Einstellungen oder deinen
                     Browser löschen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
