@@ -2,14 +2,15 @@
 # SPDX-License-Identifier: 0BSD
 name: Seed Studio Content
 # Imports the help-page text and alt (seed/help.ndjson, every locale) into Sanity.
-# Manual on purpose: the import replaces each block wholesale, so it would overwrite
-# anything an editor wrote in the Studio.
 #
-# It also drops the pictures, which live only in Sanity as uploaded assets. Merging
-# a seed edit to main re-runs "Help Screenshots" on its own, which re-attaches them
-# and re-patches the alt text from this same file. Dispatching this by hand against
-# a dataset that main has not moved leaves the blocks pictureless until that run
-# happens — dispatch "Help Screenshots" too, in that case.
+# Manual, and a last resort: the Studio is the source of truth for the help content
+# now, so this is only for a deliberate restore from the git backup. The import
+# replaces each block wholesale — it overwrites everything an editor wrote in the
+# Studio, body text included — so it must never run on its own.
+#
+# It also drops the pictures, which live only in Sanity as uploaded assets. After a
+# restore, dispatch "Help Screenshots" by hand to re-attach them and re-patch the
+# alt text from this same file; neither runs automatically any more.
 on:
   workflow_dispatch:
 permissions:

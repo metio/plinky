@@ -1,41 +1,24 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
 name: Help Screenshots
-# The help page's pictures are a function of the app, so they follow main rather
-# than someone remembering. A stale screenshot never fails anything — it just
-# quietly shows a UI that no longer exists — so noticing one can't be the plan.
-# The trigger mirrors the deploy's: if a change is worth publishing, its pictures
-# are worth re-shooting. Re-shooting an unchanged page is close to free — Sanity
-# addresses assets by content hash, so identical bytes reuse the existing asset
-# rather than piling up new ones.
+# Screenshots the app into the help page's picture blocks, patching each block's
+# image + alt text (body text is never touched).
 #
-# The seed carries the alt text this run patches alongside each picture, so a seed
-# edit re-shoots too. Importing the seed itself stays manual (Seed Studio Content),
-# because that import replaces each block wholesale and would overwrite anything
-# written in the Studio.
+# Manual only. The Studio is the source of truth for the help content — an editor
+# curates the pictures and alt text there — so this must not run on its own: an
+# automatic re-shoot on every deploy would overwrite those edits. Run it by hand
+# to refresh the pictures after a UI change, accepting that, left alone, they can
+# drift from the current UI. Sanity addresses assets by content hash, so
+# re-shooting an unchanged page reuses the existing asset rather than piling up
+# new ones. A full content restore from git is the separate, also-manual
+# "Seed Studio Content".
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/studio-screenshots.yml
-      - dev/help-screenshots.mjs
-      - studio/seed/help.ndjson
-      - app/**
-      - core/**
-      - messages/**
-      - public/**
-      - package.json
-      - package-lock.json
-      - vite.config.ts
-      - react-router.config.ts
-      - tsconfig.json
 permissions:
   contents: read
 concurrency:
-  # One run at a time: two merges in quick succession would otherwise interleave
-  # their patches across the ten blocks. Cancel rather than queue — the newer main
-  # is the one the pictures should show, and it re-patches every block anyway.
+  # One run at a time so two manual runs can't interleave their patches across the
+  # ten blocks; the later run's pictures are the ones to keep.
   group: help-screenshots
   cancel-in-progress: true
 jobs:
