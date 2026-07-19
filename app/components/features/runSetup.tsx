@@ -12,6 +12,7 @@ import { Disclosure } from "../ui/disclosure";
 import { ChoiceField, SwitchField } from "../ui/fields";
 import { RotateIcon } from "../ui/icons";
 import { Stepper } from "../ui/stepper";
+import { ReadingLevel } from "./readingLevel";
 import { usePlaySession } from "./playSession";
 
 const handLabel: Record<Hand, string> = {
@@ -67,6 +68,9 @@ export function RunSetup() {
 
     return (
         <Disclosure summary={m.run_setup()}>
+            {/* The skill-level preset sets all the reading aids at once — the same
+            control and prefs as the Settings Reading section. */}
+            <ReadingLevel />
             {staffCount >= 2 && (
                 <ChoiceField
                     label={m.hand_label()}

@@ -47,6 +47,25 @@ describe("Settings", () => {
         expect(services.prefs.load().masteryThreshold).toBe("S");
     });
 
+    it("exposes the run panel's reading prefs in the Reading section", () => {
+        const { services } = mount();
+        // A reading pref that used to live only in the run-setup panel now persists
+        // from the Settings page too.
+        expect(services.prefs.load().highway).toBe(false);
+        toggle(m.highway_toggle);
+        expect(services.prefs.load().highway).toBe(true);
+    });
+
+    it("sets every reading aid at once from the skill-level preset", () => {
+        const { services } = mount();
+        choose(m.reading_level_label, m.reading_level_sight_reader);
+        const prefs = services.prefs.load();
+        expect(prefs.noteLabels).toBe("off");
+        expect(prefs.noteHints).toBe("never");
+        expect(prefs.highway).toBe(false);
+        expect(prefs.colorNotes).toBe(false);
+    });
+
     it("disables the volume slider while sound is off, and persists the level", () => {
         const { services } = mount();
         const slider = screen.getByLabelText<HTMLInputElement>(m.settings_volume());

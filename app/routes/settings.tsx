@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { linkClasses } from "../components/ui/classes";
 import { ChoiceField, SwitchField } from "../components/ui/fields";
 import {
+    BookIcon,
     FingersIcon,
     GradCapIcon,
     KeysIcon,
@@ -21,6 +22,7 @@ import { SettingsSection } from "../components/ui/settingsSection";
 
 import { DangerZone } from "../components/features/dangerZone";
 import { HandSize } from "../components/features/handSize";
+import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
 import { LanguageSwitcher } from "../components/ui/languageSwitcher";
 import { MicConnect } from "../components/features/micConnect";
@@ -31,7 +33,8 @@ import { usePrefs } from "../hooks/usePrefs";
 import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../../core/grade";
 import type { DecayMode } from "../../core/review";
-import { METRONOME_SUBDIVISIONS } from "../../core/prefs";
+import type { Beams } from "../../core/beams";
+import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -199,6 +202,98 @@ export default function Settings() {
                     </p>
                 </div>
                 <HandSize />
+            </SettingsSection>
+
+            {/* Reading: the level preset up top sets the aids together, then every
+            reading and layout preference the run-setup panel offers, so the two
+            surfaces are one set of prefs reached from two places. */}
+            <SettingsSection
+                title={m.settings_reading_title()}
+                hint={m.settings_reading_hint()}
+                icon={<BookIcon className={ICON} />}
+            >
+                <ReadingLevel />
+                <SwitchField
+                    label={m.color_notes_toggle()}
+                    checked={prefs.colorNotes}
+                    onChange={(colorNotes) => update({ colorNotes })}
+                    help={m.color_notes_hint()}
+                />
+                <SwitchField
+                    label={m.highway_toggle()}
+                    checked={prefs.highway}
+                    onChange={(highway) => update({ highway })}
+                    help={m.highway_hint()}
+                />
+                <SwitchField
+                    label={m.forgiving_toggle()}
+                    checked={prefs.forgiving}
+                    onChange={(forgiving) => update({ forgiving })}
+                />
+                <SwitchField
+                    label={m.treadmill_toggle()}
+                    checked={prefs.treadmill}
+                    onChange={(treadmill) => update({ treadmill })}
+                    help={m.treadmill_hint()}
+                />
+                <SwitchField
+                    label={m.bar_numbers_toggle()}
+                    checked={prefs.barNumbers}
+                    onChange={(barNumbers) => update({ barNumbers })}
+                    help={m.bar_numbers_hint()}
+                />
+                <ChoiceField
+                    label={m.bars_per_row()}
+                    value={String(prefs.barsPerRow)}
+                    onChange={(id) => update({ barsPerRow: Number(id) })}
+                    options={BARS_PER_ROW.map((n) => ({
+                        id: String(n),
+                        label: n === 0 ? m.bars_per_row_auto() : String(n),
+                    }))}
+                    help={m.bars_per_row_caption()}
+                />
+                <ChoiceField
+                    label={m.note_size_label()}
+                    value={String(prefs.noteScale)}
+                    onChange={(id) => update({ noteScale: Number(id) })}
+                    options={NOTE_SCALES.map((scale) => ({
+                        id: String(scale),
+                        label: `${Math.round(scale * 100)}%`,
+                    }))}
+                    help={m.note_size_caption()}
+                />
+                <ChoiceField
+                    label={m.beams_label()}
+                    value={prefs.beams}
+                    onChange={(beams: Beams) => update({ beams })}
+                    options={[
+                        { id: "auto", label: m.beams_auto() },
+                        { id: "on", label: m.beams_on() },
+                        { id: "off", label: m.beams_off() },
+                    ]}
+                    help={m.beams_caption()}
+                />
+                <SwitchField
+                    label={m.race_ghost_toggle()}
+                    checked={prefs.raceGhost}
+                    onChange={(raceGhost) => update({ raceGhost })}
+                    help={m.race_ghost_hint()}
+                />
+                <SwitchField
+                    label={m.hidden_notes_toggle()}
+                    checked={prefs.hiddenNotes}
+                    onChange={(hiddenNotes) => update({ hiddenNotes })}
+                    help={m.hidden_notes_hint()}
+                />
+                {prefs.hiddenNotes && (
+                    <ChoiceField
+                        label={m.reveal_tries()}
+                        value={String(prefs.revealTries)}
+                        onChange={(id) => update({ revealTries: Number(id) })}
+                        options={REVEAL_TRIES.map((n) => ({ id: String(n), label: String(n) }))}
+                        help={m.reveal_tries_caption()}
+                    />
+                )}
             </SettingsSection>
 
             <SettingsSection

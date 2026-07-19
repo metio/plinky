@@ -75,7 +75,12 @@ wrong key flashes red; whether the correct key then lights up is your call — b
 default it always shows the next note, or you can ask for a nudge only after a slip,
 or read the music unaided. When the next note is shown, playing it leaves a fading
 fill on the key for as long as the note is written to last, so you can see how long
-to keep holding — not just which key to press.
+to keep holding — not just which key to press. A single **Skill level** picks all
+these reading aids together — from a new starter with every help on to a sight-reader
+reading the bare staff — and you can still fine-tune any of them; it sits in both the
+run panel and **Settings**, which now hold the same reading preferences, so wherever
+you reach for them they're the same set. Your hand size, key mapping, and sound are
+personal and a level never touches them.
 Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn on
 **Loop** and the piece repeats whole; to drill just a passage, **tap two bars on the
 score** — they fill **red** so the stretch you're repeating is clear, and the range
