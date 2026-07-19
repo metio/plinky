@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { type KeepUpResult, scoreKeepUp } from "../../core/grade";
 import {
     type KeepUpState,
+    type KeepUpStep,
     closeKeepUpStep,
     keepUpProgress,
     openKeepUpStep,
@@ -16,12 +17,42 @@ import { STAFF_FOR, type Hand } from "../../core/matcher";
 import { listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
-import { stepLengths } from "../lib/scoreCursor";
 import { useTimerChain } from "./useTimerChain";
 
 // A note sink for the guide and the player's own strikes — the slice of the
 // synth the play-along needs.
 type NoteSink = { playNote(note: number, options?: { duration?: number }): void };
+
+// Walk the engraved score once and lift the play-along timeline into the pure
+// step model: every cursor position in order, each carrying the practised hand's
+// pitches-with-length to catch and every note's length for the beat. Leaves the
+// cursor reset. The clock then reads its beats from this array, so the run reads
+// no musical data off the live cursor — the cursor only mirrors the position and
+// carries the notes the painter recolours.
+export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): KeepUpStep[] {
+    const cursor = osmd.cursor;
+    cursor.reset();
+    const steps: KeepUpStep[] = [];
+    while (!cursor.iterator.EndReached) {
+        const play: KeepUpStep["play"] = [];
+        const lengths: number[] = [];
+        for (const note of cursor.NotesUnderCursor()) {
+            const quarters = note.Length.RealValue * 4;
+            lengths.push(quarters);
+            if (note.isRest() || note.halfTone <= 0) {
+                continue;
+            }
+            if (hand !== "both" && note.ParentStaff?.idInMusicSheet !== STAFF_FOR[hand]) {
+                continue;
+            }
+            play.push({ pitch: note.halfTone + 12, quarters });
+        }
+        steps.push({ play, lengths });
+        cursor.next();
+    }
+    cursor.reset();
+    return steps;
+}
 
 // Tempo-enforced play-along ("keep up"): the cursor advances on the clock at a
 // fixed tempo, not when you play. Each step is a beat to catch — clear its notes
@@ -89,6 +120,11 @@ export function useKeepUp({
             return;
         }
         const cursor: Cursor = osmd.cursor;
+        // Lift the whole play-along timeline up front; the clock reads its beats
+        // from this and the cursor is only walked to mirror the position and hold
+        // the notes the painter recolours. `step` tracks the position being opened.
+        const steps = collectKeepUpSteps(osmd, hand);
+        let step = 0;
         cursor.reset();
         cursor.show();
         activeRef.current = true;
@@ -112,27 +148,17 @@ export function useKeepUp({
             setProgress(keepUpProgress(state));
         };
 
-        // Open the step now under the cursor: collect its expected pitches for the
-        // reducer — only the practised hand's, exactly as self-paced practice does,
-        // or a hands-separate run would demand the other hand's notes too and every
-        // step would score a miss — highlight them as "play now", and sound them if
-        // the guide is on.
-        const openStep = () => {
-            const expected: number[] = [];
-            for (const note of cursor.NotesUnderCursor()) {
-                if (note.isRest() || note.halfTone <= 0) {
-                    continue;
-                }
-                if (hand !== "both" && note.ParentStaff?.idInMusicSheet !== STAFF_FOR[hand]) {
-                    continue;
-                }
-                expected.push(note.halfTone + 12);
-                if (guideNotes) {
-                    // Length.RealValue * 4 is a quarter-note count, and the synth
-                    // duration is in seconds (60/BPM per quarter).
-                    synth.playNote(note.halfTone + 12, {
-                        duration: note.Length.RealValue * 4 * (60 / tempo()),
-                    });
+        // Open a collected step: feed its expected pitches to the reducer — only
+        // the practised hand's, exactly as self-paced practice does, or a
+        // hands-separate run would demand the other hand's notes too and every step
+        // would score a miss — highlight them as "play now", and sound them if the
+        // guide is on.
+        const openStep = (current: KeepUpStep) => {
+            const expected = current.play.map((entry) => entry.pitch);
+            if (guideNotes) {
+                for (const entry of current.play) {
+                    // The synth duration is in seconds — 60/BPM per quarter note.
+                    synth.playNote(entry.pitch, { duration: entry.quarters * (60 / tempo()) });
                 }
             }
             stateRef.current = openKeepUpStep(stateRef.current, expected);
@@ -163,15 +189,18 @@ export function useKeepUp({
 
         const tick = () => {
             closeStep();
-            if (cursor.iterator.EndReached) {
+            const current = steps[step];
+            if (!current) {
                 finish();
                 return;
             }
-            const lengths = stepLengths(cursor.NotesUnderCursor());
-            openStep();
+            openStep(current);
+            // Mirror the reducer's position onto the visual cursor, in lock-step
+            // with the collected steps, so the painter recolours the right notes.
             cursor.next();
+            step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(lengths, tempo()));
+            chain.push(tick, listenStepMs(current.lengths, tempo()));
         };
 
         // A one-bar count-in on the metronome (already ticking) before the first note.

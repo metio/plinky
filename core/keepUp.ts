@@ -9,6 +9,21 @@
 // (The self-paced twin is core/matcher.ts, where the player's input drives the
 // advance; here the clock does.)
 
+// One position on the play-along timeline, in cursor order — collected once when
+// a run starts so the clock reads its beats off this model, not the live cursor.
+// Every position appears, rests and the silent hand included (empty `play`), so a
+// step's index stays lock-step with the visual cursor the surface still advances.
+export type KeepUpStep = {
+    // The pitches to catch here, narrowed to the practised hand, each with its
+    // written length in quarter notes so the guide can sound it for that long.
+    // Empty at a rest or the other hand's turn (an unscored position).
+    play: { pitch: number; quarters: number }[];
+    // Every note's written length here in quarter notes, both hands and rests —
+    // the beat's duration comes from the shortest, so the clock advances in step
+    // with the notation regardless of which hand is being practised.
+    lengths: number[];
+};
+
 export type KeepUpState = {
     // The pitches expected at the currently-open step, and which of them have
     // been struck so far. Empty between steps, so a strike landing in the gap
