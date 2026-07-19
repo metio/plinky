@@ -4,6 +4,8 @@
 import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
+import { personSlug } from "./core/person";
+import { readScoreMetaFromText } from "./core/scoreMeta";
 import { songId } from "./core/songId";
 
 // The static routes, in canonical (unprefixed) form. generateStaticLocalizedUrls
@@ -25,12 +27,27 @@ const BASE_PATHS = [
     "/board",
 ];
 
-// Prerender a play page for every bundled score so each piece is indexable with its own
-// title and structured data. The id is the content fingerprint, matching loadBundledScores
-// in app/lib/catalog.ts. User-imported scores stay client-only.
-const BUNDLED_PLAY_PATHS = readdirSync("scores")
+// Every bundled score's id and composer, read once. The id is the content
+// fingerprint, matching loadBundledScores in app/lib/catalog.ts; the composer
+// (pure text pass, no parser) drives the person pages below.
+const BUNDLED_SCORES = readdirSync("scores")
     .filter((name) => name.endsWith(".musicxml"))
-    .map((name) => `/play/${songId(readFileSync(`scores/${name}`, "utf8"))}`);
+    .map((name) => {
+        const xml = readFileSync(`scores/${name}`, "utf8");
+        return { id: songId(xml), composer: readScoreMetaFromText(xml).composer };
+    });
+
+// Prerender a play page for every bundled score so each piece is indexable with its own
+// title and structured data. User-imported scores stay client-only.
+const BUNDLED_PLAY_PATHS = BUNDLED_SCORES.map((score) => `/play/${score.id}`);
+
+// Prerender a page for every composer the bundled catalogue credits, so each is a
+// crawlable, sitemap-listed entity (name, their pieces, Person + BreadcrumbList
+// structured data) rather than a JavaScript-only shell. One slug per composer,
+// deduped; attribution markers ("Traditional") slug to "" and are skipped.
+const PERSON_PATHS = [
+    ...new Set(BUNDLED_SCORES.map((score) => personSlug(score.composer)).filter(Boolean)),
+].map((slug) => `/person/${slug}`);
 
 export default {
     // SPA mode: no server, hydrated on the client.
@@ -42,7 +59,7 @@ export default {
     // a client redirect to the visitor's locale. Prerendering runs serially
     // (concurrency 1), which entry.server relies on to pin getLocale per page.
     prerender() {
-        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS];
+        const paths = [...BASE_PATHS, ...BUNDLED_PLAY_PATHS, ...PERSON_PATHS];
         const localized = generateStaticLocalizedUrls(paths).map((url) => url.pathname);
         // A per-locale build (PLINKY_LOCALE=de) pins getLocale to its language, so
         // it can only render its own pages correctly — prerender just those. The

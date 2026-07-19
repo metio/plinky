@@ -110,3 +110,50 @@ export function musicCompositionData(title: string, composer: string, locale: st
         ...(composer ? { composer: { "@type": "Person", name: composer } } : {}),
     };
 }
+
+// The locale-prefixed absolute URL of a page, matching the prerendered path
+// (trailing slash included): `https://plinky.fun/de/person/chopin/`.
+function localeUrl(locale: string, path: string): string {
+    return `${SITE_URL}/${locale}${path}`;
+}
+
+// schema.org data for a composer's page: the person as an entity, with the pieces
+// of theirs the catalogue holds as a work list, so the page is indexable as the
+// composer it is rather than a generic app screen.
+export function personData(
+    person: { slug: string; name: string; pieces: { id: string; title: string }[] },
+    locale: string,
+) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: person.name,
+        url: localeUrl(locale, `/person/${person.slug}/`),
+        subjectOf: {
+            "@type": "ItemList",
+            numberOfItems: person.pieces.length,
+            itemListElement: person.pieces.map((piece, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                url: localeUrl(locale, `/play/${piece.id}/`),
+                name: piece.title,
+            })),
+        },
+    };
+}
+
+// A breadcrumb trail as schema.org data, so a search result shows the page's place
+// in the hierarchy (Home › Library › Composer). Each crumb is a localized name and
+// a locale-relative path; the origin and locale prefix are added here.
+export function breadcrumbData(locale: string, trail: { name: string; path: string }[]) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: trail.map((crumb, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: crumb.name,
+            item: localeUrl(locale, crumb.path),
+        })),
+    };
+}

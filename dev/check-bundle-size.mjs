@@ -93,7 +93,10 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // The Impressum and Datenschutzerklärung — two prerendered legal routes whose German
 // legal prose is inlined in the components — add ~1.8 KB, measured at 582.8. 583.
-const BUDGET_TOTAL_KB = 583;
+//
+// The composer-page structured data (Person / ItemList / BreadcrumbList helpers in
+// core/site, wired into the person route) — adds ~0.2 KB, measured at 583.2. 584.
+const BUDGET_TOTAL_KB = 584;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -171,7 +174,10 @@ const BUDGET_TOTAL_KB = 583;
 //
 // The Impressum + Datenschutzerklärung legal routes — their German legal text inlined in
 // the two prerendered components + the footer links — add ~1.7 KB, measured at 272.7. 273.
-const BUDGET_APP_KB = 273;
+//
+// The composer-page structured data (Person / ItemList / BreadcrumbList helpers, wired
+// into the person route) — adds ~0.1 KB of app code, measured at 273.1. 274.
+const BUDGET_APP_KB = 274;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
