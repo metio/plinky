@@ -18,7 +18,8 @@ const step = (index: number, pitches: number[], staves = [0]): UpcomingStep => (
 
 // The decorative blocks carry no role; read them off the labelled panel.
 function blocks(): HTMLElement[] {
-    return Array.from(screen.getByRole("img").querySelectorAll<HTMLElement>("span"));
+    // The note blocks carry an inline lane position; the strike line (inset-x-0) does not.
+    return Array.from(screen.getByRole("img").querySelectorAll<HTMLElement>("span[style*='left']"));
 }
 
 describe("NotesHighway", () => {

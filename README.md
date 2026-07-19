@@ -56,9 +56,10 @@ a real piano. You can
 also force a **set number of bars per row** for bigger, more readable notation on a
 small screen, or switch to **treadmill** reading — the piece laid out as one continuous
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. Turn on
-the **notes highway** and the upcoming notes stack above the on-screen keys and fall onto
-them as you play (Synthesia-style, two hands coloured apart) — so a beginner can see which
-key comes next without decoding the staff; it advances by position, so it stays self-paced.
+the **notes highway** and the staff gives way to a tall lane of the upcoming notes,
+descending in each key's column toward the keys as you play (Synthesia-style, two hands
+coloured apart) — so a beginner can see which key comes next without decoding the staff;
+it advances by position, so it stays self-paced.
 **Bar
 numbers** on each row's first bar make a passage easy to find (and line up with the
 loop's from/to), or you can turn them off for a cleaner staff. **Beams** — the bars

@@ -18,8 +18,9 @@ import {
     upcomingSteps,
 } from "../../core/matcher";
 
-// How many positions ahead the notes-highway look-ahead surfaces.
-const HIGHWAY_LOOKAHEAD = 6;
+// How many positions ahead the notes-highway look-ahead surfaces — enough to fill the
+// tall highway panel that stands in for the score.
+const HIGHWAY_LOOKAHEAD = 8;
 
 export type { Hand } from "../../core/matcher";
 

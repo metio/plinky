@@ -41,25 +41,27 @@ export function NotesHighway({
     upcoming,
     from,
     to,
-    rows = 6,
+    rows = 8,
 }: {
     upcoming: UpcomingStep[];
     from: number;
     to: number;
-    // How many positions of look-ahead the panel is tall enough to stack.
+    // How many positions of look-ahead to stack across the panel's height.
     rows?: number;
 }) {
     const rowPct = 100 / rows;
     const maxWidth = keybedMaxWidthPx(from, to);
 
     return (
+        // Fills its container's height and caps + centres to the keybed width, so a tall
+        // panel above the keys reads as a lane the notes descend toward the strike line.
         <div
             aria-label={m.highway_label()}
             role="img"
-            className="mx-auto h-24 w-full"
+            className="mx-auto h-full w-full"
             style={{ maxWidth }}
         >
-            <div className="relative h-full w-full overflow-hidden rounded-md bg-gray-50 dark:bg-gray-900/40">
+            <div className="relative h-full w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-900">
                 {upcoming.slice(0, rows).flatMap((step, row) =>
                     step.pitches.map((pitch) => {
                         const lane = keyLane(pitch, from, to);
@@ -81,6 +83,11 @@ export function NotesHighway({
                         );
                     }),
                 )}
+                {/* The strike line: where a block meets its key. */}
+                <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-indigo-400/70"
+                />
             </div>
         </div>
     );

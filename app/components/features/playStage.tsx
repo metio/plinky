@@ -8,7 +8,6 @@ import { CloseIcon } from "../ui/icons";
 import { FingeringStrip } from "./fingeringStrip";
 import { FocusStrip } from "./focusStrip";
 import { FullScreen, Show } from "./conditional";
-import { NotesHighway } from "./notesHighway";
 import { PianoKeyboard } from "./pianoKeyboard";
 import { usePlaySession } from "./playSession";
 
@@ -34,7 +33,6 @@ export function PlayStage() {
         hintNotes,
         holdFractions,
         keyRange,
-        reading,
         id,
         xml,
         staffCount,
@@ -117,15 +115,8 @@ export function PlayStage() {
                     />
                 ) : (
                     <Show when={!(fullscreen && hideKeyboard)}>
-                        {/* The notes highway rides right above the keys, aligned to
-                        the same lanes, while practising with the highway aid on. */}
-                        <Show when={reading.highway && matcher.practicing}>
-                            <NotesHighway
-                                upcoming={matcher.upcoming}
-                                from={keyRange.from}
-                                to={keyRange.to}
-                            />
-                        </Show>
+                        {/* The notes-highway reading mode shows a tall highway over the
+                        staff (see ScoreCanvas); here the keys just play as always. */}
                         <PianoKeyboard
                             expected={hintNotes}
                             wrong={matcher.lastWrong}

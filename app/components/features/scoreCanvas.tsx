@@ -5,6 +5,7 @@ import { usePrefsStore } from "../../contexts/services";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { m } from "../../paraglide/messages.js";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
+import { NotesHighway } from "./notesHighway";
 import { usePlaySession } from "./playSession";
 
 // The score itself: the bordered scroll box OSMD renders into, plus the load-error notice.
@@ -29,9 +30,16 @@ export function ScoreCanvas() {
         fingerStrip,
         noteHints,
         setNoteHints,
+        reading,
+        keyRange,
     } = usePlaySession();
     const prefsStore = usePrefsStore();
     const noteLabels = useNoteLabels();
+    // In the notes-highway reading mode, a tall highway covers the staff while playing —
+    // OSMD stays mounted and rendered underneath (the matcher walks its cursor), so the
+    // staff is hidden, not unmounted. Only while a run is on: at rest the score shows so
+    // the piece can be read, looped and set up.
+    const highwayActive = reading.highway && matcher.practicing;
     return (
         // OSMD renders to its container's full offset width, which includes any border or
         // padding on that element; were either on the element OSMD owns, the rendered system
@@ -55,6 +63,18 @@ export function ScoreCanvas() {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-2 rounded-lg border border-stone-300/70"
             />
+            {/* The tall highway covers the staff while playing in highway mode. Placed
+            before the quick controls so those still paint on top of it; the OSMD box
+            below stays laid out and functional, just hidden behind this. */}
+            {highwayActive && (
+                <div className="pointer-events-none absolute inset-3 overflow-hidden rounded-md">
+                    <NotesHighway
+                        upcoming={matcher.upcoming}
+                        from={keyRange.from}
+                        to={keyRange.to}
+                    />
+                </div>
+            )}
             {fullscreen && !fingerStrip && (
                 <KeyboardQuickControls
                     floating

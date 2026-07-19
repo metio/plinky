@@ -8,6 +8,15 @@ const meta: Meta<typeof NotesHighway> = {
     title: "Features/NotesHighway",
     component: NotesHighway,
     args: { from: 60, to: 84 },
+    // The highway fills its container's height; the play surface gives it the staff's
+    // slot, so the story stands it in a tall box.
+    decorators: [
+        (Story) => (
+            <div className="h-80">
+                <Story />
+            </div>
+        ),
+    ],
 };
 export default meta;
 
