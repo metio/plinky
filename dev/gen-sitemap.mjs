@@ -45,6 +45,10 @@ function pagesUnder(dir, rel) {
     return found;
 }
 
+// Canonical paths kept out of the sitemap: the legal notices carry a noindex, so
+// listing them would tell search engines to index what their own head forbids.
+const NOINDEX = new Set(["impressum", "datenschutz"]);
+
 // Group localized pages by their canonical (locale-stripped) path.
 const groups = new Map();
 for (const rel of pagesUnder(ROOT, "").sort()) {
@@ -53,6 +57,9 @@ for (const rel of pagesUnder(ROOT, "").sort()) {
         continue;
     }
     const canonical = rest.join("/");
+    if (NOINDEX.has(canonical)) {
+        continue;
+    }
     if (!groups.has(canonical)) {
         groups.set(canonical, new Map());
     }

@@ -5,9 +5,16 @@
 import { cleanup, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { renderWithServices } from "../testing/renderWithServices";
-import Datenschutz from "./datenschutz";
+import Datenschutz, { meta } from "./datenschutz";
 
 afterEach(cleanup);
+
+describe("Datenschutzerklärung meta", () => {
+    it("keeps the privacy policy out of the search index", () => {
+        const tags = meta({} as Parameters<typeof meta>[0]) as Record<string, string>[];
+        expect(tags).toContainEqual({ name: "robots", content: "noindex, follow" });
+    });
+});
 
 describe("Datenschutzerklärung", () => {
     it("names the controller and covers the key processing sections", () => {

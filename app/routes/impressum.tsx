@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { routeMeta } from "../../core/site";
+import { noindexMeta, routeMeta } from "../../core/site";
 import type { Route } from "./+types/impressum";
 
 // The provider identification German law requires (§ 5 DDG). The content is a
@@ -11,7 +11,12 @@ import type { Route } from "./+types/impressum";
 // verfügbar" demands. NOTE: verify the wording against a current generator or a
 // lawyer before relying on it, especially once ads or analytics go live.
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta("Impressum", "Anbieterkennzeichnung von Plinky nach § 5 DDG.");
+    // A legal notice has no place in search results; it stays reachable from every
+    // footer, so noindex it (and it is left out of the sitemap).
+    return [
+        ...routeMeta("Impressum", "Anbieterkennzeichnung von Plinky nach § 5 DDG."),
+        noindexMeta(),
+    ];
 }
 
 export default function Impressum() {
