@@ -90,7 +90,10 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // The About page's contact section (five new strings inlined per locale) plus its
 // accessibility note and the peck Easter egg — add ~0.2 KB, measured at 580.2. 581.
-const BUDGET_TOTAL_KB = 581;
+//
+// The Impressum and Datenschutzerklärung — two prerendered legal routes whose German
+// legal prose is inlined in the components — add ~1.8 KB, measured at 582.8. 583.
+const BUDGET_TOTAL_KB = 583;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -165,7 +168,10 @@ const BUDGET_TOTAL_KB = 581;
 // The About page's contact section, the "everyone can play" accessibility note, and
 // the tap-Sol's-portrait peck Easter egg (a little state + animated overlay) — add
 // ~0.7 KB of app code, measured at 270.1. 271 keeps the margin.
-const BUDGET_APP_KB = 271;
+//
+// The Impressum + Datenschutzerklärung legal routes — their German legal text inlined in
+// the two prerendered components + the footer links — add ~1.7 KB, measured at 272.7. 273.
+const BUDGET_APP_KB = 273;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

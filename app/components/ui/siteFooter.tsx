@@ -39,6 +39,22 @@ export function SiteFooter() {
                     </Link>
                     <span>{m.footer_follow()}</span>
                 </div>
+                {/* The provider information German law requires, reachable from every page.
+                The labels are the German legal terms, kept as-is in every language. */}
+                <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                    <Link
+                        to={localizeHref("/impressum")}
+                        className="rounded-md px-1 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400"
+                    >
+                        Impressum
+                    </Link>
+                    <Link
+                        to={localizeHref("/datenschutz")}
+                        className="rounded-md px-1 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400"
+                    >
+                        Datenschutz
+                    </Link>
+                </div>
                 <div className="flex items-center gap-1">
                     {CHANNELS.map((channel) => (
                         <a

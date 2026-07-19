@@ -20,4 +20,18 @@ describe("SiteFooter", () => {
         const heart = screen.getByRole("link", { name: m.nav_about() });
         expect(heart.getAttribute("href")).toContain("/about");
     });
+
+    it("links to the Impressum and Datenschutz pages the law requires", () => {
+        render(
+            <MemoryRouter initialEntries={["/en"]}>
+                <SiteFooter />
+            </MemoryRouter>,
+        );
+        expect(screen.getByRole("link", { name: "Impressum" }).getAttribute("href")).toContain(
+            "/impressum",
+        );
+        expect(screen.getByRole("link", { name: "Datenschutz" }).getAttribute("href")).toContain(
+            "/datenschutz",
+        );
+    });
 });

@@ -32,6 +32,10 @@ anonymus = "anonymus"
 # The help seed carries all 26 locales in one NDJSON file, so — unlike messages/,
 # where the English base can stay checked on its own — there is no way to spell-check
 # its English without also flagging the other 25 languages.
+# The Impressum and Datenschutzerklärung are German legal documents (§ 5 DDG /
+# GDPR), kept verbatim in German for the operator's jurisdiction — typos only knows
+# English, so it flags their legitimate German words. Their tests assert on the same
+# German headings, so they are excluded too.
 [files]
 extend-exclude = [
     "messages/*",
@@ -42,4 +46,8 @@ extend-exclude = [
     "public/songs/*",
     "public/exercises/**",
     "LICENSES/*",
+    "app/routes/impressum.tsx",
+    "app/routes/impressum.test.tsx",
+    "app/routes/datenschutz.tsx",
+    "app/routes/datenschutz.test.tsx",
 ]

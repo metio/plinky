@@ -20,6 +20,8 @@ const BASE_PATHS = [
     "/settings",
     "/help",
     "/about",
+    "/impressum",
+    "/datenschutz",
     "/board",
 ];
 
