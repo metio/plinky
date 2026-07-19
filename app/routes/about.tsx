@@ -9,20 +9,21 @@ export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.about_title(), m.meta_about_description());
 }
 
-// The two founders, in the order the operation runs: Marisol leads and gives
-// Plinky its warmth; Sebastian builds it. "La Jefa" is her own title, kept as-is
-// in every language. Names are literals — they don't translate — so only each
-// role and bio flow through paraglide.
+// The two founders, in the order the operation runs: Sol leads and gives Plinky
+// its warmth; Sebastian builds it. Each title is kept in the founder's own
+// language — "La Jefa" is Spanish (Sol is Mexican), "der Architekt" German
+// (Sebastian is German) — so both are literals, like the names. Only the bios
+// flow through paraglide.
 const FOUNDERS = [
     {
-        name: "Marisol Herrera Rivero",
+        name: "Sol Herrera",
         role: "La Jefa",
         image: "/founder-marisol.webp",
-        bio: m.about_marisol_bio,
+        bio: m.about_sol_bio,
     },
     {
         name: "Sebastian Hoß",
-        role: m.about_sebastian_role(),
+        role: "der Architekt",
         image: "/founder-sebastian.webp",
         bio: m.about_sebastian_bio,
     },
@@ -84,6 +85,19 @@ export default function About() {
                 <p className="max-w-prose text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                     {m.about_why_body()}
                 </p>
+            </section>
+
+            <section className="space-y-3 border-t border-gray-200 pt-8 dark:border-gray-800">
+                <h2 className="text-lg font-semibold">{m.about_contact_title()}</h2>
+                <p className="max-w-prose text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                    {m.about_contact_body()}
+                </p>
+                <a
+                    href="mailto:contact@plinky.fun"
+                    className="inline-block rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900"
+                >
+                    contact@plinky.fun
+                </a>
             </section>
         </main>
     );

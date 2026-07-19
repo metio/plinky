@@ -13,21 +13,25 @@ afterEach(cleanup);
 describe("About", () => {
     it("introduces both founders with their portraits", () => {
         renderWithServices(<About />);
-        const marisol = screen.getByAltText("Marisol Herrera Rivero");
+        const sol = screen.getByAltText("Sol Herrera");
         const sebastian = screen.getByAltText("Sebastian Hoß");
-        expect(marisol.getAttribute("src")).toBe("/founder-marisol.webp");
+        expect(sol.getAttribute("src")).toBe("/founder-marisol.webp");
         expect(sebastian.getAttribute("src")).toBe("/founder-sebastian.webp");
     });
 
-    it("gives Marisol her La Jefa title and Sebastian his role", () => {
+    it("gives each founder their title in their own language", () => {
         renderWithServices(<About />);
         expect(screen.getByText("La Jefa")).toBeTruthy();
-        expect(screen.getByText(m.about_sebastian_role())).toBeTruthy();
+        expect(screen.getByText("der Architekt")).toBeTruthy();
     });
 
-    it("tells why Plinky was made", () => {
+    it("tells why Plinky was made and how to get in touch", () => {
         renderWithServices(<About />);
         expect(screen.getByRole("heading", { name: m.about_why_title() })).toBeTruthy();
         expect(screen.getByText(m.about_why_body())).toBeTruthy();
+        expect(screen.getByRole("heading", { name: m.about_contact_title() })).toBeTruthy();
+        expect(screen.getByRole("link", { name: "contact@plinky.fun" }).getAttribute("href")).toBe(
+            "mailto:contact@plinky.fun",
+        );
     });
 });
