@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Contacto por email",
   "datenschutz_email_body": "Se nos escreveres por email, tratamos os dados que forneces exclusivamente para dar resposta ao teu pedido (art. 6.º, n.º 1, alínea b) ou f), do RGPD).",
   "datenschutz_rights_heading": "Os teus direitos",
-  "datenschutz_rights_body": "Assistem-te, perante nós, os seguintes direitos relativamente aos teus dados pessoais: acesso, retificação, apagamento, limitação do tratamento, oposição ao tratamento e portabilidade dos dados. Tens ainda o direito de apresentar reclamação junto de uma autoridade de controlo da proteção de dados. Para exerceres os teus direitos, contacta-nos através do endereço indicado acima."
+  "datenschutz_rights_body": "Assistem-te, perante nós, os seguintes direitos relativamente aos teus dados pessoais: acesso, retificação, apagamento, limitação do tratamento, oposição ao tratamento e portabilidade dos dados. Tens ainda o direito de apresentar reclamação junto de uma autoridade de controlo da proteção de dados. Para exerceres os teus direitos, contacta-nos através do endereço indicado acima.",
+  "consent_banner_label": "Consentimento de análise",
+  "consent_banner_body": "Podemos usar o Google Analytics para ver que funcionalidades são utilizadas e melhorar o Plinky? Isto define cookies. Nada é carregado sem a tua autorização, e podes mudar de ideias a qualquer momento nas Definições.",
+  "consent_accept": "Aceitar",
+  "consent_decline": "Recusar"
 }

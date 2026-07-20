@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Yhteydenotto sähköpostitse",
   "datenschutz_email_body": "Jos otat meihin yhteyttä sähköpostitse, käsittelemme antamiasi tietoja yksinomaan tiedustelusi käsittelemiseksi (GDPR 6 artiklan 1 kohdan b tai f alakohta).",
   "datenschutz_rights_heading": "Sinun oikeutesi",
-  "datenschutz_rights_body": "Sinulla on meihin nähden seuraavat henkilötietojasi koskevat oikeudet: tiedonsaanti, oikaiseminen, poistaminen, käsittelyn rajoittaminen, käsittelyn vastustaminen sekä tietojen siirrettävyys. Sinulla on lisäksi oikeus tehdä valitus tietosuojan valvontaviranomaiselle. Oikeuksiesi käyttämiseksi ota yhteyttä yllä mainittuun yhteystietoon."
+  "datenschutz_rights_body": "Sinulla on meihin nähden seuraavat henkilötietojasi koskevat oikeudet: tiedonsaanti, oikaiseminen, poistaminen, käsittelyn rajoittaminen, käsittelyn vastustaminen sekä tietojen siirrettävyys. Sinulla on lisäksi oikeus tehdä valitus tietosuojan valvontaviranomaiselle. Oikeuksiesi käyttämiseksi ota yhteyttä yllä mainittuun yhteystietoon.",
+  "consent_banner_label": "Suostumus analytiikkaan",
+  "consent_banner_body": "Saammeko käyttää Google Analyticsia nähdäksemme, mitä ominaisuuksia käytetään, ja tehdäksemme Plinkystä paremman? Se asettaa evästeitä. Mitään ei ladata ilman suostumustasi, ja voit muuttaa mielesi milloin tahansa asetuksissa.",
+  "consent_accept": "Hyväksy",
+  "consent_decline": "Hylkää"
 }

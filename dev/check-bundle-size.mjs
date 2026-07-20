@@ -104,7 +104,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // The consent-gated analytics setting (analytics port + gtag adapter + the reactor +
 // the Privacy Settings section; gtag.js itself loads externally, not bundled) — adds
 // ~1.1 KB, measured at 586.1. 587.
-const BUDGET_TOTAL_KB = 587;
+//
+// The legal-page translations + the first-visit analytics consent banner (the moved
+// legal prose in the one built locale, LegalTranslationNotice, ConsentBanner and its
+// strings) — add ~0.2 KB to the per-visitor total, measured at 587.2. 588.
+const BUDGET_TOTAL_KB = 588;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -193,7 +197,10 @@ const BUDGET_TOTAL_KB = 587;
 // The legal-page translations — the Impressum + Datenschutz prose moved into paraglide
 // message keys (only the one built locale's strings ship) plus the LegalTranslationNotice
 // banner — add ~0.6 KB of app code, measured at 276.6. 277.
-const BUDGET_APP_KB = 277;
+//
+// The analytics consent banner (ConsentBanner + its strings, the analyticsAsked pref)
+// adds ~0.4 KB of app code, measured at 277.0. 278.
+const BUDGET_APP_KB = 278;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kapcsolatfelvétel e-mailben",
   "datenschutz_email_body": "Ha e-mailben írsz nekünk, az általad megadott adatokat kizárólag a megkeresésed feldolgozása céljából kezeljük (GDPR 6. cikk (1) bekezdés b), illetve f) pont).",
   "datenschutz_rights_heading": "A jogaid",
-  "datenschutz_rights_body": "A személyes adataiddal kapcsolatban a következő jogok illetnek meg velünk szemben: tájékoztatás, helyesbítés, törlés, az adatkezelés korlátozása, az adatkezelés elleni tiltakozás, valamint adathordozhatóság. Emellett jogod van panaszt tenni egy adatvédelmi felügyeleti hatóságnál. Jogaid gyakorlása érdekében fordulj a fent megadott kapcsolattartási címhez."
+  "datenschutz_rights_body": "A személyes adataiddal kapcsolatban a következő jogok illetnek meg velünk szemben: tájékoztatás, helyesbítés, törlés, az adatkezelés korlátozása, az adatkezelés elleni tiltakozás, valamint adathordozhatóság. Emellett jogod van panaszt tenni egy adatvédelmi felügyeleti hatóságnál. Jogaid gyakorlása érdekében fordulj a fent megadott kapcsolattartási címhez.",
+  "consent_banner_label": "Hozzájárulás az elemzéshez",
+  "consent_banner_body": "Használhatjuk a Google Analyticset, hogy lássuk, mely funkciókat használod, és jobbá tegyük a Plinkyt? Ehhez sütiket állítunk be. A hozzájárulásod nélkül semmi sem töltődik be, és a döntésedet bármikor megváltoztathatod a Beállításokban.",
+  "consent_accept": "Elfogadom",
+  "consent_decline": "Elutasítom"
 }

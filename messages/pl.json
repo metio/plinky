@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kontakt za pośrednictwem poczty elektronicznej",
   "datenschutz_email_body": "Jeśli napiszesz do nas e-mailem, przetwarzamy Twoje dane wyłącznie w celu rozpatrzenia Twojego zapytania (art. 6 ust. 1 lit. b lub lit. f RODO).",
   "datenschutz_rights_heading": "Twoje prawa",
-  "datenschutz_rights_body": "Przysługują Ci wobec nas następujące prawa dotyczące Twoich danych osobowych: dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu wobec przetwarzania oraz przenoszenia danych. Masz ponadto prawo do wniesienia skargi do organu nadzorczego ds. ochrony danych. W celu skorzystania ze swoich praw zwróć się na podany powyżej adres kontaktowy."
+  "datenschutz_rights_body": "Przysługują Ci wobec nas następujące prawa dotyczące Twoich danych osobowych: dostępu, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu wobec przetwarzania oraz przenoszenia danych. Masz ponadto prawo do wniesienia skargi do organu nadzorczego ds. ochrony danych. W celu skorzystania ze swoich praw zwróć się na podany powyżej adres kontaktowy.",
+  "consent_banner_label": "Zgoda na analitykę",
+  "consent_banner_body": "Czy możemy używać Google Analytics, aby zobaczyć, z których funkcji korzystasz, i ulepszać Plinky? Wiąże się to z plikami cookie. Bez twojej zgody nic się nie ładuje, a decyzję możesz w każdej chwili zmienić w ustawieniach.",
+  "consent_accept": "Akceptuję",
+  "consent_decline": "Odrzucam"
 }

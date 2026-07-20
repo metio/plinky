@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kontaktiranje putem e-pošte",
   "datenschutz_email_body": "Ako nam pišeš putem e-pošte, tvoje podatke obrađujemo isključivo radi obrade tvojeg upita (čl. 6. st. 1. tč. b odnosno tč. f OUZP-a).",
   "datenschutz_rights_heading": "Tvoja prava",
-  "datenschutz_rights_body": "U odnosu na nas imaš sljedeća prava u pogledu svojih osobnih podataka: pravo na pristup, ispravak, brisanje, ograničenje obrade, prigovor na obradu te prenosivost podataka. Osim toga, imaš pravo podnijeti pritužbu nadzornom tijelu za zaštitu podataka. Za ostvarivanje svojih prava obrati se na gore navedenu kontaktnu adresu."
+  "datenschutz_rights_body": "U odnosu na nas imaš sljedeća prava u pogledu svojih osobnih podataka: pravo na pristup, ispravak, brisanje, ograničenje obrade, prigovor na obradu te prenosivost podataka. Osim toga, imaš pravo podnijeti pritužbu nadzornom tijelu za zaštitu podataka. Za ostvarivanje svojih prava obrati se na gore navedenu kontaktnu adresu.",
+  "consent_banner_label": "Privola za analitiku",
+  "consent_banner_body": "Smijemo li koristiti Google Analytics kako bismo vidjeli koje se značajke koriste i poboljšali Plinky? Pritom se postavljaju kolačići. Bez tvoje privole ništa se ne učitava, a odluku možeš u svakom trenutku promijeniti u postavkama.",
+  "consent_accept": "Prihvati",
+  "consent_decline": "Odbij"
 }

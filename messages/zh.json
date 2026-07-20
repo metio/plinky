@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "通过电子邮件与我们联系",
   "datenschutz_email_body": "如果你通过电子邮件与我们联系，我们仅为处理你的请求而处理你所提供的信息（《通用数据保护条例》第 6 条第 1 款 b 项或 f 项）。",
   "datenschutz_rights_heading": "你的权利",
-  "datenschutz_rights_body": "就你的个人数据而言，你对我们享有以下权利：知情权、更正权、删除权、限制处理权、反对处理权以及数据可携权。此外，你还有权向数据保护监管机构提出投诉。如需行使你的权利，请通过上述联系地址与我们联系。"
+  "datenschutz_rights_body": "就你的个人数据而言，你对我们享有以下权利：知情权、更正权、删除权、限制处理权、反对处理权以及数据可携权。此外，你还有权向数据保护监管机构提出投诉。如需行使你的权利，请通过上述联系地址与我们联系。",
+  "consent_banner_label": "分析授权",
+  "consent_banner_body": "我们可以使用 Google Analytics 来了解哪些功能被使用，从而改进 Plinky 吗？这会设置 Cookie。未经你同意不会加载任何内容，你也可以随时在设置中更改你的选择。",
+  "consent_accept": "接受",
+  "consent_decline": "拒绝"
 }

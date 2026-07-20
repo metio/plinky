@@ -84,7 +84,11 @@ export default function Settings() {
                     <SwitchField
                         label={m.settings_analytics_toggle()}
                         checked={prefs.analyticsConsent}
-                        onChange={(analyticsConsent) => update({ analyticsConsent })}
+                        // Using the toggle is itself a consent choice, so the
+                        // first-visit banner won't ask again.
+                        onChange={(analyticsConsent) =>
+                            update({ analyticsConsent, analyticsAsked: true })
+                        }
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         {m.settings_analytics_desc()}{" "}

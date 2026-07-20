@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Contactarea prin e-mail",
   "datenschutz_email_body": "Dacă ne scrii prin e-mail, prelucrăm informațiile pe care le furnizezi exclusiv pentru soluționarea solicitării tale (Art. 6 alin. 1 lit. b, respectiv lit. f RGPD).",
   "datenschutz_rights_heading": "Drepturile tale",
-  "datenschutz_rights_body": "Ai față de noi următoarele drepturi cu privire la datele tale cu caracter personal: acces, rectificare, ștergere, restricționarea prelucrării, opoziție față de prelucrare, precum și portabilitatea datelor. Ai, de asemenea, dreptul de a depune o plângere la o autoritate de supraveghere a protecției datelor. Pentru exercitarea drepturilor tale, adresează-te la datele de contact menționate mai sus."
+  "datenschutz_rights_body": "Ai față de noi următoarele drepturi cu privire la datele tale cu caracter personal: acces, rectificare, ștergere, restricționarea prelucrării, opoziție față de prelucrare, precum și portabilitatea datelor. Ai, de asemenea, dreptul de a depune o plângere la o autoritate de supraveghere a protecției datelor. Pentru exercitarea drepturilor tale, adresează-te la datele de contact menționate mai sus.",
+  "consent_banner_label": "Consimțământ pentru analiză",
+  "consent_banner_body": "Putem folosi Google Analytics ca să vedem ce funcții sunt folosite și să facem Plinky mai bun? Sunt setate cookie-uri. Nu se încarcă nimic fără acordul tău și te poți răzgândi oricând în Setări.",
+  "consent_accept": "Accept",
+  "consent_decline": "Refuz"
 }
