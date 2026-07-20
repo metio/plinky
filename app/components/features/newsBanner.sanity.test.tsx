@@ -80,6 +80,10 @@ describe("NewsBanner against a mocked Sanity API", () => {
         const scheduler = fakeScheduler();
         renderWithServices(<NewsBanner />, { ...news, scheduler });
         await screen.findByAltText("A new piece");
+        // The auto-advance timer is armed in a passive effect once the items load;
+        // flush that effect before driving the clock, or the advance can cross an
+        // interval that was never armed and nothing rotates (a full-suite flake).
+        await act(async () => {});
         // It advances on its own...
         act(() => scheduler.advance(7000));
         expect(screen.queryByAltText("Another piece")).not.toBeNull();
