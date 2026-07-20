@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { type Beams, BEAMS } from "./beams";
+import { type Groove, GROOVES } from "./groove";
 import type { Letter } from "./grade";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
 import type { MicCalibration } from "./pitch";
@@ -81,6 +82,8 @@ export type Prefs = {
     metronomeSubdivision: number;
     metronomeAccent: boolean;
     metronomeAdaptive: boolean;
+    // The metronome's feel — which beats it accents (see core/groove).
+    metronomeGroove: Groove;
     // Render the piece as one continuous horizontal line that scrolls under a fixed gaze
     // as you play (a notation "treadmill"), instead of wrapping into stacked rows. Off by
     // default — the wrapped score is the familiar reading layout.
@@ -195,6 +198,7 @@ function defaults(): Prefs {
         metronomeSubdivision: 1,
         metronomeAccent: true,
         metronomeAdaptive: false,
+        metronomeGroove: "straight",
         treadmill: false,
         highway: false,
         raceGhost: true,
@@ -276,6 +280,7 @@ export function parsePrefs(raw: string | null): Prefs {
             ),
             metronomeAccent: bool(parsed.metronomeAccent, base.metronomeAccent),
             metronomeAdaptive: bool(parsed.metronomeAdaptive, base.metronomeAdaptive),
+            metronomeGroove: oneOf(parsed.metronomeGroove, GROOVES, base.metronomeGroove),
             treadmill: bool(parsed.treadmill, base.treadmill),
             highway: bool(parsed.highway, base.highway),
             raceGhost: bool(parsed.raceGhost, base.raceGhost),

@@ -103,4 +103,14 @@ describe("useMetronome", () => {
         vi.advanceTimersByTime(200);
         expect(audio.clicks.length).toBe(after);
     });
+
+    it("moves the accent to the backbeat when the groove is set", () => {
+        // 120 bpm 4/4 under the backbeat groove: the downbeat is a plain beat and the
+        // accent lands on beat two (0.6 s in).
+        const { audio } = harness(true, 120, 4, 1, { metronomeGroove: "backbeat" });
+        expect(audio.clicks[0]?.kind).toBe("beat");
+        audio.time = 0.6;
+        vi.advanceTimersByTime(30);
+        expect(audio.clicks[1]?.kind).toBe("accent");
+    });
 });

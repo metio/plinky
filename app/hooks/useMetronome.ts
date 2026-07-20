@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useRef } from "react";
+import { grooveAccents } from "../../core/groove";
 import { useAudioEngine, usePrefsStore, useScheduler } from "../contexts/services";
 
 // Plays an audible click while `enabled`: an accented downbeat, a plainer click on
@@ -61,9 +62,16 @@ export function useMetronome(
             }
             while (next < now + 0.12) {
                 const onBeat = tick % subs === 0;
-                const downbeat = (tick / subs) % beatsInBar === 0;
-                const kind = !onBeat ? "sub" : downbeat && accent ? "accent" : "beat";
+                const beatInBar = (tick / subs) % beatsInBar;
                 const prefs = prefsStore.load();
+                // Sub-beats stay soft; an on-beat the groove leans on is an accent (when
+                // the accent voice is on), every other on-beat a plain beat. The groove is
+                // read live, so switching it in Settings reshapes the pulse at once.
+                const kind = !onBeat
+                    ? "sub"
+                    : accent && grooveAccents(prefs.metronomeGroove, beatInBar, beatsInBar)
+                      ? "accent"
+                      : "beat";
                 const level = kind === "accent" ? 0.3 : kind === "beat" ? 0.18 : 0.08;
                 const gain = prefs.sound ? level * (prefs.volume / 100) : 0;
                 audio.click(next, kind, gain);

@@ -38,6 +38,7 @@ import { useSynth } from "../hooks/useSynth";
 import type { Letter } from "../../core/grade";
 import type { DecayMode } from "../../core/review";
 import type { Beams } from "../../core/beams";
+import { type Groove, GROOVES } from "../../core/groove";
 import { BARS_PER_ROW, METRONOME_SUBDIVISIONS, NOTE_SCALES, REVEAL_TRIES } from "../../core/prefs";
 import { type NoteHints, type NoteLabels, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
@@ -51,6 +52,17 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 const ICON = "h-5 w-5";
+
+function grooveLabel(groove: Groove): string {
+    switch (groove) {
+        case "backbeat":
+            return m.groove_backbeat();
+        case "twoFeel":
+            return m.groove_two_feel();
+        default:
+            return m.groove_straight();
+    }
+}
 
 export default function Settings() {
     const { prefs, update } = usePrefs();
@@ -354,6 +366,12 @@ export default function Settings() {
                     label={m.metronome_accent()}
                     checked={prefs.metronomeAccent}
                     onChange={(metronomeAccent) => update({ metronomeAccent })}
+                />
+                <ChoiceField
+                    label={m.metronome_groove()}
+                    value={prefs.metronomeGroove}
+                    onChange={(value) => update({ metronomeGroove: value as Groove })}
+                    options={GROOVES.map((groove) => ({ id: groove, label: grooveLabel(groove) }))}
                 />
                 <SwitchField
                     label={m.metronome_adaptive()}

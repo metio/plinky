@@ -27,6 +27,7 @@ const BASE: Prefs = {
     metronomeSubdivision: 1,
     metronomeAccent: true,
     metronomeAdaptive: false,
+    metronomeGroove: "straight",
     treadmill: false,
     raceGhost: true,
     hiddenNotes: false,
@@ -147,6 +148,8 @@ describe("parsePrefs", () => {
         expect(parsePrefs(stored({ metronomeSubdivision: 9 })).metronomeSubdivision).toBe(1);
         expect(parsePrefs(stored({ metronomeAccent: false })).metronomeAccent).toBe(false);
         expect(parsePrefs(stored({ metronomeAdaptive: "yes" })).metronomeAdaptive).toBe(false);
+        expect(parsePrefs(stored({ metronomeGroove: "backbeat" })).metronomeGroove).toBe("backbeat");
+        expect(parsePrefs(stored({ metronomeGroove: "nonsense" })).metronomeGroove).toBe("straight");
     });
 
     it("defaults treadmill off and keeps the stored toggle", () => {
