@@ -10,7 +10,6 @@ describe("levelAids", () => {
             noteLabels: "all",
             noteHints: "always",
             colorNotes: true,
-            showFingerings: true,
             forgiving: true,
             highway: true,
         });
@@ -18,7 +17,6 @@ describe("levelAids", () => {
             noteLabels: "off",
             noteHints: "never",
             colorNotes: false,
-            showFingerings: false,
             forgiving: false,
             highway: false,
         });
@@ -29,7 +27,6 @@ describe("levelAids", () => {
             (aids.noteLabels !== "off" ? 1 : 0) +
             (aids.noteHints !== "never" ? 1 : 0) +
             (aids.colorNotes ? 1 : 0) +
-            (aids.showFingerings ? 1 : 0) +
             (aids.forgiving ? 1 : 0) +
             (aids.highway ? 1 : 0);
         const counts = READING_LEVELS.map((level) => helpCount(levelAids(level)));

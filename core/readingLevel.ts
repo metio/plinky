@@ -7,9 +7,12 @@ import type { Prefs } from "./prefs";
 // beginner to a sight-reader. ONLY these fields are swept by a level; personal and
 // physical prefs (hand span, key map, mic, sound, metronome, the grade/review
 // policy, layout preferences) are never touched by picking a level.
+// Note that fingering numbers are deliberately NOT here: they mean nothing to a
+// beginner who hasn't been taught them, so they belong to no rung of the ladder —
+// an independent, opt-in aid the level never touches.
 export type AidPrefs = Pick<
     Prefs,
-    "noteLabels" | "noteHints" | "colorNotes" | "showFingerings" | "forgiving" | "highway"
+    "noteLabels" | "noteHints" | "colorNotes" | "forgiving" | "highway"
 >;
 
 // The skill ladder, most help first. No separate "level" is stored: the current
@@ -26,7 +29,6 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         noteLabels: "all",
         noteHints: "always",
         colorNotes: true,
-        showFingerings: true,
         forgiving: true,
         highway: true,
     },
@@ -34,7 +36,6 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         noteLabels: "all",
         noteHints: "always",
         colorNotes: false,
-        showFingerings: false,
         forgiving: true,
         highway: false,
     },
@@ -42,7 +43,6 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         noteLabels: "c",
         noteHints: "miss",
         colorNotes: false,
-        showFingerings: false,
         forgiving: false,
         highway: false,
     },
@@ -50,7 +50,6 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         noteLabels: "off",
         noteHints: "never",
         colorNotes: false,
-        showFingerings: false,
         forgiving: false,
         highway: false,
     },

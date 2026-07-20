@@ -18,9 +18,11 @@ const NAME: Record<Level, () => string> = {
     sightReader: m.reading_level_sight_reader,
 };
 
-// The skill-level preset: one control that sets every reading aid together — note
-// names, the next-key glow, colour, fingering numbers, keep-going, and the notes
-// highway — from a new starter's full help down to a sight-reader's bare staff.
+// The skill-level preset: one control that sets the reading aids together — note
+// names, the next-key glow, colour, keep-going, and the notes highway — from a new
+// starter's full help down to a sight-reader's bare staff. Fingering numbers are
+// left out on purpose: they confuse a beginner who hasn't been taught them, so the
+// level never touches them.
 // Personal and physical prefs (hand span, key map, sound, metronome, the grade
 // policy) are never touched. The level is derived from the aids themselves
 // (core/readingLevel), so it reads "Custom" the instant you hand-tune one and
