@@ -3,7 +3,7 @@
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { decodeGhost, encodeGhost, ghostReached } from "./ghost";
+import { decodeGhost, encodeGhost, ghostReached, raceVerdict } from "./ghost";
 
 // A ghost's onsets ascend (notes are played in order); building them as a running
 // sum of non-negative integer gaps mirrors a real run while covering the empty,
@@ -30,6 +30,27 @@ describe("recording (ghost) properties", () => {
             fc.property(fc.string(), (code) => {
                 expect(() => decodeGhost(code)).not.toThrow();
             }),
+        );
+    });
+
+    it("gives a symmetric verdict: your win is the ghost's loss by the same margin", () => {
+        fc.assert(
+            fc.property(
+                fc.array(fc.nat({ max: 4000 }), { minLength: 1, maxLength: 200 }),
+                fc.nat({ max: 400_000 }),
+                (gaps, finishMs) => {
+                    let total = 0;
+                    const onsets = gaps.map((gap) => (total += gap));
+                    const verdict = raceVerdict(onsets, finishMs);
+                    expect(verdict).not.toBeNull();
+                    expect(verdict?.marginMs).toBeGreaterThanOrEqual(0);
+                    // Swapping the two finish times mirrors the outcome and keeps the margin.
+                    const swapped = raceVerdict(onsets, 2 * total - finishMs);
+                    const flip = { won: "lost", lost: "won", tie: "tie" } as const;
+                    expect(swapped?.outcome).toBe(flip[verdict?.outcome ?? "tie"]);
+                    expect(swapped?.marginMs).toBe(verdict?.marginMs);
+                },
+            ),
         );
     });
 

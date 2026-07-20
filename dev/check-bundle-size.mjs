@@ -203,7 +203,11 @@ const BUDGET_TOTAL_KB = 589;
 //
 // The analytics consent banner (ConsentBanner + its strings, the analyticsAsked pref)
 // adds ~0.4 KB of app code, measured at 277.0. 278.
-const BUDGET_APP_KB = 278;
+//
+// The head-to-head duel verdict (raceVerdict/formatRaceMargin in core/ghost, the
+// RaceVerdict card wired into the play surface, and its three won/lost/tie strings
+// inlined per locale) — adds ~0.4 KB of app code, measured at 278.4. 279.
+const BUDGET_APP_KB = 279;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

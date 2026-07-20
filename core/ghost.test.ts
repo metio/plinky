@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it, vi } from "vitest";
-import { decodeGhost, encodeGhost, ghostReached, ghostToRace } from "./ghost";
+import {
+    decodeGhost,
+    encodeGhost,
+    formatRaceMargin,
+    ghostReached,
+    ghostToRace,
+    raceVerdict,
+} from "./ghost";
 import { packToCode } from "./shareCode";
 
 describe("ghost codec", () => {
@@ -115,5 +122,35 @@ describe("ghost codec", () => {
         expect(ghostReached(onsets, 0)).toBe(1);
         expect(ghostReached(onsets, 1200)).toBe(3);
         expect(ghostReached(onsets, 9999)).toBe(4);
+    });
+
+    describe("raceVerdict", () => {
+        // The ghost's total time is its last onset — here, 4000 ms.
+        const ghost = [0, 1000, 2000, 4000];
+
+        it("declares a win when you finish clearly sooner than the ghost", () => {
+            expect(raceVerdict(ghost, 3500)).toEqual({ outcome: "won", marginMs: 500 });
+        });
+
+        it("declares a loss when you finish clearly later than the ghost", () => {
+            expect(raceVerdict(ghost, 4600)).toEqual({ outcome: "lost", marginMs: 600 });
+        });
+
+        it("calls a near-simultaneous finish a dead heat", () => {
+            expect(raceVerdict(ghost, 4050)?.outcome).toBe("tie");
+            expect(raceVerdict(ghost, 3950)?.outcome).toBe("tie");
+        });
+
+        it("has no verdict without a ghost to race", () => {
+            expect(raceVerdict([], 1000)).toBeNull();
+        });
+    });
+
+    describe("formatRaceMargin", () => {
+        it("reads the margin as compact seconds", () => {
+            expect(formatRaceMargin(2340)).toBe("2.3s");
+            expect(formatRaceMargin(0)).toBe("0.0s");
+            expect(formatRaceMargin(12040)).toBe("12.0s");
+        });
     });
 });

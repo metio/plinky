@@ -97,6 +97,38 @@ export function ghostToRace({
     return fastestTake() ?? stored() ?? saved();
 }
 
+// The head-to-head standing of a finished race.
+export type RaceVerdict = { outcome: "won" | "lost" | "tie"; marginMs: number };
+
+// Two crossings within this of each other are called a dead heat rather than a win by
+// a few thousandths — a margin no player experiences as a real lead.
+const TIE_WINDOW_MS = 100;
+
+// The result of a completed race: your finish time against the ghost's. The ghost's
+// total time is its last onset (the moment it would cross the line); you won if you
+// crossed in less, lost if more, and it's a dead heat within the tie window. The margin
+// is the time between the two crossings. A run with no ghost — or an empty one — has no
+// verdict to show.
+export function raceVerdict(ghostOnsets: number[], yourFinishMs: number): RaceVerdict | null {
+    const ghostTotal = ghostOnsets[ghostOnsets.length - 1];
+    if (ghostTotal === undefined) {
+        return null;
+    }
+    const diff = yourFinishMs - ghostTotal;
+    const marginMs = Math.abs(diff);
+    if (marginMs <= TIE_WINDOW_MS) {
+        return { outcome: "tie", marginMs };
+    }
+    return { outcome: diff < 0 ? "won" : "lost", marginMs };
+}
+
+// A race margin as a compact seconds reading — "2.3s" — for the verdict line. The
+// second's SI symbol reads the same in every locale, so the surrounding words are all
+// the copy that needs translating.
+export function formatRaceMargin(marginMs: number): string {
+    return `${(marginMs / 1000).toFixed(1)}s`;
+}
+
 // How many notes the ghost has reached by a given elapsed time. The onsets ascend,
 // so the first one still in the future ends the count.
 export function ghostReached(onsets: number[], elapsedMs: number): number {

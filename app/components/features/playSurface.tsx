@@ -8,6 +8,7 @@ import { LoopRangeBar } from "./loopRangeBar";
 import { usePlaySession } from "./playSession";
 import { PlayStage } from "./playStage";
 import { PlayTransport } from "./playTransport";
+import { RaceVerdict } from "./raceVerdict";
 import { RunResult } from "./runResult";
 import { ScoreCanvas } from "./scoreCanvas";
 import { TakesPanel } from "./takesPanel";
@@ -115,6 +116,11 @@ export function PlaySurface() {
             tempo-locked run finishes, in place of the self-paced grade panel. */}
                 <FullScreen off>
                     {keepUp.result && <KeepUpResultCard result={keepUp.result} />}
+                </FullScreen>
+                {/* The head-to-head duel result, when this run chased a ghost — shown with
+            the grade as the finish of that race. */}
+                <FullScreen off>
+                    {ghostRace.verdict && <RaceVerdict verdict={ghostRace.verdict} />}
                 </FullScreen>
                 {/* The grade narrows the type for the readouts below, so it stays an `&&`
             guard; the full-screen branch is the declarative half. */}

@@ -4,7 +4,13 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { decodeGhost, ghostReached, ghostToRace } from "../../core/ghost";
+import {
+    decodeGhost,
+    ghostReached,
+    ghostToRace,
+    raceVerdict,
+    type RaceVerdict,
+} from "../../core/ghost";
 import type { Hand } from "../../core/matcher";
 import { GHOST_COLOR, PLAYED_COLOR } from "../../core/scoreCanvas";
 import { fastestTakeOnsets } from "../../core/takes";
@@ -53,6 +59,11 @@ export function useGhostRace({
     // the source for the share link. Mirrors storage so the share button reacts.
     const [storedGhost, setStoredGhost] = useState<number[] | null>(null);
     const [sharedFromLink, setSharedFromLink] = useState(false);
+    // The head-to-head result, set once when a raced run finishes and shown with the
+    // grade; cleared when the next run arms. `raceRef` guards the complete→verdict edge
+    // so a render while `complete` stays true doesn't recompute it.
+    const [verdict, setVerdict] = useState<RaceVerdict | null>(null);
+    const settledRef = useRef(false);
 
     const [searchParams] = useSearchParams();
     // Adopt a ghost handed over by a ?ghost= link so the player can race a friend's
@@ -88,6 +99,24 @@ export function useGhostRace({
         const timer = scheduler.every(50, tick);
         return () => scheduler.cancel(timer);
     }, [practicing, ghost, runStartedAt, scheduler]);
+
+    // Settle the head-to-head the moment a raced run completes: your elapsed time at the
+    // line against the ghost's total. Guarded on the complete edge so it's read once, and
+    // only when a ghost was actually being chased from a real start.
+    useEffect(() => {
+        if (!complete) {
+            settledRef.current = false;
+            return;
+        }
+        if (settledRef.current) {
+            return;
+        }
+        settledRef.current = true;
+        const startedAt = runStartedAt();
+        if (ghost && startedAt > 0) {
+            setVerdict(raceVerdict(ghost, scheduler.now() - startedAt));
+        }
+    }, [complete, ghost, runStartedAt, scheduler]);
 
     // Move the ghost's halo onto the note it has currently reached, restoring the one it
     // leaves to green if the player has already played it there, else clearing it.
@@ -162,6 +191,7 @@ export function useGhostRace({
             });
             setGhost(racing);
             setGhostDone(0);
+            setVerdict(null);
             ghostMarkRef.current = -1;
             const osmd = getOsmd();
             ghostNotesRef.current = racing && osmd ? collectNoteElements(osmd, hand) : [];
@@ -176,5 +206,5 @@ export function useGhostRace({
         setSharedFromLink(false);
     }, []);
 
-    return { ghost, ghostDone, storedGhost, sharedFromLink, arm, adoptOwnRun };
+    return { ghost, ghostDone, storedGhost, sharedFromLink, verdict, arm, adoptOwnRun };
 }
