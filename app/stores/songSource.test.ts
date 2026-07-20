@@ -2,17 +2,14 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
-import { memoryStore } from "../adapters/memoryStore";
 import type { Fetcher } from "../ports/fetcher";
-import { createFavoritesStore } from "./favoritesStore";
 import { createSongSource, type SongSource } from "./songSource";
 
-// The source takes its fetcher and stores as lambdas and fakes, so a canned
-// response and a memory store replace a whole mock server and browser.
+// The source takes its fetcher as a lambda, so a canned response replaces a
+// whole mock server.
 const failing: Fetcher = () => Promise.resolve(new Response(null, { status: 500 }));
 
-const sourceOver = (fetchUrl: Fetcher, kv = memoryStore()): SongSource =>
-    createSongSource(fetchUrl, kv, createFavoritesStore(kv));
+const sourceOver = (fetchUrl: Fetcher): SongSource => createSongSource(fetchUrl);
 
 describe("songSource.manifest", () => {
     it("signals an unfetchable manifest as null, not as an empty catalogue", async () => {
@@ -85,89 +82,5 @@ describe("songSource.resolve", () => {
             ),
         );
         expect(await source.resolve("s1")).toBe("unavailable");
-    });
-});
-
-describe("songSource.ensureSeeded", () => {
-    const seedFetcher =
-        (counter: { fetches: number }): Fetcher =>
-        (url) => {
-            if (url.endsWith("seed.json")) {
-                counter.fetches++;
-                return Promise.resolve(Response.json(["s1", "s2"]));
-            }
-            return Promise.resolve(new Response(null, { status: 404 }));
-        };
-
-    it("stars the seed songs once and is idempotent", async () => {
-        const counter = { fetches: 0 };
-        const kv = memoryStore();
-        const favorites = createFavoritesStore(kv);
-        const source = createSongSource(seedFetcher(counter), kv, favorites);
-        await source.ensureSeeded();
-        expect([...favorites.load()].sort()).toEqual(["s1", "s2"]);
-        await source.ensureSeeded();
-        // The second call short-circuits on its persisted flag — no re-fetch.
-        expect(counter.fetches).toBe(1);
-    });
-
-    it("writes the seed through the injected favorites store, not a global one", async () => {
-        // Two fully isolated worlds over two memory stores: seeding one must not
-        // leak into the other — the injected-persistence contract end to end.
-        const counter = { fetches: 0 };
-        const kvA = memoryStore();
-        const favoritesA = createFavoritesStore(kvA);
-        const kvB = memoryStore();
-        const favoritesB = createFavoritesStore(kvB);
-        await createSongSource(seedFetcher(counter), kvA, favoritesA).ensureSeeded();
-        expect(favoritesA.load().size).toBe(2);
-        expect(favoritesB.load().size).toBe(0);
-        expect(kvB.keys()).toEqual([]);
-    });
-
-    it("keeps a song the user already starred instead of un-starring it", async () => {
-        const counter = { fetches: 0 };
-        const kv = memoryStore();
-        const favorites = createFavoritesStore(kv);
-        favorites.toggle("s1");
-        await createSongSource(seedFetcher(counter), kv, favorites).ensureSeeded();
-        // Seeding tops up what's missing; the pre-starred song stays starred.
-        expect([...favorites.load()].sort()).toEqual(["s1", "s2"]);
-    });
-
-    it("does no network work when the seeded flag can't persist", async () => {
-        let fetches = 0;
-        const kv = { ...memoryStore(), set: () => false };
-        const source = createSongSource(
-            () => {
-                fetches++;
-                return Promise.resolve(Response.json([]));
-            },
-            kv,
-            createFavoritesStore(kv),
-        );
-        await source.ensureSeeded();
-        expect(fetches).toBe(0);
-    });
-
-    it("retries seeding after a transient non-OK response instead of latching empty", async () => {
-        const kv = memoryStore();
-        const favorites = createFavoritesStore(kv);
-        let attempt = 0;
-        const fetchUrl: Fetcher = (url) => {
-            if (url.endsWith("seed.json")) {
-                attempt++;
-                // First load hits a 503 (mid-deploy); the server recovers next load.
-                return attempt === 1
-                    ? Promise.resolve(new Response(null, { status: 503 }))
-                    : Promise.resolve(Response.json(["s1", "s2"]));
-            }
-            return Promise.resolve(new Response(null, { status: 404 }));
-        };
-        const source = createSongSource(fetchUrl, kv, favorites);
-        await source.ensureSeeded();
-        expect(favorites.load().size).toBe(0);
-        await source.ensureSeeded();
-        expect([...favorites.load()].sort()).toEqual(["s1", "s2"]);
     });
 });

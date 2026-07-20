@@ -119,8 +119,6 @@ export type AppServices = {
 // test and hands its stores back for seeding and asserting.
 export function createServices(overrides: Partial<AppServices> = {}): AppServices {
     const store = overrides.store ?? browserStore;
-    // The song source seeds first-run favorites, so it takes the same favorites
-    // store the UI subscribes to — seeding lands where the library reads.
     const favorites = overrides.favorites ?? createFavoritesStore(store);
     const fetcher = overrides.fetcher ?? httpFetcher;
     // The mic samples on the Scheduler's frames, so it takes the same one the
@@ -149,7 +147,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         pitch: overrides.pitch ?? micPitch(scheduler),
         scheduler,
         xml: overrides.xml ?? domXmlCodec,
-        songs: overrides.songs ?? createSongSource(fetcher, store, favorites),
+        songs: overrides.songs ?? createSongSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
         news: overrides.news ?? createSanityNews(fetcher),
         help: overrides.help ?? createSanityHelp(fetcher),

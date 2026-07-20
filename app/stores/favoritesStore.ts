@@ -5,9 +5,10 @@ import type { KeyValueStore } from "../ports/keyValueStore";
 import { createStringSetStore } from "./jsonStore";
 
 // The scores a user has starred, kept on the device. One source of truth over
-// the injected store: the library list subscribes to it, first-run seeding
-// writes through it, and the home page reads the same set — so starring in one
-// place updates every other without a hand-mirrored copy.
+// the injected store: the library list subscribes to it and the home page reads
+// the same set — so starring in one place updates every other without a
+// hand-mirrored copy. A fresh device starts empty; stars are only ever the
+// player's own choice.
 
 const KEY = "plinky:favorites";
 

@@ -3,8 +3,6 @@
 
 import { DEFAULT_SONG_SOURCE, licenseDir } from "../../core/attribution";
 import type { Fetcher } from "../ports/fetcher";
-import type { KeyValueStore } from "../ports/keyValueStore";
-import type { FavoritesStore } from "./favoritesStore";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
 // The curated song catalogue. Unlike the bundled exercises (inlined into the
@@ -33,9 +31,6 @@ export type SongMeta = {
 };
 
 const MANIFEST_URL = "/songs/manifest.json";
-const SEED_URL = "/songs/seed.json";
-const SEEDED_KEY = "plinky:songs-seeded";
-const PROBE_KEY = "plinky:songs-seeded-probe";
 
 export type SongSource = {
     // The browsable catalogue (metadata only). A completed fetch is cached for
@@ -52,19 +47,9 @@ export type SongSource = {
     // through to bundled, user or exercise scores; "unavailable" when a fetch
     // failed and the answer is simply unknown.
     resolve(id: string): Promise<ResolvedScore>;
-    // On first run, star the seed songs (a few per grade) so the library spans
-    // grades 1–8 and the home page has something to show without hunting.
-    ensureSeeded(): Promise<void>;
 };
 
-// Seeding writes through the same favorites store the UI subscribes to, so the
-// injected persistence is honored end to end — overriding `store` in the
-// provider redirects the seed writes along with everything else.
-export function createSongSource(
-    fetchUrl: Fetcher,
-    kv: KeyValueStore,
-    favorites: FavoritesStore,
-): SongSource {
+export function createSongSource(fetchUrl: Fetcher): SongSource {
     const manifest = cachedManifest<SongMeta>(fetchUrl, MANIFEST_URL);
 
     const fetchXml = (id: string, license?: string): Promise<string | null> =>
@@ -100,39 +85,6 @@ export function createSongSource(
                 source: meta.source ?? DEFAULT_SONG_SOURCE,
                 bundled: false,
             };
-        },
-        // Guarded so it runs once. The flag is written only after a successful
-        // seeding, so a first visit that cannot reach the seed (offline install)
-        // retries next load.
-        async ensureSeeded() {
-            if (kv.get(SEEDED_KEY)) {
-                return;
-            }
-            // Blocked storage would make the favorites unwritable AND the flag
-            // unlatchable, repeating the fetch on every page load — probe before
-            // doing any network work.
-            if (!kv.set(PROBE_KEY, "1")) {
-                return;
-            }
-            kv.remove(PROBE_KEY);
-            try {
-                const response = await fetchUrl(SEED_URL);
-                // A non-OK response (a 5xx mid-deploy, a captive-portal page) is
-                // transient: latching the flag here would strand the device with an
-                // empty library forever, so leave it unset and retry next load.
-                if (!response.ok) {
-                    return;
-                }
-                const seed = (await response.json()) as string[];
-                for (const id of seed) {
-                    if (!favorites.has(id)) {
-                        favorites.toggle(id);
-                    }
-                }
-                kv.set(SEEDED_KEY, "1");
-            } catch {
-                // No seed shipped (dev build) — nothing to add.
-            }
         },
     };
 }

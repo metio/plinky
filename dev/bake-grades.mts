@@ -7,8 +7,7 @@
 //   • GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts (the in-app grade chip),
 //   • each song's grade in public/songs/manifest.json,
 //   • each study's grade in public/exercises/manifest.json (studies grade on the same
-//     piece scale; scale/arpeggio tiles use their own fixed thresholds, untouched),
-//   • public/songs/seed.json (three songs per grade).
+//     piece scale; scale/arpeggio tiles use their own fixed thresholds, untouched).
 //
 // `npm run songs:bake` writes those; `npm run songs:bake -- --check` writes nothing and
 // exits non-zero if any are stale — the CI guard so a catalogue change can't ship with
@@ -36,7 +35,6 @@ function arraysEqual(a: number[], b: number[]): boolean {
 async function main() {
     const songs: Song[] = JSON.parse(await readFile(`${SONGS}/manifest.json`, "utf8"));
     const exercises: Exercise[] = JSON.parse(await readFile(`${EXERCISES}/manifest.json`, "utf8"));
-    const seed: string[] = JSON.parse(await readFile(`${SONGS}/seed.json`, "utf8"));
     const source = await readFile(THRESHOLDS, "utf8");
 
     const boundaries = octileBoundaries(
@@ -57,15 +55,6 @@ async function main() {
                 : exercise,
         )
         .sort((a, b) => a.grade - b.grade || a.cost - b.cost);
-    const bakedSeed: string[] = [];
-    for (let g = 1; g <= MAX_GRADE; g++) {
-        bakedSeed.push(
-            ...bakedSongs
-                .filter((song) => song.grade === g)
-                .slice(0, 3)
-                .map((song) => song.id),
-        );
-    }
 
     const currentPiece = (source.match(PIECE_RE)?.[2] ?? "")
         .split(",")
@@ -86,9 +75,6 @@ async function main() {
         if (JSON.stringify(exercises) !== JSON.stringify(bakedExercises)) {
             problems.push("public/exercises/manifest.json is stale (grades or order)");
         }
-        if (JSON.stringify(seed) !== JSON.stringify(bakedSeed)) {
-            problems.push("public/songs/seed.json is stale");
-        }
         if (problems.length > 0) {
             console.error("Catalogue grades are not baked:");
             for (const problem of problems) {
@@ -104,7 +90,6 @@ async function main() {
     await writeFile(THRESHOLDS, source.replace(PIECE_RE, `$1${boundaries.join(", ")}$3`));
     await writeFile(`${SONGS}/manifest.json`, JSON.stringify(bakedSongs));
     await writeFile(`${EXERCISES}/manifest.json`, JSON.stringify(bakedExercises));
-    await writeFile(`${SONGS}/seed.json`, JSON.stringify(bakedSeed));
 
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of bakedSongs) {

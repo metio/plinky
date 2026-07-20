@@ -5,7 +5,7 @@
 // catalogue. Reads pdmx/PDMX.csv + pdmx/mxl (a local, gitignored build input — never
 // shipped), grades every candidate by raw fingering-cost, splits them into eight
 // equal difficulty bins (so grades 1–8 are evenly populated), and writes
-// public/songs/<id>.mxl plus a metadata manifest and a seed list. It also prints the
+// public/songs/<id>.mxl plus a metadata manifest. It also prints the
 // bin boundaries — bake those into GRADE_THRESHOLDS.piece (core/scoreDifficulty.ts)
 // so the in-app grade chip matches the manifest. Run locally: `npm run songs:import`.
 //
@@ -234,21 +234,7 @@ async function main() {
     }));
     await writeFile(`${OUT}/manifest.json`, JSON.stringify(manifest));
 
-    // Seed: three of each grade, so a fresh install spans grades 1–8.
-    const seed: string[] = [];
-    for (let g = 1; g <= MAX_GRADE; g++) {
-        seed.push(
-            ...songs
-                .filter((song) => song.grade === g)
-                .slice(0, 3)
-                .map((song) => song.id),
-        );
-    }
-    await writeFile(`${OUT}/seed.json`, JSON.stringify(seed));
-
-    console.log(
-        `\nWrote ${songs.length} scores + manifest.json + seed.json (${seed.length}) to ${OUT}/.`,
-    );
+    console.log(`\nWrote ${songs.length} scores + manifest.json to ${OUT}/.`);
     console.log("→ Bake the boundaries above into GRADE_THRESHOLDS.piece in core/scoreDifficulty.ts.");
 }
 

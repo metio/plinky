@@ -76,7 +76,7 @@ SPDX-FileCopyrightText = "The catalogue score contributors"
 SPDX-License-Identifier = "CC-BY-SA-2.5"
 
 [[annotations]]
-path = ["public/songs/manifest.json", "public/songs/seed.json"]
+path = ["public/songs/manifest.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "0BSD"

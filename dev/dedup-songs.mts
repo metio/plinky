@@ -12,7 +12,7 @@
 //
 // Removing songs shifts the cost distribution, so it then re-derives the eight even
 // octile cost boundaries over the survivors and re-grades every song — keeping grades
-// 1–8 evenly populated. It rewrites public/songs/manifest.json + seed.json and deletes
+// 1–8 evenly populated. It rewrites public/songs/manifest.json and deletes
 // the orphaned .mxl. **Bake the printed boundaries into GRADE_THRESHOLDS.piece
 // (core/scoreDifficulty.ts), then run `npm run exercises`** so the studies (graded
 // on the same piece scale) re-grade to match. Run locally: `npm run songs:dedup`.
@@ -112,18 +112,6 @@ async function main() {
             removed++;
         }
     }
-
-    // Reseed: three of each grade, so a fresh install still spans grades 1–8.
-    const seed: string[] = [];
-    for (let g = 1; g <= MAX_GRADE; g++) {
-        seed.push(
-            ...deduped
-                .filter((song) => song.grade === g)
-                .slice(0, 3)
-                .map((song) => song.id),
-        );
-    }
-    await writeFile(`${OUT}/seed.json`, JSON.stringify(seed));
 
     console.log(
         `Deduped by title: kept ${deduped.length} of ${manifest.length} songs (removed ${removed}).`,

@@ -5,14 +5,12 @@ import { useEffect } from "react";
 import { Navigate, Outlet, useLocation, useParams } from "react-router";
 import { BottomNav } from "../components/ui/navBar";
 import { SiteFooter } from "../components/ui/siteFooter";
-import { useSongSource } from "../contexts/services";
 import { isLocale, localizeHref } from "../paraglide/runtime.js";
 
 // The parent of every localized page. The active locale comes from the URL
 // prefix (the `url` strategy reads it directly), so this validates the segment
 // and keeps <html lang> in sync on the client.
 export default function LocaleLayout() {
-    const songs = useSongSource();
     const { locale } = useParams();
     const { pathname } = useLocation();
     const valid = isLocale(locale);
@@ -22,14 +20,6 @@ export default function LocaleLayout() {
             document.documentElement.lang = locale;
         }
     }, [valid, locale]);
-
-    // On first run, seed a few songs per grade into the library so it's useful out
-    // of the box; guarded so it happens once.
-    useEffect(() => {
-        if (valid) {
-            songs.ensureSeeded();
-        }
-    }, [valid, songs.ensureSeeded]);
 
     // An unknown locale prefix — a typo, a stale link, a bot probing paths — can't
     // select a language, so redirect to the same page under the resolved locale rather
