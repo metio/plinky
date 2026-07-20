@@ -9,16 +9,34 @@ import type { Analytics } from "../ports/analytics";
 // still nothing loads). gtag is injected lazily on the first opt-in; toggling off
 // sets Google's own `ga-disable-<id>` flag, honoured on every hit, so collection
 // stops even after the script has loaded.
+//
+// It also speaks Google Consent Mode v2, the signal Google's own tags read. The tag
+// only loads after a deliberate opt-in, so it is unnecessary today — but it is the
+// shape Google's tooling expects and keeps us forward-compatible for the day ads /
+// GTM enter the picture. On load every consent type defaults to "denied" (before the
+// config command that could store anything), and each opt-in/opt-out pushes a
+// consent "update" reflecting the choice onto `analytics_storage`. Consent Mode does
+// not gather the choice — the first-visit ConsentBanner does that; this only relays
+// it to the tag.
 const MEASUREMENT_ID = import.meta.env.VITE_ANALYTICS_ID as string | undefined;
 
-function inject(id: string): void {
+function gtagPush(...args: unknown[]): void {
     const win = window as unknown as { dataLayer?: unknown[] };
     win.dataLayer = win.dataLayer ?? [];
-    const gtag = (...args: unknown[]) => {
-        win.dataLayer?.push(args);
-    };
-    gtag("js", new Date());
-    gtag("config", id);
+    win.dataLayer.push(args);
+}
+
+function inject(id: string): void {
+    // Consent Mode default: everything denied until an update grants it, pushed
+    // before `config` so no storage is used ahead of the granted signal.
+    gtagPush("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+    });
+    gtagPush("js", new Date());
+    gtagPush("config", id);
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
@@ -38,6 +56,13 @@ export function gtagAnalytics(id: string | undefined = MEASUREMENT_ID): Analytic
             if (on && !injected) {
                 injected = true;
                 inject(id);
+            }
+            // Relay the choice to Consent Mode once the tag exists (a decline before
+            // any opt-in never loads it, so there is nothing to tell).
+            if (injected) {
+                gtagPush("consent", "update", {
+                    analytics_storage: on ? "granted" : "denied",
+                });
             }
         },
     };

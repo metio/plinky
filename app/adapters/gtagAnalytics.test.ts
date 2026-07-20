@@ -16,6 +16,14 @@ afterEach(() => {
 
 const flag = (id: string) => (window as unknown as Record<string, boolean>)[`ga-disable-${id}`];
 
+const dataLayer = () => (window as unknown as { dataLayer?: unknown[] }).dataLayer ?? [];
+const consentCalls = () =>
+    dataLayer().filter((entry) => Array.isArray(entry) && entry[0] === "consent");
+
+afterEach(() => {
+    (window as unknown as { dataLayer?: unknown[] }).dataLayer = [];
+});
+
 describe("gtagAnalytics", () => {
     it("stays inert with no measurement id (preview / dev / test)", () => {
         gtagAnalytics(undefined).setConsent(true);
@@ -37,5 +45,41 @@ describe("gtagAnalytics", () => {
         analytics.setConsent(true);
         analytics.setConsent(false);
         expect(flag("G-TEST123")).toBe(true);
+    });
+
+    it("defaults Consent Mode to denied then updates it to granted on opt-in", () => {
+        const analytics = gtagAnalytics("G-TEST123");
+        analytics.setConsent(true);
+        // The default (all denied) must be queued before the config command…
+        const layer = dataLayer();
+        const defaultIndex = layer.findIndex(
+            (e) => Array.isArray(e) && e[0] === "consent" && e[1] === "default",
+        );
+        const configIndex = layer.findIndex((e) => Array.isArray(e) && e[0] === "config");
+        expect(defaultIndex).toBeGreaterThanOrEqual(0);
+        expect(defaultIndex).toBeLessThan(configIndex);
+        expect((layer[defaultIndex] as unknown[])[2]).toMatchObject({
+            analytics_storage: "denied",
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied",
+        });
+        // …then an update grants analytics.
+        expect(consentCalls().at(-1)).toEqual([
+            "consent",
+            "update",
+            { analytics_storage: "granted" },
+        ]);
+    });
+
+    it("relays a withdrawal to Consent Mode as denied", () => {
+        const analytics = gtagAnalytics("G-TEST123");
+        analytics.setConsent(true);
+        analytics.setConsent(false);
+        expect(consentCalls().at(-1)).toEqual([
+            "consent",
+            "update",
+            { analytics_storage: "denied" },
+        ]);
     });
 });
