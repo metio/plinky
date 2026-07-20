@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { linkClasses } from "../components/ui/classes";
 import { ChoiceField, SwitchField } from "../components/ui/fields";
@@ -30,6 +31,7 @@ import { LocalizedLink } from "../components/ui/localizedLink";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
 import { ThemeToggle } from "../components/features/themeToggle";
+import { useOnboardingStore } from "../contexts/services";
 import { useMidiConnection } from "../contexts/midi";
 import { usePrefs } from "../hooks/usePrefs";
 import { useSynth } from "../hooks/useSynth";
@@ -54,6 +56,14 @@ export default function Settings() {
     const { prefs, update } = usePrefs();
     const synth = useSynth();
     const { support: midiSupport, micStatus } = useMidiConnection();
+    const onboarding = useOnboardingStore();
+
+    // Opening Settings — where the Privacy block leads the page — marks the "check
+    // your privacy settings" discovery step. Awareness only: never tied to turning
+    // analytics on, so the checklist can't pressure a consent.
+    useEffect(() => {
+        onboarding.markDiscovered("privacyChecked");
+    }, [onboarding]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">

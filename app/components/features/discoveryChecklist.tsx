@@ -60,6 +60,7 @@ const DISCOVERY: {
     },
     { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
     { key: "imported", icon: "📥", label: m.discover_import, to: "/library?tab=manage" },
+    { key: "privacyChecked", icon: "🔒", label: m.discover_privacy, to: "/settings" },
 ];
 
 const DISCOVERY_DISMISSED = "discovery-panel";
