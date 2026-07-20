@@ -6,6 +6,7 @@ import { linkClasses } from "../components/ui/classes";
 import { ChoiceField, SwitchField } from "../components/ui/fields";
 import {
     BookIcon,
+    EyeIcon,
     FingersIcon,
     GradCapIcon,
     KeysIcon,
@@ -25,6 +26,7 @@ import { HandSize } from "../components/features/handSize";
 import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
 import { LanguageSwitcher } from "../components/ui/languageSwitcher";
+import { LocalizedLink } from "../components/ui/localizedLink";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
 import { ThemeToggle } from "../components/features/themeToggle";
@@ -350,6 +352,28 @@ export default function Settings() {
                     <MicConnect />
                 </SettingsSection>
             )}
+
+            {/* Privacy: opt-ins that involve a third party, off unless turned on. The
+            analytics toggle lives here now; a monetisation opt-in joins it later. */}
+            <SettingsSection
+                title={m.settings_privacy_title()}
+                hint={m.settings_privacy_hint()}
+                icon={<EyeIcon className={ICON} />}
+            >
+                <div className="space-y-1">
+                    <SwitchField
+                        label={m.settings_analytics_toggle()}
+                        checked={prefs.analyticsConsent}
+                        onChange={(analyticsConsent) => update({ analyticsConsent })}
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {m.settings_analytics_desc()}{" "}
+                        <LocalizedLink to="/datenschutz" className={linkClasses}>
+                            {m.settings_analytics_link()}
+                        </LocalizedLink>
+                    </p>
+                </div>
+            </SettingsSection>
 
             <SettingsSection title={m.settings_help()} icon={<QuestionIcon className={ICON} />}>
                 <a

@@ -58,6 +58,10 @@ jobs:
           # the client bundle, so they are repository *Variables*, not secrets.
           VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
           VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+          # The Google Analytics measurement id, baked in only on this production
+          # deploy — a repository *Variable*. Unset = no analytics at all, whatever
+          # a visitor's opt-in; previews never set it.
+          VITE_ANALYTICS_ID: ${{ vars.VITE_ANALYTICS_ID }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: site-root
@@ -83,6 +87,10 @@ jobs:
           PLINKY_LOCALE: ${{ matrix.locale }}
           VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID }}
           VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET }}
+          # The Google Analytics measurement id, baked in only on this production
+          # deploy — a repository *Variable*. Unset = no analytics at all, whatever
+          # a visitor's opt-in; previews never set it.
+          VITE_ANALYTICS_ID: ${{ vars.VITE_ANALYTICS_ID }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: site-${{ matrix.locale }}

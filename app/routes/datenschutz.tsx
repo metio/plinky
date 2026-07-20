@@ -60,8 +60,10 @@ export default function Datenschutz() {
                     Plinky ist eine reine Browser-Anwendung. Deine Einstellungen, dein Fortschritt
                     und deine Aufnahmen werden ausschließlich lokal in deinem Browser gespeichert
                     und von uns nicht erhoben oder an einen Server übertragen. Es gibt keine
-                    Benutzerkonten, keine Cookies zu Analyse- oder Werbezwecken, kein Tracking und
-                    keine Werbung.
+                    Benutzerkonten und keine Werbung. Standardmäßig findet keine Analyse und kein
+                    Tracking statt. Nur wenn du es in den Einstellungen ausdrücklich einschaltest,
+                    wird eine anonyme Nutzungsanalyse (Google Analytics) geladen — du kannst sie
+                    jederzeit wieder ausschalten.
                 </p>
             </Section>
 
@@ -103,6 +105,23 @@ export default function Datenschutz() {
                     EU) geladen. Dabei wird deine IP-Adresse technisch bedingt an den Anbieter
                     übermittelt, um die Inhalte auszuliefern. Rechtsgrundlage ist Art. 6 Abs. 1 lit.
                     f DSGVO. Schlägt der Abruf fehl, funktioniert die App unverändert weiter.
+                </p>
+            </Section>
+
+            <Section title="Webanalyse mit Google Analytics">
+                <p>
+                    Wenn — und nur wenn — du in den Einstellungen die anonyme Nutzungsanalyse
+                    aktivierst, binden wir Google Analytics 4 ein (Anbieter: Google Ireland
+                    Limited, Gordon House, Barrow Street, Dublin 4, Irland). Es hilft uns zu
+                    verstehen, welche Funktionen genutzt werden, um Plinky zu verbessern. Dabei
+                    werden anonymisierte Nutzungsdaten verarbeitet; Google Analytics 4 speichert
+                    keine vollständigen IP-Adressen. Rechtsgrundlage ist deine Einwilligung nach
+                    Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG. Du kannst deine Einwilligung
+                    jederzeit mit Wirkung für die Zukunft widerrufen, indem du die Analyse in den
+                    Einstellungen wieder ausschaltest. Eine Übermittlung in die USA kann
+                    stattfinden; sie stützt sich auf die Zertifizierung von Google nach dem EU-US
+                    Data Privacy Framework. Weitere Informationen findest du in der
+                    Datenschutzerklärung von Google.
                 </p>
             </Section>
 

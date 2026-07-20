@@ -102,6 +102,10 @@ export type Prefs = {
     // wizard, or null when the player has never run it (the detector's own defaults
     // stand in). Stored per device — a different room needs a different tuning.
     micCalibration: MicCalibration | null;
+    // Whether the player has opted in, in Settings, to anonymous usage analytics.
+    // Off by default and only ever set true by a deliberate toggle — nothing loads
+    // or is sent until then. A monetisation opt-in sits beside it later.
+    analyticsConsent: boolean;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -192,6 +196,7 @@ function defaults(): Prefs {
         hiddenNotes: false,
         revealTries: 1,
         micCalibration: null,
+        analyticsConsent: false,
     };
 }
 
@@ -271,6 +276,7 @@ export function parsePrefs(raw: string | null): Prefs {
             hiddenNotes: bool(parsed.hiddenNotes, base.hiddenNotes),
             revealTries: oneOf(parsed.revealTries, REVEAL_TRIES, base.revealTries),
             micCalibration: cleanCalibration(parsed.micCalibration),
+            analyticsConsent: bool(parsed.analyticsConsent, base.analyticsConsent),
         };
     } catch {
         return base;

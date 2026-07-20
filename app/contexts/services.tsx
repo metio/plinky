@@ -3,6 +3,7 @@
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
+import { webAnalytics } from "../adapters/gtagAnalytics";
 import { webAudioEngine } from "../adapters/webAudioEngine";
 import { lazyVideoExporter } from "../adapters/lazyVideo";
 import { micPitch } from "../adapters/micPitch";
@@ -11,6 +12,7 @@ import { browserScheduler } from "../adapters/browserScheduler";
 import type { MidiAccessPort } from "../ports/midiAccess";
 import type { PitchInput } from "../ports/pitchInput";
 import type { Scheduler } from "../ports/scheduler";
+import type { Analytics } from "../ports/analytics";
 import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
@@ -104,6 +106,9 @@ export type AppServices = {
     // root reads it to hold a service-worker reload until the app is idle.
     // Turns a take into a shareable MP4 where the engine can encode one.
     video: VideoExporter;
+    // Anonymous usage analytics, gated behind the Settings opt-in — inert until a
+    // deliberate consent, and carries no measurement id off the production build.
+    analytics: Analytics;
     activity: ActivitySignal;
 };
 
@@ -150,6 +155,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         help: overrides.help ?? createSanityHelp(fetcher),
         board: overrides.board ?? createSanityBoard(fetcher),
         video: overrides.video ?? lazyVideoExporter,
+        analytics: overrides.analytics ?? webAnalytics,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.
         activity: overrides.activity ?? runActivity,
@@ -188,6 +194,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     help: true,
     board: true,
     video: true,
+    analytics: true,
     activity: true,
 };
 const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
@@ -238,6 +245,10 @@ export function useStore(): KeyValueStore {
 
 export function usePrefsStore(): PrefsStore {
     return useServices().prefs;
+}
+
+export function useAnalytics(): Analytics {
+    return useServices().analytics;
 }
 
 export function useMasteryStore(): MasteryStore {

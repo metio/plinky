@@ -32,6 +32,7 @@ const BASE: Prefs = {
     hiddenNotes: false,
     revealTries: 1,
     micCalibration: null,
+    analyticsConsent: false,
 };
 
 const CALIBRATION = { noiseFloor: 0.02, softLevel: 0.03, loudLevel: 0.2, octaveShift: -1 };

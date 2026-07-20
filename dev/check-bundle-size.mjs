@@ -100,7 +100,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // The skill-level preset + the Reading section of Settings (the ReadingLevel control,
 // core/readingLevel, and the run-panel reading prefs mirrored onto the Settings page)
 // — add ~1.8 KB, measured at 585.0. 586.
-const BUDGET_TOTAL_KB = 586;
+//
+// The consent-gated analytics setting (analytics port + gtag adapter + the reactor +
+// the Privacy Settings section; gtag.js itself loads externally, not bundled) — adds
+// ~1.1 KB, measured at 586.1. 587.
+const BUDGET_TOTAL_KB = 587;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
