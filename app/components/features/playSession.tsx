@@ -890,10 +890,11 @@ function usePlaySessionValue({
         captureRef.current = startCapture();
         // The sustain pedal held down as the run begins is invisible to a fresh capture —
         // Web MIDI streams pedal changes, never the standing state — so its first notes would
-        // record dry despite ringing under the damper. Seed the capture from the live pedal.
-        // (The timestamp is unused while the pedal stays down, so a placeholder is fine.)
+        // record dry despite ringing under the damper. Seed the capture from the live pedal,
+        // on the same clock every hold is stamped with (the seed's time is unused while the
+        // pedal stays down, but sharing the origin keeps the capture single-clock throughout).
         if (pedalHeld("sustain")) {
-            capturePedal(captureRef.current, true, 0);
+            capturePedal(captureRef.current, true, scheduler.now());
         }
         gradeFromRunRef.current = false;
         gradedRef.current = false;

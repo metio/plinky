@@ -45,7 +45,7 @@ describe("webMidi", () => {
         await expect(webMidi.request()).rejects.toThrow(/not available/);
     });
 
-    it("wraps inputs with name fallbacks and delivers messages with their timestamp", async () => {
+    it("wraps inputs with name fallbacks and stamps messages on receipt, not with the driver clock", async () => {
         const raw: StubInput = {
             id: "in-1",
             name: null,
@@ -59,14 +59,19 @@ describe("webMidi", () => {
         expect(input?.name).toBe("Unknown device");
         expect(input?.manufacturer).toBe("");
 
+        // A driver's event.timeStamp rides an unreliable origin, so the adapter
+        // ignores it and stamps every message on the one performance clock the
+        // capture also reads to close a note.
+        const now = vi.spyOn(performance, "now").mockReturnValue(9999);
         const received: Array<[number[], number]> = [];
         input?.onMessage((data, timestamp) => received.push([[...data], timestamp]));
         raw.onmidimessage?.({ data: new Uint8Array([0x90, 60, 100]), timeStamp: 123 });
-        expect(received).toEqual([[[0x90, 60, 100], 123]]);
+        expect(received).toEqual([[[0x90, 60, 100], 9999]]);
 
         // A payload-less event carries nothing to parse and reaches nobody.
         raw.onmidimessage?.({ data: null, timeStamp: 456 });
         expect(received).toHaveLength(1);
+        now.mockRestore();
     });
 
     it("wires and unhooks the statechange handler through close", async () => {

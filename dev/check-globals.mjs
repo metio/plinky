@@ -32,14 +32,17 @@ const CONFINED = {
     // genuinely owns a clock rather than consuming one: the Scheduler adapter
     // that implements now(); the audio engine, whose strike decay and release
     // tails are measured against the same scale its own nodes are scheduled on;
-    // the MIDI context, because Web MIDI stamps its events on the performance
-    // scale and an event's own timestamp is the honest one to carry; and
+    // the Web MIDI adapter, which stamps every incoming message on receipt (a
+    // driver's own event.timeStamp rides an unreliable origin, so the capture must
+    // read one clock for both a note's press and its later release); the MIDI
+    // context, which force-releases held notes on the same scale; and
     // useScoreMatcher's registerNote, whose timestamp default no caller in the
     // app takes — playSession always passes the event's stamp — leaving it a
     // convenience the tests spend, not a clock the app reads.
     performance: [
         "app/adapters/browserScheduler.ts",
         "app/adapters/webAudioEngine.ts",
+        "app/adapters/webMidi.ts",
         "app/contexts/midi.tsx",
         "app/hooks/useScoreMatcher.ts",
     ],

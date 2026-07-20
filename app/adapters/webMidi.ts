@@ -16,7 +16,17 @@ function wrapInput(input: MIDIInput): MidiInput {
             input.onmidimessage = (event) => {
                 // A message without payload carries nothing to parse.
                 if (event.data) {
-                    handler(event.data, event.timeStamp);
+                    // Stamp on receipt with performance.now() rather than carrying
+                    // event.timeStamp. The spec ties timeStamp to the page time origin,
+                    // but real MIDI drivers don't reliably honour that — some stamp on a
+                    // system/subsystem epoch or emit 0. Mixing that rogue origin with the
+                    // performance-clock stamps the capture uses to CLOSE a note (the
+                    // end-of-run flush, a blur/disconnect force-release) yields a hold
+                    // length ≈ time-since-page-load: the first held note (or a note left
+                    // ringing under the sustain pedal) records as sustained for the whole
+                    // uptime. Stamping every message on the one clock the flush also reads
+                    // keeps open and close on the same origin.
+                    handler(event.data, performance.now());
                 }
             };
         },
