@@ -15,6 +15,7 @@ import {
     KEYBOARD_VELOCITY,
     MIC_DEVICE,
     ON_SCREEN_DEVICE,
+    isFocusGatedInput,
     keyToNote,
     MAX_EVENTS,
     MAX_OCTAVE_OFFSET,
@@ -26,6 +27,7 @@ import {
     type MidiStatus,
     type MidiSupport,
 } from "../../core/midi";
+import { type ConnectedInput, diffConnectedInputs } from "../../core/midiDevices";
 import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
@@ -217,6 +219,21 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 emitPedal(parsed.pedal, parsed.down, timestamp);
                 return;
             }
+            if (parsed.kind === "reset") {
+                // All-notes-off / all-sound-off / reset: the device is going quiet and
+                // will send no further note-offs. Release every note it was sounding and
+                // lift any held pedal, so nothing latches on — scoping the note release to
+                // this device leaves a sibling device's held notes untouched.
+                for (const note of heldNotesRef.current) {
+                    if (heldDevicesRef.current.get(note) === deviceName) {
+                        emitNote("noteoff", note, 0, 1, deviceName, timestamp);
+                    }
+                }
+                for (const pedal of [...pedalsDownRef.current]) {
+                    emitPedal(pedal, false, timestamp);
+                }
+                return;
+            }
             emitNote(
                 parsed.kind,
                 parsed.note,
@@ -294,6 +311,12 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                             suppressed.add(event.note);
                             return;
                         }
+                        // A genuine onset for a pitch still marked suppressed (its echo's
+                        // note-off has not arrived) must clear that mark, or the note-off
+                        // for THIS real note would be swallowed as the echo's and leave the
+                        // note stuck on. Clearing errs toward an early release over a stuck
+                        // key — the safer failure.
+                        suppressed.delete(event.note);
                         emitNote(
                             "noteon",
                             event.note,
@@ -348,8 +371,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         [emitNote],
     );
 
-    // The inputs seen connected on the last refresh, so a disconnection can be spotted.
-    const connectedInputsRef = useRef<Set<string>>(new Set());
+    // The inputs seen connected on the last refresh (id → device name), so a disconnection
+    // can be spotted and attributed to the device that dropped.
+    const connectedInputsRef = useRef<Map<string, string>>(new Map());
 
     const refreshDevices = useCallback(() => {
         const connection = connectionRef.current;
@@ -357,7 +381,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             return;
         }
         const list: MidiDevice[] = [];
-        const nowConnected = new Set<string>();
+        const current: ConnectedInput[] = [];
         for (const input of connection.inputs()) {
             list.push({
                 id: input.id,
@@ -366,31 +390,30 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 state: input.state,
             });
             input.onMessage(makeHandler(input.name));
-            if (input.state === "connected") {
-                nowConnected.add(input.id);
-            }
+            current.push({ id: input.id, name: input.name, state: input.state });
         }
         // A device unplugged mid-hold never sends its note-offs, so a held note would stay
         // stuck on — in the debug panel, on the on-screen keyboard, and in any run's hold
         // that never resolves. When an input that was connected has gone (or flipped to
-        // disconnected), release every held note on the device that sounded it, so a real
-        // piano note ends precisely while an on-screen note keeps its ring-out.
-        const dropped = [...connectedInputsRef.current].some((id) => !nowConnected.has(id));
+        // disconnected), release every held note the DROPPED device sounded — and only its
+        // own, so a second keyboard still connected keeps its chord — ending each note on
+        // that device so a real piano note stays precise.
+        const { nowConnected, droppedNames } = diffConnectedInputs(
+            connectedInputsRef.current,
+            current,
+        );
         connectedInputsRef.current = nowConnected;
-        if (dropped) {
+        if (droppedNames.size > 0) {
             for (const note of heldNotesRef.current) {
-                emitNote(
-                    "noteoff",
-                    note,
-                    0,
-                    1,
-                    heldDevicesRef.current.get(note) ?? "MIDI",
-                    performance.now(),
-                );
+                const device = heldDevicesRef.current.get(note);
+                if (device !== undefined && droppedNames.has(device)) {
+                    emitNote("noteoff", note, 0, 1, device, performance.now());
+                }
             }
             // A pedal held when its device vanishes never sends its release either, so it
-            // would latch down — every note played after would ring on. Lift whatever pedal
-            // was down (snapshotting first, since emitPedal mutates the set as it clears).
+            // would latch down — every note played after would ring on. Held pedals carry
+            // no device, so lift whatever pedal was down (snapshotting first, since
+            // emitPedal mutates the set as it clears).
             for (const pedal of [...pedalsDownRef.current]) {
                 emitPedal(pedal, false, performance.now());
             }
@@ -549,17 +572,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         const releaseAll = () => {
             pressed.clear();
             for (const note of heldNotesRef.current) {
-                // End each note on the device that sounded it: a real piano note held
-                // when focus is lost stays precise (no lengthened hold), while an
-                // on-screen or computer-keyboard note keeps its gentle ring-out.
-                emitNote(
-                    "noteoff",
-                    note,
-                    0,
-                    1,
-                    heldDevicesRef.current.get(note) ?? "MIDI",
-                    performance.now(),
-                );
+                const device = heldDevicesRef.current.get(note) ?? KEYBOARD_DEVICE;
+                // Release only the focus-gated inputs — the computer and on-screen
+                // keyboards, whose keyup/pointerup never arrives once focus leaves. A MIDI
+                // device and the microphone keep streaming their own note-offs regardless
+                // of focus, so cutting them here would clip a note that is still down. Each
+                // note ends on its own device, keeping its gentle ring-out.
+                if (isFocusGatedInput(device)) {
+                    emitNote("noteoff", note, 0, 1, device, performance.now());
+                }
             }
             // Lift any pedal held by a computer key too, so a pedal doesn't stick down.
             for (const pedal of pedalKeysDown.values()) {

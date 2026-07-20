@@ -116,6 +116,62 @@ describe("MidiProvider", () => {
         expect(result.current.heldNotes).not.toContain(60);
     });
 
+    it("releases only the dropped device's notes, leaving a second keyboard's chord held", async () => {
+        const piano = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
+        const pad = fakeMidiInput({ id: "in-2", name: "Drum Pad" });
+        const midi = fakeMidi({ inputs: [piano, pad] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        // A chord is held on the piano; a single note is held on the pad.
+        act(() => {
+            piano.emit([0x90, 60, 100]);
+            piano.emit([0x90, 64, 100]);
+            pad.emit([0x90, 48, 100]);
+        });
+        expect(result.current.heldNotes).toEqual([48, 60, 64]);
+
+        // Only the pad is unplugged. The piano is still connected and still holding.
+        midi.connection.inputs = () => [piano];
+        act(() => midi.connection.stateChange());
+        // The pad's note lifts; the piano's chord must stay down, not be cut short.
+        expect(result.current.heldNotes).toEqual([60, 64]);
+    });
+
+    it("does not cut a held MIDI note short when the window loses focus", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        act(() => input.emit([0x90, 60, 100]));
+        expect(result.current.heldNotes).toContain(60);
+        // A MIDI device keeps sending its own note-off regardless of focus, so blur must
+        // leave its held note alone — releasing it here would clip a note still down.
+        act(() => window.dispatchEvent(new Event("blur")));
+        expect(result.current.heldNotes).toContain(60);
+    });
+
+    it("releases the device's held notes on an all-notes-off control change", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        act(() => {
+            input.emit([0x90, 60, 100]);
+            input.emit([0x90, 64, 100]);
+        });
+        expect(result.current.heldNotes).toEqual([60, 64]);
+        // A panic / stop button sends CC123; after it the device sends no note-offs, so the
+        // reset itself must release everything it was sounding.
+        act(() => input.emit([0xb0, 123, 0]));
+        expect(result.current.heldNotes).toEqual([]);
+    });
+
     it("plays from the computer keyboard and shifts the octave", () => {
         const { result } = renderHook(() => useMidiConnection(), {
             wrapper: wrapperWith(fakeMidi()),

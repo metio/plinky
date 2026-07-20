@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMidiConnection } from "../../contexts/midi";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
@@ -48,21 +48,10 @@ export function PianoKeyboard({
         [subscribe],
     );
 
-    // A key still held when this surface tears down (a run ending, leaving full
-    // screen) never delivers its pointer-up, so its note would stay lit and its
-    // voice would ring on. Release whatever is held as the keybed unmounts. The
-    // latest held set is read through a ref so the cleanup isn't pinned to a stale
-    // render.
-    const heldRef = useRef(heldNotes);
-    heldRef.current = heldNotes;
-    useEffect(
-        () => () => {
-            for (const note of heldRef.current) {
-                releaseKey(note);
-            }
-        },
-        [releaseKey],
-    );
+    // A key still held when this surface tears down never delivers its pointer-up; the
+    // shared Keyboard releases its own on-screen sources on unmount, so its voice does not
+    // ring on. A MIDI or mic note held then is genuinely still down (that device keeps
+    // streaming its own note-off), so it is deliberately left alone rather than cut short.
 
     return (
         <Keyboard

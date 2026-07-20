@@ -53,17 +53,24 @@ export function pitchClass(note: number): string {
 // The MIDI control-change number each pedal speaks on: sustain 64, sostenuto 66, soft 67.
 const PEDAL_CC: Record<number, PedalKind> = { 64: "sustain", 66: "sostenuto", 67: "soft" };
 
-// A decoded MIDI message the app acts on: a note-on/off, or one of the three pedals
-// changing. Every other message (expression, bank select, pitch bend…) decodes to
-// null and is ignored.
+// The channel-mode messages that ask a device to go quiet: All Sound Off (120),
+// Reset All Controllers (121), All Notes Off (123). A stop button, a panic, or a
+// patch change sends one of these, and after it the device sends no note-offs for
+// whatever it was sounding — so it must be read as "release everything".
+const RESET_CONTROLLERS = new Set([120, 121, 123]);
+
+// A decoded MIDI message the app acts on: a note-on/off, one of the three pedals
+// changing, or a reset that releases everything. Every other message (expression,
+// bank select, pitch bend…) decodes to null and is ignored.
 export type ParsedMessage =
     | { kind: "noteon" | "noteoff"; note: number; velocity: number; channel: number }
-    | { kind: "pedal"; pedal: PedalKind; down: boolean; channel: number };
+    | { kind: "pedal"; pedal: PedalKind; down: boolean; channel: number }
+    | { kind: "reset"; channel: number };
 
-// Decode a raw MIDI status/data triple into a note event or a pedal change, or null
-// for anything else. A note-on with zero velocity is the conventional "running status"
-// way to release a key, so it reads as note-off. A pedal control change reads as down
-// when its value is in the upper half (≥64), the MIDI convention.
+// Decode a raw MIDI status/data triple into a note event, a pedal change, a reset, or
+// null for anything else. A note-on with zero velocity is the conventional "running
+// status" way to release a key, so it reads as note-off. A pedal control change reads as
+// down when its value is in the upper half (≥64), the MIDI convention.
 export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null {
     if (!data || data.length < 2) {
         return null;
@@ -72,9 +79,13 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
     const channel = (data[0]! & 0x0f) + 1;
 
     if (type === 0xb0) {
-        // Control change. Only the three pedals are acted on; every other controller
-        // (expression, modulation, bank select…) is ignored.
-        const pedal = PEDAL_CC[data[1]!];
+        // Control change. Only the three pedals and the reset controllers are acted on;
+        // every other controller (expression, modulation, bank select…) is ignored.
+        const controller = data[1]!;
+        if (RESET_CONTROLLERS.has(controller)) {
+            return { kind: "reset", channel };
+        }
+        const pedal = PEDAL_CC[controller];
         if (!pedal) {
             return null;
         }
@@ -83,6 +94,12 @@ export function parseMidiMessage(data: Uint8Array | null): ParsedMessage | null 
 
     const note = data[1]!;
     const velocity = data.length > 2 ? data[2]! : 0;
+    // A MIDI data byte is 7-bit; a value ≥128 has its high bit set, which only a status
+    // byte may carry, so the message is malformed. Drop it rather than sound a phantom
+    // pitch above the piano that would then never receive a matching note-off.
+    if (note > 127 || velocity > 127) {
+        return null;
+    }
     const isNoteOn = type === 0x90 && velocity > 0;
     const isNoteOff = type === 0x80 || (type === 0x90 && velocity === 0);
     if (!isNoteOn && !isNoteOff) {
@@ -103,6 +120,15 @@ export const KEYBOARD_VELOCITY = 80;
 // (any other device name) is held to the tight ones.
 export function isPreciseInput(device: string): boolean {
     return device !== ON_SCREEN_DEVICE && device !== KEYBOARD_DEVICE && device !== MIC_DEVICE;
+}
+
+// Whether an input's key presses are delivered only while the window holds focus.
+// The computer keyboard (keyup) and the on-screen keyboard (pointerup) both lose their
+// release event once focus leaves — Alt-Tab, clicking away — so a note held then must be
+// released on blur or it sticks. A MIDI device and the microphone keep streaming their
+// own note-offs regardless of focus, so blur must NOT cut their held notes short.
+export function isFocusGatedInput(device: string): boolean {
+    return device === ON_SCREEN_DEVICE || device === KEYBOARD_DEVICE;
 }
 
 // A tap on the on-screen keys or a jab at a computer key is far shorter than a real key

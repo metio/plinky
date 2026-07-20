@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useRef } from "react";
 import { holdScaleFor } from "../../../core/midi";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
@@ -37,19 +36,9 @@ export function HeroKeyboard() {
         onNoteOff: (event) => synth.releaseNote(event.note, holdScaleFor(event.device)),
     });
 
-    // A key still held when the hero unmounts never delivers its pointer-up, so its note
-    // would ring on and its key stay lit. Release whatever is held on teardown, reading
-    // the latest held set through a ref so the cleanup isn't pinned to a stale render.
-    const heldRef = useRef(heldNotes);
-    heldRef.current = heldNotes;
-    useEffect(
-        () => () => {
-            for (const note of heldRef.current) {
-                releaseKey(note);
-            }
-        },
-        [releaseKey],
-    );
+    // A key still held when the hero unmounts never delivers its pointer-up; the shared
+    // Keyboard releases its own on-screen sources on teardown, so its voice does not ring
+    // on. A MIDI note held then is genuinely still down and left to its device's note-off.
 
     return (
         <Keyboard

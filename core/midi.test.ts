@@ -6,6 +6,7 @@ import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
 import {
     holdScaleFor,
     IMPRECISE_HOLD_SCALE,
+    isFocusGatedInput,
     isPreciseInput,
     MIC_DEVICE,
     KEYBOARD_DEVICE,
@@ -150,6 +151,36 @@ describe("parseMidiMessage", () => {
         // The modulation wheel (CC1) and every other non-pedal controller decode to null.
         expect(parseMidiMessage(new Uint8Array([0xb0, 1, 100]))).toBeNull();
         expect(parseMidiMessage(new Uint8Array([0xb0, 7, 100]))).toBeNull();
+    });
+
+    it("reads all-sound-off / reset / all-notes-off (CC120/121/123) as a reset", () => {
+        for (const controller of [120, 121, 123]) {
+            expect(parseMidiMessage(new Uint8Array([0xb2, controller, 0]))).toEqual({
+                kind: "reset",
+                channel: 3,
+            });
+        }
+        // CC122 (local control) is not one of them and stays ignored.
+        expect(parseMidiMessage(new Uint8Array([0xb0, 122, 0]))).toBeNull();
+    });
+
+    it("rejects a note or velocity with the high bit set (a malformed 8-bit data byte)", () => {
+        // A data byte ≥128 can only be a status byte; the message is malformed, so it must
+        // not sound a phantom pitch that would then never receive a matching note-off.
+        expect(parseMidiMessage(new Uint8Array([0x90, 0x85, 100]))).toBeNull();
+        expect(parseMidiMessage(new Uint8Array([0x90, 60, 0x85]))).toBeNull();
+    });
+});
+
+describe("isFocusGatedInput", () => {
+    it("gates the keyboard fallbacks, whose release event is lost when focus leaves", () => {
+        expect(isFocusGatedInput(ON_SCREEN_DEVICE)).toBe(true);
+        expect(isFocusGatedInput(KEYBOARD_DEVICE)).toBe(true);
+    });
+
+    it("does not gate a MIDI device or the mic, which keep streaming their own note-offs", () => {
+        expect(isFocusGatedInput("Roland FP-30")).toBe(false);
+        expect(isFocusGatedInput(MIC_DEVICE)).toBe(false);
     });
 });
 
