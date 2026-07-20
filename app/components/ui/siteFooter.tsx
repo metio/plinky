@@ -37,7 +37,6 @@ export function SiteFooter() {
                             className="h-5 w-5 opacity-70 transition group-hover:opacity-100"
                         />
                     </Link>
-                    <span>{m.footer_follow()}</span>
                 </div>
                 {/* The provider information German law requires, reachable from every page.
                 The labels are the German legal terms, kept as-is in every language. */}
