@@ -71,10 +71,11 @@ export function NewsBanner() {
 
     // One aspect ratio for the whole banner, held across rotations so switching
     // items never resizes the box (the cause of the page jump when two pictures
-    // came at slightly different sizes). The pictures share a ratio, so a slight
-    // difference just letterboxes inside object-contain rather than shifting the
-    // page. Taken from the first item that carries one (its Sanity asset ratio),
-    // falling back to 16/9; it does not depend on the item currently shown.
+    // came at slightly different sizes). The image fills the box (object-cover), so
+    // there is no empty space at the sides; the pictures share a ratio, so a slight
+    // difference just crops a hair rather than shifting the page. Taken from the
+    // first item that carries one (its Sanity asset ratio), falling back to 16/9; it
+    // does not depend on the item currently shown.
     const bannerAspect = visible.find((it) => it.aspect && it.aspect > 0)?.aspect ?? 16 / 9;
 
     // Manual navigation: land on the chosen item and stop auto-advancing. The
@@ -134,8 +135,8 @@ export function NewsBanner() {
                 onClickCapture={onClickCapture}
             >
                 {/* The box holds one ratio for every item, so a rotation never
-                    resizes it; object-contain shows the whole picture — no edges
-                    cropped, a slight ratio difference letterboxes instead. */}
+                    resizes it; object-cover fills the box completely — no empty
+                    sides — cropping a hair only when a ratio differs. */}
                 <a
                     href={item.linkUrl}
                     target="_blank"
@@ -148,7 +149,7 @@ export function NewsBanner() {
                         alt={item.imageAlt}
                         loading="lazy"
                         draggable={false}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-cover"
                     />
                 </a>
 
