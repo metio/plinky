@@ -20,6 +20,10 @@ nd = "nd"
 # canonicalization must recognize — the alias's whole job is mapping it to
 # "Anonymous".
 anonymus = "anonymus"
+# "ist" is German ("is"), kept verbatim in the machine-translation notice's prevail
+# clause "maßgeblich ist die deutsche Fassung", which every translated legal page —
+# including the checked English base — carries word for word.
+ist = "ist"
 
 # The translation catalogs and the song catalogue are intentionally in many
 # languages, and the imported PDMX manifest holds real-world titles/composers plus
@@ -33,9 +37,10 @@ anonymus = "anonymus"
 # where the English base can stay checked on its own — there is no way to spell-check
 # its English without also flagging the other 25 languages.
 # The Impressum and Datenschutzerklärung are German legal documents (§ 5 DDG /
-# GDPR), kept verbatim in German for the operator's jurisdiction — typos only knows
-# English, so it flags their legitimate German words. Their tests assert on the same
-# German headings, so they are excluded too.
+# GDPR); the operator's name/address and the German page titles stay literal in the
+# route components — typos only knows English, so it flags those legitimate German
+# words. The prose itself now lives in messages/ (the English base stays checked);
+# the German is authoritative and every other locale is a machine translation.
 [files]
 extend-exclude = [
     "messages/*",

@@ -3,19 +3,23 @@
 
 import type { ReactNode } from "react";
 import { noindexMeta, routeMeta } from "../../core/site";
+import { LegalTranslationNotice } from "../components/features/legalTranslationNotice";
+import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/datenschutz";
 
 // The privacy policy German/EU law requires (GDPR / DSGVO). Like the Impressum
-// it is a legal document in German and stays as literal text. It describes what
-// Plinky ACTUALLY does today: a client-only app that keeps its data in the
-// browser, hosted static files, and one third-party content fetch for the news
-// banner — no accounts, no cookies, no tracking, no ads. NOTE: this is a
-// grounded DRAFT, not vetted legal wording — verify it against a current
-// generator (e.g. eRecht24) or a lawyer, and UPDATE it before enabling analytics
-// or ads (those add cookie consent, Consent Mode, and new processing to disclose).
+// the authoritative version is German and alone legally binding; every other
+// locale renders a machine translation carrying LegalTranslationNotice. It
+// describes what Plinky ACTUALLY does today: a client-only app that keeps its data
+// in the browser, hosted static files, one third-party content fetch for the news
+// banner, and opt-in analytics — no accounts, no cookies by default, no ads. NOTE:
+// the German text is a grounded DRAFT, not vetted legal wording — verify it against
+// a current generator (e.g. eRecht24) or a lawyer, and UPDATE it (and re-translate)
+// before relying on the analytics/ads sections.
 export function meta(_args: Route.MetaArgs) {
     // A privacy policy has no place in search results; it stays reachable from every
-    // footer, so noindex it (and it is left out of the sitemap).
+    // footer, so noindex it (and it is left out of the sitemap). Its translations
+    // inherit the same noindex.
     return [
         ...routeMeta("Datenschutzerklärung", "Wie Plinky mit deinen Daten umgeht."),
         noindexMeta(),
@@ -36,16 +40,18 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export default function Datenschutz() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">Datenschutzerklärung</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Stand: Juli 2026</p>
+            <h1 className="text-2xl font-semibold">{m.datenschutz_title()}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{m.datenschutz_updated()}</p>
 
-            <Section title="Verantwortlicher">
+            <LegalTranslationNotice page="datenschutz" />
+
+            <Section title={m.datenschutz_controller_heading()}>
                 <p>
-                    Verantwortlich für die Datenverarbeitung auf dieser Website ist:
+                    {m.datenschutz_controller_intro()}
                     <br />
-                    Sebastian Hoß, Bremer Platz 7, 48155 Münster, Deutschland
+                    Sebastian Hoß, Bremer Platz 7, 48155 Münster, {m.legal_country()}
                     <br />
-                    E-Mail:{" "}
+                    {m.contact_email_label()}{" "}
                     <a
                         href="mailto:contact@plinky.fun"
                         className="text-indigo-700 hover:underline dark:text-indigo-300"
@@ -55,91 +61,36 @@ export default function Datenschutz() {
                 </p>
             </Section>
 
-            <Section title="Kurz gefasst">
-                <p>
-                    Plinky ist eine reine Browser-Anwendung. Deine Einstellungen, dein Fortschritt
-                    und deine Aufnahmen werden ausschließlich lokal in deinem Browser gespeichert
-                    und von uns nicht erhoben oder an einen Server übertragen. Es gibt keine
-                    Benutzerkonten und keine Werbung. Standardmäßig findet keine Analyse und kein
-                    Tracking statt. Nur wenn du es in den Einstellungen ausdrücklich einschaltest,
-                    wird eine anonyme Nutzungsanalyse (Google Analytics) geladen — du kannst sie
-                    jederzeit wieder ausschalten.
-                </p>
+            <Section title={m.datenschutz_short_heading()}>
+                <p>{m.datenschutz_short_body()}</p>
             </Section>
 
-            <Section title="Hosting und Server-Logfiles">
-                <p>
-                    Die Website wird als statische Dateien über GitHub Pages (GitHub, Inc., USA)
-                    ausgeliefert. Beim Abruf verarbeitet der Hoster technisch notwendige Daten wie
-                    deine IP-Adresse, Datum und Uhrzeit des Zugriffs sowie die übertragene
-                    Datenmenge, um die Seite auszuliefern und den Betrieb sicher zu halten.
-                    Rechtsgrundlage ist unser berechtigtes Interesse an einer sicheren und stabilen
-                    Bereitstellung (Art. 6 Abs. 1 lit. f DSGVO). Eine Übermittlung in die USA stützt
-                    sich auf die Zertifizierung des Anbieters nach dem EU-US Data Privacy Framework.
-                </p>
+            <Section title={m.datenschutz_hosting_heading()}>
+                <p>{m.datenschutz_hosting_body()}</p>
             </Section>
 
-            <Section title="Lokale Speicherung im Browser">
-                <p>
-                    Für den Betrieb der App nutzen wir den lokalen Speicher deines Browsers (Local
-                    Storage) — etwa für deine Einstellungen, deinen Übungsfortschritt und
-                    gespeicherte Aufnahmen. Diese Daten verbleiben auf deinem Gerät, werden nicht an
-                    uns übertragen und lassen sich jederzeit über die Einstellungen oder deinen
-                    Browser löschen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
-                    (funktionsfähige, komfortable Bereitstellung der App).
-                </p>
+            <Section title={m.datenschutz_localstorage_heading()}>
+                <p>{m.datenschutz_localstorage_body()}</p>
             </Section>
 
-            <Section title="Schriftarten">
-                <p>
-                    Schriftarten werden von unserem eigenen Server geladen. Es werden keine externen
-                    Dienste wie Google Fonts eingebunden, sodass hierbei keine Daten an Dritte
-                    übermittelt werden.
-                </p>
+            <Section title={m.datenschutz_fonts_heading()}>
+                <p>{m.datenschutz_fonts_body()}</p>
             </Section>
 
-            <Section title="Inhalte von Drittanbietern (Neuigkeiten-Banner)">
-                <p>
-                    Auf der Startseite kann ein Hinweis-Banner mit aktuellen Neuigkeiten erscheinen.
-                    Dessen Inhalte werden bei Aufruf vom Content-Dienst Sanity (Sanity.io, Dänemark,
-                    EU) geladen. Dabei wird deine IP-Adresse technisch bedingt an den Anbieter
-                    übermittelt, um die Inhalte auszuliefern. Rechtsgrundlage ist Art. 6 Abs. 1 lit.
-                    f DSGVO. Schlägt der Abruf fehl, funktioniert die App unverändert weiter.
-                </p>
+            <Section title={m.datenschutz_thirdparty_heading()}>
+                <p>{m.datenschutz_thirdparty_body()}</p>
             </Section>
 
-            <Section title="Webanalyse mit Google Analytics">
-                <p>
-                    Wenn — und nur wenn — du in den Einstellungen die anonyme Nutzungsanalyse
-                    aktivierst, binden wir Google Analytics 4 ein (Anbieter: Google Ireland Limited,
-                    Gordon House, Barrow Street, Dublin 4, Irland). Es hilft uns zu verstehen,
-                    welche Funktionen genutzt werden, um Plinky zu verbessern. Dabei werden
-                    anonymisierte Nutzungsdaten verarbeitet; Google Analytics 4 speichert keine
-                    vollständigen IP-Adressen. Rechtsgrundlage ist deine Einwilligung nach Art. 6
-                    Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG. Du kannst deine Einwilligung
-                    jederzeit mit Wirkung für die Zukunft widerrufen, indem du die Analyse in den
-                    Einstellungen wieder ausschaltest. Eine Übermittlung in die USA kann
-                    stattfinden; sie stützt sich auf die Zertifizierung von Google nach dem EU-US
-                    Data Privacy Framework. Weitere Informationen findest du in der
-                    Datenschutzerklärung von Google.
-                </p>
+            <Section title={m.datenschutz_analytics_heading()}>
+                <p>{m.datenschutz_analytics_body()}</p>
             </Section>
 
-            <Section title="Kontaktaufnahme per E-Mail">
-                <p>
-                    Wenn du uns per E-Mail schreibst, verarbeiten wir deine Angaben ausschließlich
-                    zur Bearbeitung deiner Anfrage (Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO).
-                </p>
+            <Section title={m.datenschutz_email_heading()}>
+                <p>{m.datenschutz_email_body()}</p>
             </Section>
 
-            <Section title="Deine Rechte">
-                <p>
-                    Dir stehen gegenüber uns die folgenden Rechte hinsichtlich deiner
-                    personenbezogenen Daten zu: Auskunft, Berichtigung, Löschung, Einschränkung der
-                    Verarbeitung, Widerspruch gegen die Verarbeitung sowie Datenübertragbarkeit. Du
-                    hast zudem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
-                    Wende dich für die Ausübung deiner Rechte an die oben genannte Kontaktadresse.
-                </p>
+            <Section title={m.datenschutz_rights_heading()}>
+                <p>{m.datenschutz_rights_body()}</p>
             </Section>
         </main>
     );

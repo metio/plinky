@@ -189,7 +189,11 @@ const BUDGET_TOTAL_KB = 587;
 // The skill-level preset + Settings Reading section (ReadingLevel control, core/
 // readingLevel, the mirrored reading prefs) — add ~1.8 KB of app code, measured at
 // 274.9. 276.
-const BUDGET_APP_KB = 276;
+//
+// The legal-page translations — the Impressum + Datenschutz prose moved into paraglide
+// message keys (only the one built locale's strings ship) plus the LegalTranslationNotice
+// banner — add ~0.6 KB of app code, measured at 276.6. 277.
+const BUDGET_APP_KB = 277;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
