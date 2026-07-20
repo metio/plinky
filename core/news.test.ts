@@ -30,16 +30,12 @@ describe("parseNews", () => {
         expect(parseNews(valid)).toEqual(valid);
     });
 
-    it("keeps an optional headline and aspect", () => {
-        const item = parseNews({ ...valid, headline: "Big update", aspect: 2 });
-        expect(item?.headline).toBe("Big update");
-        expect(item?.aspect).toBe(2);
+    it("keeps an optional headline", () => {
+        expect(parseNews({ ...valid, headline: "Big update" })?.headline).toBe("Big update");
     });
 
-    it("drops a blank headline and a non-positive aspect", () => {
-        const item = parseNews({ ...valid, headline: "   ", aspect: 0 });
-        expect(item?.headline).toBeUndefined();
-        expect(item?.aspect).toBeUndefined();
+    it("drops a blank headline", () => {
+        expect(parseNews({ ...valid, headline: "   " })?.headline).toBeUndefined();
     });
 
     it("rejects a non-https image or link", () => {

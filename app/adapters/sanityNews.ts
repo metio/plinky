@@ -35,7 +35,7 @@ const DEFAULT_QUERY =
     '{"enabled": *[_type == "siteSettings"][0].newsEnabled, ' +
     `"items": *[_type == "news" && show == true] | order(_updatedAt desc)[0...${MAX_ITEMS}]{` +
     '"id": _id, "imageUrl": image.asset->url, "imageAlt": coalesce(alt, ""), ' +
-    '"linkUrl": link, headline, aspect}}';
+    '"linkUrl": link, headline}}';
 
 // The Sanity config from build-time env, or null when the project isn't wired
 // yet — in which case the source stays silent and never touches the network.

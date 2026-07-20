@@ -26,9 +26,6 @@ export type NewsItem = {
     linkUrl: string;
     // Optional caption under the picture.
     headline?: string;
-    // Optional width/height ratio, used to reserve the image box so a late-loading
-    // picture shifts nothing. Defaults to 16/9 when absent or invalid.
-    aspect?: number;
 };
 
 // Validate a raw payload (from any content service, already mapped to loose
@@ -57,9 +54,6 @@ export function parseNews(raw: unknown): NewsItem | null {
     };
     if (typeof record.headline === "string" && record.headline.trim() !== "") {
         item.headline = record.headline;
-    }
-    if (typeof record.aspect === "number" && Number.isFinite(record.aspect) && record.aspect > 0) {
-        item.aspect = record.aspect;
     }
     return item;
 }

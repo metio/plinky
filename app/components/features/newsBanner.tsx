@@ -28,6 +28,12 @@ const ROTATE_MS = 7000;
 // link — small enough to feel responsive, large enough that a jittery tap doesn't
 // trip it.
 const SWIPE_PX = 40;
+// The banner's fixed shape. Every item's box takes this ratio, so a rotation never
+// resizes it (no page jump) and the box is reserved before the first picture loads
+// (no shift on load). object-cover fills it, so a picture that IS this ratio shows
+// in full with no crop and no empty sides — publish news images at 16:9 (e.g.
+// 1600×900) and they display perfectly; an off-ratio one is cropped to fit.
+const BANNER_ASPECT = "16 / 9";
 
 export function NewsBanner() {
     const items = useNews();
@@ -68,15 +74,6 @@ export function NewsBanner() {
     if (!item) {
         return null;
     }
-
-    // One aspect ratio for the whole banner, held across rotations so switching
-    // items never resizes the box (the cause of the page jump when two pictures
-    // came at slightly different sizes). The image fills the box (object-cover), so
-    // there is no empty space at the sides; the pictures share a ratio, so a slight
-    // difference just crops a hair rather than shifting the page. Taken from the
-    // first item that carries one (its Sanity asset ratio), falling back to 16/9; it
-    // does not depend on the item currently shown.
-    const bannerAspect = visible.find((it) => it.aspect && it.aspect > 0)?.aspect ?? 16 / 9;
 
     // Manual navigation: land on the chosen item and stop auto-advancing. The
     // offset arithmetic keeps the counter positive so a step back from the first
@@ -129,7 +126,7 @@ export function NewsBanner() {
         >
             <div
                 className="relative w-full touch-pan-y bg-gray-100 dark:bg-gray-800"
-                style={{ aspectRatio: String(bannerAspect) }}
+                style={{ aspectRatio: BANNER_ASPECT }}
                 onPointerDown={onPointerDown}
                 onPointerUp={onPointerUp}
                 onClickCapture={onClickCapture}
