@@ -68,3 +68,35 @@ export function summarizePractice(history: History, now: Date): PracticeSummary 
 
     return { totalNotes, daysPracticed, recent };
 }
+
+// The "YYYY-MM" month a date falls in — the prefix shared by that month's day keys.
+export function monthKey(now: Date): string {
+    return todayKey(now).slice(0, 7);
+}
+
+// A month's practice rolled up for the shareable recap card: how many notes were played,
+// on how many days, and the biggest single day. A month with no practice reads as zeros
+// and no best day, so the card can decline to appear rather than boast about nothing.
+export type MonthlyRecap = {
+    month: string;
+    totalNotes: number;
+    daysPracticed: number;
+    bestDay: { date: string; notes: number } | null;
+};
+
+export function monthlyRecap(history: History, month: string): MonthlyRecap {
+    let totalNotes = 0;
+    let daysPracticed = 0;
+    let bestDay: { date: string; notes: number } | null = null;
+    for (const [date, notes] of Object.entries(history)) {
+        if (notes <= 0 || !date.startsWith(`${month}-`)) {
+            continue;
+        }
+        totalNotes += notes;
+        daysPracticed += 1;
+        if (!bestDay || notes > bestDay.notes) {
+            bestDay = { date, notes };
+        }
+    }
+    return { month, totalNotes, daysPracticed, bestDay };
+}

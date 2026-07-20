@@ -1,8 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { monthKey, monthlyRecap } from "../../../core/history";
 import { svgMilestone } from "../../../core/milestoneCard";
 import { practiceHref } from "../../../core/practisable";
+import { useHistoryStore } from "../../contexts/services";
 import { useYouData } from "../../hooks/useYouData";
 import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";
@@ -10,6 +12,7 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
+import { RecapCard } from "./recapCard";
 import { RefreshQueue } from "./refreshQueue";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
@@ -24,10 +27,14 @@ import { ActivityStats, YouStanding } from "./youStanding";
 // keeps CLS at zero on this client-only page.
 export function YouView() {
     const data = useYouData();
+    const history = useHistoryStore();
     if (data === null) {
         return null;
     }
     const { level, skill, mode, workingGrade, upNext, summary, fingerprint } = data;
+    // This calendar month's practice, for the recap card — shown only when the month has
+    // something to celebrate, so it reads as a reward rather than an empty prompt.
+    const recap = monthlyRecap(history.load(), monthKey(new Date()));
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -44,6 +51,8 @@ export function YouView() {
                     totalNotes={summary.totalNotes}
                 />
             )}
+
+            {recap.totalNotes > 0 && <RecapCard recap={recap} />}
 
             <Show when={level >= 1}>
                 <section className="space-y-2">
