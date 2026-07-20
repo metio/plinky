@@ -106,6 +106,30 @@ export function ogLocale(locale: string): string {
     return OG_LOCALE[locale] ?? "en_US";
 }
 
+// schema.org data for a content page that isn't a specific work or person — the
+// about, help, and practice-surface pages. It names the page as part of the Plinky
+// site (so search engines tie it to the site entity) rather than leaving it a bare,
+// context-free screen. `type` narrows it where a page has a standard specialization
+// (an AboutPage), defaulting to a plain WebPage.
+export function webPageData(
+    name: string,
+    description: string,
+    locale: string,
+    path: string,
+    type: "WebPage" | "AboutPage" | "CollectionPage" = "WebPage",
+) {
+    return {
+        "@context": "https://schema.org",
+        "@type": type,
+        name,
+        description,
+        url: localeUrl(locale, path),
+        inLanguage: locale,
+        isPartOf: { "@type": "WebSite", name: "Plinky", url: SITE_URL },
+        primaryImageOfPage: `${SITE_URL}/og.png`,
+    };
+}
+
 // schema.org data for a single piece, so a play page is indexable as the work it
 // teaches rather than a generic app screen.
 export function musicCompositionData(title: string, composer: string, locale: string) {

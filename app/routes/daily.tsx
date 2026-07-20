@@ -10,12 +10,23 @@ import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
 import { useDailyStore } from "../contexts/services";
 import { generatePhrase } from "../../core/generator";
-import { routeMeta } from "../../core/site";
+import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/daily";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.meta_daily_title(), m.meta_daily_description());
+    return [
+        ...routeMeta(m.meta_daily_title(), m.meta_daily_description()),
+        {
+            "script:ld+json": webPageData(
+                m.meta_daily_title(),
+                m.meta_daily_description(),
+                getLocale(),
+                "/daily/",
+            ),
+        },
+    ];
 }
 
 // Which day it is — and so which phrase, number and tempo — depends on the

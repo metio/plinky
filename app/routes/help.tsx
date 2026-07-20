@@ -6,13 +6,24 @@ import { linkClasses } from "../components/ui/classes";
 import { itemsForPage, paragraphs } from "../../core/help";
 import type { HelpItem } from "../../core/help";
 import { useHelp } from "../hooks/useHelp";
-import { routeMeta } from "../../core/site";
+import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/help";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.help_title(), m.meta_help_description());
+    return [
+        ...routeMeta(m.help_title(), m.meta_help_description()),
+        {
+            "script:ld+json": webPageData(
+                m.help_title(),
+                m.meta_help_description(),
+                getLocale(),
+                "/help/",
+                "CollectionPage",
+            ),
+        },
+    ];
 }
 
 // The app owns the help page's structure: one section per page of the app, in this

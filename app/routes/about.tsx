@@ -2,12 +2,24 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useState } from "react";
-import { routeMeta } from "../../core/site";
+import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/about";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.about_title(), m.meta_about_description());
+    return [
+        ...routeMeta(m.about_title(), m.meta_about_description()),
+        {
+            "script:ld+json": webPageData(
+                m.about_title(),
+                m.meta_about_description(),
+                getLocale(),
+                "/about/",
+                "AboutPage",
+            ),
+        },
+    ];
 }
 
 // The two founders, in the order the operation runs: Sol leads and gives Plinky

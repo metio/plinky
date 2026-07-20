@@ -3,13 +3,24 @@
 
 import { BoardArtistCard } from "../components/features/boardArtistCard";
 import { useBoard } from "../hooks/useBoard";
-import { routeMeta } from "../../core/site";
+import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/board";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.board_title(), m.meta_board_description());
+    return [
+        ...routeMeta(m.board_title(), m.meta_board_description()),
+        {
+            "script:ld+json": webPageData(
+                m.board_title(),
+                m.meta_board_description(),
+                getLocale(),
+                "/board/",
+                "CollectionPage",
+            ),
+        },
+    ];
 }
 
 // The board: the pin-board by the practice-room door. The content team pins the

@@ -290,8 +290,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta property="og:image" content={`${SITE_URL}/og.png`} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
+                {/* The card is the same site-wide brand image on every page, so its
+                    alt is the brand line — already translated for every locale. */}
+                <meta property="og:image:alt" content={m.meta_home_title()} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:image" content={`${SITE_URL}/og.png`} />
+                <meta name="twitter:image:alt" content={m.meta_home_title()} />
                 <Meta />
                 <Links />
             </head>

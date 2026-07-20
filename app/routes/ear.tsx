@@ -4,15 +4,26 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
 import type { EarExerciseId } from "../../core/earExercise";
-import { routeMeta } from "../../core/site";
+import { routeMeta, webPageData } from "../../core/site";
 import { EarSession } from "../components/features/earSession";
 import { EXERCISE_LABELS, LEVEL_LABELS } from "../lib/earLabels";
 import { ChoiceField } from "../components/ui/fields";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/ear";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.meta_ear_title(), m.meta_ear_description());
+    return [
+        ...routeMeta(m.meta_ear_title(), m.meta_ear_description()),
+        {
+            "script:ld+json": webPageData(
+                m.meta_ear_title(),
+                m.meta_ear_description(),
+                getLocale(),
+                "/ear/",
+            ),
+        },
+    ];
 }
 
 // The order the picker lists them: the "identify what you hear" run, then the functional

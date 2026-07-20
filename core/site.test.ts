@@ -11,6 +11,7 @@ import {
     personData,
     routeMeta,
     structuredData,
+    webPageData,
 } from "./site";
 
 describe("pageTitle", () => {
@@ -64,6 +65,26 @@ describe("musicCompositionData", () => {
 
     it("omits the composer when unknown", () => {
         expect(musicCompositionData("Etude", "", "en")).not.toHaveProperty("composer");
+    });
+});
+
+describe("webPageData", () => {
+    it("ties a content page to the site with a locale-prefixed URL", () => {
+        const data = webPageData("Ear training", "Train your ear.", "de", "/ear/");
+        expect(data["@type"]).toBe("WebPage");
+        expect(data.name).toBe("Ear training");
+        expect(data.description).toBe("Train your ear.");
+        expect(data.url).toBe("https://plinky.fun/de/ear/");
+        expect(data.inLanguage).toBe("de");
+        expect(data.isPartOf).toEqual({
+            "@type": "WebSite",
+            name: "Plinky",
+            url: "https://plinky.fun",
+        });
+    });
+
+    it("narrows the type when a page has a standard specialization", () => {
+        expect(webPageData("About", "d", "en", "/about/", "AboutPage")["@type"]).toBe("AboutPage");
     });
 });
 
