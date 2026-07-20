@@ -6,7 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Take } from "../../core/takes";
-import { useListenPlayback } from "./useListenPlayback";
+import { collectListenSteps, useListenPlayback } from "./useListenPlayback";
 
 // The colour helpers walk real OSMD graphics; stub them so the fake score
 // below only has to model the cursor walk itself.
@@ -83,6 +83,37 @@ beforeEach(() => {
 afterEach(() => {
     vi.useRealTimers();
     vi.clearAllMocks();
+});
+
+describe("collectListenSteps", () => {
+    it("lifts each position: the striking notes, the dynamic, and the lengths", () => {
+        const steps = collectListenSteps(fakeOsmd(2));
+        expect(steps).toHaveLength(2);
+        expect(steps[0]).toEqual({
+            notes: [
+                {
+                    pitch: 60,
+                    soundQuarters: 1,
+                    articulation: "none",
+                    accent: false,
+                    marcato: false,
+                    slurred: false,
+                },
+            ],
+            dynamicVolume: null,
+            lengths: [1],
+            whole: 0,
+            measureIndex: 0,
+        });
+    });
+
+    it("drops a rest from the sounding notes but keeps its length for the beat", () => {
+        const steps = collectListenSteps(
+            fakeOsmd(1, { isRest: () => true, halfTone: 0, Length: { RealValue: 0.5 } }),
+        );
+        expect(steps[0]?.notes).toEqual([]);
+        expect(steps[0]?.lengths).toEqual([2]);
+    });
 });
 
 describe("useListenPlayback", () => {

@@ -4,7 +4,7 @@
 import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
-import { performNote } from "../../core/expression";
+import { type Articulation, performNote } from "../../core/expression";
 import { listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
@@ -23,6 +23,85 @@ import { useTimerChain } from "./useTimerChain";
 type NoteSink = {
     playNote(note: number, options?: { duration?: number; velocity?: number }): void;
 };
+
+// One striking note at a position, with the marks `performNote` turns into how
+// long and how loud it sounds — everything but the tempo and the position's
+// dynamic, which are applied at play time.
+type ListenNote = {
+    pitch: number;
+    soundQuarters: number;
+    articulation: Articulation;
+    accent: boolean;
+    marcato: boolean;
+    slurred: boolean;
+};
+
+// One position on the listening timeline, in cursor order — collected once when
+// Listen starts so the clock reads its notes off this model, not the live cursor.
+// Every position appears (rests included) so an index stays lock-step with the
+// visual cursor the surface still advances and seeks.
+export type ListenStep = {
+    // The notes to strike here — a tie's held continuations and rests are already
+    // dropped, so this is exactly what sounds.
+    notes: ListenNote[];
+    // The dynamic in force here (0..127), or null when the score marks none — the
+    // same for every note at the position, so it is read once.
+    dynamicVolume: number | null;
+    // Every note's notated length in quarter notes (rests included): the beat's
+    // duration comes from the shortest, so the clock advances with the notation.
+    lengths: number[];
+    // The notated onset in whole notes, to resume from a `from` point, and the
+    // 0-based bar, to lap a section loop — the position logic reads these instead
+    // of the live cursor's iterator.
+    whole: number;
+    measureIndex: number;
+};
+
+// Walk the engraved score once and lift the listening timeline into the pure step
+// model: every cursor position with its striking notes, the dynamic in force, and
+// the lengths for the beat. Leaves the cursor reset. The clock then reads its
+// notes from this array, so playback reads no musical data off the live cursor —
+// the cursor only mirrors the position and carries the notes the trail colours.
+export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
+    const cursor = osmd.cursor;
+    cursor.reset();
+    const steps: ListenStep[] = [];
+    while (!cursor.iterator.EndReached) {
+        const notes: ListenNote[] = [];
+        const lengths: number[] = [];
+        // The dynamic in force is the same for every note under the cursor, so read
+        // it once per position.
+        const dynamicVolume = readActiveDynamic(cursor.iterator);
+        for (const note of cursor.NotesUnderCursor()) {
+            const expression = readScoreExpression(note);
+            // A tie's later notes are already sounding from the tie start, so skip the
+            // re-strike; rests never sound.
+            if (!note.isRest() && note.halfTone > 0 && expression.strike) {
+                notes.push({
+                    pitch: note.halfTone + 12,
+                    soundQuarters: expression.soundQuarters,
+                    articulation: expression.articulation,
+                    accent: expression.accent,
+                    marcato: expression.marcato,
+                    slurred: expression.slurred,
+                });
+            }
+            // Rests count too, so a written gap dwells its own length — the cursor
+            // advances by the notated rhythm regardless of what sounds.
+            lengths.push(expression.notatedQuarters);
+        }
+        steps.push({
+            notes,
+            dynamicVolume,
+            lengths,
+            whole: cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+            measureIndex: cursor.iterator.CurrentMeasureIndex,
+        });
+        cursor.next();
+    }
+    cursor.reset();
+    return steps;
+}
 
 // The listening transport: one cursor walk, one clock, one stop — driven either
 // by the score (Listen: sound each voice-entry and dwell its notated length at
@@ -105,12 +184,30 @@ export function useListenPlayback({
         activeRef.current = true;
         modeRef.current = "listen";
         const cursor: Cursor = osmd.cursor;
+        // Lift the whole listening timeline up front; the clock reads its notes from
+        // this and the cursor is only walked to mirror the position and hold the
+        // notes the trail colours. `step` tracks the position being sounded.
+        const steps = collectListenSteps(osmd);
+        // The first playable index at the loop's start bar, or the resume onset, or
+        // the top — and seek the visual cursor to match.
+        const barStart = (bar: number) =>
+            Math.max(
+                0,
+                steps.findIndex((position) => position.measureIndex >= bar - 1),
+            );
+        let step: number;
         if (loop().on) {
             seekToBar(cursor, loop().from);
+            step = barStart(loop().from);
         } else if (from > 0) {
             seekToWhole(cursor, from);
+            step = Math.max(
+                0,
+                steps.findIndex((position) => position.whole >= from - 1e-6),
+            );
         } else {
             cursor.reset();
+            step = 0;
         }
         cursor.show();
         setPlaying(true);
@@ -121,54 +218,44 @@ export function useListenPlayback({
             // trainer is on, so each pass drills the passage a little faster.
             if (
                 range.on &&
-                (cursor.iterator.EndReached || cursor.iterator.CurrentMeasureIndex > range.to - 1)
+                (step >= steps.length || (steps[step]?.measureIndex ?? 0) > range.to - 1)
             ) {
                 onLap();
                 seekToBar(cursor, range.from);
-            } else if (cursor.iterator.EndReached) {
+                step = barStart(range.from);
+            } else if (step >= steps.length) {
                 stop();
                 onLap();
                 return;
             }
+            const current = steps[step]!;
             // Light the notes now sounding so the eye can follow the music, leaving a
             // blue trail on the ones just heard — the cursor box alone is easy to lose,
             // and the trail records which stretches the computer played once it moves on.
             trailNotes(highlightRef.current, LISTENED_COLOR);
             markPainted();
             highlightRef.current = highlightCursorNotes(osmd, WINDOW_COLOR);
-            const lengths: number[] = [];
-            // The dynamic in force at this position is the same for every note under the
-            // cursor, so read it once per step.
-            const dynamicVolume = readActiveDynamic(cursor.iterator);
-            for (const note of cursor.NotesUnderCursor()) {
-                const expression = readScoreExpression(note);
-                // A tie's later notes are already sounding from the tie start, so skip the
-                // re-strike; rests never sound.
-                if (!note.isRest() && note.halfTone > 0 && expression.strike) {
-                    // performNote turns the note's marks into how long and how loud it
-                    // sounds — staccato clips it, an accent strikes it harder, the marked
-                    // dynamic sets its loudness — scaled to seconds at the current tempo.
-                    const { durationSeconds, velocity } = performNote(
-                        {
-                            quarters: expression.soundQuarters,
-                            articulation: expression.articulation,
-                            accent: expression.accent,
-                            marcato: expression.marcato,
-                            slurred: expression.slurred,
-                            dynamicVolume,
-                        },
-                        tempo(),
-                    );
-                    synth.playNote(note.halfTone + 12, { duration: durationSeconds, velocity });
-                }
-                // Rests count too, so a written gap dwells its own length. The cursor
-                // advances by the notated rhythm, so a clipped staccato still dwells its
-                // full beat — only the sound is shortened, not the reading pace.
-                lengths.push(expression.notatedQuarters);
+            for (const note of current.notes) {
+                // performNote turns the note's marks into how long and how loud it
+                // sounds — staccato clips it, an accent strikes it harder, the marked
+                // dynamic sets its loudness — scaled to seconds at the current tempo.
+                const { durationSeconds, velocity } = performNote(
+                    {
+                        quarters: note.soundQuarters,
+                        articulation: note.articulation,
+                        accent: note.accent,
+                        marcato: note.marcato,
+                        slurred: note.slurred,
+                        dynamicVolume: current.dynamicVolume,
+                    },
+                    tempo(),
+                );
+                synth.playNote(note.pitch, { duration: durationSeconds, velocity });
             }
             cursor.next();
+            step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(lengths, tempo()));
+            chain.push(tick, listenStepMs(current.lengths, tempo()));
         };
         tick();
     };
