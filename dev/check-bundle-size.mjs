@@ -108,7 +108,10 @@ const ON_DEMAND = /webCodecsVideo/;
 // The legal-page translations + the first-visit analytics consent banner (the moved
 // legal prose in the one built locale, LegalTranslationNotice, ConsentBanner and its
 // strings) — add ~0.2 KB to the per-visitor total, measured at 587.2. 588.
-const BUDGET_TOTAL_KB = 588;
+//
+// The ghost-race duel facelift (GhostTrack's two racer chips, gradient lane and finish
+// line replacing the plain bar) — adds ~0.1 KB, measured at 588.0. 589.
+const BUDGET_TOTAL_KB = 589;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
