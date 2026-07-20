@@ -26,6 +26,7 @@ import { DangerZone } from "../components/features/dangerZone";
 import { HandSize } from "../components/features/handSize";
 import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
+import { KeyboardThemePicker } from "../components/features/keyboardThemePicker";
 import { LanguageSwitcher } from "../components/ui/languageSwitcher";
 import { LocalizedLink } from "../components/ui/localizedLink";
 import { MicConnect } from "../components/features/micConnect";
@@ -382,6 +383,13 @@ export default function Settings() {
 
             <SettingsSection title={m.settings_keyboard()} icon={<KeysIcon className={ICON} />}>
                 <KeyMapping />
+            </SettingsSection>
+
+            <SettingsSection
+                title={m.settings_keyboard_theme()}
+                icon={<StarIcon className={ICON} />}
+            >
+                <KeyboardThemePicker />
             </SettingsSection>
 
             {/* No Web MIDI (Safari, all iOS) means no device to connect — the

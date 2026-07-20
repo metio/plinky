@@ -3,6 +3,7 @@
 
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { DEFAULT_THEME } from "../../../core/keyboardTheme";
 import { pitchClass } from "../../../core/midi";
 import type { NoteLabels } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
@@ -86,6 +87,7 @@ export function Keyboard({
     well = "mx-auto w-full max-w-xl",
     sustained = false,
     holds = NO_HOLDS,
+    theme = DEFAULT_THEME,
     badge,
     onPress,
     onRelease,
@@ -107,6 +109,10 @@ export function Keyboard({
     well?: string;
     // Whether the sustain pedal is held, shown as a glow along the keybed's foot.
     sustained?: boolean;
+    // The cosmetic skin for the resting keys (unpressed white/black colours). The lit,
+    // expected and wrong feedback colours ignore it — they carry meaning. Defaults to the
+    // classic palette, so an unthemed keyboard renders exactly as before.
+    theme?: { white: string; black: string };
     // An overlay pinned to the keybed's top-right corner — the MIDI-status badge. A
     // slot rather than a built-in so the bare Keyboard stays free of the MIDI context
     // (and rendarable in isolation); the wrappers that have the context pass it in.
@@ -419,7 +425,7 @@ export function Keyboard({
               ? "translate-y-0.5 bg-green-200 shadow-[0_0_14px_-3px] shadow-green-400 dark:bg-green-900"
               : expected.includes(note)
                 ? "bg-indigo-50 dark:bg-indigo-950"
-                : "bg-white hover:bg-gray-50 dark:bg-gray-100";
+                : theme.white;
     const blackState = (note: number) =>
         flash === note
             ? "bg-red-500"
@@ -427,7 +433,7 @@ export function Keyboard({
               ? "translate-y-0.5 bg-green-500 shadow-[0_0_14px_-3px] shadow-green-500"
               : expected.includes(note)
                 ? "bg-indigo-400"
-                : "bg-gray-900 hover:bg-gray-800";
+                : theme.black;
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.

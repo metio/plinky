@@ -116,7 +116,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // with its Intl month formatting, and the recap strings inlined per locale — the duel
 // verdict and "Surprise me" pick before it stayed within 589) — tips the per-visitor
 // total to a measured 589.5. 590.
-const BUDGET_TOTAL_KB = 590;
+//
+// The groove metronome (grooveAccents + its Settings control) and the unlockable
+// keyboard skins (core/keyboardTheme, useKeyboardTheme, the KeyboardThemePicker, and the
+// groove + theme strings inlined per locale) — tip the total to a measured 590.2. 591.
+const BUDGET_TOTAL_KB = 591;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -216,7 +220,11 @@ const BUDGET_TOTAL_KB = 590;
 // The "Surprise me" flow pick (surprisePick + the Today-panel button) and the monthly
 // recap card (monthlyRecap in core/history, RecapCard on the You page, and the surprise
 // + recap strings per locale) — add ~0.8 KB of app code together, measured at 279.4. 280.
-const BUDGET_APP_KB = 280;
+//
+// The groove metronome control and the unlockable keyboard skins (useKeyboardTheme, the
+// KeyboardThemePicker with its swatches and grade gating, the theme prop threaded through
+// the shared Keyboard, and the groove + theme strings per locale) — measured at 280.1. 281.
+const BUDGET_APP_KB = 281;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useMidiConnection } from "../../contexts/midi";
+import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
 import { MidiBadge } from "./midiBadge";
@@ -31,6 +32,7 @@ export function PianoKeyboard({
 }) {
     const { heldNotes, pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
     const labels = useNoteLabels();
+    const theme = useKeyboardTheme();
 
     // Reflect the sustain pedal on the keybed. The held-pedal set lives in a ref (no
     // re-render on change), so subscribe to pedal events and mirror sustain into state,
@@ -64,6 +66,7 @@ export function PianoKeyboard({
             holds={holds}
             labels={labels}
             sustained={sustained}
+            theme={theme}
             badge={<MidiBadge />}
             onPress={pressKey}
             onRelease={releaseKey}

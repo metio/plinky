@@ -84,6 +84,9 @@ export type Prefs = {
     metronomeAdaptive: boolean;
     // The metronome's feel — which beats it accents (see core/groove).
     metronomeGroove: Groove;
+    // The chosen on-screen keyboard skin id (see core/keyboardTheme); an unknown or
+    // still-locked id renders as classic, so this stays a plain string.
+    keyboardTheme: string;
     // Render the piece as one continuous horizontal line that scrolls under a fixed gaze
     // as you play (a notation "treadmill"), instead of wrapping into stacked rows. Off by
     // default — the wrapped score is the familiar reading layout.
@@ -199,6 +202,7 @@ function defaults(): Prefs {
         metronomeAccent: true,
         metronomeAdaptive: false,
         metronomeGroove: "straight",
+        keyboardTheme: "classic",
         treadmill: false,
         highway: false,
         raceGhost: true,
@@ -281,6 +285,10 @@ export function parsePrefs(raw: string | null): Prefs {
             metronomeAccent: bool(parsed.metronomeAccent, base.metronomeAccent),
             metronomeAdaptive: bool(parsed.metronomeAdaptive, base.metronomeAdaptive),
             metronomeGroove: oneOf(parsed.metronomeGroove, GROOVES, base.metronomeGroove),
+            keyboardTheme:
+                typeof parsed.keyboardTheme === "string"
+                    ? parsed.keyboardTheme
+                    : base.keyboardTheme,
             treadmill: bool(parsed.treadmill, base.treadmill),
             highway: bool(parsed.highway, base.highway),
             raceGhost: bool(parsed.raceGhost, base.raceGhost),
