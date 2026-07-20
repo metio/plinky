@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "E-posta ile iletişim kurma",
   "datenschutz_email_body": "Bize e-posta ile yazarsan, verdiğin bilgileri yalnızca talebini işleme almak amacıyla işleriz (GDPR Madde 6/1/b veya f).",
   "datenschutz_rights_heading": "Haklarına",
-  "datenschutz_rights_body": "Kişisel verilerinle ilgili olarak bize karşı şu haklara sahipsin: bilgi edinme, düzeltme, silme, işlemenin kısıtlanması, işlemeye itiraz ve veri taşınabilirliği. Ayrıca bir veri koruma denetim makamına şikâyette bulunma hakkına da sahipsin. Haklarını kullanmak için lütfen yukarıda belirtilen iletişim adresine başvur."
+  "datenschutz_rights_body": "Kişisel verilerinle ilgili olarak bize karşı şu haklara sahipsin: bilgi edinme, düzeltme, silme, işlemenin kısıtlanması, işlemeye itiraz ve veri taşınabilirliği. Ayrıca bir veri koruma denetim makamına şikâyette bulunma hakkına da sahipsin. Haklarını kullanmak için lütfen yukarıda belirtilen iletişim adresine başvur.",
+  "consent_banner_label": "Analiz izni",
+  "consent_banner_body": "Hangi özelliklerin kullanıldığını görmek ve Plinky'yi geliştirmek için Google Analytics kullanabilir miyiz? Bu, çerezler yerleştirir. Sen onaylamadan hiçbir şey yüklenmez ve kararını istediğin zaman Ayarlar'dan değiştirebilirsin.",
+  "consent_accept": "Kabul et",
+  "consent_decline": "Reddet"
 }

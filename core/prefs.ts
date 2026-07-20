@@ -102,10 +102,15 @@ export type Prefs = {
     // wizard, or null when the player has never run it (the detector's own defaults
     // stand in). Stored per device — a different room needs a different tuning.
     micCalibration: MicCalibration | null;
-    // Whether the player has opted in, in Settings, to anonymous usage analytics.
-    // Off by default and only ever set true by a deliberate toggle — nothing loads
-    // or is sent until then. A monetisation opt-in sits beside it later.
+    // Whether the player has consented to anonymous usage analytics (Google
+    // Analytics). Off by default — nothing loads or is sent until it is true. Set by
+    // the first-visit consent banner or the Settings toggle. A monetisation opt-in
+    // sits beside it later.
     analyticsConsent: boolean;
+    // Whether the consent choice has been made at all. False until the visitor
+    // answers the banner (accept or decline) or uses the Settings toggle; the banner
+    // shows only while this is false, so a decline is remembered and never nags.
+    analyticsAsked: boolean;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -197,6 +202,7 @@ function defaults(): Prefs {
         revealTries: 1,
         micCalibration: null,
         analyticsConsent: false,
+        analyticsAsked: false,
     };
 }
 
@@ -277,6 +283,7 @@ export function parsePrefs(raw: string | null): Prefs {
             revealTries: oneOf(parsed.revealTries, REVEAL_TRIES, base.revealTries),
             micCalibration: cleanCalibration(parsed.micCalibration),
             analyticsConsent: bool(parsed.analyticsConsent, base.analyticsConsent),
+            analyticsAsked: bool(parsed.analyticsAsked, base.analyticsAsked),
         };
     } catch {
         return base;

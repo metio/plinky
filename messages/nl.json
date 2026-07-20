@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Contact opnemen per e-mail",
   "datenschutz_email_body": "Wanneer je ons per e-mail schrijft, verwerken we jouw gegevens uitsluitend voor de afhandeling van je verzoek (art. 6 lid 1 sub b resp. sub f AVG).",
   "datenschutz_rights_heading": "Jouw rechten",
-  "datenschutz_rights_body": "Ten aanzien van je persoonsgegevens heb je tegenover ons de volgende rechten: inzage, rectificatie, wissing, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Daarnaast heb je het recht om een klacht in te dienen bij een toezichthoudende autoriteit voor gegevensbescherming. Wend je voor de uitoefening van je rechten tot het hierboven vermelde contactadres."
+  "datenschutz_rights_body": "Ten aanzien van je persoonsgegevens heb je tegenover ons de volgende rechten: inzage, rectificatie, wissing, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Daarnaast heb je het recht om een klacht in te dienen bij een toezichthoudende autoriteit voor gegevensbescherming. Wend je voor de uitoefening van je rechten tot het hierboven vermelde contactadres.",
+  "consent_banner_label": "Toestemming voor analyse",
+  "consent_banner_body": "Mogen we Google Analytics gebruiken om te zien welke functies gebruikt worden en Plinky beter te maken? Daarbij worden cookies geplaatst. Zonder jouw toestemming wordt er niets geladen, en je kunt je keuze op elk moment wijzigen in de instellingen.",
+  "consent_accept": "Accepteren",
+  "consent_decline": "Weigeren"
 }

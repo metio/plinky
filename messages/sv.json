@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kontakt via e-post",
   "datenschutz_email_body": "Om du skriver till oss via e-post behandlar vi de uppgifter du lämnar uteslutande för att hantera din förfrågan (artikel 6.1 b respektive f i GDPR).",
   "datenschutz_rights_heading": "Dina rättigheter",
-  "datenschutz_rights_body": "Du har följande rättigheter gentemot oss vad gäller dina personuppgifter: tillgång, rättelse, radering, begränsning av behandlingen, invändning mot behandlingen samt dataportabilitet. Du har dessutom rätt att lämna in klagomål till en tillsynsmyndighet för dataskydd. För att utöva dina rättigheter, vänd dig till den kontaktadress som anges ovan."
+  "datenschutz_rights_body": "Du har följande rättigheter gentemot oss vad gäller dina personuppgifter: tillgång, rättelse, radering, begränsning av behandlingen, invändning mot behandlingen samt dataportabilitet. Du har dessutom rätt att lämna in klagomål till en tillsynsmyndighet för dataskydd. För att utöva dina rättigheter, vänd dig till den kontaktadress som anges ovan.",
+  "consent_banner_label": "Samtycke till analys",
+  "consent_banner_body": "Får vi använda Google Analytics för att se vilka funktioner som används och göra Plinky bättre? Det sätter cookies. Ingenting laddas om du inte godkänner det, och du kan ändra dig när som helst i inställningarna.",
+  "consent_accept": "Acceptera",
+  "consent_decline": "Neka"
 }

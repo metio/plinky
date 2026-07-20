@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Contacting us by email",
   "datenschutz_email_body": "If you write to us by email, we process the information you provide solely in order to handle your enquiry (Art. 6(1)(b) or (f) GDPR).",
   "datenschutz_rights_heading": "Your rights",
-  "datenschutz_rights_body": "You have the following rights with regard to your personal data: access, rectification, erasure, restriction of processing, objection to processing, and data portability. You also have the right to lodge a complaint with a data protection supervisory authority. To exercise your rights, please contact us at the address given above."
+  "datenschutz_rights_body": "You have the following rights with regard to your personal data: access, rectification, erasure, restriction of processing, objection to processing, and data portability. You also have the right to lodge a complaint with a data protection supervisory authority. To exercise your rights, please contact us at the address given above.",
+  "consent_banner_label": "Analytics consent",
+  "consent_banner_body": "May we use Google Analytics to see which features get used and make Plinky better? It sets cookies. Nothing loads unless you agree, and you can change your mind any time in Settings.",
+  "consent_accept": "Accept",
+  "consent_decline": "Decline"
 }

@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kontaktaufnahme per E-Mail",
   "datenschutz_email_body": "Wenn du uns per E-Mail schreibst, verarbeiten wir deine Angaben ausschließlich zur Bearbeitung deiner Anfrage (Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO).",
   "datenschutz_rights_heading": "Deine Rechte",
-  "datenschutz_rights_body": "Dir stehen gegenüber uns die folgenden Rechte hinsichtlich deiner personenbezogenen Daten zu: Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Widerspruch gegen die Verarbeitung sowie Datenübertragbarkeit. Du hast zudem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Wende dich für die Ausübung deiner Rechte an die oben genannte Kontaktadresse."
+  "datenschutz_rights_body": "Dir stehen gegenüber uns die folgenden Rechte hinsichtlich deiner personenbezogenen Daten zu: Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Widerspruch gegen die Verarbeitung sowie Datenübertragbarkeit. Du hast zudem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Wende dich für die Ausübung deiner Rechte an die oben genannte Kontaktadresse.",
+  "consent_banner_label": "Einwilligung zur Analyse",
+  "consent_banner_body": "Dürfen wir Google Analytics verwenden, um zu sehen, welche Funktionen genutzt werden, und Plinky zu verbessern? Dabei werden Cookies gesetzt. Ohne deine Zustimmung wird nichts geladen, und du kannst deine Entscheidung jederzeit in den Einstellungen ändern.",
+  "consent_accept": "Akzeptieren",
+  "consent_decline": "Ablehnen"
 }

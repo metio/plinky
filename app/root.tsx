@@ -9,6 +9,7 @@ import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { AnalyticsConsent } from "./components/features/analyticsConsent";
+import { ConsentBanner } from "./components/features/consentBanner";
 import { StorageBanner } from "./components/features/storageBanner";
 import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
@@ -300,9 +301,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     the header on the default services, silently ignoring any override. */}
                 <ServicesProvider>
                     <Header />
-                    {/* Loads or stops analytics to follow the Settings opt-in; renders
-                        nothing and stays inert until a deliberate consent. */}
+                    {/* Loads or stops analytics to follow the consent pref; renders
+                        nothing and stays inert until a deliberate opt-in. */}
                     <AnalyticsConsent />
+                    {/* The first-visit consent banner that sets that pref; shows until
+                        the visitor accepts or declines, then never again. */}
+                    <ConsentBanner />
                     {/* The layout is the composition root: it hands the banner the
                         adapter's health signal so the banner itself stays oblivious
                         to where the signal comes from. */}

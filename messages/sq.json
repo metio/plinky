@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kontakti përmes emailit",
   "datenschutz_email_body": "Nëse na shkruan me email, ne i përpunojmë të dhënat e tua vetëm për të trajtuar kërkesën tënde (Art. 6 Abs. 1 lit. b përkatësisht lit. f GDPR).",
   "datenschutz_rights_heading": "Të drejtat e tua",
-  "datenschutz_rights_body": "Ndaj nesh ti gëzon të drejtat e mëposhtme lidhur me të dhënat e tua personale: qasje, korrigjim, fshirje, kufizim të përpunimit, kundërshtim ndaj përpunimit si dhe transferueshmëri të të dhënave. Përveç kësaj, ke të drejtë të ankohesh te një autoritet mbikëqyrës për mbrojtjen e të dhënave. Për ushtrimin e të drejtave të tua drejtohu te adresa e kontaktit e përmendur më sipër."
+  "datenschutz_rights_body": "Ndaj nesh ti gëzon të drejtat e mëposhtme lidhur me të dhënat e tua personale: qasje, korrigjim, fshirje, kufizim të përpunimit, kundërshtim ndaj përpunimit si dhe transferueshmëri të të dhënave. Përveç kësaj, ke të drejtë të ankohesh te një autoritet mbikëqyrës për mbrojtjen e të dhënave. Për ushtrimin e të drejtave të tua drejtohu te adresa e kontaktit e përmendur më sipër.",
+  "consent_banner_label": "Pëlqimi për analizën",
+  "consent_banner_body": "A mund të përdorim Google Analytics për të parë cilat funksione përdoren dhe për ta përmirësuar Plinky? Kjo vendos cookie. Asgjë nuk ngarkohet pa pëlqimin tënd, dhe mund ta ndryshosh vendimin tënd në çdo kohë te Cilësimet.",
+  "consent_accept": "Prano",
+  "consent_decline": "Refuzo"
 }

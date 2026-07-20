@@ -756,5 +756,9 @@
   "datenschutz_email_heading": "Kontaktování e-mailem",
   "datenschutz_email_body": "Pokud nám napíšeš e-mail, zpracováváme tvé údaje výhradně za účelem vyřízení tvého dotazu (čl. 6 odst. 1 písm. b, resp. písm. f GDPR).",
   "datenschutz_rights_heading": "Tvá práva",
-  "datenschutz_rights_body": "Ve vztahu k nám máš v souvislosti se svými osobními údaji následující práva: právo na přístup, na opravu, na výmaz, na omezení zpracování, na vznesení námitky proti zpracování a na přenositelnost údajů. Máš rovněž právo podat stížnost u dozorového úřadu pro ochranu osobních údajů. Za účelem uplatnění svých práv se obrať na výše uvedenou kontaktní adresu."
+  "datenschutz_rights_body": "Ve vztahu k nám máš v souvislosti se svými osobními údaji následující práva: právo na přístup, na opravu, na výmaz, na omezení zpracování, na vznesení námitky proti zpracování a na přenositelnost údajů. Máš rovněž právo podat stížnost u dozorového úřadu pro ochranu osobních údajů. Za účelem uplatnění svých práv se obrať na výše uvedenou kontaktní adresu.",
+  "consent_banner_label": "Souhlas s analýzou",
+  "consent_banner_body": "Můžeme používat Google Analytics, abychom viděli, které funkce se používají, a mohli Plinky vylepšovat? Nastavují se přitom cookies. Bez tvého souhlasu se nic nenačte a své rozhodnutí můžeš kdykoli změnit v nastavení.",
+  "consent_accept": "Přijmout",
+  "consent_decline": "Odmítnout"
 }
