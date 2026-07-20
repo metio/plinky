@@ -37,7 +37,7 @@ RUN pip install --break-system-packages --no-cache-dir "music21==${MUSIC21_VERSI
 # so `markdownlint-cli2 '**/*.md'` reproduces the CI markdown gate locally against
 # .markdownlint.yaml.
 # renovate: datasource=npm depName=markdownlint-cli2
-ARG MARKDOWNLINT_CLI2_VERSION=0.23.0
+ARG MARKDOWNLINT_CLI2_VERSION=0.23.1
 RUN npm install -g markdownlint-cli2@${MARKDOWNLINT_CLI2_VERSION}
 
 # typos: the spell-checker the CI `typos` job runs. A Rust binary fetched as the
