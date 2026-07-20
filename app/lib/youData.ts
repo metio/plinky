@@ -58,9 +58,6 @@ export type YouInput = {
     // once earned cannot be taken back by a later slump.
     reachedGrade: number;
     flawless: boolean;
-    // Whether analytics is currently opted in — the only non-cumulative badge fact,
-    // driving the data-hero badge that comes and goes with the consent.
-    consented: boolean;
     now: number;
 };
 
@@ -125,6 +122,5 @@ function earnedAchievements(input: YouInput, level: number): Achievement[] {
             EAR_ITEMS.every((ear) =>
                 earItems.some((item) => item.id === ear.id && item.mastery.learned),
             ),
-        consented: input.consented,
     });
 }

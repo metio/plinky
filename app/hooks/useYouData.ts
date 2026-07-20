@@ -53,7 +53,6 @@ export function useYouData(): YouData | null {
         fingerprint,
         reachedGrade: services.milestones.reachedGrade(),
         flawless: services.milestones.flawlessDone(),
-        consented: prefs.analyticsConsent,
         now: Date.now(),
     });
 }
