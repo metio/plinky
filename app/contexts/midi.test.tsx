@@ -116,6 +116,25 @@ describe("MidiProvider", () => {
         expect(result.current.heldNotes).not.toContain(60);
     });
 
+    it("releases a held note when its device flips to disconnected without leaving the list", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        act(() => input.emit([0x90, 60, 100]));
+        expect(result.current.heldNotes).toContain(60);
+
+        // The device stays in the list but reports itself disconnected — a sleep/unplug
+        // that keeps the same id. Its held note must still be released.
+        act(() => {
+            input.setState("disconnected");
+            midi.connection.stateChange();
+        });
+        expect(result.current.heldNotes).not.toContain(60);
+    });
+
     it("releases only the dropped device's notes, leaving a second keyboard's chord held", async () => {
         const piano = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
         const pad = fakeMidiInput({ id: "in-2", name: "Drum Pad" });
@@ -169,6 +188,42 @@ describe("MidiProvider", () => {
         // A panic / stop button sends CC123; after it the device sends no note-offs, so the
         // reset itself must release everything it was sounding.
         act(() => input.emit([0xb0, 123, 0]));
+        expect(result.current.heldNotes).toEqual([]);
+    });
+
+    it("keeps a pitch sounding until every source that holds it releases", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Grand Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const ons: number[] = [];
+        const offs: number[] = [];
+        const useProbe = () => {
+            const c = useMidiConnection();
+            useMidiInput({
+                onNoteOn: (e) => ons.push(e.note),
+                onNoteOff: (e) => offs.push(e.note),
+            });
+            return c;
+        };
+        const { result } = renderHook(useProbe, { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        // The same pitch is held from the computer keyboard AND the connected piano.
+        act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "z", code: "KeyZ" })));
+        act(() => input.emit([0x90, 60, 100]));
+        // Only the first strike starts it sounding; the second source is aliased away.
+        expect(ons).toEqual([60]);
+        expect(result.current.heldNotes).toEqual([60]);
+
+        // The piano lifts, but the computer key is still down — the note keeps sounding,
+        // and no note-off has reached the subscribers yet.
+        act(() => input.emit([0x80, 60, 0]));
+        expect(offs).toEqual([]);
+        expect(result.current.heldNotes).toEqual([60]);
+
+        // The last source releases — now the note stops, exactly once.
+        act(() => window.dispatchEvent(new KeyboardEvent("keyup", { key: "z", code: "KeyZ" })));
+        expect(offs).toEqual([60]);
         expect(result.current.heldNotes).toEqual([]);
     });
 

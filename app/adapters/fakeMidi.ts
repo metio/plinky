@@ -18,18 +18,24 @@ export type FakeMidiInput = MidiInput & {
     // Drop the registered handler, the way the real adapter's close() detaches
     // onmidimessage — an emit after severing reaches nobody.
     sever(): void;
+    // Flip the input's reported state in place, keeping its id — the way a real device
+    // going to sleep or being unplugged flips to "disconnected" without leaving the list.
+    // Pair with connection.stateChange() to drive the provider's disconnect detection.
+    setState(state: MidiInput["state"]): void;
 };
 
 export function fakeMidiInput(
     overrides: Partial<Omit<MidiInput, "onMessage">> = {},
 ): FakeMidiInput {
     let handler: ((data: Uint8Array, timestamp: number) => void) | null = null;
+    let state = overrides.state ?? "connected";
     return {
-        id: "fake-1",
-        name: "Fake Piano",
-        manufacturer: "Test",
-        state: "connected" as const,
-        ...overrides,
+        id: overrides.id ?? "fake-1",
+        name: overrides.name ?? "Fake Piano",
+        manufacturer: overrides.manufacturer ?? "Test",
+        get state() {
+            return state;
+        },
         onMessage(next) {
             handler = next;
         },
@@ -38,6 +44,9 @@ export function fakeMidiInput(
         },
         sever() {
             handler = null;
+        },
+        setState(next) {
+            state = next;
         },
     };
 }

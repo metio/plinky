@@ -127,11 +127,15 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // The latest held notes, read by the window-blur handler to release them all.
     const heldNotesRef = useRef(heldNotes);
     heldNotesRef.current = heldNotes;
-    // The device each currently-held note came from, so an involuntary release (window
-    // blur, a device unplugged) can end each note on its own device and apply the right
-    // hold-scale — a real piano note stays precise, an on-screen/keyboard note keeps its
-    // gentle ring-out — instead of flattening every source to one.
-    const heldDevicesRef = useRef(new Map<number, string>());
+    // The set of input devices currently sounding each held note. A single pitch can be
+    // held from more than one source at once — a computer key and a connected piano, an
+    // on-screen tap over a MIDI hold — so the funnel reference-counts by source: the note
+    // sounds while at least one device holds it, and a release from one source leaves the
+    // others ringing. This is also what lets an involuntary release (blur, an unplug, a
+    // reset) end only its OWN source's hold on a note and stamp that source's device (so a
+    // real piano note stays precise while an on-screen note keeps its gentle ring-out),
+    // rather than cutting a note a still-live source is holding.
+    const heldSourcesRef = useRef(new Map<number, Set<string>>());
 
     const subscribe = useCallback((listener: NoteListener) => {
         subscribersRef.current.add(listener);
@@ -155,6 +159,36 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             device: string,
             timestamp: number,
         ) => {
+            // Reference-count by source, so the app hears only the transitions that
+            // matter: a note's FIRST strike (it starts sounding) and its LAST release (it
+            // stops). A second source striking an already-held note, or one source
+            // releasing a note another still holds, changes no shared state and reaches no
+            // subscriber — otherwise a stray note-off would strand the other source's voice
+            // and the monitor/lit state would flip off under a note still down.
+            const sources = heldSourcesRef.current;
+            if (kind === "noteon") {
+                let set = sources.get(note);
+                if (!set) {
+                    set = new Set();
+                    sources.set(note, set);
+                }
+                const wasSilent = set.size === 0;
+                set.add(device);
+                if (!wasSilent) {
+                    return;
+                }
+            } else {
+                const set = sources.get(note);
+                if (!set || !set.has(device)) {
+                    return;
+                }
+                set.delete(device);
+                if (set.size > 0) {
+                    return;
+                }
+                sources.delete(note);
+            }
+
             const noteEvent: MidiNoteEvent = {
                 id: nextIdRef.current++,
                 kind,
@@ -173,11 +207,6 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 }
                 return prev.filter((held) => held !== note);
             });
-            if (kind === "noteon") {
-                heldDevicesRef.current.set(note, device);
-            } else {
-                heldDevicesRef.current.delete(note);
-            }
 
             for (const listener of subscribersRef.current) {
                 if (kind === "noteon") {
@@ -222,10 +251,10 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             if (parsed.kind === "reset") {
                 // All-notes-off / all-sound-off / reset: the device is going quiet and
                 // will send no further note-offs. Release every note it was sounding and
-                // lift any held pedal, so nothing latches on — scoping the note release to
-                // this device leaves a sibling device's held notes untouched.
-                for (const note of heldNotesRef.current) {
-                    if (heldDevicesRef.current.get(note) === deviceName) {
+                // lift any held pedal, so nothing latches on — releasing only this device's
+                // own source of each note leaves a sibling device's held notes untouched.
+                for (const note of [...heldNotesRef.current]) {
+                    if (heldSourcesRef.current.get(note)?.has(deviceName)) {
                         emitNote("noteoff", note, 0, 1, deviceName, timestamp);
                     }
                 }
@@ -404,10 +433,14 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         );
         connectedInputsRef.current = nowConnected;
         if (droppedNames.size > 0) {
-            for (const note of heldNotesRef.current) {
-                const device = heldDevicesRef.current.get(note);
-                if (device !== undefined && droppedNames.has(device)) {
-                    emitNote("noteoff", note, 0, 1, device, performance.now());
+            for (const note of [...heldNotesRef.current]) {
+                // Snapshot the source set — emitNote mutates it as each source releases.
+                for (const device of [...(heldSourcesRef.current.get(note) ?? [])]) {
+                    // Release only the dropped device's own source of the note; another
+                    // device still holding the same pitch keeps it sounding.
+                    if (droppedNames.has(device)) {
+                        emitNote("noteoff", note, 0, 1, device, performance.now());
+                    }
                 }
             }
             // A pedal held when its device vanishes never sends its release either, so it
@@ -571,15 +604,16 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         // computer keyboard, the on-screen keyboard, or a device — when focus is lost.
         const releaseAll = () => {
             pressed.clear();
-            for (const note of heldNotesRef.current) {
-                const device = heldDevicesRef.current.get(note) ?? KEYBOARD_DEVICE;
-                // Release only the focus-gated inputs — the computer and on-screen
+            for (const note of [...heldNotesRef.current]) {
+                // Release only the focus-gated sources — the computer and on-screen
                 // keyboards, whose keyup/pointerup never arrives once focus leaves. A MIDI
                 // device and the microphone keep streaming their own note-offs regardless
-                // of focus, so cutting them here would clip a note that is still down. Each
-                // note ends on its own device, keeping its gentle ring-out.
-                if (isFocusGatedInput(device)) {
-                    emitNote("noteoff", note, 0, 1, device, performance.now());
+                // of focus, so a note they still hold keeps sounding. Each ends on its own
+                // device, keeping its gentle ring-out.
+                for (const device of [...(heldSourcesRef.current.get(note) ?? [])]) {
+                    if (isFocusGatedInput(device)) {
+                        emitNote("noteoff", note, 0, 1, device, performance.now());
+                    }
                 }
             }
             // Lift any pedal held by a computer key too, so a pedal doesn't stick down.

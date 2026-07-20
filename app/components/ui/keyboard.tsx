@@ -227,8 +227,12 @@ export function Keyboard({
 
     // The key element under a screen point, or null for a gap or off the keybed. Black
     // keys overlay the whites, so a hit-test naturally prefers a black key where they meet.
-    const keyElementAt = (x: number, y: number): HTMLElement | null =>
-        document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-note]") ?? null;
+    // Confined to this keybed's own keys: a glide dragged onto another Keyboard instance
+    // on the page must not drive this one with the other's notes.
+    const keyElementAt = (x: number, y: number): HTMLElement | null => {
+        const key = document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-note]") ?? null;
+        return key && keysRef.current?.contains(key) ? key : null;
+    };
 
     // A tap's velocity from where the key was struck within its height.
     const velocityAt = (clientY: number, key: HTMLElement): number | undefined => {
@@ -299,10 +303,34 @@ export function Keyboard({
             key ? velocityAt(event.clientY, key) : undefined,
         );
     };
-    const up = (event: React.PointerEvent) => {
-        movePointer(event.pointerId, null);
-        activePointers.current.delete(event.pointerId);
-    };
+    const endPointer = useCallback(
+        (pointerId: number) => {
+            const prev = pointerNote.current.get(pointerId);
+            if (prev !== undefined) {
+                silence(`p${pointerId}`, prev);
+                pointerNote.current.delete(pointerId);
+            }
+            activePointers.current.delete(pointerId);
+        },
+        [silence],
+    );
+    const up = (event: React.PointerEvent) => endPointer(event.pointerId);
+
+    // A window-level backstop for the pointer's end. Pointer capture keeps a glide's moves
+    // arriving at the keybed, but setPointerCapture can be refused (a pointer the browser
+    // no longer tracks — the catch above), and then a release off the keys sends its
+    // pointerup nowhere near this element. Catching it on the window releases the note
+    // rather than leaving it stuck sounding and lit until unmount. endPointer no-ops for a
+    // pointer this keyboard isn't tracking, so other pointers on the page are ignored.
+    useEffect(() => {
+        const onWindowUp = (event: PointerEvent) => endPointer(event.pointerId);
+        window.addEventListener("pointerup", onWindowUp);
+        window.addEventListener("pointercancel", onWindowUp);
+        return () => {
+            window.removeEventListener("pointerup", onWindowUp);
+            window.removeEventListener("pointercancel", onWindowUp);
+        };
+    }, [endPointer]);
 
     // Move the roving focus to a note in range and focus its key.
     const focusNote = (note: number) => {
