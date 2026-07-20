@@ -10,6 +10,7 @@ import { createSanityNews } from "../../adapters/sanityNews";
 import type { SanityConfig } from "../../adapters/sanity";
 import { m } from "../../paraglide/messages.js";
 import { server } from "../../test-setup.node";
+import { advanceScheduler } from "../../testing/advanceScheduler";
 import { fakeScheduler } from "../../testing/fakeScheduler";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { NewsBanner } from "./newsBanner";
@@ -80,17 +81,14 @@ describe("NewsBanner against a mocked Sanity API", () => {
         const scheduler = fakeScheduler();
         renderWithServices(<NewsBanner />, { ...news, scheduler });
         await screen.findByAltText("A new piece");
-        // The auto-advance timer is armed in a passive effect once the items load;
-        // flush that effect before driving the clock, or the advance can cross an
-        // interval that was never armed and nothing rotates (a full-suite flake).
-        await act(async () => {});
-        // It advances on its own...
-        act(() => scheduler.advance(7000));
+        // It advances on its own (advanceScheduler flushes the effect that arms the
+        // auto-advance timer before driving the clock)...
+        await advanceScheduler(scheduler, 7000);
         expect(screen.queryByAltText("Another piece")).not.toBeNull();
         // ...until the reader steps back, after which the clock no longer moves it.
         act(() => void screen.getByRole("button", { name: m.news_previous() }).click());
         expect(screen.queryByAltText("A new piece")).not.toBeNull();
-        act(() => scheduler.advance(7000 * 3));
+        await advanceScheduler(scheduler, 7000 * 3);
         expect(screen.queryByAltText("A new piece")).not.toBeNull();
     });
 });

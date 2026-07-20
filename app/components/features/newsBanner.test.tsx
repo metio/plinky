@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { act, cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { fakeNews } from "../../adapters/fakeNews";
 import { m } from "../../paraglide/messages.js";
+import { advanceScheduler } from "../../testing/advanceScheduler";
 import { fakeScheduler } from "../../testing/fakeScheduler";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { NewsBanner } from "./newsBanner";
@@ -61,11 +62,7 @@ describe("NewsBanner", () => {
         const scheduler = fakeScheduler();
         renderWithServices(<NewsBanner />, { news: fakeNews([first, second]), scheduler });
         await screen.findByAltText("First");
-        // The auto-advance timer is armed in a passive effect once the items load;
-        // flush that effect before driving the clock, or the advance can cross an
-        // interval that was never armed and nothing rotates.
-        await act(async () => {});
-        act(() => scheduler.advance(ROTATE_MS));
+        await advanceScheduler(scheduler, ROTATE_MS);
         expect(screen.queryByAltText("Second")).not.toBeNull();
         expect(screen.queryByAltText("First")).toBeNull();
     });
@@ -74,8 +71,7 @@ describe("NewsBanner", () => {
         const scheduler = fakeScheduler();
         renderWithServices(<NewsBanner />, { news: fakeNews([first, second]), scheduler });
         await screen.findByAltText("First");
-        await act(async () => {});
-        act(() => scheduler.advance(ROTATE_MS * 2));
+        await advanceScheduler(scheduler, ROTATE_MS * 2);
         // Two intervals: forward to the second item and wrap back to the first.
         expect(screen.queryByAltText("First")).not.toBeNull();
         expect(screen.queryByAltText("Second")).toBeNull();
@@ -88,7 +84,7 @@ describe("NewsBanner", () => {
         fireEvent.click(screen.getByRole("button", { name: m.news_next() }));
         expect(screen.queryByAltText("Second")).not.toBeNull();
         // The clock keeps ticking, but the reader took over — nothing moves.
-        act(() => scheduler.advance(ROTATE_MS * 3));
+        await advanceScheduler(scheduler, ROTATE_MS * 3);
         expect(screen.queryByAltText("Second")).not.toBeNull();
         expect(screen.queryByAltText("First")).toBeNull();
     });
@@ -136,8 +132,7 @@ describe("NewsBanner", () => {
         const box = (await screen.findByAltText("First")).closest("div");
         // The banner takes the first item's ratio and holds it for every item.
         expect(box?.style.aspectRatio).toBe("1.9 / 1");
-        await act(async () => {});
-        act(() => scheduler.advance(ROTATE_MS));
+        await advanceScheduler(scheduler, ROTATE_MS);
         const next = (await screen.findByAltText("Second")).closest("div");
         expect(next?.style.aspectRatio).toBe("1.9 / 1");
     });
