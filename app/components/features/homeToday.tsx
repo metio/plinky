@@ -1,15 +1,21 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import { dailyNumber, todayKey } from "../../../core/daily";
+import { practiceHref } from "../../../core/practisable";
 import {
     currentGrade,
     dueReviews,
+    type GradeCatalogItem,
     gradeSuggestions,
     loadGradeCatalogue,
     loadGradedMastery,
+    surprisePick,
 } from "../../lib/gradeProgress";
+import { localizeHref } from "../../paraglide/runtime.js";
+import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
     useExerciseSource,
@@ -62,7 +68,16 @@ export function HomeToday() {
     // (or unreachable) nothing reads as missing — the panel never blocks on,
     // or degrades with, the network.
     const known = useKnownPieces();
+    const navigate = useNavigate();
     const [tasks, setTasks] = useState<Task[] | null>(null);
+    // The catalogue slice the "surprise me" pick draws from, resolved with the tasks; a
+    // rotating seed varies the pick each press.
+    const [surprise, setSurprise] = useState<{
+        catalogue: GradeCatalogItem[];
+        grade: number;
+        mastered: Set<string>;
+    } | null>(null);
+    const seedRef = useRef(0);
 
     useEffect(() => {
         let cancelled = false;
@@ -85,6 +100,7 @@ export function HomeToday() {
                 items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
             );
             const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
+            setSurprise({ catalogue, grade: workingGrade, mastered });
             const dailyDoneToday = services.daily.lastDone() === dailyNumber(todayKey(new Date()));
             // The player's own assignments first — a saved set is a deliberate
             // path — then the built-in starter, so a fresh device has a guided
@@ -150,6 +166,21 @@ export function HomeToday() {
                     </li>
                 ))}
             </ul>
+            {surprise && (
+                <SurpriseButton
+                    onClick={() => {
+                        const pick = surprisePick(
+                            surprise.catalogue,
+                            surprise.grade,
+                            surprise.mastered,
+                            seedRef.current++,
+                        );
+                        if (pick) {
+                            navigate(localizeHref(practiceHref(pick)));
+                        }
+                    }}
+                />
+            )}
         </section>
     );
 }

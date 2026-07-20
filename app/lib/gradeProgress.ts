@@ -282,6 +282,37 @@ export function gradeSuggestions(
     );
 }
 
+// How many gentlest pieces the "surprise me" flow rotates through, so repeated presses
+// vary the pick instead of always opening the single easiest one.
+const FLOW_WINDOW = 5;
+
+// One piece to play right now, at the edge of the player's ability — a gentlest
+// not-yet-mastered piece of the working grade, chosen from the flow window by a rotating
+// seed so it varies press to press. When that grade is exhausted it widens to any
+// unmastered piece, then (everything mastered) to the whole catalogue, so the button
+// always opens something. Null only when the catalogue is empty.
+export function surprisePick(
+    catalogue: GradeCatalogItem[],
+    grade: number,
+    mastered: ReadonlySet<string>,
+    seed: number,
+): GradeCatalogItem | null {
+    const gentlest = (items: GradeCatalogItem[]) =>
+        [...items].sort((a, b) => a.cost - b.cost).slice(0, FLOW_WINDOW);
+    const suggested = gradeSuggestions(catalogue, grade, mastered, FLOW_WINDOW);
+    const unmastered = catalogue.filter((item) => !mastered.has(item.id));
+    const pool =
+        suggested.length > 0
+            ? suggested
+            : unmastered.length > 0
+              ? gentlest(unmastered)
+              : gentlest(catalogue);
+    if (pool.length === 0) {
+        return null;
+    }
+    return pool[((seed % pool.length) + pool.length) % pool.length]!;
+}
+
 // How many pieces each grade's pool holds, indexed by grade.
 export function poolSizes(catalogue: GradeCatalogItem[]): Map<number, number> {
     const sizes = new Map<number, number>();

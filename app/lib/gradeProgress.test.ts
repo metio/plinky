@@ -9,6 +9,7 @@ import {
     type GradedMastery,
     gradeFreshness,
     gradeSuggestions,
+    surprisePick,
     masteredInGrade,
     nextStar,
     poolSizes,
@@ -209,6 +210,45 @@ describe("gradeSuggestions", () => {
         const catalogue = [cat("ear-intervals-0", 1, 1), cat("a-piece", 1, 2)];
         const suggestions = gradeSuggestions(catalogue, 1, new Set(), 5);
         expect(suggestions.map((item) => item.id)).toEqual(["ear-intervals-0", "a-piece"]);
+    });
+});
+
+describe("surprisePick", () => {
+    const catalogue = [
+        cat("hard", 3, 3),
+        cat("easy", 3, 1),
+        cat("mid", 3, 2),
+        cat("done", 3, 0.5),
+        cat("other", 4, 1),
+    ];
+
+    it("picks from the working grade's gentlest unmastered pieces", () => {
+        const pick = surprisePick(catalogue, 3, new Set(["done"]), 0);
+        expect(pick?.id).toBe("easy");
+    });
+
+    it("rotates the pick with the seed so repeated presses vary", () => {
+        const mastered = new Set(["done"]);
+        // The working-grade pool, easiest first, is [easy, mid, hard].
+        expect(surprisePick(catalogue, 3, mastered, 0)?.id).toBe("easy");
+        expect(surprisePick(catalogue, 3, mastered, 1)?.id).toBe("mid");
+        expect(surprisePick(catalogue, 3, mastered, 2)?.id).toBe("hard");
+        // The seed wraps around the pool.
+        expect(surprisePick(catalogue, 3, mastered, 3)?.id).toBe("easy");
+    });
+
+    it("widens to any unmastered piece when the grade is exhausted", () => {
+        const mastered = new Set(["hard", "easy", "mid", "done"]);
+        expect(surprisePick(catalogue, 3, mastered, 0)?.id).toBe("other");
+    });
+
+    it("falls back to the whole catalogue once everything is mastered", () => {
+        const mastered = new Set(catalogue.map((item) => item.id));
+        expect(surprisePick(catalogue, 3, mastered, 0)).not.toBeNull();
+    });
+
+    it("has nothing to pick from an empty catalogue", () => {
+        expect(surprisePick([], 1, new Set(), 0)).toBeNull();
     });
 });
 
