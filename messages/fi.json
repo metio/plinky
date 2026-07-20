@@ -602,6 +602,7 @@
   "achievement_flawless": "Virheetön suoritus",
   "achievement_days": "{count} päivää soittoa",
   "achievement_notes": "{count} soitettua nuottia",
+  "achievement_data_hero": "Datasankari",
   "achievement_earned": "Ansaittu",
   "achievement_locked": "Ei vielä ansaittu",
   "mic_heading": "Soita oikealla pianolla",

@@ -4,9 +4,13 @@
 import { MAX_GRADE } from "./scoreDifficulty";
 
 // The collectible badges: every earned moment the app already records, laid out
-// as one durable set. Everything here is CUMULATIVE — a badge, once earned, can
-// never un-earn (the inputs only ever grow), and none involves consecutive days:
-// Plinky never punishes a break.
+// as one durable set. The practice badges are CUMULATIVE — once earned they can
+// never un-earn (their inputs only ever grow), and none involves consecutive days:
+// Plinky never punishes a break. The ONE exception is the data-hero badge, which
+// simply reflects the current analytics consent: it appears while it's on and
+// disappears the moment it's turned off. That is deliberate and required — a
+// consent must be as free to withdraw as to give, so opting out must cost nothing,
+// not even a badge; it is a light thank-you, never a reward that pressures.
 
 export type StarKind = "bronze" | "silver" | "gold";
 
@@ -19,7 +23,8 @@ export type Achievement =
     | { id: string; kind: "flawless"; earned: boolean }
     | { id: string; kind: "days"; target: number; earned: boolean }
     | { id: string; kind: "notes"; target: number; earned: boolean }
-    | { id: string; kind: "ear"; badge: EarBadge; earned: boolean };
+    | { id: string; kind: "ear"; badge: EarBadge; earned: boolean }
+    | { id: string; kind: "dataHero"; earned: boolean };
 
 export type AchievementFacts = {
     // The highest grade ever celebrated — recorded once, never lowered, so the
@@ -38,6 +43,10 @@ export type AchievementFacts = {
     earTrained: boolean;
     earFlawless: boolean;
     earMastered: boolean;
+    // Whether analytics is currently opted in. Unlike every other fact this can go
+    // both ways — the data-hero badge follows it exactly, so turning consent off
+    // takes the badge away with no penalty.
+    consented: boolean;
 };
 
 const DAY_TARGETS = [10, 100];
@@ -87,5 +96,6 @@ export function collectAchievements(facts: AchievementFacts): Achievement[] {
                       ? facts.earFlawless
                       : facts.earMastered,
         })),
+        { id: "data-hero", kind: "dataHero", earned: facts.consented },
     ];
 }

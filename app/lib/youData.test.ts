@@ -39,6 +39,7 @@ function input(overrides: Partial<YouInput> = {}): YouInput {
         fingerprint: null,
         reachedGrade: 0,
         flawless: false,
+        consented: false,
         now: NOW,
         ...overrides,
     };

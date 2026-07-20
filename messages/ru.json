@@ -602,6 +602,7 @@
   "achievement_flawless": "Безошибочное исполнение",
   "achievement_days": "{count} дней игры",
   "achievement_notes": "{count} сыгранных нот",
+  "achievement_data_hero": "Герой данных",
   "achievement_earned": "Получено",
   "achievement_locked": "Ещё не получено",
   "mic_heading": "Играй на настоящем пианино",

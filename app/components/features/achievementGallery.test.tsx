@@ -22,6 +22,7 @@ describe("AchievementGallery", () => {
             earTrained: true,
             earFlawless: false,
             earMastered: false,
+            consented: false,
         });
         render(<AchievementGallery achievements={achievements} />);
 

@@ -14,13 +14,22 @@ const NOTHING: AchievementFacts = {
     earTrained: false,
     earFlawless: false,
     earMastered: false,
+    consented: false,
 };
 
 describe("collectAchievements", () => {
+    it("earns the data-hero badge from the current consent, and drops it when withdrawn", () => {
+        const hero = (facts: AchievementFacts) =>
+            collectAchievements(facts).find((badge) => badge.kind === "dataHero");
+        // The one non-cumulative badge: on with consent, gone without it (no penalty).
+        expect(hero({ ...NOTHING, consented: true })?.earned).toBe(true);
+        expect(hero({ ...NOTHING, consented: false })?.earned).toBe(false);
+    });
+
     it("lays out the full set unearned for a fresh player", () => {
         const badges = collectAchievements(NOTHING);
-        // 8 grades + 3 stars + first S + flawless + 2 day + 2 note + 3 ear badges.
-        expect(badges).toHaveLength(20);
+        // 8 grades + 3 stars + first S + flawless + 2 day + 2 note + 3 ear + data hero.
+        expect(badges).toHaveLength(21);
         expect(badges.every((badge) => !badge.earned)).toBe(true);
     });
 

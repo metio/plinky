@@ -31,6 +31,8 @@ function badgeFace(badge: Achievement): { emoji: string; label: string } {
             return { emoji: "🎵", label: m.achievement_notes({ count: badge.target }) };
         case "ear":
             return EAR_FACE[badge.badge];
+        case "dataHero":
+            return { emoji: "🦸", label: m.achievement_data_hero() };
     }
 }
 
