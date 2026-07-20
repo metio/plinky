@@ -62,6 +62,29 @@ export default function Settings() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">{m.settings_subtitle()}</p>
             </header>
 
+            {/* Privacy leads the page: these opt-ins involve a third party and are
+            off unless turned on, so they sit up top where they're seen. The analytics
+            toggle lives here now; a monetisation opt-in joins it later. */}
+            <SettingsSection
+                title={m.settings_privacy_title()}
+                hint={m.settings_privacy_hint()}
+                icon={<EyeIcon className={ICON} />}
+            >
+                <div className="space-y-1">
+                    <SwitchField
+                        label={m.settings_analytics_toggle()}
+                        checked={prefs.analyticsConsent}
+                        onChange={(analyticsConsent) => update({ analyticsConsent })}
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {m.settings_analytics_desc()}{" "}
+                        <LocalizedLink to="/datenschutz" className={linkClasses}>
+                            {m.settings_analytics_link()}
+                        </LocalizedLink>
+                    </p>
+                </div>
+            </SettingsSection>
+
             <SettingsSection
                 title={m.settings_appearance()}
                 hint={m.settings_appearance_hint()}
@@ -352,28 +375,6 @@ export default function Settings() {
                     <MicConnect />
                 </SettingsSection>
             )}
-
-            {/* Privacy: opt-ins that involve a third party, off unless turned on. The
-            analytics toggle lives here now; a monetisation opt-in joins it later. */}
-            <SettingsSection
-                title={m.settings_privacy_title()}
-                hint={m.settings_privacy_hint()}
-                icon={<EyeIcon className={ICON} />}
-            >
-                <div className="space-y-1">
-                    <SwitchField
-                        label={m.settings_analytics_toggle()}
-                        checked={prefs.analyticsConsent}
-                        onChange={(analyticsConsent) => update({ analyticsConsent })}
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {m.settings_analytics_desc()}{" "}
-                        <LocalizedLink to="/datenschutz" className={linkClasses}>
-                            {m.settings_analytics_link()}
-                        </LocalizedLink>
-                    </p>
-                </div>
-            </SettingsSection>
 
             <SettingsSection title={m.settings_help()} icon={<QuestionIcon className={ICON} />}>
                 <a
