@@ -41,10 +41,6 @@ export function NewsBanner() {
     // Once the reader steps through by hand they are reading, not glancing, so
     // auto-advance stops for the rest of the visit and never steals their place.
     const [paused, setPaused] = useState(false);
-    // The shown picture's own width/height ratio, learned on load and tagged with
-    // the item it belongs to, so a rotation never applies one image's ratio to the
-    // next.
-    const [loaded, setLoaded] = useState<{ id: string; ratio: number } | undefined>(undefined);
     // Where a pointer press began, so pointer-up can tell a swipe from a tap and,
     // on a swipe, keep the tap from also following the link.
     const pressX = useRef<number | null>(null);
@@ -73,8 +69,13 @@ export function NewsBanner() {
         return null;
     }
 
-    const measured = loaded?.id === item.id ? loaded.ratio : undefined;
-    const aspect = measured ?? (item.aspect && item.aspect > 0 ? item.aspect : 16 / 9);
+    // One aspect ratio for the whole banner, held across rotations so switching
+    // items never resizes the box (the cause of the page jump when two pictures
+    // came at slightly different sizes). The pictures share a ratio, so a slight
+    // difference just letterboxes inside object-contain rather than shifting the
+    // page. Taken from the first item that carries one (its Sanity asset ratio),
+    // falling back to 16/9; it does not depend on the item currently shown.
+    const bannerAspect = visible.find((it) => it.aspect && it.aspect > 0)?.aspect ?? 16 / 9;
 
     // Manual navigation: land on the chosen item and stop auto-advancing. The
     // offset arithmetic keeps the counter positive so a step back from the first
@@ -127,14 +128,14 @@ export function NewsBanner() {
         >
             <div
                 className="relative w-full touch-pan-y bg-gray-100 dark:bg-gray-800"
-                style={{ aspectRatio: String(aspect) }}
+                style={{ aspectRatio: String(bannerAspect) }}
                 onPointerDown={onPointerDown}
                 onPointerUp={onPointerUp}
                 onClickCapture={onClickCapture}
             >
-                {/* The box takes the image's own ratio once known (approximate
-                    until then), and object-contain shows the whole picture — no
-                    edges cropped. */}
+                {/* The box holds one ratio for every item, so a rotation never
+                    resizes it; object-contain shows the whole picture — no edges
+                    cropped, a slight ratio difference letterboxes instead. */}
                 <a
                     href={item.linkUrl}
                     target="_blank"
@@ -147,12 +148,6 @@ export function NewsBanner() {
                         alt={item.imageAlt}
                         loading="lazy"
                         draggable={false}
-                        onLoad={(event) => {
-                            const { naturalWidth, naturalHeight } = event.currentTarget;
-                            if (naturalWidth > 0 && naturalHeight > 0) {
-                                setLoaded({ id: item.id, ratio: naturalWidth / naturalHeight });
-                            }
-                        }}
                         className="h-full w-full object-contain"
                     />
                 </a>

@@ -126,6 +126,22 @@ describe("NewsBanner", () => {
         expect(screen.queryByAltText("First")).not.toBeNull();
     });
 
+    it("holds one aspect ratio across items, so a rotation never resizes the box", async () => {
+        // Two pictures with different ratios: the box must keep a single ratio so
+        // switching between them never resizes it (the page-jump / CLS the reader hit).
+        const scheduler = fakeScheduler();
+        const wide = { ...first, aspect: 1.9 };
+        const tall = { ...second, aspect: 1.3 };
+        renderWithServices(<NewsBanner />, { news: fakeNews([wide, tall]), scheduler });
+        const box = (await screen.findByAltText("First")).closest("div");
+        // The banner takes the first item's ratio and holds it for every item.
+        expect(box?.style.aspectRatio).toBe("1.9 / 1");
+        await act(async () => {});
+        act(() => scheduler.advance(ROTATE_MS));
+        const next = (await screen.findByAltText("Second")).closest("div");
+        expect(next?.style.aspectRatio).toBe("1.9 / 1");
+    });
+
     it("dismissing the current item reveals the next one", async () => {
         renderWithServices(<NewsBanner />, { news: fakeNews([first, second]) });
         await screen.findByAltText("First");
