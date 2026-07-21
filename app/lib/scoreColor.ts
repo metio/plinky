@@ -381,6 +381,61 @@ export function trailNotes(painted: PaintedNote[], color: string): void {
     }
 }
 
+// Each pitched note's halo colour (or null for none) in cursor-walk order — the run's
+// whole paint captured independently of the SVG. A fingering toggle re-renders the score,
+// which drops every halo; snapshotting before the render and re-applying after restores the
+// green cleared notes, the blue Listen trail, a red miss and any revealed hidden note in one
+// pass. The fresh noteheads walk in the same order because a fingering change adds no notes.
+export function snapshotNotePaint(osmd: OpenSheetMusicDisplay): (string | null)[] {
+    const colors: (string | null)[] = [];
+    osmd.cursor.show();
+    osmd.cursor.reset();
+    while (!osmd.cursor.iterator.EndReached) {
+        for (const gNote of osmd.cursor.GNotesUnderCursor()) {
+            const note = gNote.sourceNote;
+            if (note.isRest() || note.halfTone <= 0) {
+                continue;
+            }
+            const element = svgOf(gNote);
+            colors.push(element ? haloColor(element) : null);
+        }
+        osmd.cursor.next();
+    }
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    return colors;
+}
+
+// Re-applies a snapshot to the freshly-rendered noteheads, walking them in the same order.
+// Returns whether any note wore a mark, so the caller can keep the score's painted flag.
+export function restoreNotePaint(osmd: OpenSheetMusicDisplay, colors: (string | null)[]): boolean {
+    let index = 0;
+    let painted = false;
+    osmd.cursor.show();
+    osmd.cursor.reset();
+    while (!osmd.cursor.iterator.EndReached) {
+        for (const gNote of osmd.cursor.GNotesUnderCursor()) {
+            const note = gNote.sourceNote;
+            if (note.isRest() || note.halfTone <= 0) {
+                continue;
+            }
+            const color = colors[index++];
+            if (color == null) {
+                continue;
+            }
+            const element = svgOf(gNote);
+            if (element) {
+                litHalo(element, color);
+                painted = true;
+            }
+        }
+        osmd.cursor.next();
+    }
+    osmd.cursor.reset();
+    osmd.cursor.hide();
+    return painted;
+}
+
 // Scrolls a measure to the vertical centre of its own container — used by the focus
 // strip to slide to the bar being played. Scrolls the container directly (not
 // scrollIntoView, which would also scroll the page). Walks the cursor to the measure to

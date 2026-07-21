@@ -9,7 +9,7 @@ import type { MeasureBox } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
 import { usePrefsStore, useXmlCodec } from "../contexts/services";
 import { annotateFingerings } from "../lib/fingerScore";
-import { collectMeasureBoxes } from "../lib/scoreColor";
+import { collectMeasureBoxes, restoreNotePaint, snapshotNotePaint } from "../lib/scoreColor";
 import { seekToWhole } from "../lib/scoreCursor";
 import type { FingerMap } from "../stores/fingeringStore";
 
@@ -336,18 +336,22 @@ export function useOsmdScore(
         const cursor = osmd.cursor;
         const wasVisible = !cursor.hidden;
         const at = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
+        // Capture the run's paint before the render drops every halo, to re-apply it after —
+        // the green cleared notes and the blue Listen trail record how far the piece has been
+        // played, and would otherwise vanish on a mid-run fingering toggle.
+        const paint = snapshotNotePaint(osmd);
         osmd.updateGraphic();
         osmd.render();
         // A fresh render carries no measure boxes or overlay: re-measure the bars for the
-        // loop selection and click-to-select, and drop the paint flag. The render-version
-        // bump lets the caller repaint the loop overlay the fresh SVG dropped.
+        // loop selection and click-to-select. The render-version bump lets the caller repaint
+        // the loop overlay the fresh SVG dropped.
         const svg = containerRef.current?.querySelector("svg");
         measureBoxesRef.current =
             svg instanceof SVGSVGElement ? collectMeasureBoxes(osmd, svg) : [];
-        paintedRef.current = false;
         // The fresh render rebuilt every notehead, dropping any run paint injected into the
-        // old SVG — re-apply it (the ear-mode conceal most of all, so hidden answers stay
-        // hidden) before the cursor and overlay are restored.
+        // old SVG — re-apply the snapshot, keeping the painted flag when it held marks, then
+        // the ear-mode conceal so hidden answers stay hidden, before the cursor is restored.
+        paintedRef.current = restoreNotePaint(osmd, paint);
         onFingeringRedrawRef.current();
         // Step the reset cursor back to where it stood — OSMD has no direct seek — and show
         // it again where a run or Listen was using it, re-centring the treadmill.

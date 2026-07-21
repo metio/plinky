@@ -10,7 +10,9 @@ import {
     highlightCursorNotes,
     paintBarSelection,
     paintPlayedNotes,
+    restoreNotePaint,
     restoreNotes,
+    snapshotNotePaint,
 } from "./scoreColor";
 import {
     PLAYED_COLOR,
@@ -192,5 +194,82 @@ describe("highlightCursorNotes / restoreNotes", () => {
         const painted = highlightCursorNotes(fakeOsmd([rest, offscreen]), WINDOW_COLOR);
         expect(painted).toHaveLength(0);
         expect(haloColor(rest.group)).toBeNull();
+    });
+});
+
+// A cursor over a fixed sequence of positions, standing in for the OSMD graphic — the
+// snapshot/restore walk reads its iterator the way the live cursor is walked.
+function walkingOsmd(positions: ReturnType<typeof gNote>[][]): OpenSheetMusicDisplay {
+    let idx = 0;
+    return {
+        cursor: {
+            show: () => {},
+            hide: () => {},
+            reset: () => {
+                idx = 0;
+            },
+            next: () => {
+                idx += 1;
+            },
+            GNotesUnderCursor: () => positions[idx] ?? [],
+            get iterator() {
+                return { EndReached: idx >= positions.length };
+            },
+        },
+    } as unknown as OpenSheetMusicDisplay;
+}
+
+describe("snapshotNotePaint / restoreNotePaint", () => {
+    it("captures each note's halo and re-applies it to the freshly rendered notes in order", () => {
+        const a = gNote(60);
+        const b = gNote(64);
+        const c = gNote(67);
+        mount([a, b, c]);
+        // A green cleared note, a blue trail note, and one left unpainted.
+        paintPlayedNotes(fakeOsmd([a]), [60]);
+        highlightCursorNotes(fakeOsmd([b]), WINDOW_COLOR);
+        const snapshot = snapshotNotePaint(walkingOsmd([[a], [b], [c]]));
+        expect(snapshot).toEqual([PLAYED_COLOR, WINDOW_COLOR, null]);
+
+        // A fingering toggle re-renders: fresh note groups at the same positions carry no
+        // halo until the snapshot is restored onto them.
+        const a2 = gNote(60);
+        const b2 = gNote(64);
+        const c2 = gNote(67);
+        mount([a2, b2, c2]);
+        const painted = restoreNotePaint(walkingOsmd([[a2], [b2], [c2]]), snapshot);
+        expect(painted).toBe(true);
+        expect(haloColor(a2.group)).toBe(PLAYED_COLOR);
+        expect(haloColor(b2.group)).toBe(WINDOW_COLOR);
+        expect(haloColor(c2.group)).toBeNull();
+    });
+
+    it("keeps chord noteheads and skips rests, staying lock-step across the walk", () => {
+        const chordHigh = gNote(64);
+        const chordLow = gNote(60);
+        const rest = gNote(72, true, true);
+        const after = gNote(67);
+        mount([chordHigh, chordLow, after]);
+        paintPlayedNotes(fakeOsmd([chordHigh, chordLow]), [64]);
+        // The rest shares its position with nothing paintable; the note after must still line up.
+        const snapshot = snapshotNotePaint(walkingOsmd([[chordHigh, chordLow], [rest], [after]]));
+        expect(snapshot).toEqual([PLAYED_COLOR, null, null]);
+
+        const high2 = gNote(64);
+        const low2 = gNote(60);
+        const after2 = gNote(67);
+        mount([high2, low2, after2]);
+        restoreNotePaint(walkingOsmd([[high2, low2], [rest], [after2]]), snapshot);
+        expect(haloColor(high2.group)).toBe(PLAYED_COLOR);
+        expect(haloColor(low2.group)).toBeNull();
+        expect(haloColor(after2.group)).toBeNull();
+    });
+
+    it("reports no paint for an unmarked score", () => {
+        const a = gNote(60);
+        mount([a]);
+        const snapshot = snapshotNotePaint(walkingOsmd([[a]]));
+        expect(snapshot).toEqual([null]);
+        expect(restoreNotePaint(walkingOsmd([[a]]), snapshot)).toBe(false);
     });
 });
