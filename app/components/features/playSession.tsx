@@ -970,10 +970,18 @@ function usePlaySessionValue({
     // Writable from the Practice-tools drawer too, so the hint behaviour can change
     // without leaving the music; usePref persists it as the global setting.
     const [noteHints, setNoteHints] = usePref(prefsStore, "noteHints");
+    // Which keys the on-screen keyboard lights as "play now". A keep-up run owns the
+    // input on its own clock, so the keys follow its current beat (the matcher is
+    // stopped, its `expected` frozen); self-paced follows the matcher, gated by the
+    // reveal-hint setting. Either way "never" keeps the keyboard dark.
     const hintNotes =
-        noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
-            ? matcher.expected
-            : [];
+        noteHints === "never"
+            ? []
+            : keepUp.running
+              ? keepUp.expected
+              : noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
+                ? matcher.expected
+                : [];
     // A run ending — stop, restart or completion all drop `practicing` — leaves no
     // note left to hold, so drain any fills still shrinking.
     useEffect(() => {

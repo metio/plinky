@@ -39,7 +39,6 @@ export function PlayTransport() {
         restartListen,
         practice,
         playAlong,
-        getOsmd,
         reading,
         fingerStrip,
         setFingerStrip,
@@ -142,14 +141,7 @@ export function PlayTransport() {
                     itself. */}
                     <Show when={!treadmill}>
                         <ToggleIconButton
-                            onClick={() => {
-                                const next = !scrollFollow;
-                                setScrollFollow(next);
-                                const osmd = getOsmd();
-                                if (osmd) {
-                                    osmd.FollowCursor = next;
-                                }
-                            }}
+                            onClick={() => setScrollFollow((on) => !on)}
                             pressed={scrollFollow}
                             label={m.action_scroll_follow()}
                         >
