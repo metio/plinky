@@ -140,6 +140,8 @@
   "keep_up_hint": "Noty postupujú v pevnom tempe na dobu, a každá, ktorú nestihnete zahrať včas, len preplynie ďalej. Uvedie vás jeden takt predpočítania.",
   "guide_notes_toggle": "Prehrávať noty",
   "guide_notes_hint": "Každá nota zaznie, keď prechádza, aby ste ju mohli sledovať. Vypnite to a čítajte ich v tempe sami.",
+  "duet_toggle": "Zahrať druhú ruku",
+  "duet_hint": "Aplikácia hrá ruku, ktorú necvičíš, v rytme – zahráš si s ňou duet.",
   "keep_up_result": "Stihli ste {inTime} z {total} nôt načas.",
   "race_ghost_toggle": "Pretekajte s duchom",
   "race_ghost_hint": "Priehľadný záznam vášho najlepšieho pokusu na tejto skladbe hrá popri vás.",

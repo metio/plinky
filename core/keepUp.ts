@@ -18,6 +18,10 @@ export type KeepUpStep = {
     // written length in quarter notes so the guide can sound it for that long.
     // Empty at a rest or the other hand's turn (an unscored position).
     play: { pitch: number; quarters: number }[];
+    // The other hand's pitches here — the ones you are NOT catching this run. Empty for a
+    // both-hands run (nothing is left over). A duet sounds these on the clock so the app
+    // plays the accompanying hand while you play yours; a plain run ignores them.
+    accompany: { pitch: number; quarters: number }[];
     // Every note's written length here in quarter notes, both hands and rests —
     // the beat's duration comes from the shortest, so the clock advances in step
     // with the notation regardless of which hand is being practised.

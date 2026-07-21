@@ -140,6 +140,8 @@
   "keep_up_hint": "Noty postupují v pevném tempu podle doby, a co nestihnete včas, to propadne. Uvede vás jednotaktové odpočítání.",
   "guide_notes_toggle": "Přehrávat noty",
   "guide_notes_hint": "Každá nota se ozve, jak přichází, abyste ji mohli sledovat. Vypněte to a zkuste je číst v tempu sami.",
+  "duet_toggle": "Zahrát druhou ruku",
+  "duet_hint": "Aplikace hraje ruku, kterou necvičíš, v rytmu – zahraješ si s ní duet.",
   "keep_up_result": "Stihli jste včas {inTime} z {total} not.",
   "race_ghost_toggle": "Závoďte se svým duchem",
   "race_ghost_hint": "Průsvitné přehrání vašeho nejlepšího pokusu o tuto skladbu poběží vedle vás.",

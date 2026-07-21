@@ -74,15 +74,35 @@ describe("collectKeepUpSteps", () => {
         // The right hand catches only staff-0 pitches, but the beat length still
         // sees both hands (and the rest), so the clock advances with the notation.
         expect(collectKeepUpSteps(osmd, "right")).toEqual([
-            { play: [{ pitch: 60, quarters: 1 }], lengths: [1, 2] },
-            { play: [], lengths: [1] },
-            { play: [{ pitch: 62, quarters: 1 }], lengths: [1] },
+            {
+                play: [{ pitch: 60, quarters: 1 }],
+                accompany: [{ pitch: 48, quarters: 2 }],
+                lengths: [1, 2],
+            },
+            { play: [], accompany: [], lengths: [1] },
+            { play: [{ pitch: 62, quarters: 1 }], accompany: [], lengths: [1] },
         ]);
-        // The left hand catches staff-1 pitches instead.
+        // The left hand catches staff-1 pitches instead, accompanied by staff 0.
         expect(collectKeepUpSteps(osmd, "left")[0]).toEqual({
             play: [{ pitch: 48, quarters: 2 }],
+            accompany: [{ pitch: 60, quarters: 1 }],
             lengths: [1, 2],
         });
+    });
+
+    it("leaves nothing to accompany in a both-hands run", () => {
+        const osmd = fakeOsmd([
+            [
+                { midi: 60, staff: 0, quarters: 1 },
+                { midi: 48, staff: 1, quarters: 1 },
+            ],
+        ]);
+        const step = collectKeepUpSteps(osmd, "both")[0]!;
+        expect(step.play).toEqual([
+            { pitch: 60, quarters: 1 },
+            { pitch: 48, quarters: 1 },
+        ]);
+        expect(step.accompany).toEqual([]);
     });
 });
 
@@ -106,12 +126,42 @@ describe("useKeepUp", () => {
             }),
         );
 
-        result.current.start({ hand: "both", guideNotes: false });
+        result.current.start({ hand: "both", guideNotes: false, accompany: false });
         // Count-in is one bar (beatMs × beatsPerBar = 250 ms at 240 bpm), then the first
         // tick opens — and paints — the step under the cursor.
         vi.advanceTimersByTime(300);
 
         expect(markPainted).toHaveBeenCalled();
+        result.current.stop();
+    });
+
+    it("plays the other hand as accompaniment in a duet run", () => {
+        const osmd = fakeOsmd([
+            [
+                { midi: 60, staff: 0 },
+                { midi: 48, staff: 1 },
+            ],
+        ]);
+        const played: number[] = [];
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: (note) => played.push(note) },
+                tempo: () => 240,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish: () => {},
+            }),
+        );
+
+        // Practise the right hand with the guide off but the duet on.
+        result.current.start({ hand: "right", guideNotes: false, accompany: true });
+        vi.advanceTimersByTime(300);
+
+        // The left hand (48) sounds as accompaniment; the right hand (60, yours to play) does not.
+        expect(played).toContain(48);
+        expect(played).not.toContain(60);
         result.current.stop();
     });
 });

@@ -140,6 +140,8 @@
   "keep_up_hint": "De partituur schuift mee op een vast tempo, en een noot die je niet op tijd raakt, glipt voorbij. Een aftel van één maat leidt je in.",
   "guide_notes_toggle": "Speel de noten",
   "guide_notes_hint": "Elke noot klinkt terwijl hij voorbijkomt, zodat je kunt meevolgen. Zet het uit om ze zelf op tempo te lezen.",
+  "duet_toggle": "Speel de andere hand",
+  "duet_hint": "De app speelt de hand die je niet oefent, in de maat – zo speel je een duet met de app.",
   "keep_up_result": "Je bleef bij {inTime} van {total} noten op tijd.",
   "race_ghost_toggle": "Race tegen je schaduw",
   "race_ghost_hint": "Een doorschijnende herhaling van je beste run op dit stuk speelt naast je mee.",

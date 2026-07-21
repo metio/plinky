@@ -140,6 +140,8 @@
   "keep_up_hint": "Noderne rykker frem på slaget i et fast tempo, og enhver node, du ikke når i tide, glider forbi. En optaktstakt fører dig ind.",
   "guide_notes_toggle": "Spil noderne",
   "guide_notes_hint": "Hver node lyder, når den passerer, så du kan følge med. Slå den fra for selv at læse dem i tempo.",
+  "duet_toggle": "Spil den anden hånd",
+  "duet_hint": "Appen spiller den hånd, du ikke øver, i takt – så du spiller en duet med den.",
   "keep_up_result": "Du fulgte med på {inTime} af {total} noder i tide.",
   "race_ghost_toggle": "Kapløb mod dit spøgelse",
   "race_ghost_hint": "Et gennemsigtigt gensyn af dit bedste gennemløb af dette stykke spiller med ved siden af dig.",

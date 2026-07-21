@@ -140,6 +140,8 @@
   "keep_up_hint": "Die Noten laufen im festen Tempo weiter, und jede Note, die du nicht rechtzeitig triffst, zieht vorbei. Ein Takt Einzähler führt dich hinein.",
   "guide_notes_toggle": "Noten vorspielen",
   "guide_notes_hint": "Jede Note erklingt, während sie vorbeizieht, damit du mitkommst. Schalte es aus, um sie im Tempo selbst zu lesen.",
+  "duet_toggle": "Die andere Hand spielen",
+  "duet_hint": "Die App spielt die Hand, die du nicht übst, im Takt – so spielst du ein Duett mit ihr.",
   "keep_up_result": "Du hast bei {inTime} von {total} Noten rechtzeitig mitgehalten.",
   "race_ghost_toggle": "Gegen deinen Geist antreten",
   "race_ghost_hint": "Eine durchscheinende Wiederholung deines besten Durchlaufs dieses Stücks spielt neben dir mit.",

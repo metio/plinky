@@ -140,6 +140,8 @@
   "keep_up_hint": "Nota sabit bir tempoda vuruşta ilerler; zamanında yakalayamadığın nota kaçar gider. Bir ölçülük giriş sayımı seni içeri alır.",
   "guide_notes_toggle": "Notaları çal",
   "guide_notes_hint": "Takip edebilesin diye her nota geçerken çalar. Tempoda kendin okumak istersen kapat.",
+  "duet_toggle": "Diğer eli çal",
+  "duet_hint": "Uygulama çalışmadığın eli tempoda çalar; onunla düet yaparsın.",
   "keep_up_result": "{total} notanın {inTime} tanesine zamanında ayak uydurdun.",
   "race_ghost_toggle": "Hayaletinle yarış",
   "race_ghost_hint": "Bu parçadaki en iyi turunun yarı saydam bir tekrarı, yanı başında çalar.",

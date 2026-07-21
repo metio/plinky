@@ -140,6 +140,8 @@
   "keep_up_hint": "Nuty przesuwają się w stałym tempie zgodnie z rytmem, a każda, której nie złapiesz na czas, po prostu przemija. Jednotaktowe odliczanie wprowadza cię do gry.",
   "guide_notes_toggle": "Odtwarzaj nuty",
   "guide_notes_hint": "Każda nuta rozbrzmiewa, gdy przechodzi, żebyś mógł za nią podążać. Wyłącz, by czytać je samodzielnie w tempie.",
+  "duet_toggle": "Zagraj drugą ręką",
+  "duet_hint": "Aplikacja gra rękę, której nie ćwiczysz, w rytm — grasz z nią duet.",
   "keep_up_result": "Nadążyłeś z {inTime} z {total} nut na czas.",
   "race_ghost_toggle": "Ścigaj się ze swoim duchem",
   "race_ghost_hint": "Półprzezroczysta powtórka twojego najlepszego podejścia do tego utworu gra razem z tobą.",

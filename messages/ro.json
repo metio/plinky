@@ -140,6 +140,8 @@
   "keep_up_hint": "Partitura avansează pe ritm, într-un tempo fix, iar orice notă pe care n-o prinzi la timp trece mai departe. O numărătoare de o măsură te introduce în piesă.",
   "guide_notes_toggle": "Cântă notele",
   "guide_notes_hint": "Fiecare notă se aude pe măsură ce trece, ca să poți urmări. Dezactiveaz-o ca să le citești singur, în tempo.",
+  "duet_toggle": "Cântă cealaltă mână",
+  "duet_hint": "Aplicația cântă mâna pe care n-o exersezi, la timp — astfel cânți un duet cu ea.",
   "keep_up_result": "Ai ținut pasul cu {inTime} din {total} note la timp.",
   "race_ghost_toggle": "Întrece-ți umbra",
   "race_ghost_hint": "O redare translucidă a celei mai bune încercări la această piesă cântă alături de tine.",

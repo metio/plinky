@@ -140,6 +140,8 @@
   "keep_up_hint": "乐谱以固定速度随拍子推进，没能及时接住的音会悄悄溜过去。开头有一小节预备拍带你进入。",
   "guide_notes_toggle": "自动奏出音符",
   "guide_notes_hint": "每个音经过时都发声，方便你跟着。关闭后就由你自己按速度识谱。",
+  "duet_toggle": "演奏另一只手",
+  "duet_hint": "应用会按节奏演奏你没在练的那只手，让你和它合奏二重奏。",
   "keep_up_result": "你及时跟上了 {total} 个音中的 {inTime} 个。",
   "race_ghost_toggle": "与你的残影竞速",
   "race_ghost_hint": "练习时，这首曲子你最佳一轮的半透明回放会陪你一起弹。",

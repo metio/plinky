@@ -140,6 +140,8 @@
   "keep_up_hint": "Note napreduju stalnim tempom uz ritam, a svaka koju ne uhvatiš na vrijeme jednostavno prođe. Uvodi te odbrojavanje od jednog takta.",
   "guide_notes_toggle": "Sviraj note",
   "guide_notes_hint": "Svaka nota zasvira dok prolazi, tako da je možeš pratiti. Isključi da ih sam čitaš u tempu.",
+  "duet_toggle": "Sviraj drugu ruku",
+  "duet_hint": "Aplikacija svira ruku koju ne vježbaš, u ritmu – tako sviraš duet s njom.",
   "keep_up_result": "Držao si korak s {inTime} od {total} nota na vrijeme.",
   "race_ghost_toggle": "Utrkuj se sa svojim duhom",
   "race_ghost_hint": "Prozirna snimka tvog najboljeg pokušaja ove skladbe svira uz tebe.",

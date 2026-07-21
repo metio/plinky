@@ -140,6 +140,8 @@
   "keep_up_hint": "Partitura ecën me rrahjen në një tempo fikse, dhe çdo notë që s'e kap në kohë kalon tutje. Një numërim një-takti të fut brenda.",
   "guide_notes_toggle": "Luaj notat",
   "guide_notes_hint": "Çdo notë tingëllon ndërsa kalon, që të mund ta ndjekësh. Fike për t'i lexuar vetë në tempo.",
+  "duet_toggle": "Luaj dorën tjetër",
+  "duet_hint": "Aplikacioni luan dorën që nuk po ushtron, në ritëm — kështu luan një duet me të.",
   "keep_up_result": "Mbajte hapin me {inTime} nga {total} nota në kohë.",
   "race_ghost_toggle": "Garo me hijen tënde",
   "race_ghost_hint": "Një ripërsëritje e tejdukshme e provës tënde më të mirë në këtë pjesë luan pranë teje.",

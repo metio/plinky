@@ -45,6 +45,8 @@ export function RunSetup() {
         setEnforceTempo,
         guideNotes,
         setGuideNotes,
+        duet,
+        setDuet,
         transpose,
         setTranspose,
         hiddenNotes,
@@ -96,6 +98,15 @@ export function RunSetup() {
                     checked={guideNotes}
                     onChange={setGuideNotes}
                     help={m.guide_notes_hint()}
+                />
+            )}
+            {/* A duet needs a keep-up run with one hand sitting out for the app to play. */}
+            {enforceTempo && staffCount >= 2 && hand !== "both" && (
+                <SwitchField
+                    label={m.duet_toggle()}
+                    checked={duet}
+                    onChange={setDuet}
+                    help={m.duet_hint()}
                 />
             )}
             <SwitchField

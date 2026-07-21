@@ -169,6 +169,8 @@
   "keep_up_hint": "The score advances on the beat at a fixed tempo, and any note you don't catch in time slips by. A one-bar count-in leads you in.",
   "guide_notes_toggle": "Play the notes",
   "guide_notes_hint": "Each note sounds as it passes, so you can follow along. Turn it off to read them at tempo yourself.",
+  "duet_toggle": "Play the other hand",
+  "duet_hint": "The app plays the hand you're not practising, in time — so you play a duet with it.",
   "keep_up_result": "You kept up with {inTime} of {total} notes in time.",
   "race_ghost_toggle": "Race your ghost",
   "race_ghost_hint": "A translucent replay of your best run on this piece plays alongside you.",

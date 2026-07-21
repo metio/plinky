@@ -140,6 +140,8 @@
   "keep_up_hint": "La partition avance sur le temps à un tempo fixe, et toute note que vous ne rattrapez pas à temps vous échappe. Un décompte d'une mesure vous met en route.",
   "guide_notes_toggle": "Jouer les notes",
   "guide_notes_hint": "Chaque note sonne à son passage, pour vous aider à suivre. Désactivez pour les lire vous-même à tempo.",
+  "duet_toggle": "Jouer l'autre main",
+  "duet_hint": "L'appli joue la main que tu ne travailles pas, en rythme – tu joues un duo avec elle.",
   "keep_up_result": "Vous avez suivi {inTime} des {total} notes à temps.",
   "race_ghost_toggle": "Courez contre votre fantôme",
   "race_ghost_hint": "Un rejeu translucide de votre meilleure partie sur ce morceau joue à vos côtés.",

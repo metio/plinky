@@ -140,6 +140,8 @@
   "keep_up_hint": "La partitura avanza al ritmo con un tempo fijo, y cualquier nota que no alcances a tiempo se te escapa. Un compás de cuenta te da la entrada.",
   "guide_notes_toggle": "Toca las notas",
   "guide_notes_hint": "Cada nota suena al pasar, para que puedas seguirla. Desactívalo para leerlas al tempo por tu cuenta.",
+  "duet_toggle": "Tocar la otra mano",
+  "duet_hint": "La app toca la mano que no practicas, a tiempo, para que toques un dúo con ella.",
   "keep_up_result": "Seguiste el ritmo en {inTime} de {total} notas.",
   "race_ghost_toggle": "Compite con tu fantasma",
   "race_ghost_hint": "Una repetición translúcida de tu mejor intento en esta pieza se reproduce junto a ti.",

@@ -140,6 +140,8 @@
   "keep_up_hint": "A kotta rögzített tempóban, ütemre halad, és minden hang, amit nem érsz el időben, egyszerűen tovasiklik. Egy együtemes beszámolás vezet be.",
   "guide_notes_toggle": "Hangok lejátszása",
   "guide_notes_hint": "Minden hang megszólal, ahogy elhalad, hogy tudj követni. Kapcsold ki, hogy magad olvasd őket a saját tempódban.",
+  "duet_toggle": "A másik kéz lejátszása",
+  "duet_hint": "Az app lejátssza a kezet, amelyet nem gyakorolsz, ütemre – így duettet játszol vele.",
   "keep_up_result": "Időben lépést tartottál {total} hangból {inTime}-tal.",
   "race_ghost_toggle": "Versenyezz a szellemeddel",
   "race_ghost_hint": "A legjobb futásod áttetsző visszajátszása veled együtt játszik ezen a darabon.",

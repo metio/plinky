@@ -140,6 +140,8 @@
   "keep_up_hint": "Noterna rör sig på taktslaget i ett fast tempo, och varje ton du inte hinner med glider förbi. En takts inräkning leder in dig.",
   "guide_notes_toggle": "Spela tonerna",
   "guide_notes_hint": "Varje ton ljuder när den passerar, så att du kan följa med. Stäng av för att läsa dem i tempo på egen hand.",
+  "duet_toggle": "Spela den andra handen",
+  "duet_hint": "Appen spelar handen du inte övar på, i takt – så att du spelar en duett med den.",
   "keep_up_result": "Du hängde med på {inTime} av {total} toner i tid.",
   "race_ghost_toggle": "Kör mot ditt spöke",
   "race_ghost_hint": "En genomskinlig repris av din bästa genomspelning av stycket spelar med dig.",

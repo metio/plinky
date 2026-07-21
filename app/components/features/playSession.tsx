@@ -151,6 +151,9 @@ function usePlaySessionValue({
     // read-at-tempo test. Session toggles (not persisted), off by default.
     const [enforceTempo, setEnforceTempo] = useState(false);
     const [guideNotes, setGuideNotes] = useState(true);
+    // Duet: sound the other hand while you play yours during a hands-separate keep-up run.
+    // Off by default and, like the others, a session toggle rather than a saved pref.
+    const [duet, setDuet] = useState(false);
     // The tempo settings — the slider, the adaptive live pace, the metronome toggles and
     // the tempo trainer — held together. The metronome *effect* stays at its call site
     // below: it reads keepUp.running, which is created after this.
@@ -823,7 +826,12 @@ function usePlaySessionValue({
         if (score.painted()) {
             score.wipePaint();
         }
-        keepUp.start({ hand: staffCount < 2 ? "both" : hand, guideNotes });
+        keepUp.start({
+            hand: staffCount < 2 ? "both" : hand,
+            guideNotes,
+            // A duet needs two hands and a hand to sit out — meaningless in a both-hands run.
+            accompany: duet && staffCount >= 2 && hand !== "both",
+        });
     };
 
     // Save the just-finished run as a take: rebuild a Composition from the captured
@@ -1012,6 +1020,8 @@ function usePlaySessionValue({
         setEnforceTempo,
         guideNotes,
         setGuideNotes,
+        duet,
+        setDuet,
         forgiving,
         setForgiving,
         raceGhost,

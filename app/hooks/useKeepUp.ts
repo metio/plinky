@@ -35,6 +35,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
     const steps: KeepUpStep[] = [];
     while (!cursor.iterator.EndReached) {
         const play: KeepUpStep["play"] = [];
+        const accompany: KeepUpStep["accompany"] = [];
         const lengths: number[] = [];
         for (const note of cursor.NotesUnderCursor()) {
             const quarters = note.Length.RealValue * 4;
@@ -42,12 +43,16 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
             if (note.isRest() || note.halfTone <= 0) {
                 continue;
             }
-            if (hand !== "both" && note.ParentStaff?.idInMusicSheet !== STAFF_FOR[hand]) {
-                continue;
+            const entry = { pitch: note.halfTone + 12, quarters };
+            // The practised hand's notes are yours to catch; the other hand's are the
+            // accompaniment a duet sounds for you. A both-hands run has no other hand.
+            if (hand === "both" || note.ParentStaff?.idInMusicSheet === STAFF_FOR[hand]) {
+                play.push(entry);
+            } else {
+                accompany.push(entry);
             }
-            play.push({ pitch: note.halfTone + 12, quarters });
         }
-        steps.push({ play, lengths });
+        steps.push({ play, accompany, lengths });
         cursor.next();
     }
     cursor.reset();
@@ -114,7 +119,16 @@ export function useKeepUp({
     // The finished run's result is shown until the next run clears it.
     const clearResult = () => setResult(null);
 
-    const start = ({ hand, guideNotes }: { hand: Hand; guideNotes: boolean }) => {
+    const start = ({
+        hand,
+        guideNotes,
+        accompany,
+    }: {
+        hand: Hand;
+        guideNotes: boolean;
+        // Sound the other hand as you play yours — a duet. Only meaningful hands-separate.
+        accompany: boolean;
+    }) => {
         const osmd = getOsmd();
         if (!osmd || activeRef.current) {
             return;
@@ -155,10 +169,17 @@ export function useKeepUp({
         // guide is on.
         const openStep = (current: KeepUpStep) => {
             const expected = current.play.map((entry) => entry.pitch);
+            // The synth duration is in seconds — 60/BPM per quarter note.
+            const seconds = (quarters: number) => quarters * (60 / tempo());
             if (guideNotes) {
                 for (const entry of current.play) {
-                    // The synth duration is in seconds — 60/BPM per quarter note.
-                    synth.playNote(entry.pitch, { duration: entry.quarters * (60 / tempo()) });
+                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
+                }
+            }
+            // The duet: sound the other hand at each beat, so the app plays alongside you.
+            if (accompany) {
+                for (const entry of current.accompany) {
+                    synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
                 }
             }
             stateRef.current = openKeepUpStep(stateRef.current, expected);

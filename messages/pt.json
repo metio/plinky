@@ -140,6 +140,8 @@
   "keep_up_hint": "A partitura avança no tempo, a um andamento fixo, e qualquer nota que não apanhares a tempo passa. Uma contagem de um compasso conduz-te.",
   "guide_notes_toggle": "Tocar as notas",
   "guide_notes_hint": "Cada nota soa ao passar, para acompanhar facilmente. Desliga para as leres no andamento por conta própria.",
+  "duet_toggle": "Tocar a outra mão",
+  "duet_hint": "A app toca a mão que não estás a praticar, a tempo — assim tocas um dueto com ela.",
   "keep_up_result": "Acompanhaste {inTime} de {total} notas no tempo.",
   "race_ghost_toggle": "Corre contra o teu fantasma",
   "race_ghost_hint": "Uma repetição translúcida da tua melhor execução nesta peça toca ao teu lado.",

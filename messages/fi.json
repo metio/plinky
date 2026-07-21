@@ -140,6 +140,8 @@
   "keep_up_hint": "Nuotti etenee iskun tahtiin kiinteässä tempossa, ja jokainen nuotti, jota et ehdi ajoissa, luiskahtaa ohi. Yhden tahdin sisäänlasku johdattaa sinut mukaan.",
   "guide_notes_toggle": "Soita nuotit",
   "guide_notes_hint": "Jokainen nuotti soi ohittaessaan, jotta pysyt mukana. Sammuta se, jos haluat lukea nuotit itse tempossa.",
+  "duet_toggle": "Soita toinen käsi",
+  "duet_hint": "Sovellus soittaa käden, jota et harjoittele, tahdissa – soitat sen kanssa duetin.",
   "keep_up_result": "Pysyit mukana {inTime}/{total} nuotissa ajallaan.",
   "race_ghost_toggle": "Kilpaile haamuasi vastaan",
   "race_ghost_hint": "Läpikuultava toisto parhaasta suorituksestasi tässä kappaleessa soi rinnallasi.",

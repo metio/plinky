@@ -140,6 +140,8 @@
   "keep_up_hint": "Lo spartito avanza sul battito a un tempo fisso, e ogni nota che non prendi in tempo scivola via. Un conteggio di una battuta ti guida all'inizio.",
   "guide_notes_toggle": "Suona le note",
   "guide_notes_hint": "Ogni nota suona mentre passa, così puoi seguirla. Disattiva per leggerle tu a tempo.",
+  "duet_toggle": "Suona l'altra mano",
+  "duet_hint": "L'app suona la mano che non stai esercitando, a tempo: suoni un duetto con lei.",
   "keep_up_result": "Hai tenuto il passo con {inTime} di {total} note a tempo.",
   "race_ghost_toggle": "Corri contro il tuo fantasma",
   "race_ghost_hint": "Una riproduzione traslucida della tua esecuzione migliore su questo brano ti accompagna mentre suoni.",
