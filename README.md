@@ -108,6 +108,12 @@ any note you don't catch before it passes is a miss (Synthesia / Guitar-Hero sty
 notes sound as a guide so you can follow along by ear — or turn that off to read them at
 tempo yourself. At the end it tells you how many you kept up with.
 
+On a two-hand piece, pick **one hand** to practise and the run waits only on that
+hand, skipping the stretches where only the other sounds. Turn on **Play the other
+hand** and the app fills that hand in for you — on the beat during **Keep up**, and
+in self-paced practice **note by note at your own pace**: each note you play lays out
+the other hand up to your next one, so it plays a duet with you and never runs ahead.
+
 When you finish, a short **major flourish** plays to mark the moment — landing a
 beat after your last note so it reads as a reward rather than a sound on top of your
 playing. A fuller arpeggio marks a stronger grade, a warm lift a gentler one, never a

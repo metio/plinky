@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { type Hand, STAFF_FOR } from "../../core/matcher";
+import { type Hand, isPracticedHand } from "../../core/matcher";
 import { type MeasureBox, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
 // OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
@@ -65,7 +65,7 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
             if (note.isRest() || note.halfTone <= 0) {
                 continue;
             }
-            if (hand !== "both" && note.ParentStaff?.idInMusicSheet !== STAFF_FOR[hand]) {
+            if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand)) {
                 continue;
             }
             // This position counts as a step the moment it holds a playable note,

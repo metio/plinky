@@ -100,8 +100,9 @@ export function RunSetup() {
                     help={m.guide_notes_hint()}
                 />
             )}
-            {/* A duet needs a keep-up run with one hand sitting out for the app to play. */}
-            {enforceTempo && staffCount >= 2 && hand !== "both" && (
+            {/* A duet needs one hand sitting out for the app to play — in keep-up it
+            follows the clock, self-paced it follows your own pace note by note. */}
+            {staffCount >= 2 && hand !== "both" && (
                 <SwitchField
                     label={m.duet_toggle()}
                     checked={duet}

@@ -13,7 +13,7 @@ import {
     startKeepUp,
     strikeKeepUp,
 } from "../../core/keepUp";
-import { STAFF_FOR, type Hand } from "../../core/matcher";
+import { type Hand, isPracticedHand } from "../../core/matcher";
 import { listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
@@ -46,10 +46,10 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
             const entry = { pitch: note.halfTone + 12, quarters };
             // The practised hand's notes are yours to catch; the other hand's are the
             // accompaniment a duet sounds for you. A both-hands run has no other hand.
-            // A note with no staff can't be proven to be the other hand's, so it counts as
-            // yours — dropping it into the unscored accompaniment would understate the run.
+            // The same split the self-paced matcher uses, so choosing a hand narrows the
+            // beats to catch — and the notes the guide sounds — identically in both modes.
             const staffId = note.ParentStaff?.idInMusicSheet;
-            if (hand === "both" || staffId === undefined || staffId === STAFF_FOR[hand]) {
+            if (isPracticedHand(staffId, hand)) {
                 play.push(entry);
             } else {
                 accompany.push(entry);

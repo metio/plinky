@@ -41,6 +41,7 @@ import {
     useXmlCodec,
 } from "../../contexts/services";
 import { useFullscreen } from "../../hooks/useFullscreen";
+import { useDuet } from "../../hooks/useDuet";
 import { useGhostRace } from "../../hooks/useGhostRace";
 import { useHoldIndicator } from "../../hooks/useHoldIndicator";
 import { useKeepUp } from "../../hooks/useKeepUp";
@@ -412,6 +413,19 @@ function usePlaySessionValue({
     const { micStatus, pedalHeld } = useMidiConnection();
     const micListening = micStatus === "listening";
 
+    // The hand the run drills — forced to "both" for a single-staff piece, where the
+    // hand selector never shows.
+    const activeHand: Hand = staffCount < 2 ? "both" : hand;
+    // The self-paced duet: sound the sitting-out hand as you play. Off in keep-up,
+    // where the tempo-locked run plays the other hand on its own clock instead.
+    const accompaniment = useDuet({
+        getOsmd,
+        playNote: synth.playNote,
+        scheduler,
+        enabled: duet && !enforceTempo && staffCount >= 2 && activeHand !== "both",
+        hand: activeHand,
+    });
+
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
@@ -458,6 +472,11 @@ function usePlaySessionValue({
             // Ease the adaptive metronome toward the player's own pace, read from the
             // gap between the last two notes.
             easeToward(captureRef.current, runTempoRef.current);
+            // Sound the sitting-out hand across the gap up to your next note, laid
+            // out at the pace you're playing at right now (a no-op unless the duet is
+            // on). Uses the live tempo captured for this render, so it tracks the same
+            // adaptive pace the metronome eases toward.
+            accompaniment.onCleared(info.index, liveTempo);
         },
         onWrong: ({ index, misses }) => {
             // The tries budget spent on a hidden note reveals it red — the lesson
@@ -938,6 +957,9 @@ function usePlaySessionValue({
         hidden.conceal();
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
         ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
+        // Read both hands off the freshly drawn score so the duet can sound the one
+        // you're not practising (inert unless the duet is on).
+        accompaniment.prime();
         // With the section loop on, Practice drills the selected bars on repeat, the
         // same range Listen laps, instead of running the whole piece once.
         matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);

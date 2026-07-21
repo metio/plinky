@@ -94,13 +94,17 @@ describe("collectKeepUpSteps", () => {
         });
     });
 
-    it("counts a note with no engraved staff as the practised hand's, not accompaniment", () => {
-        // A staff-less note can't be proven to belong to the other hand; routing it to the
-        // unscored accompaniment would drop it from the beats-to-catch and understate the run.
+    it("leaves a note with no engraved staff out of a single hand's beats, as self-paced does", () => {
+        // A single-hand run owns only its own staff; a note the engraving gives no staff
+        // can't be proven to be that hand's, so it is the other hand's to accompany — never
+        // a beat the player must catch. Keep-up and the self-paced matcher agree here, so a
+        // hand choice narrows both modes the same way.
         const osmd = fakeOsmd([[{ midi: 60, quarters: 1 }]]);
         const step = collectKeepUpSteps(osmd, "right")[0]!;
-        expect(step.play).toEqual([{ pitch: 60, quarters: 1 }]);
-        expect(step.accompany).toEqual([]);
+        expect(step.play).toEqual([]);
+        expect(step.accompany).toEqual([{ pitch: 60, quarters: 1 }]);
+        // A both-hands run still owns it — there is no other hand to hand it to.
+        expect(collectKeepUpSteps(osmd, "both")[0]!.play).toEqual([{ pitch: 60, quarters: 1 }]);
     });
 
     it("leaves nothing to accompany in a both-hands run", () => {

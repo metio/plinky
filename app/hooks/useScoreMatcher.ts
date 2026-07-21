@@ -11,7 +11,7 @@ import {
     type MatcherState,
     type MatchStep,
     matchNote,
-    STAFF_FOR,
+    isPracticedHand,
     startMatch,
     stepRange,
     type UpcomingStep,
@@ -39,7 +39,7 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
             continue;
         }
         const staff = note.ParentStaff?.idInMusicSheet;
-        if (hand !== "both" && staff !== STAFF_FOR[hand]) {
+        if (!isPracticedHand(staff, hand)) {
             continue;
         }
         pitches.push(note.halfTone + 12);
@@ -58,7 +58,9 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
 
 // Walk the engraved score once and lift it into the pure step model: every
 // playable position for the chosen hand, in play order. Leaves the cursor reset.
-function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): MatchStep[] {
+// Exported so the duet can lift the sitting-out hand's positions the same way,
+// reading the identical staff split the run itself matches on.
+export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): MatchStep[] {
     osmd.cursor.reset();
     const steps: MatchStep[] = [];
     while (!osmd.cursor.iterator.EndReached) {

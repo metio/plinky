@@ -14,6 +14,16 @@
 export type Hand = "both" | "right" | "left";
 export const STAFF_FOR: Record<Exclude<Hand, "both">, number> = { right: 0, left: 1 };
 
+// Whether a note engraved on `staffId` belongs to the hand being practised. A
+// both-hands run owns every note; a single-hand run owns only its own staff, so a
+// note on the other staff — or one the engraving gives no resolvable staff at all —
+// is the other hand's, to leave out or accompany, never to demand of the player.
+// Every surface that narrows to a hand (the self-paced matcher, keep-up's beat
+// split, the score colouring) shares this, so a hand choice means the same in each.
+export function isPracticedHand(staffId: number | undefined, hand: Hand): boolean {
+    return hand === "both" || staffId === STAFF_FOR[hand];
+}
+
 // One playable position for the chosen hand, in play order. Hand narrowing
 // happens when the surface collects the steps, so the reducer is hand-agnostic.
 export type MatchStep = {

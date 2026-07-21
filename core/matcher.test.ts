@@ -8,6 +8,7 @@ import {
     expectedPitches,
     type MatchStep,
     matchNote,
+    isPracticedHand,
     STAFF_FOR,
     startMatch,
     stepRange,
@@ -25,6 +26,26 @@ const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep 
 
 const cleared = (events: ReturnType<typeof matchNote>["events"]): ClearedEvent[] =>
     events.filter((event): event is ClearedEvent => event.kind === "cleared");
+
+describe("isPracticedHand", () => {
+    it("owns every note in a both-hands run, whatever its staff", () => {
+        expect(isPracticedHand(0, "both")).toBe(true);
+        expect(isPracticedHand(1, "both")).toBe(true);
+        expect(isPracticedHand(undefined, "both")).toBe(true);
+    });
+
+    it("owns only its own staff for a single hand", () => {
+        expect(isPracticedHand(STAFF_FOR.right, "right")).toBe(true);
+        expect(isPracticedHand(STAFF_FOR.left, "right")).toBe(false);
+        expect(isPracticedHand(STAFF_FOR.left, "left")).toBe(true);
+        expect(isPracticedHand(STAFF_FOR.right, "left")).toBe(false);
+    });
+
+    it("disowns a staff-less note for a single hand — it is the other hand's", () => {
+        expect(isPracticedHand(undefined, "right")).toBe(false);
+        expect(isPracticedHand(undefined, "left")).toBe(false);
+    });
+});
 
 describe("startMatch", () => {
     it("is complete immediately for an empty score", () => {
