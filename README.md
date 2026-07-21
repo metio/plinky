@@ -49,11 +49,19 @@ staff **scrolls to follow the cursor** as you go, so a multi-line piece keeps up
 you instead of making you scroll — and it stays in its own box so the keyboard below
 never hides the notes. On a phone — in either orientation — a compact **focus strip**
 sits right above the keys showing the bar you're playing, so the notes you need are
-never out of reach. An **(X)** leaves full screen, and right there while
-you play are toggles to **follow the note** (auto-scroll on/off), show the **finger-position
-numbers**, **restart** the run, or fold the keyboard away for more notation if you're at
-a real piano. You can
-also force a **set number of bars per row** for bigger, more readable notation on a
+never out of reach. An **(X)** leaves full screen, **restart** takes the run back to
+the top, and a **Set up** button slides in the same setup panel you get before a run,
+so every reading aid and layout choice is a tap away mid-piece without a row of icons
+crowding the music.
+
+That setup panel — before a run and behind the full-screen **Set up** button alike —
+reads like the Settings page: each theme in its own titled card that explains itself.
+**Skill level** leads, one choice that sets the reading aids below to match you (tweak
+any and it reads Custom); then **how you play** (which hand, keep-up, the metronome),
+the **reading aids** (colour, the notes highway, hidden notes, finger numbers), the
+**score layout**, and an **extra challenge** group. In the layout group you can turn
+**follow the note** on or off (the score scrolls to keep the note you're on centred),
+force a **set number of bars per row** for bigger, more readable notation on a
 small screen, or switch to **treadmill** reading — the piece laid out as one continuous
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. Turn on
 the **notes highway** and the staff gives way to a tall lane of the upcoming notes,
