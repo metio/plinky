@@ -54,11 +54,15 @@ function inject(id: string): void {
 // production it defaults to the build-time measurement id.
 export function gtagAnalytics(id: string | undefined = MEASUREMENT_ID): Analytics {
     let injected = false;
+    // The live consent state, so a tracked event is dropped the moment it is withdrawn
+    // — not only kept out of storage by Consent Mode, but never sent at all.
+    let granted = false;
     return {
         setConsent(on) {
             if (!id) {
                 return;
             }
+            granted = on;
             (window as unknown as Record<string, boolean>)[`ga-disable-${id}`] = !on;
             if (on && !injected) {
                 injected = true;
@@ -71,6 +75,14 @@ export function gtagAnalytics(id: string | undefined = MEASUREMENT_ID): Analytic
                     analytics_storage: on ? "granted" : "denied",
                 });
             }
+        },
+        track(event, params) {
+            // `injected` is only ever set with an id present, so this one guard also
+            // covers the no-id (preview / local) case: nothing was loaded to send to.
+            if (!injected || !granted) {
+                return;
+            }
+            gtag("event", event, params ?? {});
         },
     };
 }

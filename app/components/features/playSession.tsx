@@ -34,6 +34,7 @@ import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import {
+    useAnalytics,
     useHintsStore,
     useOnboardingStore,
     useScheduler,
@@ -143,6 +144,7 @@ function usePlaySessionValue({
     const captureRef = useRef<RunCapture>(startCapture());
     const synth = useSynth();
     const scheduler = useScheduler();
+    const analytics = useAnalytics();
     // The shrinking hold-duration fill on the on-screen keys — armed per correct
     // note below, cleared whenever a run stops.
     const holdIndicator = useHoldIndicator();
@@ -657,6 +659,15 @@ function usePlaySessionValue({
         gradeFromRunRef.current = true;
         finishedGradeRef.current = outcome.grade;
         runResult.record({ ...outcome, notes });
+        // The finish half of the run funnel: which grade a completed self-paced run
+        // earned, and how clean it was, against the run_started that opened it.
+        analytics.track("run_completed", {
+            mode: "self_paced",
+            grade: outcome.grade.letter,
+            correct: matcher.total,
+            wrong: matcher.wrong,
+            daily: daily !== undefined,
+        });
         // A short major flourish to celebrate finishing — a fuller arpeggio for a
         // stronger grade, a gentle lift for a weaker one, never a penalty. playNote
         // no-ops when sound is muted, so the mute checkbox is the gate.
@@ -804,6 +815,7 @@ function usePlaySessionValue({
         // the phrase sounds over a blanked staff, ready to be played back.
         hidden.conceal();
         listenPlayback.start(from);
+        analytics.track("run_started", { mode: "listen", hidden: hiddenNotes });
     };
 
     // Restart Listen from the top (or the loop's start bar). The trail wipes like a
@@ -845,11 +857,14 @@ function usePlaySessionValue({
         if (score.painted()) {
             score.wipePaint();
         }
-        keepUp.start({
-            hand: staffCount < 2 ? "both" : hand,
-            guideNotes,
-            // A duet needs two hands and a hand to sit out — meaningless in a both-hands run.
-            accompany: duet && staffCount >= 2 && hand !== "both",
+        const runHand = staffCount < 2 ? "both" : hand;
+        const accompany = duet && staffCount >= 2 && hand !== "both";
+        keepUp.start({ hand: runHand, guideNotes, accompany });
+        analytics.track("run_started", {
+            mode: "keep_up",
+            hand: runHand,
+            guide: guideNotes,
+            duet: accompany,
         });
     };
 
@@ -963,6 +978,13 @@ function usePlaySessionValue({
         // With the section loop on, Practice drills the selected bars on repeat, the
         // same range Listen laps, instead of running the whole piece once.
         matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
+        analytics.track("run_started", {
+            mode: "self_paced",
+            hand: matcherHand,
+            hidden: hiddenNotes,
+            forgiving,
+            loop: loop.on,
+        });
     };
 
     // Reveal the next note by colour per the player's hint setting — always, only once

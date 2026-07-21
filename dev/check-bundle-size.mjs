@@ -127,7 +127,12 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // The self-paced duet (core/duet's gap scheduler and the useDuet hook that plays the
 // sitting-out hand at your live tempo) — tips the total to a measured 592.2. 593.
-const BUDGET_TOTAL_KB = 593;
+//
+// The play run-setup regroup (SettingsSection cards + group strings per locale) and the
+// analytics event layer (the track() surface, core/analyticsPrefs, the AnalyticsTracking
+// page-view / setting-change watcher, plus run and video-export events) — net of removing
+// the full-screen setup sheet — tip the total to a measured 593.3. 594.
+const BUDGET_TOTAL_KB = 594;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -239,7 +244,11 @@ const BUDGET_TOTAL_KB = 593;
 //
 // The self-paced duet (core/duet's gap scheduler and the useDuet hook that plays the
 // sitting-out hand at your live tempo, wired into playSession) — measured at 282.1. 283.
-const BUDGET_APP_KB = 283;
+//
+// The play run-setup regroup and the analytics event layer (track() through the gtag
+// adapter, core/analyticsPrefs, the AnalyticsTracking watcher, and the run / video-export
+// events) — net of dropping the full-screen setup sheet — measured at 283.2. 284.
+const BUDGET_APP_KB = 284;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

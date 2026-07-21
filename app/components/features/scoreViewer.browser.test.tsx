@@ -97,13 +97,12 @@ describe("ScoreViewer", () => {
         ).toBeTruthy();
     });
 
-    it("toggles the metronome from the full-screen setup sheet", async () => {
-        // The metronome lives in the setup sheet the gear opens — enter play, open it.
-        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+    it("toggles the metronome from the run-setup panel", async () => {
+        // Settings live in the run-setup panel you open before a run — not mid-play.
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await awaitReady());
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
+        await awaitReady();
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const toggle = await screen.findByRole("switch", { name: "Metronome" }, { timeout: 30000 });
         expect(toggle.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(toggle);
@@ -153,15 +152,12 @@ describe("ScoreViewer", () => {
         expect(screen.queryByLabelText("C 6")).toBeNull();
     });
 
-    it("offers the finger-numbers and follow-the-note toggles in the full-screen setup sheet", async () => {
-        // The browser viewport is phone-sized, so playing auto-enters full screen; the
-        // reading aids live in the setup sheet the gear opens. Stub the Fullscreen API
-        // the headless browser withholds.
-        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+    it("offers the finger-numbers and follow-the-note toggles in the run-setup panel", async () => {
+        // The reading aids live in the run-setup panel you open before a run.
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await awaitReady()); // Practice enters full screen on every device
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
+        await awaitReady();
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         // Follow-the-note is on by default; flipping it takes effect without a reload.
         const follow = await screen.findByRole("switch", { name: "Follow the note" });
         expect(follow.getAttribute("aria-checked")).toBe("true");
@@ -185,14 +181,13 @@ describe("ScoreViewer", () => {
         // Switching fingering off must remove the numbers, not leave them stranded over the
         // reclaimed space: a bare re-render repositions the cached labels without destroying
         // them, so the toggle rebuilds the graphic model to re-create them per the rule.
-        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
-        fireEvent.click(await awaitReady());
+        await awaitReady();
         const score = screen.getByRole("img", { name: "T" });
         const textCount = () => score.querySelectorAll("text").length;
         const baseline = textCount();
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
+        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
         // On: the fingering digits are drawn, adding text nodes to the staff.
         fireEvent.click(fingers);
@@ -221,11 +216,10 @@ describe("ScoreViewer", () => {
         ).toBeTruthy();
     });
 
-    it("keeps a tempo-locked run alive when fingering numbers are toggled mid-play", async () => {
-        // Toggling the on-staff fingering re-renders the score. The run — its cursor, its
-        // scheduled ticks and its progress — must survive: a reload here would tear the
-        // timers down yet leave the run "running", stranding the metronome with the button
-        // stuck on Stop and no grade ever recorded.
+    it("runs a tempo-locked run to the end with fingering numbers drawn", async () => {
+        // Fingering-on re-renders the score into a heavier graphic model; a keep-up run over
+        // it must still count in, tick to the end and record its tally — the reload that
+        // draws the numbers happens at rest, before the run, so it can't strand a live run.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
@@ -235,20 +229,12 @@ describe("ScoreViewer", () => {
         });
         fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
-        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
-        // Open the setup sheet and flip the fingering on while the run counts in — the switch
-        // it toggles used to be a dependency of the reload effect, so this is exactly the
-        // mid-run redraw to survive.
-        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
-        const fingers = await screen.findByRole("switch", { name: "Finger position numbers" });
-        expect(fingers.getAttribute("aria-checked")).toBe("false");
+        // Draw the fingering numbers before the run, then let the run play over them.
+        const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
         fireEvent.click(fingers);
-        expect(
-            screen
-                .getByRole("switch", { name: "Finger position numbers" })
-                .getAttribute("aria-checked"),
-        ).toBe("true");
-        // The run still counts in, plays to the end and reports the tally.
+        await waitFor(() => expect(fingers.getAttribute("aria-checked")).toBe("true"));
+        fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+        // The run counts in, plays to the end and reports the tally.
         expect(
             await screen.findByText(/kept up with 0 of/i, undefined, { timeout: 30000 }),
         ).toBeTruthy();

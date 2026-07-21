@@ -85,6 +85,9 @@ export type ScenePainterInput = {
     showTitle?: boolean;
     // Whether the plinky.fun wordmark rides the top-right.
     showWordmark?: boolean;
+    // The resting white / black key hex from the chosen keyboard skin, so the video's
+    // keys match the app. Absent falls back to the classic palette.
+    keyColors?: { white: string; black: string };
 };
 
 type Context2D = Pick<
@@ -178,7 +181,15 @@ function paintCredit(context: Context2D, cfg: ChromeConfig): void {
 }
 
 // Where the keyboard sits, so one key-drawing routine serves both formats.
-type KeyLayout = { margin: number; width: number; keyboardTop: number; keyboardHeight: number };
+type KeyLayout = {
+    margin: number;
+    width: number;
+    keyboardTop: number;
+    keyboardHeight: number;
+    // The resting white / black key hex, from the chosen keyboard skin.
+    white: string;
+    black: string;
+};
 
 // A sounding key is the resting colour blended toward the accent by its glow —
 // full at the press, decaying while held — so a repeated press of the same key
@@ -187,7 +198,7 @@ function paintKey(context: Context2D, key: SceneKey, glow: number | null, l: Key
     const x = l.margin + key.x * (l.width - l.margin * 2);
     const w = key.width * (l.width - l.margin * 2);
     const h = key.black ? l.keyboardHeight * 0.62 : l.keyboardHeight;
-    const rest = key.black ? BLACK_KEY : WHITE_KEY;
+    const rest = key.black ? l.black : l.white;
     context.fillStyle = glow === null ? rest : mixHex(rest, ACCENT, glow);
     context.beginPath();
     context.roundRect(x + w * 0.04, l.keyboardTop, w * 0.92, h, 4);
@@ -223,6 +234,7 @@ export function takeScenePainter({
     treadmill = false,
     showTitle = true,
     showWordmark = true,
+    keyColors,
 }: ScenePainterInput): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
@@ -252,7 +264,14 @@ export function takeScenePainter({
         showTitle,
         showWordmark,
     };
-    const keyLayout: KeyLayout = { margin, width, keyboardTop, keyboardHeight };
+    const keyLayout: KeyLayout = {
+        margin,
+        width,
+        keyboardTop,
+        keyboardHeight,
+        white: keyColors?.white ?? WHITE_KEY,
+        black: keyColors?.black ?? BLACK_KEY,
+    };
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);
@@ -386,6 +405,7 @@ export function takeHighwayPainter({
     height,
     showTitle = true,
     showWordmark = true,
+    keyColors,
 }: {
     title: string;
     credit: string;
@@ -395,6 +415,7 @@ export function takeHighwayPainter({
     height: number;
     showTitle?: boolean;
     showWordmark?: boolean;
+    keyColors?: { white: string; black: string };
 }): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
@@ -417,7 +438,14 @@ export function takeHighwayPainter({
         showTitle,
         showWordmark,
     };
-    const keyLayout: KeyLayout = { margin, width, keyboardTop, keyboardHeight };
+    const keyLayout: KeyLayout = {
+        margin,
+        width,
+        keyboardTop,
+        keyboardHeight,
+        white: keyColors?.white ?? WHITE_KEY,
+        black: keyColors?.black ?? BLACK_KEY,
+    };
 
     return (context, timeMs) => {
         const frame = frameAt(notes, timeMs);

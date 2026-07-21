@@ -33,10 +33,9 @@ const beamsLabel: Record<Beams, string> = {
 // The run-setup panel: everything that shapes the run you are ABOUT to play. Changing
 // any of it mid-piece would mean starting over, so it lives before the run rather than
 // in the mid-play controls. It reads as the Settings page does — each theme grouped in
-// its own titled, icon-led card that explains itself — so a control looks and behaves
-// the same wherever it appears. The same panel is the at-rest disclosure and the
-// fullscreen Setup sheet; only its frame differs.
-export function RunSetupPanel() {
+// its own titled, icon-led card that explains itself. Folded behind the at-rest
+// disclosure below; full-screen play carries no settings.
+function RunSetupPanel() {
     const {
         lockTempo,
         staffCount,
