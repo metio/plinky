@@ -5,29 +5,30 @@ import { useState } from "react";
 import { tempoTerm } from "../../../core/tempoTerm";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
+import { Drawer } from "../ui/drawer";
 import { BumpValue } from "../ui/stepper";
 import { ToggleIconButton } from "../ui/toggleIconButton";
 import { Button, IconButton } from "../ui/button";
 import {
     CloseIcon,
-    EyeIcon,
     FingersIcon,
-    HandIcon,
     PlayIcon,
     RotateIcon,
-    ForwardIcon,
+    SlidersIcon,
     SpeakerIcon,
     StopIcon,
-    MetronomeIcon,
 } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlaySession } from "./playSession";
-import { RunSetup } from "./runSetup";
+import { RunSetup, RunSetupPanel } from "./runSetup";
 
-// The play controls: a rich full-screen top bar (Listen, Practice/Stop, progress, restart,
-// the fingering and follow toggles, settings, hide-keyboard, exit) and, inline before play
-// begins, a single primary Practice plus the settings and runs entries. Every button drives
-// a session action; the bar holds no state of its own.
+// The play controls. Full screen keeps only what you reach for WHILE playing — Listen,
+// Practice/Stop, progress, restart, tempo, and the fingering-editor workspace — plus a
+// Setup button that slides the whole run-setup panel in as a sheet, so every reading aid
+// and layout choice has one home rather than a row of cryptic icons. Inline, before play
+// begins, a single primary Practice sits beside the same setup, folded behind a
+// disclosure. Every button drives a session action; the bar holds no state but the sheet's
+// open flag and the tempo popover's.
 export function PlayTransport() {
     const {
         ready,
@@ -39,19 +40,16 @@ export function PlayTransport() {
         restartListen,
         practice,
         playAlong,
-        reading,
         fingerStrip,
         setFingerStrip,
         exitFullscreen,
-        metronomeOn,
-        setMetronomeOn,
-        forgiving,
-        setForgiving,
         tempo,
         setTempo,
         lockTempo,
     } = usePlaySession();
-    const { showFingerings, setShowFingerings, treadmill, scrollFollow, setScrollFollow } = reading;
+    // The run-setup sheet, reachable mid-run in full screen — the one place settings
+    // change during play, deliberately behind a button rather than always on the bar.
+    const [setupOpen, setSetupOpen] = useState(false);
 
     // Listen lives only in the full-screen top bar. Playing enters full screen on every
     // device, so that is the one place it's reachable — which keeps the inline /play view to
@@ -127,57 +125,28 @@ export function PlayTransport() {
                             <RotateIcon />
                         </IconButton>
                     </Show>
-                    {/* Show/hide the fingering numbers on the staff without leaving the
-                    music — seeded from the setting, flipped here for this session. */}
-                    <ToggleIconButton
-                        onClick={() => setShowFingerings((on) => !on)}
-                        pressed={showFingerings}
-                        label={m.action_finger_numbers()}
-                    >
-                        <HandIcon />
-                    </ToggleIconButton>
-                    {/* Turn the follow-the-note scrolling off to read at your own pace,
-                    or on to let the staff keep up. Moot in treadmill, which scrolls
-                    itself. */}
-                    <Show when={!treadmill}>
-                        <ToggleIconButton
-                            onClick={() => setScrollFollow((on) => !on)}
-                            pressed={scrollFollow}
-                            label={m.action_scroll_follow()}
-                        >
-                            <EyeIcon />
-                        </ToggleIconButton>
-                    </Show>
-                    {/* The metronome, one tap from the music — its finer settings
-                    (adaptive, subdivision) stay in the drawer. */}
-                    <ToggleIconButton
-                        onClick={() => setMetronomeOn(!metronomeOn)}
-                        pressed={metronomeOn}
-                        label={m.action_metronome()}
-                    >
-                        <MetronomeIcon />
-                    </ToggleIconButton>
                     {/* The one shared tempo, adjustable mid-play: a BPM readout that
                     opens a small slider popover. Hidden for a locked challenge. */}
                     {!lockTempo && <TempoPopover tempo={tempo} setTempo={setTempo} />}
-                    {/* Keep going past a slip without leaving the music — read live
-                    by the matcher, so it takes effect on the very next note. */}
-                    <ToggleIconButton
-                        onClick={() => setForgiving(!forgiving)}
-                        pressed={forgiving}
-                        label={m.forgiving_toggle()}
-                    >
-                        <ForwardIcon />
-                    </ToggleIconButton>
                     {/* Swap the keyboard area for the fingering editor: work out (or
                     fine-tune) the fingers for the piece with the difficulty heat-map
-                    washed over the score. */}
+                    washed over the score. A workspace, not a setting, so it stays on
+                    the bar rather than moving into the setup sheet. */}
                     <ToggleIconButton
                         onClick={() => setFingerStrip((on: boolean) => !on)}
                         pressed={fingerStrip}
                         label={m.action_fingering_editor()}
                     >
                         <FingersIcon />
+                    </ToggleIconButton>
+                    {/* Every reading aid and layout choice lives in one sheet, a tap
+                    away without a row of icons crowding the music. */}
+                    <ToggleIconButton
+                        onClick={() => setSetupOpen(true)}
+                        pressed={setupOpen}
+                        label={m.run_setup()}
+                    >
+                        <SlidersIcon />
                     </ToggleIconButton>
                     <IconButton
                         variant="primary"
@@ -189,6 +158,9 @@ export function PlayTransport() {
                     </IconButton>
                 </div>
             </FullScreen>
+            <Drawer open={setupOpen} onClose={() => setSetupOpen(false)} title={m.run_setup()}>
+                <RunSetupPanel />
+            </Drawer>
             {/* Inline, a single primary action sits above the score so it's the first
             thing in reach — Practice enters full screen and starts the run. Listen and
             the rest of the transport live in the full-screen top bar (above), reachable

@@ -97,18 +97,19 @@ describe("ScoreViewer", () => {
         ).toBeTruthy();
     });
 
-    it("toggles the metronome from the fullscreen transport", async () => {
-        // The metronome lives in the fullscreen transport now — enter play.
+    it("toggles the metronome from the full-screen setup sheet", async () => {
+        // The metronome lives in the setup sheet the gear opens — enter play, open it.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
-        const toggle = await screen.findByRole("button", { name: "Metronome" }, { timeout: 30000 });
-        expect(toggle.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
+        const toggle = await screen.findByRole("switch", { name: "Metronome" }, { timeout: 30000 });
+        expect(toggle.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(toggle);
-        expect(toggle.getAttribute("aria-pressed")).toBe("true");
+        expect(toggle.getAttribute("aria-checked")).toBe("true");
         fireEvent.click(toggle);
-        expect(toggle.getAttribute("aria-pressed")).toBe("false");
+        expect(toggle.getAttribute("aria-checked")).toBe("false");
     });
 
     it("opens a Runs view that explains how to make a run before any is saved", async () => {
@@ -152,28 +153,30 @@ describe("ScoreViewer", () => {
         expect(screen.queryByLabelText("C 6")).toBeNull();
     });
 
-    it("offers the finger-numbers and follow-the-note toggles in full screen", async () => {
-        // The browser viewport is phone-sized, so playing auto-enters full screen where
-        // the toggles live; stub the Fullscreen API the headless browser withholds.
+    it("offers the finger-numbers and follow-the-note toggles in the full-screen setup sheet", async () => {
+        // The browser viewport is phone-sized, so playing auto-enters full screen; the
+        // reading aids live in the setup sheet the gear opens. Stub the Fullscreen API
+        // the headless browser withholds.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady()); // Practice enters full screen on every device
+        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         // Follow-the-note is on by default; flipping it takes effect without a reload.
-        const follow = await screen.findByRole("button", { name: "Follow the note" });
-        expect(follow.getAttribute("aria-pressed")).toBe("true");
+        const follow = await screen.findByRole("switch", { name: "Follow the note" });
+        expect(follow.getAttribute("aria-checked")).toBe("true");
         fireEvent.click(follow);
-        expect(follow.getAttribute("aria-pressed")).toBe("false");
+        expect(follow.getAttribute("aria-checked")).toBe("false");
         // Fingering numbers are off by default (the flipped setting); the toggle turns
         // them on for the session.
-        const fingers = screen.getByRole("button", { name: "Finger position numbers" });
-        expect(fingers.getAttribute("aria-pressed")).toBe("false");
+        const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
+        expect(fingers.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(fingers);
         await waitFor(() =>
             expect(
                 screen
-                    .getByRole("button", { name: "Finger position numbers" })
-                    .getAttribute("aria-pressed"),
+                    .getByRole("switch", { name: "Finger position numbers" })
+                    .getAttribute("aria-checked"),
             ).toBe("true"),
         );
     });
@@ -189,7 +192,8 @@ describe("ScoreViewer", () => {
         const score = screen.getByRole("img", { name: "T" });
         const textCount = () => score.querySelectorAll("text").length;
         const baseline = textCount();
-        const fingers = screen.getByRole("button", { name: "Finger position numbers" });
+        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
+        const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
         // On: the fingering digits are drawn, adding text nodes to the staff.
         fireEvent.click(fingers);
         await waitFor(() => expect(textCount()).toBeGreaterThan(baseline), { timeout: 30000 });
@@ -232,15 +236,17 @@ describe("ScoreViewer", () => {
         fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         fireEvent.click(screen.getByRole("switch", { name: "Keep up" }));
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
-        // Flip the fingering on while the run counts in — the switch it toggles used to be a
-        // dependency of the reload effect, so this is exactly the mid-run redraw to survive.
-        const fingers = await screen.findByRole("button", { name: "Finger position numbers" });
-        expect(fingers.getAttribute("aria-pressed")).toBe("false");
+        // Open the setup sheet and flip the fingering on while the run counts in — the switch
+        // it toggles used to be a dependency of the reload effect, so this is exactly the
+        // mid-run redraw to survive.
+        fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
+        const fingers = await screen.findByRole("switch", { name: "Finger position numbers" });
+        expect(fingers.getAttribute("aria-checked")).toBe("false");
         fireEvent.click(fingers);
         expect(
             screen
-                .getByRole("button", { name: "Finger position numbers" })
-                .getAttribute("aria-pressed"),
+                .getByRole("switch", { name: "Finger position numbers" })
+                .getAttribute("aria-checked"),
         ).toBe("true");
         // The run still counts in, plays to the end and reports the tally.
         expect(

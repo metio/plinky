@@ -393,17 +393,6 @@ export function FingersIcon({ className }: IconProps) {
     );
 }
 
-// An arrow skipping over a gap — the keep-going toggle.
-export function ForwardIcon({ className }: IconProps) {
-    return (
-        <Icon className={className}>
-            <path d="M4 12h9" />
-            <path d="M10 7l5 5-5 5" />
-            <path d="M17 6v12" />
-        </Icon>
-    );
-}
-
 // A metronome — the click-track toggle.
 export function MetronomeIcon({ className }: IconProps) {
     return (

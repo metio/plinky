@@ -28,15 +28,21 @@ const NAME: Record<Level, () => string> = {
 // (core/readingLevel), so it reads "Custom" the instant you hand-tune one and
 // there is no separate stored level that could drift. Shown in both the Settings
 // Reading section and the run-setup panel — the same prefs, two doors.
-export function ReadingLevel() {
+// `labelled` draws the control's own "Skill level" heading — right in the Settings
+// Reading section, where it sits among other reading controls. In the run-setup panel
+// its card is already titled "Skill level", so the label is passed false to avoid
+// saying it twice.
+export function ReadingLevel({ labelled = true }: { labelled?: boolean } = {}) {
     const { prefs, update } = usePrefs();
     const level = levelOf(prefs);
     const options = READING_LEVELS.map((id) => ({ id, label: NAME[id]() }));
     return (
         <div className="space-y-1">
-            <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {m.reading_level_label()}
-            </span>
+            {labelled && (
+                <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {m.reading_level_label()}
+                </span>
+            )}
             <SegmentedControl<Level | "custom">
                 label={m.reading_level_label()}
                 options={options}
