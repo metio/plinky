@@ -162,16 +162,23 @@ export function useOsmdScore(
         setRenderVersion((version) => version + 1);
     }, []);
 
+    // Follow the note: scroll so the cursor's note stays centred as the run advances.
+    // One mechanism for both layouts — `scrollIntoView` walks every scrollable ancestor,
+    // so it centres whether the page scrolls (at rest) or the fullscreen container does,
+    // and we own it outright (OSMD's own followCursor is off) so the two never fight. The
+    // treadmill scrolls horizontally under a fixed gaze; the wrapped layout scrolls
+    // vertically to the current staff row. Off only when the player turns follow off.
     const centerCursor = useCallback(() => {
-        if (!treadmill) {
+        if (!scrollFollowRef.current) {
             return;
         }
         const el = osmdRef.current?.cursor?.cursorElement;
-        const box = containerRef.current;
-        if (el && box) {
-            box.scrollTo({ left: el.offsetLeft - box.clientWidth / 2, behavior: "smooth" });
-        }
-    }, [treadmill, containerRef]);
+        el?.scrollIntoView(
+            treadmill
+                ? { inline: "center", block: "nearest", behavior: "smooth" }
+                : { block: "center", inline: "nearest", behavior: "smooth" },
+        );
+    }, [treadmill]);
 
     // Reload OSMD whenever the score or a reading-mode input changes, stopping any
     // playback/practice first (a layout change mid-run would otherwise strand its running
@@ -191,12 +198,10 @@ export function useOsmdScore(
                 const osmd = new OpenSheetMusicDisplay(containerRef.current, {
                     autoResize: true,
                     drawingParameters: "compact",
-                    // Scroll the staff to keep the cursor in view as it advances, so a
-                    // multi-line piece follows along while you play instead of forcing
-                    // you to scroll — critical on a phone where the staff is tall. The
-                    // treadmill drives its own horizontal centring, so OSMD's vertical
-                    // follow is turned off there.
-                    followCursor: scrollFollowRef.current && !treadmill,
+                    // We own follow-the-note scrolling ourselves (centerCursor centres the
+                    // current note in whatever scrolls, in both layouts), so OSMD's own
+                    // follow stays off — two mechanisms would fight over the scroll position.
+                    followCursor: false,
                     // One continuous horizontal staffline that scrolls right, rather than
                     // wrapping into rows — the treadmill reading mode.
                     renderSingleHorizontalStaffline: treadmill,

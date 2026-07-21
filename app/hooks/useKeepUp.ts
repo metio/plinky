@@ -98,6 +98,9 @@ export function useKeepUp({
     const [running, setRunning] = useState(false);
     const [progress, setProgress] = useState({ inTime: 0, done: 0 });
     const [result, setResult] = useState<KeepUpResult | null>(null);
+    // The pitches of the beat currently open, for the on-screen keyboard to light —
+    // cleared when no run owns the input so stale keys never linger lit.
+    const [expected, setExpected] = useState<number[]>([]);
     // Synchronous "a run owns the input" flag, read by the MIDI routing before
     // the `running` state has re-rendered.
     const activeRef = useRef(false);
@@ -116,6 +119,7 @@ export function useKeepUp({
         activeRef.current = false;
         stateRef.current = startKeepUp();
         setRunning(false);
+        setExpected([]);
         getOsmd()?.cursor?.hide();
     };
 
@@ -171,7 +175,11 @@ export function useKeepUp({
         // would score a miss — highlight them as "play now", and sound them if the
         // guide is on.
         const openStep = (current: KeepUpStep) => {
-            const expected = current.play.map((entry) => entry.pitch);
+            const pitches = current.play.map((entry) => entry.pitch);
+            // Light the on-screen keys for this beat too, so the keyboard follows the
+            // clock the way the score does — the run drives the input, not the matcher,
+            // which is stopped, so its `expected` would otherwise freeze the keys.
+            setExpected(pitches);
             // The synth duration is in seconds — 60/BPM per quarter note.
             const seconds = (quarters: number) => quarters * (60 / tempo());
             if (guideNotes) {
@@ -185,13 +193,13 @@ export function useKeepUp({
                     synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
                 }
             }
-            stateRef.current = openKeepUpStep(stateRef.current, expected);
+            stateRef.current = openKeepUpStep(stateRef.current, pitches);
             // Light "play now" only when this step has notes for the practised hand. A
             // hands-separate run leaves the other hand's positions unscored (closeStep
             // skips an empty step), so highlighting them would strand a mark the trail
             // never lifts. Keep the noteheads so closeStep can recolour their halos hit/miss.
             notesRef.current =
-                expected.length === 0
+                pitches.length === 0
                     ? []
                     : highlightCursorNotes(osmd, WINDOW_COLOR).map((painted) => painted.element);
             // The highlight — and the hit/miss colour closeStep/registerNote later
@@ -205,6 +213,7 @@ export function useKeepUp({
         const finish = () => {
             activeRef.current = false;
             setRunning(false);
+            setExpected([]);
             cursor.hide();
             setResult(scoreKeepUp(stateRef.current.hits));
             stateRef.current = startKeepUp();
@@ -249,5 +258,5 @@ export function useKeepUp({
         }
     };
 
-    return { running, progress, result, active, start, stop, clearResult, registerNote };
+    return { running, progress, result, expected, active, start, stop, clearResult, registerNote };
 }

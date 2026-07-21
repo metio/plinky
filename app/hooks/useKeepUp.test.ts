@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
@@ -150,6 +150,34 @@ describe("useKeepUp", () => {
 
         expect(markPainted).toHaveBeenCalled();
         result.current.stop();
+    });
+
+    it("surfaces the open beat's pitches for the keyboard, and clears them on stop", () => {
+        // The keyboard lights "play now" from this; the matcher is stopped during keep-up,
+        // so without the run surfacing its own beat the keys would freeze on a stale note.
+        const osmd = fakeOsmd([[{ midi: 60, staff: 0 }], [{ midi: 62, staff: 0 }]]);
+        const { result } = renderHook(() =>
+            useKeepUp({
+                getOsmd: () => osmd,
+                synth: { playNote: () => {} },
+                tempo: () => 240,
+                beatsPerBar: 1,
+                centerCursor: () => {},
+                markPainted: () => {},
+                onFinish: () => {},
+            }),
+        );
+
+        act(() => result.current.start({ hand: "both", guideNotes: false, accompany: false }));
+        // Count-in (250 ms) then the first tick opens the beat under the cursor.
+        act(() => vi.advanceTimersByTime(300));
+        expect(result.current.expected).toEqual([60]);
+        // The next tick advances the lit beat with the clock.
+        act(() => vi.advanceTimersByTime(250));
+        expect(result.current.expected).toEqual([62]);
+
+        act(() => result.current.stop());
+        expect(result.current.expected).toEqual([]);
     });
 
     it("plays the other hand as accompaniment in a duet run", () => {
