@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import { type KeyboardTheme, KEYBOARD_THEMES, themeUnlocked } from "../../../core/keyboardTheme";
+import { useSyncExternalStore } from "react";
+import { type KeyboardTheme, KEYBOARD_THEMES } from "../../../core/keyboardTheme";
 import { DEFAULT_PREFS } from "../../../core/prefs";
-import { usePrefsStore, useServices } from "../../contexts/services";
-import { currentGrade, loadGradedMastery } from "../../lib/gradeProgress";
+import { usePrefsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 
 function themeName(id: string): string {
@@ -35,50 +34,30 @@ export function ThemeSwatch({ theme }: { theme: KeyboardTheme }) {
     );
 }
 
-// Pick the on-screen keyboard's skin. Each is unlocked by reaching a grade — a small
-// reward for climbing, never anything but looks. A skin still beyond the player's grade
-// shows locked with the grade it needs; the chosen one carries a ring.
+// Pick the on-screen keyboard's skin. Every skin is free from the start — never anything
+// but looks — so each is always selectable; the chosen one carries a ring.
 export function KeyboardThemePicker() {
-    const services = useServices();
     const prefsStore = usePrefsStore();
     const chosen = useSyncExternalStore(
         prefsStore.subscribe,
         () => prefsStore.load().keyboardTheme,
         () => DEFAULT_PREFS.keyboardTheme,
     );
-    const [grade, setGrade] = useState<number | null>(null);
-
-    useEffect(() => {
-        let cancelled = false;
-        loadGradedMastery(services.mastery, services).then((items) => {
-            if (!cancelled) {
-                setGrade(currentGrade(items));
-            }
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [services]);
 
     return (
         // biome-ignore lint/a11y/useSemanticElements: a swatch chooser is a group of toggle buttons, not a fieldset
         <div role="group" aria-label={m.settings_keyboard_theme()} className="flex flex-wrap gap-3">
             {KEYBOARD_THEMES.map((theme) => {
-                // Until the grade resolves, only the always-free skins are offered, so a
-                // slow load never dangles a skin the player hasn't earned.
-                const unlocked =
-                    grade === null ? theme.unlockGrade === 0 : themeUnlocked(theme, grade);
                 const active = chosen === theme.id;
                 return (
                     <button
                         key={theme.id}
                         type="button"
                         aria-pressed={active}
-                        disabled={!unlocked}
                         onClick={() =>
                             prefsStore.save({ ...prefsStore.load(), keyboardTheme: theme.id })
                         }
-                        className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition disabled:opacity-50 ${
+                        className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition ${
                             active
                                 ? "border-indigo-500 ring-2 ring-indigo-300 dark:ring-indigo-700"
                                 : "border-gray-200 hover:border-indigo-300 dark:border-gray-700"
@@ -88,11 +67,6 @@ export function KeyboardThemePicker() {
                         <span className="font-medium text-gray-800 text-xs dark:text-gray-200">
                             {themeName(theme.id)}
                         </span>
-                        {!unlocked && (
-                            <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                                🔒 {m.grade_label({ level: theme.unlockGrade })}
-                            </span>
-                        )}
                     </button>
                 );
             })}

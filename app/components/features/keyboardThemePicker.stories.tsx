@@ -6,7 +6,7 @@ import { KEYBOARD_THEMES } from "../../../core/keyboardTheme";
 import { ThemeSwatch } from "./keyboardThemePicker";
 
 // The swatch previews on their own, so every skin's resting palette is a visual baseline
-// (the full picker's lock state depends on the injected grade, so it is tested in jsdom).
+// (the full picker's selection wiring is tested in jsdom).
 const meta: Meta<typeof ThemeSwatch> = {
     title: "Features/KeyboardThemeSwatch",
     component: ThemeSwatch,
