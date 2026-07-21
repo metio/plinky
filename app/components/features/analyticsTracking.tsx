@@ -19,7 +19,6 @@ export function AnalyticsTracking() {
 
     // One page view per navigation. The path is de-localized so /en/play and /de/play
     // report the same page — the locale rides its own param, not the path dimension.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: the capability is stable; firing on pathname is the intent
     useEffect(() => {
         analytics.track("page_view", { page_path: deLocalizeHref(pathname), locale: getLocale() });
     }, [analytics, pathname]);
