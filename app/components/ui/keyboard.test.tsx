@@ -65,6 +65,25 @@ describe("Keyboard", () => {
         await waitFor(() => expect(screen.getByLabelText("D 4").className).toContain("bg-red-200"));
     });
 
+    it("keeps arrow-key keybed navigation from bubbling to a global key listener", () => {
+        // The computer-key funnel reads ArrowUp/ArrowDown on window as octave shifts. Walking
+        // the keybed with the arrows must not also reach it, or focusing a key and navigating
+        // would silently transpose the play octave.
+        const onWindowKey = vi.fn();
+        window.addEventListener("keydown", onWindowKey);
+        try {
+            render(<Keyboard from={60} to={72} />);
+            const key = screen.getByLabelText("C 4");
+            key.focus();
+            fireEvent.keyDown(key, { key: "ArrowUp" });
+            fireEvent.keyDown(key, { key: "ArrowDown" });
+            fireEvent.keyDown(key, { key: "ArrowRight" });
+            expect(onWindowKey).not.toHaveBeenCalled();
+        } finally {
+            window.removeEventListener("keydown", onWindowKey);
+        }
+    });
+
     it("reports presses and releases to the parent", () => {
         const onPress = vi.fn();
         const onRelease = vi.fn();

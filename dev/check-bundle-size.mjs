@@ -228,7 +228,12 @@ const BUDGET_TOTAL_KB = 592;
 // The groove metronome control and the unlockable keyboard skins (useKeyboardTheme, the
 // KeyboardThemePicker with its swatches and grade gating, the theme prop threaded through
 // the shared Keyboard, and the groove + theme strings per locale) — measured at 280.1. 281.
-const BUDGET_APP_KB = 281;
+//
+// The play/listen bug-fix pass — the audio engine's scheduled-strike tracking so a panic
+// silences notes queued ahead, the mic-pitch start generation guard with its resume and
+// webkit fallback, the ear-level clamp, and the keyboard's navigation stopPropagation and
+// seq-keyed miss flash — measured at 281.1. 282.
+const BUDGET_APP_KB = 282;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

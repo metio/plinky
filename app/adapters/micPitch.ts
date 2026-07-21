@@ -34,6 +34,11 @@ export function micPitch(scheduler: Scheduler): PitchInput {
     let context: AudioContext | null = null;
     let frameHandle: SchedulerHandle | null = null;
     let onDone: (() => void) | null = null;
+    // Bumped by every start(), so a start whose getUserMedia is still pending when a newer
+    // start() supersedes it can tell — and release the microphone it just acquired instead
+    // of overwriting the live listener's stream and orphaning the old track (mic left on)
+    // and its frame loop. This is the async gap between requesting and owning the device.
+    let generation = 0;
 
     const stop = () => {
         if (frameHandle !== null) {
@@ -60,8 +65,10 @@ export function micPitch(scheduler: Scheduler): PitchInput {
 
         async start(onEvent, options): Promise<PitchStartResult> {
             stop();
+            const myGeneration = ++generation;
+            let acquired: MediaStream;
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
+                acquired = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: false,
                         noiseSuppression: false,
@@ -72,8 +79,33 @@ export function micPitch(scheduler: Scheduler): PitchInput {
                 return classifyMicError(error);
             }
 
+            // A newer start() ran while this one awaited the device. The stream we just got
+            // belongs to nobody — stop its track here rather than adopt it over the newer
+            // listener's stream. The newer start owns the shared state and is the live
+            // listener, so the outcome for this (superseded) call is still "listening".
+            if (myGeneration !== generation) {
+                for (const track of acquired.getTracks()) {
+                    track.stop();
+                }
+                return "listening";
+            }
+
             try {
-                context = new AudioContext();
+                // Older Safari only exposes the prefixed constructor; mirror the audio engine.
+                const Ctor =
+                    window.AudioContext ??
+                    (window as unknown as { webkitAudioContext?: typeof AudioContext })
+                        .webkitAudioContext;
+                // Adopt the stream before anything can throw, so a failure below is torn
+                // down by stop() rather than leaking the freshly-granted microphone track.
+                stream = acquired;
+                if (!Ctor) {
+                    throw new Error("no AudioContext");
+                }
+                context = new Ctor();
+                // A context born while autoplay is still gated starts suspended and the
+                // analyser reads silence; nudge it running so the detector actually hears.
+                void context.resume().catch(() => {});
                 const source = context.createMediaStreamSource(stream);
                 const analyser = context.createAnalyser();
                 analyser.fftSize = FFT_SIZE;

@@ -17,7 +17,8 @@ vi.mock("../lib/scoreColor", () => ({
 
 // One voice at a position: a MIDI pitch on a staff (0 = right, 1 = left) with a
 // written length in quarter notes, or a rest carrying only a length.
-type Voice = { midi: number; staff: number; quarters?: number } | { rest: number };
+// staff omitted models a note whose engraved ParentStaff is undefined.
+type Voice = { midi: number; staff?: number; quarters?: number } | { rest: number };
 
 // A cursor over a fixed sequence of positions, standing in for the OSMD graphic.
 // EndReached turns true once the walk steps past the last position, so the
@@ -44,7 +45,10 @@ function fakeOsmd(positions: Voice[][]) {
                     : {
                           isRest: (): boolean => false,
                           halfTone: voice.midi - 12,
-                          ParentStaff: { idInMusicSheet: voice.staff },
+                          ParentStaff:
+                              voice.staff === undefined
+                                  ? undefined
+                                  : { idInMusicSheet: voice.staff },
                           Length: { RealValue: (voice.quarters ?? 1) / 4 },
                       },
             ),
@@ -88,6 +92,15 @@ describe("collectKeepUpSteps", () => {
             accompany: [{ pitch: 60, quarters: 1 }],
             lengths: [1, 2],
         });
+    });
+
+    it("counts a note with no engraved staff as the practised hand's, not accompaniment", () => {
+        // A staff-less note can't be proven to belong to the other hand; routing it to the
+        // unscored accompaniment would drop it from the beats-to-catch and understate the run.
+        const osmd = fakeOsmd([[{ midi: 60, quarters: 1 }]]);
+        const step = collectKeepUpSteps(osmd, "right")[0]!;
+        expect(step.play).toEqual([{ pitch: 60, quarters: 1 }]);
+        expect(step.accompany).toEqual([]);
     });
 
     it("leaves nothing to accompany in a both-hands run", () => {

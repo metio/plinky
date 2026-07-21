@@ -46,7 +46,10 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
             const entry = { pitch: note.halfTone + 12, quarters };
             // The practised hand's notes are yours to catch; the other hand's are the
             // accompaniment a duet sounds for you. A both-hands run has no other hand.
-            if (hand === "both" || note.ParentStaff?.idInMusicSheet === STAFF_FOR[hand]) {
+            // A note with no staff can't be proven to be the other hand's, so it counts as
+            // yours — dropping it into the unscored accompaniment would understate the run.
+            const staffId = note.ParentStaff?.idInMusicSheet;
+            if (hand === "both" || staffId === undefined || staffId === STAFF_FOR[hand]) {
                 play.push(entry);
             } else {
                 accompany.push(entry);

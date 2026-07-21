@@ -220,9 +220,18 @@ export function useListenPlayback({
                 range.on &&
                 (step >= steps.length || (steps[step]?.measureIndex ?? 0) > range.to - 1)
             ) {
+                const lapStart = barStart(range.from);
+                // An inverted or out-of-piece range (to < from, or a start past the last
+                // bar) resolves its lap start outside [from, to]; laping there would spin on
+                // step 0 every tick, re-firing onLap and re-sounding note 0. Stop instead.
+                if ((steps[lapStart]?.measureIndex ?? 0) > range.to - 1) {
+                    stop();
+                    onLap();
+                    return;
+                }
                 onLap();
                 seekToBar(cursor, range.from);
-                step = barStart(range.from);
+                step = lapStart;
             } else if (step >= steps.length) {
                 stop();
                 onLap();

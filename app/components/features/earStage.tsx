@@ -29,7 +29,11 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
             scheduler.cancel(handle);
         }
         handles.current = [];
-    }, [scheduler]);
+        // The dot timers are JS handles, but the notes themselves are scheduled ahead on the
+        // audio clock — cancelling the timers alone would leave a question's later strikes
+        // sounding into the next question or on past leaving the page. Silence them too.
+        synth.silenceAll();
+    }, [scheduler, synth]);
 
     const play = useCallback(() => {
         clear();

@@ -122,12 +122,15 @@ export function Keyboard({
     onPress?: (note: number, velocity?: number) => void;
     onRelease?: (note: number) => void;
 }) {
-    const [flash, setFlash] = useState<number | null>(null);
+    const [flash, setFlash] = useState<{ note: number; seq: number } | null>(null);
     useEffect(() => {
         if (wrong == null) {
             return;
         }
-        setFlash(wrong.note);
+        // Carry the seq into flash state so a repeated identical miss (same note, new seq)
+        // is a distinct value — it re-renders, re-flashes, and re-announces, where storing
+        // the bare note would be a no-op update the live region never re-speaks.
+        setFlash({ note: wrong.note, seq: wrong.seq });
         // A cosmetic fade — the ui-is-pure rule keeps this primitive free of the
         // services context, so it owns its own transition timer (allow-listed in
         // dev/check-globals.mjs) rather than the injected Scheduler.
@@ -347,29 +350,38 @@ export function Keyboard({
 
     const keyDown = (note: number) => (event: React.KeyboardEvent) => {
         // Arrow keys walk the keybed (roving tabindex); Enter/Space sound the key.
+        // Navigation keys stopPropagation as well as preventDefault: the global computer-key
+        // listener on window also reads ArrowUp/ArrowDown as octave shifts, so without halting
+        // the bubble, walking the keybed vertically would silently transpose the play octave.
         switch (event.key) {
             case "ArrowRight":
                 event.preventDefault();
+                event.stopPropagation();
                 focusNote(note + 1);
                 return;
             case "ArrowLeft":
                 event.preventDefault();
+                event.stopPropagation();
                 focusNote(note - 1);
                 return;
             case "ArrowUp":
                 event.preventDefault();
+                event.stopPropagation();
                 focusNote(note + 12);
                 return;
             case "ArrowDown":
                 event.preventDefault();
+                event.stopPropagation();
                 focusNote(note - 12);
                 return;
             case "Home":
                 event.preventDefault();
+                event.stopPropagation();
                 focusNote(from);
                 return;
             case "End":
                 event.preventDefault();
+                event.stopPropagation();
                 focusNote(to);
                 return;
             case "Enter":
@@ -419,7 +431,7 @@ export function Keyboard({
     };
 
     const whiteState = (note: number) =>
-        flash === note
+        flash?.note === note
             ? "bg-red-200 dark:bg-red-900"
             : lit.has(note)
               ? "translate-y-0.5 bg-green-200 shadow-[0_0_14px_-3px] shadow-green-400 dark:bg-green-900"
@@ -427,7 +439,7 @@ export function Keyboard({
                 ? "bg-indigo-50 dark:bg-indigo-950"
                 : theme.white;
     const blackState = (note: number) =>
-        flash === note
+        flash?.note === note
             ? "bg-red-500"
             : lit.has(note)
               ? "translate-y-0.5 bg-green-500 shadow-[0_0_14px_-3px] shadow-green-500"
@@ -437,7 +449,7 @@ export function Keyboard({
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.
-    const flashNote = flash;
+    const flashNote = flash?.note ?? null;
 
     return (
         <div className={`${KEYBED_WELL} ${well}`}>
@@ -531,7 +543,7 @@ export function Keyboard({
                     />
                 )}
             </div>
-            <span className="sr-only" role="status" aria-live="assertive">
+            <span key={flash?.seq} className="sr-only" role="status" aria-live="assertive">
                 {flashNote !== null ? m.keyboard_wrong_note({ note: spokenNote(flashNote) }) : ""}
             </span>
         </div>

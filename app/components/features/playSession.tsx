@@ -883,6 +883,15 @@ function usePlaySessionValue({
     };
 
     const practice = (resume = true) => {
+        // A completed run whose auto-take-save is still pending — the player pressed Practice
+        // or Restart while still holding the final note, before its release fired the deferred
+        // save — would be lost once the capture and completion latch are replaced below. Save
+        // it first, closing its hold at this instant, exactly as leaving the surface does.
+        if (matcher.complete && !ephemeral && !takeSavedRef.current) {
+            takeSavedRef.current = true;
+            flushHolds(captureRef.current, scheduler.now());
+            saveTake(finishedGradeRef.current);
+        }
         // Take over at the cursor's current position when resuming (handing over from
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
         // begin at the top. The top of a fresh piece reads as 0 either way.

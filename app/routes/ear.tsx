@@ -69,7 +69,16 @@ export default function Ear() {
             <ChoiceField
                 label={m.ear_exercise_label()}
                 value={exercise}
-                onChange={(next) => setExercise(next as EarExerciseId)}
+                onChange={(next) => {
+                    const id = next as EarExerciseId;
+                    setExercise(id);
+                    // Exercises differ in how many levels they offer; a level index valid for the
+                    // old drill can be out of range for the new one, which would leave the picker
+                    // with no active segment while the session silently ran the easiest level.
+                    if (Number(level) >= LEVEL_LABELS[id].length) {
+                        setLevel("0");
+                    }
+                }}
                 options={ORDER.map((id) => ({ id, label: EXERCISE_LABELS[id]() }))}
             />
 

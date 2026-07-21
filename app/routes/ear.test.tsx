@@ -68,6 +68,23 @@ describe("ear route", () => {
         expect(chosen(m.ear_level_label)).toBe(m.ear_level_fifths());
     });
 
+    it("clamps a now-out-of-range level when switching to an exercise with fewer levels", () => {
+        // "All" (index 3) is valid for intervals but out of range for scale-degrees, which has
+        // three levels — the level must fall back to the first rather than leave the picker
+        // showing no active segment while the drill silently runs the easiest level.
+        renderAt("/ear?exercise=intervals&level=3");
+        expect(chosen(m.ear_level_label)).toBe(m.ear_level_all());
+        choose(m.ear_exercise_label, m.ear_exercise_scale_degrees);
+        expect(chosen(m.ear_level_label)).toBe(m.ear_sd_level_triad());
+    });
+
+    it("keeps an in-range level when switching exercises", () => {
+        renderAt("/ear?exercise=intervals&level=1");
+        choose(m.ear_exercise_label, m.ear_exercise_chords);
+        // Index 1 is valid for both, so the position is kept — chords name it differently.
+        expect(chosen(m.ear_level_label)).toBe(m.ear_chord_level_triads());
+    });
+
     it("offers chords and scales, each with its own level names", () => {
         renderAt("/ear?exercise=chords&level=1");
         expect(chosen(m.ear_exercise_label)).toBe(m.ear_exercise_chords());

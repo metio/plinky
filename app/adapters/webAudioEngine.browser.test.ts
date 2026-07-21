@@ -65,6 +65,19 @@ describe("webAudioEngine", () => {
         }
     });
 
+    it("silences a strike scheduled ahead when all notes are turned off", () => {
+        // A fixed-length strike opens no live voice, so allNotesOff must reach it through the
+        // scheduled-strike tracking — otherwise a note scheduled seconds ahead by its delay
+        // (an ear-training question's later notes) rings on past a panic or a page change.
+        expect(() => {
+            webAudioEngine.resume();
+            webAudioEngine.strike({ note: 60, gain: 0.2, duration: 0.5, delay: 2 });
+            webAudioEngine.allNotesOff();
+            // A second panic with nothing pending is a clean no-op.
+            webAudioEngine.allNotesOff();
+        }).not.toThrow();
+    });
+
     it("ignores a zero-gain strike instead of feeding it to a ramp", () => {
         // An exponential ramp to 0 is a RangeError; the engine must drop it.
         expect(() =>
