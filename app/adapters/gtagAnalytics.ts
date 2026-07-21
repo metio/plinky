@@ -20,23 +20,30 @@ import type { Analytics } from "../ports/analytics";
 // it to the tag.
 const MEASUREMENT_ID = import.meta.env.VITE_ANALYTICS_ID as string | undefined;
 
-function gtagPush(...args: unknown[]): void {
+// Google's canonical stub — `function gtag(){ dataLayer.push(arguments); }`. gtag.js
+// consumes the queue expecting each entry to be the `arguments` object a gtag() call
+// produces; a plain array is not reliably processed as a command, so config/consent
+// signals could be silently dropped. Pushing the real `arguments` object keeps us on
+// the shape the tag reads. A zero-parameter function keeps `arguments` fully bound;
+// the cast gives callers the variadic signature.
+const gtag = function (): void {
     const win = window as unknown as { dataLayer?: unknown[] };
     win.dataLayer = win.dataLayer ?? [];
-    win.dataLayer.push(args);
-}
+    // biome-ignore lint/complexity/noArguments: gtag.js reads the arguments object, not a rest array.
+    win.dataLayer.push(arguments);
+} as (...args: unknown[]) => void;
 
 function inject(id: string): void {
     // Consent Mode default: everything denied until an update grants it, pushed
     // before `config` so no storage is used ahead of the granted signal.
-    gtagPush("consent", "default", {
+    gtag("consent", "default", {
         ad_storage: "denied",
         ad_user_data: "denied",
         ad_personalization: "denied",
         analytics_storage: "denied",
     });
-    gtagPush("js", new Date());
-    gtagPush("config", id);
+    gtag("js", new Date());
+    gtag("config", id);
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
@@ -60,7 +67,7 @@ export function gtagAnalytics(id: string | undefined = MEASUREMENT_ID): Analytic
             // Relay the choice to Consent Mode once the tag exists (a decline before
             // any opt-in never loads it, so there is nothing to tell).
             if (injected) {
-                gtagPush("consent", "update", {
+                gtag("consent", "update", {
                     analytics_storage: on ? "granted" : "denied",
                 });
             }

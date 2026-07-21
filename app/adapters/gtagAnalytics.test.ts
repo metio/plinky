@@ -16,9 +16,13 @@ afterEach(() => {
 
 const flag = (id: string) => (window as unknown as Record<string, boolean>)[`ga-disable-${id}`];
 
-const dataLayer = () => (window as unknown as { dataLayer?: unknown[] }).dataLayer ?? [];
-const consentCalls = () =>
-    dataLayer().filter((entry) => Array.isArray(entry) && entry[0] === "consent");
+// Each dataLayer entry is the `arguments` object gtag() pushes (Google's shape),
+// so normalise to a real array before asserting.
+const calls = () =>
+    ((window as unknown as { dataLayer?: unknown[] }).dataLayer ?? []).map((entry) =>
+        Array.from(entry as ArrayLike<unknown>),
+    );
+const consentCalls = () => calls().filter((entry) => entry[0] === "consent");
 
 afterEach(() => {
     (window as unknown as { dataLayer?: unknown[] }).dataLayer = [];
@@ -51,14 +55,12 @@ describe("gtagAnalytics", () => {
         const analytics = gtagAnalytics("G-TEST123");
         analytics.setConsent(true);
         // The default (all denied) must be queued before the config command…
-        const layer = dataLayer();
-        const defaultIndex = layer.findIndex(
-            (e) => Array.isArray(e) && e[0] === "consent" && e[1] === "default",
-        );
-        const configIndex = layer.findIndex((e) => Array.isArray(e) && e[0] === "config");
+        const layer = calls();
+        const defaultIndex = layer.findIndex((e) => e[0] === "consent" && e[1] === "default");
+        const configIndex = layer.findIndex((e) => e[0] === "config");
         expect(defaultIndex).toBeGreaterThanOrEqual(0);
         expect(defaultIndex).toBeLessThan(configIndex);
-        expect((layer[defaultIndex] as unknown[])[2]).toMatchObject({
+        expect(layer[defaultIndex]?.[2]).toMatchObject({
             analytics_storage: "denied",
             ad_storage: "denied",
             ad_user_data: "denied",
