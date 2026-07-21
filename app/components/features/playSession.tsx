@@ -723,6 +723,7 @@ function usePlaySessionValue({
         publishMilestone,
         ghostRace.adoptOwnRun,
         runResult.record,
+        analytics,
     ]);
 
     // Keep the finished run as a take without a separate Save press — finishing a song and
