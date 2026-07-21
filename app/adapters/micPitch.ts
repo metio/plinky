@@ -92,9 +92,11 @@ export function micPitch(scheduler: Scheduler): PitchInput {
 
             try {
                 // Older Safari only exposes the prefixed constructor; mirror the audio engine.
+                // globalThis, not window — this adapter is also constructed under the node test
+                // environment, which has a stubbed global but no window.
                 const Ctor =
-                    window.AudioContext ??
-                    (window as unknown as { webkitAudioContext?: typeof AudioContext })
+                    globalThis.AudioContext ??
+                    (globalThis as unknown as { webkitAudioContext?: typeof AudioContext })
                         .webkitAudioContext;
                 // Adopt the stream before anything can throw, so a failure below is torn
                 // down by stop() rather than leaking the freshly-granted microphone track.
@@ -105,7 +107,7 @@ export function micPitch(scheduler: Scheduler): PitchInput {
                 context = new Ctor();
                 // A context born while autoplay is still gated starts suspended and the
                 // analyser reads silence; nudge it running so the detector actually hears.
-                void context.resume().catch(() => {});
+                void context.resume?.().catch(() => {});
                 const source = context.createMediaStreamSource(stream);
                 const analyser = context.createAnalyser();
                 analyser.fftSize = FFT_SIZE;
