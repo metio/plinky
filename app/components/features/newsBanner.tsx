@@ -28,12 +28,6 @@ const ROTATE_MS = 7000;
 // link — small enough to feel responsive, large enough that a jittery tap doesn't
 // trip it.
 const SWIPE_PX = 40;
-// The banner's fixed shape. Every item's box takes this ratio, so a rotation never
-// resizes it (no page jump) and the box is reserved before the first picture loads
-// (no shift on load). object-cover fills it, so a picture that IS this ratio shows
-// in full with no crop and no empty sides — publish news images at 16:9 (e.g.
-// 1600×900) and they display perfectly; an off-ratio one is cropped to fit.
-const BANNER_ASPECT = "16 / 9";
 
 export function NewsBanner() {
     const items = useNews();
@@ -126,14 +120,17 @@ export function NewsBanner() {
         >
             <div
                 className="relative w-full touch-pan-y bg-gray-100 dark:bg-gray-800"
-                style={{ aspectRatio: BANNER_ASPECT }}
+                style={{ aspectRatio: item.aspect }}
                 onPointerDown={onPointerDown}
                 onPointerUp={onPointerUp}
                 onClickCapture={onClickCapture}
             >
-                {/* The box holds one ratio for every item, so a rotation never
-                    resizes it; object-cover fills the box completely — no empty
-                    sides — cropping a hair only when a ratio differs. */}
+                {/* The box takes each item's own cropped image ratio, so object-cover
+                    fills it edge to edge with no letterbox padding — a flyer that is
+                    3:2 shows as 3:2, a 16:9 one as 16:9. The ratio is known from the
+                    item before the picture loads, so the box is still reserved up front
+                    (no shift on load); it only resizes when the carousel rotates to an
+                    item of a different shape. */}
                 <a
                     href={item.linkUrl}
                     target="_blank"

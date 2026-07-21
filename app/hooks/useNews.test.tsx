@@ -16,6 +16,7 @@ const ITEM: NewsItem = {
     imageUrl: "https://plinky.test/i.png",
     imageAlt: "A piano",
     linkUrl: "https://plinky.test",
+    aspect: 16 / 9,
 };
 
 const wrap =

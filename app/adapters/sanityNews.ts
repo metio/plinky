@@ -21,9 +21,11 @@ import {
 // documents each with an image field `image`, an `alt` string, a `link` URL, an
 // optional `headline`, and a boolean `show`. The default query returns the most-
 // recently-updated shown items (newest first, capped) together with the master
-// switch, projecting each image asset to a direct https CDN URL. News is hidden
-// when the switch is explicitly off, so the board works with just a shown item
-// and no settings doc.
+// switch, projecting each image asset to a direct https CDN URL alongside the
+// image's Studio `crop` and the asset's original `dimensions`, so an editor's crop
+// is baked into the served URL (croppedImageUrl) rather than ignored. News is
+// hidden when the switch is explicitly off, so the board works with just a shown
+// item and no settings doc.
 
 export type { SanityConfig };
 
@@ -34,7 +36,8 @@ const MAX_ITEMS = 3;
 const DEFAULT_QUERY =
     '{"enabled": *[_type == "siteSettings"][0].newsEnabled, ' +
     `"items": *[_type == "news" && show == true] | order(_updatedAt desc)[0...${MAX_ITEMS}]{` +
-    '"id": _id, "imageUrl": image.asset->url, "imageAlt": coalesce(alt, ""), ' +
+    '"id": _id, "imageUrl": image.asset->url, "crop": image.crop, ' +
+    '"dimensions": image.asset->metadata.dimensions, "imageAlt": coalesce(alt, ""), ' +
     '"linkUrl": link, headline}}';
 
 // The Sanity config from build-time env, or null when the project isn't wired

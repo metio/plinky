@@ -11,11 +11,14 @@ const config: SanityConfig = {
     query: "*",
 };
 
+// No crop or dimensions in the payload, so parsing defaults the box to 16:9 — the
+// fixture carries that expected aspect so it doubles as the parsed-output shape.
 const item = {
     id: "n1",
     imageUrl: "https://cdn.sanity.io/pic.png",
     imageAlt: "A promo",
     linkUrl: "https://example.com/news",
+    aspect: 16 / 9,
 };
 
 const second = { ...item, id: "n2", linkUrl: "https://example.com/other" };

@@ -19,6 +19,7 @@ const item = {
     imageAlt: "A promo picture",
     linkUrl: "https://example.com/news",
     headline: "Big update",
+    aspect: 16 / 9,
 };
 
 const first = { ...item, id: "a", imageAlt: "First", headline: "First update" };
@@ -36,6 +37,13 @@ describe("NewsBanner", () => {
         expect(img.getAttribute("src")).toBe(item.imageUrl);
         expect(img.closest("a")?.getAttribute("href")).toBe(item.linkUrl);
         expect(screen.queryByText("Big update")).not.toBeNull();
+    });
+
+    it("sizes the box to the item's aspect so the picture fills it edge to edge", async () => {
+        renderWithServices(<NewsBanner />, { news: fakeNews({ ...item, aspect: 1.5 }) });
+        const img = await screen.findByAltText("A promo picture");
+        const box = img.closest("a")?.parentElement as HTMLElement;
+        expect(box.style.aspectRatio).toBe("1.5 / 1");
     });
 
     it("renders nothing when no item is live", () => {
@@ -122,16 +130,18 @@ describe("NewsBanner", () => {
         expect(screen.queryByAltText("First")).not.toBeNull();
     });
 
-    it("holds one fixed aspect ratio across items, so a rotation never resizes the box", async () => {
-        // The box is a fixed 16:9 for every item, so switching between pictures never
-        // resizes it (the page-jump / CLS the reader hit) whatever their own shapes.
+    it("gives each item's box its own aspect as the carousel rotates", async () => {
+        // The box hugs each picture's cropped shape, so a 16:9 flyer shows as 16:9 and a
+        // 3:2 one as 3:2 — no letterbox padding, whatever mix the carousel holds.
         const scheduler = fakeScheduler();
-        renderWithServices(<NewsBanner />, { news: fakeNews([first, second]), scheduler });
+        const wide = { ...first, aspect: 16 / 9 };
+        const tall = { ...second, aspect: 3 / 2 };
+        renderWithServices(<NewsBanner />, { news: fakeNews([wide, tall]), scheduler });
         const box = (await screen.findByAltText("First")).closest("div");
-        expect(box?.style.aspectRatio).toBe("16 / 9");
+        expect(box?.style.aspectRatio).toBe("1.7777777777777777 / 1");
         await advanceScheduler(scheduler, ROTATE_MS);
         const next = (await screen.findByAltText("Second")).closest("div");
-        expect(next?.style.aspectRatio).toBe("16 / 9");
+        expect(next?.style.aspectRatio).toBe("1.5 / 1");
     });
 
     it("dismissing the current item reveals the next one", async () => {

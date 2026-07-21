@@ -9,6 +9,7 @@ const item = {
     imageUrl: "https://cdn.example.com/pic.png",
     imageAlt: "A promo",
     linkUrl: "https://example.com",
+    aspect: 16 / 9,
 };
 
 describe("fakeNews", () => {
