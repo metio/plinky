@@ -124,7 +124,10 @@ const ON_DEMAND = /webCodecsVideo/;
 // The duet toggle and the sight-reading arcade (core/arcade, the ArcadeCard on the home
 // page, the exercise source's generate-any-valid-id fallback, and the duet + arcade
 // strings inlined per locale) — tip the per-visitor total to a measured 591.0. 592.
-const BUDGET_TOTAL_KB = 592;
+//
+// The self-paced duet (core/duet's gap scheduler and the useDuet hook that plays the
+// sitting-out hand at your live tempo) — tips the total to a measured 592.2. 593.
+const BUDGET_TOTAL_KB = 593;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -233,7 +236,10 @@ const BUDGET_TOTAL_KB = 592;
 // silences notes queued ahead, the mic-pitch start generation guard with its resume and
 // webkit fallback, the ear-level clamp, and the keyboard's navigation stopPropagation and
 // seq-keyed miss flash — measured at 281.1. 282.
-const BUDGET_APP_KB = 282;
+//
+// The self-paced duet (core/duet's gap scheduler and the useDuet hook that plays the
+// sitting-out hand at your live tempo, wired into playSession) — measured at 282.1. 283.
+const BUDGET_APP_KB = 283;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
