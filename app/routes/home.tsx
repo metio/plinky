@@ -4,6 +4,7 @@
 import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { HeroKeyboard } from "../components/features/heroKeyboard";
 import { BookIcon, EarIcon, ListIcon, NotesIcon, PinIcon } from "../components/ui/icons";
+import { ArcadeCard } from "../components/features/arcadeCard";
 import { HomeToday } from "../components/features/homeToday";
 import { NewsBanner } from "../components/features/newsBanner";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
@@ -99,6 +100,8 @@ export default function Home() {
             <DiscoveryChecklist />
 
             <HomeToday />
+
+            <ArcadeCard />
 
             <NewsBanner />
 

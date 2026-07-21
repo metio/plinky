@@ -3,7 +3,8 @@
 
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
-import type { ExerciseConfig } from "../../core/exerciseGen";
+import { arcadeConfig } from "../../core/arcade";
+import { buildExerciseId, type ExerciseConfig } from "../../core/exerciseGen";
 import type { Fetcher } from "../ports/fetcher";
 import { createExerciseSource, type ExerciseMeta } from "./exerciseSource";
 
@@ -125,6 +126,17 @@ describe("exerciseSource.resolve", () => {
     it("is null for an unknown id, so the play flow can fall through", async () => {
         const source = createExerciseSource(withManifest([scaleMeta]));
         expect(await source.resolve("not-an-exercise")).toBeNull();
+    });
+
+    it("generates a valid exercise id that isn't in the manifest, so the arcade climbs beyond it", async () => {
+        const source = createExerciseSource(withManifest([scaleMeta]));
+        // A far arcade rung: a valid config, but no manifest entry names it.
+        const id = buildExerciseId(arcadeConfig(50));
+        const resolved = await source.resolve(id);
+        const score = typeof resolved === "object" ? resolved : null;
+        expect(score?.xml).toContain("score-partwise");
+        expect(score?.tempo).toBe(90);
+        expect(score?.license).toBe("CC0-1.0");
     });
 
     it("is unavailable — not null — when a study's .mxl cannot be fetched", async () => {

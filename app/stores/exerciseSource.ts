@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: 0BSD
 
 import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
-import { type ExerciseConfig, exerciseTitle, generateExercise } from "../../core/exerciseGen";
+import {
+    type ExerciseConfig,
+    exerciseTitle,
+    generateExercise,
+    parseExerciseId,
+} from "../../core/exerciseGen";
 import type { Fetcher } from "../ports/fetcher";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
@@ -34,6 +39,32 @@ export type ExerciseMeta = {
 
 const MANIFEST_URL = "/exercises/manifest.json";
 
+// Tempo and metre for an exercise generated on demand (an arcade rung past the curated
+// manifest): the same steady scale tempo and common time every manifest scale carries.
+const GENERATED_TEMPO = 90;
+const GENERATED_BEATS = 4;
+
+// A generated scale/arpeggio as a playable score — our own work at runtime, so it credits
+// no external source and rides into the public domain like the manifest's own generated set.
+function generatedExercise(
+    id: string,
+    config: ExerciseConfig,
+    tempo: number,
+    beatsPerBar: number,
+): ResolvedScore {
+    return {
+        id,
+        title: exerciseTitle(config),
+        composer: "",
+        description: "",
+        xml: generateExercise(config),
+        tempo,
+        beatsPerBar,
+        license: "CC0-1.0",
+        bundled: true,
+    };
+}
+
 export type ExerciseSource = {
     // The browsable metadata list, or null when the fetch failed — callers that
     // only display may treat null as empty, but "unreachable" must never read
@@ -62,22 +93,17 @@ export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
             }
             const meta = list.find((exercise) => exercise.id === id);
             if (!meta) {
-                return null;
+                // Not curated in the manifest — but a valid scale/arpeggio id can still be
+                // generated on demand, so the sight-reading arcade climbs beyond the
+                // handful the manifest names. An id that isn't a valid config is genuinely
+                // absent. Generated exercises share the manifest's scale tempo and metre.
+                const config = parseExerciseId(id);
+                return config
+                    ? generatedExercise(id, config, GENERATED_TEMPO, GENERATED_BEATS)
+                    : null;
             }
             if (meta.kind === "scale-arpeggio" && meta.config) {
-                return {
-                    id,
-                    title: exerciseTitle(meta.config),
-                    composer: "",
-                    description: "",
-                    xml: generateExercise(meta.config),
-                    tempo: meta.tempo,
-                    beatsPerBar: meta.beatsPerBar,
-                    // Generated from a config at runtime — our own work, dedicated to
-                    // the public domain. No external source to credit.
-                    license: "CC0-1.0",
-                    bundled: true,
-                };
+                return generatedExercise(id, meta.config, meta.tempo, meta.beatsPerBar);
             }
             const xml = await fetchStudyXml(id);
             if (xml === null) {

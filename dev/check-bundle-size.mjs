@@ -120,7 +120,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // The groove metronome (grooveAccents + its Settings control) and the unlockable
 // keyboard skins (core/keyboardTheme, useKeyboardTheme, the KeyboardThemePicker, and the
 // groove + theme strings inlined per locale) — tip the total to a measured 590.2. 591.
-const BUDGET_TOTAL_KB = 591;
+//
+// The duet toggle and the sight-reading arcade (core/arcade, the ArcadeCard on the home
+// page, the exercise source's generate-any-valid-id fallback, and the duet + arcade
+// strings inlined per locale) — tip the per-visitor total to a measured 591.0. 592.
+const BUDGET_TOTAL_KB = 592;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
