@@ -9,6 +9,7 @@ import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
 import { AnalyticsConsent } from "./components/features/analyticsConsent";
+import { AnalyticsTracking } from "./components/features/analyticsTracking";
 import { ConsentBanner } from "./components/features/consentBanner";
 import { StorageBanner } from "./components/features/storageBanner";
 import { UpdateBanner } from "./components/features/updateBanner";
@@ -308,6 +309,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     {/* Loads or stops analytics to follow the consent pref; renders
                         nothing and stays inert until a deliberate opt-in. */}
                     <AnalyticsConsent />
+                    {/* Sends page views and setting-change events; every call is a
+                        no-op until the same consent is granted. */}
+                    <AnalyticsTracking />
                     {/* The first-visit consent banner that sets that pref; shows until
                         the visitor accepts or declines, then never again. */}
                     <ConsentBanner />

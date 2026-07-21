@@ -84,4 +84,31 @@ describe("gtagAnalytics", () => {
             { analytics_storage: "denied" },
         ]);
     });
+
+    const eventCalls = () => calls().filter((entry) => entry[0] === "event");
+
+    it("sends a tracked event only once consent is granted", () => {
+        const analytics = gtagAnalytics("G-TEST123");
+        // Before opt-in nothing is sent, even though a call is made.
+        analytics.track("run_started", { mode: "listen" });
+        expect(eventCalls()).toHaveLength(0);
+        analytics.setConsent(true);
+        analytics.track("run_started", { mode: "listen" });
+        expect(eventCalls().at(-1)).toEqual(["event", "run_started", { mode: "listen" }]);
+    });
+
+    it("drops tracked events after consent is withdrawn", () => {
+        const analytics = gtagAnalytics("G-TEST123");
+        analytics.setConsent(true);
+        analytics.setConsent(false);
+        analytics.track("run_started", { mode: "listen" });
+        expect(eventCalls()).toHaveLength(0);
+    });
+
+    it("sends no event without a measurement id (preview / dev / test)", () => {
+        const analytics = gtagAnalytics(undefined);
+        analytics.setConsent(true);
+        analytics.track("run_started", { mode: "listen" });
+        expect(eventCalls()).toHaveLength(0);
+    });
 });

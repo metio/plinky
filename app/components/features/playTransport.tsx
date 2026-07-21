@@ -5,30 +5,20 @@ import { useState } from "react";
 import { tempoTerm } from "../../../core/tempoTerm";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
-import { Drawer } from "../ui/drawer";
 import { BumpValue } from "../ui/stepper";
 import { ToggleIconButton } from "../ui/toggleIconButton";
 import { Button, IconButton } from "../ui/button";
-import {
-    CloseIcon,
-    FingersIcon,
-    PlayIcon,
-    RotateIcon,
-    SlidersIcon,
-    SpeakerIcon,
-    StopIcon,
-} from "../ui/icons";
+import { CloseIcon, FingersIcon, PlayIcon, RotateIcon, SpeakerIcon, StopIcon } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlaySession } from "./playSession";
-import { RunSetup, RunSetupPanel } from "./runSetup";
+import { RunSetup } from "./runSetup";
 
 // The play controls. Full screen keeps only what you reach for WHILE playing — Listen,
-// Practice/Stop, progress, restart, tempo, and the fingering-editor workspace — plus a
-// Setup button that slides the whole run-setup panel in as a sheet, so every reading aid
-// and layout choice has one home rather than a row of cryptic icons. Inline, before play
-// begins, a single primary Practice sits beside the same setup, folded behind a
-// disclosure. Every button drives a session action; the bar holds no state but the sheet's
-// open flag and the tempo popover's.
+// Practice/Stop, progress, restart, tempo, and the fingering-editor workspace. Settings
+// belong to the run you set up before playing, not mid-flight, so the whole run-setup
+// panel lives inline before play, folded behind a disclosure, and full screen carries no
+// settings of its own. Every button drives a session action; the bar holds no state but
+// the tempo popover's.
 export function PlayTransport() {
     const {
         ready,
@@ -47,9 +37,6 @@ export function PlayTransport() {
         setTempo,
         lockTempo,
     } = usePlaySession();
-    // The run-setup sheet, reachable mid-run in full screen — the one place settings
-    // change during play, deliberately behind a button rather than always on the bar.
-    const [setupOpen, setSetupOpen] = useState(false);
 
     // Listen lives only in the full-screen top bar. Playing enters full screen on every
     // device, so that is the one place it's reachable — which keeps the inline /play view to
@@ -131,22 +118,13 @@ export function PlayTransport() {
                     {/* Swap the keyboard area for the fingering editor: work out (or
                     fine-tune) the fingers for the piece with the difficulty heat-map
                     washed over the score. A workspace, not a setting, so it stays on
-                    the bar rather than moving into the setup sheet. */}
+                    the bar. */}
                     <ToggleIconButton
                         onClick={() => setFingerStrip((on: boolean) => !on)}
                         pressed={fingerStrip}
                         label={m.action_fingering_editor()}
                     >
                         <FingersIcon />
-                    </ToggleIconButton>
-                    {/* Every reading aid and layout choice lives in one sheet, a tap
-                    away without a row of icons crowding the music. */}
-                    <ToggleIconButton
-                        onClick={() => setSetupOpen(true)}
-                        pressed={setupOpen}
-                        label={m.run_setup()}
-                    >
-                        <SlidersIcon />
                     </ToggleIconButton>
                     <IconButton
                         variant="primary"
@@ -158,9 +136,6 @@ export function PlayTransport() {
                     </IconButton>
                 </div>
             </FullScreen>
-            <Drawer open={setupOpen} onClose={() => setSetupOpen(false)} title={m.run_setup()}>
-                <RunSetupPanel />
-            </Drawer>
             {/* Inline, a single primary action sits above the score so it's the first
             thing in reach — Practice enters full screen and starts the run. Listen and
             the rest of the transport live in the full-screen top bar (above), reachable

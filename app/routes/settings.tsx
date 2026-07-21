@@ -129,6 +129,11 @@ export default function Settings() {
                     </span>
                     <LanguageSwitcher />
                 </div>
+                {/* The on-screen keyboard's colours are an appearance choice too, so
+                they sit here rather than in a section of their own. */}
+                <SettingsSection title={m.settings_keyboard_theme()} level={3}>
+                    <KeyboardThemePicker />
+                </SettingsSection>
             </SettingsSection>
 
             <SettingsSection
@@ -383,13 +388,6 @@ export default function Settings() {
 
             <SettingsSection title={m.settings_keyboard()} icon={<KeysIcon className={ICON} />}>
                 <KeyMapping />
-            </SettingsSection>
-
-            <SettingsSection
-                title={m.settings_keyboard_theme()}
-                icon={<StarIcon className={ICON} />}
-            >
-                <KeyboardThemePicker />
             </SettingsSection>
 
             {/* No Web MIDI (Safari, all iOS) means no device to connect — the
