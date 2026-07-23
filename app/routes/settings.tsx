@@ -69,14 +69,6 @@ export default function Settings() {
     const { prefs, update } = usePrefs();
     const synth = useSynth();
     const { support: midiSupport, micStatus } = useMidiConnection();
-    const onboarding = useOnboardingStore();
-
-    // Opening Settings — where the Privacy block leads the page — marks the "check
-    // your privacy settings" discovery step. Awareness only: never tied to turning
-    // analytics on, so the checklist can't pressure a consent.
-    useEffect(() => {
-        onboarding.markDiscovered("privacyChecked");
-    }, [onboarding]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -84,33 +76,6 @@ export default function Settings() {
                 <h1 className="text-2xl font-semibold">{m.nav_settings()}</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{m.settings_subtitle()}</p>
             </header>
-
-            {/* Privacy leads the page: these opt-ins involve a third party and are
-            off unless turned on, so they sit up top where they're seen. The analytics
-            toggle lives here now; a monetisation opt-in joins it later. */}
-            <SettingsSection
-                title={m.settings_privacy_title()}
-                hint={m.settings_privacy_hint()}
-                icon={<EyeIcon className={ICON} />}
-            >
-                <div className="space-y-1">
-                    <SwitchField
-                        label={m.settings_analytics_toggle()}
-                        checked={prefs.analyticsConsent}
-                        // Using the toggle is itself a consent choice, so the
-                        // first-visit banner won't ask again.
-                        onChange={(analyticsConsent) =>
-                            update({ analyticsConsent, analyticsAsked: true })
-                        }
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {m.settings_analytics_desc()}{" "}
-                        <LocalizedLink to="/datenschutz" className={linkClasses}>
-                            {m.settings_analytics_link()}
-                        </LocalizedLink>
-                    </p>
-                </div>
-            </SettingsSection>
 
             <SettingsSection
                 title={m.settings_appearance()}

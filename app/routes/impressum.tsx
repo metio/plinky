@@ -12,7 +12,7 @@ import type { Route } from "./+types/impressum";
 // carrying LegalTranslationNotice. It is reachable from the footer of every page,
 // as "leicht erkennbar, unmittelbar erreichbar, ständig verfügbar" demands. NOTE:
 // verify the German wording against a current generator or a lawyer before relying
-// on it, especially once ads or analytics go live; the translations follow it.
+// on it; the translations follow it.
 export function meta(_args: Route.MetaArgs) {
     // A legal notice has no place in search results; it stays reachable from every
     // footer, so noindex it (and it is left out of the sitemap). Its translations

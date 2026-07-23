@@ -18,8 +18,7 @@ export type DiscoveryId =
     | "fingeringTried"
     | "composed"
     | "imported"
-    | "keysCustomized"
-    | "privacyChecked";
+    | "keysCustomized";
 
 // The steps marked by doing them — features that record no lasting state of their own.
 // keysCustomized is here too so it can be reached by engaging with the key editor:
@@ -32,10 +31,6 @@ export const MARKABLE: readonly DiscoveryId[] = [
     "composed",
     "imported",
     "keysCustomized",
-    // Seeing the privacy controls leaves no trace of its own, so opening Settings —
-    // where the Privacy block now leads — marks it. Never tied to toggling analytics
-    // on: the step is about awareness, and rewarding the opt-in would pressure it.
-    "privacyChecked",
 ];
 
 // What the discovery steps are computed from. The caller loads these from its
@@ -71,9 +66,6 @@ export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean>
         // the standard layout — so a player who likes the defaults isn't stuck on a step
         // that a non-default binding is otherwise the only way to reach.
         keysCustomized: marked.has("keysCustomized") || !isDefaultKeyMap(prefs.keyMap),
-        // Marked by opening Settings (the Privacy block leads the page), so the step
-        // is reached by seeing the controls, not by turning anything on.
-        privacyChecked: marked.has("privacyChecked"),
     };
 }
 

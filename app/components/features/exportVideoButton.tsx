@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import type { Take } from "../../../core/takes";
 import { videoDurationMs } from "../../../core/videoFrames";
-import { useAnalytics, useVideoExporter } from "../../contexts/services";
+import { useVideoExporter } from "../../contexts/services";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { downloadBlob } from "../../lib/download";
 import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
@@ -39,7 +39,6 @@ export function ExportVideoButton({
     original?: OriginalScore | null;
 }) {
     const exporter = useVideoExporter();
-    const analytics = useAnalytics();
     // The chosen on-screen keyboard skin, so the exported video's keys match the app.
     const theme = useKeyboardTheme();
     const [supported, setSupported] = useState(false);
@@ -76,7 +75,6 @@ export function ExportVideoButton({
 
     const save = async () => {
         setProgress(0);
-        analytics.track("video_export", { format, orientation, quality, fps, theme: theme.id });
         try {
             const base = SIZES[quality];
             const width = orientation === "portrait" ? base.height : base.width;

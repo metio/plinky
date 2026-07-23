@@ -68,7 +68,7 @@ describe("discoveryProgress", () => {
             masteredCount: 2,
         });
         const progress = discoveryProgress(done);
-        expect(progress.total).toBe(10);
+        expect(progress.total).toBe(9);
         expect(progress.done).toBe(6);
         expect(progress.allDone).toBe(false);
     });
