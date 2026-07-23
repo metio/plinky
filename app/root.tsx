@@ -43,20 +43,6 @@ import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
 
-// Per-branch preview deploys run on origins Sanity's CORS allowlist doesn't
-// know, so their builds carry VITE_PREVIEW_MOCKS=1 and answer Sanity queries
-// from a Mock Service Worker with demo content. Statically false in production
-// builds, so the mock module is never even bundled; awaited so the first
-// content fetch can't race past the worker's registration.
-if (
-    import.meta.env.VITE_PREVIEW_MOCKS === "1" &&
-    typeof navigator !== "undefined" &&
-    "serviceWorker" in navigator
-) {
-    const { startPreviewMocks } = await import("./mocks/preview");
-    await startPreviewMocks();
-}
-
 // Locales whose UI text is not drawn from Inter's Latin subset: Cyrillic and
 // Greek pages render from a different Inter subset, and CJK pages fall back to
 // system fonts. Preloading the Latin file on those pages competes with the
@@ -167,14 +153,9 @@ function useServiceWorkerUpdate() {
     const [watcher, setWatcher] = useState<SwUpdateWatcher | null>(null);
 
     useEffect(() => {
-        // In dev the SW would cache the dev server's assets and serve them stale —
-        // and a preview-mock build hands the service-worker slot to MSW instead,
-        // which registering the app SW on the same scope would evict.
-        if (
-            !import.meta.env.PROD ||
-            import.meta.env.VITE_PREVIEW_MOCKS === "1" ||
-            !("serviceWorker" in navigator)
-        ) {
+        // In dev the SW would cache the dev server's assets and serve them stale, so
+        // it registers only in a production build.
+        if (!import.meta.env.PROD || !("serviceWorker" in navigator)) {
             return;
         }
         const created = createSwUpdateWatcher(navigator.serviceWorker, {

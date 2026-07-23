@@ -3,11 +3,10 @@
 
 import type { HelpItem } from "../../core/help";
 
-// The seam for the help page's content: fetch every published help item, with each
-// item's text and alt resolved to the given language (falling back to English).
-// Empty on no content, no configured project, or a failed fetch — help never
-// throws into the page. The Sanity adapter implements it in production; an
-// in-memory fake backs tests and local preview.
+// The seam for the help page's content: fetch every help item, with each item's text
+// resolved to the given language (falling back to English). The local adapter serves
+// the content bundled with the app, so it never throws into the page; an in-memory fake
+// backs component tests.
 export type HelpSource = {
     fetchItems(lang: string): Promise<HelpItem[]>;
 };
