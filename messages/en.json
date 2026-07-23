@@ -749,7 +749,7 @@
   "datenschutz_controller_heading": "Controller",
   "datenschutz_controller_intro": "The controller responsible for data processing on this website is:",
   "datenschutz_short_heading": "In brief",
-  "datenschutz_short_body": "Plinky is a browser-only application. Your settings, your progress and your recordings are stored only locally in your browser; we do not collect them or transmit them to a server. There are no user accounts and no advertising. By default there is no analytics and no tracking. Only if you explicitly enable it in the settings is an anonymous usage analysis (Google Analytics) loaded — and you can switch it off again at any time.",
+  "datenschutz_short_body": "Plinky is a browser-only application. Your settings, your progress and your recordings are stored only locally in your browser; we do not collect them or transmit them to a server. There are no user accounts and no advertising, no cookies, and no analytics or tracking of any kind. Plinky fetches no content from any external service.",
   "datenschutz_hosting_heading": "Hosting and server log files",
   "datenschutz_hosting_body": "The website is delivered as static files via GitHub Pages (GitHub, Inc., USA). When the page is requested, the host processes technically necessary data such as your IP address, the date and time of access and the amount of data transferred, in order to deliver the page and keep operations secure. The legal basis is our legitimate interest in secure and stable delivery (Art. 6(1)(f) GDPR). Any transfer to the USA relies on the provider's certification under the EU-US Data Privacy Framework.",
   "datenschutz_localstorage_heading": "Local storage in your browser",

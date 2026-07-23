@@ -369,78 +369,19 @@ instructs, and never nags about a missed day. [VOICE.md](VOICE.md) is the contra
 every string keeps — worth a read before writing copy or translating it, since the
 register is part of the string.
 
-## News banner
-
-The home page can show a small "what's new" picture that links somewhere — a new
-piece, an announcement, a seasonal note. It's optional and edited outside the code
-so anyone can change it live, with no redeploy: the running app fetches the current
-items from a [Sanity](https://www.sanity.io) project at load time. The document
-schemas live in [studio/](studio/), and every change to them redeploys the hosted
-Studio from CI.
-
-Publish more than one item (up to three, newest first) and the banner becomes a
-gentle carousel: it advances on its own every few seconds, and a reader can step
-through it with the chevrons, the position dots, or a swipe. The moment they
-navigate by hand it stops advancing on its own, so it never pulls a picture out
-from under someone who is reading it — and it doesn't auto-advance at all when the
-device asks for reduced motion.
-
-To connect it, copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`
-and `VITE_SANITY_DATASET`. In Sanity, add a `news` document type with an `image`
-(plus `alt` text), a `link` URL, an optional `headline`, and a `show` boolean, and a
-singleton `siteSettings` document with a `newsEnabled` boolean — the master switch
-for the whole board. The editor uploads a picture and publishes, and the banner
-appears; the most-recently-updated shown items rotate, newest first. Flipping
-`newsEnabled` off (or a single item's `show` off) hides them again, all without a
-redeploy. Only `https` image and link URLs are shown, and a missing or
-unreachable source simply shows nothing — the banner never blocks or breaks the
-page. Leave the variables unset and no banner appears and no network call is made.
-
 ## Help page
 
 The **?** in the header opens a help page that explains Plinky area by area — one
 section per part of the app, and it drops you on the section for the page you came
-from. Like the news banner, the content is edited outside the code in the same
-[Sanity](https://www.sanity.io) project, so anyone can write and update it live with
-no redeploy, and it's translated: a reader downloads only their own language.
+from. It works **fully offline**: the copy is bundled with the app (translated with
+the rest of the UI, so a reader downloads only their own language) and the section
+screenshots ship in `public/help/`.
 
-The app owns the sections (their titles are translated with the rest of the UI); Sanity
-holds the blocks inside them. The `helpItem` document type (see [studio/](studio/)) carries a `pageKey` (which
-section it belongs to — `gettingStarted`, `home`, `play`, `library`, `daily`, `compose`,
-`assignments`, `you`, `review`, or `settings`), an `order`, an optional `image` (shared
-across languages) with internationalized `alt` text, an internationalized `text` body,
-and an optional `link`. Publish a block and it appears under its section; a section with
-no blocks shows a short "on the way" note. Only `https` image and link URLs are shown,
-and an unreachable source falls back to the section skeleton — help never breaks the
-page. It reuses the news banner's `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
-
-## About page
-
-A small heart in the footer opens `/about` — the two people behind Plinky. Marisol
-"La Jefa" heads the whole operation and gives Plinky its warmth and welcome;
-Sebastian writes the code. The page is a plain prerendered route (their portraits
-live in `public/`, the copy is translated with the rest of the UI), with a short
-note on why Plinky is a calm place to play rather than one more thing to keep a
-streak on.
-
-## The board
-
-The board is Plinky's pin-board of artists worth following — pianists and
-composers the content team wants to put in front of players, each with a
-picture, a short blurb, and a follow link. Recognized social links (Instagram,
-TikTok, YouTube, X, Bluesky, Threads) get their platform's icon on the follow
-button; anything else becomes a plain visit link. Like the news banner and help
-page, the content lives in the same [Sanity](https://www.sanity.io) project and
-is edited live with no redeploy, and blurbs are translated: a reader downloads
-only their own language.
-
-The `boardArtist` document type (see [studio/](studio/)) carries a `name`, an
-`image` (shared across languages) with internationalized `alt` text, an
-internationalized `text` blurb, a `link` URL, an `order`, and a `show` boolean. Publish an artist and the card
-appears; flip `show` off and it disappears, all without a redeploy. Only `https`
-image and link URLs are shown, and an unreachable source simply shows an empty
-board — the page never breaks. It reuses the news banner's
-`VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
+The app owns the sections and their order; [`core/helpContent.ts`](core/helpContent.ts)
+holds the body text for each section in every locale, and a local help adapter joins it
+with the screenshots — no network, no external service. Regenerate the screenshots from
+the real UI after a visual change with `nix develop --command ci-build` followed by
+`nix develop --command node dev/help-screenshots.mjs`, then commit the updated PNGs.
 
 ## Composer pages
 
@@ -450,12 +391,14 @@ practised. The composer's name on a play page links there. Spelling variants
 across the source corpora ("J.S. Bach", "Johann Sebastian Bach (1685 - 1750)")
 are canonicalized so one composer owns one page.
 
-## Follow Plinky
+## Privacy
 
-Every page ends with a slim footer linking to Plinky's own channels —
-[Instagram](https://www.instagram.com/plinky.piano),
-[Facebook](https://www.facebook.com/profile.php?id=61591963944991) and
-the source itself on [GitHub](https://github.com/metio/plinky).
+Plinky collects **nothing**. It is a browser-only app: your settings, progress and
+recordings live only in your browser, there are no accounts, no cookies, no advertising,
+and no analytics or tracking of any kind. It fetches no content from any external
+service, so the whole thing works offline. Every page ends with a slim footer linking to
+the German-law Impressum and Datenschutz notices and to the source on
+[GitHub](https://github.com/metio/plinky).
 
 ## Development
 
