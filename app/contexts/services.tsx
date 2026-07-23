@@ -20,10 +20,8 @@ import type { KeyValueStore } from "../ports/keyValueStore";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
 import type { HelpSource } from "../ports/help";
-import type { BoardSource } from "../ports/board";
 import type { VideoExporter } from "../ports/videoExporter";
 import { createSanityHelp } from "../adapters/sanityHelp";
-import { createSanityBoard } from "../adapters/sanityBoard";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
@@ -92,10 +90,6 @@ export type AppServices = {
     // can write per-page help in every language without a redeploy. Language-aware;
     // no configured project or a failed fetch simply yields no items.
     help: HelpSource;
-    // The board's featured artists, fetched from the same Sanity project so the
-    // content team can pin whoever is worth following without a redeploy.
-    // Language-aware; no configured project or a failed fetch simply yields no one.
-    board: BoardSource;
     // The "a run is in progress" signal: screens begin/end it, the composition
     // root reads it to hold a service-worker reload until the app is idle.
     // Turns a take into a shareable MP4 where the engine can encode one.
@@ -144,7 +138,6 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         songs: overrides.songs ?? createSongSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
         help: overrides.help ?? createSanityHelp(fetcher),
-        board: overrides.board ?? createSanityBoard(fetcher),
         video: overrides.video ?? lazyVideoExporter,
         analytics: overrides.analytics ?? webAnalytics,
         // The shared app-wide instance by default — the composition root watches
@@ -182,7 +175,6 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     songs: true,
     exercises: true,
     help: true,
-    board: true,
     video: true,
     analytics: true,
     activity: true,
@@ -295,10 +287,6 @@ export function useExerciseSource(): ExerciseSource {
 
 export function useHelpSource(): HelpSource {
     return useServices().help;
-}
-
-export function useBoardSource(): BoardSource {
-    return useServices().board;
 }
 
 export function useVideoExporter(): VideoExporter {

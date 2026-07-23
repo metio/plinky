@@ -3,7 +3,7 @@
 
 import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { HeroKeyboard } from "../components/features/heroKeyboard";
-import { BookIcon, EarIcon, ListIcon, NotesIcon, PinIcon } from "../components/ui/icons";
+import { BookIcon, EarIcon, ListIcon, NotesIcon } from "../components/ui/icons";
 import { ArcadeCard } from "../components/features/arcadeCard";
 import { HomeToday } from "../components/features/homeToday";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
@@ -52,7 +52,6 @@ const FEATURES = [
         note: 67,
     },
     { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 72 },
-    { to: "/board", label: m.board_title, blurb: m.home_board_blurb, Icon: PinIcon, note: 76 },
 ];
 
 export default function Home() {
