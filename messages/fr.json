@@ -540,7 +540,6 @@
   "help_section_review": "Révision",
   "help_loading": "Chargement de l’aide…",
   "help_empty": "L’aide pour cette section arrive bientôt.",
-  "help_learn_more": "En savoir plus",
   "meta_help_description": "Comment fonctionne Plinky : des guides pour chaque partie de l’application, de votre première note au suivi de votre progression.",
   "discover_jump_in": "Lancez-vous",
   "today_assignment": "Continuez « {name} » — étape {step} sur {total}",

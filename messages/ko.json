@@ -540,7 +540,6 @@
   "help_section_review": "복습",
   "help_loading": "도움말 불러오는 중…",
   "help_empty": "이 영역의 도움말은 곧 제공됩니다.",
-  "help_learn_more": "자세히 보기",
   "meta_help_description": "Plinky 작동 방식: 첫 음표부터 진행 상황 추적까지, 앱의 모든 부분에 대한 가이드.",
   "discover_jump_in": "바로 시작하기",
   "today_assignment": "“{name}” 이어서 하기 — {step}/{total} 단계",

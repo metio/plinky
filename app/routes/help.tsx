@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect } from "react";
-import { linkClasses } from "../components/ui/classes";
 import { itemsForPage, paragraphs } from "../../core/help";
 import type { HelpItem } from "../../core/help";
 import { useHelp } from "../hooks/useHelp";
@@ -28,10 +27,10 @@ export function meta(_args: Route.MetaArgs) {
 
 // The app owns the help page's structure: one section per page of the app, in this
 // order, each titled by a translated string (several reuse the nav labels so the
-// help section reads with the same name as the page). The bundled help content
-// (core/helpContent) supplies the item inside each section; a section with no item
-// still renders, so the page mirrors the app regardless. The `key` is both the
-// content's `pageKey` and the hash the header ? links to.
+// help section reads with the same name as the page). The local help adapter supplies
+// the item inside each section from the app's own bundled content; a section with no
+// item still renders, so the page mirrors the app regardless. The `key` is both the
+// item's `pageKey` and the hash the header ? links to.
 const SECTIONS: { key: string; title: () => string }[] = [
     { key: "gettingStarted", title: m.help_section_getting_started },
     { key: "home", title: m.nav_home },
@@ -66,16 +65,6 @@ function HelpBlock({ item }: { item: HelpItem }) {
                     </p>
                 ))}
             </div>
-            {item.linkUrl && (
-                <a
-                    href={item.linkUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`inline-block text-sm ${linkClasses}`}
-                >
-                    {m.help_learn_more()} →
-                </a>
-            )}
         </div>
     );
 }

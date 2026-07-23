@@ -16,23 +16,16 @@ const playItem: HelpItem = {
     pageKey: "play",
     order: 0,
     text: "Press a key to play the note under the cursor.",
-    imageUrl: "https://cdn.example.com/play.png",
+    imageUrl: "/help/play.png",
     imageAlt: "The play screen",
-    linkUrl: "https://plinky.fun/en/play",
 };
 
 describe("Help", () => {
-    it("renders a published item under its page's section, with picture and link", async () => {
+    it("renders an item under its page's section, with its picture", async () => {
         renderWithServices(<Help />, { help: fakeHelp([playItem]) });
         expect(await screen.findByText(playItem.text)).toBeTruthy();
         const img = screen.getByAltText("The play screen");
         expect(img.getAttribute("src")).toBe(playItem.imageUrl);
-        expect(
-            screen
-                .getByText(/Learn more/)
-                .closest("a")
-                ?.getAttribute("href"),
-        ).toBe(playItem.linkUrl);
     });
 
     it("gives each section an anchor id so the header ? can deep-link to it", () => {
