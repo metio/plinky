@@ -132,7 +132,12 @@ const ON_DEMAND = /webCodecsVideo/;
 // analytics event layer (the track() surface, core/analyticsPrefs, the AnalyticsTracking
 // page-view / setting-change watcher, plus run and video-export events) — net of removing
 // the full-screen setup sheet — tip the total to a measured 593.3. 594.
-const BUDGET_TOTAL_KB = 594;
+//
+// Going fully offline and tracking-free — removing the news banner, the About and board
+// pages, Google Analytics and the consent banner, and the whole Sanity fetch layer, while
+// inlining the help text into the per-locale message catalogue — drops the total to a
+// measured 586.6. Ratcheted down to 587.
+const BUDGET_TOTAL_KB = 587;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -248,7 +253,11 @@ const BUDGET_TOTAL_KB = 594;
 // The play run-setup regroup and the analytics event layer (track() through the gtag
 // adapter, core/analyticsPrefs, the AnalyticsTracking watcher, and the run / video-export
 // events) — net of dropping the full-screen setup sheet — measured at 283.2. 284.
-const BUDGET_APP_KB = 284;
+//
+// Going fully offline and tracking-free — removing the news banner, the About and board
+// pages, Google Analytics and the consent banner, and the Sanity fetch layer, with the
+// help text inlined per locale — trims app code to a measured 276.5. Ratcheted to 277.
+const BUDGET_APP_KB = 277;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
