@@ -19,8 +19,6 @@ import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
-import type { NewsSource } from "../ports/news";
-import { createSanityNews } from "../adapters/sanityNews";
 import type { HelpSource } from "../ports/help";
 import type { BoardSource } from "../ports/board";
 import type { VideoExporter } from "../ports/videoExporter";
@@ -90,10 +88,6 @@ export type AppServices = {
     // and the exercise manifest + generated/fetched pieces.
     songs: SongSource;
     exercises: ExerciseSource;
-    // The live home-page news item, fetched from an external content service
-    // (Sanity) so a non-technical editor can change the picture + link without a
-    // redeploy. No configured project or a failed fetch simply yields no news.
-    news: NewsSource;
     // The help page's content, fetched from the same Sanity project so an editor
     // can write per-page help in every language without a redeploy. Language-aware;
     // no configured project or a failed fetch simply yields no items.
@@ -149,7 +143,6 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
-        news: overrides.news ?? createSanityNews(fetcher),
         help: overrides.help ?? createSanityHelp(fetcher),
         board: overrides.board ?? createSanityBoard(fetcher),
         video: overrides.video ?? lazyVideoExporter,
@@ -188,7 +181,6 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     xml: true,
     songs: true,
     exercises: true,
-    news: true,
     help: true,
     board: true,
     video: true,
@@ -299,10 +291,6 @@ export function useSongSource(): SongSource {
 
 export function useExerciseSource(): ExerciseSource {
     return useServices().exercises;
-}
-
-export function useNewsSource(): NewsSource {
-    return useServices().news;
 }
 
 export function useHelpSource(): HelpSource {

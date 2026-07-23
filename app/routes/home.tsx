@@ -6,7 +6,6 @@ import { HeroKeyboard } from "../components/features/heroKeyboard";
 import { BookIcon, EarIcon, ListIcon, NotesIcon, PinIcon } from "../components/ui/icons";
 import { ArcadeCard } from "../components/features/arcadeCard";
 import { HomeToday } from "../components/features/homeToday";
-import { NewsBanner } from "../components/features/newsBanner";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { useSynth } from "../hooks/useSynth";
 import { socialMeta, structuredData } from "../../core/site";
@@ -102,8 +101,6 @@ export default function Home() {
             <HomeToday />
 
             <ArcadeCard />
-
-            <NewsBanner />
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
