@@ -1,112 +1,46 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// Illustrates the help page with real screenshots: serves the built site, drives
-// Chromium to each app section, screenshots it, uploads each picture as a Sanity
-// image asset, and patches the section's seeded help block (`help-<key>-intro`)
-// to carry it, alongside the alt text in every locale. Requires a token with the
-// Editor role in SANITY_AUTH_TOKEN; project and dataset come from
-// SANITY_STUDIO_PROJECT_ID / SANITY_STUDIO_DATASET. Rerunning replaces the
-// pictures — the body text is untouched.
-//
-// The alt text is read from seed/help.ndjson rather than kept here, so the seed
-// stays the one source of truth for every translated string on the help page: a
-// patch that carried its own English-only alt would silently drop 25 locales'
-// translations each time this runs.
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+// Illustrates the help page with real screenshots, bundled with the app so /help works
+// offline. Serves the built site (build/client), drives Chromium to each app section,
+// and writes public/help/<key>.png — the pictures the local help adapter references. No
+// network, no CMS: rerun after a UI change to refresh the illustrations, then commit the
+// updated PNGs. Requires a prior `npm run build:client` (or ci-build) so build/client
+// exists with a prerendered play page.
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { chromium } from "playwright";
 
 const ROOT = "build/client";
-const SEED_PATH = "studio/seed/help.ndjson";
+const OUT = "public/help";
 const PORT = Number(process.env.PORT) || 8098;
 
-const PROJECT = process.env.SANITY_STUDIO_PROJECT_ID;
-const DATASET = process.env.SANITY_STUDIO_DATASET || "production";
-const TOKEN = process.env.SANITY_AUTH_TOKEN;
-// A dry run writes the pictures to this directory instead of touching Sanity —
-// for eyeballing the screenshots before spending real asset uploads.
-const DRY_RUN_DIR = process.env.HELP_SHOTS_DIR;
-if (!DRY_RUN_DIR && (!PROJECT || !TOKEN)) {
-    console.error("SANITY_STUDIO_PROJECT_ID and SANITY_AUTH_TOKEN are required.");
+if (!existsSync(ROOT)) {
+    console.error(`${ROOT} not found — run \`nix develop --command ci-build\` first.`);
     process.exit(1);
 }
+mkdirSync(OUT, { recursive: true });
 
 // The play page needs a piece; any prerendered one will do.
 const playId = readdirSync(join(ROOT, "en", "play"), { withFileTypes: true }).find((entry) =>
     entry.isDirectory(),
 )?.name;
 
-// The seeded help blocks, by section key — the source of the alt text this
-// script patches back alongside each picture.
-const SEED = new Map(
-    readFileSync(SEED_PATH, "utf8")
-        .split("\n")
-        .filter((line) => line.trim())
-        .map((line) => JSON.parse(line))
-        .map((doc) => [doc._id.replace(/^help-|-intro$/g, ""), doc]),
-);
-
 // One screenshot per help section: the page it explains. `selector` waits for the
-// page's real content before shooting; the play page is ready once the score's
-// SVG exists. Alt text comes from the seed, in every locale.
+// page's real content before shooting; the play page is ready once the score's SVG exists.
 const SECTIONS = [
-    {
-        key: "gettingStarted",
-        path: "/en/",
-        selector: "main",
-    },
-    {
-        key: "home",
-        path: "/en/",
-        selector: "main",
-    },
-    {
-        key: "play",
-        path: `/en/play/${playId}`,
-        selector: "svg",
-    },
-    {
-        key: "library",
-        path: "/en/library",
-        selector: "main",
-    },
-    {
-        key: "daily",
-        path: "/en/daily",
-        selector: "main",
-    },
-    {
-        key: "ear",
-        path: "/en/ear",
-        selector: "main",
-    },
-    {
-        key: "compose",
-        path: "/en/compose",
-        selector: "main",
-    },
-    {
-        key: "assignments",
-        path: "/en/assignments",
-        selector: "main",
-    },
-    {
-        key: "you",
-        path: "/en/you",
-        selector: "main",
-    },
-    {
-        key: "review",
-        path: "/en/review",
-        selector: "main",
-    },
-    {
-        key: "settings",
-        path: "/en/settings",
-        selector: "main",
-    },
+    { key: "gettingStarted", path: "/en/", selector: "main" },
+    { key: "home", path: "/en/", selector: "main" },
+    { key: "play", path: `/en/play/${playId}`, selector: "svg" },
+    { key: "library", path: "/en/library", selector: "main" },
+    { key: "daily", path: "/en/daily", selector: "main" },
+    { key: "ear", path: "/en/ear", selector: "main" },
+    { key: "compose", path: "/en/compose", selector: "main" },
+    { key: "assignments", path: "/en/assignments", selector: "main" },
+    { key: "you", path: "/en/you", selector: "main" },
+    { key: "review", path: "/en/review", selector: "main" },
+    { key: "settings", path: "/en/settings", selector: "main" },
 ];
 
 const MIME = {
@@ -121,8 +55,8 @@ const MIME = {
     ".webmanifest": "application/manifest+json",
 };
 
-// A static server matching how GitHub Pages serves the build: directory URLs map
-// to their index.html, and unknown paths fall back to the SPA shell.
+// A static server matching how GitHub Pages serves the build: directory URLs map to
+// their index.html, and unknown paths fall back to the SPA shell.
 const server = createServer((req, res) => {
     let path = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
     if (path.endsWith("/")) {
@@ -139,65 +73,13 @@ const server = createServer((req, res) => {
     res.end(readFileSync(file));
 });
 
-const api = `https://${PROJECT}.api.sanity.io/v2024-01-01`;
-
-async function uploadImage(png, filename) {
-    const response = await fetch(`${api}/assets/images/${DATASET}?filename=${filename}`, {
-        method: "POST",
-        headers: { authorization: `Bearer ${TOKEN}`, "content-type": "image/png" },
-        body: png,
-    });
-    if (!response.ok) {
-        throw new Error(`asset upload failed (${response.status}): ${await response.text()}`);
-    }
-    return (await response.json()).document._id;
-}
-
-async function patchBlock(key, assetId) {
-    const block = SEED.get(key);
-    if (!block) {
-        throw new Error(
-            `no seeded help block for ${key} — is studio/seed/help.ndjson in step with SECTIONS?`,
-        );
-    }
-    const response = await fetch(`${api}/data/mutate/${DATASET}`, {
-        method: "POST",
-        headers: { authorization: `Bearer ${TOKEN}`, "content-type": "application/json" },
-        body: JSON.stringify({
-            mutations: [
-                // Create the document from the seed if it isn't in the dataset yet — the
-                // first shoot of a newly added section, before Seed Studio Content has
-                // imported it, would otherwise fail to patch a document that doesn't exist.
-                // createIfNotExists never touches an existing document, so a Studio text
-                // edit is safe; only a missing block is filled from the seed file, and its
-                // picture attaches in the same run. So a new section needs no seed-first
-                // dance — the screenshot job stands the whole block up on its own.
-                { createIfNotExists: block },
-                {
-                    patch: {
-                        id: block._id,
-                        set: {
-                            image: {
-                                _type: "image",
-                                asset: { _type: "reference", _ref: assetId },
-                            },
-                            alt: block.alt,
-                        },
-                    },
-                },
-            ],
-        }),
-    });
-    if (!response.ok) {
-        throw new Error(`patch ${key} failed (${response.status}): ${await response.text()}`);
-    }
-}
-
 await new Promise((resolve) => server.listen(PORT, resolve));
+// Scale 1 and a modest viewport keep the bundled PNGs small — the help page lazy-loads
+// them below the fold, so a device-pixel-perfect shot isn't worth the extra weight.
 const browser = await chromium.launch();
 const page = await browser.newPage({
-    viewport: { width: 1280, height: 800 },
-    deviceScaleFactor: 2,
+    viewport: { width: 1000, height: 720 },
+    deviceScaleFactor: 1,
     colorScheme: "light",
 });
 
@@ -210,14 +92,8 @@ for (const section of SECTIONS) {
         await page.evaluate(() => document.fonts.ready);
         await page.waitForTimeout(500);
         const png = await page.screenshot({ type: "png" });
-        if (DRY_RUN_DIR) {
-            writeFileSync(join(DRY_RUN_DIR, `help-${section.key}.png`), png);
-            console.log(`${section.key}: written to ${DRY_RUN_DIR}`);
-            continue;
-        }
-        const assetId = await uploadImage(png, `help-${section.key}.png`);
-        await patchBlock(section.key, assetId);
-        console.log(`${section.key}: uploaded + patched (${assetId})`);
+        writeFileSync(join(OUT, `${section.key}.png`), png);
+        console.log(`${section.key}: written to ${OUT}/${section.key}.png`);
     } catch (error) {
         failed = true;
         console.error(`${section.key}: ${error.message}`);

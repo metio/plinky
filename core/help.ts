@@ -5,10 +5,10 @@ import { isHttpsUrl } from "./url";
 
 // A single help block: a short description, optionally with a picture, belonging
 // to one page of the app. The app owns the sections — a fixed set of page keys,
-// each with a translated title — so Sanity only supplies these items, already
-// resolved to the reader's language by the query. Editor-controlled, so nothing
-// is trusted: an unsafe image or link URL is dropped, and an item with no usable
-// text is discarded rather than rendered empty.
+// each with a translated title — and the item text, resolved to the reader's
+// language, comes bundled with the app. The parser stays strict for any
+// externally-sourced item: an unsafe image or link URL is dropped, and an item
+// with no usable text is discarded rather than rendered empty.
 export type HelpItem = {
     // Stable identifier from the content source.
     id: string;

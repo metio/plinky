@@ -21,10 +21,8 @@ const BASE_PATHS = [
     "/review",
     "/settings",
     "/help",
-    "/about",
     "/impressum",
     "/datenschutz",
-    "/board",
 ];
 
 // Every bundled score's id and composer, read once. The id is the content

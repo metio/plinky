@@ -19,7 +19,7 @@ import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
 import type { HelpSource } from "../ports/help";
 import type { VideoExporter } from "../ports/videoExporter";
-import { createSanityHelp } from "../adapters/sanityHelp";
+import { createLocalHelp } from "../adapters/localHelp";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
@@ -84,9 +84,8 @@ export type AppServices = {
     // and the exercise manifest + generated/fetched pieces.
     songs: SongSource;
     exercises: ExerciseSource;
-    // The help page's content, fetched from the same Sanity project so an editor
-    // can write per-page help in every language without a redeploy. Language-aware;
-    // no configured project or a failed fetch simply yields no items.
+    // The help page's content, bundled with the app so /help works offline. The local
+    // adapter resolves it to the reader's language, with English as the fallback.
     help: HelpSource;
     // The "a run is in progress" signal: screens begin/end it, the composition
     // root reads it to hold a service-worker reload until the app is idle.
@@ -132,7 +131,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
-        help: overrides.help ?? createSanityHelp(fetcher),
+        help: overrides.help ?? createLocalHelp(),
         video: overrides.video ?? lazyVideoExporter,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.

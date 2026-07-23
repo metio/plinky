@@ -28,10 +28,10 @@ export function meta(_args: Route.MetaArgs) {
 
 // The app owns the help page's structure: one section per page of the app, in this
 // order, each titled by a translated string (several reuse the nav labels so the
-// help section reads with the same name as the page). Sanity supplies the items
-// inside each section; a section with no published items still renders, so the page
-// mirrors the app even before any content exists. The `key` is both the Sanity
-// `pageKey` an item is tagged with and the hash the header ? links to.
+// help section reads with the same name as the page). The bundled help content
+// (core/helpContent) supplies the item inside each section; a section with no item
+// still renders, so the page mirrors the app regardless. The `key` is both the
+// content's `pageKey` and the hash the header ? links to.
 const SECTIONS: { key: string; title: () => string }[] = [
     { key: "gettingStarted", title: m.help_section_getting_started },
     { key: "home", title: m.nav_home },
