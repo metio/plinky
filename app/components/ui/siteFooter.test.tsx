@@ -11,14 +11,14 @@ import { SiteFooter } from "./siteFooter";
 afterEach(cleanup);
 
 describe("SiteFooter", () => {
-    it("routes the heart to the About page", () => {
+    it("links to the project source on GitHub", () => {
         render(
             <MemoryRouter initialEntries={["/en"]}>
                 <SiteFooter />
             </MemoryRouter>,
         );
-        const heart = screen.getByRole("link", { name: m.nav_about() });
-        expect(heart.getAttribute("href")).toContain("/about");
+        const source = screen.getByRole("link", { name: m.footer_source() });
+        expect(source.getAttribute("href")).toContain("github.com/metio/plinky");
     });
 
     it("links to the Impressum and Datenschutz pages the law requires", () => {
