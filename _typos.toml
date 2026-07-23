@@ -45,7 +45,7 @@ ist = "ist"
 extend-exclude = [
     "messages/*",
     "!messages/en.json",
-    "studio/seed/help.ndjson",
+    "core/helpContent.ts",
     "songs/*",
     "scores/*",
     "public/songs/*",

@@ -5,7 +5,7 @@
 // offline. Serves the built site (build/client), drives Chromium to each app section,
 // and writes public/help/<key>.png — the pictures the local help adapter references. No
 // network, no CMS: rerun after a UI change to refresh the illustrations, then commit the
-// updated PNGs. Requires a prior `npm run build:client` (or ci-build) so build/client
+// updated PNG files. Requires a prior `npm run build:client` (or ci-build) so build/client
 // exists with a prerendered play page.
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
@@ -74,7 +74,7 @@ const server = createServer((req, res) => {
 });
 
 await new Promise((resolve) => server.listen(PORT, resolve));
-// Scale 1 and a modest viewport keep the bundled PNGs small — the help page lazy-loads
+// Scale 1 and a modest viewport keep the bundled PNG files small — the help page lazy-loads
 // them below the fold, so a device-pixel-perfect shot isn't worth the extra weight.
 const browser = await chromium.launch();
 const page = await browser.newPage({

@@ -381,7 +381,7 @@ The app owns the sections and their order; [`core/helpContent.ts`](core/helpCont
 holds the body text for each section in every locale, and a local help adapter joins it
 with the screenshots — no network, no external service. Regenerate the screenshots from
 the real UI after a visual change with `nix develop --command ci-build` followed by
-`nix develop --command node dev/help-screenshots.mjs`, then commit the updated PNGs.
+`nix develop --command node dev/help-screenshots.mjs`, then commit the updated PNG files.
 
 ## Composer pages
 
