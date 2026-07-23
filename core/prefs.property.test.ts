@@ -37,8 +37,6 @@ function expectValid(prefs: Prefs): void {
     expect(typeof prefs.barNumbers).toBe("boolean");
     expect(typeof prefs.metronomeAccent).toBe("boolean");
     expect(typeof prefs.metronomeAdaptive).toBe("boolean");
-    expect(typeof prefs.analyticsConsent).toBe("boolean");
-    expect(typeof prefs.analyticsAsked).toBe("boolean");
     expect(typeof prefs.treadmill).toBe("boolean");
     expect(typeof prefs.highway).toBe("boolean");
     expect(typeof prefs.raceGhost).toBe("boolean");
@@ -132,8 +130,6 @@ describe("parsePrefs properties", () => {
                         "hiddenNotes",
                         "revealTries",
                         "micCalibration",
-                        "analyticsConsent",
-                        "analyticsAsked",
                     ] as const
                 ).map((key) => [key, fc.jsonValue()]),
             ),

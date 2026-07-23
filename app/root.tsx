@@ -8,9 +8,6 @@ import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
-import { AnalyticsConsent } from "./components/features/analyticsConsent";
-import { AnalyticsTracking } from "./components/features/analyticsTracking";
-import { ConsentBanner } from "./components/features/consentBanner";
 import { StorageBanner } from "./components/features/storageBanner";
 import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
@@ -45,20 +42,6 @@ import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
 
 const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
-
-// Per-branch preview deploys run on origins Sanity's CORS allowlist doesn't
-// know, so their builds carry VITE_PREVIEW_MOCKS=1 and answer Sanity queries
-// from a Mock Service Worker with demo content. Statically false in production
-// builds, so the mock module is never even bundled; awaited so the first
-// content fetch can't race past the worker's registration.
-if (
-    import.meta.env.VITE_PREVIEW_MOCKS === "1" &&
-    typeof navigator !== "undefined" &&
-    "serviceWorker" in navigator
-) {
-    const { startPreviewMocks } = await import("./mocks/preview");
-    await startPreviewMocks();
-}
 
 // Locales whose UI text is not drawn from Inter's Latin subset: Cyrillic and
 // Greek pages render from a different Inter subset, and CJK pages fall back to
@@ -170,14 +153,9 @@ function useServiceWorkerUpdate() {
     const [watcher, setWatcher] = useState<SwUpdateWatcher | null>(null);
 
     useEffect(() => {
-        // In dev the SW would cache the dev server's assets and serve them stale —
-        // and a preview-mock build hands the service-worker slot to MSW instead,
-        // which registering the app SW on the same scope would evict.
-        if (
-            !import.meta.env.PROD ||
-            import.meta.env.VITE_PREVIEW_MOCKS === "1" ||
-            !("serviceWorker" in navigator)
-        ) {
+        // In dev the SW would cache the dev server's assets and serve them stale, so
+        // it registers only in a production build.
+        if (!import.meta.env.PROD || !("serviceWorker" in navigator)) {
             return;
         }
         const created = createSwUpdateWatcher(navigator.serviceWorker, {
@@ -306,15 +284,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     the header on the default services, silently ignoring any override. */}
                 <ServicesProvider>
                     <Header />
-                    {/* Loads or stops analytics to follow the consent pref; renders
-                        nothing and stays inert until a deliberate opt-in. */}
-                    <AnalyticsConsent />
-                    {/* Sends page views and setting-change events; every call is a
-                        no-op until the same consent is granted. */}
-                    <AnalyticsTracking />
-                    {/* The first-visit consent banner that sets that pref; shows until
-                        the visitor accepts or declines, then never again. */}
-                    <ConsentBanner />
                     {/* The layout is the composition root: it hands the banner the
                         adapter's health signal so the banner itself stays oblivious
                         to where the signal comes from. */}

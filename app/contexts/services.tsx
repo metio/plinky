@@ -3,7 +3,6 @@
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
-import { webAnalytics } from "../adapters/gtagAnalytics";
 import { webAudioEngine } from "../adapters/webAudioEngine";
 import { lazyVideoExporter } from "../adapters/lazyVideo";
 import { micPitch } from "../adapters/micPitch";
@@ -12,20 +11,15 @@ import { browserScheduler } from "../adapters/browserScheduler";
 import type { MidiAccessPort } from "../ports/midiAccess";
 import type { PitchInput } from "../ports/pitchInput";
 import type { Scheduler } from "../ports/scheduler";
-import type { Analytics } from "../ports/analytics";
 import type { AudioEngine } from "../ports/audioEngine";
 import type { XmlCodec } from "../../core/xml";
 import { domXmlCodec } from "../adapters/domXmlCodec";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import type { Fetcher } from "../ports/fetcher";
 import { httpFetcher } from "../adapters/httpFetcher";
-import type { NewsSource } from "../ports/news";
-import { createSanityNews } from "../adapters/sanityNews";
 import type { HelpSource } from "../ports/help";
-import type { BoardSource } from "../ports/board";
 import type { VideoExporter } from "../ports/videoExporter";
-import { createSanityHelp } from "../adapters/sanityHelp";
-import { createSanityBoard } from "../adapters/sanityBoard";
+import { createLocalHelp } from "../adapters/localHelp";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
@@ -90,25 +84,13 @@ export type AppServices = {
     // and the exercise manifest + generated/fetched pieces.
     songs: SongSource;
     exercises: ExerciseSource;
-    // The live home-page news item, fetched from an external content service
-    // (Sanity) so a non-technical editor can change the picture + link without a
-    // redeploy. No configured project or a failed fetch simply yields no news.
-    news: NewsSource;
-    // The help page's content, fetched from the same Sanity project so an editor
-    // can write per-page help in every language without a redeploy. Language-aware;
-    // no configured project or a failed fetch simply yields no items.
+    // The help page's content, bundled with the app so /help works offline. The local
+    // adapter resolves it to the reader's language, with English as the fallback.
     help: HelpSource;
-    // The board's featured artists, fetched from the same Sanity project so the
-    // content team can pin whoever is worth following without a redeploy.
-    // Language-aware; no configured project or a failed fetch simply yields no one.
-    board: BoardSource;
     // The "a run is in progress" signal: screens begin/end it, the composition
     // root reads it to hold a service-worker reload until the app is idle.
     // Turns a take into a shareable MP4 where the engine can encode one.
     video: VideoExporter;
-    // Anonymous usage analytics, gated behind the Settings opt-in — inert until a
-    // deliberate consent, and carries no measurement id off the production build.
-    analytics: Analytics;
     activity: ActivitySignal;
 };
 
@@ -149,11 +131,8 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher),
         exercises: overrides.exercises ?? createExerciseSource(fetcher),
-        news: overrides.news ?? createSanityNews(fetcher),
-        help: overrides.help ?? createSanityHelp(fetcher),
-        board: overrides.board ?? createSanityBoard(fetcher),
+        help: overrides.help ?? createLocalHelp(),
         video: overrides.video ?? lazyVideoExporter,
-        analytics: overrides.analytics ?? webAnalytics,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.
         activity: overrides.activity ?? runActivity,
@@ -188,11 +167,8 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     xml: true,
     songs: true,
     exercises: true,
-    news: true,
     help: true,
-    board: true,
     video: true,
-    analytics: true,
     activity: true,
 };
 const SERVICE_KEYS = Object.keys(SERVICE_KEY_SET) as readonly (keyof AppServices)[];
@@ -243,10 +219,6 @@ export function useStore(): KeyValueStore {
 
 export function usePrefsStore(): PrefsStore {
     return useServices().prefs;
-}
-
-export function useAnalytics(): Analytics {
-    return useServices().analytics;
 }
 
 export function useMasteryStore(): MasteryStore {
@@ -301,16 +273,8 @@ export function useExerciseSource(): ExerciseSource {
     return useServices().exercises;
 }
 
-export function useNewsSource(): NewsSource {
-    return useServices().news;
-}
-
 export function useHelpSource(): HelpSource {
     return useServices().help;
-}
-
-export function useBoardSource(): BoardSource {
-    return useServices().board;
 }
 
 export function useVideoExporter(): VideoExporter {

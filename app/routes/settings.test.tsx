@@ -66,20 +66,6 @@ describe("Settings", () => {
         expect(prefs.colorNotes).toBe(false);
     });
 
-    it("marks the privacy step discovered on opening Settings, without touching the toggle", () => {
-        const { services } = mount();
-        // Awareness — opening the page (where Privacy leads) is enough; consent stays off.
-        expect(services.onboarding.marked().has("privacyChecked")).toBe(true);
-        expect(services.prefs.load().analyticsConsent).toBe(false);
-    });
-
-    it("persists the analytics opt-in, off by default", () => {
-        const { services } = mount();
-        expect(services.prefs.load().analyticsConsent).toBe(false);
-        toggle(m.settings_analytics_toggle);
-        expect(services.prefs.load().analyticsConsent).toBe(true);
-    });
-
     it("disables the volume slider while sound is off, and persists the level", () => {
         const { services } = mount();
         const slider = screen.getByLabelText<HTMLInputElement>(m.settings_volume());

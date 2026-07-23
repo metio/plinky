@@ -33,9 +33,6 @@ ist = "ist"
 # documents (the CC 2.5/3.0 deeds even carry an official "MERCHANTIBILITY" typo) and
 # must not be altered.
 #
-# The help seed carries all 26 locales in one NDJSON file, so — unlike messages/,
-# where the English base can stay checked on its own — there is no way to spell-check
-# its English without also flagging the other 25 languages.
 # The Impressum and Datenschutzerklärung are German legal documents (§ 5 DDG /
 # GDPR); the operator's name/address and the German page titles stay literal in the
 # route components — typos only knows English, so it flags those legitimate German
@@ -45,7 +42,6 @@ ist = "ist"
 extend-exclude = [
     "messages/*",
     "!messages/en.json",
-    "studio/seed/help.ndjson",
     "songs/*",
     "scores/*",
     "public/songs/*",
