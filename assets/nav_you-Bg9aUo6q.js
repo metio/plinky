@@ -1,0 +1,1 @@
+import"./runtime-XWpZIenf.js";var e=()=>`Daily`,t=((t={},n={})=>e(t)),n=()=>`Compose`,r=((e={},t={})=>n(e)),i=()=>`You`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

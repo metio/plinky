@@ -1,0 +1,1 @@
+import"./runtime-DYNqBaDv.js";var e=()=>`오늘의 도전`,t=((t={},n={})=>e(t)),n=()=>`작곡`,r=((e={},t={})=>n(e)),i=()=>`나`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

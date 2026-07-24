@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Plinky — klaverøvelse i din browser`,t=((t={},n={})=>e(t));export{t};

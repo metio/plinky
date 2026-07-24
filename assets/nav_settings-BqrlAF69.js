@@ -1,0 +1,1 @@
+import"./runtime-nY4zrSrg.js";var e=()=>`Instellingen`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BzMHxmbB.js";var e=()=>`İptal`,t=((t={},n={})=>e(t));export{t};

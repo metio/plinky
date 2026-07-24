@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Daglig`,t=((t={},n={})=>e(t)),n=()=>`Komponér`,r=((e={},t={})=>n(e)),i=()=>`Dig`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

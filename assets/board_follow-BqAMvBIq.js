@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=e=>`${e?.platform}でフォロー`,t=((t,n={})=>e(t));export{t};

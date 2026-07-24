@@ -1,0 +1,1 @@
+import"./runtime-XWpZIenf.js";var e=()=>`The Board`,t=((t={},n={})=>e(t));export{t};

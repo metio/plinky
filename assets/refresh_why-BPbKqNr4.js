@@ -1,0 +1,1 @@
+import"./runtime-DcnGG2u7.js";var e=()=>`I brani ritornano a intervalli sempre più ampi, così ciò che hai imparato resta davvero.`,t=((t={},n={})=>e(t));export{t};

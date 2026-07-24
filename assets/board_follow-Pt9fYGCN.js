@@ -1,0 +1,1 @@
+import"./runtime-ChsbvrKE.js";var e=e=>`Urmărește pe ${e?.platform}`,t=((t,n={})=>e(t));export{t};

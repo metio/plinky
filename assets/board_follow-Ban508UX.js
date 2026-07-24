@@ -1,0 +1,1 @@
+import"./runtime-D8obLm44.js";var e=e=>`Følg på ${e?.platform}`,t=((t,n={})=>e(t));export{t};

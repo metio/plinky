@@ -1,0 +1,1 @@
+import"./runtime-DeoVMqMM.js";var e=()=>`Entrenamiento auditivo`,t=((t={},n={})=>e(t));export{t};

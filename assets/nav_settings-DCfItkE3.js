@@ -1,0 +1,1 @@
+import"./runtime-DKeAe0au.js";var e=()=>`Paramètres`,t=((t={},n={})=>e(t));export{t};

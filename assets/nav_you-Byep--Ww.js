@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Daglig`,t=((t={},n={})=>e(t)),n=()=>`Komponera`,r=((e={},t={})=>n(e)),i=()=>`Du`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

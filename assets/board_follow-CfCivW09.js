@@ -1,0 +1,1 @@
+import"./runtime-BzMHxmbB.js";var e=e=>`${e?.platform} üzerinde takip et`,t=((t,n={})=>e(t));export{t};

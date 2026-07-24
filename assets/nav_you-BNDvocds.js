@@ -1,0 +1,1 @@
+import"./runtime-D8obLm44.js";var e=()=>`Daglig`,t=((t={},n={})=>e(t)),n=()=>`Komponer`,r=((e={},t={})=>n(e)),i=()=>`Deg`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

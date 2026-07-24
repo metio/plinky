@@ -1,0 +1,1 @@
+import"./runtime-CCc3PWxx.js";var e=()=>`Täglich`,t=((t={},n={})=>e(t)),n=()=>`Komponieren`,r=((e={},t={})=>n(e)),i=()=>`Du`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

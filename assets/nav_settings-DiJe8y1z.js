@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";var e=()=>`Asetukset`,t=((t={},n={})=>e(t));export{t};

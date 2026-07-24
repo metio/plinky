@@ -1,0 +1,1 @@
+import"./runtime-XWpZIenf.js";var e=()=>`Pieces resurface on a widening schedule, so what you've learned actually sticks.`,t=((t={},n={})=>e(t));export{t};

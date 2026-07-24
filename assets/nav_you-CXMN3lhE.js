@@ -1,0 +1,1 @@
+import"./runtime-BbkK0Fo4.js";var e=()=>`Ditore`,t=((t={},n={})=>e(t)),n=()=>`Kompozo`,r=((e={},t={})=>n(e)),i=()=>`Ti`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

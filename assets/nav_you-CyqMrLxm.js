@@ -1,0 +1,1 @@
+import"./runtime-nY4zrSrg.js";var e=()=>`Dagelijks`,t=((t={},n={})=>e(t)),n=()=>`Componeren`,r=((e={},t={})=>n(e)),i=()=>`Jij`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

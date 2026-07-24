@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Bläddra i biblioteket`,t=((t={},n={})=>e(t));export{t};

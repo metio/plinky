@@ -1,0 +1,1 @@
+import"./runtime-D8obLm44.js";var e=()=>`Vis mer`,t=((t={},n={})=>e(t));export{t};

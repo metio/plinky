@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-CBh0ZOZc.js";import{t}from"./lib-Cs_MZysa.js";import{a as n}from"./runtime-BrAoCqaq.js";var r=e();function i({to:e,...i}){return(0,r.jsx)(t,{to:typeof e==`string`?n(e):e,...i})}export{i as t};

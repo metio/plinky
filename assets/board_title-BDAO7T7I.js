@@ -1,0 +1,1 @@
+import"./runtime-JAD24awa.js";var e=()=>`Nástenka`,t=((t={},n={})=>e(t));export{t};

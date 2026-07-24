@@ -1,0 +1,1 @@
+import"./runtime-ChsbvrKE.js";var e=()=>`Copiat!`,t=((t={},n={})=>e(t));export{t};

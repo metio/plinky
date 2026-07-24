@@ -1,0 +1,1 @@
+import"./runtime-DeoVMqMM.js";var e=()=>`Inicio`,t=((t={},n={})=>e(t)),n=()=>`Biblioteca`,r=((e={},t={})=>n(e));export{t as n,r as t};

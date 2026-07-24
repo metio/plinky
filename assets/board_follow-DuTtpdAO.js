@@ -1,0 +1,1 @@
+import"./runtime-DeoVMqMM.js";var e=e=>`Seguir en ${e?.platform}`,t=((t,n={})=>e(t));export{t};

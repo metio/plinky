@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Plinky — pianoövning i webbläsaren`,t=((t={},n={})=>e(t));export{t};

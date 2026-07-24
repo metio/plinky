@@ -1,0 +1,1 @@
+import"./runtime-3-65kTcI.js";var e=()=>`Diário`,t=((t={},n={})=>e(t)),n=()=>`Compor`,r=((e={},t={})=>n(e)),i=()=>`Tu`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

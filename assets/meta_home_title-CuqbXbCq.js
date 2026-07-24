@@ -1,0 +1,1 @@
+import"./runtime-BbkK0Fo4.js";var e=()=>`Plinky — praktikë pianoje në shfletuesin tënd`,t=((t={},n={})=>e(t));export{t};

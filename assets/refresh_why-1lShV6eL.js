@@ -1,0 +1,1 @@
+import"./runtime-JAD24awa.js";var e=()=>`Skladby sa vynárajú v čoraz dlhších intervaloch, aby to, čo ste sa naučili, naozaj zostalo.`,t=((t={},n={})=>e(t));export{t};

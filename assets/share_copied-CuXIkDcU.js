@@ -1,0 +1,1 @@
+import"./runtime-DeoVMqMM.js";var e=()=>`¡Copiado!`,t=((t={},n={})=>e(t));export{t};

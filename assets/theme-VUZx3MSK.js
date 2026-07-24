@@ -1,0 +1,1 @@
+import"./runtime-DcnGG2u7.js";import{gt as e}from"./services-DUs42wmY.js";var t=()=>`Come vengono trattati i tuoi dati`,n=((e={},n={})=>t(e));function r(t){let n=typeof matchMedia==`function`&&matchMedia(`(prefers-color-scheme: dark)`).matches;document.documentElement.classList.toggle(`dark`,e(t,n)===`dark`)}export{n,r as t};

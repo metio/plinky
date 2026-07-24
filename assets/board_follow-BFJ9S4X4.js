@@ -1,0 +1,1 @@
+import"./runtime-BbkK0Fo4.js";var e=e=>`Ndiq në ${e?.platform}`,t=((t,n={})=>e(t));export{t};

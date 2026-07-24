@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Gehörsträning`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BrAoCqaq.js";var e=()=>`曲目会按逐渐拉长的周期重新出现，让你学到的真正留得住。`,t=((t={},n={})=>e(t));export{t};

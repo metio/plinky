@@ -1,0 +1,1 @@
+import"./runtime-DYNqBaDv.js";var e=()=>`곡은 점점 넓어지는 간격으로 다시 나타나요, 그래서 배운 것이 진짜로 몸에 남아요.`,t=((t={},n={})=>e(t));export{t};

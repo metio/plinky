@@ -1,0 +1,1 @@
+import"./runtime-ChsbvrKE.js";var e=()=>`Plinky — exersează pian în browser`,t=((t={},n={})=>e(t));export{t};

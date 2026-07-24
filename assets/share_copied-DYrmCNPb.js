@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";var e=()=>`Kopioitu!`,t=((t={},n={})=>e(t));export{t};

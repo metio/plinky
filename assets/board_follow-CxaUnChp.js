@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=e=>`Følg på ${e?.platform}`,t=((t,n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-CvRQpQrf.js";var e=()=>`Закрити`,t=((t={},n={})=>e(t));export{t};

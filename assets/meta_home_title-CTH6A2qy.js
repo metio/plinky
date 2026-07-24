@@ -1,0 +1,1 @@
+import"./runtime-DcnGG2u7.js";var e=()=>`Plinky — esercizi di pianoforte nel browser`,t=((t={},n={})=>e(t));export{t};

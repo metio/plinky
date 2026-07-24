@@ -1,0 +1,1 @@
+import"./runtime-uiRhkd-I.js";var e=()=>`Codzienne`,t=((t={},n={})=>e(t)),n=()=>`Komponuj`,r=((e={},t={})=>n(e)),i=()=>`Ty`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

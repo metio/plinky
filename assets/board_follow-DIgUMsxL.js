@@ -1,0 +1,1 @@
+import"./runtime-D9oATj4f.js";var e=e=>`Прати на платформи ${e?.platform}`,t=((t,n={})=>e(t));export{t};

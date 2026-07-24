@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";var e=()=>`Päivä`,t=((t={},n={})=>e(t)),n=()=>`Sävellä`,r=((e={},t={})=>n(e)),i=()=>`Sinä`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

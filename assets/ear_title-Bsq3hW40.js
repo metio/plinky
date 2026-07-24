@@ -1,0 +1,1 @@
+import"./runtime-CvRQpQrf.js";var e=()=>`Тренування слуху`,t=((t={},n={})=>e(t));export{t};

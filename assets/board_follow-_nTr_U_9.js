@@ -1,0 +1,1 @@
+import"./runtime-DD8gfxju.js";var e=e=>`Prati na ${e?.platform}`,t=((t,n={})=>e(t));export{t};

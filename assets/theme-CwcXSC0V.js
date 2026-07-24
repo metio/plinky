@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";import{gt as e}from"./services-DUs42wmY.js";var t=()=>`データの取り扱いについて`,n=((e={},n={})=>t(e));function r(t){let n=typeof matchMedia==`function`&&matchMedia(`(prefers-color-scheme: dark)`).matches;document.documentElement.classList.toggle(`dark`,e(t,n)===`dark`)}export{n,r as t};

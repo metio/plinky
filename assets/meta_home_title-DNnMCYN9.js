@@ -1,0 +1,1 @@
+import"./runtime-BrAoCqaq.js";var e=()=>`Plinky——在浏览器中练习钢琴`,t=((t={},n={})=>e(t));export{t};

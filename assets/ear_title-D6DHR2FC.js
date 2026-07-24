@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Høretræning`,t=((t={},n={})=>e(t));export{t};

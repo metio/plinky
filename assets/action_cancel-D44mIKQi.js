@@ -1,0 +1,1 @@
+import"./runtime-JAD24awa.js";var e=()=>`Zrušiť`,t=((t={},n={})=>e(t));export{t};

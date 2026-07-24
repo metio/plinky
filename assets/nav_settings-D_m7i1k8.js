@@ -1,0 +1,1 @@
+import"./runtime-ChsbvrKE.js";var e=()=>`Setări`,t=((t={},n={})=>e(t));export{t};

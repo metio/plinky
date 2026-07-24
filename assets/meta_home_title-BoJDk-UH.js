@@ -1,0 +1,1 @@
+import"./runtime-BX4zqUpg.js";var e=()=>`Plinky — занятия на пианино в браузере`,t=((t={},n={})=>e(t));export{t};

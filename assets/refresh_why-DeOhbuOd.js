@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";var e=()=>`Kappaleet palaavat esiin laajenevalla aikataululla, jotta oppimasi todella jää mieleen.`,t=((t={},n={})=>e(t));export{t};

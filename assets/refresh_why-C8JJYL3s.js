@@ -1,0 +1,1 @@
+import"./runtime-DM3Hqd2K.js";var e=()=>`A darabok egyre táguló ütemezés szerint bukkannak fel újra, így amit megtanultál, tényleg megragad.`,t=((t={},n={})=>e(t));export{t};

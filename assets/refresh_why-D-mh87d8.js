@@ -1,0 +1,1 @@
+import"./runtime-DKeAe0au.js";var e=()=>`Les morceaux reviennent selon un rythme de plus en plus espacé, pour que ce que vous avez appris reste vraiment acquis.`,t=((t={},n={})=>e(t));export{t};

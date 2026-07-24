@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";var e=e=>`Seuraa palvelussa ${e?.platform}`,t=((t,n={})=>e(t));export{t};

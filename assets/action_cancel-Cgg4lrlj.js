@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`キャンセル`,t=((t={},n={})=>e(t));export{t};

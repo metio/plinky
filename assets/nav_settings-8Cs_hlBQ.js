@@ -1,0 +1,1 @@
+import"./runtime-uiRhkd-I.js";var e=()=>`Ustawienia`,t=((t={},n={})=>e(t));export{t};

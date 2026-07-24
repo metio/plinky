@@ -1,0 +1,1 @@
+import"./runtime-BzMHxmbB.js";var e=()=>`Parçalar giderek genişleyen bir programda yeniden karşına çıkar, böylece öğrendiklerin gerçekten kalıcı olur.`,t=((t={},n={})=>e(t));export{t};

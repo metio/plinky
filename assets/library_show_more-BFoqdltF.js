@@ -1,0 +1,1 @@
+import"./runtime-CCc3PWxx.js";var e=()=>`Mehr anzeigen`,t=((t={},n={})=>e(t));export{t};

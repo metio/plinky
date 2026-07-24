@@ -1,0 +1,1 @@
+import"./runtime-BrAoCqaq.js";var e=()=>`每日`,t=((t={},n={})=>e(t)),n=()=>`创作`,r=((e={},t={})=>n(e)),i=()=>`你`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

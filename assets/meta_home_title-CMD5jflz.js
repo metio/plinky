@@ -1,0 +1,1 @@
+import"./runtime-DYNqBaDv.js";var e=()=>`Plinky — 브라우저에서 하는 피아노 연습`,t=((t={},n={})=>e(t));export{t};

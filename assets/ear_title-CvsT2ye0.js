@@ -1,0 +1,1 @@
+import"./runtime-BX4zqUpg.js";var e=()=>`Тренировка слуха`,t=((t={},n={})=>e(t));export{t};

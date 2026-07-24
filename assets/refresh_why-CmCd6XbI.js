@@ -1,0 +1,1 @@
+import"./runtime-c-ySB708.js";var e=()=>`Skladby se vracejí podle rozšiřujícího se plánu, aby vám naučené skutečně zůstalo.`,t=((t={},n={})=>e(t));export{t};

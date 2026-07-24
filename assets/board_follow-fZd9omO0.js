@@ -1,0 +1,1 @@
+import"./runtime-DYNqBaDv.js";var e=e=>`${e?.platform}에서 팔로우`,t=((t,n={})=>e(t));export{t};

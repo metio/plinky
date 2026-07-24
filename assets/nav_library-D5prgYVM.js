@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";var e=()=>`Alku`,t=((t={},n={})=>e(t)),n=()=>`Kirjasto`,r=((e={},t={})=>n(e));export{t as n,r as t};

@@ -1,0 +1,1 @@
+import"./runtime-D0MKO8Wi.js";var e=()=>`Ο πίνακας`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-D9oATj4f.js";var e=()=>`Откажи`,t=((t={},n={})=>e(t));export{t};

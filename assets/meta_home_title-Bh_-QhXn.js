@@ -1,0 +1,1 @@
+import"./runtime-DKeAe0au.js";var e=()=>`Plinky — le piano dans votre navigateur`,t=((t={},n={})=>e(t));export{t};

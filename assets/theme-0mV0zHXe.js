@@ -1,0 +1,1 @@
+import"./runtime-D-GFp4mJ.js";import{gt as e}from"./services-DUs42wmY.js";var t=()=>`Miten tietojasi käsitellään`,n=((e={},n={})=>t(e));function r(t){let n=typeof matchMedia==`function`&&matchMedia(`(prefers-color-scheme: dark)`).matches;document.documentElement.classList.toggle(`dark`,e(t,n)===`dark`)}export{n,r as t};

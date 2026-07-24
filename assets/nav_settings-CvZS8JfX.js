@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Indstillinger`,t=((t={},n={})=>e(t));export{t};

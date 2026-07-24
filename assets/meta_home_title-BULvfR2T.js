@@ -1,0 +1,1 @@
+import"./runtime-CvRQpQrf.js";var e=()=>`Plinky — практика фортепіано у вашому браузері`,t=((t={},n={})=>e(t));export{t};

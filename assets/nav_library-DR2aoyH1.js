@@ -1,0 +1,1 @@
+import"./runtime-D9oATj4f.js";var e=()=>`Почетна`,t=((t={},n={})=>e(t)),n=()=>`Библиотека`,r=((e={},t={})=>n(e));export{t as n,r as t};

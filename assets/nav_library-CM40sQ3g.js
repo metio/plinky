@@ -1,0 +1,1 @@
+import"./runtime-D0MKO8Wi.js";var e=()=>`Αρχική`,t=((t={},n={})=>e(t)),n=()=>`Βιβλιοθήκη`,r=((e={},t={})=>n(e));export{t as n,r as t};

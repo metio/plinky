@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Kopierat!`,t=((t={},n={})=>e(t));export{t};

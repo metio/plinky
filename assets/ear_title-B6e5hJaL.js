@@ -1,0 +1,1 @@
+import"./runtime-BbkK0Fo4.js";var e=()=>`Stërvitje e veshit`,t=((t={},n={})=>e(t));export{t};

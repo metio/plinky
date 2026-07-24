@@ -1,0 +1,1 @@
+import"./runtime-ChsbvrKE.js";var e=()=>`Piesele reapar după un program tot mai rar, așa că ce ai învățat chiar rămâne.`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-uiRhkd-I.js";var e=()=>`Utwory wracają w coraz rzadszych odstępach, aby to, czego się nauczysz, naprawdę zostało.`,t=((t={},n={})=>e(t));export{t};

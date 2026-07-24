@@ -1,0 +1,1 @@
+import{a as e}from"./earLabels-CTaK71b4.js";function t(t){if(t.kind===`ear`){let n=e(t.id);if(!n)return`/ear`;let r=n.level??0;return`/ear?exercise=${n.exercise}&level=${r}`}return`/play/${t.id}`}export{t};

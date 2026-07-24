@@ -1,0 +1,1 @@
+import"./runtime-BbkK0Fo4.js";var e=()=>`Pjesët rishfaqen sipas një orari që zgjerohet, kështu që ajo që ke mësuar vërtet të ngulitet.`,t=((t={},n={})=>e(t));export{t};

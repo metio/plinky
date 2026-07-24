@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`曲は少しずつ間隔を広げて再登場するので、学んだことがしっかり定着します。`,t=((t={},n={})=>e(t));export{t};

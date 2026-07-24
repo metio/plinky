@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Stycken dyker upp igen med allt längre mellanrum, så att det du lärt dig verkligen fastnar.`,t=((t={},n={})=>e(t));export{t};

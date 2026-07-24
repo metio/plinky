@@ -1,0 +1,1 @@
+import"./runtime-BrAoCqaq.js";var e=e=>`在${e?.platform}上关注`,t=((t,n={})=>e(t));export{t};

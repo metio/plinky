@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`Plinky — ブラウザでピアノ練習`,t=((t={},n={})=>e(t));export{t};

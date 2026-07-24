@@ -1,0 +1,1 @@
+import"./runtime-CCc3PWxx.js";var e=e=>`Auf ${e?.platform} folgen`,t=((t,n={})=>e(t));export{t};

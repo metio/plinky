@@ -1,0 +1,1 @@
+import"./runtime-DD8gfxju.js";var e=()=>`Trening sluha`,t=((t={},n={})=>e(t));export{t};

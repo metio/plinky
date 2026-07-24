@@ -1,0 +1,1 @@
+import"./runtime-c-ySB708.js";var e=()=>`Nástěnka`,t=((t={},n={})=>e(t));export{t};

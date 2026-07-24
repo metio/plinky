@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`コピーしました！`,t=((t={},n={})=>e(t));export{t};

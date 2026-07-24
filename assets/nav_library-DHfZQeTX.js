@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Start`,t=((t={},n={})=>e(t)),n=()=>`Bibliotek`,r=((e={},t={})=>n(e));export{t as n,r as t};

@@ -1,0 +1,1 @@
+import"./runtime-DcnGG2u7.js";var e=()=>`Giornaliera`,t=((t={},n={})=>e(t)),n=()=>`Componi`,r=((e={},t={})=>n(e)),i=()=>`Tu`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

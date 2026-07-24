@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Avfärda`,t=((t={},n={})=>e(t));export{t};

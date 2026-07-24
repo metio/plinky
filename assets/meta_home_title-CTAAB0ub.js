@@ -1,0 +1,1 @@
+import"./runtime-XWpZIenf.js";var e=()=>`Plinky — piano practice in your browser`,t=((t={},n={})=>e(t));export{t};

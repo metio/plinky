@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Vis mere`,t=((t={},n={})=>e(t));export{t};

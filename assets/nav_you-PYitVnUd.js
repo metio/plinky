@@ -1,0 +1,1 @@
+import"./runtime-c-ySB708.js";var e=()=>`Denně`,t=((t={},n={})=>e(t)),n=()=>`Kompozice`,r=((e={},t={})=>n(e)),i=()=>`Vy`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

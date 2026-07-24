@@ -1,0 +1,1 @@
+import"./runtime-XWpZIenf.js";var e=e=>`Follow on ${e?.platform}`,t=((t,n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-CvRQpQrf.js";var e=()=>`Головна`,t=((t={},n={})=>e(t)),n=()=>`Бібліотека`,r=((e={},t={})=>n(e));export{t as n,r as t};

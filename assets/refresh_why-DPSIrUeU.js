@@ -1,0 +1,1 @@
+import"./runtime-DKthTE1s.js";var e=()=>`Stykker dukker op igen med voksende mellemrum, så det, du har lært, faktisk sætter sig fast.`,t=((t={},n={})=>e(t));export{t};

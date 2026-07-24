@@ -1,0 +1,1 @@
+import"./runtime-BzMHxmbB.js";var e=()=>`Plinky — tarayıcında piyano çalışması`,t=((t={},n={})=>e(t));export{t};

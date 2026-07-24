@@ -1,0 +1,1 @@
+import"./runtime-DYNqBaDv.js";var e=()=>`복사됨!`,t=((t={},n={})=>e(t));export{t};

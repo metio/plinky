@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`設定`,t=((t={},n={})=>e(t));export{t};

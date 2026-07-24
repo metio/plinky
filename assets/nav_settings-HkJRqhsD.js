@@ -1,0 +1,1 @@
+import"./runtime-BJIDDpBV.js";var e=()=>`Inställningar`,t=((t={},n={})=>e(t));export{t};

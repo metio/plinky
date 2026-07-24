@@ -1,0 +1,1 @@
+import"./runtime-D8obLm44.js";var e=()=>`Start`,t=((t={},n={})=>e(t)),n=()=>`Bibliotek`,r=((e={},t={})=>n(e));export{t as n,r as t};

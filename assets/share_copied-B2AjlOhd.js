@@ -1,0 +1,1 @@
+import"./runtime-DM3Hqd2K.js";var e=()=>`Másolva!`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BzMHxmbB.js";var e=()=>`Günlük`,t=((t={},n={})=>e(t)),n=()=>`Beste`,r=((e={},t={})=>n(e)),i=()=>`Sen`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

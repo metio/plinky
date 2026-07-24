@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`閉じる`,t=((t={},n={})=>e(t));export{t};

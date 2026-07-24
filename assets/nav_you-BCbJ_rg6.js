@@ -1,0 +1,1 @@
+import"./runtime-DKeAe0au.js";var e=()=>`Défi`,t=((t={},n={})=>e(t)),n=()=>`Composer`,r=((e={},t={})=>n(e)),i=()=>`Vous`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

@@ -1,0 +1,1 @@
+import"./runtime-uiRhkd-I.js";var e=e=>`Obserwuj na ${e?.platform}`,t=((t,n={})=>e(t));export{t};

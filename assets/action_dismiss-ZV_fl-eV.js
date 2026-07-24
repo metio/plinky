@@ -1,0 +1,1 @@
+import"./runtime-BzMHxmbB.js";var e=()=>`Kapat`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-3-65kTcI.js";var e=()=>`Cancelar`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-XWpZIenf.js";var e=()=>`Ear training`,t=((t={},n={})=>e(t));export{t};

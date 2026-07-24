@@ -1,0 +1,1 @@
+import"./runtime-D9oATj4f.js";var e=()=>`Прикажи још`,t=((t={},n={})=>e(t));export{t};

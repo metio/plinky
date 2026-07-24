@@ -1,0 +1,1 @@
+import"./runtime-BTwOe4oz.js";var e=()=>`ホーム`,t=((t={},n={})=>e(t)),n=()=>`ライブラリ`,r=((e={},t={})=>n(e));export{t as n,r as t};

@@ -1,0 +1,1 @@
+import"./runtime-DeoVMqMM.js";var e=()=>`Plinky — práctica de piano en tu navegador`,t=((t={},n={})=>e(t));export{t};

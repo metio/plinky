@@ -1,0 +1,1 @@
+import"./runtime-CCc3PWxx.js";var e=()=>`Die Pinnwand`,t=((t={},n={})=>e(t));export{t};
