@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup } from "@testing-library/react";
+import { cleanup, fireEvent, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { DEFAULT_PREFS } from "../../../core/prefs";
@@ -14,9 +15,10 @@ import { AnalyticsTracking } from "./analyticsTracking";
 
 afterEach(cleanup);
 
-const at = (path: string) => (
+const at = (path: string, ui: ReactNode = null) => (
     <MemoryRouter initialEntries={[path]}>
         <AnalyticsTracking />
+        {ui}
     </MemoryRouter>
 );
 
@@ -43,5 +45,40 @@ describe("AnalyticsTracking", () => {
             event: "setting_changed",
             params: { setting: "colorNotes", value: !DEFAULT_PREFS.colorNotes },
         });
+    });
+
+    it("sends a click event for a pressed control, named and attributed to the page", () => {
+        const analytics = fakeAnalytics();
+        renderWithServices(
+            at(
+                "/en/library",
+                <button type="button" aria-label="Save take">
+                    Save
+                </button>,
+            ),
+            { analytics },
+        );
+        fireEvent.click(screen.getByRole("button", { name: "Save take" }));
+        expect(analytics.events()).toContainEqual({
+            event: "click",
+            params: { label: "Save take", control: "button", page_path: "/library" },
+        });
+    });
+
+    it("ignores clicks inside the on-screen keyboard — the instrument, not UI", () => {
+        const analytics = fakeAnalytics();
+        renderWithServices(
+            at(
+                "/en/play",
+                <div data-analytics-skip="">
+                    <button type="button" aria-label="C 4">
+                        key
+                    </button>
+                </div>,
+            ),
+            { analytics },
+        );
+        fireEvent.click(screen.getByRole("button", { name: "C 4" }));
+        expect(analytics.events().some((event) => event.event === "click")).toBe(false);
     });
 });
