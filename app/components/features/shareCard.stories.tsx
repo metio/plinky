@@ -29,6 +29,7 @@ type Story = StoryObj<typeof ShareCard>;
 
 export const StrongRun: Story = {
     args: {
+        context: "story",
         grid: STRONG,
         caption: "How the run went, moment by moment",
         gridLabel: "Run share grid",
@@ -40,6 +41,7 @@ export const StrongRun: Story = {
 
 export const MixedRun: Story = {
     args: {
+        context: "story",
         grid: MIXED,
         caption: "How the run went, moment by moment",
         gridLabel: "Run share grid",

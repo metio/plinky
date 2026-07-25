@@ -10,9 +10,13 @@ import { m } from "../../paraglide/messages.js";
 // straight away (`alreadyOpen`), and reduced motion skips the animation.
 export function DailyReveal({
     alreadyOpen,
+    onOpen,
     children,
 }: {
     alreadyOpen: boolean;
+    // Called when the present is opened here. The day it belongs to lives on the page,
+    // not in the present, so the caller reports the moment with the day in hand.
+    onOpen?: () => void;
     children: ReactNode;
 }) {
     const [opened, setOpened] = useState(false);
@@ -28,7 +32,10 @@ export function DailyReveal({
     return (
         <button
             type="button"
-            onClick={() => setOpened(true)}
+            onClick={() => {
+                setOpened(true);
+                onOpen?.();
+            }}
             className="flex w-full flex-col items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50/50 px-6 py-12 text-center transition hover:border-indigo-300 hover:shadow-md dark:border-indigo-900 dark:bg-indigo-950/30 dark:hover:border-indigo-700"
         >
             <span aria-hidden="true" className="animate-bounce text-5xl motion-reduce:animate-none">

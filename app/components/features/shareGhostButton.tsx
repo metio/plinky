@@ -3,6 +3,7 @@
 
 import { encodeGhost } from "../../../core/ghost";
 import { SITE_URL } from "../../../core/site";
+import { useAnalytics } from "../../contexts/services";
 import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
 import { localizeHref } from "../../paraglide/runtime.js";
@@ -37,17 +38,21 @@ export function ShareGhostButton({
 }) {
     // Briefly confirm a clipboard copy on the surface where no native share sheet ran.
     const [copied, flashCopied] = useCopied();
+    const analytics = useAnalytics();
     const share = async () => {
         const url = `${SITE_URL}${localizeHref(`/play/${id}`)}?ghost=${encodeGhost(onsets)}`;
         try {
             if (typeof navigator.share === "function") {
                 await navigator.share({ url, text: m.ghost_share_boast({ title }) });
+                analytics.track("share", { context: "ghost", channel: "share_sheet" });
             } else {
                 await navigator.clipboard?.writeText(url);
+                analytics.track("share", { context: "ghost", channel: "copy" });
                 flashCopied();
             }
         } catch {
-            // A cancelled share or a blocked clipboard needs no message.
+            // A cancelled share or a blocked clipboard needs no message — and reports
+            // nothing either, so only a landed share counts.
         }
     };
     const copiedNote = copied && (

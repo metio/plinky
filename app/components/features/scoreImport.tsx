@@ -7,7 +7,13 @@ import { gradeOf } from "../../../core/scoreDifficulty";
 import { readScoreMeta } from "../../../core/scoreMeta";
 import { songId } from "../../../core/songId";
 import type { XmlCodec } from "../../../core/xml";
-import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../../contexts/services";
+import {
+    useAnalytics,
+    useOnboardingStore,
+    useSongSource,
+    useStore,
+    useXmlCodec,
+} from "../../contexts/services";
 import { loadCatalog, type Score, saveUserScore } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { Button, buttonClasses } from "../ui/button";
@@ -44,6 +50,7 @@ const FIELD = `w-full ${fieldClasses}`;
 export function ScoreImport() {
     const store = useStore();
     const onboarding = useOnboardingStore();
+    const analytics = useAnalytics();
     const xmlCodec = useXmlCodec();
     const songs = useSongSource();
     const [draft, setDraft] = useState<Draft | null>(null);
@@ -61,10 +68,12 @@ export function ScoreImport() {
         }
         const xml = await readScoreFile(file);
         if (xml === null) {
+            analytics.track("score_import", { success: false, reason: "unreadable" });
             setError(m.import_read_error());
             return;
         }
         if (!looksPlayable(xmlCodec, xml)) {
+            analytics.track("score_import", { success: false, reason: "no_notes" });
             setError(m.import_no_notes());
             return;
         }
@@ -115,9 +124,19 @@ export function ScoreImport() {
             bundled: false,
         };
         if (!saveUserScore(store, score)) {
+            analytics.track("score_import", { success: false, reason: "save_failed" });
             setError(m.import_save_failed());
             return;
         }
+        // A landed import: the piece's shape, never its title or composer — those are the
+        // player's own words on a score they brought.
+        analytics.track("score_import", {
+            success: true,
+            grade: draft.grade,
+            tempo: score.tempo,
+            beats_per_bar: draft.beatsPerBar,
+            duplicate,
+        });
         onboarding.markDiscovered("imported");
         setDraft(null);
         setSavedId(score.id);

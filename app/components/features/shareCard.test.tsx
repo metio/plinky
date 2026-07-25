@@ -18,6 +18,7 @@ const GRID: Grid = [
 function renderCard() {
     return render(
         <ShareCard
+            context="test"
             grid={GRID}
             caption="Share your run"
             gridLabel="grid"

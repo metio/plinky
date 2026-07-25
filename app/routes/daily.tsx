@@ -8,7 +8,7 @@ import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
-import { useDailyStore } from "../contexts/services";
+import { useAnalytics, useDailyStore } from "../contexts/services";
 import { generatePhrase } from "../../core/generator";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -39,6 +39,7 @@ const WARMUP = { bars: 8, beatsPerBar: 4 };
 export default function DailyRoute() {
     const daily = useDailyStore();
     const [today, setToday] = useState<Today | null>(null);
+    const analytics = useAnalytics();
     const [mode, setMode] = useState<"challenge" | "warmup">("challenge");
 
     // Warm-up (the old sprint): a fresh generated phrase each run; bumping the
@@ -107,7 +108,15 @@ export default function DailyRoute() {
                 today && (
                     // The unplayed daily arrives as a present to open; a finished
                     // one shows its result without ceremony.
-                    <DailyReveal alreadyOpen={today.result !== null}>
+                    <DailyReveal
+                        alreadyOpen={today.result !== null}
+                        onOpen={() =>
+                            analytics.track("daily_opened", {
+                                day: today.number,
+                                tempo: today.tempo,
+                            })
+                        }
+                    >
                         <ScoreViewer
                             key={today.number}
                             id={`daily-${today.number}`}

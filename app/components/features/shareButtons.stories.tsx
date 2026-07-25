@@ -20,6 +20,7 @@ const boast = "Plinky 42 A";
 
 export const Default: Story = {
     args: {
+        context: "story",
         text: shareText(boast, grid),
         imageSvg: svgCard(grid, boast),
         imageText: boast,

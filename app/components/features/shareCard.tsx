@@ -25,6 +25,7 @@ export function ShareCard({
     rowLabels,
     boast,
     heading,
+    context,
 }: {
     grid: Grid;
     caption: string;
@@ -35,6 +36,8 @@ export function ShareCard({
     rowLabels: string[];
     boast: string;
     heading: string;
+    // What this card is about, for the share analytics event.
+    context: string;
 }) {
     return (
         <figure className="space-y-2">
@@ -58,6 +61,7 @@ export function ShareCard({
                 ))}
             </div>
             <ShareButtons
+                context={context}
                 text={shareText(boast, grid)}
                 imageSvg={svgCard(grid, heading)}
                 imageText={boast}

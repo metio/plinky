@@ -112,6 +112,7 @@ export function RunResult({
             )}
             {grid && (
                 <ShareCard
+                    context="run"
                     grid={grid}
                     caption={m.share_heading()}
                     gridLabel={m.share_grid_label()}

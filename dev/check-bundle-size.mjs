@@ -132,7 +132,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // analytics event layer (the track() surface, core/analyticsPrefs, the AnalyticsTracking
 // page-view / setting-change watcher, plus run and video-export events) — net of removing
 // the full-screen setup sheet — tip the total to a measured 593.3. 594.
-const BUDGET_TOTAL_KB = 594;
+//
+// The analytics funnel events (the delegated click tracker with its clickInfo naming, plus
+// song/import/share/daily/review/compose/MIDI/milestone/keep-up events at their choke
+// points) — tip the per-visitor total to a measured 594.5. 595.
+const BUDGET_TOTAL_KB = 595;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -248,7 +252,10 @@ const BUDGET_TOTAL_KB = 594;
 // The play run-setup regroup and the analytics event layer (track() through the gtag
 // adapter, core/analyticsPrefs, the AnalyticsTracking watcher, and the run / video-export
 // events) — net of dropping the full-screen setup sheet — measured at 283.2. 284.
-const BUDGET_APP_KB = 284;
+//
+// The analytics funnel events (the delegated click tracker, and the song/import/share/
+// daily/review/compose/MIDI/milestone/keep-up events) — measured at 284.4. 285.
+const BUDGET_APP_KB = 285;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

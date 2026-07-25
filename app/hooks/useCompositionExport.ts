@@ -9,24 +9,37 @@ import {
     toMusicXml,
 } from "../../core/composition";
 import { buildMidiFile } from "../../core/midiFile";
+import { useAnalytics } from "../contexts/services";
 import { downloadBlob } from "../lib/download";
 import { fileStem } from "../lib/printScore";
 import { localizeHref } from "../paraglide/runtime.js";
 import { useCopied } from "./useCopied";
 
 // The three ways a take leaves the page: a share link on the clipboard (with the
-// transient "copied" flash), a Standard MIDI File, and MusicXML.
+// transient "copied" flash), a Standard MIDI File, and MusicXML. Each reports a
+// compose_export naming the format and the take's shape — instrumented here, at the
+// one hook all three buttons drive, so the export bar stays presentational.
 export function useCompositionExport(composition: Composition, title: string) {
     const [copied, flashCopied] = useCopied();
+    const analytics = useAnalytics();
 
     const share = useCallback(() => {
         const code = encodeComposition(composition);
         const url = `${window.location.origin}${localizeHref("/compose")}?c=${code}`;
         navigator.clipboard
             ?.writeText(url)
-            .then(() => flashCopied())
+            // Only a landed clipboard write counts as a share.
+            .then(() => {
+                analytics.track("compose_export", {
+                    format: "link",
+                    notes: composition.notes.length,
+                    tempo: composition.tempo,
+                    beats_per_bar: composition.beatsPerBar,
+                });
+                flashCopied();
+            })
             .catch(() => {});
-    }, [composition, flashCopied]);
+    }, [composition, flashCopied, analytics]);
 
     const downloadMidi = useCallback(() => {
         const data = buildMidiFile(toMidiNotes(composition), {
@@ -34,12 +47,24 @@ export function useCompositionExport(composition: Composition, title: string) {
             beatsPerBar: composition.beatsPerBar,
         });
         downloadBlob(data, "audio/midi", `${fileStem(title)}.mid`);
-    }, [composition, title]);
+        analytics.track("compose_export", {
+            format: "midi",
+            notes: composition.notes.length,
+            tempo: composition.tempo,
+            beats_per_bar: composition.beatsPerBar,
+        });
+    }, [composition, title, analytics]);
 
     const downloadMusicXml = useCallback(() => {
         const xml = toMusicXml(composition, { title });
         downloadBlob(xml, "application/vnd.recordare.musicxml+xml", `${fileStem(title)}.musicxml`);
-    }, [composition, title]);
+        analytics.track("compose_export", {
+            format: "musicxml",
+            notes: composition.notes.length,
+            tempo: composition.tempo,
+            beats_per_bar: composition.beatsPerBar,
+        });
+    }, [composition, title, analytics]);
 
     return { copied: copied !== null, share, downloadMidi, downloadMusicXml };
 }
