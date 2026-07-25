@@ -12,6 +12,13 @@ import { deLocalizeHref, getLocale } from "../../paraglide/runtime.js";
 // ARIA widgets the app builds from divs (switches, tabs) and a disclosure summary.
 const ACTIONABLE = "button, a[href], [role='button'], [role='switch'], [role='tab'], summary";
 
+// A switch is built from a <button>, so it has to be excluded by role rather than left
+// out of the selector above. Flipping one already reports the change itself — with the
+// value, which a click can't carry — so counting the press too would double every
+// toggle. The session-only toggles that never reach the preferences store are carried
+// by the run events instead, so nothing goes unreported.
+const isToggle = (el: Element): boolean => el.getAttribute("role") === "switch";
+
 // Sends anonymous usage analytics — a page view per navigation, a setting_changed event
 // per preference write, and a click event for every button/link/toggle press. Renders
 // nothing, like AnalyticsConsent; it lives at the composition root so one place feeds the
@@ -45,7 +52,7 @@ export function AnalyticsTracking() {
                 return;
             }
             const el = start.closest(ACTIONABLE);
-            if (!el || el.closest("[data-analytics-skip]")) {
+            if (!el || isToggle(el) || el.closest("[data-analytics-skip]")) {
                 return;
             }
             const info = clickInfo({

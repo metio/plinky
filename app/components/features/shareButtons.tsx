@@ -104,7 +104,9 @@ export function ShareButtons({
     }, []);
 
     return (
-        <div className="flex flex-wrap items-center gap-2">
+        // Every control here sends its own `share` event naming the channel, so the
+        // delegated click tracker skips the whole row rather than counting each press twice.
+        <div className="flex flex-wrap items-center gap-2" data-analytics-skip="">
             <button
                 type="button"
                 onClick={() => {

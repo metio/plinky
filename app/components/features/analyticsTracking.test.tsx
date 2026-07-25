@@ -65,6 +65,36 @@ describe("AnalyticsTracking", () => {
         });
     });
 
+    it("ignores a switch — flipping one reports the change, with its value, on its own", () => {
+        const analytics = fakeAnalytics();
+        renderWithServices(
+            at(
+                "/en/settings",
+                <button type="button" role="switch" aria-checked="false">
+                    Colour the notes
+                </button>,
+            ),
+            { analytics },
+        );
+        fireEvent.click(screen.getByRole("switch", { name: "Colour the notes" }));
+        expect(analytics.events().some((event) => event.event === "click")).toBe(false);
+    });
+
+    it("ignores a control that opts out, so a typed event isn't counted twice", () => {
+        const analytics = fakeAnalytics();
+        renderWithServices(
+            at(
+                "/en/you",
+                <div data-analytics-skip="">
+                    <button type="button">Copy</button>
+                </div>,
+            ),
+            { analytics },
+        );
+        fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+        expect(analytics.events().some((event) => event.event === "click")).toBe(false);
+    });
+
     it("ignores clicks inside the on-screen keyboard — the instrument, not UI", () => {
         const analytics = fakeAnalytics();
         renderWithServices(

@@ -1024,6 +1024,12 @@ function usePlaySessionValue({
             hidden: hiddenNotes,
             forgiving,
             loop: loop.on,
+            // The session-only view toggles. They never reach the preferences store, so
+            // no setting_changed reports them; carrying them here records how the run was
+            // actually set up, which is what the toggle was a proxy for anyway.
+            fingerings: reading.showFingerings,
+            follow: reading.scrollFollow,
+            trainer: trainerOn,
         });
     };
 
