@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useLocation } from "react-router";
 import { clickInfo } from "../../../core/analyticsClick";
 import { prefChanges } from "../../../core/analyticsPrefs";
-import { useAnalytics, usePrefsStore } from "../../contexts/services";
+import { useAnalytics, useOnboardingStore, usePrefsStore } from "../../contexts/services";
 import { deLocalizeHref, getLocale } from "../../paraglide/runtime.js";
 
 // The controls a click counts as a "button press": real buttons and links, plus the
@@ -21,6 +21,7 @@ const ACTIONABLE = "button, a[href], [role='button'], [role='switch'], [role='ta
 export function AnalyticsTracking() {
     const analytics = useAnalytics();
     const store = usePrefsStore();
+    const onboarding = useOnboardingStore();
     const { pathname } = useLocation();
     // The live page, read by the click listener (a stable listener, not re-bound per
     // navigation) so each click is attributed to the page it happened on.
@@ -84,6 +85,23 @@ export function AnalyticsTracking() {
             previous = next;
         });
     }, [analytics, store]);
+
+    // A discovery_marked event per getting-started step reached. The store is the single
+    // choke point every markDiscovered call funnels through, and it already de-dupes, so
+    // each step reports once ever — no matter which of the eight surfaces marked it.
+    // Diffing its set the same way settings diff theirs keeps a rehydrated set silent.
+    useEffect(() => {
+        let previous = onboarding.marked();
+        return onboarding.subscribe(() => {
+            const next = onboarding.marked();
+            for (const step of next) {
+                if (!previous.has(step)) {
+                    analytics.track("discovery_marked", { step });
+                }
+            }
+            previous = next;
+        });
+    }, [analytics, onboarding]);
 
     return null;
 }

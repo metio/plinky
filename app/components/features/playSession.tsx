@@ -353,6 +353,25 @@ function usePlaySessionValue({
         setKeyRange(songKeyRange(collectSteps(osmd, "both").flat()));
     }, [ready, xml, transpose, staffCount, getOsmd]);
 
+    // A song_opened event per piece put on the stand. This session is the single funnel
+    // every surface loads a piece through — the play route, the daily challenge, a review
+    // step, a warm-up — so one effect here covers them all. It waits for `ready` so the
+    // staff count is the engraved truth, and keys on the content id, so moving to another
+    // piece reports again while a re-render never does. Only the piece's shape travels:
+    // an imported score's title is the player's own.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: id is the piece-change trigger; grade/staffCount are read at that moment
+    useEffect(() => {
+        if (!ready) {
+            return;
+        }
+        analytics.track("song_opened", {
+            grade,
+            daily: daily !== undefined,
+            ephemeral: ephemeral === true,
+            two_hands: staffCount >= 2,
+        });
+    }, [analytics, ready, id]);
+
     // The cursor's current position in whole notes — the shared place Listen and Practice
     // hand off at, so switching between them (or leaving and re-entering the play surface)
     // continues here rather than rewinding.
@@ -369,6 +388,26 @@ function usePlaySessionValue({
         markPainted,
         onFinish: exitFullscreen,
     });
+
+    // The finish half of the keep-up funnel, mirroring the self-paced run_completed that
+    // the completion effect sends. A result appears only when a run reached the end — an
+    // early stop scores nothing and clears it — so the transition to non-null IS the
+    // completion, and the run's own settings are reported the way run_started reported them.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: the result's arrival is the event; the run's settings are read at that moment
+    useEffect(() => {
+        if (!keepUp.result) {
+            return;
+        }
+        analytics.track("run_completed", {
+            mode: "keep_up",
+            grade: keepUp.result.letter,
+            in_time: keepUp.result.inTime,
+            total: keepUp.result.total,
+            hand: staffCount < 2 ? "both" : hand,
+            guide: guideNotes,
+            daily: daily !== undefined,
+        });
+    }, [analytics, keepUp.result]);
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's own pace
     // when adaptive. Keep-up mode always ticks (a count-in then the beat you're racing),

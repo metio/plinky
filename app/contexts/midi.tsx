@@ -33,7 +33,7 @@ import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
 import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
-import { useServices } from "./services";
+import { useAnalytics, useServices } from "./services";
 import { resetDevice } from "../lib/resetDevice";
 
 export type NoteListener = {
@@ -113,6 +113,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // (a fake MIDI in tests) reach it too.
     const { midi, store, pitch, audio } = useServices();
     const prefsStore = usePrefsStore();
+    const analytics = useAnalytics();
     const [support, setSupport] = useState<MidiSupport>("unknown");
     const [status, setStatus] = useState<MidiStatus>("idle");
     const [error, setError] = useState<string | null>(null);
@@ -640,6 +641,22 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             connectionRef.current?.close();
         };
     }, []);
+
+    // Anonymous usage analytics for the one MIDI transition worth counting: a piano
+    // becoming available. A read-only watcher over the derived state — it never touches
+    // the access request, the device diff, or the note path — and it latches, so a device
+    // list that changes mid-session reports once. A returning player whose permission is
+    // already granted reconnects silently on load, so this counts sessions that have a
+    // piano rather than first-time setups. Only the device COUNT is sent: a device's name
+    // and manufacturer identify hardware, so they never leave the app.
+    const midiReported = useRef(false);
+    useEffect(() => {
+        if (status !== "ready" || devices.length === 0 || midiReported.current) {
+            return;
+        }
+        midiReported.current = true;
+        analytics.track("midi_connected", { devices: devices.length, support });
+    }, [analytics, status, devices, support]);
 
     const value: MidiContextValue = {
         support,
