@@ -15,7 +15,7 @@ jobs:
     # Its `detect` job enables each gate from this repo's package.json scripts.
     # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
     name: Frontend
-    uses: metio/ci/.github/workflows/frontend.yml@499bb7663dcf22bc15263bc6b35078fe86916da7 # 2026.7.28205258
+    uses: metio/ci/.github/workflows/frontend.yml@7b2e803d80b49a8cc03fd38bfde7466f2fd7a366 # 2026.7.28213002
     with:
       # Node returns DNS records verbatim, so a bare `localhost` can resolve to
       # ::1 first — the prerender's internal server and its own fetch would then
@@ -35,6 +35,10 @@ jobs:
       # three. The accessibility category is left out because axe already gates
       # a11y in light and dark, where Lighthouse only ever sees light.
       build-command: ci-build
+      # `npm run coverage` runs the same vitest projects `npm test` does, plus
+      # instrumentation, so the build job need not run the suite a second time —
+      # a node-test failure still fails CI, through coverage.
+      tests-in-coverage: true
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
