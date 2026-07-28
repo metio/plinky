@@ -32,6 +32,8 @@ export function ScoreCanvas() {
         setNoteHints,
         reading,
         keyRange,
+        aids,
+        sightRead,
     } = usePlaySession();
     const prefsStore = usePrefsStore();
     const noteLabels = useNoteLabels();
@@ -39,7 +41,7 @@ export function ScoreCanvas() {
     // OSMD stays mounted and rendered underneath (the matcher walks its cursor), so the
     // staff is hidden, not unmounted. Only while a run is on: at rest the score shows so
     // the piece can be read, looped and set up.
-    const highwayActive = reading.highway && matcher.practicing;
+    const highwayActive = aids.highway && matcher.practicing;
     // The score slot's size: full screen hands it the spare height (flex-1); a phone gets
     // a fixed slice so the keys still fit; otherwise a tall band that scrolls if taller.
     // The highway takes this same slot so it stands exactly where the staff did.
@@ -95,13 +97,26 @@ export function ScoreCanvas() {
                     floating
                     hidden={hideKeyboard}
                     onToggleHidden={() => setHideKeyboard((on) => !on)}
-                    noteLabels={noteLabels}
+                    noteLabels={aids.noteLabels}
                     onNoteLabels={(value) =>
                         prefsStore.save({ ...prefsStore.load(), noteLabels: value })
                     }
-                    noteHints={noteHints}
+                    noteHints={aids.noteHints}
                     onNoteHints={setNoteHints}
                 />
+            )}
+            {/* The study countdown: the score is up and the run has not begun, so the
+            piece can be taken in — key, metre, shape — before the first note. Announced
+            politely so a screen reader hears the time left without the run being
+            interrupted on every tick. */}
+            {sightRead.countdown !== null && (
+                <p
+                    role="status"
+                    aria-live="polite"
+                    className="rounded-lg bg-indigo-50 px-3 py-2 text-center text-sm font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                >
+                    {m.sight_read_studying({ seconds: sightRead.countdown })}
+                </p>
             )}
             {/* Click a bar to build the loop range; the loop from/to number inputs
             are the keyboard-accessible equivalent, so no key handler is needed. */}

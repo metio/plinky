@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useState } from "react";
+import type { NoteLabels } from "../../../core/prefs";
 import { useMidiConnection } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
@@ -18,6 +19,7 @@ export function PianoKeyboard({
     from = 60,
     to = 84,
     well,
+    labels: labelsOverride,
 }: {
     expected?: number[];
     wrong?: { note: number; seq: number } | null;
@@ -29,9 +31,14 @@ export function PianoKeyboard({
     // centred, capped instrument; full screen passes a full-width well so the
     // keys use the whole page.
     well?: string;
+    // Override the saved key labels for this keybed. A sight-read run passes "off"
+    // so the run reads without them while the player's own setting stands for
+    // everything else.
+    labels?: NoteLabels;
 }) {
     const { heldNotes, pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
-    const labels = useNoteLabels();
+    const savedLabels = useNoteLabels();
+    const labels = labelsOverride ?? savedLabels;
     const theme = useKeyboardTheme();
 
     // Reflect the sustain pedal on the keybed. The held-pedal set lives in a ref (no

@@ -38,6 +38,7 @@ export function PlayStage() {
         staffCount,
         containerRef,
         score,
+        aids,
     } = usePlaySession();
 
     // A stable handle to the rendered score SVG, so the strip's heat effect only
@@ -118,6 +119,9 @@ export function PlayStage() {
                         {/* The notes-highway reading mode shows a tall highway over the
                         staff (see ScoreCanvas); here the keys just play as always. */}
                         <PianoKeyboard
+                            // A sight-read strips the key names for the run; every
+                            // other mode passes the player's own setting through.
+                            labels={aids.noteLabels}
                             expected={hintNotes}
                             wrong={matcher.lastWrong}
                             holds={holdFractions}

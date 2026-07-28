@@ -36,6 +36,7 @@ export function PlayTransport() {
         tempo,
         setTempo,
         lockTempo,
+        sightRead,
     } = usePlaySession();
 
     // Listen lives only in the full-screen top bar. Playing enters full screen on every
@@ -61,14 +62,20 @@ export function PlayTransport() {
     // Practice is the screen's primary action, so it carries the dominant filled variant.
     // It enters full screen first, then starts the run; with "keep up" on it starts a
     // tempo-locked play-along instead of the self-paced run.
-    const practiceRunning = matcher.practicing || keepUp.running;
+    // A sight-read's study countdown is part of the run: the piece is up, the clock is
+    // going, and the only thing the player can want from this button is out. So it reads
+    // as running and cancels, rather than offering to start a run that is already coming.
+    const studying = sightRead.countdown !== null;
+    const practiceRunning = matcher.practicing || keepUp.running || studying;
     const practiceButton = (
         <Button
             variant="primary"
             disabled={!ready}
             aria-pressed={practiceRunning}
             onClick={() => {
-                if (matcher.practicing) {
+                if (studying) {
+                    sightRead.cancel();
+                } else if (matcher.practicing) {
                     matcher.stop();
                 } else if (keepUp.running) {
                     keepUp.stop();

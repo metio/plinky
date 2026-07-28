@@ -32,6 +32,7 @@ import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSou
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
 import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
+import { createSightReadStore, type SightReadStore } from "../stores/sightReadStore";
 import { createThemeStore, type ThemeStore } from "../stores/themeStore";
 import { createFavoritesStore, type FavoritesStore } from "../stores/favoritesStore";
 import { createFingeringStore, type FingeringStore } from "../stores/fingeringStore";
@@ -68,6 +69,7 @@ export type AppServices = {
     milestones: MilestonesStore;
     lifetime: LifetimeStore;
     ghosts: GhostStore;
+    sightReads: SightReadStore;
     takes: TakesStore;
     fingering: FingeringStore;
     assignments: AssignmentsStore;
@@ -138,6 +140,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         milestones: overrides.milestones ?? createMilestonesStore(store),
         lifetime: overrides.lifetime ?? createLifetimeStore(store),
         ghosts: overrides.ghosts ?? createGhostStore(store),
+        sightReads: overrides.sightReads ?? createSightReadStore(store),
         takes: overrides.takes ?? createTakesStore(store),
         fingering: overrides.fingering ?? createFingeringStore(store),
         assignments: overrides.assignments ?? createAssignmentsStore(store),
@@ -177,6 +180,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     milestones: true,
     lifetime: true,
     ghosts: true,
+    sightReads: true,
     takes: true,
     fingering: true,
     assignments: true,

@@ -61,6 +61,9 @@ import {
     useScoreMatcher,
 } from "../../hooks/useScoreMatcher";
 import { useHiddenNotes } from "../../hooks/useHiddenNotes";
+import { useNoteLabels } from "../../hooks/useNoteLabels";
+import { useSightRead } from "../../hooks/useSightRead";
+import { useVanishingBars } from "../../hooks/useVanishingBars";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
@@ -138,6 +141,9 @@ function usePlaySessionValue({
     // runResult a render later, so the save (which can run in the same commit) reads it here
     // instead of the not-yet-updated runResult.grade.
     const finishedGradeRef = useRef<Grade | null>(null);
+    // Claims the current attempt to start a run: a sight-read's study countdown lets
+    // the player act again before the run begins, and only the newest press may start.
+    const practiceSeqRef = useRef(0);
     // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
     // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
     // callback and the MIDI release handler both advance it between renders.
@@ -193,6 +199,14 @@ function usePlaySessionValue({
     // This score's saved takes, live over the store; how the finished run's save
     // went lives with the run result.
     const takesList = useTakes(services.takes, id);
+    // This piece's first cold read, if it has ever had one. Subscribed rather than
+    // read once, so a run that records one updates the panel without a re-mount; the
+    // keyed store caches by stored string, so the snapshot is stable between writes.
+    const sightReadRecord = useSyncExternalStore(
+        services.sightReads.subscribe,
+        () => services.sightReads.load(id),
+        () => null,
+    );
     // The fingering the player worked out for this piece (Fingering mode). When they
     // have some, the staff can show theirs instead of the app's suggestion — defaulting
     // to theirs, since they chose it on purpose.
@@ -223,6 +237,26 @@ function usePlaySessionValue({
     // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
     const reading = useReadingMode();
     const { barsPerRow, barNumbers, treadmill, showFingerings, scrollFollow } = reading;
+    // Keep-going mode, remembered across pieces; captured by the matcher at run start.
+    const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
+    const savedNoteLabels = useNoteLabels();
+    // Reveal the next note by colour per the player's hint setting — always, only once
+    // they've slipped at this position, or never. A wrong key flashes red regardless.
+    // Writable from the Practice-tools drawer too, so the hint behaviour can change
+    // without leaving the music; usePref persists it as the global setting.
+    const [noteHints, setNoteHints] = usePref(prefsStore, "noteHints");
+    // Sight-read mode: one cold read of a piece with nothing to lean on. It owns the
+    // aids for as long as it is on — turning it on strips them there and then, so what
+    // you are about to attempt is visible before you commit to it, and no aid can flip
+    // mid-run and re-render the score under the player.
+    const sightRead = useSightRead({
+        noteLabels: savedNoteLabels,
+        noteHints,
+        colorNotes: reading.colorNotes,
+        forgiving,
+        highway: reading.highway,
+    });
+    const aids = sightRead.aids;
     // The piece's 1–8 difficulty grade, so "auto" beam mode can hide beam groups on the
     // easy grades a beginner reads note-by-note. gradeOf is memoised by the content id, so
     // this is a map lookup after the first render.
@@ -306,7 +340,7 @@ function usePlaySessionValue({
         barNumbers,
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),
-        colorNotes: reading.colorNotes,
+        colorNotes: aids.colorNotes,
         showFingerings,
         scrollFollow,
         onReload: () => {
@@ -328,7 +362,10 @@ function usePlaySessionValue({
         },
         // The in-place fingering redraw rebuilt the noteheads mid-run: re-apply the ear-mode
         // conceal so a hidden run's blanked answers aren't exposed by the fresh render.
-        onFingeringRedraw: () => hidden.reconceal(),
+        onFingeringRedraw: () => {
+            hidden.reconceal();
+            vanishing.rearm();
+        },
     });
     const { getOsmd, ready, staffCount, measureCount, measureBoxes, centerCursor, markPainted } =
         score;
@@ -421,8 +458,6 @@ function usePlaySessionValue({
         metronomeAccent,
     );
 
-    // Keep-going mode, remembered across pieces; captured by the matcher at run start.
-    const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
     // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
     // found, red once the tries budget is spent. Persisted like the other play prefs.
     const onboarding = useOnboardingStore();
@@ -436,6 +471,17 @@ function usePlaySessionValue({
         setHiddenNotesPref(value);
     };
     const [revealTries, setRevealTries] = usePref(prefsStore, "revealTries");
+    // The read-ahead drill: bars vanish behind the run so the eyes cannot go back.
+    // Armed only while sight-read mode asks for it.
+    // Self-paced only: the drill hides the bar you have moved past, which it learns
+    // from the matcher's cleared-step index. A tempo-locked run walks its own step
+    // list on the clock (core/keepUp collects every cursor position, not just the
+    // playable ones), so its indices address different notes and would take away
+    // the wrong bars.
+    const vanishing = useVanishingBars(getOsmd, {
+        enabled: sightRead.on && sightRead.vanish && !enforceTempo,
+        hand: staffCount < 2 ? "both" : hand,
+    });
     const hidden = useHiddenNotes(getOsmd, {
         enabled: hiddenNotes,
         tries: revealTries,
@@ -447,6 +493,11 @@ function usePlaySessionValue({
             hidden.restore();
         }
     }, [hiddenNotes, hidden.restore]);
+    useEffect(() => {
+        if (!sightRead.on || !sightRead.vanish || enforceTempo) {
+            vanishing.restore();
+        }
+    }, [sightRead.on, sightRead.vanish, enforceTempo, vanishing.restore]);
     // The microphone as an input: while it listens, the player already hears
     // their real piano, so echoing the note back through the synth only doubles
     // the sound and feeds the app's own output into the mic. (The session already
@@ -470,7 +521,7 @@ function usePlaySessionValue({
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
-        forgiving,
+        forgiving: aids.forgiving,
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
             if (!micListening) {
@@ -493,6 +544,9 @@ function usePlaySessionValue({
             // A hidden note earned its reveal — lift the blank before the green
             // paint below, so the note appears already coloured.
             hidden.revealCorrect(info.index);
+            // Take away whatever bar the run has now left behind (inert unless the
+            // read-ahead drill is armed).
+            vanishing.advance(info.index);
             // Colour the notes just cleared — the cursor is still on them, as it
             // only advances after this callback — so the score shows progress.
             const osmd = getOsmd();
@@ -503,7 +557,7 @@ function usePlaySessionValue({
             // Show how long to keep holding, but only in the full-guidance hint mode
             // — the same beginner crutch the pre-highlight belongs to. A sight-reader
             // who dialled hints down gets no afterglow.
-            if (noteHints === "always") {
+            if (aids.noteHints === "always") {
                 holdIndicator.begin(info.pitches, info.holdMs);
             }
             // Record the cleared note — its ideal and actual timing, and a hold per
@@ -743,6 +797,18 @@ function usePlaySessionValue({
         if (newGhost) {
             ghostRace.adoptOwnRun(newGhost);
         }
+        // A sight-read is remembered apart from mastery: mastery tracks the best a piece
+        // has ever been played, this records how it went the one time it was new. Only a
+        // full run counts — a takeover from Listen has already been read to you — and the
+        // store keeps the first, so a second read never overwrites it.
+        if (sightRead.on && !ephemeral && !partialRunRef.current) {
+            services.sightReads.record(id, {
+                score: outcome.grade.score,
+                letter: outcome.grade.letter,
+                atTempo: enforceTempo,
+                playedAt: Date.now(),
+            });
+        }
         if (!ephemeral) {
             onRunComplete?.();
         }
@@ -763,6 +829,8 @@ function usePlaySessionValue({
         ghostRace.adoptOwnRun,
         runResult.record,
         analytics,
+        sightRead.on,
+        enforceTempo,
     ]);
 
     // Keep the finished run as a take without a separate Save press — finishing a song and
@@ -818,6 +886,7 @@ function usePlaySessionValue({
             matcher.stop();
             // Stepping out mid-run must never leave the resting score half blank.
             hidden.restore();
+            vanishing.restore();
             // Silence any guide voice still ringing — leaving the surface ends the run,
             // so nothing should sound on. A safety net over the held-key press gate: even
             // an orphaned or pedal-sustained voice can't outlive the surface.
@@ -891,8 +960,10 @@ function usePlaySessionValue({
         enterPlayFullscreen();
         matcher.stop();
         // Keep-up is read-at-tempo: a blanked staff would be unreadable, so the
-        // hidden-notes game stays a self-paced feature.
+        // hidden-notes game stays a self-paced feature, and the read-ahead drill
+        // likewise gives the whole score back for the run.
         hidden.restore();
+        vanishing.restore();
         clearSelfPacedResult();
         if (score.painted()) {
             score.wipePaint();
@@ -957,6 +1028,7 @@ function usePlaySessionValue({
     };
 
     const practice = (resume = true) => {
+        const mine = ++practiceSeqRef.current;
         // A completed run whose auto-take-save is still pending — the player pressed Practice
         // or Restart while still holding the final note, before its release fired the deferred
         // save — would be lost once the capture and completion latch are replaced below. Save
@@ -1005,49 +1077,68 @@ function usePlaySessionValue({
             // A fresh render rebuilt the SVG, so any previous blanks are gone with it;
             // forget them and blank the new elements below.
             hidden.restore();
+            vanishing.restore();
         }
         // Blank the noteheads (a no-op unless hidden-notes is on, or when a resumed
         // run is already concealed). Runs before the matcher seeks the cursor — the
         // collection walk resets it.
         hidden.conceal();
+        // Same for the read-ahead drill, which walks the cursor the same way.
+        vanishing.arm();
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
         ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
         // Read both hands off the freshly drawn score so the duet can sound the one
         // you're not practising (inert unless the duet is on).
         accompaniment.prime();
-        // With the section loop on, Practice drills the selected bars on repeat, the
-        // same range Listen laps, instead of running the whole piece once.
-        matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
-        analytics.track("run_started", {
-            mode: "self_paced",
-            hand: matcherHand,
-            hidden: hiddenNotes,
-            forgiving,
-            loop: loop.on,
-            // The session-only view toggles. They never reach the preferences store, so
-            // no setting_changed reports them; carrying them here records how the run was
-            // actually set up, which is what the toggle was a proxy for anyway.
-            fingerings: reading.showFingerings,
-            follow: reading.scrollFollow,
-            trainer: trainerOn,
-        });
+        // Everything above prepares the run; this starts it. Held apart because a
+        // sight-read waits out its study countdown first, and in that gap the player
+        // can press Listen, Stop or Practice again — so the start is claimed by a
+        // token and dropped if anything since has taken the surface. Without that, a
+        // countdown resolving late would start a run over whatever is now playing.
+        const begin = () => {
+            if (mine !== practiceSeqRef.current || listenPlayback.active() || keepUp.active()) {
+                return;
+            }
+            // With the section loop on, Practice drills the selected bars on repeat, the
+            // same range Listen laps, instead of running the whole piece once.
+            matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
+            analytics.track("run_started", {
+                mode: "self_paced",
+                hand: matcherHand,
+                hidden: hiddenNotes,
+                forgiving,
+                loop: loop.on,
+                // The session-only view toggles. They never reach the preferences store, so
+                // no setting_changed reports them; carrying them here records how the run was
+                // actually set up, which is what the toggle was a proxy for anyway.
+                fingerings: reading.showFingerings,
+                follow: reading.scrollFollow,
+                trainer: trainerOn,
+            });
+        };
+        // A sight-read gets its moment to take the piece in first — key, metre, shape —
+        // exactly as a real sight-reading test does. Off the mode, the run starts now:
+        // deferring every run by even a microtask would let a Listen pressed straight
+        // after Practice be overtaken by the run it just replaced.
+        if (sightRead.on) {
+            // A cancelled countdown never resolves, so the run it belonged to is
+            // simply never started.
+            void sightRead.study().then(begin);
+            return;
+        }
+        begin();
     };
 
-    // Reveal the next note by colour per the player's hint setting — always, only once
-    // they've slipped at this position, or never. A wrong key flashes red regardless.
-    // Writable from the Practice-tools drawer too, so the hint behaviour can change
-    // without leaving the music; usePref persists it as the global setting.
-    const [noteHints, setNoteHints] = usePref(prefsStore, "noteHints");
     // Which keys the on-screen keyboard lights as "play now". A keep-up run owns the
     // input on its own clock, so the keys follow its current beat (the matcher is
     // stopped, its `expected` frozen); self-paced follows the matcher, gated by the
     // reveal-hint setting. Either way "never" keeps the keyboard dark.
     const hintNotes =
-        noteHints === "never"
+        aids.noteHints === "never"
             ? []
             : keepUp.running
               ? keepUp.expected
-              : noteHints === "always" || (noteHints === "miss" && matcher.missedHere)
+              : aids.noteHints === "always" || (aids.noteHints === "miss" && matcher.missedHere)
                 ? matcher.expected
                 : [];
     // A run ending — stop, restart or completion all drop `practicing` — leaves no
@@ -1133,6 +1224,15 @@ function usePlaySessionValue({
         setForgiving,
         raceGhost,
         setRaceGhost,
+        // Sight-read mode and its study countdown.
+        sightRead,
+        // The aids a run actually reads with — the player's own settings, or the
+        // sight-reader rung while the mode is on. Every surface reads these rather
+        // than the stored preferences, so the override cannot be half-applied.
+        aids,
+        // What this piece scored the first time it was ever read cold, or null when it
+        // has never been sight-read here.
+        sightReadRecord,
         hiddenNotes,
         setHiddenNotes,
         revealTries,

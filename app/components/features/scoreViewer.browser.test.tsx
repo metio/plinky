@@ -1137,4 +1137,64 @@ describe("ScoreViewer", () => {
         fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         expect(screen.queryByText("Transpose")).toBeNull();
     });
+
+    // Sight-read mode: the run setup panel turns it on, and the study countdown then
+    // stands between pressing Practice and the run actually starting.
+    describe("sight-read mode", () => {
+        // Turning the mode on sheds the reading aids, and dropping the note colours
+        // re-renders the score — which disables Practice until OSMD has redrawn. So
+        // every step here waits for readiness the way a player would.
+        const armSightRead = async () => {
+            const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+            mount(phrase, { beatsPerBar: 4 });
+            await awaitReady();
+            fireEvent.click(screen.getByText("Set up your run"));
+            fireEvent.click(screen.getByRole("switch", { name: "Sight-read this piece" }));
+            await awaitReady();
+        };
+
+        it("keeps its study and tempo choices out of the way until the mode is on", async () => {
+            const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+            mount(phrase, { beatsPerBar: 4 });
+            await awaitReady();
+            fireEvent.click(screen.getByText("Set up your run"));
+
+            expect(screen.queryByText("Time to study")).toBeNull();
+            fireEvent.click(screen.getByRole("switch", { name: "Sight-read this piece" }));
+
+            expect(screen.getByText("Time to study")).toBeTruthy();
+            expect(screen.getByText("Tempo")).toBeTruthy();
+            // The read-ahead drill needs your own progress through the score, so it is
+            // offered only while the run waits for you.
+            expect(screen.getByRole("switch", { name: "Bars disappear behind you" })).toBeTruthy();
+        });
+
+        it("studies the piece before the run rather than starting one", async () => {
+            await armSightRead();
+            vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+
+            fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+
+            // The countdown is up and the run has not begun — the score is there to be
+            // read, and Practice offers the way out rather than another start.
+            expect(await screen.findByText(/Reading it through/)).toBeTruthy();
+            expect(
+                screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
+            ).toBe("true");
+        });
+
+        it("gives the piece back when the countdown is abandoned", async () => {
+            await armSightRead();
+            vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+            fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+            await screen.findByText(/Reading it through/);
+
+            fireEvent.click(screen.getByRole("button", { name: "Practice" }));
+
+            await waitFor(() => expect(screen.queryByText(/Reading it through/)).toBeNull());
+            expect(
+                screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
+            ).toBe("false");
+        });
+    });
 });

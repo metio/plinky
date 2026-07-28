@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { type Beams, BEAMS } from "../../../core/beams";
 import type { Hand } from "../../../core/matcher";
 import { BARS_PER_ROW, NOTE_SCALES, REVEAL_TRIES } from "../../../core/prefs";
+import { STUDY_SECONDS, type StudySeconds } from "../../../core/sightRead";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { IconButton } from "../ui/button";
@@ -71,6 +72,8 @@ function RunSetupPanel() {
         forgiving,
         setForgiving,
         reading,
+        sightRead,
+        sightReadRecord,
     } = usePlaySession();
 
     return (
@@ -252,6 +255,54 @@ function RunSetupPanel() {
                 hint={m.run_group_challenge_hint()}
                 icon={<StarIcon className={ICON} />}
             >
+                <SwitchField
+                    label={m.sight_read()}
+                    checked={sightRead.on}
+                    onChange={sightRead.setOn}
+                    help={m.sight_read_caption()}
+                />
+                {sightRead.on && (
+                    <>
+                        <ChoiceField
+                            label={m.sight_read_study()}
+                            value={String(sightRead.studySeconds)}
+                            onChange={(value: string) =>
+                                sightRead.setStudySeconds(Number(value) as StudySeconds)
+                            }
+                            options={STUDY_SECONDS.map((seconds) => ({
+                                id: String(seconds),
+                                label: m.sight_read_study_seconds({ seconds }),
+                            }))}
+                            help={m.sight_read_study_caption()}
+                        />
+                        <ChoiceField
+                            label={m.sight_read_tempo()}
+                            value={enforceTempo ? "tempo" : "own"}
+                            onChange={(value: string) => setEnforceTempo(value === "tempo")}
+                            options={[
+                                { id: "own", label: m.sight_read_tempo_own() },
+                                { id: "tempo", label: m.sight_read_tempo_piece() },
+                            ]}
+                            help={m.sight_read_tempo_caption()}
+                        />
+                        {!enforceTempo && (
+                            <SwitchField
+                                label={m.sight_read_vanish()}
+                                checked={sightRead.vanish}
+                                onChange={sightRead.setVanish}
+                                help={m.sight_read_vanish_caption()}
+                            />
+                        )}
+                        {sightReadRecord && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {m.sight_read_already({
+                                    letter: sightReadRecord.letter,
+                                    score: sightReadRecord.score,
+                                })}
+                            </p>
+                        )}
+                    </>
+                )}
                 {!lockTempo && <TransposeRow transpose={transpose} setTranspose={setTranspose} />}
                 {!lockTempo && (
                     <SwitchField

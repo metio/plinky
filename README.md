@@ -116,6 +116,17 @@ any note you don't catch before it passes is a miss (Synthesia / Guitar-Hero sty
 notes sound as a guide so you can follow along by ear — or turn that off to read them at
 tempo yourself. At the end it tells you how many you kept up with.
 
+Practice is about repetition; **sight-reading** is the opposite discipline, so it has a
+mode of its own under *Extra challenge*. Turn on **Sight-read this piece** and every
+reading aid steps aside for the run — no note names on the keys, no next-note glow, no
+colours, no highway, no keep-going — leaving the bare staff. You get a moment to take the
+piece in first (5, 10 or 20 seconds: key, metre, shape), then it's one run, at your own
+pace or at the piece's tempo, whichever you pick. Turn on **Bars disappear behind you**
+and each bar vanishes once you've left it, so your eyes have nowhere to go but forward —
+the habit that keeps a reader ahead of their hands. Your **first** read of a piece is
+kept as your sight-read of it and never overwritten, because once you've read it, it
+isn't sight-reading any more; play it again and the panel reminds you what you got.
+
 On a two-hand piece, pick **one hand** to practise and the run waits only on that
 hand, skipping the stretches where only the other sounds. Turn on **Play the other
 hand** and the app fills that hand in for you — on the beat during **Keep up**, and

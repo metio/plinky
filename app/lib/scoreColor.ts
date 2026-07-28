@@ -48,11 +48,15 @@ export function unhideNoteElements(steps: SVGGElement[][]): void {
     }
 }
 
-// The rendered SVG groups of the playable notes at each step, in the same order
-// and with the same hand filter the matcher steps through — so index i here is the
-// note the ghost's i-th onset belongs to. Leaves the cursor reset for the caller.
-export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SVGGElement[][] {
-    const steps: SVGGElement[][] = [];
+// One step's rendered notes and the bar they sit in.
+export type StepNotes = { elements: SVGGElement[]; measure: number };
+
+// The playable notes at each step, in the same order and with the same hand filter
+// the matcher steps through — so index i here is the note the ghost's i-th onset
+// belongs to — each tagged with its 0-based bar. Leaves the cursor reset for the
+// caller.
+export function collectStepNotes(osmd: OpenSheetMusicDisplay, hand: Hand): StepNotes[] {
+    const steps: StepNotes[] = [];
     // The graphical notes under the cursor are only exposed once it's shown, so
     // make it visible before walking; the matcher reshows and repositions it after.
     osmd.cursor.show();
@@ -79,12 +83,19 @@ export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SV
             }
         }
         if (playable) {
-            steps.push(elements);
+            steps.push({ elements, measure: osmd.cursor.iterator.CurrentMeasureIndex });
         }
         osmd.cursor.next();
     }
     osmd.cursor.reset();
     return steps;
+}
+
+// The step order above, elements only — the shape the conceal/reveal painters take.
+// Derived from the one walk rather than a second of its own, so a step index can
+// never mean one note here and a different one there.
+export function collectNoteElements(osmd: OpenSheetMusicDisplay, hand: Hand): SVGGElement[][] {
+    return collectStepNotes(osmd, hand).map((step) => step.elements);
 }
 
 // Haloes every note in a half-open range of measures (0-based, matching scoreToBars'

@@ -140,7 +140,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // Whole-device progress backup and restore (the bundle codec, the storage-seam
 // export/import, and the Settings section with its copy) — tips the per-visitor
 // total to a measured 595.7. 596.
-const BUDGET_TOTAL_KB = 596;
+//
+// Sight-read mode (core/sightRead, the session hook and its study countdown, the
+// vanishing-bars drill, and the run-setup block with its copy) — tips the
+// per-visitor total to a measured 597.1. 598.
+const BUDGET_TOTAL_KB = 598;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -262,7 +266,10 @@ const BUDGET_TOTAL_KB = 596;
 //
 // Whole-device progress backup and restore (core/progressPack, the storage-seam
 // export/import, and the Settings section) — measured at 285.6. 286.
-const BUDGET_APP_KB = 286;
+//
+// Sight-read mode (core/sightRead, useSightRead + useVanishingBars, and the
+// run-setup block) — measured at 287.0. 288.
+const BUDGET_APP_KB = 288;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
