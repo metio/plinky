@@ -136,7 +136,11 @@ const ON_DEMAND = /webCodecsVideo/;
 // The analytics funnel events (the delegated click tracker with its clickInfo naming, plus
 // song/import/share/daily/review/compose/MIDI/milestone/keep-up events at their choke
 // points) — tip the per-visitor total to a measured 594.5. 595.
-const BUDGET_TOTAL_KB = 595;
+//
+// Whole-device progress backup and restore (the bundle codec, the storage-seam
+// export/import, and the Settings section with its copy) — tips the per-visitor
+// total to a measured 595.7. 596.
+const BUDGET_TOTAL_KB = 596;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -255,7 +259,10 @@ const BUDGET_TOTAL_KB = 595;
 //
 // The analytics funnel events (the delegated click tracker, and the song/import/share/
 // daily/review/compose/MIDI/milestone/keep-up events) — measured at 284.4. 285.
-const BUDGET_APP_KB = 285;
+//
+// Whole-device progress backup and restore (core/progressPack, the storage-seam
+// export/import, and the Settings section) — measured at 285.6. 286.
+const BUDGET_APP_KB = 286;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

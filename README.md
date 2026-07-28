@@ -292,6 +292,21 @@ graded like any other, saved on your device. Preview the staff, set its grade an
 details, then add it. Export your whole library as a pack to back it up or hand it to
 a student.
 
+## Taking your progress with you
+
+Everything Plinky remembers lives in this browser and nowhere else — which is what
+lets it work with no account and send nothing anywhere, and also means a new phone
+would otherwise start from zero. **Settings → Your progress** downloads the lot as a
+single file: grades and the review schedule, saved takes and ghosts, worked-out
+fingerings, preferences, achievements and your score library. Restore it on another
+device — or back onto this one if its storage is ever cleared — and Plinky picks up
+where you left off.
+
+Restoring replaces what's on the device rather than merging into it, so a piece you
+deleted before backing up doesn't come back to life; it asks before it does that. If
+the device is out of room the restore stops rather than half-landing, and says so —
+nothing already there is touched.
+
 ## Playing
 
 - **With a digital piano** — connect it over USB or Bluetooth MIDI and click

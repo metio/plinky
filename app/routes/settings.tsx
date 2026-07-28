@@ -23,6 +23,7 @@ import { Keyboard } from "../components/ui/keyboard";
 import { SettingsSection } from "../components/ui/settingsSection";
 
 import { DangerZone } from "../components/features/dangerZone";
+import { ProgressBackup } from "../components/features/progressBackup";
 import { HandSize } from "../components/features/handSize";
 import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
@@ -424,6 +425,8 @@ export default function Settings() {
                     {m.settings_get_help()} →
                 </a>
             </SettingsSection>
+
+            <ProgressBackup />
 
             <DangerZone />
         </main>
