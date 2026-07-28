@@ -35,7 +35,7 @@ describe("LocaleLayout", () => {
         renderWithServices(routerAt("/zz/play/abc"));
         const dest = (await screen.findByTestId("dest")).textContent ?? "";
         // The page is preserved (…/play/abc) but now under a real locale, not the "zz" typo.
-        expect(dest).toMatch(/\/play\/abc$/);
+        expect(dest).toMatch(/\/play\/abc\/$/);
         expect(dest.startsWith("/zz/")).toBe(false);
         expect(isLocale(dest.split("/")[1])).toBe(true);
     });

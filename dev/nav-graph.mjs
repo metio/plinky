@@ -3,7 +3,7 @@
 
 // Navigation-depth guardrail. Models the app as a directed graph — nodes are pages,
 // edges are the one-tap navigations a page renders (every <Link to>, navigate() and
-// localizeHref target, found by crawling each route's transitive component imports) —
+// localizedHref target, found by crawling each route's transitive component imports) —
 // plus the global affordances (the bottom-tab/header nav and the header gear/logo) that
 // every page carries. Then it BFS-measures:
 //   • eccentricity from home — the worst-case taps to reach any feature from "/", and
@@ -49,7 +49,7 @@ function resolveLocal(dir, spec) {
     return existsSync(base) ? base : null;
 }
 
-// Every absolute path a `to`/navigate/localizeHref points at in a file.
+// Every absolute path a `to`/navigate/localizedHref points at in a file.
 function targetsIn(src) {
     const found = new Set();
     const add = (value) => {
@@ -65,7 +65,7 @@ function targetsIn(src) {
     for (const m of src.matchAll(/\bto:\s*"([^"]+)"/g)) {
         add(m[1]);
     }
-    for (const m of src.matchAll(/(?:navigate|localizeHref)\((?:"([^"]+)"|`([^`$]*))/g)) {
+    for (const m of src.matchAll(/(?:navigate|localizedHref)\((?:"([^"]+)"|`([^`$]*))/g)) {
         add(m[1] ?? m[2]);
     }
     return found;

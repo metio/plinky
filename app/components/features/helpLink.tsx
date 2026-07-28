@@ -5,7 +5,7 @@ import type React from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { QuestionIcon } from "../ui/icons";
 import { m } from "../../paraglide/messages.js";
-import { localizeHref } from "../../paraglide/runtime.js";
+import { localizedHref } from "../ui/href";
 
 // Maps the current path to a help section key so the header ? lands the reader on
 // the help for the page they're on. The pathname carries the /:locale prefix, so
@@ -44,13 +44,13 @@ export function HelpLink() {
     const onClick = (event: React.MouseEvent) => {
         if (anchor === "home" && window.scrollY <= AT_TOP_PX) {
             event.preventDefault();
-            navigate(localizeHref("/help"));
+            navigate(localizedHref("/help"));
         }
     };
 
     return (
         <Link
-            to={`${localizeHref("/help")}#${anchor}`}
+            to={`${localizedHref("/help")}#${anchor}`}
             onClick={onClick}
             aria-label={m.nav_help()}
             className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"

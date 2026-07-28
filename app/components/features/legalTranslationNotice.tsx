@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 0BSD
 
 import { m } from "../../paraglide/messages.js";
-import { getLocale, localizeHref } from "../../paraglide/runtime.js";
+import { getLocale } from "../../paraglide/runtime.js";
+import { localizedHref } from "../ui/href";
 
 // The legal pages are authored in German, the operator's binding language. Every
 // other locale renders a machine translation, so it carries this notice: German
@@ -20,7 +21,7 @@ export function LegalTranslationNotice({ page }: { page: "impressum" | "datensch
             <p>{m.legal_mt_notice_body()}</p>
             <p className="mt-2">
                 <a
-                    href={localizeHref(`/${page}`, { locale: "de" })}
+                    href={localizedHref(`/${page}`, { locale: "de" })}
                     className="font-medium underline hover:no-underline"
                 >
                     {m.legal_mt_view_original()}

@@ -73,10 +73,10 @@ describe("Home", () => {
         renderHome();
         // Links are localized; the test setup pins the locale to the base.
         expect(screen.getByText("Library →").closest("a")?.getAttribute("href")).toBe(
-            "/en/library",
+            "/en/library/",
         );
         expect(screen.getByText("Assignments →").closest("a")?.getAttribute("href")).toBe(
-            "/en/assignments",
+            "/en/assignments/",
         );
     });
 });

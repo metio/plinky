@@ -20,7 +20,7 @@ describe("LegalTranslationNotice", () => {
         render(<LegalTranslationNotice page="datenschutz" />);
         expect(screen.getByRole("note").textContent).toContain(m.legal_mt_notice_body());
         const link = screen.getByRole("link", { name: m.legal_mt_view_original() });
-        expect(link.getAttribute("href")).toBe("/de/datenschutz");
+        expect(link.getAttribute("href")).toBe("/de/datenschutz/");
     });
 
     it("renders nothing on the German page, where there is nothing to disclaim", () => {

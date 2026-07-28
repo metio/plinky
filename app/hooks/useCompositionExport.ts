@@ -12,8 +12,8 @@ import { buildMidiFile } from "../../core/midiFile";
 import { useAnalytics } from "../contexts/services";
 import { downloadBlob } from "../lib/download";
 import { fileStem } from "../lib/printScore";
-import { localizeHref } from "../paraglide/runtime.js";
 import { useCopied } from "./useCopied";
+import { localizedHref } from "../components/ui/href";
 
 // The three ways a take leaves the page: a share link on the clipboard (with the
 // transient "copied" flash), a Standard MIDI File, and MusicXML. Each reports a
@@ -25,7 +25,7 @@ export function useCompositionExport(composition: Composition, title: string) {
 
     const share = useCallback(() => {
         const code = encodeComposition(composition);
-        const url = `${window.location.origin}${localizeHref("/compose")}?c=${code}`;
+        const url = `${window.location.origin}${localizedHref("/compose")}?c=${code}`;
         navigator.clipboard
             ?.writeText(url)
             // Only a landed clipboard write counts as a share.

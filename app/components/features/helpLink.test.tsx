@@ -39,7 +39,7 @@ describe("HelpLink", () => {
             </MemoryRouter>,
         );
         const link = screen.getByLabelText("Help");
-        expect(link.getAttribute("href")).toBe("/en/help#play");
+        expect(link.getAttribute("href")).toBe("/en/help/#play");
     });
 
     it("opens help at its own top from the top of the front page", () => {
@@ -51,10 +51,10 @@ describe("HelpLink", () => {
             </MemoryRouter>,
         );
         // The href still names the home section (for hover/new-tab).
-        expect(screen.getByLabelText("Help").getAttribute("href")).toBe("/en/help#home");
+        expect(screen.getByLabelText("Help").getAttribute("href")).toBe("/en/help/#home");
         fireEvent.click(screen.getByLabelText("Help"));
         // But the click lands on the help top, not the skipped-past home section.
-        expect(screen.getByTestId("loc").textContent).toBe("/en/help");
+        expect(screen.getByTestId("loc").textContent).toBe("/en/help/");
     });
 
     it("jumps to the home section once the front page is scrolled down", () => {
@@ -66,6 +66,6 @@ describe("HelpLink", () => {
             </MemoryRouter>,
         );
         fireEvent.click(screen.getByLabelText("Help"));
-        expect(screen.getByTestId("loc").textContent).toBe("/en/help#home");
+        expect(screen.getByTestId("loc").textContent).toBe("/en/help/#home");
     });
 });

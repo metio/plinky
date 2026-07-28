@@ -12,6 +12,7 @@ import {
     routeMeta,
     structuredData,
     webPageData,
+    withTrailingSlash,
 } from "./site";
 
 describe("pageTitle", () => {
@@ -133,5 +134,24 @@ describe("breadcrumbData", () => {
         expect(data.itemListElement[2]?.item).toBe(
             "https://plinky.fun/en/person/frederic-chopin/",
         );
+    });
+});
+
+describe("withTrailingSlash", () => {
+    it("adds the slash the prerendered page is served under", () => {
+        expect(withTrailingSlash("/de/daily")).toBe("/de/daily/");
+        expect(withTrailingSlash("/de/play/K2k2MQKNlj6d")).toBe("/de/play/K2k2MQKNlj6d/");
+    });
+
+    it("leaves an already-slashed path untouched", () => {
+        expect(withTrailingSlash("/de/")).toBe("/de/");
+        expect(withTrailingSlash("/de/daily/")).toBe("/de/daily/");
+        expect(withTrailingSlash("/de/library/?tab=manage")).toBe("/de/library/?tab=manage");
+    });
+
+    it("keeps a query or fragment after the slash", () => {
+        expect(withTrailingSlash("/de/library?tab=manage")).toBe("/de/library/?tab=manage");
+        expect(withTrailingSlash("/de/help#daily")).toBe("/de/help/#daily");
+        expect(withTrailingSlash("/de/play/abc?mode=ear#top")).toBe("/de/play/abc/?mode=ear#top");
     });
 });

@@ -14,7 +14,6 @@ import {
     loadGradedMastery,
     surprisePick,
 } from "../../lib/gradeProgress";
-import { localizeHref } from "../../paraglide/runtime.js";
 import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
@@ -30,6 +29,7 @@ import { type Task, todayTasks } from "../../../core/today";
 import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { localizedHref } from "../ui/href";
 
 const ICON: Record<Task["key"], string> = {
     review: "🔁",
@@ -176,7 +176,7 @@ export function HomeToday() {
                             seedRef.current++,
                         );
                         if (pick) {
-                            navigate(localizeHref(practiceHref(pick)));
+                            navigate(localizedHref(practiceHref(pick)));
                         }
                     }}
                 />
