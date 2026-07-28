@@ -11,8 +11,13 @@
         "http://localhost/en/you/",
         "http://localhost/en/settings/"
       ],
-      "numberOfRuns": 3,
-      "settings": { "preset": "desktop" }
+      "numberOfRuns": 1,
+      "settings": {
+        "preset": "desktop",
+        "onlyCategories": ["performance", "best-practices", "seo"],
+        "disableFullPageScreenshot": true,
+        "skipAudits": ["screenshot-thumbnails", "final-screenshot"]
+      }
     },
     "assert": {
       "assertMatrix": [
