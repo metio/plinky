@@ -8,13 +8,14 @@ permissions:
   contents: read
 jobs:
   frontend:
-    # The shared Vite/React pipeline (build, browser + coverage, biome lint,
-    # knip, a11y light/dark, lighthouse, and the metio lint gate: reuse, typos,
-    # yamllint, actionlint, markdownlint), run through this repo's flake devShell.
+    # The shared Vite/React pipeline (build, browser + coverage, the story
+    # screenshots, biome lint, knip, a11y light/dark, lighthouse, and the metio lint
+    # gate: reuse, typos, yamllint, actionlint, markdownlint), run through this
+    # repo's flake devShell.
     # Its `detect` job enables each gate from this repo's package.json scripts.
     # Named "Frontend" so its checks read "Frontend / build", "Frontend / browser", …
     name: Frontend
-    uses: metio/ci/.github/workflows/frontend.yml@5f69e7b9caf71a563b345a06e9480a14cd38299d # 2026.7.28183925
+    uses: metio/ci/.github/workflows/frontend.yml@499bb7663dcf22bc15263bc6b35078fe86916da7 # 2026.7.28205258
     with:
       # Node returns DNS records verbatim, so a bare `localhost` can resolve to
       # ::1 first — the prerender's internal server and its own fetch would then

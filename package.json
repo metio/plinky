@@ -30,7 +30,7 @@
     "nav": "node dev/nav-graph.mjs",
     "format": "biome check --write .",
     "knip": "npm run messages && react-router typegen && knip",
-    "coverage": "npm run messages && vitest run --coverage",
+    "coverage": "npm run messages && vitest run --coverage --project '!storybook'",
     "test:storybook": "npm run messages && vitest run --project storybook",
     "mutation": "npm run messages && stryker run",
     "storybook": "npm run messages && storybook dev -p 6006",

@@ -26,8 +26,9 @@ nix develop                         # or enter the shell, then run commands bare
 CI mirrors this exactly: every job in `.github/workflows/verify.yml` is
 `nix develop --command …` behind the `metio/nix-devshell` action, and the
 `Frontend` job delegates to `metio/ci`'s reusable `frontend.yml`, which is where
-the shared lint gate, coverage, a11y and Lighthouse run — they are easy to
-forget precisely because this repo's own workflow never names them. The
+the shared lint gate, coverage, the story screenshots, a11y and Lighthouse run —
+they are easy to forget precisely because this repo's own workflow never names
+them. The
 `playwright` npm version is held to the flake's `playwright-driver`, so bump
 both together.
 
@@ -70,7 +71,9 @@ npm run typecheck
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
 npm run test:storybook # every story, light and dark, against its baseline
-npm run coverage      # ratchet thresholds — a drop fails the build
+npm run coverage      # ratchet thresholds — a drop fails the build (skips the
+                      # storybook project: screenshots measure no lines and starve
+                      # under instrumentation, so CI runs them as their own gate)
 npm run arch          # layer rules + confined globals
 npm run tailwind      # every class name compiles against app.css (blocking)
 npm run messages:check # every locale carries every message (blocking)
