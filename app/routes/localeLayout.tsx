@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import { Navigate, Outlet, useLocation, useParams } from "react-router";
 import { BottomNav } from "../components/ui/navBar";
 import { SiteFooter } from "../components/ui/siteFooter";
-import { isLocale, localizeHref } from "../paraglide/runtime.js";
+import { isLocale } from "../paraglide/runtime.js";
+import { localizedHref } from "../components/ui/href";
 
 // The parent of every localized page. The active locale comes from the URL
 // prefix (the `url` strategy reads it directly), so this validates the segment
@@ -23,7 +24,7 @@ export default function LocaleLayout() {
 
     // An unknown locale prefix — a typo, a stale link, a bot probing paths — can't
     // select a language, so redirect to the same page under the resolved locale rather
-    // than dead-ending: the visitor keeps the page they asked for. localizeHref picks the
+    // than dead-ending: the visitor keeps the page they asked for. localizedHref picks the
     // target the way the bare "/" does (the language last chosen, else the browser's,
     // else English); the bad first segment is dropped and the rest re-localized. During
     // prerender there is no navigator to resolve against — and an unknown locale is never
@@ -33,7 +34,7 @@ export default function LocaleLayout() {
             return null;
         }
         const rest = pathname.replace(/^\/[^/]+/, "") || "/";
-        return <Navigate to={localizeHref(rest)} replace />;
+        return <Navigate to={localizedHref(rest)} replace />;
     }
 
     return (

@@ -41,8 +41,8 @@ import {
 import { routeMeta, SITE_URL } from "../../core/site";
 import { trackSteps } from "../../core/tracks";
 import { m } from "../paraglide/messages.js";
-import { localizeHref } from "../paraglide/runtime.js";
 import type { Route } from "./+types/assignments";
+import { localizedHref } from "../components/ui/href";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.assignments_heading(), m.meta_assignments_description());
@@ -178,7 +178,7 @@ export default function AssignmentsRoute() {
         );
 
     const onShare = async (assignment: Assignment, buttonKey: string) => {
-        const url = `${SITE_URL}${localizeHref("/assignments")}?assignment=${encodeAssignmentLink(assignment)}`;
+        const url = `${SITE_URL}${localizedHref("/assignments")}?assignment=${encodeAssignmentLink(assignment)}`;
         try {
             if (typeof navigator.share === "function") {
                 await navigator.share({

@@ -43,7 +43,7 @@ describe("useCompositionExport", () => {
         act(() => result.current.share());
         await waitFor(() => expect(result.current.copied).toBe(true));
         const url = new URL(written[0] ?? "");
-        expect(url.pathname.endsWith("/compose")).toBe(true);
+        expect(url.pathname.endsWith("/compose/")).toBe(true);
         expect(decodeComposition(url.searchParams.get("c") ?? "")).toEqual(COMPOSITION);
     });
 

@@ -3,10 +3,11 @@
 
 import type { ReactNode } from "react";
 import { useLocation } from "react-router";
+import { withTrailingSlash } from "../../../core/site";
 import { m } from "../../paraglide/messages.js";
-import { localizeHref } from "../../paraglide/runtime.js";
 import { BookIcon, CalendarIcon, GradCapIcon, HomeIcon, NotesIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
+import { localizedHref } from "./href";
 
 // The app's primary destinations. Before this, every section was reachable only as a
 // home-page tile, so moving between Library/Daily/Compose/You meant a round-trip
@@ -25,15 +26,17 @@ const DESTINATIONS: {
 ];
 
 // Marks the current section. Home matches only its exact path; the rest also match
-// their sub-pages (e.g. /library stays lit while reading a piece under it).
+// their sub-pages (e.g. /library stays lit while reading a piece under it). Both sides
+// are normalized to the trailing-slash form the links carry, so a visitor who arrives
+// on the bare path before the host redirects still sees their section lit.
 function useIsActive(): (to: string) => boolean {
     const { pathname } = useLocation();
     return (to) => {
-        const href = localizeHref(to);
-        if (to === "/") {
-            return pathname === href || pathname === `${href}/`;
-        }
-        return pathname === href || pathname.startsWith(`${href}/`);
+        const href = localizedHref(to);
+        const here = withTrailingSlash(pathname);
+        // Every href ends in "/", so the prefix test covers the exact match too and
+        // cannot mistake a sibling section (/library/ never matches /librarything/).
+        return to === "/" ? here === href : here.startsWith(href);
     };
 }
 

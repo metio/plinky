@@ -5,6 +5,19 @@
 // structured data.
 export const SITE_URL = "https://plinky.fun";
 
+// Every page prerenders to `<path>/index.html`, so the trailing-slash form is what
+// the static host serves and what the canonical link, the sitemap and the structured
+// data all name. A link to the bare path only reaches it through a redirect, which
+// costs a round trip and splits the URL a crawler records from the one we declare
+// canonical — so the slash goes on the href itself. Takes an absolute app path,
+// optionally carrying a query or fragment, and keeps those after the slash:
+// `/de/library?tab=manage` → `/de/library/?tab=manage`.
+export function withTrailingSlash(href: string): string {
+    const mark = href.search(/[?#]/);
+    const path = mark === -1 ? href : href.slice(0, mark);
+    return path.endsWith("/") ? href : `${path}/${href.slice(path.length)}`;
+}
+
 // A page title with the most specific part first, ending in the brand, so a
 // bookmark list reads "C major scale · Practice · Plinky" — distinguishable at a
 // glance and aligned with the URL's path segments.

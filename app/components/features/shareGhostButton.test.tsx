@@ -23,7 +23,7 @@ describe("ShareGhostButton", () => {
         expect(await screen.findByText(/link copied/i)).toBeTruthy();
 
         const url = writeText.mock.calls[0]![0] as string;
-        expect(url).toContain("/play/song?ghost=");
+        expect(url).toContain("/play/song/?ghost=");
         const code = new URL(url).searchParams.get("ghost") ?? "";
         // The shared code round-trips back to the same run the friend will race.
         expect(decodeGhost(code)).toEqual([0, 250, 500]);

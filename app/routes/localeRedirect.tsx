@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { Navigate } from "react-router";
-import { localizeHref } from "../paraglide/runtime.js";
+import { localizedHref } from "../components/ui/href";
 
 // The bare "/" carries no locale, so it redirects to the localized home. On the
 // client getLocale() resolves through the strategies: the language the player last
@@ -13,5 +13,5 @@ export default function LocaleRedirect() {
     if (typeof window === "undefined") {
         return null;
     }
-    return <Navigate to={localizeHref("/")} replace />;
+    return <Navigate to={localizedHref("/")} replace />;
 }

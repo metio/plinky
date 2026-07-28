@@ -11,8 +11,10 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-// Each confined global maps to the files allowed to name it. Test files are always
-// allowed — they exercise the real thing on purpose.
+// Each confined name maps to the files allowed to use it. Mostly platform globals;
+// the map also takes an imported name that must funnel through a single owner, since
+// the mechanism — a bare identifier no import graph can constrain — is the same. Test
+// files are always allowed: they exercise the real thing on purpose.
 const CONFINED = {
     localStorage: ["app/adapters/browserStore.ts", "app/testing/deniedStorage.ts"],
     DOMParser: ["app/adapters/domXmlCodec.ts"],
@@ -78,6 +80,18 @@ const CONFINED = {
     clearInterval: ["app/adapters/browserScheduler.ts"],
     requestAnimationFrame: ["app/adapters/browserScheduler.ts", "app/components/ui/drawer.tsx"],
     cancelAnimationFrame: ["app/adapters/browserScheduler.ts", "app/components/ui/drawer.tsx"],
+    // Not a browser global but confined for the same reason: paraglide's raw
+    // localizeHref returns the bare locale-prefixed path, and a link built from it
+    // reaches the prerendered page only through the host's redirect to the
+    // trailing-slash form. The URL a crawler then records is not the one the page
+    // declares canonical. localizedHref adds the slash, and the only way to keep a
+    // future link from silently skipping it is to make the raw call unavailable.
+    localizeHref: ["app/components/ui/href.ts"],
+};
+
+// What to do instead, when the remedy is not "use the port/adapter".
+const REMEDIES = {
+    localizeHref: "build the URL with localizedHref() from app/components/ui/href.ts",
 };
 
 // The ambient sources core/ may never read. These are not confined to an adapter the
@@ -161,7 +175,8 @@ for (const global of Object.keys(CONFINED)) {
             continue;
         }
         if (re.test(source)) {
-            violations.push(`${file} references \`${global}\` directly — use the port/adapter instead`);
+            const remedy = REMEDIES[global] ?? "use the port/adapter instead";
+            violations.push(`${file} references \`${global}\` directly — ${remedy}`);
         }
     }
 }

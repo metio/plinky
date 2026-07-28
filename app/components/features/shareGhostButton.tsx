@@ -6,9 +6,9 @@ import { SITE_URL } from "../../../core/site";
 import { useAnalytics } from "../../contexts/services";
 import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
-import { localizeHref } from "../../paraglide/runtime.js";
 import { Button, type ButtonVariant, IconButton } from "../ui/button";
 import { GhostIcon } from "../ui/icons";
+import { localizedHref } from "../ui/href";
 
 // Hand a run to a friend as a link they open to race it. The onsets are any run's
 // note timings — a saved take, or your auto-saved last run — and the link points back
@@ -40,7 +40,7 @@ export function ShareGhostButton({
     const [copied, flashCopied] = useCopied();
     const analytics = useAnalytics();
     const share = async () => {
-        const url = `${SITE_URL}${localizeHref(`/play/${id}`)}?ghost=${encodeGhost(onsets)}`;
+        const url = `${SITE_URL}${localizedHref(`/play/${id}`)}?ghost=${encodeGhost(onsets)}`;
         try {
             if (typeof navigator.share === "function") {
                 await navigator.share({ url, text: m.ghost_share_boast({ title }) });

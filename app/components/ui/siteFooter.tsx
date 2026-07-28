@@ -3,9 +3,9 @@
 
 import { Link } from "react-router";
 import { m } from "../../paraglide/messages.js";
-import { localizeHref } from "../../paraglide/runtime.js";
 import { type Brand, BrandIcon } from "./brandIcons";
 import { HeartIcon } from "./icons";
+import { localizedHref } from "./href";
 
 const CHANNELS: { brand: Brand; label: string; href: string }[] = [
     { brand: "instagram", label: "Instagram", href: "https://www.instagram.com/plinky.piano" },
@@ -28,7 +28,7 @@ export function SiteFooter() {
                     {/* The heart is the quiet way to the people behind Plinky; it
                         fills in on hover, a small warm tell. */}
                     <Link
-                        to={localizeHref("/about")}
+                        to={localizedHref("/about")}
                         aria-label={m.nav_about()}
                         className="group rounded-md p-1 text-gray-400 hover:text-rose-500 focus-visible:ring-2 focus-visible:ring-rose-400 dark:text-gray-500 dark:hover:text-rose-400"
                     >
@@ -42,13 +42,13 @@ export function SiteFooter() {
                 The labels are the German legal terms, kept as-is in every language. */}
                 <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                     <Link
-                        to={localizeHref("/impressum")}
+                        to={localizedHref("/impressum")}
                         className="rounded-md px-1 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400"
                     >
                         Impressum
                     </Link>
                     <Link
-                        to={localizeHref("/datenschutz")}
+                        to={localizedHref("/datenschutz")}
                         className="rounded-md px-1 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400"
                     >
                         Datenschutz

@@ -38,6 +38,6 @@ describe("Datenschutzerklärung", () => {
         // renders a translation and carries the notice back to the German original.
         renderWithServices(<Datenschutz />);
         const link = screen.getByRole("link", { name: m.legal_mt_view_original() });
-        expect(link.getAttribute("href")).toBe("/de/datenschutz");
+        expect(link.getAttribute("href")).toBe("/de/datenschutz/");
     });
 });

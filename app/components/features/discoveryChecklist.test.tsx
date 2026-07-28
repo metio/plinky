@@ -48,10 +48,10 @@ describe("DiscoveryChecklist", () => {
         const links = screen.getAllByRole("link");
         // Setting yourself up leads — the MIDI piano, hand size, then the key
         // mapping — and playing your first piece follows.
-        expect(links[0]?.getAttribute("href")).toBe("/en/settings");
-        expect(links[1]?.getAttribute("href")).toBe("/en/settings");
-        expect(links[2]?.getAttribute("href")).toBe("/en/settings");
-        expect(links[3]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}`);
+        expect(links[0]?.getAttribute("href")).toBe("/en/settings/");
+        expect(links[1]?.getAttribute("href")).toBe("/en/settings/");
+        expect(links[2]?.getAttribute("href")).toBe("/en/settings/");
+        expect(links[3]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}/`);
     });
 
     it("marks the straight-to-the-keys steps with the jump-in pill", async () => {
@@ -71,7 +71,7 @@ describe("DiscoveryChecklist", () => {
         await screen.findByText("Getting started");
         expect(
             screen.getByRole("link", { name: "Play your first piece" }).getAttribute("href"),
-        ).toBe("/en/play/some-piece");
+        ).toBe("/en/play/some-piece/");
     });
 
     it("dismisses for good when the ✕ is clicked", async () => {
