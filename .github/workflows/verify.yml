@@ -35,6 +35,10 @@ jobs:
       # three. The accessibility category is left out because axe already gates
       # a11y in light and dark, where Lighthouse only ever sees light.
       build-command: ci-build
+      # `npm run coverage` runs the same vitest projects `npm test` does, plus
+      # instrumentation, so the build job need not run the suite a second time —
+      # a node-test failure still fails CI, through coverage.
+      tests-in-coverage: true
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
