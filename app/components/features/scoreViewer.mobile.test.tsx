@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { useState } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { generatePhrase } from "../../../core/generator";
+import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 import { PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider } from "../../contexts/midi";
@@ -75,7 +75,10 @@ afterEach(() => {
 
 describe("ScoreViewer on a phone", () => {
     it("opens the Runs view from the resting action row", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Runs" }));
@@ -83,7 +86,10 @@ describe("ScoreViewer on a phone", () => {
     });
 
     it("puts the cursor at a tapped bar while the loop is off, to start from there", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const score = await screen.findByRole("img", { name: "T" });
         const svg = await waitFor(
@@ -120,7 +126,10 @@ describe("ScoreViewer on a phone", () => {
     });
 
     it("narrows the loop to a tapped bar, filling it with a red overlay", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const score = await screen.findByRole("img", { name: "T" });
         const svg = await waitFor(
@@ -164,7 +173,10 @@ describe("ScoreViewer on a phone", () => {
         // the score reclaims that space — a click with no pointer press on the score. That
         // must not silently build a one-bar loop the player never asked for.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         const score = mount(phrase, { beatsPerBar: 4 }).container;
         const img = await screen.findByRole("img", { name: "T" });
         fireEvent.click(await awaitReady());
@@ -187,7 +199,10 @@ describe("ScoreViewer on a phone", () => {
     });
 
     it("colours notes on the score as they are played", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         const { container } = mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
         const key = await screen.findByLabelText("C 5");
@@ -203,7 +218,10 @@ describe("ScoreViewer on a phone", () => {
 
     it("leaves full screen and keeps the score on screen when the run finishes", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
         const key = await screen.findByLabelText("C 5");

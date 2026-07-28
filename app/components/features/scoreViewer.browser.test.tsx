@@ -10,7 +10,7 @@ import { MidiProvider } from "../../contexts/midi";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { ServicesProvider } from "../../contexts/services";
 import type { DailyResult } from "../../../core/daily";
-import { generatePhrase } from "../../../core/generator";
+import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 
 import { encodeGhost } from "../../../core/ghost";
 import { browserStore } from "../../adapters/browserStore";
@@ -99,7 +99,10 @@ describe("ScoreViewer", () => {
 
     it("toggles the metronome from the run-setup panel", async () => {
         // Settings live in the run-setup panel you open before a run — not mid-play.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
@@ -114,7 +117,10 @@ describe("ScoreViewer", () => {
     it("opens a Runs view that explains how to make a run before any is saved", async () => {
         // The Runs button is always in the action row (on a savable piece) so the feature is
         // discoverable; opening it with nothing saved explains how to make a run.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Runs" }));
@@ -124,7 +130,10 @@ describe("ScoreViewer", () => {
     it("keeps the keys on stage through full screen, run or no run", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // An all-C5 phrase, so the C5 key is inside the keyboard's visible window.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await awaitReady();
         fireEvent.click(practice); // enters full screen and starts the run
@@ -144,7 +153,10 @@ describe("ScoreViewer", () => {
         // An all-C5 phrase: the old fixed C4–C6 keyboard always drew C4 and C6,
         // far from the single note played. The keyboard now frames the piece, so
         // those distant keys are gone while C5 stays.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
         expect(await screen.findByLabelText("C 5")).toBeTruthy();
@@ -154,7 +166,10 @@ describe("ScoreViewer", () => {
 
     it("offers the finger-numbers and follow-the-note toggles in the run-setup panel", async () => {
         // The reading aids live in the run-setup panel you open before a run.
-        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
@@ -181,7 +196,10 @@ describe("ScoreViewer", () => {
         // Switching fingering off must remove the numbers, not leave them stranded over the
         // reclaimed space: a bare re-render repositions the cached labels without destroying
         // them, so the toggle rebuilds the graphic model to re-create them per the rule.
-        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         const score = screen.getByRole("img", { name: "T" });
@@ -200,7 +218,10 @@ describe("ScoreViewer", () => {
     it("runs a tempo-locked play-along and reports how many notes you kept up with", async () => {
         // Small viewport → play-along auto-enters full screen; stub the withheld API.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -221,7 +242,10 @@ describe("ScoreViewer", () => {
         // it must still count in, tick to the end and record its tally — the reload that
         // draws the numbers happens at rest, before the run, so it can't strand a live run.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -246,7 +270,10 @@ describe("ScoreViewer", () => {
         // and the stale self-paced grade panel both show at once — and the grade panel's
         // Save prompt would save the old, unrelated take.
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         const seededResult: DailyResult = {
             grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
             grid: [["best", "good"]],
@@ -285,7 +312,10 @@ describe("ScoreViewer", () => {
     });
 
     it("puts the cursor at a tapped bar while the loop is off, to start from there", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const score = await screen.findByRole("img", { name: "T" });
         const svg = await waitFor(
@@ -321,7 +351,10 @@ describe("ScoreViewer", () => {
     });
 
     it("narrows the loop to a clicked bar, filling it with a red overlay", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const score = await screen.findByRole("img", { name: "T" });
         // Wait for OSMD to render the staff (its glyph groups are what the boxes measure).
@@ -365,7 +398,10 @@ describe("ScoreViewer", () => {
     });
 
     it("re-renders as a single horizontal line when treadmill is toggled on", async () => {
-        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -389,7 +425,10 @@ describe("ScoreViewer", () => {
     });
 
     it("keeps the loop on across a treadmill toggle — the two are independent", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -421,7 +460,10 @@ describe("ScoreViewer", () => {
     });
 
     it("toggles bar numbers, persists the choice, and re-renders the score", async () => {
-        const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -448,7 +490,10 @@ describe("ScoreViewer", () => {
     });
 
     it("replaces the previous render instead of stacking when the layout changes", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const ready = async () =>
             waitFor(
@@ -484,7 +529,10 @@ describe("ScoreViewer", () => {
         }));
         const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // A one-bar phrase whose every note is C5, so the same key clears each position.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -517,7 +565,10 @@ describe("ScoreViewer", () => {
         const onRunComplete = vi.fn();
         // Built once so the xml prop stays referentially stable across the harness's
         // re-renders; a fresh string would reload OSMD mid-run and derail the test.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         function Harness() {
             const [, setPlayed] = useState(false);
             return (
@@ -561,7 +612,10 @@ describe("ScoreViewer", () => {
     it("keeps a finished run as a take without a separate save press", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // A one-bar phrase whose every note is C5, so the same key clears each position.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
         const key = await screen.findByLabelText("C 5");
@@ -583,7 +637,10 @@ describe("ScoreViewer", () => {
 
     it("holds the take-save until the final note is released, so its hold isn't clipped", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
         const key = await screen.findByLabelText("C 5");
@@ -613,7 +670,10 @@ describe("ScoreViewer", () => {
             media: query,
         }));
         const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
         // At rest the /play view is a single action: Listen is not inline, it waits in the
@@ -632,7 +692,10 @@ describe("ScoreViewer", () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // Four C5 notes: the same key clears every position, so playing two leaves the
         // run halfway with the cursor partway through.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady()); // Practice: a full-screen run over all four notes
         const key = await screen.findByLabelText("C 5");
@@ -656,7 +719,10 @@ describe("ScoreViewer", () => {
     it("keeps the place when you leave full screen and come back", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // Four C5 notes; playing two leaves the run halfway.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady()); // Practice: a full-screen run over all four notes
         const key = await screen.findByLabelText("C 5");
@@ -680,7 +746,10 @@ describe("ScoreViewer", () => {
         // Re-opening a finished daily seeds the grade on mount; the result-scroll must
         // not fire then and yank the page down before the player has done anything.
         const scroll = vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(() => {});
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         const seededResult: DailyResult = {
             grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
             grid: [["best", "good"]],
@@ -734,7 +803,10 @@ describe("ScoreViewer", () => {
             notes: [...rightAtTempo, ...leftSlow],
             tolerance: 1,
         };
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, hands: 2, low: 60, high: 79 },
+            () => 0.5,
+        );
         render(
             <MemoryRouter>
                 <ServicesProvider services={midiFake}>
@@ -757,7 +829,10 @@ describe("ScoreViewer", () => {
 
     it("scrolls to the grade when a run finishes in this session", async () => {
         const scroll = vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(() => {});
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practice = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
@@ -776,7 +851,10 @@ describe("ScoreViewer", () => {
     it("colours notes on the score as they are played", async () => {
         // A one-bar phrase whose every note is the first scale degree (C5), so the
         // same key clears each position in turn.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         const { container } = mount(phrase, { beatsPerBar: 4 });
         // Wait for OSMD to be ready via the real signal — the Practice button
         // enabling — since toolbar icons mean "any svg" is present from the start.
@@ -809,7 +887,10 @@ describe("ScoreViewer", () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // mount() renders with id "t"; a saved ghost for it is loaded on Practice.
         createGhostStore(browserStore).save("t", [0, 500, 1000]);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         const { container } = mount(phrase, { beatsPerBar: 4 });
         // Wait for OSMD to be ready via the real signal — the Practice button
         // enabling — since toolbar icons mean "any svg" is present from the start.
@@ -838,7 +919,10 @@ describe("ScoreViewer", () => {
         // played, the ghost belongs at the start line — not painted at the finish
         // because the stale elapsed time reads as the whole piece already played.
         createGhostStore(browserStore).save("t", [0, 500, 1000]);
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase, { beatsPerBar: 4 });
         const practiceButton = await screen.findByRole("button", { name: "Practice" });
         await waitFor(() => expect((practiceButton as HTMLButtonElement).disabled).toBe(false), {
@@ -863,7 +947,10 @@ describe("ScoreViewer", () => {
     });
 
     it("adopts a ghost handed over by a link", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         const code = encodeGhost([0, 500, 1000]);
         render(
             <MemoryRouter initialEntries={[`/play/t?ghost=${code}`]}>
@@ -878,7 +965,10 @@ describe("ScoreViewer", () => {
     });
 
     it("lights the note now sounding while listening, so the eye can follow", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await enterAndListen();
         // As playback walks the score, exactly the notes under the cursor wear the
@@ -895,7 +985,10 @@ describe("ScoreViewer", () => {
     });
 
     it("leaves a blue trail on the notes Listen has played", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await enterAndListen();
         // As playback advances, the notes it has moved past wear the persistent listened
@@ -912,7 +1005,10 @@ describe("ScoreViewer", () => {
     });
 
     it("offers Restart while listening and takes the playback back to the top", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await enterAndListen();
         // Let playback advance far enough to leave a trail.
@@ -937,7 +1033,10 @@ describe("ScoreViewer", () => {
     });
 
     it("leaves the note sounding at a Listen stop blue, not snapped back to black", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         await enterAndListen();
         await expect
@@ -964,7 +1063,10 @@ describe("ScoreViewer", () => {
     it("keeps the notes you practised coloured when you hand off to Listen", async () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
         // Four C5 notes; play two so they turn green.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         const { container } = mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await awaitReady());
         const key = await screen.findByLabelText("C 5");
@@ -988,8 +1090,16 @@ describe("ScoreViewer", () => {
         // (the shorter note), not linger for the longest, or the second hand's notes queue
         // up behind a held whole note. Here the run reaching the notes proves the grand
         // staff drives playback end to end; lib/playback pins the interval arithmetic.
-        const phrase = generatePhrase(
-            { bars: 2, beatsPerBar: 4, twoHands: true, rhythm: "varied" },
+        const phrase = generateDrill(
+            {
+                ...DEFAULT_DRILL,
+                bars: 2,
+                beatsPerBar: 4,
+                hands: 2,
+                low: 60,
+                high: 79,
+                rhythm: "varied",
+            },
             () => 0.5,
         );
         mount(phrase, { beatsPerBar: 4 });
@@ -1007,7 +1117,10 @@ describe("ScoreViewer", () => {
     });
 
     it("offers a hands-separate selector only for a grand staff", async () => {
-        const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
+        const grand = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, hands: 2, low: 60, high: 79 },
+            () => 0.5,
+        );
         mount(grand, { beatsPerBar: 4 });
         fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         // The selector appears once OSMD reports two staves; its three options name
@@ -1018,7 +1131,10 @@ describe("ScoreViewer", () => {
     });
 
     it("keeps the chosen hand across a relayout — the hand belongs to the piece, not the layout", async () => {
-        const grand = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: true }, () => 0.5);
+        const grand = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, hands: 2, low: 60, high: 79 },
+            () => 0.5,
+        );
         mount(grand, { beatsPerBar: 4 });
         fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         const left = await screen.findByRole("tab", { name: "Left" }, { timeout: 30000 });
@@ -1041,7 +1157,10 @@ describe("ScoreViewer", () => {
     });
 
     it("omits the hands selector for a single-staff score", async () => {
-        const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const single = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(single, { beatsPerBar: 4 });
         // Wait until the score is interactive, then confirm the single-staff piece offers
         // no hand choice.
@@ -1052,7 +1171,10 @@ describe("ScoreViewer", () => {
     });
 
     it("reveals the section-loop bar inputs only once looping is on", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         const loop = await screen.findByRole("switch", { name: "Loop" }, { timeout: 30000 });
@@ -1070,7 +1192,10 @@ describe("ScoreViewer", () => {
     });
 
     it("never lets the loop range invert", async () => {
-        const phrase = generatePhrase({ bars: 3, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 3, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(phrase, { beatsPerBar: 4 });
         fireEvent.click(await screen.findByRole("button", { name: "Set up your run" }));
         fireEvent.click(await screen.findByRole("switch", { name: "Loop" }, { timeout: 30000 }));
@@ -1085,14 +1210,20 @@ describe("ScoreViewer", () => {
     });
 
     it("omits the section-loop control for a single-bar score", async () => {
-        const single = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const single = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount(single, { beatsPerBar: 4 });
         await awaitReady();
         expect(screen.queryByText(/Loop/)).toBeNull();
     });
 
     it("transposes by semitones and re-renders the score in the new key", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         const { container } = mount(phrase, { beatsPerBar: 4 });
         await waitFor(() => expect(container.querySelector("svg")).toBeTruthy(), {
             timeout: 30000,
@@ -1114,7 +1245,10 @@ describe("ScoreViewer", () => {
     });
 
     it("hides transposition for a locked-tempo challenge so it stays identical for all", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         render(
             <MemoryRouter>
                 <ServicesProvider services={midiFake}>
@@ -1145,7 +1279,10 @@ describe("ScoreViewer", () => {
         // re-renders the score — which disables Practice until OSMD has redrawn. So
         // every step here waits for readiness the way a player would.
         const armSightRead = async () => {
-            const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+            const phrase = generateDrill(
+                { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+                () => 0.5,
+            );
             mount(phrase, { beatsPerBar: 4 });
             await awaitReady();
             fireEvent.click(screen.getByText("Set up your run"));
@@ -1154,7 +1291,10 @@ describe("ScoreViewer", () => {
         };
 
         it("keeps its study and tempo choices out of the way until the mode is on", async () => {
-            const phrase = generatePhrase({ bars: 2, beatsPerBar: 4, twoHands: false }, () => 0.5);
+            const phrase = generateDrill(
+                { ...DEFAULT_DRILL, bars: 2, beatsPerBar: 4, low: 72, high: 79 },
+                () => 0.5,
+            );
             mount(phrase, { beatsPerBar: 4 });
             await awaitReady();
             fireEvent.click(screen.getByText("Set up your run"));

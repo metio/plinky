@@ -177,7 +177,14 @@ one-tap **review session** walks you through everything that's fading, and you c
   streak to keep up. An unplayed day arrives as a little present to open; once
   played, re-opening the day's challenge shows your result again. Like any piece, the day's phrase leaves through the title line's **Export
   menu** — print it, or download it as MIDI or MusicXML, each option explained in
-  plain words. A **Warm up** tab drills unlimited fresh phrases to prepare for it.
+  plain words. A **Warm up** tab drills unlimited fresh phrases to prepare for it —
+  and those phrases are yours to shape: pick any of the **fifteen key signatures**
+  (or read **every note in the octave** and take the accidentals as they come), set
+  the **range** the notes are drawn from anywhere on the 88 keys, choose **one hand
+  or two**, stack **up to four notes at once** into chords to read down, pick
+  **quarters, eighths or a mix**, cap the **biggest jump** between notes, and ask the
+  drill to **stay close** so the next note lands near the last. Nothing is
+  memorisable — every setting makes fresh notation on the spot.
 - **Compose** — improvise freely and Plinky captures every note, sketching it onto
   a staff to share or export (see below). **Count in** works like a play page's
   Practice: it drops into **full screen**, and only there do the on-screen keys

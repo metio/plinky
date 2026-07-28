@@ -9,7 +9,8 @@ import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
 import { useAnalytics, useDailyStore } from "../contexts/services";
-import { generatePhrase } from "../../core/generator";
+import { DEFAULT_DRILL, type DrillOptions, generateDrill } from "../../core/drill";
+import { DrillSetup } from "../components/features/drillSetup";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -34,7 +35,9 @@ export function meta(_args: Route.MetaArgs) {
 // date-independent <head> meta stays valid and no stale number is baked in.
 type Today = { number: number; tempo: number; xml: string; result: DailyResult | null };
 
-const WARMUP = { bars: 8, beatsPerBar: 4 };
+// The warm-up starts where the daily does — a beginner's five-finger read — and
+// every control on the panel moves it from there.
+const WARMUP: DrillOptions = { ...DEFAULT_DRILL, bars: 8, beatsPerBar: 4, low: 72, high: 79 };
 
 export default function DailyRoute() {
     const daily = useDailyStore();
@@ -46,7 +49,7 @@ export default function DailyRoute() {
     // counter regenerates and remounts the viewer.
     const [run, setRun] = useState(0);
     const [warmupXml, setWarmupXml] = useState<string | null>(null);
-    const [twoHands, setTwoHands] = useState(false);
+    const [drill, setDrill] = useState<DrillOptions>(WARMUP);
 
     useEffect(() => {
         const dateKey = todayKey(new Date());
@@ -55,22 +58,24 @@ export default function DailyRoute() {
         setToday({ number, tempo, xml, result: daily.loadResult(number) });
     }, [daily]);
 
-    const regenerate = (hands: boolean) => {
+    const regenerate = (options: DrillOptions) => {
         // The warm-up is deliberately unseeded — a different phrase every run, unlike
         // the day's challenge, which every player must share.
-        setWarmupXml(generatePhrase({ ...WARMUP, twoHands: hands }, Math.random));
+        setWarmupXml(generateDrill(options, Math.random));
         setRun((value) => value + 1);
     };
     // Generate the first warm-up phrase only when the player opens that tab.
     const openWarmup = () => {
         setMode("warmup");
         if (!warmupXml) {
-            regenerate(twoHands);
+            regenerate(drill);
         }
     };
-    const toggleHands = () => {
-        const next = !twoHands;
-        setTwoHands(next);
+    // Changing the shape of the drill regenerates it: the panel describes the piece
+    // in front of you, so leaving the old one up would make every control read as
+    // broken until the next press.
+    const reshape = (next: DrillOptions) => {
+        setDrill(next);
         regenerate(next);
     };
 
@@ -134,24 +139,18 @@ export default function DailyRoute() {
                 <>
                     <p className="text-sm text-gray-600 dark:text-gray-400">{m.sprint_intro()}</p>
                     <div className="flex flex-wrap items-center gap-3">
-                        <Button variant="primary" onClick={() => regenerate(twoHands)}>
-                            {m.sprint_fresh()}
-                        </Button>
-                        <Button
-                            variant={twoHands ? "primary" : "secondary"}
-                            aria-pressed={twoHands}
-                            onClick={toggleHands}
-                        >
-                            {m.sprint_two_hands()}
+                        <Button variant="primary" onClick={() => regenerate(drill)}>
+                            {m.drill_new()}
                         </Button>
                     </div>
+                    <DrillSetup value={drill} onChange={reshape} />
                     {warmupXml && (
                         <ScoreViewer
                             key={run}
                             id="warmup"
                             xml={warmupXml}
                             title={m.daily_tab_warmup()}
-                            beatsPerBar={WARMUP.beatsPerBar}
+                            beatsPerBar={drill.beatsPerBar}
                             ephemeral
                         />
                     )}

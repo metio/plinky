@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { browserStore } from "../../adapters/browserStore";
-import { generatePhrase } from "../../../core/generator";
+import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 import { loadBundledScores, loadUserScores } from "../../lib/catalog";
 import { ScoreImport } from "./scoreImport";
 
@@ -28,7 +28,10 @@ afterEach(() => {
 
 describe("ScoreImport", () => {
     it("previews a dropped MusicXML file, then imports it with edited fields", async () => {
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0.5);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0.5,
+        );
         mount();
         drop(fileInput(), new File([phrase], "tune.musicxml", { type: "application/xml" }));
 

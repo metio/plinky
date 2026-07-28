@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { generatePhrase } from "./generator";
+import { DEFAULT_DRILL, generateDrill } from "./drill";
 import type { Grade } from "./grade";
 import { hashString, seededRandom } from "./random";
 import type { Grid, RunNote } from "./shareCard";
@@ -52,13 +52,18 @@ export function dailyChallenge(dateKey: string, number: number): DailyChallenge 
     const tempo = DAILY_MIN_BPM + Math.round(rng() * (DAILY_MAX_BPM - DAILY_MIN_BPM));
     const beats = Math.round((DAILY_SECONDS * tempo) / 60);
     const bars = Math.max(1, Math.round(beats / BEATS_PER_BAR));
-    const xml = generatePhrase(
+    // The day's phrase is deliberately a beginner's read: one hand, C major, the
+    // five-finger position C5–G5, mixed note values. Everyone plays the same drill,
+    // so it is pitched at whoever might open it rather than at whoever is best.
+    const xml = generateDrill(
         {
+            ...DEFAULT_DRILL,
             bars,
             beatsPerBar: BEATS_PER_BAR,
-            twoHands: false,
-            title: `Plinky #${number}`,
+            low: 72,
+            high: 79,
             rhythm: "varied",
+            title: `Plinky #${number}`,
         },
         rng,
     );

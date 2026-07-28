@@ -21,8 +21,10 @@ export const RHYTHM: Record<RhythmValue, { divisions: number; type: string }> = 
     half: { divisions: 4, type: "half" },
 };
 
-// A pitch paired with how long it sounds.
-export type BuiltNote = { pitch: BuiltPitch; value: RhythmValue };
+// A pitch paired with how long it sounds. `with` carries the rest of a chord —
+// pitches struck at the same moment and held for the same value, which MusicXML
+// spells as following notes marked <chord/>.
+export type BuiltNote = { pitch: BuiltPitch; value: RhythmValue; with?: BuiltPitch[] };
 
 const SHARP_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
 const FLAT_ORDER = ["B", "E", "A", "D", "G", "C", "F"];
@@ -43,12 +45,27 @@ function escapeXml(text: string): string {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function noteXml(note: BuiltNote, staff?: number): string {
-    const { pitch, value } = note;
+// One <note>. `chord` marks it as sounding with the note before it rather than
+// after — the duration is still written, but the reader does not advance.
+function oneNoteXml(
+    pitch: BuiltPitch,
+    value: RhythmValue,
+    staff: number | undefined,
+    chord: boolean,
+): string {
     const { divisions, type } = RHYTHM[value];
     const alter = pitch.alter === 0 ? "" : `<alter>${pitch.alter}</alter>`;
     const staffTag = staff ? `<staff>${staff}</staff>` : "";
-    return `      <note><pitch><step>${pitch.step}</step>${alter}<octave>${pitch.octave}</octave></pitch><duration>${divisions}</duration><type>${type}</type>${staffTag}</note>`;
+    const chordTag = chord ? "<chord/>" : "";
+    return `      <note>${chordTag}<pitch><step>${pitch.step}</step>${alter}<octave>${pitch.octave}</octave></pitch><duration>${divisions}</duration><type>${type}</type>${staffTag}</note>`;
+}
+
+function noteXml(note: BuiltNote, staff?: number): string {
+    const head = oneNoteXml(note.pitch, note.value, staff, false);
+    if (!note.with || note.with.length === 0) {
+        return head;
+    }
+    return [head, ...note.with.map((p) => oneNoteXml(p, note.value, staff, true))].join("\n");
 }
 
 export type ScoreSpec = {

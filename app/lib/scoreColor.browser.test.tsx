@@ -4,7 +4,7 @@
 import { ColoringModes, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { collectSteps } from "../hooks/useScoreMatcher";
-import { generatePhrase } from "../../core/generator";
+import { DEFAULT_DRILL, generateDrill } from "../../core/drill";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import { PLAYED_COLOR } from "../../core/scoreCanvas";
 import { collectNoteElements, paintPlayedNotes } from "./scoreColor";
@@ -28,7 +28,10 @@ async function renderOsmd(xml: string): Promise<OpenSheetMusicDisplay> {
     return osmd;
 }
 
-const PHRASE = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+const PHRASE = generateDrill(
+    { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+    () => 0,
+);
 
 // The class the feedback layer tags its per-note halos with.
 const HALO = ".plinky-note-halo";

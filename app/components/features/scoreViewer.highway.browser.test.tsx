@@ -4,7 +4,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { generatePhrase } from "../../../core/generator";
+import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
@@ -40,7 +40,10 @@ describe("notes-highway reading mode", () => {
         vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
 
         // A one-bar phrase whose every note is C5, so one key clears each position.
-        const phrase = generatePhrase({ bars: 1, beatsPerBar: 4, twoHands: false }, () => 0);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
         mount(phrase);
         const practice = await screen.findByRole(
             "button",

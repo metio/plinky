@@ -144,7 +144,9 @@ describe("Daily", () => {
         );
         // The folded-in sprint: switching tabs reveals its controls and a phrase.
         fireEvent.click(await screen.findByText("Warm up"));
-        expect(screen.getByText("New phrase")).toBeTruthy();
+        expect(screen.getByText("New drill")).toBeTruthy();
+        // The drill panel shapes the phrase in place of the old two-hands button.
+        expect(screen.getByText("Shape the drill")).toBeTruthy();
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
     });
 });
