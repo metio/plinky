@@ -6,6 +6,8 @@
 // static finger-exercise scores are emitted by the same model offline in
 // dev/gen-exercise-scores.mjs.
 
+export { alterFor } from "./notes";
+
 export type BuiltPitch = { step: string; octave: number; alter: number };
 
 // The rhythmic values a generated phrase uses — quarters, on-beat eighth pairs and
@@ -26,20 +28,6 @@ export const RHYTHM: Record<RhythmValue, { divisions: number; type: string }> = 
 // spells as following notes marked <chord/>.
 export type BuiltNote = { pitch: BuiltPitch; value: RhythmValue; with?: BuiltPitch[] };
 
-const SHARP_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
-const FLAT_ORDER = ["B", "E", "A", "D", "G", "C", "F"];
-
-// The diatonic alteration a key signature applies to a letter, so notes are spelled
-// from plain letters and the signature supplies the sharps and flats.
-export function alterFor(letter: string, fifths: number): number {
-    if (fifths > 0) {
-        return SHARP_ORDER.slice(0, fifths).includes(letter) ? 1 : 0;
-    }
-    if (fifths < 0) {
-        return FLAT_ORDER.slice(0, -fifths).includes(letter) ? -1 : 0;
-    }
-    return 0;
-}
 
 function escapeXml(text: string): string {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

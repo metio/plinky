@@ -10,8 +10,8 @@
 // Pure: the rng arrives as a parameter, so a seeded drill (the daily) and an
 // unseeded one (a warm-up) run the identical code.
 
+import { alterFor, LETTERS, SEMITONE } from "./notes";
 import {
-    alterFor,
     type BuiltNote,
     type BuiltPitch,
     buildScore,
@@ -74,10 +74,6 @@ export const DEFAULT_DRILL: DrillOptions = {
     smoothness: 0,
 };
 
-const LETTERS = ["C", "D", "E", "F", "G", "A", "B"];
-// Semitones above C for each natural letter.
-const NATURAL: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-
 // A MIDI note spelled for a key signature: the letter whose signature alteration
 // already lands on this pitch when there is one, so a scale tone is written plain
 // and the signature does the work. A note outside the key takes an accidental,
@@ -86,7 +82,7 @@ export function spell(midi: number, fifths: number): BuiltPitch {
     const pc = ((midi % 12) + 12) % 12;
     for (const letter of LETTERS) {
         const alter = alterFor(letter, fifths);
-        if (((((NATURAL[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+        if (((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
             return { step: letter, octave: octaveOf(midi, letter, alter), alter };
         }
     }
@@ -95,7 +91,7 @@ export function spell(midi: number, fifths: number): BuiltPitch {
     for (const letter of LETTERS) {
         const base = alterFor(letter, fifths);
         const alter = base - direction;
-        if (Math.abs(alter) <= 2 && ((((NATURAL[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
+        if (Math.abs(alter) <= 2 && ((((SEMITONE[letter] ?? 0) + alter) % 12) + 12) % 12 === pc) {
             return { step: letter, octave: octaveOf(midi, letter, alter), alter };
         }
     }
@@ -108,7 +104,7 @@ export function spell(midi: number, fifths: number): BuiltPitch {
 // alteration comes back out here.
 function octaveOf(midi: number, letter: string, alter: number): number {
     const natural = midi - alter;
-    return Math.floor(natural / 12) - 1 + (natural % 12 < (NATURAL[letter] ?? 0) ? 1 : 0);
+    return Math.floor(natural / 12) - 1 + (natural % 12 < (SEMITONE[letter] ?? 0) ? 1 : 0);
 }
 
 // Every MIDI note in range the drill may draw, low to high: the key's seven pitch
@@ -117,7 +113,7 @@ function octaveOf(midi: number, letter: string, alter: number): number {
 export function pitchPool(options: DrillOptions): number[] {
     const { low, high, fifths, chromatic } = options;
     const inKey = new Set(
-        LETTERS.map((letter) => (((NATURAL[letter] ?? 0) + alterFor(letter, fifths)) % 12 + 12) % 12),
+        LETTERS.map((letter) => (((SEMITONE[letter] ?? 0) + alterFor(letter, fifths)) % 12 + 12) % 12),
     );
     const pool: number[] = [];
     for (let midi = Math.max(LOWEST_MIDI, low); midi <= Math.min(HIGHEST_MIDI, high); midi++) {

@@ -51,110 +51,23 @@ const VENDOR = /opensheetmusicdisplay/;
 // so like OSMD they are budgeted apart from the per-visitor app weight.
 const ON_DEMAND = /webCodecsVideo/;
 
-// The client bundle a SINGLE visitor downloads: the fixed OSMD vendor chunk
-// (~310 KB, pinned) plus our own code. CI measures a per-locale build
-// (`PLINKY_LOCALE=en npm run build`), because the deploy ships one tree-shaken
+// What a single visitor downloads, in two independent measurements. CI builds one
+// locale (`PLINKY_LOCALE=en npm run build`), because the deploy ships a tree-shaken
 // bundle per language (dev/build-locales.mjs) — a German visitor never downloads
-// Korean. So this tracks real per-visitor weight, not the summed all-locales output.
-// The UI copy is inlined per locale, so the warmth of the writing has a byte cost:
-// an invitation ("Give it a go, see how it lands") runs longer than the instruction
-// it replaces. 565 bought that voice roughly 1 KB of room over the measured 564.1.
+// Korean. So these track real per-visitor weight, not the summed all-locales output.
 //
-// The /ear page — the pure theory vocabulary and question generators, the interval
-// ladder and answer keyboard, the listening stage, and 39 strings inlined per locale
-// — adds ~4.5 KB, measured at 569.5. 570 keeps the same roughly-1-KB margin.
+// There used to be a third budget over the total. It carried no signal of its own:
+// total is app + vendor + on-demand, and the other two only move when a dependency
+// is upgraded, so every ordinary feature moved the total and the app figure by the
+// same amount and the two had to be raised together, in lockstep, forever. A gate
+// that always fires alongside another gate is ceremony, not an alarm. The vendor
+// budget below replaces it and watches the thing the total was accidentally
+// hiding — a dependency growing — which the app budget genuinely cannot see.
+// (Per-release totals from before the change are in git, not here.)
 //
-// Wiring ear rounds into the grades — the ear catalogue that places each exercise on the
-// ladder, the bounded session that records mastery, three ear achievements, and 5 more
-// strings per locale — adds ~1.6 KB, measured at 571.1. 572 keeps the margin.
-//
-// The first-class item kind (a piece opens a score, an ear item runs a drill) that
-// retired the id-prefix sniffing — the shared practiceHref, the ear-review drill in the
-// review session, and the /ear deep-link — adds ~0.9 KB, measured at 572.0. 573 restores
-// the margin.
-//
-// The chords and scales ear exercises — the chord/scale theory tables and their two
-// generators, the naming choice grid, and 33 more strings (the two exercises, their
-// levels, and the chord/scale/mode names) inlined per locale — add ~1.5 KB, measured at
-// 573.6. 575 restores the margin.
-//
-// The three functional exercises — the key-setting cadence, the scale-degree/interval-in-
-// context/melodic-dictation generators, and 14 more strings per locale — add ~2 KB,
-// measured at 575.5. 577 restores the margin.
-//
-// The About page — the two founder cards and the "why we made it" note, plus its nine
-// strings inlined per locale — adds ~0.8 KB, measured at 577.8. 579 restores the margin.
-//
-// The notes-highway (on-screen reading mode + highway video-export format, with its five
-// new strings inlined per locale) — adds ~0.5 KB, measured at 579.5. 580 restores the margin.
-//
-// The About page's contact section (five new strings inlined per locale) plus its
-// accessibility note and the peck Easter egg — add ~0.2 KB, measured at 580.2. 581.
-//
-// The Impressum and Datenschutzerklärung — two prerendered legal routes whose German
-// legal prose is inlined in the components — add ~1.8 KB, measured at 582.8. 583.
-//
-// The composer-page structured data (Person / ItemList / BreadcrumbList helpers in
-// core/site, wired into the person route) — adds ~0.2 KB, measured at 583.2. 584.
-//
-// The skill-level preset + the Reading section of Settings (the ReadingLevel control,
-// core/readingLevel, and the run-panel reading prefs mirrored onto the Settings page)
-// — add ~1.8 KB, measured at 585.0. 586.
-//
-// The consent-gated analytics setting (analytics port + gtag adapter + the reactor +
-// the Privacy Settings section; gtag.js itself loads externally, not bundled) — adds
-// ~1.1 KB, measured at 586.1. 587.
-//
-// The legal-page translations + the first-visit analytics consent banner (the moved
-// legal prose in the one built locale, LegalTranslationNotice, ConsentBanner and its
-// strings) — add ~0.2 KB to the per-visitor total, measured at 587.2. 588.
-//
-// The ghost-race duel facelift (GhostTrack's two racer chips, gradient lane and finish
-// line replacing the plain bar) — adds ~0.1 KB, measured at 588.0. 589.
-//
-// The monthly recap card (monthlyRecap in core/history, the RecapCard on the You page
-// with its Intl month formatting, and the recap strings inlined per locale — the duel
-// verdict and "Surprise me" pick before it stayed within 589) — tips the per-visitor
-// total to a measured 589.5. 590.
-//
-// The groove metronome (grooveAccents + its Settings control) and the unlockable
-// keyboard skins (core/keyboardTheme, useKeyboardTheme, the KeyboardThemePicker, and the
-// groove + theme strings inlined per locale) — tip the total to a measured 590.2. 591.
-//
-// The duet toggle and the sight-reading arcade (core/arcade, the ArcadeCard on the home
-// page, the exercise source's generate-any-valid-id fallback, and the duet + arcade
-// strings inlined per locale) — tip the per-visitor total to a measured 591.0. 592.
-//
-// The self-paced duet (core/duet's gap scheduler and the useDuet hook that plays the
-// sitting-out hand at your live tempo) — tips the total to a measured 592.2. 593.
-//
-// The play run-setup regroup (SettingsSection cards + group strings per locale) and the
-// analytics event layer (the track() surface, core/analyticsPrefs, the AnalyticsTracking
-// page-view / setting-change watcher, plus run and video-export events) — net of removing
-// the full-screen setup sheet — tip the total to a measured 593.3. 594.
-//
-// The analytics funnel events (the delegated click tracker with its clickInfo naming, plus
-// song/import/share/daily/review/compose/MIDI/milestone/keep-up events at their choke
-// points) — tip the per-visitor total to a measured 594.5. 595.
-//
-// Whole-device progress backup and restore (the bundle codec, the storage-seam
-// export/import, and the Settings section with its copy) — tips the per-visitor
-// total to a measured 595.7. 596.
-//
-// Sight-read mode (core/sightRead, the session hook and its study countdown, the
-// vanishing-bars drill, and the run-setup block with its copy) — tips the
-// per-visitor total to a measured 597.1. 598.
-//
-// The drill generator and its setup panel (core/drill + core/drillSpec, the
-// spec-rendered controls, and the copy for nine options) — net of deleting the
-// five-finger generator it replaces — tip the total to a measured 599.2. 600.
-//
-// The placement test (core/placement's ladder and rung profiles, its route and
-// store, and the copy for the test) — tips the total to a measured 601.5. 602.
-//
-// Handing an assignment back (the report codec, the student's panel and the
-// teacher's collect page) — tips the total to a measured 605.0. 605.
-const BUDGET_TOTAL_KB = 605;
+// OSMD is pinned and lazy-loaded on score pages; a jump here means a dependency
+// grew, which is a different conversation from our own code growing.
+const BUDGET_VENDOR_KB = 311;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -332,12 +245,12 @@ for (const chunk of chunks.slice(0, 8)) {
 }
 console.log(
     `Total ${kb(total)} KB · vendor/OSMD ${kb(vendor)} KB · on-demand ${kb(onDemand)} KB · ` +
-        `app ${kb(app)} KB (budgets: total ${BUDGET_TOTAL_KB}, app ${BUDGET_APP_KB})`,
+        `app ${kb(app)} KB (budgets: app ${BUDGET_APP_KB}, vendor ${BUDGET_VENDOR_KB})`,
 );
 
 const problems = [];
-if ((total - onDemand) / 1024 > BUDGET_TOTAL_KB) {
-    problems.push(`total ${kb(total - onDemand)} KB exceeds the ${BUDGET_TOTAL_KB} KB budget`);
+if (vendor / 1024 > BUDGET_VENDOR_KB) {
+    problems.push(`vendor ${kb(vendor)} KB exceeds the ${BUDGET_VENDOR_KB} KB budget`);
 }
 if (app / 1024 > BUDGET_APP_KB) {
     problems.push(`app ${kb(app)} KB exceeds the ${BUDGET_APP_KB} KB budget`);

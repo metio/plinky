@@ -6,13 +6,12 @@ import type { HandSpan } from "../../core/prefs";
 import { type FingerMap, fingerKey } from "../stores/fingeringStore";
 import { scoreToBars } from "../../core/scoreToBars";
 import type { XmlCodec } from "../../core/xml";
+import { SEMITONE } from "../../core/notes";
 
 // Suggested fingering belongs on the staff, the way printed music carries it —
 // tied to the note you read, not mapped onto a key. This annotates a score's
 // MusicXML with <technical><fingering> per note, computed per hand from the
 // fingering cost model and personalised to the player's reach, for OSMD to print.
-
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
 function midiOf(note: Element): number | null {
     const pitch = note.querySelector("pitch");
@@ -20,7 +19,7 @@ function midiOf(note: Element): number | null {
         return null; // a rest or unpitched note has no finger
     }
     const step = pitch.querySelector("step")?.textContent?.trim() ?? "";
-    const semitone = STEP_SEMITONES[step];
+    const semitone = SEMITONE[step];
     if (semitone === undefined) {
         return null;
     }

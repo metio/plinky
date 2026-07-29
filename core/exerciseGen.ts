@@ -7,6 +7,8 @@
 // links, and mastery keep working; the canonical form (1 octave, right hand, root
 // position) keeps its plain id (scale-c-major) for backward compatibility.
 
+import { alterFor, LETTERS, SEMITONE } from "./notes";
+
 export type ExerciseType =
     | "major-scale"
     | "natural-minor-scale"
@@ -33,10 +35,6 @@ export type ExerciseConfig = {
 
 type Note = { letter: string; octave: number; alter: number };
 
-const ORDER = ["C", "D", "E", "F", "G", "A", "B"];
-const STEP: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-const SHARP_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
-const FLAT_ORDER = ["B", "E", "A", "D", "G", "C", "F"];
 
 // slug -> [tonic letter, key-signature fifths] for the major and minor contexts.
 const MAJOR_KEYS: Record<string, [string, number]> = {
@@ -103,24 +101,19 @@ const niceKey = (slug: string): string =>
           ? `${slug[0]!.toUpperCase()}♭`
           : slug.toUpperCase();
 
-function alterFor(letter: string, fifths: number): number {
-    if (fifths > 0) return SHARP_ORDER.slice(0, fifths).includes(letter) ? 1 : 0;
-    if (fifths < 0) return FLAT_ORDER.slice(0, -fifths).includes(letter) ? -1 : 0;
-    return 0;
-}
 const degreeOf = (letter: string, tonic: string): number =>
-    (ORDER.indexOf(letter) - ORDER.indexOf(tonic) + 7) % 7;
+    (LETTERS.indexOf(letter) - LETTERS.indexOf(tonic) + 7) % 7;
 const midiOf = (note: Note): number =>
-    (note.octave + 1) * 12 + (STEP[note.letter] ?? 0) + note.alter;
+    (note.octave + 1) * 12 + (SEMITONE[note.letter] ?? 0) + note.alter;
 
 // Diatonic letters from the tonic, ascending or descending, `octaves` octaves plus
 // the closing tonic. The octave number ticks at C (scientific pitch).
 function diatonic(tonic: string, fifths: number, octaves: number, dir: 1 | -1): Note[] {
-    let index = ORDER.indexOf(tonic);
+    let index = LETTERS.indexOf(tonic);
     let octave = 4;
     const notes: Note[] = [];
     for (let step = 0; step < octaves * 7; step++) {
-        const letter = ORDER[index]!;
+        const letter = LETTERS[index]!;
         notes.push({ letter, octave, alter: alterFor(letter, fifths) });
         if (dir === 1) {
             index = (index + 1) % 7;
@@ -130,7 +123,7 @@ function diatonic(tonic: string, fifths: number, octaves: number, dir: 1 | -1): 
             index = (index + 6) % 7;
         }
     }
-    const last = ORDER[index]!;
+    const last = LETTERS[index]!;
     notes.push({ letter: last, octave, alter: alterFor(last, fifths) });
     return notes;
 }
