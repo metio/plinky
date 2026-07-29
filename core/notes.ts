@@ -40,3 +40,22 @@ export function alterFor(letter: string, fifths: number): number {
     }
     return 0;
 }
+
+// Fixed-do solfège: which of the seven syllables a pitch class is named by, and
+// whether it needs a sharp on top. Fixed-do (do is always C) is how the syllables
+// are used across the Romance and Slavic traditions, where they are not a teaching
+// aid but simply what the notes are called.
+//
+// The syllables themselves are not here: they are spelled differently from one
+// language to the next (dó and ré in Portuguese, ré in French), so they live with
+// the rest of the translated copy. This gives their index; the caller names them.
+const SOLFEGE_DEGREE = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+
+export type SolfegeName = { degree: number; sharp: boolean };
+
+export function solfegeOf(midi: number): SolfegeName {
+    const pc = ((midi % 12) + 12) % 12;
+    const degree = SOLFEGE_DEGREE[pc] ?? 0;
+    // A pitch class sharing its degree with the one below it is that note raised.
+    return { degree, sharp: pc > 0 && SOLFEGE_DEGREE[pc - 1] === degree };
+}

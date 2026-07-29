@@ -200,7 +200,10 @@ const BUDGET_VENDOR_KB = 311;
 // app figure moves because the ladder and store are shared code.
 //
 // Handing an assignment back — measured at 294.9. 295.
-const BUDGET_APP_KB = 295;
+//
+// Solfège key labels (core/notes' degree map, the keyboard's syllable lookup, and
+// seven translated syllables per locale) — measured at 295.0. 296.
+const BUDGET_APP_KB = 296;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

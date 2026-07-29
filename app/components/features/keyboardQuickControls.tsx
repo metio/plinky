@@ -13,7 +13,7 @@ import { ToggleIconButton } from "../ui/toggleIconButton";
 // is a change everywhere.
 
 // Tap-to-cycle orders, each walking from most help to none.
-const LABELS_CYCLE: NoteLabels[] = ["all", "c", "off"];
+const LABELS_CYCLE: NoteLabels[] = ["all", "c", "solfege", "off"];
 const HINTS_CYCLE: NoteHints[] = ["always", "miss", "never"];
 // Filled / half / empty: how much the keyboard gives away about the next note.
 const hintGlyph: Record<NoteHints, string> = { always: "◉", miss: "◐", never: "○" };
@@ -26,7 +26,14 @@ function nextIn<T>(cycle: readonly T[], current: T): T {
 const CYCLE_BUTTON =
     "min-w-9 rounded-md px-2 py-1 text-xs font-medium tabular-nums text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100";
 
-const labelGlyph: Record<NoteLabels, string> = { all: "ABC", c: "C", off: "–" };
+// The glyph stands for the naming itself: letters, the one landmark letter, the
+// first solfège syllable, or nothing.
+const labelGlyph: Record<NoteLabels, string> = {
+    all: "ABC",
+    c: "C",
+    solfege: "do",
+    off: "–",
+};
 
 export function KeyboardQuickControls({
     hidden,

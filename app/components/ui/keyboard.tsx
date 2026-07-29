@@ -5,6 +5,7 @@ import type React from "react";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
 import { pitchClass } from "../../../core/midi";
+import { solfegeOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
@@ -27,15 +28,33 @@ const MAX_WHITE_KEY_PX = 44;
 const MIN_TAP_VELOCITY = 45;
 const MAX_TAP_VELOCITY = 120;
 
-// The letter to print on a key, or null for none. "all" labels every key; "c" prints
-// only on the C keys, the landmark that orients a beginner (the white key just left of
-// each two-black-key group); "off" prints nothing.
+// The seven solfège syllables, in scale order from do. Translated, because they are
+// spelled differently from one language to the next — and in the traditions that use
+// them they are not a teaching aid, they are the note's name.
+const SYLLABLES: Array<() => string> = [
+    m.solfege_do,
+    m.solfege_re,
+    m.solfege_mi,
+    m.solfege_fa,
+    m.solfege_sol,
+    m.solfege_la,
+    m.solfege_si,
+];
+
+// The label to print on a key, or null for none. "all" labels every key by letter;
+// "c" prints only on the C keys, the landmark that orients a beginner (the white key
+// just left of each two-black-key group); "solfege" names every key the way a reader
+// raised on do-re-mi already thinks of it; "off" prints nothing.
 function keyLabel(note: number, labels: NoteLabels): string | null {
     if (labels === "all") {
         return pitchClass(note);
     }
     if (labels === "c" && ((note % 12) + 12) % 12 === 0) {
         return "C";
+    }
+    if (labels === "solfege") {
+        const { degree, sharp } = solfegeOf(note);
+        return `${SYLLABLES[degree]?.() ?? ""}${sharp ? SHARP_GLYPH : ""}`;
     }
     return null;
 }

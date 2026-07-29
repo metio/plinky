@@ -22,7 +22,7 @@ export type NoteHints = "always" | "miss" | "never";
 // are: every key labelled (all), only the C keys as orientation landmarks (c — the
 // white key left of each two-black-key group), or bare (off) once the map is second
 // nature.
-export type NoteLabels = "all" | "c" | "off";
+export type NoteLabels = "all" | "c" | "solfege" | "off";
 
 export type Prefs = {
     sound: boolean;
@@ -139,7 +139,7 @@ export const REVEAL_TRIES = [1, 2, 3];
 
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
 const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
-const NOTE_LABELS: NoteLabels[] = ["all", "c", "off"];
+const NOTE_LABELS: NoteLabels[] = ["all", "c", "solfege", "off"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
 export function clampVolume(value: number): number {

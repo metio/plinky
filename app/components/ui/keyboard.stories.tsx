@@ -43,3 +43,9 @@ export const HoldDuration: Story = {
         ]),
     },
 };
+
+// The keybed named the way a reader raised on do-re-mi already thinks of it —
+// every key, with the black keys reading as the syllable below them raised.
+export const SolfegeLabels: Story = {
+    args: { labels: "solfege" },
+};

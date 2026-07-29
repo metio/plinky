@@ -240,6 +240,7 @@ export default function Settings() {
                     options={[
                         { id: "all", label: m.note_labels_all() },
                         { id: "c", label: m.note_labels_c() },
+                        { id: "solfege", label: m.note_labels_solfege() },
                         { id: "off", label: m.note_labels_off() },
                     ]}
                     help={m.settings_note_labels_help()}

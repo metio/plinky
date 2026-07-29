@@ -372,7 +372,10 @@ nothing already there is touched.
 
 Still learning where the notes are? The keys can carry their **note names** — every key,
 or just the C keys as orientation landmarks (the white key left of each pair of black
-keys), or none once the map is second nature — set under **Settings**. Every key is
+keys), or none once the map is second nature — set under **Settings**. They can also
+read as **do re mi** rather than letters: in French, Italian, Spanish, Portuguese,
+Romanian, Russian, Greek and much of Asia those *are* the note names, not a beginner's
+crutch, and the syllables follow the language you're reading Plinky in. Every key is
 labelled by default, so a first-timer can find any note straight away.
 
 Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
