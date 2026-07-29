@@ -9,6 +9,7 @@ import {
     useHistoryStore,
     useMasteryStore,
     useOnboardingStore,
+    usePlacementStore,
     usePrefsStore,
 } from "../../contexts/services";
 import {
@@ -50,6 +51,11 @@ const DISCOVERY: {
         to: `/play/${FIRST_SONG_ID}`,
         quick: true,
     },
+    // Straight after the first piece, and before every corner: by now the reader knows
+    // the cursor and the feedback colours, so the test measures their reading rather
+    // than their unfamiliarity — and a pianist who does not need a beginner ladder finds
+    // the shortcut in the first screenful instead of hunting for it on the You page.
+    { key: "placed", icon: "📊", label: m.discover_placement, to: "/placement" },
     { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily", quick: true },
     { key: "earTried", icon: "👂", label: m.discover_ear, to: `/play/${FIRST_SONG_ID}?mode=ear` },
     {
@@ -97,6 +103,7 @@ export function DiscoveryChecklist() {
     const historyStore = useHistoryStore();
     const daily = useDailyStore();
     const onboarding = useOnboardingStore();
+    const placement = usePlacementStore();
     const hints = useHintsStore();
     const assignmentsStore = useAssignmentsStore();
     // A plugged-in piano completes the connect step wherever it happens — the
@@ -113,6 +120,7 @@ export function DiscoveryChecklist() {
             masteredCount: masteryStore.loadAll().length,
             history: historyStore.load(),
             lastDaily: daily.lastDone(),
+            placementTaken: placement.load() !== null,
             marked: onboarding.marked(),
         });
         const firstItem = assignmentsStore.list()[0]?.items[0];
@@ -128,6 +136,7 @@ export function DiscoveryChecklist() {
         historyStore,
         daily,
         onboarding,
+        placement,
         hints,
         assignmentsStore,
         midiConnected,

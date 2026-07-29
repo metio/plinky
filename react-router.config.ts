@@ -21,6 +21,7 @@ const BASE_PATHS = [
     "/review",
     "/settings",
     "/help",
+    "/glossary",
     "/about",
     "/impressum",
     "/datenschutz",

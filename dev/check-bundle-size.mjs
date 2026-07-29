@@ -209,7 +209,12 @@ const BUDGET_VENDOR_KB = 311;
 //
 // Echo release tracking (one pending release per note, plus the flush that runs
 // when playback stops or the page goes away) — measured at 297.1. 298.
-const BUDGET_APP_KB = 298;
+//
+// The notation glossary — measured at 302.4. 303. All of it is the /glossary route's
+// own 4.8 KB chunk (twelve examples, the snippet builder, the labels and the page), so
+// a visitor who never opens the page downloads none of it. The app figure counts every
+// chunk we ship on purpose: a whole new page is meant to show up here as a decision.
+const BUDGET_APP_KB = 303;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

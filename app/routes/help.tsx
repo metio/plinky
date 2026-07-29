@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { linkClasses } from "../components/ui/classes";
+import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { itemsForPage, paragraphs } from "../../core/help";
 import type { HelpItem } from "../../core/help";
 import { useHelp } from "../hooks/useHelp";
@@ -102,6 +103,13 @@ export default function Help() {
                 <h1 className="text-2xl font-semibold">{m.help_title()}</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{m.help_intro()}</p>
             </header>
+
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+                {m.help_glossary_lead()}{" "}
+                <Link to="/glossary/" className={linkClasses}>
+                    {m.glossary_title()}
+                </Link>
+            </p>
 
             {SECTIONS.map(({ key, title }) => {
                 const blocks = itemsForPage(items, key);

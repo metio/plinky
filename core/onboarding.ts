@@ -12,6 +12,7 @@ import type { Prefs } from "./prefs";
 export type DiscoveryId =
     | "midiConnected"
     | "played"
+    | "placed"
     | "handSet"
     | "dailyDone"
     | "earTried"
@@ -47,6 +48,9 @@ export type DiscoveryState = {
     history: History;
     // The number of the last daily completed, 0 for none.
     lastDaily: number;
+    // Whether a placement test has ever been finished. Read from the saved result, so
+    // like `played` it cannot be reached by merely visiting the page.
+    placementTaken: boolean;
     // The markable steps already reached.
     marked: ReadonlySet<DiscoveryId>;
 };
@@ -54,13 +58,17 @@ export type DiscoveryState = {
 // Which discovery steps are done: the derived ones from the given state, the rest
 // from the marked set.
 export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean> {
-    const { prefs, masteredCount, history, lastDaily, marked } = state;
+    const { prefs, masteredCount, history, lastDaily, placementTaken, marked } = state;
     const span = prefs.handSpan;
     return {
         // Connecting is a one-time setup step; once a device has ever been seen,
         // the mark persists even when the piano is unplugged today.
         midiConnected: marked.has("midiConnected"),
         played: masteredCount > 0 || Object.values(history).some((notes) => notes > 0),
+        // Finishing the test writes a rating and a grade; opening it and walking away
+        // leaves nothing, which is the honest reading — the step is "you know your
+        // level", and an abandoned test tells you nothing.
+        placed: placementTaken,
         handSet: span.left !== null || span.right !== null,
         dailyDone: lastDaily > 0,
         earTried: marked.has("earTried"),

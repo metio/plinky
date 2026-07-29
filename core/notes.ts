@@ -59,3 +59,9 @@ export function solfegeOf(midi: number): SolfegeName {
     // A pitch class sharing its degree with the one below it is that note raised.
     return { degree, sharp: pc > 0 && SOLFEGE_DEGREE[pc - 1] === degree };
 }
+
+// The MIDI number for a written pitch. Octave 4 holds middle C (MIDI 60), the
+// convention MusicXML and every module here already assume.
+export function midiOf(step: string, octave: number, alter = 0): number {
+    return (octave + 1) * 12 + (SEMITONE[step] ?? 0) + alter;
+}

@@ -293,9 +293,14 @@ On the **home page**, a gentle, dismissible **Getting started** checklist explai
 Plinky works and walks the first session in order — set yourself up (connect your MIDI
 piano in Settings, then hand size and key mapping, so everything after is tailored to
 you), then play your first piece (your
-first assignment when you have one) — before pointing out the app's other corners. The
+first assignment when you have one), then find the level you read at — before pointing
+out the app's other corners. The
 steps that put your fingers on keys right away carry a small **Jump right in** marker,
-the shortcut for anyone who'd rather play first and configure later. The **Today**
+the shortcut for anyone who'd rather play first and configure later. Finding your level
+sits just after that first piece rather than before it: by then the cursor and the
+feedback colours are familiar, so the placement test measures your reading instead of a
+screen you've never seen — and anyone who already plays meets the shortcut past the
+beginner grades without going looking for it. The **Today**
 panel alongside it lists the day's practice as one-tap links — pieces due for review,
 the daily challenge, and **your open assignment's next step** ("Continue *First
 steps* — step 2 of 5"), which goes straight into that piece; while an assignment is
@@ -303,6 +308,15 @@ open, its next step stands in for the generic something-new suggestion, so the p
 you (or your teacher) chose is always one tap from the front page. The first time you
 open a score a one-time tip explains the three modes and the listen-then-play-slowly
 loop — a guided tour where you land, never a gate on progress.
+
+**What the marks mean** — a glossary of notation, linked from Help. Every symbol you
+meet in a score, grouped by what it controls: how long a note lasts, how you touch it,
+how loud it is, and where on the page you are. Each one gets a bar of real notation,
+drawn by the same engine that draws your pieces, and a **Hear it** button. Where the
+mark changes the sound there is a second button that plays the same music without it,
+so a staccato dot stops being a dot and becomes the short, detached sound it asks for.
+Where a mark instructs your hands rather than the sound — a slur, a clef — there is one
+reading and no pretence of a difference to hear.
 
 ## Composing
 

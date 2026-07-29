@@ -5,6 +5,7 @@
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { afterEach, describe, expect, it } from "vitest";
+import { MemoryRouter } from "react-router";
 import { httpFetcher } from "../adapters/httpFetcher";
 import { createSanityHelp, type SanityHelpConfig } from "../adapters/sanityHelp";
 import { server } from "../test-setup.node";
@@ -40,7 +41,12 @@ const playItem = {
 describe("Help against a mocked Sanity API", () => {
     it("renders a published block under its section, with picture and link", async () => {
         server.use(http.get(QUERY_URL, () => HttpResponse.json({ result: [playItem] })));
-        const { container } = renderWithServices(<Help />, help);
+        const { container } = renderWithServices(
+            <MemoryRouter>
+                <Help />
+            </MemoryRouter>,
+            help,
+        );
         expect(await screen.findByText(playItem.text)).toBeTruthy();
         expect(container.querySelector("#play")?.textContent).toContain(playItem.text);
         expect(screen.getByAltText("The play screen").getAttribute("src")).toBe(playItem.imageUrl);
@@ -54,7 +60,12 @@ describe("Help against a mocked Sanity API", () => {
 
     it("falls back to the section skeleton when the API errors", async () => {
         server.use(http.get(QUERY_URL, () => new HttpResponse(null, { status: 500 })));
-        renderWithServices(<Help />, help);
+        renderWithServices(
+            <MemoryRouter>
+                <Help />
+            </MemoryRouter>,
+            help,
+        );
         await waitFor(() =>
             expect(screen.getAllByText("Help for this area is on the way.").length).toBeGreaterThan(
                 0,

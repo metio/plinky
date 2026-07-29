@@ -52,6 +52,21 @@ describe("DiscoveryChecklist", () => {
         expect(links[1]?.getAttribute("href")).toBe("/en/settings/");
         expect(links[2]?.getAttribute("href")).toBe("/en/settings/");
         expect(links[3]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}/`);
+        // Then finding your level — after the first piece on purpose, so the test reads
+        // someone who already knows the cursor and the colours, and ahead of every
+        // corner so a pianist meets their shortcut in the first screenful.
+        expect(links[4]?.getAttribute("href")).toBe("/en/placement/");
+        expect(links[5]?.getAttribute("href")).toBe("/en/daily/");
+    });
+
+    it("leaves finding your level off the jump-straight-in shortcuts", async () => {
+        mount();
+        await screen.findByText("Getting started");
+
+        // The pill is for steps that put fingers on keys now. A graded test that climbs
+        // until you fail is not that, however early it sits.
+        const level = screen.getByRole("link", { name: m.discover_placement() });
+        expect(level.textContent).not.toContain(m.discover_jump_in());
     });
 
     it("marks the straight-to-the-keys steps with the jump-in pill", async () => {

@@ -13,6 +13,7 @@ const fresh = (): DiscoveryState => ({
     masteredCount: 0,
     history: {},
     lastDaily: 0,
+    placementTaken: false,
     marked: new Set(),
 });
 
@@ -57,6 +58,13 @@ describe("discoveries", () => {
         const done = discoveries({ ...fresh(), marked: new Set(["keysCustomized"]) });
         expect(done.keysCustomized).toBe(true);
     });
+
+    it("counts a finished placement test, not an opened one", () => {
+        // The step is "you know your level", so only a saved result completes it —
+        // walking away from the test leaves nothing to know.
+        expect(discoveries(fresh()).placed).toBe(false);
+        expect(discoveries({ ...fresh(), placementTaken: true }).placed).toBe(true);
+    });
 });
 
 describe("discoveryProgress", () => {
@@ -68,7 +76,7 @@ describe("discoveryProgress", () => {
             masteredCount: 2,
         });
         const progress = discoveryProgress(done);
-        expect(progress.total).toBe(10);
+        expect(progress.total).toBe(11);
         expect(progress.done).toBe(6);
         expect(progress.allDone).toBe(false);
     });

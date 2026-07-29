@@ -22,6 +22,7 @@ export default [
         route("review", "routes/review.tsx"),
         route("settings", "routes/settings.tsx"),
         route("help", "routes/help.tsx"),
+        route("glossary", "routes/glossary.tsx"),
         route("about", "routes/about.tsx"),
         route("impressum", "routes/impressum.tsx"),
         route("datenschutz", "routes/datenschutz.tsx"),
