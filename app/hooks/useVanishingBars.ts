@@ -26,6 +26,13 @@ export function useVanishingBars(
     options: { enabled: boolean; hand: Hand },
 ) {
     const stepsRef = useRef<StepNotes[]>([]);
+    // Each step's bar, lifted out once. Rebuilding it per note would allocate an
+    // array the length of the piece inside the callback that clears a note — the
+    // same moment the synth is being asked to sound one.
+    const measuresRef = useRef<number[]>([]);
+    // The bar the run was in when bars last vanished. While it has not changed there
+    // is nothing new to hide, which is true of every note in a bar but its first.
+    const lastMeasureRef = useRef<number | null>(null);
     const activeRef = useRef(false);
     // Which step indices are currently hidden, so a re-render that rebuilds the
     // noteheads can restore exactly the same vanished bars rather than bringing the
@@ -45,7 +52,9 @@ export function useVanishingBars(
             return;
         }
         stepsRef.current = collectStepNotes(osmd, optionsRef.current.hand);
+        measuresRef.current = stepsRef.current.map((step) => step.measure);
         goneRef.current.clear();
+        lastMeasureRef.current = null;
         activeRef.current = true;
     }, [getOsmd]);
 
@@ -55,8 +64,14 @@ export function useVanishingBars(
         if (!activeRef.current) {
             return;
         }
-        const measures = stepsRef.current.map((step) => step.measure);
-        for (const index of vanishedSteps(measures, clearedIndex)) {
+        // Bars vanish when the run leaves one, so only the first note of a bar can
+        // change anything. Every other note returns here without touching the DOM.
+        const measure = measuresRef.current[clearedIndex];
+        if (measure === undefined || measure === lastMeasureRef.current) {
+            return;
+        }
+        lastMeasureRef.current = measure;
+        for (const index of vanishedSteps(measuresRef.current, clearedIndex)) {
             if (goneRef.current.has(index)) {
                 continue;
             }
@@ -74,6 +89,7 @@ export function useVanishingBars(
             return;
         }
         stepsRef.current = collectStepNotes(osmd, optionsRef.current.hand);
+        measuresRef.current = stepsRef.current.map((step) => step.measure);
         for (const index of goneRef.current) {
             hideNoteElements([stepsRef.current[index]?.elements ?? []]);
         }
@@ -85,7 +101,9 @@ export function useVanishingBars(
         if (activeRef.current) {
             unhideNoteElements(stepsRef.current.map((step) => step.elements));
             stepsRef.current = [];
+            measuresRef.current = [];
             goneRef.current.clear();
+            lastMeasureRef.current = null;
             activeRef.current = false;
         }
     }, []);

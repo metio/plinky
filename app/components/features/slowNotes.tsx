@@ -3,7 +3,7 @@
 
 import { useSyncExternalStore } from "react";
 import { noteName } from "../../../core/midi";
-import { slowestNotes, typicalMs } from "../../../core/noteStats";
+import { type NoteStats, slowestNotes, typicalMs } from "../../../core/noteStats";
 import { useNoteStatsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 
@@ -14,9 +14,13 @@ import { m } from "../../paraglide/messages.js";
 // directly, and a list can be read aloud by a screen reader while a coloured keybed
 // cannot. The bar is the same number again for anyone who reads shapes faster than
 // figures.
+// One frozen empty record for the prerender snapshot. A fresh object each call would
+// be a new value every time React asked, which is the shape that loops.
+const NOTHING_YET: NoteStats = {};
+
 export function SlowNotes() {
     const store = useNoteStatsStore();
-    const stats = useSyncExternalStore(store.subscribe, store.load, () => ({}));
+    const stats = useSyncExternalStore(store.subscribe, store.load, () => NOTHING_YET);
     const slow = slowestNotes(stats);
     const typical = typicalMs(stats);
 

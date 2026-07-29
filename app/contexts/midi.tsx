@@ -32,6 +32,7 @@ import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
 import { noteOff, noteOn, sendable } from "../../core/midiMessage";
+import type { SchedulerHandle } from "../ports/scheduler";
 import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
 import { useAnalytics, useServices } from "./services";
@@ -98,6 +99,9 @@ type MidiContextValue = {
     // asked for the echo and anything is listening. Fire-and-forget: nothing about
     // a run depends on it, and a device that ignores it changes nothing.
     echoNote: (note: number, velocity: number, durationMs: number) => void;
+    // Release every echoed note still ringing — when playback stops, not only when
+    // the page goes away.
+    silenceEcho: () => void;
     // The microphone as an input device: an acoustic piano heard through pitch
     // detection lands in the same funnel as a MIDI keyboard.
     micStatus: MicStatus;
@@ -243,6 +247,9 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         }
     }, []);
     const pedalHeld = useCallback((pedal: PedalKind) => pedalsDownRef.current.has(pedal), []);
+    // The release pending for each note echoed out, so a re-strike can replace it and
+    // a teardown can flush it.
+    const echoOffsRef = useRef<Map<number, SchedulerHandle>>(new Map());
 
     // Echo a note out to whatever is connected, so a keyboard with lights shows the
     // piece as Plinky plays it. Off unless asked for: sending MIDI to somebody's
@@ -257,20 +264,48 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             if (outputs.length === 0) {
                 return;
             }
+            // A note struck again while the last one is still ringing — a repeat, or
+            // anything slurred, which sounds past its written length — must not be
+            // cut short by the earlier note's release. One pending release per note:
+            // re-striking replaces it rather than racing it.
+            const pending = echoOffsRef.current.get(note);
+            if (pending !== undefined) {
+                scheduler.cancel(pending);
+            }
             for (const output of outputs) {
                 output.send(noteOn(note, velocity));
             }
-            // The note-off is scheduled rather than sent with a duration, because Web
+            // The release is scheduled rather than sent with a timestamp, because Web
             // MIDI's timestamped send is not honoured everywhere and a key left lit is
             // worse than one that clears a few milliseconds early.
-            scheduler.after(Math.max(1, durationMs), () => {
+            const handle = scheduler.after(Math.max(1, durationMs), () => {
+                echoOffsRef.current.delete(note);
                 for (const output of outputs) {
                     output.send(noteOff(note));
                 }
             });
+            echoOffsRef.current.set(note, handle);
         },
         [prefsStore, scheduler],
     );
+
+    // Release everything still ringing on the instrument, now. A pending release is a
+    // promise to an object outside the browser: if the page goes away before the timer
+    // fires, the key stays lit with nothing left to clear it.
+    const silenceEcho = useCallback(() => {
+        const outputs = connectionRef.current?.outputs() ?? [];
+        for (const [note, handle] of echoOffsRef.current) {
+            scheduler.cancel(handle);
+            for (const output of outputs) {
+                output.send(noteOff(note));
+            }
+        }
+        echoOffsRef.current.clear();
+    }, [scheduler]);
+
+    // Unmounting, navigating away, or switching the echo off must not strand a lit
+    // key on somebody's piano.
+    useEffect(() => silenceEcho, [silenceEcho]);
 
     const makeHandler = useCallback(
         (deviceName: string) => (data: Uint8Array, timestamp: number) => {
@@ -706,6 +741,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         releaseKey,
         pedalHeld,
         echoNote,
+        silenceEcho,
         micStatus,
         startMic,
         stopMic,

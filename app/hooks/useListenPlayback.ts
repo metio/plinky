@@ -122,6 +122,7 @@ export function useListenPlayback({
     // from the MIDI context: playback is about sound and cursor, and a hook that
     // reached for a provider could not be used — or tested — outside one.
     echoNote = () => {},
+    silenceEcho = () => {},
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
     synth: NoteSink;
@@ -141,6 +142,9 @@ export function useListenPlayback({
     // the cursor shown where the matcher is using it.
     isPracticing: () => boolean;
     echoNote?: (note: number, velocity: number, durationMs: number) => void;
+    // Release everything the echo is still holding — playback stopping is a request
+    // for silence on the instrument too, not only in the browser.
+    silenceEcho?: () => void;
 }) {
     const chain = useTimerChain();
     const [playing, setPlaying] = useState(false);
@@ -162,6 +166,10 @@ export function useListenPlayback({
 
     const stop = () => {
         chain.clear();
+        // Playback holds its echoed notes open on a timer, not on the audio engine,
+        // so clearing the chain alone would leave the instrument lit for up to a
+        // note's length after the player asked for silence.
+        silenceEcho();
         if (modeRef.current === "listen" && highlightRef.current.length > 0) {
             trailNotes(highlightRef.current, LISTENED_COLOR);
             markPainted();

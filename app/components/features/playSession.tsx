@@ -513,7 +513,7 @@ function usePlaySessionValue({
     // their real piano, so echoing the note back through the synth only doubles
     // the sound and feeds the app's own output into the mic. (The session already
     // subscribes to this context via useMidiConnected, so reading it is free.)
-    const { micStatus, pedalHeld, echoNote } = useMidiConnection();
+    const { micStatus, pedalHeld, echoNote, silenceEcho } = useMidiConnection();
     const micListening = micStatus === "listening";
 
     // The hand the run drills — forced to "both" for a single-staff piece, where the
@@ -708,8 +708,10 @@ function usePlaySessionValue({
         centerCursor,
         markPainted,
         isPracticing,
-        // Light the notes on a connected instrument as Listen plays them.
+        // Light the notes on a connected instrument as Listen plays them, and let
+        // them go the moment playback stops.
         echoNote,
+        silenceEcho,
     });
 
     // When a run finishes, bring the result into view: the player's eyes are on the
@@ -921,6 +923,10 @@ function usePlaySessionValue({
             // so nothing should sound on. A safety net over the held-key press gate: even
             // an orphaned or pedal-sustained voice can't outlive the surface.
             synth.silenceAll();
+            // The same for anything still lit on a connected instrument: its notes
+            // are held by a timer, not by the audio engine, so silencing the synth
+            // alone would leave the keyboard glowing.
+            silenceEcho();
         }
     }, [fullscreen]);
 
