@@ -151,7 +151,10 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // The placement test (core/placement's ladder and rung profiles, its route and
 // store, and the copy for the test) — tips the total to a measured 601.5. 602.
-const BUDGET_TOTAL_KB = 602;
+//
+// Handing an assignment back (the report codec, the student's panel and the
+// teacher's collect page) — tips the total to a measured 605.0. 605.
+const BUDGET_TOTAL_KB = 605;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -282,7 +285,9 @@ const BUDGET_TOTAL_KB = 602;
 //
 // The placement test — measured at 291.4. 292. Its route is its own chunk; the
 // app figure moves because the ladder and store are shared code.
-const BUDGET_APP_KB = 292;
+//
+// Handing an assignment back — measured at 294.9. 295.
+const BUDGET_APP_KB = 295;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

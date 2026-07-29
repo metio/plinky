@@ -16,6 +16,7 @@ export default [
         route("ear", "routes/ear.tsx"),
         route("library", "routes/library.tsx"),
         route("assignments", "routes/assignments.tsx"),
+        route("collect", "routes/collect.tsx"),
         route("you", "routes/you.tsx"),
         route("placement", "routes/placement.tsx"),
         route("review", "routes/review.tsx"),

@@ -4,6 +4,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Button } from "../components/ui/button";
+import { ReportBack } from "../components/features/reportBack";
+import { linkClasses } from "../components/ui/classes";
+import { LocalizedLink } from "../components/ui/localizedLink";
 import { downloadBlob } from "../lib/download";
 import { Show } from "../components/features/conditional";
 import {
@@ -170,6 +173,9 @@ export default function AssignmentsRoute() {
         }
     };
 
+    const shareUrl = (assignment: Assignment) =>
+        `${SITE_URL}${localizedHref("/assignments")}?assignment=${encodeAssignmentLink(assignment)}`;
+
     const onDownload = (assignment: Assignment) =>
         downloadBlob(
             serializeAssignment(assignment),
@@ -178,7 +184,7 @@ export default function AssignmentsRoute() {
         );
 
     const onShare = async (assignment: Assignment, buttonKey: string) => {
-        const url = `${SITE_URL}${localizedHref("/assignments")}?assignment=${encodeAssignmentLink(assignment)}`;
+        const url = shareUrl(assignment);
         try {
             if (typeof navigator.share === "function") {
                 await navigator.share({
@@ -345,10 +351,17 @@ export default function AssignmentsRoute() {
                                     description={assignment.description}
                                 >
                                     {steps(list)}
+                                    <ReportBack assignment={assignment} />
                                 </AssignmentCard>
                             );
                         })}
                     </ul>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {m.assignments_collect_hint()}{" "}
+                        <LocalizedLink to="/collect" className={linkClasses}>
+                            {m.collect_title()}
+                        </LocalizedLink>
+                    </p>
                 </section>
             </Show>
 
@@ -422,18 +435,37 @@ export default function AssignmentsRoute() {
                                             </>
                                         }
                                         actionsAfter={
-                                            <Button
-                                                variant="danger"
-                                                onClick={() => onDelete(assignment)}
-                                                aria-label={m.assignments_delete_label({
-                                                    name: assignment.name,
-                                                })}
-                                            >
-                                                {m.assignments_remove()}
-                                            </Button>
+                                            <>
+                                                {/* Handing the list out through a class
+                                                the teacher already runs. A plain link,
+                                                not Google's share widget: the widget
+                                                would pull a third-party script onto
+                                                every assignments page, and this needs
+                                                none. */}
+                                                <a
+                                                    href={`https://classroom.google.com/share?url=${encodeURIComponent(
+                                                        shareUrl(assignment),
+                                                    )}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className={`${linkClasses} text-sm`}
+                                                >
+                                                    {m.assignments_classroom()}
+                                                </a>
+                                                <Button
+                                                    variant="danger"
+                                                    onClick={() => onDelete(assignment)}
+                                                    aria-label={m.assignments_delete_label({
+                                                        name: assignment.name,
+                                                    })}
+                                                >
+                                                    {m.assignments_remove()}
+                                                </Button>
+                                            </>
                                         }
                                     >
                                         {steps(list)}
+                                        <ReportBack assignment={assignment} />
                                     </AssignmentCard>
                                 );
                             })}

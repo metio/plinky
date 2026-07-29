@@ -253,6 +253,17 @@ one-tap **review session** walks you through everything that's fading, and you c
   number and the grade it lands near, so a newcomer starts where they actually read
   rather than where a dropdown guessed. Every drill is generated on the spot, so
   nothing in it can be a piece you already know — it measures reading, not memory.
+- **Handing an assignment back** — the loop used to run one way: a teacher shares a
+  list, and never learns what happened, because progress lives on the student's
+  device. Now each assignment offers **Hand your results back**: type a name and the
+  device turns how the list went into one code to paste into a message. The teacher
+  drops however many arrive into **Collect results**, reads them as a class table —
+  a piece nobody attempted shows blank rather than failed — and downloads a CSV for
+  whatever they already keep marks in. Nothing is stored on either side; the collect
+  page is a lens over the text in the box. It is **not proof** and the app says so:
+  a code is written by the device it describes, so it replaces the transcription, not
+  the trust. An assignment can also be handed out straight into **Google Classroom**
+  (a plain link — no third-party script rides along).
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the
