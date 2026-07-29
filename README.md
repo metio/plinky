@@ -248,6 +248,11 @@ one-tap **review session** walks you through everything that's fading, and you c
   missing instead of leading to a dead end, and a one-tap action prunes those steps;
   importing a shared assignment says up front how many of its pieces resolve here,
   and deleting a score from the Library warns when saved assignments still use it.
+- **Find your level** — a placement test, reached from the You page. Read a drill;
+  if it goes well the next is harder, and three shaky runs stop it. It reports one
+  number and the grade it lands near, so a newcomer starts where they actually read
+  rather than where a dropdown guessed. Every drill is generated on the spot, so
+  nothing in it can be a piece you already know — it measures reading, not memory.
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the

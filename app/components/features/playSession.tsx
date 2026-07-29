@@ -87,6 +87,10 @@ export type PlaySessionProps = {
     // piece carries no credit beyond its title (a generated exercise).
     credit?: string;
     onRunComplete?: () => void;
+    // Every graded run, ephemeral ones included — the placement test needs the score
+    // of a drill it deliberately does not keep, which onRunComplete (skipped for an
+    // ephemeral piece) cannot report.
+    onGraded?: (grade: Grade) => void;
     initialTempo?: number;
     beatsPerBar?: number;
     lockTempo?: boolean;
@@ -111,6 +115,7 @@ function usePlaySessionValue({
     title,
     credit,
     onRunComplete,
+    onGraded,
     initialTempo,
     beatsPerBar,
     lockTempo,
@@ -809,6 +814,7 @@ function usePlaySessionValue({
                 playedAt: Date.now(),
             });
         }
+        onGraded?.(outcome.grade);
         if (!ephemeral) {
             onRunComplete?.();
         }
@@ -819,6 +825,7 @@ function usePlaySessionValue({
         id,
         title,
         onRunComplete,
+        onGraded,
         ephemeral,
         daily,
         initialTempo,

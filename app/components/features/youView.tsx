@@ -88,6 +88,20 @@ export function YouView() {
                 </section>
             </Show>
 
+            {/* Where the ladder starts for someone who has no idea. Sits above the
+            roadmap because it answers the question the roadmap raises. */}
+            <section className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {m.placement_cta()}
+                </h2>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    {m.placement_cta_hint()}
+                </p>
+                <Link to="/placement" className={`${linkClasses} mt-2 inline-block text-sm`}>
+                    {m.placement_start()} →
+                </Link>
+            </section>
+
             <GradeRoadmap
                 items={data.items}
                 level={level}

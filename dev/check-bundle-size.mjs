@@ -148,7 +148,10 @@ const ON_DEMAND = /webCodecsVideo/;
 // The drill generator and its setup panel (core/drill + core/drillSpec, the
 // spec-rendered controls, and the copy for nine options) — net of deleting the
 // five-finger generator it replaces — tip the total to a measured 599.2. 600.
-const BUDGET_TOTAL_KB = 600;
+//
+// The placement test (core/placement's ladder and rung profiles, its route and
+// store, and the copy for the test) — tips the total to a measured 601.5. 602.
+const BUDGET_TOTAL_KB = 602;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
@@ -276,7 +279,10 @@ const BUDGET_TOTAL_KB = 600;
 //
 // The drill generator and its setup panel, net of the generator it replaces —
 // measured at 289.1. 290.
-const BUDGET_APP_KB = 290;
+//
+// The placement test — measured at 291.4. 292. Its route is its own chunk; the
+// app figure moves because the ladder and store are shared code.
+const BUDGET_APP_KB = 292;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

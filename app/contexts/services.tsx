@@ -32,6 +32,7 @@ import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSou
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
 import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
+import { createPlacementStore, type PlacementStore } from "../stores/placementStore";
 import { createSightReadStore, type SightReadStore } from "../stores/sightReadStore";
 import { createThemeStore, type ThemeStore } from "../stores/themeStore";
 import { createFavoritesStore, type FavoritesStore } from "../stores/favoritesStore";
@@ -70,6 +71,7 @@ export type AppServices = {
     lifetime: LifetimeStore;
     ghosts: GhostStore;
     sightReads: SightReadStore;
+    placement: PlacementStore;
     takes: TakesStore;
     fingering: FingeringStore;
     assignments: AssignmentsStore;
@@ -141,6 +143,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         lifetime: overrides.lifetime ?? createLifetimeStore(store),
         ghosts: overrides.ghosts ?? createGhostStore(store),
         sightReads: overrides.sightReads ?? createSightReadStore(store),
+        placement: overrides.placement ?? createPlacementStore(store),
         takes: overrides.takes ?? createTakesStore(store),
         fingering: overrides.fingering ?? createFingeringStore(store),
         assignments: overrides.assignments ?? createAssignmentsStore(store),
@@ -181,6 +184,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     lifetime: true,
     ghosts: true,
     sightReads: true,
+    placement: true,
     takes: true,
     fingering: true,
     assignments: true,
@@ -255,6 +259,10 @@ export function useAnalytics(): Analytics {
 
 export function useMasteryStore(): MasteryStore {
     return useServices().mastery;
+}
+
+export function usePlacementStore(): PlacementStore {
+    return useServices().placement;
 }
 
 export function useHistoryStore(): HistoryStore {
