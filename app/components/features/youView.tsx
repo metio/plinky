@@ -13,6 +13,7 @@ import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
 import { RecapCard } from "./recapCard";
+import { SlowNotes } from "./slowNotes";
 import { RefreshQueue } from "./refreshQueue";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
@@ -109,6 +110,8 @@ export function YouView() {
                 now={data.now}
                 poolSizes={data.poolSizes}
             />
+
+            <SlowNotes />
 
             <RefreshQueue reviews={data.reviews} />
 

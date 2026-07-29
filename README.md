@@ -266,6 +266,11 @@ one-tap **review session** walks you through everything that's fading, and you c
   a code is written by the device it describes, so it replaces the transcription, not
   the trust. An assignment can also be handed out straight into **Google Classroom**
   (a plain link — no third-party script rides along).
+- **Notes you take longest to find** — on the You page, once you've read enough for it
+  to mean anything. Every run already timed how long each note took; this adds it up
+  per note and names the handful that consistently slow you down, against the time a
+  note usually takes you. Reading trouble is rarely spread evenly — it sits on a few
+  ledger lines — and a grade averages that away.
 - **You** — your one progress page: the grade you're at on the eight-grade ladder and
   what's left to reach the next, your skill rating, days practised and notes played, a
   slow-moving fingerprint of your Accuracy, Timing and Flow, and the

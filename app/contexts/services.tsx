@@ -32,6 +32,7 @@ import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSou
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
 import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
+import { createNoteStatsStore, type NoteStatsStore } from "../stores/noteStatsStore";
 import { createPlacementStore, type PlacementStore } from "../stores/placementStore";
 import { createSightReadStore, type SightReadStore } from "../stores/sightReadStore";
 import { createThemeStore, type ThemeStore } from "../stores/themeStore";
@@ -72,6 +73,7 @@ export type AppServices = {
     ghosts: GhostStore;
     sightReads: SightReadStore;
     placement: PlacementStore;
+    noteStats: NoteStatsStore;
     takes: TakesStore;
     fingering: FingeringStore;
     assignments: AssignmentsStore;
@@ -144,6 +146,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         ghosts: overrides.ghosts ?? createGhostStore(store),
         sightReads: overrides.sightReads ?? createSightReadStore(store),
         placement: overrides.placement ?? createPlacementStore(store),
+        noteStats: overrides.noteStats ?? createNoteStatsStore(store),
         takes: overrides.takes ?? createTakesStore(store),
         fingering: overrides.fingering ?? createFingeringStore(store),
         assignments: overrides.assignments ?? createAssignmentsStore(store),
@@ -185,6 +188,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     ghosts: true,
     sightReads: true,
     placement: true,
+    noteStats: true,
     takes: true,
     fingering: true,
     assignments: true,
@@ -263,6 +267,10 @@ export function useMasteryStore(): MasteryStore {
 
 export function usePlacementStore(): PlacementStore {
     return useServices().placement;
+}
+
+export function useNoteStatsStore(): NoteStatsStore {
+    return useServices().noteStats;
 }
 
 export function useHistoryStore(): HistoryStore {

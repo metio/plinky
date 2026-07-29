@@ -4,7 +4,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Grade } from "../../core/grade";
 import type { GradedMastery } from "./gradeProgress";
-import type { OutcomeNote } from "../../core/runOutcome";
+import type { CapturedNote } from "../../core/runCapture";
 import type { Grid } from "../../core/shareCard";
 import { memoryStore } from "../adapters/memoryStore";
 import { createServices } from "../contexts/services";
@@ -35,9 +35,9 @@ const grade = (over: Partial<Grade> = {}): Grade => ({
     ...over,
 });
 
-const notes: OutcomeNote[] = [
-    { targetMs: 0, playedMs: 10, wrongBefore: 0, staves: [0], velocity: 80 },
-    { targetMs: 500, playedMs: 515, wrongBefore: 0, staves: [0], velocity: 90 },
+const notes: CapturedNote[] = [
+    { targetMs: 0, playedMs: 10, wrongBefore: 0, staves: [0], velocity: 80, pitches: [60] },
+    { targetMs: 500, playedMs: 515, wrongBefore: 0, staves: [0], velocity: 90, pitches: [62] },
 ];
 
 const run = (over: Partial<Parameters<typeof recordRun>[0]> = {}) => ({

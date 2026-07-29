@@ -4,7 +4,7 @@
 import type { Grade } from "../../core/grade";
 import { applyRun, letterMin } from "../../core/mastery";
 import { isFirstS, isFlawless, type Milestone } from "../../core/milestones";
-import type { OutcomeNote } from "../../core/runOutcome";
+import type { CapturedNote } from "../../core/runCapture";
 import type { Grid } from "../../core/shareCard";
 import type { AppServices } from "../contexts/services";
 import { currentGrade, loadGradedMastery, skillRating } from "./gradeProgress";
@@ -22,7 +22,9 @@ export type RecordedRun = {
     // A run that began partway through (a takeover from Listen) keeps no ghost — a partial
     // replay would strand the next race at its early end.
     partial: boolean;
-    notes: OutcomeNote[];
+    // Captured rather than merely scored: the per-note reading times need to know
+    // which pitches a step sounded, which the outcome type drops.
+    notes: CapturedNote[];
     // The positions cleared, counted toward the practice history.
     correct: number;
     grade: Grade;
@@ -57,6 +59,10 @@ export function recordRun(
         services.daily.saveResult(daily, { grade, grid, notes, tolerance });
     }
     services.history.record(correct);
+    // Which notes this run was slow to find, folded into the running per-note record.
+    // Every run counts, ephemeral ones included: a generated drill reads the staff
+    // exactly as a piece does, and it is reading that is being measured.
+    services.noteStats.record(notes);
     if (ephemeral) {
         return { ghost: null };
     }
