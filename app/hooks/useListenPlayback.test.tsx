@@ -231,4 +231,43 @@ describe("useListenPlayback", () => {
         expect(result.current.playing).toBe(false);
         expect(playNote).not.toHaveBeenCalled();
     });
+
+    it("echoes each note it sounds to a connected instrument", () => {
+        // Playback lights an instrument's keys through the callback it is given —
+        // the same notes, the same lengths, so the keyboard shows what is heard.
+        const echoed: Array<[number, number, number]> = [];
+        const osmd = fakeOsmd(2);
+        const { result } = renderHook(() =>
+            useListenPlayback({
+                getOsmd: () => osmd,
+                synth: { playNote },
+                tempo: () => 120,
+                loop: () => loopState,
+                onLap,
+                centerCursor: () => {},
+                markPainted: () => {},
+                isPracticing: () => false,
+                echoNote: (note, velocity, durationMs) => {
+                    echoed.push([note, velocity, durationMs]);
+                },
+            }),
+        );
+
+        act(() => result.current.start(0));
+
+        // The first note sounds for half a second at 120 BPM; the echo says the same
+        // in milliseconds.
+        expect(echoed[0]).toEqual([60, 90, 500]);
+    });
+
+    it("plays perfectly well with no echo wired at all", () => {
+        // A caller outside a MIDI provider passes none; playback must not care.
+        const osmd = fakeOsmd(2);
+        const { result } = mount(osmd);
+
+        act(() => result.current.start(0));
+
+        expect(result.current.playing).toBe(true);
+        expect(playNote).toHaveBeenCalledTimes(1);
+    });
 });

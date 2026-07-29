@@ -458,6 +458,8 @@
   "slow_notes_heading": "Hangok, amiket a legtovább keresel",
   "slow_notes_intro": "A legtöbb hangot nagyjából {typical}s alatt olvasod. Ezek tovább tartanak — megér fejenként pár percet.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Világítsanak a zongorám billentyűi",
+  "settings_midi_echo_help": "Visszaküldi a zongorádra, amit a Plinky játszik: a világító billentyűzet megmutatja a hangokat. Alapból ki, mert egy hangmodul is játszani kezdene.",
   "settings_danger_heading": "Veszélyzóna",
   "settings_reset_help": "Törli mindazt, ami ezen az eszközön van — a kottáidat, a haladásod és a beállításaidat. Ez nem vonható vissza, ezért ha meg szeretnéd tartani a kottáidat, előbb tölts le egy biztonsági mentést a Könyvtárból.",
   "settings_reset": "Eszköz visszaállítása",

@@ -458,6 +458,8 @@
   "slow_notes_heading": "Note che impieghi più tempo a trovare",
   "slow_notes_intro": "La maggior parte delle note ti richiede circa {typical}s. Queste durano di più — valgono qualche minuto ciascuna.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Accendi i tasti del mio piano",
+  "settings_midi_echo_help": "Rimanda al tuo pianoforte quello che Plinky suona: una tastiera con le luci mostra le note. Disattivato di base — un modulo sonoro si metterebbe a suonare.",
   "settings_danger_heading": "Zona pericolosa",
   "settings_reset_help": "Cancella tutto su questo dispositivo — i tuoi spartiti, progressi e impostazioni. Non si può annullare, quindi prendi prima un backup dalla Libreria se vuoi conservare i tuoi spartiti.",
   "settings_reset": "Ripristina questo dispositivo",

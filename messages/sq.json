@@ -458,6 +458,8 @@
   "slow_notes_heading": "Notat që i gjen më ngadalë",
   "slow_notes_intro": "Shumicën e notave i lexon për rreth {typical}s. Këto zgjasin më shumë — ia vlejnë disa minuta secila.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Ndriço tastet e pianos sime",
+  "settings_midi_echo_help": "Dërgon atë që luan Plinky te pianoja jote: një tastierë me drita i tregon notat. E fikur si parazgjedhje — një modul zëri do të fillonte të luante gjithashtu.",
   "settings_danger_heading": "Zona e rrezikut",
   "settings_reset_help": "Fshin gjithçka në këtë pajisje — partiturat, progresin dhe cilësimet e tua. Kjo s'mund të zhbëhet, prandaj merr fillimisht një kopje rezervë nga Biblioteka nëse do t'i mbash partiturat.",
   "settings_reset": "Rivendos këtë pajisje",

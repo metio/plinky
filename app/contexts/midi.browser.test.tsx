@@ -48,9 +48,26 @@ describe("webMidi adapter in a real browser", () => {
         // its platform initialization even with permission granted. Both outcomes
         // are asserted: a resolved connection behaves, and a platform failure is
         // exactly that — never a permission denial, which the grant rules out.
+        //
+        // Inputs and outputs are asserted from ONE connection on purpose: asking the
+        // platform for MIDI access a second time in the same page takes Chromium
+        // down in a container, so a second request here would test the harness
+        // rather than the adapter.
         try {
             const connection = await webMidi.request();
             expect(Array.isArray(connection.inputs())).toBe(true);
+
+            // Sending is a bonus — most granted connections expose no output at all,
+            // and nothing in the app may depend on one existing. What must hold is
+            // that asking is safe and always answers with a list.
+            // Outputs are enumerated but never sent to here. Sending to a real
+            // device takes this container's Chromium down — its MIDI backend is a
+            // stub — so a send in this project would be testing the harness, not
+            // the adapter. The swallow-on-failure contract is covered against a
+            // stubbed device in webMidi.test.ts instead.
+            const outputs = connection.outputs();
+            expect(Array.isArray(outputs)).toBe(true);
+
             expect(() => connection.close()).not.toThrow();
         } catch (error) {
             expect(String(error)).not.toMatch(/not granted|NotAllowed/i);

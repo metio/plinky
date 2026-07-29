@@ -385,6 +385,10 @@ Romanian, Russian, Greek and much of Asia those *are* the note names, not a begi
 crutch, and the syllables follow the language you're reading Plinky in. Every key is
 labelled by default, so a first-timer can find any note straight away.
 
+If your piano has lights, **Settings → Light up my keyboard** sends what Plinky plays
+back to it, so Listen shows the notes on the instrument as well as sounding them. It's
+off by default: a sound module on the other end would start playing along uninvited.
+
 Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your
 instrument is hooked up.

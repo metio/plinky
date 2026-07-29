@@ -458,6 +458,8 @@
   "slow_notes_heading": "Töne, die du am längsten suchst",
   "slow_notes_intro": "Die meisten Töne liest du in etwa {typical}s. Diese dauern länger — ein paar Minuten wert.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Tasten am Klavier aufleuchten lassen",
+  "settings_midi_echo_help": "Schickt, was Plinky spielt, an dein Klavier zurück — ein Keyboard mit Leuchttasten zeigt dann die Noten. Standardmäßig aus, denn ein Klangmodul spielt sonst mit.",
   "settings_danger_heading": "Gefahrenzone",
   "settings_reset_help": "Löscht alles auf diesem Gerät – deine Stücke, deinen Fortschritt und deine Einstellungen. Das lässt sich nicht rückgängig machen, hol dir also zuerst eine Sicherung aus der Bibliothek, wenn du deine Stücke behalten möchtest.",
   "settings_reset": "Dieses Gerät zurücksetzen",

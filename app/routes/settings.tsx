@@ -401,6 +401,12 @@ export default function Settings() {
                     icon={<PlugIcon className={ICON} />}
                 >
                     <MidiConnect />
+                    <SwitchField
+                        label={m.settings_midi_echo()}
+                        checked={prefs.midiEcho}
+                        onChange={(midiEcho) => update({ midiEcho })}
+                        help={m.settings_midi_echo_help()}
+                    />
                 </SettingsSection>
             )}
 

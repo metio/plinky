@@ -15,6 +15,7 @@ const BASE: Prefs = {
     colorNotes: true,
     noteHints: "always",
     noteLabels: "all",
+    midiEcho: false,
     highway: false,
     forgiving: false,
     fingerHints: true,

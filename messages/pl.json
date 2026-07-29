@@ -458,6 +458,8 @@
   "slow_notes_heading": "Dźwięki, których szukasz najdłużej",
   "slow_notes_intro": "Większość dźwięków czytasz w około {typical}s. Te trwają dłużej — warte kilku minut.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Podświetl klawisze mojego pianina",
+  "settings_midi_echo_help": "Wysyła to, co gra Plinky, z powrotem do pianina: klawiatura z podświetleniem pokaże nuty. Domyślnie wyłączone — moduł brzmieniowy zacząłby też grać.",
   "settings_danger_heading": "Strefa zagrożenia",
   "settings_reset_help": "Wymazuje wszystko na tym urządzeniu — twoje nuty, postępy i ustawienia. Tego nie da się cofnąć, więc jeśli chcesz zachować swoje nuty, pobierz najpierw kopię zapasową z Biblioteki.",
   "settings_reset": "Zresetuj to urządzenie",

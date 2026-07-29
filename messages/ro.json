@@ -458,6 +458,8 @@
   "slow_notes_heading": "Notele pe care le găsești cel mai greu",
   "slow_notes_intro": "Majoritatea notelor îți iau cam {typical}s. Acestea durează mai mult — merită câteva minute fiecare.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Aprinde clapele pianului meu",
+  "settings_midi_echo_help": "Trimite ce cântă Plinky înapoi la pianul tău: o claviatură cu lumini arată notele. Dezactivat implicit — un modul de sunet ar începe și el să cânte.",
   "settings_danger_heading": "Zonă periculoasă",
   "settings_reset_help": "Șterge tot de pe acest dispozitiv — partiturile, progresul și setările tale. Nu poate fi anulat, așa că fă întâi o copie de rezervă din Bibliotecă, dacă vrei să-ți păstrezi partiturile.",
   "settings_reset": "Resetează acest dispozitiv",

@@ -203,7 +203,10 @@ const BUDGET_VENDOR_KB = 311;
 //
 // Solfège key labels (core/notes' degree map, the keyboard's syllable lookup, and
 // seven translated syllables per locale) — measured at 295.0. 296.
-const BUDGET_APP_KB = 296;
+//
+// MIDI output echo (the output side of the port and adapter, core/midiMessage, the
+// context's echo and its Settings switch) — measured at 296.2. 297.
+const BUDGET_APP_KB = 297;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

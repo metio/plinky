@@ -44,6 +44,8 @@ export type Prefs = {
     colorNotes: boolean;
     noteHints: NoteHints;
     noteLabels: NoteLabels;
+    // Echo what Plinky plays to a connected instrument, lighting its keys.
+    midiEcho: boolean;
     // Keep going past a slip: when on, playing the next note advances the score even if a
     // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
     // freezes you mid-piece. Off waits for every note, which builds accuracy.
@@ -190,6 +192,7 @@ function defaults(): Prefs {
         colorNotes: true,
         noteHints: "always",
         noteLabels: "all",
+        midiEcho: false,
         forgiving: false,
         fingerHints: true,
         decayMode: "gentle",
@@ -261,6 +264,7 @@ export function parsePrefs(raw: string | null): Prefs {
         const parsed = JSON.parse(raw ?? "{}");
         return {
             sound: bool(parsed.sound, base.sound),
+            midiEcho: bool(parsed.midiEcho, base.midiEcho),
             volume: num(parsed.volume, clampVolume, base.volume),
             masteryThreshold: oneOf(parsed.masteryThreshold, LETTERS, base.masteryThreshold),
             handSpan: cleanHandSpan(parsed.handSpan),

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import type { MidiAccessPort, MidiConnection, MidiInput } from "../ports/midiAccess";
+import type { MidiAccessPort, MidiConnection, MidiInput, MidiOutput } from "../ports/midiAccess";
 
 // The Web MIDI implementation of the MIDI seam — the one place the app touches
 // navigator.requestMIDIAccess and the "midi" permission descriptor.
@@ -33,9 +33,26 @@ function wrapInput(input: MIDIInput): MidiInput {
     };
 }
 
+function wrapOutput(output: MIDIOutput): MidiOutput {
+    return {
+        id: output.id,
+        name: output.name ?? "Unknown device",
+        send(data) {
+            try {
+                output.send(data);
+            } catch {
+                // A device unplugged between the lookup and the send throws; the run
+                // that was echoing to it carries on regardless. Echoing is decoration,
+                // and decoration must never be able to stop the music.
+            }
+        },
+    };
+}
+
 function wrapAccess(access: MIDIAccess): MidiConnection {
     return {
         inputs: () => [...access.inputs.values()].map(wrapInput),
+        outputs: () => [...access.outputs.values()].map(wrapOutput),
         onStateChange(handler) {
             access.onstatechange = () => handler();
         },

@@ -512,7 +512,7 @@ function usePlaySessionValue({
     // their real piano, so echoing the note back through the synth only doubles
     // the sound and feeds the app's own output into the mic. (The session already
     // subscribes to this context via useMidiConnected, so reading it is free.)
-    const { micStatus, pedalHeld } = useMidiConnection();
+    const { micStatus, pedalHeld, echoNote } = useMidiConnection();
     const micListening = micStatus === "listening";
 
     // The hand the run drills — forced to "both" for a single-staff piece, where the
@@ -707,6 +707,8 @@ function usePlaySessionValue({
         centerCursor,
         markPainted,
         isPracticing,
+        // Light the notes on a connected instrument as Listen plays them.
+        echoNote,
     });
 
     // When a run finishes, bring the result into view: the player's eyes are on the

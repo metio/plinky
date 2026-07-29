@@ -118,6 +118,10 @@ export function useListenPlayback({
     centerCursor,
     markPainted,
     isPracticing,
+    // Light each played note on a connected instrument. Passed in rather than taken
+    // from the MIDI context: playback is about sound and cursor, and a hook that
+    // reached for a provider could not be used — or tested — outside one.
+    echoNote = () => {},
 }: {
     getOsmd: () => OpenSheetMusicDisplay | null;
     synth: NoteSink;
@@ -136,6 +140,7 @@ export function useListenPlayback({
     // Whether a self-paced run owns the cursor — stopping playback then leaves
     // the cursor shown where the matcher is using it.
     isPracticing: () => boolean;
+    echoNote?: (note: number, velocity: number, durationMs: number) => void;
 }) {
     const chain = useTimerChain();
     const [playing, setPlaying] = useState(false);
@@ -260,6 +265,9 @@ export function useListenPlayback({
                     tempo(),
                 );
                 synth.playNote(note.pitch, { duration: durationSeconds, velocity });
+                // …and light the same note on a connected instrument, so the piece
+                // can be watched as well as heard. Inert unless asked for.
+                echoNote(note.pitch, velocity, durationSeconds * 1000);
             }
             cursor.next();
             step += 1;
@@ -301,6 +309,7 @@ export function useListenPlayback({
                     velocity: note.velocity,
                     duration: note.durationMs / 1000,
                 });
+                echoNote(note.pitch, note.velocity, note.durationMs);
             }
             // Advance the visual cursor alongside the audio; when the score runs out
             // before the take does, the audio simply plays on to the end.

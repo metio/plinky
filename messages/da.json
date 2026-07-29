@@ -458,6 +458,8 @@
   "slow_notes_heading": "Toner du er længst om at finde",
   "slow_notes_intro": "De fleste toner læser du på omkring {typical}s. Disse tager længere — et par minutter værd hver.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Lys tangenterne op på mit klaver",
+  "settings_midi_echo_help": "Sender det, Plinky spiller, tilbage til klaveret: et keyboard med lys viser tonerne. Fra som standard — et lydmodul ville også begynde at spille.",
   "settings_danger_heading": "Farezone",
   "settings_reset_help": "Sletter alt på denne enhed — dine stykker, dit fremskridt og dine indstillinger. Det kan ikke fortrydes, så hent en sikkerhedskopi fra Biblioteket først, hvis du gerne vil beholde dine stykker.",
   "settings_reset": "Nulstil denne enhed",

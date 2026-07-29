@@ -458,6 +458,8 @@
   "slow_notes_heading": "Tóny, které hledáš nejdéle",
   "slow_notes_intro": "Většinu tónů přečteš asi za {typical}s. Tyhle trvají déle — stojí za pár minut.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Rozsvítit klávesy mého piana",
+  "settings_midi_echo_help": "Pošle to, co Plinky hraje, zpět do tvého piana: klávesy s podsvícením pak ukážou noty. Standardně vypnuto — zvukový modul by se rozehrál taky.",
   "settings_danger_heading": "Nebezpečná zóna",
   "settings_reset_help": "Vymaže vše na tomto zařízení — vaše skladby, pokrok i nastavení. Nedá se to vzít zpět, takže pokud chcete skladby zachovat, stáhněte si nejprve zálohu v Knihovně.",
   "settings_reset": "Resetovat toto zařízení",

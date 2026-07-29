@@ -57,6 +57,8 @@ export type FakeMidi = MidiAccessPort & {
         stateChange(): void;
         closed(): boolean;
     };
+    // Every MIDI message the app sent to an output, in order.
+    sent(): number[][];
 };
 
 export function fakeMidi(
@@ -66,13 +68,27 @@ export function fakeMidi(
         // A rejection message makes request() fail, like a user denying the prompt.
         rejectWith?: string;
         inputs?: FakeMidiInput[];
+        // Named outputs the fake offers. A test that cares what was sent reads
+        // `sent` below; most tests want none, which is also the common real case.
+        outputs?: string[];
     } = {},
 ): FakeMidi {
     const inputs = options.inputs ?? [];
+    // Everything the app echoed, newest last — the assertion surface for a test
+    // about sending rather than receiving.
+    const sent: number[][] = [];
+    const outputs = (options.outputs ?? []).map((name, index) => ({
+        id: `out-${index}`,
+        name,
+        send: (data: number[]) => {
+            sent.push(data);
+        },
+    }));
     let onStateChange: (() => void) | null = null;
     let closed = false;
     const connection = {
         inputs: () => inputs,
+        outputs: () => outputs,
         onStateChange(handler: () => void) {
             onStateChange = handler;
         },
@@ -98,5 +114,6 @@ export function fakeMidi(
                 : Promise.resolve(connection),
         permissionState: () => Promise.resolve(options.permission ?? "prompt"),
         connection,
+        sent: () => sent,
     };
 }

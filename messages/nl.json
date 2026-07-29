@@ -458,6 +458,8 @@
   "slow_notes_heading": "Noten die je het langst zoekt",
   "slow_notes_intro": "De meeste noten lees je in ongeveer {typical}s. Deze duren langer — een paar minuten waard.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Verlicht de toetsen van mijn piano",
+  "settings_midi_echo_help": "Stuurt wat Plinky speelt terug naar je piano: een keyboard met lampjes laat de noten zien. Standaard uit — een geluidsmodule gaat anders meespelen.",
   "settings_danger_heading": "Gevarenzone",
   "settings_reset_help": "Wist alles op dit apparaat — je stukken, voortgang en instellingen. Dit kan niet ongedaan worden gemaakt, dus haal eerst een back-up op uit de bibliotheek als je je stukken wilt bewaren.",
   "settings_reset": "Dit apparaat resetten",

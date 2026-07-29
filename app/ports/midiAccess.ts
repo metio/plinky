@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-// Where MIDI comes from. A narrow seam over the Web MIDI API shaped by what the
-// app actually consumes: whether the platform offers MIDI, the persisted
-// permission (so a granted connection resumes without prompting), and — once
-// access is granted — the inputs and their message streams. The connection's
-// state is the browser's; the port only reports it.
+// Where MIDI comes from, and where it can go. A narrow seam over the Web MIDI API
+// shaped by what the app actually consumes: whether the platform offers MIDI, the
+// persisted permission (so a granted connection resumes without prompting), and —
+// once access is granted — the inputs and their message streams, plus any outputs
+// worth echoing to. The connection's state is the browser's; the port only reports
+// it.
 
 export type MidiInput = {
     id: string;
@@ -17,8 +18,21 @@ export type MidiInput = {
     onMessage(handler: (data: Uint8Array, timestamp: number) => void): void;
 };
 
+// A device the app can send to — a keyboard that lights its keys, or a sound module.
+export type MidiOutput = {
+    id: string;
+    name: string;
+    // Send raw MIDI bytes now. Errors are the adapter's to swallow: a device
+    // unplugged mid-send must never take down the run that was echoing to it.
+    send(data: number[]): void;
+};
+
 export type MidiConnection = {
     inputs(): MidiInput[];
+    // The devices that can be sent to. Empty when the platform grants access to
+    // inputs only, which is the common case — sending is a bonus, never a
+    // requirement, and nothing in the app may depend on an output existing.
+    outputs(): MidiOutput[];
     // Register the handler called when a device is plugged or unplugged
     // (replacing any previous one).
     onStateChange(handler: () => void): void;

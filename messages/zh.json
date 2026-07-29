@@ -458,6 +458,8 @@
   "slow_notes_heading": "你找得最慢的音",
   "slow_notes_intro": "大多数音你大约 {typical} 秒就能读出来。这些要更久——每个花几分钟就值得。",
   "slow_notes_seconds": "{seconds} 秒",
+  "settings_midi_echo": "点亮我的琴键",
+  "settings_midi_echo_help": "把 Plinky 弹的音送回你的钢琴：带灯的键盘就会把音显示出来。默认关闭——音源模块也会跟着响。",
   "settings_danger_heading": "危险区",
   "settings_reset_help": "会清除此设备上的一切——你的乐谱、进度和设置。此操作无法撤销，想保留乐谱的话，不妨先在曲库取一份备份。",
   "settings_reset": "重置此设备",

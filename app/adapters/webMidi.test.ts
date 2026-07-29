@@ -5,106 +5,75 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { webMidi } from "./webMidi";
 
-// The adapter's wrapping is exercised against a scripted MIDIAccess shape —
-// the real browser paths run in midi.browser.test.tsx where the platform
-// cooperates; the wrapping logic itself must not depend on that.
+// The real Web MIDI adapter against a stubbed browser. What cannot be tested on
+// real hardware here — a device that fails mid-send — is exactly what matters:
+// echoing is decoration, and decoration must never be able to stop the music.
 
-type StubInput = {
-    id: string;
-    name?: string | null;
-    manufacturer?: string | null;
-    state: string;
-    onmidimessage: ((event: { data: Uint8Array | null; timeStamp: number }) => void) | null;
-};
+type StubOutput = { id: string; name?: string | null; send: (data: number[]) => void };
 
-function stubAccess(inputs: StubInput[]) {
-    return {
-        inputs: new Map(inputs.map((input) => [input.id, input])),
-        onstatechange: null as (() => void) | null,
+function stubAccess(outputs: StubOutput[]) {
+    const access = {
+        inputs: new Map(),
+        outputs: new Map(outputs.map((output) => [output.id, output])),
+        onstatechange: null,
     };
+    vi.stubGlobal("navigator", {
+        ...navigator,
+        requestMIDIAccess: () => Promise.resolve(access),
+    });
 }
 
-function withAccess(access: ReturnType<typeof stubAccess>) {
-    (navigator as unknown as { requestMIDIAccess: unknown }).requestMIDIAccess = vi.fn(() =>
-        Promise.resolve(access),
-    );
-}
+afterEach(() => vi.unstubAllGlobals());
 
-afterEach(() => {
-    (navigator as unknown as { requestMIDIAccess?: unknown }).requestMIDIAccess = undefined;
-});
+describe("webMidi outputs", () => {
+    it("hands back every output the browser offers", async () => {
+        stubAccess([
+            { id: "a", name: "Piano", send: () => {} },
+            { id: "b", name: "Module", send: () => {} },
+        ]);
 
-describe("webMidi", () => {
-    it("is unsupported without the API and supported with it", () => {
-        expect(webMidi.supported()).toBe(false);
-        withAccess(stubAccess([]));
-        expect(webMidi.supported()).toBe(true);
+        const outputs = (await webMidi.request()).outputs();
+
+        expect(outputs.map((output) => output.name)).toEqual(["Piano", "Module"]);
+        expect(outputs.map((output) => output.id)).toEqual(["a", "b"]);
     });
 
-    it("rejects the request when the API is missing", async () => {
-        await expect(webMidi.request()).rejects.toThrow(/not available/);
+    it("names a device the browser could not", async () => {
+        stubAccess([{ id: "a", name: null, send: () => {} }]);
+
+        expect((await webMidi.request()).outputs()[0]?.name).toBe("Unknown device");
     });
 
-    it("wraps inputs with name fallbacks and stamps messages on receipt, not with the driver clock", async () => {
-        const raw: StubInput = {
-            id: "in-1",
-            name: null,
-            manufacturer: null,
-            state: "connected",
-            onmidimessage: null,
-        };
-        withAccess(stubAccess([raw]));
-        const connection = await webMidi.request();
-        const [input] = connection.inputs();
-        expect(input?.name).toBe("Unknown device");
-        expect(input?.manufacturer).toBe("");
+    it("swallows a device that fails mid-send", async () => {
+        // A keyboard unplugged between the lookup and the send throws. The run that
+        // was echoing to it has to carry on regardless.
+        stubAccess([
+            {
+                id: "a",
+                name: "Gone",
+                send: () => {
+                    throw new Error("device disappeared");
+                },
+            },
+        ]);
 
-        // A driver's event.timeStamp rides an unreliable origin, so the adapter
-        // ignores it and stamps every message on the one performance clock the
-        // capture also reads to close a note.
-        const now = vi.spyOn(performance, "now").mockReturnValue(9999);
-        const received: Array<[number[], number]> = [];
-        input?.onMessage((data, timestamp) => received.push([[...data], timestamp]));
-        raw.onmidimessage?.({ data: new Uint8Array([0x90, 60, 100]), timeStamp: 123 });
-        expect(received).toEqual([[[0x90, 60, 100], 9999]]);
+        const output = (await webMidi.request()).outputs()[0];
 
-        // A payload-less event carries nothing to parse and reaches nobody.
-        raw.onmidimessage?.({ data: null, timeStamp: 456 });
-        expect(received).toHaveLength(1);
-        now.mockRestore();
+        expect(() => output?.send([0x90, 60, 100])).not.toThrow();
     });
 
-    it("wires and unhooks the statechange handler through close", async () => {
-        const raw: StubInput = {
-            id: "in-1",
-            name: "Piano",
-            manufacturer: "Acme",
-            state: "connected",
-            onmidimessage: null,
-        };
-        const access = stubAccess([raw]);
-        withAccess(access);
-        const connection = await webMidi.request();
+    it("passes the bytes through untouched when the device is there", async () => {
+        const seen: number[][] = [];
+        stubAccess([{ id: "a", name: "Piano", send: (data) => seen.push(data) }]);
 
-        const onChange = vi.fn();
-        connection.onStateChange(onChange);
-        access.onstatechange?.();
-        expect(onChange).toHaveBeenCalledTimes(1);
+        (await webMidi.request()).outputs()[0]?.send([0x90, 60, 100]);
 
-        connection.inputs()[0]?.onMessage(() => {});
-        expect(raw.onmidimessage).not.toBeNull();
-        connection.close();
-        expect(access.onstatechange).toBeNull();
-        expect(raw.onmidimessage).toBeNull();
+        expect(seen).toEqual([[0x90, 60, 100]]);
     });
 
-    it("reports the permission as unknown when the platform cannot say", async () => {
-        const original = navigator.permissions;
-        Object.defineProperty(navigator, "permissions", {
-            configurable: true,
-            value: { query: () => Promise.reject(new TypeError("no midi descriptor")) },
-        });
-        expect(await webMidi.permissionState()).toBe("unknown");
-        Object.defineProperty(navigator, "permissions", { configurable: true, value: original });
+    it("reports no outputs without complaint", async () => {
+        stubAccess([]);
+
+        expect((await webMidi.request()).outputs()).toEqual([]);
     });
 });

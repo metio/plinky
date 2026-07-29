@@ -458,6 +458,8 @@
   "slow_notes_heading": "Notas que tardas más en encontrar",
   "slow_notes_intro": "La mayoría de las notas te llevan unos {typical}s. Estas tardan más — merecen unos minutos cada una.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Iluminar las teclas de mi piano",
+  "settings_midi_echo_help": "Envía lo que Plinky toca de vuelta a tu piano: un teclado con luces muestra las notas. Desactivado por defecto — un módulo de sonido también se pondría a tocar.",
   "settings_danger_heading": "Zona de peligro",
   "settings_reset_help": "Borra todo en este dispositivo: tus partituras, tu progreso y tus ajustes. Esto no se puede deshacer, así que haz una copia de seguridad desde la Biblioteca primero si quieres conservar tus partituras.",
   "settings_reset": "Restablecer este dispositivo",

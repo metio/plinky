@@ -31,6 +31,7 @@ import { type ConnectedInput, diffConnectedInputs } from "../../core/midiDevices
 import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
+import { noteOff, noteOn, sendable } from "../../core/midiMessage";
 import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
 import { useAnalytics, useServices } from "./services";
@@ -93,6 +94,10 @@ type MidiContextValue = {
     // Whether a pedal is currently held (any source). A run starting mid-hold reads it
     // to seed its recording, since Web MIDI streams only pedal changes, never the state.
     pedalHeld: (pedal: PedalKind) => boolean;
+    // Light this note on a connected instrument for `durationMs`, if the player
+    // asked for the echo and anything is listening. Fire-and-forget: nothing about
+    // a run depends on it, and a device that ignores it changes nothing.
+    echoNote: (note: number, velocity: number, durationMs: number) => void;
     // The microphone as an input device: an acoustic piano heard through pitch
     // detection lands in the same funnel as a MIDI keyboard.
     micStatus: MicStatus;
@@ -111,7 +116,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // Injected capabilities: the MIDI seam itself, and the store the dev reset
     // bridge wipes — the provider renders inside ServicesProvider, so overrides
     // (a fake MIDI in tests) reach it too.
-    const { midi, store, pitch, audio } = useServices();
+    const { midi, store, pitch, audio, scheduler } = useServices();
     const prefsStore = usePrefsStore();
     const analytics = useAnalytics();
     const [support, setSupport] = useState<MidiSupport>("unknown");
@@ -238,6 +243,34 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         }
     }, []);
     const pedalHeld = useCallback((pedal: PedalKind) => pedalsDownRef.current.has(pedal), []);
+
+    // Echo a note out to whatever is connected, so a keyboard with lights shows the
+    // piece as Plinky plays it. Off unless asked for: sending MIDI to somebody's
+    // instrument unprompted would be a surprise, and a sound module would start
+    // playing along uninvited.
+    const echoNote = useCallback(
+        (note: number, velocity: number, durationMs: number) => {
+            if (!prefsStore.load().midiEcho || !sendable(note)) {
+                return;
+            }
+            const outputs = connectionRef.current?.outputs() ?? [];
+            if (outputs.length === 0) {
+                return;
+            }
+            for (const output of outputs) {
+                output.send(noteOn(note, velocity));
+            }
+            // The note-off is scheduled rather than sent with a duration, because Web
+            // MIDI's timestamped send is not honoured everywhere and a key left lit is
+            // worse than one that clears a few milliseconds early.
+            scheduler.after(Math.max(1, durationMs), () => {
+                for (const output of outputs) {
+                    output.send(noteOff(note));
+                }
+            });
+        },
+        [prefsStore, scheduler],
+    );
 
     const makeHandler = useCallback(
         (deviceName: string) => (data: Uint8Array, timestamp: number) => {
@@ -672,6 +705,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         pressKey,
         releaseKey,
         pedalHeld,
+        echoNote,
         micStatus,
         startMic,
         stopMic,

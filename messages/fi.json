@@ -458,6 +458,8 @@
   "slow_notes_heading": "Sävelet, joiden löytäminen kestää kauimmin",
   "slow_notes_intro": "Useimmat sävelet luet noin {typical}s:ssa. Nämä kestävät kauemmin — muutaman minuutin arvoisia.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Sytytä pianoni koskettimet",
+  "settings_midi_echo_help": "Lähettää Plinkyn soittaman takaisin pianoosi: valoilla varustettu koskettimisto näyttää sävelet. Oletuksena pois — äänimoduuli alkaisi myös soittaa.",
   "settings_danger_heading": "Vaaravyöhyke",
   "settings_reset_help": "Poistaa kaiken tältä laitteelta — nuottisi, edistymisesi ja asetuksesi. Tätä ei voi perua, joten ota ensin varmuuskopio Kirjastosta, jos haluat säilyttää nuottisi.",
   "settings_reset": "Nollaa tämä laite",

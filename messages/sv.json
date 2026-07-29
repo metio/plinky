@@ -458,6 +458,8 @@
   "slow_notes_heading": "Toner du tar längst tid på dig att hitta",
   "slow_notes_intro": "De flesta toner läser du på ungefär {typical}s. De här tar längre tid — värda några minuter var.",
   "slow_notes_seconds": "{seconds}s",
+  "settings_midi_echo": "Tänd tangenterna på mitt piano",
+  "settings_midi_echo_help": "Skickar det Plinky spelar tillbaka till pianot: ett klaviatur med lampor visar tonerna. Av som standard — en ljudmodul skulle också börja spela.",
   "settings_danger_heading": "Farozon",
   "settings_reset_help": "Raderar allt på den här enheten — dina stycken, framsteg och inställningar. Detta kan inte ångras, så ta en säkerhetskopia från biblioteket först om du vill behålla dina stycken.",
   "settings_reset": "Återställ den här enheten",

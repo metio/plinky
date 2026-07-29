@@ -458,6 +458,8 @@
   "slow_notes_heading": "Bulman en uzun süren notalar",
   "slow_notes_intro": "Çoğu notayı yaklaşık {typical}s'de okuyorsun. Bunlar daha uzun sürüyor — her biri birkaç dakikaya değer.",
   "slow_notes_seconds": "{seconds}sn",
+  "settings_midi_echo": "Piyanomun tuşlarını yak",
+  "settings_midi_echo_help": "Plinky'nin çaldığını piyanona geri gönderir: ışıklı bir klavye notaları gösterir. Varsayılan olarak kapalı — bir ses modülü de çalmaya başlardı.",
   "settings_danger_heading": "Tehlikeli bölge",
   "settings_reset_help": "Bu cihazdaki her şeyi siler — parçaların, ilerlemen ve ayarların. Bu geri alınamaz, o yüzden parçalarını korumak istiyorsan önce Kütüphane'den bir yedek al.",
   "settings_reset": "Bu cihazı sıfırla",
