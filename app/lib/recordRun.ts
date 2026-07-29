@@ -22,6 +22,11 @@ export type RecordedRun = {
     // A run that began partway through (a takeover from Listen) keeps no ghost — a partial
     // replay would strand the next race at its early end.
     partial: boolean;
+    // A run that drilled a bar range on repeat. Its notes cover a slice of the piece,
+    // so its sections are not the same stretches of music a whole run's are.
+    looped?: boolean;
+    // The run's per-section scores, for the piece's section-wise best.
+    sections: number[];
     // Captured rather than merely scored: the per-note reading times need to know
     // which pitches a step sounded, which the outcome type drops.
     notes: CapturedNote[];
@@ -48,7 +53,20 @@ export function recordRun(
     now: number,
     publishMilestone: (milestone: Milestone) => void,
 ): { ghost: number[] | null } {
-    const { id, title, daily, ephemeral, partial, notes, correct, grade, grid, tolerance } = run;
+    const {
+        id,
+        title,
+        daily,
+        ephemeral,
+        partial,
+        looped,
+        sections,
+        notes,
+        correct,
+        grade,
+        grid,
+        tolerance,
+    } = run;
     services.lifetime.recordRun({
         accuracy: grade.accuracy,
         timing: grade.timing,
@@ -65,6 +83,13 @@ export function recordRun(
     services.noteStats.record(notes);
     if (ephemeral) {
         return { ghost: null };
+    }
+    // The section-wise best only takes whole, unlooped readings. Sections are cut by
+    // position within the run, so a takeover from Listen or a drilled bar range would
+    // file a different stretch of music under the same section number and quietly
+    // corrupt the record it is compared against.
+    if (!partial && !looped) {
+        services.sectionBest.record(id, sections);
     }
     const ghost = partial ? null : notes.map((note) => note.playedMs);
     if (ghost) {

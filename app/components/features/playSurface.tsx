@@ -10,6 +10,7 @@ import { PlayStage } from "./playStage";
 import { PlayTransport } from "./playTransport";
 import { RaceVerdict } from "./raceVerdict";
 import { RunResult } from "./runResult";
+import { SectionBest } from "./sectionBest";
 import { ScoreCanvas } from "./scoreCanvas";
 import { TakesPanel } from "./takesPanel";
 
@@ -140,6 +141,17 @@ export function PlaySurface() {
                                 runSaved={runResult.saved}
                                 onSaveTake={saveCurrentTake}
                             />
+                            {/* Only for a real piece: a generated phrase is different
+                            every time, so there is no "this piece's sections" to hold
+                            a record for. */}
+                            {!ephemeral && (
+                                <SectionBest
+                                    scoreId={id}
+                                    notes={runResult.notes}
+                                    tolerance={runResult.tolerance}
+                                    tempoScale={runTempoScale}
+                                />
+                            )}
                         </div>
                     )}
                 </FullScreen>

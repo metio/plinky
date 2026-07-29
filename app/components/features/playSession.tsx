@@ -69,6 +69,7 @@ import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
 import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
+import { sectionScores } from "../../../core/sectionBest";
 import { recordRun } from "../../lib/recordRun";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
@@ -756,6 +757,10 @@ function usePlaySessionValue({
         // Everything the finished run shows and records — the grade, the timing tolerance,
         // the per-hand share grid and the tempo curve — is a pure function of the played
         // notes. The component only produces the run; deriveRunOutcome scores it.
+        // The run's pace against the piece's own, on the same footing the share grid
+        // scores speed with.
+        const intended = initialTempo ?? runTempoRef.current;
+        const gradedTempoScale = intended > 0 ? runTempoRef.current / intended : 1;
         const outcome = deriveRunOutcome({
             notes,
             correct: matcher.total,
@@ -799,6 +804,13 @@ function usePlaySessionValue({
                 daily,
                 ephemeral,
                 partial: partialRunRef.current,
+                looped: loop.on,
+                // Scored on the same terms the share grid uses, so "your best section"
+                // and the grid's cells can never disagree about how a moment went.
+                sections: sectionScores(notes, {
+                    tolerance: outcome.tolerance,
+                    tempoScale: gradedTempoScale,
+                }),
                 notes,
                 correct: matcher.total,
                 grade: outcome.grade,
@@ -848,6 +860,7 @@ function usePlaySessionValue({
         analytics,
         sightRead.on,
         enforceTempo,
+        loop.on,
     ]);
 
     // Keep the finished run as a take without a separate Save press — finishing a song and

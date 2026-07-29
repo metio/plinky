@@ -34,6 +34,7 @@ import { createMilestonesStore, type MilestonesStore } from "../stores/milestone
 import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
 import { createNoteStatsStore, type NoteStatsStore } from "../stores/noteStatsStore";
 import { createPlacementStore, type PlacementStore } from "../stores/placementStore";
+import { createSectionBestStore, type SectionBestStore } from "../stores/sectionBestStore";
 import { createSightReadStore, type SightReadStore } from "../stores/sightReadStore";
 import { createThemeStore, type ThemeStore } from "../stores/themeStore";
 import { createFavoritesStore, type FavoritesStore } from "../stores/favoritesStore";
@@ -74,6 +75,7 @@ export type AppServices = {
     sightReads: SightReadStore;
     placement: PlacementStore;
     noteStats: NoteStatsStore;
+    sectionBest: SectionBestStore;
     takes: TakesStore;
     fingering: FingeringStore;
     assignments: AssignmentsStore;
@@ -147,6 +149,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         sightReads: overrides.sightReads ?? createSightReadStore(store),
         placement: overrides.placement ?? createPlacementStore(store),
         noteStats: overrides.noteStats ?? createNoteStatsStore(store),
+        sectionBest: overrides.sectionBest ?? createSectionBestStore(store),
         takes: overrides.takes ?? createTakesStore(store),
         fingering: overrides.fingering ?? createFingeringStore(store),
         assignments: overrides.assignments ?? createAssignmentsStore(store),
@@ -189,6 +192,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     sightReads: true,
     placement: true,
     noteStats: true,
+    sectionBest: true,
     takes: true,
     fingering: true,
     assignments: true,
@@ -271,6 +275,10 @@ export function usePlacementStore(): PlacementStore {
 
 export function useNoteStatsStore(): NoteStatsStore {
     return useServices().noteStats;
+}
+
+export function useSectionBestStore(): SectionBestStore {
+    return useServices().sectionBest;
 }
 
 export function useHistoryStore(): HistoryStore {

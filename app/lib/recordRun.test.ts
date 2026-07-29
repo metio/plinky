@@ -44,6 +44,7 @@ const run = (over: Partial<Parameters<typeof recordRun>[0]> = {}) => ({
     id: "song-1",
     title: "Minuet",
     partial: false,
+    sections: [80, 70, 60, 50, 40, 30],
     notes,
     correct: 2,
     grade: grade(),

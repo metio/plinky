@@ -266,6 +266,13 @@ one-tap **review session** walks you through everything that's fading, and you c
   a code is written by the device it describes, so it replaces the transcription, not
   the trust. An assignment can also be handed out straight into **Google Classroom**
   (a plain link — no third-party script rides along).
+- **Your best of this piece** — under a finished run: the best each of its six parts
+  has ever been played, and their total. A grade describes one run, so playing the
+  opening beautifully and fumbling the coda scores the same as the reverse and the
+  improvement stays invisible. This can only go up, and it goes up whenever any part
+  of the piece gets better. It counts whole, unlooped readings only — a takeover from
+  Listen or a drilled bar range covers a different stretch of music, and filing that
+  under the same part would corrupt the record it's compared against.
 - **Notes you take longest to find** — on the You page, once you've read enough for it
   to mean anything. Every run already timed how long each note took; this adds it up
   per note and names the handful that consistently slow you down, against the time a

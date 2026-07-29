@@ -168,7 +168,7 @@ export function toGrid<K extends string>(
 // weakest dimension wins: a moment is only as good as its worst aspect, so a crawl (low
 // Speed) or a slip (low Accuracy) drags the cell down even when the others are perfect —
 // the averaging alternative floors every clean run near green and hides the difference.
-function combined(metrics: SegmentMetrics): number {
+export function combinedScore(metrics: SegmentMetrics): number {
     return Math.min(metrics.accuracy, metrics.speed, metrics.timing);
 }
 
@@ -191,7 +191,7 @@ export function handGrid(notes: RunNote[], options: ShareOptions = {}): Grid {
     return handsPlayed(notes).map((staff) => {
         const handNotes = notes.filter((note) => (note.staves ?? [0]).includes(staff));
         return computeSegments(handNotes, SEGMENTS, options).map((segment) =>
-            levelFor(combined(segment)),
+            levelFor(combinedScore(segment)),
         );
     });
 }
@@ -206,7 +206,7 @@ export function handScores(
     return handsPlayed(notes).map((staff) => {
         const handNotes = notes.filter((note) => (note.staves ?? [0]).includes(staff));
         const [whole] = computeSegments(handNotes, 1, options);
-        return { staff, overall: whole ? combined(whole) : 0 };
+        return { staff, overall: whole ? combinedScore(whole) : 0 };
     });
 }
 
