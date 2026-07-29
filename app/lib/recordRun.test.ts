@@ -94,6 +94,30 @@ describe("recordRun", () => {
         expect(services.mastery.load("song-1")).toBeNull();
     });
 
+    it("keeps an assessment's reading times out of the per-note record", () => {
+        const services = createServices({ store: memoryStore() });
+        loadMock.mockResolvedValue([]);
+        const history = vi.spyOn(services.history, "record");
+
+        recordRun(run({ ephemeral: true, assessment: true }), services, 1000, vi.fn());
+
+        // The run still counts as practice — only the per-note reading times are
+        // withheld, because an assessment picks material above the player's level.
+        expect(history).toHaveBeenCalledWith(2);
+        expect(services.noteStats.load()).toEqual({});
+    });
+
+    it("still folds an ephemeral drill's reading times into the per-note record", () => {
+        const services = createServices({ store: memoryStore() });
+        loadMock.mockResolvedValue([]);
+
+        recordRun(run({ ephemeral: true }), services, 1000, vi.fn());
+
+        // Gating the per-note record on `ephemeral` would silently take generated
+        // practice drills with it; the two flags mean different things.
+        expect(Object.keys(services.noteStats.load()).sort()).toEqual(["60", "62"]);
+    });
+
     it("keeps no ghost for a partial run but still folds it into mastery", () => {
         const services = createServices({ store: memoryStore() });
         loadMock.mockResolvedValue([]);

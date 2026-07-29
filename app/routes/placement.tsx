@@ -117,6 +117,7 @@ export default function PlacementRoute() {
                         beatsPerBar={4}
                         onGraded={graded}
                         ephemeral
+                        assessment
                     />
                 </>
             )}

@@ -25,6 +25,9 @@ export type RecordedRun = {
     // A run that drilled a bar range on repeat. Its notes cover a slice of the piece,
     // so its sections are not the same stretches of music a whole run's are.
     looped?: boolean;
+    // A run whose difficulty was chosen to find the player's limit rather than to
+    // practise at it. Its reading times describe the material, not the reader.
+    assessment?: boolean;
     // The run's per-section scores, for the piece's section-wise best.
     sections: number[];
     // Captured rather than merely scored: the per-note reading times need to know
@@ -60,6 +63,7 @@ export function recordRun(
         ephemeral,
         partial,
         looped,
+        assessment,
         sections,
         notes,
         correct,
@@ -78,9 +82,16 @@ export function recordRun(
     }
     services.history.record(correct);
     // Which notes this run was slow to find, folded into the running per-note record.
-    // Every run counts, ephemeral ones included: a generated drill reads the staff
-    // exactly as a piece does, and it is reading that is being measured.
-    services.noteStats.record(notes);
+    // Ephemeral runs count: a generated drill reads the staff exactly as a piece does,
+    // and it is reading that is being measured.
+    //
+    // An assessment does not. The placement test climbs until the player fails, so its
+    // closing rungs are material above their level by construction — a long gap there
+    // says the drill was too hard, not that the note is hard to find, and folding it in
+    // would file that difficulty under whichever pitches the overshoot happened to use.
+    if (!assessment) {
+        services.noteStats.record(notes);
+    }
     if (ephemeral) {
         return { ghost: null };
     }

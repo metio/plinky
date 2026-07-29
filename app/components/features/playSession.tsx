@@ -98,6 +98,9 @@ export type PlaySessionProps = {
     lockTempo?: boolean;
     daily?: number;
     ephemeral?: boolean;
+    // A run the placement test scores to find the player's level. It climbs past that
+    // level on purpose, so its reading times are kept out of the per-note record.
+    assessment?: boolean;
     canShareGhost?: boolean;
     seededResult?: DailyResult | null;
     // The resting page's Runs tab: true renders the saved-runs page instead of the
@@ -123,6 +126,7 @@ function usePlaySessionValue({
     lockTempo,
     daily,
     ephemeral,
+    assessment,
     canShareGhost,
     seededResult,
     runsView = false,
@@ -825,6 +829,7 @@ function usePlaySessionValue({
                 ephemeral,
                 partial: partialRunRef.current,
                 looped: loop.on,
+                assessment,
                 // Scored on the same terms the share grid uses, so "your best section"
                 // and the grid's cells can never disagree about how a moment went.
                 sections: sectionScores(notes, {
@@ -869,6 +874,7 @@ function usePlaySessionValue({
         onRunComplete,
         onGraded,
         ephemeral,
+        assessment,
         daily,
         initialTempo,
         bumpTempo,
