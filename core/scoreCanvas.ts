@@ -20,6 +20,13 @@ export const LISTENED_COLOR = "#3b82f6";
 // The loop selection is filled behind its bars in a bright red so the stretch you're
 // about to drill reads at a glance — the same red the share grid's weakest band uses.
 export const SELECT_COLOR = "#ef4444";
+// A note found only after a wrong key at that position — amber, between the green of
+// a clean read and the red of a miss. It is the difference between "you played this"
+// and "you played this eventually", which a single green cannot say: a score that is
+// green throughout after a dozen fumbles tells the player nothing about where they
+// actually hesitated.
+export const ASSISTED_COLOR = "#f59e0b";
+
 // A hidden note revealed by failure (the tries budget spent) — the same red the
 // wrong-key flash and the loop selection use, so "red = missed" stays one meaning.
 export const MISSED_COLOR = "#ef4444";

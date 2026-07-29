@@ -67,6 +67,7 @@ import { useVanishingBars } from "../../hooks/useVanishingBars";
 import { useSynth } from "../../hooks/useSynth";
 import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
+import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
 import { recordRun } from "../../lib/recordRun";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
@@ -149,6 +150,10 @@ function usePlaySessionValue({
     // Claims the current attempt to start a run: a sight-read's study countdown lets
     // the player act again before the run begins, and only the newest press may start.
     const practiceSeqRef = useRef(0);
+    // Step indices where a wrong key was played before the right one. A note cleared
+    // from here reads amber rather than green: the score then shows where the run
+    // actually hesitated, which a uniform green cannot.
+    const stumbledRef = useRef<Set<number>>(new Set());
     // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
     // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
     // callback and the MIDI release handler both advance it between renders.
@@ -548,7 +553,9 @@ function usePlaySessionValue({
             }
             // A hidden note earned its reveal — lift the blank before the green
             // paint below, so the note appears already coloured.
-            hidden.revealCorrect(info.index);
+            // Green for a clean read, amber for one that took a wrong key first.
+            const foundColor = stumbledRef.current.has(info.index) ? ASSISTED_COLOR : PLAYED_COLOR;
+            hidden.revealCorrect(info.index, foundColor);
             // Take away whatever bar the run has now left behind (inert unless the
             // read-ahead drill is armed).
             vanishing.advance(info.index);
@@ -556,7 +563,7 @@ function usePlaySessionValue({
             // only advances after this callback — so the score shows progress.
             const osmd = getOsmd();
             if (osmd) {
-                paintPlayedNotes(osmd, info.pitches);
+                paintPlayedNotes(osmd, info.pitches, foundColor);
                 markPainted();
             }
             // Show how long to keep holding, but only in the full-guidance hint mode
@@ -579,6 +586,7 @@ function usePlaySessionValue({
             accompaniment.onCleared(info.index, liveTempo);
         },
         onWrong: ({ index, misses }) => {
+            stumbledRef.current.add(index);
             // The tries budget spent on a hidden note reveals it red — the lesson
             // arrives, and (keep-going aside) the run still waits for the right key.
             hidden.revealMissed(index, misses);
@@ -1068,6 +1076,7 @@ function usePlaySessionValue({
         }
         gradeFromRunRef.current = false;
         gradedRef.current = false;
+        stumbledRef.current.clear();
         takeSavedRef.current = false;
         keepUp.clearResult();
         resyncLive();

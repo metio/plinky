@@ -15,7 +15,13 @@ import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 import { encodeGhost } from "../../../core/ghost";
 import { browserStore } from "../../adapters/browserStore";
 import { createGhostStore } from "../../stores/ghostStore";
-import { GHOST_COLOR, LISTENED_COLOR, PLAYED_COLOR, WINDOW_COLOR } from "../../../core/scoreCanvas";
+import {
+    ASSISTED_COLOR,
+    GHOST_COLOR,
+    LISTENED_COLOR,
+    PLAYED_COLOR,
+    WINDOW_COLOR,
+} from "../../../core/scoreCanvas";
 import { ScoreViewer } from "./scoreViewer";
 
 // The browser context arrives with MIDI pre-granted; without a fake seam the
@@ -1335,6 +1341,75 @@ describe("ScoreViewer", () => {
             expect(
                 screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
             ).toBe("false");
+        });
+    });
+
+    // A note found only after a wrong key reads amber, so the finished score shows
+    // where the run hesitated instead of a uniform green that forgets.
+    describe("found after a slip", () => {
+        const oneNote = () =>
+            generateDrill(
+                { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+                () => 0,
+            );
+
+        it("greens a note read cleanly", async () => {
+            const { container } = mount(oneNote(), { beatsPerBar: 4 });
+            fireEvent.click(await awaitReady());
+            const right = await screen.findByLabelText("C 5");
+
+            fireEvent.pointerDown(right);
+            fireEvent.pointerUp(right);
+
+            await waitFor(
+                () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+                { timeout: 30000 },
+            );
+            expect(container.querySelector(`[fill="${ASSISTED_COLOR}"]`)).toBeNull();
+        });
+
+        it("ambers a note that took a wrong key first", async () => {
+            const { container } = mount(oneNote(), { beatsPerBar: 4 });
+            fireEvent.click(await awaitReady());
+            const right = await screen.findByLabelText("C 5");
+            const wrong = await screen.findByLabelText("D 5");
+
+            // Slip, then find it: the position is cleared, but not at sight.
+            fireEvent.pointerDown(wrong);
+            fireEvent.pointerUp(wrong);
+            fireEvent.pointerDown(right);
+            fireEvent.pointerUp(right);
+
+            await waitFor(
+                () => expect(container.querySelector(`[fill="${ASSISTED_COLOR}"]`)).toBeTruthy(),
+                { timeout: 30000 },
+            );
+        });
+
+        it("forgets the slip when the run starts over", async () => {
+            const { container } = mount(oneNote(), { beatsPerBar: 4 });
+            fireEvent.click(await awaitReady());
+            const right = await screen.findByLabelText("C 5");
+            const wrong = await screen.findByLabelText("D 5");
+            fireEvent.pointerDown(wrong);
+            fireEvent.pointerUp(wrong);
+            fireEvent.pointerDown(right);
+            fireEvent.pointerUp(right);
+            await waitFor(
+                () => expect(container.querySelector(`[fill="${ASSISTED_COLOR}"]`)).toBeTruthy(),
+                { timeout: 30000 },
+            );
+
+            fireEvent.click(screen.getByRole("button", { name: "Restart" }));
+            fireEvent.pointerDown(right);
+            fireEvent.pointerUp(right);
+
+            // A fresh run is read at sight again — last run's stumble is not carried.
+            await waitFor(
+                () => expect(container.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+                { timeout: 30000 },
+            );
+            expect(container.querySelector(`[fill="${ASSISTED_COLOR}"]`)).toBeNull();
         });
     });
 });

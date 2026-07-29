@@ -47,10 +47,13 @@ export function useHiddenNotes(
         activeRef.current = true;
     }, [getOsmd]);
 
-    const revealCorrect = useCallback((index: number) => {
+    // The colour arrives from the caller, which knows whether this note was found
+    // cleanly or only after a wrong key — a blanked note that took three tries
+    // should not reveal itself the same green as one read at sight.
+    const revealCorrect = useCallback((index: number, color: string = PLAYED_COLOR) => {
         if (activeRef.current) {
-            revealedRef.current.set(index, PLAYED_COLOR);
-            revealNoteElements(stepsRef.current[index] ?? [], PLAYED_COLOR);
+            revealedRef.current.set(index, color);
+            revealNoteElements(stepsRef.current[index] ?? [], color);
         }
     }, []);
 
