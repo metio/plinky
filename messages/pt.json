@@ -465,6 +465,8 @@
   "section_best_section": "Parte {number}: {score}",
   "section_best_set": "Esta passagem marcou o teu melhor em {count} de {total} partes.",
   "section_best_none": "Sem recordes novos desta vez — o teu continua de pé.",
+  "focus_loop": "Mostrar só os compassos do ciclo",
+  "focus_loop_caption": "Desenha só esse trecho, na sua própria linha com a armação e o compasso repetidos — grande e sem mais nada para olhar.",
   "settings_danger_heading": "Zona de perigo",
   "settings_reset_help": "Apaga tudo neste dispositivo — as tuas partituras, progresso e definições. Isto não tem volta, por isso tira um backup na Biblioteca primeiro se quiseres guardar as tuas partituras.",
   "settings_reset": "Redefinir este dispositivo",

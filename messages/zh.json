@@ -465,6 +465,8 @@
   "section_best_section": "第 {number} 段：{score}",
   "section_best_set": "这一遍在 {total} 段中的 {count} 段刷新了你的最好成绩。",
   "section_best_none": "这次没有新纪录——你之前的成绩依然保持。",
+  "focus_loop": "只显示循环的小节",
+  "focus_loop_caption": "只画那一段，单独成行并重新标出调号和拍号——放得大，也没有别处可看。",
   "settings_danger_heading": "危险区",
   "settings_reset_help": "会清除此设备上的一切——你的乐谱、进度和设置。此操作无法撤销，想保留乐谱的话，不妨先在曲库取一份备份。",
   "settings_reset": "重置此设备",

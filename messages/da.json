@@ -465,6 +465,8 @@
   "section_best_section": "Del {number}: {score}",
   "section_best_set": "Denne runde satte dit bedste på {count} af {total} dele.",
   "section_best_none": "Ingen nye rekorder denne gang — dit står stadig.",
+  "focus_loop": "Vis kun takterne i løkken",
+  "focus_loop_caption": "Tegner kun det stykke, på sin egen linje med toneart og taktart gentaget — stort, og uden andet at kigge på.",
   "settings_danger_heading": "Farezone",
   "settings_reset_help": "Sletter alt på denne enhed — dine stykker, dit fremskridt og dine indstillinger. Det kan ikke fortrydes, så hent en sikkerhedskopi fra Biblioteket først, hvis du gerne vil beholde dine stykker.",
   "settings_reset": "Nulstil denne enhed",

@@ -465,6 +465,8 @@
   "section_best_section": "{number}번 구간: {score}",
   "section_best_set": "이번 연주로 {total}개 구간 중 {count}개에서 최고를 세웠어요.",
   "section_best_none": "이번엔 갱신 없음 — 기존 기록이 그대로예요.",
+  "focus_loop": "반복 구간의 마디만 보기",
+  "focus_loop_caption": "그 구간만 조표와 박자를 다시 적어 한 줄로 그려요. 크게 보이고, 눈이 갈 곳이 달리 없어요.",
   "settings_danger_heading": "위험 구역",
   "settings_reset_help": "이 기기의 모든 것을 지워요 — 악보, 진행 상황, 설정까지 전부요. 되돌릴 수 없으니, 악보를 남기고 싶다면 먼저 라이브러리에서 백업을 받아두세요.",
   "settings_reset": "이 기기 초기화",

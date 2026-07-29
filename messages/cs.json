@@ -465,6 +465,8 @@
   "section_best_section": "Část {number}: {score}",
   "section_best_set": "Tenhle průchod ustanovil tvoje maximum v {count} z {total} částí.",
   "section_best_none": "Tentokrát žádné nové maximum — to tvoje pořád platí.",
+  "focus_loop": "Ukázat jen takty smyčky",
+  "focus_loop_caption": "Vykreslí jen ten úsek, na vlastním řádku s zopakovanou tóninou a taktem — velký a bez ničeho vedle.",
   "settings_danger_heading": "Nebezpečná zóna",
   "settings_reset_help": "Vymaže vše na tomto zařízení — vaše skladby, pokrok i nastavení. Nedá se to vzít zpět, takže pokud chcete skladby zachovat, stáhněte si nejprve zálohu v Knihovně.",
   "settings_reset": "Resetovat toto zařízení",

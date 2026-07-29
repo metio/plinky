@@ -465,6 +465,8 @@
   "section_best_section": "Del {number}: {score}",
   "section_best_set": "Den här rundan satte ditt bästa på {count} av {total} delar.",
   "section_best_none": "Inga nya rekord den här gången — ditt står kvar.",
+  "focus_loop": "Visa bara looptakterna",
+  "focus_loop_caption": "Ritar bara den sträckan, på en egen rad med tonart och taktart upprepade — stort, och utan något annat att titta på.",
   "settings_danger_heading": "Farozon",
   "settings_reset_help": "Raderar allt på den här enheten — dina stycken, framsteg och inställningar. Detta kan inte ångras, så ta en säkerhetskopia från biblioteket först om du vill behålla dina stycken.",
   "settings_reset": "Återställ den här enheten",

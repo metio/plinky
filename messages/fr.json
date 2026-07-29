@@ -465,6 +465,8 @@
   "section_best_section": "Partie {number} : {score}",
   "section_best_set": "Ce passage a établi ton meilleur sur {count} parties sur {total}.",
   "section_best_none": "Pas de nouveau record cette fois — le tien tient toujours.",
+  "focus_loop": "N'afficher que les mesures en boucle",
+  "focus_loop_caption": "Ne dessine que ce passage, sur sa propre ligne avec l'armure et la mesure rappelées — en grand, sans rien d'autre à regarder.",
   "settings_danger_heading": "Zone de danger",
   "settings_reset_help": "Efface tout sur cet appareil — vos partitions, votre progression et vos réglages. C'est irréversible, alors prenez d'abord une sauvegarde depuis la Bibliothèque si vous voulez garder vos partitions.",
   "settings_reset": "Réinitialiser cet appareil",

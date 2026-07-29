@@ -465,6 +465,8 @@
   "section_best_section": "Parte {number}: {score}",
   "section_best_set": "Esta pasada marcó tu mejor resultado en {count} de {total} partes.",
   "section_best_none": "Ningún récord nuevo esta vez — el tuyo sigue en pie.",
+  "focus_loop": "Mostrar solo los compases del bucle",
+  "focus_loop_caption": "Dibuja solo ese tramo, en su propia línea con la armadura y el compás repetidos — grande y sin nada más que mirar.",
   "settings_danger_heading": "Zona de peligro",
   "settings_reset_help": "Borra todo en este dispositivo: tus partituras, tu progreso y tus ajustes. Esto no se puede deshacer, así que haz una copia de seguridad desde la Biblioteca primero si quieres conservar tus partituras.",
   "settings_reset": "Restablecer este dispositivo",

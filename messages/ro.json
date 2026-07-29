@@ -465,6 +465,8 @@
   "section_best_section": "Partea {number}: {score}",
   "section_best_set": "Trecerea asta ți-a stabilit recordul la {count} din {total} părți.",
   "section_best_none": "Niciun record nou de data asta — al tău rămâne.",
+  "focus_loop": "Arată doar măsurile din buclă",
+  "focus_loop_caption": "Desenează doar acel fragment, pe rândul lui, cu armura și măsura reluate — mare și fără nimic altceva de privit.",
   "settings_danger_heading": "Zonă periculoasă",
   "settings_reset_help": "Șterge tot de pe acest dispozitiv — partiturile, progresul și setările tale. Nu poate fi anulat, așa că fă întâi o copie de rezervă din Bibliotecă, dacă vrei să-ți păstrezi partiturile.",
   "settings_reset": "Resetează acest dispozitiv",

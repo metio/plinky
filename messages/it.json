@@ -465,6 +465,8 @@
   "section_best_section": "Parte {number}: {score}",
   "section_best_set": "Questa esecuzione ha fissato il tuo meglio in {count} parti su {total}.",
   "section_best_none": "Nessun record nuovo stavolta — il tuo resta.",
+  "focus_loop": "Mostra solo le battute in loop",
+  "focus_loop_caption": "Disegna solo quel tratto, su una riga propria con armatura e tempo ripetuti — grande, e senza altro da guardare.",
   "settings_danger_heading": "Zona pericolosa",
   "settings_reset_help": "Cancella tutto su questo dispositivo — i tuoi spartiti, progressi e impostazioni. Non si può annullare, quindi prendi prima un backup dalla Libreria se vuoi conservare i tuoi spartiti.",
   "settings_reset": "Ripristina questo dispositivo",

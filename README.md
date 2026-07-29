@@ -95,7 +95,10 @@ Single notes, **chords**, and **two-hand grand staffs** all work the same. Turn 
 **Loop** and the piece repeats whole; to drill just a passage, **tap two bars on the
 score** — they fill **red** so the stretch you're repeating is clear, and the range
 (with a *Whole song* reset) sits right beside the score, so you can also set the first
-and last bar by number. Turn on
+and last bar by number. With a loop set, **Show only the looped bars** re-engraves just that stretch on its
+own — key and time signature restated, drawn big, with nowhere else for the eye to
+go. On a phone it's the difference between practising four bars and hunting for them.
+Turn on
 **Keep going** and a missed note no longer freezes you — playing the next one moves the
 score along, so one hand's slip never stops the other. And for ear training, turn on
 **Hidden notes**: the noteheads start blank (the staff and rhythm stay), you Listen to

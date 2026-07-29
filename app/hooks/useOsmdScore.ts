@@ -63,6 +63,7 @@ export function useOsmdScore(
         treadmill,
         showBeams,
         colorNotes,
+        focus,
         showFingerings,
         scrollFollow,
         onReload,
@@ -76,6 +77,15 @@ export function useOsmdScore(
         // Draw the player's worked-out fingering instead of the app's suggestion.
         showMine: boolean;
         saved: FingerMap;
+        // Draw only this stretch of bars (1-based, inclusive), re-engraved on its own
+        // with its clef, key and metre restated — the loop range read as if it were the
+        // whole piece. Null draws everything.
+        //
+        // The cursor still walks the entire sheet; only the drawing is narrowed. Notes
+        // outside the range therefore have no rendered element, which the collectors
+        // already tolerate — they keep a step's place even when it drew no glyph, so
+        // step indices stay aligned with the matcher's.
+        focus: { from: number; to: number } | null;
         // Bars forced onto each staff row (0 = fit to width).
         barsPerRow: number;
         // Magnification applied to the whole rendered score (1 = normal), via OSMD's Zoom.
@@ -198,6 +208,15 @@ export function useOsmdScore(
                 const osmd = new OpenSheetMusicDisplay(containerRef.current, {
                     autoResize: true,
                     drawingParameters: "compact",
+                    // Focus mode: OSMD draws only this range, restating the clef, key
+                    // and metre at its start, so a handful of bars can be read as a
+                    // piece in their own right instead of hunted for on a full page.
+                    ...(focus
+                        ? {
+                              drawFromMeasureNumber: focus.from,
+                              drawUpToMeasureNumber: focus.to,
+                          }
+                        : {}),
                     // We own follow-the-note scrolling ourselves (centerCursor centres the
                     // current note in whatever scrolls, in both layouts), so OSMD's own
                     // follow stays off — two mechanisms would fight over the scroll position.
@@ -315,6 +334,7 @@ export function useOsmdScore(
         treadmill,
         showBeams,
         colorNotes,
+        focus,
     ]);
 
     // Toggle the on-staff fingering without re-parsing the MusicXML, so the loaded sheet

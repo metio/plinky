@@ -174,6 +174,15 @@ function usePlaySessionValue({
     // Duet: sound the other hand while you play yours during a hands-separate keep-up run.
     // Off by default and, like the others, a session toggle rather than a saved pref.
     const [duet, setDuet] = useState(false);
+    // Focus mode: draw only the looped bars, re-engraved on their own. A session
+    // toggle, and only ever meaningful with a loop set — there is no "just these
+    // bars" without bars to mean.
+    const [focusLoop, setFocusLoop] = useState(false);
+    // The range OSMD is actually drawing. Held as state rather than derived inline
+    // because the loop is built from the rendered bar boxes and so cannot exist until
+    // after the score does — the reader of this value comes first in the file, and the
+    // source of it comes later. Synced below, once both exist.
+    const [focusRange, setFocusRange] = useState<{ from: number; to: number } | null>(null);
     // The tempo settings — the slider, the adaptive live pace, the metronome toggles and
     // the tempo trainer — held together. The metronome *effect* stays at its call site
     // below: it reads keepUp.running, which is created after this.
@@ -352,6 +361,7 @@ function usePlaySessionValue({
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),
         colorNotes: aids.colorNotes,
+        focus: focusRange,
         showFingerings,
         scrollFollow,
         onReload: () => {
@@ -684,6 +694,14 @@ function usePlaySessionValue({
             centerCursor();
         },
     });
+
+    // A loop turned off (or never set) leaves the whole piece drawn, so the mode can be
+    // left on without stranding the reader on a range that no longer applies. Keyed on
+    // the numbers rather than an object, so this settles rather than re-firing.
+    const focusOn = focusLoop && loop.on;
+    useEffect(() => {
+        setFocusRange(focusOn ? { from: loop.from, to: loop.to } : null);
+    }, [focusOn, loop.from, loop.to]);
 
     // A practice run in progress holds the app-wide activity signal, so a
     // service-worker reload arriving mid-run waits until the run ends. The
@@ -1261,6 +1279,8 @@ function usePlaySessionValue({
         setForgiving,
         raceGhost,
         setRaceGhost,
+        focusLoop,
+        setFocusLoop,
         // Sight-read mode and its study countdown.
         sightRead,
         // The aids a run actually reads with — the player's own settings, or the

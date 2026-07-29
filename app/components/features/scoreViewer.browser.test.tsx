@@ -1412,4 +1412,65 @@ describe("ScoreViewer", () => {
             expect(container.querySelector(`[fill="${ASSISTED_COLOR}"]`)).toBeNull();
         });
     });
+
+    // Focus mode narrows what OSMD draws to the looped bars. The cursor still walks
+    // the whole sheet, so the risk is not the drawing — it is whether a run still
+    // matches when most of the piece has no rendered glyph.
+    describe("focus mode", () => {
+        const fourBars = () =>
+            generateDrill(
+                { ...DEFAULT_DRILL, bars: 4, beatsPerBar: 4, low: 72, high: 79 },
+                () => 0,
+            );
+
+        const openSetup = async () => {
+            mount(fourBars(), { beatsPerBar: 4 });
+            await awaitReady();
+            fireEvent.click(screen.getByText("Set up your run"));
+        };
+
+        it("offers nothing to focus until there is a loop to focus on", async () => {
+            await openSetup();
+
+            expect(screen.queryByRole("switch", { name: "Show only the looped bars" })).toBeNull();
+        });
+
+        it("draws only the looped bars, not the whole piece", async () => {
+            await openSetup();
+            fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
+            await awaitReady();
+            const drawn = () => document.querySelectorAll("svg .vf-stavenote").length;
+            const whole = drawn();
+            expect(whole).toBeGreaterThan(0);
+
+            // Narrow the loop to the first bar of four, then focus it.
+            fireEvent.change(screen.getByLabelText("Loop to bar"), { target: { value: "1" } });
+            fireEvent.click(screen.getByRole("switch", { name: "Show only the looped bars" }));
+            await awaitReady();
+
+            // A quarter of the piece: markedly fewer noteheads on the page.
+            await waitFor(() => expect(drawn()).toBeLessThan(whole), { timeout: 30000 });
+            expect(drawn()).toBeGreaterThan(0);
+        });
+
+        it("still matches what you play when only part of the piece is drawn", async () => {
+            await openSetup();
+            fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
+            await awaitReady();
+            fireEvent.click(screen.getByRole("switch", { name: "Show only the looped bars" }));
+            const practice = await awaitReady();
+
+            fireEvent.click(practice);
+            const key = await screen.findByLabelText("C 5");
+            fireEvent.pointerDown(key);
+            fireEvent.pointerUp(key);
+
+            // A cleared note paints, which only happens if the matcher accepted it —
+            // the cursor and the drawn range agreeing about where the run is.
+            await waitFor(
+                () => expect(document.querySelector(`[fill="${PLAYED_COLOR}"]`)).toBeTruthy(),
+                { timeout: 30000 },
+            );
+        });
+    });
 });

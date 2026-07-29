@@ -494,6 +494,8 @@
   "section_best_section": "Part {number}: {score}",
   "section_best_set": "This run set your best for {count} of {total} parts.",
   "section_best_none": "No new bests this run — your record still stands.",
+  "focus_loop": "Show only the looped bars",
+  "focus_loop_caption": "Draw just that stretch, on its own line with the key and time signature restated — big, and with nowhere else to look.",
   "settings_danger_heading": "Danger zone",
   "settings_reset_help": "Erases everything on this device — your scores, progress, and settings. This can't be undone, so grab a backup from the Library first if you'd like to keep your scores.",
   "settings_reset": "Reset this device",

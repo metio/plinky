@@ -465,6 +465,8 @@
   "section_best_section": "Dio {number}: {score}",
   "section_best_set": "Ovaj prolaz postavio je tvoj najbolji rezultat u {count} od {total} dijelova.",
   "section_best_none": "Ovaj put bez novih rekorda — tvoj i dalje stoji.",
+  "focus_loop": "Prikaži samo taktove petlje",
+  "focus_loop_caption": "Crta samo taj dio, u vlastitom retku s ponovljenim predznacima i mjerom — velik i bez ičega uz njega.",
   "settings_danger_heading": "Opasna zona",
   "settings_reset_help": "Briše sve na ovom uređaju — tvoje skladbe, napredak i postavke. Ovo se ne može poništiti, pa prvo preuzmi sigurnosnu kopiju iz Biblioteke ako želiš zadržati skladbe.",
   "settings_reset": "Poništi ovaj uređaj",

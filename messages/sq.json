@@ -465,6 +465,8 @@
   "section_best_section": "Pjesa {number}: {score}",
   "section_best_set": "Ky kalim vendosi më të mirën tënde në {count} nga {total} pjesë.",
   "section_best_none": "S'ka rekorde të reja këtë herë — yti qëndron.",
+  "focus_loop": "Shfaq vetëm masat e ciklit",
+  "focus_loop_caption": "Vizaton vetëm atë pjesë, në rreshtin e vet me tonalitetin dhe masën të përsëritura — i madh dhe pa asgjë tjetër përreth.",
   "settings_danger_heading": "Zona e rrezikut",
   "settings_reset_help": "Fshin gjithçka në këtë pajisje — partiturat, progresin dhe cilësimet e tua. Kjo s'mund të zhbëhet, prandaj merr fillimisht një kopje rezervë nga Biblioteka nëse do t'i mbash partiturat.",
   "settings_reset": "Rivendos këtë pajisje",

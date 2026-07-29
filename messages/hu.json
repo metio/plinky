@@ -465,6 +465,8 @@
   "section_best_section": "{number}. rész: {score}",
   "section_best_set": "Ez a menet {count} részben állította be a legjobbadat {total}-ból.",
   "section_best_none": "Most nincs új csúcs — a régi áll.",
+  "focus_loop": "Csak a hurok ütemeit mutasd",
+  "focus_loop_caption": "Csak azt a szakaszt rajzolja, saját sorban, megismételt előjegyzéssel és ütemmutatóval — nagyban, és semmi más nincs mellette.",
   "settings_danger_heading": "Veszélyzóna",
   "settings_reset_help": "Törli mindazt, ami ezen az eszközön van — a kottáidat, a haladásod és a beállításaidat. Ez nem vonható vissza, ezért ha meg szeretnéd tartani a kottáidat, előbb tölts le egy biztonsági mentést a Könyvtárból.",
   "settings_reset": "Eszköz visszaállítása",

@@ -465,6 +465,8 @@
   "section_best_section": "Część {number}: {score}",
   "section_best_set": "Ten przebieg ustanowił twój najlepszy wynik w {count} z {total} części.",
   "section_best_none": "Tym razem bez nowych rekordów — twój wciąż stoi.",
+  "focus_loop": "Pokaż tylko takty pętli",
+  "focus_loop_caption": "Rysuje tylko ten fragment, we własnej linii z powtórzoną tonacją i metrum — duży i bez niczego obok.",
   "settings_danger_heading": "Strefa zagrożenia",
   "settings_reset_help": "Wymazuje wszystko na tym urządzeniu — twoje nuty, postępy i ustawienia. Tego nie da się cofnąć, więc jeśli chcesz zachować swoje nuty, pobierz najpierw kopię zapasową z Biblioteki.",
   "settings_reset": "Zresetuj to urządzenie",

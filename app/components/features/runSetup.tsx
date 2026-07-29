@@ -74,6 +74,8 @@ function RunSetupPanel() {
         reading,
         sightRead,
         sightReadRecord,
+        focusLoop,
+        setFocusLoop,
     } = usePlaySession();
 
     return (
@@ -343,6 +345,15 @@ function RunSetupPanel() {
                         checked={loop.on}
                         onChange={loop.toggle}
                         help={m.loop_caption()}
+                    />
+                )}
+                {/* Only offered with a loop set: "just these bars" needs bars to mean. */}
+                {ready && measureCount > 1 && loop.on && (
+                    <SwitchField
+                        label={m.focus_loop()}
+                        checked={focusLoop}
+                        onChange={setFocusLoop}
+                        help={m.focus_loop_caption()}
                     />
                 )}
             </SettingsSection>

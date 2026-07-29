@@ -465,6 +465,8 @@
   "section_best_section": "Abschnitt {number}: {score}",
   "section_best_set": "Dieser Durchgang setzte deine Bestwerte für {count} von {total} Abschnitten.",
   "section_best_none": "Diesmal keine neuen Bestwerte — dein Rekord steht weiter.",
+  "focus_loop": "Nur die Schleifentakte zeigen",
+  "focus_loop_caption": "Zeichnet nur diesen Abschnitt, auf eigener Zeile mit wiederholter Tonart und Taktangabe — groß, und ohne Ablenkung.",
   "settings_danger_heading": "Gefahrenzone",
   "settings_reset_help": "Löscht alles auf diesem Gerät – deine Stücke, deinen Fortschritt und deine Einstellungen. Das lässt sich nicht rückgängig machen, hol dir also zuerst eine Sicherung aus der Bibliothek, wenn du deine Stücke behalten möchtest.",
   "settings_reset": "Dieses Gerät zurücksetzen",

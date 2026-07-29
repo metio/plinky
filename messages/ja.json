@@ -465,6 +465,8 @@
   "section_best_section": "パート{number}：{score}",
   "section_best_set": "今回は{total}パート中{count}パートでベストを更新しました。",
   "section_best_none": "今回は更新なし — これまでのベストはそのままです。",
+  "focus_loop": "ループの小節だけ表示",
+  "focus_loop_caption": "その範囲だけを、調号と拍子を書き直した独立した行に描きます。大きく、ほかに目を移す先がありません。",
   "settings_danger_heading": "危険な操作",
   "settings_reset_help": "この端末のすべて — 楽譜、進捗、設定 — を消去します。元に戻せないので、楽譜を残しておきたい方はまず Library でバックアップを取ってください。",
   "settings_reset": "このデバイスをリセット",

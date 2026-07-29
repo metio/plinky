@@ -465,6 +465,8 @@
   "section_best_section": "Deel {number}: {score}",
   "section_best_set": "Deze ronde zette je beste voor {count} van {total} delen.",
   "section_best_none": "Geen nieuwe records deze keer — dat van jou staat nog.",
+  "focus_loop": "Alleen de herhaalde maten tonen",
+  "focus_loop_caption": "Tekent alleen dat stuk, op een eigen regel met de toonsoort en maatsoort herhaald — groot, en zonder afleiding.",
   "settings_danger_heading": "Gevarenzone",
   "settings_reset_help": "Wist alles op dit apparaat — je stukken, voortgang en instellingen. Dit kan niet ongedaan worden gemaakt, dus haal eerst een back-up op uit de bibliotheek als je je stukken wilt bewaren.",
   "settings_reset": "Dit apparaat resetten",

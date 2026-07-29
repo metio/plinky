@@ -465,6 +465,8 @@
   "section_best_section": "Bölüm {number}: {score}",
   "section_best_set": "Bu çalış {total} bölümün {count} tanesinde en iyini belirledi.",
   "section_best_none": "Bu sefer yeni rekor yok — seninki hâlâ geçerli.",
+  "focus_loop": "Sadece döngüdeki ölçüleri göster",
+  "focus_loop_caption": "Yalnızca o bölümü çizer, kendi satırında donanım ve ölçü yeniden yazılmış olarak — büyük ve başka bakacak bir şey yok.",
   "settings_danger_heading": "Tehlikeli bölge",
   "settings_reset_help": "Bu cihazdaki her şeyi siler — parçaların, ilerlemen ve ayarların. Bu geri alınamaz, o yüzden parçalarını korumak istiyorsan önce Kütüphane'den bir yedek al.",
   "settings_reset": "Bu cihazı sıfırla",

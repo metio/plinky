@@ -465,6 +465,8 @@
   "section_best_section": "Osa {number}: {score}",
   "section_best_set": "Tämä kierros asetti parhaasi {count}/{total} osassa.",
   "section_best_none": "Ei uusia ennätyksiä — omasi pitää yhä.",
+  "focus_loop": "Näytä vain silmukan tahdit",
+  "focus_loop_caption": "Piirtää vain sen pätkän, omalle rivilleen sävellaji ja tahtilaji uudelleen merkittyinä — isona, eikä muuta katsottavaa.",
   "settings_danger_heading": "Vaaravyöhyke",
   "settings_reset_help": "Poistaa kaiken tältä laitteelta — nuottisi, edistymisesi ja asetuksesi. Tätä ei voi perua, joten ota ensin varmuuskopio Kirjastosta, jos haluat säilyttää nuottisi.",
   "settings_reset": "Nollaa tämä laite",
