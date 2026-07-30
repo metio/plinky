@@ -124,6 +124,16 @@ tools than CI's fresh install and can pass what CI fails.
 
 ## Conventions the tools don't fully enforce
 
+- **A new page is a route in `app/routes.ts`, and nothing else.** The prerender paths,
+  the audited URL set (Lighthouse and the axe sweep share one list) and the
+  SEO-assertion opt-out all derive from that table through `dev/pages.mjs` — so a page
+  gets its static document, gets audited in both themes, and is bucketed correctly the
+  moment it exists. These used to be separate hand-kept lists, and being absent from one
+  was invisible: a route with no prerender entry 404s as a static document, and an
+  unlisted page is simply never audited while both gates still pass. What is *not*
+  derived, because it cannot be read off the source: which pages arrive carrying the
+  notation machinery (measure it — a wrong guess fails loudly in `lighthouserc.js`), and
+  the bundle-size ratchet, which exists to make a human decide.
 - **New persistent state** = a store factory in `app/stores/` over the injected
   `KeyValueStore` (use the `jsonStore` idiom), registered as an `AppServices`
   capability in `app/contexts/services.tsx` — in all three places: the type, the

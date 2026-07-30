@@ -125,7 +125,7 @@ export default function Help() {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-sm text-gray-400 dark:text-gray-500">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {loading ? m.help_loading() : m.help_empty()}
                             </p>
                         )}

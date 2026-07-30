@@ -14,10 +14,19 @@ import {
     placementRating,
     startPlacement,
 } from "../../core/placement";
+import { noindexMeta, routeMeta } from "../../core/site";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { Button } from "../components/ui/button";
 import { usePlacementStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
+import type { Route } from "./+types/placement";
+
+export function meta(_args: Route.MetaArgs) {
+    // A personal, data-driven page like the review session: it needs a title (a document
+    // without one is a bare URL in the reader's tabs and history, and axe flags it), but
+    // it has no place in the index.
+    return [...routeMeta(m.placement_title(), m.meta_placement_description()), noindexMeta()];
+}
 
 // The placement test: read a drill, and the next one is harder or the run takes a
 // strike. Nothing here is repertoire — every drill is generated on the spot, so

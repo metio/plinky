@@ -419,6 +419,7 @@
   "drill_more": "Enemmän {field}",
   "drill_new": "Uusi harjoitus",
   "placement_title": "Löydä tasosi",
+  "meta_placement_description": "Selvitä, millä tasolla todella luet: lue pari luotua harjoitusta, ja Plinky asettaa sinut tasolle.",
   "placement_intro": "Lue harjoitus; jos se sujuu, seuraava on vaikeampi. Kolme epävarmaa läpimenoa ja se päättyy. Mikään täällä ei ole kappale, jonka saattaisit jo tuntea — jokainen harjoitus syntyy siinä hetkessä.",
   "placement_start": "Aloita lukeminen",
   "placement_again": "Lue uudestaan",

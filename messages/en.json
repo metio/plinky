@@ -484,6 +484,7 @@
   "drill_more": "More {field}",
   "drill_new": "New drill",
   "placement_title": "Find your level",
+  "meta_placement_description": "Find the grade you actually read at: read a few generated drills and Plinky places you on the ladder.",
   "placement_intro": "Read a drill; if it goes well the next one is harder. Three shaky ones and it stops. Nothing here is a piece you might already know — every drill is made on the spot.",
   "placement_start": "Start reading",
   "placement_again": "Read again",

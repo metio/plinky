@@ -10,7 +10,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { chromium } from "playwright";
-import lighthouserc from "../lighthouserc.json" with { type: "json" };
+import lighthouserc from "../lighthouserc.js";
 import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
 
 // The npm script builds the single locale first, so this only fires when the script is

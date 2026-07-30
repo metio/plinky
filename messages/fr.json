@@ -419,6 +419,7 @@
   "drill_more": "Plus de {field}",
   "drill_new": "Nouvel exercice",
   "placement_title": "Trouve ton niveau",
+  "meta_placement_description": "Découvre le niveau auquel tu lis vraiment : lis quelques exercices générés et Plinky te place sur l'échelle.",
   "placement_intro": "Lis un exercice ; si ça va bien, le suivant est plus difficile. Trois passages hésitants et ça s'arrête. Rien ici n'est un morceau que tu connais déjà — chaque exercice naît sur le moment.",
   "placement_start": "Commencer à lire",
   "placement_again": "Relire",

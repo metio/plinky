@@ -4,29 +4,15 @@
 import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
+import { staticPaths } from "./dev/pages.mjs";
 import { personSlug } from "./core/person";
 import { readScoreMetaFromText } from "./core/scoreMeta";
 import { songId } from "./core/songId";
 
-// The static routes, in canonical (unprefixed) form. generateStaticLocalizedUrls
-// expands each into one prefixed path per locale (/en/scores, /de/scores, …).
-const BASE_PATHS = [
-    "/",
-    "/compose",
-    "/daily",
-    "/ear",
-    "/library",
-    "/assignments",
-    "/you",
-    "/review",
-    "/settings",
-    "/help",
-    "/glossary",
-    "/about",
-    "/impressum",
-    "/datenschutz",
-    "/board",
-];
+// Every page the route table defines, read from it rather than restated here: a route
+// with no prerender entry has no static document and 404s, which nothing else catches.
+// generateStaticLocalizedUrls expands each into one prefixed path per locale.
+const BASE_PATHS = staticPaths();
 
 // Every bundled score's id and composer, read once. The id is the content
 // fingerprint, matching loadBundledScores in app/lib/catalog.ts; the composer

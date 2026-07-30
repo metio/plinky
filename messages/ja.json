@@ -419,6 +419,7 @@
   "drill_more": "{field}を増やす",
   "drill_new": "新しい練習",
   "placement_title": "いまの読みの力を測る",
+  "meta_placement_description": "自分が本当に読めるレベルを知る。生成された練習をいくつか読むと、Plinky があなたの級を判定します。",
   "placement_intro": "1つ弾いてみて、うまくいけば次はもう少し難しくなります。あやしい回が3つで終わりです。知っている曲は一つもありません。どれもその場で作られます。",
   "placement_start": "始める",
   "placement_again": "もう一度読む",

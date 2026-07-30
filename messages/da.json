@@ -419,6 +419,7 @@
   "drill_more": "Flere {field}",
   "drill_new": "Ny øvelse",
   "placement_title": "Find dit niveau",
+  "meta_placement_description": "Find ud af, hvilket niveau du faktisk læser på: læs et par genererede øvelser, og Plinky placerer dig på stigen.",
   "placement_intro": "Læs en øvelse; går det godt, bliver den næste sværere. Tre vaklende gennemspilninger, og det stopper. Intet her er et stykke, du måske allerede kan — hver øvelse bliver til på stedet.",
   "placement_start": "Begynd at læse",
   "placement_again": "Læs igen",

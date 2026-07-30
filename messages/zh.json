@@ -419,6 +419,7 @@
   "drill_more": "增加{field}",
   "drill_new": "换一条练习",
   "placement_title": "找到你的水平",
+  "meta_placement_description": "看看你真正能读到什么程度：读几段即时生成的练习，Plinky 就能把你放到对应的级别上。",
   "placement_intro": "读一条练习；顺利的话下一条会更难。三次磕绊就结束。这里没有你可能已经会的曲子——每条练习都是当场生成的。",
   "placement_start": "开始读谱",
   "placement_again": "再读一次",
