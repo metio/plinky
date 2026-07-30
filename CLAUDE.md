@@ -83,18 +83,25 @@ npx biome check       # lint + format
 npm run nav           # navigation-depth budget
 nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
 npm run size          # bundle budget — measures the ci-build output
-npm run a11y:light    # axe over the built site (needs the ci-build above)
+npm run a11y:light    # axe over the built site (builds it first)
 npm run a11y:dark
+nix develop --command ci-lighthouse  # perf/SEO/CLS budgets (builds the site it audits)
 ```
 
-**Build for the size/a11y gates with `ci-build`, not `npm run build`.** `ci-build`
-bakes in `PLINKY_LOCALE=en npm run build` — one tree-shaken locale, exactly what
-the deploy ships and what the size budget tracks. A plain `npm run build` prerenders
-all 26 locales into one tree (a local-preview convenience that ships nowhere); run
-`npm run size` against *that* and it measures ~3× the per-visitor weight and fails
-for the wrong reason. `size` now detects this and tells you to switch to `ci-build`,
-and `npm run build` prints the same reminder — but reach for `ci-build` first and
-neither fires.
+**Every per-visitor budget measures the same build, and each gate now produces it.**
+`npm run build:single` (`PLINKY_LOCALE=en npm run build`) is the one definition of that
+build — one tree-shaken locale, exactly what the deploy ships. `ci-build`, both a11y
+sweeps and `ci-lighthouse` all route through it, so there is nothing to sequence and
+nothing to remember.
+
+A plain `npm run build` prerenders all 26 locales into the same directory (a local
+preview convenience that ships nowhere). Measuring *that* reports ~3× the per-visitor
+weight, which reads exactly like a real regression: it fails the size budget, and it
+used to fail Lighthouse's script-payload assertion on every page at once. So all three
+consumers of `build/client` refuse an all-locales tree and name the command that fixes
+it — `dev/single-locale-build.mjs` is that check, shared by the size gate, the a11y
+sweep and `ci-lighthouse`. The trap that remains is only the one you have to ask for:
+run `npm run build` by hand, then a gate, and it stops you.
 
 The shared metio lint gate runs in CI through `metio/ci`'s reusable
 `frontend.yml`, which is why it is easy to forget it exists — its wrappers come

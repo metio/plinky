@@ -65,7 +65,18 @@
             (pkgs.writeShellScriptBin "ci-biome" ''exec npx biome check "$@"'')
             (pkgs.writeShellScriptBin "ci-messages-check" ''exec npm run messages:check "$@"'')
             (pkgs.writeShellScriptBin "ci-bake-check" ''exec npm run songs:bake -- --check "$@"'')
-            (pkgs.writeShellScriptBin "ci-build" ''exec env PLINKY_LOCALE=en npm run build "$@"'')
+            # The locale lives in package.json's build:single, which the a11y sweeps and
+            # ci-lighthouse also run — so every per-visitor budget measures the same tree.
+            (pkgs.writeShellScriptBin "ci-build" ''exec npm run build:single "$@"'')
+            # Builds the site it audits, so Lighthouse can never read an all-locales tree
+            # left behind by something else. CI uses the pinned lhci action against the
+            # build job's artifact; this is the local equivalent of that pairing.
+            (pkgs.writeShellScriptBin "ci-lighthouse" ''
+              set -e
+              npm run build:single
+              node dev/single-locale-build.mjs "the lighthouse gate"
+              exec npx --yes @lhci/cli autorun "$@"
+            '')
             (pkgs.writeShellScriptBin "ci-size" ''exec npm run size "$@"'')
             (pkgs.writeShellScriptBin "ci-parity" ''exec npm run ci:parity "$@"'')
           ];

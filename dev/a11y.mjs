@@ -11,6 +11,12 @@ import { createServer } from "node:http";
 import { extname, join } from "node:path";
 import { chromium } from "playwright";
 import lighthouserc from "../lighthouserc.json" with { type: "json" };
+import { requireSingleLocaleBuild } from "./single-locale-build.mjs";
+
+// The npm script builds the single locale first, so this only fires when the script is
+// run by hand over a tree something else left behind — the audited pages are /en/ only,
+// and an all-locales build serves each of them a bundle no visitor downloads.
+requireSingleLocaleBuild("the a11y gate");
 
 const ROOT = "build/client";
 const PORT = Number(process.env.PORT) || 8099;

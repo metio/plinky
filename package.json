@@ -14,6 +14,7 @@
     "songs:cost": "tsx dev/backfill-song-cost.mts",
     "songs:audit": "tsx dev/audit-catalog.mts",
     "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
+    "build:single": "PLINKY_LOCALE=en npm run build",
     "build:locales": "node dev/build-locales.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "build:client": "npm run messages && node dev/build-retry.mjs",
     "dev": "npm run messages && react-router dev",
@@ -36,8 +37,8 @@
     "storybook": "npm run messages && storybook dev -p 6006",
     "build-storybook": "npm run messages && storybook build",
     "og": "node dev/make-og.mjs",
-    "a11y:light": "npm run build && A11Y_MODE=light node dev/a11y.mjs",
-    "a11y:dark": "npm run build && A11Y_MODE=dark node dev/a11y.mjs",
+    "a11y:light": "npm run build:single && A11Y_MODE=light node dev/a11y.mjs",
+    "a11y:dark": "npm run build:single && A11Y_MODE=dark node dev/a11y.mjs",
     "songs:reid": "tsx dev/reid-songs.mts",
     "exercises:reid": "tsx dev/reid-exercises.mts"
   },
