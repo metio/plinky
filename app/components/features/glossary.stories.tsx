@@ -51,6 +51,20 @@ export const OneReadingOnly: Story = {
     ),
 };
 
+// While the phrase is on the speakers, both readings rest — pressing again mid-phrase
+// would lay one over the other and the comparison would stop being one.
+export const Sounding: Story = {
+    render: () => (
+        <GlossaryDetail
+            entry={detail("staccato")}
+            example={Placeholder}
+            sounding
+            onHear={() => {}}
+            onHearPlain={() => {}}
+        />
+    ),
+};
+
 // The way in: every symbol grouped by what it controls, with the open one marked.
 export const Index: Story = {
     render: () => (

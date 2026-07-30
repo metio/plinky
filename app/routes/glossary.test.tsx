@@ -8,6 +8,8 @@ import { MemoryRouter } from "react-router";
 import { entryById, GLOSSARY, performSnippet } from "../../core/glossary";
 import { fakeAudioEngine } from "../adapters/fakeAudioEngine";
 import { memoryStore } from "../adapters/memoryStore";
+import { advanceScheduler } from "../testing/advanceScheduler";
+import { fakeScheduler } from "../testing/fakeScheduler";
 import { m } from "../paraglide/messages.js";
 import { symbolName } from "../lib/glossaryLabels";
 import { renderWithServices } from "../testing/renderWithServices";
@@ -34,13 +36,14 @@ afterEach(cleanup);
 
 function mount() {
     const audio = fakeAudioEngine();
+    const scheduler = fakeScheduler();
     const view = renderWithServices(
         <MemoryRouter>
             <Glossary />
         </MemoryRouter>,
-        { store: memoryStore(), audio },
+        { store: memoryStore(), audio, scheduler },
     );
-    return { audio, ...view };
+    return { audio, scheduler, ...view };
 }
 
 describe("Glossary", () => {
@@ -95,13 +98,16 @@ describe("Glossary", () => {
         );
     });
 
-    it("plays the plain reading differently from the marked one", () => {
+    it("plays the plain reading differently from the marked one", async () => {
         const view = mount();
 
         fireEvent.click(screen.getByRole("button", { name: m.glossary_accent_name() }));
         fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
         const marked = [...view.audio.strikes];
         view.audio.strikes.length = 0;
+        // The reader hears one phrase out before the other, which is what makes it a
+        // comparison rather than a chord.
+        await advanceScheduler(view.scheduler, 60_000);
         fireEvent.click(screen.getByRole("button", { name: m.glossary_hear_plain() }));
 
         // The accent is a loudness mark, so the two readings differ in how hard the
@@ -114,13 +120,80 @@ describe("Glossary", () => {
         );
     });
 
-    it("describes the notation for a reader who cannot see it", () => {
+    it("names the notation for a reader who cannot see it, without repeating the gloss", () => {
         mount();
 
-        // The engine draws a thicket of SVG paths; the label is what a screen reader
-        // gets instead.
-        expect(document.querySelector("[data-example]")?.getAttribute("data-example")).toBe(
-            m.glossary_dotted_gloss(),
-        );
+        // The engine draws a thicket of SVG paths, so the picture needs a label — but the
+        // gloss is already on the page as text directly above it, and labelling the image
+        // with the same sentence would read it out twice.
+        const label = document.querySelector("[data-example]")?.getAttribute("data-example");
+        expect(label).toBe(m.glossary_dotted_name());
+        expect(label).not.toBe(m.glossary_dotted_gloss());
+    });
+
+    it("rests the buttons until the phrase has finished sounding", async () => {
+        // Strikes are scheduled ahead on the audio clock, so a second press mid-phrase
+        // would lay one reading over the other — and the pair is the whole explanation.
+        const view = mount();
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_staccato_name() }));
+        const hear = screen.getByRole("button", { name: m.glossary_hear() });
+
+        fireEvent.click(hear);
+        const struck = view.audio.strikes.length;
+        expect(struck).toBeGreaterThan(0);
+        expect(hear.hasAttribute("disabled")).toBe(true);
+        expect(
+            screen.getByRole("button", { name: m.glossary_hear_plain() }).hasAttribute("disabled"),
+        ).toBe(true);
+
+        // A press while it rests adds nothing.
+        fireEvent.click(hear);
+        expect(view.audio.strikes).toHaveLength(struck);
+
+        // Once the phrase is over, it can be heard again.
+        await advanceScheduler(view.scheduler, 60_000);
+        expect(
+            screen.getByRole("button", { name: m.glossary_hear() }).hasAttribute("disabled"),
+        ).toBe(false);
+    });
+
+    it("frees the buttons at once when another symbol is chosen", async () => {
+        // The phrase still ringing belongs to a symbol no longer on screen, so waiting it
+        // out would leave the new symbol's buttons dead for no reason the reader can see.
+        const view = mount();
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_staccato_name() }));
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_hear() }));
+        expect(
+            screen.getByRole("button", { name: m.glossary_hear() }).hasAttribute("disabled"),
+        ).toBe(true);
+
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_accent_name() }));
+
+        expect(
+            screen.getByRole("button", { name: m.glossary_hear() }).hasAttribute("disabled"),
+        ).toBe(false);
+        // And the timer it cancelled is not left behind to fire later.
+        expect(view.scheduler.pending().timers).toBe(0);
+    });
+
+    it("moves focus to the symbol it just opened", () => {
+        // On a phone the index is taller than the screen, so this pane is under the fold:
+        // a tap would change a screenful the reader cannot see. Focus scrolls it into
+        // view and tells a screen reader what it landed on.
+        mount();
+        const heading = screen.getByRole("heading", { level: 2 });
+        expect(document.activeElement).not.toBe(heading);
+
+        fireEvent.click(screen.getByRole("button", { name: m.glossary_slur_name() }));
+
+        expect(document.activeElement).toBe(screen.getByRole("heading", { level: 2 }));
+    });
+
+    it("leaves focus alone on arrival", () => {
+        // Only choosing a symbol moves focus; landing on the page must not yank the
+        // reader out of the document flow.
+        mount();
+
+        expect(document.activeElement).toBe(document.body);
     });
 });

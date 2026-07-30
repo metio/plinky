@@ -1,15 +1,23 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useMemo, useState } from "react";
-import { entryById, GLOSSARY, performSnippet, type GlossaryEntry } from "../../core/glossary";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+    entryById,
+    GLOSSARY,
+    type GlossaryEntry,
+    performSnippet,
+    snippetSeconds,
+} from "../../core/glossary";
 import { buildSnippet, type Snippet } from "../../core/glossaryScore";
 import { routeMeta, webPageData } from "../../core/site";
 import { GlossaryDetail } from "../components/features/glossaryDetail";
 import { GlossaryIndex } from "../components/features/glossaryIndex";
 import { NotationExample } from "../components/features/notationExample";
+import { useScheduler } from "../contexts/services";
 import { useSynth } from "../hooks/useSynth";
-import { symbolGloss } from "../lib/glossaryLabels";
+import type { SchedulerHandle } from "../ports/scheduler";
+import { symbolName } from "../lib/glossaryLabels";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/glossary";
@@ -41,6 +49,23 @@ export default function Glossary() {
     const [selected, setSelected] = useState(FIRST.id);
     const entry = entryById(selected) ?? FIRST;
     const synth = useSynth();
+    const scheduler = useScheduler();
+
+    // Strikes are scheduled ahead on the audio clock, so a second press before the
+    // first phrase has finished lays one reading over the other and the comparison —
+    // the whole point of the pair — turns to mush. The buttons rest until it ends.
+    const [sounding, setSounding] = useState(false);
+    const until = useRef<SchedulerHandle | null>(null);
+
+    // A phrase left sounding when the page goes away must not come back to set state on
+    // a gone component, and picking another symbol frees its buttons straight away.
+    useEffect(() => {
+        return () => {
+            if (until.current) {
+                scheduler.cancel(until.current);
+            }
+        };
+    }, [scheduler]);
 
     // Rebuilt only when the symbol changes: the drawing engine reloads on a new score,
     // and handing it an equal-but-new string every render would redraw for nothing.
@@ -54,6 +79,26 @@ export default function Glossary() {
                 delay: strike.delay,
             });
         }
+        if (until.current) {
+            scheduler.cancel(until.current);
+        }
+        setSounding(true);
+        // The written length of the phrase is exactly how long it occupies the speakers.
+        until.current = scheduler.after(snippetSeconds(snippet) * 1000, () => {
+            until.current = null;
+            setSounding(false);
+        });
+    };
+
+    const choose = (id: string) => {
+        setSelected(id);
+        // The previous phrase may still be ringing, but it belongs to a symbol no longer
+        // on screen — the new one's buttons should be ready immediately.
+        if (until.current) {
+            scheduler.cancel(until.current);
+            until.current = null;
+        }
+        setSounding(false);
     };
 
     return (
@@ -64,7 +109,7 @@ export default function Glossary() {
             </header>
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
-                <GlossaryIndex selected={entry.id} onSelect={setSelected} />
+                <GlossaryIndex selected={entry.id} onSelect={choose} />
                 <GlossaryDetail
                     entry={entry}
                     example={
@@ -73,9 +118,13 @@ export default function Glossary() {
                             // redraws rather than trying to swap a score under itself.
                             key={entry.id}
                             xml={xml}
-                            label={symbolGloss(entry.id)}
+                            // The gloss is already read out as text right above the
+                            // drawing, so labelling the picture with it again would say
+                            // the same sentence twice. The name identifies it instead.
+                            label={symbolName(entry.id)}
                         />
                     }
+                    sounding={sounding}
                     onHear={() => play(entry.shown)}
                     onHearPlain={entry.plain ? () => play(entry.plain as Snippet) : null}
                 />

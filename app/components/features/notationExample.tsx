@@ -49,8 +49,14 @@ export function NotationExample({ xml, label }: { xml: string; label: string }) 
         return () => {
             cancelled = true;
             // OSMD leaves its SVG behind on unmount, and a remount would draw a second
-            // one beside it.
-            display?.clear();
+            // one beside it. Tearing down mid-load reaches an engine part-way through
+            // reading a file, which is its own business to complain about — and a throw
+            // from a cleanup function would take the unmount down with it.
+            try {
+                display?.clear();
+            } catch {
+                // Nothing to salvage: the element is going away regardless.
+            }
         };
     }, [xml]);
 
@@ -64,7 +70,9 @@ export function NotationExample({ xml, label }: { xml: string; label: string }) 
                 className="pointer-events-none absolute inset-2 rounded-lg border border-stone-300/70"
             />
             {failed ? (
-                <p className="px-2 py-6 text-center text-sm text-gray-600">
+                // The same reserved height as the drawing, so failing to draw doesn't
+                // shift the buttons below into a different place than success does.
+                <p className="flex min-h-24 items-center justify-center px-2 text-center text-sm text-gray-600">
                     {m.glossary_example_unavailable()}
                 </p>
             ) : (
