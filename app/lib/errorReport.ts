@@ -8,6 +8,10 @@ import { isRouteErrorResponse } from "react-router";
 // the prefilled GitHub issue carries. Pure: page and browser identity arrive as
 // parameters, so every shape is unit-testable without a window.
 
+// Where a bug report goes. Both the full-page error and a single broken panel link
+// here, so the destination is stated once.
+export const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
+
 export type ErrorReport = {
     // A missing page gets a gentler message and no reload button.
     notFound: boolean;

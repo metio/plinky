@@ -14,6 +14,7 @@ import { routeMeta, webPageData } from "../../core/site";
 import { GlossaryDetail } from "../components/features/glossaryDetail";
 import { GlossaryIndex } from "../components/features/glossaryIndex";
 import { NotationExample } from "../components/features/notationExample";
+import { FeatureBoundary } from "../components/features/featureBoundary";
 import { useScheduler } from "../contexts/services";
 import { useSynth } from "../hooks/useSynth";
 import type { SchedulerHandle } from "../ports/scheduler";
@@ -113,16 +114,21 @@ export default function Glossary() {
                 <GlossaryDetail
                     entry={entry}
                     example={
-                        <NotationExample
-                            // A fresh element per symbol, so the engine tears down and
-                            // redraws rather than trying to swap a score under itself.
-                            key={entry.id}
-                            xml={xml}
-                            // The gloss is already read out as text right above the
-                            // drawing, so labelling the picture with it again would say
-                            // the same sentence twice. The name identifies it instead.
-                            label={symbolName(entry.id)}
-                        />
+                        // A drawing engine given a file it dislikes can throw rather than
+                        // reject, which the load path's catch never sees — and the reader
+                        // would lose the words explaining the symbol along with the picture.
+                        <FeatureBoundary feature="NotationExample">
+                            <NotationExample
+                                // A fresh element per symbol, so the engine tears down and
+                                // redraws rather than trying to swap a score under itself.
+                                key={entry.id}
+                                xml={xml}
+                                // The gloss is already read out as text right above the
+                                // drawing, so labelling the picture with it again would say
+                                // the same sentence twice. The name identifies it instead.
+                                label={symbolName(entry.id)}
+                            />
+                        </FeatureBoundary>
                     }
                     sounding={sounding}
                     onHear={() => play(entry.shown)}

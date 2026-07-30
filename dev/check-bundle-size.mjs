@@ -214,7 +214,12 @@ const BUDGET_VENDOR_KB = 311;
 // own 4.8 KB chunk (twelve examples, the snippet builder, the labels and the page), so
 // a visitor who never opens the page downloads none of it. The app figure counts every
 // chunk we ship on purpose: a whole new page is meant to show up here as a decision.
-const BUDGET_APP_KB = 303;
+//
+// Per-panel error boundaries — the boundary itself, its panel-sized fallback with the
+// report link, and the three strings they need — measured at 303.8. 304. Unlike the
+// glossary above, this is shared code on the entry page's path rather than a route
+// chunk: the front page and the You page each wrap their panels in it.
+const BUDGET_APP_KB = 304;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

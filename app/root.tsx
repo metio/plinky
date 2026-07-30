@@ -20,7 +20,7 @@ import { isInAppBrowser, isIosLike } from "../core/platform";
 import { HelpLink } from "./components/features/helpLink";
 import { browserStore, storageHealth } from "./adapters/browserStore";
 import { runActivity } from "./lib/activity";
-import { describeError, issueUrl } from "./lib/errorReport";
+import { describeError, issueUrl, REPO_ISSUES } from "./lib/errorReport";
 import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
@@ -43,8 +43,6 @@ import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal
 import "@fontsource-variable/inter/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
-
-const REPO_ISSUES = "https://github.com/metio/plinky/issues/new";
 
 // Per-branch preview deploys run on origins Sanity's CORS allowlist doesn't
 // know, so their builds carry VITE_PREVIEW_MOCKS=1 and answer Sanity queries

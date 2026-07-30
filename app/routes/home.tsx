@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
+import { FeatureBoundary } from "../components/features/featureBoundary";
 import { HeroKeyboard } from "../components/features/heroKeyboard";
 import { BookIcon, EarIcon, ListIcon, NotesIcon, PinIcon } from "../components/ui/icons";
 import { ArcadeCard } from "../components/features/arcadeCard";
@@ -86,7 +87,9 @@ export default function Home() {
                             aria-hidden="true"
                             className="mx-auto mb-2 h-px max-w-md bg-gradient-to-r from-indigo-500 via-violet-500 to-transparent"
                         />
-                        <HeroKeyboard />
+                        <FeatureBoundary feature="HeroKeyboard">
+                            <HeroKeyboard />
+                        </FeatureBoundary>
                     </div>
                     <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                         {m.home_keyboard_hint()}
@@ -97,13 +100,19 @@ export default function Home() {
             {/* The one front door for a new player: the Getting-started checklist sits
             in the prime slot the moment the page opens, prerendered for the common
             first visit. It reconciles itself away as its steps complete. */}
-            <DiscoveryChecklist />
+            <FeatureBoundary feature="DiscoveryChecklist">
+                <DiscoveryChecklist />
+            </FeatureBoundary>
 
-            <HomeToday />
+            <FeatureBoundary feature="HomeToday">
+                <HomeToday />
+            </FeatureBoundary>
 
             <ArcadeCard />
 
-            <NewsBanner />
+            <FeatureBoundary feature="NewsBanner">
+                <NewsBanner />
+            </FeatureBoundary>
 
             <section className="space-y-3">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">

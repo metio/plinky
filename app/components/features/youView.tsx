@@ -13,6 +13,7 @@ import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
 import { RecapCard } from "./recapCard";
+import { FeatureBoundary } from "./featureBoundary";
 import { SlowNotes } from "./slowNotes";
 import { RefreshQueue } from "./refreshQueue";
 import { ShareButtons } from "./shareButtons";
@@ -53,7 +54,11 @@ export function YouView() {
                 />
             )}
 
-            {recap.totalNotes > 0 && <RecapCard recap={recap} />}
+            {recap.totalNotes > 0 && (
+                <FeatureBoundary feature="RecapCard">
+                    <RecapCard recap={recap} />
+                </FeatureBoundary>
+            )}
 
             <Show when={level >= 1}>
                 <section className="space-y-2">
@@ -111,13 +116,23 @@ export function YouView() {
                 poolSizes={data.poolSizes}
             />
 
-            <SlowNotes />
+            <FeatureBoundary feature="SlowNotes">
+                <SlowNotes />
+            </FeatureBoundary>
 
-            <RefreshQueue reviews={data.reviews} />
+            <FeatureBoundary feature="RefreshQueue">
+                <RefreshQueue reviews={data.reviews} />
+            </FeatureBoundary>
 
-            <AchievementGallery achievements={data.achievements} />
+            <FeatureBoundary feature="AchievementGallery">
+                <AchievementGallery achievements={data.achievements} />
+            </FeatureBoundary>
 
-            {summary && <WeekChart recent={summary.recent} />}
+            {summary && (
+                <FeatureBoundary feature="WeekChart">
+                    <WeekChart recent={summary.recent} />
+                </FeatureBoundary>
+            )}
 
             {fingerprint && (
                 <ShareCard
