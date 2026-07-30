@@ -318,6 +318,15 @@ so a staccato dot stops being a dot and becomes the short, detached sound it ask
 Where a mark instructs your hands rather than the sound — a slur, a clef — there is one
 reading and no pretence of a difference to hear.
 
+**In this piece** — the setup panel before a run lists the marks the piece you're about
+to play actually uses, each one a link straight to its glossary entry. A reference
+nobody knows to open teaches nobody: if you meet a curve over two notes you can't look
+up "slur", because not knowing the word is the problem. So the piece names them for you,
+where you're about to read them. It's worked out from the music itself rather than from
+the grade — the grades measure how hard a piece is to *play*, and ties, rests and key
+signatures turn up as often in grade 1 as in grade 8 — so a piece with nothing unusual
+in it says nothing at all.
+
 ## Composing
 
 Play whatever you like — on a MIDI piano, your computer keys, or the on-screen

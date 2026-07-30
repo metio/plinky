@@ -672,6 +672,8 @@
   "help_learn_more": "了解更多",
   "meta_help_description": "了解 Plinky 的运作方式：涵盖应用每个部分的指南，从你的第一个音符到进度跟踪。",
   "glossary_title": "这些记号是什么意思",
+  "score_symbols_title": "这首曲子里的记号",
+  "score_symbols_subtitle": "你在这里会遇到的记号，以及每一个对你的要求。",
   "glossary_intro": "你在乐谱上会遇到的记号，以及每一个对声音做了什么。大多数都能听两遍：先按写的样子，再把记号去掉听一次。",
   "glossary_index_label": "记号",
   "glossary_hear": "听一听",

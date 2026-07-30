@@ -200,7 +200,11 @@ const BUDGET_VENDOR_KB = 311;
 // report link, and the three strings they need — measured at 303.8. 304. Unlike the
 // glossary above, this is shared code on the entry page's path rather than a route
 // chunk: the front page and the You page each wrap their panels in it.
-const BUDGET_APP_KB = 304;
+//
+// "In this piece" — the per-piece notation scan and the list it renders in the run-setup
+// panel, plus its two strings — measured at 304.6. 305. It rides on the glossary's own
+// labels rather than carrying copy of its own, which is most of why it is this small.
+const BUDGET_APP_KB = 305;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

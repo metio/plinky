@@ -34,6 +34,17 @@ function must(id: string) {
 
 afterEach(cleanup);
 
+function mountAt(search: string) {
+    const audio = fakeAudioEngine();
+    const scheduler = fakeScheduler();
+    return renderWithServices(
+        <MemoryRouter initialEntries={[`/en/glossary/${search}`]}>
+            <Glossary />
+        </MemoryRouter>,
+        { store: memoryStore(), audio, scheduler },
+    );
+}
+
 function mount() {
     const audio = fakeAudioEngine();
     const scheduler = fakeScheduler();

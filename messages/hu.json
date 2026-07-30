@@ -672,6 +672,8 @@
   "help_learn_more": "Tudj meg többet",
   "meta_help_description": "Hogyan működik a Plinky: útmutatók az alkalmazás minden részéhez, az első hangjegytől a fejlődésed követéséig.",
   "glossary_title": "Mit jelentenek a jelek",
+  "score_symbols_title": "Ebben a darabban",
+  "score_symbols_subtitle": "A jelek, amikkel itt találkozol, és hogy melyik mit kér tőled.",
   "glossary_intro": "A jelek, amikkel a kottában találkozol, és hogy melyik mit tesz a hanggal. A legtöbbet kétszer is meghallgathatod: ahogy le van írva, és még egyszer a jel nélkül.",
   "glossary_index_label": "Jelek",
   "glossary_hear": "Hallgasd meg",

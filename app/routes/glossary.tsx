@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router";
 import {
     entryById,
     GLOSSARY,
@@ -47,7 +48,12 @@ export function meta(_args: Route.MetaArgs) {
 const FIRST = GLOSSARY[0] as GlossaryEntry;
 
 export default function Glossary() {
-    const [selected, setSelected] = useState(FIRST.id);
+    // A piece links here naming the mark the reader just met (?symbol=slur), so the
+    // answer is the first thing on screen rather than something to hunt for. An unknown
+    // or absent name simply opens the first entry.
+    const [params] = useSearchParams();
+    const asked = entryById(params.get("symbol") ?? "");
+    const [selected, setSelected] = useState(asked?.id ?? FIRST.id);
     const entry = entryById(selected) ?? FIRST;
     const synth = useSynth();
     const scheduler = useScheduler();

@@ -672,6 +672,8 @@
   "help_learn_more": "Læs mere",
   "meta_help_description": "Sådan fungerer Plinky: vejledninger til hver del af appen, fra din første node til at følge dine fremskridt.",
   "glossary_title": "Hvad tegnene betyder",
+  "score_symbols_title": "I dette stykke",
+  "score_symbols_subtitle": "De tegn du møder her, og hvad hvert af dem beder dig om.",
   "glossary_intro": "De tegn du møder i et nodeblad, og hvad hvert af dem gør ved klangen. De fleste kan du høre to gange: som de står skrevet, og en gang mere uden tegnet.",
   "glossary_index_label": "Tegn",
   "glossary_hear": "Lyt",

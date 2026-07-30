@@ -12,6 +12,7 @@ import { IconButton } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { ChoiceField, SwitchField } from "../ui/fields";
 import { BookIcon, EyeIcon, GradCapIcon, RotateIcon, SlidersIcon, StarIcon } from "../ui/icons";
+import { ScoreSymbols } from "./scoreSymbols";
 import { SettingsSection } from "../ui/settingsSection";
 import { Stepper } from "../ui/stepper";
 import { ReadingLevel } from "./readingLevel";
@@ -76,6 +77,7 @@ function RunSetupPanel() {
         sightReadRecord,
         focusLoop,
         setFocusLoop,
+        xml,
     } = usePlaySession();
 
     return (
@@ -89,6 +91,8 @@ function RunSetupPanel() {
             >
                 <ReadingLevel labelled={false} />
             </SettingsSection>
+
+            <ScoreSymbols xml={xml} />
 
             <SettingsSection
                 title={m.run_group_practice_title()}
