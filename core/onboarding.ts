@@ -10,6 +10,7 @@ import type { Prefs } from "./prefs";
 // you've set your hand, you've done a daily); the rest are marked the first time you
 // reach a feature, since "tried Ear once" leaves no other trace to read back.
 export type DiscoveryId =
+    | "keyboardMet"
     | "midiConnected"
     | "played"
     | "placed"
@@ -27,6 +28,8 @@ export type DiscoveryId =
 // changing a key already shows in the saved map, but a player happy with the standard
 // layout leaves no such trace, so opening the editor and touching it counts as well.
 export const MARKABLE: readonly DiscoveryId[] = [
+    // Finishing the tour is the only trace it leaves; there is nothing else to read back.
+    "keyboardMet",
     "midiConnected",
     "earTried",
     "fingeringTried",
@@ -61,6 +64,7 @@ export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean>
     const { prefs, masteredCount, history, lastDaily, placementTaken, marked } = state;
     const span = prefs.handSpan;
     return {
+        keyboardMet: marked.has("keyboardMet"),
         // Connecting is a one-time setup step; once a device has ever been seen,
         // the mark persists even when the piano is unplugged today.
         midiConnected: marked.has("midiConnected"),

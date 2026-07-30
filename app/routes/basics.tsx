@@ -1,0 +1,41 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: 0BSD
+
+import { useNavigate } from "react-router";
+import { noindexMeta, routeMeta } from "../../core/site";
+import { KeyboardTour } from "../components/features/keyboardTour";
+import { useOnboardingStore } from "../contexts/services";
+import { localizedHref } from "../components/ui/href";
+import { m } from "../paraglide/messages.js";
+import type { Route } from "./+types/basics";
+
+export function meta(_args: Route.MetaArgs) {
+    // A hands-on tour rather than a page of prose: there is nothing here for a crawler
+    // to index, and it is personal to a device's first session.
+    return [...routeMeta(m.basics_title(), m.meta_basics_description()), noindexMeta()];
+}
+
+// The way in for someone who has never touched a piano. Everything else in Plinky
+// assumes the keyboard is already understood; this is the missing first hour.
+export default function Basics() {
+    const onboarding = useOnboardingStore();
+    const navigate = useNavigate();
+
+    return (
+        <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
+            <header className="space-y-1">
+                <h1 className="text-2xl font-semibold">{m.basics_title()}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{m.basics_intro()}</p>
+            </header>
+
+            <KeyboardTour
+                onFinished={() => {
+                    // Finishing ticks the checklist step; nothing about the tour is
+                    // required, so leaving part-way simply leaves it unticked.
+                    onboarding.markDiscovered("keyboardMet");
+                    navigate(localizedHref("/"));
+                }}
+            />
+        </main>
+    );
+}

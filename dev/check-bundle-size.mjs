@@ -204,7 +204,12 @@ const BUDGET_VENDOR_KB = 311;
 // "In this piece" — the per-piece notation scan and the list it renders in the run-setup
 // panel, plus its two strings — measured at 304.6. 305. It rides on the glossary's own
 // labels rather than carrying copy of its own, which is most of why it is this small.
-const BUDGET_APP_KB = 305;
+//
+// The keyboard tour — the pure six-step machine, the guided surface it drives, and the
+// two dozen strings it says — measured at 308.3. 309. It is a route chunk, so only a
+// reader who opens it downloads it, and it brings no notation engine on arrival: the
+// first four steps are the keyboard alone, and the staff loads when step five needs it.
+const BUDGET_APP_KB = 309;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

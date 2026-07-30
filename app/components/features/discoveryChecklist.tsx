@@ -41,6 +41,9 @@ const DISCOVERY: {
     to: string;
     quick?: boolean;
 }[] = [
+    // First: the only step that needs no piano, no MIDI cable and no reading — for
+    // someone who has never touched a keyboard, everything else assumes too much.
+    { key: "keyboardMet", icon: "🎼", label: m.discover_keyboard, to: "/basics" },
     { key: "midiConnected", icon: "🔌", label: m.discover_midi, to: "/settings" },
     { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
     { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },

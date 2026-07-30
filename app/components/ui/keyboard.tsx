@@ -465,6 +465,13 @@ export function Keyboard({
               : expected.includes(note)
                 ? "bg-indigo-400"
                 : theme.black;
+    // A black key's name is pale because the key is nearly black — but every state that
+    // means something (wrong, held, play this) fills it with a bright colour, and pale
+    // grey on those is well under the contrast floor. The name follows the fill.
+    const blackLabel = (note: number) =>
+        flash?.note === note || lit.has(note) || expected.includes(note)
+            ? "text-gray-900"
+            : "text-gray-300";
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.
@@ -549,7 +556,7 @@ export function Keyboard({
                             {keyLabel(note, labels) && (
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight text-gray-300"
+                                    className={`pointer-events-none absolute inset-x-0 bottom-0.5 text-center text-[8px] font-medium leading-tight ${blackLabel(note)}`}
                                 >
                                     {keyLabel(note, labels)}
                                 </span>

@@ -289,6 +289,16 @@ one-tap **review session** walks you through everything that's fading, and you c
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
   carries an optional *About this grade* note.
 
+**Meet the keyboard** — the first item on that checklist, and the only one that needs no
+piano, no cable and no reading. Six steps for someone who has never touched a keyboard:
+the black keys come in twos and threes, middle C sits left of a group of two, the white
+keys are seven names that start over, a black key has two names — and then the leap
+beginners find hardest, that a dot printed on a staff is a key under your hand. Every
+step ends in a press, on a real piano or the on-screen keys or your computer keyboard,
+whichever you have. A key that isn't the one asked for still sounds and simply doesn't
+count: wandering along the keys is how a keyboard gets learned, and nothing here keeps
+score. It's entirely optional, and it never asks twice.
+
 On the **home page**, a gentle, dismissible **Getting started** checklist explains how
 Plinky works and walks the first session in order — set yourself up (connect your MIDI
 piano in Settings, then hand size and key mapping, so everything after is tailored to

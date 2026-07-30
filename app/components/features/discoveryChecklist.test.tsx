@@ -42,21 +42,24 @@ describe("DiscoveryChecklist", () => {
         expect(screen.getByRole("link", { name: m.discover_compose() })).toBeTruthy();
     });
 
-    it("puts settings first, then the first piece to play", async () => {
+    it("opens with the keyboard tour, then settings, then the first piece", async () => {
         mount();
         await screen.findByText("Getting started");
         const links = screen.getAllByRole("link");
-        // Setting yourself up leads — the MIDI piano, hand size, then the key
-        // mapping — and playing your first piece follows.
-        expect(links[0]?.getAttribute("href")).toBe("/en/settings/");
+        // Meeting the keyboard leads: it is the only step that needs no piano, no cable
+        // and no reading, and everything after it assumes you know what a key is.
+        expect(links[0]?.getAttribute("href")).toBe("/en/basics/");
+        // Then setting yourself up — the MIDI piano, hand size, the key mapping — and
+        // playing your first piece follows.
         expect(links[1]?.getAttribute("href")).toBe("/en/settings/");
         expect(links[2]?.getAttribute("href")).toBe("/en/settings/");
-        expect(links[3]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}/`);
+        expect(links[3]?.getAttribute("href")).toBe("/en/settings/");
+        expect(links[4]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}/`);
         // Then finding your level — after the first piece on purpose, so the test reads
         // someone who already knows the cursor and the colours, and ahead of every
         // corner so a pianist meets their shortcut in the first screenful.
-        expect(links[4]?.getAttribute("href")).toBe("/en/placement/");
-        expect(links[5]?.getAttribute("href")).toBe("/en/daily/");
+        expect(links[5]?.getAttribute("href")).toBe("/en/placement/");
+        expect(links[6]?.getAttribute("href")).toBe("/en/daily/");
     });
 
     it("leaves finding your level off the jump-straight-in shortcuts", async () => {
