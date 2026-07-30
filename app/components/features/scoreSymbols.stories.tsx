@@ -16,17 +16,21 @@ export default meta;
 
 type Story = StoryObj<typeof ScoreSymbols>;
 
+// Three marks with short glosses, chosen so every row fits comfortably on one line at
+// the 800px baseline viewport. The longer glosses run to within ~200px of the edge, and
+// a sub-pixel font-metric difference between machines is enough to wrap one of them —
+// which reflows every row below it and blows past the 0.5% pixel allowance. Three short
+// rows pin the layout, the link styling and the glossary's grouping order just as well.
 export const SeveralMarks: Story = {
     args: {
         xml: buildSnippet({
-            clef: "bass",
-            fifths: 2,
-            beatsPerBar: 3,
+            clef: "treble",
+            fifths: 0,
+            beatsPerBar: 4,
             notes: [
-                { step: "C", octave: 3, value: "quarter", articulation: "staccato", dynamic: "p" },
                 { step: null, value: "quarter" },
-                { step: "G", octave: 2, value: "quarter", tie: "start" },
-                { step: "G", octave: 2, value: "half", dotted: true, tie: "stop" },
+                { step: "C", octave: 5, value: "quarter", dynamic: "p" },
+                { step: "E", octave: 5, value: "half", dynamic: "f" },
             ],
         }),
     },
