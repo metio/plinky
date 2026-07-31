@@ -209,7 +209,15 @@ const BUDGET_VENDOR_KB = 311;
 // two dozen strings it says — measured at 308.3. 309. It is a route chunk, so only a
 // reader who opens it downloads it, and it brings no notation engine on arrival: the
 // first four steps are the keyboard alone, and the staff loads when step five needs it.
-const BUDGET_APP_KB = 309;
+//
+// Bounds on what a malformed file or link may ask of the app — a four-byte cap on the
+// MIDI variable-length reader, a meter the notation can actually spell, and a folded
+// min/max a six-figure note list cannot overflow — measured at 309.2. 310. The smallest
+// raise on this list and the one that carries no feature at all: it is what stops a
+// corrupt .mid from locking the tab in a loop that no timeout can interrupt. Most of its
+// weight was avoided rather than spent — core/meter.ts exists so the two file parsers
+// keep type-only imports of the engraver instead of pulling it into their chunk.
+const BUDGET_APP_KB = 310;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -751,3 +751,32 @@ describe("shared compositions are bounded", () => {
         expect(decodeComposition(encodeComposition(original))).toEqual(original);
     });
 });
+
+describe("meters the engraver can spell", () => {
+    it("engraves a composition whose meter is a fraction rather than throwing", () => {
+        // A bar of 0.1 beats is smaller than the shortest note value the duration
+        // table can spell, so the engraver has nothing to write there.
+        const xml = toMusicXml({
+            tempo: 120,
+            beatsPerBar: 0.1,
+            notes: [
+                { pitch: 60, startMs: 0, durationMs: 500, velocity: 90 },
+                { pitch: 62, startMs: 4000, durationMs: 500, velocity: 90 },
+            ],
+        });
+        expect(xml).toContain("score-partwise");
+        expect(parseDom(xml).querySelectorAll("measure").length).toBeGreaterThan(0);
+    });
+
+    it("refuses a share link carrying an unspellable meter", () => {
+        expect(
+            decodeComposition(packToCode([120, 0.001, [0], [100], [60], [90]])),
+        ).toBeNull();
+        expect(decodeComposition(packToCode([120, 1e9, [0], [100], [60], [90]]))).toBeNull();
+    });
+
+    it("still round-trips a real meter through a link", () => {
+        const original = composition([note({ pitch: 60, startMs: 0 })], 120, 3);
+        expect(decodeComposition(encodeComposition(original))?.beatsPerBar).toBe(3);
+    });
+});

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { maxOf, minOf } from "../../../core/stats";
 import type { Hotspot, TempoPoint } from "../../../core/tempo";
 import { m } from "../../paraglide/messages.js";
 
@@ -32,9 +33,11 @@ export function TempoGraph({
         series && series.length > 1 ? series : [{ label: "", points, color: "#4f46e5" }];
 
     const allBpms = [median, ...lines.flatMap((line) => line.points.map((point) => point.bpm))];
-    const yPad = Math.max(5, (Math.max(...allBpms) - Math.min(...allBpms)) * 0.15);
-    const yLo = Math.min(...allBpms) - yPad;
-    const yHi = Math.max(...allBpms) + yPad;
+    const bpmLo = minOf(allBpms, median);
+    const bpmHi = maxOf(allBpms, median);
+    const yPad = Math.max(5, (bpmHi - bpmLo) * 0.15);
+    const yLo = bpmLo - yPad;
+    const yHi = bpmHi + yPad;
     const yFor = (bpm: number) =>
         PAD.top + (1 - (bpm - yLo) / Math.max(1, yHi - yLo)) * (HEIGHT - PAD.top - PAD.bottom);
 
@@ -42,16 +45,16 @@ export function TempoGraph({
     // different lengths still span the full width.
     const xForLine = (linePoints: TempoPoint[]) => {
         const indices = linePoints.map((point) => point.index);
-        const lo = Math.min(...indices);
-        const hi = Math.max(...indices);
+        const lo = minOf(indices, 0);
+        const hi = maxOf(indices, 0);
         return (index: number) =>
             PAD.left + ((index - lo) / Math.max(1, hi - lo)) * (WIDTH - PAD.left - PAD.right);
     };
 
     // Hotspot shading uses the combined timeline behind the curves.
     const combinedIndices = points.map((point) => point.index);
-    const minX = Math.min(...combinedIndices);
-    const maxX = Math.max(...combinedIndices);
+    const minX = minOf(combinedIndices, 0);
+    const maxX = maxOf(combinedIndices, 0);
     const xCombined = (index: number) =>
         PAD.left + ((index - minX) / Math.max(1, maxX - minX)) * (WIDTH - PAD.left - PAD.right);
     const step = (WIDTH - PAD.left - PAD.right) / Math.max(1, maxX - minX);

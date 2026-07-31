@@ -11,6 +11,7 @@
 // longer ambiguously means both "all easy" and "all hard".
 
 import { type Hand, fingerPositions, positionsCost } from "./fingering";
+import { maxOf, minOf } from "./stats";
 
 // The raw per-bar cost: optimal fingering's cost averaged over the bar's
 // positions; an empty bar (a rest bar, or the other hand's solo) costs 0.
@@ -27,8 +28,8 @@ export function barCosts(bars: number[][][], hand: Hand, span?: number): number[
 // Costs → 0..1 heat by min–max over the whole piece. A flat piece (or a single
 // bar) yields all zeros: nothing stands out because nothing should.
 export function normalizeHeat(costs: number[]): number[] {
-    const min = Math.min(...costs);
-    const max = Math.max(...costs);
+    const min = minOf(costs, 0);
+    const max = maxOf(costs, 0);
     if (costs.length === 0 || max - min <= 1e-9) {
         return costs.map(() => 0);
     }

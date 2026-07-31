@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Composition, RecordedNote } from "./composition";
+import { cleanBeatsPerBar } from "./meter";
 
 // Reads a Standard MIDI File back into a composition, the inverse of midiFile.ts, so
 // a take exported on one device can be carried to another and kept growing. It reads
@@ -34,22 +35,32 @@ class Reader {
         return ((this.u8() << 24) | (this.u16() << 8) | this.u8()) >>> 0;
     }
 
+    // The cursor only ever moves forward. A length that is negative or unreadable
+    // would rewind it, and since the track loop's bound is `pos < end`, a cursor that
+    // goes backwards makes that loop run forever on the same bytes.
     bytesOf(length: number): Uint8Array {
-        const slice = this.bytes.subarray(this.pos, this.pos + length);
-        this.pos += length;
+        const forward = Number.isFinite(length) && length > 0 ? length : 0;
+        const slice = this.bytes.subarray(this.pos, this.pos + forward);
+        this.pos += forward;
         return slice;
     }
 
     // A variable-length quantity: 7 bits per byte, high bit set on all but the last.
+    // The spec caps it at four bytes (28 bits) and the cap is load-bearing, not
+    // decorative — a corrupt file that sets the high bit on byte after byte would
+    // otherwise shift the accumulator past 32 bits and wrap it negative, and that
+    // negative then travels into bytesOf as a length. Multiplying rather than
+    // shifting keeps the arithmetic clear of int32 entirely.
     varLen(): number {
         let value = 0;
-        for (;;) {
+        for (let read = 0; read < 4; read++) {
             const byte = this.u8();
-            value = (value << 7) | (byte & 0x7f);
+            value = value * 128 + (byte & 0x7f);
             if ((byte & 0x80) === 0) {
-                return value;
+                break;
             }
         }
+        return value;
     }
 }
 
@@ -136,10 +147,16 @@ export function parseMidiFile(bytes: Uint8Array): Composition | null {
                             microsecondsPerQuarter = value;
                             tempoSeen = true;
                         }
-                    } else if (metaType === 0x58 && metaLength >= 2 && !timeSignatureSeen) {
+                    } else if (metaType === 0x58 && data.length >= 2 && !timeSignatureSeen) {
                         // Numerator, then a power-of-two denominator; a quarter-note beat
-                        // means scaling the count to quarters.
-                        beatsPerBar = Math.max(1, Math.round((data[0]! * 4) / 2 ** data[1]!));
+                        // means scaling the count to quarters. Measured against the bytes
+                        // actually delivered, not the length the file claimed: a truncated
+                        // event yields fewer, and an absent byte reads as NaN all the way
+                        // through to the meter the metronome runs on.
+                        beatsPerBar = cleanBeatsPerBar(
+                            Math.round((data[0]! * 4) / 2 ** data[1]!),
+                            beatsPerBar,
+                        );
                         timeSignatureSeen = true;
                     }
                     continue;

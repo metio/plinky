@@ -3,6 +3,7 @@
 
 import type { XmlCodec } from "./xml";
 import type { Composition, RecordedNote } from "./composition";
+import { cleanBeatsPerBar } from "./meter";
 import { STEP_SEMITONES } from "./pitch";
 
 // Reads MusicXML back into a composition, the inverse of the toMusicXml sketch, so a
@@ -64,7 +65,7 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
     const declaredTempo = Number(tempoAttr ?? perMinute ?? DEFAULT_TEMPO);
     const tempo = declaredTempo > 0 ? declaredTempo : DEFAULT_TEMPO;
     const beats = Number(text(doc.documentElement, "time > beats") ?? DEFAULT_BEATS_PER_BAR);
-    const beatsPerBar = beats > 0 ? beats : DEFAULT_BEATS_PER_BAR;
+    const beatsPerBar = cleanBeatsPerBar(beats, DEFAULT_BEATS_PER_BAR);
 
     // Notes accrued in quarter notes — a divisions-independent clock. `divisions` is
     // the number of duration units per quarter note and a measure may restate it, so

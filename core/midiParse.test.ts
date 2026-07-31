@@ -230,4 +230,51 @@ describe("parseMidiFile", () => {
         const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
         expect(parsed!.notes.map((n) => n.pitch).sort()).toEqual([60, 64]);
     });
+
+    describe("a corrupt file cannot capture the parser", () => {
+        // Seven VLQ continuation bytes. Shifting the accumulator left by seven for each
+        // one runs it past 32 bits and back to a negative number, and a negative length
+        // rewinds the read cursor — inside a loop whose only bound is that the cursor
+        // has not yet reached the track's end.
+        const OVERFLOW_VLQ = [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00];
+
+        it("returns from a meta event whose declared length overflows", () => {
+            const events = [...ONE_NOTE, 0x00, 0xff, 0x01, ...OVERFLOW_VLQ, ...ONE_NOTE];
+            const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+            expect(parsed?.notes.length ?? 0).toBeGreaterThan(0);
+        });
+
+        it("returns from a sysex event whose declared length overflows", () => {
+            const events = [...ONE_NOTE, 0x00, 0xf0, ...OVERFLOW_VLQ, ...ONE_NOTE];
+            const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+            expect(parsed?.notes.length ?? 0).toBeGreaterThan(0);
+        });
+
+        it("keeps onsets forward when a delta time overflows", () => {
+            const events = [
+                ...ONE_NOTE,
+                ...OVERFLOW_VLQ,
+                0x90, 0x3e, 0x40, 0x60, 0x80, 0x3e, 0x00,
+            ];
+            const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+            expect(parsed?.notes.every((n) => Number.isFinite(n.startMs) && n.startMs >= 0)).toBe(
+                true,
+            );
+        });
+
+        it("keeps the meter a real number when a time signature is truncated", () => {
+            // Declares four bytes of time-signature data; the track ends after none.
+            const events = [...ONE_NOTE, 0x00, 0xff, 0x58, 0x04];
+            const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+            expect(Number.isFinite(parsed?.beatsPerBar ?? Number.NaN)).toBe(true);
+            expect(parsed?.beatsPerBar).toBeGreaterThanOrEqual(1);
+        });
+
+        it("still reads a real time signature", () => {
+            // 3/4: numerator 3, denominator power 2.
+            const events = [...ONE_NOTE, 0x00, 0xff, 0x58, 0x04, 0x03, 0x02, 0x18, 0x08];
+            const parsed = parseMidiFile(file(...HEADER, ...track(events.length, events)));
+            expect(parsed?.beatsPerBar).toBe(3);
+        });
+    });
 });

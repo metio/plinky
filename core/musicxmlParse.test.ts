@@ -228,3 +228,18 @@ describe("an imported score feeding the staff sketch", () => {
         expect(xml.match(/<measure /g)?.length ?? 0).toBeLessThanOrEqual(MAX_SKETCH_BARS);
     });
 });
+
+describe("meters a file may declare", () => {
+    it("falls back when <beats> is a fraction the engraver cannot spell", () => {
+        const xml = `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><time><beats>0.05</beats><beat-type>4</beat-type></time></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+        const parsed = parseMusicXml(domXmlCodec, xml);
+        expect(parsed?.beatsPerBar).toBe(4);
+        // And the sketch it feeds engraves rather than throwing out of the render.
+        expect(toMusicXml(parsed!)).toContain("score-partwise");
+    });
+
+    it("keeps a real time signature", () => {
+        const xml = `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><time><beats>3</beats><beat-type>4</beat-type></time></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+        expect(parseMusicXml(domXmlCodec, xml)?.beatsPerBar).toBe(3);
+    });
+});

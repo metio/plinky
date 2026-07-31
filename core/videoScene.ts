@@ -6,6 +6,7 @@
 // geometry and wording here keeps them testable and the painter thin.
 
 import type { Attribution } from "./attribution";
+import { maxOf, minOf } from "./stats";
 
 // Black keys sit above the gap after these white-key positions within an
 // octave (C, D, F, G, A — no black key after E and B).
@@ -27,8 +28,8 @@ export type SceneKey = {
 // reads as a piano, then keep it at least two octaves wide so a one-note take
 // doesn't render three giant keys.
 export function sceneRange(pitches: number[]): { from: number; to: number } {
-    const lowest = pitches.length ? Math.min(...pitches) : 60;
-    const highest = pitches.length ? Math.max(...pitches) : 60;
+    const lowest = minOf(pitches, 60);
+    const highest = maxOf(pitches, 60);
     let from = lowest - (lowest % 12);
     let to = highest + (11 - (highest % 12));
     while (to - from < 23) {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { MidiNote } from "./midiFile";
+import { cleanBeatsPerBar } from "./meter";
 import { packToCode, unpackFromCode } from "./shareCode";
 
 // A free improvisation captured at the keyboard: the raw notes a player struck,
@@ -162,14 +163,15 @@ export function decodeComposition(code: string): Composition | null {
     const [tempo, beatsPerBar, gaps, durations, pitches, velocities] = unpacked as unknown[];
     // A share URL is untrusted: a non-finite or non-positive tempo/meter would feed
     // 60_000 / tempo downstream and poison every onset with Infinity or NaN, so reject
-    // it rather than build an unplayable composition.
+    // it rather than build an unplayable composition. "Positive" is not enough for the
+    // meter — a bar of 0.001 beats is positive, finite, and has no notation — so it
+    // must be a meter the engraver can spell.
     if (
         typeof tempo !== "number" ||
         !Number.isFinite(tempo) ||
         tempo <= 0 ||
         typeof beatsPerBar !== "number" ||
-        !Number.isFinite(beatsPerBar) ||
-        beatsPerBar <= 0
+        beatsPerBar !== cleanBeatsPerBar(beatsPerBar, Number.NaN)
     ) {
         return null;
     }
@@ -256,9 +258,15 @@ const DURATIONS: { cells: number; type: string; dots: number }[] = [
 
 function splitDuration(cells: number): { cells: number; type: string; dots: number }[] {
     const pieces: { cells: number; type: string; dots: number }[] = [];
-    let remaining = cells;
+    // Whole cells only: the shortest value the table can spell is one cell, so a
+    // fractional remainder names no note. The loop also stops rather than trusting the
+    // table to be total — nothing below is worth an exception in a render callback.
+    let remaining = Math.floor(cells);
     while (remaining > 0) {
-        const piece = DURATIONS.find((d) => d.cells <= remaining)!;
+        const piece = DURATIONS.find((d) => d.cells <= remaining);
+        if (!piece) {
+            break;
+        }
         pieces.push(piece);
         remaining -= piece.cells;
     }
@@ -422,7 +430,7 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
     const title = options.title ?? "Improvisation";
     const subdivisions = options.subdivisionsPerBeat ?? DIVISIONS;
     const splitPoint = options.splitPoint ?? DEFAULT_SPLIT_POINT;
-    const beatsPerBar = composition.beatsPerBar > 0 ? composition.beatsPerBar : 4;
+    const beatsPerBar = cleanBeatsPerBar(composition.beatsPerBar);
 
     const beatMs = 60_000 / composition.tempo;
     // The render grid is always sixteenths; a coarser quantize is applied first so the

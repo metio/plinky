@@ -160,3 +160,20 @@ describe("stepCenterAt", () => {
         expect(stepCenterAt([], [], 0)).toBe(0);
     });
 });
+
+describe("sceneRange on a large piece", () => {
+    it("spans a take too long to spread into an argument list", () => {
+        // A composition loaded from a large MIDI file runs to six figures of notes.
+        const pitches = Array.from({ length: 200_000 }, (_, i) => 21 + (i % 88));
+        const range = sceneRange(pitches);
+        expect(range.from).toBeLessThanOrEqual(21);
+        expect(range.to).toBeGreaterThanOrEqual(108);
+    });
+
+    it("still frames an ordinary take", () => {
+        const range = sceneRange([60, 62, 64]);
+        expect(range.to - range.from).toBeGreaterThanOrEqual(23);
+        expect(range.from).toBeLessThanOrEqual(60);
+        expect(range.to).toBeGreaterThanOrEqual(64);
+    });
+});
