@@ -28,6 +28,18 @@ export type Composition = {
 // anything lower falls to the bass staff. Middle C is the conventional split.
 export const DEFAULT_SPLIT_POINT = 60;
 
+// The longest staff the sketch will draw. A recorded improvisation is a few dozen
+// bars; this is the ceiling that keeps an untrusted span from deciding how much
+// memory the engraving takes.
+export const MAX_SKETCH_BARS = 2000;
+
+// The most notes a shared composition may carry, and the widest onset it may claim.
+// A link is untrusted input: the decoder already refuses a tempo that would poison
+// every onset, and these bound the same way — an hour of playing at a hundred notes
+// a minute is a few thousand notes inside a few million milliseconds.
+const MAX_SHARED_NOTES = 20_000;
+const MAX_SHARED_MS = 24 * 60 * 60 * 1000;
+
 // The staff is drawn on a sixteenth-note grid: four divisions per quarter note lets
 // every snapped onset and length be an integer count of grid cells.
 const DIVISIONS = 4;
@@ -173,13 +185,29 @@ export function decodeComposition(code: string): Composition | null {
     if (durations.length !== count || pitches.length !== count || velocities.length !== count) {
         return null;
     }
+    // Finite is not the same as playable. A gap or length of a billion milliseconds
+    // passes every check above and then decides, on its own, how many bars the staff
+    // sketch allocates — so the span a link may claim is bounded here, at the edge,
+    // rather than left for each reader to survive.
+    if (count > MAX_SHARED_NOTES) {
+        return null;
+    }
     const notes: RecordedNote[] = [];
     let running = 0;
     for (let i = 0; i < count; i++) {
+        const duration = durations[i]!;
         running += gaps[i]!;
+        // The gaps themselves may run either way — a take's notes are not required to
+        // arrive sorted, and the codec round-trips them as given. What is bounded is
+        // where they land: an onset or a length of a billion milliseconds passes every
+        // check above and then decides, on its own, how many bars the staff sketch
+        // allocates.
+        if (Math.abs(running) > MAX_SHARED_MS || duration < 0 || duration > MAX_SHARED_MS) {
+            return null;
+        }
         notes.push({
             startMs: running,
-            durationMs: durations[i]!,
+            durationMs: duration,
             pitch: pitches[i]!,
             velocity: velocities[i]!,
         });
@@ -402,10 +430,30 @@ export function toMusicXml(composition: Composition, options: MusicXmlOptions = 
     const gridMs = beatMs / DIVISIONS;
     const cellsPerBar = beatsPerBar * DIVISIONS;
 
-    const snapped = quantize(composition.notes, composition.tempo, subdivisions);
-    const ends = snapped.map((note) => note.startMs + note.durationMs);
-    const lastEnd = ends.length > 0 ? Math.max(...ends) : 0;
-    const usedCells = Math.max(1, Math.ceil(lastEnd / gridMs));
+    // The engraving allocates per bar, and a bar's worth of rest is written out even
+    // where nothing sounds — so the span between the first and last note, not the note
+    // count, decides how much work this is. A composition read from a share link or an
+    // imported file can claim any span at all, so the sketch is bounded: notes starting
+    // past the cap are left off and one running past it is clipped to it. A take played
+    // at the keyboard never comes near MAX_SKETCH_BARS.
+    const maxCells = MAX_SKETCH_BARS * cellsPerBar;
+    const snapped = quantize(composition.notes, composition.tempo, subdivisions)
+        .filter((note) => note.startMs >= 0 && note.startMs < maxCells * gridMs)
+        .map((note) => ({
+            ...note,
+            durationMs: Math.max(
+                0,
+                Math.min(note.durationMs, maxCells * gridMs - note.startMs),
+            ),
+        }));
+    // Folded rather than spread: a long take holds more notes than an argument list
+    // can carry, and Math.max(...notes) would overflow the stack on exactly the
+    // pieces most worth engraving.
+    const lastEnd = snapped.reduce(
+        (latest, note) => Math.max(latest, note.startMs + note.durationMs),
+        0,
+    );
+    const usedCells = Math.max(1, Math.min(maxCells, Math.ceil(lastEnd / gridMs)));
     const totalCells = Math.ceil(usedCells / cellsPerBar) * cellsPerBar;
 
     const treble = snapped.filter((note) => note.pitch >= splitPoint);

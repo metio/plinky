@@ -20,6 +20,15 @@ function text(parent: Element, selector: string): string | null {
     return parent.querySelector(selector)?.textContent?.trim() ?? null;
 }
 
+// A <duration> the clock can actually advance by. Durations drive a running cursor,
+// so one unreadable value doesn't spoil its own note alone — it makes the cursor NaN
+// and every onset after it with it. An unreadable or negative duration reads as zero,
+// which leaves the notes around it where they belong.
+function durationOf(parent: Element): number {
+    const value = Number(text(parent, "duration") ?? "0");
+    return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
 function midiOf(pitch: Element): number | null {
     const step = text(pitch, "step");
     const octave = text(pitch, "octave");
@@ -91,11 +100,11 @@ export function parseMusicXml(codec: XmlCodec, xml: string): Composition | null 
         const toQuarters = (divs: number) => divs / divisions;
         for (const element of measure.children) {
             if (element.tagName === "backup") {
-                cursor -= toQuarters(Number(text(element, "duration") ?? "0"));
+                cursor -= toQuarters(durationOf(element));
             } else if (element.tagName === "forward") {
-                cursor += toQuarters(Number(text(element, "duration") ?? "0"));
+                cursor += toQuarters(durationOf(element));
             } else if (element.tagName === "note") {
-                const durationQuarters = toQuarters(Number(text(element, "duration") ?? "0"));
+                const durationQuarters = toQuarters(durationOf(element));
                 const isChord = element.querySelector("chord") !== null;
                 const start = isChord ? lastStart : cursor;
                 const pitch = element.querySelector("pitch");

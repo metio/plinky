@@ -18,18 +18,24 @@ import { PREFIX } from "./resetDevice";
 // would only find out at the moment you needed it.
 
 // Every stored key with the prefix stripped, ready for a bundle.
+//
+// Built through fromEntries because it defines own data properties: a plain
+// `entries[key] = value` reaches the prototype for a key of "__proto__" and, since
+// the value is a string, silently keeps nothing — so that one entry would vanish
+// from the backup while the device still held it. The bundle format guards the same
+// hazard on the way in (see pickStringEntries); this is the reading half.
 function readEntries(kv: KeyValueStore): Record<string, string> {
-    const entries: Record<string, string> = {};
+    const pairs: Array<[string, string]> = [];
     for (const key of kv.keys()) {
         if (!key.startsWith(PREFIX)) {
             continue;
         }
         const value = kv.get(key);
         if (value !== null) {
-            entries[key.slice(PREFIX.length)] = value;
+            pairs.push([key.slice(PREFIX.length), value]);
         }
     }
-    return entries;
+    return Object.fromEntries(pairs);
 }
 
 // How many values this device holds — what the backup would carry, so the UI can

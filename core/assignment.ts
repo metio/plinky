@@ -29,10 +29,19 @@ export interface Assignment {
 
 const FORMAT = "plinky-assignment";
 
+// The playable band for a target tempo. Exported so the builder's input advertises
+// the same range this rejects — a field that accepts what the save discards is a
+// field that loses the teacher's work silently.
+export const MIN_TEMPO = 20;
+export const MAX_TEMPO = 400;
+
 // A tempo feeds the 60000/tempo playback math, so only a sane positive value is
 // kept; anything else is dropped and the item simply carries no target.
 function cleanTempo(value: unknown): number | undefined {
-    return typeof value === "number" && Number.isFinite(value) && value >= 20 && value <= 400
+    return typeof value === "number" &&
+        Number.isFinite(value) &&
+        value >= MIN_TEMPO &&
+        value <= MAX_TEMPO
         ? Math.round(value)
         : undefined;
 }
@@ -89,6 +98,12 @@ export function newAssignmentId(name: string, taken: Iterable<string>): string {
     return id;
 }
 
+// The most steps an assignment may hold. A teacher's list is a handful of pieces;
+// this is the ceiling that keeps a shared link — whose compressed items cost a few
+// bytes each and expand without limit — from handing the page a list no one could
+// have written and no one can scroll.
+export const MAX_ITEMS = 500;
+
 // Build a validated assignment from loose parts, dropping malformed items.
 export function makeAssignment(parts: {
     id?: string;
@@ -100,6 +115,7 @@ export function makeAssignment(parts: {
         typeof parts.name === "string" && parts.name.trim() ? parts.name.trim() : "Untitled";
     const description = cleanDescription(parts.description);
     const items = parts.items
+        .slice(0, MAX_ITEMS)
         .map(cleanItem)
         .filter((item): item is AssignmentItem => item !== null);
     return {
@@ -300,8 +316,11 @@ export function moveItem(items: AssignmentItem[], index: number, delta: number):
     return next;
 }
 
-// Set an item's target tempo from a form field. An empty or unparsable field
-// clears the target rather than storing a NaN the playback math would divide by.
+// Set an item's target tempo from a form field. The draft holds only a tempo a save
+// would keep: an empty, unparsable or out-of-band field clears the target instead of
+// carrying a number makeAssignment quietly drops on the way to storage. The input
+// keeps the player's raw keystrokes of its own accord, so typing toward a valid
+// tempo is not fought by this narrowing.
 export function withItemTempo(
     items: AssignmentItem[],
     index: number,
@@ -311,9 +330,9 @@ export function withItemTempo(
         if (i !== index) {
             return item;
         }
-        const tempo = Number(value);
+        const tempo = cleanTempo(Number(value));
         const { tempo: _drop, ...rest } = item;
-        return value && Number.isFinite(tempo) ? { ...rest, tempo } : rest;
+        return tempo === undefined ? rest : { ...rest, tempo };
     });
 }
 

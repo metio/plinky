@@ -322,3 +322,28 @@ describe("clampHeading", () => {
         expect(clamped.length).toBeLessThanOrEqual(28);
     });
 });
+
+describe("clampHeading with astral characters", () => {
+    it("never leaves a lone surrogate when an emoji straddles the cut", () => {
+        // The emoji sits astride the 28-code-point budget, so a UTF-16 cut would
+        // keep only its leading half.
+        const clamped = clampHeading(`${"a".repeat(26)}🎹 and more besides`);
+        expect(clamped.isWellFormed()).toBe(true);
+    });
+
+    it("keeps the card's SVG well-formed for an emoji title", () => {
+        expect(svgCard([["best", "good"]], `${"a".repeat(26)}🎹 and more besides`).isWellFormed()).toBe(
+            true,
+        );
+    });
+
+    it("measures the budget in code points, so emoji are not counted twice", () => {
+        // Twenty emoji are twenty characters to a reader, well inside the budget.
+        const heading = "🎹".repeat(20);
+        expect(clampHeading(heading)).toBe(heading);
+    });
+
+    it("still shortens a long plain heading", () => {
+        expect(clampHeading("a".repeat(40))).toBe(`${"a".repeat(27)}…`);
+    });
+});

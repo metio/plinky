@@ -6,7 +6,7 @@
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
 import type { Composition } from "./composition";
-import { toMusicXml } from "./composition";
+import { MAX_SKETCH_BARS, toMusicXml } from "./composition";
 import { parseMusicXml } from "./musicxmlParse";
 
 describe("parseMusicXml", () => {
@@ -161,5 +161,70 @@ describe("parseMusicXml", () => {
     it("returns null for non-score XML", () => {
         expect(parseMusicXml(domXmlCodec, "<html><body>nope</body></html>")).toBeNull();
         expect(parseMusicXml(domXmlCodec, "not xml at all <<<")).toBeNull();
+    });
+});
+
+describe("unreadable durations", () => {
+    const score = (notes: string) =>
+        `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>${notes}</measure></part></score-partwise>`;
+    const pitched = (step: string, duration: string) =>
+        `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>${duration}</duration></note>`;
+
+    it("keeps every onset finite when a duration cannot be read", () => {
+        const parsed = parseMusicXml(domXmlCodec, score(pitched("C", "x") + pitched("E", "1")));
+        expect(parsed?.notes.every((n) => Number.isFinite(n.startMs))).toBe(true);
+        expect(parsed?.notes.every((n) => Number.isFinite(n.durationMs))).toBe(true);
+    });
+
+    it("keeps the notes after a bad duration where they belong", () => {
+        // The unreadable duration advances the clock by nothing, so E lands on C's onset
+        // and G a quarter later — the rest of the measure still reads.
+        const parsed = parseMusicXml(
+            domXmlCodec,
+            score(pitched("C", "x") + pitched("E", "1") + pitched("G", "1")),
+        );
+        expect(parsed?.notes.map((n) => n.startMs)).toEqual([0, 0, 500]);
+    });
+
+    it("ignores a negative duration rather than winding the clock back", () => {
+        const parsed = parseMusicXml(domXmlCodec, score(pitched("C", "-8") + pitched("E", "1")));
+        expect(parsed?.notes.every((n) => n.startMs >= 0)).toBe(true);
+    });
+
+    it("survives an unreadable backup and forward", () => {
+        const parsed = parseMusicXml(
+            domXmlCodec,
+            score(
+                pitched("C", "1") +
+                    `<backup><duration>oops</duration></backup>` +
+                    `<forward><duration>NaN</duration></forward>` +
+                    pitched("E", "1"),
+            ),
+        );
+        expect(parsed?.notes.every((n) => Number.isFinite(n.startMs))).toBe(true);
+    });
+});
+
+describe("an imported score feeding the staff sketch", () => {
+    const score = (notes: string) =>
+        `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>${notes}</measure></part></score-partwise>`;
+
+    it("engraves a file whose duration claims a span no piece has", () => {
+        // Opening this in Compose re-engraves it a moment later, so a span the file
+        // simply asserts must not decide how much memory that takes. A converter that
+        // writes tick durations under <divisions>1</divisions> produces exactly this.
+        const parsed = parseMusicXml(
+            domXmlCodec,
+            score(
+                `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note>` +
+                    `<note><pitch><step>E</step><octave>4</octave></pitch><duration>99999999</duration></note>`,
+            ),
+        );
+        expect(parsed).not.toBeNull();
+        const xml = toMusicXml(parsed!);
+        // It engraves — a bounded sketch of the readable part, not an allocation
+        // sized by a number the file made up.
+        expect(xml).toContain("score-partwise");
+        expect(xml.match(/<measure /g)?.length ?? 0).toBeLessThanOrEqual(MAX_SKETCH_BARS);
     });
 });

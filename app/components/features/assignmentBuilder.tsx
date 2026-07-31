@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useMemo } from "react";
-import { MAX_DESCRIPTION_LENGTH } from "../../../core/assignment";
+import { useMemo, useState } from "react";
+import { MAX_DESCRIPTION_LENGTH, MAX_TEMPO, MIN_TEMPO } from "../../../core/assignment";
 import type { AssignmentDraft } from "../../hooks/useAssignmentDraft";
 import { useDragReorder } from "../../hooks/useDragReorder";
 import { m } from "../../paraglide/messages.js";
@@ -14,6 +14,39 @@ import { Show } from "./conditional";
 // A pickable piece for the builder: a catalogue score or a finger exercise, both
 // reduced to the id and title the basket needs.
 export type PoolItem = { id: string; title: string };
+
+// One step's target tempo. The field owns the text being typed while it holds focus:
+// the draft keeps only a tempo that would survive a save, so a directly-bound value
+// would erase "1" on the way to "120". Letting go re-reads the draft, which is what
+// makes a rejected entry show itself — an out-of-band number clears in front of the
+// player instead of sitting in the field until the save quietly discards it.
+function TempoField({
+    tempo,
+    onChange,
+    label,
+}: {
+    tempo: number | undefined;
+    onChange: (value: string) => void;
+    label: string;
+}) {
+    const [typed, setTyped] = useState<string | null>(null);
+    return (
+        <input
+            type="number"
+            min={MIN_TEMPO}
+            max={MAX_TEMPO}
+            className={`${FIELD} w-20`}
+            placeholder={m.assignments_tempo_placeholder()}
+            value={typed ?? (tempo === undefined ? "" : String(tempo))}
+            onChange={(event) => {
+                setTyped(event.target.value);
+                onChange(event.target.value);
+            }}
+            onBlur={() => setTyped(null)}
+            aria-label={label}
+        />
+    );
+}
 
 // The builder face of the assignments page: search the pool, assemble and order
 // the basket (drag or arrows), attach per-step tempo/notes, name it, save or
@@ -126,17 +159,10 @@ export function AssignmentBuilder({
                                         {titleOf(item.id)}
                                     </span>
                                 )}
-                                <input
-                                    type="number"
-                                    min={20}
-                                    max={400}
-                                    className={`${FIELD} w-20`}
-                                    placeholder={m.assignments_tempo_placeholder()}
-                                    value={item.tempo ?? ""}
-                                    onChange={(event) =>
-                                        draft.setItemTempo(index, event.target.value)
-                                    }
-                                    aria-label={m.assignments_tempo_label({
+                                <TempoField
+                                    tempo={item.tempo}
+                                    onChange={(value) => draft.setItemTempo(index, value)}
+                                    label={m.assignments_tempo_label({
                                         title: titleOf(item.id),
                                     })}
                                 />

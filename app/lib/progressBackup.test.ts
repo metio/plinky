@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { memoryStore } from "../adapters/memoryStore";
 import type { KeyValueStore } from "../ports/keyValueStore";
 import { countProgressEntries, exportProgress, importProgress } from "./progressBackup";
+import { PREFIX } from "./resetDevice";
 
 const device = {
     "plinky:prefs": '{"noteLabels":"all"}',
@@ -90,5 +91,33 @@ describe("progress backup", () => {
         const result = importProgress(memoryStore(device), exportProgress(memoryStore(), ""));
 
         expect(result).toEqual({ ok: false, problem: "empty" });
+    });
+});
+
+describe("keys that collide with Object.prototype", () => {
+    it("carries a __proto__ key through a backup", () => {
+        const kv = memoryStore();
+        kv.set(`${PREFIX}__proto__`, "kept");
+        kv.set(`${PREFIX}theme`, '"dark"');
+        expect(countProgressEntries(kv)).toBe(2);
+        const bundle = exportProgress(kv, "2026-07-31T00:00:00.000Z");
+        expect(JSON.parse(bundle).entries.__proto__).toBe("kept");
+    });
+
+    it("restores it onto a fresh device", () => {
+        const source = memoryStore();
+        source.set(`${PREFIX}__proto__`, "kept");
+        const target = memoryStore();
+        const result = importProgress(target, exportProgress(source, "2026-07-31T00:00:00.000Z"));
+        expect(result.ok).toBe(true);
+        expect(target.get(`${PREFIX}__proto__`)).toBe("kept");
+    });
+
+    it("leaves the object prototype alone", () => {
+        const kv = memoryStore();
+        kv.set(`${PREFIX}__proto__`, "kept");
+        exportProgress(kv, "2026-07-31T00:00:00.000Z");
+        expect(Object.getPrototypeOf({})).toBe(Object.prototype);
+        expect(({} as Record<string, unknown>).kept).toBeUndefined();
     });
 });

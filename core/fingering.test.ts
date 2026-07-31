@@ -119,3 +119,42 @@ describe("fingerSteps", () => {
         expect(small).not.toEqual(large);
     });
 });
+
+describe("positions with no notes", () => {
+    // A rest between two chords reaches the cost model as an empty position on some
+    // score readings; it must cost nothing rather than index off the end of a chord.
+    const withGap = [[60, 64], [], [67, 72]];
+
+    it("fingers a sequence containing an empty position", () => {
+        const fingers = fingerPositions(withGap, "right");
+        expect(fingers.length).toBe(3);
+        expect(fingers[1]).toEqual([]);
+    });
+
+    it("costs a sequence containing an empty position finitely", () => {
+        const cost = positionsCost(withGap, fingerPositions(withGap, "right"), "right");
+        expect(Number.isFinite(cost)).toBe(true);
+    });
+
+    it("charges nothing for the empty position itself", () => {
+        // The silence contributes neither a chord shape nor a move, so the total is
+        // exactly what the two sounding chords cost on their own.
+        const fingers = [
+            [1, 3],
+            [],
+            [1, 5],
+        ];
+        expect(positionsCost(withGap, fingers, "right")).toBe(
+            positionsCost([[60, 64]], [[1, 3]], "right") +
+                positionsCost([[67, 72]], [[1, 5]], "right"),
+        );
+    });
+
+    it("still costs an ordinary sequence exactly as before", () => {
+        const solid = [
+            [60, 64],
+            [67, 72],
+        ];
+        expect(positionsCost(solid, fingerPositions(solid, "right"), "right")).toBeGreaterThan(0);
+    });
+});

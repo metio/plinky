@@ -11,6 +11,9 @@ import {
     encodeAssignmentLink,
     makeAssignment,
     MAX_DESCRIPTION_LENGTH,
+    MAX_ITEMS,
+    MAX_TEMPO,
+    MIN_TEMPO,
     missingAssignmentIds,
     moveItem,
     newAssignmentId,
@@ -359,5 +362,48 @@ describe("basket mechanics", () => {
                 { id: "a", tempo: 90, note: "legato" },
             ]);
         });
+    });
+});
+
+describe("bounded assignments", () => {
+    it("caps the steps a shared link can hand over", () => {
+        const items = Array.from({ length: MAX_ITEMS + 500 }, (_, i) => ({ id: `piece-${i}` }));
+        const link = encodeAssignmentLink(makeAssignment({ name: "Huge", items }));
+        expect(decodeAssignmentLink(link)?.items.length).toBe(MAX_ITEMS);
+    });
+
+    it("keeps a teacher's real list whole", () => {
+        const items = Array.from({ length: 12 }, (_, i) => ({ id: `piece-${i}` }));
+        expect(makeAssignment({ name: "Week 1", items }).items.length).toBe(12);
+    });
+});
+
+describe("withItemTempo rejects what a save would discard", () => {
+    it.each([
+        ["zero", "0"],
+        ["a lone space", " "],
+        ["below the playable band", "5"],
+        ["above the playable band", "900"],
+        ["not a number", "fast"],
+        ["empty", ""],
+    ])("clears the target for %s", (_case, value) => {
+        expect(withItemTempo([{ id: "a", tempo: 90 }], 0, value)).toEqual([{ id: "a" }]);
+    });
+
+    it.each([
+        [MIN_TEMPO, String(MIN_TEMPO)],
+        [MAX_TEMPO, String(MAX_TEMPO)],
+        [120, "120"],
+    ])("keeps %s", (expected, value) => {
+        expect(withItemTempo([{ id: "a" }], 0, value)).toEqual([{ id: "a", tempo: expected }]);
+    });
+
+    it("stores nothing a later save would drop", () => {
+        // Whatever the field holds, saving must not change it — a tempo shown in the
+        // builder is a tempo the assignment goes out with.
+        for (const value of ["0", "19", "401", "120", "abc", ""]) {
+            const items = withItemTempo([{ id: "a" }], 0, value);
+            expect(makeAssignment({ name: "n", items }).items).toEqual(items);
+        }
     });
 });

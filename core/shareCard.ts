@@ -270,11 +270,16 @@ const FILL: Record<Level, string> = {
 // inside the card at this font on a system sans-serif.
 const MAX_HEADING_CHARS = 28;
 
+// Measured and cut in code points, not UTF-16 units: an emoji in a piece title is a
+// surrogate pair, and cutting between its halves leaves a lone surrogate that makes
+// the card's SVG ill-formed XML — so the image share fails on exactly the titles
+// most likely to carry one.
 export function clampHeading(heading: string): string {
-    if (heading.length <= MAX_HEADING_CHARS) {
+    const points = [...heading];
+    if (points.length <= MAX_HEADING_CHARS) {
         return heading;
     }
-    return `${heading.slice(0, MAX_HEADING_CHARS - 1).trimEnd()}…`;
+    return `${points.slice(0, MAX_HEADING_CHARS - 1).join("").trimEnd()}…`;
 }
 
 // A 1080×1350 dark portrait card — the shape sized for a social feed. Pure markup

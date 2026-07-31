@@ -8,6 +8,7 @@ import {
     type Composition,
     decodeComposition,
     encodeComposition,
+    MAX_SKETCH_BARS,
     quantize,
     type RecordedNote,
     toMidiNotes,
@@ -676,5 +677,77 @@ describe("toMusicXml lays out one voice without gaps or overlaps", () => {
             }
         }
         expect(trebleSum).toBe(16);
+    });
+});
+
+describe("bounded engraving", () => {
+    // At 120bpm with 4 beats to the bar, one bar is 2000ms — so MAX_SKETCH_BARS bars
+    // is the span past which a composition is no longer drawn in full.
+    const barMs = 2000;
+
+    it("engraves a far-flung note without allocating a bar for every silent beat", () => {
+        const xml = toMusicXml(
+            composition([note({ pitch: 60, startMs: 0 }), note({ pitch: 62, startMs: 1e9 })]),
+        );
+        expect(parseDom(xml).querySelectorAll("measure").length).toBeLessThanOrEqual(
+            MAX_SKETCH_BARS,
+        );
+    });
+
+    it("clips a note whose length runs past the cap", () => {
+        const xml = toMusicXml(composition([note({ startMs: 0, durationMs: 1e12 })]));
+        expect(parseDom(xml).querySelectorAll("measure").length).toBeLessThanOrEqual(
+            MAX_SKETCH_BARS,
+        );
+    });
+
+    it("leaves an ordinary take untouched", () => {
+        const xml = toMusicXml(
+            composition([note({ pitch: 60, startMs: 0 }), note({ pitch: 62, startMs: barMs * 3 })]),
+        );
+        expect(parseDom(xml).querySelectorAll("measure").length).toBe(4);
+    });
+});
+
+describe("shared compositions are bounded", () => {
+    it("refuses a link claiming an absurd span", () => {
+        const code = encodeComposition(
+            composition([note({ startMs: 0 }), note({ startMs: 1e9 })]),
+        );
+        expect(decodeComposition(code)).toBeNull();
+    });
+
+    it("refuses a link whose note outlasts any performance", () => {
+        const code = encodeComposition(composition([note({ startMs: 0, durationMs: 1e12 })]));
+        expect(decodeComposition(code)).toBeNull();
+    });
+
+    it("accepts notes that arrive out of order", () => {
+        // The codec carries a take's notes as given, sorted or not, so a backwards
+        // gap is ordinary — it is the distance travelled, not the direction, that
+        // the bound is about.
+        const decoded = decodeComposition(packToCode([120, 4, [0, -50], [10, 10], [60, 62], [90, 90]]));
+        expect(decoded?.notes.map((n) => n.startMs)).toEqual([0, -50]);
+    });
+
+    it("refuses a link whose onsets run far into the past", () => {
+        expect(
+            decodeComposition(packToCode([120, 4, [0, -1e9], [10, 10], [60, 62], [90, 90]])),
+        ).toBeNull();
+    });
+
+    it("refuses a link carrying more notes than a player could strike", () => {
+        const many = Array.from({ length: 20_001 }, () => 1);
+        expect(
+            decodeComposition(packToCode([120, 4, many, many, many.map(() => 60), many.map(() => 90)])),
+        ).toBeNull();
+    });
+
+    it("still accepts a real take", () => {
+        const original = composition([
+            note({ pitch: 60, startMs: 0 }),
+            note({ pitch: 64, startMs: 500 }),
+        ]);
+        expect(decodeComposition(encodeComposition(original))).toEqual(original);
     });
 });

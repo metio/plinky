@@ -211,9 +211,30 @@ function chordCost(pitches: number[], fingers: number[], spread: Record<number, 
 }
 
 // The voice that leads hand movement between positions: the top note for the
-// right hand, the bottom for the left.
+// right hand, the bottom for the left. A position with no pitches has no voice to
+// lead, so it reports -1 and the movement across it is skipped rather than costed
+// against an absent note.
 function anchor(pitches: number[], hand: Hand): number {
-    return hand === "right" ? pitches.length - 1 : 0;
+    return pitches.length === 0 ? -1 : hand === "right" ? pitches.length - 1 : 0;
+}
+
+// The cost of moving between two positions, or 0 when either holds no notes — an
+// empty position is silence, and silence neither helps nor hinders the hand.
+function moveCost(
+    from: number[],
+    fromFingers: number[],
+    to: number[],
+    toFingers: number[],
+    hand: Hand,
+    spread: Record<number, number>,
+    leap: number,
+): number {
+    const a = anchor(from, hand);
+    const b = anchor(to, hand);
+    if (a < 0 || b < 0) {
+        return 0;
+    }
+    return transitionCost(from[a]!, fromFingers[a]!, to[b]!, toFingers[b]!, hand, spread, leap);
 }
 
 // The comfort cost of fingering a whole sequence of positions a given way — chord
@@ -231,13 +252,11 @@ export function positionsCost(
     let cost = chordCost(positions[0]!, fingers[0]!, spread);
     for (let i = 1; i < positions.length; i++) {
         cost += chordCost(positions[i]!, fingers[i]!, spread);
-        const from = anchor(positions[i - 1]!, hand);
-        const to = anchor(positions[i]!, hand);
-        cost += transitionCost(
-            positions[i - 1]![from]!,
-            fingers[i - 1]![from]!,
-            positions[i]![to]!,
-            fingers[i]![to]!,
+        cost += moveCost(
+            positions[i - 1]!,
+            fingers[i - 1]!,
+            positions[i]!,
+            fingers[i]!,
             hand,
             spread,
             leap,
@@ -262,23 +281,13 @@ export function fingerPositions(positions: number[][], hand: Hand, span?: number
     for (let i = 1; i < positions.length; i++) {
         const pos = positions[i]!;
         const prevPos = positions[i - 1]!;
-        const from = anchor(prevPos, hand);
-        const to = anchor(pos, hand);
         paths = fingerSets(pos.length, hand).map((fingers) => {
             let best: Path = { fingers, cost: Number.POSITIVE_INFINITY, path: [] };
             for (const previous of paths) {
                 const cost =
                     previous.cost +
                     chordCost(pos, fingers, spread) +
-                    transitionCost(
-                        prevPos[from]!,
-                        previous.fingers[from]!,
-                        pos[to]!,
-                        fingers[to]!,
-                        hand,
-                        spread,
-                        leap,
-                    );
+                    moveCost(prevPos, previous.fingers, pos, fingers, hand, spread, leap);
                 if (cost < best.cost) {
                     best = { fingers, cost, path: [...previous.path, fingers] };
                 }
