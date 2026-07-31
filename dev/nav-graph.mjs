@@ -140,6 +140,30 @@ for (const page of pages) {
     edges.set(page.path, reached);
 }
 
+// --- The same graph, with the dismissible checklist taken out ----------------------
+//
+// Depth is not the only way to lose a page. The home page's Getting started checklist
+// links a dozen destinations, but it disappears for good once it is dismissed or once
+// every step is done — so a page whose ONLY door is that checklist is two taps from
+// home right up until the reader tidies it away, and then it is gone with no way back.
+// /basics was exactly that: reachable solely from "Meet the keyboard", with nowhere to
+// return to after forgetting where middle C was.
+//
+// Depth cannot see this — the edge is real while it lasts — so the graph is rebuilt
+// with the checklist's own links removed and every page must still be reachable.
+// Seeding it into `seen` makes the crawl skip it wherever it is rendered.
+const CHECKLIST = resolve(APP, "components/features/discoveryChecklist.tsx");
+
+const durable = new Map();
+for (const page of pages) {
+    const reached = nodesFor(crawl(resolve(APP, page.file), new Set([CHECKLIST])));
+    for (const g of global) {
+        reached.add(g);
+    }
+    reached.delete(page.path);
+    durable.set(page.path, reached);
+}
+
 // --- BFS, eccentricity, diameter ---------------------------------------------------
 
 function bfs(start) {
@@ -158,6 +182,24 @@ function bfs(start) {
 }
 
 const fromHome = bfs("/");
+// Reachability once the checklist is gone. Uses the same walk over the reduced graph.
+const durableFromHome = (() => {
+    const dist = new Map([["/", 0]]);
+    const queue = ["/"];
+    while (queue.length > 0) {
+        const cur = queue.shift();
+        for (const next of durable.get(cur) ?? []) {
+            if (!dist.has(next)) {
+                dist.set(next, dist.get(cur) + 1);
+                queue.push(next);
+            }
+        }
+    }
+    return dist;
+})();
+const checklistOnly = pages.filter(
+    (p) => fromHome.has(p.path) && !durableFromHome.has(p.path),
+);
 const unreachable = pages.filter((p) => !fromHome.has(p.path));
 const eccentricity = Math.max(...pages.map((p) => fromHome.get(p.path) ?? Number.POSITIVE_INFINITY));
 
@@ -187,14 +229,21 @@ const problems = [];
 if (unreachable.length > 0) {
     problems.push(`unreachable from home: ${unreachable.map((p) => p.path).join(", ")}`);
 }
+if (checklistOnly.length > 0) {
+    problems.push(
+        `reachable only through the Getting started checklist, which goes away once it is ` +
+            `dismissed or finished: ${checklistOnly.map((p) => p.path).join(", ")}`,
+    );
+}
 if (Number.isFinite(eccentricity) && eccentricity > BUDGET_FROM_HOME) {
     problems.push(`a feature is ${eccentricity} taps from home, over the ${BUDGET_FROM_HOME} budget`);
 }
 if (problems.length > 0) {
     console.error(
         `\nNavigation too deep:\n- ${problems.join("\n- ")}\n` +
-            "Add a link from a shallower page (or the global nav), or raise the budget in " +
-            "dev/nav-graph.mjs deliberately.",
+            "Add a link from a shallower page (or the global nav), give the stranded page a " +
+            "door that outlives the checklist, or raise the budget in dev/nav-graph.mjs " +
+            "deliberately.",
     );
     process.exitCode = 1;
 } else {
