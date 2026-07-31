@@ -94,8 +94,9 @@ export type Prefs = {
     // default — the wrapped score is the familiar reading layout.
     treadmill: boolean;
     // Show the upcoming notes as blocks falling onto the on-screen keys (a Synthesia-style
-    // "notes highway"), above the staff, to train finding the keys. Off by default — the
-    // staff is the reading surface; the highway is an opt-in aid.
+    // "notes highway"), above the staff, to train finding the keys. On by default, as
+    // part of the starter rung: someone who has never read music cannot start at the
+    // staff, and the skill level sheds this the moment they move down the ladder.
     highway: boolean;
     // Race a translucent replay of your best run (or fastest saved take) on the piece
     // while you practise. On by default; turn it off to practise without the chase.
@@ -189,11 +190,18 @@ function defaults(): Prefs {
         handSpan: { left: null, right: null },
         showFingerings: false,
         beams: "auto",
+        // These five aid fields are exactly the "starter" rung of core/readingLevel's
+        // ladder, so a device that has touched nothing reads as a real level rather than
+        // "Custom" — a strange thing to tell someone who has changed nothing — and the
+        // run panel's beginner layout, which keys off the level, reaches the people it
+        // was built for. Starter is the whole point of a beginner-first app: every aid
+        // on, including the notes highway, until the reader chooses otherwise. A test
+        // pins the pairing, so moving either side without the other fails.
         colorNotes: true,
         noteHints: "always",
         noteLabels: "all",
         midiEcho: false,
-        forgiving: false,
+        forgiving: true,
         fingerHints: true,
         decayMode: "gentle",
         reviewCap: REVIEW_CAP,
@@ -207,7 +215,7 @@ function defaults(): Prefs {
         metronomeGroove: "straight",
         keyboardTheme: "classic",
         treadmill: false,
-        highway: false,
+        highway: true,
         raceGhost: true,
         hiddenNotes: false,
         revealTries: 1,

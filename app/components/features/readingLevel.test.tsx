@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 // @vitest-environment jsdom
 
-import { cleanup } from "@testing-library/react";
+import { act, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { type AidPrefs, levelAids } from "../../../core/readingLevel";
 import { m } from "../../paraglide/messages.js";
@@ -33,9 +33,19 @@ describe("ReadingLevel", () => {
         expect(prefs.highway).toBe(true); // the aid did change
     });
 
-    it("shows no level selected for a mix that matches none", () => {
-        // The default prefs are a mix that matches no single level — an honest "Custom".
+    it("shows a real level on a device that has changed nothing", () => {
+        // The shipped defaults are exactly the starter rung, so a reader who has touched
+        // no setting is told where they are rather than "Custom".
         renderWithServices(<ReadingLevel />);
+        expect(chosen(m.reading_level_label)).toBe(m.reading_level_starter());
+    });
+
+    it("shows no level selected once the aids are mixed by hand", () => {
+        const { services } = renderWithServices(<ReadingLevel />);
+        // One aid off the starter rung and the mix matches nothing — an honest "Custom".
+        act(() => {
+            services.prefs.save({ ...services.prefs.load(), colorNotes: false });
+        });
         expect(chosen(m.reading_level_label)).toBeNull();
     });
 });

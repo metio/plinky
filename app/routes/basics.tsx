@@ -3,8 +3,10 @@
 
 import { useNavigate } from "react-router";
 import { noindexMeta, routeMeta } from "../../core/site";
+import { levelAids } from "../../core/readingLevel";
 import { KeyboardTour } from "../components/features/keyboardTour";
 import { useOnboardingStore } from "../contexts/services";
+import { usePrefs } from "../hooks/usePrefs";
 import { localizedHref } from "../components/ui/href";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/basics";
@@ -19,6 +21,7 @@ export function meta(_args: Route.MetaArgs) {
 // assumes the keyboard is already understood; this is the missing first hour.
 export default function Basics() {
     const onboarding = useOnboardingStore();
+    const { update } = usePrefs();
     const navigate = useNavigate();
 
     return (
@@ -33,6 +36,11 @@ export default function Basics() {
                     // Finishing ticks the checklist step; nothing about the tour is
                     // required, so leaving part-way simply leaves it unticked.
                     onboarding.markDiscovered("keyboardMet");
+                    // Someone who just worked out where middle C is has told us plainly
+                    // where they are, so the reading aids go all the way up and the run
+                    // panel folds to its essentials. Only the five aid fields move; every
+                    // personal and physical preference is left exactly as it was.
+                    update(levelAids("starter"));
                     navigate(localizedHref("/"));
                 }}
             />

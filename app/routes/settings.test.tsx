@@ -51,9 +51,10 @@ describe("Settings", () => {
         const { services } = mount();
         // A reading pref that used to live only in the run-setup panel now persists
         // from the Settings page too.
-        expect(services.prefs.load().highway).toBe(false);
-        toggle(m.highway_toggle);
+        // The highway ships on, as part of the starter rung a fresh device sits at.
         expect(services.prefs.load().highway).toBe(true);
+        toggle(m.highway_toggle);
+        expect(services.prefs.load().highway).toBe(false);
     });
 
     it("sets every reading aid at once from the skill-level preset", () => {

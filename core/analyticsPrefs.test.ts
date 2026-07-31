@@ -43,7 +43,7 @@ describe("prefChanges", () => {
     it("collects several changes from one save", () => {
         const changes = prefChanges(
             DEFAULT_PREFS,
-            withChange({ highway: true, treadmill: true, barNumbers: false }),
+            withChange({ highway: false, treadmill: true, barNumbers: false }),
         );
         expect(changes.map((c) => c.setting).sort()).toEqual([
             "barNumbers",

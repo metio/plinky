@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it } from "vitest";
+import { DEFAULT_PREFS } from "./prefs";
 import { type AidPrefs, READING_LEVELS, levelAids, levelOf } from "./readingLevel";
 
 describe("levelAids", () => {
@@ -52,5 +53,13 @@ describe("levelOf", () => {
         // Extra fields on the object (as a full Prefs would carry) don't matter.
         const withExtras = { ...levelAids("confident"), sound: false, volume: 10 } as AidPrefs;
         expect(levelOf(withExtras)).toBe("confident");
+    });
+
+    it("is the level a fresh device reads as", () => {
+        // A device that has changed nothing must land on a real rung: "Custom" is a
+        // strange thing to tell someone who has touched no setting, and the run panel
+        // keys its beginner layout off the level. Starter, because a beginner-first app
+        // should start with every aid on and let the reader shed them.
+        expect(levelOf(DEFAULT_PREFS)).toBe("starter");
     });
 });
