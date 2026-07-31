@@ -764,6 +764,8 @@
   "video_show_score": "Ноти",
   "video_show_keyboard": "Клавіатура",
   "run_setup": "Налаштуйте прогін",
+  "run_more_options": "Інші налаштування",
+  "run_starter_hint": "Грай так повільно, як хочеш — ноти тебе почекають.",
   "run_group_skill_title": "Рівень майстерності",
   "run_group_skill_hint": "Скажи Plinky, де ти є, і підказки для читання нижче підлаштуються. Зміни будь-яку — і буде «Власний».",
   "run_group_practice_title": "Як ти граєш",

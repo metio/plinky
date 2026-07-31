@@ -764,6 +764,8 @@
   "video_show_score": "Noter",
   "video_show_keyboard": "Klaviatur",
   "run_setup": "Gör i ordning ditt försök",
+  "run_more_options": "Fler inställningar",
+  "run_starter_hint": "Spela så långsamt du vill — noterna väntar på dig.",
   "run_group_skill_title": "Färdighetsnivå",
   "run_group_skill_hint": "Berätta för Plinky var du är, så följer läshjälpen nedan med. Finjustera någon och det står Anpassad.",
   "run_group_practice_title": "Hur du spelar",

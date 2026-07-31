@@ -764,6 +764,8 @@
   "video_show_score": "Noten",
   "video_show_keyboard": "Klaviatur",
   "run_setup": "Durchlauf einrichten",
+  "run_more_options": "Mehr Einstellungen",
+  "run_starter_hint": "Spiel so langsam, wie du magst — die Noten warten auf dich.",
   "run_group_skill_title": "Niveau",
   "run_group_skill_hint": "Sag Plinky, wo du stehst, und die Lesehilfen unten passen sich an. Änderst du eine davon, steht dort Eigene.",
   "run_group_practice_title": "Wie du spielst",

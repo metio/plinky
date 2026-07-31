@@ -764,6 +764,8 @@
   "video_show_score": "Noter",
   "video_show_keyboard": "Klaviatur",
   "run_setup": "Gjør klart forsøket",
+  "run_more_options": "Flere innstillinger",
+  "run_starter_hint": "Spill så sakte du vil — notene venter på deg.",
   "run_group_skill_title": "Nivå",
   "run_group_skill_hint": "Fortell Plinky hvor du er, så følger lesehjelpene under etter. Justerer du én av dem, står det Egendefinert.",
   "run_group_practice_title": "Hvordan du spiller",

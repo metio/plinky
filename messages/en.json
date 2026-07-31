@@ -764,6 +764,8 @@
   "video_show_score": "Score",
   "video_show_keyboard": "Keyboard",
   "run_setup": "Set up your run",
+  "run_more_options": "More options",
+  "run_starter_hint": "Play it as slowly as you like — the notes wait for you.",
   "run_group_skill_title": "Skill level",
   "run_group_skill_hint": "Tell Plinky where you're at and the reading aids below follow. Tune any one and it reads Custom.",
   "run_group_practice_title": "How you play",

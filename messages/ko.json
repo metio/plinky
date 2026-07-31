@@ -764,6 +764,8 @@
   "video_show_score": "악보",
   "video_show_keyboard": "건반",
   "run_setup": "연주 설정",
+  "run_more_options": "다른 설정",
+  "run_starter_hint": "원하는 만큼 천천히 쳐도 돼요 — 음표는 기다려 줍니다.",
   "run_group_skill_title": "레벨",
   "run_group_skill_hint": "지금 자신에게 맞는 레벨을 고르면 아래 읽기 보조가 따라옵니다. 하나라도 조정하면 '커스텀'으로 바뀝니다.",
   "run_group_practice_title": "연주 방식",

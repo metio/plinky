@@ -764,6 +764,8 @@
   "video_show_score": "Kotta",
   "video_show_keyboard": "Billentyűzet",
   "run_setup": "Állítsd be a futamot",
+  "run_more_options": "További beállítások",
+  "run_starter_hint": "Játssz olyan lassan, ahogy jólesik — a hangok megvárnak.",
   "run_group_skill_title": "Tudásszint",
   "run_group_skill_hint": "Mondd el Plinkynek, hol tartasz, és az alábbi olvasási segítségek követik. Állíts bármit, és Egyéni lesz.",
   "run_group_practice_title": "Hogyan játszol",

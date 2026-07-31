@@ -764,6 +764,8 @@
   "video_show_score": "Ноты",
   "video_show_keyboard": "Клавиатура",
   "run_setup": "Настройте прогон",
+  "run_more_options": "Другие настройки",
+  "run_starter_hint": "Играй так медленно, как хочешь — ноты тебя подождут.",
   "run_group_skill_title": "Уровень навыка",
   "run_group_skill_hint": "Скажи Plinky, где ты находишься, и подсказки для чтения ниже подстроятся. Измени любую — и станет Свой.",
   "run_group_practice_title": "Как ты играешь",

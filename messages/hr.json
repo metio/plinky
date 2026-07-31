@@ -764,6 +764,8 @@
   "video_show_score": "Note",
   "video_show_keyboard": "Klavijatura",
   "run_setup": "Postavi izvedbu",
+  "run_more_options": "Više postavki",
+  "run_starter_hint": "Sviraj polako koliko želiš — note će te pričekati.",
   "run_group_skill_title": "Razina vještine",
   "run_group_skill_hint": "Reci Plinkyju gdje si i pomagala za čitanje ispod slijede. Podesi bilo koje i piše Prilagođeno.",
   "run_group_practice_title": "Kako sviraš",

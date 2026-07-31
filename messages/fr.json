@@ -764,6 +764,8 @@
   "video_show_score": "Partition",
   "video_show_keyboard": "Clavier",
   "run_setup": "Préparez votre prise",
+  "run_more_options": "Plus d'options",
+  "run_starter_hint": "Joue aussi lentement que tu veux — les notes t'attendent.",
   "run_group_skill_title": "Niveau",
   "run_group_skill_hint": "Dis à Plinky où tu en es et les aides de lecture ci-dessous suivent. Ajuste-en une et il affiche Personnalisé.",
   "run_group_practice_title": "Comment tu joues",

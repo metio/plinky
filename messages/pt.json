@@ -764,6 +764,8 @@
   "video_show_score": "Partitura",
   "video_show_keyboard": "Teclado",
   "run_setup": "Prepara a tua execução",
+  "run_more_options": "Mais opções",
+  "run_starter_hint": "Toca tão devagar quanto quiseres — as notas esperam por ti.",
   "run_group_skill_title": "Nível de habilidade",
   "run_group_skill_hint": "Diz ao Plinky onde estás e as ajudas de leitura em baixo acompanham. Afina qualquer uma e passa a Personalizado.",
   "run_group_practice_title": "Como tocas",

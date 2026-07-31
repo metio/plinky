@@ -764,6 +764,8 @@
   "video_show_score": "Nuotit",
   "video_show_keyboard": "Koskettimisto",
   "run_setup": "Valmistele suorituksesi",
+  "run_more_options": "Lisää asetuksia",
+  "run_starter_hint": "Soita niin hitaasti kuin haluat — nuotit odottavat sinua.",
   "run_group_skill_title": "Taitotaso",
   "run_group_skill_hint": "Kerro Plinkylle, missä olet, niin alla olevat apuvälineet seuraavat. Säädä mitä tahansa, niin lukee Oma.",
   "run_group_practice_title": "Miten soitat",

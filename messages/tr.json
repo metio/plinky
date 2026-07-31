@@ -764,6 +764,8 @@
   "video_show_score": "Nota",
   "video_show_keyboard": "Klavye",
   "run_setup": "Çalışını ayarla",
+  "run_more_options": "Diğer seçenekler",
+  "run_starter_hint": "İstediğin kadar yavaş çal — notalar seni bekler.",
   "run_group_skill_title": "Beceri düzeyi",
   "run_group_skill_hint": "Plinky'ye nerede olduğunu söyle, aşağıdaki okuma yardımları ona göre ayarlansın. Herhangi birini değiştirdiğinde Özel olur.",
   "run_group_practice_title": "Nasıl çalıyorsun",

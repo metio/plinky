@@ -764,6 +764,8 @@
   "video_show_score": "乐谱",
   "video_show_keyboard": "键盘",
   "run_setup": "设置本次演奏",
+  "run_more_options": "更多设置",
+  "run_starter_hint": "想多慢就多慢——音符会等你。",
   "run_group_skill_title": "技能水平",
   "run_group_skill_hint": "告诉 Plinky 你现在的水平，下面的读谱辅助就会随之调整。任意微调一项，它就会显示为“自定义”。",
   "run_group_practice_title": "你的弹法",

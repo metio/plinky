@@ -764,6 +764,8 @@
   "video_show_score": "Partitura",
   "video_show_keyboard": "Tastiera",
   "run_setup": "Përgatit ekzekutimin",
+  "run_more_options": "Më shumë opsione",
+  "run_starter_hint": "Luaj sa ngadalë të duash — notat të presin.",
   "run_group_skill_title": "Niveli i aftësisë",
   "run_group_skill_hint": "Trego Plinky-t ku je dhe ndihmat e leximit më poshtë e ndjekin. Rregullo cilëndo dhe kalon në I personalizuar.",
   "run_group_practice_title": "Si luan",

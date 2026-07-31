@@ -764,6 +764,8 @@
   "video_show_score": "楽譜",
   "video_show_keyboard": "鍵盤",
   "run_setup": "演奏のセットアップ",
+  "run_more_options": "その他の設定",
+  "run_starter_hint": "好きなだけゆっくりで大丈夫。音符は待っていてくれます。",
   "run_group_skill_title": "レベル",
   "run_group_skill_hint": "今の自分に合うレベルを選ぶと、下の読譜補助もそれに合わせて変わります。どれかを調整すると「カスタム」になります。",
   "run_group_practice_title": "弾き方",

@@ -764,6 +764,8 @@
   "video_show_score": "Ноте",
   "video_show_keyboard": "Клавијатура",
   "run_setup": "Подеси извођење",
+  "run_more_options": "Више подешавања",
+  "run_starter_hint": "Свирај полако колико желиш — ноте ће те сачекати.",
   "run_group_skill_title": "Ниво вештине",
   "run_group_skill_hint": "Реци Plinky-ју где си, и помоћи за читање испод се прилагоде. Дотерај било коју и приказаће „Прилагођено”.",
   "run_group_practice_title": "Како свираш",
