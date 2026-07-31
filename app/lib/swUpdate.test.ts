@@ -171,6 +171,51 @@ function setup({
 
 const SKIP = { type: "SKIP_WAITING" };
 
+describe("applyIfIdle", () => {
+    it("does nothing when no build is waiting", async () => {
+        const { container, watcher } = setup();
+        container.resolveRegister(fakeRegistration());
+        await tick();
+
+        expect(watcher.applyIfIdle()).toBe(false);
+    });
+
+    it("takes a waiting build when nothing is in progress", async () => {
+        const { container, watcher, timers } = setup();
+        const registration = fakeRegistration();
+        const parked = fakeWorker();
+        registration.waiting = parked;
+        container.resolveRegister(registration);
+        await tick();
+
+        expect(watcher.applyIfIdle()).toBe(true);
+        // The update check runs first; letting it time out takes the parked build.
+        timers.fire();
+        await tick();
+        expect(parked.messages).toContainEqual(SKIP);
+    });
+
+    it("leaves a waiting build alone while the player is busy", async () => {
+        // The point of applying at a boundary rather than on a prompt: it must never
+        // interrupt. Telling the worker to take over hands the page to a new cache, so
+        // it is not something to start and then park — the next boundary will do.
+        const busy = { now: true };
+        const { container, watcher } = setup({ hold: () => busy.now });
+        const registration = fakeRegistration();
+        const parked = fakeWorker();
+        registration.waiting = parked;
+        container.resolveRegister(registration);
+        await tick();
+
+        expect(watcher.applyIfIdle()).toBe(false);
+        expect(parked.messages).toEqual([]);
+
+        // Once the run ends, the next boundary takes it.
+        busy.now = false;
+        expect(watcher.applyIfIdle()).toBe(true);
+    });
+});
+
 describe("createSwUpdateWatcher", () => {
     it("offers a build already parked in waiting when a controller exists", async () => {
         const { container, watcher, readyFlips } = setup();

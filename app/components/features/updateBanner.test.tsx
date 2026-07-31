@@ -3,60 +3,34 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { UpdateBanner } from "./updateBanner";
-import { m } from "../../paraglide/messages.js";
 
 afterEach(cleanup);
 
 describe("UpdateBanner", () => {
-    it("renders nothing until an update is ready", () => {
-        render(<UpdateBanner updateReady={false} onReload={() => {}} />);
+    it("says nothing while updates are working", () => {
+        // A waiting build is taken at the next boundary without asking, so there is
+        // nothing to announce — the banner exists only for the opposite case.
+        render(<UpdateBanner />);
         expect(screen.queryByRole("status")).toBeNull();
-    });
-
-    it("announces the new version when one is ready", () => {
-        render(<UpdateBanner updateReady={true} onReload={() => {}} />);
-        expect(screen.getByRole("status").textContent).toContain(m.update_available());
-    });
-
-    it("applies the update on Reload", () => {
-        const onReload = vi.fn();
-        render(<UpdateBanner updateReady={true} onReload={onReload} />);
-        fireEvent.click(screen.getByRole("button", { name: "Reload" }));
-        expect(onReload).toHaveBeenCalledOnce();
     });
 
     it("warns when updates can't be installed on this device", () => {
-        render(<UpdateBanner updateReady={false} updateBroken={true} onReload={() => {}} />);
+        render(<UpdateBanner updateBroken={true} />);
+
         expect(screen.getByRole("status").textContent).toContain("Updates can’t be installed");
-        // The broken notice offers no reload — there is nothing to apply.
+        // Nothing to press: there is no build waiting, which is the whole problem.
         expect(screen.queryByRole("button", { name: "Reload" })).toBeNull();
     });
 
-    it("prefers a ready update over the broken notice", () => {
-        // Both at once cannot really happen (a failed registration never parks a
-        // build), but the ready offer is the actionable one either way.
-        render(<UpdateBanner updateReady={true} updateBroken={true} onReload={() => {}} />);
-        expect(screen.getByRole("button", { name: "Reload" })).toBeTruthy();
-    });
-
-    it("dismisses the broken notice on ✕ for this page load", () => {
-        const { rerender } = render(
-            <UpdateBanner updateReady={false} updateBroken={true} onReload={() => {}} />,
-        );
-        fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-        expect(screen.queryByRole("status")).toBeNull();
-        rerender(<UpdateBanner updateReady={false} updateBroken={true} onReload={() => {}} />);
-        expect(screen.queryByRole("status")).toBeNull();
-    });
-
     it("dismisses on ✕ and stays dismissed for this page load", () => {
-        const { rerender } = render(<UpdateBanner updateReady={true} onReload={() => {}} />);
+        const { rerender } = render(<UpdateBanner updateBroken={true} />);
+
         fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
         expect(screen.queryByRole("status")).toBeNull();
-        // A later render with the update still pending does not resurrect it.
-        rerender(<UpdateBanner updateReady={true} onReload={() => {}} />);
+
+        rerender(<UpdateBanner updateBroken={true} />);
         expect(screen.queryByRole("status")).toBeNull();
     });
 });

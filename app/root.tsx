@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -202,23 +202,48 @@ function useServiceWorkerUpdate() {
         (onChange: () => void) => (watcher ? watcher.subscribe(onChange) : () => {}),
         [watcher],
     );
-    const updateReady = useSyncExternalStore(
-        subscribe,
-        () => watcher?.updateReady() ?? false,
-        () => false,
-    );
     const updateBroken = useSyncExternalStore(
         subscribe,
         () => watcher?.registrationFailed() ?? false,
         () => false,
     );
-    const applyUpdate = useCallback(() => watcher?.applyUpdate(), [watcher]);
+    // A waiting build is taken at the next natural boundary rather than announced.
+    //
+    // Nobody has a reason to decline an update, so asking was a chore with one sensible
+    // answer. It applies on a route change or on coming back to a backgrounded tab —
+    // moments the reader already experiences as the app loading something — and never
+    // while anything is in progress, which the activity signal decides.
+    //
+    // Once per page load: if a reload somehow lands back here still holding a waiting
+    // build, a second attempt would loop the page rather than fix anything.
+    const applied = useRef(false);
+    const location = useLocation();
+    // biome-ignore lint/correctness/useExhaustiveDependencies: the pathname is the trigger, not a read — a route change is the boundary
+    useEffect(() => {
+        if (!watcher || applied.current) {
+            return;
+        }
+        applied.current = watcher.applyIfIdle();
+    }, [watcher, location.pathname]);
 
-    return { updateReady, updateBroken, applyUpdate };
+    useEffect(() => {
+        if (!watcher) {
+            return;
+        }
+        const onVisible = () => {
+            if (document.visibilityState === "visible" && !applied.current) {
+                applied.current = watcher.applyIfIdle();
+            }
+        };
+        document.addEventListener("visibilitychange", onVisible);
+        return () => document.removeEventListener("visibilitychange", onVisible);
+    }, [watcher]);
+
+    return { updateBroken };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-    const { updateReady, updateBroken, applyUpdate } = useServiceWorkerUpdate();
+    const { updateBroken } = useServiceWorkerUpdate();
     // Apply the saved theme (following the OS when "system") here in the layout,
     // so even the error page is themed — App's render is skipped on an error.
     useEffect(() => {
@@ -317,13 +342,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         adapter's health signal so the banner itself stays oblivious
                         to where the signal comes from. */}
                     <StorageBanner health={storageHealth} />
-                    {/* A newer build parks in "waiting"; this offers it as a prompt
-                        rather than letting it swap in mid-interaction. */}
-                    <UpdateBanner
-                        updateReady={updateReady}
-                        updateBroken={updateBroken}
-                        onReload={applyUpdate}
-                    />
+                    {/* A newer build takes over by itself at the next boundary, so there
+                        is nothing to announce. What is worth saying is the opposite: this
+                        device can no longer receive updates at all. */}
+                    <UpdateBanner updateBroken={updateBroken} />
                     {/* iOS is decided at this composition root and passed down, so
                         the hint component reads no browser global of its own. */}
                     <SoundHint iosLike={iosLike} inAppBrowser={inAppBrowser} />

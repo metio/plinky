@@ -1,8 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "update_available": "Uusi Plinky odottaa, kun ehdit.",
   "update_broken": "Päivityksiä ei voi juuri nyt asentaa tälle laitteelle — sovellus toimii silti, ja myöhempi uudelleenlataus yrittää uudelleen.",
-  "update_reload": "Lataa uudelleen",
   "feature_broken": "Tämä osa lakkasi toimimasta. Kaikki muu sivulla on kunnossa.",
   "action_try_again": "Yritä uudelleen",
   "action_report_problem": "Ilmoita ongelmasta",

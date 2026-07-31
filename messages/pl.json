@@ -1,8 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "update_available": "Nowa wersja Plinky czeka, aż będziesz gotowy.",
   "update_broken": "Aktualizacji nie można teraz zainstalować na tym urządzeniu — aplikacja nadal działa, a późniejsze przeładowanie spróbuje ponownie.",
-  "update_reload": "Załaduj ponownie",
   "feature_broken": "Ta część przestała działać. Wszystko inne na stronie działa dalej.",
   "action_try_again": "Spróbuj ponownie",
   "action_report_problem": "Zgłoś problem",

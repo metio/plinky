@@ -7,7 +7,7 @@ import { ComposeControls } from "../components/features/composeControls";
 import { ComposeExportBar } from "../components/features/composeExportBar";
 import { ComposeSettings } from "../components/features/composeSettings";
 import { ComposeStage } from "../components/features/composeStage";
-import { useOnboardingStore } from "../contexts/services";
+import { useOnboardingStore, useServices } from "../contexts/services";
 import { useFullscreen } from "../hooks/useFullscreen";
 import { useComposeFile } from "../hooks/useComposeFile";
 import { useCompositionExport } from "../hooks/useCompositionExport";
@@ -54,6 +54,18 @@ export default function Compose() {
             setKeyWindow((prev) => followKeyboardWindow(prev, note, KEYBOARD_SPAN, COMPOSE_REACH)),
     });
     const { notes } = recorder;
+
+    // A take exists only in this page's memory until it is downloaded or shared, so the
+    // app counts as busy while one is on the staff: an update that reloaded the page
+    // underneath it would take the composition with it, and unlike a practice run there
+    // is nothing on disk to fall back to.
+    const { activity } = useServices();
+    useEffect(() => {
+        if (notes.length === 0) {
+            return;
+        }
+        return activity.begin();
+    }, [notes.length, activity]);
 
     const transport = useCompositionTransport({
         notes,

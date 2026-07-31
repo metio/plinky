@@ -1,8 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "update_available": "En ny versjon av Plinky venter når du er klar.",
   "update_broken": "Oppdateringer kan ikke installeres på denne enheten akkurat nå — appen fungerer fortsatt, og en senere ny innlasting prøver igjen.",
-  "update_reload": "Last inn på nytt",
   "feature_broken": "Denne delen sluttet å virke. Alt annet på siden er som det skal.",
   "action_try_again": "Prøv igjen",
   "action_report_problem": "Rapporter problemet",

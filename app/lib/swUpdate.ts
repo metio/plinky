@@ -49,6 +49,16 @@ export type SwUpdateWatcher = {
     // that silently stops updating is undebuggable from the outside.
     registrationFailed(): boolean;
     applyUpdate(): void;
+    // Take a waiting build, but only if nothing is in progress. Returns whether it
+    // started.
+    //
+    // This is what the natural boundaries call — a route change, or coming back to a
+    // backgrounded tab — rather than applyUpdate. Telling the waiting worker to take
+    // over hands the page to a new cache while the old page is still running, so the
+    // gap between that and the reload wants to be as short as possible; it only is when
+    // we are not about to park the reload behind a run. Busy means try again at the
+    // next boundary, which costs nothing.
+    applyIfIdle(): boolean;
     // Fires a reload that was parked behind env.holdReload, if the hold has
     // cleared; otherwise a no-op. Safe to call on every hold change.
     flushReload(): void;
@@ -197,7 +207,18 @@ export function createSwUpdateWatcher(container: SwContainer, env: SwEnv): SwUpd
             .catch(() => finish(null));
     };
 
+    // Apply only when nothing is in progress; see the type's note on why the boundaries
+    // use this rather than applyUpdate.
+    const applyIfIdle = () => {
+        if (!updateReady || env.holdReload?.()) {
+            return false;
+        }
+        applyUpdate();
+        return true;
+    };
+
     return {
+        applyIfIdle,
         subscribe(onChange) {
             listeners.add(onChange);
             return () => {

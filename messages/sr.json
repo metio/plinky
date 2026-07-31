@@ -1,8 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "update_available": "Нова верзија Plinky-ја те чека, кад год пожелиш.",
   "update_broken": "Ажурирања тренутно не могу да се инсталирају на овом уређају — апликација и даље ради, а касније поновно учитавање ће покушати поново.",
-  "update_reload": "Поново учитај",
   "feature_broken": "Овај део је престао да ради. Све остало на страници је у реду.",
   "action_try_again": "Пробај поново",
   "action_report_problem": "Пријави проблем",
