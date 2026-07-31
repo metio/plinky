@@ -703,6 +703,7 @@
   "glossary_example_unavailable": "Este exemplo não pode ser desenhado neste momento.",
   "meta_glossary_description": "Um glossário de notação musical: o que significa cada sinal de uma partitura, com um exemplo que podes ouvir.",
   "help_glossary_lead": "Cada sinal que encontras numa partitura está explicado em",
+  "help_basics_lead": "Nunca tocaste piano? Começa por",
   "glossary_category_length": "Quanto tempo dura",
   "glossary_category_touch": "Como a tocas",
   "glossary_category_loudness": "Quão forte soa",

@@ -703,6 +703,7 @@
   "glossary_example_unavailable": "Овај пример тренутно не може да се нацрта.",
   "meta_glossary_description": "Речник нотног записа: шта значи свака ознака у нотама, уз пример који можеш да послушаш.",
   "help_glossary_lead": "Свака ознака на коју наилазиш у нотама објашњена је у",
+  "help_basics_lead": "Ниси никад свирао клавир? Почни са",
   "glossary_category_length": "Колико дуго траје",
   "glossary_category_touch": "Како је одсвираш",
   "glossary_category_loudness": "Колико је гласна",

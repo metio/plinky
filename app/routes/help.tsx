@@ -111,6 +111,16 @@ export default function Help() {
                 </Link>
             </p>
 
+            {/* The keyboard tour's only other door is the home checklist, which goes away
+                once it is dismissed or finished — so this is where it stays findable, and
+                where someone comes back to it having forgotten where middle C was. */}
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+                {m.help_basics_lead()}{" "}
+                <Link to="/basics/" className={linkClasses}>
+                    {m.basics_title()}
+                </Link>
+            </p>
+
             {SECTIONS.map(({ key, title }) => {
                 const blocks = itemsForPage(items, key);
                 return (

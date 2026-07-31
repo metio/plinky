@@ -703,6 +703,7 @@
   "glossary_example_unavailable": "この例は今は描けません。",
   "meta_glossary_description": "楽譜記号の用語集。楽譜のそれぞれの記号が何を意味するかを、聴ける例とともに。",
   "help_glossary_lead": "楽譜で出会う記号はすべてこちらで説明しています:",
+  "help_basics_lead": "ピアノを弾いたことがない？ まずはこちらから:",
   "glossary_category_length": "どのくらい伸ばすか",
   "glossary_category_touch": "どう触れるか",
   "glossary_category_loudness": "どのくらいの強さか",

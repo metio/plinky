@@ -703,6 +703,7 @@
   "glossary_example_unavailable": "Ezt a példát most nem lehet kirajzolni.",
   "meta_glossary_description": "A kottaírás szótára: mit jelent a kotta minden jele, meghallgatható példával.",
   "help_glossary_lead": "Minden jel, amivel a kottában találkozol, el van magyarázva itt:",
+  "help_basics_lead": "Még sosem zongoráztál? Kezdd ezzel:",
   "glossary_category_length": "Meddig szól",
   "glossary_category_touch": "Hogyan ütöd le",
   "glossary_category_loudness": "Milyen hangos",

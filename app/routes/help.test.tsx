@@ -8,6 +8,7 @@ import { MemoryRouter } from "react-router";
 import type { HelpItem } from "../../core/help";
 import { fakeHelp } from "../adapters/fakeHelp";
 import { renderWithServices } from "../testing/renderWithServices";
+import { m } from "../paraglide/messages.js";
 import Help from "./help";
 
 afterEach(cleanup);
@@ -65,6 +66,25 @@ describe("Help", () => {
             expect(screen.getAllByText("Help for this area is on the way.").length).toBeGreaterThan(
                 0,
             ),
+        );
+    });
+
+    it("keeps a door to the keyboard tour and the glossary", async () => {
+        // The tour's only other link is the home checklist, which goes away once it is
+        // dismissed or finished — so without this, /basics becomes unreachable and there
+        // is no way back to it having forgotten where middle C was.
+        renderWithServices(
+            <MemoryRouter>
+                <Help />
+            </MemoryRouter>,
+            { help: fakeHelp() },
+        );
+
+        expect(screen.getByRole("link", { name: m.basics_title() }).getAttribute("href")).toBe(
+            "/en/basics/",
+        );
+        expect(screen.getByRole("link", { name: m.glossary_title() }).getAttribute("href")).toBe(
+            "/en/glossary/",
         );
     });
 });

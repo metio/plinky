@@ -703,6 +703,7 @@
   "glossary_example_unavailable": "Cet exemple ne peut pas être dessiné pour le moment.",
   "meta_glossary_description": "Un glossaire du solfège : ce que veut dire chaque signe d'une partition, avec un exemple à écouter.",
   "help_glossary_lead": "Chaque signe que tu croises dans une partition est expliqué dans",
+  "help_basics_lead": "Jamais joué de piano ? Commence par",
   "glossary_category_length": "Combien de temps ça dure",
   "glossary_category_touch": "Comment tu la joues",
   "glossary_category_loudness": "À quel point c'est fort",

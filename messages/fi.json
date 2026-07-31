@@ -703,6 +703,7 @@
   "glossary_example_unavailable": "Tätä esimerkkiä ei voi juuri nyt piirtää.",
   "meta_glossary_description": "Nuotinkirjoituksen sanasto: mitä jokainen nuottien merkki tarkoittaa, kuunneltavan esimerkin kanssa.",
   "help_glossary_lead": "Jokainen nuoteissa vastaan tuleva merkki selitetään täällä:",
+  "help_basics_lead": "Etkö ole koskaan soittanut pianoa? Aloita tästä:",
   "glossary_category_length": "Kuinka kauan kestää",
   "glossary_category_touch": "Miten kosketat sitä",
   "glossary_category_loudness": "Kuinka voimakas se on",
