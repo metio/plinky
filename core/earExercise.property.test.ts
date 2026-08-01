@@ -5,6 +5,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
     CHORD_LEVELS,
+    type EarExerciseId,
     DEFAULT_HIGHEST,
     DEFAULT_LOWEST,
     type IntervalDirection,
@@ -420,5 +421,46 @@ describe("functional exercise properties (a cadence sets the key)", () => {
                 });
             }),
         );
+    });
+});
+
+describe("a question owns its choices", () => {
+    const EXERCISES: EarExerciseId[] = [
+        "perfect-pitch",
+        "intervals",
+        "chords",
+        "scales",
+        "progressions",
+        "scale-degrees",
+        "intervals-context",
+        "melodic-dictation",
+    ];
+
+    it("never hands out a level constant for a caller to edit", () => {
+        // A surface is free to sort or shuffle the choices it was given; doing so must
+        // not reorder the ladder every later question is drawn from.
+        const ladders = [INTERVAL_LEVELS, SCALE_DEGREE_LEVELS, CHORD_LEVELS, SCALE_LEVELS];
+        const before = ladders.map((ladder) => ladder.map((level) => [...level]));
+        for (const exercise of EXERCISES) {
+            const question = generateQuestion(exercise, 1, () => 0.5);
+            const choices = question.choices as unknown[];
+            choices.reverse();
+            choices.length = 0;
+        }
+        expect(ladders.map((ladder) => ladder.map((level) => [...level]))).toEqual(before);
+    });
+
+    it("still offers every part of the answer", () => {
+        for (const exercise of EXERCISES) {
+            for (let seed = 1; seed <= 20; seed++) {
+                const question = generateQuestion(exercise, 1, () => (seed % 17) / 17);
+                const choices = question.choices as readonly string[];
+                const parts =
+                    "sequence" in question ? (question.sequence as string[]) : [question.answer];
+                for (const part of parts) {
+                    expect(choices).toContain(part);
+                }
+            }
+        }
     });
 });

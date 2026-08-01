@@ -489,7 +489,12 @@ export function generateScaleDegree(
         velocity: VELOCITY,
         duration: NOTE_SECONDS,
     };
-    return { kind: "scale-degrees", notes: [...cadence.notes, note], answer, choices: degrees };
+    return {
+        kind: "scale-degrees",
+        notes: [...cadence.notes, note],
+        answer,
+        choices: [...degrees],
+    };
 }
 
 export function generateIntervalContext(
@@ -511,7 +516,12 @@ export function generateIntervalContext(
         { note: root, at: start, velocity: VELOCITY, duration: NOTE_SECONDS },
         { note: root + semitones, at: start + MELODIC_GAP, velocity: VELOCITY, duration: NOTE_SECONDS },
     ];
-    return { kind: "intervals-context", notes: [...cadence.notes, ...notes], answer, choices: intervals };
+    return {
+        kind: "intervals-context",
+        notes: [...cadence.notes, ...notes],
+        answer,
+        choices: [...intervals],
+    };
 }
 
 export function generateMelodic(config: MelodicConfig, rng: () => number): MelodicQuestion {
@@ -537,7 +547,7 @@ export function generateMelodic(config: MelodicConfig, rng: () => number): Melod
         notes: [...cadence.notes, ...melody],
         answer: sequence.join("-"),
         sequence,
-        choices: DIATONIC_DEGREES,
+        choices: [...DIATONIC_DEGREES],
     };
 }
 

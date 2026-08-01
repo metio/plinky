@@ -5,8 +5,11 @@ import { describe, expect, it } from "vitest";
 import {
     buildExerciseId,
     EXERCISE_TILES,
+    type ExerciseConfig,
     exerciseTitle,
     generateExercise,
+    type Hands,
+    type Interval,
     parseExerciseId,
 } from "./exerciseGen";
 import { songId } from "./songId";
@@ -214,5 +217,106 @@ describe("generateExercise", () => {
         // The double stop prints the upper note as a <chord/>.
         expect(xml).toContain("<chord/>");
         expect(xml).toContain("<step>E</step>");
+    });
+});
+
+describe("an id names the exercise, not the route taken to it", () => {
+    const scale: ExerciseConfig = {
+        type: "major-scale",
+        key: "c",
+        octaves: 1,
+        hands: "right",
+        inversion: 0,
+        interval: "single",
+    };
+
+    it("drops a double stop that contrary motion has no version of", () => {
+        // Walking the form — choose "in thirds", then "contrary motion" — leaves the
+        // interval set on a config that no longer has a use for it.
+        const viaThirds = { ...scale, interval: "thirds" as const, hands: "contrary" as const };
+        const direct = { ...scale, hands: "contrary" as const };
+        expect(buildExerciseId(viaThirds)).toBe(buildExerciseId(direct));
+        expect(generateExercise(viaThirds)).toBe(generateExercise(direct));
+    });
+
+    it("does not advertise a form the notes do not contain", () => {
+        const viaThirds = { ...scale, interval: "thirds" as const, hands: "contrary" as const };
+        expect(exerciseTitle(viaThirds)).not.toContain("thirds");
+        expect(exerciseTitle(viaThirds)).toBe(exerciseTitle({ ...scale, hands: "contrary" }));
+    });
+
+    it("drops an inversion a scale has no version of", () => {
+        const inverted = { ...scale, inversion: 2 as const };
+        expect(buildExerciseId(inverted)).toBe(buildExerciseId(scale));
+        expect(exerciseTitle(inverted)).not.toContain("inversion");
+    });
+
+    it("drops contrary motion an arpeggio has no version of", () => {
+        const arpeggio: ExerciseConfig = { ...scale, type: "major-arpeggio" };
+        const contrary = { ...arpeggio, hands: "contrary" as const };
+        expect(buildExerciseId(contrary)).toBe(buildExerciseId({ ...arpeggio, hands: "both" }));
+    });
+
+    it("keeps the dials that do apply", () => {
+        expect(buildExerciseId({ ...scale, interval: "thirds" })).toBe("scale-c-major.1rt");
+        expect(
+            buildExerciseId({ ...scale, type: "major-arpeggio", inversion: 2 }),
+        ).toBe("arpeggio-c-major.1ri2");
+        expect(buildExerciseId({ ...scale, hands: "contrary" })).toBe("scale-c-major.1c");
+    });
+
+    it("resolves a hand-written id to the nearest real exercise", () => {
+        // An inversion of a scale: playable, but not a form this exercise has.
+        const parsed = parseExerciseId("scale-c-major.1ri1");
+        expect(parsed?.inversion).toBe(0);
+        expect(buildExerciseId(parsed!)).toBe("scale-c-major");
+    });
+
+    it("gives every distinct score a distinct id", () => {
+        const byId = new Map<string, string>();
+        const collisions: string[] = [];
+        for (const tile of EXERCISE_TILES) {
+            for (const octaves of [1, 2] as const) {
+                for (const hands of ["right", "left", "both", "contrary"] as Hands[]) {
+                    for (const inversion of [0, 1, 2] as const) {
+                        for (const interval of ["single", "thirds", "sixths"] as Interval[]) {
+                            const config = { ...tile, octaves, hands, inversion, interval };
+                            const id = buildExerciseId(config);
+                            const xml = generateExercise(config);
+                            const seen = byId.get(id);
+                            if (seen === undefined) {
+                                byId.set(id, xml);
+                            } else if (seen !== xml) {
+                                collisions.push(id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        expect([...new Set(collisions)].slice(0, 5)).toEqual([]);
+    });
+
+    it("gives every distinct id a distinct score", () => {
+        const byScore = new Map<string, string>();
+        const duplicates: string[] = [];
+        for (const tile of EXERCISE_TILES) {
+            for (const hands of ["right", "left", "both", "contrary"] as Hands[]) {
+                for (const inversion of [0, 1, 2] as const) {
+                    for (const interval of ["single", "thirds", "sixths"] as Interval[]) {
+                        const config = { ...tile, octaves: 1 as const, hands, inversion, interval };
+                        const id = buildExerciseId(config);
+                        const xml = generateExercise(config);
+                        const seen = byScore.get(xml);
+                        if (seen === undefined) {
+                            byScore.set(xml, id);
+                        } else if (seen !== id) {
+                            duplicates.push(`${seen} === ${id}`);
+                        }
+                    }
+                }
+            }
+        }
+        expect([...new Set(duplicates)].slice(0, 5)).toEqual([]);
     });
 });

@@ -305,12 +305,29 @@ ${bodies}
 }
 
 const isScale = (type: ExerciseType): boolean => type.endsWith("-scale");
-// Contrary motion — right ascending, left descending from the same tonic — is a mirror
-// of the same line, which is defined only for scales. An arpeggio has no such contrary
-// form, so it falls back to both hands in parallel; normalising here keeps the rendered
-// score and its title in agreement and avoids doubling the treble line onto the bass staff.
-const effectiveHands = (config: ExerciseConfig): Hands =>
-    config.hands === "contrary" && !isScale(config.type) ? "both" : config.hands;
+
+// The config with every dial that does not apply to this exercise returned to its
+// default, so the id, the title and the notes always describe the same thing.
+//
+// The dials are not independent: an inversion means nothing to a scale, a double stop
+// means nothing to an arpeggio or to contrary motion, and contrary motion means nothing
+// to an arpeggio (which has no mirror form, so it plays both hands in parallel). The
+// generator has always ignored the inapplicable ones — but the title read them anyway,
+// and the id encoded them, so choosing "in thirds" and then "contrary motion" produced
+// a second id for an exercise already reachable under another, and a title advertising
+// thirds the score does not contain. Normalising once, at the edge, is what makes the id
+// a name for the exercise rather than for the route taken to it.
+function normalizeExercise(config: ExerciseConfig): ExerciseConfig {
+    const hands: Hands =
+        config.hands === "contrary" && !isScale(config.type) ? "both" : config.hands;
+    return {
+        ...config,
+        hands,
+        inversion: isArpeggio(config.type) ? config.inversion : 0,
+        interval:
+            supportsIntervals(config.type) && hands !== "contrary" ? config.interval : "single",
+    };
+}
 function context(type: ExerciseType, key: string): { tonic: string; fifths: number } {
     const minor =
         type === "natural-minor-scale" ||
@@ -321,22 +338,26 @@ function context(type: ExerciseType, key: string): { tonic: string; fifths: numb
     return { tonic, fifths };
 }
 
-export function generateExercise(config: ExerciseConfig): string {
+export function generateExercise(raw: ExerciseConfig): string {
+    const config = normalizeExercise(raw);
     const { tonic, fifths } = context(config.type, config.key);
     const fx = config.type === "chromatic-scale" ? 0 : fifths;
     const line = isScale(config.type)
         ? scaleLine(config.type, tonic, fx, config.octaves)
         : arpeggioLine(config.type, tonic, fx, config.octaves, config.inversion);
-    // Double stops apply to the supported scales, but not in contrary motion.
-    const useInterval =
-        config.interval !== "single" &&
-        supportsIntervals(config.type) &&
-        config.hands !== "contrary";
-    const main: Note[][] = useInterval
-        ? doubleStops(config.type, tonic, fx, config.octaves, config.interval === "thirds" ? 2 : 5)
-        : line.map((note) => [note]);
+    // Normalisation has already cleared the interval wherever double stops do not apply.
+    const main: Note[][] =
+        config.interval !== "single"
+            ? doubleStops(
+                  config.type,
+                  tonic,
+                  fx,
+                  config.octaves,
+                  config.interval === "thirds" ? 2 : 5,
+              )
+            : line.map((note) => [note]);
     const title = exerciseTitle(config);
-    const hands = effectiveHands(config);
+    const hands = config.hands;
     let parts: Part[];
     if (hands === "left") {
         parts = [{ id: "P1", clef: "F", positions: shiftPositions(main, -2) }];
@@ -372,9 +393,10 @@ const SCALE_LABEL: Record<string, string> = {
     "dim7-arpeggio": "diminished 7th arpeggio",
 };
 
-export function exerciseTitle(config: ExerciseConfig): string {
+export function exerciseTitle(raw: ExerciseConfig): string {
+    const config = normalizeExercise(raw);
     const parts = [`${niceKey(config.key)} ${SCALE_LABEL[config.type]}`];
-    const hands = effectiveHands(config);
+    const hands = config.hands;
     const forms: string[] = [];
     if (config.interval === "thirds") forms.push("in thirds");
     if (config.interval === "sixths") forms.push("in sixths");
@@ -408,7 +430,11 @@ const CODE_HAND: Record<string, Hands> = { r: "right", l: "left", b: "both", c: 
 const INTERVAL_CODE: Record<Interval, string> = { single: "", thirds: "t", sixths: "s" };
 const CODE_INTERVAL: Record<string, Interval> = { t: "thirds", s: "sixths" };
 
-export function buildExerciseId(config: ExerciseConfig): string {
+// The exercise's name. Normalised first, so two configs that generate the same score
+// share one id — and, because the slot after the hand carries either an inversion or an
+// interval and never both, so two that generate DIFFERENT scores never can.
+export function buildExerciseId(raw: ExerciseConfig): string {
+    const config = normalizeExercise(raw);
     const [kind, mode] = TYPE_TO_PARTS[config.type];
     const base = `${kind}-${config.key}-${mode}`;
     const canonical =
@@ -467,7 +493,11 @@ export function parseExerciseId(id: string): ExerciseConfig | null {
         inversion = (match[3] ? Number(match[3]) : 0) as 0 | 1 | 2;
         interval = match[4] ? CODE_INTERVAL[match[4]]! : "single";
     }
-    return { type, key, octaves, hands, inversion, interval };
+    // A hand-written id may name a form the exercise has no version of — an inversion of
+    // a scale, contrary motion on an arpeggio. It resolves to the nearest real exercise
+    // rather than to nothing, so the link still opens something playable, and building an
+    // id back from the result yields that exercise's own canonical name.
+    return normalizeExercise({ type, key, octaves, hands, inversion, interval });
 }
 
 // The browsable tiles: one per (type, key) in its canonical form.
