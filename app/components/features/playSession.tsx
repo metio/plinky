@@ -13,7 +13,6 @@ import {
     useSyncExternalStore,
 } from "react";
 import { beamsVisible } from "../../../core/beams";
-import { cadence } from "../../../core/cadence";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
@@ -27,7 +26,6 @@ import {
     type RunCapture,
     startCapture,
 } from "../../../core/runCapture";
-import { deriveRunOutcome } from "../../../core/runOutcome";
 import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
@@ -53,6 +51,7 @@ import { useMetronome } from "../../hooks/useMetronome";
 import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
+import { useRunGrading } from "../../hooks/useRunGrading";
 import { useRunResult } from "../../hooks/useRunResult";
 import {
     collectSteps,
@@ -69,8 +68,6 @@ import { useTempoControls } from "../../hooks/useTempoControls";
 import { cursorWhole, seekToBar } from "../../lib/scoreCursor";
 import { ASSISTED_COLOR, PLAYED_COLOR } from "../../../core/scoreCanvas";
 import { paintPlayedNotes } from "../../lib/scoreColor";
-import { sectionScores } from "../../../core/sectionBest";
-import { recordRun } from "../../lib/recordRun";
 import { FullscreenProvider, useMidiConnected } from "./conditional";
 import { useTranspose } from "./transposeContext";
 
@@ -135,23 +132,10 @@ function usePlaySessionValue({
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const gradePanelRef = useRef<HTMLDivElement>(null);
-    // True only once a run finishes this session, so the result scroll fires on
-    // completion but not when the grade is seeded from a saved result on mount.
-    const gradeFromRunRef = useRef(false);
-    // Latches a completed run's grading so its side effects (history, lifetime,
-    // ghost, mastery, daily, cadence) land exactly once. The completion effect
-    // depends on inputs — like an onRunComplete callback the parent re-creates each
-    // render — whose identity can churn while `matcher.complete` stays true; a
-    // re-fire without this latch would double-count the run. Reset at run start.
-    const gradedRef = useRef(false);
     // Latches the auto-save of the finished run's take, separate from grading: the take is
     // saved only once the final note is released, so its recorded length is the real hold
     // rather than the beat the run completed on. Reset at run start.
     const takeSavedRef = useRef(false);
-    // The finished run's grade, stashed for the deferred take-save: grading records into
-    // runResult a render later, so the save (which can run in the same commit) reads it here
-    // instead of the not-yet-updated runResult.grade.
-    const finishedGradeRef = useRef<Grade | null>(null);
     // Claims the current attempt to start a run: a sight-read's study countdown lets
     // the player act again before the run begins, and only the newest press may start.
     const practiceSeqRef = useRef(0);
@@ -736,6 +720,43 @@ function usePlaySessionValue({
         silenceEcho,
     });
 
+    // Re-centre the treadmill as the matcher advances through the piece — the cursor
+    // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: done/practicing are the advance signal, not centerCursor inputs
+    useEffect(() => {
+        centerCursor();
+    }, [centerCursor, matcher.done, matcher.practicing]);
+
+    // Grade a run once it completes. The whole decision lives in useRunGrading, which
+    // needs none of the surface — only the matcher's counters and the capture — so a
+    // finished run can be driven through it in a test without a rendered staff.
+    const grading = useRunGrading({
+        complete: matcher.complete,
+        correct: matcher.total,
+        wrong: matcher.wrong,
+        capture: captureRef,
+        runTempo: runTempoRef,
+        intendedTempo: initialTempo,
+        partial: partialRunRef,
+        id,
+        title,
+        daily,
+        ephemeral,
+        assessment,
+        looped: loop.on,
+        sightReading: sightRead.on,
+        atTempo: enforceTempo,
+        services,
+        analytics,
+        playNote: synth.playNote,
+        publishMilestone,
+        recordResult: runResult.record,
+        bumpTempo,
+        adoptOwnRun: ghostRace.adoptOwnRun,
+        onGraded,
+        onRunComplete,
+    });
+
     // When a run finishes, bring the result into view: the player's eyes are on the
     // keyboard, and the grade renders below it (and below the whole score on the way
     // out of full screen), so it can otherwise land off-screen unnoticed. Honour
@@ -743,7 +764,7 @@ function usePlaySessionValue({
     // Re-opening a finished daily seeds the grade on mount; that must not yank the
     // page down, so scroll only for a run completed in this session.
     useEffect(() => {
-        if (!runResult.grade || !gradeFromRunRef.current) {
+        if (!runResult.grade || !grading.fromRun()) {
             return;
         }
         const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -754,140 +775,7 @@ function usePlaySessionValue({
             });
         });
         return () => scheduler.cancelFrame(frame);
-    }, [runResult.grade, scheduler]);
-
-    // Re-centre the treadmill as the matcher advances through the piece — the cursor
-    // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: done/practicing are the advance signal, not centerCursor inputs
-    useEffect(() => {
-        centerCursor();
-    }, [centerCursor, matcher.done, matcher.practicing]);
-
-    // Grade a run once it completes, from the captured timing and velocity. A run
-    // with no real velocity variation (the computer keyboard) is graded without
-    // dynamics rather than crediting a constant. Timing is judged against the
-    // player's own pace (so a steady run at any tempo reads as in time) with windows
-    // widened for imprecise input (on-screen / computer keyboard).
-    useEffect(() => {
-        if (!matcher.complete || gradedRef.current) {
-            return;
-        }
-        gradedRef.current = true;
-        // Grade the run from its cleared notes' timing and velocity — none of which needs the
-        // final note's key-up. The take (which does need the real hold) is saved separately
-        // once the last note is released, so the grade and stats land now while a held note
-        // still rings.
-        const notes = captureRef.current.notes;
-        // Everything the finished run shows and records — the grade, the timing tolerance,
-        // the per-hand share grid and the tempo curve — is a pure function of the played
-        // notes. The component only produces the run; deriveRunOutcome scores it.
-        // The run's pace against the piece's own, on the same footing the share grid
-        // scores speed with.
-        const intended = initialTempo ?? runTempoRef.current;
-        const gradedTempoScale = intended > 0 ? runTempoRef.current / intended : 1;
-        const outcome = deriveRunOutcome({
-            notes,
-            correct: matcher.total,
-            wrong: matcher.wrong,
-            imprecise: captureRef.current.imprecise,
-            intendedTempo: initialTempo ?? runTempoRef.current,
-            runTempo: runTempoRef.current,
-        });
-        gradeFromRunRef.current = true;
-        finishedGradeRef.current = outcome.grade;
-        runResult.record({ ...outcome, notes });
-        // The finish half of the run funnel: which grade a completed self-paced run
-        // earned, and how clean it was, against the run_started that opened it.
-        analytics.track("run_completed", {
-            mode: "self_paced",
-            grade: outcome.grade.letter,
-            correct: matcher.total,
-            wrong: matcher.wrong,
-            daily: daily !== undefined,
-        });
-        // A short major flourish to celebrate finishing — a fuller arpeggio for a
-        // stronger grade, a gentle lift for a weaker one, never a penalty. playNote
-        // no-ops when sound is muted, so the mute checkbox is the gate.
-        for (const beat of cadence(outcome.grade.letter)) {
-            synth.playNote(beat.note, {
-                velocity: beat.velocity,
-                duration: beat.duration,
-                delay: beat.at,
-            });
-        }
-        // A finished run nudges the tempo trainer up for the next attempt.
-        bumpTempo();
-        // React to the finished run: record it in every store that remembers a run and
-        // surface any earned moment. The component only produces the run; recordRun writes
-        // it. It hands back the onsets when they become this score's new ghost, so the
-        // share button's mirror can follow.
-        const { ghost: newGhost } = recordRun(
-            {
-                id,
-                title,
-                daily,
-                ephemeral,
-                partial: partialRunRef.current,
-                looped: loop.on,
-                assessment,
-                // Scored on the same terms the share grid uses, so "your best section"
-                // and the grid's cells can never disagree about how a moment went.
-                sections: sectionScores(notes, {
-                    tolerance: outcome.tolerance,
-                    tempoScale: gradedTempoScale,
-                }),
-                notes,
-                correct: matcher.total,
-                grade: outcome.grade,
-                grid: outcome.grid,
-                tolerance: outcome.tolerance,
-            },
-            services,
-            Date.now(),
-            publishMilestone,
-        );
-        if (newGhost) {
-            ghostRace.adoptOwnRun(newGhost);
-        }
-        // A sight-read is remembered apart from mastery: mastery tracks the best a piece
-        // has ever been played, this records how it went the one time it was new. Only a
-        // full run counts — a takeover from Listen has already been read to you — and the
-        // store keeps the first, so a second read never overwrites it.
-        if (sightRead.on && !ephemeral && !partialRunRef.current) {
-            services.sightReads.record(id, {
-                score: outcome.grade.score,
-                letter: outcome.grade.letter,
-                atTempo: enforceTempo,
-                playedAt: Date.now(),
-            });
-        }
-        onGraded?.(outcome.grade);
-        if (!ephemeral) {
-            onRunComplete?.();
-        }
-    }, [
-        matcher.complete,
-        matcher.total,
-        matcher.wrong,
-        id,
-        title,
-        onRunComplete,
-        onGraded,
-        ephemeral,
-        assessment,
-        daily,
-        initialTempo,
-        bumpTempo,
-        synth,
-        services,
-        publishMilestone,
-        ghostRace.adoptOwnRun,
-        runResult.record,
-        analytics,
-        sightRead.on,
-        enforceTempo,
-        loop.on,
-    ]);
+    }, [runResult.grade, scheduler, grading]);
 
     // Keep the finished run as a take without a separate Save press — finishing a song and
     // later finding Runs empty reads as data loss. This waits until the last note is released
@@ -903,7 +791,7 @@ function usePlaySessionValue({
         }
         takeSavedRef.current = true;
         flushHolds(captureRef.current, scheduler.now());
-        saveTake(finishedGradeRef.current);
+        saveTake(grading.finishedGrade());
     }, [matcher.complete, holdingNote, ephemeral]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
@@ -933,7 +821,7 @@ function usePlaySessionValue({
             if (matcher.complete && !ephemeral && !takeSavedRef.current) {
                 takeSavedRef.current = true;
                 flushHolds(captureRef.current, scheduler.now());
-                saveTake(finishedGradeRef.current);
+                saveTake(grading.finishedGrade());
             }
             // A tempo-locked play-along drives the cursor from its own timers and funnels
             // every note into the run; without tearing it down here, leaving full screen
@@ -1096,7 +984,7 @@ function usePlaySessionValue({
         if (matcher.complete && !ephemeral && !takeSavedRef.current) {
             takeSavedRef.current = true;
             flushHolds(captureRef.current, scheduler.now());
-            saveTake(finishedGradeRef.current);
+            saveTake(grading.finishedGrade());
         }
         // Take over at the cursor's current position when resuming (handing over from
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
@@ -1119,8 +1007,7 @@ function usePlaySessionValue({
         if (pedalHeld("sustain")) {
             capturePedal(captureRef.current, true, scheduler.now());
         }
-        gradeFromRunRef.current = false;
-        gradedRef.current = false;
+        grading.reset();
         stumbledRef.current.clear();
         takeSavedRef.current = false;
         keepUp.clearResult();
