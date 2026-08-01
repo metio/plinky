@@ -17,7 +17,6 @@ import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
-import { holdScaleFor, isPreciseInput, MIC_DEVICE } from "../../../core/midi";
 import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
@@ -45,6 +44,7 @@ import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useEndRun } from "../../hooks/useEndRun";
 import { useLatestPress } from "../../hooks/useLatestPress";
+import { useNoteFunnel } from "../../hooks/useNoteFunnel";
 import { useRunGrading } from "../../hooks/useRunGrading";
 import { useRunRecorder } from "../../hooks/useRunRecorder";
 import { useTakeAutosave } from "../../hooks/useTakeAutosave";
@@ -536,7 +536,7 @@ function usePlaySessionValue({
                 // pitch's key is already up. Pressing a voice for that pitch would open one
                 // with no key-up left to release it — it would ring on forever.
                 for (const pitch of info.pitches) {
-                    if (heldNotes.current.has(pitch)) {
+                    if (funnel.isHeld(pitch)) {
                         synth.pressNote(pitch, { velocity: info.velocity });
                     }
                 }
@@ -582,56 +582,18 @@ function usePlaySessionValue({
     // Keys the player is holding down right now. A finished run defers leaving full
     // screen while any of these ring, so the last note plays out for as long as it is
     // held instead of being cut off the instant the run completes.
-    const heldNotes = useRef(new Set<number>());
-    const [holdingNote, setHoldingNote] = useState(false);
-    const syncHolding = useCallback(() => setHoldingNote(heldNotes.current.size > 0), []);
-    useMidiInput({
-        onNoteOn: (event) => {
-            // A play-along run owns the input: notes are caught against the clock, not fed
-            // to the self-paced matcher.
-            if (keepUp.active()) {
-                keepUp.registerNote(event.note);
-                return;
-            }
-            if (!isPreciseInput(event.device)) {
-                recorder.markImprecise();
-            }
-            // The mic's note-off is the detector's own timing, never a real key lift, so a
-            // mic note would stick in the held set and hold full screen open forever. Only
-            // keyed input, which releases cleanly, defers the exit.
-            if (event.device !== MIC_DEVICE) {
-                heldNotes.current.add(event.note);
-                syncHolding();
-            }
-            matcher.registerNote(event.note, event.timestamp, event.velocity);
-        },
-        // A released key ends its live voice and fills in the run note's real hold length,
-        // so the sound and the recording both follow how long you actually held — a quick
-        // tap plays and records staccato, a long hold sustains. The microphone is left out:
-        // its note-off is the pitch detector's own timing, too noisy to read as
-        // articulation, and it opened no voice to end.
-        onNoteOff: (event) => {
-            if (event.device === MIC_DEVICE) {
-                return;
-            }
-            // On-screen taps and computer keys ring on a little so a short jab still sounds
-            // musical; a real MIDI key keeps its own articulation (holdScale 1).
-            synth.releaseNote(event.note, holdScaleFor(event.device));
-            heldNotes.current.delete(event.note);
-            syncHolding();
-            recorder.released(event.note, event.timestamp);
-        },
-        // The pedals shape the live sound; the sustain pedal also drives the recording's
-        // damper model, so a pedalled take plays and replays as pedalled (sostenuto and soft
-        // colour the live sound but not the recorded note lengths). No pedal ever touches
-        // the matcher — the key press alone still decides when a note counts.
-        onPedal: (pedal, down, timestamp) => {
-            synth.setPedal(pedal, down);
-            if (pedal === "sustain") {
-                recorder.pedal(down, timestamp);
-            }
-        },
+    const funnel = useNoteFunnel({
+        keepUpActive: keepUp.active,
+        registerKeepUp: keepUp.registerNote,
+        registerNote: matcher.registerNote,
+        markImprecise: recorder.markImprecise,
+        recordRelease: recorder.released,
+        recordPedal: recorder.pedal,
+        releaseVoice: synth.releaseNote,
+        setPedal: synth.setPedal,
     });
+    const holdingNote = funnel.holding;
+    useMidiInput(funnel.listener);
     const connected = useMidiConnected();
 
     // The ghost race — a previous run replayed against the clock on the staff and the
