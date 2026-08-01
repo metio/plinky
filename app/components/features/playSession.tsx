@@ -22,11 +22,10 @@ import {
     captureCleared,
     capturePedal,
     captureRelease,
-    flushHolds,
     type RunCapture,
     startCapture,
 } from "../../../core/runCapture";
-import { compositionFromRun, type RunStep, type Take } from "../../../core/takes";
+import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
@@ -52,6 +51,7 @@ import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useRunGrading } from "../../hooks/useRunGrading";
+import { useTakeAutosave } from "../../hooks/useTakeAutosave";
 import { useRunResult } from "../../hooks/useRunResult";
 import {
     collectSteps,
@@ -132,10 +132,6 @@ function usePlaySessionValue({
     const containerRef = useRef<HTMLDivElement>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const gradePanelRef = useRef<HTMLDivElement>(null);
-    // Latches the auto-save of the finished run's take, separate from grading: the take is
-    // saved only once the final note is released, so its recorded length is the real hold
-    // rather than the beat the run completed on. Reset at run start.
-    const takeSavedRef = useRef(false);
     // Claims the current attempt to start a run: a sight-read's study countdown lets
     // the player act again before the run begins, and only the newest press may start.
     const practiceSeqRef = useRef(0);
@@ -757,6 +753,22 @@ function usePlaySessionValue({
         onRunComplete,
     });
 
+    // Keeping the finished run without a Save press. The hook owns the one-per-run latch
+    // and every way out of a run that still owes a take — see useTakeAutosave for why the
+    // save waits on the last key coming up.
+    const takes = useTakeAutosave({
+        complete: matcher.complete,
+        holdingNote,
+        ephemeral,
+        capture: captureRef,
+        tempo,
+        beatsPerBar,
+        finishedGrade: grading.finishedGrade,
+        save: takesList.save,
+        onSaved: runResult.markSaved,
+        now: scheduler.now,
+    });
+
     // When a run finishes, bring the result into view: the player's eyes are on the
     // keyboard, and the grade renders below it (and below the whole score on the way
     // out of full screen), so it can otherwise land off-screen unnoticed. Honour
@@ -776,23 +788,6 @@ function usePlaySessionValue({
         });
         return () => scheduler.cancelFrame(frame);
     }, [runResult.grade, scheduler, grading]);
-
-    // Keep the finished run as a take without a separate Save press — finishing a song and
-    // later finding Runs empty reads as data loss. This waits until the last note is released
-    // (holdingNote) so the take records the note's real hold, not the beat the run completed
-    // on; a note still down at the finish never received its key-up until now. flushHolds then
-    // finds the release already recorded and is a no-op — it only bites the leave-mid-hold
-    // fallback below, closing the hold at that instant rather than a clipped beat. The result
-    // panel's saved/failed note reflects how the write landed.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: saveTake is a per-render closure; the takeSavedRef latch pins this to one save per run
-    useEffect(() => {
-        if (!matcher.complete || ephemeral || takeSavedRef.current || holdingNote) {
-            return;
-        }
-        takeSavedRef.current = true;
-        flushHolds(captureRef.current, scheduler.now());
-        saveTake(grading.finishedGrade());
-    }, [matcher.complete, holdingNote, ephemeral]);
 
     // Finishing a run leaves full-screen play, so the grade, share card and per-note
     // strip — all hidden while full screen to keep the play surface clean — come into
@@ -818,11 +813,7 @@ function usePlaySessionValue({
             // Leaving with a finished run whose take is still pending (the player stepped out
             // while holding the last note) saves it now, before matcher.stop() clears the
             // completion the deferred save waits on — its hold is closed at this instant.
-            if (matcher.complete && !ephemeral && !takeSavedRef.current) {
-                takeSavedRef.current = true;
-                flushHolds(captureRef.current, scheduler.now());
-                saveTake(grading.finishedGrade());
-            }
+            takes.saveIfOwed();
             // A tempo-locked play-along drives the cursor from its own timers and funnels
             // every note into the run; without tearing it down here, leaving full screen
             // freezes it mid-run and strands note input until Stop.
@@ -927,39 +918,7 @@ function usePlaySessionValue({
         });
     };
 
-    // Save the just-finished run as a take: rebuild a Composition from the captured
-    // steps (their played onsets, pitches and velocity) and store it under this song.
-    // The grade arrives as a parameter because the completion effect saves before the
-    // recorded result has re-rendered into runResult.grade.
-    const saveTake = (grade: Grade | null) => {
-        const steps: RunStep[] = captureRef.current.notes.map((note) => ({
-            pitches: note.pitches,
-            startMs: note.playedMs,
-            velocity: note.velocity,
-            heldMs: note.heldMs,
-            // The notated onset, so a note with no measured hold can't ring
-            // longer than the score says while the player hunts for the next key.
-            targetMs: note.targetMs,
-        }));
-        if (steps.length === 0) {
-            return;
-        }
-        const take: Take = {
-            id: crypto.randomUUID(),
-            createdAt: Date.now(),
-            letter: grade?.letter ?? "",
-            complete: matcher.complete,
-            metrics: grade,
-            composition: compositionFromRun(
-                steps,
-                tempo,
-                beatsPerBar ?? 4,
-                captureRef.current.imprecise,
-            ),
-        };
-        runResult.markSaved(takesList.save(take));
-    };
-    const saveCurrentTake = () => saveTake(runResult.grade);
+    const saveCurrentTake = () => takes.saveNow(runResult.grade);
 
     // Replay a saved take: any Listen in progress hands the transport over, and the
     // self-paced matcher stops so the replay owns the cursor.
@@ -981,11 +940,7 @@ function usePlaySessionValue({
         // or Restart while still holding the final note, before its release fired the deferred
         // save — would be lost once the capture and completion latch are replaced below. Save
         // it first, closing its hold at this instant, exactly as leaving the surface does.
-        if (matcher.complete && !ephemeral && !takeSavedRef.current) {
-            takeSavedRef.current = true;
-            flushHolds(captureRef.current, scheduler.now());
-            saveTake(grading.finishedGrade());
-        }
+        takes.saveIfOwed();
         // Take over at the cursor's current position when resuming (handing over from
         // Listen, or continuing a run stopped partway); Restart passes resume=false to
         // begin at the top. The top of a fresh piece reads as 0 either way.
@@ -1009,7 +964,7 @@ function usePlaySessionValue({
         }
         grading.reset();
         stumbledRef.current.clear();
-        takeSavedRef.current = false;
+        takes.reset();
         keepUp.clearResult();
         resyncLive();
         runTempoRef.current = tempo;
