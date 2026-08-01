@@ -127,7 +127,7 @@ export function PlayTransport() {
                     washed over the score. A workspace, not a setting, so it stays on
                     the bar. */}
                     <ToggleIconButton
-                        onClick={() => setFingerStrip((on: boolean) => !on)}
+                        onClick={() => setFingerStrip(!fingerStrip)}
                         pressed={fingerStrip}
                         label={m.action_fingering_editor()}
                     >

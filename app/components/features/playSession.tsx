@@ -279,12 +279,15 @@ function usePlaySessionValue({
     // fingering strip and washes the score with the difficulty heat-map.
     const [fingerStrip, setFingerStripState] = useState(false);
     // Opening the fingering editor ticks its discovery step — the strip is the
-    // fingering drill's home now that its tab is gone.
-    const setFingerStrip: typeof setFingerStripState = (value) => {
-        if (value === true || (typeof value === "function" && value(fingerStrip))) {
+    // fingering drill's home now that its tab is gone. Takes a plain boolean rather
+    // than React's updater form: deciding whether this counts as "opened" meant
+    // calling an updater to look at its result, and React calls it again itself — so
+    // the function ran twice, against a value from this render rather than the live one.
+    const setFingerStrip = (open: boolean) => {
+        if (open) {
             onboarding.markDiscovered("fingeringTried");
         }
-        setFingerStripState(value);
+        setFingerStripState(open);
     };
     // Whether the Runs drawer (your saved performances of this piece) is open.
 
@@ -956,8 +959,9 @@ function usePlaySessionValue({
         // after Practice be overtaken by the run it just replaced.
         if (sightRead.on) {
             // A cancelled countdown never resolves, so the run it belonged to is
-            // simply never started.
-            void sightRead.study().then(begin);
+            // simply never started. Should the countdown ever fail instead, the run
+            // stays unstarted rather than surfacing as an unhandled rejection.
+            void sightRead.study().then(begin, () => {});
             return;
         }
         begin();
@@ -967,14 +971,18 @@ function usePlaySessionValue({
     // input on its own clock, so the keys follow its current beat (the matcher is
     // stopped, its `expected` frozen); self-paced follows the matcher, gated by the
     // reveal-hint setting. Either way "never" keeps the keyboard dark.
-    const hintNotes =
-        aids.noteHints === "never"
-            ? []
-            : keepUp.running
-              ? keepUp.expected
-              : aids.noteHints === "always" || (aids.noteHints === "miss" && matcher.missedHere)
-                ? matcher.expected
-                : [];
+    const hintNotes = ((): number[] => {
+        if (aids.noteHints === "never") {
+            return [];
+        }
+        // A keep-up run owns the input on its own clock, so the keys follow its beat.
+        if (keepUp.running) {
+            return keepUp.expected;
+        }
+        const helping =
+            aids.noteHints === "always" || (aids.noteHints === "miss" && matcher.missedHere);
+        return helping ? matcher.expected : [];
+    })();
     // A run ending — stop, restart or completion all drop `practicing` — leaves no
     // note left to hold, so drain any fills still shrinking.
     useEffect(() => {
@@ -1036,7 +1044,6 @@ function usePlaySessionValue({
         // Tempo settings.
         tempo,
         setTempo,
-        liveTempo,
         trainerOn,
         setTrainerOn,
         trainerTarget,
