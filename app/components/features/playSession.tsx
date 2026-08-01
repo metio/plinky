@@ -43,6 +43,7 @@ import { useMetronome } from "../../hooks/useMetronome";
 import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
+import { useLatestPress } from "../../hooks/useLatestPress";
 import { useRunGrading } from "../../hooks/useRunGrading";
 import { useRunRecorder } from "../../hooks/useRunRecorder";
 import { useTakeAutosave } from "../../hooks/useTakeAutosave";
@@ -128,7 +129,7 @@ function usePlaySessionValue({
     const gradePanelRef = useRef<HTMLDivElement>(null);
     // Claims the current attempt to start a run: a sight-read's study countdown lets
     // the player act again before the run begins, and only the newest press may start.
-    const practiceSeqRef = useRef(0);
+    const startPress = useLatestPress();
     // Step indices where a wrong key was played before the right one. A note cleared
     // from here reads amber rather than green: the score then shows where the run
     // actually hesitated, which a uniform green cannot.
@@ -339,6 +340,12 @@ function usePlaySessionValue({
             listenPlayback.stop();
             keepUp.stop();
             matcher.stop();
+            // A run already on its way — a sight-read counting down before it begins —
+            // must not arrive after the player has stopped. Dropping the claim stops the
+            // start; cancelling the countdown stops the timer and clears it off screen,
+            // which it would otherwise keep ticking on a surface nobody is looking at.
+            startPress.cancel();
+            sightRead.cancel();
         },
         onRendered: ({ bars, freshPiece }) => {
             // A fresh render carries no in-progress click selection.
@@ -918,7 +925,7 @@ function usePlaySessionValue({
     };
 
     const practice = (resume = true) => {
-        const mine = ++practiceSeqRef.current;
+        const isMine = startPress.press();
         // A completed run whose auto-take-save is still pending — the player pressed Practice
         // or Restart while still holding the final note, before its release fired the deferred
         // save — would be lost once the capture and completion latch are replaced below. Save
@@ -974,7 +981,7 @@ function usePlaySessionValue({
         // token and dropped if anything since has taken the surface. Without that, a
         // countdown resolving late would start a run over whatever is now playing.
         const begin = () => {
-            if (mine !== practiceSeqRef.current || listenPlayback.active() || keepUp.active()) {
+            if (!isMine() || listenPlayback.active() || keepUp.active()) {
                 return;
             }
             // With the section loop on, Practice drills the selected bars on repeat, the
