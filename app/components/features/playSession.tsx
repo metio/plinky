@@ -18,13 +18,6 @@ import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import { holdScaleFor, isPreciseInput, MIC_DEVICE } from "../../../core/midi";
-import {
-    captureCleared,
-    capturePedal,
-    captureRelease,
-    type RunCapture,
-    startCapture,
-} from "../../../core/runCapture";
 import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
 import { transposeMusicXml } from "../../../core/transpose";
@@ -51,6 +44,7 @@ import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
 import { useRunGrading } from "../../hooks/useRunGrading";
+import { useRunRecorder } from "../../hooks/useRunRecorder";
 import { useTakeAutosave } from "../../hooks/useTakeAutosave";
 import { useRunResult } from "../../hooks/useRunResult";
 import {
@@ -139,10 +133,6 @@ function usePlaySessionValue({
     // from here reads amber rather than green: the score then shows where the run
     // actually hesitated, which a uniform green cannot.
     const stumbledRef = useRef<Set<number>>(new Set());
-    // The run recorder (core/runCapture): the cleared notes' timing, the open key-holds,
-    // the run clock's zero, and the imprecise-input flag. One ref, because the matcher
-    // callback and the MIDI release handler both advance it between renders.
-    const captureRef = useRef<RunCapture>(startCapture());
     const synth = useSynth();
     const scheduler = useScheduler();
     const analytics = useAnalytics();
@@ -260,6 +250,12 @@ function usePlaySessionValue({
         forgiving,
         highway: reading.highway,
     });
+
+    // The run's recording, and the run-scoped tempo/partial bookkeeping that travels with
+    // it. Six callers that never meet share this one capture — the matcher's cleared
+    // callback, the MIDI release and pedal handlers, the run starter, the grader and the
+    // take save — so it is owned in one place with a named method per reason.
+    const recorder = useRunRecorder(initialTempo ?? 100, easeToward);
     const aids = sightRead.aids;
     // The piece's 1–8 difficulty grade, so "auto" beam mode can hide beam groups on the
     // easy grades a beginner reads note-by-note. gradeOf is memoised by the content id, so
@@ -319,15 +315,6 @@ function usePlaySessionValue({
     // channel once the run's mastery is folded in, for the shell banner to celebrate. At
     // most one per run; cleared at the next run's start.
     const { publish: publishMilestone, dismiss: dismissMilestone } = useMilestoneChannel();
-    // The tempo a run was matched at, captured when practice starts so the run's
-    // self-paced tempo curve reads against the same reference the matcher used,
-    // even if the slider is moved afterwards.
-    const runTempoRef = useRef(initialTempo ?? 100);
-    // A run that began partway through — taking over from Listen, or resuming where a
-    // stopped run left off. It is graded for what was played, but keeps no ghost: a
-    // partial replay would strand the next race at its early end, and chasing a
-    // full-piece ghost from the middle is meaningless.
-    const partialRunRef = useRef(false);
 
     // The score-rendering surface: OSMD loads and re-renders the piece, and reports what
     // the rest of the play surface reads off it. The transports and the matcher drive the
@@ -567,13 +554,9 @@ function usePlaySessionValue({
             if (aids.noteHints === "always") {
                 holdIndicator.begin(info.pitches, info.holdMs);
             }
-            // Record the cleared note — its ideal and actual timing, and a hold per
-            // pitch for the release to close — for the grade, the per-note strip, the
-            // share grid and the saved take.
-            captureCleared(captureRef.current, info);
-            // Ease the adaptive metronome toward the player's own pace, read from the
-            // gap between the last two notes.
-            easeToward(captureRef.current, runTempoRef.current);
+            // Record the cleared note — its timing, a hold per pitch for the release
+            // to close — and ease the adaptive metronome toward the player's own pace.
+            recorder.cleared(info);
             // Sound the sitting-out hand across the gap up to your next note, laid
             // out at the pace you're playing at right now (a no-op unless the duet is
             // on). Uses the live tempo captured for this render, so it tracks the same
@@ -603,7 +586,7 @@ function usePlaySessionValue({
                 return;
             }
             if (!isPreciseInput(event.device)) {
-                captureRef.current.imprecise = true;
+                recorder.markImprecise();
             }
             // The mic's note-off is the detector's own timing, never a real key lift, so a
             // mic note would stick in the held set and hold full screen open forever. Only
@@ -628,7 +611,7 @@ function usePlaySessionValue({
             synth.releaseNote(event.note, holdScaleFor(event.device));
             heldNotes.current.delete(event.note);
             syncHolding();
-            captureRelease(captureRef.current, event.note, event.timestamp);
+            recorder.released(event.note, event.timestamp);
         },
         // The pedals shape the live sound; the sustain pedal also drives the recording's
         // damper model, so a pedalled take plays and replays as pedalled (sostenuto and soft
@@ -637,7 +620,7 @@ function usePlaySessionValue({
         onPedal: (pedal, down, timestamp) => {
             synth.setPedal(pedal, down);
             if (pedal === "sustain") {
-                capturePedal(captureRef.current, down, timestamp);
+                recorder.pedal(down, timestamp);
             }
         },
     });
@@ -645,7 +628,7 @@ function usePlaySessionValue({
 
     // The ghost race — a previous run replayed against the clock on the staff and the
     // race track. Armed at run start; the run clock's zero is the capture's startedAt.
-    const runStartedAt = useCallback(() => captureRef.current.startedAt, []);
+    const runStartedAt = useCallback(() => recorder.startedAt(), [recorder]);
     const ghostRace = useGhostRace({
         id,
         canShareGhost,
@@ -730,10 +713,10 @@ function usePlaySessionValue({
         complete: matcher.complete,
         correct: matcher.total,
         wrong: matcher.wrong,
-        capture: captureRef,
-        runTempo: runTempoRef,
+        capture: recorder.capture,
+        runTempo: recorder.tempo,
         intendedTempo: initialTempo,
-        partial: partialRunRef,
+        partial: recorder.partial,
         id,
         title,
         daily,
@@ -760,7 +743,7 @@ function usePlaySessionValue({
         complete: matcher.complete,
         holdingNote,
         ephemeral,
-        capture: captureRef,
+        capture: recorder.capture,
         tempo,
         beatsPerBar,
         finishedGrade: grading.finishedGrade,
@@ -946,28 +929,20 @@ function usePlaySessionValue({
         // begin at the top. The top of a fresh piece reads as 0 either way.
         const from = resume ? resumePoint() : 0;
         const partial = from > 0;
-        partialRunRef.current = partial;
         enterPlayFullscreen();
         listenPlayback.stop();
         clearSelfPacedResult();
-        // A fresh recorder also zeroes the run clock, so the ghost tick's startedAt
-        // guard holds until the run's first note arrives — a stale start timestamp
-        // would paint the ghost at the finish the moment Practice is pressed.
-        captureRef.current = startCapture();
-        // The sustain pedal held down as the run begins is invisible to a fresh capture —
-        // Web MIDI streams pedal changes, never the standing state — so its first notes would
-        // record dry despite ringing under the damper. Seed the capture from the live pedal,
-        // on the same clock every hold is stamped with (the seed's time is unused while the
-        // pedal stays down, but sharing the origin keeps the capture single-clock throughout).
-        if (pedalHeld("sustain")) {
-            capturePedal(captureRef.current, true, scheduler.now());
-        }
+        recorder.begin({
+            tempo,
+            partial,
+            pedalDown: pedalHeld("sustain"),
+            at: scheduler.now(),
+        });
         grading.reset();
         stumbledRef.current.clear();
         takes.reset();
         keepUp.clearResult();
         resyncLive();
-        runTempoRef.current = tempo;
         // The hand the matcher and the ghost step through: the whole grand staff
         // when there's a single staff, otherwise the hand being drilled. (Fingering
         // is printed on the staff at load time, not computed per run.)
@@ -1054,8 +1029,8 @@ function usePlaySessionValue({
 
     // The run's tempo re-referenced to the piece's own, so the results panel reads the
     // lagging hand at the same scale the share grid was built with.
-    const intendedTempo = initialTempo ?? runTempoRef.current;
-    const runTempoScale = intendedTempo > 0 ? runTempoRef.current / intendedTempo : 1;
+    const intendedTempo = initialTempo ?? recorder.tempo.current;
+    const runTempoScale = intendedTempo > 0 ? recorder.tempo.current / intendedTempo : 1;
 
     // Dismiss the rotate-your-phone nudge, and remember the choice.
     const dismissRotate = () => {

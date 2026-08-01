@@ -35,7 +35,13 @@ function playedRun(count = 4, holdOpen = false): RunCapture {
 
 function harness(overrides: Partial<TakeAutosaveOptions> = {}) {
     const saved: Take[] = [];
-    const calls = { save: vi.fn((take: Take) => (saved.push(take), true)), onSaved: vi.fn() };
+    const calls = {
+        save: vi.fn((take: Take) => {
+            saved.push(take);
+            return true;
+        }),
+        onSaved: vi.fn(),
+    };
     const options: TakeAutosaveOptions = {
         complete: false,
         holdingNote: false,
@@ -53,8 +59,7 @@ function harness(overrides: Partial<TakeAutosaveOptions> = {}) {
     const view = renderHook((props: TakeAutosaveOptions) => useTakeAutosave(props), {
         initialProps: options,
     });
-    const set = (extra: Partial<TakeAutosaveOptions>) =>
-        view.rerender({ ...options, ...extra });
+    const set = (extra: Partial<TakeAutosaveOptions>) => view.rerender({ ...options, ...extra });
     return { ...view, set, calls, saved, options };
 }
 
@@ -69,7 +74,12 @@ describe("useTakeAutosave", () => {
         set({ complete: true });
 
         expect(saved).toHaveLength(1);
-        expect(saved[0]).toMatchObject({ id: "take-1", createdAt: AT, letter: "A", complete: true });
+        expect(saved[0]).toMatchObject({
+            id: "take-1",
+            createdAt: AT,
+            letter: "A",
+            complete: true,
+        });
         expect(saved[0]?.metrics).toBe(GRADE);
         expect(calls.onSaved).toHaveBeenCalledWith(true);
     });
@@ -115,7 +125,10 @@ describe("useTakeAutosave", () => {
             // The note stopped when the player stopped, so that is its honest length —
             // not a clipped beat, and not left ringing forever.
             const capture = playedRun(4, true);
-            const { set, result, saved } = harness({ capture: { current: capture }, now: () => 9_000 });
+            const { set, result, saved } = harness({
+                capture: { current: capture },
+                now: () => 9_000,
+            });
             set({ complete: true, holdingNote: true });
             result.current.saveIfOwed();
 
