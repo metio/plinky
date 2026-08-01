@@ -25,11 +25,11 @@ describe("Attribution", () => {
         expect(screen.queryByText(/public domain/i)).toBeNull();
     });
 
-    it("credits the engraver for a source whose licence requires attribution", () => {
-        render(<Attribution composer="Scott Joplin" license="CC-BY-NC-SA-4.0" source="kern" />);
-        expect(screen.getByRole("link", { name: "CC BY-NC-SA 4.0" })).toBeTruthy();
-        expect(screen.getByRole("link", { name: "KernScores" })).toBeTruthy();
-        expect(screen.getByText(/Craig Stuart Sapp/)).toBeTruthy();
+    it("credits the editor for a source whose licence requires attribution", () => {
+        render(<Attribution composer="Anon." license="CC-BY-SA-4.0" source="cpdl" />);
+        expect(screen.getByRole("link", { name: "CC BY-SA 4.0" })).toBeTruthy();
+        expect(screen.getByRole("link", { name: "CPDL" })).toBeTruthy();
+        expect(screen.getByText(/the CPDL editors/)).toBeTruthy();
     });
 
     it("renders nothing for a piece with no licence or source", () => {

@@ -26,9 +26,9 @@ RUN apt-get update \
 ARG REUSE_VERSION=6.2.0
 RUN pip install --break-system-packages --no-cache-dir "reuse==${REUSE_VERSION}"
 
-# music21: converts Humdrum **kern scores to MusicXML for `npm run scores:import kern`
-# (the KernScores corpora ship .krn, not MusicXML). Pure Python — no MuseScore needed
-# for kern parsing.
+# music21: reduces the CPDL choral editions to a two-staff piano grand staff for
+# dev/cpdl-harvest.py, which scrapes them ahead of `npm run scores:import cpdl`. Pure
+# Python — no MuseScore needed.
 # renovate: datasource=pypi depName=music21
 ARG MUSIC21_VERSION=10.5.0
 RUN pip install --break-system-packages --no-cache-dir "music21==${MUSIC21_VERSION}"

@@ -78,11 +78,11 @@ describe("sourceInfo", () => {
         expect(sourceInfo("pdmx")?.url).toMatch(/^https:\/\//);
     });
 
-    it("carries an engraver credit for a source whose licence needs one", () => {
-        expect(sourceInfo("kern")).toMatchObject({
-            id: "kern",
-            label: "KernScores",
-            credit: "Craig Stuart Sapp",
+    it("carries an editor credit for a source whose licence needs one", () => {
+        expect(sourceInfo("cpdl")).toMatchObject({
+            id: "cpdl",
+            label: "CPDL",
+            credit: "the CPDL editors",
         });
         // CC0 sources need no separate credit.
         expect(sourceInfo("pdmx")?.credit).toBeUndefined();
@@ -123,5 +123,68 @@ describe("licenseDir", () => {
     it("falls back to CC0 for an absent licence, so a file always has a home", () => {
         expect(licenseDir(undefined)).toBe("cc0-1.0");
         expect(licenseDir("")).toBe("cc0-1.0");
+    });
+});
+
+describe("a licence or source the tables do not own", () => {
+    // Every one of these resolves up the prototype chain to a truthy value. Callers read
+    // truthy as "known", so any of them would render a badge with no label and no link,
+    // and drop the licence from the burnt-in video credit.
+    const INHERITED = [
+        "constructor",
+        "toString",
+        "valueOf",
+        "hasOwnProperty",
+        "isPrototypeOf",
+        "propertyIsEnumerable",
+        "toLocaleString",
+        "__proto__",
+        "__defineGetter__",
+        "__lookupGetter__",
+    ];
+
+    it.each(INHERITED)("reads %s as an unknown licence", (id) => {
+        expect(licenseInfo(id)).toBeNull();
+    });
+
+    it.each(INHERITED)("reads %s as an unknown source", (id) => {
+        expect(sourceInfo(id)).toBeNull();
+    });
+
+    it("leaves a piece carrying one with no licence to display", () => {
+        const attribution = attributionFor({ composer: "Anon.", license: "constructor" });
+        expect(attribution.license).toBeNull();
+        expect(attribution.source).toBeNull();
+    });
+
+    it("still resolves every real licence and source", () => {
+        for (const id of [
+            "CC0-1.0",
+            "CC-BY-4.0",
+            "CC-BY-3.0",
+            "CC-BY-2.5",
+            "CC-BY-SA-4.0",
+            "CC-BY-SA-3.0",
+            "CC-BY-SA-2.5",
+            "CC-BY-NC-4.0",
+            "CC-BY-ND-4.0",
+            "CC-BY-NC-SA-4.0",
+        ]) {
+            expect(licenseInfo(id), id).not.toBeNull();
+        }
+        for (const id of ["pdmx", "openscore-lieder", "mutopia", "cpdl"]) {
+            expect(sourceInfo(id), id).not.toBeNull();
+        }
+    });
+});
+
+describe("the source list matches what the catalogue may admit", () => {
+    it("offers no source whose corpus the licence gate refuses", () => {
+        // The catalogue admits only commercially usable, derivative-friendly pieces, so a
+        // NonCommercial corpus can never reach a reader — listing one would credit an
+        // editor for material this catalogue does not carry.
+        for (const id of ["kern", "bach-chorales", "asap", "dcml"]) {
+            expect(sourceInfo(id), id).toBeNull();
+        }
     });
 });

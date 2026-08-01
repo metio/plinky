@@ -196,8 +196,8 @@ async function main() {
         throw new Error(`unknown source "${key}"; known: ${Object.keys(CONFIGS).join(", ")}`);
     }
 
-    // Clone each repo (and, for kern, convert its .krn to .mxl) — gathering the .mxl to
-    // ingest only from the dirs we manage, so a stray checkout can't leak in.
+    // Clone each repo, gathering the .mxl to ingest only from the dirs we manage, so a
+    // stray checkout can't leak in.
     await mkdir(`${SOURCES_DIR}/${key}`, { recursive: true });
     const files: string[] = [];
     if (cfg.preconverted) {

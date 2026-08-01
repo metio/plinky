@@ -131,37 +131,9 @@ const SOURCES: Record<string, Omit<SourceInfo, "id">> = {
         label: "OpenScore Lieder",
         url: "https://github.com/OpenScore/Lieder",
     },
-    // The KernScores keyboard corpora, engraved by Craig Stuart Sapp and licensed
-    // CC-BY-NC-SA — so the editor is credited and the pieces are non-commercial.
-    kern: {
-        label: "KernScores",
-        url: "https://github.com/craigsapp",
-        credit: "Craig Stuart Sapp",
-    },
-    // Bach's 370 four-part chorales, reduced to a two-staff piano grand staff — same
-    // KernScores editor and CC-BY-NC-SA licence as the other kern corpora.
-    "bach-chorales": {
-        label: "KernScores",
-        url: "https://github.com/craigsapp/bach-370-chorales",
-        credit: "Craig Stuart Sapp",
-    },
     // Public-domain solo-keyboard pieces from the Mutopia Project (CC0, no credit
     // required), converted from their LilyPond sources.
     mutopia: { label: "Mutopia Project", url: "https://www.mutopiaproject.org" },
-    // Solo-piano classical scores from the ASAP dataset (CC-BY-NC-SA — non-commercial,
-    // and the project is credited).
-    asap: {
-        label: "ASAP Dataset",
-        url: "https://github.com/fosfrancesco/asap-dataset",
-        credit: "the ASAP Dataset authors",
-    },
-    // Solo-piano corpora from DCMLab (Digital and Cognitive Musicology Lab, EPFL),
-    // CC-BY-NC-SA — non-commercial, and the corpus editors are credited.
-    dcml: {
-        label: "DCMLab",
-        url: "https://github.com/DCMLab",
-        credit: "the DCMLab corpus editors",
-    },
     // Public-domain choral editions from CPDL (ChoralWiki), reduced to piano. Only the
     // CC0/CC-BY/CC-BY-SA/PD editions are harvested; the CC variants credit the editor.
     cpdl: {
@@ -182,20 +154,28 @@ export function licenseDir(license: string | undefined): string {
     return (license || "cc0-1.0").toLowerCase();
 }
 
+// Both lookups ask whether the table OWNS the key rather than whether indexing it
+// yields something. A piece's licence and source are plain strings that reach here from
+// a restored backup or a shared score pack, and a handful of strings — "constructor",
+// "toString", "valueOf" — resolve up the prototype chain to a truthy value with none of
+// the fields a licence has. Every caller reads truthy as "this licence is known", so the
+// badge would render an empty link and the video credit would drop the licence line
+// entirely: a piece redistributed without the credit its licence requires, which is the
+// one outcome this module exists to prevent. An unrecognised licence must read as
+// unknown, and unknown is null.
+
 export function licenseInfo(id: string | undefined): LicenseInfo | null {
-    if (!id) {
+    if (!id || !Object.hasOwn(LICENSES, id)) {
         return null;
     }
-    const deed = LICENSES[id];
-    return deed ? { id, ...deed } : null;
+    return { id, ...LICENSES[id]! };
 }
 
 export function sourceInfo(id: string | undefined): SourceInfo | null {
-    if (!id) {
+    if (!id || !Object.hasOwn(SOURCES, id)) {
         return null;
     }
-    const source = SOURCES[id];
-    return source ? { id, ...source } : null;
+    return { id, ...SOURCES[id]! };
 }
 
 export type Attribution = {

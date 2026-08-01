@@ -17,7 +17,7 @@ export const PublicDomain: Story = {
 };
 
 export const AttributionRequired: Story = {
-    args: { license: "CC-BY-SA-4.0", source: "kern" },
+    args: { license: "CC-BY-SA-4.0", source: "cpdl" },
 };
 
 export const LicenseOnly: Story = {
