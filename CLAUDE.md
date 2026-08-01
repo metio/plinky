@@ -81,6 +81,9 @@ npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
 npx biome check       # lint + format
 npm run nav           # navigation-depth budget
+npm run bytes         # no control bytes in tracked source (blocking) — a NUL
+                      # makes git call a file binary, and a binary file reviews
+                      # as an empty diff
 nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
 npm run size          # bundle budget — measures the ci-build output
 npm run a11y:light    # axe over the built site (builds it first)

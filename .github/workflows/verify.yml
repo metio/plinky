@@ -68,6 +68,16 @@ jobs:
       # Enforce the layered architecture: dependencies point strictly downward and
       # no cycles form. The contract lives in .dependency-cruiser.cjs.
       - run: nix develop --command ci-arch
+  bytes:
+    name: bytes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # A control byte makes git treat a source file as binary, and a binary file
+      # reviews as an empty diff — so the change nobody can see is the one that ships.
+      - run: nix develop --command ci-bytes
   tailwind:
     name: tailwind
     runs-on: ubuntu-latest
@@ -102,7 +112,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, bake-check, nav, arch, tailwind, i18n, ci-parity]
+    needs: [frontend, bake-check, nav, arch, bytes, tailwind, i18n, ci-parity]
     if: always()
     runs-on: ubuntu-latest
     steps:

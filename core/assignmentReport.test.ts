@@ -154,6 +154,37 @@ describe("collectReports", () => {
         expect(collectReports(text)[0]?.items[0]?.score).toBe(95);
     });
 
+    it("cannot be made to fold two students into one row", () => {
+        // Both halves of the key are attacker-chosen strings off the wire, so a report
+        // crafted to look like another (id, name) pair when the two are joined must
+        // still count as its own row.
+        const wire = (assignmentId: string, who: string) =>
+            encodeReport({
+                assignmentId,
+                assignmentName: "W",
+                who,
+                items: [{ id: "twinkle", score: 90 }],
+                at: 1,
+            });
+        for (const [id, who] of [
+            ["wk1 ada", ""],
+            ["wk1", "ada"],
+            ["wk", "1 ada"],
+            ['wk1","ada', ""],
+            ["wk1\u0000ada", ""],
+        ] as [string, string][]) {
+            expect(collectReports(wire(id, who))).toHaveLength(1);
+        }
+        const all = [
+            wire("wk1 ada", ""),
+            wire("wk1", "ada"),
+            wire("wk", "1 ada"),
+            wire("wk1\u0000ada", ""),
+        ].join("\n");
+        // Four distinct pairs, four rows — none of them collapsed into another.
+        expect(collectReports(all)).toHaveLength(4);
+    });
+
     it("treats a name's capitalisation as the same person", () => {
         expect(collectReports(`${code("ada", 1)}\n${code("Ada", 2)}`)).toHaveLength(1);
     });

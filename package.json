@@ -29,6 +29,7 @@
     "tailwind": "node dev/check-tailwind.mjs",
     "size": "node dev/check-bundle-size.mjs",
     "nav": "node dev/nav-graph.mjs",
+        "bytes": "node dev/check-source-bytes.mjs",
     "format": "biome check --write .",
     "knip": "npm run messages && react-router typegen && knip",
     "coverage": "npm run messages && vitest run --coverage --project '!storybook'",
