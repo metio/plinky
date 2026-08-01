@@ -809,6 +809,12 @@ function usePlaySessionValue({
             // freezes it mid-run and strands note input until Stop.
             keepUp.stop();
             matcher.stop();
+            // A run already on its way — a sight-read counting down before it begins —
+            // must not arrive after the player has stopped. Dropping the claim stops the
+            // start; cancelling the countdown stops its timer and clears it off screen,
+            // which it would otherwise keep ticking on a surface nobody is looking at.
+            startPress.cancel();
+            sightRead.cancel();
             // Stepping out mid-run must never leave the resting score half blank.
             hidden.restore();
             vanishing.restore();
