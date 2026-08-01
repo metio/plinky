@@ -43,6 +43,7 @@ import { useMetronome } from "../../hooks/useMetronome";
 import { useOsmdScore } from "../../hooks/useOsmdScore";
 import { usePref } from "../../hooks/usePref";
 import { useReadingMode } from "../../hooks/useReadingMode";
+import { useEndRun } from "../../hooks/useEndRun";
 import { useLatestPress } from "../../hooks/useLatestPress";
 import { useRunGrading } from "../../hooks/useRunGrading";
 import { useRunRecorder } from "../../hooks/useRunRecorder";
@@ -792,47 +793,27 @@ function usePlaySessionValue({
         }
     }, [matcher.complete, fullscreen, holdingNote, exitFullscreen]);
 
-    // Leaving the play surface — the ✕, Esc, or a finished run dropping out — ends any
-    // run in progress, but keeps the cursor where it is (stop hides, never rewinds), so
-    // re-entering Practice or Listen picks up from the same place. A run that finished on
-    // its own has already stopped; this covers stepping out mid-run.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: stopListen/stopKeepUp/matcher.stop reset transient playback, not render inputs
-    useEffect(() => {
-        if (!fullscreen) {
-            listenPlayback.stop();
-            // Leaving with a finished run whose take is still pending (the player stepped out
-            // while holding the last note) saves it now, before matcher.stop() clears the
-            // completion the deferred save waits on — its hold is closed at this instant.
-            takes.saveIfOwed();
-            // A tempo-locked play-along drives the cursor from its own timers and funnels
-            // every note into the run; without tearing it down here, leaving full screen
-            // freezes it mid-run and strands note input until Stop.
-            keepUp.stop();
-            matcher.stop();
-            // A run already on its way — a sight-read counting down before it begins —
-            // must not arrive after the player has stopped. Dropping the claim stops the
-            // start; cancelling the countdown stops its timer and clears it off screen,
-            // which it would otherwise keep ticking on a surface nobody is looking at.
+    // Ending a run when the surface goes quiet. The order is the logic — see useEndRun,
+    // which also silences the module-singleton audio engine on unmount.
+    useEndRun({
+        active: fullscreen,
+        stopListen: listenPlayback.stop,
+        saveOwedTake: takes.saveIfOwed,
+        stopKeepUp: keepUp.stop,
+        stopMatcher: matcher.stop,
+        cancelPendingStart: () => {
             startPress.cancel();
             sightRead.cancel();
-            // Stepping out mid-run must never leave the resting score half blank.
+        },
+        restoreScore: () => {
             hidden.restore();
             vanishing.restore();
-            // Silence any guide voice still ringing — leaving the surface ends the run,
-            // so nothing should sound on. A safety net over the held-key press gate: even
-            // an orphaned or pedal-sustained voice can't outlive the surface.
+        },
+        silence: () => {
             synth.silenceAll();
-            // The same for anything still lit on a connected instrument: its notes
-            // are held by a timer, not by the audio engine, so silencing the synth
-            // alone would leave the keyboard glowing.
             silenceEcho();
-        }
-    }, [fullscreen]);
-
-    // The audio engine's voices live for the whole process (a module singleton), so
-    // navigating away from the play route must silence them too — the effect above only
-    // fires on a fullscreen change, never on unmount.
-    useEffect(() => () => synth.silenceAll(), [synth]);
+        },
+    });
 
     // Playing goes full screen on every device. The play surface holds controls that live
     // only there — Listen, the finger-number and follow-the-note toggles, the on-staff
