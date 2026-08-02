@@ -120,6 +120,107 @@ only through the Getting started checklist, which disappears once you dismiss it
 finish its last step — taking the only way back with it. Both now have a permanent link
 from Help.
 
+## 30 July 2026
+
+**A glossary of the marks in a score.** Meet a curved line over two notes and there
+was nowhere to ask what it is — and you can't look up "slur" when not knowing the
+word is the problem. `/glossary` answers that for twelve symbols, grouped by what
+each one controls: how long a note lasts, how you touch it, how loud it is, and where
+on the page you are. Notation is instructions for sound, so every entry can be heard.
+
+The setup panel before a run now lists the marks the piece in front of you actually
+uses, each a link straight into its entry — so the explanation arrives at the moment
+you meet the thing, rather than waiting in a reference you'd have to know to open.
+
+**One panel breaking no longer takes the page with it.** The home and You pages are
+built from panels that each read their own store. A stumble in one used to reach the
+whole document's error boundary and replace every pane on screen, including all the
+parts that were working. A panel now fails on its own and leaves the rest of the page
+standing.
+
+## 29 July 2026
+
+**A placement test that finds your level by reading.** Most apps ask a newcomer to
+pick beginner, intermediate or advanced and take them at their word, which is how
+people land somewhere that bores or drowns them. Plinky asked nothing and started
+everyone at the bottom. The test walks a ladder instead: read a short drill, and the
+next one is harder or easier depending on how that went.
+
+**Your best of each part, not just your best run.** A grade describes one run — play
+the opening beautifully and fumble the coda, and it reads the same as the week you
+fumbled the opening instead. A finished run now also folds into a record of the best
+each of the piece's six parts has ever been, totalled under the result, so real
+improvement in one stretch is visible even when the run as a whole isn't your best.
+
+**The score shows where a run hesitated.** A cleared note went green whether you read
+it at sight or found it on the fourth guess. A note that cost a wrong key now paints
+amber instead, so a finished piece shows where the run actually hesitated rather than
+a uniform green that forgets.
+
+**The notes you're slowest to find.** Every run has always timed each note; nothing
+added it up. Read the treble staff fluently but stall on every ledger line below
+middle C and the grade folded both into one number. The You page now names the notes
+that take you longest, so a hunch becomes something you can practise.
+
+**Do, re, mi where that's what the notes are called.** Plinky speaks 26 languages and
+had been labelling its keys C, D, E in all of them. For roughly half that isn't the
+note's name — in French, Italian, Spanish, Portuguese, Romanian, Russian, Ukrainian,
+Serbian, Greek and much of Asia a musician says "sol" the way an English one says
+"G". The keys can now carry the names you actually use.
+
+**Plinky can light up your piano.** The MIDI connection only ever listened, so a
+piano with lit keys — which is most of the affordable ones — was told nothing. Listen
+can now echo each note it sounds, so a piece can be watched on the instrument as well
+as heard. Off by default, behind a switch in Settings.
+
+**Shape the daily drill.** The generated phrase drew one note per beat from a
+five-finger box in one of four keys — a first week of reading and nothing after it. A
+drill is now described rather than fixed: any of the fifteen key signatures or all
+twelve notes, any span of the 88 keys, one or two hands, up to four notes struck
+together, quarters or eighths or a mix, a cap on the biggest jump, and a pull toward
+keeping the next note near the last.
+
+**Read just the bars you're drilling.** With a loop set, the looped stretch can be
+re-engraved on its own — key and time signature restated, drawn big, with nowhere
+else for the eye to go. On a phone it's the difference between practising four bars
+and hunting for them.
+
+**A student can hand the list back.** An assignment ran one way: a teacher built a
+list, shared it by link, and then found out how it went by asking, because progress
+lives on the student's device. Each assignment now offers a report — type a name and
+the device turns what it knows into one code to paste into a message.
+
+Two fixes alongside: the MIDI echo no longer cuts notes short or strands a lit key
+on, and the placement test no longer counts toward your per-note reading times.
+
+## 28 July 2026
+
+**Read a piece cold, once, with nothing to lean on.** Practice is repetition until a
+piece is learned; sight-reading is the opposite discipline, and Plinky couldn't tell
+them apart — a first cold read and the twentieth rehearsal of the same bars counted
+the same. Sight-read mode sits in the setup panel's extra-challenge group, and what
+it records is kept apart from your practice best.
+
+**Take your whole progress to another device.** Everything Plinky remembers lived in
+one browser and nowhere else. Only scores had an export, so mastery, the review
+schedule, takes, ghosts, fingerings, preferences, favourites and achievements had no
+way off the device — a new phone started from zero, and a browser clearing its
+storage took the lot. Settings → Your progress now downloads all of it as one bundle,
+and restores it on the other side.
+
+## 25 July 2026
+
+**The anonymous usage analysis covers more of the app.** If you've turned it on — it
+stays off until you do, and nothing loads unless you agree — Plinky now also counts
+which buttons, links and switches get used, how far the onboarding steps get, and
+whether features like importing a score, sharing a run or the daily challenge are
+actually reached.
+
+What it records is counts and the page you were on: a run reports its mode and the
+grade letter it earned, not the notes you played, and nothing you write or record
+ever leaves the device. Pressing keys is never tracked, so playing a piece can't
+flood it. You can switch it back off in Settings at any time.
+
 ---
 
-Older changes aren't listed here; this file starts at 31 July 2026.
+Older changes aren't listed here; this file starts at 25 July 2026.
