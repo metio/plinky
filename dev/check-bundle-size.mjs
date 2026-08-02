@@ -48,7 +48,13 @@ const ON_DEMAND = /webCodecsVideo/;
 //
 // OSMD is pinned and lazy-loaded on score pages; a jump here means a dependency
 // grew, which is a different conversation from our own code growing.
-const BUDGET_VENDOR_KB = 311;
+//
+// The line sits just above what opensheetmusicdisplay 2.1.1 actually measures,
+// 323.5 KB gzipped — 13.4 KB more than 2.0.0 asked for. Nothing here is ours to
+// trim: it is one vendor chunk, taken or not taken whole. The bytes buy the
+// engine's own minor release, and the budget is set tight against them so the
+// next dependency growth still has to be argued for rather than absorbed.
+const BUDGET_VENDOR_KB = 324;
 // Headroom for the header badges, the on-staff ghost race, the localizable SEO meta
 // strings, the landing page's playable keyboard, the drag-and-drop score import page,
 // compose mode (capture → notation sketch → share, plus the on-demand MIDI and
