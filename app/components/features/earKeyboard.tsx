@@ -58,7 +58,7 @@ function whiteClasses(verdict: Verdict, settled: boolean): string {
     if (settled) {
         return "border-line bg-raised text-faint";
     }
-    return "border-line-strong bg-key-white text-key-white-ink hover:bg-key-hover hover:text-accent-strong";
+    return "border-line-strong bg-key-white text-key-ink hover:bg-key-hover hover:text-accent-strong";
 }
 
 function blackClasses(verdict: Verdict, settled: boolean): string {

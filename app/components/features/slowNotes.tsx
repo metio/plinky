@@ -47,7 +47,7 @@ export function SlowNotes() {
                             {noteName(row.note)}
                         </span>
                         <span
-                            className="h-2 rounded-full bg-chart-bar"
+                            className="h-2 rounded-full bg-accent-soft"
                             // The bar is decoration over the figure beside it, so it
                             // carries no separate label for a screen reader to repeat.
                             aria-hidden="true"

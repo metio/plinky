@@ -21,7 +21,7 @@ const tones = {
     sky: {
         shell: "border-info-line bg-info-surface",
         text: "text-info-ink",
-        dismiss: "text-info-ink hover:text-info-ink",
+        dismiss: "text-info-ink hover:text-info",
     },
 } as const;
 

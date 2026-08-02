@@ -40,7 +40,7 @@ export function ArcadeCard() {
             <p className="text-muted text-sm">{m.arcade_blurb()}</p>
             <Link
                 to={`/play/${id}`}
-                className="inline-block rounded-lg bg-ghost px-4 py-2 font-medium text-sm text-white transition hover:bg-ghost"
+                className="inline-block rounded-lg bg-ghost-solid px-4 py-2 font-medium text-sm text-white transition hover:bg-ghost-solid-hover"
             >
                 {m.arcade_play({ level })}
             </Link>

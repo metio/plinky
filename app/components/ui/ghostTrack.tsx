@@ -43,7 +43,7 @@ export function GhostTrack({ you, ghost, total }: { you: number; ghost: number; 
                 {/* The shared lane, with the finish line pinned to its end. */}
                 <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-subtle-strong" />
                 <div
-                    className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-chart-bar to-accent-solid"
+                    className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-accent-soft to-accent-solid"
                     style={{ width: `${youAt}%` }}
                 />
                 <div className="absolute right-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-key-spent" />

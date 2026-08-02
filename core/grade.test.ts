@@ -80,16 +80,21 @@ describe("parseGrade", () => {
 });
 
 describe("GRADE_COLOR", () => {
-    it("maps every letter to its contrast-safe light/dark colour classes", () => {
+    it("gives every letter its own token, and no two letters the same one", () => {
         expect(GRADE_COLOR).toEqual({
-            S: "text-amber-500 dark:text-amber-300",
-            A: "text-green-600 dark:text-green-400",
-            B: "text-lime-600 dark:text-lime-400",
-            C: "text-yellow-600 dark:text-yellow-400",
-            D: "text-orange-600 dark:text-orange-400",
-            E: "text-red-600 dark:text-red-400",
-            F: "text-red-800 dark:text-red-500",
+            S: "text-grade-s",
+            A: "text-grade-a",
+            B: "text-grade-b",
+            C: "text-grade-c",
+            D: "text-grade-d",
+            E: "text-grade-e",
+            F: "text-grade-f",
         });
+        // The letters are an ordinal scale, so two of them sharing a colour
+        // would silently merge two ranks. Each token's light and dark values
+        // live in app/app.css, where the token gate holds them to both themes.
+        const colours = Object.values(GRADE_COLOR);
+        expect(new Set(colours).size).toBe(colours.length);
     });
 });
 

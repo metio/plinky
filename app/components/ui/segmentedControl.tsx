@@ -42,7 +42,10 @@ export function SegmentedControl<T extends string>({
                         className={`inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-50 ${
                             selected
                                 ? "bg-surface text-accent-strong shadow-sm"
-                                : "text-muted hover:text-ink"
+                                : // `body`, not `muted`: an unselected tab is a control the
+                                  // reader is meant to act on, and it sits on the tinted
+                                  // track, where helper-text grey drops under 4.5:1.
+                                  "text-body hover:text-ink"
                         }`}
                     >
                         {option.label}

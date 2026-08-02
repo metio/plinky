@@ -85,7 +85,7 @@ export function NotesHighway({
                 {/* The strike line: where a block meets its key. */}
                 <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-chart-bar/70"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-accent-soft/70"
                 />
             </div>
         </div>

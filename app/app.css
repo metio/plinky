@@ -19,9 +19,10 @@ SPDX-License-Identifier: 0BSD
    themes cannot come apart.
 
    `npm run tokens` (dev/check-design-tokens.mjs) reads the token names straight
-   out of this block and rejects raw palette utilities in `app/components` and
-   `app/routes`, so adding a token here is all it takes to make it usable, and
-   the hand-paired form cannot come back.
+   out of this block and rejects raw palette utilities anywhere under `app/` or
+   `core/`, so adding a token here is all it takes to make it usable, and the
+   hand-paired form cannot come back. It also rejects a token nothing uses,
+   which keeps this list a description of the product rather than a wish list.
 
    Utilities generated from a token reference its variable rather than inlining
    the value, so redefining the variable under `.dark` re-resolves every use.
@@ -62,6 +63,8 @@ SPDX-License-Identifier: 0BSD
     --color-accent-line: var(--color-indigo-200);
     --color-accent-line-strong: var(--color-indigo-300);
     --color-accent-ring: var(--color-indigo-500); /* focus ring */
+    /* A lighter accent fill: progress bars, the race track, a decorative mark. */
+    --color-accent-soft: var(--color-indigo-400);
 
     /* Correct, saved, on target. Green only — `emerald` said the same thing. */
     --color-success: var(--color-green-700);
@@ -69,7 +72,6 @@ SPDX-License-Identifier: 0BSD
        white text needs it to clear WCAG 4.5:1, exactly as `danger-solid` does.
        The lighter greens look better and fail: white on green-600 is 3.2:1. */
     --color-success-solid: var(--color-green-700);
-    --color-success-solid-hover: var(--color-green-800);
     --color-success-surface: var(--color-green-50);
     --color-success-fill: var(--color-green-200);
     --color-success-line: var(--color-green-300);
@@ -94,6 +96,7 @@ SPDX-License-Identifier: 0BSD
     --color-warn-solid: var(--color-amber-500);
 
     /* Neutral news — the sky banner, distinct from a warning and from the brand. */
+    --color-info: var(--color-sky-700); /* the dismiss control's hover */
     --color-info-ink: var(--color-sky-900);
     --color-info-surface: var(--color-sky-50);
     --color-info-line: var(--color-sky-300);
@@ -108,14 +111,23 @@ SPDX-License-Identifier: 0BSD
        the same way the score sheet stays paper. Inverting them would be a
        different instrument. */
     --color-key-white: var(--color-white);
-    --color-key-white-ink: var(--color-gray-900);
+    /* Dark ink for any bright key face — a white key, or a black key lit by a
+       state colour. Flat across themes, because the face it sits on does not
+       invert: `ink` would go pale in dark mode and vanish into the fill. */
+    --color-key-ink: var(--color-gray-900);
     --color-key-black: var(--color-gray-900);
     --color-key-black-ink: var(--color-gray-300);
     --color-key-spent: var(--color-gray-400); /* a key the round is done with */
     --color-key-spent-ink: var(--color-gray-200);
     --color-key-hover: var(--color-indigo-50);
     --color-key-held: var(--color-green-500); /* a key you are holding down */
-    --color-key-next: var(--color-indigo-400); /* the note to play next */
+    /* What the score asks of a key — which one comes next, and the hold bar
+       draining down it for as long as the note is written to last. */
+    --color-key-next: var(--color-indigo-400);
+    /* The note name printed on a white key. It darkens in dark mode rather than
+       lightening, because the key it sits on does not invert — `faint` would
+       lighten it against a light key and sink it under the contrast floor. */
+    --color-key-label: var(--color-gray-400);
     /* How a run went, as a fixed scale. These are data, not chrome: the steps
        are matched to the share emoji (🟩 🟨 🟧 🟥 ⬜), and the share card is an
        image other people look at, so they hold the same value in both themes.
@@ -128,13 +140,27 @@ SPDX-License-Identifier: 0BSD
     --color-band-weak: var(--color-red-500);
     --color-band-none: var(--color-gray-300);
 
-    /* Bars in the practice charts: the run's peak, an ordinary reading, and the
-       track the readings sit on. */
+    /* The grade letters, S down to F. Another scale rather than a set of states:
+       E and F are both red, but they are a grade, not an error, so they move
+       when the scale is retuned and not when `danger` is. */
+    --color-grade-s: var(--color-amber-500);
+    --color-grade-a: var(--color-green-600);
+    --color-grade-b: var(--color-lime-600);
+    --color-grade-c: var(--color-yellow-600);
+    --color-grade-d: var(--color-orange-600);
+    --color-grade-e: var(--color-red-600);
+    --color-grade-f: var(--color-red-800);
+
+    /* The two bars in the practice charts: the run's peak, and the track the
+       other readings sit on. */
     --color-chart-peak: var(--color-indigo-500);
-    --color-chart-bar: var(--color-indigo-400);
     --color-chart-track: var(--color-indigo-300);
     /* A race has two runners: you in indigo, the ghost in fuchsia. */
     --color-ghost: var(--color-fuchsia-500);
+    /* The arcade's filled call to action. fuchsia-600, not the ghost fill it
+       sits near: white on fuchsia-500 is 3.5:1, under the floor. */
+    --color-ghost-solid: var(--color-fuchsia-600);
+    --color-ghost-solid-hover: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-600);
     --color-ghost-surface: var(--color-fuchsia-50);
     --color-ghost-line: var(--color-fuchsia-200);
@@ -185,10 +211,10 @@ SPDX-License-Identifier: 0BSD
     --color-accent-line: var(--color-indigo-900);
     --color-accent-line-strong: var(--color-indigo-700);
     --color-accent-ring: var(--color-indigo-500);
+    --color-accent-soft: var(--color-indigo-500);
 
     --color-success: var(--color-green-300);
     --color-success-solid: var(--color-green-700);
-    --color-success-solid-hover: var(--color-green-800);
     --color-success-surface: var(--color-green-950);
     --color-success-fill: var(--color-green-900);
     --color-success-line: var(--color-green-700);
@@ -208,6 +234,7 @@ SPDX-License-Identifier: 0BSD
     --color-warn-line: var(--color-amber-800);
     --color-warn-solid: var(--color-amber-400);
 
+    --color-info: var(--color-sky-100);
     --color-info-ink: var(--color-sky-200);
     --color-info-surface: var(--color-sky-950);
     --color-info-line: var(--color-sky-800);
@@ -219,7 +246,7 @@ SPDX-License-Identifier: 0BSD
     --color-paper-ink: var(--color-stone-500);
 
     --color-key-white: var(--color-gray-100);
-    --color-key-white-ink: var(--color-gray-900);
+    --color-key-ink: var(--color-gray-900);
     --color-key-black: var(--color-gray-800);
     --color-key-black-ink: var(--color-gray-300);
     --color-key-spent: var(--color-gray-700);
@@ -227,6 +254,7 @@ SPDX-License-Identifier: 0BSD
     --color-key-hover: var(--color-indigo-100);
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
+    --color-key-label: var(--color-gray-600);
 
     /* The run scale holds its values across themes — see above. */
     --color-band-best: var(--color-green-500);
@@ -236,11 +264,20 @@ SPDX-License-Identifier: 0BSD
     --color-band-weak: var(--color-red-500);
     --color-band-none: var(--color-gray-300);
 
+    --color-grade-s: var(--color-amber-300);
+    --color-grade-a: var(--color-green-400);
+    --color-grade-b: var(--color-lime-400);
+    --color-grade-c: var(--color-yellow-400);
+    --color-grade-d: var(--color-orange-400);
+    --color-grade-e: var(--color-red-400);
+    --color-grade-f: var(--color-red-500);
+
     --color-chart-peak: var(--color-indigo-500);
-    --color-chart-bar: var(--color-indigo-500);
     --color-chart-track: var(--color-indigo-800);
 
     --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-solid: var(--color-fuchsia-600);
+    --color-ghost-solid-hover: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-400);
     --color-ghost-surface: var(--color-fuchsia-950);
     --color-ghost-line: var(--color-fuchsia-900);

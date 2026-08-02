@@ -85,7 +85,7 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
                             aria-hidden="true"
                             className={`h-4 w-4 rounded-full transition-all duration-200 motion-reduce:transition-none ${
                                 sounding
-                                    ? "scale-150 bg-chart-bar shadow-[0_0_20px_theme(colors.indigo.500)]"
+                                    ? "scale-150 bg-accent-soft shadow-[0_0_20px] shadow-accent-ring"
                                     : "scale-100 bg-key-spent"
                             }`}
                         />

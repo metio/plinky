@@ -47,7 +47,7 @@ const FOUNDERS = [
 function DuetMark() {
     return (
         <span aria-hidden="true" className="inline-flex items-center gap-1 align-middle">
-            <span className="h-1.5 w-6 rounded-full bg-chart-bar" />
+            <span className="h-1.5 w-6 rounded-full bg-accent-soft" />
             <span className="h-1.5 w-3 rounded-full bg-key-spent" />
         </span>
     );

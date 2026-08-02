@@ -25,13 +25,13 @@ export type Grade = {
 // A gold "S" tier above an A–F gradient that runs green → red. Contrast-safe
 // text colours (light / dark) at the large size the grade letter is shown.
 export const GRADE_COLOR: Record<Letter, string> = {
-    S: "text-amber-500 dark:text-amber-300",
-    A: "text-green-600 dark:text-green-400",
-    B: "text-lime-600 dark:text-lime-400",
-    C: "text-yellow-600 dark:text-yellow-400",
-    D: "text-orange-600 dark:text-orange-400",
-    E: "text-red-600 dark:text-red-400",
-    F: "text-red-800 dark:text-red-500",
+    S: "text-grade-s",
+    A: "text-grade-a",
+    B: "text-grade-b",
+    C: "text-grade-c",
+    D: "text-grade-d",
+    E: "text-grade-e",
+    F: "text-grade-f",
 };
 
 const LETTERS: readonly Letter[] = ["S", "A", "B", "C", "D", "E", "F"];

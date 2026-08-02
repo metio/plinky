@@ -13,11 +13,20 @@
 //
 // A token has one definition and resolves per theme on its own, so:
 //
-//   1. No raw palette colour utility under app/. `bg-indigo-600` names a hue;
-//      `bg-accent-solid` names a role, and the role is defined once in app.css.
+//   1. No raw palette colour utility under app/ or core/. `bg-indigo-600` names
+//      a hue; `bg-accent-solid` names a role, defined once in app.css. core/ is
+//      pure but still holds class strings, and the scales living there — the
+//      grade letters — drift the same way a component would.
 //   2. Every token declares both themes. A token that exists only in @theme
 //      would silently render its light value on a dark page — exactly the bug
 //      rule 1 exists to prevent — so a missing `.dark` entry fails here.
+//   3. Every token is used. An unused one is a role nothing plays, and it makes
+//      the next reader reach for a name the product does not actually have.
+//   4. No `hover:`/`focus:`/`active:` utility resolves to the same token as the
+//      base it sits beside. Naming colours by role invites exactly this: a fill
+//      and its hover were two neighbouring palette steps, and folding both onto
+//      one role leaves a control that no longer responds to the pointer. The
+//      class compiles, the screen just stops reacting.
 //
 // Pure white and black are not palette steps and stay legal: white text on a
 // solid fill and a black scrim over an image mean the same thing in both themes.
@@ -81,10 +90,25 @@ const PROP =
 const HUE =
     "slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose";
 const PALETTE_UTILITY = new RegExp(`^(?:[\\w-]+:)*(${PROP})-(${HUE})-(\\d{2,3})(?:/\\d+)?$`);
-// A colour written straight into the class, which no theme can reach either.
+// A colour written straight into the class, which no theme can reach either —
+// as a literal, or pulled back out of the palette through `theme(colors.…)`
+// inside an arbitrary value, where it hides from the utility pattern above.
 const LITERAL_UTILITY = new RegExp(`^(?:[\\w-]+:)*(?:${PROP})-\\[(?:#|rgba?\\(|hsla?\\(|oklch\\()`);
+const THEME_ESCAPE = /theme\(\s*colors\./;
+// `dark:hover:bg-x` → prefix `dark:`, state `hover`, so the base it would have
+// to differ from is `dark:bg-x` and not the light-theme one.
+const STATE_UTILITY = new RegExp(
+    `^((?:[\\w-]+:)*?)(hover|focus|focus-visible|focus-within|active|group-hover|group-focus):(${PROP})-([\\w-]+(?:/\\d+)?)$`,
+);
 
 const SKIP = new Set(["paraglide", "__screenshots__", "__story-shots__"]);
+// The keyboard skins are the one place a palette belongs in source. Each entry
+// is a whole named look the player picks — "sunset", "forest" — so its colours
+// are the thing itself, not a role standing in for one, and they already sit in
+// a single table beside the canvas hexes the video export paints with. There is
+// no light/dark pair to drift here: a skin names its own `dark:` variant because
+// the key it paints does not invert.
+const EXEMPT = new Set(["core/keyboardTheme.ts"]);
 function walk(dir) {
     const out = [];
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -118,15 +142,33 @@ function classLists(src) {
     return out;
 }
 
-for (const file of walk(join(root, "app"))) {
+const used = new Set();
+for (const file of [...walk(join(root, "app")), ...walk(join(root, "core"))]) {
+    const rel = file.slice(root.length + 1);
+    if (EXEMPT.has(rel)) continue;
     const src = readFileSync(file, "utf8");
+    for (const name of light.keys()) {
+        if (new RegExp(`[-:]${name}(?![\\w-])`).test(src)) used.add(name);
+    }
     for (const { text, offset } of classLists(src)) {
-        for (const token of text.split(/\s+/).filter(Boolean)) {
+        const classes = text.split(/\s+/).filter(Boolean);
+        for (const token of classes) {
+            const state = STATE_UTILITY.exec(token);
+            if (state) {
+                const [, prefix, , prop, value] = state;
+                const base = `${prefix ?? ""}${prop}-${value}`;
+                if (classes.includes(base)) {
+                    const line = src.slice(0, offset).split("\n").length;
+                    failures.push(
+                        `${rel}:${line}  \`${token}\` resolves to the same colour as \`${base}\`, so it does nothing`,
+                    );
+                }
+            }
             const palette = PALETTE_UTILITY.exec(token);
-            const literal = !palette && LITERAL_UTILITY.test(token);
+            const literal = !palette && (LITERAL_UTILITY.test(token) || THEME_ESCAPE.test(token));
             if (!palette && !literal) continue;
             const line = src.slice(0, offset).split("\n").length;
-            const where = `${file.slice(root.length + 1)}:${line}`;
+            const where = `${rel}:${line}`;
             if (literal) {
                 failures.push(`${where}  \`${token}\` writes a colour straight into the class`);
                 continue;
@@ -138,6 +180,12 @@ for (const file of walk(join(root, "app"))) {
                     (hit ? ` — \`${prop}-${hit}\` already resolves to ${hue}-${step}` : ""),
             );
         }
+    }
+}
+
+for (const name of light.keys()) {
+    if (!used.has(name)) {
+        failures.push(`app/app.css  token \`${name}\` is declared but nothing uses it`);
     }
 }
 
