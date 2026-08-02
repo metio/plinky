@@ -195,10 +195,22 @@ tools than CI's fresh install and can pass what CI fails.
   vitest project screenshots every story light and dark (the hook flips the
   `.dark` root class for a second, `-dark`-named baseline) and compares both
   to committed baselines in `app/**/__story-shots__/` (chromium-only, fixed
-  800×600 viewport, the flake pins the browser so local and CI rasterize
-  identically). After an intentional visual change — or when adding a story —
+  800×600 viewport, the flake pinning the browser so local and CI rasterize
+  the same way — closely, but not to the pixel). After an intentional visual
+  change — or when adding a story —
   refresh with `npm run test:storybook -- -u` and commit the changed images; a
-  baseline diff in review is the feature. Stories must render
+  baseline diff in review is the feature. **A green local run does not prove CI
+  agrees.** The comparator allows `allowedMismatchedPixelRatio: 0.005`
+  (`vitest.config.ts`), so a change landing near that line can measure under it
+  on one machine and over it on another — a card border moving one palette step
+  did exactly that, passing every local run while CI rejected it. Treat a
+  baseline failure CI reports but this host cannot reproduce as real. Note that
+  `-u` only rewrites what it considers mismatched, so where local sees no
+  mismatch it is a no-op and re-running it changes nothing: **delete the
+  offending PNG first**, then `-u` rebuilds it from the current render. A
+  deliberate visual change whose diff lands near the threshold is worth pushing
+  clearly over or under it, since a borderline baseline can flip between
+  machines on an unrelated commit. Stories must render
   deterministically: no live dates, no randomness, no unawaited async — and a
   story whose visible content includes emoji joins the `EMOJI_STORIES` skip
   set in `.storybook/vitest.setup.ts` (emoji glyphs rasterize
