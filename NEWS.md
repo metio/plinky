@@ -10,6 +10,24 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 2 August 2026
 
+**Colours read the same in both themes.** Every colour in Plinky is now named for the
+job it does — the muted grey of a hint, the green of a right answer, the indigo of the
+next note to play — instead of being written out twice, once for the light theme and
+once for dark. The two had quietly drifted apart in places, and pulling them back
+together fixed three things you can see:
+
+- In the ear trainer, a correct answer used to sit below the contrast floor in dark
+  mode — white text on a green too pale to carry it. Both the right answer and the
+  missed one are now legible in either theme.
+- The little tab pickers dotted through Settings and the run panel had grey labels on a
+  grey track. The unselected labels are darker, so a choice you haven't made yet is
+  still readable.
+- The arcade's play button had lost its hover entirely and drew its text too faintly.
+  It responds again.
+
+A few tinted panels also sit on a slightly deeper outline in dark mode, so a card edge
+reads as an edge rather than fading into the page.
+
 **Help items with a stray space now appear.** A help item is filed under the page it
 belongs to. If that page name was typed with a leading or trailing space, the item was
 published but shown on no page at all — and nothing anywhere reported it missing. The
