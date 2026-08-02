@@ -91,3 +91,26 @@ describe("paragraphs", () => {
         expect(paragraphs("line one\nline two")).toEqual(["line one\nline two"]);
     });
 });
+
+describe("what an editor typed, normalised", () => {
+    it("shows an item whose page key carries stray whitespace", () => {
+        // The key is matched exactly against the page being rendered, so an untrimmed
+        // one publishes an item that appears on no page and reports nothing wrong.
+        const items = parseHelp([{ id: "1", pageKey: " play ", text: "Helpful thing" }]);
+        expect(items[0]?.pageKey).toBe("play");
+        expect(itemsForPage(items, "play")).toHaveLength(1);
+    });
+
+    it("trims the text an editor pasted", () => {
+        const items = parseHelp([{ id: "1", pageKey: "play", text: "  Helpful thing\n" }]);
+        expect(items[0]?.text).toBe("Helpful thing");
+    });
+
+    it("still matches a page exactly rather than by prefix", () => {
+        const items = parseHelp([
+            { id: "1", pageKey: "play", text: "x" },
+            { id: "2", pageKey: "playground", text: "y" },
+        ]);
+        expect(itemsForPage(items, "play").map((i) => i.id)).toEqual(["1"]);
+    });
+});

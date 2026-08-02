@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_DRILL, type DrillOptions, generateDrill, pitchPool, spell } from "./drill";
+import { seededRandom } from "./random";
 
 // A deterministic rng: cycles the given values, so a test picks exactly which
 // draws happen rather than hoping a seed lands somewhere useful.
@@ -207,3 +208,42 @@ function seeded(seed: number): () => number {
         return state / 4294967296;
     };
 }
+
+describe("options no reader would choose", () => {
+    // The panel bounds every knob, so none of this arrives through the UI. It is here
+    // because the generator is also called from code — the daily challenge, the
+    // placement ladder — and a drill that throws or writes a pitch off the keyboard
+    // would take the page down rather than draw a bad bar.
+    const SEMI: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const midisIn = (xml: string): number[] =>
+        [
+            ...xml.matchAll(
+                /<step>([A-G])<\/step>(?:<alter>(-?\d+)<\/alter>)?<octave>(-?\d+)<\/octave>/g,
+            ),
+        ].map((m) => (Number(m[3]) + 1) * 12 + SEMI[m[1]!]! + Number(m[2] ?? 0));
+
+    it.each([
+        ["an inverted range", { low: 90, high: 40 }],
+        ["a range holding no note of the key", { low: 61, high: 61, fifths: 0 }],
+        ["a range of one note", { low: 60, high: 60 }],
+        ["no bars", { bars: 0 }],
+        ["no beats to the bar", { beatsPerBar: 0 }],
+        ["a fractional meter", { beatsPerBar: 3.5 }],
+        ["a key signature past the circle of fifths", { fifths: 30 }],
+        ["more notes per column than fingers", { notesPerColumn: 40 }],
+        ["two hands on a one-note range", { hands: 2 as const, low: 60, high: 60 }],
+        ["a range off the bottom of the piano", { low: -50, high: -10 }],
+        ["a range off the top", { low: 200, high: 300 }],
+    ])("draws something playable for %s", (_case, patch) => {
+        const xml = generateDrill({ ...DEFAULT_DRILL, ...patch }, seededRandom(7));
+        expect(xml).toContain("score-partwise");
+        const off = midisIn(xml).filter((n) => !Number.isFinite(n) || n < 21 || n > 108);
+        expect(off.slice(0, 3)).toEqual([]);
+    });
+
+    it("keeps the pool on the keyboard however wide the range asked", () => {
+        const pool = pitchPool({ ...DEFAULT_DRILL, low: -100, high: 500, chromatic: true });
+        expect(Math.min(...pool)).toBeGreaterThanOrEqual(21);
+        expect(Math.max(...pool)).toBeLessThanOrEqual(108);
+    });
+});

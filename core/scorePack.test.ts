@@ -61,3 +61,28 @@ describe("score pack", () => {
         expect(pack.scores.map((entry) => entry.id)).toEqual(["a"]);
     });
 });
+
+describe("a score with no name", () => {
+    it("drops an entry whose id is the empty string", () => {
+        // The library keys on the id and /play/<id> links to it, so the empty string
+        // names nothing — the board and the progress bundle drop theirs the same way.
+        const pack = JSON.stringify({
+            format: "plinky-scores",
+            version: 1,
+            scores: [
+                { id: "", title: "Nameless", xml: "<score/>" },
+                { id: "keeper", title: "Real", xml: "<score/>" },
+            ],
+        });
+        expect(parsePack(pack).scores.map((s) => s.id)).toEqual(["keeper"]);
+    });
+
+    it("refuses a bundle whose every score is nameless", () => {
+        const pack = JSON.stringify({
+            format: "plinky-scores",
+            version: 1,
+            scores: [{ id: "", title: "T", xml: "<score/>" }],
+        });
+        expect(() => parsePack(pack)).toThrow();
+    });
+});

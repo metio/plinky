@@ -49,10 +49,14 @@ export function parseHelpItem(raw: unknown): HelpItem | null {
     }
     const item: HelpItem = {
         id,
-        pageKey,
+        // Trimmed, because it is matched exactly against the page being rendered. An
+        // editor who types a trailing space would otherwise publish an item that
+        // appears on no page at all and reports nothing wrong anywhere — the emptiness
+        // check above already trims to decide, so the stored value follows it.
+        pageKey: pageKey.trim(),
         order:
             typeof record.order === "number" && Number.isFinite(record.order) ? record.order : 0,
-        text,
+        text: text.trim(),
     };
     if (isHttpsUrl(record.imageUrl)) {
         item.imageUrl = record.imageUrl;
