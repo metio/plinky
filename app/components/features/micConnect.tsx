@@ -36,7 +36,7 @@ export function MicConnect() {
                 >
                     {listening ? m.mic_stop() : m.mic_listen()}
                 </Button>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-muted">
                     {micStatus === "requesting" && m.mic_requesting()}
                     {micStatus === "listening" && m.mic_listening()}
                     {micStatus === "denied" && m.mic_denied()}
@@ -45,13 +45,13 @@ export function MicConnect() {
             </div>
 
             {listening && (
-                <p className="text-sm text-gray-700 dark:text-gray-300" role="status">
+                <p className="text-sm text-body" role="status">
                     {heard === null ? (
                         m.mic_play_something()
                     ) : (
                         <>
                             {m.mic_heard()}{" "}
-                            <span className="rounded-md bg-indigo-100 px-2 py-1 font-mono text-sm text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100">
+                            <span className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-indigo-800 dark:text-indigo-100">
                                 {noteName(heard)}
                             </span>
                         </>
@@ -62,7 +62,7 @@ export function MicConnect() {
             {/* Tuning is its own guided flow: it takes over the microphone to
             measure the room, so it lives below the plain listen check rather
             than running alongside it. */}
-            <div className="border-gray-200 border-t pt-3 dark:border-gray-800">
+            <div className="border-line border-t pt-3">
                 <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                     {m.mic_calibrate_lead()}
                 </p>

@@ -17,7 +17,7 @@ function Frame({ midi, children }: { midi: MidiAccessPort; children: ReactNode }
     return (
         <ServicesProvider services={{ midi }}>
             <MidiProvider>
-                <div className="relative h-16 w-40 rounded-md border border-gray-300 dark:border-gray-700">
+                <div className="relative h-16 w-40 rounded-md border border-line-strong">
                     {children}
                 </div>
             </MidiProvider>

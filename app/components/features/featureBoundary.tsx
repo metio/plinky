@@ -76,7 +76,7 @@ function FeatureFallback({
     const agent = typeof navigator === "undefined" ? "" : navigator.userAgent;
 
     return (
-        <section className="space-y-3 rounded-md border border-gray-200 p-4 dark:border-gray-800">
+        <section className="space-y-3 rounded-md border border-line p-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">{m.feature_broken()}</p>
             <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={onRetry} className={buttonClasses("secondary")}>

@@ -82,7 +82,7 @@ export function GradeRoadmap({
                                 <span className="tabular-nums">
                                     {m.grades_pool({ mastered, total })}
                                 </span>
-                                <span className="text-gray-500 dark:text-gray-400">
+                                <span className="text-muted">
                                     {next
                                         ? m.grades_to_next({
                                               count: next.remaining,
@@ -91,14 +91,14 @@ export function GradeRoadmap({
                                         : m.grades_maxed()}
                                 </span>
                                 <Show when={due > 0}>
-                                    <span className="text-amber-700 dark:text-amber-400">
+                                    <span className="text-warn">
                                         {m.grades_due({ count: due })}
                                     </span>
                                 </Show>
                             </span>
                         </div>
                         <details className="text-sm">
-                            <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+                            <summary className="cursor-pointer text-xs text-muted">
                                 {m.grade_about_heading()}
                             </summary>
                             <p className="pt-1 text-gray-600 dark:text-gray-400">

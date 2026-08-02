@@ -36,14 +36,12 @@ export function DailyReveal({
                 setOpened(true);
                 onOpen?.();
             }}
-            className="flex w-full flex-col items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50/50 px-6 py-12 text-center transition hover:border-indigo-300 hover:shadow-md dark:border-indigo-900 dark:bg-indigo-950/30 dark:hover:border-indigo-700"
+            className="flex w-full flex-col items-center gap-3 rounded-xl border border-accent-line bg-indigo-50/50 px-6 py-12 text-center transition hover:border-accent-line-strong hover:shadow-md dark:bg-indigo-950/30"
         >
             <span aria-hidden="true" className="animate-bounce text-5xl motion-reduce:animate-none">
                 🎁
             </span>
-            <span className="text-lg font-medium text-indigo-800 dark:text-indigo-200">
-                {m.daily_reveal()}
-            </span>
+            <span className="text-lg font-medium text-accent-deep">{m.daily_reveal()}</span>
         </button>
     );
 }

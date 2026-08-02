@@ -19,13 +19,12 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 // mastery-tracked.
 const BTN = "rounded-md border px-3 py-1 text-sm tabular-nums";
 const ON = "border-indigo-600 bg-indigo-600 text-white";
-const OFF =
-    "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
+const OFF = "border-line-strong text-body hover:bg-gray-50 dark:hover:bg-gray-800";
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="flex flex-wrap items-center gap-2">
-            <span className="w-16 shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <span className="w-16 shrink-0 text-xs font-medium uppercase tracking-wide text-muted">
                 {label}
             </span>
             {children}
@@ -58,7 +57,7 @@ export function ExerciseForms({ config }: { config: ExerciseConfig }) {
     const showIntervals = supportsIntervals(config.type) && config.hands !== "contrary";
 
     return (
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+        <div className="space-y-2 rounded-lg border border-line p-3">
             <Row label={m.exercise_octaves()}>
                 {([1, 2] as const).map((octaves) => (
                     <Link

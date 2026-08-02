@@ -47,9 +47,9 @@ function rungClasses(verdict: Verdict, dimmed: boolean): string {
         return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
     }
     if (dimmed) {
-        return "border-gray-200 bg-white text-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-600";
+        return "border-line bg-white text-gray-400 dark:bg-gray-900 dark:text-gray-600";
     }
-    return "border-gray-300 bg-white text-gray-900 hover:border-indigo-600 hover:text-indigo-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-indigo-500 dark:hover:text-indigo-300";
+    return "border-line-strong bg-white text-ink hover:border-indigo-600 hover:text-accent-strong dark:bg-gray-900 dark:hover:border-indigo-500";
 }
 
 export function EarLadder({

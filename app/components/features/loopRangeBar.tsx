@@ -7,7 +7,7 @@ import { m } from "../../paraglide/messages.js";
 // A typed bar number for the loop range — a number field (not a stepper), because a
 // piece can run to many bars and typing the target beats tapping a stepper there.
 const NUMBER_INPUT =
-    "w-14 rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm tabular-nums text-gray-700 dark:border-gray-700 dark:text-gray-300";
+    "w-14 rounded-md border border-line-strong bg-transparent px-2 py-1 text-sm tabular-nums text-body";
 
 // The active loop's range and narrowing controls, sitting right by the score — the
 // practice-tools drawer's backdrop covers the score, so narrowing happens here, drawer
@@ -32,21 +32,19 @@ export function LoopRangeBar({
 }) {
     return (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="font-medium text-red-600 dark:text-red-400">
-                🔁 {m.loop_section()}
-            </span>
+            <span className="font-medium text-danger">🔁 {m.loop_section()}</span>
             {from === 1 && to === measureCount ? (
-                <span className="text-gray-500 dark:text-gray-400">{m.loop_hint_narrow()}</span>
+                <span className="text-muted">{m.loop_hint_narrow()}</span>
             ) : (
                 <button
                     type="button"
                     onClick={onWholeSong}
-                    className="min-h-11 text-indigo-700 hover:underline dark:text-indigo-300"
+                    className="min-h-11 text-accent-strong hover:underline"
                 >
                     {m.loop_whole_song()}
                 </button>
             )}
-            <span className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
+            <span className="flex items-center gap-1 text-body">
                 <input
                     type="number"
                     min={1}

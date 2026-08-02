@@ -100,12 +100,12 @@ export function ProgressBackup() {
                     }}
                 />
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-muted">
                 {m.progress_backup_holds({ count: pluralItems(count) })}{" "}
                 {m.progress_backup_restore_hint()}
             </p>
             {error && (
-                <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-300">
+                <p role="alert" className="text-sm font-medium text-danger-strong">
                     {error}
                 </p>
             )}

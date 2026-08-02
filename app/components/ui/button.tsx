@@ -11,20 +11,18 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "plain";
 
 const VARIANT: Record<ButtonVariant, string> = {
-    primary:
-        "bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400",
-    secondary:
-        "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900",
-    ghost: "text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900",
+    primary: "bg-accent-solid text-white hover:bg-accent-solid-hover",
+    secondary: "bg-accent-surface text-accent-strong hover:bg-accent-fill",
+    ghost: "text-accent-strong hover:bg-accent-fill",
     // red-700, not the brighter reds: white text needs it to clear the WCAG
     // 4.5:1 contrast ratio in both themes.
-    danger: "bg-red-700 text-white hover:bg-red-800 dark:bg-red-700 dark:hover:bg-red-600",
+    danger: "bg-danger-solid text-white hover:bg-danger-solid-hover",
     // Ghost's hover, but no text colour of its own — for a button that sets its own
     // colour to signal state (e.g. the learned toggle). Without tailwind-merge, a variant
     // that shipped its own text-* would fight the caller's, and same-property utilities
     // resolve by stylesheet order, not class-string order — so the caller could silently
     // lose. Owning no colour here leaves the caller's the only one, so it always wins.
-    plain: "hover:bg-indigo-100 dark:hover:bg-indigo-900",
+    plain: "hover:bg-accent-fill",
 };
 
 const BASE =

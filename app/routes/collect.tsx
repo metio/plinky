@@ -55,14 +55,12 @@ export default function CollectRoute() {
             </header>
 
             <label className="block space-y-1">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {m.collect_paste()}
-                </span>
+                <span className="text-sm font-medium text-body">{m.collect_paste()}</span>
                 <textarea
                     value={text}
                     onChange={(event) => setText(event.target.value)}
                     rows={5}
-                    className="w-full rounded-lg border border-gray-300 p-2 font-mono text-xs dark:border-gray-700 dark:bg-gray-900"
+                    className="w-full rounded-lg border border-line-strong p-2 font-mono text-xs dark:bg-gray-900"
                 />
             </label>
 
@@ -85,7 +83,7 @@ export default function CollectRoute() {
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-max border-collapse text-sm">
                             <thead>
-                                <tr className="border-b border-gray-200 text-left dark:border-gray-800">
+                                <tr className="border-b border-line text-left">
                                     <th scope="col" className="p-2">
                                         {m.collect_who()}
                                     </th>
@@ -110,9 +108,7 @@ export default function CollectRoute() {
                             </tbody>
                         </table>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {m.report_not_proof()}
-                    </p>
+                    <p className="text-xs text-muted">{m.report_not_proof()}</p>
                 </>
             )}
         </main>
@@ -123,7 +119,7 @@ function Row({ report, columns }: { report: AssignmentReport; columns: string[] 
     const { played, total } = reportSummary(report);
     const scores = new Map(report.items.map((item) => [item.id, item.score]));
     return (
-        <tr className="border-b border-gray-100 dark:border-gray-900">
+        <tr className="border-b border-line-faint">
             <th scope="row" className="p-2 text-left font-medium">
                 {report.who || m.collect_unnamed()}
             </th>

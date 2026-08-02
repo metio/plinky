@@ -43,16 +43,14 @@ export function AssignmentStepList({
                         {step.status === "done" ? <CheckIcon className="h-4 w-4" /> : index + 1}
                     </span>
                     {isMissing(step.scoreId) ? (
-                        <span className="italic text-gray-400 dark:text-gray-500">
-                            {m.assignments_step_missing()}
-                        </span>
+                        <span className="italic text-faint">{m.assignments_step_missing()}</span>
                     ) : (
                         <Link
                             to={`/play/${step.scoreId}`}
                             className={
                                 step.status === "current"
-                                    ? "font-medium text-indigo-700 dark:text-indigo-300"
-                                    : "text-gray-700 hover:underline dark:text-gray-300"
+                                    ? "font-medium text-accent-strong"
+                                    : "text-body hover:underline"
                             }
                         >
                             {titleOf(step.scoreId)}
@@ -90,11 +88,11 @@ export function AssignmentCard({
 }) {
     const doneCount = steps.filter((step) => step.status === "done").length;
     return (
-        <li className="space-y-2 rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-gray-800">
+        <li className="space-y-2 rounded-md border border-line px-3 py-2 text-sm">
             <div className="flex flex-wrap items-center gap-2">
                 <span className="flex-1">
                     <span className="font-medium">{assignment.name}</span>{" "}
-                    <span className="tabular-nums text-gray-500 dark:text-gray-400">
+                    <span className="tabular-nums text-muted">
                         {doneCount}/{steps.length}
                     </span>
                 </span>
@@ -110,7 +108,7 @@ export function AssignmentCard({
             {/* Descriptions are real instructions, often several sentences with
                 line breaks — give them their space instead of clamping. */}
             {description && (
-                <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-muted">
                     {description}
                 </p>
             )}

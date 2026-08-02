@@ -22,7 +22,7 @@ import type { FingerQuality } from "../../../core/fingeringScore";
 const QUALITY_STYLE: Record<FingerQuality, string> = {
     good: "border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-950/40",
     ok: "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40",
-    bad: "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40",
+    bad: "border-danger-line bg-red-50 dark:bg-red-950/40",
 };
 const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string }> = {
     good: { glyph: "✓", label: () => m.fingering_quality_good() },
@@ -30,17 +30,17 @@ const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string
     bad: { glyph: "!", label: () => m.fingering_quality_bad() },
 };
 const QUALITY_TEXT: Record<FingerQuality, string> = {
-    good: "text-green-700 dark:text-green-300",
+    good: "text-success",
     ok: "text-amber-700 dark:text-amber-300",
-    bad: "text-red-700 dark:text-red-300",
+    bad: "text-danger-strong",
 };
-const NEUTRAL = "border-gray-200 dark:border-gray-800";
+const NEUTRAL = "border-line";
 
 // The hand-toggle button style.
 const HAND_BUTTON = (selected: boolean) =>
     selected
         ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-        : "rounded-md bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300";
+        : "rounded-md bg-accent-surface px-3 py-1.5 text-sm font-medium text-accent-strong hover:bg-indigo-100";
 
 // Two bars at a time, the same window the Finger Position tab works in.
 const WINDOW = 2;
@@ -168,7 +168,7 @@ export function FingeringStrip({
     };
 
     return (
-        <div className="mx-auto w-full max-w-3xl space-y-2 rounded-md border border-gray-200 p-2 dark:border-gray-800">
+        <div className="mx-auto w-full max-w-3xl space-y-2 rounded-md border border-line p-2">
             <div className="flex flex-wrap items-center gap-2">
                 {staffCount >= 2 && (
                     <fieldset aria-label={m.hand_label()} className="flex items-center gap-1">
@@ -194,7 +194,7 @@ export function FingeringStrip({
                         }}
                         disabled={!window.canPrev}
                         aria-label={m.fingering_prev_bars()}
-                        className="rounded-md bg-indigo-50 px-2 py-1.5 text-sm font-medium text-indigo-700 disabled:opacity-40 dark:bg-indigo-950 dark:text-indigo-300"
+                        className="rounded-md bg-accent-surface px-2 py-1.5 text-sm font-medium text-accent-strong disabled:opacity-40"
                     >
                         ‹
                     </button>
@@ -213,7 +213,7 @@ export function FingeringStrip({
                         }}
                         disabled={!window.canNext}
                         aria-label={m.fingering_next_bars()}
-                        className="rounded-md bg-indigo-50 px-2 py-1.5 text-sm font-medium text-indigo-700 disabled:opacity-40 dark:bg-indigo-950 dark:text-indigo-300"
+                        className="rounded-md bg-accent-surface px-2 py-1.5 text-sm font-medium text-accent-strong disabled:opacity-40"
                     >
                         ›
                     </button>
@@ -221,7 +221,7 @@ export function FingeringStrip({
             </div>
 
             {positions.length === 0 ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.fingering_empty()}</p>
+                <p className="text-sm text-muted">{m.fingering_empty()}</p>
             ) : (
                 <div className="flex flex-wrap items-end justify-center gap-1.5">
                     {positions.map((pos, p) => (
@@ -267,7 +267,7 @@ export function FingeringStrip({
                                                     : "bg-transparent"
                                             }`}
                                         >
-                                            <span className="font-mono text-xs text-gray-700 dark:text-gray-300">
+                                            <span className="font-mono text-xs text-body">
                                                 {noteName(pitch)}
                                             </span>
                                             <span className="text-base font-semibold tabular-nums">
@@ -289,7 +289,7 @@ export function FingeringStrip({
                     {fingerRow("right")}
                 </fieldset>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted">
                 {m.fingering_color_legend()} {m.fingering_heat_legend()}
             </p>
         </div>

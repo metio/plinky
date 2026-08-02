@@ -261,13 +261,13 @@ export default function AssignmentsRoute() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.assignments_heading()}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.assignments_intro()}</p>
+                <p className="text-sm text-muted">{m.assignments_intro()}</p>
             </header>
 
             {status && (
                 <p
                     role="status"
-                    className="rounded-md bg-indigo-50 px-3 py-2 text-sm text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200"
+                    className="rounded-md bg-accent-surface px-3 py-2 text-sm text-accent-deep"
                 >
                     {status}
                 </p>
@@ -289,7 +289,7 @@ export default function AssignmentsRoute() {
             />
 
             {tab === "list" && incoming && (
-                <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
+                <section className="space-y-2 rounded-md border border-accent-line bg-indigo-50/50 p-4 dark:bg-indigo-950/30">
                     <h2 className="font-semibold">{m.assignments_received_heading()}</h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                         {m.assignments_received_detail({
@@ -384,9 +384,7 @@ export default function AssignmentsRoute() {
                         />
                     </div>
                     {assignments.length === 0 ? (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {m.assignments_yours_empty()}
-                        </p>
+                        <p className="text-sm text-muted">{m.assignments_yours_empty()}</p>
                     ) : (
                         <ul className="space-y-2">
                             {assignments.map((assignment) => {

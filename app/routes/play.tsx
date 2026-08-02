@@ -117,7 +117,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 {personSlug(score.composer) ? (
                                     <Link
                                         to={`/person/${personSlug(score.composer)}`}
-                                        className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+                                        className="hover:text-accent hover:underline"
                                     >
                                         {canonicalComposer(score.composer)}
                                     </Link>

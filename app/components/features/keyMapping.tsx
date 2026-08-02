@@ -116,7 +116,7 @@ export function KeyMapping() {
 
     return (
         <div className="space-y-3">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{m.keymap_help()}</p>
+            <p className="text-xs text-muted">{m.keymap_help()}</p>
             {HANDS.map((hand) => (
                 <div key={hand} className="space-y-1">
                     <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -148,7 +148,7 @@ export function KeyMapping() {
                                             : "border-gray-300 hover:border-indigo-400 dark:border-gray-700"
                                     }`}
                                 >
-                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                    <span className="text-[10px] text-muted">
                                         {NOTE_LABELS[semitone]}
                                     </span>
                                     <span className="font-mono text-sm font-semibold">
@@ -184,7 +184,7 @@ export function KeyMapping() {
                                         : "border-gray-300 hover:border-indigo-400 dark:border-gray-700"
                                 }`}
                             >
-                                <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                <span className="text-[10px] text-muted">
                                     {PEDAL_LABEL[pedal]()}
                                 </span>
                                 <span className="font-mono text-sm font-semibold">
@@ -194,16 +194,14 @@ export function KeyMapping() {
                         );
                     })}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{m.keymap_pedals_help()}</p>
+                <p className="text-xs text-muted">{m.keymap_pedals_help()}</p>
             </div>
             <div className="flex items-center gap-3">
                 {pedalClash ? (
-                    <span className="text-xs text-red-600 dark:text-red-400">
-                        {m.keymap_pedal_taken()}
-                    </span>
+                    <span className="text-xs text-danger">{m.keymap_pedal_taken()}</span>
                 ) : (
                     arming && (
-                        <span className="text-xs text-indigo-700 dark:text-indigo-300">
+                        <span className="text-xs text-accent-strong">
                             {arming.kind === "pedal" ? m.keymap_press_pedal() : m.keymap_press()}
                         </span>
                     )

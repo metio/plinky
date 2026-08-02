@@ -20,10 +20,10 @@ export function ConsentBanner() {
     return (
         <section
             aria-label={m.consent_banner_label()}
-            className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 p-4 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95"
+            className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white/95 p-4 backdrop-blur dark:bg-gray-900/95"
         >
             <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                <p className="text-sm leading-relaxed text-body">
                     {m.consent_banner_body()}{" "}
                     <LocalizedLink to="/datenschutz" className={linkClasses}>
                         {m.settings_analytics_link()}

@@ -145,8 +145,8 @@ export function HomeToday() {
     }
 
     return (
-        <section className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50/50 p-5 dark:border-indigo-900 dark:bg-indigo-950/30">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">
+        <section className="space-y-3 rounded-xl border border-accent-line bg-indigo-50/50 p-5 dark:bg-indigo-950/30">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-accent-strong">
                 {m.today_heading()}
             </h2>
             <ul className="space-y-2">
@@ -154,12 +154,12 @@ export function HomeToday() {
                     <li key={task.key}>
                         <Link
                             to={task.to}
-                            className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
+                            className="group flex items-center gap-3 rounded-lg border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm dark:bg-gray-900"
                         >
                             <span aria-hidden="true" className="text-xl">
                                 {task.key === "daily" && task.done ? "✅" : ICON[task.key]}
                             </span>
-                            <span className="font-medium text-gray-900 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
+                            <span className="font-medium text-ink group-hover:text-accent-strong">
                                 {taskLabel(task)} →
                             </span>
                         </Link>

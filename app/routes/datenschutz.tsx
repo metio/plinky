@@ -29,10 +29,8 @@ export function meta(_args: Route.MetaArgs) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
     return (
         <section className="space-y-2">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
-            <div className="space-y-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                {children}
-            </div>
+            <h2 className="text-base font-semibold text-ink">{title}</h2>
+            <div className="space-y-2 text-sm leading-relaxed text-body">{children}</div>
         </section>
     );
 }
@@ -41,7 +39,7 @@ export default function Datenschutz() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <h1 className="text-2xl font-semibold">{m.datenschutz_title()}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{m.datenschutz_updated()}</p>
+            <p className="text-sm text-muted">{m.datenschutz_updated()}</p>
 
             <LegalTranslationNotice page="datenschutz" />
 
@@ -54,7 +52,7 @@ export default function Datenschutz() {
                     {m.contact_email_label()}{" "}
                     <a
                         href="mailto:contact@plinky.fun"
-                        className="text-indigo-700 hover:underline dark:text-indigo-300"
+                        className="text-accent-strong hover:underline"
                     >
                         contact@plinky.fun
                     </a>

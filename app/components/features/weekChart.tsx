@@ -10,9 +10,7 @@ export function WeekChart({ recent }: { recent: PracticeSummary["recent"] }) {
     const max = Math.max(1, ...recent.map((day) => day.notes));
     return (
         <div>
-            <h2 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                {m.progress_last_7_days()}
-            </h2>
+            <h2 className="mb-2 text-sm font-medium text-body">{m.progress_last_7_days()}</h2>
             <div className="flex h-32 items-end gap-2">
                 {recent.map((day) => (
                     <div
@@ -28,9 +26,7 @@ export function WeekChart({ recent }: { recent: PracticeSummary["recent"] }) {
                             className="w-full rounded-t bg-indigo-500"
                             style={{ height: `${Math.round((day.notes / max) * 100)}%` }}
                         />
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {day.date.slice(5)}
-                        </span>
+                        <span className="text-xs text-muted">{day.date.slice(5)}</span>
                     </div>
                 ))}
             </div>

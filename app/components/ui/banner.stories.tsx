@@ -55,7 +55,7 @@ export const WithFooter: Story = {
             onDismiss={() => {}}
             dismissLabel="Dismiss"
             emphasis
-            footer={<p className="text-sm text-indigo-900 dark:text-indigo-200">Share the run</p>}
+            footer={<p className="text-sm text-accent-ink">Share the run</p>}
         >
             Grade 3 reached
         </Banner>

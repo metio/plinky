@@ -331,7 +331,7 @@ function RunSetupPanel() {
                                 />
                             )}
                             {sightReadRecord && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                <p className="text-sm text-muted">
                                     {m.sight_read_already({
                                         letter: sightReadRecord.letter,
                                         score: sightReadRecord.score,
@@ -353,7 +353,7 @@ function RunSetupPanel() {
                     )}
                     {!lockTempo && trainerOn && (
                         <div className="space-y-1">
-                            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                            <label className="flex items-center gap-2 text-sm text-body">
                                 <span>{m.tempo_trainer_target()}</span>
                                 <input
                                     type="range"
@@ -367,9 +367,7 @@ function RunSetupPanel() {
                                 />
                                 <Bpm tempo={trainerTarget} term />
                             </label>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {m.tempo_trainer_target_caption()}
-                            </p>
+                            <p className="text-xs text-muted">{m.tempo_trainer_target_caption()}</p>
                         </div>
                     )}
                     <SwitchField
@@ -421,7 +419,7 @@ function TransposeRow({
 }) {
     return (
         <div className="space-y-1">
-            <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <span className="flex items-center gap-2 text-sm text-body">
                 <span>{m.transpose()}</span>
                 <Stepper
                     value={m.transpose_semitones({
@@ -449,7 +447,7 @@ function TransposeRow({
                     </IconButton>
                 )}
             </span>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{m.transpose_caption()}</p>
+            <p className="text-xs text-muted">{m.transpose_caption()}</p>
         </div>
     );
 }

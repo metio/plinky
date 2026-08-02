@@ -27,8 +27,8 @@ import { m } from "../../paraglide/messages.js";
 // baselines; real browsers render 400 fine, but the pinned baseline browser does
 // not, so we steer clear.
 const SHADES = {
-    indigo: ["bg-indigo-500 dark:bg-indigo-300", "bg-indigo-300 dark:bg-indigo-500"],
-    teal: ["bg-teal-500 dark:bg-teal-300", "bg-teal-300 dark:bg-teal-500"],
+    indigo: ["bg-hand-right", "bg-hand-right-soft"],
+    teal: ["bg-hand-left", "bg-hand-left-soft"],
 };
 
 function blockClass(staves: number[], row: number): string {

@@ -53,7 +53,7 @@ export function HelpLink() {
             to={`${localizedHref("/help")}#${anchor}`}
             onClick={onClick}
             aria-label={m.nav_help()}
-            className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="text-muted hover:text-ink"
         >
             <QuestionIcon className="h-5 w-5" />
         </Link>

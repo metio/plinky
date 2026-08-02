@@ -30,7 +30,7 @@ export function Disclosure({
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={() => setOpen((value) => !value)}
-                className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-indigo-700 dark:text-indigo-300"
+                className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-accent-strong"
             >
                 <ChevronIcon
                     className={`h-4 w-4 transition-transform duration-200 ease-out motion-reduce:transition-none ${
@@ -73,9 +73,7 @@ export function Disclosure({
 export function FieldGroup({ label, children }: { label: string; children: ReactNode }) {
     return (
         <section className="border-t border-gray-200/70 pt-4 first:border-t-0 first:pt-0 dark:border-gray-800">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {label}
-            </h3>
+            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">{label}</h3>
             <div className="flex flex-wrap items-start gap-x-4 gap-y-3">{children}</div>
         </section>
     );

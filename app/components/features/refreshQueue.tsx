@@ -23,10 +23,8 @@ export function RefreshQueue({
             <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {m.grades_refresh_heading()}
             </h2>
-            {!due && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.grades_all_fresh()}</p>
-            )}
-            <p className="text-sm text-gray-500 dark:text-gray-400">{m.refresh_why()}</p>
+            {!due && <p className="text-sm text-muted">{m.grades_all_fresh()}</p>}
+            <p className="text-sm text-muted">{m.refresh_why()}</p>
             {due ? (
                 <>
                     <Link to="/review" className={buttonClasses("primary")}>

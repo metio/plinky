@@ -127,10 +127,8 @@ export function Drawer({
                         : "translate-y-full sm:translate-y-0 sm:translate-x-full"
                 }`}
             >
-                <header className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-800">
-                    <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                        {title}
-                    </h2>
+                <header className="flex shrink-0 items-center justify-between border-b border-line px-4 py-3">
+                    <h2 className="text-base font-semibold text-ink">{title}</h2>
                     <IconButton onClick={onClose} label={m.action_close()}>
                         <CloseIcon />
                     </IconButton>

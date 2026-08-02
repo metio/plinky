@@ -16,11 +16,11 @@ type Story = StoryObj<typeof BrandIcon>;
 
 export const Gallery: Story = {
     render: () => (
-        <div className="flex gap-6 text-gray-800 dark:text-gray-200">
+        <div className="flex gap-6 text-ink-soft">
             {BRANDS.map((brand) => (
                 <div key={brand} className="flex flex-col items-center gap-1">
                     <BrandIcon brand={brand} className="h-6 w-6" />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{brand}</span>
+                    <span className="text-xs text-muted">{brand}</span>
                 </div>
             ))}
         </div>

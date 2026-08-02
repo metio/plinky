@@ -121,7 +121,7 @@ export function MicCalibrationWizard() {
     const heard = heardNote(state);
 
     return (
-        <div className="space-y-4 rounded-xl border border-indigo-200 bg-indigo-50/60 p-4 dark:border-indigo-900 dark:bg-indigo-950/40">
+        <div className="space-y-4 rounded-xl border border-accent-line bg-indigo-50/60 p-4 dark:bg-indigo-950/40">
             {failed ? (
                 <div className="space-y-3">
                     <p className="text-sm text-gray-700 dark:text-gray-200" role="status">
@@ -145,7 +145,7 @@ export function MicCalibrationWizard() {
                 </div>
             ) : (
                 <div className="space-y-3">
-                    <p className="text-xs font-medium uppercase tracking-wide text-indigo-700 dark:text-indigo-300">
+                    <p className="text-xs font-medium uppercase tracking-wide text-accent-strong">
                         {m.mic_calibrate_step({ current: stepIndex + 1, total: STEPS.length })}
                     </p>
                     <p
@@ -157,11 +157,11 @@ export function MicCalibrationWizard() {
                     </p>
                     {state.step === "note" && (
                         <div className="flex items-center gap-3">
-                            <span className="rounded-md bg-white px-3 py-1.5 font-mono text-lg font-semibold text-indigo-800 shadow-sm dark:bg-gray-900 dark:text-indigo-200">
+                            <span className="rounded-md bg-white px-3 py-1.5 font-mono text-lg font-semibold text-accent-deep shadow-sm dark:bg-gray-900">
                                 {noteName(TARGET_NOTE)}
                             </span>
                             {heard !== null && (
-                                <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                                <span className="text-sm font-medium text-success">
                                     {m.mic_calibrate_heard()}
                                 </span>
                             )}

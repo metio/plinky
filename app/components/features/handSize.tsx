@@ -84,19 +84,17 @@ export function HandSize() {
                     return (
                         <div
                             key={side}
-                            className="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 dark:border-gray-800"
+                            className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2"
                         >
                             <span className="text-sm">
                                 <span className="font-medium">{sideLabel[side]}</span>{" "}
                                 {span !== null ? (
-                                    <span className="text-gray-500 dark:text-gray-400">
+                                    <span className="text-muted">
                                         {m.hand_size_semitones({ count: span })}
                                         {spanName(span) ? ` · ${spanName(span)}` : ""}
                                     </span>
                                 ) : (
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                        {m.hand_size_not_set()}
-                                    </span>
+                                    <span className="text-muted">{m.hand_size_not_set()}</span>
                                 )}
                             </span>
                             <span className="flex shrink-0 gap-2">
@@ -118,11 +116,11 @@ export function HandSize() {
             </div>
 
             {active && (
-                <div className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-900 dark:bg-indigo-950">
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                <div className="space-y-2 rounded-md border border-accent-line bg-accent-surface p-3">
+                    <p className="text-sm text-body">
                         {sideLabel[active]} — {m.hand_size_instruction()}
                     </p>
-                    <p className="font-mono text-sm text-gray-800 dark:text-gray-200">{readout}</p>
+                    <p className="font-mono text-sm text-ink-soft">{readout}</p>
                     <PianoKeyboard expected={captured} from={48} to={72} />
                     <div className="flex gap-2">
                         <Button variant="primary" onClick={save} disabled={measured === null}>

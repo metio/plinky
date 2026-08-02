@@ -39,7 +39,7 @@ export function ReadingLevel({ labelled = true }: { labelled?: boolean } = {}) {
     return (
         <div className="space-y-1">
             {labelled && (
-                <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="block text-sm font-medium text-body">
                     {m.reading_level_label()}
                 </span>
             )}
@@ -55,7 +55,7 @@ export function ReadingLevel({ labelled = true }: { labelled?: boolean } = {}) {
                     }
                 }}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted">
                 {level === "custom" ? m.reading_level_custom_help() : m.reading_level_help()}
             </p>
         </div>

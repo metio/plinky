@@ -29,7 +29,7 @@ export function CoachMark({ id, children }: { id: string; children: ReactNode })
     return (
         <div
             role="note"
-            className="flex items-start justify-between gap-2 rounded-md border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200"
+            className="flex items-start justify-between gap-2 rounded-md border border-accent-line bg-accent-surface px-3 py-2 text-sm text-accent-deep"
         >
             <span>{children}</span>
             <button

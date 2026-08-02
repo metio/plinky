@@ -67,10 +67,7 @@ export function GradeBadge() {
             </span>
             <span className="tabular-nums">{level}</span>
             {competitive && <span aria-hidden="true">⚔️</span>}
-            <span
-                aria-hidden="true"
-                className="ml-0.5 text-xs font-medium text-gray-500 dark:text-gray-400"
-            >
+            <span aria-hidden="true" className="ml-0.5 text-xs font-medium text-muted">
                 ⚡{skill}
             </span>
         </Link>

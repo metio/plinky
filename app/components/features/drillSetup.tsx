@@ -123,9 +123,7 @@ export function DrillSetup({
                     // cannot be dragged inside out.
                     return (
                         <div key={field.id} className="space-y-1">
-                            <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {label}
-                            </span>
+                            <span className="block text-sm font-medium text-body">{label}</span>
                             <div className="flex flex-wrap items-center gap-4">
                                 <Stepper
                                     value={noteName(value.low)}
@@ -153,9 +151,7 @@ export function DrillSetup({
                 const current = value[field.id];
                 return (
                     <div key={field.id} className="space-y-1">
-                        <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {label}
-                        </span>
+                        <span className="block text-sm font-medium text-body">{label}</span>
                         <Stepper
                             value={readNumber(field.id, current)}
                             decrementLabel={m.drill_less({ field: label })}
@@ -165,7 +161,7 @@ export function DrillSetup({
                             onDecrement={() => update({ [field.id]: current - 1 })}
                             onIncrement={() => update({ [field.id]: current + 1 })}
                         />
-                        {help && <p className="text-xs text-gray-500 dark:text-gray-400">{help}</p>}
+                        {help && <p className="text-xs text-muted">{help}</p>}
                     </div>
                 );
             })}

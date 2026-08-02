@@ -16,7 +16,7 @@ export function YouStanding({
     competitive: boolean;
 }) {
     return (
-        <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 p-4 dark:border-gray-800">
+        <div className="flex items-center justify-between gap-3 rounded-md border border-line p-4">
             <span className="flex items-center gap-3">
                 <span aria-hidden="true" className="text-4xl">
                     🎓
@@ -28,10 +28,7 @@ export function YouStanding({
             <span className="flex flex-col items-end gap-0.5 text-right text-sm text-gray-600 dark:text-gray-400">
                 <span title={m.grades_skill_help()}>{m.grades_skill({ rating: skill })}</span>
                 <Show when={competitive}>
-                    <span
-                        title={m.grades_competitive_help()}
-                        className="font-medium text-amber-700 dark:text-amber-400"
-                    >
+                    <span title={m.grades_competitive_help()} className="font-medium text-warn">
                         ⚔️ {m.grades_competitive()}
                     </span>
                 </Show>
@@ -42,10 +39,8 @@ export function YouStanding({
 
 function Stat({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-md border border-gray-200 p-4 dark:border-gray-800">
-            <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                {label}
-            </div>
+        <div className="rounded-md border border-line p-4">
+            <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
             <div className="font-mono text-3xl tabular-nums">{value}</div>
         </div>
     );

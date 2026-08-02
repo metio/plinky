@@ -56,15 +56,13 @@ export function ShareGhostButton({
         }
     };
     const copiedNote = copied && (
-        <span className="text-xs text-fuchsia-600 dark:text-fuchsia-400">
-            {m.takes_link_copied()}
-        </span>
+        <span className="text-xs text-ghost-text">{m.takes_link_copied()}</span>
     );
     if (showLabel) {
         return (
             // Sharing sends its own `share` event, so the click tracker skips this.
             <div className="flex items-center gap-2" data-analytics-skip="">
-                <Button onClick={share} className="text-fuchsia-600 dark:text-fuchsia-400">
+                <Button onClick={share} className="text-ghost-text">
                     <GhostIcon />
                     {label}
                 </Button>
@@ -75,12 +73,7 @@ export function ShareGhostButton({
     return (
         <span className="inline-flex items-center gap-1" data-analytics-skip="">
             {copiedNote}
-            <IconButton
-                label={label}
-                onClick={share}
-                variant={variant}
-                className="text-fuchsia-600 dark:text-fuchsia-400"
-            >
+            <IconButton label={label} onClick={share} variant={variant} className="text-ghost-text">
                 <GhostIcon />
             </IconButton>
         </span>

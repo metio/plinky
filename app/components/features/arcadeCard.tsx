@@ -35,10 +35,8 @@ export function ArcadeCard() {
     const id = buildExerciseId(arcadeConfig(level));
 
     return (
-        <section className="space-y-3 rounded-xl border border-fuchsia-200 bg-gradient-to-br from-fuchsia-50 to-indigo-50 p-5 dark:border-fuchsia-900 dark:from-fuchsia-950/40 dark:to-indigo-950/40">
-            <h2 className="font-semibold text-fuchsia-900 text-lg dark:text-fuchsia-100">
-                {m.arcade_title()}
-            </h2>
+        <section className="space-y-3 rounded-xl border border-ghost-line bg-gradient-to-br from-fuchsia-50 to-indigo-50 p-5 dark:from-fuchsia-950/40 dark:to-indigo-950/40">
+            <h2 className="font-semibold text-ghost-ink text-lg">{m.arcade_title()}</h2>
             <p className="text-gray-600 text-sm dark:text-gray-400">{m.arcade_blurb()}</p>
             <Link
                 to={`/play/${id}`}

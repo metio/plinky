@@ -22,15 +22,15 @@ const CHANNELS: { brand: Brand; label: string; href: string }[] = [
 // keeps the accent for hover — the icons are the only ornament.
 export function SiteFooter() {
     return (
-        <footer className="mt-12 border-t border-gray-200 px-6 py-4 font-sans dark:border-gray-800">
+        <footer className="mt-12 border-t border-line px-6 py-4 font-sans">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
-                <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-3 text-sm text-muted">
                     {/* The heart is the quiet way to the people behind Plinky; it
                         fills in on hover, a small warm tell. */}
                     <Link
                         to={localizedHref("/about")}
                         aria-label={m.nav_about()}
-                        className="group rounded-md p-1 text-gray-400 hover:text-rose-500 focus-visible:ring-2 focus-visible:ring-rose-400 dark:text-gray-500 dark:hover:text-rose-400"
+                        className="group rounded-md p-1 text-faint hover:text-love focus-visible:ring-2 focus-visible:ring-rose-400"
                     >
                         <HeartIcon
                             filled
@@ -40,16 +40,16 @@ export function SiteFooter() {
                 </div>
                 {/* The provider information German law requires, reachable from every page.
                 The labels are the German legal terms, kept as-is in every language. */}
-                <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-3 text-sm text-muted">
                     <Link
                         to={localizedHref("/impressum")}
-                        className="rounded-md px-1 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400"
+                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-indigo-500"
                     >
                         Impressum
                     </Link>
                     <Link
                         to={localizedHref("/datenschutz")}
-                        className="rounded-md px-1 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:text-indigo-400"
+                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-indigo-500"
                     >
                         Datenschutz
                     </Link>
@@ -62,7 +62,7 @@ export function SiteFooter() {
                             target="_blank"
                             rel="noreferrer"
                             aria-label={m.board_follow({ platform: channel.label })}
-                            className="rounded-md p-2 text-gray-500 hover:text-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:text-gray-400 dark:hover:text-indigo-400"
+                            className="rounded-md p-2 text-muted hover:text-accent focus-visible:ring-2 focus-visible:ring-indigo-500"
                         >
                             <BrandIcon brand={channel.brand} className="h-5 w-5" />
                         </a>

@@ -50,7 +50,7 @@ export function LibraryRow({
                 the viewport (which would clip the fixed bottom nav). The title link
                 stretches over the whole card (after:inset-0); the composer link stacks
                 above the stretch (z-10) so it opens the person page instead. */}
-            <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md border border-gray-300 px-3 py-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
+            <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md border border-line-strong px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">
                 <span className="min-w-0 flex-1">
                     <Link
                         to={`/play/${item.id}`}
@@ -74,7 +74,7 @@ export function LibraryRow({
                         (personSlug(item.composer) ? (
                             <Link
                                 to={`/person/${personSlug(item.composer)}`}
-                                className="relative z-10 block w-fit max-w-full truncate text-xs text-gray-600 hover:text-indigo-600 hover:underline dark:text-gray-400 dark:hover:text-indigo-400"
+                                className="relative z-10 block w-fit max-w-full truncate text-xs text-gray-600 hover:text-accent hover:underline dark:text-gray-400"
                             >
                                 {canonicalComposer(item.composer)}
                             </Link>
@@ -92,7 +92,7 @@ export function LibraryRow({
                     onConfirm={onRemove}
                     confirmLabel={removeConfirmLabel ?? m.action_remove_confirm()}
                     label={m.action_remove()}
-                    className="text-red-600 dark:text-red-400"
+                    className="text-danger"
                 >
                     <CloseIcon className="h-5 w-5" />
                 </ConfirmButton>

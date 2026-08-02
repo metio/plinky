@@ -5,6 +5,205 @@ SPDX-License-Identifier: 0BSD
 
 @import "tailwindcss";
 
+/* ── The colour tokens ───────────────────────────────────────────────────────
+   Every colour the product uses is named here for its *role*, not its hue, and
+   resolves to a light value in this block and a dark one in the `.dark` block
+   below. A component writes `text-muted` once; it never pairs
+   `text-gray-500 dark:text-gray-400` by hand.
+
+   The hand-paired form is what these replace, and it drifts: the same intent
+   was spelled two ways (`text-gray-500` and `text-gray-600` against the same
+   `dark:text-gray-400`), success arrived as both `green` and `emerald`, and a
+   handful of pairs had no dark counterpart at all — invisible until someone
+   opened that screen in that theme. A token has one definition, so the two
+   themes cannot come apart.
+
+   `npm run tokens` (dev/check-design-tokens.mjs) reads the token names straight
+   out of this block and rejects raw palette utilities in `app/components` and
+   `app/routes`, so adding a token here is all it takes to make it usable, and
+   the hand-paired form cannot come back.
+
+   Utilities generated from a token reference its variable rather than inlining
+   the value, so redefining the variable under `.dark` re-resolves every use.
+   Palette variables referenced only from that block are still emitted —
+   Tailwind tracks `var(--color-*)` references across the whole stylesheet.
+
+   Opacity modifiers work as usual: `bg-accent-surface/50`. */
+@theme {
+    /* Surfaces, back to front. */
+    --color-surface: var(--color-white); /* the page itself */
+    --color-raised: var(--color-white); /* cards and popovers over it */
+    --color-sunken: var(--color-gray-50); /* inset panels */
+    --color-subtle: var(--color-gray-100); /* quiet fills, chips, hovers */
+    --color-subtle-strong: var(--color-gray-200);
+
+    /* Hairlines. */
+    --color-line-faint: var(--color-gray-100);
+    --color-line: var(--color-gray-200); /* the default border */
+    --color-line-strong: var(--color-gray-300); /* inputs and controls */
+
+    /* Text, strongest to quietest. */
+    --color-ink: var(--color-gray-900); /* headings, primary text */
+    --color-ink-soft: var(--color-gray-800);
+    --color-body: var(--color-gray-700); /* running copy */
+    --color-muted: var(--color-gray-500); /* secondary and helper text */
+    --color-faint: var(--color-gray-400); /* decorative glyphs, disabled */
+
+    /* Indigo carries the brand: links, selection, the primary action. */
+    --color-accent: var(--color-indigo-600);
+    --color-accent-strong: var(--color-indigo-700); /* link text */
+    --color-accent-deep: var(--color-indigo-800);
+    --color-accent-ink: var(--color-indigo-900); /* text on accent-surface */
+    --color-accent-solid: var(--color-indigo-600); /* filled button */
+    --color-accent-solid-hover: var(--color-indigo-700);
+    --color-accent-surface: var(--color-indigo-50); /* tinted panel */
+    --color-accent-fill: var(--color-indigo-100); /* tinted hover */
+    --color-accent-line: var(--color-indigo-200);
+    --color-accent-line-strong: var(--color-indigo-300);
+    --color-accent-ring: var(--color-indigo-500); /* focus ring */
+
+    /* Correct, saved, on target. Green only — `emerald` said the same thing. */
+    --color-success: var(--color-green-700);
+    --color-success-solid: var(--color-green-600);
+    --color-success-solid-hover: var(--color-green-500);
+    --color-success-surface: var(--color-green-50);
+    --color-success-fill: var(--color-green-200);
+    --color-success-line: var(--color-green-300);
+
+    /* Wrong, destructive, failed. */
+    --color-danger: var(--color-red-600);
+    --color-danger-strong: var(--color-red-700);
+    /* red-700, not the brighter reds: white text needs it to clear the WCAG
+       4.5:1 contrast ratio in both themes. */
+    --color-danger-solid: var(--color-red-700);
+    --color-danger-solid-hover: var(--color-red-800);
+    --color-danger-surface: var(--color-red-50);
+    --color-danger-fill: var(--color-red-200);
+    --color-danger-line: var(--color-red-400);
+
+    /* Caution — the amber banner, the "close but not right" verdict. */
+    --color-warn: var(--color-amber-700);
+    --color-warn-ink: var(--color-amber-900);
+    --color-warn-surface: var(--color-amber-50);
+    --color-warn-fill: var(--color-amber-100);
+    --color-warn-line: var(--color-amber-300);
+    --color-warn-solid: var(--color-amber-500);
+
+    /* Neutral news — the sky banner, distinct from a warning and from the brand. */
+    --color-info-ink: var(--color-sky-900);
+    --color-info-surface: var(--color-sky-50);
+    --color-info-line: var(--color-sky-300);
+
+    /* Domain colours. These are not chrome — each one means something on
+       screen, so they stay separate hues on purpose rather than folding into
+       the accent. */
+    --color-paper: var(--color-stone-50); /* the score sheet, warm not grey */
+    --color-paper-line: var(--color-stone-300);
+    --color-paper-ink: var(--color-stone-500);
+    /* A race has two runners: you in indigo, the ghost in fuchsia. */
+    --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-text: var(--color-fuchsia-600);
+    --color-ghost-surface: var(--color-fuchsia-50);
+    --color-ghost-line: var(--color-fuchsia-200);
+    --color-ghost-ink: var(--color-fuchsia-900);
+    /* The notes highway tints the two hands apart. */
+    --color-hand-right: var(--color-indigo-500);
+    --color-hand-right-soft: var(--color-indigo-300);
+    --color-hand-left: var(--color-teal-500);
+    --color-hand-left-soft: var(--color-teal-300);
+    /* Violet partners indigo in the hero's gradients and free-play keys. */
+    --color-spark: var(--color-violet-500);
+    --color-spark-strong: var(--color-violet-600);
+    --color-spark-soft: var(--color-violet-400);
+    --color-spark-surface: var(--color-violet-50);
+    /* The footer's heart, on hover. */
+    --color-love: var(--color-rose-500);
+    --color-love-ring: var(--color-rose-400);
+}
+
+/* The dark half of every token above. Unlayered on purpose, so it outranks the
+   `@layer theme` defaults; `.dark` sits on <html>, which is also `:root`. */
+.dark {
+    --color-surface: var(--color-gray-950);
+    --color-raised: var(--color-gray-900);
+    --color-sunken: var(--color-gray-900);
+    --color-subtle: var(--color-gray-800);
+    --color-subtle-strong: var(--color-gray-800);
+
+    --color-line-faint: var(--color-gray-900);
+    --color-line: var(--color-gray-800);
+    --color-line-strong: var(--color-gray-700);
+
+    --color-ink: var(--color-gray-100);
+    --color-ink-soft: var(--color-gray-200);
+    --color-body: var(--color-gray-300);
+    --color-muted: var(--color-gray-400);
+    --color-faint: var(--color-gray-500);
+
+    --color-accent: var(--color-indigo-400);
+    --color-accent-strong: var(--color-indigo-300);
+    --color-accent-deep: var(--color-indigo-200);
+    --color-accent-ink: var(--color-indigo-200);
+    --color-accent-solid: var(--color-indigo-500);
+    --color-accent-solid-hover: var(--color-indigo-400);
+    --color-accent-surface: var(--color-indigo-950);
+    --color-accent-fill: var(--color-indigo-900);
+    --color-accent-line: var(--color-indigo-900);
+    --color-accent-line-strong: var(--color-indigo-700);
+    --color-accent-ring: var(--color-indigo-500);
+
+    --color-success: var(--color-green-300);
+    --color-success-solid: var(--color-green-500);
+    --color-success-solid-hover: var(--color-green-400);
+    --color-success-surface: var(--color-green-950);
+    --color-success-fill: var(--color-green-900);
+    --color-success-line: var(--color-green-700);
+
+    --color-danger: var(--color-red-400);
+    --color-danger-strong: var(--color-red-300);
+    --color-danger-solid: var(--color-red-700);
+    --color-danger-solid-hover: var(--color-red-600);
+    --color-danger-surface: var(--color-red-950);
+    --color-danger-fill: var(--color-red-900);
+    --color-danger-line: var(--color-red-700);
+
+    --color-warn: var(--color-amber-400);
+    --color-warn-ink: var(--color-amber-200);
+    --color-warn-surface: var(--color-amber-950);
+    --color-warn-fill: var(--color-amber-950);
+    --color-warn-line: var(--color-amber-800);
+    --color-warn-solid: var(--color-amber-400);
+
+    --color-info-ink: var(--color-sky-200);
+    --color-info-surface: var(--color-sky-950);
+    --color-info-line: var(--color-sky-800);
+
+    /* The score sheet keeps its light paper in both themes — a staff is read as
+       ink on paper, and inverting it costs legibility for no gain. */
+    --color-paper: var(--color-stone-50);
+    --color-paper-line: var(--color-stone-300);
+    --color-paper-ink: var(--color-stone-500);
+
+    --color-ghost: var(--color-fuchsia-500);
+    --color-ghost-text: var(--color-fuchsia-400);
+    --color-ghost-surface: var(--color-fuchsia-950);
+    --color-ghost-line: var(--color-fuchsia-900);
+    --color-ghost-ink: var(--color-fuchsia-100);
+
+    --color-hand-right: var(--color-indigo-300);
+    --color-hand-right-soft: var(--color-indigo-500);
+    --color-hand-left: var(--color-teal-300);
+    --color-hand-left-soft: var(--color-teal-500);
+
+    --color-spark: var(--color-violet-500);
+    --color-spark-strong: var(--color-violet-600);
+    --color-spark-soft: var(--color-violet-400);
+    --color-spark-surface: var(--color-violet-950);
+
+    --color-love: var(--color-rose-400);
+    --color-love-ring: var(--color-rose-400);
+}
+
 /* Use self-hosted Inter for the sans utility and the document default, keeping
    the system stack as the fallback while the font loads. */
 @theme {
@@ -101,7 +300,7 @@ SPDX-License-Identifier: 0BSD
 
 html,
 body {
-    @apply bg-white font-sans text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    @apply bg-surface font-sans text-ink;
 }
 
 html.dark {

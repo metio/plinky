@@ -18,7 +18,7 @@ type ComposeSettingsProps = {
     onMetronome: (on: boolean) => void;
 };
 
-const LABEL = "block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400";
+const LABEL = "block text-xs font-medium uppercase tracking-wide text-muted";
 
 // The take's settings row: title, the tempo/meter grid the staff and exports are
 // measured against, and the quantize/metronome toggles. Fully controlled — the

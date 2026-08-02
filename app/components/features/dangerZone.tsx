@@ -38,7 +38,7 @@ export function DangerZone() {
                 {m.settings_reset()}
             </ConfirmButton>
             {failed && (
-                <p role="alert" className="text-sm font-medium text-red-700 dark:text-red-300">
+                <p role="alert" className="text-sm font-medium text-danger-strong">
                     {m.settings_reset_failed()}
                 </p>
             )}

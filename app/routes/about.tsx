@@ -65,7 +65,7 @@ export default function About() {
                     {m.about_title()}
                     <DuetMark />
                 </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.about_intro()}</p>
+                <p className="text-sm text-muted">{m.about_intro()}</p>
             </header>
 
             <section className="grid gap-4 sm:grid-cols-2">
@@ -81,7 +81,7 @@ export default function About() {
                             width={112}
                             height={112}
                             loading="lazy"
-                            className={`h-28 w-28 rounded-full bg-gray-100 object-cover ring-2 ring-indigo-100 dark:bg-gray-800 dark:ring-indigo-900/50 ${
+                            className={`h-28 w-28 rounded-full bg-subtle object-cover ring-2 ring-indigo-100 dark:ring-indigo-900/50 ${
                                 kiss > 0
                                     ? lead
                                         ? "motion-safe:animate-smooch"
@@ -93,7 +93,7 @@ export default function About() {
                     return (
                         <article
                             key={founder.name}
-                            className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900"
+                            className="flex flex-col items-center gap-3 rounded-xl border border-line bg-white p-6 text-center dark:bg-gray-900"
                         >
                             {lead ? (
                                 <button
@@ -129,10 +129,8 @@ export default function About() {
                                 portrait
                             )}
                             <div className="space-y-1">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                    {founder.name}
-                                </h2>
-                                <span className="inline-block rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                                <h2 className="text-lg font-semibold text-ink">{founder.name}</h2>
+                                <span className="inline-block rounded-full bg-accent-surface px-3 py-0.5 text-xs font-medium text-accent-strong">
                                     {founder.role}
                                 </span>
                             </div>
@@ -144,21 +142,21 @@ export default function About() {
                 })}
             </section>
 
-            <section className="space-y-3 border-t border-gray-200 pt-8 dark:border-gray-800">
+            <section className="space-y-3 border-t border-line pt-8">
                 <h2 className="text-lg font-semibold">{m.about_why_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                     {m.about_why_body()}
                 </p>
             </section>
 
-            <section className="space-y-3 border-t border-gray-200 pt-8 dark:border-gray-800">
+            <section className="space-y-3 border-t border-line pt-8">
                 <h2 className="text-lg font-semibold">{m.about_contact_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                     {m.about_contact_body()}
                 </p>
                 <a
                     href="mailto:contact@plinky.fun"
-                    className="inline-block rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900"
+                    className="inline-block rounded-full bg-accent-surface px-4 py-1.5 text-sm font-medium text-accent-strong transition hover:bg-accent-fill"
                 >
                     contact@plinky.fun
                 </a>

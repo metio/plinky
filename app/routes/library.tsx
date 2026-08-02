@@ -62,7 +62,7 @@ export default function LibraryRoute() {
                 <h1 className="text-2xl font-semibold">{m.library_heading()}</h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{m.library_intro()}</p>
                 <Show when={due > 0}>
-                    <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                    <p className="text-sm font-medium text-warn">
                         {m.mastery_due_count({ count: due })}
                     </p>
                 </Show>
@@ -85,9 +85,7 @@ export default function LibraryRoute() {
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             {m.import_intro()}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {m.import_local_note()}
-                        </p>
+                        <p className="text-sm text-muted">{m.import_local_note()}</p>
                     </section>
                     <ScoreImport />
                     <ScoreBackup />
@@ -101,7 +99,7 @@ export default function LibraryRoute() {
                         onChange={(event) => filters.setQuery(event.target.value)}
                         placeholder={m.scores_search_placeholder()}
                         aria-label={m.scores_search_placeholder()}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
+                        className="w-full rounded-md border border-line-strong px-3 py-2 text-sm dark:bg-gray-900"
                     />
 
                     <LibraryFilters
@@ -117,7 +115,7 @@ export default function LibraryRoute() {
                         showDue={due > 0}
                     />
 
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted">
                         {matches.length === 1
                             ? m.scores_count_one({ count: matches.length })
                             : m.scores_count_other({ count: matches.length })}

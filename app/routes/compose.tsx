@@ -148,7 +148,7 @@ export default function Compose() {
                     <h1 className="text-3xl font-bold tracking-tight">{m.compose_heading()}</h1>
                     {/* Capture is always on, so a live indicator makes that legible —
                         otherwise a first-timer can't tell their playing is being kept. */}
-                    <span className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="flex items-center gap-2 text-sm font-medium text-body">
                         <span className="relative flex h-2.5 w-2.5">
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500/70 motion-reduce:hidden" />
                             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />

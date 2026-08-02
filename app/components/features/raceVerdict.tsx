@@ -26,14 +26,14 @@ export function RaceVerdict({ verdict }: { verdict: Verdict }) {
 
     const won = verdict.outcome === "won";
     return won ? (
-        <Card tone="border-green-300 bg-green-50 text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-300">
+        <Card tone="border-success-line bg-success-surface text-green-800 dark:text-green-300">
             <Badge fill="bg-indigo-600">
                 <KeysIcon className="h-3.5 w-3.5" />
             </Badge>
             {m.ghost_verdict_won({ margin })}
         </Card>
     ) : (
-        <Card tone="border-fuchsia-300 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-800 dark:bg-fuchsia-950 dark:text-fuchsia-300">
+        <Card tone="border-fuchsia-300 bg-ghost-surface text-fuchsia-700 dark:border-fuchsia-800 dark:text-fuchsia-300">
             <Badge fill="bg-fuchsia-500">
                 <GhostIcon className="h-3.5 w-3.5" />
             </Badge>

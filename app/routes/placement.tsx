@@ -82,7 +82,7 @@ export default function PlacementRoute() {
             {!live && (
                 <div className="space-y-3">
                     {saved && (
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        <p className="text-sm text-body">
                             {m.placement_last({ rating: saved.rating, grade: saved.grade })}
                         </p>
                     )}
@@ -95,10 +95,10 @@ export default function PlacementRoute() {
             {live && !live.state.done && (
                 <>
                     <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <p className="text-sm font-medium text-body">
                             {m.placement_level({ level: live.state.level })}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-muted">
                             {m.placement_strikes({
                                 used: live.state.strikes,
                                 total: MAX_STRIKES,

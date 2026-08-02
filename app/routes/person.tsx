@@ -93,7 +93,7 @@ export default function PersonPage() {
     return (
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                     {m.person_eyebrow()}
                 </p>
                 <h1 className="text-3xl font-bold tracking-tight">
@@ -112,12 +112,12 @@ export default function PersonPage() {
                         <li key={piece.id}>
                             <Link
                                 to={`/play/${piece.id}`}
-                                className="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm hover:border-indigo-300 hover:bg-indigo-50/50 dark:border-gray-800 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/30"
+                                className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/30"
                             >
                                 <span className="min-w-0 truncate font-medium">{piece.title}</span>
-                                <span className="flex shrink-0 items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
                                     {piece.grade !== undefined && (
-                                        <span className="rounded bg-gray-100 px-1.5 py-0.5 font-medium tabular-nums dark:bg-gray-800">
+                                        <span className="rounded bg-subtle px-1.5 py-0.5 font-medium tabular-nums">
                                             G{piece.grade}
                                         </span>
                                     )}
@@ -129,12 +129,9 @@ export default function PersonPage() {
                 </ul>
             ) : (
                 !loading && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-muted">
                         {m.person_empty()}{" "}
-                        <Link
-                            to="/library"
-                            className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-                        >
+                        <Link to="/library" className="font-medium text-accent hover:underline">
                             {m.nav_library()}
                         </Link>
                     </p>

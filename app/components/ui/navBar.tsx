@@ -47,7 +47,7 @@ export function BottomNav() {
     return (
         <nav
             aria-label={m.nav_primary_label()}
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-gray-800 dark:bg-gray-950/95"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:bg-gray-950/95"
         >
             <ul className="mx-auto flex max-w-3xl">
                 {DESTINATIONS.map(({ to, label, Icon }) => {

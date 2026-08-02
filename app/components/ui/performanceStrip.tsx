@@ -36,9 +36,7 @@ export function PerformanceStrip({
     const mid = HEIGHT / 2;
     return (
         <figure className="space-y-1">
-            <figcaption className="text-sm text-gray-500 dark:text-gray-400">
-                {m.perf_heading()}
-            </figcaption>
+            <figcaption className="text-sm text-muted">{m.perf_heading()}</figcaption>
             <svg
                 viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
                 className="w-full"
@@ -84,7 +82,7 @@ export function PerformanceStrip({
                     );
                 })}
             </svg>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
                 <span>{m.perf_legend_timing()}</span>
                 <span>{m.perf_legend_accuracy()}</span>
                 <span>{m.perf_legend_flow()}</span>

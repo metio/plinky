@@ -198,25 +198,19 @@ export function ScoreImport() {
                             event.target.value = "";
                         }}
                     />
-                    <UploadIcon className="h-8 w-8 text-gray-500 dark:text-gray-400" />
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
-                        {m.import_drop_here()}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {m.import_formats()}
-                    </span>
+                    <UploadIcon className="h-8 w-8 text-muted" />
+                    <span className="font-medium text-body">{m.import_drop_here()}</span>
+                    <span className="text-xs text-muted">{m.import_formats()}</span>
                 </label>
             )}
 
-            {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-            {duplicate && (
-                <p className="text-sm text-amber-700 dark:text-amber-400">{m.import_duplicate()}</p>
-            )}
+            {error && <p className="text-sm text-danger">{error}</p>}
+            {duplicate && <p className="text-sm text-warn">{m.import_duplicate()}</p>}
 
             {draft && (
                 <div className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="rounded-md border border-gray-200 p-2 dark:border-gray-800">
+                        <div className="rounded-md border border-line p-2">
                             <StaffPreview
                                 xml={draft.xml}
                                 label={draft.title || m.import_untitled()}
@@ -224,7 +218,7 @@ export function ScoreImport() {
                         </div>
                         <div className="space-y-3">
                             <label className="block space-y-1">
-                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <span className="text-xs font-medium text-muted">
                                     {m.import_field_title()}
                                 </span>
                                 <input
@@ -234,7 +228,7 @@ export function ScoreImport() {
                                 />
                             </label>
                             <label className="block space-y-1">
-                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <span className="text-xs font-medium text-muted">
                                     {m.import_field_composer()}
                                 </span>
                                 <input
@@ -245,7 +239,7 @@ export function ScoreImport() {
                             </label>
                             <div className="flex items-end gap-3">
                                 <label className="block flex-1 space-y-1">
-                                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                    <span className="text-xs font-medium text-muted">
                                         {m.import_field_tempo()}
                                     </span>
                                     <input
@@ -257,13 +251,13 @@ export function ScoreImport() {
                                         onChange={(event) => set({ tempo: event.target.value })}
                                     />
                                 </label>
-                                <span className="flex items-center gap-1 pb-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                <span className="flex items-center gap-1 pb-1.5 text-xs text-muted">
                                     {m.import_field_grade()}
                                     <GradeChip grade={draft.grade} />
                                 </span>
                             </div>
                             <label className="block space-y-1">
-                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                <span className="text-xs font-medium text-muted">
                                     {m.import_field_description()}
                                 </span>
                                 <input

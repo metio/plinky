@@ -67,21 +67,19 @@ export function RunResult({
                         </Button>
                     </div>
                 ))}
-            <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
+            <div className="flex items-center gap-4 rounded-md border border-line p-3">
                 <GradeLetter letter={grade.letter} />
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
-                    <dt className="text-gray-500 dark:text-gray-400">{m.scores_accuracy()}</dt>
+                    <dt className="text-muted">{m.scores_accuracy()}</dt>
                     <dd className="text-right font-mono tabular-nums">{grade.accuracy}%</dd>
-                    <dt className="text-gray-500 dark:text-gray-400">{m.scores_timing()}</dt>
+                    <dt className="text-muted">{m.scores_timing()}</dt>
                     <dd className="text-right font-mono tabular-nums">{grade.timing}%</dd>
-                    <dt className="text-gray-500 dark:text-gray-400">{m.scores_flow()}</dt>
+                    <dt className="text-muted">{m.scores_flow()}</dt>
                     <dd className="text-right font-mono tabular-nums">{grade.flow}%</dd>
                     {grade.dynamics !== null && (
                         <>
-                            <dt className="text-gray-400 dark:text-gray-500">
-                                {m.scores_dynamics()}
-                            </dt>
-                            <dd className="text-right font-mono tabular-nums text-gray-500 dark:text-gray-400">
+                            <dt className="text-faint">{m.scores_dynamics()}</dt>
+                            <dd className="text-right font-mono tabular-nums text-muted">
                                 {grade.dynamics}%
                             </dd>
                         </>

@@ -9,21 +9,19 @@ import { CloseIcon } from "./icons";
 // no fragment may be assembled dynamically.
 const tones = {
     amber: {
-        shell: "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950",
-        text: "text-amber-900 dark:text-amber-200",
-        dismiss:
-            "text-amber-900 hover:text-amber-700 dark:text-amber-200 dark:hover:text-amber-100",
+        shell: "border-warn-line bg-warn-surface",
+        text: "text-warn-ink",
+        dismiss: "text-warn-ink hover:text-amber-700 dark:hover:text-amber-100",
     },
     indigo: {
-        shell: "border-indigo-300 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-950",
-        text: "text-indigo-900 dark:text-indigo-200",
-        dismiss:
-            "text-indigo-900 hover:text-indigo-700 dark:text-indigo-200 dark:hover:text-indigo-100",
+        shell: "border-indigo-300 bg-accent-surface dark:border-indigo-800",
+        text: "text-accent-ink",
+        dismiss: "text-accent-ink hover:text-indigo-700 dark:hover:text-indigo-100",
     },
     sky: {
-        shell: "border-sky-300 bg-sky-50 dark:border-sky-800 dark:bg-sky-950",
-        text: "text-sky-900 dark:text-sky-200",
-        dismiss: "text-sky-900 hover:text-sky-700 dark:text-sky-200 dark:hover:text-sky-100",
+        shell: "border-info-line bg-info-surface",
+        text: "text-info-ink",
+        dismiss: "text-info-ink hover:text-sky-700 dark:hover:text-sky-100",
     },
 } as const;
 

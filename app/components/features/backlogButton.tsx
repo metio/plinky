@@ -26,11 +26,7 @@ export function BacklogButton({ id }: { id: string }) {
             aria-pressed={backlogged}
             onClick={() => masteryStore.save(id, setBacklog(mastery, !backlogged, Date.now()))}
             label={backlogged ? m.mastery_resume() : m.mastery_backlog()}
-            className={
-                backlogged
-                    ? "text-indigo-600 dark:text-indigo-400"
-                    : "text-gray-400 dark:text-gray-500"
-            }
+            className={backlogged ? "text-accent" : "text-faint"}
         >
             <ArchiveIcon filled={backlogged} />
         </IconButton>

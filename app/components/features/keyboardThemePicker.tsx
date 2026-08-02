@@ -64,7 +64,7 @@ export function KeyboardThemePicker() {
                         }`}
                     >
                         <ThemeSwatch theme={theme} />
-                        <span className="font-medium text-gray-800 text-xs dark:text-gray-200">
+                        <span className="font-medium text-ink-soft text-xs">
                             {themeName(theme.id)}
                         </span>
                     </button>

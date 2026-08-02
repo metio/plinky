@@ -92,7 +92,7 @@ export function AssignmentBuilder({
         <section className="space-y-3">
             <h2 className="font-semibold">{m.assignments_build_heading()}</h2>
             {draft.editingId && (
-                <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                <p className="rounded-md bg-warn-surface px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
                     {m.assignments_editing({ name: draft.name })}
                 </p>
             )}
@@ -104,7 +104,7 @@ export function AssignmentBuilder({
                 aria-label={m.assignments_search_placeholder()}
             />
             <Show when={matches.length > 0}>
-                <ul className="divide-y divide-gray-100 rounded-md border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+                <ul className="divide-y divide-gray-100 rounded-md border border-line dark:divide-gray-800">
                     {matches.slice(0, draft.visible).map((entry) => (
                         <li
                             key={entry.id}
@@ -147,7 +147,7 @@ export function AssignmentBuilder({
                                 {isMissing(item.id) ? (
                                     <span
                                         {...drag.handleProps(index)}
-                                        className="flex-1 cursor-grab select-none truncate italic text-gray-400 active:cursor-grabbing dark:text-gray-500"
+                                        className="flex-1 cursor-grab select-none truncate italic text-faint active:cursor-grabbing"
                                     >
                                         {m.assignments_step_missing()}
                                     </span>
@@ -198,7 +198,7 @@ export function AssignmentBuilder({
                                         variant="ghost"
                                         onClick={() => draft.removeItem(index)}
                                         label={m.assignments_remove()}
-                                        className="text-red-600 dark:text-red-400"
+                                        className="text-danger"
                                     >
                                         <CloseIcon className="h-5 w-5" />
                                     </IconButton>
@@ -206,14 +206,10 @@ export function AssignmentBuilder({
                             </li>
                         ))}
                     </ol>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
-                        {m.assignments_reorder_hint()}
-                    </p>
+                    <p className="text-xs text-faint">{m.assignments_reorder_hint()}</p>
                 </>
             ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.assignments_empty_basket()}
-                </p>
+                <p className="text-sm text-muted">{m.assignments_empty_basket()}</p>
             )}
 
             {/* Naming sits right above Save so the last step before saving
@@ -255,9 +251,7 @@ export function AssignmentBuilder({
                 )}
             </div>
             <Show when={!draft.canSave}>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {m.assignments_save_hint()}
-                </p>
+                <p className="text-sm text-muted">{m.assignments_save_hint()}</p>
             </Show>
         </section>
     );

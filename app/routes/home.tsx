@@ -63,7 +63,7 @@ export default function Home() {
         <main className="mx-auto max-w-3xl space-y-12 p-6 font-sans">
             <section className="space-y-6 pt-2">
                 <div className="space-y-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                         {m.home_eyebrow()}
                     </p>
                     <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
@@ -91,9 +91,7 @@ export default function Home() {
                             <HeroKeyboard />
                         </FeatureBoundary>
                     </div>
-                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                        {m.home_keyboard_hint()}
-                    </p>
+                    <p className="text-center text-sm text-muted">{m.home_keyboard_hint()}</p>
                 </div>
             </section>
 
@@ -115,7 +113,7 @@ export default function Home() {
             </FeatureBoundary>
 
             <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
                     {m.home_explore_heading()}
                 </h2>
                 <div className="space-y-3">
@@ -131,11 +129,11 @@ export default function Home() {
                                     synth.playNote(feature.note, { velocity: 55, duration: 0.4 });
                                 }
                             }}
-                            className="group flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
+                            className="group flex items-start gap-4 rounded-xl border border-line bg-white p-5 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-md dark:bg-gray-900"
                         >
-                            <feature.Icon className="mt-0.5 h-8 w-8 shrink-0 text-indigo-600 group-hover:text-indigo-700 dark:text-indigo-400 dark:group-hover:text-indigo-300" />
+                            <feature.Icon className="mt-0.5 h-8 w-8 shrink-0 text-accent group-hover:text-accent-strong" />
                             <span className="space-y-1">
-                                <span className="block text-lg font-medium text-gray-900 group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300">
+                                <span className="block text-lg font-medium text-ink group-hover:text-accent-strong">
                                     {feature.label()} →
                                 </span>
                                 <span className="block text-sm leading-relaxed text-gray-600 dark:text-gray-400">

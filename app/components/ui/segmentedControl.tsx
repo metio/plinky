@@ -27,7 +27,7 @@ export function SegmentedControl<T extends string>({
         <div
             role="tablist"
             aria-label={label}
-            className={`inline-flex flex-wrap gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800 ${className}`}
+            className={`inline-flex flex-wrap gap-1 rounded-lg bg-subtle p-1 ${className}`}
         >
             {options.map((option) => {
                 const selected = option.id === value;

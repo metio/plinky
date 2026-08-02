@@ -56,9 +56,9 @@ function whiteClasses(verdict: Verdict, settled: boolean): string {
         return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
     }
     if (settled) {
-        return "border-gray-200 bg-white text-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-600";
+        return "border-line bg-white text-gray-400 dark:bg-gray-900 dark:text-gray-600";
     }
-    return "border-gray-300 bg-white text-gray-900 hover:bg-indigo-50 hover:text-indigo-700 dark:border-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-indigo-100";
+    return "border-line-strong bg-white text-gray-900 hover:bg-indigo-50 hover:text-indigo-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-indigo-100";
 }
 
 function blackClasses(verdict: Verdict, settled: boolean): string {

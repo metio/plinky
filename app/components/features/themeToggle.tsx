@@ -34,7 +34,7 @@ export function ThemeToggle() {
             type="button"
             onClick={cycle}
             aria-label={m.theme_aria({ theme })}
-            className="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="text-sm text-muted hover:text-ink"
         >
             {LABEL[theme]()}
         </button>

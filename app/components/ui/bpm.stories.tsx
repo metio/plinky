@@ -18,7 +18,7 @@ export const Default: Story = {
 
 export const InlineWithText: Story = {
     render: () => (
-        <p className="text-sm text-gray-700 dark:text-gray-300">
+        <p className="text-sm text-body">
             Practice tempo: <Bpm tempo={120} className="font-medium" />
         </p>
     ),

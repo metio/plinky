@@ -78,11 +78,11 @@ type Story = StoryObj;
 
 export const Gallery: Story = {
     render: () => (
-        <div className="grid grid-cols-4 gap-4 text-gray-800 sm:grid-cols-6 dark:text-gray-200">
+        <div className="grid grid-cols-4 gap-4 text-ink-soft sm:grid-cols-6">
             {ICONS.map(([name, icon]) => (
                 <div key={name} className="flex flex-col items-center gap-1">
                     {icon}
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{name}</span>
+                    <span className="text-xs text-muted">{name}</span>
                 </div>
             ))}
         </div>

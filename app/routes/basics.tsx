@@ -28,7 +28,7 @@ export default function Basics() {
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.basics_title()}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.basics_intro()}</p>
+                <p className="text-sm text-muted">{m.basics_intro()}</p>
             </header>
 
             <KeyboardTour

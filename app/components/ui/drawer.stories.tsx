@@ -19,12 +19,12 @@ export const Open: Story = {
         title: "Practice settings",
         children: (
             <>
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+                <p className="text-sm text-body">
                     Adjust the tempo, metronome, and looping for this piece.
                 </p>
                 <button
                     type="button"
-                    className="rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700"
+                    className="rounded-md border border-line-strong px-3 py-1.5 text-sm"
                 >
                     A focusable control
                 </button>

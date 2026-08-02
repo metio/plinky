@@ -22,12 +22,7 @@ export function Bpm({
     return (
         <span className={`whitespace-nowrap tabular-nums${className ? ` ${className}` : ""}`}>
             {m.home_bpm({ tempo })}
-            {term && (
-                <span className="text-gray-500 italic dark:text-gray-400">
-                    {" "}
-                    · {tempoTerm(tempo)}
-                </span>
-            )}
+            {term && <span className="text-muted italic"> · {tempoTerm(tempo)}</span>}
         </span>
     );
 }

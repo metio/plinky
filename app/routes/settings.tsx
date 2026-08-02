@@ -83,7 +83,7 @@ export default function Settings() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.nav_settings()}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.settings_subtitle()}</p>
+                <p className="text-sm text-muted">{m.settings_subtitle()}</p>
             </header>
 
             {/* Privacy leads the page: these opt-ins involve a third party and are
@@ -104,7 +104,7 @@ export default function Settings() {
                             update({ analyticsConsent, analyticsAsked: true })
                         }
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted">
                         {m.settings_analytics_desc()}{" "}
                         <LocalizedLink to="/datenschutz" className={linkClasses}>
                             {m.settings_analytics_link()}
@@ -119,15 +119,11 @@ export default function Settings() {
                 icon={<SlidersIcon className={ICON} />}
             >
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {m.settings_theme()}
-                    </span>
+                    <span className="text-sm text-body">{m.settings_theme()}</span>
                     <ThemeToggle />
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {m.settings_language()}
-                    </span>
+                    <span className="text-sm text-body">{m.settings_language()}</span>
                     <LanguageSwitcher />
                 </div>
                 {/* The on-screen keyboard's colours are an appearance choice too, so
@@ -148,9 +144,7 @@ export default function Settings() {
                     onChange={(sound) => update({ sound })}
                 />
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {m.settings_volume()}
-                    </span>
+                    <span className="text-sm text-body">{m.settings_volume()}</span>
                     <input
                         type="range"
                         aria-label={m.settings_volume()}
@@ -256,9 +250,7 @@ export default function Settings() {
                         well="w-full max-w-sm"
                         onPress={(note) => synth.playNote(note)}
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {m.settings_labels_example()}
-                    </p>
+                    <p className="text-xs text-muted">{m.settings_labels_example()}</p>
                 </div>
                 <HandSize />
             </SettingsSection>

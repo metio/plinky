@@ -146,7 +146,7 @@ export function EarSession({
 
     if (question === null) {
         return (
-            <div className="space-y-4 rounded-xl border border-gray-200 p-8 text-center dark:border-gray-800">
+            <div className="space-y-4 rounded-xl border border-line p-8 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">{BLURB[exercise]()}</p>
                 <Button variant="primary" onClick={next}>
                     {m.ear_start()}
@@ -226,10 +226,7 @@ export function EarSession({
             )}
 
             <div className="flex items-center justify-between gap-4">
-                <p
-                    aria-live="polite"
-                    className="text-sm font-medium text-gray-900 dark:text-gray-100"
-                >
+                <p aria-live="polite" className="text-sm font-medium text-ink">
                     {done
                         ? m.ear_session_recorded()
                         : settled
@@ -252,7 +249,7 @@ export function EarSession({
                 ) : null}
             </div>
 
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted">
                 <span>{m.ear_score({ correct: score.correct, asked: score.asked })}</span>
                 {" · "}
                 <span>

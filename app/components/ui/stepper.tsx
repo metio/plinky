@@ -68,7 +68,7 @@ export function Stepper({
             </IconButton>
             <BumpValue
                 value={value}
-                className="min-w-[3.25rem] text-center text-sm font-semibold text-gray-800 dark:text-gray-200"
+                className="min-w-[3.25rem] text-center text-sm font-semibold text-ink-soft"
             />
             <IconButton
                 variant="secondary"

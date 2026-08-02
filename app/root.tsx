@@ -101,7 +101,7 @@ export const links: Route.LinksFunction = () => [
 // screen, including the error page, giving a way back from anywhere.
 function Header() {
     return (
-        <header className="border-b border-gray-200 px-6 py-3 font-sans dark:border-gray-800">
+        <header className="border-b border-line px-6 py-3 font-sans">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3">
                     {/* The wordmark is text (it follows the theme for free); its i is the
@@ -111,7 +111,7 @@ function Header() {
                         <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-md" />
                         <span
                             aria-hidden="true"
-                            className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
+                            className="text-xl font-bold tracking-tight text-ink"
                         >
                             Pl
                             <span className="relative">
@@ -131,7 +131,7 @@ function Header() {
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
-                        className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        className="text-muted hover:text-ink"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -404,7 +404,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     <button
                         type="button"
                         onClick={() => window.location.reload()}
-                        className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                        className="rounded-md border border-line-strong px-4 py-2 text-sm font-medium text-body"
                     >
                         Reload the page
                     </button>
@@ -413,15 +413,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     href={reportUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                    className="rounded-md border border-line-strong px-4 py-2 text-sm font-medium text-body"
                 >
                     Report it on GitHub
                 </a>
             </div>
 
-            <details className="text-sm text-gray-500 dark:text-gray-400">
+            <details className="text-sm text-muted">
                 <summary className="cursor-pointer">Technical details</summary>
-                <pre className="mt-2 overflow-x-auto rounded-md bg-gray-50 p-3 text-xs dark:bg-gray-900">
+                <pre className="mt-2 overflow-x-auto rounded-md bg-sunken p-3 text-xs">
                     <code>{technical}</code>
                 </pre>
             </details>

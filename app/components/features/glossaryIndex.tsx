@@ -25,7 +25,7 @@ export function GlossaryIndex({
                     {/* A group label rather than a heading: the page's heading outline is
                     its title and the symbol being read, and four more headings inside the
                     index would bury that. The list carries the name for a screen reader. */}
-                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted">
                         {CATEGORY_NAMES[category]()}
                     </p>
                     <ul aria-label={CATEGORY_NAMES[category]()}>

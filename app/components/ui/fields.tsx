@@ -25,9 +25,7 @@ export function ChoiceField<T extends string>({
 }) {
     return (
         <div className="space-y-1">
-            <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {label}
-            </span>
+            <span className="block text-sm font-medium text-body">{label}</span>
             <SegmentedControl
                 label={label}
                 options={options}
@@ -35,9 +33,7 @@ export function ChoiceField<T extends string>({
                 onChange={onChange}
                 disabled={disabled}
             />
-            {help !== undefined && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">{help}</p>
-            )}
+            {help !== undefined && <p className="text-xs text-muted">{help}</p>}
         </div>
     );
 }
@@ -64,7 +60,7 @@ export function SwitchField({
     return (
         <div className="space-y-1">
             <Switch label={label} checked={checked} onChange={onChange} disabled={disabled} />
-            <p className="text-xs text-gray-500 dark:text-gray-400">{help}</p>
+            <p className="text-xs text-muted">{help}</p>
         </div>
     );
 }

@@ -113,7 +113,7 @@ export function ScoreCanvas() {
                 <p
                     role="status"
                     aria-live="polite"
-                    className="rounded-lg bg-indigo-50 px-3 py-2 text-center text-sm font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                    className="rounded-lg bg-accent-surface px-3 py-2 text-center text-sm font-medium text-indigo-700 dark:text-indigo-200"
                 >
                     {m.sight_read_studying({ seconds: sightRead.countdown })}
                 </p>
@@ -162,9 +162,7 @@ export function ScoreCanvas() {
                           } ${slotSize}`
                 }
             />
-            {loadError && (
-                <p className="p-2 text-sm text-red-600 dark:text-red-400">{m.score_load_error()}</p>
-            )}
+            {loadError && <p className="p-2 text-sm text-danger">{m.score_load_error()}</p>}
         </div>
     );
 }

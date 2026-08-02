@@ -170,7 +170,7 @@ export function ReviewSession() {
             <header className="space-y-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
-                    <span className="text-sm tabular-nums text-gray-500 dark:text-gray-400">
+                    <span className="text-sm tabular-nums text-muted">
                         {m.review_progress({ index: index + 1, total })}
                     </span>
                 </div>

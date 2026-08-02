@@ -14,7 +14,7 @@ export function BoardArtistCard({ artist, tilt }: { artist: BoardArtist; tilt: "
     const platform = artist.linkUrl ? platformFor(artist.linkUrl) : null;
     return (
         <article
-            className={`relative rounded-2xl border border-gray-200 bg-white p-3 shadow-md transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:rotate-0 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 ${
+            className={`relative rounded-2xl border border-line bg-white p-3 shadow-md transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:rotate-0 hover:shadow-xl dark:bg-gray-900 ${
                 tilt === "left" ? "motion-safe:-rotate-1" : "motion-safe:rotate-1"
             }`}
         >
@@ -45,7 +45,7 @@ export function BoardArtistCard({ artist, tilt }: { artist: BoardArtist; tilt: "
                 </div>
             </div>
             <div className="space-y-3 px-1 pb-1 pt-3">
-                <div className="space-y-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                <div className="space-y-2 text-sm leading-relaxed text-body">
                     {paragraphs(artist.text).map((para, index) => (
                         // Paragraphs are plain text in fixed order; index keys are stable.
                         // biome-ignore lint/suspicious/noArrayIndexKey: static, ordered text

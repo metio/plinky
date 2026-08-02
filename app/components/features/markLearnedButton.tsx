@@ -31,11 +31,7 @@ export function MarkLearnedButton({ id }: { id: string }) {
                 )
             }
             label={learned ? m.mastery_learned() : m.mastery_mark_learned()}
-            className={
-                learned
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-indigo-600 dark:text-indigo-400"
-            }
+            className={learned ? "text-green-600 dark:text-green-400" : "text-accent"}
         >
             <CheckIcon filled={learned} />
         </IconButton>

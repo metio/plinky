@@ -16,7 +16,7 @@ function FilterGroup({ label, children }: { label: string; children: ReactNode }
             {/* A minimum, not a fixed, width: the label column aligns across the
                 groups for short labels but grows for a longer translation (e.g.
                 German "Anzeigen") instead of overflowing into the first chip. */}
-            <span className="min-w-12 shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <span className="min-w-12 shrink-0 text-xs font-medium uppercase tracking-wide text-muted">
                 {label}
             </span>
             {children}

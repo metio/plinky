@@ -116,10 +116,10 @@ export function NewsBanner() {
     return (
         <section
             aria-label={m.news_label()}
-            className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+            className="group relative overflow-hidden rounded-xl border border-line bg-white dark:bg-gray-900"
         >
             <div
-                className="relative w-full touch-pan-y bg-gray-100 dark:bg-gray-800"
+                className="relative w-full touch-pan-y bg-subtle"
                 style={{ aspectRatio: item.aspect }}
                 onPointerDown={onPointerDown}
                 onPointerUp={onPointerUp}
@@ -208,7 +208,7 @@ export function NewsBanner() {
                     href={item.linkUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block px-4 py-3 text-sm font-medium text-gray-800 transition group-hover:text-indigo-700 dark:text-gray-100 dark:group-hover:text-indigo-300"
+                    className="block px-4 py-3 text-sm font-medium text-gray-800 transition group-hover:text-accent-strong dark:text-gray-100"
                 >
                     {item.headline}
                 </a>

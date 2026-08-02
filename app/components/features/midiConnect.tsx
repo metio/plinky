@@ -24,7 +24,7 @@ export function MidiConnect() {
                 >
                     {status === "ready" ? m.midi_debug_reconnect() : m.midi_connect()}
                 </Button>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-muted">
                     {support === "unknown" && m.midi_debug_checking()}
                     {status === "requesting" && m.midi_debug_requesting()}
                     {status === "ready" &&
@@ -36,20 +36,16 @@ export function MidiConnect() {
                 </span>
             </div>
 
-            {error && status !== "error" && (
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-            )}
+            {error && status !== "error" && <p className="text-sm text-danger">{error}</p>}
 
             <KeyboardHint octaveOffset={octaveOffset} />
 
             <div>
-                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
                     {m.midi_debug_inputs()}
                 </h3>
                 {devices.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {m.midi_debug_no_inputs()}
-                    </p>
+                    <p className="text-sm text-muted">{m.midi_debug_no_inputs()}</p>
                 ) : (
                     <ul className="space-y-1 text-sm">
                         {devices.map((device) => (
@@ -63,9 +59,7 @@ export function MidiConnect() {
                                 />
                                 <span className="font-medium">{device.name}</span>
                                 {device.manufacturer && (
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                        · {device.manufacturer}
-                                    </span>
+                                    <span className="text-muted">· {device.manufacturer}</span>
                                 )}
                             </li>
                         ))}
@@ -74,19 +68,17 @@ export function MidiConnect() {
             </div>
 
             <div>
-                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
                     {m.midi_debug_held_notes()}
                 </h3>
                 {heldNotes.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {m.midi_debug_press_key()}
-                    </p>
+                    <p className="text-sm text-muted">{m.midi_debug_press_key()}</p>
                 ) : (
                     <div className="flex flex-wrap gap-2">
                         {heldNotes.map((note) => (
                             <span
                                 key={note}
-                                className="rounded-md bg-indigo-100 px-2 py-1 font-mono text-sm text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100"
+                                className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-indigo-800 dark:text-indigo-100"
                             >
                                 {noteName(note)} ({note})
                             </span>

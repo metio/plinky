@@ -9,9 +9,9 @@ import { GradeLetter } from "../ui/gradeLetter";
 // tempo-locked run finishes, in place of the self-paced grade panel.
 export function KeepUpResultCard({ result }: { result: KeepUpResult }) {
     return (
-        <div className="flex items-center gap-4 rounded-md border border-gray-200 p-3 dark:border-gray-800">
+        <div className="flex items-center gap-4 rounded-md border border-line p-3">
             <GradeLetter letter={result.letter} />
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-body">
                 {m.keep_up_result({ inTime: result.inTime, total: result.total })}
             </p>
         </div>

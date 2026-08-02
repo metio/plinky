@@ -45,7 +45,7 @@ export function SectionBest({
 
     return (
         <section className="space-y-2">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <h3 className="text-sm font-medium text-body">
                 {m.section_best_heading({ total: bestTotal(best) })}
             </h3>
             <ol className="flex gap-1" aria-label={m.section_best_label()}>
@@ -55,7 +55,7 @@ export function SectionBest({
                         // identity — there is nothing else to key on.
                         // biome-ignore lint/suspicious/noArrayIndexKey: the index is the section
                         key={index}
-                        className="flex h-10 flex-1 items-end rounded bg-gray-100 dark:bg-gray-800"
+                        className="flex h-10 flex-1 items-end rounded bg-subtle"
                         title={m.section_best_section({ number: index + 1, score })}
                     >
                         <span
@@ -69,7 +69,7 @@ export function SectionBest({
                     </li>
                 ))}
             </ol>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-muted">
                 {setNow > 0
                     ? m.section_best_set({ count: setNow, total: SECTIONS })
                     : m.section_best_none()}

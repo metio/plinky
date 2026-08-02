@@ -76,7 +76,7 @@ export function PlayStage() {
                             compact && portrait && coarsePointer && !connected && !rotateDismissed
                         }
                     >
-                        <div className="flex items-center justify-between gap-2 rounded-md bg-indigo-50 px-3 py-2 text-sm text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200">
+                        <div className="flex items-center justify-between gap-2 rounded-md bg-accent-surface px-3 py-2 text-sm text-accent-deep">
                             <span>{m.rotate_hint()}</span>
                             <button
                                 type="button"

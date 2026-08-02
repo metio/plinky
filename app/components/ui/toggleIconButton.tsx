@@ -23,7 +23,7 @@ export function ToggleIconButton({
             onClick={onClick}
             aria-pressed={pressed}
             label={label}
-            className={pressed ? "text-indigo-600 dark:text-indigo-400" : ""}
+            className={pressed ? "text-accent" : ""}
         >
             {children}
         </IconButton>

@@ -69,7 +69,7 @@ export function ComposeStage({
                 </div>
                 <div className={fullscreen ? "flex min-h-0 flex-1 flex-col" : ""}>
                     <div
-                        className={`rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900 ${
+                        className={`rounded-lg border border-line bg-white p-3 dark:bg-gray-900 ${
                             fullscreen ? "relative min-h-0 flex-1 overflow-y-auto" : ""
                         }`}
                     >
@@ -90,15 +90,13 @@ export function ComposeStage({
                         {staffXml ? (
                             <StaffPreview xml={staffXml} label={m.compose_staff_label()} />
                         ) : (
-                            <p className="px-2 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <p className="px-2 py-10 text-center text-sm text-muted">
                                 {m.compose_staff_empty()}
                             </p>
                         )}
                     </div>
                     {!fullscreen && (
-                        <p className="pt-3 text-xs text-gray-500 dark:text-gray-400">
-                            {m.compose_sketch_note()}
-                        </p>
+                        <p className="pt-3 text-xs text-muted">{m.compose_sketch_note()}</p>
                     )}
                 </div>
                 {/* The keys live in full screen only — the same surface play grants

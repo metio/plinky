@@ -34,8 +34,7 @@ const SHARE_TARGETS: { brand: Brand; label: string; href: (text: string) => stri
     },
 ];
 
-const LINK =
-    "rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300";
+const LINK = "rounded-md border border-line-strong px-3 py-1.5 text-sm font-medium text-body";
 
 // Rasterises a self-contained SVG card to a PNG and either shares it as a file
 // (mobile) or downloads it. The card is self-contained, so the canvas stays untainted

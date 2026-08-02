@@ -7,11 +7,11 @@
 
 // The standard text input.
 export const fieldClasses =
-    "rounded-md border border-gray-300 bg-transparent px-2 py-1.5 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-200";
+    "rounded-md border border-line-strong bg-transparent px-2 py-1.5 text-sm text-ink-soft";
 
 // The compact input/select used in dense control rows.
 export const compactFieldClasses =
-    "rounded-md border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300";
+    "rounded-md border border-line-strong bg-transparent px-2 py-1 text-sm text-body";
 
 // The inline text link.
-export const linkClasses = "text-indigo-700 underline dark:text-indigo-300";
+export const linkClasses = "text-accent-strong underline";

@@ -78,8 +78,8 @@ export function YouView() {
             </Show>
 
             <Show when={upNext.length > 0}>
-                <section className="space-y-2 rounded-md border border-indigo-200 bg-indigo-50/50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-                    <h2 className="text-sm font-medium text-indigo-800 dark:text-indigo-200">
+                <section className="space-y-2 rounded-md border border-accent-line bg-indigo-50/50 p-4 dark:bg-indigo-950/30">
+                    <h2 className="text-sm font-medium text-accent-deep">
                         {m.grades_up_next({ grade: workingGrade })}
                     </h2>
                     <ul className="space-y-1 text-sm">
@@ -96,8 +96,8 @@ export function YouView() {
 
             {/* Where the ladder starts for someone who has no idea. Sits above the
             roadmap because it answers the question the roadmap raises. */}
-            <section className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <section className="rounded-xl border border-line p-4">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
                     {m.placement_cta()}
                 </h2>
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">

@@ -58,15 +58,11 @@ export function ComposeExportBar({
                     }}
                 />
             </label>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-                {m.compose_note_count({ count: noteCount })}
-            </span>
-            {uploadError && (
-                <p className="w-full text-sm text-red-600 dark:text-red-400">{uploadError}</p>
-            )}
+            <span className="text-sm text-muted">{m.compose_note_count({ count: noteCount })}</span>
+            {uploadError && <p className="w-full text-sm text-danger">{uploadError}</p>}
             {pendingReplace && (
                 <div className="flex w-full flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                    <span className="text-sm font-medium text-danger-strong">
                         {m.compose_replace_confirm()}
                     </span>
                     <Button variant="danger" onClick={onConfirmReplace}>

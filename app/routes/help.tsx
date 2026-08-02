@@ -55,10 +55,10 @@ function HelpBlock({ item }: { item: HelpItem }) {
                     src={item.imageUrl}
                     alt={item.imageAlt ?? ""}
                     loading="lazy"
-                    className="w-full rounded-lg border border-gray-200 dark:border-gray-800"
+                    className="w-full rounded-lg border border-line"
                 />
             )}
-            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <div className="space-y-2 text-sm text-body">
                 {paragraphs(item.text).map((para, index) => (
                     // Paragraphs are plain text in fixed order; index keys are stable.
                     // biome-ignore lint/suspicious/noArrayIndexKey: static, ordered text
@@ -101,10 +101,10 @@ export default function Help() {
         <main className="mx-auto max-w-3xl space-y-10 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.help_title()}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.help_intro()}</p>
+                <p className="text-sm text-muted">{m.help_intro()}</p>
             </header>
 
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-body">
                 {m.help_glossary_lead()}{" "}
                 <Link to="/glossary/" className={linkClasses}>
                     {m.glossary_title()}
@@ -114,7 +114,7 @@ export default function Help() {
             {/* The keyboard tour's only other door is the home checklist, which goes away
                 once it is dismissed or finished — so this is where it stays findable, and
                 where someone comes back to it having forgotten where middle C was. */}
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-body">
                 {m.help_basics_lead()}{" "}
                 <Link to="/basics/" className={linkClasses}>
                     {m.basics_title()}
@@ -125,7 +125,7 @@ export default function Help() {
                 const blocks = itemsForPage(items, key);
                 return (
                     <section key={key} id={key} className="scroll-mt-20 space-y-4">
-                        <h2 className="border-b border-gray-200 pb-1 text-lg font-semibold dark:border-gray-800">
+                        <h2 className="border-b border-line pb-1 text-lg font-semibold">
                             {title()}
                         </h2>
                         {blocks.length > 0 ? (
@@ -135,7 +135,7 @@ export default function Help() {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm text-muted">
                                 {loading ? m.help_loading() : m.help_empty()}
                             </p>
                         )}

@@ -121,7 +121,7 @@ export function ExportMenu({
                 variant="ghost"
                 onClick={() => setOpen((value) => !value)}
                 aria-expanded={open}
-                className="text-indigo-600 dark:text-indigo-400"
+                className="text-accent"
             >
                 <DownloadIcon className="h-4 w-4" />
                 {m.action_export()}
@@ -171,12 +171,10 @@ function ExportRow({
             onClick={onClick}
             className="flex w-full items-start gap-3 rounded-md p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
         >
-            <span className="mt-0.5 shrink-0 text-indigo-600 dark:text-indigo-400">{icon}</span>
+            <span className="mt-0.5 shrink-0 text-accent">{icon}</span>
             <span className="min-w-0">
-                <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {label}
-                </span>
-                <span className="block text-xs text-gray-500 dark:text-gray-400">{hint}</span>
+                <span className="block text-sm font-medium text-ink">{label}</span>
+                <span className="block text-xs text-muted">{hint}</span>
             </span>
         </button>
     );

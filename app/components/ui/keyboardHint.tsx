@@ -14,8 +14,8 @@ function formatOffset(offset: number): string {
 // of text doesn't greet everyone (most play with a MIDI piano, touch, or already know it).
 export function KeyboardHint({ octaveOffset }: { octaveOffset: number }) {
     return (
-        <details className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
-            <summary className="cursor-pointer font-medium text-gray-700 dark:text-gray-300">
+        <details className="rounded-md border border-line bg-sunken p-3 text-xs text-gray-600 dark:text-gray-300">
+            <summary className="cursor-pointer font-medium text-body">
                 {m.keyboard_hint_no_piano()}
             </summary>
             <div className="space-y-1 pt-2">

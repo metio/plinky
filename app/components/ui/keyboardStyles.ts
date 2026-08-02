@@ -9,7 +9,7 @@
 export const KEYBED_WELL = "rounded-2xl bg-gray-200 p-3 shadow-inner dark:bg-gray-900";
 
 export const WHITE_KEY =
-    "relative rounded-b-lg border border-gray-300 shadow-sm transition-[transform,background-color,box-shadow] duration-150 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-700";
+    "relative rounded-b-lg border border-line-strong shadow-sm transition-[transform,background-color,box-shadow] duration-150 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500";
 
 export const BLACK_KEY =
     "absolute top-0 rounded-b-md transition-[transform,background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400";

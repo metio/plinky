@@ -41,13 +41,11 @@ export function ShareCard({
 }) {
     return (
         <figure className="space-y-2">
-            <figcaption className="text-sm text-gray-500 dark:text-gray-400">{caption}</figcaption>
+            <figcaption className="text-sm text-muted">{caption}</figcaption>
             <div role="img" aria-label={gridLabel} className="w-max space-y-1">
                 {grid.map((row, r) => (
                     <div key={rowLabels[r] ?? r} className="flex items-center gap-2">
-                        <span className="w-16 text-right text-xs text-gray-500 dark:text-gray-400">
-                            {rowLabels[r]}
-                        </span>
+                        <span className="w-16 text-right text-xs text-muted">{rowLabels[r]}</span>
                         <div className="flex gap-1">
                             {row.map((level, c) => (
                                 <span

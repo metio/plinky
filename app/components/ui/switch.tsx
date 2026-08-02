@@ -28,7 +28,7 @@ export function Switch({
             disabled={disabled}
             title={title}
             onClick={() => onChange(!checked)}
-            className="inline-flex min-h-11 items-center gap-2.5 text-sm font-medium text-gray-700 transition-opacity disabled:opacity-50 dark:text-gray-300"
+            className="inline-flex min-h-11 items-center gap-2.5 text-sm font-medium text-body transition-opacity disabled:opacity-50"
         >
             <span
                 aria-hidden="true"

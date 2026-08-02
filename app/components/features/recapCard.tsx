@@ -38,7 +38,7 @@ export function RecapCard({ recap }: { recap: MonthlyRecap }) {
     };
 
     return (
-        <section className="space-y-4 rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-fuchsia-50 p-5 dark:border-indigo-800 dark:from-indigo-950 dark:to-fuchsia-950/40">
+        <section className="space-y-4 rounded-xl border border-indigo-200 bg-gradient-to-br from-accent-surface to-fuchsia-50 p-5 dark:border-indigo-800 dark:to-fuchsia-950/40">
             <h3 className="font-semibold text-indigo-900 text-lg dark:text-indigo-100">
                 {heading}
             </h3>
@@ -65,7 +65,7 @@ export function RecapCard({ recap }: { recap: MonthlyRecap }) {
 function Stat({ value, label }: { value: number; label: string }) {
     return (
         <div>
-            <div className="font-bold text-3xl text-indigo-700 tabular-nums dark:text-indigo-300">
+            <div className="font-bold text-3xl text-accent-strong tabular-nums">
                 {value.toLocaleString(getLocale())}
             </div>
             <div className="text-gray-600 text-xs uppercase tracking-wide dark:text-gray-400">

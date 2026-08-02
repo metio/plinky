@@ -133,7 +133,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     return (
         <section className="space-y-4">
             <div className="space-y-1">
-                <p className="text-xs font-medium uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+                <p className="text-xs font-medium uppercase tracking-wide text-accent">
                     {m.tour_step_of({ step: state.step + 1, total: TOUR_STEPS.length })}
                 </p>
                 <h2 className="text-xl font-semibold">{STEP_TITLE[step.id]?.() ?? ""}</h2>
@@ -186,7 +186,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
                 {ready ? (
                     <p className="text-sm text-green-700 dark:text-green-400">{m.tour_got_it()}</p>
                 ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{m.tour_waiting()}</p>
+                    <p className="text-sm text-muted">{m.tour_waiting()}</p>
                 )}
             </div>
         </section>

@@ -9,9 +9,9 @@ import { m } from "../../paraglide/messages.js";
 // material at their level. Tinted by difficulty band (low / mid / high) for a
 // quick visual read; the number carries the meaning.
 const BAND = [
-    "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
-    "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300",
-    "bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
+    "bg-success-surface text-success",
+    "bg-accent-surface text-accent-strong",
+    "bg-spark-surface text-violet-700 dark:text-violet-300",
 ];
 
 // A grade chip from a known grade number — used in the library list, where song

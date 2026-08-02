@@ -25,11 +25,11 @@ function slotClasses(state: "correct" | "wrong" | "current" | "filled" | "empty"
         case "wrong":
             return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
         case "current":
-            return "border-indigo-600 text-indigo-700 dark:border-indigo-400 dark:text-indigo-300";
+            return "border-indigo-600 text-accent-strong dark:border-indigo-400";
         case "filled":
-            return "border-gray-400 text-gray-900 dark:border-gray-500 dark:text-gray-100";
+            return "border-gray-400 text-ink dark:border-gray-500";
         default:
-            return "border-gray-200 text-gray-400 dark:border-gray-800 dark:text-gray-600";
+            return "border-line text-gray-400 dark:text-gray-600";
     }
 }
 
@@ -118,7 +118,7 @@ export function EarSequence<T extends string>({
                         key={degree}
                         disabled={settled}
                         onClick={() => choose(degree)}
-                        className="flex min-h-11 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-semibold text-gray-900 transition-colors hover:border-indigo-600 hover:text-indigo-700 disabled:cursor-default disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-indigo-500 dark:hover:text-indigo-300"
+                        className="flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white text-sm font-semibold text-ink transition-colors hover:border-indigo-600 hover:text-accent-strong disabled:cursor-default disabled:opacity-50 dark:bg-gray-900 dark:hover:border-indigo-500"
                     >
                         {degree}
                     </button>

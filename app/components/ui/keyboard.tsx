@@ -451,11 +451,11 @@ export function Keyboard({
 
     const whiteState = (note: number) =>
         flash?.note === note
-            ? "bg-red-200 dark:bg-red-900"
+            ? "bg-danger-fill"
             : lit.has(note)
-              ? "translate-y-0.5 bg-green-200 shadow-[0_0_14px_-3px] shadow-green-400 dark:bg-green-900"
+              ? "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-green-400"
               : expected.includes(note)
-                ? "bg-indigo-50 dark:bg-indigo-950"
+                ? "bg-accent-surface"
                 : theme.white;
     const blackState = (note: number) =>
         flash?.note === note

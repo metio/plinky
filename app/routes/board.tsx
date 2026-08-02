@@ -32,7 +32,7 @@ export default function Board() {
     return (
         <main className="mx-auto max-w-4xl space-y-10 p-6 font-sans">
             <header className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                     {m.board_eyebrow()}
                 </p>
                 <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
@@ -54,7 +54,7 @@ export default function Board() {
                     ))}
                 </div>
             ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-muted">
                     {loading ? m.board_loading() : m.board_empty()}
                 </p>
             )}

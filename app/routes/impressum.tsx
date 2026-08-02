@@ -31,10 +31,10 @@ export default function Impressum() {
             <LegalTranslationNotice page="impressum" />
 
             <section className="space-y-2">
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-base font-semibold text-ink">
                     {m.impressum_provider_heading()}
                 </h2>
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                <p className="text-sm leading-relaxed text-body">
                     Sebastian Hoß
                     <br />
                     Bremer Platz 7
@@ -46,14 +46,14 @@ export default function Impressum() {
             </section>
 
             <section className="space-y-2">
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-base font-semibold text-ink">
                     {m.impressum_contact_heading()}
                 </h2>
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                <p className="text-sm leading-relaxed text-body">
                     {m.contact_email_label()}{" "}
                     <a
                         href="mailto:contact@plinky.fun"
-                        className="text-indigo-700 hover:underline dark:text-indigo-300"
+                        className="text-accent-strong hover:underline"
                     >
                         contact@plinky.fun
                     </a>
@@ -61,10 +61,10 @@ export default function Impressum() {
             </section>
 
             <section className="space-y-2">
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-base font-semibold text-ink">
                     {m.impressum_responsible_heading()}
                 </h2>
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                <p className="text-sm leading-relaxed text-body">
                     {m.impressum_responsible_body()}
                 </p>
             </section>

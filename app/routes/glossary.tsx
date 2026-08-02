@@ -112,7 +112,7 @@ export default function Glossary() {
         <main className="mx-auto max-w-4xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.glossary_title()}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{m.glossary_intro()}</p>
+                <p className="text-sm text-muted">{m.glossary_intro()}</p>
             </header>
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">

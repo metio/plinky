@@ -171,7 +171,7 @@ function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: nu
                 onClick={() => setOpen((value) => !value)}
                 aria-expanded={open}
                 aria-label={m.scores_tempo()}
-                className="min-h-11 rounded-md px-2 text-sm font-semibold tabular-nums text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="min-h-11 rounded-md px-2 text-sm font-semibold tabular-nums text-gray-600 hover:bg-subtle dark:text-gray-300"
             >
                 <Bpm tempo={tempo} />
             </button>
@@ -188,13 +188,11 @@ function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: nu
                         />
                         <BumpValue
                             value={tempo}
-                            className="w-10 text-sm font-semibold text-gray-800 dark:text-gray-200"
+                            className="w-10 text-sm font-semibold text-ink-soft"
                         />
                     </span>
                     {/* The speed as music: the classical term for the current mark. */}
-                    <span className="text-xs italic text-gray-500 dark:text-gray-400">
-                        {tempoTerm(tempo)}
-                    </span>
+                    <span className="text-xs italic text-muted">{tempoTerm(tempo)}</span>
                 </span>
             )}
         </span>

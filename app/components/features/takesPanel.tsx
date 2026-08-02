@@ -85,13 +85,10 @@ export function TakesPanel({
                             // line, and a footer strip of ghost-styled export actions
                             // behind a hairline — wrapping inside the strip reads as a
                             // toolbar, not as overflow.
-                            <li
-                                key={take.id}
-                                className="rounded-md border border-gray-200 text-sm dark:border-gray-800"
-                            >
+                            <li key={take.id} className="rounded-md border border-line text-sm">
                                 <div className="flex items-center gap-2 px-2 pt-1">
                                     <span className="font-semibold">{take.letter || "—"}</span>
-                                    <span className="truncate text-gray-500 dark:text-gray-400">
+                                    <span className="truncate text-muted">
                                         {formatAgo(take.createdAt, now, getLocale())}
                                         {!take.complete && ` · ${m.takes_partial()}`}
                                     </span>
@@ -106,14 +103,14 @@ export function TakesPanel({
                                         <IconButton
                                             label={m.takes_delete()}
                                             onClick={() => onDelete(take.id)}
-                                            className="text-red-600 dark:text-red-400"
+                                            className="text-danger"
                                         >
                                             <TrashIcon />
                                         </IconButton>
                                     </span>
                                 </div>
                                 {take.metrics && (
-                                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 px-2 pb-2 text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 px-2 pb-2 text-xs text-muted tabular-nums">
                                         <span>
                                             {m.scores_accuracy()} {take.metrics.accuracy}%
                                         </span>
@@ -125,7 +122,7 @@ export function TakesPanel({
                                         </span>
                                     </div>
                                 )}
-                                <div className="flex flex-wrap items-center gap-x-1 border-t border-gray-200 px-1 py-1 dark:border-gray-800">
+                                <div className="flex flex-wrap items-center gap-x-1 border-t border-line px-1 py-1">
                                     <ShareGhostButton
                                         id={id}
                                         title={title}

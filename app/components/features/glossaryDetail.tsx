@@ -55,7 +55,7 @@ export function GlossaryDetail({
     return (
         <article className="space-y-4">
             <header className="space-y-1">
-                <p className="text-xs font-medium uppercase tracking-wide text-indigo-600 dark:text-indigo-400">
+                <p className="text-xs font-medium uppercase tracking-wide text-accent">
                     {CATEGORY_NAMES[entry.category]()}
                 </p>
                 <h2

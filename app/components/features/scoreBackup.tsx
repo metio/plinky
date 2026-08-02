@@ -61,12 +61,10 @@ export function ScoreBackup() {
 
     return (
         <section className="space-y-3">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
                 {m.backup_heading()}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-                {m.backup_intro({ count: pluralScores(count) })}
-            </p>
+            <p className="text-sm text-muted">{m.backup_intro({ count: pluralScores(count) })}</p>
             <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" onClick={download} disabled={count === 0}>
                     {m.backup_download()}
@@ -89,7 +87,7 @@ export function ScoreBackup() {
                     }}
                 />
             </div>
-            {status && <p className="text-sm text-gray-700 dark:text-gray-300">{status}</p>}
+            {status && <p className="text-sm text-body">{status}</p>}
         </section>
     );
 }

@@ -24,7 +24,7 @@ function nextIn<T>(cycle: readonly T[], current: T): T {
 }
 
 const CYCLE_BUTTON =
-    "min-w-9 rounded-md px-2 py-1 text-xs font-medium tabular-nums text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100";
+    "min-w-9 rounded-md px-2 py-1 text-xs font-medium tabular-nums text-muted hover:bg-subtle hover:text-ink";
 
 // The glyph stands for the naming itself: letters, the one landmark letter, the
 // first solfège syllable, or nothing.

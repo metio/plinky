@@ -134,7 +134,7 @@ export function ExportVideoButton({
         // its one-tap exports flat and the multi-option video panel opens as a
         // clearly grouped card below.
         <Disclosure summary={m.video_export()}>
-            <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-gray-200 p-2 dark:border-gray-800">
+            <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-line p-2">
                 <SegmentedControl
                     options={[
                         { id: "staff", label: m.video_format_staff() },
