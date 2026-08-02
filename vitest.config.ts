@@ -11,6 +11,17 @@ import { defineConfig } from "vitest/config";
 // docblock); a small browser project covers code that depends on
 // OpenSheetMusicDisplay, which only renders and populates note pitches under a
 // real browser.
+// OSMD renders under a real browser on its own schedule and can be slow on a loaded
+// machine. Rather than fail a test that just hadn't rendered yet, give the polls
+// (waitFor/findBy) and the hard per-test limit generous headroom so they wait the render
+// out — and keep a couple of retries as a last-resort backstop.
+//
+// Spread into each project rather than set once at the root: a root `test` block is not
+// inherited by `projects`, so declaring it there left every project on vitest's defaults
+// — 5s in node, 15s in browser mode — which is the opposite of what it read as. A
+// six-second test failed at five under a config that said sixty.
+const LIMITS = { testTimeout: 60_000, retry: 2 } as const;
+
 export default defineConfig({
     // Dedupe React so browser-rendered component tests share one instance, and
     // pre-bundle the JSX runtime so a dynamic import does not reload a test
@@ -30,12 +41,6 @@ export default defineConfig({
         ],
     },
     test: {
-        // OSMD renders under a real browser on its own schedule and can be slow on a
-        // loaded machine. Rather than fail a test that just hadn't rendered yet, give the
-        // polls (waitFor/findBy) and the hard per-test limit generous headroom so they
-        // wait the render out — and keep a couple of retries as a last-resort backstop.
-        testTimeout: 60_000,
-        retry: 2,
         coverage: {
             // istanbul instruments at transform time, so coverage is collected
             // uniformly in both the node and browser projects and merges into one
@@ -63,6 +68,7 @@ export default defineConfig({
         projects: [
             {
                 test: {
+                    ...LIMITS,
                     name: "node",
                     environment: "node",
                     // core/ is the pure domain layer and dev/ the catalogue build tooling
@@ -89,6 +95,7 @@ export default defineConfig({
                 // browser-midi project below; Playwright rejects the `midi`
                 // permission on Firefox, so this project must not request it.
                 test: {
+                    ...LIMITS,
                     name: "browser",
                     include: ["app/**/*.browser.test.{ts,tsx}", "core/**/*.browser.test.{ts,tsx}"],
                     exclude: ["app/contexts/midi.browser.test.tsx"],
@@ -110,6 +117,7 @@ export default defineConfig({
                 // be provisioned here, and WebKit has no Web MIDI at all — neither
                 // can run these, so this project stays Chromium-only.
                 test: {
+                    ...LIMITS,
                     name: "browser-midi",
                     include: ["app/contexts/midi.browser.test.tsx"],
                     setupFiles: ["./app/test-setup.ts"],
@@ -134,6 +142,7 @@ export default defineConfig({
                 // Playwright's isMobile/touch emulation is a Chromium feature that Firefox
                 // rejects. Files carry the `.mobile.test.tsx` suffix.
                 test: {
+                    ...LIMITS,
                     name: "browser-mobile",
                     include: ["app/**/*.mobile.test.{ts,tsx}", "core/**/*.mobile.test.{ts,tsx}"],
                     setupFiles: ["./app/test-setup.ts"],
@@ -156,6 +165,9 @@ export default defineConfig({
             // against a committed baseline (see .storybook/vitest.setup.ts).
             {
                 plugins: [storybookTest({ configDir: ".storybook" })],
+                // LIMITS is deliberately not spread here. A story screenshot that
+                // misses its deadline is starving for round-trips, not short of
+                // time, and more of it only makes a stuck run take longer to say so.
                 test: {
                     name: "storybook",
                     setupFiles: [".storybook/vitest.setup.ts"],
