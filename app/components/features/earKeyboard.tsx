@@ -4,6 +4,7 @@
 import { NOTE_LABELS } from "../../../core/keyMap";
 import { noteNameOf, type NoteNameId, type PitchClass } from "../../../core/theory";
 import { m } from "../../paraglide/messages.js";
+import { answerClasses, VERDICT_FILL, type Verdict } from "./earVerdict";
 
 // The answer surface for the perfect-pitch exercise. The question is "which note was
 // that?", and the answer set is the twelve notes — which is a keyboard. Naming C by
@@ -32,8 +33,6 @@ const BLACK: { pitchClass: PitchClass; boundary: number }[] = [
 const WHITE_WIDTH = 100 / WHITE.length;
 const BLACK_WIDTH = WHITE_WIDTH * 0.62;
 
-type Verdict = "correct" | "wrong" | null;
-
 function verdictFor(
     name: NoteNameId,
     answer: NoteNameId | null,
@@ -48,30 +47,23 @@ function verdictFor(
     return name === given ? "wrong" : null;
 }
 
+// A white key is an answer surface like any other, but its resting face is a piano
+// key rather than a card.
+const WHITE_IDLE =
+    "border-line-strong bg-key-white text-key-ink hover:bg-key-hover hover:text-accent-strong";
+
 function whiteClasses(verdict: Verdict, settled: boolean): string {
-    if (verdict === "correct") {
-        return "border-success-solid bg-success-solid text-white";
-    }
-    if (verdict === "wrong") {
-        return "border-danger-solid bg-danger-solid text-white";
-    }
-    if (settled) {
-        return "border-line bg-raised text-faint";
-    }
-    return "border-line-strong bg-key-white text-key-ink hover:bg-key-hover hover:text-accent-strong";
+    return answerClasses(verdict, settled, WHITE_IDLE);
 }
 
+// A black key carries no border of its own, so the verdict arrives as fill alone.
 function blackClasses(verdict: Verdict, settled: boolean): string {
-    if (verdict === "correct") {
-        return "bg-success-solid text-white";
+    if (verdict !== null) {
+        return VERDICT_FILL[verdict];
     }
-    if (verdict === "wrong") {
-        return "bg-danger-solid text-white";
-    }
-    if (settled) {
-        return "bg-key-spent text-key-spent-ink";
-    }
-    return "bg-key-black text-key-black-ink hover:bg-accent-solid-hover";
+    return settled
+        ? "bg-key-spent text-key-spent-ink"
+        : "bg-key-black text-key-black-ink hover:bg-accent-solid-hover";
 }
 
 export function EarKeyboard({

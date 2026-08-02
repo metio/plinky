@@ -6,24 +6,10 @@
 // the way an interval has a height or a note has a key, so the choices are just their
 // names, laid out as a grid to pick from.
 //
-// The verdict colours match the ladder and the keyboard so a right or wrong answer reads
-// the same across every exercise: green is what played, red is the miss, and once the
-// round is settled the rest recede.
+// The verdict comes from `earVerdict`, so a right or wrong answer reads the same here as
+// on the ladder, the keyboard and the sequence.
 
-type Verdict = "correct" | "wrong" | null;
-
-function choiceClasses(verdict: Verdict, settled: boolean): string {
-    if (verdict === "correct") {
-        return "border-success-solid bg-success-solid text-white";
-    }
-    if (verdict === "wrong") {
-        return "border-danger-solid bg-danger-solid text-white";
-    }
-    if (settled) {
-        return "border-line bg-raised text-faint";
-    }
-    return "border-line-strong bg-raised text-ink hover:border-accent-solid hover:text-accent-strong";
-}
+import { answerClasses, type Verdict } from "./earVerdict";
 
 export function EarChoices<T extends string>({
     choices,
@@ -61,7 +47,7 @@ export function EarChoices<T extends string>({
                         key={choice}
                         disabled={settled}
                         onClick={() => onChoose(choice)}
-                        className={`flex min-h-11 items-center justify-center rounded-md border px-3 text-center text-sm font-medium transition-colors disabled:cursor-default ${choiceClasses(verdict, settled)}`}
+                        className={`flex min-h-11 items-center justify-center rounded-md border px-3 text-center text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, settled)}`}
                     >
                         {nameOf(choice)}
                     </button>

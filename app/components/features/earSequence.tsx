@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { UndoIcon } from "../ui/icons";
 import { IconButton } from "../ui/button";
+import { VERDICT_BOX } from "./earVerdict";
 import { m } from "../../paraglide/messages.js";
 
 // The answer surface for the exercises whose answer is a SEQUENCE rather than a single
@@ -21,9 +22,9 @@ import { m } from "../../paraglide/messages.js";
 function slotClasses(state: "correct" | "wrong" | "current" | "filled" | "empty"): string {
     switch (state) {
         case "correct":
-            return "border-success-solid bg-success-solid text-white";
+            return VERDICT_BOX.correct;
         case "wrong":
-            return "border-danger-solid bg-danger-solid text-white";
+            return VERDICT_BOX.wrong;
         case "current":
             return "border-accent text-accent-strong";
         case "filled":

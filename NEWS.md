@@ -8,6 +8,13 @@ SPDX-License-Identifier: 0BSD
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 3 August 2026
+
+**The arcade button reads properly under the pointer.** Hovering it lightened the fill
+while the label stayed white, which left the two too close together to read — and it
+was the only filled button in Plinky that brightened on hover instead of deepening.
+It now darkens like the rest, and the label stays legible throughout.
+
 ## 2 August 2026
 
 **Colours read the same in both themes.** Every colour in Plinky is now named for the

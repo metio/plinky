@@ -4,6 +4,7 @@
 import type { IntervalId } from "../../../core/theory";
 import { semitonesOf, SEMITONES_PER_OCTAVE } from "../../../core/theory";
 import { intervalName } from "../../lib/theoryNames";
+import { answerClasses, type Verdict } from "./earVerdict";
 import { m } from "../../paraglide/messages.js";
 
 // The answer surface for the interval exercise. An interval IS a distance, so the
@@ -31,25 +32,10 @@ const LADDER_HEIGHT = RUNG_HEIGHT * SEMITONES_PER_OCTAVE;
 const INSET = RUNG_HEIGHT / 2;
 const BOX_HEIGHT = LADDER_HEIGHT + RUNG_HEIGHT;
 
-type Verdict = "correct" | "wrong" | null;
-
 // Where a rung sits, as a percentage from the foot of the ladder. The rung is centred
 // on its height, so the label lines up with the distance it names.
 function offsetOf(interval: IntervalId): number {
     return (semitonesOf(interval) / SEMITONES_PER_OCTAVE) * 100;
-}
-
-function rungClasses(verdict: Verdict, dimmed: boolean): string {
-    if (verdict === "correct") {
-        return "border-success-solid bg-success-solid text-white";
-    }
-    if (verdict === "wrong") {
-        return "border-danger-solid bg-danger-solid text-white";
-    }
-    if (dimmed) {
-        return "border-line bg-raised text-faint";
-    }
-    return "border-line-strong bg-raised text-ink hover:border-accent-solid hover:text-accent-strong";
 }
 
 export function EarLadder({
@@ -97,7 +83,7 @@ export function EarLadder({
                         key={interval}
                         disabled={settled}
                         onClick={() => onChoose(interval)}
-                        className={`absolute left-0 right-0 flex items-center rounded-md border px-4 text-sm font-medium transition-colors disabled:cursor-default ${rungClasses(verdict, dimmed)}`}
+                        className={`absolute left-0 right-0 flex items-center rounded-md border px-4 text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, dimmed)}`}
                         style={{
                             height: `${RUNG_HEIGHT}px`,
                             // Measured against the inset span, not the padded box, so a
