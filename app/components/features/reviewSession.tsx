@@ -109,8 +109,8 @@ export function ReviewSession() {
         return (
             <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
                 <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.review_empty()}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.refresh_why()}</p>
+                <p className="text-sm text-muted">{m.review_empty()}</p>
+                <p className="text-sm text-muted">{m.refresh_why()}</p>
                 <div className="flex flex-wrap items-center gap-4">
                     <Link to="/library" className={BACK}>
                         {m.today_browse()}
@@ -127,7 +127,7 @@ export function ReviewSession() {
         return (
             <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
                 <h1 className="text-2xl font-semibold">🎉 {m.review_complete_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-muted">
                     {m.review_complete_summary({ refreshed, shelved })}
                 </p>
                 <Link to="/you" className={BACK}>
@@ -175,9 +175,9 @@ export function ReviewSession() {
                     </span>
                 </div>
                 {/* A simple filled bar so the end of the session is always in sight. */}
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-subtle-strong">
                     <div
-                        className="h-full rounded-full bg-indigo-500 transition-all"
+                        className="h-full rounded-full bg-chart-peak transition-all"
                         style={{ width: `${Math.round((index / total) * 100)}%` }}
                     />
                 </div>

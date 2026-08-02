@@ -100,12 +100,12 @@ export function PlayTransport() {
                     {listenButton}
                     {practiceButton}
                     <Show when={matcher.practicing}>
-                        <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
+                        <span className="text-sm tabular-nums text-muted">
                             {matcher.done}/{matcher.total}
                         </span>
                     </Show>
                     <Show when={keepUp.running}>
-                        <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
+                        <span className="text-sm tabular-nums text-muted">
                             {keepUp.progress.inTime}/{keepUp.progress.done}
                         </span>
                     </Show>
@@ -171,12 +171,12 @@ function TempoPopover({ tempo, setTempo }: { tempo: number; setTempo: (value: nu
                 onClick={() => setOpen((value) => !value)}
                 aria-expanded={open}
                 aria-label={m.scores_tempo()}
-                className="min-h-11 rounded-md px-2 text-sm font-semibold tabular-nums text-gray-600 hover:bg-subtle dark:text-gray-300"
+                className="min-h-11 rounded-md px-2 text-sm font-semibold tabular-nums text-muted hover:bg-subtle"
             >
                 <Bpm tempo={tempo} />
             </button>
             {open && (
-                <span className="absolute left-0 top-full z-30 mt-1 flex flex-col gap-1 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                <span className="absolute left-0 top-full z-30 mt-1 flex flex-col gap-1 rounded-md border border-line bg-raised p-3 shadow-lg">
                     <span className="flex items-center gap-2">
                         <input
                             type="range"

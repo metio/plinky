@@ -145,7 +145,7 @@ export function HomeToday() {
     }
 
     return (
-        <section className="space-y-3 rounded-xl border border-accent-line bg-indigo-50/50 p-5 dark:bg-indigo-950/30">
+        <section className="space-y-3 rounded-xl border border-accent-line bg-accent-surface/50 p-5 dark:bg-accent-surface/30">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-accent-strong">
                 {m.today_heading()}
             </h2>
@@ -154,7 +154,7 @@ export function HomeToday() {
                     <li key={task.key}>
                         <Link
                             to={task.to}
-                            className="group flex items-center gap-3 rounded-lg border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm dark:bg-gray-900"
+                            className="group flex items-center gap-3 rounded-lg border border-line bg-raised p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm"
                         >
                             <span aria-hidden="true" className="text-xl">
                                 {task.key === "daily" && task.done ? "✅" : ICON[task.key]}

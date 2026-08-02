@@ -50,7 +50,7 @@ export function ComposeStage({
                 ref={stageRef as RefObject<HTMLElement>}
                 className={
                     fullscreen
-                        ? "fixed inset-0 z-50 flex flex-col justify-between gap-3 overflow-y-auto bg-white p-4 dark:bg-gray-950"
+                        ? "fixed inset-0 z-50 flex flex-col justify-between gap-3 overflow-y-auto bg-surface p-4"
                         : "space-y-3"
                 }
             >
@@ -69,7 +69,7 @@ export function ComposeStage({
                 </div>
                 <div className={fullscreen ? "flex min-h-0 flex-1 flex-col" : ""}>
                     <div
-                        className={`rounded-lg border border-line bg-white p-3 dark:bg-gray-900 ${
+                        className={`rounded-lg border border-line bg-raised p-3 ${
                             fullscreen ? "relative min-h-0 flex-1 overflow-y-auto" : ""
                         }`}
                     >

@@ -34,10 +34,10 @@ export function AssignmentStepList({
                         aria-hidden="true"
                         className={`${STEP_MARK} ${
                             step.status === "done"
-                                ? "bg-green-600 text-white"
+                                ? "bg-success-solid text-white"
                                 : step.status === "current"
-                                  ? "bg-indigo-600 text-white"
-                                  : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                  ? "bg-accent-solid text-white"
+                                  : "bg-subtle-strong text-muted"
                         }`}
                     >
                         {step.status === "done" ? <CheckIcon className="h-4 w-4" /> : index + 1}

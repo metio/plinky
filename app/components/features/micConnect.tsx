@@ -51,7 +51,7 @@ export function MicConnect() {
                     ) : (
                         <>
                             {m.mic_heard()}{" "}
-                            <span className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-indigo-800 dark:text-indigo-100">
+                            <span className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-accent-deep">
                                 {noteName(heard)}
                             </span>
                         </>
@@ -63,9 +63,7 @@ export function MicConnect() {
             measure the room, so it lives below the plain listen check rather
             than running alongside it. */}
             <div className="border-line border-t pt-3">
-                <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                    {m.mic_calibrate_lead()}
-                </p>
+                <p className="mb-2 text-sm text-muted">{m.mic_calibrate_lead()}</p>
                 <MicCalibrationWizard />
             </div>
         </div>

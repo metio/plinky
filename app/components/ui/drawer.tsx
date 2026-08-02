@@ -121,7 +121,7 @@ export function Drawer({
                 aria-modal="true"
                 aria-label={title}
                 tabIndex={-1}
-                className={`relative flex max-h-[85vh] w-full flex-col rounded-t-2xl bg-white shadow-xl outline-none transition-transform duration-300 ease-out motion-reduce:transition-none dark:bg-gray-900 sm:h-full sm:max-h-full sm:w-96 sm:max-w-[90vw] sm:rounded-none ${
+                className={`relative flex max-h-[85vh] w-full flex-col rounded-t-2xl bg-raised shadow-xl outline-none transition-transform duration-300 ease-out motion-reduce:transition-none sm:h-full sm:max-h-full sm:w-96 sm:max-w-[90vw] sm:rounded-none ${
                     shown
                         ? "translate-y-0 sm:translate-x-0"
                         : "translate-y-full sm:translate-y-0 sm:translate-x-full"

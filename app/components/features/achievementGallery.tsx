@@ -54,8 +54,8 @@ export function AchievementGallery({ achievements }: { achievements: Achievement
                             key={badge.id}
                             className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center ${
                                 badge.earned
-                                    ? "border-indigo-200 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-950/40"
-                                    : "border-dashed border-gray-200 dark:border-gray-800"
+                                    ? "border-accent-line bg-accent-surface/60 dark:bg-accent-surface/40"
+                                    : "border-dashed border-line"
                             }`}
                         >
                             {/* Only the decorative emoji dims for a locked badge — fading
@@ -68,9 +68,7 @@ export function AchievementGallery({ achievements }: { achievements: Achievement
                             </span>
                             <span
                                 className={`text-xs font-medium ${
-                                    badge.earned
-                                        ? "text-gray-700 dark:text-gray-300"
-                                        : "text-gray-600 dark:text-gray-400"
+                                    badge.earned ? "text-body" : "text-muted"
                                 }`}
                             >
                                 {label}

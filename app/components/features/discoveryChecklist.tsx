@@ -155,7 +155,7 @@ export function DiscoveryChecklist() {
     };
 
     return (
-        <section className="space-y-3 rounded-md border border-accent-line bg-indigo-50/50 p-4 dark:bg-indigo-950/30">
+        <section className="space-y-3 rounded-md border border-accent-line bg-accent-surface/50 p-4 dark:bg-accent-surface/30">
             <div className="flex items-start justify-between gap-2">
                 <h2 className="font-semibold text-accent-deep">{m.discover_heading()}</h2>
                 <button
@@ -167,7 +167,7 @@ export function DiscoveryChecklist() {
                     <CloseIcon className="h-4 w-4" />
                 </button>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-muted">
                 {m.discover_intro()}{" "}
                 <span className="font-medium tabular-nums">
                     {m.discover_progress({
@@ -185,8 +185,8 @@ export function DiscoveryChecklist() {
                                 aria-hidden="true"
                                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
                                     stepDone
-                                        ? "bg-green-600 text-white"
-                                        : "border border-gray-300 dark:border-gray-600"
+                                        ? "bg-success-solid text-white"
+                                        : "border border-line-strong"
                                 }`}
                             >
                                 {stepDone && <CheckIcon className="h-3.5 w-3.5" />}
@@ -201,7 +201,7 @@ export function DiscoveryChecklist() {
                             {/* The shortcut marker for the itchy-fingered: these
                             steps start you playing immediately, no set-up needed. */}
                             <Show when={step.quick && !stepDone}>
-                                <span className="rounded-full bg-warn-fill px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300">
+                                <span className="rounded-full bg-warn-fill px-2 py-0.5 text-xs font-medium text-warn">
                                     {m.discover_jump_in()}
                                 </span>
                             </Show>

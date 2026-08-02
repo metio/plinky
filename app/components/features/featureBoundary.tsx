@@ -77,7 +77,7 @@ function FeatureFallback({
 
     return (
         <section className="space-y-3 rounded-md border border-line p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">{m.feature_broken()}</p>
+            <p className="text-sm text-muted">{m.feature_broken()}</p>
             <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={onRetry} className={buttonClasses("secondary")}>
                     {m.action_try_again()}

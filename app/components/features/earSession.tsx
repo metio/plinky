@@ -147,7 +147,7 @@ export function EarSession({
     if (question === null) {
         return (
             <div className="space-y-4 rounded-xl border border-line p-8 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">{BLURB[exercise]()}</p>
+                <p className="text-sm text-muted">{BLURB[exercise]()}</p>
                 <Button variant="primary" onClick={next}>
                     {m.ear_start()}
                 </Button>

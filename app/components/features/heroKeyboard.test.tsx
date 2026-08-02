@@ -31,7 +31,7 @@ describe("HeroKeyboard", () => {
         renderHero();
         const key = screen.getByLabelText("C 4");
         fireEvent.pointerDown(key);
-        expect(key.className).toContain("bg-green-200");
+        expect(key.className).toContain("bg-success-fill");
     });
 
     it("lights up when a note arrives from the input funnel (a MIDI key)", () => {
@@ -52,6 +52,6 @@ describe("HeroKeyboard", () => {
             </MidiProvider>,
         );
         fireEvent.click(screen.getByText("play"));
-        expect(screen.getByLabelText("C 4").className).toContain("bg-green-200");
+        expect(screen.getByLabelText("C 4").className).toContain("bg-success-fill");
     });
 });

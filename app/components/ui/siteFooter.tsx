@@ -30,7 +30,7 @@ export function SiteFooter() {
                     <Link
                         to={localizedHref("/about")}
                         aria-label={m.nav_about()}
-                        className="group rounded-md p-1 text-faint hover:text-love focus-visible:ring-2 focus-visible:ring-rose-400"
+                        className="group rounded-md p-1 text-faint hover:text-love focus-visible:ring-2 focus-visible:ring-love-ring"
                     >
                         <HeartIcon
                             filled
@@ -43,13 +43,13 @@ export function SiteFooter() {
                 <div className="flex items-center gap-3 text-sm text-muted">
                     <Link
                         to={localizedHref("/impressum")}
-                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         Impressum
                     </Link>
                     <Link
                         to={localizedHref("/datenschutz")}
-                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        className="rounded-md px-1 hover:text-accent focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         Datenschutz
                     </Link>
@@ -62,7 +62,7 @@ export function SiteFooter() {
                             target="_blank"
                             rel="noreferrer"
                             aria-label={m.board_follow({ platform: channel.label })}
-                            className="rounded-md p-2 text-muted hover:text-accent focus-visible:ring-2 focus-visible:ring-indigo-500"
+                            className="rounded-md p-2 text-muted hover:text-accent focus-visible:ring-2 focus-visible:ring-accent-ring"
                         >
                             <BrandIcon brand={channel.brand} className="h-5 w-5" />
                         </a>

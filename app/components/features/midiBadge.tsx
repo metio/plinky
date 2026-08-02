@@ -25,9 +25,7 @@ export function MidiBadge() {
             aria-label={label}
             title={label}
             className={`pointer-events-none absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full ${
-                connected
-                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                    : "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
+                connected ? "bg-success-fill text-success" : "bg-subtle text-faint"
             }`}
         >
             {connected ? (

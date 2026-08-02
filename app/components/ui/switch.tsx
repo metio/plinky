@@ -33,7 +33,7 @@ export function Switch({
             <span
                 aria-hidden="true"
                 className={`relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors ${
-                    checked ? "bg-indigo-600 dark:bg-indigo-500" : "bg-gray-300 dark:bg-gray-600"
+                    checked ? "bg-accent-solid" : "bg-key-spent"
                 }`}
             >
                 <span

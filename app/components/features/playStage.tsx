@@ -55,7 +55,7 @@ export function PlayStage() {
                 rides in the top bar, so this full-width status row is dropped. */}
                 <FullScreen off>
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
+                        <span className="text-muted">
                             {m.play_progress()} {matcher.done} / {matcher.total}
                         </span>
                     </div>

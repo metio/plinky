@@ -116,7 +116,7 @@ export function NewsBanner() {
     return (
         <section
             aria-label={m.news_label()}
-            className="group relative overflow-hidden rounded-xl border border-line bg-white dark:bg-gray-900"
+            className="group relative overflow-hidden rounded-xl border border-line bg-raised"
         >
             <div
                 className="relative w-full touch-pan-y bg-subtle"
@@ -191,7 +191,7 @@ export function NewsBanner() {
                                         <span
                                             className={`h-1.5 rounded-full motion-safe:transition-all ${
                                                 i === current
-                                                    ? "w-4 bg-indigo-300"
+                                                    ? "w-4 bg-chart-track"
                                                     : "w-1.5 bg-white/45"
                                             }`}
                                         />
@@ -208,7 +208,7 @@ export function NewsBanner() {
                     href={item.linkUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block px-4 py-3 text-sm font-medium text-gray-800 transition group-hover:text-accent-strong dark:text-gray-100"
+                    className="block px-4 py-3 text-sm font-medium text-ink-soft transition group-hover:text-accent-strong"
                 >
                     {item.headline}
                 </a>

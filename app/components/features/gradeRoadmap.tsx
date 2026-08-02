@@ -65,8 +65,8 @@ export function GradeRoadmap({
                         key={grade}
                         className={`space-y-2 rounded-md border p-3 ${
                             grade === level
-                                ? "border-indigo-300 bg-indigo-50/60 dark:border-indigo-800 dark:bg-indigo-950/40"
-                                : "border-gray-200 dark:border-gray-800"
+                                ? "border-accent-line-strong bg-accent-surface/60 dark:bg-accent-surface/40"
+                                : "border-line"
                         }`}
                     >
                         <div className="flex items-center justify-between gap-3">
@@ -78,7 +78,7 @@ export function GradeRoadmap({
                                     </span>
                                 )}
                             </span>
-                            <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                            <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-muted">
                                 <span className="tabular-nums">
                                     {m.grades_pool({ mastered, total })}
                                 </span>
@@ -101,9 +101,7 @@ export function GradeRoadmap({
                             <summary className="cursor-pointer text-xs text-muted">
                                 {m.grade_about_heading()}
                             </summary>
-                            <p className="pt-1 text-gray-600 dark:text-gray-400">
-                                {GRADE_ABOUT[grade]?.()}
-                            </p>
+                            <p className="pt-1 text-muted">{GRADE_ABOUT[grade]?.()}</p>
                         </details>
                     </li>
                 );

@@ -60,7 +60,7 @@ export default function LibraryRoute() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.library_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.library_intro()}</p>
+                <p className="text-sm text-muted">{m.library_intro()}</p>
                 <Show when={due > 0}>
                     <p className="text-sm font-medium text-warn">
                         {m.mastery_due_count({ count: due })}
@@ -82,9 +82,7 @@ export default function LibraryRoute() {
                 <>
                     <section className="space-y-2">
                         <h2 className="text-lg font-semibold">{m.import_heading()}</h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {m.import_intro()}
-                        </p>
+                        <p className="text-sm text-muted">{m.import_intro()}</p>
                         <p className="text-sm text-muted">{m.import_local_note()}</p>
                     </section>
                     <ScoreImport />
@@ -99,7 +97,7 @@ export default function LibraryRoute() {
                         onChange={(event) => filters.setQuery(event.target.value)}
                         placeholder={m.scores_search_placeholder()}
                         aria-label={m.scores_search_placeholder()}
-                        className="w-full rounded-md border border-line-strong px-3 py-2 text-sm dark:bg-gray-900"
+                        className="w-full rounded-md border border-line-strong px-3 py-2 text-sm dark:bg-raised"
                     />
 
                     <LibraryFilters
@@ -126,9 +124,7 @@ export default function LibraryRoute() {
                     ) : (
                         <>
                             {matches.length === 0 ? (
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {m.scores_empty()}
-                                </p>
+                                <p className="text-sm text-muted">{m.scores_empty()}</p>
                             ) : (
                                 <ul className="space-y-1">
                                     {matches.slice(0, visible).map((item) => {

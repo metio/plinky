@@ -22,11 +22,11 @@ type Story = StoryObj<typeof FeatureBoundary>;
 export const PanelStopped: Story = {
     render: () => (
         <div className="space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400">A panel above, working.</p>
+            <p className="text-sm text-muted">A panel above, working.</p>
             <FeatureBoundary feature="ExamplePanel">
                 <Broken />
             </FeatureBoundary>
-            <p className="text-sm text-gray-600 dark:text-gray-400">A panel below, working.</p>
+            <p className="text-sm text-muted">A panel below, working.</p>
         </div>
     ),
 };

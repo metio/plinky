@@ -63,7 +63,7 @@ export function ScoreCanvas() {
         // rounded edge — the plate border of an engraved music edition. `relative` anchors
         // that decorative rule.
         <div
-            className={`relative rounded-xl bg-stone-50 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)] ${
+            className={`relative rounded-xl bg-paper p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)] ${
                 fullscreen ? "flex min-h-0 flex-1 flex-col" : ""
             }`}
         >
@@ -71,7 +71,7 @@ export function ScoreCanvas() {
             between the page edge and the staff. Decorative, so it never takes a press. */}
             <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-2 rounded-lg border border-stone-300/70"
+                className="pointer-events-none absolute inset-2 rounded-lg border border-paper-line/70"
             />
             {/* In highway mode the highway takes the staff's slot as an in-flow panel,
             so it gets its height the same way the staff did (the flex-1 / min-h band
@@ -80,9 +80,7 @@ export function ScoreCanvas() {
             is pulled out of flow and hidden (see the container below), kept mounted only
             so OSMD stays rendered and the matcher's cursor keeps walking it. */}
             {highwayActive && (
-                <div
-                    className={`relative overflow-hidden rounded-md bg-gray-100 dark:bg-gray-900 ${slotSize}`}
-                >
+                <div className={`relative overflow-hidden rounded-md bg-subtle ${slotSize}`}>
                     <div className="absolute inset-0">
                         <NotesHighway
                             upcoming={matcher.upcoming}
@@ -113,7 +111,7 @@ export function ScoreCanvas() {
                 <p
                     role="status"
                     aria-live="polite"
-                    className="rounded-lg bg-accent-surface px-3 py-2 text-center text-sm font-medium text-indigo-700 dark:text-indigo-200"
+                    className="rounded-lg bg-accent-surface px-3 py-2 text-center text-sm font-medium text-accent-strong"
                 >
                     {m.sight_read_studying({ seconds: sightRead.countdown })}
                 </p>

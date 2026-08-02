@@ -18,8 +18,8 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 // variant's id, so the exercise regenerates and the URL stays shareable and
 // mastery-tracked.
 const BTN = "rounded-md border px-3 py-1 text-sm tabular-nums";
-const ON = "border-indigo-600 bg-indigo-600 text-white";
-const OFF = "border-line-strong text-body hover:bg-gray-50 dark:hover:bg-gray-800";
+const ON = "border-accent-solid bg-accent-solid text-white";
+const OFF = "border-line-strong text-body hover:bg-sunken";
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
     return (

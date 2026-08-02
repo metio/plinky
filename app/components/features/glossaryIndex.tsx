@@ -42,8 +42,8 @@ export function GlossaryIndex({
                                         aria-current={current ? "true" : undefined}
                                         className={`flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm transition-colors ${
                                             current
-                                                ? "bg-indigo-100 font-medium text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100"
-                                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                                                ? "bg-accent-fill font-medium text-accent-ink"
+                                                : "text-body hover:bg-subtle"
                                         }`}
                                     >
                                         {symbolName(entry.id)}

@@ -111,7 +111,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                             </div>
                         </div>
                         {score.composer && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-muted">
                                 {/* The composer's name opens their page — everything of
                                     theirs in the catalogue, one tap away. */}
                                 {personSlug(score.composer) ? (
@@ -162,13 +162,11 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                 </TransposeProvider>
             )}
             <Show when={score === null}>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.play_not_found()}</p>
+                <p className="text-sm text-muted">{m.play_not_found()}</p>
             </Show>
             <Show when={resolved === "unavailable"}>
                 <div className="space-y-3">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.play_unavailable()}
-                    </p>
+                    <p className="text-sm text-muted">{m.play_unavailable()}</p>
                     <Button variant="secondary" onClick={() => setAttempt((n) => n + 1)}>
                         {m.play_retry()}
                     </Button>

@@ -37,7 +37,7 @@ export const WithActions: Story = {
             actions={
                 <button
                     type="button"
-                    className="rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white hover:bg-indigo-500"
+                    className="rounded-md bg-accent-solid px-3 py-1 text-sm font-medium text-white hover:bg-chart-peak"
                 >
                     Reload
                 </button>

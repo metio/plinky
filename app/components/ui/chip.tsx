@@ -19,8 +19,8 @@ export function Chip({
             type={type}
             className={`inline-flex min-h-11 items-center justify-center rounded-md border px-3.5 text-sm font-medium transition-colors disabled:opacity-50 ${
                 selected
-                    ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-gray-300 text-body hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+                    ? "border-accent-solid bg-accent-solid text-white"
+                    : "border-line-strong text-body hover:bg-subtle"
             } ${className}`}
             {...rest}
         >

@@ -50,28 +50,28 @@ function verdictFor(
 
 function whiteClasses(verdict: Verdict, settled: boolean): string {
     if (verdict === "correct") {
-        return "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500";
+        return "border-success-solid bg-success-solid text-white";
     }
     if (verdict === "wrong") {
-        return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
+        return "border-danger-solid bg-danger-solid text-white";
     }
     if (settled) {
-        return "border-line bg-white text-gray-400 dark:bg-gray-900 dark:text-gray-600";
+        return "border-line bg-raised text-faint";
     }
-    return "border-line-strong bg-white text-gray-900 hover:bg-indigo-50 hover:text-indigo-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-indigo-100";
+    return "border-line-strong bg-key-white text-key-white-ink hover:bg-key-hover hover:text-accent-strong";
 }
 
 function blackClasses(verdict: Verdict, settled: boolean): string {
     if (verdict === "correct") {
-        return "bg-emerald-600 text-white dark:bg-emerald-500";
+        return "bg-success-solid text-white";
     }
     if (verdict === "wrong") {
-        return "bg-red-700 text-white dark:bg-red-600";
+        return "bg-danger-solid text-white";
     }
     if (settled) {
-        return "bg-gray-400 text-gray-200 dark:bg-gray-700 dark:text-gray-500";
+        return "bg-key-spent text-key-spent-ink";
     }
-    return "bg-gray-900 text-gray-100 hover:bg-indigo-700 dark:bg-gray-800 dark:hover:bg-indigo-600";
+    return "bg-key-black text-key-black-ink hover:bg-accent-solid-hover";
 }
 
 export function EarKeyboard({

@@ -11,7 +11,7 @@ import { m } from "../../paraglide/messages.js";
 const BAND = [
     "bg-success-surface text-success",
     "bg-accent-surface text-accent-strong",
-    "bg-spark-surface text-violet-700 dark:text-violet-300",
+    "bg-spark-surface text-spark-strong",
 ];
 
 // A grade chip from a known grade number — used in the library list, where song

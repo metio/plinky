@@ -127,7 +127,7 @@ export function ExportMenu({
                 {m.action_export()}
             </Button>
             {open && (
-                <span className="absolute right-0 top-full z-30 mt-1 block w-72 rounded-md border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+                <span className="absolute right-0 top-full z-30 mt-1 block w-72 rounded-md border border-line bg-raised p-1 shadow-lg">
                     <ExportRow
                         icon={<PrinterIcon className="h-5 w-5" />}
                         label={m.action_print()}
@@ -169,7 +169,7 @@ function ExportRow({
         <button
             type="button"
             onClick={onClick}
-            className="flex w-full items-start gap-3 rounded-md p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="flex w-full items-start gap-3 rounded-md p-3 text-left hover:bg-sunken"
         >
             <span className="mt-0.5 shrink-0 text-accent">{icon}</span>
             <span className="min-w-0">

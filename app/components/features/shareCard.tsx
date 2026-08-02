@@ -6,11 +6,11 @@ import { ShareButtons } from "./shareButtons";
 
 // On-card cell colours, matched to the share emoji (🟩 / 🟨 / 🟧 / 🟥 / ⬜).
 const CELL: Record<Level, string> = {
-    best: "bg-green-500",
-    good: "bg-yellow-500",
-    ok: "bg-orange-500",
-    weak: "bg-red-500",
-    none: "bg-gray-300 dark:bg-gray-700",
+    best: "bg-band-best",
+    good: "bg-band-good",
+    ok: "bg-band-ok",
+    weak: "bg-band-weak",
+    none: "bg-band-none",
 };
 
 // A Wordle-style grid (Accuracy / Timing / Flow as rows) with no numbers, plus

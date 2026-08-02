@@ -1139,7 +1139,7 @@ export function PlaySessionProvider({
                     ref={session.rootRef}
                     className={
                         session.fullscreen
-                            ? "fixed inset-0 z-50 flex flex-col gap-2 bg-white p-3 dark:bg-gray-950"
+                            ? "fixed inset-0 z-50 flex flex-col gap-2 bg-surface p-3"
                             : "space-y-3"
                     }
                 >

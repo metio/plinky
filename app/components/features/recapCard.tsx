@@ -38,23 +38,21 @@ export function RecapCard({ recap }: { recap: MonthlyRecap }) {
     };
 
     return (
-        <section className="space-y-4 rounded-xl border border-indigo-200 bg-gradient-to-br from-accent-surface to-fuchsia-50 p-5 dark:border-indigo-800 dark:to-fuchsia-950/40">
-            <h3 className="font-semibold text-indigo-900 text-lg dark:text-indigo-100">
-                {heading}
-            </h3>
+        <section className="space-y-4 rounded-xl border border-accent-line bg-gradient-to-br from-accent-surface to-ghost-surface p-5 dark:to-ghost-surface/40">
+            <h3 className="font-semibold text-accent-ink text-lg">{heading}</h3>
             <div className="flex gap-8">
                 <Stat value={recap.totalNotes} label={m.progress_notes_played()} />
                 <Stat value={recap.daysPracticed} label={m.progress_days_practiced()} />
             </div>
             {recap.bestDay && (
-                <p className="text-gray-600 text-sm dark:text-gray-400">
+                <p className="text-muted text-sm">
                     {m.recap_best_day({ count: recap.bestDay.notes })}
                 </p>
             )}
             <button
                 type="button"
                 onClick={share}
-                className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-sm text-white transition hover:bg-indigo-500"
+                className="rounded-lg bg-accent-solid px-4 py-2 font-medium text-sm text-white transition hover:bg-chart-peak"
             >
                 {copied ? m.share_copied() : m.recap_share()}
             </button>
@@ -68,9 +66,7 @@ function Stat({ value, label }: { value: number; label: string }) {
             <div className="font-bold text-3xl text-accent-strong tabular-nums">
                 {value.toLocaleString(getLocale())}
             </div>
-            <div className="text-gray-600 text-xs uppercase tracking-wide dark:text-gray-400">
-                {label}
-            </div>
+            <div className="text-muted text-xs uppercase tracking-wide">{label}</div>
         </div>
     );
 }

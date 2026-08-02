@@ -25,7 +25,7 @@ export function YouStanding({
                     {level === 0 ? m.grades_not_started() : m.grades_current({ level })}
                 </span>
             </span>
-            <span className="flex flex-col items-end gap-0.5 text-right text-sm text-gray-600 dark:text-gray-400">
+            <span className="flex flex-col items-end gap-0.5 text-right text-sm text-muted">
                 <span title={m.grades_skill_help()}>{m.grades_skill({ rating: skill })}</span>
                 <Show when={competitive}>
                     <span title={m.grades_competitive_help()} className="font-medium text-warn">

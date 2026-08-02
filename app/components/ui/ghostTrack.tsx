@@ -30,11 +30,7 @@ export function GhostTrack({ you, ghost, total }: { you: number; ghost: number; 
         <div className="space-y-2">
             <p
                 className={`text-sm font-semibold ${
-                    youLead
-                        ? "text-green-700 dark:text-green-400"
-                        : ghostLead
-                          ? "text-fuchsia-600 dark:text-fuchsia-400"
-                          : "text-gray-600 dark:text-gray-400"
+                    youLead ? "text-success" : ghostLead ? "text-ghost-text" : "text-muted"
                 }`}
             >
                 {m.ghost_race({ ghost })} {status}
@@ -45,20 +41,20 @@ export function GhostTrack({ you, ghost, total }: { you: number; ghost: number; 
                 aria-label={m.ghost_track_label({ you, ghost, total })}
             >
                 {/* The shared lane, with the finish line pinned to its end. */}
-                <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-subtle-strong" />
                 <div
-                    className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600"
+                    className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-chart-bar to-accent-solid"
                     style={{ width: `${youAt}%` }}
                 />
-                <div className="absolute right-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gray-300 dark:bg-gray-500" />
+                <div className="absolute right-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-key-spent" />
                 {/* The ghost rides above the lane, you below, so the two never overlap
                     even in a photo finish. */}
                 <span className="absolute top-0 -translate-x-1/2" style={{ left: `${ghostAt}%` }}>
                     <span
                         className={racer(
                             ghostLead,
-                            "bg-fuchsia-500",
-                            "shadow-[0_0_12px_-2px] shadow-fuchsia-500",
+                            "bg-ghost",
+                            "shadow-[0_0_12px_-2px] shadow-ghost",
                         )}
                     >
                         <GhostIcon className="h-3.5 w-3.5" />
@@ -68,8 +64,8 @@ export function GhostTrack({ you, ghost, total }: { you: number; ghost: number; 
                     <span
                         className={racer(
                             youLead,
-                            "bg-indigo-600",
-                            "shadow-[0_0_12px_-2px] shadow-indigo-500",
+                            "bg-accent-solid",
+                            "shadow-[0_0_12px_-2px] shadow-accent-ring",
                         )}
                     >
                         <KeysIcon className="h-3.5 w-3.5" />

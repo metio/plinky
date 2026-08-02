@@ -105,9 +105,7 @@ export function PlaySurface() {
 
                 <FullScreen off>
                     <Show when={ghostRace.sharedFromLink}>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {m.ghost_shared_loaded()}
-                        </p>
+                        <p className="text-sm text-muted">{m.ghost_shared_loaded()}</p>
                     </Show>
                 </FullScreen>
 

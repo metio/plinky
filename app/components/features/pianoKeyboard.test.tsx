@@ -40,7 +40,9 @@ describe("PianoKeyboard", () => {
     it("flashes a wrongly-played key red", async () => {
         renderKeyboard({ from: 60, to: 67, wrong: { note: 62, seq: 1 } });
         // The flash is set in an effect after mount, so wait for it.
-        await waitFor(() => expect(screen.getByLabelText("D 4").className).toContain("bg-red-200"));
+        await waitFor(() =>
+            expect(screen.getByLabelText("D 4").className).toContain("bg-danger-fill"),
+        );
     });
 
     it("keeps a leading black key inside the keyboard", () => {

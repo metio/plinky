@@ -255,7 +255,12 @@ export function shareText(boast: string, grid: Grid): string {
     return `${boast}\n${gridEmoji(grid)}`;
 }
 
-// Image-share colours, matched to the in-app band emoji on a dark card.
+// Image-share colours, matched to the in-app band emoji on a dark card. These
+// are the literal values of the `--color-band-*` tokens the in-app grid renders
+// with — core is pure, so it cannot read the stylesheet, and the two must agree
+// or a run looks like one thing on screen and another once shared. `none` is
+// the exception: this card is always dark, so its empty cell is gray-700 rather
+// than the light grid's gray-300.
 const FILL: Record<Level, string> = {
     best: "#22c55e",
     good: "#eab308",

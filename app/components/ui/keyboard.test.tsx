@@ -48,8 +48,8 @@ describe("Keyboard", () => {
 
     it("lights a held key green and highlights the expected one", () => {
         render(<Keyboard from={60} to={67} lit={new Set([60])} expected={[64]} />);
-        expect(screen.getByLabelText("C 4").className).toContain("bg-green-200");
-        expect(screen.getByLabelText("E 4").className).toContain("bg-indigo-50");
+        expect(screen.getByLabelText("C 4").className).toContain("bg-success-fill");
+        expect(screen.getByLabelText("E 4").className).toContain("bg-accent-surface");
     });
 
     it("fills a held note's key to its remaining hold fraction", () => {
@@ -62,7 +62,9 @@ describe("Keyboard", () => {
 
     it("flashes a wrong key red", async () => {
         render(<Keyboard from={60} to={67} wrong={{ note: 62, seq: 1 }} />);
-        await waitFor(() => expect(screen.getByLabelText("D 4").className).toContain("bg-red-200"));
+        await waitFor(() =>
+            expect(screen.getByLabelText("D 4").className).toContain("bg-danger-fill"),
+        );
     });
 
     it("keeps arrow-key keybed navigation from bubbling to a global key listener", () => {

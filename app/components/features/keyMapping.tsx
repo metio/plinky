@@ -119,9 +119,7 @@ export function KeyMapping() {
             <p className="text-xs text-muted">{m.keymap_help()}</p>
             {HANDS.map((hand) => (
                 <div key={hand} className="space-y-1">
-                    <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                        {HAND_LABEL[hand]()}
-                    </div>
+                    <div className="text-xs font-medium text-muted">{HAND_LABEL[hand]()}</div>
                     <div className="flex flex-wrap gap-1.5">
                         {SEMITONES.map((semitone) => {
                             const armed =
@@ -144,8 +142,8 @@ export function KeyMapping() {
                                     aria-pressed={armed}
                                     className={`flex w-12 flex-col items-center rounded-md border px-1 py-1 text-center ${
                                         armed
-                                            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950"
-                                            : "border-gray-300 hover:border-indigo-400 dark:border-gray-700"
+                                            ? "border-accent-ring bg-accent-surface"
+                                            : "border-line-strong hover:border-accent"
                                     }`}
                                 >
                                     <span className="text-[10px] text-muted">
@@ -161,9 +159,7 @@ export function KeyMapping() {
                 </div>
             ))}
             <div className="space-y-1">
-                <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {m.keymap_pedals()}
-                </div>
+                <div className="text-xs font-medium text-muted">{m.keymap_pedals()}</div>
                 <div className="flex flex-wrap gap-1.5">
                     {PEDAL_KINDS.map((pedal) => {
                         const armed = arming?.kind === "pedal" && arming.pedal === pedal;
@@ -180,8 +176,8 @@ export function KeyMapping() {
                                 aria-pressed={armed}
                                 className={`flex w-20 flex-col items-center rounded-md border px-1 py-1 text-center ${
                                     armed
-                                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950"
-                                        : "border-gray-300 hover:border-indigo-400 dark:border-gray-700"
+                                        ? "border-accent-ring bg-accent-surface"
+                                        : "border-line-strong hover:border-accent"
                                 }`}
                             >
                                 <span className="text-[10px] text-muted">

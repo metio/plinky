@@ -121,7 +121,7 @@ function RunSetupPanel() {
             {starter && (
                 // The space the folded controls free up says the one thing a beginner
                 // actually needs to hear before a first run.
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.run_starter_hint()}</p>
+                <p className="text-sm text-muted">{m.run_starter_hint()}</p>
             )}
 
             <AdvancedOptions starter={starter}>

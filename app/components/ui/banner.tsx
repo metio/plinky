@@ -11,17 +11,17 @@ const tones = {
     amber: {
         shell: "border-warn-line bg-warn-surface",
         text: "text-warn-ink",
-        dismiss: "text-warn-ink hover:text-amber-700 dark:hover:text-amber-100",
+        dismiss: "text-warn-ink hover:text-warn",
     },
     indigo: {
-        shell: "border-indigo-300 bg-accent-surface dark:border-indigo-800",
+        shell: "border-accent-line-strong bg-accent-surface",
         text: "text-accent-ink",
-        dismiss: "text-accent-ink hover:text-indigo-700 dark:hover:text-indigo-100",
+        dismiss: "text-accent-ink hover:text-accent-strong",
     },
     sky: {
         shell: "border-info-line bg-info-surface",
         text: "text-info-ink",
-        dismiss: "text-info-ink hover:text-sky-700 dark:hover:text-sky-100",
+        dismiss: "text-info-ink hover:text-info-ink",
     },
 } as const;
 

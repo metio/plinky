@@ -51,7 +51,7 @@ export default function CollectRoute() {
         <main className="mx-auto max-w-5xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.collect_title()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.collect_intro()}</p>
+                <p className="text-sm text-muted">{m.collect_intro()}</p>
             </header>
 
             <label className="block space-y-1">
@@ -60,12 +60,12 @@ export default function CollectRoute() {
                     value={text}
                     onChange={(event) => setText(event.target.value)}
                     rows={5}
-                    className="w-full rounded-lg border border-line-strong p-2 font-mono text-xs dark:bg-gray-900"
+                    className="w-full rounded-lg border border-line-strong p-2 font-mono text-xs dark:bg-raised"
                 />
             </label>
 
             {text.trim().length > 0 && reports.length === 0 && (
-                <p role="status" className="text-sm text-gray-600 dark:text-gray-400">
+                <p role="status" className="text-sm text-muted">
                     {m.collect_nothing()}
                 </p>
             )}
@@ -73,7 +73,7 @@ export default function CollectRoute() {
             {reports.length > 0 && (
                 <>
                     <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-muted">
                             {m.collect_found({ count: reports.length })}
                         </p>
                         <Button variant="secondary" onClick={download}>
@@ -123,9 +123,7 @@ function Row({ report, columns }: { report: AssignmentReport; columns: string[] 
             <th scope="row" className="p-2 text-left font-medium">
                 {report.who || m.collect_unnamed()}
             </th>
-            <td className="p-2 text-gray-600 dark:text-gray-400">
-                {m.collect_of({ played, total })}
-            </td>
+            <td className="p-2 text-muted">{m.collect_of({ played, total })}</td>
             {columns.map((id) => {
                 const score = scores.get(id);
                 const letter = score === undefined ? null : reportLetter(score);
@@ -133,7 +131,7 @@ function Row({ report, columns }: { report: AssignmentReport; columns: string[] 
                     <td key={id} className="p-2">
                         {/* A piece nobody attempted reads as a blank, not an F. */}
                         {letter === null ? (
-                            <span className="text-gray-400 dark:text-gray-600">–</span>
+                            <span className="text-faint">–</span>
                         ) : (
                             `${letter} (${score})`
                         )}

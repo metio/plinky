@@ -53,8 +53,8 @@ export function MidiConnect() {
                                 <span
                                     className={`inline-block h-2 w-2 rounded-full ${
                                         device.state === "connected"
-                                            ? "bg-green-500"
-                                            : "bg-gray-300"
+                                            ? "bg-key-held"
+                                            : "bg-key-spent"
                                     }`}
                                 />
                                 <span className="font-medium">{device.name}</span>
@@ -78,7 +78,7 @@ export function MidiConnect() {
                         {heldNotes.map((note) => (
                             <span
                                 key={note}
-                                className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-indigo-800 dark:text-indigo-100"
+                                className="rounded-md bg-accent-fill px-2 py-1 font-mono text-sm text-accent-deep"
                             >
                                 {noteName(note)} ({note})
                             </span>

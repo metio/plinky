@@ -79,7 +79,7 @@ export function TempoGraph({
                         y={PAD.top}
                         width={Math.max(0, right - left)}
                         height={HEIGHT - PAD.top - PAD.bottom}
-                        className="fill-red-100 dark:fill-red-950"
+                        className="fill-danger-surface"
                     />
                 );
             })}

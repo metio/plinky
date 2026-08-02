@@ -41,15 +41,15 @@ function offsetOf(interval: IntervalId): number {
 
 function rungClasses(verdict: Verdict, dimmed: boolean): string {
     if (verdict === "correct") {
-        return "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500";
+        return "border-success-solid bg-success-solid text-white";
     }
     if (verdict === "wrong") {
-        return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
+        return "border-danger-solid bg-danger-solid text-white";
     }
     if (dimmed) {
-        return "border-line bg-white text-gray-400 dark:bg-gray-900 dark:text-gray-600";
+        return "border-line bg-raised text-faint";
     }
-    return "border-line-strong bg-white text-ink hover:border-indigo-600 hover:text-accent-strong dark:bg-gray-900 dark:hover:border-indigo-500";
+    return "border-line-strong bg-raised text-ink hover:border-accent-solid hover:text-accent-strong";
 }
 
 export function EarLadder({
@@ -77,7 +77,7 @@ export function EarLadder({
                 the octave exactly, so its ends mark the unison and the octave. */}
             <div
                 aria-hidden="true"
-                className="absolute left-4 w-px bg-gray-200 dark:bg-gray-800"
+                className="absolute left-4 w-px bg-subtle-strong"
                 style={{ top: `${INSET}px`, bottom: `${INSET}px` }}
             />
             {rungs.map((interval) => {

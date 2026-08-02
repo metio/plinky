@@ -76,7 +76,7 @@ export default function PlacementRoute() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.placement_title()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.placement_intro()}</p>
+                <p className="text-sm text-muted">{m.placement_intro()}</p>
             </header>
 
             {!live && (
@@ -105,7 +105,7 @@ export default function PlacementRoute() {
                             })}
                         </p>
                         <div
-                            className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800"
+                            className="h-1.5 w-full overflow-hidden rounded-full bg-subtle-strong"
                             role="progressbar"
                             aria-valuenow={Math.round(placementProgress(live.state) * 100)}
                             aria-valuemin={0}
@@ -113,7 +113,7 @@ export default function PlacementRoute() {
                             aria-label={m.placement_progress()}
                         >
                             <div
-                                className="h-full bg-indigo-500"
+                                className="h-full bg-chart-peak"
                                 style={{ width: `${placementProgress(live.state) * 100}%` }}
                             />
                         </div>
@@ -139,9 +139,7 @@ export default function PlacementRoute() {
                             grade: placementGrade(live.state),
                         })}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.placement_result_hint()}
-                    </p>
+                    <p className="text-sm text-muted">{m.placement_result_hint()}</p>
                     <Button variant="secondary" onClick={() => setLive(null)}>
                         {m.placement_done()}
                     </Button>

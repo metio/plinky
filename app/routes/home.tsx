@@ -69,9 +69,7 @@ export default function Home() {
                     <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
                         {m.home_heading()}
                     </h1>
-                    <p className="text-pretty leading-relaxed text-gray-600 dark:text-gray-300">
-                        {m.home_intro()}
-                    </p>
+                    <p className="text-pretty leading-relaxed text-muted">{m.home_intro()}</p>
                 </div>
 
                 {/* Signature: a real keyboard you play right here, resting on a staff
@@ -81,11 +79,11 @@ export default function Home() {
                     <div className="relative">
                         <div
                             aria-hidden="true"
-                            className="pointer-events-none absolute -inset-x-6 -top-8 bottom-2 -z-10 bg-gradient-to-r from-indigo-500/15 via-violet-500/15 to-transparent blur-2xl"
+                            className="pointer-events-none absolute -inset-x-6 -top-8 bottom-2 -z-10 bg-gradient-to-r from-accent-ring/15 via-spark/15 to-transparent blur-2xl"
                         />
                         <div
                             aria-hidden="true"
-                            className="mx-auto mb-2 h-px max-w-md bg-gradient-to-r from-indigo-500 via-violet-500 to-transparent"
+                            className="mx-auto mb-2 h-px max-w-md bg-gradient-to-r from-accent-ring via-spark to-transparent"
                         />
                         <FeatureBoundary feature="HeroKeyboard">
                             <HeroKeyboard />
@@ -129,14 +127,14 @@ export default function Home() {
                                     synth.playNote(feature.note, { velocity: 55, duration: 0.4 });
                                 }
                             }}
-                            className="group flex items-start gap-4 rounded-xl border border-line bg-white p-5 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-md dark:bg-gray-900"
+                            className="group flex items-start gap-4 rounded-xl border border-line bg-raised p-5 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-md"
                         >
                             <feature.Icon className="mt-0.5 h-8 w-8 shrink-0 text-accent group-hover:text-accent-strong" />
                             <span className="space-y-1">
                                 <span className="block text-lg font-medium text-ink group-hover:text-accent-strong">
                                     {feature.label()} →
                                 </span>
-                                <span className="block text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                                <span className="block text-sm leading-relaxed text-muted">
                                     {feature.blurb()}
                                 </span>
                             </span>

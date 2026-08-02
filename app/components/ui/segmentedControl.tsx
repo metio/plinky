@@ -41,8 +41,8 @@ export function SegmentedControl<T extends string>({
                         onClick={() => onChange(option.id)}
                         className={`inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors disabled:opacity-50 ${
                             selected
-                                ? "bg-white text-indigo-700 shadow-sm dark:bg-gray-950 dark:text-indigo-300"
-                                : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                                ? "bg-surface text-accent-strong shadow-sm"
+                                : "text-muted hover:text-ink"
                         }`}
                     >
                         {option.label}

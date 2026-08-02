@@ -11,7 +11,7 @@ import { GlossaryIndex } from "./glossaryIndex";
 // and cover the surface around it: the grouping, the selected state, and whether a
 // symbol offers one reading or two. The real drawing is covered in the browser suite.
 const Placeholder = (
-    <div className="flex h-24 items-center justify-center rounded-xl bg-stone-50 text-xs text-stone-500">
+    <div className="flex h-24 items-center justify-center rounded-xl bg-paper text-xs text-paper-ink">
         notation
     </div>
 );

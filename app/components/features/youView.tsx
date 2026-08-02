@@ -42,7 +42,7 @@ export function YouView() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="text-2xl font-semibold">{m.you_heading()}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.you_intro()}</p>
+                <p className="text-sm text-muted">{m.you_intro()}</p>
             </header>
 
             <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
@@ -62,9 +62,7 @@ export function YouView() {
 
             <Show when={level >= 1}>
                 <section className="space-y-2">
-                    <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {m.grades_share_heading()}
-                    </h2>
+                    <h2 className="text-sm font-medium text-muted">{m.grades_share_heading()}</h2>
                     <ShareButtons
                         context="grade"
                         text={m.milestone_grade_boast({ level })}
@@ -78,7 +76,7 @@ export function YouView() {
             </Show>
 
             <Show when={upNext.length > 0}>
-                <section className="space-y-2 rounded-md border border-accent-line bg-indigo-50/50 p-4 dark:bg-indigo-950/30">
+                <section className="space-y-2 rounded-md border border-accent-line bg-accent-surface/50 p-4 dark:bg-accent-surface/30">
                     <h2 className="text-sm font-medium text-accent-deep">
                         {m.grades_up_next({ grade: workingGrade })}
                     </h2>
@@ -100,9 +98,7 @@ export function YouView() {
                 <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
                     {m.placement_cta()}
                 </h2>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    {m.placement_cta_hint()}
-                </p>
+                <p className="mt-1 text-sm text-muted">{m.placement_cta_hint()}</p>
                 <Link to="/placement" className={`${linkClasses} mt-2 inline-block text-sm`}>
                     {m.placement_start()} →
                 </Link>

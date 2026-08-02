@@ -68,7 +68,7 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
     }, [autoPlay, clear, play]);
 
     return (
-        <div className="flex flex-col items-center gap-6 rounded-xl bg-gray-950 px-6 py-10 dark:bg-gray-900">
+        <div className="flex flex-col items-center gap-6 rounded-xl bg-surface px-6 py-10">
             <div className="flex h-16 items-center justify-center gap-4">
                 {notes.map((_note, index) => {
                     const sounding = lit.includes(index);
@@ -85,8 +85,8 @@ export function EarStage({ notes, autoPlay }: { notes: EarNote[]; autoPlay: bool
                             aria-hidden="true"
                             className={`h-4 w-4 rounded-full transition-all duration-200 motion-reduce:transition-none ${
                                 sounding
-                                    ? "scale-150 bg-indigo-400 shadow-[0_0_20px_theme(colors.indigo.500)]"
-                                    : "scale-100 bg-gray-700"
+                                    ? "scale-150 bg-chart-bar shadow-[0_0_20px_theme(colors.indigo.500)]"
+                                    : "scale-100 bg-key-spent"
                             }`}
                         />
                     );

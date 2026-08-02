@@ -4,8 +4,8 @@
 import type { ReactNode } from "react";
 
 const CHIP: Record<"accent" | "danger", string> = {
-    accent: "bg-accent-surface text-indigo-600 dark:text-indigo-300",
-    danger: "bg-danger-surface text-red-600 dark:text-red-300",
+    accent: "bg-accent-surface text-accent",
+    danger: "bg-danger-surface text-danger",
 };
 
 // A titled block of related settings. With an `icon` it renders as a card — the
@@ -52,7 +52,7 @@ export function SettingsSection({
     }
 
     return (
-        <section className="space-y-4 rounded-2xl border border-line bg-white p-5 shadow-sm dark:bg-gray-900">
+        <section className="space-y-4 rounded-2xl border border-line bg-raised p-5 shadow-sm">
             <div className="flex items-start gap-3">
                 <span
                     aria-hidden="true"

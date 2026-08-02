@@ -59,7 +59,7 @@ export function GradeBadge() {
                 competitive ? m.grade_label_competitive({ level }) : m.grade_label({ level })
             }
             className={`flex items-center gap-1 text-sm font-semibold ${
-                earned ? "text-indigo-600 dark:text-indigo-300" : "text-gray-500 dark:text-gray-400"
+                earned ? "text-accent" : "text-muted"
             }`}
         >
             <span aria-hidden="true" className={earned ? "" : "grayscale"}>

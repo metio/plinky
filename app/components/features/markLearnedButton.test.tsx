@@ -57,11 +57,10 @@ describe("MarkLearnedButton", () => {
         const mastery = createMasteryStore(kv);
         mastery.save("btn-colour", markLearned(null, Date.now()));
         renderWithServices(<MarkLearnedButton id="btn-colour" />, { store: kv, mastery });
-        const classes = screen.getByRole("button", { name: "Learned" }).className;
-        expect(classes).toContain("text-green-600");
-        expect(classes).toContain("dark:text-green-400");
-        // No competing text colour from the variant (the ghost indigo that used to win).
-        expect(classes).not.toContain("text-indigo-700");
-        expect(classes).not.toContain("dark:text-indigo-300");
+        const classes = screen.getByRole("button", { name: "Learned" }).className.split(/\s+/);
+        // One token carries both themes, so there is no dark: half to check for.
+        expect(classes).toContain("text-success");
+        // No competing text colour from the variant.
+        expect(classes.filter((c) => /^(dark:)?text-/.test(c))).toEqual(["text-success"]);
     });
 });

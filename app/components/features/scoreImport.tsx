@@ -156,11 +156,9 @@ export function ScoreImport() {
             {savedId && (
                 <div
                     role="status"
-                    className="space-y-2 rounded-md border border-green-300 bg-green-50 p-4 text-sm dark:border-green-900 dark:bg-green-950/40"
+                    className="space-y-2 rounded-md border border-success-line bg-success-surface p-4 text-sm dark:bg-success-surface/40"
                 >
-                    <p className="font-medium text-green-800 dark:text-green-300">
-                        {m.import_added()}
-                    </p>
+                    <p className="font-medium text-success">{m.import_added()}</p>
                     <div className="flex flex-wrap gap-3">
                         <Link to={`/play/${savedId}`} className={buttonClasses("primary")}>
                             {m.import_play_now()}
@@ -185,8 +183,8 @@ export function ScoreImport() {
                     onDragLeave={() => setDragOver(false)}
                     className={`flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed p-12 text-center transition-colors ${
                         dragOver
-                            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40"
-                            : "border-gray-300 dark:border-gray-700"
+                            ? "border-accent-ring bg-accent-surface dark:bg-accent-surface/40"
+                            : "border-line-strong"
                     }`}
                 >
                     <input

@@ -20,9 +20,7 @@ export function RefreshQueue({
     const due = reviews.length > 0;
     return (
         <section className="space-y-2">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {m.grades_refresh_heading()}
-            </h2>
+            <h2 className="text-sm font-medium text-muted">{m.grades_refresh_heading()}</h2>
             {!due && <p className="text-sm text-muted">{m.grades_all_fresh()}</p>}
             <p className="text-sm text-muted">{m.refresh_why()}</p>
             {due ? (

@@ -61,8 +61,8 @@ export function SectionBest({
                         <span
                             className={`w-full rounded ${
                                 run[index] === score && score > 0
-                                    ? "bg-indigo-500"
-                                    : "bg-indigo-300 dark:bg-indigo-800"
+                                    ? "bg-chart-peak"
+                                    : "bg-chart-track"
                             }`}
                             style={{ height: `${Math.max(4, score)}%` }}
                         />

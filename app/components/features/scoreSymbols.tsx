@@ -46,7 +46,7 @@ export function ScoreSymbols({ xml }: { xml: string }) {
                         >
                             {symbolName(symbol.id)}
                         </Link>
-                        <span className="text-gray-600 dark:text-gray-400">
+                        <span className="text-muted">
                             {" — "}
                             {symbolGloss(symbol.id)}
                         </span>

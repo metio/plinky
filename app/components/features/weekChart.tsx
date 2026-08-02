@@ -23,7 +23,7 @@ export function WeekChart({ recent }: { recent: PracticeSummary["recent"] }) {
                         }
                     >
                         <div
-                            className="w-full rounded-t bg-indigo-500"
+                            className="w-full rounded-t bg-chart-peak"
                             style={{ height: `${Math.round((day.notes / max) * 100)}%` }}
                         />
                         <span className="text-xs text-muted">{day.date.slice(5)}</span>

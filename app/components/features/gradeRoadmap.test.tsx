@@ -58,7 +58,7 @@ describe("GradeRoadmap", () => {
         );
         const current = screen.getByText("Grade 1").closest("li");
         const other = screen.getByText("Grade 2").closest("li");
-        expect(current?.className).toContain("border-indigo-300");
-        expect(other?.className).not.toContain("border-indigo-300");
+        expect(current?.className).toContain("border-accent-line-strong");
+        expect(other?.className).not.toContain("border-accent-line-strong");
     });
 });

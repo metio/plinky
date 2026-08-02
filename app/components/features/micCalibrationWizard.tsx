@@ -106,11 +106,7 @@ export function MicCalibrationWizard() {
                 <Button variant={calibrated ? "secondary" : "primary"} onClick={begin}>
                     {calibrated ? m.mic_calibrate_redo() : m.mic_calibrate_start()}
                 </Button>
-                {calibrated && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.mic_calibrate_saved()}
-                    </p>
-                )}
+                {calibrated && <p className="text-sm text-muted">{m.mic_calibrate_saved()}</p>}
             </div>
         );
     }
@@ -121,10 +117,10 @@ export function MicCalibrationWizard() {
     const heard = heardNote(state);
 
     return (
-        <div className="space-y-4 rounded-xl border border-accent-line bg-indigo-50/60 p-4 dark:bg-indigo-950/40">
+        <div className="space-y-4 rounded-xl border border-accent-line bg-accent-surface/60 p-4 dark:bg-accent-surface/40">
             {failed ? (
                 <div className="space-y-3">
-                    <p className="text-sm text-gray-700 dark:text-gray-200" role="status">
+                    <p className="text-sm text-body" role="status">
                         {micStatus === "denied" ? m.mic_denied() : m.mic_error()}
                     </p>
                     <Button variant="secondary" onClick={close}>
@@ -133,12 +129,8 @@ export function MicCalibrationWizard() {
                 </div>
             ) : done ? (
                 <div className="space-y-3 text-center">
-                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                        {m.mic_calibrate_done()}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {m.mic_calibrate_saved()}
-                    </p>
+                    <p className="text-lg font-semibold text-ink">{m.mic_calibrate_done()}</p>
+                    <p className="text-sm text-muted">{m.mic_calibrate_saved()}</p>
                     <Button variant="primary" onClick={close}>
                         {m.mic_calibrate_finish()}
                     </Button>
@@ -148,16 +140,12 @@ export function MicCalibrationWizard() {
                     <p className="text-xs font-medium uppercase tracking-wide text-accent-strong">
                         {m.mic_calibrate_step({ current: stepIndex + 1, total: STEPS.length })}
                     </p>
-                    <p
-                        className="text-base text-gray-900 dark:text-gray-50"
-                        role="status"
-                        aria-live="polite"
-                    >
+                    <p className="text-base text-ink" role="status" aria-live="polite">
                         {STEP_MESSAGE[state.step]()}
                     </p>
                     {state.step === "note" && (
                         <div className="flex items-center gap-3">
-                            <span className="rounded-md bg-white px-3 py-1.5 font-mono text-lg font-semibold text-accent-deep shadow-sm dark:bg-gray-900">
+                            <span className="rounded-md bg-raised px-3 py-1.5 font-mono text-lg font-semibold text-accent-deep shadow-sm">
                                 {noteName(TARGET_NOTE)}
                             </span>
                             {heard !== null && (
@@ -168,14 +156,14 @@ export function MicCalibrationWizard() {
                         </div>
                     )}
                     <div
-                        className="h-2 overflow-hidden rounded-full bg-indigo-200 dark:bg-indigo-900"
+                        className="h-2 overflow-hidden rounded-full bg-accent-fill"
                         role="progressbar"
                         aria-valuemin={0}
                         aria-valuemax={100}
                         aria-valuenow={Math.round(stepProgress(state) * 100)}
                     >
                         <div
-                            className="h-full rounded-full bg-indigo-600 transition-[width] dark:bg-indigo-400"
+                            className="h-full rounded-full bg-accent transition-[width]"
                             style={{ width: `${Math.round(stepProgress(state) * 100)}%` }}
                         />
                     </div>

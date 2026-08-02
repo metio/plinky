@@ -12,7 +12,7 @@ export function SurpriseButton({ onClick }: { onClick: () => void }) {
         <button
             type="button"
             onClick={onClick}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm font-medium text-accent-strong transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm dark:border-indigo-800 dark:bg-gray-900"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-accent-line bg-raised px-3 py-2 text-sm font-medium text-accent-strong transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm"
         >
             <span aria-hidden="true">🎲</span>
             {m.surprise_me()}

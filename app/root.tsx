@@ -116,7 +116,7 @@ function Header() {
                             Pl
                             <span className="relative">
                                 ı
-                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-fuchsia-400" />
+                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-ghost" />
                             </span>
                             nky
                         </span>
@@ -387,7 +387,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             <h1 className="text-2xl font-semibold">
                 {notFound ? "We couldn't find that" : "Something went wrong"}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted">
                 {notFound
                     ? "That page or exercise doesn't exist — it may have been removed, or the link is slightly off."
                     : "This is a bug on our side, not anything you did. Your scores are safe on this device — try heading back or reloading."}
@@ -396,7 +396,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             <div className="flex flex-wrap gap-2">
                 <Link
                     to="/"
-                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                    className="rounded-md bg-accent-solid px-4 py-2 text-sm font-medium text-white"
                 >
                     Back to exercises
                 </Link>

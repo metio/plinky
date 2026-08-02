@@ -20,7 +20,7 @@ export function ConsentBanner() {
     return (
         <section
             aria-label={m.consent_banner_label()}
-            className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white/95 p-4 backdrop-blur dark:bg-gray-900/95"
+            className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-raised/95 p-4 backdrop-blur"
         >
             <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm leading-relaxed text-body">

@@ -18,7 +18,7 @@ describe("WeekChart", () => {
                 ]}
             />,
         );
-        const bars = container.querySelectorAll<HTMLElement>(".bg-indigo-500");
+        const bars = container.querySelectorAll<HTMLElement>(".bg-chart-peak");
         expect(bars[0]?.style.height).toBe("50%");
         expect(bars[1]?.style.height).toBe("100%");
         // Day labels drop the year.
@@ -27,6 +27,6 @@ describe("WeekChart", () => {
 
     it("survives an all-zero week without dividing by zero", () => {
         const { container } = render(<WeekChart recent={[{ date: "2026-07-11", notes: 0 }]} />);
-        expect(container.querySelector<HTMLElement>(".bg-indigo-500")?.style.height).toBe("0%");
+        expect(container.querySelector<HTMLElement>(".bg-chart-peak")?.style.height).toBe("0%");
     });
 });

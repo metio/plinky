@@ -20,9 +20,9 @@ import type { FingerQuality } from "../../../core/fingeringScore";
 // alarming — each paired with a glyph so the verdict doesn't rely on colour
 // alone (readable to a colour-blind player, and a label for assistive tech).
 const QUALITY_STYLE: Record<FingerQuality, string> = {
-    good: "border-green-400 bg-green-50 dark:border-green-700 dark:bg-green-950/40",
-    ok: "border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-950/40",
-    bad: "border-danger-line bg-red-50 dark:bg-red-950/40",
+    good: "border-success-line bg-success-surface dark:bg-success-surface/40",
+    ok: "border-warn-line bg-warn-surface dark:bg-warn-surface/40",
+    bad: "border-danger-line bg-danger-surface dark:bg-danger-surface/40",
 };
 const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string }> = {
     good: { glyph: "✓", label: () => m.fingering_quality_good() },
@@ -31,7 +31,7 @@ const QUALITY_SYMBOL: Record<FingerQuality, { glyph: string; label: () => string
 };
 const QUALITY_TEXT: Record<FingerQuality, string> = {
     good: "text-success",
-    ok: "text-amber-700 dark:text-amber-300",
+    ok: "text-warn",
     bad: "text-danger-strong",
 };
 const NEUTRAL = "border-line";
@@ -39,8 +39,8 @@ const NEUTRAL = "border-line";
 // The hand-toggle button style.
 const HAND_BUTTON = (selected: boolean) =>
     selected
-        ? "rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white"
-        : "rounded-md bg-accent-surface px-3 py-1.5 text-sm font-medium text-accent-strong hover:bg-indigo-100";
+        ? "rounded-md bg-accent-solid px-3 py-1.5 text-sm font-medium text-white"
+        : "rounded-md bg-accent-surface px-3 py-1.5 text-sm font-medium text-accent-strong hover:bg-accent-fill";
 
 // Two bars at a time, the same window the Finger Position tab works in.
 const WINDOW = 2;
@@ -158,8 +158,8 @@ export function FingeringStrip({
                 aria-label={`${rowHand === "left" ? m.hand_left() : m.hand_right()} — ${m.fingering_finger({ finger })}`}
                 className={`h-10 w-9 rounded-md text-lg font-semibold ${
                     enabled
-                        ? "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300"
-                        : "bg-gray-100 text-gray-300 dark:bg-gray-900 dark:text-gray-700"
+                        ? "bg-accent-surface text-accent-strong hover:bg-accent-fill"
+                        : "bg-subtle text-ink-disabled"
                 }`}
             >
                 {finger}
@@ -198,7 +198,7 @@ export function FingeringStrip({
                     >
                         ‹
                     </button>
-                    <span className="text-sm tabular-nums text-gray-600 dark:text-gray-400">
+                    <span className="text-sm tabular-nums text-muted">
                         {m.fingering_bars({
                             from: window.start + 1,
                             to: window.end,
@@ -262,9 +262,7 @@ export function FingeringStrip({
                                             }
                                             aria-current={isActive ? "true" : undefined}
                                             className={`flex w-14 items-center justify-between rounded px-1.5 py-0.5 ${
-                                                isActive
-                                                    ? "bg-indigo-100 dark:bg-indigo-900"
-                                                    : "bg-transparent"
+                                                isActive ? "bg-accent-fill" : "bg-transparent"
                                             }`}
                                         >
                                             <span className="font-mono text-xs text-body">

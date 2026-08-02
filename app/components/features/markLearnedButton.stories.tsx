@@ -38,7 +38,7 @@ export const AlreadyLearned: Story = {
         mastery.save("story-piece", markLearned(null, 0));
         return (
             <ServicesProvider services={{ mastery }}>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted">
                     A learned piece shows a filled green check, pressed — click to un-mark it:
                 </p>
                 <MarkLearnedButton id="story-piece" />

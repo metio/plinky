@@ -62,9 +62,7 @@ export function KeyboardQuickControls({
     return (
         <div
             className={`flex items-center justify-end gap-1 ${
-                floating
-                    ? "absolute right-3 bottom-3 z-10 rounded-md bg-white/90 shadow-sm dark:bg-gray-900/90"
-                    : ""
+                floating ? "absolute right-3 bottom-3 z-10 rounded-md bg-raised/90 shadow-sm" : ""
             }`}
         >
             {!hidden && (

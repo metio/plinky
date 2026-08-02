@@ -96,7 +96,7 @@ export default function DailyRoute() {
                         </div>
                     )}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.daily_intro()}</p>
+                <p className="text-sm text-muted">{m.daily_intro()}</p>
             </header>
 
             <SegmentedControl
@@ -137,7 +137,7 @@ export default function DailyRoute() {
                 )
             ) : (
                 <>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{m.sprint_intro()}</p>
+                    <p className="text-sm text-muted">{m.sprint_intro()}</p>
                     <div className="flex flex-wrap items-center gap-3">
                         <Button variant="primary" onClick={() => regenerate(drill)}>
                             {m.drill_new()}

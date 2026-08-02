@@ -21,15 +21,15 @@ import { m } from "../../paraglide/messages.js";
 function slotClasses(state: "correct" | "wrong" | "current" | "filled" | "empty"): string {
     switch (state) {
         case "correct":
-            return "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500";
+            return "border-success-solid bg-success-solid text-white";
         case "wrong":
-            return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
+            return "border-danger-solid bg-danger-solid text-white";
         case "current":
-            return "border-indigo-600 text-accent-strong dark:border-indigo-400";
+            return "border-accent text-accent-strong";
         case "filled":
-            return "border-gray-400 text-ink dark:border-gray-500";
+            return "border-line-strong text-ink";
         default:
-            return "border-line text-gray-400 dark:text-gray-600";
+            return "border-line text-faint";
     }
 }
 
@@ -118,7 +118,7 @@ export function EarSequence<T extends string>({
                         key={degree}
                         disabled={settled}
                         onClick={() => choose(degree)}
-                        className="flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white text-sm font-semibold text-ink transition-colors hover:border-indigo-600 hover:text-accent-strong disabled:cursor-default disabled:opacity-50 dark:bg-gray-900 dark:hover:border-indigo-500"
+                        className="flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-raised text-sm font-semibold text-ink transition-colors hover:border-accent-solid hover:text-accent-strong disabled:cursor-default disabled:opacity-50"
                     >
                         {degree}
                     </button>

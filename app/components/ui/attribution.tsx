@@ -29,7 +29,7 @@ export function Attribution({
 
     const link = linkClasses;
     return (
-        <p className="flex flex-wrap items-center gap-x-2 text-xs text-gray-500 dark:text-gray-500">
+        <p className="flex flex-wrap items-center gap-x-2 text-xs text-muted">
             {licenseDetail && (
                 <a href={licenseDetail.url} target="_blank" rel="noreferrer" className={link}>
                     {licenseDetail.publicDomain

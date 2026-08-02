@@ -26,9 +26,7 @@ export function BumpValue({ value, className = "" }: { value: ReactNode; classNa
     return (
         <span
             className={`tabular-nums transition-[color,transform] duration-150 ${
-                bumped
-                    ? "scale-110 text-indigo-600 motion-reduce:scale-100 dark:text-indigo-400"
-                    : ""
+                bumped ? "scale-110 text-accent motion-reduce:scale-100" : ""
             } ${className}`}
         >
             {value}

@@ -120,7 +120,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
         return (
             <section className="space-y-4">
                 <h2 className="text-xl font-semibold">{m.tour_done_title()}</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.tour_done_body()}</p>
+                <p className="text-sm text-muted">{m.tour_done_body()}</p>
                 <Button variant="primary" onClick={onFinished}>
                     {m.tour_done_action()}
                 </Button>
@@ -137,13 +137,11 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
                     {m.tour_step_of({ step: state.step + 1, total: TOUR_STEPS.length })}
                 </p>
                 <h2 className="text-xl font-semibold">{STEP_TITLE[step.id]?.() ?? ""}</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {STEP_BODY[step.id]?.() ?? ""}
-                </p>
+                <p className="text-sm text-muted">{STEP_BODY[step.id]?.() ?? ""}</p>
             </div>
 
             <div
-                className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800"
+                className="h-1.5 w-full overflow-hidden rounded-full bg-subtle-strong"
                 role="progressbar"
                 aria-valuenow={Math.round(tourProgress(state) * 100)}
                 aria-valuemin={0}
@@ -151,7 +149,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
                 aria-label={m.tour_progress()}
             >
                 <div
-                    className="h-full bg-indigo-500"
+                    className="h-full bg-chart-peak"
                     style={{ width: `${tourProgress(state) * 100}%` }}
                 />
             </div>
@@ -184,7 +182,7 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
                     {m.tour_next()}
                 </Button>
                 {ready ? (
-                    <p className="text-sm text-green-700 dark:text-green-400">{m.tour_got_it()}</p>
+                    <p className="text-sm text-success">{m.tour_got_it()}</p>
                 ) : (
                     <p className="text-sm text-muted">{m.tour_waiting()}</p>
                 )}

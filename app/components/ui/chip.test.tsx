@@ -13,9 +13,9 @@ describe("Chip", () => {
         const { rerender } = render(<Chip selected>Songs</Chip>);
         const selected = screen.getByRole("button").className;
         expect(selected).toContain("min-h-11");
-        expect(selected).toContain("bg-indigo-600");
+        expect(selected).toContain("bg-accent-solid");
         rerender(<Chip>Songs</Chip>);
-        expect(screen.getByRole("button").className).not.toContain("bg-indigo-600");
+        expect(screen.getByRole("button").className).not.toContain("bg-accent-solid");
     });
 
     it("forwards toggle semantics and clicks", () => {

@@ -41,7 +41,7 @@ export function LibraryRow({
                 onClick={onToggleStar}
                 aria-pressed={starred}
                 label={starred ? m.scores_unfavorite() : m.scores_favorite()}
-                className={starred ? "text-amber-500 dark:text-amber-400" : "text-gray-400"}
+                className={starred ? "text-warn" : "text-faint"}
             >
                 <StarIcon className="h-5 w-5" filled={starred} />
             </IconButton>
@@ -50,7 +50,7 @@ export function LibraryRow({
                 the viewport (which would clip the fixed bottom nav). The title link
                 stretches over the whole card (after:inset-0); the composer link stacks
                 above the stretch (z-10) so it opens the person page instead. */}
-            <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md border border-line-strong px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800">
+            <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md border border-line-strong px-3 py-2 hover:bg-sunken">
                 <span className="min-w-0 flex-1">
                     <Link
                         to={`/play/${item.id}`}
@@ -58,13 +58,13 @@ export function LibraryRow({
                     >
                         {item.title}
                         {learned && (
-                            <span className="ml-1 inline-flex items-center text-green-600 dark:text-green-400">
+                            <span className="ml-1 inline-flex items-center text-success">
                                 <CheckIcon className="h-4 w-4" />
                                 <span className="sr-only">{m.mastery_learned()}</span>
                             </span>
                         )}
                         {due && (
-                            <span className="ml-1 inline-flex items-center text-amber-600 dark:text-amber-400">
+                            <span className="ml-1 inline-flex items-center text-warn">
                                 <ClockIcon className="h-4 w-4" />
                                 <span className="sr-only">{m.mastery_due()}</span>
                             </span>
@@ -74,12 +74,12 @@ export function LibraryRow({
                         (personSlug(item.composer) ? (
                             <Link
                                 to={`/person/${personSlug(item.composer)}`}
-                                className="relative z-10 block w-fit max-w-full truncate text-xs text-gray-600 hover:text-accent hover:underline dark:text-gray-400"
+                                className="relative z-10 block w-fit max-w-full truncate text-xs text-muted hover:text-accent hover:underline"
                             >
                                 {canonicalComposer(item.composer)}
                             </Link>
                         ) : (
-                            <span className="block truncate text-xs text-gray-600 dark:text-gray-400">
+                            <span className="block truncate text-xs text-muted">
                                 {item.composer}
                             </span>
                         ))}

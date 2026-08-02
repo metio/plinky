@@ -14,13 +14,13 @@ export function BoardArtistCard({ artist, tilt }: { artist: BoardArtist; tilt: "
     const platform = artist.linkUrl ? platformFor(artist.linkUrl) : null;
     return (
         <article
-            className={`relative rounded-2xl border border-line bg-white p-3 shadow-md transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:rotate-0 hover:shadow-xl dark:bg-gray-900 ${
+            className={`relative rounded-2xl border border-line bg-raised p-3 shadow-md transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:rotate-0 hover:shadow-xl ${
                 tilt === "left" ? "motion-safe:-rotate-1" : "motion-safe:rotate-1"
             }`}
         >
             <span
                 aria-hidden="true"
-                className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md ring-2 ring-white dark:ring-gray-900"
+                className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-gradient-to-br from-accent-ring to-spark-strong shadow-md ring-2 ring-raised"
             />
             <div className="relative overflow-hidden rounded-xl">
                 {artist.imageUrl ? (
@@ -33,7 +33,7 @@ export function BoardArtistCard({ artist, tilt }: { artist: BoardArtist; tilt: "
                 ) : (
                     <div
                         aria-hidden="true"
-                        className="flex aspect-[4/5] w-full items-center justify-center bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500"
+                        className="flex aspect-[4/5] w-full items-center justify-center bg-gradient-to-br from-accent-ring via-spark to-ghost"
                     >
                         <span className="text-7xl font-bold text-white/80">
                             {artist.name.slice(0, 1)}
@@ -59,7 +59,7 @@ export function BoardArtistCard({ artist, tilt }: { artist: BoardArtist; tilt: "
                         href={artist.linkUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:from-indigo-500 hover:to-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-solid to-spark-strong px-4 py-2 text-sm font-semibold text-white shadow transition hover:from-accent-ring hover:to-spark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ring"
                     >
                         {platform && <BrandIcon brand={platform} className="h-4 w-4" />}
                         {platform

@@ -52,16 +52,12 @@ export function RunResult({
         <>
             {!ephemeral &&
                 (runSaved === "saved" ? (
-                    <p className="text-sm text-green-700 dark:text-green-400">{m.takes_saved()}</p>
+                    <p className="text-sm text-success">{m.takes_saved()}</p>
                 ) : runSaved === "failed" ? (
-                    <p className="text-sm text-red-700 dark:text-red-400">
-                        {m.takes_save_failed()}
-                    </p>
+                    <p className="text-sm text-danger">{m.takes_save_failed()}</p>
                 ) : (
                     <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {m.takes_save_prompt()}
-                        </span>
+                        <span className="text-sm text-muted">{m.takes_save_prompt()}</span>
                         <Button variant="primary" onClick={onSaveTake}>
                             {m.takes_save()}
                         </Button>
@@ -89,9 +85,7 @@ export function RunResult({
             <PerformanceStrip notes={notes} tolerance={tolerance} />
             {tempoCurve && (
                 <section className="space-y-1">
-                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {m.tempo_heading()}
-                    </h3>
+                    <h3 className="text-sm font-medium text-muted">{m.tempo_heading()}</h3>
                     <TempoGraph
                         points={tempoCurve.points}
                         median={tempoCurve.median}
@@ -100,7 +94,7 @@ export function RunResult({
                 </section>
             )}
             {handVerdict && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-muted">
                     {handVerdict === "even"
                         ? m.hands_even()
                         : handVerdict === "left"

@@ -31,7 +31,7 @@ export function PlayModeBar({
     };
     return (
         <div className="space-y-2">
-            <div className="sticky top-0 z-10 -mx-6 border-b border-line bg-white/90 px-6 py-2 backdrop-blur dark:bg-gray-950/90">
+            <div className="sticky top-0 z-10 -mx-6 border-b border-line bg-surface/90 px-6 py-2 backdrop-blur">
                 <SegmentedControl
                     options={MODES.map((tab) => ({ id: tab.id, label: tab.label() }))}
                     value={mode}

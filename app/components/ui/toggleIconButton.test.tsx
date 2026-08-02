@@ -16,8 +16,11 @@ describe("ToggleIconButton", () => {
             </ToggleIconButton>,
         );
         const button = screen.getByRole("button", { name: "Finger numbers" });
+        // Membership, not substring: the quiet variant already carries
+        // `text-accent-strong`, which contains `text-accent`.
+        const classes = () => button.className.split(/\s+/);
         expect(button.getAttribute("aria-pressed")).toBe("false");
-        expect(button.className).not.toContain("text-indigo-600");
+        expect(classes()).not.toContain("text-accent");
 
         rerender(
             <ToggleIconButton pressed label="Finger numbers" onClick={() => {}}>
@@ -25,7 +28,7 @@ describe("ToggleIconButton", () => {
             </ToggleIconButton>,
         );
         expect(button.getAttribute("aria-pressed")).toBe("true");
-        expect(button.className).toContain("text-indigo-600");
+        expect(classes()).toContain("text-accent");
     });
 
     it("reports clicks", () => {

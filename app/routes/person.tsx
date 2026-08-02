@@ -100,7 +100,7 @@ export default function PersonPage() {
                     {person?.name ?? nameFromSlug(slug ?? "")}
                 </h1>
                 {person && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted">
                         {m.person_pieces({ count: person.pieces.length })}
                     </p>
                 )}
@@ -112,7 +112,7 @@ export default function PersonPage() {
                         <li key={piece.id}>
                             <Link
                                 to={`/play/${piece.id}`}
-                                className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/30"
+                                className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30"
                             >
                                 <span className="min-w-0 truncate font-medium">{piece.title}</span>
                                 <span className="flex shrink-0 items-center gap-2 text-xs text-muted">

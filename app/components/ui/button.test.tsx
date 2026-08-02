@@ -22,7 +22,7 @@ describe("Button", () => {
         rerender(<Button variant="secondary">Go</Button>);
         const secondary = screen.getByRole("button").className;
         expect(primary).not.toBe(secondary);
-        expect(primary).toContain("bg-indigo-600");
+        expect(primary).toContain("bg-accent-solid");
     });
 
     it("forwards clicks", () => {

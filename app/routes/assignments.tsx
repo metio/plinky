@@ -289,16 +289,16 @@ export default function AssignmentsRoute() {
             />
 
             {tab === "list" && incoming && (
-                <section className="space-y-2 rounded-md border border-accent-line bg-indigo-50/50 p-4 dark:bg-indigo-950/30">
+                <section className="space-y-2 rounded-md border border-accent-line bg-accent-surface/50 p-4 dark:bg-accent-surface/30">
                     <h2 className="font-semibold">{m.assignments_received_heading()}</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted">
                         {m.assignments_received_detail({
                             name: incoming.name,
                             count: incoming.items.length,
                         })}
                     </p>
                     <Show when={known.ready}>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-muted">
                             {m.assignments_available_count({
                                 available: availableItemCount(
                                     incoming.items,
@@ -356,7 +356,7 @@ export default function AssignmentsRoute() {
                             );
                         })}
                     </ul>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted">
                         {m.assignments_collect_hint()}{" "}
                         <LocalizedLink to="/collect" className={linkClasses}>
                             {m.collect_title()}

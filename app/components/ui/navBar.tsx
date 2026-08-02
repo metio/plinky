@@ -47,7 +47,7 @@ export function BottomNav() {
     return (
         <nav
             aria-label={m.nav_primary_label()}
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:bg-gray-950/95"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
         >
             <ul className="mx-auto flex max-w-3xl">
                 {DESTINATIONS.map(({ to, label, Icon }) => {
@@ -58,9 +58,7 @@ export function BottomNav() {
                                 to={to}
                                 aria-current={active ? "page" : undefined}
                                 className={`flex min-h-14 flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium ${
-                                    active
-                                        ? "text-indigo-600 dark:text-indigo-400"
-                                        : "text-gray-500 dark:text-gray-400"
+                                    active ? "text-accent" : "text-muted"
                                 }`}
                             >
                                 <Icon className="h-6 w-6" />
@@ -87,9 +85,7 @@ export function HeaderNav({ className = "" }: { className?: string }) {
                         to={to}
                         aria-current={active ? "page" : undefined}
                         className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                            active
-                                ? "text-indigo-600 dark:text-indigo-400"
-                                : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                            active ? "text-accent" : "text-muted hover:text-ink"
                         }`}
                     >
                         {label()}

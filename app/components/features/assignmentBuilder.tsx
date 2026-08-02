@@ -92,7 +92,7 @@ export function AssignmentBuilder({
         <section className="space-y-3">
             <h2 className="font-semibold">{m.assignments_build_heading()}</h2>
             {draft.editingId && (
-                <p className="rounded-md bg-warn-surface px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
+                <p className="rounded-md bg-warn-surface px-3 py-2 text-sm text-warn">
                     {m.assignments_editing({ name: draft.name })}
                 </p>
             )}
@@ -104,7 +104,7 @@ export function AssignmentBuilder({
                 aria-label={m.assignments_search_placeholder()}
             />
             <Show when={matches.length > 0}>
-                <ul className="divide-y divide-gray-100 rounded-md border border-line dark:divide-gray-800">
+                <ul className="divide-y divide-line-faint rounded-md border border-line">
                     {matches.slice(0, draft.visible).map((entry) => (
                         <li
                             key={entry.id}
@@ -132,15 +132,13 @@ export function AssignmentBuilder({
                                 key={item.id}
                                 className={`flex flex-wrap items-center gap-2 rounded-md border px-3 py-2 text-sm ${
                                     drag.dragIndex === index
-                                        ? "border-indigo-400 opacity-60"
+                                        ? "border-accent opacity-60"
                                         : drag.dragIndex !== null && drag.overIndex === index
-                                          ? "border-indigo-400 ring-2 ring-indigo-300 dark:ring-indigo-700"
-                                          : "border-gray-200 dark:border-gray-800"
+                                          ? "border-accent ring-2 ring-accent-line-strong"
+                                          : "border-line"
                                 }`}
                             >
-                                <span className="font-mono text-xs text-gray-400">
-                                    {index + 1}.
-                                </span>
+                                <span className="font-mono text-xs text-faint">{index + 1}.</span>
                                 {/* The title doubles as the drag handle (pointer events
                                     cover mouse and touch); the arrow buttons stay as the
                                     keyboard path, so this handle is not a tab stop. */}

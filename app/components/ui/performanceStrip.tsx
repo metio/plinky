@@ -8,9 +8,9 @@ import { m } from "../../paraglide/messages.js";
 
 // Each note's timing band, matched to the share emoji and the run grade.
 const FILL: Record<Rating, string> = {
-    perfect: "fill-green-500",
-    good: "fill-amber-500",
-    off: "fill-red-500",
+    perfect: "fill-band-best",
+    good: "fill-band-mid",
+    off: "fill-band-weak",
 };
 
 const WIDTH = 1000;
@@ -48,7 +48,7 @@ export function PerformanceStrip({
                     y1={mid}
                     x2={WIDTH - PAD}
                     y2={mid}
-                    className="stroke-gray-200 dark:stroke-gray-700"
+                    className="stroke-line"
                     strokeWidth="2"
                 />
                 {plotted.map((note) => {
@@ -62,7 +62,7 @@ export function PerformanceStrip({
                                     y1={PAD}
                                     x2={x}
                                     y2={HEIGHT - PAD}
-                                    className="stroke-amber-400"
+                                    className="stroke-band-mid"
                                     strokeWidth="2"
                                     strokeDasharray="3 4"
                                 />
@@ -74,7 +74,7 @@ export function PerformanceStrip({
                                     cy={y}
                                     r="9"
                                     fill="none"
-                                    className="stroke-red-500"
+                                    className="stroke-band-weak"
                                     strokeWidth="2"
                                 />
                             )}

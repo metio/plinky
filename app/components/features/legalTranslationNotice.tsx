@@ -16,7 +16,7 @@ export function LegalTranslationNotice({ page }: { page: "impressum" | "datensch
     return (
         <aside
             role="note"
-            className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-warn-ink dark:border-amber-800/60 dark:bg-amber-950/40"
+            className="rounded-lg border border-warn-line bg-warn-surface p-4 text-sm leading-relaxed text-warn-ink dark:border-warn-line/60 dark:bg-warn-surface/40"
         >
             <p>{m.legal_mt_notice_body()}</p>
             <p className="mt-2">

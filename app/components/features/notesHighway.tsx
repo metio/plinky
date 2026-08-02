@@ -15,26 +15,25 @@ import { m } from "../../paraglide/messages.js";
 // caps + centres to the same width so the columns line up with the keys below.
 
 // Left-hand notes read teal, everything else (right hand, or a chord spanning both)
-// reads indigo — the same indigo the keyboard lights the expected key, for continuity.
+// reads the same indigo the keyboard lights the expected key with, for continuity.
 // Depth is a lighter *shade* per tier (nearest → furthest), NOT the CSS `opacity`
 // property: an opacity layer triggers a headless-Chromium compositing artifact that
 // drops a block's blue channel and would flake the story baselines. Full static class
 // strings so Tailwind (and the class gate) pick them up.
-// Two tiers — the imminent note against the keys reads bold, the rest a step
-// lighter — using only the 300/500 shades, which rasterise cleanly. The 400/600
-// shades hit a headless-Chromium OKLCH→sRGB gamut clip that zeroes their blue
-// channel (rendering indigo as yellow) and would bake a wrong colour into the
-// baselines; real browsers render 400 fine, but the pinned baseline browser does
-// not, so we steer clear.
+// The `hand-*` tokens resolve to the 300/500 shades on purpose, and the two tiers
+// swap which is which per theme. The 400/600 shades hit a headless-Chromium
+// OKLCH→sRGB gamut clip that zeroes their blue channel (rendering indigo as yellow)
+// and would bake a wrong colour into the baselines; real browsers render 400 fine,
+// but the pinned baseline browser does not, so those shades stay out of these lanes.
 const SHADES = {
-    indigo: ["bg-hand-right", "bg-hand-right-soft"],
-    teal: ["bg-hand-left", "bg-hand-left-soft"],
+    right: ["bg-hand-right", "bg-hand-right-soft"],
+    left: ["bg-hand-left", "bg-hand-left-soft"],
 };
 
 function blockClass(staves: number[], row: number): string {
     const tier = row === 0 ? 0 : 1;
     const leftOnly = staves.length === 1 && staves[0] === 1;
-    return SHADES[leftOnly ? "teal" : "indigo"][tier]!;
+    return SHADES[leftOnly ? "left" : "right"][tier]!;
 }
 
 export function NotesHighway({
@@ -61,7 +60,7 @@ export function NotesHighway({
             className="mx-auto h-full w-full"
             style={{ maxWidth }}
         >
-            <div className="relative h-full w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-900">
+            <div className="relative h-full w-full overflow-hidden rounded-md bg-subtle">
                 {upcoming.slice(0, rows).flatMap((step, row) =>
                     step.pitches.map((pitch) => {
                         const lane = keyLane(pitch, from, to);
@@ -86,7 +85,7 @@ export function NotesHighway({
                 {/* The strike line: where a block meets its key. */}
                 <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-indigo-400/70"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-chart-bar/70"
                 />
             </div>
         </div>

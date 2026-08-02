@@ -67,7 +67,7 @@ export function GlossaryDetail({
                 >
                     {symbolName(entry.id)}
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{symbolGloss(entry.id)}</p>
+                <p className="text-sm text-muted">{symbolGloss(entry.id)}</p>
             </header>
 
             {example}

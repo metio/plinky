@@ -14,15 +14,15 @@ type Verdict = "correct" | "wrong" | null;
 
 function choiceClasses(verdict: Verdict, settled: boolean): string {
     if (verdict === "correct") {
-        return "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500";
+        return "border-success-solid bg-success-solid text-white";
     }
     if (verdict === "wrong") {
-        return "border-red-700 bg-red-700 text-white dark:border-red-600 dark:bg-red-600";
+        return "border-danger-solid bg-danger-solid text-white";
     }
     if (settled) {
-        return "border-line bg-white text-gray-400 dark:bg-gray-900 dark:text-gray-600";
+        return "border-line bg-raised text-faint";
     }
-    return "border-line-strong bg-white text-ink hover:border-indigo-600 hover:text-accent-strong dark:bg-gray-900 dark:hover:border-indigo-500";
+    return "border-line-strong bg-raised text-ink hover:border-accent-solid hover:text-accent-strong";
 }
 
 export function EarChoices<T extends string>({

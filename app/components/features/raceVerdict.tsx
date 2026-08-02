@@ -15,8 +15,8 @@ export function RaceVerdict({ verdict }: { verdict: Verdict }) {
 
     if (verdict.outcome === "tie") {
         return (
-            <Card tone="border-gray-300 bg-gray-50 text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
-                <Badge fill="bg-gray-400">
+            <Card tone="border-line-strong bg-sunken text-body">
+                <Badge fill="bg-key-spent">
                     <KeysIcon className="h-3.5 w-3.5" />
                 </Badge>
                 {m.ghost_verdict_tie()}
@@ -26,15 +26,15 @@ export function RaceVerdict({ verdict }: { verdict: Verdict }) {
 
     const won = verdict.outcome === "won";
     return won ? (
-        <Card tone="border-success-line bg-success-surface text-green-800 dark:text-green-300">
-            <Badge fill="bg-indigo-600">
+        <Card tone="border-success-line bg-success-surface text-success">
+            <Badge fill="bg-accent-solid">
                 <KeysIcon className="h-3.5 w-3.5" />
             </Badge>
             {m.ghost_verdict_won({ margin })}
         </Card>
     ) : (
-        <Card tone="border-fuchsia-300 bg-ghost-surface text-fuchsia-700 dark:border-fuchsia-800 dark:text-fuchsia-300">
-            <Badge fill="bg-fuchsia-500">
+        <Card tone="border-ghost-line bg-ghost-surface text-ghost-text">
+            <Badge fill="bg-ghost">
                 <GhostIcon className="h-3.5 w-3.5" />
             </Badge>
             {m.ghost_verdict_lost({ margin })}

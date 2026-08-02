@@ -38,7 +38,7 @@ export default function Board() {
                 <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">
                     {m.board_title()}
                 </h1>
-                <p className="max-w-2xl text-pretty leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="max-w-2xl text-pretty leading-relaxed text-muted">
                     {m.board_intro()}
                 </p>
             </header>

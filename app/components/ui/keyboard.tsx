@@ -82,7 +82,7 @@ function HoldFill({ fraction }: { fraction: number }) {
     return (
         <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 bg-indigo-400/45 dark:bg-indigo-400/40"
+            className="pointer-events-none absolute inset-x-0 bottom-0 bg-chart-bar/45 dark:bg-chart-bar/40"
             style={{ height: `${Math.min(1, Math.max(0, fraction)) * 100}%` }}
         />
     );
@@ -453,25 +453,25 @@ export function Keyboard({
         flash?.note === note
             ? "bg-danger-fill"
             : lit.has(note)
-              ? "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-green-400"
+              ? "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held"
               : expected.includes(note)
                 ? "bg-accent-surface"
                 : theme.white;
     const blackState = (note: number) =>
         flash?.note === note
-            ? "bg-red-500"
+            ? "bg-danger"
             : lit.has(note)
-              ? "translate-y-0.5 bg-green-500 shadow-[0_0_14px_-3px] shadow-green-500"
+              ? "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held"
               : expected.includes(note)
-                ? "bg-indigo-400"
+                ? "bg-chart-bar"
                 : theme.black;
     // A black key's name is pale because the key is nearly black — but every state that
     // means something (wrong, held, play this) fills it with a bright colour, and pale
     // grey on those is well under the contrast floor. The name follows the fill.
     const blackLabel = (note: number) =>
         flash?.note === note || lit.has(note) || expected.includes(note)
-            ? "text-gray-900"
-            : "text-gray-300";
+            ? "text-ink"
+            : "text-key-black-ink";
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.
@@ -515,7 +515,7 @@ export function Keyboard({
                             {keyLabel(note, labels) && (
                                 <span
                                     aria-hidden="true"
-                                    className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-gray-400 dark:text-gray-600"
+                                    className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-faint"
                                 >
                                     {keyLabel(note, labels)}
                                 </span>
@@ -567,7 +567,7 @@ export function Keyboard({
                 {sustained && (
                     <span
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-x-0 bottom-0 h-1 rounded-full bg-amber-400/80 shadow-[0_0_10px_0] shadow-amber-400"
+                        className="pointer-events-none absolute inset-x-0 bottom-0 h-1 rounded-full bg-warn-solid/80 shadow-[0_0_10px_0] shadow-warn-solid"
                     />
                 )}
             </div>

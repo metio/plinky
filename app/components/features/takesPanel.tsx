@@ -73,7 +73,7 @@ export function TakesPanel({
     return (
         <div className="space-y-3">
             {takes.length === 0 ? (
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.takes_empty_hint()}</p>
+                <p className="text-sm text-muted">{m.takes_empty_hint()}</p>
             ) : (
                 <ul className="space-y-2">
                     {takes.map((take) => {

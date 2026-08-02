@@ -64,15 +64,15 @@ export function NotationExample({ xml, label }: { xml: string; label: string }) 
         // The warm paper field, soft lift and inset hairline are the play surface's
         // engraved-plate frame: an example should look like the page it prepares you to
         // read. Paper stays light in both themes, as it does there.
-        <figure className="relative rounded-xl bg-stone-50 p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)]">
+        <figure className="relative rounded-xl bg-paper p-3 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_32px_-14px_rgba(0,0,0,0.20)]">
             <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-2 rounded-lg border border-stone-300/70"
+                className="pointer-events-none absolute inset-2 rounded-lg border border-paper-line/70"
             />
             {failed ? (
                 // The same reserved height as the drawing, so failing to draw doesn't
                 // shift the buttons below into a different place than success does.
-                <p className="flex min-h-24 items-center justify-center px-2 text-center text-sm text-gray-600">
+                <p className="flex min-h-24 items-center justify-center px-2 text-center text-sm text-muted">
                     {m.glossary_example_unavailable()}
                 </p>
             ) : (

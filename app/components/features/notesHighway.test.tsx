@@ -51,8 +51,8 @@ describe("NotesHighway", () => {
             <NotesHighway upcoming={[step(0, [48], [1]), step(1, [60], [0])]} from={48} to={72} />,
         );
         const [left, right] = blocks();
-        expect(left!.className).toContain("teal");
-        expect(right!.className).toContain("indigo");
+        expect(left!.className).toContain("hand-left");
+        expect(right!.className).toContain("hand-right");
     });
 
     it("drops pitches outside the keyboard range", () => {

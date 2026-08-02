@@ -48,7 +48,7 @@ export function ReportBack({ assignment }: { assignment: Assignment }) {
     return (
         <Disclosure summary={m.report_back()}>
             <div className="space-y-3">
-                <p className="text-sm text-gray-600 dark:text-gray-400">{m.report_back_hint()}</p>
+                <p className="text-sm text-muted">{m.report_back_hint()}</p>
                 <label className="block space-y-1">
                     <span className="text-sm font-medium text-body">{m.report_who()}</span>
                     <input
@@ -61,7 +61,7 @@ export function ReportBack({ assignment }: { assignment: Assignment }) {
                             // older one on screen looking current.
                             setCode(null);
                         }}
-                        className="w-full rounded-lg border border-line-strong px-3 py-2 text-sm dark:bg-gray-900"
+                        className="w-full rounded-lg border border-line-strong px-3 py-2 text-sm dark:bg-raised"
                     />
                 </label>
                 <Button variant="secondary" onClick={make} disabled={who.trim().length === 0}>
@@ -74,7 +74,7 @@ export function ReportBack({ assignment }: { assignment: Assignment }) {
                             value={code}
                             rows={3}
                             aria-label={m.report_code()}
-                            className="w-full break-all rounded-lg border border-line-strong p-2 font-mono text-xs dark:bg-gray-900"
+                            className="w-full break-all rounded-lg border border-line-strong p-2 font-mono text-xs dark:bg-raised"
                         />
                         <Button variant="secondary" onClick={copy}>
                             {copied === "report" ? m.share_copied() : m.report_copy()}

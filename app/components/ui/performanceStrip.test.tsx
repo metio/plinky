@@ -34,11 +34,11 @@ describe("PerformanceStrip", () => {
         const clean = render(
             <PerformanceStrip notes={[note(0, 0), note(500, 510), note(1000, 1005)]} />,
         );
-        expect(clean.container.querySelector("circle.stroke-red-500")).toBeNull();
+        expect(clean.container.querySelector("circle.stroke-band-weak")).toBeNull();
         cleanup();
         const withWrong = render(
             <PerformanceStrip notes={[note(0, 0), note(500, 510), note(1000, 1005, 2)]} />,
         );
-        expect(withWrong.container.querySelector("circle.stroke-red-500")).toBeTruthy();
+        expect(withWrong.container.querySelector("circle.stroke-band-weak")).toBeTruthy();
     });
 });

@@ -47,8 +47,8 @@ const FOUNDERS = [
 function DuetMark() {
     return (
         <span aria-hidden="true" className="inline-flex items-center gap-1 align-middle">
-            <span className="h-1.5 w-6 rounded-full bg-indigo-400" />
-            <span className="h-1.5 w-3 rounded-full bg-gray-300 dark:bg-gray-600" />
+            <span className="h-1.5 w-6 rounded-full bg-chart-bar" />
+            <span className="h-1.5 w-3 rounded-full bg-key-spent" />
         </span>
     );
 }
@@ -81,7 +81,7 @@ export default function About() {
                             width={112}
                             height={112}
                             loading="lazy"
-                            className={`h-28 w-28 rounded-full bg-subtle object-cover ring-2 ring-indigo-100 dark:ring-indigo-900/50 ${
+                            className={`h-28 w-28 rounded-full bg-subtle object-cover ring-2 ring-accent-fill dark:ring-accent-fill/50 ${
                                 kiss > 0
                                     ? lead
                                         ? "motion-safe:animate-smooch"
@@ -93,13 +93,13 @@ export default function About() {
                     return (
                         <article
                             key={founder.name}
-                            className="flex flex-col items-center gap-3 rounded-xl border border-line bg-white p-6 text-center dark:bg-gray-900"
+                            className="flex flex-col items-center gap-3 rounded-xl border border-line bg-raised p-6 text-center"
                         >
                             {lead ? (
                                 <button
                                     type="button"
                                     onClick={() => setKiss((count) => count + 1)}
-                                    className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                                    className="relative rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent-ring focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                                 >
                                     {portrait}
                                     {/* A rose blush blooms over her cheek. */}
@@ -134,9 +134,7 @@ export default function About() {
                                     {founder.role}
                                 </span>
                             </div>
-                            <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                                {founder.bio()}
-                            </p>
+                            <p className="text-sm leading-relaxed text-muted">{founder.bio()}</p>
                         </article>
                     );
                 })}
@@ -144,14 +142,14 @@ export default function About() {
 
             <section className="space-y-3 border-t border-line pt-8">
                 <h2 className="text-lg font-semibold">{m.about_why_title()}</h2>
-                <p className="max-w-prose text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_why_body()}
                 </p>
             </section>
 
             <section className="space-y-3 border-t border-line pt-8">
                 <h2 className="text-lg font-semibold">{m.about_contact_title()}</h2>
-                <p className="max-w-prose text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_contact_body()}
                 </p>
                 <a
