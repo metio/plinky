@@ -217,7 +217,18 @@ const BUDGET_VENDOR_KB = 311;
 // corrupt .mid from locking the tab in a loop that no timeout can interrupt. Most of its
 // weight was avoided rather than spent — core/meter.ts exists so the two file parsers
 // keep type-only imports of the engraver instead of pulling it into their chunk.
-const BUDGET_APP_KB = 310;
+//
+// Six seams lifted out of the play surface — the run's grading, its recording, the take
+// it saves without being asked, the claim that only the newest press may start a run,
+// the order a run ends in, and the one door every note arrives at — measured at 310.0.
+// 311. The first raise here that buys no capability at all: the app does exactly what it
+// did, in 227 fewer lines of the file that had none of its logic under test and now has
+// sixty-two tests over it. What the bytes actually pay for is the option objects and
+// module boundaries an extraction needs. Two bugs came out of the work — a run that
+// could start after the player had stopped, and a setter that ran its own argument
+// twice — so some of it is paid back already. Trimmed first by deleting five session
+// keys no consumer read.
+const BUDGET_APP_KB = 311;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

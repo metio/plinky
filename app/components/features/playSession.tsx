@@ -1028,7 +1028,6 @@ function usePlaySessionValue({
         dismissRotate,
         // The render surface.
         score,
-        getOsmd,
         ready,
         loadError: score.loadError,
         staffCount,
@@ -1050,10 +1049,6 @@ function usePlaySessionValue({
         setTrainerTarget,
         metronomeOn,
         setMetronomeOn,
-        adaptive,
-        setAdaptive,
-        subdivision,
-        setSubdivision,
         // Play options.
         enforceTempo,
         setEnforceTempo,
