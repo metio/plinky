@@ -88,6 +88,16 @@ jobs:
       # Every class name in source must compile against app/app.css — an unknown
       # utility silently applies no styling, which no other gate can see.
       - run: nix develop --command ci-tailwind
+  tokens:
+    name: tokens
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      # Pure source analysis (no dependencies): colour is named for its role in
+      # app/app.css and every token declares both themes, so a component can
+      # never hand-pair a light and a dark hue and let the two drift apart.
+      - run: nix develop --command ci-tokens
   i18n:
     name: i18n
     runs-on: ubuntu-latest
@@ -112,7 +122,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, bake-check, nav, arch, bytes, tailwind, i18n, ci-parity]
+    needs: [frontend, bake-check, nav, arch, bytes, tailwind, tokens, i18n, ci-parity]
     if: always()
     runs-on: ubuntu-latest
     steps:

@@ -27,6 +27,7 @@
     "lint": "biome check",
     "arch": "depcruise core app dev react-router.config.ts && node dev/check-globals.mjs",
     "tailwind": "node dev/check-tailwind.mjs",
+    "tokens": "node dev/check-design-tokens.mjs",
     "size": "node dev/check-bundle-size.mjs",
     "nav": "node dev/nav-graph.mjs",
         "bytes": "node dev/check-source-bytes.mjs",

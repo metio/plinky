@@ -76,6 +76,7 @@ npm run coverage      # ratchet thresholds — a drop fails the build (skips the
                       # under instrumentation, so CI runs them as their own gate)
 npm run arch          # layer rules + confined globals
 npm run tailwind      # every class name compiles against app.css (blocking)
+npm run tokens        # colour is named by role, not hue (blocking)
 npm run messages:check # every locale carries every message (blocking)
 npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
@@ -137,6 +138,20 @@ tools than CI's fresh install and can pass what CI fails.
   derived, because it cannot be read off the source: which pages arrive carrying the
   notation machinery (measure it — a wrong guess fails loudly in `lighthouserc.js`), and
   the bundle-size ratchet, which exists to make a human decide.
+- **Colour is a token, never a hue.** `app/app.css` names every colour for its
+  role — `muted`, `line`, `accent-solid`, `danger-surface`, plus the domain ones
+  (`paper`, `ghost`, `hand-left`, `band-*`) — and each resolves to a light value
+  in `@theme` and a dark one in the `.dark` block below it. Components write
+  `text-muted`, never `text-gray-500 dark:text-gray-400`; `npm run tokens` is a
+  blocking gate that rejects any raw palette utility under `app/` and any token
+  missing one of its two themes. Adding a token is the whole cost of a new role:
+  the gate reads the names out of `app.css`, so there is no second list. Pure
+  `white` and `black` stay legal — white text on a solid fill means the same
+  thing in both themes. What the gate can't decide for you is whether a colour is
+  *chrome* or *data*: the share grid's `band-*` scale is matched to the 🟩🟨🟧🟥⬜
+  emoji and to the literal hexes `core/shareCard.ts` bakes into the exported
+  image, so it must never be folded into `success`/`warn`/`danger` — moving a
+  state colour for contrast would quietly turn five bands into four.
 - **New persistent state** = a store factory in `app/stores/` over the injected
   `KeyValueStore` (use the `jsonStore` idiom), registered as an `AppServices`
   capability in `app/contexts/services.tsx` — in all three places: the type, the
