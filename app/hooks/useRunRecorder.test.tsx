@@ -118,6 +118,29 @@ describe("useRunRecorder", () => {
         expect(recorder().capture.current.notes[0]?.heldMs).toBe(900);
     });
 
+    describe("input that arrives out of nowhere", () => {
+        // A device reconnecting, or a pedal that was already down when the page loaded,
+        // sends events with no matching press. core/runCapture treats them as strays;
+        // these pin that the recorder passes them through rather than guarding twice.
+        it("shrugs off a release for a pitch it never saw cleared", () => {
+            const { recorder } = harness();
+            recorder().begin({ tempo: 100, partial: false, pedalDown: false, at: 0 });
+            expect(() => recorder().released(60, 500)).not.toThrow();
+            expect(recorder().capture.current.notes).toHaveLength(0);
+        });
+
+        it("shrugs off a pedal lift that was holding nothing", () => {
+            const { recorder } = harness();
+            recorder().begin({ tempo: 100, partial: false, pedalDown: false, at: 0 });
+            expect(() => recorder().pedal(false, 500)).not.toThrow();
+        });
+
+        it("shrugs off a release arriving before the run has begun", () => {
+            const { recorder } = harness();
+            expect(() => recorder().released(60, 500)).not.toThrow();
+        });
+    });
+
     it("keeps one identity across renders, so callers can depend on it", () => {
         const { recorder, view } = harness();
         const first = recorder();
