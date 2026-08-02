@@ -199,6 +199,16 @@ tools than CI's fresh install and can pass what CI fails.
   comments), like the top of this file.
 - **Update README.md in the same change** whenever a user-facing feature is
   added or changed.
+- **Update NEWS.md in the same change**, for anything a player would notice — a
+  new feature, a changed behaviour, a bug they'd have hit. Plinky has no
+  versions, tags or releases (every push to main deploys), so nothing else
+  records what changed and nothing generates it from the log: unwritten at the
+  time means unwritten for good. Entries are `## <D Month YYYY>` headings,
+  newest first. Write for a player, not a contributor — what is different on
+  screen and why it matters — in the [VOICE.md](VOICE.md) register. Purely
+  internal work gets no entry; when a day is mostly internal, say the small
+  user-visible part and stop rather than padding it. Note that `ci-markdown`
+  only lints **tracked** files, so `git add NEWS.md` before running it.
 
 ## Product guardrails
 

@@ -21,6 +21,9 @@ device's storage ever fills up or gets blocked, Plinky says so — a banner warn
 progress isn't being saved, and saving a take tells you when it didn't land instead
 of pretending it did.
 
+There are no version numbers to wait for — every change goes live as it lands.
+[NEWS.md](NEWS.md) says what's changed recently, and what it means for you.
+
 ## Practising a score
 
 Open any score and Plinky renders it as real notation, led by a single action:
