@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { cadence } from "../../core/cadence";
 import type { Grade } from "../../core/grade";
 import type { RunCapture } from "../../core/runCapture";
-import { deriveRunOutcome, type RunOutcome } from "../../core/runOutcome";
+import { deriveRunOutcome, type RunOutcome, tempoScale } from "../../core/runOutcome";
 import { sectionScores } from "../../core/sectionBest";
 import type { AppServices } from "../contexts/services";
 import type { Analytics } from "../ports/analytics";
@@ -100,7 +100,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
         // final note's key-up — so the grade lands while a held note still rings.
         const notes = o.capture.current.notes;
         const intended = o.intendedTempo ?? o.runTempo.current;
-        const tempoScale = intended > 0 ? o.runTempo.current / intended : 1;
+        const scale = tempoScale(o.runTempo.current, intended);
         const outcome = deriveRunOutcome({
             notes,
             correct: o.correct,
@@ -142,7 +142,7 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
                 // and the grid's cells can never disagree about how a moment went.
                 sections: sectionScores(notes, {
                     tolerance: outcome.tolerance,
-                    tempoScale,
+                    tempoScale: scale,
                 }),
                 notes,
                 correct: o.correct,

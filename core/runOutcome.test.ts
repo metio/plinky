@@ -5,7 +5,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { LENIENT_TOLERANCE, PRECISE_TOLERANCE } from "./rhythm";
 import { parseGrade } from "./grade";
-import { type OutcomeNote, deriveRunOutcome } from "./runOutcome";
+import { type OutcomeNote, deriveRunOutcome, tempoScale } from "./runOutcome";
 
 // A run note played exactly on its notated onset (perfect timing), on the treble staff,
 // with a mid-range velocity — the building block a test tweaks one field of.
@@ -155,5 +155,58 @@ describe("deriveRunOutcome properties", () => {
                 expect(deriveRunOutcome(input)).toEqual(deriveRunOutcome(input));
             }),
         );
+    });
+});
+
+describe("tempoScale", () => {
+    it("reads 1 at the piece's own tempo", () => {
+        expect(tempoScale(100, 100)).toBe(1);
+    });
+
+    it("reads below 1 for a run played slower than the piece", () => {
+        // Speed is scored against this, so a careful crawl cannot pass as at-tempo.
+        expect(tempoScale(50, 100)).toBe(0.5);
+    });
+
+    it("reads above 1 for a run played faster", () => {
+        expect(tempoScale(120, 100)).toBe(1.2);
+    });
+
+    it("falls back to 1 when the piece names no tempo of its own", () => {
+        // Nothing to be measured against, so the run is taken at face value rather
+        // than divided by zero.
+        expect(tempoScale(100, 0)).toBe(1);
+        expect(tempoScale(100, -20)).toBe(1);
+    });
+
+    it("is the same number the grade's own grid is built with", () => {
+        // Three readers derive this — the share grid inside deriveRunOutcome, the
+        // results panel, and the sections a run is scored into — and they have to
+        // agree, so they share one definition rather than three copies of a ternary.
+        const outcome = deriveRunOutcome({
+            notes: [
+                { targetMs: 0, playedMs: 0, wrongBefore: 0, velocity: 80 },
+                { targetMs: 500, playedMs: 500, wrongBefore: 0, velocity: 80 },
+            ],
+            correct: 2,
+            wrong: 0,
+            imprecise: false,
+            intendedTempo: 100,
+            runTempo: 50,
+        });
+        const halfSpeed = deriveRunOutcome({
+            notes: [
+                { targetMs: 0, playedMs: 0, wrongBefore: 0, velocity: 80 },
+                { targetMs: 500, playedMs: 500, wrongBefore: 0, velocity: 80 },
+            ],
+            correct: 2,
+            wrong: 0,
+            imprecise: false,
+            intendedTempo: 100,
+            runTempo: 100,
+        });
+        expect(tempoScale(50, 100)).toBe(0.5);
+        // The slower run's grid is scored on the lower scale, so it cannot match.
+        expect(JSON.stringify(outcome.grid)).not.toBe(JSON.stringify(halfSpeed.grid));
     });
 });

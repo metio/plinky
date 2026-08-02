@@ -13,6 +13,7 @@ import {
     useSyncExternalStore,
 } from "react";
 import { beamsVisible } from "../../../core/beams";
+import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
 import type { Grade } from "../../../core/grade";
@@ -172,9 +173,7 @@ function usePlaySessionValue({
         metronomeOn,
         setMetronomeOn,
         subdivision,
-        setSubdivision,
         adaptive,
-        setAdaptive,
         trainerOn,
         setTrainerOn,
         trainerTarget,
@@ -373,6 +372,12 @@ function usePlaySessionValue({
     const { getOsmd, ready, staffCount, measureCount, measureBoxes, centerCursor, markPainted } =
         score;
 
+    // The hand the run drills. A single-staff piece has no hand to choose — the selector
+    // never shows for one — so it is always both. Derived once: the matcher, the ghost,
+    // the duet, the reading aids and the two analytics events all have to name the same
+    // hand, and six copies of the same ternary is six chances for one to drift.
+    const activeHand: Hand = staffCount < 2 ? "both" : hand;
+
     // Frame the on-screen keyboard around the notes THIS piece uses, so a narrow
     // tune shows a short keyboard instead of a fixed two octaves. Recomputed only
     // when the sounding pitches can have changed — a new piece (xml) or a
@@ -443,7 +448,7 @@ function usePlaySessionValue({
             grade: keepUp.result.letter,
             in_time: keepUp.result.inTime,
             total: keepUp.result.total,
-            hand: staffCount < 2 ? "both" : hand,
+            hand: activeHand,
             guide: guideNotes,
             daily: daily !== undefined,
         });
@@ -483,12 +488,12 @@ function usePlaySessionValue({
     // the wrong bars.
     const vanishing = useVanishingBars(getOsmd, {
         enabled: sightRead.on && sightRead.vanish && !enforceTempo,
-        hand: staffCount < 2 ? "both" : hand,
+        hand: activeHand,
     });
     const hidden = useHiddenNotes(getOsmd, {
         enabled: hiddenNotes,
         tries: revealTries,
-        hand: staffCount < 2 ? "both" : hand,
+        hand: activeHand,
     });
     // Turning the mode off mid-piece must bring the music back immediately.
     useEffect(() => {
@@ -508,9 +513,6 @@ function usePlaySessionValue({
     const { micStatus, pedalHeld, echoNote, silenceEcho } = useMidiConnection();
     const micListening = micStatus === "listening";
 
-    // The hand the run drills — forced to "both" for a single-staff piece, where the
-    // hand selector never shows.
-    const activeHand: Hand = staffCount < 2 ? "both" : hand;
     // The self-paced duet: sound the sitting-out hand as you play. Off in keep-up,
     // where the tempo-locked run plays the other hand on its own clock instead.
     const accompaniment = useDuet({
@@ -849,12 +851,11 @@ function usePlaySessionValue({
         if (score.painted()) {
             score.wipePaint();
         }
-        const runHand = staffCount < 2 ? "both" : hand;
         const accompany = duet && staffCount >= 2 && hand !== "both";
-        keepUp.start({ hand: runHand, guideNotes, accompany });
+        keepUp.start({ hand: activeHand, guideNotes, accompany });
         analytics.track("run_started", {
             mode: "keep_up",
-            hand: runHand,
+            hand: activeHand,
             guide: guideNotes,
             duet: accompany,
         });
@@ -905,7 +906,6 @@ function usePlaySessionValue({
         // The hand the matcher and the ghost step through: the whole grand staff
         // when there's a single staff, otherwise the hand being drilled. (Fingering
         // is printed on the staff at load time, not computed per run.)
-        const matcherHand: Hand = staffCount < 2 ? "both" : hand;
         // A fresh run from the top wipes the previous run's colours for a clean slate; a
         // resumed run (taking over from Listen) keeps them, so the blue Listen trail and
         // any earlier green survive and the score shows how the whole piece was played.
@@ -923,7 +923,7 @@ function usePlaySessionValue({
         // Same for the read-ahead drill, which walks the cursor the same way.
         vanishing.arm();
         // Arm the ghost race post-render, so its marker moves along the freshly drawn notes.
-        ghostRace.arm({ partial, ephemeral, raceGhost, hand: matcherHand });
+        ghostRace.arm({ partial, ephemeral, raceGhost, hand: activeHand });
         // Read both hands off the freshly drawn score so the duet can sound the one
         // you're not practising (inert unless the duet is on).
         accompaniment.prime();
@@ -941,7 +941,7 @@ function usePlaySessionValue({
             matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
             analytics.track("run_started", {
                 mode: "self_paced",
-                hand: matcherHand,
+                hand: activeHand,
                 hidden: hiddenNotes,
                 forgiving,
                 loop: loop.on,
@@ -993,8 +993,10 @@ function usePlaySessionValue({
 
     // The run's tempo re-referenced to the piece's own, so the results panel reads the
     // lagging hand at the same scale the share grid was built with.
-    const intendedTempo = initialTempo ?? recorder.tempo.current;
-    const runTempoScale = intendedTempo > 0 ? recorder.tempo.current / intendedTempo : 1;
+    const runTempoScale = tempoScale(
+        recorder.tempo.current,
+        initialTempo ?? recorder.tempo.current,
+    );
 
     // Dismiss the rotate-your-phone nudge, and remember the choice.
     const dismissRotate = () => {

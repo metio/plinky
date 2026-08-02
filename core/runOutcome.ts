@@ -22,6 +22,19 @@ export type OutcomeNote = RunNote & { velocity: number };
 // dragged; null when too few notes to plot a curve.
 export type TempoCurve = { points: TempoPoint[]; median: number; hotspots: Hotspot[] };
 
+// How the run's own tempo related to the piece's: 1 at the intended tempo, below it
+// when slower. Speed is scored against this, so a careful crawl cannot read as an
+// at-tempo performance.
+//
+// One definition because three readers have to agree on it. The grade's share grid is
+// built with it, the results panel re-derives it to read the lagging hand at the same
+// scale, and the run's sections are scored against it — and a piece with no intended
+// tempo of its own falls back to the tempo it was played at, which is the one case
+// where the three could quietly disagree.
+export function tempoScale(runTempo: number, intendedTempo: number): number {
+    return intendedTempo > 0 ? runTempo / intendedTempo : 1;
+}
+
 export type RunOutcome = {
     grade: Grade;
     // The timing leniency the run was graded at, kept so the per-note strip reads the same
@@ -74,7 +87,7 @@ export function deriveRunOutcome({
     });
     // Timing is judged against the player's own pace (so a steady run at any tempo reads as
     // in time); the scale re-references the run to the piece's tempo for the share grid.
-    const scale = intendedTempo > 0 ? runTempo / intendedTempo : 1;
+    const scale = tempoScale(runTempo, intendedTempo);
     const grid = handGrid(notes, { tempoScale: scale });
     const points = tempoSeries(
         runTempo,
