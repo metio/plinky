@@ -18,7 +18,10 @@ Two phases so the large scrape is resumable and its yield is known before downlo
            the permissive editions: {page, title, composer, spdx, file}. One per page.
   reduce — download and reduce the planned editions into <out-dir>.
 
-Usage (in dev/Containerfile — needs music21):
+Needs music21, which the flake does not carry. Run it in the Mutopia image, which
+installs it for the same reason:
+  ilo --no-rc shell --remote-user pwuser --update-remote-user-uid \
+    --containerfile dev/mutopia.Containerfile dev/plinky-mutopia:latest bash -c '…'
   python3 dev/cpdl-harvest.py plan sources/cpdl/plan.json
   python3 dev/cpdl-harvest.py reduce sources/cpdl/plan.json sources/cpdl/_mxl [--limit N]
 """

@@ -1,9 +1,10 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: 0BSD
 
-# Import-only image for the Mutopia harvest — NOT the project build image
-# (dev/Containerfile). LilyPond is a large toolchain (Guile, fonts), kept out of the lean
-# dev/CI container and isolated here. The pipeline is:
+# Import-only image for the Mutopia harvest, and one of the two things left that still
+# want a container — the toolchain is otherwise a nix flake. LilyPond is large (Guile,
+# fonts), so it stays isolated here rather than in anything a build touches. The pipeline
+# is:
 #   .ly  --lilypond-->  MIDI  --music21-->  two-staff piano MusicXML
 # LilyPond is the reference parser, so it resolves any Mutopia .ly (variables, \relative,
 # \repeat) that a source-level converter mishandles; its MIDI is score-exact (not a
