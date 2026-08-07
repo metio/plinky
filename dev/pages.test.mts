@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 // @ts-expect-error - plain JS module with a .d.mts declaration; vitest resolves the source
-import { assertPages, readPages, staticPaths } from "./pages.mjs";
+import { assertPages, noindexPaths, readPages, staticPaths } from "./pages.mjs";
 
 // The page list is derived by reading app/routes.ts as text, because the Lighthouse config
 // and the a11y sweep are plain Node and cannot import TypeScript. A text parse can quietly
@@ -49,5 +50,64 @@ describe("the derived page list", () => {
         // The specific number will drift as pages are added; the point is that an empty or
         // near-empty result is a broken parse, not a small app.
         expect(staticPaths().length).toBeGreaterThan(10);
+    });
+});
+
+describe("the derived noindex list", () => {
+    it("finds every page whose route declares noindexMeta()", () => {
+        const paths = noindexPaths();
+
+        // The legal notices and the personal/utility surfaces.
+        for (const path of [
+            "/impressum",
+            "/datenschutz",
+            "/you",
+            "/review",
+            "/settings",
+            "/basics",
+            "/collect",
+            "/placement",
+        ]) {
+            expect(paths).toContain(path);
+        }
+    });
+
+    it("leaves the indexable pages out", () => {
+        const paths = noindexPaths();
+
+        for (const path of ["/", "/about", "/help", "/glossary", "/library", "/daily", "/board"]) {
+            expect(paths).not.toContain(path);
+        }
+    });
+
+    it("never returns an empty list, which would read as 'every page is indexable'", () => {
+        // An empty result is what a renamed or reformatted call would produce, and it fails
+        // open: the sitemap would advertise pages whose own documents forbid indexing.
+        expect(noindexPaths().length).toBeGreaterThan(5);
+    });
+
+    it("agrees with a loose scan of the route modules", () => {
+        // The precise match (`noindexMeta()`) and the loose one (the bare word) must pick out
+        // the same pages. They diverge exactly when the call shape has moved on, which is the
+        // drift assertPages() exists to refuse.
+        const loose = readPages()
+            .filter((page: { dynamic?: boolean; module: string }) => !page.dynamic && page.module)
+            .filter((page: { module: string }) =>
+                readFileSync(`app/${page.module}`, "utf8").includes("noindex"),
+            )
+            .map((page: { path: string }) => page.path);
+
+        expect(noindexPaths().sort()).toEqual(loose.sort());
+    });
+
+    it("returns canonical paths in the same shape as staticPaths", () => {
+        // The sitemap matches these against locale-stripped paths, so a bare "basics" here
+        // would silently match nothing and leave the page in the sitemap.
+        const paths = staticPaths();
+
+        for (const path of noindexPaths()) {
+            expect(path.startsWith("/")).toBe(true);
+            expect(paths).toContain(path);
+        }
     });
 });

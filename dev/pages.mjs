@@ -63,6 +63,27 @@ export function staticPaths() {
         .map((page) => page.path);
 }
 
+// The exact call a route makes to opt out of the index. Matching the call rather than the
+// bare word keeps a comment or a test name from reading as a declaration.
+const NOINDEX_CALL = "noindexMeta()";
+
+// The pages whose own meta() marks them noindex, read from the route module that declares
+// it — in the same canonical (unprefixed) form as staticPaths().
+//
+// A page that forbids indexing must not be advertised for indexing, so the sitemap leaves
+// these out; Lighthouse's is-crawlable audit would tank their SEO category by design, so
+// that one assertion is dropped for them. Both readings come from here, so neither can
+// drift from the route table or from each other. A restated copy of the list falls behind
+// the moment a route adds the call, and what it produces is a sitemap submitting pages for
+// indexing whose own documents refuse it — valid XML that no gate can see through, so the
+// contradiction surfaces only as a Search Console error weeks later.
+export function noindexPaths() {
+    return readPages()
+        .filter((page) => !page.dynamic && page.module)
+        .filter((page) => readFileSync(`app/${page.module}`, "utf8").includes(NOINDEX_CALL))
+        .map((page) => page.path);
+}
+
 // Fails when the parse has stopped describing the file — a reformatted route table, a
 // renamed module, or a match that found nothing. Silence is the failure mode this
 // module exists to remove, so every consumer calls this before trusting the result.
@@ -87,6 +108,24 @@ export function assertPages() {
     for (const page of pages) {
         if (page.module && !existsSync(`app/${page.module}`)) {
             throw new Error(`${ROUTES}: parsed module app/${page.module} for ${page.path}, which does not exist`);
+        }
+    }
+    // noindexPaths() matches one exact call, so renaming or reformatting it would leave the
+    // match finding nothing — and an empty noindex list reads as "every page is indexable",
+    // which puts pages that forbid indexing back into the sitemap. Cross-check the precise
+    // match against a loose one: a route module that mentions noindex at all without
+    // matching the call means this reading has gone stale.
+    const declared = new Set(noindexPaths());
+    for (const page of pages) {
+        if (!page.module || page.dynamic) {
+            continue;
+        }
+        const mentions = readFileSync(`app/${page.module}`, "utf8").includes("noindex");
+        if (mentions && !declared.has(page.path)) {
+            throw new Error(
+                `${ROUTES}: app/${page.module} mentions noindex but does not call ${NOINDEX_CALL} — ` +
+                    "dev/pages.mjs can no longer tell which pages are noindex",
+            );
         }
     }
     return pages;

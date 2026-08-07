@@ -18,4 +18,5 @@ export type Page = {
 
 export function readPages(): Page[];
 export function staticPaths(): string[];
+export function noindexPaths(): string[];
 export function assertPages(): Page[];

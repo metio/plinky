@@ -24,10 +24,10 @@
 // Whether a page is noindex IS readable from the route that declares it, so the SEO
 // assertion turns itself off for those pages without anyone maintaining a list.
 
-import { readFileSync } from "node:fs";
-import { assertPages, staticPaths } from "./dev/pages.mjs";
+import { assertPages, noindexPaths, staticPaths } from "./dev/pages.mjs";
 
-const pages = assertPages();
+// Fails loudly if the route-table reading has gone stale, before any of it is trusted.
+assertPages();
 
 // The audit runs against the single-locale build, which is English.
 const LOCALE = "en";
@@ -36,13 +36,13 @@ const url = (path) => `http://localhost/${LOCALE}${path === "/" ? "/" : `${path}
 // One concrete score page. Any bundled score would do; this one is prerendered.
 const PLAY_SAMPLE = "/play/47xd2XDpYFCy";
 
-// Pages whose own meta() marks them noindex. Lighthouse's is-crawlable audit tanks
-// their SEO category by design, so that one assertion is dropped for them — while every
-// other budget still applies.
-const noindex = pages
-    .filter((page) => !page.dynamic && page.module)
-    .filter((page) => readFileSync(`app/${page.module}`, "utf8").includes("noindex"))
-    .map((page) => page.path.slice(1))
+// Pages whose own meta() marks them noindex, as bare path segments for the URL patterns
+// below. Lighthouse's is-crawlable audit tanks their SEO category by design, so that one
+// assertion is dropped for them — while every other budget still applies. The same reading
+// keeps them out of the sitemap (dev/gen-sitemap.mjs), so the two cannot disagree about
+// which pages belong in the index.
+const noindex = noindexPaths()
+    .map((path) => path.slice(1))
     .filter(Boolean);
 
 // Pages that bring the notation machinery with them as they load. Budgeted apart so its
