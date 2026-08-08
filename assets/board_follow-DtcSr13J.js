@@ -1,0 +1,1 @@
+import"./runtime-B0jpyP6o.js";var e=e=>`Obserwuj na ${e?.platform}`,t=((t,n={})=>e(t));export{t};

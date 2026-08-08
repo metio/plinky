@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=e=>`Prati na ${e?.platform}`,t=((t,n={})=>e(t));export{t};

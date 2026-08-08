@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=()=>`Commencer à lire`,t=((t={},n={})=>e(t));export{t};

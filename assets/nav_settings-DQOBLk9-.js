@@ -1,0 +1,1 @@
+import"./runtime-CYmR0ZQG.js";var e=()=>`Setări`,t=((t={},n={})=>e(t));export{t};

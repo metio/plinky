@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=e=>`Követés itt: ${e?.platform}`,t=((t,n={})=>e(t));export{t};

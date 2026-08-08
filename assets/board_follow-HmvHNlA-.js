@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";var e=e=>`Sledovať na ${e?.platform}`,t=((t,n={})=>e(t));export{t};

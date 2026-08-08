@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Stücke tauchen in wachsenden Abständen wieder auf, damit das Gelernte wirklich sitzt.`,t=((t={},n={})=>e(t));export{t};

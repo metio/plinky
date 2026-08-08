@@ -1,0 +1,1 @@
+import"./runtime-nfdFSxix.js";var e=()=>`Begynd at læse`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=()=>`Paramètres`,t=((t={},n={})=>e(t));export{t};

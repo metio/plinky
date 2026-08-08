@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=()=>`Mit jelentenek a jelek`,t=((t={},n={})=>e(t));export{t};

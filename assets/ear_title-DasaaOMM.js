@@ -1,0 +1,1 @@
+import"./runtime-CdlhHM1_.js";var e=()=>`Обука слуха`,t=((t={},n={})=>e(t));export{t};

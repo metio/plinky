@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=()=>`Plinky — zongoragyakorlás a böngésződben`,t=((t={},n={})=>e(t));export{t};

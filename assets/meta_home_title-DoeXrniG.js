@@ -1,0 +1,1 @@
+import"./runtime-CBh4YF7E.js";var e=()=>`Plinky — pianoøving i nettleseren`,t=((t={},n={})=>e(t));export{t};

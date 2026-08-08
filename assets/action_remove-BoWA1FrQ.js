@@ -1,0 +1,1 @@
+import"./runtime-s9eaDc-x.js";var e=()=>`Удалить`,t=((t={},n={})=>e(t));export{t};

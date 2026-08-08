@@ -1,0 +1,1 @@
+import"./runtime-CBh4YF7E.js";var e=()=>`Kopiert!`,t=((t={},n={})=>e(t));export{t};

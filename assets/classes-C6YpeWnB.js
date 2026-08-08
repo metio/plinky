@@ -1,0 +1,1 @@
+var e=`rounded-md border border-line-strong bg-transparent px-2 py-1.5 text-sm text-ink-soft`,t=`rounded-md border border-line-strong bg-transparent px-2 py-1 text-sm text-body`,n=`text-accent-strong underline`;export{e as n,n as r,t};

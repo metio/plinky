@@ -1,0 +1,1 @@
+import"./runtime-s9eaDc-x.js";var e=e=>`Подписаться в ${e?.platform}`,t=((t,n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-higT1hu2.js";var e=()=>`Ο πίνακας`,t=((t={},n={})=>e(t));export{t};

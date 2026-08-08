@@ -1,0 +1,1 @@
+import{a as e,v as t}from"./runtime-1CUFmveb.js";function n(n,r){return t(e(n,r))}export{n as t};

@@ -1,0 +1,1 @@
+import"./runtime-D4Ujw4pr.js";var e=()=>`U kopjua!`,t=((t={},n={})=>e(t));export{t};

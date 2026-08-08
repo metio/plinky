@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=()=>`Le tableau`,t=((t={},n={})=>e(t));export{t};

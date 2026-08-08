@@ -1,0 +1,1 @@
+import"./runtime-BcOHc90q.js";var e=()=>`Maak kennis met het klavier`,t=((t={},n={})=>e(t));export{t};

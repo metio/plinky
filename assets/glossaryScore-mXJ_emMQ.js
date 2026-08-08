@@ -1,0 +1,10 @@
+import{$t as e,en as t}from"./services-DgNgj1Mv.js";var n={sixteenth:1,eighth:2,quarter:4,half:8,whole:16};function r(e){let t=n[e.value];return e.dotted?t+t/2:t}function i(e){return r(e)/4}function a(e){if(e.step===null)return`<rest/>`;let t=e.alter?`<alter>${e.alter}</alter>`:``;return`<pitch><step>${e.step}</step>${t}<octave>${e.octave??4}</octave></pitch>`}function o(e){let t=[];e.articulation&&t.push(`<${e.articulation}/>`),e.accent&&t.push(`<accent/>`);let n=[];return e.tie&&n.push(`<tied type="${e.tie}"/>`),e.slur&&n.push(`<slur number="1" type="${e.slur}"/>`),t.length>0&&n.push(`<articulations>${t.join(``)}</articulations>`),n.length>0?`<notations>${n.join(``)}</notations>`:``}function s(e){let t=e.tie?`<tie type="${e.tie}"/>`:``,n=e.dotted?`<dot/>`:``,i=e.accidental?`<accidental>${e.accidental}</accidental>`:``;return`      <note>${a(e)}<duration>${r(e)}</duration>${t}<type>${e.value}</type>${n}${i}${o(e)}</note>`}function c(e){return e.dynamic?`      <direction placement="below"><direction-type><dynamics><${e.dynamic}/></dynamics></direction-type></direction>\n`:``}function l(e){return e===`bass`?`<clef><sign>F</sign><line>4</line></clef>`:`<clef><sign>G</sign><line>2</line></clef>`}function u(e,t){let n=t*4,i=[],a=[],o=0;for(let t of e)a.push(t),o+=r(t),o>=n&&(i.push(a),a=[],o=0);return a.length>0&&i.push(a),i}function d(e){return`<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
+  <part id="P1">
+${u(e.notes,e.beatsPerBar).map((t,n)=>{let r=n===0?`      <attributes><divisions>4</divisions><key><fifths>${e.fifths}</fifths></key><time><beats>${e.beatsPerBar}</beats><beat-type>4</beat-type></time>${l(e.clef)}</attributes>\n`:``,i=t.map(e=>`${c(e)}${s(e)}`).join(`
+`);return`    <measure number="${n+1}">\n${r}${i}\n    </measure>`}).join(`
+`)}
+  </part>
+</score-partwise>
+`}function f(n,r){if(n.step===null)return null;let i=n.alter??(n.accidental?p(n.accidental):e(n.step,r));return t(n.step,n.octave??4,i)}function p(e){return e===`sharp`?1:e===`flat`?-1:0}export{i as n,f as r,d as t};

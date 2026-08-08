@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=()=>`Početna`,t=((t={},n={})=>e(t)),n=()=>`Biblioteka`,r=((e={},t={})=>n(e));export{t as n,r as t};

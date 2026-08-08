@@ -1,0 +1,1 @@
+import"./runtime-CJrbI4bV.js";var e=()=>`Plinky — pianonharjoittelua selaimessa`,t=((t={},n={})=>e(t));export{t};

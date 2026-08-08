@@ -1,0 +1,1 @@
+import"./runtime-DgczLZWX.js";var e=()=>`Ayarlar`,t=((t={},n={})=>e(t));export{t};

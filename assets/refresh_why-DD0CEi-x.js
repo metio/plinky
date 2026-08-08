@@ -1,0 +1,1 @@
+import"./runtime-1CUFmveb.js";var e=()=>`As peças voltam à tona num intervalo cada vez maior, para que o que aprendeste realmente se fixe.`,t=((t={},n={})=>e(t));export{t};

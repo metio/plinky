@@ -1,0 +1,1 @@
+import"./runtime-B0jpyP6o.js";var e=()=>`Pokaż więcej`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BcOHc90q.js";var e=()=>`Stukken komen op een steeds ruimer schema terug, zodat wat je hebt geleerd echt beklijft.`,t=((t={},n={})=>e(t));export{t};

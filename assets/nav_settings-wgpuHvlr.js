@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=()=>`Postavke`,t=((t={},n={})=>e(t));export{t};

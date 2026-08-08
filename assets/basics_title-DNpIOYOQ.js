@@ -1,0 +1,1 @@
+import"./runtime-ctLZx0N-.js";var e=()=>`Знайомство з клавіатурою`,t=((t={},n={})=>e(t));export{t};

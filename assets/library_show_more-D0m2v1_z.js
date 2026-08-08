@@ -1,0 +1,1 @@
+import"./runtime-ctLZx0N-.js";var e=()=>`Показати більше`,t=((t={},n={})=>e(t));export{t};

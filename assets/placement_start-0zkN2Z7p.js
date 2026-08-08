@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Lesen beginnen`,t=((t={},n={})=>e(t));export{t};

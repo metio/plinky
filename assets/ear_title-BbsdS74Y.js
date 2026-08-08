@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=()=>`Trening sluha`,t=((t={},n={})=>e(t));export{t};

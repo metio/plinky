@@ -1,0 +1,1 @@
+import"./runtime-D4Ujw4pr.js";var e=e=>`Ndiq në ${e?.platform}`,t=((t,n={})=>e(t));export{t};

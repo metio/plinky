@@ -1,0 +1,1 @@
+import"./runtime-DdimL0pH.js";var e=()=>`Anslagstavlan`,t=((t={},n={})=>e(t));export{t};

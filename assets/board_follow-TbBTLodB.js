@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=e=>`Suivre sur ${e?.platform}`,t=((t,n={})=>e(t));export{t};

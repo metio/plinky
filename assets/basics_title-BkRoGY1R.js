@@ -1,0 +1,1 @@
+import"./runtime-I8D2cIsL.js";var e=()=>`鍵盤と仲よくなる`,t=((t={},n={})=>e(t));export{t};

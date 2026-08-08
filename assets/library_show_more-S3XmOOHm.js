@@ -1,0 +1,1 @@
+import"./runtime-CdlhHM1_.js";var e=()=>`Прикажи још`,t=((t={},n={})=>e(t));export{t};

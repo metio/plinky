@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";var e=()=>`Skopírované!`,t=((t={},n={})=>e(t));export{t};

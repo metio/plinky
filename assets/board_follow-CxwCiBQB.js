@@ -1,0 +1,1 @@
+import"./runtime-BvRsDGr8.js";var e=e=>`Seguir en ${e?.platform}`,t=((t,n={})=>e(t));export{t};

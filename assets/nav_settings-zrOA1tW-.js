@@ -1,0 +1,1 @@
+import"./runtime-nfdFSxix.js";var e=()=>`Indstillinger`,t=((t={},n={})=>e(t));export{t};

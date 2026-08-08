@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=()=>`Hallásfejlesztés`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=()=>`Copié !`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-B0jpyP6o.js";var e=()=>`Plinky — ćwiczenie gry na pianinie w przeglądarce`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-DgczLZWX.js";var e=()=>`Okumaya başla`,t=((t={},n={})=>e(t));export{t};

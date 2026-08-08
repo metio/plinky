@@ -1,0 +1,1 @@
+import"./runtime-D4Ujw4pr.js";var e=()=>`Njihu me tastierën`,t=((t={},n={})=>e(t));export{t};

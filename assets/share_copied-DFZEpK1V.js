@@ -1,0 +1,1 @@
+import"./runtime-CdlhHM1_.js";var e=()=>`Копирано!`,t=((t={},n={})=>e(t));export{t};

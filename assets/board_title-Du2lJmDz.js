@@ -1,0 +1,1 @@
+import"./runtime-B0jpyP6o.js";var e=()=>`Tablica`,t=((t={},n={})=>e(t));export{t};

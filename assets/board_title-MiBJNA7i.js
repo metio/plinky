@@ -1,0 +1,1 @@
+import"./runtime-CM4gjVq9.js";var e=()=>`The Board`,t=((t={},n={})=>e(t));export{t};

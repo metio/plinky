@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";var e=()=>`Nastavenia`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=()=>`Napi`,t=((t={},n={})=>e(t)),n=()=>`Komponálás`,r=((e={},t={})=>n(e)),i=()=>`Te`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

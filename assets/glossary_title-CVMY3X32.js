@@ -1,0 +1,1 @@
+import"./runtime-CYmR0ZQG.js";var e=()=>`Ce înseamnă semnele`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-CBh4YF7E.js";var e=()=>`Stykker dukker opp igjen etter en stadig lengre plan, så det du har lært faktisk sitter.`,t=((t={},n={})=>e(t));export{t};

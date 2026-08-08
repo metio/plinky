@@ -1,0 +1,1 @@
+import"./runtime-BvRsDGr8.js";var e=()=>`¡Copiado!`,t=((t={},n={})=>e(t));export{t};

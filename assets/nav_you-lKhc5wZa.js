@@ -1,0 +1,1 @@
+import"./runtime-BvRsDGr8.js";var e=()=>`Diario`,t=((t={},n={})=>e(t)),n=()=>`Componer`,r=((e={},t={})=>n(e)),i=()=>`Tú`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

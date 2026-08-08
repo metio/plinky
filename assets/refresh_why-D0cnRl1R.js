@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=()=>`Skladbe se vraćaju po sve širem rasporedu, pa ono što naučiš doista ostane.`,t=((t={},n={})=>e(t));export{t};

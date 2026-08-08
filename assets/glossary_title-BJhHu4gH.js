@@ -1,0 +1,1 @@
+import"./runtime-nfdFSxix.js";var e=()=>`Hvad tegnene betyder`,t=((t={},n={})=>e(t));export{t};

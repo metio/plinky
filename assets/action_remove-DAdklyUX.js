@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=()=>`Supprimer`,t=((t={},n={})=>e(t));export{t};

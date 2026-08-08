@@ -1,0 +1,3 @@
+import{N as e}from"./jsx-runtime-CnzDHtc3.js";var t=`https://github.com/metio/plinky/issues/new`;function n(t){let n=e(t)&&t.status===404,r;return r=e(t)?`${t.status} ${t.statusText}`:t instanceof Error?`${t.message}\n\n${t.stack??``}`.trim():String(t),{notFound:n,technical:r}}function r(e,t,n,r){let i=[`**What were you doing when this happened?**`,``,`_(please describe)_`,``,`**Page:** ${n}`,``,`**Details**`,``,"```",t.technical,"```",``,`**Browser:** ${r}`].join(`
+`),a=t.notFound?`Page not found`:`Error: ${t.technical.split(`
+`)[0]}`;return`${e}?title=${encodeURIComponent(a)}&body=${encodeURIComponent(i)}`}export{n,r,t};

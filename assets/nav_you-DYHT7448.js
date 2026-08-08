@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";var e=()=>`Denná`,t=((t={},n={})=>e(t)),n=()=>`Skladať`,r=((e={},t={})=>n(e)),i=()=>`Vy`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

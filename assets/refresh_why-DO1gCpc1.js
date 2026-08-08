@@ -1,0 +1,1 @@
+import"./runtime-CM4gjVq9.js";var e=()=>`Pieces resurface on a widening schedule, so what you've learned actually sticks.`,t=((t={},n={})=>e(t));export{t};

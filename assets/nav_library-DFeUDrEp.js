@@ -1,0 +1,1 @@
+import"./runtime-1CUFmveb.js";var e=()=>`Início`,t=((t={},n={})=>e(t)),n=()=>`Biblioteca`,r=((e={},t={})=>n(e));export{t as n,r as t};

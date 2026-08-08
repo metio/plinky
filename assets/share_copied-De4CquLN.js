@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=()=>`Kopirano!`,t=((t={},n={})=>e(t));export{t};

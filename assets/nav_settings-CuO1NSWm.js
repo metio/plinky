@@ -1,0 +1,1 @@
+import"./runtime-B0jpyP6o.js";var e=()=>`Ustawienia`,t=((t={},n={})=>e(t));export{t};

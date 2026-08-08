@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";var e=()=>`Tréning sluchu`,t=((t={},n={})=>e(t));export{t};

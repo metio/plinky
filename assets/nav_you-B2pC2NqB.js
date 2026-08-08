@@ -1,0 +1,1 @@
+import"./runtime-s9eaDc-x.js";var e=()=>`День`,t=((t={},n={})=>e(t)),n=()=>`Сочинение`,r=((e={},t={})=>n(e)),i=()=>`Вы`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

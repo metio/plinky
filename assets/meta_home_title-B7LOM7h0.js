@@ -1,0 +1,1 @@
+import"./runtime-CH7u7A98.js";var e=()=>`Plinky — cvičení klavíru ve vašem prohlížeči`,t=((t={},n={})=>e(t));export{t};

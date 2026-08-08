@@ -1,0 +1,1 @@
+import"./runtime-BvRsDGr8.js";var e=()=>`Plinky — práctica de piano en tu navegador`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=()=>`Másolva!`,t=((t={},n={})=>e(t));export{t};

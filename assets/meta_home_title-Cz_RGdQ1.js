@@ -1,0 +1,1 @@
+import"./runtime-1CUFmveb.js";var e=()=>`Plinky — prática de piano no teu navegador`,t=((t={},n={})=>e(t));export{t};

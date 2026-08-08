@@ -1,0 +1,1 @@
+import"./runtime-CdlhHM1_.js";var e=()=>`Дневно`,t=((t={},n={})=>e(t)),n=()=>`Компонуј`,r=((e={},t={})=>n(e)),i=()=>`Ти`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

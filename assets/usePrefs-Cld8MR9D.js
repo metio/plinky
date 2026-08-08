@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-CbXtAM7H.js";import{q as t}from"./jsx-runtime-CnzDHtc3.js";import{k as n,v as r}from"./services-DgNgj1Mv.js";var i=e(t(),1);function a(){let e=r(),t=(0,i.useSyncExternalStore)(e.subscribe,e.load,()=>n),a=(0,i.useCallback)(t=>e.save({...e.load(),...t}),[e]);return(0,i.useMemo)(()=>({prefs:t,update:a}),[t,a])}export{a as t};

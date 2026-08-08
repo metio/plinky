@@ -1,0 +1,1 @@
+import"./runtime-ctLZx0N-.js";var e=()=>`Видалити`,t=((t={},n={})=>e(t));export{t};

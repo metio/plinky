@@ -1,0 +1,1 @@
+import"./runtime-DdimL0pH.js";var e=()=>`Plinky — pianoövning i webbläsaren`,t=((t={},n={})=>e(t));export{t};

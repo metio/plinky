@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Was die Zeichen bedeuten`,t=((t={},n={})=>e(t));export{t};

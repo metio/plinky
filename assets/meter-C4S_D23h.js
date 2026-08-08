@@ -1,0 +1,1 @@
+function e(e,t=4){if(typeof e!=`number`||!Number.isFinite(e))return t;let n=Math.round(e);return n>=1&&n<=32?n:t}export{e as t};

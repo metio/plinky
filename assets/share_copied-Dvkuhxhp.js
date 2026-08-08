@@ -1,0 +1,1 @@
+import"./runtime-CYmR0ZQG.js";var e=()=>`Copiat!`,t=((t={},n={})=>e(t));export{t};

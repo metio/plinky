@@ -1,0 +1,1 @@
+import"./runtime-B0jpyP6o.js";var e=()=>`Główna`,t=((t={},n={})=>e(t)),n=()=>`Biblioteka`,r=((e={},t={})=>n(e));export{t as n,r as t};

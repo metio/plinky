@@ -1,0 +1,1 @@
+import"./runtime-D4Ujw4pr.js";var e=()=>`Ditore`,t=((t={},n={})=>e(t)),n=()=>`Kompozo`,r=((e={},t={})=>n(e)),i=()=>`Ti`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

@@ -1,0 +1,1 @@
+import"./runtime-CM4gjVq9.js";var e=e=>`Follow on ${e?.platform}`,t=((t,n={})=>e(t));export{t};

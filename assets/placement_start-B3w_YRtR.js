@@ -1,0 +1,1 @@
+import"./runtime-CdlhHM1_.js";var e=()=>`Почни да читаш`,t=((t={},n={})=>e(t));export{t};

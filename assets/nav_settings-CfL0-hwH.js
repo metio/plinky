@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Einstellungen`,t=((t={},n={})=>e(t));export{t};

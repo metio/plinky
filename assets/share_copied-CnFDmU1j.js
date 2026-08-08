@@ -1,0 +1,1 @@
+import"./runtime-DdimL0pH.js";var e=()=>`Kopierat!`,t=((t={},n={})=>e(t));export{t};

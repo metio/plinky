@@ -1,0 +1,1 @@
+import"./runtime-DVMPvZSc.js";var e=()=>`Ismerkedj meg a billentyűzettel`,t=((t={},n={})=>e(t));export{t};

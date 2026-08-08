@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Lern die Tastatur kennen`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";var e=()=>`Čo znamenajú značky`,t=((t={},n={})=>e(t));export{t};

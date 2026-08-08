@@ -1,0 +1,1 @@
+import"./runtime-1CUFmveb.js";var e=()=>`O quadro`,t=((t={},n={})=>e(t));export{t};

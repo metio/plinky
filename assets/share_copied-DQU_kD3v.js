@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Kopiert!`,t=((t={},n={})=>e(t));export{t};

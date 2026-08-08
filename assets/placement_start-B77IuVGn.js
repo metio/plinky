@@ -1,0 +1,1 @@
+import"./runtime-CYmR0ZQG.js";var e=()=>`Începe să citești`,t=((t={},n={})=>e(t));export{t};

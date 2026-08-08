@@ -1,0 +1,1 @@
+import"./runtime-1CUFmveb.js";var e=e=>`Seguir no ${e?.platform}`,t=((t,n={})=>e(t));export{t};

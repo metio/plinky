@@ -1,0 +1,1 @@
+import"./runtime-DOgjssA-.js";var e=()=>`Plinky – Klavier üben im Browser`,t=((t={},n={})=>e(t));export{t};

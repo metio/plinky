@@ -1,0 +1,1 @@
+import"./runtime-BcOHc90q.js";var e=()=>`Beginnen met lezen`,t=((t={},n={})=>e(t));export{t};

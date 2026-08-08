@@ -1,0 +1,1 @@
+import{n as e,s as t,t as n}from"./jsx-runtime-CnzDHtc3.js";import{t as r}from"./href-Dl6np9Da.js";var i=n(),a=t(function(){return typeof window>`u`?null:(0,i.jsx)(e,{to:r(`/`),replace:!0})});export{a as default};

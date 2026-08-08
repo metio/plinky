@@ -1,0 +1,1 @@
+import"./runtime-nfdFSxix.js";var e=()=>`Lær klaviaturet at kende`,t=((t={},n={})=>e(t));export{t};

@@ -1,0 +1,1 @@
+import"./runtime-BRCBUxQN.js";var e=()=>`Fais connaissance avec le clavier`,t=((t={},n={})=>e(t));export{t};

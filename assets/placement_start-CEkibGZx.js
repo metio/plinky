@@ -1,0 +1,1 @@
+import"./runtime-Bg1kMaMh.js";var e=()=>`Počni čitati`,t=((t={},n={})=>e(t));export{t};

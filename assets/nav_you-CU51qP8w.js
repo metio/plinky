@@ -1,0 +1,1 @@
+import"./runtime-I8D2cIsL.js";var e=()=>`デイリー`,t=((t={},n={})=>e(t)),n=()=>`作曲`,r=((e={},t={})=>n(e)),i=()=>`あなた`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

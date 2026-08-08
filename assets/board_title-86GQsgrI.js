@@ -1,0 +1,1 @@
+import"./runtime-BR44qWke.js";var e=()=>`La bacheca`,t=((t={},n={})=>e(t));export{t};

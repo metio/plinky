@@ -1,0 +1,1 @@
+import"./runtime-higT1hu2.js";var e=()=>`Plinky — εξάσκηση πιάνου στον browser σου`,t=((t={},n={})=>e(t));export{t};

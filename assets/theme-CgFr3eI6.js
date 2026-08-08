@@ -1,0 +1,1 @@
+import"./runtime-jxdwd0gZ.js";import{ft as e}from"./services-DgNgj1Mv.js";var t=()=>`Ako sa spracúvajú tvoje údaje`,n=((e={},n={})=>t(e));function r(t){let n=typeof matchMedia==`function`&&matchMedia(`(prefers-color-scheme: dark)`).matches;document.documentElement.classList.toggle(`dark`,e(t,n)===`dark`)}export{n,r as t};

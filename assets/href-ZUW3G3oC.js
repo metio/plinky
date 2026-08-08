@@ -1,0 +1,1 @@
+import{a as e,v as t}from"./runtime-DQu4mI4A.js";function n(n,r){return t(e(n,r))}export{n as t};

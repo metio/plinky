@@ -1,0 +1,1 @@
+import"./runtime-BcOHc90q.js";var e=()=>`Het prikbord`,t=((t={},n={})=>e(t));export{t};

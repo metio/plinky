@@ -1,0 +1,1 @@
+import"./runtime-CdlhHM1_.js";var e=()=>`Шта значе ознаке`,t=((t={},n={})=>e(t));export{t};

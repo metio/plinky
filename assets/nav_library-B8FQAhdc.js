@@ -1,0 +1,1 @@
+import"./runtime-CM4gjVq9.js";var e=()=>`Home`,t=((t={},n={})=>e(t)),n=()=>`Library`,r=((e={},t={})=>n(e));export{t as n,r as t};

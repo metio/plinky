@@ -1,0 +1,1 @@
+import"./runtime-ctLZx0N-.js";var e=e=>`Стежити в ${e?.platform}`,t=((t,n={})=>e(t));export{t};

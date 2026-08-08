@@ -1,0 +1,1 @@
+import"./runtime-DQu4mI4A.js";var e=()=>`首页`,t=((t={},n={})=>e(t)),n=()=>`曲库`,r=((e={},t={})=>n(e));export{t as n,r as t};

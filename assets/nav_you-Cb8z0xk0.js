@@ -1,0 +1,1 @@
+import"./runtime-higT1hu2.js";var e=()=>`Ημερήσιο`,t=((t={},n={})=>e(t)),n=()=>`Σύνθεση`,r=((e={},t={})=>n(e)),i=()=>`Εσύ`,a=((e={},t={})=>i(e));export{r as n,t as r,a as t};

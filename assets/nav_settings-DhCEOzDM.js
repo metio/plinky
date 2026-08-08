@@ -1,0 +1,1 @@
+import"./runtime-I8D2cIsL.js";var e=()=>`設定`,t=((t={},n={})=>e(t));export{t};

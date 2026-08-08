@@ -1,0 +1,1 @@
+import"./runtime-D4Ujw4pr.js";import{ft as e}from"./services-DgNgj1Mv.js";var t=()=>`Si trajtohen të dhënat e tua`,n=((e={},n={})=>t(e));function r(t){let n=typeof matchMedia==`function`&&matchMedia(`(prefers-color-scheme: dark)`).matches;document.documentElement.classList.toggle(`dark`,e(t,n)===`dark`)}export{n,r as t};
