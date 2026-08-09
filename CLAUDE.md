@@ -231,6 +231,15 @@ tools than CI's fresh install and can pass what CI fails.
   commits lack the trailer.
 - **Update README.md in the same change** whenever a user-facing feature is
   added or changed.
+- **Update [BACKEND.md](BACKEND.md) in the same change** whenever backend work
+  contradicts it — an endpoint, a schema, a limit, a merge policy, an invariant,
+  or a phase reaching its exit criterion. The document is the design *and* the
+  implementation plan for backend mode, so a session that reads a stale one
+  re-derives a decision that was already made and argued. It is append-only where
+  it records decisions: a reversal gets a new row saying so, leaving the original
+  in place, because a reader who cannot see that a path was abandoned will propose
+  it again. Nothing in it is user-facing — player-visible changes still go to
+  `NEWS.md` and `README.md` in the [VOICE.md](VOICE.md) register.
 - **Update NEWS.md in the same change**, for anything a player would notice — a
   new feature, a changed behaviour, a bug they'd have hit. Plinky has no
   versions, tags or releases (every push to main deploys), so nothing else
@@ -246,5 +255,13 @@ tools than CI's fresh install and can pass what CI fails.
 
 - **No streaks, ever.** Plinky never punishes a missed day; the daily challenge
   has a ✓ and cumulative stats, nothing consecutive.
+- **No ranked competition, ever.** No leaderboards, no ladders, no rank against
+  other players — decided 2026-08-09, and it is the same instinct the streak rule
+  refuses. Ranking is pressure, and the friendliness Plinky promotes is worth more
+  than the engagement a ladder would buy. Comparison is allowed only in the shape
+  the daily share grid already uses: a histogram of where people landed, showing a
+  player their own band and never a position above or below anyone. See
+  [BACKEND.md](BACKEND.md) for the full reasoning, including why the server-side
+  referee such a ladder would need could not have proven anything anyway.
 - **The catalogue is Creative-Commons only**, and every piece credits its
   composer, source and licence in the app.
