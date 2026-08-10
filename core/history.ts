@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { todayKey } from "./daily";
+import { shiftDay } from "./dateKey";
 
 // Notes practiced per day, keyed by local calendar date (YYYY-MM-DD), matching todayKey.
 // Every practice day is retained: totalNotes and daysPracticed are lifetime aggregates
@@ -47,12 +48,6 @@ export function foldPractice(history: History, notes: number, now: Date): Histor
     }
     const key = todayKey(now);
     return { ...history, [key]: (history[key] ?? 0) + notes };
-}
-
-function shiftDay(dateKey: string, delta: number): string {
-    const date = new Date(`${dateKey}T00:00:00Z`);
-    date.setUTCDate(date.getUTCDate() + delta);
-    return date.toISOString().slice(0, 10);
 }
 
 export function summarizePractice(history: History, now: Date): PracticeSummary {

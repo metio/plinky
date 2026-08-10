@@ -81,6 +81,19 @@ export function recordRun(
         services.daily.saveResult(daily, { grade, grid, notes, tolerance });
     }
     services.history.record(correct);
+    // How long this run took, folded into the practice diary. Onsets count from the
+    // run's first cleared note, so the last one is the run's length; the diary decides
+    // for itself whether that extends the sitting in progress or opens a new one.
+    //
+    // A generated drill still contributes its minutes — time at the keyboard is time at
+    // the keyboard — but carries no piece id, because it has no catalogue entry the
+    // report could name.
+    services.practiceLog.record({
+        at: now,
+        activeMs: notes.at(-1)?.playedMs ?? 0,
+        notes: correct,
+        pieceId: ephemeral ? undefined : id,
+    });
     // Which notes this run was slow to find, folded into the running per-note record.
     // Ephemeral runs count: a generated drill reads the staff exactly as a piece does,
     // and it is reading that is being measured.

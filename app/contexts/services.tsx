@@ -43,6 +43,7 @@ import { createGhostStore, type GhostStore } from "../stores/ghostStore";
 import { createLifetimeStore, type LifetimeStore } from "../stores/lifetimeStore";
 import { createTakesStore, type TakesStore } from "../stores/takesStore";
 import { createHistoryStore, type HistoryStore } from "../stores/historyStore";
+import { createPracticeLogStore, type PracticeLogStore } from "../stores/practiceLogStore";
 import { createSongSource, type SongSource } from "../stores/songSource";
 import { createMasteryStore, type MasteryStore } from "../stores/masteryStore";
 import { createPrefsStore, type PrefsStore } from "../stores/prefsStore";
@@ -64,6 +65,7 @@ export type AppServices = {
     prefs: PrefsStore;
     mastery: MasteryStore;
     history: HistoryStore;
+    practiceLog: PracticeLogStore;
     favorites: FavoritesStore;
     theme: ThemeStore;
     hints: HintsStore;
@@ -138,6 +140,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         prefs: overrides.prefs ?? createPrefsStore(store),
         mastery: overrides.mastery ?? createMasteryStore(store),
         history: overrides.history ?? createHistoryStore(store),
+        practiceLog: overrides.practiceLog ?? createPracticeLogStore(store),
         favorites,
         theme: overrides.theme ?? createThemeStore(store),
         hints: overrides.hints ?? createHintsStore(store),
@@ -181,6 +184,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     prefs: true,
     mastery: true,
     history: true,
+    practiceLog: true,
     favorites: true,
     theme: true,
     hints: true,

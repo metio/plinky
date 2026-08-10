@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { Assignment } from "./assignment";
+import { toCsv } from "./csv";
 import { letterFor } from "./grade";
 import { isRecord } from "./guards";
 import { packToCode, unpackFromCode } from "./shareCode";
@@ -197,28 +198,5 @@ export function reportsToCsv(reports: AssignmentReport[], pieceTitle: (id: strin
             }),
         ];
     });
-    return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
-}
-
-// A cell a spreadsheet would RUN rather than read. Excel, LibreOffice and Sheets all
-// treat a leading =, +, - or @ as the start of a formula, and a leading tab or carriage
-// return can carry one in past a check that only looks at the first character.
-//
-// Everything in this file arrives from a report a student's device wrote, and the format
-// says plainly that such a code is not proof — anyone can author one. The name they chose
-// and, where a piece id doesn't resolve to a title, the id itself both reach the export
-// verbatim. So a crafted report puts a live formula in the sheet the teacher opens:
-// =HYPERLINK carries the rest of the class off to a URL on one click, and on Excel a DDE
-// payload does worse. Escaping quotes and commas makes a row PARSE correctly; it does
-// nothing about what the spreadsheet then executes.
-const FORMULA_START = /^[=+\-@\t\r]/;
-
-// A name with a comma in it would otherwise split a row into two columns, and a leading
-// formula character is disarmed with the apostrophe every spreadsheet reads as "what
-// follows is text". Such a cell is always quoted too, so a parser that trims whitespace
-// can't strip a leading tab back off and re-expose the character behind it.
-function csvCell(value: string): string {
-    const guarded = FORMULA_START.test(value);
-    const text = guarded ? `'${value}` : value;
-    return guarded || /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+    return toCsv([header, ...rows]);
 }
