@@ -69,6 +69,7 @@ describe("TakesPanel", () => {
                             timing: 73,
                             flow: 88,
                             dynamics: null,
+                            expression: null,
                             score: 84,
                             letter: "B",
                         },

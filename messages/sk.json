@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Striedanie sa v tej chvíli zdá horšie a o týždeň drží oveľa lepšie. Práve tá námaha vrátiť sa k niečomu je to, čo zostáva.",
   "method_spacing_name": "Vráť sa k tomu neskôr",
   "method_spacing_how": "Nechaj skladbu pár dní stíchnuť a potom si ju zahraj znova. Plinky si už stráži, kedy je ktorá pripravená.",
-  "method_spacing_why": "To, čo si takmer zabudol a potom si na to prišiel, ti vydrží dlhšie než to, čomu si nikdy nedovolil vyblednúť."
+  "method_spacing_why": "To, čo si takmer zabudol a potom si na to prišiel, ti vydrží dlhšie než to, čomu si nikdy nedovolil vyblednúť.",
+  "scores_expression": "Výraz",
+  "assignments_due_label": "Cieľový dátum",
+  "assignments_due_hint": "Hodina, skúška, koncert — nepovinné.",
+  "assignments_left": "Zostáva naučiť: {count}"
 }

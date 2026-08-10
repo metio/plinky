@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Cambiare sembra peggio sul momento e regge molto meglio una settimana dopo. È la fatica di tornarci che resta.",
   "method_spacing_name": "Riprendilo più avanti",
   "method_spacing_how": "Lascia riposare un brano per qualche giorno, poi risuonalo. Plinky tiene già il conto di quando ognuno è pronto.",
-  "method_spacing_why": "Qualcosa quasi dimenticato e poi richiamato resta più a lungo di qualcosa a cui non si è mai lasciato sbiadire."
+  "method_spacing_why": "Qualcosa quasi dimenticato e poi richiamato resta più a lungo di qualcosa a cui non si è mai lasciato sbiadire.",
+  "scores_expression": "Espressione",
+  "assignments_due_label": "Data obiettivo",
+  "assignments_due_hint": "Una lezione, un esame, un saggio — facoltativa.",
+  "assignments_left": "Ancora {count} da imparare"
 }

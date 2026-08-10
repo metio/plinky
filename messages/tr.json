@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Parça değiştirmek o an daha zor gelir, bir hafta sonra çok daha iyi durur. Bir şeye geri dönmenin zahmeti, kalıcı olan kısımdır.",
   "method_spacing_name": "Sonra geri dön",
   "method_spacing_how": "Bir parça birkaç gün sussun, sonra yeniden çal. Plinky her birinin ne zaman hazır olduğunu zaten takip ediyor.",
-  "method_spacing_why": "Neredeyse unutulup sonra hatırlanan bir şey, hiç solmasına izin verilmeyenden daha uzun akılda kalır."
+  "method_spacing_why": "Neredeyse unutulup sonra hatırlanan bir şey, hiç solmasına izin verilmeyenden daha uzun akılda kalır.",
+  "scores_expression": "İfade",
+  "assignments_due_label": "Hedef tarih",
+  "assignments_due_hint": "Bir ders, bir sınav, bir dinleti — isteğe bağlı.",
+  "assignments_left": "Öğrenilecek {count} parça kaldı"
 }

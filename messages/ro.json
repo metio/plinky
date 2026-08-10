@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Schimbarea pare mai grea pe moment și ține mult mai bine peste o săptămână. Efortul de a reveni la ceva e partea care rămâne.",
   "method_spacing_name": "Revino la ea mai târziu",
   "method_spacing_how": "Lasă o piesă să tacă vreo câteva zile, apoi cânt-o din nou. Plinky ține deja socoteala când e fiecare gata.",
-  "method_spacing_why": "Ceva aproape uitat și apoi readus în minte se ține minte mai mult decât ceva care n-a fost lăsat niciodată să pălească."
+  "method_spacing_why": "Ceva aproape uitat și apoi readus în minte se ține minte mai mult decât ceva care n-a fost lăsat niciodată să pălească.",
+  "scores_expression": "Expresivitate",
+  "assignments_due_label": "Data țintă",
+  "assignments_due_hint": "O lecție, un examen, un recital — opțional.",
+  "assignments_left": "Mai sunt {count} de învățat"
 }

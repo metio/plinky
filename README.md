@@ -158,6 +158,16 @@ from three things:
   keyboard can't be as precise as real keys, so those get a wider window.
 - **Flow** — whether you kept moving like a musician rather than stopping to hunt.
 
+Where the music is marked, an **Expression** reading joins them: how closely you
+followed the written dynamics and articulation. Loudness is judged as a shape rather
+than a level — did you play louder where the score says louder — so a light touch or
+a heavy piano costs you nothing, and note lengths are read the same way against what
+the staccato and tenuto marks ask for. It appears only when there is something to
+read: an unmarked score, or an input that can't report how hard a key was struck, says
+nothing rather than awarding full marks. Like Dynamics, it sits beside the grade and
+never changes the letter, so a marked piece and an unmarked one earn the same grade
+for the same playing.
+
 A **per-note strip** and a **tempo graph** then show where you rushed or dragged, and on
 a two-hand piece a line calls out **which hand lagged** (or that they kept pace). You
 can **race a ghost** of your previous best — or a friend's run, shared by link —
@@ -253,7 +263,10 @@ one-tap **review session** walks you through everything that's fading, and you c
   or search the whole catalogue page by page, add pieces, drag titles into the
   right order (or use the arrow buttons), and give each an optional target tempo
   and note, plus a free-form description for the whole set. The page splits into
-  two tabs — your assignments, and the one you're creating or editing. Save it,
+  two tabs — your assignments, and the one you're creating or editing. Give the set a
+  **date you're working toward** — a lesson, an exam, a recital — and its card counts
+  down beside how many pieces are still to learn; the date travels with a shared set,
+  so handing one out hands out its date too. Save it,
   **edit it later**, share it by link, or pass it around as a file; each piece
   checks off as it's learned. A step whose piece is no
   longer on the device (a deleted import, a link from elsewhere) is labelled as

@@ -30,6 +30,7 @@ const grade = (over: Partial<Grade> = {}): Grade => ({
     timing: 88,
     flow: 80,
     dynamics: null,
+    expression: null,
     score: 86,
     letter: "A",
     ...over,

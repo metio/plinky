@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Å bytte kjennes verre der og da, og sitter langt bedre en uke etter. Anstrengelsen ved å komme tilbake til noe er den delen som fester seg.",
   "method_spacing_name": "Kom tilbake til det senere",
   "method_spacing_how": "La et stykke ligge noen dager, og spill det så igjen. Plinky holder allerede rede på når hvert enkelt er klart.",
-  "method_spacing_why": "Noe som er nesten glemt og så hentet frem igjen, huskes lenger enn noe som aldri fikk blekne."
+  "method_spacing_why": "Noe som er nesten glemt og så hentet frem igjen, huskes lenger enn noe som aldri fikk blekne.",
+  "scores_expression": "Uttrykk",
+  "assignments_due_label": "Måldato",
+  "assignments_due_hint": "En time, en eksamen, en konsert — valgfritt.",
+  "assignments_left": "{count} igjen å lære"
 }

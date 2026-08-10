@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Przeskakiwanie jest w danej chwili trudniejsze, a tydzień później trzyma się znacznie lepiej. To właśnie wysiłek powrotu do czegoś zostaje na dłużej.",
   "method_spacing_name": "Wróć do tego później",
   "method_spacing_how": "Niech utwór umilknie na kilka dni, a potem zagraj go znowu. Plinky już śledzi, kiedy każdy jest gotowy.",
-  "method_spacing_why": "To, co niemal zapomniane, a potem przypomniane, zostaje w pamięci dłużej niż to, czemu nigdy nie pozwolono zblaknąć."
+  "method_spacing_why": "To, co niemal zapomniane, a potem przypomniane, zostaje w pamięci dłużej niż to, czemu nigdy nie pozwolono zblaknąć.",
+  "scores_expression": "Wyraz",
+  "assignments_due_label": "Data docelowa",
+  "assignments_due_hint": "Lekcja, egzamin, koncert — opcjonalnie.",
+  "assignments_left": "Jeszcze {count} do opanowania"
 }

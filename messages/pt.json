@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Alternar sabe pior no momento e aguenta muito melhor uma semana depois. É o esforço de voltar a alguma coisa que a faz ficar.",
   "method_spacing_name": "Volta-lhe mais tarde",
   "method_spacing_how": "Deixa uma peça em silêncio durante uns dias e depois toca-a outra vez. O Plinky já sabe quando cada uma está pronta.",
-  "method_spacing_why": "Algo quase esquecido e depois relembrado fica mais tempo do que algo a que nunca se deixou desvanecer."
+  "method_spacing_why": "Algo quase esquecido e depois relembrado fica mais tempo do que algo a que nunca se deixou desvanecer.",
+  "scores_expression": "Expressão",
+  "assignments_due_label": "Data-alvo",
+  "assignments_due_hint": "Uma aula, um exame, uma audição — opcional.",
+  "assignments_left": "Faltam {count} por aprender"
 }

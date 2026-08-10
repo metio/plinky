@@ -10,7 +10,15 @@ import type { RunOutcome } from "./useRunResult";
 import { useRunResult } from "./useRunResult";
 
 const outcome: RunOutcome = {
-    grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
+    grade: {
+        accuracy: 90,
+        timing: 80,
+        flow: 70,
+        dynamics: null,
+        expression: null,
+        score: 82,
+        letter: "B",
+    },
     notes: [{ targetMs: 0, playedMs: 0, wrongBefore: 0, staves: [0] }],
     tolerance: 2,
     grid: [["best", "good"]],

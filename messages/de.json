@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Das Wechseln fühlt sich im Moment schlechter an und hält eine Woche später weit besser. Gerade die Mühe, zu etwas zurückzukommen, ist der Teil, der bleibt.",
   "method_spacing_name": "Später wiederkommen",
   "method_spacing_how": "Lass ein Stück ein paar Tage ruhen, dann spiel es wieder. Plinky merkt sich schon, wann jedes so weit ist.",
-  "method_spacing_why": "Was fast vergessen und dann wieder erinnert wird, bleibt länger als etwas, das man nie verblassen ließ."
+  "method_spacing_why": "Was fast vergessen und dann wieder erinnert wird, bleibt länger als etwas, das man nie verblassen ließ.",
+  "scores_expression": "Ausdruck",
+  "assignments_due_label": "Zieldatum",
+  "assignments_due_hint": "Eine Stunde, eine Prüfung, ein Vorspiel — optional.",
+  "assignments_left": "Noch {count} zu lernen"
 }

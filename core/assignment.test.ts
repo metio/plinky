@@ -407,3 +407,35 @@ describe("withItemTempo rejects what a save would discard", () => {
         }
     });
 });
+
+describe("a set worked toward a date", () => {
+    it("keeps a real calendar date and drops one that is not", () => {
+        expect(makeAssignment({ name: "Recital", dueOn: "2026-07-04", items: [{ id: "a" }] }).dueOn).toBe(
+            "2026-07-04",
+        );
+        expect(makeAssignment({ name: "Recital", dueOn: "2026-02-31", items: [{ id: "a" }] }).dueOn)
+            .toBeUndefined();
+        expect(makeAssignment({ name: "Recital", items: [{ id: "a" }] }).dueOn).toBeUndefined();
+    });
+
+    it("travels with a shared set — a handed-out programme carries its date", () => {
+        const assignment = makeAssignment({ name: "Exam", dueOn: "2026-07-04", items: [{ id: "a" }, { id: "b" }] });
+        expect(decodeAssignmentLink(encodeAssignmentLink(assignment))?.dueOn).toBe("2026-07-04");
+    });
+
+    it("survives the file round trip", () => {
+        const assignment = makeAssignment({ name: "Exam", dueOn: "2026-07-04", items: [{ id: "a" }] });
+        expect(parseAssignment(serializeAssignment(assignment)).dueOn).toBe("2026-07-04");
+    });
+
+    it("reads a set saved before dates existed as having none", () => {
+        const legacy = JSON.stringify({
+            format: "plinky-assignment",
+            version: 1,
+            id: "old",
+            name: "Old",
+            items: [{ id: "a" }],
+        });
+        expect(parseAssignment(legacy).dueOn).toBeUndefined();
+    });
+});

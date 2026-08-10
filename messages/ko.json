@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "바꿔 가며 하면 그 순간엔 더 힘들지만 일주일 뒤엔 훨씬 잘 남아요. 다시 돌아오는 그 수고가 몸에 새겨지는 부분이에요.",
   "method_spacing_name": "시간을 두고 다시",
   "method_spacing_how": "한 곡을 며칠 쉬게 두었다가 다시 연주해 보세요. 어떤 곡이 준비됐는지는 Plinky가 이미 챙기고 있어요.",
-  "method_spacing_why": "거의 잊었다가 다시 떠올린 것은, 한 번도 흐려지지 않은 것보다 더 오래 남아요."
+  "method_spacing_why": "거의 잊었다가 다시 떠올린 것은, 한 번도 흐려지지 않은 것보다 더 오래 남아요.",
+  "scores_expression": "표현",
+  "assignments_due_label": "목표 날짜",
+  "assignments_due_hint": "레슨, 시험, 발표회 — 선택이에요.",
+  "assignments_left": "{count}곡 더 익히면 돼요"
 }

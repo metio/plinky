@@ -231,6 +231,16 @@ export function AssignmentBuilder({
                     onChange={(event) => draft.setDescription(event.target.value)}
                     aria-label={m.assignments_description_label()}
                 />
+                <label className="flex flex-wrap items-center gap-2 text-sm text-muted">
+                    <span>{m.assignments_due_label()}</span>
+                    <input
+                        type="date"
+                        value={draft.dueOn}
+                        onChange={(event) => draft.setDueOn(event.target.value)}
+                        className="rounded-md border border-line bg-surface px-2 py-1 text-body"
+                    />
+                    <span className="text-xs">{m.assignments_due_hint()}</span>
+                </label>
             </div>
             <div className="flex flex-wrap gap-2">
                 <Button variant="primary" disabled={!draft.canSave} onClick={onSave}>

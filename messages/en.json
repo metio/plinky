@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Switching feels worse in the moment and holds far better a week later. The effort of coming back to something is the part that sticks.",
   "method_spacing_name": "Come back to it later",
   "method_spacing_how": "Let a piece go quiet for a few days, then play it again. Plinky already tracks when each one is ready.",
-  "method_spacing_why": "Something almost forgotten and then recalled is remembered longer than something never allowed to fade."
+  "method_spacing_why": "Something almost forgotten and then recalled is remembered longer than something never allowed to fade.",
+  "scores_expression": "Expression",
+  "assignments_due_label": "Working toward",
+  "assignments_due_hint": "A lesson, an exam, a recital — optional.",
+  "assignments_left": "{count} still to learn"
 }

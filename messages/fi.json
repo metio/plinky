@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Vaihtaminen tuntuu hetkessä huonommalta ja pitää viikon päästä paljon paremmin. Juuri se vaiva, jolla palaat johonkin, on se osa joka jää.",
   "method_spacing_name": "Palaa siihen myöhemmin",
   "method_spacing_how": "Anna kappaleen olla hiljaa muutama päivä, ja soita se sitten uudelleen. Plinky seuraa jo, milloin kukin on valmiina.",
-  "method_spacing_why": "Se, mikä on melkein unohtunut ja sitten palautunut mieleen, muistetaan pidempään kuin se, jonka ei ole annettu haipua."
+  "method_spacing_why": "Se, mikä on melkein unohtunut ja sitten palautunut mieleen, muistetaan pidempään kuin se, jonka ei ole annettu haipua.",
+  "scores_expression": "Ilmaisu",
+  "assignments_due_label": "Tavoitepäivä",
+  "assignments_due_hint": "Tunti, tutkinto, konsertti — valinnainen.",
+  "assignments_left": "{count} vielä opittavana"
 }

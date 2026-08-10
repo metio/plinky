@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Prebacivanje se u trenutku čini težim, a tjedan dana kasnije drži daleko bolje. Trud da se vratiš nečemu upravo je ono što ostane.",
   "method_spacing_name": "Vrati se tome kasnije",
   "method_spacing_how": "Pusti skladbu da nekoliko dana miruje, pa je odsviraj ponovno. Plinky već prati kad je koja spremna.",
-  "method_spacing_why": "Ono čega se sjetiš nakon što si ga gotovo zaboravio pamti se dulje od onoga čemu nikad nisi dao da izblijedi."
+  "method_spacing_why": "Ono čega se sjetiš nakon što si ga gotovo zaboravio pamti se dulje od onoga čemu nikad nisi dao da izblijedi.",
+  "scores_expression": "Izražajnost",
+  "assignments_due_label": "Ciljni datum",
+  "assignments_due_hint": "Sat, ispit, koncert — neobavezno.",
+  "assignments_left": "Još {count} za naučiti"
 }

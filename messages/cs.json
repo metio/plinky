@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Střídání je v tu chvíli nepříjemnější a za týden drží mnohem líp. Právě to úsilí vrátit se k něčemu je ta část, která zůstane.",
   "method_spacing_name": "Vrať se k tomu později",
   "method_spacing_how": "Nech skladbu pár dní ležet a pak si ji zahraj znovu. Plinky si hlídá, kdy je která připravená.",
-  "method_spacing_why": "Co skoro zapomeneš a pak si vybavíš, to ti vydrží déle než něco, co jsi nikdy nenechal vyblednout."
+  "method_spacing_why": "Co skoro zapomeneš a pak si vybavíš, to ti vydrží déle než něco, co jsi nikdy nenechal vyblednout.",
+  "scores_expression": "Výraz",
+  "assignments_due_label": "Cílové datum",
+  "assignments_due_hint": "Hodina, zkouška, koncert — nepovinné.",
+  "assignments_left": "Zbývá naučit: {count}"
 }

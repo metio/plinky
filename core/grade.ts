@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import type { DynamicsSummary } from "./dynamics";
+import type { ExpressionSummary } from "./expressionGrade";
 import type { RhythmSummary } from "./rhythm";
 
 // A performance grade for one run: each dimension is 0..100, combined into an
@@ -18,6 +19,12 @@ export type Grade = {
     timing: number;
     flow: number;
     dynamics: number | null;
+    // How closely the run followed the written dynamics and articulations, 0..100, or
+    // null when the score marks no expression or the input cannot report it. Kept out
+    // of the aggregate for the same reason `dynamics` is: an unmarked piece and a
+    // computer keyboard must earn the same letter as a marked one on a real piano, or
+    // the share card stops comparing like with like.
+    expression: number | null;
     score: number;
     letter: Letter;
 };
@@ -55,7 +62,11 @@ export function parseGrade(value: unknown): Grade | null {
         !finite(grade.flow) ||
         !finite(grade.score) ||
         !isLetter(grade.letter) ||
-        !(grade.dynamics === null || finite(grade.dynamics))
+        !(grade.dynamics === null || finite(grade.dynamics)) ||
+        // A grade stored before expression was scored carries no such field. It reads
+        // as "not measured", which is exactly what it was — rejecting the whole grade
+        // would throw away every take saved until now.
+        !(grade.expression === undefined || grade.expression === null || finite(grade.expression))
     ) {
         return null;
     }
@@ -64,6 +75,7 @@ export function parseGrade(value: unknown): Grade | null {
         timing: grade.timing,
         flow: grade.flow,
         dynamics: grade.dynamics,
+        expression: finite(grade.expression) ? grade.expression : null,
         score: grade.score,
         letter: grade.letter,
     };
@@ -109,9 +121,17 @@ export type GradeInput = {
     rhythm: RhythmSummary;
     flow: number; // 0..100, continuity (see lib/flow)
     dynamics: DynamicsSummary | null;
+    expression: ExpressionSummary | null;
 };
 
-export function computeGrade({ correct, wrong, rhythm, flow, dynamics }: GradeInput): Grade {
+export function computeGrade({
+    correct,
+    wrong,
+    rhythm,
+    flow,
+    dynamics,
+    expression,
+}: GradeInput): Grade {
     const attempts = correct + wrong;
     // Nothing played is an F across the board, not a middling score from the
     // empty-input defaults of the individual dimensions disagreeing.
@@ -121,6 +141,7 @@ export function computeGrade({ correct, wrong, rhythm, flow, dynamics }: GradeIn
             timing: 0,
             flow: 0,
             dynamics: dynamics ? Math.round(dynamics.evenness) : null,
+            expression: expression ? expression.score : null,
             score: 0,
             letter: "F",
         };
@@ -132,7 +153,8 @@ export function computeGrade({ correct, wrong, rhythm, flow, dynamics }: GradeIn
     const graded = rhythm.perfect + rhythm.good + rhythm.off;
     const timing = graded > 0 ? ((rhythm.perfect + rhythm.good * 0.6) / graded) * 100 : 100;
 
-    // The letter comes from the core trio only; dynamics rides along for feedback.
+    // The letter comes from the core trio only; dynamics and expression ride along
+    // for feedback.
     const score = Math.round((accuracy + timing + flow) / 3);
 
     return {
@@ -140,6 +162,7 @@ export function computeGrade({ correct, wrong, rhythm, flow, dynamics }: GradeIn
         timing: Math.round(timing),
         flow: Math.round(flow),
         dynamics: dynamics ? Math.round(dynamics.evenness) : null,
+        expression: expression ? expression.score : null,
         score,
         letter: letterFor(score),
     };

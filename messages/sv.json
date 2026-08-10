@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Att byta känns sämre för stunden och sitter mycket bättre en vecka senare. Mödan i att komma tillbaka till något är det som fastnar.",
   "method_spacing_name": "Kom tillbaka till det senare",
   "method_spacing_how": "Låt ett stycke vila några dagar, och spela det sedan igen. Plinky håller redan reda på när vart och ett är moget.",
-  "method_spacing_why": "Något som nästan glömts bort och sedan plockats fram sitter längre än något som aldrig fick blekna."
+  "method_spacing_why": "Något som nästan glömts bort och sedan plockats fram sitter längre än något som aldrig fick blekna.",
+  "scores_expression": "Uttryck",
+  "assignments_due_label": "Måldatum",
+  "assignments_due_hint": "En lektion, ett prov, en konsert — valfritt.",
+  "assignments_left": "{count} kvar att lära"
 }

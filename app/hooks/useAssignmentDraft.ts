@@ -24,6 +24,8 @@ export const PICKER_PAGE = 20;
 export function useAssignmentDraft() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    // The date the set is being worked toward, "" for an open-ended one.
+    const [dueOn, setDueOn] = useState("");
     const [items, setItems] = useState<AssignmentItem[]>([]);
     const [query, setQueryState] = useState("");
     const [visible, setVisible] = useState(PICKER_PAGE);
@@ -56,12 +58,14 @@ export function useAssignmentDraft() {
             id: editingId ?? newAssignmentId(name, existingIds),
             name,
             description,
+            dueOn,
             items,
         });
 
     const reset = () => {
         setName("");
         setDescription("");
+        setDueOn("");
         setItems([]);
         setQueryState("");
         setEditingId(null);
@@ -70,6 +74,7 @@ export function useAssignmentDraft() {
     const startEdit = (assignment: Assignment) => {
         setName(assignment.name);
         setDescription(assignment.description ?? "");
+        setDueOn(assignment.dueOn ?? "");
         setItems(assignment.items);
         setEditingId(assignment.id);
     };
@@ -79,6 +84,8 @@ export function useAssignmentDraft() {
         setName,
         description,
         setDescription,
+        dueOn,
+        setDueOn,
         items,
         query,
         setQuery,

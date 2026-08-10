@@ -75,6 +75,7 @@ export const FullRow: Story = {
                         timing: 91,
                         flow: 95,
                         dynamics: null,
+                        expression: null,
                         score: 95,
                         letter: "A",
                     },

@@ -3,6 +3,8 @@
 
 import type { ReactNode } from "react";
 import type { Assignment } from "../../../core/assignment";
+import { todayKey } from "../../../core/daily";
+import { deadlineFor } from "../../../core/repertoire";
 import type { trackSteps } from "../../../core/tracks";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -87,6 +89,10 @@ export function AssignmentCard({
     children: ReactNode;
 }) {
     const doneCount = steps.filter((step) => step.status === "done").length;
+    // How the set stands against the day it is due, when it has one. A programme with
+    // a date is the one case where "how much is left" and "how long is left" belong
+    // side by side; a set with no date reports neither and reads exactly as before.
+    const due = assignment.dueOn ? deadlineFor(assignment.dueOn, todayKey(new Date())) : null;
     return (
         <li className="space-y-2 rounded-md border border-line px-3 py-2 text-sm">
             <div className="flex flex-wrap items-center gap-2">
@@ -105,6 +111,15 @@ export function AssignmentCard({
                 </Button>
                 {actionsAfter}
             </div>
+            {due && (
+                <p className="text-xs text-muted">
+                    {due.passed
+                        ? m.repertoire_date_passed({ date: due.date })
+                        : m.repertoire_days_left({ date: due.date, count: due.daysLeft })}
+                    {doneCount < steps.length &&
+                        ` · ${m.assignments_left({ count: steps.length - doneCount })}`}
+                </p>
+            )}
             {/* Descriptions are real instructions, often several sentences with
                 line breaks — give them their space instead of clamping. */}
             {description && (

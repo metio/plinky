@@ -10,6 +10,24 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 August 2026
 
+**Plinky can hear how you shaped it.** The run summary has a new Expression reading:
+how closely you followed the dynamics and articulation the score actually writes.
+Loudness is judged as a shape rather than a level — did you play louder where the
+music says louder — so it costs you nothing to have a light touch or a heavy piano.
+Note lengths are judged the same way, against what the staccato and tenuto marks ask
+for, so a page of staccato played legato finally shows up as something.
+
+It appears only when there is something to read: a score with no dynamics marked, or
+an input that can't report how hard you struck a key, says nothing rather than
+awarding full marks. Like the Dynamics reading, it sits beside your grade and never
+changes the letter — a piece with no markings and a piece full of them earn the same
+grade for the same playing.
+
+**Assignments can have a date.** Building a set for a lesson, an exam or a recital?
+Give it the day you're working toward and the card counts down, alongside how many of
+its pieces you still have to learn. The date travels with the set, so a teacher
+handing one out hands out its date too.
+
 **Plinky keeps a practice diary now.** It always knew how many notes you'd played and
 on how many days; it had no idea how long you'd sat there. Runs now fold into the
 sitting they belong to, and **You → Your practice** rolls it up over a week, a month,

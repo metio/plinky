@@ -42,6 +42,12 @@ export type MatchStep = {
     // indicator reads it off the step model, never the live cursor. Zero when
     // the score marks no length.
     holdQuarters: number;
+    // What the score asks for here: the standing dynamic with any accent applied
+    // (null when the score marks none), and the fraction of its written length the
+    // note is meant to sound. Absent on a step model lifted for something other than
+    // a graded run — the duet's other hand, a fingering walk — which needs the
+    // pitches and nothing about how they are meant to sound.
+    expected?: { velocity: number | null; lengthScale: number };
 };
 
 export type MatcherState = {

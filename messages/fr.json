@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Changer paraît plus dur sur le moment et tient bien mieux une semaine plus tard. L’effort de revenir à quelque chose, c’est justement ce qui le fait rester.",
   "method_spacing_name": "Reviens-y plus tard",
   "method_spacing_how": "Laisse un morceau de côté quelques jours, puis rejoue-le. Plinky sait déjà quand chacun est prêt.",
-  "method_spacing_why": "Ce qu’on a presque oublié puis retrouvé se retient plus longtemps que ce qu’on n’a jamais laissé s’estomper."
+  "method_spacing_why": "Ce qu’on a presque oublié puis retrouvé se retient plus longtemps que ce qu’on n’a jamais laissé s’estomper.",
+  "scores_expression": "Expression",
+  "assignments_due_label": "Date visée",
+  "assignments_due_hint": "Un cours, un examen, une audition — facultatif.",
+  "assignments_left": "Encore {count} à apprendre"
 }

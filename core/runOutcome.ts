@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { summarizeDynamics } from "./dynamics";
+import { summarizeExpression } from "./expressionGrade";
 import { computeFlow } from "./flow";
 import { computeGrade, type Grade } from "./grade";
 import {
@@ -16,7 +17,18 @@ import { findHotspots, type Hotspot, median, type TempoPoint, tempoSeries } from
 
 // A cleared run note plus the velocity it was struck at — the raw record the whole outcome
 // is derived from. The share grid, per-hand rows and per-note strip all read these fields.
-export type OutcomeNote = RunNote & { velocity: number };
+export type OutcomeNote = RunNote & {
+    velocity: number;
+    // The real key-hold length, filled in from the MIDI note-off once the key is
+    // released. Absent for imprecise input, which reports no meaningful hold.
+    heldMs?: number;
+    // What the score asked for at this position: the standing dynamic with any accent
+    // applied (null when the score marks none), and how long the note is meant to
+    // sound — its written length narrowed by its articulation. Absent for a run with
+    // no engraved score behind it.
+    expectedVelocity?: number | null;
+    expectedHoldMs?: number;
+};
 
 // The player's own pace read back out of the run, with the passages where they sped up or
 // dragged; null when too few notes to plot a curve.
@@ -84,6 +96,17 @@ export function deriveRunOutcome({
         rhythm: summarize(hits),
         flow: computeFlow(notes),
         dynamics: hasDynamics ? summarizeDynamics(velocities) : null,
+        // Every note carries what the score asked for at its position, so the
+        // expressive reading needs no second walk of the engraved score. It returns
+        // null by itself when there is nothing to measure.
+        expression: summarizeExpression(
+            notes.map((note) => ({
+                velocity: note.velocity,
+                heldMs: note.heldMs,
+                expectedVelocity: note.expectedVelocity ?? null,
+                expectedHoldMs: note.expectedHoldMs ?? 0,
+            })),
+        ),
     });
     // Timing is judged against the player's own pace (so a steady run at any tempo reads as
     // in time); the scale re-references the run to the piece's tempo for the share grid.

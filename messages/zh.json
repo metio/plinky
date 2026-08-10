@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "换来换去当下更难受，一周后却记得牢得多。重新找回一首曲子的那点吃力，正是留下来的部分。",
   "method_spacing_name": "过些天再回来",
   "method_spacing_how": "让一首曲子安静几天，然后再弹一遍。哪一首到时候了，Plinky 一直替你记着。",
-  "method_spacing_why": "快忘了又想起来的东西，比从来不让它淡去的记得更久。"
+  "method_spacing_why": "快忘了又想起来的东西，比从来不让它淡去的记得更久。",
+  "scores_expression": "表现力",
+  "assignments_due_label": "目标日期",
+  "assignments_due_hint": "一节课、一场考试、一次演出——可选。",
+  "assignments_left": "还有 {count} 首要学"
 }

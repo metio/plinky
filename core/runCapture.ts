@@ -19,7 +19,7 @@ import { instantaneousBpm } from "./tempo";
 // A cleared note plus the pitches sounded at that step — the run's raw record.
 // heldMs is the real key-hold length, filled in from the MIDI note-off once the
 // key is released (absent for imprecise input, which reports no meaningful hold).
-export type CapturedNote = OutcomeNote & { pitches: number[]; heldMs?: number };
+export type CapturedNote = OutcomeNote & { pitches: number[] };
 
 export type RunCapture = {
     notes: CapturedNote[];
@@ -79,6 +79,11 @@ export type ClearedNote = {
     velocity: number;
     wrongBefore: number;
     staves: number[];
+    // What the score asked for at this position, carried through so the expressive
+    // reading can compare intention with performance without a second walk of the
+    // engraved score. Absent for a run with no score behind it.
+    expectedVelocity?: number | null;
+    expectedHoldMs?: number;
 };
 
 // Record a cleared position: the first one seeds the run clock, every one appends
@@ -95,6 +100,8 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         velocity: info.velocity,
         pitches: [...info.pitches],
         staves: info.staves,
+        expectedVelocity: info.expectedVelocity,
+        expectedHoldMs: info.expectedHoldMs,
     });
     const index = capture.notes.length - 1;
     for (const pitch of info.pitches) {

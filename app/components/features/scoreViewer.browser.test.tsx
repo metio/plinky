@@ -281,7 +281,15 @@ describe("ScoreViewer", () => {
             () => 0.5,
         );
         const seededResult: DailyResult = {
-            grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
+            grade: {
+                accuracy: 90,
+                timing: 80,
+                flow: 70,
+                dynamics: null,
+                expression: null,
+                score: 82,
+                letter: "B",
+            },
             grid: [["best", "good"]],
             notes: [],
             tolerance: 1,
@@ -757,7 +765,15 @@ describe("ScoreViewer", () => {
             () => 0,
         );
         const seededResult: DailyResult = {
-            grade: { accuracy: 90, timing: 80, flow: 70, dynamics: null, score: 82, letter: "B" },
+            grade: {
+                accuracy: 90,
+                timing: 80,
+                flow: 70,
+                dynamics: null,
+                expression: null,
+                score: 82,
+                letter: "B",
+            },
             grid: [["best", "good"]],
             notes: [],
             tolerance: 1,
@@ -801,7 +817,15 @@ describe("ScoreViewer", () => {
             staves: [1],
         }));
         const seededResult: DailyResult = {
-            grade: { accuracy: 80, timing: 80, flow: 80, dynamics: null, score: 80, letter: "B" },
+            grade: {
+                accuracy: 80,
+                timing: 80,
+                flow: 80,
+                dynamics: null,
+                expression: null,
+                score: 80,
+                letter: "B",
+            },
             grid: [
                 ["best", "best"],
                 ["weak", "weak"],

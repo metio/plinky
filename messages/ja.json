@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "切り替えはその場では手ごたえが悪く、一週間後にはずっとよく残っています。戻ってくるときの手間こそ、身につく部分です。",
   "method_spacing_name": "日をおいてもう一度",
   "method_spacing_how": "曲をしばらく休ませてから、また弾いてみましょう。どれがいつ頃合いかは Plinky が見ています。",
-  "method_spacing_why": "忘れかけてから思い出したことは、忘れる間もなかったことより長く残ります。"
+  "method_spacing_why": "忘れかけてから思い出したことは、忘れる間もなかったことより長く残ります。",
+  "scores_expression": "表現",
+  "assignments_due_label": "目標の日",
+  "assignments_due_hint": "レッスン、試験、発表会 — 任意です。",
+  "assignments_left": "あと {count} 曲"
 }

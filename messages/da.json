@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "At skifte føles værre i øjeblikket og sidder langt bedre en uge efter. Besværet ved at finde tilbage til noget er lige netop det, der får det til at sætte sig.",
   "method_spacing_name": "Kom tilbage til det senere",
   "method_spacing_how": "Lad et stykke ligge stille et par dage, og spil det så igen. Plinky holder allerede styr på, hvornår hvert enkelt er klar.",
-  "method_spacing_why": "Noget, der er næsten glemt og så hentet frem igen, huskes længere end noget, der aldrig fik lov at falme."
+  "method_spacing_why": "Noget, der er næsten glemt og så hentet frem igen, huskes længere end noget, der aldrig fik lov at falme.",
+  "scores_expression": "Udtryk",
+  "assignments_due_label": "Måldato",
+  "assignments_due_hint": "En time, en eksamen, en koncert — valgfrit.",
+  "assignments_left": "{count} tilbage at lære"
 }

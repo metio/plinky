@@ -3,7 +3,8 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
-import { readScoreExpression } from "../lib/scoreExpression";
+import { lengthScaleOf, velocityOf } from "../../core/expression";
+import { readActiveDynamic, readScoreExpression } from "../lib/scoreExpression";
 import {
     currentBar,
     expectedPitches,
@@ -34,6 +35,10 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
     const pitches: number[] = [];
     const staves = new Set<number>();
     let holdQuarters = 0;
+    // The dynamic in force at this position, read once per step: it is a property of
+    // where the cursor sits, not of any one note under it.
+    const dynamicVolume = readActiveDynamic(osmd.cursor.iterator);
+    let expected: MatchStep["expected"];
     for (const note of osmd.cursor.NotesUnderCursor()) {
         if (note.isRest() || note.halfTone <= 0) {
             continue;
@@ -46,13 +51,24 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
         if (staff !== undefined) {
             staves.add(staff);
         }
-        holdQuarters = Math.max(holdQuarters, readScoreExpression(note).notatedQuarters);
+        const expression = readScoreExpression(note);
+        // The longest note under the cursor is the one the hold indicator follows, so
+        // the expression graded is the expression of that same note.
+        if (expression.notatedQuarters >= holdQuarters) {
+            expected = {
+                velocity:
+                    dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
+                lengthScale: lengthScaleOf(expression),
+            };
+        }
+        holdQuarters = Math.max(holdQuarters, expression.notatedQuarters);
     }
     return {
         pitches,
         staves: [...staves].sort((a, b) => a - b),
         whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
         holdQuarters,
+        expected,
     };
 }
 
@@ -120,6 +136,12 @@ export type CorrectInfo = {
     // is meant to keep sounding, for the hold-duration indicator. Zero when the
     // score marks no length.
     holdMs: number;
+    // What the score asks for here, for the expressive reading: the standing dynamic
+    // with any accent applied (null when the score marks none), and how long the note
+    // is meant to SOUND — the written length narrowed by its articulation, which is
+    // what holdMs deliberately is not (the hold indicator shows the written value).
+    expectedVelocity: number | null;
+    expectedHoldMs: number;
     velocity: number;
     // How many wrong notes were played at this position before it was cleared —
     // zero means a clean first try, the signal Flow and per-segment accuracy are
@@ -296,6 +318,11 @@ export function useScoreMatcher(
                     // The written length to hold, taken from the cleared step itself,
                     // so it stays right regardless of where the visual cursor sits.
                     holdMs: event.step.holdQuarters * (60000 / runTempoRef.current),
+                    expectedVelocity: event.step.expected?.velocity ?? null,
+                    expectedHoldMs:
+                        event.step.holdQuarters *
+                        (60000 / runTempoRef.current) *
+                        (event.step.expected?.lengthScale ?? 1),
                     velocity,
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,

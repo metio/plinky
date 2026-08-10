@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Wisselen voelt op het moment zelf slechter en houdt een week later veel beter stand. Juist de moeite van het terugkomen is wat blijft hangen.",
   "method_spacing_name": "Kom er later op terug",
   "method_spacing_how": "Laat een stuk een paar dagen rusten en speel het dan opnieuw. Plinky houdt al bij wanneer elk stuk aan de beurt is.",
-  "method_spacing_why": "Iets dat je bijna vergeten was en dan terughaalt, blijft langer hangen dan iets dat nooit mocht vervagen."
+  "method_spacing_why": "Iets dat je bijna vergeten was en dan terughaalt, blijft langer hangen dan iets dat nooit mocht vervagen.",
+  "scores_expression": "Expressie",
+  "assignments_due_label": "Streefdatum",
+  "assignments_due_hint": "Een les, een examen, een uitvoering — optioneel.",
+  "assignments_left": "Nog {count} te leren"
 }

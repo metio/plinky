@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: 0BSD
 
+import { isDateKey } from "./dateKey";
 import { isRecord } from "./guards";
 import { packToCode, unpackFromCode } from "./shareCode";
 
@@ -24,6 +25,11 @@ export interface Assignment {
     id: string;
     name: string;
     description?: string;
+    // The local calendar date the set is being worked toward — a lesson, an exam, a
+    // recital. Absent for an open-ended set, which is most of them. It travels with a
+    // shared assignment: a teacher handing out a programme is handing out its date
+    // too, and a set that arrives without one is simply not due on a day.
+    dueOn?: string;
     items: AssignmentItem[];
 }
 
@@ -109,6 +115,7 @@ export function makeAssignment(parts: {
     id?: string;
     name?: string;
     description?: string;
+    dueOn?: string;
     items: unknown[];
 }): Assignment {
     const name =
@@ -124,6 +131,9 @@ export function makeAssignment(parts: {
         id: parts.id && parts.id.length > 0 ? parts.id : slugifyName(name),
         name,
         ...(description ? { description } : {}),
+        // A date that isn't a real calendar day is dropped rather than kept: a set
+        // showing "due 2026-02-31" is worse than one showing no date at all.
+        ...(parts.dueOn && isDateKey(parts.dueOn) ? { dueOn: parts.dueOn } : {}),
         items,
     };
 }
@@ -151,6 +161,7 @@ export function parseAssignment(json: string): Assignment {
         id: typeof data.id === "string" ? data.id : undefined,
         name: typeof data.name === "string" ? data.name : undefined,
         description: typeof data.description === "string" ? data.description : undefined,
+        dueOn: typeof data.dueOn === "string" ? data.dueOn : undefined,
         items: data.items,
     });
     if (assignment.items.length === 0) {
@@ -163,12 +174,13 @@ export function parseAssignment(json: string): Assignment {
 // receiver assigns its own), each item a tuple so the payload stays small before
 // compression: [id], [id, tempo], or [id, tempo, note].
 type CompactItem = [string] | [string, number] | [string, number, string];
-type Compact = { n: string; d?: string; i: CompactItem[] };
+type Compact = { n: string; d?: string; u?: string; i: CompactItem[] };
 
 function toCompact(assignment: Assignment): Compact {
     return {
         n: assignment.name,
         ...(assignment.description ? { d: assignment.description } : {}),
+        ...(assignment.dueOn ? { u: assignment.dueOn } : {}),
         i: assignment.items.map((item): CompactItem => {
             if (item.note) {
                 return [item.id, item.tempo ?? 0, item.note];
@@ -195,6 +207,7 @@ function fromCompact(compact: unknown): Assignment {
     return makeAssignment({
         name: typeof compact.n === "string" ? compact.n : undefined,
         description: typeof compact.d === "string" ? compact.d : undefined,
+        dueOn: typeof compact.u === "string" ? compact.u : undefined,
         items,
     });
 }

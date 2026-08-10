@@ -41,6 +41,7 @@ const goodGrade: Grade = {
     timing: 88,
     flow: 92,
     dynamics: null,
+    expression: null,
     score: 91,
     letter: "A",
 };
@@ -50,6 +51,7 @@ const mixedGrade: Grade = {
     timing: 61,
     flow: 70,
     dynamics: 74,
+    expression: null,
     score: 71,
     letter: "C",
 };

@@ -242,7 +242,12 @@ const BUDGET_VENDOR_KB = 324;
 // three pure core modules plus their panels. The stage a piece has reached is derived
 // from the review interval rather than stored, which is why the feature costs no
 // storage format and no migration.
-const BUDGET_APP_KB = 315;
+//
+// 317. The expressive reading: how closely a run followed the written dynamics and
+// articulation. Most of the cost is carrying what the score asks for through the step
+// model and the capture; the scorer itself is one small pure module. Assignments
+// gaining a target date rides along in the same raise.
+const BUDGET_APP_KB = 317;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

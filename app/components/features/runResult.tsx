@@ -80,6 +80,14 @@ export function RunResult({
                             </dd>
                         </>
                     )}
+                    {grade.expression !== null && (
+                        <>
+                            <dt className="text-faint">{m.scores_expression()}</dt>
+                            <dd className="text-right font-mono tabular-nums text-muted">
+                                {grade.expression}%
+                            </dd>
+                        </>
+                    )}
                 </dl>
             </div>
             <PerformanceStrip notes={notes} tolerance={tolerance} />

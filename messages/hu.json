@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "A váltogatás a pillanatban rosszabbnak érződik, és egy héttel később sokkal jobban tart. Épp az a rész ragad meg, hogy vissza kell találnod valamihez.",
   "method_spacing_name": "Térj vissza rá később",
   "method_spacing_how": "Hagyj egy darabot néhány napig pihenni, aztán játszd el újra. A Plinky már követi, melyik mikor áll készen.",
-  "method_spacing_why": "Amit már majdnem elfelejtettél, aztán mégis felidéztél, tovább marad meg, mint amit sosem hagytál elhalványulni."
+  "method_spacing_why": "Amit már majdnem elfelejtettél, aztán mégis felidéztél, tovább marad meg, mint amit sosem hagytál elhalványulni.",
+  "scores_expression": "Kifejezés",
+  "assignments_due_label": "Céldátum",
+  "assignments_due_hint": "Egy óra, egy vizsga, egy koncert — opcionális.",
+  "assignments_left": "Még {count} megtanulásra vár"
 }

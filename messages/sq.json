@@ -1039,5 +1039,9 @@
   "method_interleaving_why": "Ndërrimi duket më i vështirë në çast dhe mbahet shumë më mirë një javë më vonë. Mundimi i kthimit te diçka është pjesa që ngulitet.",
   "method_spacing_name": "Kthehu te ajo më vonë",
   "method_spacing_how": "Lëre një pjesë të pushojë disa ditë, pastaj luaje sërish. Plinky e ndjek vetë kur është gati secila.",
-  "method_spacing_why": "Diçka gati e harruar e pastaj e kujtuar mbahet mend më gjatë se diçka që s'e lë kurrë të zbehet."
+  "method_spacing_why": "Diçka gati e harruar e pastaj e kujtuar mbahet mend më gjatë se diçka që s'e lë kurrë të zbehet.",
+  "scores_expression": "Shprehësia",
+  "assignments_due_label": "Data e synuar",
+  "assignments_due_hint": "Një mësim, një provim, një koncert — opsionale.",
+  "assignments_left": "Edhe {count} për të mësuar"
 }

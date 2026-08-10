@@ -49,17 +49,31 @@ const LENGTH_SCALE: Record<Articulation, number> = {
 const ACCENT_BOOST = 1.3;
 const MARCATO_BOOST = 1.5;
 
+// The fraction of its written length a note is meant to sound. Split out of
+// performNote because grading needs the shape of the intention without the tempo
+// baked in: a staccato quarter is "a quarter of its written length" whether the
+// player took it at 60 or at 120.
+export function lengthScaleOf(marks: Pick<NoteMarks, "articulation" | "slurred">): number {
+    // A slur means "connect to the next note", so it overrides any clip — a slurred
+    // staccato (portato) still holds full here; the release tail bridges the notes.
+    return marks.slurred ? 1 : LENGTH_SCALE[marks.articulation];
+}
+
+// The loudness a note is meant to be struck at, 0..127 — the standing dynamic with
+// any accent applied. Split out for the same reason as lengthScaleOf.
+export function velocityOf(
+    marks: Pick<NoteMarks, "accent" | "marcato" | "dynamicVolume">,
+): number {
+    const base = marks.dynamicVolume ?? DEFAULT_VELOCITY;
+    const boosted = marks.marcato ? base * MARCATO_BOOST : marks.accent ? base * ACCENT_BOOST : base;
+    return Math.max(1, Math.min(127, Math.round(boosted)));
+}
+
 export function performNote(marks: NoteMarks, tempo: number): Performance {
     const beatSeconds = 60 / Math.max(1, tempo);
     const fullSeconds = Math.max(0, marks.quarters) * beatSeconds;
-    // A slur means "connect to the next note", so it overrides any clip — a slurred
-    // staccato (portato) still holds full here; the release tail bridges the notes.
-    const scale = marks.slurred ? 1 : LENGTH_SCALE[marks.articulation];
-    const durationSeconds = fullSeconds * scale;
-
-    const base = marks.dynamicVolume ?? DEFAULT_VELOCITY;
-    const boosted = marks.marcato ? base * MARCATO_BOOST : marks.accent ? base * ACCENT_BOOST : base;
-    const velocity = Math.max(1, Math.min(127, Math.round(boosted)));
-
-    return { durationSeconds, velocity };
+    return {
+        durationSeconds: fullSeconds * lengthScaleOf(marks),
+        velocity: velocityOf(marks),
+    };
 }

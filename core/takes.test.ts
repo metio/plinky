@@ -39,6 +39,7 @@ const grade = (
     timing: 84,
     flow: 88,
     dynamics: null,
+    expression: null,
     score: 87,
     letter: "B",
     ...overrides,
