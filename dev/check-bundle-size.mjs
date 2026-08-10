@@ -234,7 +234,15 @@ const BUDGET_VENDOR_KB = 324;
 // could start after the player had stopped, and a setter that ran its own argument
 // twice — so some of it is paid back already. Trimmed first by deleting five session
 // keys no consumer read.
-const BUDGET_APP_KB = 311;
+//
+// 315. The practice diary: sessions folded from finished runs, a report over four
+// windows with a consistency grid, target dates and derived practice stages on the
+// pieces in progress, and a page naming six ways to practise. Roughly a third of the
+// raise is the seventy-one new strings, which are inlined per locale, and the rest is
+// three pure core modules plus their panels. The stage a piece has reached is derived
+// from the review interval rather than stored, which is why the feature costs no
+// storage format and no migration.
+const BUDGET_APP_KB = 315;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

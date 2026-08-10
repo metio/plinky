@@ -385,6 +385,36 @@ graded like any other, saved on your device. Preview the staff, set its grade an
 details, then add it. Export your whole library as a pack to back it up or hand it to
 a student.
 
+## Your practice
+
+Plinky keeps a practice diary. Runs fold into the sitting they belong to rather than
+piling up one row each, so half an hour at the piano reads as half an hour and not as
+eighteen separate entries. Two clocks are kept for every sitting: time actually spent
+playing, and the wall-clock span it covered, because a report that quotes only one of
+them is misleading in one direction or the other.
+
+**You → Your practice** rolls it up over seven days, a month, three months or a year:
+time played, days played, a typical sitting, notes, and a grid showing where the
+practice went — every day in the range, shaded against the busiest one. A quiet week
+is drawn as a quiet week. Nothing here counts consecutive days and nothing reproaches
+a gap.
+
+Played at a piano Plinky wasn't listening to? Add those minutes yourself. Hand-logged
+time is marked as such wherever it appears, so the picture stays honest. Any sitting
+can carry a note and a word for how it went, and the whole log downloads as a
+spreadsheet or prints, which is what to hand a teacher who asks.
+
+**On the music stand** lists what you're working on and where each piece has got to —
+learning, settling in, polishing, or just keeping it. The stage comes from the review
+schedule rather than from anything you set. Give a piece a date you're working toward
+— an exam, a recital, a lesson — and it moves to the top with the days counted down.
+
+**[Ways to practise](https://plinky.fun/en/methods/)** names six things a teacher
+would suggest, says what each is for, and hands you straight to the Plinky control
+that does it: looping the two bars that keep going wrong, dropping the tempo until
+the notes land, taking one hand at a time, hearing a phrase before playing it, mixing
+pieces up in a review session, and letting a piece go quiet before coming back to it.
+
 ## Taking your progress with you
 
 Everything Plinky remembers lives in this browser and nowhere else — which is what

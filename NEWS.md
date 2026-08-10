@@ -8,6 +8,32 @@ SPDX-License-Identifier: 0BSD
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 10 August 2026
+
+**Plinky keeps a practice diary now.** It always knew how many notes you'd played and
+on how many days; it had no idea how long you'd sat there. Runs now fold into the
+sitting they belong to, and **You → Your practice** rolls it up over a week, a month,
+three months or a year — time played, days played, a typical sitting, and a grid
+showing where the practice went. Every day in the range is drawn, quiet ones included.
+Nothing counts consecutive days.
+
+Played somewhere Plinky couldn't hear? Add those minutes yourself; they're marked as
+hand-logged wherever they show up. Each sitting can carry a note and a word for how it
+went. The whole log downloads as a spreadsheet or prints — handy if a teacher asks
+what you've been doing.
+
+**A music stand for what you're working on.** The You page now lists your pieces in
+progress with the stage each has reached — learning, settling in, polishing, keeping
+it — worked out from the review schedule rather than anything you have to set. Give a
+piece a date you're working toward and it moves to the top, with the days counted
+down.
+
+**Six ways to practise, and where to do them.** The new [Ways to
+practise](https://plinky.fun/en/methods/) page names what a teacher would suggest —
+loop the two awkward bars, slow it down, one hand at a time, hear it before you play
+it, mix pieces up, come back to it later — and links each to the part of Plinky that
+already does it.
+
 ## 3 August 2026
 
 **The arcade button reads properly under the pointer.** Hovering it lightened the fill
