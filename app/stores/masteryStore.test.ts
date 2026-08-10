@@ -16,6 +16,7 @@ const mastery = (overrides: Partial<Mastery> = {}): Mastery => ({
     intervalDays: 3,
     reviewAt: NOW,
     updatedAt: NOW,
+    deadline: "",
     ...overrides,
 });
 

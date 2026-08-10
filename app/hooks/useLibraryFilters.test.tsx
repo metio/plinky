@@ -90,6 +90,7 @@ describe("useLibraryFilters", () => {
                 intervalDays: 5,
                 reviewAt: 1,
                 updatedAt: 0,
+                deadline: "",
             },
         };
         const { wrapper } = world();

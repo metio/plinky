@@ -30,6 +30,7 @@ const mastery = (parts: Partial<Mastery>): Mastery => ({
     intervalDays: 5,
     reviewAt: NOW - 1,
     updatedAt: 0,
+    deadline: "",
     ...parts,
 });
 

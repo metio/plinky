@@ -13,6 +13,7 @@ import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
 import { PracticeReport } from "./practiceReport";
+import { RepertoirePanel } from "./repertoirePanel";
 import { RecapCard } from "./recapCard";
 import { FeatureBoundary } from "./featureBoundary";
 import { SlowNotes } from "./slowNotes";
@@ -137,9 +138,19 @@ export function YouView() {
                 </FeatureBoundary>
             )}
 
+            <FeatureBoundary feature="RepertoirePanel">
+                <RepertoirePanel items={data.items} now={new Date()} />
+            </FeatureBoundary>
+
             <FeatureBoundary feature="PracticeReport">
                 <PracticeReport pieceTitle={pieceTitle} />
             </FeatureBoundary>
+
+            <p className="text-sm text-muted">
+                <Link className={linkClasses} to="/methods/">
+                    {m.methods_link()}
+                </Link>
+            </p>
 
             {fingerprint && (
                 <ShareCard

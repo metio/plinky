@@ -150,6 +150,7 @@ describe("Library", () => {
             intervalDays: 5,
             reviewAt: Date.now() - 86_400_000,
             updatedAt: 0,
+            deadline: "",
         });
         renderLibrary();
         expect(await screen.findByText("Twinkle, Twinkle, Little Star")).toBeTruthy();

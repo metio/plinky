@@ -34,6 +34,7 @@ const fresh: Mastery = {
     intervalDays: 10,
     reviewAt: Date.now() + 86_400_000,
     updatedAt: 0,
+    deadline: "",
 };
 
 const wrapper = ({ children }: { children: ReactNode }) => (

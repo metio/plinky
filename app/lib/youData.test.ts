@@ -18,6 +18,7 @@ const mastered: Mastery = {
     intervalDays: 10,
     reviewAt: NOW + DAY,
     updatedAt: NOW,
+    deadline: "",
 };
 
 function piece(id: string, grade: number, mastery: Partial<Mastery> = {}): GradedMastery {

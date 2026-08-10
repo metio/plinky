@@ -29,6 +29,7 @@ function mastery(partial: Partial<Mastery> = {}): Mastery {
         intervalDays: 10,
         reviewAt: NOW + 5 * DAY, // fresh: due in the future
         updatedAt: NOW,
+        deadline: "",
         ...partial,
     };
 }

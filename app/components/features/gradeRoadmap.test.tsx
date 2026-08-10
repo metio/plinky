@@ -19,6 +19,7 @@ const fresh: Mastery = {
     intervalDays: 10,
     reviewAt: NOW + 86_400_000,
     updatedAt: 0,
+    deadline: "",
 };
 
 const items: GradedMastery[] = Array.from({ length: 5 }, (_, i) => ({

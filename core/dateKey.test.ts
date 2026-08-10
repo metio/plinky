@@ -46,7 +46,7 @@ describe("daysInRange", () => {
         ]);
     });
 
-    it("is empty for an inverted or unparseable range", () => {
+    it("is empty for an inverted or unparsable range", () => {
         expect(daysInRange("2026-06-26", "2026-06-23")).toEqual([]);
         expect(daysInRange("nonsense", "2026-06-23")).toEqual([]);
     });

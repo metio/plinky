@@ -45,6 +45,7 @@ const learned = (overrides: Partial<Mastery> = {}): Mastery => ({
     intervalDays: 10,
     reviewAt: NOW - DAY,
     updatedAt: NOW,
+    deadline: "",
     ...overrides,
 });
 
@@ -107,6 +108,7 @@ describe("applyRun", () => {
             intervalDays: 1,
             reviewAt: NOW,
             updatedAt: NOW,
+            deadline: "",
         };
         const next = applyRun(learned, 90, 85, NOW + DAY);
         expect(next.intervalDays).toBeGreaterThan(1);
@@ -121,6 +123,7 @@ describe("applyRun", () => {
             intervalDays: 30,
             reviewAt: NOW,
             updatedAt: NOW,
+            deadline: "",
         };
         const next = applyRun(learned, 60, 85, NOW + DAY);
         expect(next.intervalDays).toBe(1);
@@ -136,6 +139,7 @@ describe("isDue", () => {
         intervalDays: 1,
         reviewAt: NOW,
         updatedAt: NOW,
+        deadline: "",
     };
 
     it("is due once the review time has passed", () => {

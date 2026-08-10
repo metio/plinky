@@ -46,6 +46,7 @@ const due: Mastery = {
     intervalDays: 5,
     reviewAt: Date.now() - 1000,
     updatedAt: 0,
+    deadline: "",
 };
 
 function queueOf(...ids: string[]): GradedMastery[] {

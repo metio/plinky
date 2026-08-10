@@ -36,7 +36,7 @@ export function daysBetween(from: string, to: string): number {
     return Math.round((end - start) / DAY_MS);
 }
 
-// Every key from `from` to `to` inclusive, oldest first. An inverted or unparseable
+// Every key from `from` to `to` inclusive, oldest first. An inverted or unparsable
 // range yields nothing — a report over it is empty rather than unbounded. The cap
 // bounds what a stored (or hand-typed) range can ask the caller to allocate.
 const MAX_RANGE_DAYS = 3660;
@@ -44,7 +44,7 @@ const MAX_RANGE_DAYS = 3660;
 export function daysInRange(from: string, to: string): string[] {
     const span = daysBetween(from, to);
     // daysBetween reports 0 for a bound it cannot parse, which would otherwise yield a
-    // one-day range holding that unparseable key.
+    // one-day range holding that unparsable key.
     if (!isDateKey(from) || !isDateKey(to) || span < 0 || span > MAX_RANGE_DAYS) {
         return [];
     }

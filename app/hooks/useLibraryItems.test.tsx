@@ -114,6 +114,7 @@ describe("useLibraryItems", () => {
             intervalDays: 5,
             reviewAt: 1,
             updatedAt: 0,
+            deadline: "",
         });
         createAssignmentsStore(store).save(
             makeAssignment({ id: "set", name: "Set", items: [{ id: score.id }] }),

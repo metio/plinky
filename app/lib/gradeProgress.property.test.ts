@@ -23,6 +23,7 @@ const arbMastery = fc.record({
     intervalDays: fc.integer({ min: 0, max: 365 }),
     reviewAt: fc.integer({ min: 0, max: 2_000_000_000_000 }),
     updatedAt: fc.integer({ min: 0, max: 2_000_000_000_000 }),
+    deadline: fc.constantFrom("", "2026-07-04"),
 });
 
 const arbItem: fc.Arbitrary<GradedMastery> = fc.record({

@@ -18,6 +18,7 @@ const mastery = (): Mastery => ({
     intervalDays: 3,
     reviewAt: 0,
     updatedAt: 0,
+    deadline: "",
 });
 
 describe("useMastery", () => {

@@ -239,7 +239,7 @@ export function removeSession(log: PracticeLog, start: number): PracticeLog {
     return log.filter((session) => session.start !== start);
 }
 
-// Annotates a recorded sitting. Passing null clears the mood, so a mis-tap is
+// Annotates a recorded sitting. Passing null clears the mood, so a mistaken tap is
 // undoable — the log is the player's own record and every entry in it is editable.
 export function setSessionMood(log: PracticeLog, start: number, mood: Mood | null): PracticeLog {
     return log.map((session) =>

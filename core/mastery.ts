@@ -14,6 +14,10 @@ export type Mastery = {
     intervalDays: number;
     reviewAt: number; // epoch ms; 0 when not scheduled
     updatedAt: number;
+    // A local calendar date the player is working toward — an exam, a recital, a
+    // lesson — or "" for none. The one thing about a piece the app cannot derive,
+    // which is why it is stored while the practice stage (see repertoire.ts) is not.
+    deadline: string;
 };
 
 const DAY_MS = 86_400_000;
@@ -28,6 +32,7 @@ const EMPTY: Mastery = {
     intervalDays: 0,
     reviewAt: 0,
     updatedAt: 0,
+    deadline: "",
 };
 
 // Coerce a parsed (possibly legacy or corrupt) value into a complete Mastery.
@@ -44,6 +49,7 @@ export function normalizeMastery(raw: unknown): Mastery {
         intervalDays: num(value.intervalDays, EMPTY.intervalDays),
         reviewAt: num(value.reviewAt, EMPTY.reviewAt),
         updatedAt: num(value.updatedAt, EMPTY.updatedAt),
+        deadline: typeof value.deadline === "string" ? value.deadline : EMPTY.deadline,
     };
 }
 
@@ -155,4 +161,11 @@ export function unmarkLearned(current: Mastery | null, now: number): Mastery {
 export function setBacklog(current: Mastery | null, backlog: boolean, now: number): Mastery {
     const base = current ?? EMPTY;
     return { ...base, backlog, updatedAt: now };
+}
+
+// Sets or clears the date a piece is being worked toward. An empty string clears it,
+// so a cancelled recital leaves no phantom date behind.
+export function setDeadline(current: Mastery | null, date: string, now: number): Mastery {
+    const base = current ?? EMPTY;
+    return { ...base, deadline: date, updatedAt: now };
 }
