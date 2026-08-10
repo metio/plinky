@@ -111,6 +111,16 @@ export default function Help() {
                 </Link>
             </p>
 
+            {/* The small look-it-up things — a circle of fifths, a scale, a tempo read
+                off your own tapping. They belong beside the glossary: both answer a
+                question that comes up in the middle of practising. */}
+            <p className="text-sm text-body">
+                {m.help_tools_lead()}{" "}
+                <Link to="/tools/" className={linkClasses}>
+                    {m.tools_title()}
+                </Link>
+            </p>
+
             {/* The keyboard tour's only other door is the home checklist, which goes away
                 once it is dismissed or finished — so this is where it stays findable, and
                 where someone comes back to it having forgotten where middle C was. */}

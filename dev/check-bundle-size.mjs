@@ -247,7 +247,12 @@ const BUDGET_VENDOR_KB = 324;
 // articulation. Most of the cost is carrying what the score asks for through the step
 // model and the capture; the scorer itself is one small pure module. Assignments
 // gaining a target date rides along in the same raise.
-const BUDGET_APP_KB = 317;
+//
+// 319. The look-it-up page: a circle of fifths that names each key's signature and
+// relative minor, scale and chord explorers over the existing keyboard and synth, and
+// a tap-tempo reader. Two small pure modules plus twenty-three strings; the engines it
+// draws on were already in the bundle, which is the whole reason the page is cheap.
+const BUDGET_APP_KB = 319;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

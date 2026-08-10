@@ -357,6 +357,15 @@ the grade — the grades measure how hard a piece is to *play*, and ties, rests 
 signatures turn up as often in grade 1 as in grade 8 — so a piece with nothing unusual
 in it says nothing at all.
 
+## Little tools
+
+[Little tools](https://plinky.fun/en/tools/) is the look-it-up page: no account, no
+instrument, nothing to set up. A **circle of fifths** where picking a key names its
+signature and its relative minor and sounds its chord — and where each key spells its
+own notes, so D flat major reads as D flat and never as C sharp. A **scale explorer**
+and a **chord explorer** that light the notes on a keyboard from any root and play
+them back. And a **tap tempo** reader: tap along and it tells you the number.
+
 ## Composing
 
 Play whatever you like — on a MIDI piano, your computer keys, or the on-screen

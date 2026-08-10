@@ -79,6 +79,31 @@ const FLAT_NAMES: NoteNameId[] = [
     "b",
 ];
 
+// How each note name is written. Deliberately NOT translated: letter names are not
+// translated anywhere else in Plinky, and one surface reading "Do" beside another
+// reading "C" would be worse than either alone. The keyboard's own labels come from
+// core/keyMap's sharp-only table; this one exists because a key signature has to be
+// able to say D flat rather than C sharp — the key of D flat contains no C sharp.
+export const NOTE_TEXT: Record<NoteNameId, string> = {
+    c: "C",
+    "c-sharp": "C♯",
+    "d-flat": "D♭",
+    d: "D",
+    "d-sharp": "D♯",
+    "e-flat": "E♭",
+    e: "E",
+    f: "F",
+    "f-sharp": "F♯",
+    "g-flat": "G♭",
+    g: "G",
+    "g-sharp": "G♯",
+    "a-flat": "A♭",
+    a: "A",
+    "a-sharp": "A♯",
+    "b-flat": "B♭",
+    b: "B",
+};
+
 export function noteNameOf(pitchClass: PitchClass, spelling: Spelling = "sharp"): NoteNameId {
     const names = spelling === "flat" ? FLAT_NAMES : SHARP_NAMES;
     return names[pitchClassOf(pitchClass)] ?? "c";

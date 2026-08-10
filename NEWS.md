@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 10 August 2026
 
+**A page of little tools.** [Little tools](https://plinky.fun/en/tools/) collects the
+things you look up in the middle of practising, and none of them need an account or an
+instrument. A **circle of fifths** you can hear — pick a key and it names its signature
+and its relative minor and plays its chord. A **scale** and a **chord** explorer that
+light the notes up on a keyboard from any root. And a **tap tempo** reader for when you
+know how fast a piece goes but not the number.
+
 **Plinky can hear how you shaped it.** The run summary has a new Expression reading:
 how closely you followed the dynamics and articulation the score actually writes.
 Loudness is judged as a shape rather than a level — did you play louder where the

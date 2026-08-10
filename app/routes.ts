@@ -25,6 +25,7 @@ export default [
         route("help", "routes/help.tsx"),
         route("glossary", "routes/glossary.tsx"),
         route("methods", "routes/methods.tsx"),
+        route("tools", "routes/tools.tsx"),
         route("about", "routes/about.tsx"),
         route("impressum", "routes/impressum.tsx"),
         route("datenschutz", "routes/datenschutz.tsx"),
