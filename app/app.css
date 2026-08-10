@@ -155,6 +155,14 @@ SPDX-License-Identifier: 0BSD
        other readings sit on. */
     --color-chart-peak: var(--color-indigo-500);
     --color-chart-track: var(--color-indigo-300);
+    /* Four steps of practice intensity for the consistency grid, plus the empty
+       cell. A day with no practice is a quiet outline rather than a red mark:
+       the grid shows where the practice went, and never reproaches a gap. */
+    --color-heat-none: var(--color-gray-100);
+    --color-heat-light: var(--color-indigo-200);
+    --color-heat-mid: var(--color-indigo-400);
+    --color-heat-strong: var(--color-indigo-600);
+    --color-heat-deep: var(--color-indigo-800);
     /* A race has two runners: you in indigo, the ghost in fuchsia. */
     --color-ghost: var(--color-fuchsia-500);
     /* The arcade's filled call to action, carrying white text. Both steps have to
@@ -277,6 +285,11 @@ SPDX-License-Identifier: 0BSD
 
     --color-chart-peak: var(--color-indigo-500);
     --color-chart-track: var(--color-indigo-800);
+    --color-heat-none: var(--color-gray-800);
+    --color-heat-light: var(--color-indigo-900);
+    --color-heat-mid: var(--color-indigo-700);
+    --color-heat-strong: var(--color-indigo-500);
+    --color-heat-deep: var(--color-indigo-300);
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-solid: var(--color-fuchsia-600);

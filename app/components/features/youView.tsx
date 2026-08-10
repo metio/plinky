@@ -12,6 +12,7 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
+import { PracticeReport } from "./practiceReport";
 import { RecapCard } from "./recapCard";
 import { FeatureBoundary } from "./featureBoundary";
 import { SlowNotes } from "./slowNotes";
@@ -37,6 +38,12 @@ export function YouView() {
     // This calendar month's practice, for the recap card — shown only when the month has
     // something to celebrate, so it reads as a reward rather than an empty prompt.
     const recap = monthlyRecap(history.load(), monthKey(new Date()));
+    // The diary stores catalogue ids; the titles live with the graded items this page
+    // already loaded, so resolving here costs nothing and keeps the report ignorant of
+    // the library. An id with no match is shown as itself — a piece removed from the
+    // library should not erase the practice done on it.
+    const titles = new Map(data.items.map((item) => [item.id, item.title]));
+    const pieceTitle = (id: string) => titles.get(id) ?? id;
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -129,6 +136,10 @@ export function YouView() {
                     <WeekChart recent={summary.recent} />
                 </FeatureBoundary>
             )}
+
+            <FeatureBoundary feature="PracticeReport">
+                <PracticeReport pieceTitle={pieceTitle} />
+            </FeatureBoundary>
 
             {fingerprint && (
                 <ShareCard

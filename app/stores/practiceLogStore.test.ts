@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: 0BSD
 
 import { describe, expect, it, vi } from "vitest";
-import {
-    type PracticeLog,
-    type PracticeSession,
-    SESSION_GAP_MS,
-} from "../../core/practiceSession";
+import { type PracticeLog, type PracticeSession, SESSION_GAP_MS } from "../../core/practiceSession";
 import { memoryStore } from "../adapters/memoryStore";
 import { createPracticeLogStore } from "./practiceLogStore";
 

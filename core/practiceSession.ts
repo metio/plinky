@@ -355,6 +355,31 @@ export function summarizeRange(log: PracticeLog, from: string, to: string): Prac
     };
 }
 
+// Which of the consistency grid's four filled steps a day earns, or 0 for a day
+// with no practice. Scaled against the busiest day in the same range rather than a
+// fixed number of minutes, so a grid of ten-minute days reads as varied instead of
+// uniformly empty — the question the grid answers is "where did the practice go",
+// not "did you do enough".
+export function heatLevel(activeMs: number, busiestMs: number): 0 | 1 | 2 | 3 | 4 {
+    if (activeMs <= 0) {
+        return 0;
+    }
+    if (busiestMs <= 0) {
+        return 1;
+    }
+    const share = activeMs / busiestMs;
+    if (share > 0.75) {
+        return 4;
+    }
+    if (share > 0.5) {
+        return 3;
+    }
+    if (share > 0.25) {
+        return 2;
+    }
+    return 1;
+}
+
 // Common ranges the report offers. Values are day counts back from today, so the
 // report never has to reason about month lengths.
 export const RANGE_DAYS = { week: 7, month: 30, quarter: 90, year: 365 } as const;

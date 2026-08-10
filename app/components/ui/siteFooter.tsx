@@ -22,7 +22,7 @@ const CHANNELS: { brand: Brand; label: string; href: string }[] = [
 // keeps the accent for hover — the icons are the only ornament.
 export function SiteFooter() {
     return (
-        <footer className="mt-12 border-t border-line px-6 py-4 font-sans">
+        <footer className="mt-12 border-t border-line px-6 py-4 font-sans print:hidden">
             <div className="mx-auto flex max-w-3xl items-center justify-between">
                 <div className="flex items-center gap-3 text-sm text-muted">
                     {/* The heart is the quiet way to the people behind Plinky; it

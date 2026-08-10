@@ -289,6 +289,10 @@ export function useHistoryStore(): HistoryStore {
     return useServices().history;
 }
 
+export function usePracticeLogStore(): PracticeLogStore {
+    return useServices().practiceLog;
+}
+
 export function useFavoritesStore(): FavoritesStore {
     return useServices().favorites;
 }
