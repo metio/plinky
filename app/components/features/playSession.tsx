@@ -34,6 +34,7 @@ import {
 import { useFullscreen } from "../../hooks/useFullscreen";
 import { useDuet } from "../../hooks/useDuet";
 import { useGhostRace } from "../../hooks/useGhostRace";
+import { useKeyLights } from "../../hooks/useKeyLights";
 import { useHoldIndicator } from "../../hooks/useHoldIndicator";
 import { useKeepUp } from "../../hooks/useKeepUp";
 import { useListenPlayback } from "../../hooks/useListenPlayback";
@@ -240,6 +241,7 @@ function usePlaySessionValue({
     // Writable from the Practice-tools drawer too, so the hint behaviour can change
     // without leaving the music; usePref persists it as the global setting.
     const [noteHints, setNoteHints] = usePref(prefsStore, "noteHints");
+    const [keyLightsOn] = usePref(prefsStore, "keyLights");
     // Sight-read mode: one cold read of a piece with nothing to lean on. It owns the
     // aids for as long as it is on — turning it on strips them there and then, so what
     // you are about to attempt is visible before you commit to it, and no aid can flip
@@ -510,7 +512,7 @@ function usePlaySessionValue({
     // their real piano, so echoing the note back through the synth only doubles
     // the sound and feeds the app's own output into the mic. (The session already
     // subscribes to this context via useMidiConnected, so reading it is free.)
-    const { micStatus, pedalHeld, echoNote, silenceEcho } = useMidiConnection();
+    const { micStatus, pedalHeld, echoNote, silenceEcho, keyLights } = useMidiConnection();
     const micListening = micStatus === "listening";
 
     // The self-paced duet: sound the sitting-out hand as you play. Off in keep-up,
@@ -779,7 +781,23 @@ function usePlaySessionValue({
         silence: () => {
             synth.silenceAll();
             silenceEcho();
+            // Everything else going out stops here, and a lit key is going out too —
+            // left alone it would still be glowing on an instrument nobody is playing.
+            keyLights.clear();
         },
+    });
+
+    // A keyboard that lights its own keys shows the position the run is on, from the
+    // same look-ahead the notes highway draws. `aids.noteHints` is the policy already
+    // resolved for this run, so a sight-read arrives here as "never" and needs no
+    // second check.
+    useKeyLights({
+        lights: keyLights,
+        enabled: keyLightsOn,
+        practicing: matcher.practicing,
+        hints: aids.noteHints,
+        missedHere: matcher.missedHere,
+        upcoming: matcher.upcoming,
     });
 
     // Playing goes full screen on every device. The play surface holds controls that live

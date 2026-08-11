@@ -11,8 +11,10 @@ it's ready. This is what's changed, newest first, in plain terms.
 ## 11 August 2026 — later
 
 **Your keyboard can show you what's coming.** If your piano lights its own keys —
-Casio's LK series, Yamaha's EZ series — Plinky can now light the key you're about to
-play, before you play it, and keep it lit until you find it. Set it up in **Settings →
+Casio's LK series, Yamaha's EZ series — Plinky now lights the key you're about to play,
+before you play it, and keeps it lit until you find it. On a two-hand piece each hand
+lights on its own channel. Because practice waits for you rather than running to a
+clock, the light simply follows where you are in the music. Set it up in **Settings →
 Light the keys I'm about to play**: pick your make, and the MIDI channels fill
 themselves in. There's a **Test the lights** button, because four separate things have
 to agree before a key glows and it's much easier to check than to guess.

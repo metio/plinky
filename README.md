@@ -503,7 +503,10 @@ If your piano has lights, Plinky can use them, two different ways. **Settings �
 along on my keyboard** mirrors each note as Plinky plays it, so Listen shows the music
 on the instrument as well as sounding it. **Light the keys I'm about to play** does the
 opposite and more useful thing: it lights what's *coming*, so the next key glows before
-you reach for it and stays lit until you find it.
+you reach for it and stays lit until you find it. Practice is self-paced — the cursor
+waits for you — so "next" is a place in the music rather than a moment on a clock, and
+nothing has to be timed or predicted. Two-hand pieces light each hand on its own
+channel.
 
 That second one speaks the two conventions the makers document — Casio's *MIDI In
 Navigate* and Yamaha's *Light Guide* — each of which lights whichever keys arrive as

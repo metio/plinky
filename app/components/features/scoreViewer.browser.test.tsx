@@ -14,6 +14,9 @@ import { DEFAULT_DRILL, generateDrill } from "../../../core/drill";
 
 import { encodeGhost } from "../../../core/ghost";
 import { browserStore } from "../../adapters/browserStore";
+import { memoryStore } from "../../adapters/memoryStore";
+import { DEFAULT_PREFS, type Prefs } from "../../../core/prefs";
+import { createPrefsStore } from "../../stores/prefsStore";
 import { createGhostStore } from "../../stores/ghostStore";
 import {
     ASSISTED_COLOR,
@@ -1496,5 +1499,64 @@ describe("ScoreViewer", () => {
                 { timeout: 30000 },
             );
         });
+    });
+});
+
+// A keyboard that lights its own keys is driven from the same look-ahead the highway
+// draws, so the proof it works is end to end: start a run and watch the bytes leave.
+// Its own fake, because the shared one offers no outputs — which is the common real
+// case and what the rest of this file wants.
+describe("lighted keyboard", () => {
+    // One bar in the right hand, so the first position lights on the right channel.
+    const phrase = generateDrill(
+        { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+        () => 0.5,
+    );
+
+    function mountLit(prefs: Partial<Prefs>) {
+        const store = memoryStore();
+        createPrefsStore(store).save({ ...DEFAULT_PREFS, ...prefs });
+        // Granted, so the provider resumes the connection on mount the way a returning
+        // player's browser does — without it there is no output to send to at all.
+        const midi = fakeMidi({ outputs: ["Lighted Piano"], permission: "granted" });
+        render(
+            <MemoryRouter>
+                <ServicesProvider services={{ midi, store }}>
+                    <MidiProvider>
+                        <Harness xml={phrase} beatsPerBar={4} />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        return midi;
+    }
+
+    // Casio's documented right-hand navigation channel is 4, which is 0x93 on the wire.
+    const litNotes = (midi: ReturnType<typeof fakeMidi>) =>
+        midi.sent().filter((message) => message[0] === 0x93);
+
+    it("lights the note to play once a run starts", async () => {
+        const midi = mountLit({ keyLights: true, noteHints: "always" });
+        fireEvent.click(await awaitReady());
+        await expect.poll(() => litNotes(midi).length).toBeGreaterThan(0);
+        // Full velocity: brightest on an instrument that maps it, and the value every
+        // manual uses on one that does not.
+        expect(litNotes(midi)[0]?.[2]).toBe(127);
+    });
+
+    it("sends nothing at all when the player has not asked for it", async () => {
+        const midi = mountLit({ keyLights: false, noteHints: "always" });
+        fireEvent.click(await awaitReady());
+        await expect.poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
+            .toBeGreaterThan(0);
+        expect(midi.sent()).toEqual([]);
+    });
+
+    it("stays dark when the reading aids are off, without a switch of its own", async () => {
+        const midi = mountLit({ keyLights: true, noteHints: "never" });
+        fireEvent.click(await awaitReady());
+        await expect.poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
+            .toBeGreaterThan(0);
+        expect(litNotes(midi)).toEqual([]);
     });
 });
