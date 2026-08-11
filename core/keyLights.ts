@@ -23,14 +23,14 @@ export type LitKeys = { left: number[]; right: number[] };
 
 export const NOTHING_LIT: LitKeys = { left: [], right: [] };
 
-// A position the run has yet to reach: the pitches that sound there and the staves
-// they sit on. Structurally the matcher's UpcomingStep, taken as a shape rather than
-// imported so this stays free of the matcher's own state.
-export type UpcomingPosition = { pitches: number[]; staves: number[] };
+// A position the run has yet to reach: the pitches that sound there and the staff each
+// one sits on, index-aligned. Structurally the matcher's UpcomingStep, taken as a shape
+// rather than imported so this stays free of the matcher's own state.
+export type UpcomingPosition = { pitches: number[]; pitchStaves: number[] };
 
 // Staff 0 is the treble (right hand), staff 1 the bass (left) — the split the run
-// itself matches on. A pitch on no staff at all belongs to neither hand's channel and
-// is shown on the right, which is where a single-staff piece is read.
+// itself matches on. Anything else, including a pitch whose staff the engraver did not
+// report, lights on the right, which is where a single-staff piece is read.
 const BASS_STAFF = 1;
 
 // How many positions ahead to light, by default.
@@ -53,13 +53,14 @@ export function litKeys(upcoming: UpcomingPosition[], depth: number): LitKeys {
     const left: number[] = [];
     const right: number[] = [];
     for (const position of upcoming.slice(0, Math.max(0, depth))) {
-        for (const pitch of position.pitches) {
-            // A chord spanning the grand staff carries both staves; it lights on both
-            // channels, which is what a two-handed chord looks like on the instrument.
-            if (position.staves.includes(BASS_STAFF)) {
+        for (const [note, pitch] of position.pitches.entries()) {
+            // Each key on the channel of the hand that plays IT. A chord spanning the
+            // grand staff used to light every one of its notes on both channels, which
+            // on an instrument whose two channels are different colours says the
+            // opposite of what the colours are for.
+            if (position.pitchStaves[note] === BASS_STAFF) {
                 left.push(pitch);
-            }
-            if (position.staves.length === 0 || position.staves.some((staff) => staff !== BASS_STAFF)) {
+            } else {
                 right.push(pitch);
             }
         }

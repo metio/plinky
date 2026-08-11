@@ -30,10 +30,13 @@ const SHADES = {
     left: ["bg-hand-left", "bg-hand-left-soft"],
 };
 
-function blockClass(staves: number[], row: number): string {
+// The hand that plays THIS note, not the hands the position involves. Taken per pitch
+// because a chord spanning the grand staff is the common case — 41% of positions in the
+// catalogue — and colouring it all one hand tells the reader the opposite of what the
+// two colours are for.
+function blockClass(staff: number | undefined, row: number): string {
     const tier = row === 0 ? 0 : 1;
-    const leftOnly = staves.length === 1 && staves[0] === 1;
-    return SHADES[leftOnly ? "left" : "right"][tier]!;
+    return SHADES[staff === 1 ? "left" : "right"][tier]!;
 }
 
 export function NotesHighway({
@@ -62,7 +65,7 @@ export function NotesHighway({
         >
             <div className="relative h-full w-full overflow-hidden rounded-md bg-subtle">
                 {upcoming.slice(0, rows).flatMap((step, row) =>
-                    step.pitches.map((pitch) => {
+                    step.pitches.map((pitch, note) => {
                         const lane = keyLane(pitch, from, to);
                         if (!lane) {
                             return null;
@@ -71,7 +74,7 @@ export function NotesHighway({
                             <span
                                 key={`${step.index}-${pitch}`}
                                 aria-hidden="true"
-                                className={`absolute rounded-sm shadow-sm transition-[bottom] duration-200 ease-out motion-reduce:transition-none ${blockClass(step.staves, row)}`}
+                                className={`absolute rounded-sm shadow-sm transition-[bottom] duration-200 ease-out motion-reduce:transition-none ${blockClass(step.pitchStaves[note], row)}`}
                                 style={{
                                     left: `${lane.leftPct}%`,
                                     width: `${lane.widthPct}%`,

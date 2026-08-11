@@ -50,6 +50,13 @@ inside its description was read as though it named the author.
 which only works if you start on a white one. It now says twelve keys, black and white
 alike, and mentions that on the white keys that comes to eight.
 
+*Two-hand chords know which hand plays which note.* When both hands land together —
+which is 41% of the moments in the catalogue — Plinky was only recording that the
+chord involved both hands, not which note belonged to which. So the notes highway
+coloured the whole chord one hand's colour, and a lighted keyboard lit every note of it
+on both of its channels. Each note now takes its own hand: the bass notes left, the
+treble right, in the highway's colours and on the instrument's own two channels.
+
 *Expression now waits for your hands.* The reading of how closely you followed the
 written dynamics and articulation is judged on how long you held each key — so it now
 waits until you lift them before deciding, rather than grading while the last chord is

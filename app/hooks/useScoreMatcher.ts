@@ -33,7 +33,9 @@ export type { Hand } from "../../core/matcher";
 // cursor, so the cursor stays purely a visual mirror during a run.
 function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, "bar"> {
     const pitches: number[] = [];
-    const staves = new Set<number>();
+    // One entry per pitch, in the same order. A note whose staff the engraver does not
+    // report reads as the treble, which is where a single-staff piece is played.
+    const pitchStaves: number[] = [];
     let holdQuarters = 0;
     // The dynamic in force at this position, read once per step: it is a property of
     // where the cursor sits, not of any one note under it.
@@ -48,9 +50,7 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
             continue;
         }
         pitches.push(note.halfTone + 12);
-        if (staff !== undefined) {
-            staves.add(staff);
-        }
+        pitchStaves.push(staff ?? 0);
         const expression = readScoreExpression(note);
         // The longest note under the cursor is the one the hold indicator follows, so
         // the expression graded is the expression of that same note.
@@ -65,7 +65,8 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
     }
     return {
         pitches,
-        staves: [...staves].sort((a, b) => a - b),
+        pitchStaves,
+        staves: [...new Set(pitchStaves)].sort((a, b) => a - b),
         whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
         holdQuarters,
         expected,

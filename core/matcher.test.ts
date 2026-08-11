@@ -17,7 +17,7 @@ import {
 
 const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep => ({
     pitches,
-    staves: [0],
+    pitchStaves: [0], staves: [0],
     whole: 0,
     bar: 0,
     holdQuarters: 0,
@@ -61,13 +61,13 @@ describe("startMatch", () => {
 describe("upcomingSteps", () => {
     it("returns the next positions from the current one with run indices and staves", () => {
         const state = startMatch([
-            step([60], { staves: [0] }),
-            step([48], { staves: [1] }),
-            step([64, 67], { staves: [0] }),
+            step([60], { pitchStaves: [0], staves: [0] }),
+            step([48], { pitchStaves: [1], staves: [1] }),
+            step([64, 67], { pitchStaves: [0], staves: [0] }),
         ]);
         expect(upcomingSteps(state, 2)).toEqual([
-            { index: 0, pitches: [60], staves: [0] },
-            { index: 1, pitches: [48], staves: [1] },
+            { index: 0, pitches: [60], pitchStaves: [0], staves: [0] },
+            { index: 1, pitches: [48], pitchStaves: [1], staves: [1] },
         ]);
     });
 
@@ -75,8 +75,8 @@ describe("upcomingSteps", () => {
         const start = startMatch([step([60]), step([62]), step([64])]);
         const { state: next } = matchNote(start, 60);
         expect(upcomingSteps(next, 6)).toEqual([
-            { index: 1, pitches: [62], staves: [0] },
-            { index: 2, pitches: [64], staves: [0] },
+            { index: 1, pitches: [62], pitchStaves: [0], staves: [0] },
+            { index: 2, pitches: [64], pitchStaves: [0], staves: [0] },
         ]);
     });
 
@@ -226,5 +226,24 @@ describe("matcher constants and edges", () => {
     it("forgiving into a chord emits the carried note as its own hit event", () => {
         const result = matchNote(startMatch([step([60]), step([62, 65])]), 62, true);
         expect(result.events).toContainEqual({ kind: "hit", note: 62 });
+    });
+});
+
+describe("the staff of each pitch", () => {
+    it("travels with the position, one entry per note", () => {
+        // 41% of catalogue positions carry notes on both staves, so which hand plays
+        // which key is the common question, not an edge case.
+        const step = {
+            pitches: [48, 64],
+            pitchStaves: [1, 0],
+            staves: [0, 1],
+            whole: 0,
+            bar: 0,
+            holdQuarters: 1,
+        };
+        const state = startMatch([step]);
+        const [upcoming] = upcomingSteps(state, 1);
+        expect(upcoming?.pitchStaves).toEqual([1, 0]);
+        expect(upcoming?.pitches).toHaveLength(upcoming?.pitchStaves.length ?? 0);
     });
 });

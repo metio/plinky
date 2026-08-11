@@ -29,8 +29,14 @@ export function isPracticedHand(staffId: number | undefined, hand: Hand): boolea
 export type MatchStep = {
     // The MIDI pitches that sound here — a chord gives several.
     pitches: number[];
-    // The staves the position sits on (0 = treble/right, 1 = bass/left), so a
-    // run can be scored per hand. Both when a chord spans the grand staff.
+    // The staff each pitch sits on, index-aligned with `pitches` (0 = treble/right,
+    // 1 = bass/left). A chord spanning the grand staff has both here, one per note,
+    // which is what lets a reader of this model say WHICH hand plays which key rather
+    // than only that both are involved. In the real catalogue 41% of positions carry
+    // notes on both staves, so the distinction is the common case, not an edge.
+    pitchStaves: number[];
+    // The distinct staves the position sits on, derived from pitchStaves and kept
+    // because most readers only ask "which hands are involved here".
     staves: number[];
     // The notated onset in whole notes from the top of the piece — pure
     // notation; the caller scales it by the run's tempo into milliseconds.
@@ -94,7 +100,14 @@ export function expectedPitches(state: MatcherState): number[] {
 // view (the notes highway) shows above the keys. Each carries its whole-run index
 // so a view can key blocks stably as the run advances, and the staves it sits on
 // so a two-hand piece can colour the hands apart. Fewer than `count` near the end.
-export type UpcomingStep = { index: number; pitches: number[]; staves: number[] };
+export type UpcomingStep = {
+    index: number;
+    pitches: number[];
+    // Index-aligned with `pitches`, so a look-ahead can colour or light each note by
+    // the hand that plays it rather than by the hands the position involves.
+    pitchStaves: number[];
+    staves: number[];
+};
 
 export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[] {
     return state.steps
@@ -102,6 +115,7 @@ export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[
         .map((step, offset) => ({
             index: state.index + offset,
             pitches: step.pitches,
+            pitchStaves: step.pitchStaves,
             staves: step.staves,
         }));
 }

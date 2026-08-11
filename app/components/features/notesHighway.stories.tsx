@@ -26,11 +26,11 @@ type Story = StoryObj<typeof NotesHighway>;
 export const RightHand: Story = {
     args: {
         upcoming: [
-            { index: 0, pitches: [60], staves: [0] },
-            { index: 1, pitches: [64], staves: [0] },
-            { index: 2, pitches: [67], staves: [0] },
-            { index: 3, pitches: [72], staves: [0] },
-            { index: 4, pitches: [71], staves: [0] },
+            { index: 0, pitches: [60], pitchStaves: [0], staves: [0] },
+            { index: 1, pitches: [64], pitchStaves: [0], staves: [0] },
+            { index: 2, pitches: [67], pitchStaves: [0], staves: [0] },
+            { index: 3, pitches: [72], pitchStaves: [0], staves: [0] },
+            { index: 4, pitches: [71], pitchStaves: [0], staves: [0] },
         ],
     },
 };
@@ -42,10 +42,10 @@ export const TwoHands: Story = {
         from: 48,
         to: 84,
         upcoming: [
-            { index: 0, pitches: [48], staves: [1] },
-            { index: 1, pitches: [72], staves: [0] },
-            { index: 2, pitches: [52], staves: [1] },
-            { index: 3, pitches: [76], staves: [0] },
+            { index: 0, pitches: [48], pitchStaves: [1], staves: [1] },
+            { index: 1, pitches: [72], pitchStaves: [0], staves: [0] },
+            { index: 2, pitches: [52], pitchStaves: [1], staves: [1] },
+            { index: 3, pitches: [76], pitchStaves: [0], staves: [0] },
         ],
     },
 };
@@ -54,8 +54,25 @@ export const TwoHands: Story = {
 export const Chord: Story = {
     args: {
         upcoming: [
-            { index: 0, pitches: [60, 64, 67], staves: [0] },
-            { index: 1, pitches: [62, 65, 69], staves: [0] },
+            { index: 0, pitches: [60, 64, 67], pitchStaves: [0, 0, 0], staves: [0] },
+            { index: 1, pitches: [62, 65, 69], pitchStaves: [0, 0, 0], staves: [0] },
+        ],
+    },
+};
+
+// A chord the two hands play together, which is 41% of the positions in the real
+// catalogue. Each note takes the colour of the hand that plays it — the bass notes
+// left, the treble right — rather than the whole chord taking one hand's colour
+// because the position happens to involve both.
+export const HandsTogether: Story = {
+    args: {
+        // Wide enough to hold both hands: the default range starts at middle C, which
+        // would drop every bass note out of the picture.
+        from: 36,
+        to: 84,
+        upcoming: [
+            { index: 0, pitches: [48, 55, 64, 67], pitchStaves: [1, 1, 0, 0], staves: [0, 1] },
+            { index: 1, pitches: [50, 57, 65, 69], pitchStaves: [1, 1, 0, 0], staves: [0, 1] },
         ],
     },
 };

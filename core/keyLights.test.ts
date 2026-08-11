@@ -12,9 +12,9 @@ import {
     type UpcomingPosition,
 } from "./keyLights";
 
-const RIGHT: UpcomingPosition = { pitches: [60, 64], staves: [0] };
-const LEFT: UpcomingPosition = { pitches: [48], staves: [1] };
-const BOTH: UpcomingPosition = { pitches: [36, 72], staves: [0, 1] };
+const RIGHT: UpcomingPosition = { pitches: [60, 64], pitchStaves: [0, 0] };
+const LEFT: UpcomingPosition = { pitches: [48], pitchStaves: [1] };
+const BOTH: UpcomingPosition = { pitches: [36, 72], pitchStaves: [1, 0] };
 
 describe("litKeys", () => {
     it("lights nothing at depth zero, which is how every aid-off case is said", () => {
@@ -27,14 +27,19 @@ describe("litKeys", () => {
         expect(litKeys([RIGHT], 1)).toEqual({ left: [], right: [60, 64] });
     });
 
-    it("shows a chord spanning the grand staff on both hands", () => {
-        expect(litKeys([BOTH], 1)).toEqual({ left: [36, 72], right: [36, 72] });
+    it("puts each note of a grand-staff chord on the hand that plays it", () => {
+        // The bass note lights the left channel and the treble the right. Lighting every
+        // note on both — which is what a per-POSITION staff set forces — tells an
+        // instrument whose two channels are different colours the opposite of what the
+        // colours are for. 41% of catalogue positions span both staves, so this is the
+        // common case rather than an edge.
+        expect(litKeys([BOTH], 1)).toEqual({ left: [36], right: [72] });
     });
 
-    it("reads a position on no staff at all as the right hand", () => {
-        // A single-staff piece is read in the right hand, and a staff-less note must
-        // still light somewhere rather than vanishing.
-        expect(litKeys([{ pitches: [67], staves: [] }], 1)).toEqual({ left: [], right: [67] });
+    it("reads a note whose staff is unknown as the right hand", () => {
+        // A single-staff piece is read in the right hand, and a note the engraver gave
+        // no staff must still light somewhere rather than vanishing.
+        expect(litKeys([{ pitches: [67], pitchStaves: [] }], 1)).toEqual({ left: [], right: [67] });
     });
 
     it("takes only as many positions as the depth allows", () => {
@@ -45,8 +50,8 @@ describe("litKeys", () => {
     });
 
     it("sorts and deduplicates, so the same keys compare equal however they arrived", () => {
-        const once = litKeys([{ pitches: [64, 60], staves: [0] }], 1);
-        const twice = litKeys([{ pitches: [60], staves: [0] }, { pitches: [64, 60], staves: [0] }], 2);
+        const once = litKeys([{ pitches: [64, 60], pitchStaves: [0, 0] }], 1);
+        const twice = litKeys([{ pitches: [60], pitchStaves: [0] }, { pitches: [64, 60], pitchStaves: [0, 0] }], 2);
         expect(once).toEqual(twice);
     });
 });

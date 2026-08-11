@@ -10,9 +10,9 @@ import { useKeyLights } from "./useKeyLights";
 
 afterEach(cleanup);
 
-const HERE: UpcomingPosition = { pitches: [60], staves: [0] };
-const NEXT: UpcomingPosition = { pitches: [62], staves: [0] };
-const LEFT: UpcomingPosition = { pitches: [48], staves: [1] };
+const HERE: UpcomingPosition = { pitches: [60], pitchStaves: [0] };
+const NEXT: UpcomingPosition = { pitches: [62], pitchStaves: [0] };
+const LEFT: UpcomingPosition = { pitches: [48], pitchStaves: [1] };
 
 type Options = Parameters<typeof useKeyLights>[0];
 
@@ -107,5 +107,16 @@ describe("useKeyLights", () => {
         view.unmount();
         // A light outlives the page that lit it, so nothing may leave one behind.
         expect(lights.lit()).toEqual(NOTHING_LIT);
+    });
+});
+
+describe("a chord across the grand staff", () => {
+    it("lights each hand's own note, not every note on both", () => {
+        // The step model carries a staff per pitch, so the instrument's two channels —
+        // different colours on a Casio — say which hand plays which key.
+        const { lights } = mount({
+            upcoming: [{ pitches: [48, 60, 64], pitchStaves: [1, 0, 0] }],
+        });
+        expect(lights.lit()).toEqual({ left: [48], right: [60, 64] });
     });
 });

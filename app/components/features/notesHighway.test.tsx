@@ -13,7 +13,10 @@ afterEach(cleanup);
 const step = (index: number, pitches: number[], staves = [0]): UpcomingStep => ({
     index,
     pitches,
-    staves,
+    // One staff per pitch: a fixture that names a single staff means every note of the
+    // position is on it.
+    pitchStaves: pitches.map((_, note) => staves[note] ?? staves[0] ?? 0),
+    staves: [...new Set(staves)],
 });
 
 // The decorative blocks carry no role; read them off the labelled panel.
