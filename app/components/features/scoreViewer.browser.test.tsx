@@ -1547,7 +1547,8 @@ describe("lighted keyboard", () => {
     it("sends nothing at all when the player has not asked for it", async () => {
         const midi = mountLit({ keyLights: false, noteHints: "always" });
         fireEvent.click(await awaitReady());
-        await expect.poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
+        await expect
+            .poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
             .toBeGreaterThan(0);
         expect(midi.sent()).toEqual([]);
     });
@@ -1555,7 +1556,8 @@ describe("lighted keyboard", () => {
     it("stays dark when the reading aids are off, without a switch of its own", async () => {
         const midi = mountLit({ keyLights: true, noteHints: "never" });
         fireEvent.click(await awaitReady());
-        await expect.poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
+        await expect
+            .poll(() => screen.queryAllByRole("button", { name: "Restart" }).length)
             .toBeGreaterThan(0);
         expect(litNotes(midi)).toEqual([]);
     });

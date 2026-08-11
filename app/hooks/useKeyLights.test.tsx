@@ -5,7 +5,6 @@
 import { cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { NOTHING_LIT, type UpcomingPosition } from "../../core/keyLights";
-import type { NoteHints } from "../../core/prefs";
 import { fakeKeyLights } from "../adapters/fakeKeyLights";
 import { useKeyLights } from "./useKeyLights";
 
