@@ -64,7 +64,11 @@
             (pkgs.writeShellScriptBin "ci-tailwind" ''exec npm run tailwind "$@"'')
             (pkgs.writeShellScriptBin "ci-tokens" ''exec npm run tokens "$@"'')
             (pkgs.writeShellScriptBin "ci-knip" ''exec npm run knip "$@"'')
-            (pkgs.writeShellScriptBin "ci-biome" ''exec npx biome check "$@"'')
+            # npm run lint, not a bare biome call: the script carries --error-on-warnings
+            # (a warning nobody has to fix is a rule nobody enforces) and its prelint
+            # node_modules check, so this wrapper is what CI runs rather than something
+            # close to it.
+            (pkgs.writeShellScriptBin "ci-biome" ''exec npm run lint "$@"'')
             (pkgs.writeShellScriptBin "ci-messages-check" ''exec npm run messages:check "$@"'')
             (pkgs.writeShellScriptBin "ci-bake-check" ''exec npm run songs:bake -- --check "$@"'')
             # The locale lives in package.json's build:single, which the a11y sweeps and

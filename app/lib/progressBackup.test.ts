@@ -101,6 +101,10 @@ describe("keys that collide with Object.prototype", () => {
         kv.set(`${PREFIX}theme`, '"dark"');
         expect(countProgressEntries(kv)).toBe(2);
         const bundle = exportProgress(kv, "2026-07-31T00:00:00.000Z");
+        // Reading __proto__ IS the assertion: the export has to carry a key literally
+        // named "__proto__" as data rather than let it reach the prototype, which is the
+        // hole this test exists to keep shut.
+        // biome-ignore lint/suspicious/noProto: the deprecated accessor is the subject here
         expect(JSON.parse(bundle).entries.__proto__).toBe("kept");
     });
 

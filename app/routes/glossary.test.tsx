@@ -71,6 +71,31 @@ describe("Glossary", () => {
         }
     });
 
+    it("opens the symbol a piece sent the reader here to look up", () => {
+        // The run-setup panel links the marks a piece uses as /glossary/?symbol=<id>.
+        // Arriving on that link has to land on the answer rather than on the first
+        // entry with the answer somewhere below.
+        mountAt("?symbol=staccato");
+
+        expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
+            m.glossary_staccato_name(),
+        );
+        expect(
+            screen
+                .getByRole("button", { name: m.glossary_staccato_name() })
+                .getAttribute("aria-current"),
+        ).toBe("true");
+    });
+
+    it("opens the first symbol when the link names one that does not exist", () => {
+        // A stale link from an older build must not land on a blank page.
+        mountAt("?symbol=nonsense");
+
+        expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
+            symbolName(GLOSSARY[0]?.id ?? "slur"),
+        );
+    });
+
     it("marks the selected symbol and swaps the reading when another is chosen", () => {
         mount();
 

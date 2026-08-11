@@ -78,6 +78,11 @@ export function FingeringStrip({
     const [map, setMap] = useState<FingerMap>(() => fingering.load(id));
     const [active, setActive] = useState(0);
 
+    // Read rather than subscribed, deliberately. Hand span is set in Settings, and
+    // reaching Settings unmounts this strip — so it cannot change underneath a mounted
+    // one, and the read happens afresh on every render anyway. A subscription here
+    // would re-render the strip on every unrelated preference save for a value that
+    // cannot have moved.
     const span = prefsStore.load().handSpan[hand] ?? undefined;
     const bars = useMemo(() => scoreToBars(xmlCodec, xml, staffFor(hand)), [xmlCodec, xml, hand]);
     const window = useBarWindow(bars, WINDOW);

@@ -197,7 +197,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 }
             } else {
                 const set = sources.get(note);
-                if (!set || !set.has(device)) {
+                if (!set?.has(device)) {
                     return;
                 }
                 set.delete(device);

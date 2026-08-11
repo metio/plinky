@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { usePrefsStore } from "../../contexts/services";
-import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { m } from "../../paraglide/messages.js";
 import { KeyboardQuickControls } from "./keyboardQuickControls";
 import { NotesHighway } from "./notesHighway";
@@ -28,15 +27,12 @@ export function ScoreCanvas() {
         hideKeyboard,
         setHideKeyboard,
         fingerStrip,
-        noteHints,
         setNoteHints,
-        reading,
         keyRange,
         aids,
         sightRead,
     } = usePlaySession();
     const prefsStore = usePrefsStore();
-    const noteLabels = useNoteLabels();
     // In the notes-highway reading mode, a tall highway covers the staff while playing —
     // OSMD stays mounted and rendered underneath (the matcher walks its cursor), so the
     // staff is hidden, not unmounted. Only while a run is on: at rest the score shows so

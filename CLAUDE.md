@@ -80,7 +80,8 @@ npm run tokens        # colour is named by role, not hue (blocking)
 npm run messages:check # every locale carries every message (blocking)
 npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
-npx biome check       # lint + format
+npm run lint          # biome lint + format; a WARNING fails it too
+                      # (--error-on-warnings), so dead code cannot accumulate
 npm run nav           # navigation-depth budget
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
