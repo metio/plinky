@@ -50,6 +50,13 @@ inside its description was read as though it named the author.
 which only works if you start on a white one. It now says twelve keys, black and white
 alike, and mentions that on the white keys that comes to eight.
 
+*Tied notes stopped asking you to play them twice.* A tie means keep holding — and
+Listen always did. Practice didn't: it demanded a fresh press at every tied note, so
+the two halves of the app asked for different performances of the same bar, and the
+hold indicator showed the written length rather than the tie's. More than four in five
+pieces in the library contain a tie, so this was quietly getting in the way almost
+everywhere.
+
 *"Which hand lagged" can finally see the two hands apart.* When you play a chord with
 both hands, the app noted the moment the chord was complete — one time for the pair. So
 on hands-together music, which is most music, the two hands were being compared using

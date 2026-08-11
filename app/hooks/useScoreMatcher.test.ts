@@ -11,7 +11,12 @@ import { collectSteps, type CorrectInfo, useScoreMatcher } from "./useScoreMatch
 // halfTone is OSMD's pitch index, which the matcher maps to MIDI as halfTone + 12.
 // A bare number is a right-hand (staff 0) note; {midi, staff} pins the staff so
 // hands-separate matching can be exercised.
-type Voice = number | { midi: number; staff: number };
+// `tie` models what OSMD hands back for a tied note: "start" is the note that is
+// actually struck and sounds the whole tie, "held" is a later note of the same tie —
+// already sounding, so nothing for the player to do.
+type Voice =
+    | number
+    | { midi: number; staff?: number; tie?: "start" | "held"; tieQuarters?: number };
 type Position = Voice[];
 
 function midiToHalfTone(midi: number): number {
@@ -36,8 +41,10 @@ function fakeOsmd(positions: Position[]): { osmd: OpenSheetMusicDisplay; shown: 
             const chord = positions[index] ?? [];
             return chord.map((voice) => {
                 const midi = typeof voice === "number" ? voice : voice.midi;
-                const staff = typeof voice === "number" ? 0 : voice.staff;
-                return {
+                const staff = typeof voice === "number" ? 0 : (voice.staff ?? 0);
+                const tie = typeof voice === "number" ? undefined : voice.tie;
+                const tieQuarters = typeof voice === "number" ? 1 : (voice.tieQuarters ?? 1);
+                const note: Record<string, unknown> = {
                     isRest: () => false,
                     halfTone: midiToHalfTone(midi),
                     ParentStaff: { idInMusicSheet: staff },
@@ -45,6 +52,15 @@ function fakeOsmd(positions: Position[]): { osmd: OpenSheetMusicDisplay; shown: 
                     // known written length off the score.
                     Length: { RealValue: 0.25 },
                 };
+                if (tie === "start") {
+                    // The struck note of the tie: OSMD names it first in the tie, and the
+                    // tie's own duration is the whole chain's.
+                    note.NoteTie = { Notes: [note], Duration: { RealValue: tieQuarters / 4 } };
+                } else if (tie === "held") {
+                    // A later note of the tie: the tie names some earlier note first.
+                    note.NoteTie = { Notes: [{}], Duration: { RealValue: tieQuarters / 4 } };
+                }
+                return note;
             });
         },
         next() {
@@ -349,5 +365,55 @@ describe("whole-piece step indexing (the reveal/ghost address space)", () => {
         act(() => result.current.start(0, { from: 2, to: 2 }));
         act(() => result.current.registerNote(64));
         expect(correct[0]?.index).toBe(4);
+    });
+});
+
+describe("tied notes", () => {
+    it("asks for the struck note once, not again at every tie", () => {
+        // A tie means "keep holding", and the page says so. Demanding a re-strike
+        // contradicts the notation — and contradicts Listen, which honours the tie, so
+        // the two halves of the app would ask for different performances of one bar.
+        // 82.7% of the catalogue's files contain a tie.
+        const steps = collectSteps(
+            fakeOsmd([
+                [{ midi: 60, tie: "start", tieQuarters: 3 }],
+                [{ midi: 60, tie: "held" }],
+                [{ midi: 60, tie: "held" }],
+                [64],
+            ]).osmd,
+        );
+        expect(steps).toEqual([[60], [64]]);
+    });
+
+    it("keeps the other hand's note at a position where one hand is holding", () => {
+        const steps = collectSteps(
+            fakeOsmd([
+                [
+                    { midi: 60, tie: "start", tieQuarters: 2 },
+                    { midi: 48, staff: 1 },
+                ],
+                [
+                    { midi: 60, tie: "held" },
+                    { midi: 50, staff: 1 },
+                ],
+            ]).osmd,
+        );
+        // Pitches keep the order the score lists them in, not a sorted one.
+        expect(steps).toEqual([[60, 48], [50]]);
+    });
+
+    it("holds a tied note for the whole tie, not its written length", () => {
+        // The hold indicator and the expressive reading both take this length; the
+        // written value would say a quarter where the music says three.
+        const onCorrect = vi.fn();
+        const { result } = render([[{ midi: 60, tie: "start", tieQuarters: 3 }]], {
+            onCorrect,
+            tempo: 60,
+        });
+        act(() => result.current.start());
+        act(() => result.current.registerNote(60, 0));
+        const info = onCorrect.mock.calls[0]?.[0] as CorrectInfo;
+        // Three quarters at 60bpm is three seconds.
+        expect(info.holdMs).toBe(3000);
     });
 });

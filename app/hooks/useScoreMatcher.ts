@@ -49,19 +49,29 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
         if (!isPracticedHand(staff, hand)) {
             continue;
         }
+        const expression = readScoreExpression(note);
+        // A tie's later notes are the same sound continuing, not a note to play again:
+        // the key is already down and the score is asking for it to stay down. Demanding
+        // a re-strike contradicts what the page says, and contradicts Listen, which
+        // honours the tie — the two would ask for different performances of one bar.
+        // A position whose notes are ALL continuations collects no pitches and is
+        // dropped, which is right: there is nothing to do there.
+        if (!expression.strike) {
+            continue;
+        }
         pitches.push(note.halfTone + 12);
         pitchStaves.push(staff ?? 0);
-        const expression = readScoreExpression(note);
-        // The longest note under the cursor is the one the hold indicator follows, so
-        // the expression graded is the expression of that same note.
-        if (expression.notatedQuarters >= holdQuarters) {
+        // The sounding length, not the written one: a tied minim is held for the whole
+        // tie. The longest note under the cursor is the one the hold indicator follows,
+        // so the expression graded is the expression of that same note.
+        if (expression.soundQuarters >= holdQuarters) {
             expected = {
                 velocity:
                     dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
                 lengthScale: lengthScaleOf(expression),
             };
         }
-        holdQuarters = Math.max(holdQuarters, expression.notatedQuarters);
+        holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
     }
     return {
         pitches,
