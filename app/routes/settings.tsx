@@ -272,6 +272,12 @@ export default function Settings() {
                     help={m.color_notes_hint()}
                 />
                 <SwitchField
+                    label={m.accompaniment_toggle()}
+                    checked={prefs.showAccompaniment}
+                    onChange={(showAccompaniment) => update({ showAccompaniment })}
+                    help={m.accompaniment_hint()}
+                />
+                <SwitchField
                     label={m.highway_toggle()}
                     checked={prefs.highway}
                     onChange={(highway) => update({ highway })}

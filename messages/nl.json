@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Dwingt dit aantal maten per rij af voor grotere notatie; Auto past ze aan je scherm aan.",
   "treadmill_toggle": "Loopband",
   "treadmill_hint": "Het stuk leest als één regel die meeschuift terwijl je speelt, in plaats van gestapelde rijen.",
+  "accompaniment_toggle": "Andere partijen",
+  "accompaniment_hint": "Sommige stukken zijn geschreven voor piano en zang of een ander instrument. Die partij blijft buiten beeld, tot je hem naast de jouwe wilt zien en horen.",
   "highway_toggle": "Vallende noten",
   "highway_hint": "De komende noten stapelen zich boven de toetsen op en vallen erop terwijl je speelt, zodat je ziet welke toets de volgende is.",
   "highway_label": "Komende noten die op de toetsen vallen",

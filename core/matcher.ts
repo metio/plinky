@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { GRAND_STAFF, type ScoreParts } from "./parts";
+
 // The note-by-note practice matcher: a pure reducer over a pre-collected step
 // model. The rendering surface extracts the steps from the engraved score and
 // mirrors the reducer's position onto the visual cursor; everything about what
@@ -9,10 +11,12 @@
 // testable without a score renderer.
 
 // Which hand's staff to match: both together, or one alone for hands-separate
-// practice. On the grand staff our scores build, the treble (right) is staff 0
-// and the bass (left) is staff 1.
+// practice.
 export type Hand = "both" | "right" | "left";
-export const STAFF_FOR: Record<Exclude<Hand, "both">, number> = { right: 0, left: 1 };
+
+export function staffFor(hand: Exclude<Hand, "both">, parts: ScoreParts): number {
+    return hand === "right" ? parts.right : parts.left;
+}
 
 // Whether a note engraved on `staffId` belongs to the hand being practised. A
 // both-hands run owns every note; a single-hand run owns only its own staff, so a
@@ -20,8 +24,22 @@ export const STAFF_FOR: Record<Exclude<Hand, "both">, number> = { right: 0, left
 // is the other hand's, to leave out or accompany, never to demand of the player.
 // Every surface that narrows to a hand (the self-paced matcher, keep-up's beat
 // split, the score colouring) shares this, so a hand choice means the same in each.
-export function isPracticedHand(staffId: number | undefined, hand: Hand): boolean {
-    return hand === "both" || staffId === STAFF_FOR[hand];
+export function isPracticedHand(
+    staffId: number | undefined,
+    hand: Hand,
+    // Which staves the practised instrument occupies. A score with a singer or a second
+    // instrument on top numbers the piano's staves 1 and 2, not 0 and 1 — and even a
+    // both-hands run must leave those other staves alone rather than demand them.
+    parts: ScoreParts = GRAND_STAFF,
+): boolean {
+    // An accompaniment staff is never the player's, in either mode: a both-hands run of
+    // an art song must not demand the sung line.
+    if (staffId !== undefined && parts.other.includes(staffId)) {
+        return false;
+    }
+    // A note the engraving gives no resolvable staff still belongs to a both-hands run,
+    // which is what a generated drill relies on.
+    return hand === "both" || staffId === staffFor(hand, parts);
 }
 
 // One playable position for the chosen hand, in play order. Hand narrowing

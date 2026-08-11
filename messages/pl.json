@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Mieści dokładnie tyle taktów w każdym wierszu, by nuty były większe; Auto dopasowuje je do twojego ekranu.",
   "treadmill_toggle": "Bieżnia",
   "treadmill_hint": "Utwór płynie jako jedna linia, która przewija się, gdy grasz, zamiast ułożonych wierszy.",
+  "accompaniment_toggle": "Inne partie",
+  "accompaniment_hint": "Niektóre utwory napisano na fortepian i głos albo inny instrument. Ich partia pozostaje na uboczu, dopóki nie zechcesz jej zobaczyć i usłyszeć obok swojej.",
   "highway_toggle": "Spadające nuty",
   "highway_hint": "Nadchodzące nuty układają się nad klawiszami i spadają na nie, gdy grasz, żebyś widział, który klawisz jest następny.",
   "highway_label": "Nadchodzące nuty spadające na klawisze",

@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Vendos këtë numër taktesh në çdo rresht për notacion më të madh; Auto i përshtat me ekranin tënd.",
   "treadmill_toggle": "Rrip lëvizës",
   "treadmill_hint": "Pjesa lexohet si një rresht i vetëm që rrëshqet ndërsa luan, në vend të radhëve të stivosura.",
+  "accompaniment_toggle": "Pjesët e tjera",
+  "accompaniment_hint": "Disa copa janë shkruar për piano dhe një këngëtar ose një instrument tjetër. Pjesa e tyre rri mënjanë, derisa të duash ta shohësh dhe ta dëgjosh krahas tëndes.",
   "highway_toggle": "Korsia e notave",
   "highway_hint": "Notat që vijnë grumbullohen mbi tastet dhe bien mbi to ndërsa luan, që të shohësh cila tastë vjen më pas.",
   "highway_label": "Nota që vijnë duke rënë mbi tastet",

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Articulation } from "../../core/expression";
+import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
 // Reads the expression marks OSMD parsed from the MusicXML — articulations, slurs,
 // ties and the dynamic in force — off a note under the cursor, so Listen can play the
@@ -153,4 +154,24 @@ export function readActiveDynamic(iterator: unknown): number | null {
         // rather than breaking playback.
     }
     return null;
+}
+
+// How the engraved sheet lays its instruments out, as staff counts in score order —
+// what partsOf needs to work out which staves are the piano.
+//
+// Read defensively like everything else here: this is OSMD's internal model, and a
+// score it could not resolve gives a plain grand staff, which is what every
+// single-instrument piece is anyway.
+type SheetShape = { Instruments?: { Staves?: unknown[] }[] };
+
+export function readParts(osmd: unknown): ScoreParts {
+    try {
+        const sheet = (osmd as { sheet?: SheetShape } | null)?.sheet;
+        const counts = (sheet?.Instruments ?? []).map(
+            (instrument) => instrument?.Staves?.length ?? 0,
+        );
+        return counts.length > 0 ? partsOf(counts) : GRAND_STAFF;
+    } catch {
+        return GRAND_STAFF;
+    }
 }

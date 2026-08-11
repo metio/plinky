@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Postavlja točno ovoliko taktova u svaki red za veću notaciju; Automatski ih prilagođava tvom zaslonu.",
   "treadmill_toggle": "Traka",
   "treadmill_hint": "Skladba se čita kao jedna linija koja klizi dok sviraš, umjesto poredanih redova.",
+  "accompaniment_toggle": "Ostale dionice",
+  "accompaniment_hint": "Neki su komadi pisani za klavir i pjevača ili drugi instrument. Njihova dionica ostaje po strani, dok je ne poželiš vidjeti i čuti uz svoju.",
   "highway_toggle": "Traka nota",
   "highway_hint": "Note koje dolaze slažu se iznad tipki i padaju na njih dok sviraš, pa vidiš koja je tipka sljedeća.",
   "highway_label": "Nadolazeće note padaju na tipke",

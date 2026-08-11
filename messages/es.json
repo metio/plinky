@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Fuerza este número de compases por línea para una notación más grande; Automático los ajusta a tu pantalla.",
   "treadmill_toggle": "Cinta",
   "treadmill_hint": "La pieza se lee como una sola línea que se desplaza mientras tocas, en vez de filas apiladas.",
+  "accompaniment_toggle": "Otras partes",
+  "accompaniment_hint": "Algunas piezas están escritas para piano y voz u otro instrumento. Su parte se queda al margen hasta que quieras verla y escucharla junto a la tuya.",
   "highway_toggle": "Notas en cascada",
   "highway_hint": "Las notas que vienen se apilan sobre las teclas y caen sobre ellas mientras tocas, así ves cuál es la siguiente tecla.",
   "highway_label": "Notas que caen sobre las teclas",

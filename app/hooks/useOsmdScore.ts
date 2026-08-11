@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { stripAccompaniment } from "../../core/accompaniment";
 import { stripBeams } from "../../core/beams";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import type { MeasureBox } from "../../core/scoreCanvas";
@@ -62,6 +63,7 @@ export function useOsmdScore(
         barNumbers,
         treadmill,
         showBeams,
+        showAccompaniment,
         colorNotes,
         focus,
         showFingerings,
@@ -97,6 +99,10 @@ export function useOsmdScore(
         // elements are stripped before OSMD loads it, so short notes render with flags.
         // The effective value is decided per piece by beamsVisible before it reaches here.
         showBeams: boolean;
+        // Whether a multi-part score keeps its other parts. When false they are removed
+        // before OSMD loads the sheet, so the cursor, the matcher and every staff index
+        // downstream see the piano's grand staff exactly as a solo piece gives them.
+        showAccompaniment: boolean;
         // Colour the noteheads by note name (the Boomwhacker reading aid), off = black.
         colorNotes: boolean;
         // Whether the printed fingering is drawn — flipped in place without a reload.
@@ -278,7 +284,10 @@ export function useOsmdScore(
                 // Drop the beams last, so short notes render with flags instead of
                 // beat groups — an easier read for a beginner. Notes and durations are
                 // untouched, so playback, timing and matching are unaffected.
-                const source = showBeams ? annotated : stripBeams(xmlCodec, annotated);
+                const played = showAccompaniment
+                    ? annotated
+                    : stripAccompaniment(xmlCodec, annotated);
+                const source = showBeams ? played : stripBeams(xmlCodec, played);
                 return osmd.load(source).then(() => {
                     if (cancelled) {
                         return;
@@ -333,6 +342,7 @@ export function useOsmdScore(
         barNumbers,
         treadmill,
         showBeams,
+        showAccompaniment,
         colorNotes,
         focus,
     ]);

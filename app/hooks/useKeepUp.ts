@@ -14,6 +14,7 @@ import {
     strikeKeepUp,
 } from "../../core/keepUp";
 import { type Hand, isPracticedHand } from "../../core/matcher";
+import { readParts } from "../lib/scoreExpression";
 import { listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
@@ -31,6 +32,7 @@ type NoteSink = { playNote(note: number, options?: { duration?: number }): void 
 // carries the notes the painter recolours.
 export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): KeepUpStep[] {
     const cursor = osmd.cursor;
+    const parts = readParts(osmd);
     cursor.reset();
     const steps: KeepUpStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -49,7 +51,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
             // The same split the self-paced matcher uses, so choosing a hand narrows the
             // beats to catch — and the notes the guide sounds — identically in both modes.
             const staffId = note.ParentStaff?.idInMusicSheet;
-            if (isPracticedHand(staffId, hand)) {
+            if (isPracticedHand(staffId, hand, parts)) {
                 play.push(entry);
             } else {
                 accompany.push(entry);

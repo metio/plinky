@@ -34,6 +34,11 @@ export type ReadingMode = {
     // per piece by beamsVisible.
     beams: Beams;
     setBeams: (value: Beams) => void;
+    // Engrave the parts besides the piano — a song's vocal line, a chamber partner.
+    // Off by default, remembered per device; when off those parts are dropped from the
+    // sheet before it loads, so the score is a plain grand staff throughout.
+    showAccompaniment: boolean;
+    setShowAccompaniment: (value: boolean) => void;
     // Colour the noteheads by note name (the Boomwhacker reading aid), remembered per device.
     colorNotes: boolean;
     setColorNotes: (value: boolean) => void;
@@ -55,6 +60,7 @@ export function useReadingMode(): ReadingMode {
     const [treadmill, setTreadmill] = usePref(prefs, "treadmill");
     const [highway, setHighway] = usePref(prefs, "highway");
     const [beams, setBeams] = usePref(prefs, "beams");
+    const [showAccompaniment, setShowAccompaniment] = usePref(prefs, "showAccompaniment");
     const [colorNotes, setColorNotes] = usePref(prefs, "colorNotes");
     // The fingering numbers are always baked into the loaded sheet; this only flips whether
     // OSMD draws them, so it stays session state rather than a persisted preference.
@@ -74,6 +80,8 @@ export function useReadingMode(): ReadingMode {
         setHighway,
         beams,
         setBeams,
+        showAccompaniment,
+        setShowAccompaniment,
         colorNotes,
         setColorNotes,
         showFingerings,

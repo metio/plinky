@@ -4,7 +4,8 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
 import { lengthScaleOf, velocityOf } from "../../core/expression";
-import { readActiveDynamic, readScoreExpression } from "../lib/scoreExpression";
+import type { ScoreParts } from "../../core/parts";
+import { readActiveDynamic, readParts, readScoreExpression } from "../lib/scoreExpression";
 import {
     currentBar,
     expectedPitches,
@@ -31,7 +32,11 @@ export type { Hand } from "../../core/matcher";
 // one entry of the step model the pure matcher runs on. Collecting the hold length
 // with the position means the run reads it off the step model, never the live
 // cursor, so the cursor stays purely a visual mirror during a run.
-function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, "bar"> {
+function stepAtCursor(
+    osmd: OpenSheetMusicDisplay,
+    hand: Hand,
+    parts: ScoreParts,
+): Omit<MatchStep, "bar"> {
     const pitches: number[] = [];
     // One entry per pitch, in the same order. A note whose staff the engraver does not
     // report reads as the treble, which is where a single-staff piece is played.
@@ -46,7 +51,7 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
             continue;
         }
         const staff = note.ParentStaff?.idInMusicSheet;
-        if (!isPracticedHand(staff, hand)) {
+        if (!isPracticedHand(staff, hand, parts)) {
             continue;
         }
         const expression = readScoreExpression(note);
@@ -109,10 +114,13 @@ function staffArrivals(event: {
 // Exported so the duet can lift the sitting-out hand's positions the same way,
 // reading the identical staff split the run itself matches on.
 export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): MatchStep[] {
+    // Which staves are the practised instrument's, worked out from the sheet rather than
+    // assumed: on an art song the piano is staves 1 and 2, and staff 0 is the singer.
+    const parts = readParts(osmd);
     osmd.cursor.reset();
     const steps: MatchStep[] = [];
     while (!osmd.cursor.iterator.EndReached) {
-        const step = stepAtCursor(osmd, hand);
+        const step = stepAtCursor(osmd, hand, parts);
         if (step.pitches.length > 0) {
             steps.push({ ...step, bar: osmd.cursor.iterator.CurrentMeasureIndex });
         }
@@ -132,10 +140,11 @@ export function collectSteps(osmd: OpenSheetMusicDisplay, hand: Hand = "both"): 
 // Walk the reset cursor forward to the first playable position at or after `from`,
 // so the visual cursor and the reducer agree from note one.
 function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): void {
+    const parts = readParts(osmd);
     while (
         !osmd.cursor.iterator.EndReached &&
         ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
-            stepAtCursor(osmd, hand).pitches.length === 0)
+            stepAtCursor(osmd, hand, parts).pitches.length === 0)
     ) {
         osmd.cursor.next();
     }
@@ -145,8 +154,12 @@ function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): vo
 // the stretches where only the other hand sounds, are skipped exactly the way the
 // step collector skipped them.
 function advanceCursor(osmd: OpenSheetMusicDisplay, hand: Hand): void {
+    const parts = readParts(osmd);
     osmd.cursor.next();
-    while (!osmd.cursor.iterator.EndReached && stepAtCursor(osmd, hand).pitches.length === 0) {
+    while (
+        !osmd.cursor.iterator.EndReached &&
+        stepAtCursor(osmd, hand, parts).pitches.length === 0
+    ) {
         osmd.cursor.next();
     }
 }

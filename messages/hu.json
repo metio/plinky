@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Ennyi ütemet kényszerít minden sorba a nagyobb kottaképért; az Auto a képernyődhöz igazítja őket.",
   "treadmill_toggle": "Futószalag",
   "treadmill_hint": "A darab egyetlen sorként jelenik meg, amely játék közben gördül, egymásra tornyozott sorok helyett.",
+  "accompaniment_toggle": "Többi szólam",
+  "accompaniment_hint": "Néhány darab zongorára és énekhangra vagy másik hangszerre íródott. Az ő szólamuk félreáll, amíg nem szeretnéd a magadé mellett látni és hallani.",
   "highway_toggle": "Hangjegysáv",
   "highway_hint": "A közelgő hangjegyek a billentyűk fölé rendeződnek, és játék közben rájuk hullanak, így látod, melyik billentyű következik.",
   "highway_label": "Közelgő hangjegyek a billentyűkre hullva",

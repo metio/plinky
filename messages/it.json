@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Forza questo numero di battute per riga per una notazione più grande; Auto le adatta al tuo schermo.",
   "treadmill_toggle": "Tapis roulant",
   "treadmill_hint": "Il brano si legge come un'unica riga che scorre mentre suoni, invece di righe impilate.",
+  "accompaniment_toggle": "Altre parti",
+  "accompaniment_hint": "Alcuni brani sono scritti per pianoforte e voce o un altro strumento. La loro parte resta da parte, finché non vuoi vederla e ascoltarla accanto alla tua.",
   "highway_toggle": "Cascata di note",
   "highway_hint": "Le note in arrivo si accumulano sopra i tasti e cadono su di essi mentre suoni, così vedi qual è il tasto successivo.",
   "highway_label": "Note in arrivo che cadono sui tasti",

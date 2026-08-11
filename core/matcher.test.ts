@@ -9,11 +9,12 @@ import {
     type MatchStep,
     matchNote,
     isPracticedHand,
-    STAFF_FOR,
+    staffFor,
     startMatch,
     stepRange,
     upcomingSteps,
 } from "./matcher";
+import { GRAND_STAFF, partsOf } from "./parts";
 
 const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep => ({
     pitches,
@@ -35,10 +36,10 @@ describe("isPracticedHand", () => {
     });
 
     it("owns only its own staff for a single hand", () => {
-        expect(isPracticedHand(STAFF_FOR.right, "right")).toBe(true);
-        expect(isPracticedHand(STAFF_FOR.left, "right")).toBe(false);
-        expect(isPracticedHand(STAFF_FOR.left, "left")).toBe(true);
-        expect(isPracticedHand(STAFF_FOR.right, "left")).toBe(false);
+        expect(isPracticedHand(0, "right")).toBe(true);
+        expect(isPracticedHand(1, "right")).toBe(false);
+        expect(isPracticedHand(1, "left")).toBe(true);
+        expect(isPracticedHand(0, "left")).toBe(false);
     });
 
     it("disowns a staff-less note for a single hand — it is the other hand's", () => {
@@ -202,7 +203,8 @@ describe("helpers", () => {
 
 describe("matcher constants and edges", () => {
     it("maps each single hand to its staff index", () => {
-        expect(STAFF_FOR).toEqual({ right: 0, left: 1 });
+        expect(staffFor("right", GRAND_STAFF)).toBe(0);
+        expect(staffFor("left", GRAND_STAFF)).toBe(1);
     });
 
     it("expects no pitches and rests on bar 0 with no steps, and empties once complete", () => {
@@ -279,5 +281,26 @@ describe("when each pitch of a position landed", () => {
         const result = matchNote(state, 67, 2000, true);
         const [event] = cleared(result.events);
         expect(event?.arrivals.every((at) => at === 2000)).toBe(true);
+    });
+});
+
+describe("a score whose piano is not the first instrument", () => {
+    // Voice on staff 0, piano on staves 1 and 2 — the art-song shape, and 89% of the
+    // catalogue's multi-part scores.
+    const song = partsOf([1, 2]);
+
+    it("gives each hand the piano's own staff", () => {
+        expect(isPracticedHand(1, "right", song)).toBe(true);
+        expect(isPracticedHand(2, "left", song)).toBe(true);
+        // Not the singer's line, whichever hand is asked for.
+        expect(isPracticedHand(0, "right", song)).toBe(false);
+        expect(isPracticedHand(0, "left", song)).toBe(false);
+    });
+
+    it("keeps the sung line out of a both-hands run too", () => {
+        // Otherwise the player is asked to play the melody they are meant to accompany.
+        expect(isPracticedHand(0, "both", song)).toBe(false);
+        expect(isPracticedHand(1, "both", song)).toBe(true);
+        expect(isPracticedHand(2, "both", song)).toBe(true);
     });
 });

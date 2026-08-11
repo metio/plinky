@@ -337,6 +337,7 @@ function usePlaySessionValue({
         barNumbers,
         treadmill,
         showBeams: beamsVisible(reading.beams, grade),
+        showAccompaniment: reading.showAccompaniment,
         colorNotes: aids.colorNotes,
         focus: focusRange,
         showFingerings,

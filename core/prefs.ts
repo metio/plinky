@@ -44,6 +44,13 @@ export type Prefs = {
     // the piece's difficulty — flags on the easy grades a beginner reads note-by-note,
     // beat-grouping beams once they help — and "on"/"off" force it either way.
     beams: Beams;
+    // Engrave the parts a score carries besides the piano — the vocal line of an art
+    // song, another instrument in a chamber piece. Off by default: most of the
+    // catalogue's multi-part scores are songs, and a piano learner opening one wants
+    // their own two staves, not a system with a sung melody on top. Turned on, the
+    // other parts are printed and sounded as accompaniment, and never demanded of the
+    // player — the hand mapping resolves the piano's own staves from the score.
+    showAccompaniment: boolean;
     // Colour the noteheads by note name (a Boomwhacker reading aid), so a beginner reads
     // pitch by hue. Off by default — standard black notation. The played/heard feedback
     // rides behind the notes as a halo, so the colours stay readable as you play.
@@ -215,6 +222,7 @@ function defaults(): Prefs {
         // was built for. Starter is the whole point of a beginner-first app: every aid
         // on, including the notes highway, until the reader chooses otherwise. A test
         // pins the pairing, so moving either side without the other fails.
+        showAccompaniment: false,
         colorNotes: true,
         noteHints: "always",
         noteLabels: "all",
@@ -304,6 +312,7 @@ export function parsePrefs(raw: string | null): Prefs {
             handSpan: cleanHandSpan(parsed.handSpan),
             showFingerings: bool(parsed.showFingerings, base.showFingerings),
             beams: oneOf(parsed.beams, BEAMS, base.beams),
+            showAccompaniment: bool(parsed.showAccompaniment, base.showAccompaniment),
             colorNotes: bool(parsed.colorNotes, base.colorNotes),
             noteHints: oneOf(parsed.noteHints, NOTE_HINTS, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABELS, base.noteLabels),

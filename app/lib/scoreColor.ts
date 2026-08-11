@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type Hand, isPracticedHand } from "../../core/matcher";
+import { readParts } from "./scoreExpression";
 import { type MeasureBox, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
 // OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
@@ -61,6 +62,7 @@ export function collectStepNotes(osmd: OpenSheetMusicDisplay, hand: Hand): StepN
     // make it visible before walking; the matcher reshows and repositions it after.
     osmd.cursor.show();
     osmd.cursor.reset();
+    const parts = readParts(osmd);
     while (!osmd.cursor.iterator.EndReached) {
         const elements: SVGGElement[] = [];
         let playable = false;
@@ -69,7 +71,7 @@ export function collectStepNotes(osmd: OpenSheetMusicDisplay, hand: Hand): StepN
             if (note.isRest() || note.halfTone <= 0) {
                 continue;
             }
-            if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand)) {
+            if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand, parts)) {
                 continue;
             }
             // This position counts as a step the moment it holds a playable note,

@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Impune acest număr de măsuri pe fiecare rând, pentru notație mai mare; Automat le adaptează la ecranul tău.",
   "treadmill_toggle": "Bandă rulantă",
   "treadmill_hint": "Piesa se citește ca o singură linie care derulează pe măsură ce cânți, în loc de rânduri suprapuse.",
+  "accompaniment_toggle": "Celelalte partide",
+  "accompaniment_hint": "Unele piese sunt scrise pentru pian și voce sau alt instrument. Partida lor stă deoparte, până când vrei să o vezi și să o auzi alături de a ta.",
   "highway_toggle": "Pista notelor",
   "highway_hint": "Notele care urmează se adună deasupra tastelor și cad pe ele pe măsură ce cânți, ca să vezi care tastă urmează.",
   "highway_label": "Note care urmează, căzând pe taste",

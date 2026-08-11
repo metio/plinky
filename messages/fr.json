@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Impose ce nombre de mesures par ligne pour une notation plus grande ; Auto les ajuste à votre écran.",
   "treadmill_toggle": "Défilement",
   "treadmill_hint": "Le morceau se lit comme une seule ligne qui défile pendant que vous jouez, au lieu de lignes empilées.",
+  "accompaniment_toggle": "Autres parties",
+  "accompaniment_hint": "Certains morceaux sont écrits pour piano et voix ou un autre instrument. Leur partie reste à l'écart, jusqu'à ce que tu souhaites la voir et l'entendre à côté de la tienne.",
   "highway_toggle": "Cascade de notes",
   "highway_hint": "Les notes à venir s'empilent au-dessus des touches et tombent dessus pendant que vous jouez, pour que vous voyiez quelle touche vient ensuite.",
   "highway_label": "Notes à venir tombant sur les touches",

@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Presser lige så mange takter ind på hver række for større noder; Auto tilpasser dem til din skærm.",
   "treadmill_toggle": "Løbebånd",
   "treadmill_hint": "Stykket læses som én linje, der ruller, mens du spiller, i stedet for stablede rækker.",
+  "accompaniment_toggle": "Andre stemmer",
+  "accompaniment_hint": "Nogle stykker er skrevet for klaver og sang eller et andet instrument. Deres stemme holder sig væk, indtil du vil se og høre den ved siden af din egen.",
   "highway_toggle": "Faldende noder",
   "highway_hint": "De kommende noder stabler sig over tangenterne og falder ned på dem, mens du spiller, så du kan se, hvilken tangent der er den næste.",
   "highway_label": "Kommende noder, der falder ned på tangenterne",

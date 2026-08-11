@@ -80,7 +80,10 @@ numbers** on each row's first bar make a passage easy to find (and line up with 
 loop's from/to), or you can turn them off for a cleaner staff. **Beams** — the bars
 that join fast notes into beat groups — can be hidden so a beginner reads one note at a
 time, shown, or left on **Auto**, which draws them on harder pieces where the beat
-grouping helps and drops them on the easy grades. A **note-size** control magnifies the
+grouping helps and drops them on the easy grades. Pieces written for piano
+and a singer or another instrument show only your own two staves; **Other parts** brings
+theirs back, printed above yours and sounded along with them, and it is never something
+you are asked to play. A **note-size** control magnifies the
 whole score — bigger, easier-to-read glyphs on a small screen or for a beginner, and it
 works in treadmill mode too. The notes are **coloured** by name out of the box — every C red,
 every D orange — so a beginner reads pitch by hue while the names sink in; turn it off once

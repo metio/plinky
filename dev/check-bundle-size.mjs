@@ -265,7 +265,12 @@ const BUDGET_VENDOR_KB = 324;
 // Nearly all of it is the Settings panel and its fourteen strings; the parts that do
 // the work — the picture, the diff, the MIDI adapter — are small, because the feature
 // is plain note-on/note-off over the MIDI output that already existed.
-const BUDGET_APP_KB = 328;
+//
+// 329. Opening a song as piano music: the parts written for a singer or a second
+// instrument are removed from the sheet before it loads, so the cursor and the matcher
+// see the grand staff a piano learner came for. The cost is one MusicXML rewrite and
+// the Settings switch that brings the rest back.
+const BUDGET_APP_KB = 329;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

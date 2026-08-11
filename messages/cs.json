@@ -185,6 +185,8 @@
   "bars_per_row_caption": "Vynutí tolik taktů na každý řádek pro větší notaci; Automaticky je přizpůsobí vaší obrazovce.",
   "treadmill_toggle": "Běžící pás",
   "treadmill_hint": "Skladba se čte jako jedna linka, která se posouvá, jak hrajete, místo naskládaných řádků.",
+  "accompaniment_toggle": "Ostatní party",
+  "accompaniment_hint": "Některé skladby jsou psané pro klavír a zpěv nebo jiný nástroj. Jejich part zůstává stranou, dokud ho nebudeš chtít vidět a slyšet vedle svého.",
   "highway_toggle": "Padající noty",
   "highway_hint": "Nadcházející noty se skládají nad klávesami a padají na ně, jak hrajete, takže vidíte, která klávesa je na řadě.",
   "highway_label": "Nadcházející noty padající na klávesy",

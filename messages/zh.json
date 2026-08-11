@@ -185,6 +185,8 @@
   "bars_per_row_caption": "强制每行放这么多小节，让记谱更大；「自动」会按你的屏幕适配。",
   "treadmill_toggle": "跑带模式",
   "treadmill_hint": "曲子会显示成随你演奏滚动的一整行，而不是堆叠的多行。",
+  "accompaniment_toggle": "其他声部",
+  "accompaniment_hint": "有些曲子是为钢琴与歌唱或另一件乐器而写的。那个声部会先退到一旁，等你想和自己的声部一起看、一起听时再出现。",
   "highway_toggle": "音符轨道",
   "highway_hint": "接下来的音符会在琴键上方叠好，随着你演奏落到键上，让你看清下一个该按哪个键。",
   "highway_label": "即将落到琴键上的音符",

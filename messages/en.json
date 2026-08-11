@@ -277,6 +277,8 @@
   "bars_per_row_caption": "Forces this many bars onto each row for bigger notation; Auto fits them to your screen.",
   "treadmill_toggle": "Treadmill",
   "treadmill_hint": "The piece reads as one line that scrolls as you play, instead of stacked rows.",
+  "accompaniment_toggle": "Other parts",
+  "accompaniment_hint": "Some pieces are written for piano and a singer or another instrument. Their part stays out of the way unless you'd like to see and hear it alongside yours.",
   "highway_toggle": "Notes highway",
   "highway_hint": "The notes to come stack above the keys and fall onto them as you play, so you can see which key is next.",
   "highway_label": "Upcoming notes falling onto the keys",

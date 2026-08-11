@@ -12,6 +12,7 @@ const BASE: Prefs = {
     handSpan: { left: null, right: null },
     showFingerings: false,
     beams: "auto",
+    showAccompaniment: false,
     colorNotes: true,
     noteHints: "always",
     noteLabels: "all",

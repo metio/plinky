@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 11 August 2026 — later still
+
+**Songs open as piano music.** A lot of scores are written for piano and a singer, or
+piano and another instrument, and until now that whole part landed on screen next to
+yours — a sung melody sitting above the music you were meant to read, and the piano's
+left hand out of reach of hands-separate practice. Those pieces now open showing your
+two staves and nothing else, with the hands the right way round. If you'd like the rest
+back, **Other parts** in Settings prints it above yours and plays it along with you; it
+is accompaniment, never something Plinky asks you to play.
+
 ## 11 August 2026 — later
 
 **Your keyboard can show you what's coming.** If your piano lights its own keys —
