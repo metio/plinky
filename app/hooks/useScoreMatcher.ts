@@ -3,6 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
+import { elapsedWholes } from "../../core/elapsed";
 import { lengthScaleOf, velocityOf } from "../../core/expression";
 import type { ScoreParts } from "../../core/parts";
 import { readActiveDynamic, readParts, readScoreExpression } from "../lib/scoreExpression";
@@ -32,11 +33,23 @@ export type { Hand } from "../../core/matcher";
 // one entry of the step model the pure matcher runs on. Collecting the hold length
 // with the position means the run reads it off the step model, never the live
 // cursor, so the cursor stays purely a visual mirror during a run.
+// How long the position under the cursor lasts before the next onset: the shortest note
+// or rest here, in quarter notes. The shortest is what ends first, and its end is where
+// the cursor stops next — the same rule Listen advances by. A position the score gives
+// nothing lasts a beat, matching that fallback.
+function shortestLength(osmd: OpenSheetMusicDisplay): number {
+    let shortest = Number.POSITIVE_INFINITY;
+    for (const note of osmd.cursor.NotesUnderCursor()) {
+        shortest = Math.min(shortest, note.Length.RealValue * 4);
+    }
+    return Number.isFinite(shortest) ? shortest : 1;
+}
+
 function stepAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
-): Omit<MatchStep, "bar"> {
+): Omit<MatchStep, "bar" | "elapsed"> & { advanceQuarters: number } {
     const pitches: number[] = [];
     // One entry per pitch, in the same order. A note whose staff the engraver does not
     // report reads as the treble, which is where a single-staff piece is played.
@@ -83,6 +96,10 @@ function stepAtCursor(
         pitchStaves,
         staves: [...new Set(pitchStaves)].sort((a, b) => a - b),
         whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+        // The SHORTEST written length here, rests included — the gap to the next onset,
+        // the same measure playback advances the cursor by. Only the repeat arithmetic
+        // reads it, and only where the printed onsets jump.
+        advanceQuarters: shortestLength(osmd),
         holdQuarters,
         expected,
     };
@@ -118,15 +135,30 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // assumed: on an art song the piano is staves 1 and 2, and staff 0 is the singer.
     const parts = readParts(osmd);
     osmd.cursor.reset();
-    const steps: MatchStep[] = [];
+    // Every position the performance passes through, playable or not, because elapsed time
+    // is only recoverable from a walk with no holes in it: two positions that follow each
+    // other here are adjacent in the music, so the gap between their printed onsets is the
+    // real gap — except where a repeat jumps, which is exactly what the accumulation is
+    // for. Filtering to the playable ones first would leave gaps indistinguishable from
+    // jumps.
+    const walked: (Omit<MatchStep, "elapsed"> & { advanceQuarters: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
-        const step = stepAtCursor(osmd, hand, parts);
-        if (step.pitches.length > 0) {
-            steps.push({ ...step, bar: osmd.cursor.iterator.CurrentMeasureIndex });
-        }
+        walked.push({
+            ...stepAtCursor(osmd, hand, parts),
+            bar: osmd.cursor.iterator.CurrentMeasureIndex,
+        });
         osmd.cursor.next();
     }
     osmd.cursor.reset();
+
+    const elapsed = elapsedWholes(walked);
+    const steps: MatchStep[] = [];
+    for (const [index, step] of walked.entries()) {
+        if (step.pitches.length > 0) {
+            const { advanceQuarters: _advance, ...rest } = step;
+            steps.push({ ...rest, elapsed: elapsed[index] as number });
+        }
+    }
     return steps;
 }
 
@@ -365,7 +397,7 @@ export function useScoreMatcher(
                     ordinal: event.ordinal,
                     index: runStartIndexRef.current + event.ordinal,
                     timestamp,
-                    timeMs: event.step.whole * 4 * (60000 / runTempoRef.current),
+                    timeMs: event.step.elapsed * 4 * (60000 / runTempoRef.current),
                     // The written length to hold, taken from the cleared step itself,
                     // so it stays right regardless of where the visual cursor sits.
                     holdMs: event.step.holdQuarters * (60000 / runTempoRef.current),

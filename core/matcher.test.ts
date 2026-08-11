@@ -20,6 +20,7 @@ const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep 
     pitches,
     pitchStaves: [0], staves: [0],
     whole: 0,
+    elapsed: 0,
     bar: 0,
     holdQuarters: 0,
     ...overrides,
@@ -241,6 +242,7 @@ describe("the staff of each pitch", () => {
             pitchStaves: [1, 0],
             staves: [0, 1],
             whole: 0,
+            elapsed: 0,
             bar: 0,
             holdQuarters: 1,
         };

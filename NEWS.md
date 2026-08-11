@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 August 2026
+
+**Repeats are counted as time played, not time printed.** When a piece repeats a
+section, you play those bars twice — but the timing feedback read both passes as the
+same moment on the page, so the second time round every note looked hopelessly late
+however well you played it. Repeated sections are now measured where they actually fall
+in the performance, and first and second endings no longer leave a silent gap where the
+bar you skipped used to be. Timing scores, the ghost race and the exported takes are all
+straighter for it on any piece with a repeat sign.
+
 ## 11 August 2026 — later still
 
 **Songs open as piano music.** A lot of scores are written for piano and a singer, or

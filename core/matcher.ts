@@ -56,9 +56,14 @@ export type MatchStep = {
     // The distinct staves the position sits on, derived from pitchStaves and kept
     // because most readers only ask "which hands are involved here".
     staves: number[];
-    // The notated onset in whole notes from the top of the piece — pure
-    // notation; the caller scales it by the run's tempo into milliseconds.
+    // The notated onset in whole notes from the top of the piece — where the position is
+    // PRINTED. Repeats revisit it, so several steps of one run can share a value; use it
+    // to find a place in the score, never to say when a note is due.
     whole: number;
+    // Elapsed whole notes at this position once the repeats are played out — where it
+    // falls in TIME. Rises across the whole run even where `whole` rewinds, and it is
+    // this the caller scales by the run's tempo into milliseconds.
+    elapsed: number;
     // The 0-based bar the position sits in, for a focus view.
     bar: number;
     // The longest written length here, in quarter notes — how long the key is

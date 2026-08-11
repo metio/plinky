@@ -5,7 +5,12 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { collectSteps, type CorrectInfo, useScoreMatcher } from "./useScoreMatcher";
+import {
+    collectMatchSteps,
+    collectSteps,
+    type CorrectInfo,
+    useScoreMatcher,
+} from "./useScoreMatcher";
 
 // A position is the chord sounding at one cursor step; an empty array is a rest.
 // halfTone is OSMD's pitch index, which the matcher maps to MIDI as halfTone + 12.
@@ -25,14 +30,19 @@ function midiToHalfTone(midi: number): number {
 
 // A minimal stand-in for the OSMD cursor the matcher drives: just enough of
 // NotesUnderCursor / iterator / next / reset / show / hide to exercise matching.
-function fakeOsmd(positions: Position[]): { osmd: OpenSheetMusicDisplay; shown: () => boolean } {
+// `wholes` overrides the printed onset of each position, so a walk can revisit one — a
+// repeat plays bars over again and OSMD's timestamp rewinds with them.
+function fakeOsmd(
+    positions: Position[],
+    wholes?: number[],
+): { osmd: OpenSheetMusicDisplay; shown: () => boolean } {
     let index = 0;
     let shown = false;
     const cursor = {
         get iterator() {
             return {
                 EndReached: index >= positions.length,
-                currentTimeStamp: { RealValue: index * 0.25 },
+                currentTimeStamp: { RealValue: wholes?.[index] ?? index * 0.25 },
                 // Four quarter-note positions per 4/4 bar.
                 CurrentMeasureIndex: Math.floor(index / 4),
             };
@@ -415,5 +425,37 @@ describe("tied notes", () => {
         const info = onCorrect.mock.calls[0]?.[0] as CorrectInfo;
         // Three quarters at 60bpm is three seconds.
         expect(info.holdMs).toBe(3000);
+    });
+});
+
+describe("elapsed time across a repeat", () => {
+    // Two positions played twice: the printed onsets rewind, 0, ¼, 0, ¼, and every note
+    // is a quarter long, so the four of them are due a quarter apart.
+    const REPEATED: Position[] = [[60], [62], [60], [62]];
+    const WHOLES = [0, 0.25, 0, 0.25];
+
+    it("keeps counting instead of rewinding with the printed onset", () => {
+        const { osmd } = fakeOsmd(REPEATED, WHOLES);
+        const steps = collectMatchSteps(osmd, "both");
+        expect(steps.map((step) => step.whole)).toEqual(WHOLES);
+        expect(steps.map((step) => step.elapsed)).toEqual([0, 0.25, 0.5, 0.75]);
+    });
+
+    it("gives the second pass its own onsets in the graded run", () => {
+        const view = render(REPEATED, {});
+        const times: number[] = [];
+        // A run reports each cleared position's notated onset in ms; at 60 bpm a quarter
+        // note is a second, and the repeat's notes must not land back at the start.
+        const cleared = (info: CorrectInfo) => times.push(info.timeMs);
+        view.rerender({ opts: { onCorrect: cleared, tempo: 60 } });
+        act(() => {
+            view.result.current.start();
+        });
+        for (const pitch of [60, 62, 60, 62]) {
+            act(() => {
+                view.result.current.registerNote(pitch);
+            });
+        }
+        expect(times).toEqual([0, 1000, 2000, 3000]);
     });
 });
