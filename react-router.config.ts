@@ -5,6 +5,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import type { Config } from "@react-router/dev/config";
 import { generateStaticLocalizedUrls } from "./app/paraglide/runtime.js";
 import { staticPaths } from "./dev/pages.mjs";
+import { PEOPLE_INDEX } from "./core/peopleIndex";
 import { personSlug } from "./core/person";
 import { readScoreMetaFromText } from "./core/scoreMeta";
 import { songId } from "./core/songId";
@@ -32,8 +33,19 @@ const BUNDLED_PLAY_PATHS = BUNDLED_SCORES.map((score) => `/play/${score.id}`);
 // crawlable, sitemap-listed entity (name, their pieces, Person + BreadcrumbList
 // structured data) rather than a JavaScript-only shell. One slug per composer,
 // deduped; attribution markers ("Traditional") slug to "" and are skipped.
+// Plus every composer the shipped catalogue credits with enough pieces to be worth a
+// static document — read from the baked index (dev/bake-people.mts), which is derived
+// from the same manifests the app loads. The floor keeps a page that would list one or
+// two pieces off the sitemap: thin for a reader, thin for a crawler, and multiplied by
+// every locale it is a build cost with nothing on the other side. A composer below the
+// floor still has a working page; it simply renders on the client like any other.
+const CATALOGUE_PERSON_SLUGS = Object.keys(PEOPLE_INDEX);
+
 const PERSON_PATHS = [
-    ...new Set(BUNDLED_SCORES.map((score) => personSlug(score.composer)).filter(Boolean)),
+    ...new Set([
+        ...BUNDLED_SCORES.map((score) => personSlug(score.composer)).filter(Boolean),
+        ...CATALOGUE_PERSON_SLUGS,
+    ]),
 ].map((slug) => `/person/${slug}`);
 
 export default {

@@ -8,6 +8,27 @@ SPDX-License-Identifier: 0BSD
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 11 August 2026
+
+**A short course in how the music works.** [How the music
+works](https://plinky.fun/en/theory/) is eight lessons on what a stave is actually
+telling you — the page as a picture of the keyboard, half steps and whole steps, the
+octave, major and minor scales, why a piece carries sharps, triads, and the single key
+that turns a major chord minor. Each lesson is a paragraph and something to play, so
+you hear the idea rather than only read it. The glossary says what a mark means; this
+says why the music is built that way. Both are linked from Help.
+
+**Every composer has a real page now.** Plinky credits 542 composers across the
+catalogue, and the ones with a few pieces to their name now have a proper page that
+loads with their name and their piece count already on it, rather than filling in a
+moment later. Fixing that turned up a pile of duplicates: Carl Czerny was three
+different people, Handel was two, and Scriabin, Brahms, Beethoven, Liszt, Ravel,
+Vivaldi, Mendelssohn and Chopin were each split across an abbreviated spelling and a
+full one. They are one person each again, so "more by this composer" shows you
+everything rather than a third of it. A few credits that were really work numbers
+("… Opus 100.") or traditions rather than people ("Gregorian chant") have stopped
+claiming pages of their own.
+
 ## 10 August 2026
 
 **A page of little tools.** [Little tools](https://plinky.fun/en/tools/) collects the

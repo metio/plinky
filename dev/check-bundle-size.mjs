@@ -252,7 +252,15 @@ const BUDGET_VENDOR_KB = 324;
 // relative minor, scale and chord explorers over the existing keyboard and synth, and
 // a tap-tempo reader. Two small pure modules plus twenty-three strings; the engines it
 // draws on were already in the bundle, which is the whole reason the page is cheap.
-const BUDGET_APP_KB = 319;
+//
+// 326. Two pages that exist to be found: an eight-lesson theory course, and a person
+// page for every composer the catalogue credits with three pieces or more. About half
+// the raise is the baked composer index — 154 names and counts, in the person route's
+// own chunk — which is what lets a prerendered composer page carry a real name and
+// real structured data instead of a name guessed back from its URL. Trimmed first by
+// baking only the composers actually prerendered: listing all 542 cost 6 KB more and
+// bought nothing, since below that floor the manifest names them anyway.
+const BUDGET_APP_KB = 326;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

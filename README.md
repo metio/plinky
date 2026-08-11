@@ -357,6 +357,16 @@ the grade — the grades measure how hard a piece is to *play*, and ties, rests 
 signatures turn up as often in grade 1 as in grade 8 — so a piece with nothing unusual
 in it says nothing at all.
 
+## How the music works
+
+[How the music works](https://plinky.fun/en/theory/) is a short course — eight lessons
+on the theory the page assumes you already have. The stave as a picture of the
+keyboard; half steps and whole steps; the octave; the major and minor scales; why a
+piece carries sharps; triads; and the one key that turns a major chord minor. Each
+lesson is a paragraph and something to play, so the idea arrives through your ears as
+well as your eyes. The glossary tells you what a mark means, this tells you why the
+music is built that way.
+
 ## Little tools
 
 [Little tools](https://plinky.fun/en/tools/) is the look-it-up page: no account, no
@@ -614,8 +624,17 @@ board — the page never breaks. It reuses the news banner's
 Every composer credited in the catalogue gets a page at `/person/<name>` —
 all of their pieces in one place, easiest first, each one tap from being
 practised. The composer's name on a play page links there. Spelling variants
-across the source corpora ("J.S. Bach", "Johann Sebastian Bach (1685 - 1750)")
-are canonicalized so one composer owns one page.
+across the source corpora ("J.S. Bach", "Johann Sebastian Bach (1685 - 1750)",
+"C. Czerny", "Georg Friedrich Händel") are canonicalized so one composer owns one
+page, and credits that are really work numbers or traditions rather than people get
+no page at all.
+
+The catalogue credits 542 of them. Those with three pieces or more arrive as a static
+document carrying their name, their piece count and their structured data, so a
+crawler or a link unfurler that runs no JavaScript still sees a real person; the piece
+list itself fills in a moment later. Composers below that line still have a working
+page — it simply renders on the client like everything else, because a page listing
+one piece is thin whoever is reading it.
 
 ## Follow Plinky
 

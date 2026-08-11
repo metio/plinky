@@ -37,12 +37,52 @@ const ALIASES: Record<string, string> = {
     anonymus: "Anonymous",
     anon: "Anonymous",
     "anon.": "Anonymous",
+    // Variants the shipped catalogue actually credits, found by baking the composer
+    // index (dev/bake-people.mts) and reading what came out. Each of these owned a
+    // separate page — and a separate "more by this composer" list — until it was
+    // merged here, so the table is what stops one person from being several.
+    "a. scriabin": "Alexander Scriabin",
+    scriabin: "Alexander Scriabin",
+    "c. czerny": "Carl Czerny",
+    czernyc: "Carl Czerny",
+    czerny: "Carl Czerny",
+    "j. brahms": "Johannes Brahms",
+    brahms: "Johannes Brahms",
+    "l. van beethoven": "Ludwig van Beethoven",
+    "f. liszt": "Franz Liszt",
+    liszt: "Franz Liszt",
+    "m. ravel": "Maurice Ravel",
+    ravel: "Maurice Ravel",
+    "n. rimsky-korsakov": "Nikolai Rimsky-Korsakov",
+    "chopinff": "Frédéric Chopin",
+    "frédérick chopin": "Frédéric Chopin",
+    "g. f. händel": "George Frideric Handel",
+    "georg friedrich händel": "George Frideric Handel",
+    "haendel": "George Frideric Handel",
+    "händel": "George Frideric Handel",
+    "a. vivaldi": "Antonio Vivaldi",
+    "antónio vivaldi": "Antonio Vivaldi",
+    vivaldi: "Antonio Vivaldi",
+    "a. goedicke": "Alexander Goedicke",
+    "felix mendelssohn-bartholdy": "Felix Mendelssohn",
+    mendelssohn: "Felix Mendelssohn",
+    "augusta mary anne holmès": "Augusta Holmès",
+    "clara mathilda faisst": "Clara Faisst",
+    "alexander campbell mackenzie": "Alexander Mackenzie",
+    "friedrich burgmüller": "Johann Friedrich Franz Burgmüller",
+    "johann friedrich franz burgmüller opus 100": "Johann Friedrich Franz Burgmüller",
+    "l. streabbog": "Louis Streabbog",
+    "frederik kuhlau": "Friedrich Kuhlau",
+    "by scott joplin": "Scott Joplin",
+    "john philip sousa": "John Philip Sousa",
 };
 
-// Initials written tight ("J.S. Bach") spread to the spaced form ("J. S. Bach")
-// so both spellings clean to the same key.
+// Initials written tight spread to the spaced form, so every spelling of the same
+// credit cleans to one key: "J.S. Bach" and "A.Scriabin" both gain the space, which is
+// what lets a single alias entry catch them. A single capital before the dot is what
+// makes it an initial — "St." and "Op." are left alone.
 function spaceInitials(name: string): string {
-    return name.replace(/\b([A-Z])\.(?=[A-Z]\.)/g, "$1. ");
+    return name.replace(/\b([A-Z])\.(?=\p{L})/gu, "$1. ");
 }
 
 // The mechanical cleanup shared by the canonical name and the grouping key:
@@ -55,13 +95,26 @@ function cleaned(raw: string): string {
         /\b\p{Lu}{4,}\b/gu,
         (word) => word[0] + word.slice(1).toLowerCase(),
     );
+    // Corpora that passed their credits through an HTML pipeline leak entities into
+    // the name — a page reading `Claribel&quot;` is the credit failing in public.
+    name = name
+        .replace(/&quot;/gi, '"')
+        .replace(/&amp;/gi, "&")
+        .replace(/&#39;|&apos;/gi, "'");
     name = name.replace(/\s*\([^)]*\)/g, "");
+    // A bracketed aside ("[published as …]") is about the work or the pen name, not
+    // the person, and would otherwise split one composer across two pages.
+    name = name.replace(/\s*\[[^\]]*\]/g, "");
+    // A work number appended to the credit ("… Opus 100.", "Op.11.No.1") names the
+    // piece, not its composer.
+    name = name.replace(/[\s,]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*\d+[\d.\s]*.*$/i, "");
     name = name.replace(/[\s,]*\d{4}\s*[-–—]?\s*(\d{4})?\s*$/g, "");
     const comma = name.indexOf(",");
     if (comma > 0 && comma < name.length - 1) {
         name = `${name.slice(comma + 1)} ${name.slice(0, comma)}`;
     }
-    return name.replace(/\s+/g, " ").trim();
+    // A trailing full stop is punctuation from the credit line, never part of a name.
+    return name.replace(/\s+/g, " ").replace(/[.,;:]+$/, "").trim();
 }
 
 // The display name a person page carries: the cleaned spelling, routed through
@@ -76,7 +129,8 @@ export function canonicalComposer(raw: string): string {
 // for display ("trad." reads as Traditional) but never become a person: no
 // link, no page. Matched as words anywhere in the credit, so an enriched
 // attribution ("Traditional — …, 1761") stays a non-person too.
-const NOT_A_PERSON = /\b(trad|traditional|traditionnel|anonymous|anonymus|anon)\b/i;
+const NOT_A_PERSON =
+    /\b(trad|traditional|traditionnel|anonymous|anonymus|anon|volkslied|gregorian|plainchant|folk\s?song|spiritual|shanty)\b/i;
 
 // The person's URL segment: the canonical name lowercased, diacritics stripped,
 // anything non-alphanumeric folded to single hyphens — stable, readable, and

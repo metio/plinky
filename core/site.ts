@@ -174,16 +174,23 @@ export function personData(
         "@type": "Person",
         name: person.name,
         url: localeUrl(locale, `/person/${person.slug}/`),
-        subjectOf: {
-            "@type": "ItemList",
-            numberOfItems: person.pieces.length,
-            itemListElement: person.pieces.map((piece, index) => ({
-                "@type": "ListItem",
-                position: index + 1,
-                url: localeUrl(locale, `/play/${piece.id}/`),
-                name: piece.title,
-            })),
-        },
+        // The list is omitted rather than published empty: at prerender a catalogue
+        // composer is known by name before their pieces are, and an ItemList declaring
+        // zero items describes the page wrongly instead of describing it partially.
+        ...(person.pieces.length > 0
+            ? {
+                  subjectOf: {
+                      "@type": "ItemList",
+                      numberOfItems: person.pieces.length,
+                      itemListElement: person.pieces.map((piece, index) => ({
+                          "@type": "ListItem",
+                          position: index + 1,
+                          url: localeUrl(locale, `/play/${piece.id}/`),
+                          name: piece.title,
+                      })),
+                  },
+              }
+            : {}),
     };
 }
 

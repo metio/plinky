@@ -111,6 +111,16 @@ export default function Help() {
                 </Link>
             </p>
 
+            {/* The theory the glossary assumes: it says what a mark means, this says
+                why the music is built that way. Reached from here rather than from the
+                home page, because it is something you come looking for. */}
+            <p className="text-sm text-body">
+                {m.help_theory_lead()}{" "}
+                <Link to="/theory/" className={linkClasses}>
+                    {m.theory_title()}
+                </Link>
+            </p>
+
             {/* The small look-it-up things — a circle of fifths, a scale, a tempo read
                 off your own tapping. They belong beside the glossary: both answer a
                 question that comes up in the middle of practising. */}

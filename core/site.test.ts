@@ -111,8 +111,8 @@ describe("personData", () => {
         expect(data["@type"]).toBe("Person");
         expect(data.name).toBe("Frédéric Chopin");
         expect(data.url).toBe("https://plinky.fun/de/person/frederic-chopin/");
-        expect(data.subjectOf.numberOfItems).toBe(2);
-        expect(data.subjectOf.itemListElement[0]).toEqual({
+        expect(data.subjectOf?.numberOfItems).toBe(2);
+        expect(data.subjectOf?.itemListElement[0]).toEqual({
             "@type": "ListItem",
             position: 1,
             url: "https://plinky.fun/de/play/abc/",
@@ -153,5 +153,14 @@ describe("withTrailingSlash", () => {
         expect(withTrailingSlash("/de/library?tab=manage")).toBe("/de/library/?tab=manage");
         expect(withTrailingSlash("/de/help#daily")).toBe("/de/help/#daily");
         expect(withTrailingSlash("/de/play/abc?mode=ear#top")).toBe("/de/play/abc/?mode=ear#top");
+    });
+});
+
+describe("personData with no pieces yet", () => {
+    it("omits the list rather than publishing an empty one", () => {
+        // A prerendered catalogue composer is known by name before their pieces are.
+        const data = personData({ slug: "amy-beach", name: "Amy Beach", pieces: [] }, "en");
+        expect(data.name).toBe("Amy Beach");
+        expect(data.subjectOf).toBeUndefined();
     });
 });

@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { type Person, type PersonPiece, personFor } from "../../core/person";
+import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
 import { loadBundledScores } from "../lib/catalog";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
@@ -24,9 +25,23 @@ function bundledPieces(): PersonPiece[] {
     }));
 }
 
-// meta() runs statically, before the catalogue is loaded — the slug prettifies to
-// a tab title when the composer isn't among the bundled pieces, and the component
-// swaps in the canonical spelling once the manifest arrives.
+// The composer a slug names, with no network and no manifest: the bundled pieces
+// first (they carry their own titles, so the page has real content immediately), then
+// the baked catalogue index, which knows every credited composer's canonical spelling
+// but not their pieces. A prerendered page for a catalogue composer therefore ships
+// with the right name and structured data in its static HTML, and fills its piece list
+// in from the manifest on the client.
+function knownPerson(slug: string): Person | null {
+    const bundled = personFor(bundledPieces(), slug);
+    if (bundled) {
+        return bundled;
+    }
+    const indexed = indexedPerson(slug);
+    return indexed ? { slug, name: indexed.name, pieces: [] } : null;
+}
+
+// The fallback for a slug the catalogue credits nobody by — a user's own import, or a
+// hand-typed URL: prettify the slug so the tab still reads as a name.
 function nameFromSlug(slug: string): string {
     return slug
         .split("-")
@@ -39,7 +54,7 @@ export function meta({ params }: Route.MetaArgs) {
     const slug = params.slug ?? "";
     // The bundled composer resolves at prerender, so a bundled composer's page
     // carries its real name, piece list, and structured data in the static HTML.
-    const person = personFor(bundledPieces(), slug);
+    const person = knownPerson(slug);
     const name = person?.name ?? nameFromSlug(slug);
     const tags: Record<string, unknown>[] = [
         ...routeMeta(name || m.person_eyebrow(), m.meta_person_description({ name })),
@@ -67,15 +82,20 @@ export default function PersonPage() {
     // Seed with the bundled catalogue so the composer's pieces are in the first
     // render (prerendered HTML, then instant on load); the manifest merges the
     // user's imports in a beat later.
-    const [person, setPerson] = useState<Person | null>(() =>
-        personFor(bundledPieces(), slug ?? ""),
-    );
+    const [person, setPerson] = useState<Person | null>(() => knownPerson(slug ?? ""));
     const [loading, setLoading] = useState(true);
+    // How many pieces the shipped catalogue credits this composer with, known without
+    // the network. The prerendered document is what a crawler that runs no JavaScript
+    // reads, and a composer page stating "0 pieces" there would be worse than one
+    // stating nothing — the count is right in the static HTML, and the list itself
+    // arrives a beat later.
+    const known = indexedPerson(slug ?? "");
 
     useEffect(() => {
         let cancelled = false;
-        // Re-seed from the bundled catalogue on a slug change, then merge imports.
-        setPerson(personFor(bundledPieces(), slug ?? ""));
+        // Re-seed from what is known without the network on a slug change — the name at
+        // minimum — then merge the catalogue and the user's imports.
+        setPerson(knownPerson(slug ?? ""));
         (async () => {
             const manifest = (await songs.manifest()) ?? [];
             if (cancelled) {
@@ -99,9 +119,11 @@ export default function PersonPage() {
                 <h1 className="text-3xl font-bold tracking-tight">
                     {person?.name ?? nameFromSlug(slug ?? "")}
                 </h1>
-                {person && (
+                {person && (person.pieces.length > 0 || known) && (
                     <p className="text-sm text-muted">
-                        {m.person_pieces({ count: person.pieces.length })}
+                        {m.person_pieces({
+                            count: person.pieces.length || (known?.pieces ?? 0),
+                        })}
                     </p>
                 )}
             </header>

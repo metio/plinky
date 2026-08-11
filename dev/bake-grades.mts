@@ -9,12 +9,17 @@
 //   • each study's grade in public/exercises/manifest.json (studies grade on the same
 //     piece scale; scale/arpeggio tiles use their own fixed thresholds, untouched).
 //
+// It also bakes the composer index (dev/bake-people.mts) from the same manifests, so
+// every artefact derived from the shipped catalogue is regenerated and checked by one
+// command and one CI gate rather than drifting apart behind separate ones.
+//
 // `npm run songs:bake` writes those; `npm run songs:bake -- --check` writes nothing and
 // exits non-zero if any are stale — the CI guard so a catalogue change can't ship with
 // grades that disagree with the boundaries. Run songs:bake after songs:import /
 // songs:dedup, or whenever the catalogue changes.
 
 import { readFile, writeFile } from "node:fs/promises";
+import { bakePeopleIndex } from "./bake-people.mts";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 
 const MAX_GRADE = 8;
@@ -83,6 +88,10 @@ async function main() {
             console.error("\nRun `npm run songs:bake` to update, then commit the result.");
             process.exit(1);
         }
+        if (!(await bakePeopleIndex(true))) {
+            console.error("\nRun `npm run songs:bake` to update, then commit the result.");
+            process.exit(1);
+        }
         console.log("Catalogue grades are baked and consistent.");
         return;
     }
@@ -90,6 +99,7 @@ async function main() {
     await writeFile(THRESHOLDS, source.replace(PIECE_RE, `$1${boundaries.join(", ")}$3`));
     await writeFile(`${SONGS}/manifest.json`, JSON.stringify(bakedSongs));
     await writeFile(`${EXERCISES}/manifest.json`, JSON.stringify(bakedExercises));
+    await bakePeopleIndex(false);
 
     const histogram = Array.from({ length: MAX_GRADE + 1 }, () => 0);
     for (const song of bakedSongs) {

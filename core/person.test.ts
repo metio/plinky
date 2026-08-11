@@ -109,3 +109,46 @@ describe("peopleFrom / personFor", () => {
         expect(personFor(pieces, "nobody-here")).toBeNull();
     });
 });
+
+describe("credits the catalogue actually carries", () => {
+    it("merges the abbreviated spellings onto one person", () => {
+        for (const [variant, canonical] of [
+            ["C. Czerny", "Carl Czerny"],
+            ["CzernyC", "Carl Czerny"],
+            ["A. Scriabin", "Alexander Scriabin"],
+            ["J. Brahms", "Johannes Brahms"],
+            ["L. van Beethoven", "Ludwig van Beethoven"],
+            ["M.Ravel", "Maurice Ravel"],
+            ["Georg Friedrich Händel", "George Frideric Handel"],
+            ["Felix Mendelssohn-Bartholdy", "Felix Mendelssohn"],
+            ["António Vivaldi", "Antonio Vivaldi"],
+            ["Frédérick Chopin", "Frédéric Chopin"],
+        ] as const) {
+            expect(canonicalComposer(variant)).toBe(canonical);
+            expect(personSlug(variant)).toBe(personSlug(canonical));
+        }
+    });
+
+    it("drops a work number that was filed as part of the composer's name", () => {
+        expect(canonicalComposer("A.Scriabin Op.11.No.1")).toBe("Alexander Scriabin");
+        expect(canonicalComposer("Johann Friedrich Franz Burgmüller Opus 100.")).toBe(
+            "Johann Friedrich Franz Burgmüller",
+        );
+    });
+
+    it("decodes an entity a credit picked up from an HTML pipeline", () => {
+        expect(canonicalComposer('Charlotte Alington Barnard [published as &quot;Claribel&quot;]')).toBe(
+            "Charlotte Alington Barnard",
+        );
+    });
+
+    it("gives a tradition no page of its own", () => {
+        for (const credit of ["Gregorian chant", "Volkslied", "1860s English Sea Shanty"]) {
+            expect(personSlug(credit)).toBe("");
+        }
+    });
+
+    it("strips the full stop a credit line left behind", () => {
+        expect(canonicalComposer("John Philip Sousa.")).toBe("John Philip Sousa");
+    });
+});
