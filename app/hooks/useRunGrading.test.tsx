@@ -6,6 +6,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { Grade } from "../../core/grade";
 import { type RunCapture, startCapture } from "../../core/runCapture";
+import { beginHold } from "../../core/takes";
 import { memoryStore } from "../adapters/memoryStore";
 import { type AppServices, createServices } from "../contexts/services";
 import { createActivitySignal } from "../lib/activity";
@@ -53,6 +54,7 @@ function harness(overrides: Partial<RunGradingOptions> = {}, services?: Partial<
     };
     const options: RunGradingOptions = {
         complete: false,
+        holdingNote: false,
         correct: 8,
         wrong: 0,
         capture: { current: playedRun(8) },
@@ -199,5 +201,53 @@ describe("useRunGrading", () => {
         expect(() => finish()).not.toThrow();
         expect(calls.recordResult).toHaveBeenCalledTimes(1);
         expect(result.current.finishedGrade()).not.toBeNull();
+    });
+});
+
+describe("waiting for the keys to come up", () => {
+    it("does not grade while a key is still down", () => {
+        // The run is matched but the player is still holding the final chord. Grading
+        // now would read that note as having no length at all.
+        const { finish, calls } = harness();
+        finish({ holdingNote: true });
+        expect(calls.recordResult).not.toHaveBeenCalled();
+    });
+
+    it("grades the moment the last key comes up", () => {
+        const { finish, rerender, options, calls } = harness();
+        finish({ holdingNote: true });
+        rerender({ ...options, complete: true, holdingNote: false });
+        expect(calls.recordResult).toHaveBeenCalledTimes(1);
+    });
+
+    it("closes the final note's hold, so no played note is lost", () => {
+        // The whole point: the last note's length is only known once its key is up, and
+        // the expressive reading is judged on exactly that.
+        const capture = playedRun(6);
+        beginHold(capture.holds, 65, capture.notes.length - 1, 0);
+        const { finish, rerender, options } = harness({ capture: { current: capture } });
+        finish({ holdingNote: true });
+        expect(capture.notes.at(-1)?.heldMs).toBeUndefined();
+
+        rerender({ ...options, capture: { current: capture }, complete: true, holdingNote: false });
+        expect(capture.notes.at(-1)?.heldMs).toBeGreaterThan(0);
+        expect(capture.holds.size).toBe(0);
+    });
+
+    it("still grades a run whose last chord was never released, on the way out", () => {
+        // A player who finishes and walks away with a key down must not lose the run.
+        const { finish, result, calls } = harness();
+        finish({ holdingNote: true });
+        expect(calls.recordResult).not.toHaveBeenCalled();
+
+        result.current.gradeIfOwed();
+        expect(calls.recordResult).toHaveBeenCalledTimes(1);
+    });
+
+    it("grades once even if both the key-up and the teardown ask", () => {
+        const { finish, result, calls } = harness();
+        finish();
+        result.current.gradeIfOwed();
+        expect(calls.recordResult).toHaveBeenCalledTimes(1);
     });
 });

@@ -31,7 +31,7 @@ import { type ConnectedInput, diffConnectedInputs } from "../../core/midiDevices
 import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
-import { noteOff, noteOn, sendable } from "../../core/midiMessage";
+import { echoChannel, noteOff, noteOn, sendable } from "../../core/midiMessage";
 import { createMidiKeyLights } from "../adapters/midiKeyLights";
 import type { KeyLightsPort } from "../ports/keyLights";
 import type { SchedulerHandle } from "../ports/scheduler";
@@ -281,8 +281,18 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         );
     }
 
-    // Echo a note out to whatever is connected, so a keyboard with lights shows the
-    // piece as Plinky plays it. Off unless asked for: sending MIDI to somebody's
+    // Which channel the echo speaks on. Read at send time, and steered clear of whatever
+    // the lighting is using: the echo drives a sound module, the lights are a separate
+    // conversation with the same instrument, and a collision makes keys glow for notes
+    // nobody was asked to play.
+    const outChannel = useCallback(() => {
+        const prefs = prefsStore.load();
+        return prefs.keyLights
+            ? echoChannel([prefs.lightLeftChannel, prefs.lightRightChannel])
+            : echoChannel([]);
+    }, [prefsStore]);
+
+    // Echo a note out to whatever is connected, so a sound module can play along. Off unless asked for: sending MIDI to somebody's
     // instrument unprompted would be a surprise, and a sound module would start
     // playing along uninvited.
     const echoNote = useCallback(
@@ -303,7 +313,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
                 scheduler.cancel(pending);
             }
             for (const output of outputs) {
-                output.send(noteOn(note, velocity));
+                output.send(noteOn(note, velocity, outChannel()));
             }
             // The release is scheduled rather than sent with a timestamp, because Web
             // MIDI's timestamped send is not honoured everywhere and a key left lit is
@@ -311,12 +321,12 @@ export function MidiProvider({ children }: { children: ReactNode }) {
             const handle = scheduler.after(Math.max(1, durationMs), () => {
                 echoOffsRef.current.delete(note);
                 for (const output of outputs) {
-                    output.send(noteOff(note));
+                    output.send(noteOff(note, outChannel()));
                 }
             });
             echoOffsRef.current.set(note, handle);
         },
-        [prefsStore, scheduler],
+        [prefsStore, scheduler, outChannel],
     );
 
     // Release everything still ringing on the instrument, now. A pending release is a
@@ -327,11 +337,11 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         for (const [note, handle] of echoOffsRef.current) {
             scheduler.cancel(handle);
             for (const output of outputs) {
-                output.send(noteOff(note));
+                output.send(noteOff(note, outChannel()));
             }
         }
         echoOffsRef.current.clear();
-    }, [scheduler]);
+    }, [scheduler, outChannel]);
 
     // Unmounting, navigating away, or switching the echo off must not strand a lit
     // key on somebody's piano.

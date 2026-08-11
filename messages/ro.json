@@ -462,7 +462,7 @@
   "slow_notes_intro": "Majoritatea notelor îți iau cam {typical}s. Acestea durează mai mult — merită câteva minute fiecare.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Pianul meu să urmeze muzica",
-  "settings_midi_echo_help": "Trimite fiecare notă în clipa în care Plinky o cântă, așa că o claviatură cu lumini urmează muzica — iar un modul de sunet cântă alături. Dezactivat implicit.",
+  "settings_midi_echo_help": "Trimite fiecare notă în clipa în care Plinky o cântă, ca un modul de sunet să cânte alături cu sunetul lui. Dezactivat implicit. Dacă claviatura ta aprinde clapele, Plinky trimite asta pe alt canal, ca cele două să nu se încurce.",
   "section_best_heading": "Cel mai bun al tău la piesa asta: {total}",
   "section_best_label": "Cel mai bun scor al tău pentru fiecare parte",
   "section_best_section": "Partea {number}: {score}",

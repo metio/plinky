@@ -462,7 +462,7 @@
   "slow_notes_intro": "대부분의 음은 약 {typical}초에 읽고 있어요. 이 음들은 더 걸려요 — 각각 몇 분이면 달라져요.",
   "slow_notes_seconds": "{seconds}초",
   "settings_midi_echo": "피아노도 함께 따라가기",
-  "settings_midi_echo_help": "Plinky가 소리 내는 순간 그 음을 피아노로 보내요. 불이 들어오는 건반이면 음악을 따라가고, 음원 모듈이면 함께 울려요. 기본은 꺼짐이에요.",
+  "settings_midi_echo_help": "Plinky가 소리 내는 순간 그 음을 보내서, 음원 모듈이 자기 음색으로 함께 울릴 수 있어요. 기본은 꺼짐이에요. 건반에 불을 켜 두었다면 Plinky는 이걸 다른 채널로 보내니 둘이 서로 방해하지 않아요.",
   "section_best_heading": "이 곡의 최고 기록: {total}",
   "section_best_label": "곡의 각 구간별 최고 점수",
   "section_best_section": "{number}번 구간: {score}",

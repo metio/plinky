@@ -462,7 +462,7 @@
   "slow_notes_intro": "La maggior parte delle note ti richiede circa {typical}s. Queste durano di più — valgono qualche minuto ciascuna.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Fai seguire la musica al mio piano",
-  "settings_midi_echo_help": "Manda ogni nota nel momento in cui Plinky la suona, così una tastiera con le luci segue la musica — e un modulo sonoro suona insieme. Disattivato di base.",
+  "settings_midi_echo_help": "Manda ogni nota nel momento in cui Plinky la suona, così un modulo sonoro può suonare insieme con la sua voce. Disattivato di base. Se la tua tastiera accende i tasti, Plinky manda questo su un altro canale, così i due non si intralciano.",
   "section_best_heading": "Il tuo meglio su questo brano: {total}",
   "section_best_label": "Il tuo punteggio migliore per ogni parte del brano",
   "section_best_section": "Parte {number}: {score}",

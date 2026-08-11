@@ -28,6 +28,9 @@ export type EndRunOptions = {
     active: boolean;
     stopListen: () => void;
     // Take the recording if one is still owed. Runs before stopMatcher.
+    // Grade a finished run that is still waiting for the player to let go. Without it, a
+    // run whose last chord is held while the player walks away would never be graded.
+    gradeOwedRun: () => void;
     saveOwedTake: () => void;
     stopKeepUp: () => void;
     stopMatcher: () => void;
@@ -49,6 +52,9 @@ export function useEndRun(options: EndRunOptions): void {
         }
         const o = latest.current;
         o.stopListen();
+        // Before the take: a run left with a key still down has not been graded yet, and
+        // the take reads the grade at save time.
+        o.gradeOwedRun();
         o.saveOwedTake();
         o.stopKeepUp();
         o.stopMatcher();

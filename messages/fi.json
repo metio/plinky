@@ -462,7 +462,7 @@
   "slow_notes_intro": "Useimmat sävelet luet noin {typical}s:ssa. Nämä kestävät kauemmin — muutaman minuutin arvoisia.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Seuraa soittoa pianollani",
-  "settings_midi_echo_help": "Lähettää jokaisen sävelen sillä hetkellä, kun Plinky soittaa sen, joten valoilla varustettu koskettimisto seuraa musiikkia — ja äänimoduuli soittaa mukana. Oletuksena pois.",
+  "settings_midi_echo_help": "Lähettää jokaisen sävelen sillä hetkellä, kun Plinky soittaa sen, jotta äänimoduuli voi soittaa mukana omalla äänellään. Oletuksena pois. Jos koskettimistosi sytyttää koskettimia, Plinky lähettää tämän eri kanavalla, jotteivät nämä kaksi häiritse toisiaan.",
   "section_best_heading": "Paras suorituksesi tästä kappaleesta: {total}",
   "section_best_label": "Paras tuloksesi kappaleen jokaisesta osasta",
   "section_best_section": "Osa {number}: {score}",

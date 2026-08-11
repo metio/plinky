@@ -462,7 +462,7 @@
   "slow_notes_intro": "A legtöbb hangot nagyjából {typical}s alatt olvasod. Ezek tovább tartanak — megér fejenként pár percet.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Kövesse a zongorám a zenét",
-  "settings_midi_echo_help": "Minden hangot elküld abban a pillanatban, amikor a Plinky megszólaltatja, így a világító billentyűzet követi a zenét — egy hangmodul pedig együtt szól. Alapból ki.",
+  "settings_midi_echo_help": "Minden hangot elküld abban a pillanatban, amikor a Plinky megszólaltatja, hogy egy hangmodul a saját hangján együtt szólhasson. Alapból ki. Ha a billentyűzeted világítja a billentyűket, a Plinky ezt másik csatornán küldi, hogy a kettő ne zavarja egymást.",
   "section_best_heading": "A legjobbad ebből a darabból: {total}",
   "section_best_label": "A legjobb pontszámod a darab minden részére",
   "section_best_section": "{number}. rész: {score}",

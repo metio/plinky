@@ -462,7 +462,7 @@
   "slow_notes_intro": "De fleste toner leser du på rundt {typical}s. Disse tar lengre tid — verdt et par minutter hver.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Følg med på pianoet mitt",
-  "settings_midi_echo_help": "Sender hver tone i det Plinky spiller den, så et keyboard med lys følger musikken — og en lydmodul spiller med. Av som standard.",
+  "settings_midi_echo_help": "Sender hver tone i det Plinky spiller den, så en lydmodul kan spille med i sin egen lyd. Av som standard. Hvis keyboardet ditt lyser opp tangentene, sender Plinky dette på en annen kanal, så de to ikke kommer i veien for hverandre.",
   "section_best_heading": "Ditt beste av dette stykket: {total}",
   "section_best_label": "Ditt beste resultat for hver del av stykket",
   "section_best_section": "Del {number}: {score}",

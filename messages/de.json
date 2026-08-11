@@ -462,7 +462,7 @@
   "slow_notes_intro": "Die meisten Töne liest du in etwa {typical}s. Diese dauern länger — ein paar Minuten wert.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Auf meinem Keyboard mitlaufen lassen",
-  "settings_midi_echo_help": "Schickt jede Note in dem Moment, in dem Plinky sie spielt — ein Keyboard mit Leuchttasten folgt so der Musik, und ein Klangmodul spielt mit. Standardmäßig aus.",
+  "settings_midi_echo_help": "Schickt jede Note in dem Moment, in dem Plinky sie spielt, damit ein Klangmodul mit seinem eigenen Klang mitspielen kann. Standardmäßig aus. Wenn dein Keyboard die Tasten aufleuchten lässt, schickt Plinky das hier auf einem anderen Kanal, damit sich beides nicht in die Quere kommt.",
   "section_best_heading": "Dein Bestes für dieses Stück: {total}",
   "section_best_label": "Dein bester Wert für jeden Abschnitt des Stücks",
   "section_best_section": "Abschnitt {number}: {score}",

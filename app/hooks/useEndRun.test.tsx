@@ -16,6 +16,7 @@ function harness() {
     const options: EndRunOptions = {
         active: true,
         stopListen: step("stopListen"),
+        gradeOwedRun: step("gradeOwedRun"),
         saveOwedTake: step("saveOwedTake"),
         stopKeepUp: step("stopKeepUp"),
         stopMatcher: step("stopMatcher"),
@@ -45,6 +46,9 @@ describe("useEndRun", () => {
         end();
         expect(order).toEqual([
             "stopListen",
+            // Grading first: the take reads the grade at save time, so a run still
+            // owed one has to earn it before the take is written.
+            "gradeOwedRun",
             "saveOwedTake",
             "stopKeepUp",
             "stopMatcher",

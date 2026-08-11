@@ -462,7 +462,7 @@
   "slow_notes_intro": "Shumicën e notave i lexon për rreth {typical}s. Këto zgjasin më shumë — ia vlejnë disa minuta secila.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Pianoja ime të ndjekë muzikën",
-  "settings_midi_echo_help": "Dërgon çdo notë në çastin kur Plinky e luan, kështu një tastierë me drita ndjek muzikën — dhe një modul zëri luan bashkë me të. E fikur si parazgjedhje.",
+  "settings_midi_echo_help": "Dërgon çdo notë në çastin kur Plinky e luan, që një modul zëri të luajë bashkë me zërin e vet. E fikur si parazgjedhje. Nëse tastiera jote i ndriçon tastet, Plinky e dërgon këtë në një kanal tjetër, që të dyja të mos pengojnë njëra-tjetrën.",
   "section_best_heading": "Më e mira jote në këtë pjesë: {total}",
   "section_best_label": "Rezultati yt më i mirë për çdo pjesë",
   "section_best_section": "Pjesa {number}: {score}",

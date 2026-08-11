@@ -462,7 +462,7 @@
   "slow_notes_intro": "La mayoría de las notas te llevan unos {typical}s. Estas tardan más — merecen unos minutos cada una.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Que mi piano me siga",
-  "settings_midi_echo_help": "Envía cada nota en el momento en que Plinky la toca, así un teclado con luces sigue la música — y un módulo de sonido toca a la vez. Desactivado por defecto.",
+  "settings_midi_echo_help": "Envía cada nota en el momento en que Plinky la toca, para que un módulo de sonido toque a la vez con su propia voz. Desactivado por defecto. Si tu teclado ilumina las teclas, Plinky manda esto por otro canal para que no se estorben.",
   "section_best_heading": "Tu mejor versión de esta pieza: {total}",
   "section_best_label": "Tu mejor puntuación en cada parte de la pieza",
   "section_best_section": "Parte {number}: {score}",

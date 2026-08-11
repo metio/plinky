@@ -462,7 +462,7 @@
   "slow_notes_intro": "De meeste noten lees je in ongeveer {typical}s. Deze duren langer — een paar minuten waard.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Mijn piano speelt mee",
-  "settings_midi_echo_help": "Stuurt elke noot op het moment dat Plinky hem speelt, zodat een keyboard met lampjes de muziek volgt — en een geluidsmodule meespeelt. Standaard uit.",
+  "settings_midi_echo_help": "Stuurt elke noot op het moment dat Plinky hem speelt, zodat een geluidsmodule met zijn eigen klank kan meespelen. Standaard uit. Als je keyboard de toetsen verlicht, stuurt Plinky dit op een ander kanaal, zodat de twee elkaar niet in de weg zitten.",
   "section_best_heading": "Je beste van dit stuk: {total}",
   "section_best_label": "Je beste score voor elk deel van het stuk",
   "section_best_section": "Deel {number}: {score}",

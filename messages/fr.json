@@ -462,7 +462,7 @@
   "slow_notes_intro": "La plupart des notes te prennent environ {typical}s à lire. Celles-ci durent plus longtemps — quelques minutes chacune valent le coup.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Suivre la musique sur mon clavier",
-  "settings_midi_echo_help": "Envoie chaque note au moment où Plinky la joue : un clavier lumineux suit ainsi la musique, et un module sonore joue avec. Désactivé par défaut.",
+  "settings_midi_echo_help": "Envoie chaque note au moment où Plinky la joue, pour qu'un module sonore joue avec, de sa propre voix. Désactivé par défaut. Si ton clavier allume ses touches, Plinky envoie ceci sur un autre canal pour que les deux ne se gênent pas.",
   "section_best_heading": "Ton meilleur sur ce morceau : {total}",
   "section_best_label": "Ton meilleur score pour chaque partie du morceau",
   "section_best_section": "Partie {number} : {score}",

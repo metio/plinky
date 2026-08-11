@@ -688,6 +688,7 @@ function usePlaySessionValue({
     // finished run can be driven through it in a test without a rendered staff.
     const grading = useRunGrading({
         complete: matcher.complete,
+        holdingNote,
         correct: matcher.total,
         wrong: matcher.wrong,
         capture: recorder.capture,
@@ -767,6 +768,7 @@ function usePlaySessionValue({
     useEndRun({
         active: fullscreen,
         stopListen: listenPlayback.stop,
+        gradeOwedRun: grading.gradeIfOwed,
         saveOwedTake: takes.saveIfOwed,
         stopKeepUp: keepUp.stop,
         stopMatcher: matcher.stop,

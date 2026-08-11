@@ -462,7 +462,7 @@
   "slow_notes_intro": "Çoğu notayı yaklaşık {typical}s'de okuyorsun. Bunlar daha uzun sürüyor — her biri birkaç dakikaya değer.",
   "slow_notes_seconds": "{seconds}sn",
   "settings_midi_echo": "Piyanom müziği takip etsin",
-  "settings_midi_echo_help": "Her notayı Plinky çaldığı anda gönderir; ışıklı bir klavye müziği böyle takip eder, bir ses modülü de birlikte çalar. Varsayılan olarak kapalı.",
+  "settings_midi_echo_help": "Her notayı Plinky çaldığı anda gönderir; bir ses modülü kendi sesiyle birlikte çalabilsin diye. Varsayılan olarak kapalı. Klavyen tuşları yakıyorsa Plinky bunu başka bir kanaldan gönderir, böylece ikisi birbirine karışmaz.",
   "section_best_heading": "Bu parçadaki en iyin: {total}",
   "section_best_label": "Parçanın her bölümü için en iyi puanın",
   "section_best_section": "Bölüm {number}: {score}",

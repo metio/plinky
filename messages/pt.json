@@ -462,7 +462,7 @@
   "slow_notes_intro": "A maioria das notas leva-te cerca de {typical}s a ler. Estas demoram mais — valem uns minutos cada.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Deixar o meu piano acompanhar",
-  "settings_midi_echo_help": "Envia cada nota no momento em que o Plinky a toca, por isso um teclado com luzes acompanha a música — e um módulo de som toca junto. Desligado por omissão.",
+  "settings_midi_echo_help": "Envia cada nota no momento em que o Plinky a toca, para que um módulo de som toque junto com o seu próprio som. Desligado por omissão. Se o teu teclado acende as teclas, o Plinky envia isto noutro canal, para que os dois não se atrapalhem.",
   "section_best_heading": "O teu melhor nesta peça: {total}",
   "section_best_label": "A tua melhor pontuação em cada parte da peça",
   "section_best_section": "Parte {number}: {score}",

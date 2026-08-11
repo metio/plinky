@@ -462,7 +462,7 @@
   "slow_notes_intro": "ほとんどの音は約{typical}秒で読めています。これらはもっとかかります — それぞれ数分の練習で変わります。",
   "slow_notes_seconds": "{seconds}秒",
   "settings_midi_echo": "ピアノでも一緒に鳴らす",
-  "settings_midi_echo_help": "Plinky が鳴らした瞬間に、その音をピアノへ送ります。光る鍵盤なら音楽をそのまま追いかけ、音源モジュールなら一緒に鳴ります。既定はオフです。",
+  "settings_midi_echo_help": "Plinky が鳴らした瞬間に、その音を送ります。音源モジュールが自分の音色で一緒に鳴らせます。既定はオフです。鍵盤を光らせているときは、Plinky はこれを別のチャンネルで送るので、ふたつがぶつかりません。",
   "section_best_heading": "この曲のベスト：{total}",
   "section_best_label": "曲の各パートでのベストスコア",
   "section_best_section": "パート{number}：{score}",

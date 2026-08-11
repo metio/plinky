@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { cadence } from "../../core/cadence";
 import type { Grade } from "../../core/grade";
-import type { RunCapture } from "../../core/runCapture";
+import { flushHolds, type RunCapture } from "../../core/runCapture";
 import { deriveRunOutcome, type RunOutcome, tempoScale } from "../../core/runOutcome";
 import { sectionScores } from "../../core/sectionBest";
 import type { AppServices } from "../contexts/services";
@@ -52,6 +52,11 @@ export type RunGradingOptions = {
     sightReading: boolean;
     atTempo: boolean;
 
+    // Whether any key is still down. The run is not over while one is: the final note
+    // has not finished sounding, and its length is what the expressive reading is
+    // judged on. Grading waits for the keys to come up, the way the take autosave and
+    // the full-screen exit already do.
+    holdingNote: boolean;
     services: AppServices;
     analytics: Analytics;
     // Sounds the finishing flourish. Muted playback no-ops inside the engine.
@@ -70,6 +75,10 @@ export type RunGradingOptions = {
 };
 
 export type RunGrading = {
+    // Grade the finished run now, if it has not been graded already. Called when the
+    // last key comes up, and again by the run's teardown so a run left with a key held
+    // down still earns its grade on the way out.
+    gradeIfOwed: () => void;
     // Whether the result on screen was earned by a run just played, rather than
     // seeded or restored — only the former is worth celebrating.
     fromRun: () => boolean;
@@ -89,15 +98,20 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
     const latest = useRef(options);
     latest.current = options;
 
-    useEffect(() => {
-        if (!options.complete || gradedRef.current) {
+    const gradeIfOwed = useCallback(() => {
+        const o = latest.current;
+        if (!o.complete || gradedRef.current) {
             return;
         }
         gradedRef.current = true;
-        const o = latest.current;
         const now = o.now ?? Date.now;
-        // Scored from the cleared notes' timing and velocity, none of which needs the
-        // final note's key-up — so the grade lands while a held note still rings.
+        // Close every hold still open — the final note, and anything still ringing under
+        // the pedal — at this instant, which is when the player stopped. Accuracy,
+        // timing and flow were settled the moment the last note was matched, but the
+        // expressive reading is judged on how long each key was actually down, and a
+        // note graded before its release has no length to read. Idempotent: the take
+        // autosave flushes too, and the second call finds nothing open.
+        flushHolds(o.capture.current, now());
         const notes = o.capture.current.notes;
         const intended = o.intendedTempo ?? o.runTempo.current;
         const scale = tempoScale(o.runTempo.current, intended);
@@ -173,13 +187,24 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
         if (!o.ephemeral) {
             o.onRunComplete?.();
         }
-    }, [options.complete]);
+    }, []);
+
+    // The ordinary path: the run is complete and the player has let go. Spelled out here
+    // rather than left to gradeIfOwed so every value it turns on is one this effect
+    // visibly depends on — the same shape the take autosave uses, for the same reason.
+    useEffect(() => {
+        if (!options.complete || options.holdingNote) {
+            return;
+        }
+        gradeIfOwed();
+    }, [options.complete, options.holdingNote, gradeIfOwed]);
 
     // One object for the hook's whole life. Each accessor reads a ref, so nothing here
     // depends on a render — and a caller may list `grading` in an effect's dependencies
     // without that effect firing again on every render.
     return useMemo(
         () => ({
+            gradeIfOwed,
             fromRun: () => gradeFromRunRef.current,
             finishedGrade: () => finishedGradeRef.current,
             reset: () => {
@@ -188,6 +213,6 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
                 finishedGradeRef.current = null;
             },
         }),
-        [],
+        [gradeIfOwed],
     );
 }

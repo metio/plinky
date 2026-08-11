@@ -462,7 +462,7 @@
   "slow_notes_intro": "Większość dźwięków czytasz w około {typical}s. Te trwają dłużej — warte kilku minut.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Niech pianino idzie za muzyką",
-  "settings_midi_echo_help": "Wysyła każdą nutę w chwili, gdy Plinky ją gra, więc klawiatura z podświetleniem podąża za muzyką — a moduł brzmieniowy gra razem z nią. Domyślnie wyłączone.",
+  "settings_midi_echo_help": "Wysyła każdą nutę w chwili, gdy Plinky ją gra, żeby moduł brzmieniowy mógł zagrać razem własnym brzmieniem. Domyślnie wyłączone. Jeśli twoja klawiatura podświetla klawisze, Plinky wysyła to innym kanałem, żeby jedno nie wchodziło drugiemu w drogę.",
   "section_best_heading": "Twój najlepszy wynik w tym utworze: {total}",
   "section_best_label": "Twój najlepszy wynik dla każdej części utworu",
   "section_best_section": "Część {number}: {score}",

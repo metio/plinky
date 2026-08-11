@@ -462,7 +462,7 @@
   "slow_notes_intro": "Väčšinu tónov prečítaš asi za {typical}s. Tieto trvajú dlhšie — stoja za pár minút.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Nech ma moje piano sprevádza",
-  "settings_midi_echo_help": "Posiela každú notu vo chvíli, keď ju Plinky zahrá — klaviatúra s podsvietením tak sleduje hudbu a zvukový modul hrá s ňou. Štandardne vypnuté.",
+  "settings_midi_echo_help": "Posiela každú notu vo chvíli, keď ju Plinky zahrá, aby ju zvukový modul hral s ním vlastným zvukom. Štandardne vypnuté. Ak sa ti rozsvecujú klávesy, Plinky to posiela na inom kanáli, aby si tie dve veci neprekážali.",
   "section_best_heading": "Tvoje najlepšie podanie tejto skladby: {total}",
   "section_best_label": "Tvoje najlepšie skóre pre každú časť skladby",
   "section_best_section": "Časť {number}: {score}",

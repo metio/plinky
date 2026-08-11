@@ -462,7 +462,7 @@
   "slow_notes_intro": "Většinu tónů přečteš asi za {typical}s. Tyhle trvají déle — stojí za pár minut.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Sledovat hru na mé klaviatuře",
-  "settings_midi_echo_help": "Posílá každou notu ve chvíli, kdy ji Plinky zahraje — klaviatura s podsvícením tak sleduje hudbu a zvukový modul hraje s ní. Standardně vypnuto.",
+  "settings_midi_echo_help": "Posílá každou notu ve chvíli, kdy ji Plinky zahraje, aby ji zvukový modul zahrál s ním svým vlastním zvukem. Standardně vypnuto. Když ti svítí klávesy, posílá to Plinky na jiném kanálu, aby si obě věci nepřekážely.",
   "section_best_heading": "Tvoje nejlepší podání téhle skladby: {total}",
   "section_best_label": "Tvoje nejlepší skóre pro každou část skladby",
   "section_best_section": "Část {number}: {score}",

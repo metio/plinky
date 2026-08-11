@@ -50,6 +50,17 @@ inside its description was read as though it named the author.
 which only works if you start on a white one. It now says twelve keys, black and white
 alike, and mentions that on the white keys that comes to eight.
 
+*Expression now waits for your hands.* The reading of how closely you followed the
+written dynamics and articulation is judged on how long you held each key — so it now
+waits until you lift them before deciding, rather than grading while the last chord is
+still ringing. Nothing you played is left out any more, including the final note. If
+you finish and walk away with a key still down, the run is still graded on the way out.
+
+*Follow along and key lighting no longer talk over each other.* Both send MIDI to the
+same instrument, and on a Yamaha they were using the same channel — so following along
+would light keys you hadn't been asked to play, and the lights could cut a note short.
+Plinky now moves the follow-along to a channel the lights aren't using. Nothing to set.
+
 *Hovering the home page no longer saves up its sounds.* Each card on the front page
 gives a soft note as the mouse passes over it — but before you've clicked anything,
 browsers keep audio asleep, and those notes were being queued rather than dropped. They

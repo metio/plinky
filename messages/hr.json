@@ -462,7 +462,7 @@
   "slow_notes_intro": "Većinu tonova pročitaš za otprilike {typical}s. Ovi traju dulje — vrijedni su nekoliko minuta.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Neka me moj klavir prati",
-  "settings_midi_echo_help": "Šalje svaku notu u trenutku kad je Plinky odsvira, pa klavijatura sa svjetlima prati glazbu — a zvučni modul svira uz nju. Prema zadanom isključeno.",
+  "settings_midi_echo_help": "Šalje svaku notu u trenutku kad je Plinky odsvira, da zvučni modul može svirati uz nju svojim zvukom. Prema zadanom isključeno. Ako ti klavijatura osvjetljava tipke, Plinky ovo šalje na drugom kanalu da si to dvoje ne smeta.",
   "section_best_heading": "Tvoje najbolje izvedeno u ovoj skladbi: {total}",
   "section_best_label": "Tvoj najbolji rezultat za svaki dio skladbe",
   "section_best_section": "Dio {number}: {score}",

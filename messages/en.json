@@ -554,7 +554,7 @@
   "slow_notes_intro": "Most notes take you about {typical}s to read. These take longer — worth a few minutes each.",
   "slow_notes_seconds": "{seconds}s",
   "settings_midi_echo": "Follow along on my keyboard",
-  "settings_midi_echo_help": "Sends each note as Plinky plays it, so a keyboard with lights follows the music — and a sound module plays along. Off by default.",
+  "settings_midi_echo_help": "Sends each note as Plinky plays it, so a sound module can play along on its own voice. Off by default. If your keyboard is lighting its keys, Plinky sends this on a different channel so the two don't get in each other's way.",
   "section_best_heading": "Your best of this piece: {total}",
   "section_best_label": "Your best score for each part of the piece",
   "section_best_section": "Part {number}: {score}",
