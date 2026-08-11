@@ -44,7 +44,7 @@ function play(
     let state = startMatch(steps);
     const events: MatchEvent[] = [];
     for (const note of notes) {
-        const result: Played = matchNote(state, note, forgiving);
+        const result: Played = matchNote(state, note, 0, forgiving);
         state = result.state;
         events.push(...result.events);
     }
@@ -58,7 +58,7 @@ describe("matcher properties", () => {
                 let state = startMatch(steps);
                 for (const note of notes) {
                     const before = state.index;
-                    const result = matchNote(state, note, forgiving);
+                    const result = matchNote(state, note, 0, forgiving);
                     const cleared = result.events.filter((e) => e.kind === "cleared").length;
                     expect(result.state.index).toBe(before + cleared);
                     expect(result.state.index).toBeGreaterThanOrEqual(before);
@@ -103,15 +103,17 @@ describe("matcher properties", () => {
                     // Interleave arbitrary noise, then play the next expected pitch;
                     // the run must still advance to the end.
                     if (noiseAt < noise.length) {
-                        state = matchNote(state, noise[noiseAt++] as number, forgiving).state;
+                        state = matchNote(state, noise[noiseAt++] as number, 0, forgiving).state;
                     }
                     // The first pitch of the position not yet sounded — replaying an
                     // already-hit chord note would not advance the run.
-                    const next = expectedPitches(state).find((p) => !state.hit.includes(p));
+                    const next = expectedPitches(state).find(
+                        (p) => !state.hit.some((arrival) => arrival.note === p),
+                    );
                     if (next === undefined) {
                         break; // the noise itself completed the run (forgiving skip)
                     }
-                    state = matchNote(state, next, forgiving).state;
+                    state = matchNote(state, next, 0, forgiving).state;
                     plays++;
                     expect(plays).toBeLessThanOrEqual(totalPitches + noise.length + 1);
                 }
@@ -128,11 +130,11 @@ describe("matcher properties", () => {
             { pitches: [60], pitchStaves: [0], staves: [0], whole: 0, bar: 0, holdQuarters: 1 },
             { pitches: [60], pitchStaves: [0], staves: [0], whole: 1, bar: 0, holdQuarters: 1 },
         ];
-        const first = matchNote(startMatch(steps), 60, true);
+        const first = matchNote(startMatch(steps), 60, 0, true);
         expect(first.events.map((e) => e.kind)).toEqual(["cleared"]);
         expect(first.state.index).toBe(1);
         expect(first.state.complete).toBe(false);
-        const second = matchNote(first.state, 60, true);
+        const second = matchNote(first.state, 60, 0, true);
         expect(second.state.complete).toBe(true);
     });
 });

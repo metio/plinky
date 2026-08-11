@@ -56,12 +56,18 @@ export type MatchStep = {
     expected?: { velocity: number | null; lengthScale: number };
 };
 
+// A pitch of the current position that has sounded, and when. The time comes from the
+// caller — this module reads no clock — and is kept because a chord's notes do not all
+// land together: on hands-together music the two hands arrive at measurably different
+// moments, and that difference is the only evidence of which hand is trailing.
+export type Arrival = { note: number; at: number };
+
 export type MatcherState = {
     steps: MatchStep[];
     // The position being played, and the pitches of it already sounded — a
     // chord is cleared pitch by pitch in any order.
     index: number;
-    hit: number[];
+    hit: Arrival[];
     wrong: number;
     // Wrong notes at the current position so far — zero at a clear means a
     // clean first try, the signal Flow and per-segment accuracy build from.
@@ -78,6 +84,10 @@ export type ClearedEvent = {
     step: MatchStep;
     ordinal: number;
     playedPitches: number[];
+    // When each of `playedPitches` landed, index-aligned. A position clears on its LAST
+    // pitch, so a single time for the whole position says nothing about the hand that
+    // arrived first — which is exactly what a per-hand verdict needs.
+    arrivals: number[];
     wrongBefore: number;
 };
 
@@ -140,7 +150,12 @@ export function stepRange(steps: MatchStep[]): { from: number; to: number } | nu
     return Number.isFinite(lo) ? { from: lo - 2, to: hi + 2 } : null;
 }
 
-function clear(state: MatcherState, playedPitches: number[], events: MatchEvent[]): MatcherState {
+function clear(
+    state: MatcherState,
+    playedPitches: number[],
+    events: MatchEvent[],
+    at: number,
+): MatcherState {
     const step = state.steps[state.index];
     if (!step) {
         return state;
@@ -150,6 +165,12 @@ function clear(state: MatcherState, playedPitches: number[], events: MatchEvent[
         step,
         ordinal: state.index,
         playedPitches,
+        // A pitch with no recorded arrival is one the forgiving advance credited without
+        // it ever being played; it takes the clearing moment, which is the only time
+        // anything is known to have happened.
+        arrivals: playedPitches.map(
+            (pitch) => state.hit.find((arrival) => arrival.note === pitch)?.at ?? at,
+        ),
         wrongBefore: state.sinceWrong,
     });
     const index = state.index + 1;
@@ -171,6 +192,8 @@ function clear(state: MatcherState, playedPitches: number[], events: MatchEvent[
 export function matchNote(
     state: MatcherState,
     note: number,
+    // When the note landed, on the caller's own clock. This module reads no clock.
+    at: number,
     forgiving = false,
 ): { state: MatcherState; events: MatchEvent[] } {
     if (state.complete) {
@@ -180,24 +203,28 @@ export function matchNote(
     const expected = expectedPitches(state);
 
     if (expected.includes(note)) {
-        const hit = state.hit.includes(note) ? state.hit : [...state.hit, note];
-        if (expected.every((pitch) => hit.includes(pitch))) {
-            return { state: clear({ ...state, hit }, expected, events), events };
+        // A pitch struck twice keeps its FIRST arrival: the hand got there then, and a
+        // re-strike while the rest of the chord is still coming does not undo that.
+        const hit = state.hit.some((arrival) => arrival.note === note)
+            ? state.hit
+            : [...state.hit, { note, at }];
+        if (expected.every((pitch) => hit.some((arrival) => arrival.note === pitch))) {
+            return { state: clear({ ...state, hit }, expected, events, at), events };
         }
         events.push({ kind: "hit", note });
         return { state: { ...state, hit }, events };
     }
 
     if (forgiving && state.steps[state.index + 1]?.pitches.includes(note)) {
-        let next = clear(state, [...state.hit], events);
+        let next = clear(state, state.hit.map((arrival) => arrival.note), events, at);
         if (!next.complete) {
             const nextExpected = expectedPitches(next);
             if (nextExpected.includes(note)) {
                 if (nextExpected.every((pitch) => pitch === note)) {
-                    next = clear(next, nextExpected, events);
+                    next = clear(next, nextExpected, events, at);
                 } else {
                     events.push({ kind: "hit", note });
-                    next = { ...next, hit: [note] };
+                    next = { ...next, hit: [{ note, at }] };
                 }
             }
         }

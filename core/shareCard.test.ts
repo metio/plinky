@@ -347,3 +347,49 @@ describe("clampHeading with astral characters", () => {
         expect(clampHeading("a".repeat(40))).toBe(`${"a".repeat(27)}…`);
     });
 });
+
+describe("a hand that trails on a chord both hands play", () => {
+    // Eight two-hand chords. The right hand is exact; the left is erratic around the
+    // beat. The position clears on whichever lands last, so `playedMs` alone describes
+    // the pair rather than either hand.
+    const wobble = [0, 260, -180, 300, -220, 240, -200, 280];
+    const notes: RunNote[] = wobble.map((offset, index) => ({
+        targetMs: index * 500,
+        playedMs: index * 500 + Math.max(0, offset),
+        wrongBefore: 0,
+        staves: [0, 1],
+        staffMs: { 0: index * 500, 1: index * 500 + offset },
+    }));
+
+    it("names the hand that was not keeping time", () => {
+        // Both hands share one `playedMs` on a chord, so without per-hand times they
+        // read identically and the verdict is always "even" — the wrong answer on the
+        // 41% of catalogue positions where the hands land together.
+        expect(laggingHand(notes)).toBe("left");
+    });
+
+    it("reads as even when both hands are equally steady", () => {
+        const together = notes.map((note) => ({
+            ...note,
+            playedMs: note.targetMs,
+            staffMs: { 0: note.targetMs, 1: note.targetMs },
+        }));
+        expect(laggingHand(together)).toBe("even");
+    });
+
+    it("is not fooled by a hand that is merely early or late, but steady", () => {
+        // Timing is judged against the player's OWN pace, so a hand consistently a beat
+        // behind is still playing in time — it is unevenness that reads as lagging.
+        const steadyButLate = notes.map((note, index) => ({
+            ...note,
+            playedMs: index * 500 + 200,
+            staffMs: { 0: index * 500, 1: index * 500 + 200 },
+        }));
+        expect(laggingHand(steadyButLate)).toBe("even");
+    });
+
+    it("falls back to the position's own time for a run that recorded none", () => {
+        const legacy = notes.map(({ staffMs, ...note }) => note);
+        expect(laggingHand(legacy)).toBe("even");
+    });
+});

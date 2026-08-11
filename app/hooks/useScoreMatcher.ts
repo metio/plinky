@@ -73,6 +73,27 @@ function stepAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand): Omit<MatchStep, 
     };
 }
 
+// When each hand got to this position: the EARLIEST arrival among the pitches that
+// staff owns, because a hand's moment is when it struck rather than when it finished a
+// rolled chord.
+function staffArrivals(event: {
+    step: MatchStep;
+    playedPitches: number[];
+    arrivals: number[];
+}): Record<number, number> {
+    const times: Record<number, number> = {};
+    for (const [index, pitch] of event.playedPitches.entries()) {
+        const at = event.arrivals[index];
+        if (at === undefined) {
+            continue;
+        }
+        const note = event.step.pitches.indexOf(pitch);
+        const staff = event.step.pitchStaves[note] ?? 0;
+        times[staff] = Math.min(times[staff] ?? at, at);
+    }
+    return times;
+}
+
 // Walk the engraved score once and lift it into the pure step model: every
 // playable position for the chosen hand, in play order. Leaves the cursor reset.
 // Exported so the duet can lift the sitting-out hand's positions the same way,
@@ -151,6 +172,11 @@ export type CorrectInfo = {
     // The staves this position sits on (0 = treble/right, 1 = bass/left), so a run can be
     // scored per hand. Both when a chord spans the grand staff.
     staves: number[];
+    // When each staff's part of this position landed, on the same clock as `timestamp`.
+    // A position clears on its LAST pitch, so `timestamp` alone says nothing about which
+    // hand got there first — and on hands-together music, which is most of it, that
+    // difference is the whole of a per-hand verdict.
+    staffTimes: Record<number, number>;
 };
 
 // Drives note-by-note practice of an OSMD score. The pure matcher in core owns
@@ -292,6 +318,7 @@ export function useScoreMatcher(
             const { state: next, events } = matchNote(
                 state,
                 note,
+                timestamp,
                 optionsRef.current.forgiving ?? false,
             );
             stateRef.current = next;
@@ -327,6 +354,7 @@ export function useScoreMatcher(
                     velocity,
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,
+                    staffTimes: staffArrivals(event),
                 });
                 // Mirror the reducer's advance onto the visual cursor.
                 advanceCursor(osmd, runHandRef.current);

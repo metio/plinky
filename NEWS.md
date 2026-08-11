@@ -50,6 +50,14 @@ inside its description was read as though it named the author.
 which only works if you start on a white one. It now says twelve keys, black and white
 alike, and mentions that on the white keys that comes to eight.
 
+*"Which hand lagged" can finally see the two hands apart.* When you play a chord with
+both hands, the app noted the moment the chord was complete — one time for the pair. So
+on hands-together music, which is most music, the two hands were being compared using
+the same number, and the answer was always "you kept pace". Plinky now records when each
+hand actually struck. Note that a hand which is simply early or late but steady still
+reads as even, because timing is judged against your own pace: it is unevenness that
+shows up as lagging.
+
 *Two-hand chords know which hand plays which note.* When both hands land together —
 which is 41% of the moments in the catalogue — Plinky was only recording that the
 chord involved both hands, not which note belonged to which. So the notes highway

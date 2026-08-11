@@ -27,6 +27,11 @@ export type RunNote = {
     playedMs: number;
     wrongBefore: number;
     staves?: number[];
+    // When each hand struck this position, on the run clock. `playedMs` is when the
+    // position cleared — its LAST pitch — so on a chord both hands share it and neither
+    // can be seen to trail. Absent for a run captured before this was recorded, and for
+    // anything rebuilt from a stored take.
+    staffMs?: Record<number, number>;
 };
 
 // A run note tagged with how close to the piece's tempo it was played and its timing
@@ -204,7 +209,12 @@ export function handScores(
     options: ShareOptions = {},
 ): { staff: number; overall: number }[] {
     return handsPlayed(notes).map((staff) => {
-        const handNotes = notes.filter((note) => (note.staves ?? [0]).includes(staff));
+        const handNotes = notes
+            .filter((note) => (note.staves ?? [0]).includes(staff))
+            // Each hand judged on when IT played, not on when the position finished
+            // clearing. Without this a hands-together chord gives both hands the same
+            // moment, and the verdict drifts to "even" however far apart they were.
+            .map((note) => ({ ...note, playedMs: note.staffMs?.[staff] ?? note.playedMs }));
         const [whole] = computeSegments(handNotes, 1, options);
         return { staff, overall: whole ? combinedScore(whole) : 0 };
     });

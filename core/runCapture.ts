@@ -79,12 +79,28 @@ export type ClearedNote = {
     velocity: number;
     wrongBefore: number;
     staves: number[];
+    // When each staff's part of this position landed, on the same clock as `timestamp`.
+    staffTimes?: Record<number, number>;
     // What the score asked for at this position, carried through so the expressive
     // reading can compare intention with performance without a second walk of the
     // engraved score. Absent for a run with no score behind it.
     expectedVelocity?: number | null;
     expectedHoldMs?: number;
 };
+
+function staffOffsets(
+    info: ClearedNote,
+    startedAt: number,
+): Record<number, number> | undefined {
+    if (!info.staffTimes) {
+        return undefined;
+    }
+    const offsets: Record<number, number> = {};
+    for (const [staff, at] of Object.entries(info.staffTimes)) {
+        offsets[Number(staff)] = at - startedAt;
+    }
+    return offsets;
+}
 
 // Record a cleared position: the first one seeds the run clock, every one appends
 // its ideal-vs-actual timing and opens a hold per pitch for the release to close.
@@ -100,6 +116,10 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         velocity: info.velocity,
         pitches: [...info.pitches],
         staves: info.staves,
+        // Per hand, on the run clock. `playedMs` is when the position CLEARED, which is
+        // its last pitch — so on a chord the two hands share it and neither can be seen
+        // to trail. These are when each hand actually struck.
+        staffMs: staffOffsets(info, capture.startedAt),
         expectedVelocity: info.expectedVelocity,
         expectedHoldMs: info.expectedHoldMs,
     });
