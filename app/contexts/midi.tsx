@@ -32,6 +32,8 @@ import { DEFAULT_KEY_MAP, type KeyMap, pedalForKey } from "../../core/keyMap";
 import type { CalibrationSample } from "../../core/micCalibration";
 import type { PedalKind } from "../../core/pedals";
 import { noteOff, noteOn, sendable } from "../../core/midiMessage";
+import { createMidiKeyLights } from "../adapters/midiKeyLights";
+import type { KeyLightsPort } from "../ports/keyLights";
 import type { SchedulerHandle } from "../ports/scheduler";
 import { usePrefsStore } from "./services";
 import type { MidiConnection } from "../ports/midiAccess";
@@ -102,6 +104,12 @@ type MidiContextValue = {
     // Release every echoed note still ringing — when playback stops, not only when
     // the page goes away.
     silenceEcho: () => void;
+    // The lighted keyboard, if the player asked for one and something is connected.
+    // Separate from echoNote on purpose: that shows what Plinky HAS played, this shows
+    // what is coming, and the two cannot share one stream of messages. Always present —
+    // it simply sends nothing when the feature is off or no device is listening, so no
+    // caller has to check.
+    keyLights: KeyLightsPort;
     // The microphone as an input device: an acoustic piano heard through pitch
     // detection lands in the same funnel as a MIDI keyboard.
     micStatus: MicStatus;
@@ -250,6 +258,28 @@ export function MidiProvider({ children }: { children: ReactNode }) {
     // The release pending for each note echoed out, so a re-strike can replace it and
     // a teardown can flush it.
     const echoOffsRef = useRef<Map<number, SchedulerHandle>>(new Map());
+
+    // The lighted keyboard. Built once and kept: the port owns the picture currently on
+    // the instrument, so it must outlive any one render to know what it owes a note-off
+    // for. Everything variable — whether the feature is on, which device is listening,
+    // which channels it navigates on — is read at send time through the closures below.
+    const keyLights = useRef<KeyLightsPort | null>(null);
+    if (keyLights.current === null) {
+        keyLights.current = createMidiKeyLights(
+            (data) => {
+                if (!prefsStore.load().keyLights) {
+                    return;
+                }
+                for (const output of connectionRef.current?.outputs() ?? []) {
+                    output.send(data);
+                }
+            },
+            () => {
+                const prefs = prefsStore.load();
+                return { left: prefs.lightLeftChannel, right: prefs.lightRightChannel };
+            },
+        );
+    }
 
     // Echo a note out to whatever is connected, so a keyboard with lights shows the
     // piece as Plinky plays it. Off unless asked for: sending MIDI to somebody's
@@ -742,6 +772,7 @@ export function MidiProvider({ children }: { children: ReactNode }) {
         pedalHeld,
         echoNote,
         silenceEcho,
+        keyLights: keyLights.current,
         micStatus,
         startMic,
         stopMic,

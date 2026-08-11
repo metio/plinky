@@ -8,6 +8,22 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 11 August 2026 — later
+
+**Your keyboard can show you what's coming.** If your piano lights its own keys —
+Casio's LK series, Yamaha's EZ series — Plinky can now light the key you're about to
+play, before you play it, and keep it lit until you find it. Set it up in **Settings →
+Light the keys I'm about to play**: pick your make, and the MIDI channels fill
+themselves in. There's a **Test the lights** button, because four separate things have
+to agree before a key glows and it's much easier to check than to guess.
+
+It follows your next-note hint setting rather than adding one of its own, so if you've
+asked for hints only after a slip, that's when the keys light too — and during a
+sight-read they stay dark like every other reading aid.
+
+The older switch that mirrors what Plinky *has* played is still there; it's now called
+**Follow along on my keyboard**, which is what it always did.
+
 ## 11 August 2026
 
 **Plinky is now licensed AGPL-3.0-or-later.** It was 0BSD, which let anyone do

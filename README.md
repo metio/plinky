@@ -499,9 +499,23 @@ Romanian, Russian, Greek and much of Asia those *are* the note names, not a begi
 crutch, and the syllables follow the language you're reading Plinky in. Every key is
 labelled by default, so a first-timer can find any note straight away.
 
-If your piano has lights, **Settings → Light up my keyboard** sends what Plinky plays
-back to it, so Listen shows the notes on the instrument as well as sounding them. It's
-off by default: a sound module on the other end would start playing along uninvited.
+If your piano has lights, Plinky can use them, two different ways. **Settings → Follow
+along on my keyboard** mirrors each note as Plinky plays it, so Listen shows the music
+on the instrument as well as sounding it. **Light the keys I'm about to play** does the
+opposite and more useful thing: it lights what's *coming*, so the next key glows before
+you reach for it and stays lit until you find it.
+
+That second one speaks the two conventions the makers document — Casio's *MIDI In
+Navigate* and Yamaha's *Light Guide* — each of which lights whichever keys arrive as
+notes on its own left- and right-hand channels. Pick your make and Plinky fills in the
+channels it ships with; change them if you've changed them on the instrument. **Test
+the lights** sounds a C major chord in both hands, which is the quickest way to find
+out whether the device, the channel and the keyboard's own lighting mode all agree.
+Lighting is a reading aid like any other, so it follows your next-note hint setting and
+goes quiet entirely during a sight-read.
+
+Both are off by default: sending MIDI to somebody's instrument unasked would be a
+surprise, and a sound module on the other end would start playing along uninvited.
 
 Every keyboard shows a small badge in its corner — a green tick the moment a MIDI
 piano is connected, a quiet plug otherwise — so you can see at a glance whether your

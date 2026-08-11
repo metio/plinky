@@ -4,6 +4,12 @@
 import { type Beams, BEAMS } from "./beams";
 import { type Groove, GROOVES } from "./groove";
 import type { Letter } from "./grade";
+import {
+    cleanChannel,
+    defaultChannels,
+    LIGHT_PROFILE_IDS,
+    type LightProfileId,
+} from "./lightProfile";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
 import type { MicCalibration } from "./pitch";
 import { type DecayMode, REVIEW_CAP } from "./review";
@@ -46,6 +52,18 @@ export type Prefs = {
     noteLabels: NoteLabels;
     // Echo what Plinky plays to a connected instrument, lighting its keys.
     midiEcho: boolean;
+    // Light the keys you are about to play on an instrument that illuminates them —
+    // Casio's MIDI In Navigate, Yamaha's Light Guide. Distinct from midiEcho, which
+    // shows what Plinky HAS played: this shows what comes next, which is the point.
+    // How far ahead it goes is not a setting of its own; lighting a key is a reading
+    // aid and answers to noteHints like every other one.
+    keyLights: boolean;
+    // Which instrument's lighting convention to speak, and the two channels it
+    // navigates on. The channels are the maker's defaults until the player changes
+    // them, because they are changeable on the instrument too.
+    lightProfile: LightProfileId;
+    lightLeftChannel: number;
+    lightRightChannel: number;
     // Keep going past a slip: when on, playing the next note advances the score even if a
     // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
     // freezes you mid-piece. Off waits for every note, which builds accuracy.
@@ -201,6 +219,10 @@ function defaults(): Prefs {
         noteHints: "always",
         noteLabels: "all",
         midiEcho: false,
+        keyLights: false,
+        lightProfile: "casio",
+        lightLeftChannel: defaultChannels("casio").left,
+        lightRightChannel: defaultChannels("casio").right,
         forgiving: true,
         fingerHints: true,
         decayMode: "gentle",
@@ -273,6 +295,10 @@ export function parsePrefs(raw: string | null): Prefs {
         return {
             sound: bool(parsed.sound, base.sound),
             midiEcho: bool(parsed.midiEcho, base.midiEcho),
+            keyLights: bool(parsed.keyLights, base.keyLights),
+            lightProfile: oneOf(parsed.lightProfile, LIGHT_PROFILE_IDS, base.lightProfile),
+            lightLeftChannel: cleanChannel(parsed.lightLeftChannel, base.lightLeftChannel),
+            lightRightChannel: cleanChannel(parsed.lightRightChannel, base.lightRightChannel),
             volume: num(parsed.volume, clampVolume, base.volume),
             masteryThreshold: oneOf(parsed.masteryThreshold, LETTERS, base.masteryThreshold),
             handSpan: cleanHandSpan(parsed.handSpan),

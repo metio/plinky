@@ -32,6 +32,7 @@ import { LanguageSwitcher } from "../components/ui/languageSwitcher";
 import { LocalizedLink } from "../components/ui/localizedLink";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
+import { KeyLightsSettings } from "../components/features/keyLightsSettings";
 import { ThemeToggle } from "../components/features/themeToggle";
 import { useOnboardingStore } from "../contexts/services";
 import { useMidiConnection } from "../contexts/midi";
@@ -69,7 +70,7 @@ function grooveLabel(groove: Groove): string {
 export default function Settings() {
     const { prefs, update } = usePrefs();
     const synth = useSynth();
-    const { support: midiSupport, micStatus } = useMidiConnection();
+    const { support: midiSupport, micStatus, keyLights } = useMidiConnection();
     const onboarding = useOnboardingStore();
 
     // Opening Settings — where the Privacy block leads the page — marks the "check
@@ -399,6 +400,7 @@ export default function Settings() {
                         onChange={(midiEcho) => update({ midiEcho })}
                         help={m.settings_midi_echo_help()}
                     />
+                    <KeyLightsSettings prefs={prefs} update={update} keyLights={keyLights} />
                 </SettingsSection>
             )}
 

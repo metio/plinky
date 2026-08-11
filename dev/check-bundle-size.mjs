@@ -260,7 +260,12 @@ const BUDGET_VENDOR_KB = 324;
 // real structured data instead of a name guessed back from its URL. Trimmed first by
 // baking only the composers actually prerendered: listing all 542 cost 6 KB more and
 // bought nothing, since below that floor the manifest names them anyway.
-const BUDGET_APP_KB = 326;
+//
+// 328. Lighting the keys you are about to play, on a keyboard that illuminates them.
+// Nearly all of it is the Settings panel and its fourteen strings; the parts that do
+// the work — the picture, the diff, the MIDI adapter — are small, because the feature
+// is plain note-on/note-off over the MIDI output that already existed.
+const BUDGET_APP_KB = 328;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
