@@ -18,6 +18,9 @@ export type FakeAudioEngine = AudioEngine & {
     pedals: Array<{ pedal: PedalKind; down: boolean }>;
     clicks: Array<{ time: number; kind: ClickKind; gain: number }>;
     resumed: number;
+    // Stands in for a context the browser has suspended — before the first gesture, or
+    // across an interruption.
+    asleep: boolean;
     unlocked: number;
     // How many times the panic (allNotesOff) fired — a test asserts a play surface
     // silences everything on teardown.
@@ -33,11 +36,17 @@ export function fakeAudioEngine(): FakeAudioEngine {
         pedals: [],
         clicks: [],
         resumed: 0,
+        asleep: false,
         unlocked: 0,
         silenced: 0,
         time: 0,
         now() {
             return engine.time;
+        },
+        // Awake by default: a test asserting a sound would otherwise have to unlock
+        // first. Set `engine.asleep = true` to exercise the dropped-decoration path.
+        running() {
+            return !engine.asleep;
         },
         resume() {
             engine.resumed += 1;

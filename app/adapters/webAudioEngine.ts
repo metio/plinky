@@ -398,6 +398,9 @@ export const webAudioEngine: AudioEngine = {
     now() {
         return context()?.currentTime ?? null;
     },
+    running() {
+        return sharedContext?.state === "running";
+    },
     resume() {
         context()
             ?.resume()

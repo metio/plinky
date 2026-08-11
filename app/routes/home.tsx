@@ -124,7 +124,11 @@ export default function Home() {
                             // The synth already honours the sound/mute preference.
                             onPointerEnter={(event) => {
                                 if (event.pointerType === "mouse") {
-                                    synth.playNote(feature.note, { velocity: 55, duration: 0.4 });
+                                    synth.playNote(feature.note, {
+                                        velocity: 55,
+                                        duration: 0.4,
+                                        decorative: true,
+                                    });
                                 }
                             }}
                             className="group flex items-start gap-4 rounded-xl border border-line bg-raised p-5 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-md"

@@ -40,6 +40,7 @@ describe("Home", () => {
         const strike = vi.fn();
         const audio: AudioEngine = {
             now: () => 0,
+            running: () => true,
             resume: () => {},
             unlock: () => {},
             strike,

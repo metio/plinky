@@ -50,6 +50,13 @@ inside its description was read as though it named the author.
 which only works if you start on a white one. It now says twelve keys, black and white
 alike, and mentions that on the white keys that comes to eight.
 
+*Hovering the home page no longer saves up its sounds.* Each card on the front page
+gives a soft note as the mouse passes over it — but before you've clicked anything,
+browsers keep audio asleep, and those notes were being queued rather than dropped. They
+all arrived at once, as a chord, whenever sound finally woke up. A sound that only means
+something at the moment you asked for it is now simply not played if it can't be heard
+then. Notes you actually play are untouched: those still sound, late rather than never.
+
 *Smaller ones.* Testing your keyboard's lights left them on after you left Settings.
 A practice session you logged by hand landed on the wrong day in New Zealand and the
 Pacific, and two entries on the same day couldn't be told apart, so deleting one

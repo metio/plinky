@@ -27,6 +27,15 @@ export interface AudioEngine {
     // Ask the engine to leave the suspended state browsers park audio in until
     // a user gesture. Best-effort.
     resume(): void;
+    // Whether a sound struck now would actually be heard now. False before the first
+    // gesture unlocks audio, and while the browser has the context suspended.
+    //
+    // It matters because a strike is scheduled against the context's own clock, and
+    // that clock does not advance while the context is suspended — so every strike made
+    // during a suspension is scheduled at the same frozen instant and they all sound
+    // together the moment it resumes. A caller whose sound is only meaningful NOW
+    // should ask first and drop it otherwise.
+    running(): boolean;
     // Wake audio from inside a user gesture: resume the context and play a silent
     // buffer through it. iOS Safari parks a freshly opened context suspended until
     // a gesture actually plays something, and a resume() alone does not always

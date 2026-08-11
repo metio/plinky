@@ -9,6 +9,16 @@ export type PlayNoteOptions = {
     velocity?: number; // 0..127
     duration?: number; // seconds
     delay?: number; // seconds to wait before the strike, for scheduling a chord or arpeggio
+    // A sound that is only worth anything at the instant it was asked for — a hover
+    // plink, an ornament. Dropped outright when audio is asleep rather than scheduled.
+    //
+    // A strike is timed against the audio context's own clock, and that clock STOPS
+    // while the context is suspended (before the first gesture unlocks audio, or across
+    // an interruption). Every strike made during a suspension therefore lands on the
+    // same frozen instant, and they all sound together the moment it resumes — five
+    // hovers down a list arriving as one chord, minutes later. A note the player asked
+    // for is worth hearing late; decoration is not.
+    decorative?: boolean;
 };
 
 export type UseSynthResult = {
@@ -55,6 +65,11 @@ export function useSynth(): UseSynthResult {
         (note: number, options: PlayNoteOptions = {}) => {
             const gain = gainFor(options.velocity ?? 90);
             if (gain === null) {
+                return;
+            }
+            if (options.decorative && !audio.running()) {
+                // Nor resume(): a hover is not a user gesture, so the browser would
+                // refuse it anyway, and decoration has no business waking the audio.
                 return;
             }
             audio.resume();

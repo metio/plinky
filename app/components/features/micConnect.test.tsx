@@ -65,6 +65,7 @@ describe("MicConnect", () => {
         // its octave neighbour) is our speaker, anything else is the player.
         const audio = {
             now: () => 0,
+            running: () => true,
             resume: () => {},
             unlock: () => {},
             strike: () => {},
