@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { daysBetween } from "./dateKey";
+import { daysBetween, isDateKey } from "./dateKey";
 import { type Mastery, isLapsed } from "./mastery";
 
 // Where a piece sits in the arc from first read to kept-up repertoire. Every
@@ -49,7 +49,9 @@ export type Deadline = {
 };
 
 export function deadlineFor(date: string, today: string): Deadline | null {
-    if (date === "") {
+    // daysBetween answers 0 for a date it cannot parse, which would read as "due today"
+    // and put a corrupt entry at the top of the panel forever.
+    if (date === "" || !isDateKey(date)) {
         return null;
     }
     const daysLeft = daysBetween(today, date);

@@ -26,16 +26,23 @@
 // cannot be judged on length. Each half returns null rather than a flattering 100.
 
 export type ExpressionNote = {
-    // What the player did: the struck velocity, and how long the key was actually
-    // held. `heldMs` is absent for an input with no key release to report.
+    // What the player did: the struck velocity, and how long the KEY was down —
+    // deliberately not how long the note rang, which under the sustain pedal runs to
+    // the pedal lift and would read every pedalled note as several times its written
+    // length. Absent for an input with no key release to report.
     velocity: number;
-    heldMs?: number;
+    keyHeldMs?: number;
     // What the score asked for at that position: the standing dynamic with any accent
     // applied (null when the score marks no dynamic), and the length the note is meant
     // to sound in milliseconds at the run's tempo.
     expectedVelocity: number | null;
     expectedHoldMs: number;
 };
+
+// What the run was played on. An input that cannot report a real key velocity or a
+// real key release has no expression to be judged on, and saying so beats inventing a
+// figure from a constant.
+export type InputPrecision = "precise" | "imprecise";
 
 export type ExpressionSummary = {
     // How well the loudness followed the written dynamics, 0..100, or null when the
@@ -107,7 +114,7 @@ function dynamicsScore(notes: ExpressionNote[]): number | null {
 
 function articulationScore(notes: ExpressionNote[]): number | null {
     const usable = notes.filter(
-        (note) => note.heldMs !== undefined && note.heldMs > 0 && note.expectedHoldMs > 0,
+        (note) => note.keyHeldMs !== undefined && note.keyHeldMs > 0 && note.expectedHoldMs > 0,
     );
     if (usable.length < MIN_NOTES) {
         return null;
@@ -115,7 +122,7 @@ function articulationScore(notes: ExpressionNote[]): number | null {
     // Scored per note as a ratio rather than in milliseconds, so a run taken slower
     // than written is judged on its shaping and not on its tempo.
     const total = usable.reduce((sum, note) => {
-        const ratio = (note.heldMs as number) / note.expectedHoldMs;
+        const ratio = (note.keyHeldMs as number) / note.expectedHoldMs;
         const error = Math.abs(Math.log2(ratio));
         // A ratio inside the tolerance is fully right; beyond it the score falls away
         // over one further doubling, so twice or half the written length still reads
@@ -128,9 +135,16 @@ function articulationScore(notes: ExpressionNote[]): number | null {
 // The expressive reading of a run, or null when neither half could be measured — an
 // unmarked score played on a computer keyboard has no expression to grade, and
 // saying so is more honest than awarding it full marks.
-export function summarizeExpression(notes: ExpressionNote[]): ExpressionSummary | null {
+export function summarizeExpression(
+    notes: ExpressionNote[],
+    // An on-screen or computer keyboard reports a constant velocity and a key-hold that
+    // is about hunting for the key rather than shaping the note. Neither half means
+    // anything there, and the dynamics half would fall out by itself — this makes the
+    // articulation half say so too, rather than grading a typing speed as phrasing.
+    precision: InputPrecision = "precise",
+): ExpressionSummary | null {
     const dynamics = dynamicsScore(notes);
-    const articulation = articulationScore(notes);
+    const articulation = precision === "imprecise" ? null : articulationScore(notes);
     const measured = [dynamics, articulation].filter((value): value is number => value !== null);
     if (measured.length === 0) {
         return null;

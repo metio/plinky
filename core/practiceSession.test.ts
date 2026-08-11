@@ -236,3 +236,29 @@ describe("practiceLogToCsv", () => {
         expect(practiceLogToCsv(log, title, formatTime)).toContain("\"'=HYPERLINK");
     });
 });
+
+describe("a hand-logged sitting is anchored where the player is", () => {
+    it("lands on the day entered, read back through the local calendar", () => {
+        // Anchored at UTC noon this filed the session on the NEXT day for anyone at
+        // UTC+13 or +14, because the key it is read back through is local.
+        const session = only(addManualSession([], { date: "2026-06-23", minutes: 30 }));
+        expect(sessionDate(session)).toBe("2026-06-23");
+        expect(new Date(session.start).getHours()).toBe(12);
+    });
+
+    it("gives two entries on one day distinct identities", () => {
+        // `start` is how remove() and setMood() find a row; sharing one meant deleting
+        // either deleted both.
+        const twice = addManualSession(
+            addManualSession([], { date: "2026-06-23", minutes: 30 }),
+            { date: "2026-06-23", minutes: 45 },
+        );
+        expect(twice).toHaveLength(2);
+        expect(nth(twice, 0).start).not.toBe(nth(twice, 1).start);
+        expect(twice.map(sessionDate)).toEqual(["2026-06-23", "2026-06-23"]);
+
+        const left = removeSession(twice, nth(twice, 0).start);
+        expect(left).toHaveLength(1);
+        expect(only(left).activeMs).toBe(45 * MINUTE);
+    });
+});

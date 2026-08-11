@@ -7,7 +7,7 @@ import { type ExpressionNote, summarizeExpression } from "./expressionGrade";
 
 const arbNote: fc.Arbitrary<ExpressionNote> = fc.record({
     velocity: fc.integer({ min: 1, max: 127 }),
-    heldMs: fc.option(fc.integer({ min: 1, max: 8000 }), { nil: undefined }),
+    keyHeldMs: fc.option(fc.integer({ min: 1, max: 8000 }), { nil: undefined }),
     expectedVelocity: fc.option(fc.integer({ min: 1, max: 127 }), { nil: null }),
     expectedHoldMs: fc.integer({ min: 0, max: 8000 }),
 });

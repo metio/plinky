@@ -58,9 +58,11 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = `;
 const FOOTER = `;
 
 // The canonical name for a slug, or null when the catalogue credits nobody by it —
-// a user-imported score's composer, or a slug typed by hand.
+// a user-imported score's composer, or a slug typed by hand. Own-property only: a bare
+// lookup answers for "constructor", "toString" and every other name on Object's
+// prototype, so /person/constructor would open a page for a function.
 export function indexedPerson(slug: string): PersonEntry | null {
-    return PEOPLE_INDEX[slug] ?? null;
+    return Object.hasOwn(PEOPLE_INDEX, slug) ? (PEOPLE_INDEX[slug] as PersonEntry) : null;
 }
 `;
 

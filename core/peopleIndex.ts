@@ -74,7 +74,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "frank-bridge": {"name":"Frank Bridge","pieces":12},
     "franz-liszt": {"name":"Franz Liszt","pieces":7},
     "franz-schubert": {"name":"Franz Schubert","pieces":97},
-    "frederic-chopin": {"name":"Frédéric Chopin","pieces":40},
+    "frederic-chopin": {"name":"Frédéric Chopin","pieces":41},
     "frederic-hymen-cowen": {"name":"Frederic Hymen Cowen","pieces":4},
     "frederick-delius": {"name":"Frederick Delius","pieces":6},
     "friedrich-kuhlau": {"name":"Friedrich Kuhlau","pieces":4},
@@ -89,7 +89,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "gustav-mahler": {"name":"Gustav Mahler","pieces":12},
     "guy-d-hardelot": {"name":"Guy d’ Hardelot","pieces":9},
     "hans-leo-hassler": {"name":"Hans Leo Hassler","pieces":5},
-    "harry-thacker-burleigh": {"name":"Harry Thacker Burleigh","pieces":5},
+    "harry-thacker-burleigh": {"name":"Harry Thacker Burleigh","pieces":6},
     "helena-munktell": {"name":"Helena Munktell","pieces":12},
     "henry-purcell": {"name":"Henry Purcell","pieces":7},
     "hezekiah-moors": {"name":"Hezekiah Moors","pieces":6},
@@ -104,7 +104,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "johann-pachelbel": {"name":"Johann Pachelbel","pieces":3},
     "johann-sebastian-bach": {"name":"Johann Sebastian Bach","pieces":198},
     "johanna-kinkel": {"name":"Johanna Kinkel","pieces":45},
-    "johannes-brahms": {"name":"Johannes Brahms","pieces":113},
+    "johannes-brahms": {"name":"Johannes Brahms","pieces":114},
     "john-dowland": {"name":"John Dowland","pieces":7},
     "john-field": {"name":"John Field","pieces":3},
     "john-philip-sousa": {"name":"John Philip Sousa","pieces":3},
@@ -172,7 +172,9 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
 };
 
 // The canonical name for a slug, or null when the catalogue credits nobody by it —
-// a user-imported score's composer, or a slug typed by hand.
+// a user-imported score's composer, or a slug typed by hand. Own-property only: a bare
+// lookup answers for "constructor", "toString" and every other name on Object's
+// prototype, so /person/constructor would open a page for a function.
 export function indexedPerson(slug: string): PersonEntry | null {
-    return PEOPLE_INDEX[slug] ?? null;
+    return Object.hasOwn(PEOPLE_INDEX, slug) ? (PEOPLE_INDEX[slug] as PersonEntry) : null;
 }

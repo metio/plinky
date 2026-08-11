@@ -211,16 +211,26 @@ export type ManualEntry = {
     label?: string;
 };
 
-// Adds a sitting the player did away from Plinky. Anchored at noon on the given day
-// so the session lands on that calendar date under any time zone — midnight would
-// fall on the previous day for anyone east of UTC once read back through a local
-// date key. Returns the log unchanged when the entry says nothing.
+// Adds a sitting the player did away from Plinky. Anchored at LOCAL noon on the given
+// day: the date keys these are read back through are local (see sessionDate), so an
+// anchor in UTC lands on the wrong day for anyone far enough east — at UTC+13 or +14,
+// noon UTC is already the following morning. Returns the log unchanged when the entry
+// says nothing.
 export function addManualSession(log: PracticeLog, entry: ManualEntry): PracticeLog {
     const minutes = Math.floor(clampNumber(entry.minutes, 0));
     if (!isDateKey(entry.date) || minutes <= 0 || minutes > MAX_MANUAL_MINUTES) {
         return log;
     }
-    const start = Date.parse(`${entry.date}T12:00:00Z`);
+    const [year, month, day] = entry.date.split("-").map(Number);
+    const noon = new Date(year as number, (month as number) - 1, day as number, 12, 0, 0, 0);
+    // The start doubles as the row's identity — remove() and setMood() find a session by
+    // it — so two entries logged for the same day must not share one. Later entries step
+    // forward a millisecond each, which keeps the ordering and the day unchanged.
+    const taken = new Set(log.map((session) => session.start));
+    let start = noon.getTime();
+    while (taken.has(start)) {
+        start += 1;
+    }
     const activeMs = minutes * 60_000;
     const session: PracticeSession = {
         start,

@@ -121,10 +121,26 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
 // rings on; its hold is left open and marked pedal-held until the pedal lifts.
 export function captureRelease(capture: RunCapture, pitch: number, offMs: number): void {
     if (capture.pedalDown && capture.holds.has(pitch)) {
+        // The key is up but the damper is off, so the note rings on and its heldMs must
+        // run to the pedal lift for the replay to sound like the playing did. How long
+        // the KEY was down is settled here, though, and that is the figure articulation
+        // is judged on — otherwise a pedalled staccato reads as a held note.
+        noteKeyRelease(capture, pitch, offMs);
         capture.pedalHeld.add(pitch);
         return;
     }
+    noteKeyRelease(capture, pitch, offMs);
     closeHold(capture, pitch, offMs);
+}
+
+// Record how long the key itself was down, without ending the note. Keeps the longest
+// across a chord's separate releases, like heldMs.
+function noteKeyRelease(capture: RunCapture, pitch: number, offMs: number): void {
+    const hold = capture.holds.get(pitch);
+    const note = hold ? capture.notes[hold.index] : undefined;
+    if (hold && note) {
+        note.keyHeldMs = Math.max(note.keyHeldMs ?? 0, offMs - hold.onMs);
+    }
 }
 
 // The sustain pedal changed. Pressing it arms the damper; lifting it drops every note

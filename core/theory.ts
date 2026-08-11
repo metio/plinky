@@ -47,7 +47,15 @@ export type NoteNameId =
     | "a"
     | "a-sharp"
     | "b-flat"
-    | "b";
+    | "b"
+    // The four names no pitch ever canonicalises to, because a pitch is spelled by the
+    // simplest name that fits it. A KEY SIGNATURE is not: the order of sharps runs
+    // F C G D A E B and the sixth of them is E sharp, whatever pitch it sounds. Without
+    // these a signature at the circle's cut has to print the wrong letter.
+    | "e-sharp"
+    | "b-sharp"
+    | "c-flat"
+    | "f-flat";
 
 const SHARP_NAMES: NoteNameId[] = [
     "c",
@@ -102,6 +110,10 @@ export const NOTE_TEXT: Record<NoteNameId, string> = {
     "a-sharp": "A♯",
     "b-flat": "B♭",
     b: "B",
+    "e-sharp": "E♯",
+    "b-sharp": "B♯",
+    "c-flat": "C♭",
+    "f-flat": "F♭",
 };
 
 export function noteNameOf(pitchClass: PitchClass, spelling: Spelling = "sharp"): NoteNameId {

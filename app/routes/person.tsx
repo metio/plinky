@@ -96,13 +96,21 @@ export default function PersonPage() {
         // Re-seed from what is known without the network on a slug change — the name at
         // minimum — then merge the catalogue and the user's imports.
         setPerson(knownPerson(slug ?? ""));
+        setLoading(true);
         (async () => {
             const manifest = (await songs.manifest()) ?? [];
             if (cancelled) {
                 return;
             }
             const pieces: PersonPiece[] = [...manifest, ...bundledPieces()];
-            setPerson(personFor(pieces, slug ?? ""));
+            const resolved = personFor(pieces, slug ?? "");
+            // Only ever an improvement on what the page opened with. A manifest that
+            // could not be fetched answers null — unreachable, not empty — and taking
+            // that as "this composer has nothing" would replace a name and a piece
+            // count the baked index already gave us with a slug and an empty state.
+            if (resolved) {
+                setPerson(resolved);
+            }
             setLoading(false);
         })();
         return () => {

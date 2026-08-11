@@ -1082,7 +1082,7 @@
   "theory_steps_title": "Semitonos y tonos",
   "theory_steps_body": "El movimiento más pequeño del piano es a la tecla de al lado, negra o blanca: un semitono. Dos semitonos hacen un tono. Un sostenido sube la nota un semitono y un bemol la baja, y por eso cada tecla negra tiene dos nombres: la misma tecla, según de qué lado llegues.",
   "theory_octave_title": "La misma nota, más arriba",
-  "theory_octave_body": "Cuenta ocho teclas blancas hacia arriba desde cualquier nota y llegas a otra que suena igual, solo que más aguda: una octava. Es el intervalo que cualquier oído reconoce sin que se lo expliquen, y por eso el teclado son las mismas doce teclas repitiéndose y no ochenta y ocho distintas.",
+  "theory_octave_body": "Cuenta doce teclas hacia arriba desde cualquier nota, negras y blancas por igual, y llegas a otra que suena igual, solo que más aguda: una octava. En las teclas blancas son ocho, de C al siguiente C. Es el intervalo que cualquier oído reconoce sin que se lo expliquen, y por eso el teclado son las mismas doce teclas repitiéndose y no ochenta y ocho distintas.",
   "theory_major_title": "La escala mayor",
   "theory_major_body": "Toca de C a C por las teclas blancas y tienes una escala mayor: tono, tono, semitono, tono, tono, tono, semitono. Lo que suena mayor es ese patrón, no las notas en sí: empieza donde quieras, mantén el patrón y tienes la misma luz en otro sitio.",
   "theory_minor_title": "La escala menor",

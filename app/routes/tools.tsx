@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CIRCLE, type CircleKey, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
 import { bpmOf, NO_TAPS, type TapState, tap, tapCount } from "../../core/tapTempo";
@@ -20,6 +20,7 @@ import { Keyboard } from "../components/ui/keyboard";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useScheduler } from "../contexts/services";
+import type { SchedulerHandle } from "../ports/scheduler";
 import { useSynth } from "../hooks/useSynth";
 import { chordName, scaleName } from "../lib/theoryNames";
 import { m } from "../paraglide/messages.js";
@@ -111,7 +112,7 @@ function CircleOfFifths() {
                 <dd>
                     {notes.length === 0
                         ? m.tools_circle_none()
-                        : notes.map((pitch) => spell(pitch, selected)).join(" · ")}
+                        : notes.map((name) => NOTE_TEXT[name]).join(" · ")}
                 </dd>
                 <dt className="text-muted">{m.tools_circle_relative()}</dt>
                 <dd>{m.tools_circle_minor({ note: spell(selected.relativeMinor, selected) })}</dd>
@@ -126,10 +127,24 @@ function CircleOfFifths() {
 function useSequencePlayer() {
     const synth = useSynth();
     const scheduler = useScheduler();
+    // Every strike still waiting to happen. A scale left running when the page goes —
+    // or a second press landing on top of the first — would otherwise keep striking
+    // notes into a route nobody is on any more.
+    const pending = useRef<SchedulerHandle[]>([]);
+    const stop = useCallback(() => {
+        for (const handle of pending.current) {
+            scheduler.cancel(handle);
+        }
+        pending.current = [];
+    }, [scheduler]);
+    useEffect(() => stop, [stop]);
     return (pitches: number[]) => {
+        stop();
         for (const [index, pitch] of pitches.entries()) {
-            scheduler.after(index * STEP_MS, () =>
-                synth.playNote(pitch, { duration: NOTE_SECONDS }),
+            pending.current.push(
+                scheduler.after(index * STEP_MS, () =>
+                    synth.playNote(pitch, { duration: NOTE_SECONDS }),
+                ),
             );
         }
     };

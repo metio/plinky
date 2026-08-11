@@ -111,3 +111,13 @@ describe("buildRepertoire", () => {
         expect(built?.slipping).toBe(true);
     });
 });
+
+describe("a date that will not parse", () => {
+    it("is no deadline at all, rather than one due today", () => {
+        // daysBetween answers 0 for an unparsable key, so this used to read as due
+        // today and sit at the top of the panel for ever.
+        expect(deadlineFor("2026-02-31", TODAY)).toBeNull();
+        expect(deadlineFor("not-a-date", TODAY)).toBeNull();
+        expect(deadlineFor("23/06/2026", TODAY)).toBeNull();
+    });
+});

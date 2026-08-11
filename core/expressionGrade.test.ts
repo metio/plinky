@@ -17,7 +17,7 @@ function crescendo(played: number[]): ExpressionNote[] {
 function lengths(pairs: Array<{ heldMs: number; expectedHoldMs: number }>): ExpressionNote[] {
     return pairs.map((pair) => ({
         velocity: 80,
-        heldMs: pair.heldMs,
+        keyHeldMs: pair.heldMs,
         expectedVelocity: null,
         expectedHoldMs: pair.expectedHoldMs,
     }));
@@ -121,13 +121,37 @@ describe("articulation", () => {
         }));
         expect(summarizeExpression(noHolds)?.articulation).toBeNull();
     });
+
+    it("judges the key hold, so the sustain pedal cannot flatten it", () => {
+        // Under the pedal a note rings to the pedal lift; the KEY comes up on time. The
+        // figure has to follow the key, or a pedalled staccato reads as legato.
+        const staccatoUnderPedal = lengths([
+            { heldMs: 125, expectedHoldMs: 125 },
+            { heldMs: 125, expectedHoldMs: 125 },
+            { heldMs: 125, expectedHoldMs: 125 },
+            { heldMs: 125, expectedHoldMs: 125 },
+        ]);
+        expect(summarizeExpression(staccatoUnderPedal)?.articulation).toBe(100);
+    });
+
+    it("says nothing at all about an input that cannot shape a note", () => {
+        // A computer keyboard's key-hold is hunting for the key, not phrasing.
+        const played = lengths([
+            { heldMs: 250, expectedHoldMs: 250 },
+            { heldMs: 500, expectedHoldMs: 500 },
+            { heldMs: 250, expectedHoldMs: 250 },
+            { heldMs: 500, expectedHoldMs: 500 },
+        ]);
+        expect(summarizeExpression(played, "imprecise")).toBeNull();
+        expect(summarizeExpression(played, "precise")?.articulation).toBe(100);
+    });
 });
 
 describe("summarizeExpression", () => {
     it("averages over whichever halves could be measured", () => {
         const notes = crescendo([40, 55, 70, 85, 100]).map((note) => ({
             ...note,
-            heldMs: 500,
+            keyHeldMs: 500,
             expectedHoldMs: 500,
         }));
         const summary = summarizeExpression(notes);

@@ -34,26 +34,47 @@ describe("CIRCLE", () => {
         for (const key of CIRCLE) {
             expect(signatureNotes(key)).toHaveLength(Math.abs(key.accidentals));
         }
-        // A major writes F sharp, C sharp, G sharp — the altered notes, in signature order.
+        // A major writes F sharp, C sharp, G sharp — in signature order, as names.
         expect(
             signatureNotes({ tonic: 9, accidentals: 3, spelling: "sharp", relativeMinor: 6 }),
-        ).toEqual([6, 1, 8]);
+        ).toEqual(["f-sharp", "c-sharp", "g-sharp"]);
         // B flat major writes B flat and E flat.
         expect(
             signatureNotes({ tonic: 10, accidentals: -2, spelling: "flat", relativeMinor: 7 }),
-        ).toEqual([10, 3]);
+        ).toEqual(["b-flat", "e-flat"]);
     });
 });
 
 describe("signatureNotes", () => {
-    it("names notes the key actually contains", () => {
+    it("writes one letter per accidental, never the same letter twice", () => {
+        // A signature names seven letters at most, each once. Spelling it from pitch
+        // classes broke exactly this: F sharp major printed "F" for its sixth sharp,
+        // which both repeats a letter and claims to sharpen a note the key contains.
         for (const key of CIRCLE) {
-            const scale = new Set(
-                // The major scale on this tonic, as pitch classes.
-                [0, 2, 4, 5, 7, 9, 11].map((step) => (key.tonic + step) % 12),
-            );
-            for (const note of signatureNotes(key)) {
-                expect(scale.has(note)).toBe(true);
+            const names = signatureNotes(key);
+            expect(names).toHaveLength(Math.abs(key.accidentals));
+            const letters = names.map((name) => name[0]);
+            expect(new Set(letters).size).toBe(letters.length);
+        }
+    });
+
+    it("spells the sixth sharp as E sharp, not F", () => {
+        const fSharpMajor = CIRCLE.find((key) => key.accidentals === 6);
+        expect(fSharpMajor).toBeDefined();
+        expect(signatureNotes(fSharpMajor as NonNullable<typeof fSharpMajor>)).toEqual([
+            "f-sharp",
+            "c-sharp",
+            "g-sharp",
+            "d-sharp",
+            "a-sharp",
+            "e-sharp",
+        ]);
+    });
+
+    it("uses only accidentals — a signature never writes a natural", () => {
+        for (const key of CIRCLE) {
+            for (const name of signatureNotes(key)) {
+                expect(name).toMatch(key.accidentals < 0 ? /-flat$/ : /-sharp$/);
             }
         }
     });

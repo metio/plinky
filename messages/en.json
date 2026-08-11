@@ -1082,7 +1082,7 @@
   "theory_steps_title": "Half steps and whole steps",
   "theory_steps_body": "The smallest move on a piano is to the very next key, black or white: a half step. Two of those make a whole step. A sharp raises a note by a half step and a flat lowers it, which is why the black keys have two names each — the same key, reached from either side.",
   "theory_octave_title": "The same note, higher up",
-  "theory_octave_body": "Count eight white keys up from any note and you land on one that sounds like it again, only higher — an octave. It is the one interval every ear recognises without being taught, and it is why the keyboard is the same twelve keys repeating rather than eighty-eight different ones.",
+  "theory_octave_body": "Count twelve keys up from any note, black and white alike, and you land on one that sounds like it again, only higher — an octave. On the white keys that is eight of them, C up to the next C. It is the one interval every ear recognises without being taught, and it is why the keyboard is the same twelve keys repeating rather than eighty-eight different ones.",
   "theory_major_title": "The major scale",
   "theory_major_body": "Play from C to C on the white keys and you have a major scale: whole, whole, half, whole, whole, whole, half. That pattern is what makes it sound major, not the notes themselves — start anywhere and keep the pattern and you get the same brightness in a different place.",
   "theory_minor_title": "The minor scale",

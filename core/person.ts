@@ -106,8 +106,23 @@ function cleaned(raw: string): string {
     // the person, and would otherwise split one composer across two pages.
     name = name.replace(/\s*\[[^\]]*\]/g, "");
     // A work number appended to the credit ("… Opus 100.", "Op.11.No.1") names the
-    // piece, not its composer.
-    name = name.replace(/[\s,]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*\d+[\d.\s]*.*$/i, "");
+    // piece, not its composer — so it and everything after it goes. But only when a
+    // name survives in front of it: some corpora write the work number FIRST
+    // ("Op 39, No. 15 Johannes Brahms"), and stripping to the end there would delete
+    // the composer entirely and leave the piece credited to nobody.
+    // Leading work numbers first, as many as are stacked up ("Op 39, No. 15 Brahms"),
+    // each dropped on its own so the name behind them survives.
+    const LEADING_WORK = /^[\s,.]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*[\d.]+[\s,.]*/i;
+    while (LEADING_WORK.test(name)) {
+        name = name.replace(LEADING_WORK, "");
+    }
+    // Then a trailing one, which takes everything after it — but only if a name is left
+    // in front. Otherwise the credit was nothing but a work number and there is no
+    // composer to keep.
+    const withoutWork = name.replace(/[\s,]*\b(op|opus|no|nr|bwv|kv|k)\b\.?\s*\d+[\d.\s]*.*$/i, "");
+    if (withoutWork.trim().length > 0) {
+        name = withoutWork;
+    }
     name = name.replace(/[\s,]*\d{4}\s*[-–—]?\s*(\d{4})?\s*$/g, "");
     const comma = name.indexOf(",");
     if (comma > 0 && comma < name.length - 1) {
@@ -137,10 +152,15 @@ const NOT_A_PERSON =
 // safe in a path. Empty when the composer is unknown or is an attribution
 // marker rather than a person.
 export function personSlug(raw: string): string {
-    if (NOT_A_PERSON.test(raw)) {
+    // Tested against the CLEANED name, not the raw credit. A parenthetical or bracketed
+    // aside describes the arrangement rather than the author — "Harry Thacker Burleigh
+    // (arranged from a traditional Negro Spiritual)" is a piece BY Burleigh — and
+    // testing before that aside is stripped hands his work to nobody.
+    const name = canonicalComposer(raw);
+    if (NOT_A_PERSON.test(name)) {
         return "";
     }
-    return canonicalComposer(raw)
+    return name
         .normalize("NFKD")
         .replace(/\p{M}/gu, "")
         .toLowerCase()

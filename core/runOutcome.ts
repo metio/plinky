@@ -19,9 +19,15 @@ import { findHotspots, type Hotspot, median, type TempoPoint, tempoSeries } from
 // is derived from. The share grid, per-hand rows and per-note strip all read these fields.
 export type OutcomeNote = RunNote & {
     velocity: number;
-    // The real key-hold length, filled in from the MIDI note-off once the key is
-    // released. Absent for imprecise input, which reports no meaningful hold.
+    // How long the note RANG, filled in from the MIDI note-off once the key is
+    // released — or, under the sustain pedal, once the pedal lifts. Absent for
+    // imprecise input, which reports no meaningful hold. This is what a replay needs.
     heldMs?: number;
+    // How long the KEY was down, which under the pedal is a different and much shorter
+    // figure. Articulation is judged on this one: a phrase played staccato under the
+    // pedal is still played staccato, and dividing by the ringing length would read
+    // every pedalled note as several times its written value.
+    keyHeldMs?: number;
     // What the score asked for at this position: the standing dynamic with any accent
     // applied (null when the score marks none), and how long the note is meant to
     // sound — its written length narrowed by its articulation. Absent for a run with
@@ -102,10 +108,11 @@ export function deriveRunOutcome({
         expression: summarizeExpression(
             notes.map((note) => ({
                 velocity: note.velocity,
-                heldMs: note.heldMs,
+                keyHeldMs: note.keyHeldMs,
                 expectedVelocity: note.expectedVelocity ?? null,
                 expectedHoldMs: note.expectedHoldMs ?? 0,
             })),
+            imprecise ? "imprecise" : "precise",
         ),
     });
     // Timing is judged against the player's own pace (so a steady run at any tempo reads as

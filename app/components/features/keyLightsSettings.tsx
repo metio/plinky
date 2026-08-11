@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useEffect } from "react";
 import { NOTHING_LIT, TEST_CHORD } from "../../../core/keyLights";
 import {
     defaultChannels,
@@ -70,6 +71,13 @@ export function KeyLightsSettings({
     update: (patch: Partial<Prefs>) => void;
     keyLights: KeyLightsPort;
 }) {
+    // The test chord is lit by a button press and has nothing else to take it back, so
+    // leaving Settings with it showing would strand six keys on the instrument until
+    // something else happened to clear them — or forever, if the tab closes.
+    useEffect(() => {
+        return () => keyLights.clear();
+    }, [keyLights]);
+
     // Choosing a maker seeds its documented channels. It does not lock them: a player
     // who has changed them on the instrument picks the maker for the convention and
     // then corrects the numbers.

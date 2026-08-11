@@ -1082,7 +1082,7 @@
   "theory_steps_title": "Semitoni e toni",
   "theory_steps_body": "Il movimento più piccolo al pianoforte è al tasto immediatamente accanto, bianco o nero: un semitono. Due semitoni fanno un tono. Un diesis alza la nota di un semitono e un bemolle la abbassa, ed è per questo che ogni tasto nero ha due nomi — lo stesso tasto, raggiunto da un lato o dall'altro.",
   "theory_octave_title": "La stessa nota, più in alto",
-  "theory_octave_body": "Conta otto tasti bianchi verso l'alto da una nota qualsiasi e arrivi su una che suona di nuovo come lei, solo più acuta: un'ottava. È l'intervallo che ogni orecchio riconosce senza che glielo abbiano insegnato, ed è il motivo per cui la tastiera sono sempre gli stessi dodici tasti che si ripetono, non ottantotto tasti diversi.",
+  "theory_octave_body": "Conta dodici tasti verso l'alto da una nota qualsiasi, neri e bianchi insieme, e arrivi su una che suona di nuovo come lei, solo più acuta: un'ottava. Sui tasti bianchi sono otto, da C al C successivo. È l'intervallo che ogni orecchio riconosce senza che glielo abbiano insegnato, ed è il motivo per cui la tastiera sono sempre gli stessi dodici tasti che si ripetono, non ottantotto tasti diversi.",
   "theory_major_title": "La scala maggiore",
   "theory_major_body": "Suona da C a C sui tasti bianchi e hai una scala maggiore: tono, tono, semitono, tono, tono, tono, semitono. È lo schema a renderla maggiore, non le note in sé — parti da dove vuoi, tieni lo schema e ritrovi la stessa luce in un altro punto della tastiera.",
   "theory_minor_title": "La scala minore",

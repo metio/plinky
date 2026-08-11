@@ -28,6 +28,34 @@ The older switch that mirrors what Plinky *has* played is still there; it's now 
 
 ## 11 August 2026
 
+**Fixes from a sweep over the week's new code.**
+
+*F sharp major's key signature was wrong.* The circle of fifths named its sixth sharp
+"F" where it should read "E♯" — five letters for six sharps, and it appeared to sharpen
+a note the key already contains. It reads correctly now, on the tools page and in the
+theory lesson.
+
+*Pedalling no longer flattens your Expression score.* A note held under the sustain
+pedal rings until the pedal lifts, and the new reading was measuring that instead of
+how long you actually held the key — so a pedalled staccato read as legato and the
+score collapsed. It follows the key now. Playing on a computer or on-screen keyboard
+no longer gets an articulation figure at all, which was never meaningful there.
+
+*Three pieces had lost their composer.* Where a credit put the work number first —
+"Op 39, No. 15 Johannes Brahms" — the whole name was being stripped away with it.
+A Burleigh arrangement had also been filed under nobody, because the word "Spiritual"
+inside its description was read as though it named the author.
+
+*The octave lesson was wrong.* It said to count eight white keys up from any note,
+which only works if you start on a white one. It now says twelve keys, black and white
+alike, and mentions that on the white keys that comes to eight.
+
+*Smaller ones.* Testing your keyboard's lights left them on after you left Settings.
+A practice session you logged by hand landed on the wrong day in New Zealand and the
+Pacific, and two entries on the same day couldn't be told apart, so deleting one
+deleted both. A scale started on the tools or theory page kept playing after you
+navigated away.
+
 **Plinky is now licensed AGPL-3.0-or-later.** It was 0BSD, which let anyone do
 anything with the code including keeping their changes to themselves. Under the AGPL
 you can still run it, self-host it and change it — that is guaranteed — with one

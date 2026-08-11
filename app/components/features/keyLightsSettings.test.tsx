@@ -26,7 +26,7 @@ function mount(overrides: Partial<Prefs> = {}) {
         view.rerender(panel());
     };
     const view = renderWithServices(panel());
-    return { lights, prefsNow: () => prefs };
+    return { lights, view, prefsNow: () => prefs };
 }
 
 describe("KeyLightsSettings", () => {
@@ -90,6 +90,16 @@ describe("KeyLightsSettings", () => {
         expect(up.hasAttribute("disabled")).toBe(true);
         fireEvent.click(up);
         expect(prefsNow().lightRightChannel).toBe(16);
+    });
+
+    it("puts the test chord out when the page goes away", () => {
+        // The chord is lit by a button press and nothing else takes it back, so leaving
+        // Settings with it showing used to strand six keys on the instrument.
+        const { lights, view } = mount({ keyLights: true });
+        fireEvent.click(screen.getByRole("button", { name: m.lights_test() }));
+        expect(lights.lit()).toEqual(TEST_CHORD);
+        view.unmount();
+        expect(lights.lit()).toEqual(NOTHING_LIT);
     });
 
     it("lights a chord in both hands on request, and takes it back", () => {

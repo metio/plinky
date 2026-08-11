@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useCallback, useEffect, useRef } from "react";
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
 import { NOTE_TEXT, noteNameOf, type ScaleId, scalePitches } from "../../core/theory";
@@ -16,6 +17,7 @@ import {
 import { Button } from "../components/ui/button";
 import { Keyboard } from "../components/ui/keyboard";
 import { useScheduler } from "../contexts/services";
+import type { SchedulerHandle } from "../ports/scheduler";
 import { useSynth } from "../hooks/useSynth";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -97,6 +99,16 @@ function litNotes(demo: Demo): number[] {
 function LessonDemo({ demo }: { demo: Demo }) {
     const synth = useSynth();
     const scheduler = useScheduler();
+    // Strikes still waiting to happen, so a comparison left half-played when the reader
+    // moves on does not go on sounding, and a second press replaces the first.
+    const pending = useRef<SchedulerHandle[]>([]);
+    const stop = useCallback(() => {
+        for (const handle of pending.current) {
+            scheduler.cancel(handle);
+        }
+        pending.current = [];
+    }, [scheduler]);
+    useEffect(() => stop, [stop]);
 
     // A scale unfolds one note at a time; a chord sounds together. Both go through the
     // injected scheduler rather than a bare timer, which the architecture confines.
@@ -107,12 +119,13 @@ function LessonDemo({ demo }: { demo: Demo }) {
             if (at === 0) {
                 strike();
             } else {
-                scheduler.after(at, strike);
+                pending.current.push(scheduler.after(at, strike));
             }
         }
     };
 
     const hear = () => {
+        stop();
         if (demo.kind === "compare") {
             play(demo.first);
             play(demo.second, COMPARE_GAP_MS);
@@ -131,7 +144,7 @@ function LessonDemo({ demo }: { demo: Demo }) {
                     {m.theory_signature_reads({
                         key: NOTE_TEXT[noteNameOf(key.tonic, key.spelling)],
                         notes: signatureNotes(key)
-                            .map((pitch) => NOTE_TEXT[noteNameOf(pitch, key.spelling)])
+                            .map((name) => NOTE_TEXT[name])
                             .join(" · "),
                     })}
                 </p>

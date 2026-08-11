@@ -152,3 +152,41 @@ describe("credits the catalogue actually carries", () => {
         expect(canonicalComposer("John Philip Sousa.")).toBe("John Philip Sousa");
     });
 });
+
+describe("credits whose work number comes first", () => {
+    it("keeps the composer instead of deleting them", () => {
+        // Stripping "Op … " to the end of the string erased the whole credit when the
+        // work number led it, leaving three real pieces attributed to nobody.
+        expect(canonicalComposer("Op 39, No. 15 Johannes Brahms")).toBe("Johannes Brahms");
+        expect(canonicalComposer("No.1. F. Chopin. Op.6")).toBe("Frédéric Chopin");
+        expect(canonicalComposer("Opus 36 No. 1 M. Clementi")).toBe("M. Clementi");
+    });
+
+    it("still drops a work number that trails the name", () => {
+        expect(canonicalComposer("Johann Friedrich Franz Burgmüller Opus 100.")).toBe(
+            "Johann Friedrich Franz Burgmüller",
+        );
+    });
+
+    it("leaves a name with no work number in it untouched", () => {
+        for (const name of ["Johann Sebastian Bach", "Kurt Weill", "Turlough O'Carolan"]) {
+            expect(canonicalComposer(name)).toBe(name);
+        }
+    });
+});
+
+describe("an arrangement's aside is not a claim about who wrote it", () => {
+    it("keeps the arranger's page when the aside names a tradition", () => {
+        // The tradition filter used to run on the raw credit, so this piece — BY
+        // Burleigh — was handed to nobody by the word "Spiritual" inside his aside.
+        const credit = "Harry Thacker Burleigh (arranged from a traditional Negro Spiritual)";
+        expect(canonicalComposer(credit)).toBe("Harry Thacker Burleigh");
+        expect(personSlug(credit)).toBe(personSlug("Harry Thacker Burleigh"));
+    });
+
+    it("still gives a tradition no page of its own", () => {
+        for (const credit of ["Gregorian chant", "Volkslied", "Traditional", "Anonymous"]) {
+            expect(personSlug(credit)).toBe("");
+        }
+    });
+});

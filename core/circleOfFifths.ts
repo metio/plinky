@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { type PitchClass, pitchClassOf, type Spelling } from "./theory";
+import { type NoteNameId, type PitchClass, pitchClassOf, type Spelling } from "./theory";
 
 // The circle of fifths: the twelve major keys in the order a fifth takes you through
 // them, each with its relative minor and how many sharps or flats it carries.
@@ -69,17 +69,35 @@ export function neighbours(key: CircleKey): { up: CircleKey; down: CircleKey } {
     return { up: at(key.accidentals + 1), down: at(key.accidentals - 1) };
 }
 
-// Which notes carry an accidental in this key, in the order a key signature writes
-// them — sharps rising by fifths from F sharp, flats falling by fifths from B flat.
-// A reader looking at a signature is reading exactly this sequence.
+// The accidentals a key signature writes, in the order it writes them — sharps rising
+// by fifths from F sharp, flats falling by fifths from B flat. A reader looking at a
+// signature is reading exactly this sequence.
 //
-// These are the notes AS ALTERED, not the letters they are written on: a signature
-// with two sharps shows F sharp and C sharp, and listing F and C would name the very
-// notes the key does not contain.
-const SHARP_ORDER: PitchClass[] = [6, 1, 8, 3, 10, 5, 0];
-const FLAT_ORDER: PitchClass[] = [10, 3, 8, 1, 6, 11, 4];
+// NAMES, not pitch classes. A signature is a statement about letters: the sixth sharp
+// is E sharp even though it sounds the pitch F, and the sixth flat is C flat even
+// though it sounds B. Spelling these from a pitch class asks the wrong question and
+// gets the wrong letter — F sharp major would print "F" for its sixth sharp, naming
+// five letters for six accidentals and appearing to sharpen a note the key holds.
+const SHARP_ORDER: NoteNameId[] = [
+    "f-sharp",
+    "c-sharp",
+    "g-sharp",
+    "d-sharp",
+    "a-sharp",
+    "e-sharp",
+    "b-sharp",
+];
+const FLAT_ORDER: NoteNameId[] = [
+    "b-flat",
+    "e-flat",
+    "a-flat",
+    "d-flat",
+    "g-flat",
+    "c-flat",
+    "f-flat",
+];
 
-export function signatureNotes(key: CircleKey): PitchClass[] {
+export function signatureNotes(key: CircleKey): NoteNameId[] {
     const order = key.accidentals < 0 ? FLAT_ORDER : SHARP_ORDER;
     return order.slice(0, Math.abs(key.accidentals));
 }
