@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { DrillOptions } from "../../../core/drill";
 import { clampDrill, DRILL_FIELDS, type DrillField, keyName } from "../../../core/drillSpec";

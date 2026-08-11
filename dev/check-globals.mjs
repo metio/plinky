@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Confines platform globals to the adapters that own them. dependency-cruiser guards
 // the import graph, but a browser global like `localStorage` is a bare identifier, not

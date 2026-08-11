@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Curated composer credits for pieces the corpora label only "Traditional" or
 // "Anonymous": the sources carry no origin data, so each entry here is

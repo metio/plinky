@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The hold-duration indicator's pure state: how long each just-played note is
 // meant to keep sounding, so the on-screen key can show a shrinking fill for the

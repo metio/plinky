@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Preview } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";

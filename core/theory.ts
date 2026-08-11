@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The music-theory vocabulary the ear exercises are built from: pitch classes, note
 // names and intervals, all as plain MIDI-note arithmetic.

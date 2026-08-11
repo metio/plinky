@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Adds the per-song fingering `cost` to the shipped song manifest by recomputing it
 // from each shipped .mxl with the same engine the import uses. The full import grades

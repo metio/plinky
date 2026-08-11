@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Where MIDI comes from, and where it can go. A narrow seam over the Web MIDI API
 // shaped by what the app actually consumes: whether the platform offers MIDI, the

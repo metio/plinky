@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A selector that reads as a selector, not a row of action buttons. The options sit in
 // a recessed track and the chosen one lifts out as a card — visually distinct from the

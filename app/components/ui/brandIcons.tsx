@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Brand glyphs for the share links and the board's follow links, drawn in the
 // current text colour so they sit quietly on their buttons and adapt to light and

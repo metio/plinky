@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A best-effort denylist of well-known copyrighted recording artists, songwriters, and
 // film/game composers whose work pervades user-uploaded "cover" datasets like PDMX.

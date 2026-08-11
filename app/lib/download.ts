@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Triggers a browser download of in-memory data as a named file — the one place the
 // object-URL dance lives so every export (takes, score packs, assignments, compose)

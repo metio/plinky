@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Audits the shipped song catalogue for scores that don't belong in a *piano* app —
 // drum kits, other solo instruments — and for the cost:0 entries that the piano

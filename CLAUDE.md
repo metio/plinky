@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: The Plinky Authors
-SPDX-License-Identifier: 0BSD
+SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # Working on Plinky
@@ -222,8 +222,13 @@ tools than CI's fresh install and can pass what CI fails.
   silently fall back. Then `npm run messages` regenerates the gitignored
   `app/paraglide/`.
 - **Every file** carries the two SPDX header lines declaring the Plinky Authors
-  and the 0BSD licence (or a `REUSE.toml` entry when the format can't hold
-  comments), like the top of this file.
+  and the AGPL-3.0-or-later licence (or a `REUSE.toml` entry when the format can't
+  hold comments), like the top of this file. The catalogue is the exception: scores
+  and manifests keep their own Creative Commons terms in `REUSE.toml`, and a
+  relicensing sweep must never touch them.
+- **Every commit is signed off** — `git commit --signoff` — under the Developer
+  Certificate of Origin. The `dco` job in `verify.yml` fails a pull request whose
+  commits lack the trailer.
 - **Update README.md in the same change** whenever a user-facing feature is
   added or changed.
 - **Update NEWS.md in the same change**, for anything a player would notice — a

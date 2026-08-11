@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Timing windows around each note's target time, in milliseconds. A hit within
 // PERFECT_MS counts as perfect; within GOOD_MS as good; otherwise off.

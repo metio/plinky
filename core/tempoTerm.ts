@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The classical Italian tempo term for a metronome mark, so a speed reads as
 // music ("Allegro"), not just arithmetic. The terms are the universal vocabulary

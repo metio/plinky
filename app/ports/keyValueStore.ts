@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The persistence seam. Everything that needs to remember something across reloads
 // depends on this interface, not on `localStorage` directly, so the denied-storage

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: The Plinky Authors
-# SPDX-License-Identifier: 0BSD
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 version = 1
 
@@ -9,7 +9,7 @@ version = 1
 path = ["package.json", "package-lock.json", "tsconfig.json", "studio/package.json", "studio/package-lock.json", "studio/tsconfig.json", "studio/seed/*.ndjson", "renovate.json", "biome.json", "knip.json", "lighthouserc.json", "public/manifest.webmanifest", "messages/*.json", "project.inlang/settings.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "0BSD"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # flake.lock is nix-generated JSON; it pins the toolchain both CI and local
 # shells resolve from flake.nix.
@@ -17,7 +17,7 @@ SPDX-License-Identifier = "0BSD"
 path = "flake.lock"
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "0BSD"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # Catalog scores (MusicXML) are transcriptions/arrangements of public-domain or
 # non-copyrightable music, dedicated to the public domain (CC0). Each is its own
@@ -79,7 +79,7 @@ SPDX-License-Identifier = "CC-BY-SA-2.5"
 path = ["public/songs/manifest.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "0BSD"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # The finger-exercise catalogue. Scales/arpeggios are generated client-side (no
 # shipped files); the metadata manifest plus the curated studies are stored — the
@@ -89,7 +89,7 @@ SPDX-License-Identifier = "0BSD"
 path = ["public/exercises/manifest.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "0BSD"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
 path = ["public/exercises/studies/*.mxl"]
@@ -104,7 +104,7 @@ SPDX-License-Identifier = "CC0-1.0"
 path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "0BSD"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 # Story screenshot baselines: rendered from our own components by the visual
 # regression suite (vitest toMatchScreenshot over the Storybook stories).
@@ -112,4 +112,4 @@ SPDX-License-Identifier = "0BSD"
 path = ["app/**/__story-shots__/**/*.png"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
-SPDX-License-Identifier = "0BSD"
+SPDX-License-Identifier = "AGPL-3.0-or-later"

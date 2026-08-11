@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The shared look of the on-screen keyboards — the landing hero and the practice
 // trainer — so both read as the same instrument: a recessed keybed well and

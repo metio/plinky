@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The notation glossary: the marks a beginner meets in a score, each with a bar of
 // music that shows it and a way to hear what it does.

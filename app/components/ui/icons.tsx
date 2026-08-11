@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
 
 // Original line-art icons, drawn as simple geometric paths so they carry no
-// third-party licence — they are ours under 0BSD like the rest of the app, free to
-// use and ship even once Plinky is paid for. Stroke follows currentColor, so each
-// icon takes its button's text colour and theme.
+// third-party licence — they are ours, under the same licence as the rest of the app,
+// with no attribution or icon-set terms to honour wherever Plinky ships. Stroke
+// follows currentColor, so each icon takes its button's text colour and theme.
 function Icon({ children, className = "h-4 w-4" }: { children: ReactNode; className?: string }) {
     return (
         <svg

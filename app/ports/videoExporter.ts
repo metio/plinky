@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The video-file seam. The hooks that decide WHAT a frame shows (the scene
 // painter) and what it sounds like (the offline audio render) stay free of

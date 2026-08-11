@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A small offline cache with three strategies, chosen per request:
 //   - navigations: network-first, falling back to the cached app shell so the

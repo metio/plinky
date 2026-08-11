@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Writes a Standard MIDI File (format 0) from a piece's notes, so a score can be
 // carried into a DAW or another instrument. The note list is whatever the player

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Guards that every locale carries every message. The base locale (English) is the
 // contract: a key present there but missing from another locale falls back to

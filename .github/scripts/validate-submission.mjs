@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Validates a score-submission issue: reads the MusicXML from the form body and
 // renders it with the same OpenSheetMusicDisplay the app uses (in headless

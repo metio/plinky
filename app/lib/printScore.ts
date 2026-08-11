@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A self-contained HTML page wrapping just the rendered score's SVG, for the print
 // window. Isolating the staff from the rest of the app gives a clean printout (or

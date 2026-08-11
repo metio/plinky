@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: The Plinky Authors
-SPDX-License-Identifier: 0BSD
+SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # What's new
@@ -9,6 +9,16 @@ Plinky has no version numbers and no release days — every change goes live the
 it's ready. This is what's changed, newest first, in plain terms.
 
 ## 11 August 2026
+
+**Plinky is now licensed AGPL-3.0-or-later.** It was 0BSD, which let anyone do
+anything with the code including keeping their changes to themselves. Under the AGPL
+you can still run it, self-host it and change it — that is guaranteed — with one
+condition: if you modify Plinky and let other people use your version over a network,
+those people get your source too. Improvements to a public Plinky stay public.
+
+Nothing changes for you as a player, and nothing changes for the music: every piece in
+the catalogue keeps its own Creative Commons licence, credited in the app exactly as
+before.
 
 **A short course in how the music works.** [How the music
 works](https://plinky.fun/en/theory/) is eight lessons on what a stave is actually

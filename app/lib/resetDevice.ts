@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Everything Plinky stores lives under the "plinky:" localStorage prefix — scores,
 // mastery, prefs, favourites, history, ghosts, assignments. Wiping every

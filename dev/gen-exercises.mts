@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Emits the finger-exercise metadata the app browses. The exercises themselves are
 // generated client-side from their config (core/exerciseGen.ts) — this just

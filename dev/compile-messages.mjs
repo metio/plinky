@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Compiles the Paraglide messages. Run via `npm run messages` (and as the
 // prebuild step of build/dev/test/typecheck) since app/paraglide is gitignored.

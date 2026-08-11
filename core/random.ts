@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A tiny deterministic PRNG (mulberry32) plus a string hash, so a given seed
 // always yields the same sequence — used to make the daily challenge identical

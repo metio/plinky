@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The time seam: everything that schedules future work — a revert timer, a
 // playback chain, a metronome pulse, an animation frame — asks the Scheduler

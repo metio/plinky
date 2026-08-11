@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // What to practise today, in priority order, so the home page can tell a player
 // exactly what to do the moment they open the app. Pure: the component gathers the

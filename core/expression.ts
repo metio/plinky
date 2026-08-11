@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Turns a note's written expression marks into how it should actually sound — how
 // long and how loud — so Listen and the exported replay play the score the way it's

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Turns a human title into a lowercase, hyphen-separated token safe for both a URL
 // slug and a download filename stem. Runs of non-alphanumerics collapse to a single

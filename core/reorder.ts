@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Pure list-reordering math shared by the drag handles and any other reorder
 // affordance: moving an element to a new position, and translating a pointer's

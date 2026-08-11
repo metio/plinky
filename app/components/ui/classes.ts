@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Shared Tailwind class strings for elements that must match a common look without
 // a component wrapper — the class-string counterpart of `buttonClasses`. Kept as

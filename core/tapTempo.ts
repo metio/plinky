@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Reading a tempo from someone tapping along. A player who knows how fast a piece
 // should go usually cannot say the number — they can only tap it, which is what a

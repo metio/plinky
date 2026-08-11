@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Stamps the built service worker's cache name with a hash of the build's hashed
 // assets. Because asset filenames are content-addressed, the hash changes exactly

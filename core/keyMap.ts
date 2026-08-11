@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The computer-keyboard layout: which physical key plays each of the twelve notes
 // of one octave (C through B) under each hand. The default is the classic

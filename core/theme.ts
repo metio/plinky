@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The one list of valid theme choices — parseTheme and the pre-paint bootstrap
 // script both derive from it, so a theme value cannot be known to one and not

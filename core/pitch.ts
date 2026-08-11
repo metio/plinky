@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The semitone offset of each natural note letter above C — the shared base every
 // MusicXML reader adds <octave> and <alter> to when turning a written pitch into a

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The answer surface for the exercises whose answer is a NAME, not a distance or a note:
 // chords and scales. A chord's quality and a scale's identity have no natural geometry

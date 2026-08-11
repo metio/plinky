@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: The Plinky Authors
-# SPDX-License-Identifier: 0BSD
+# SPDX-License-Identifier: AGPL-3.0-or-later
 name: Verify
 on:
   pull_request:
@@ -39,6 +39,22 @@ jobs:
       # instrumentation, so the build job need not run the suite a second time —
       # a node-test failure still fails CI, through coverage.
       tests-in-coverage: true
+  dco:
+    # Every commit carries a Signed-off-by trailer: contributions are taken under the
+    # Developer Certificate of Origin, which is what lets the project accept them
+    # under its own licence without a per-contributor agreement. The shared action
+    # skips bot-authored commits, which cannot sign off, and the whole job is guarded
+    # for bot-opened pull requests — a skipped job still satisfies the aggregate below.
+    name: dco
+    if: github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # The action walks base..head, so the whole pull-request range has to be
+          # present — a shallow clone has nothing to walk.
+          fetch-depth: 0
+      - uses: metio/ci/dco@6ccbfec6667dbf259d07ae33159592fb80f4aba2 # 2026.8.4134806
   bake-check:
     name: bake-check
     runs-on: ubuntu-latest
@@ -122,7 +138,7 @@ jobs:
     # Single required check: mark only this one required in branch protection and
     # new jobs are covered automatically.
     name: Verify
-    needs: [frontend, bake-check, nav, arch, bytes, tailwind, tokens, i18n, ci-parity]
+    needs: [frontend, dco, bake-check, nav, arch, bytes, tailwind, tokens, i18n, ci-parity]
     if: always()
     runs-on: ubuntu-latest
     steps:

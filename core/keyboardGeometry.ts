@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Where each piano key sits horizontally within a keybed spanning [from, to],
 // as percentages of the keybed's width. The on-screen keyboard lays white keys

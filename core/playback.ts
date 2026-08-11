@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The shortest a playback step may last before advancing, so a very short note — or a
 // zero-length glitch from the score — still moves on rather than stalling or firing the

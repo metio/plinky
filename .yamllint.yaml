@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: The Plinky Authors
-# SPDX-License-Identifier: 0BSD
+# SPDX-License-Identifier: AGPL-3.0-or-later
 extends: default
 # Skip everything git ignores (node_modules, build, coverage) so a local or
 # dev-container run lints only our own YAML.

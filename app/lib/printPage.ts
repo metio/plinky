@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Hands the current page to the browser's own print dialogue. Printing a score
 // needs a rendered copy of its own and lives in printScore.ts; a report is already

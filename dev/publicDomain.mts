@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // An ALLOWLIST: a song is admitted to the catalogue only when we can affirmatively
 // show its *composition* is public domain (the notes are copyrighted independently of

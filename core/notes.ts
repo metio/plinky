@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The facts about note letters that every other module was quietly keeping its own
 // copy of: which letters there are, how far each sits above C, and what a key

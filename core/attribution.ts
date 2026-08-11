@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Provenance for a catalogue piece: which licence it carries and where it came
 // from. Surfacing this is both courtesy and obligation — a CC-BY/CC-BY-SA piece

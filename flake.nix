@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: The Plinky Authors
-# SPDX-License-Identifier: 0BSD
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # The Plinky development environment. It consumes the shared metio devShell
 # (`devshell.lib.mkDevShell`), so the lint gate (reuse, typos, yamllint, actionlint,

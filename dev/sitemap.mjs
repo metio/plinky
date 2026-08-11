@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The XML assembly behind the sitemap, kept apart from the build tree it describes so the
 // shape can be tested without a 26-locale prerender standing by. dev/gen-sitemap.mjs walks

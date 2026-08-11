@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { clampVolume, parsePrefs, type Prefs } from "../../core/prefs";
 import type { KeyValueStore } from "../ports/keyValueStore";

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Accessibility gate. Serves the built site, drives Chromium with the theme
 // forced to A11Y_MODE (light or dark), and runs the full axe-core ruleset against

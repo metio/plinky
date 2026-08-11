@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Generated reading drills: fresh notation on demand, shaped by the reader rather
 // than fixed by the code. The old generator drew one note per beat from a

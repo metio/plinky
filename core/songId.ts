@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The one id scheme for every playable piece — catalogue songs, bundled demos, studies,
 // generated scale/arpeggio exercises and user uploads alike. It is a content fingerprint:

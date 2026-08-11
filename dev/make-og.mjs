@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Generates public/og.png (1200x630), the social-card image, by rendering an
 // HTML card with the app icon in headless Chromium and screenshotting it.

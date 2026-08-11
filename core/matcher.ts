@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The note-by-note practice matcher: a pure reducer over a pre-collected step
 // model. The rendering surface extracts the steps from the engraved score and

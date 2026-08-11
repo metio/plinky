@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { describeError, issueUrl, REPO_ISSUES } from "../../lib/errorReport";

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Rejects class names that Tailwind would silently ignore. An unknown utility
 // (`max-w-xxl`) compiles to nothing, so the element just renders unstyled —

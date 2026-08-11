@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Runs `react-router build`, retrying ONLY the transient prerender flake. React Router
 // prerenders every localized route by fetching it from an in-process Vite preview server;

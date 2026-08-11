@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Preview-deploy mocks ("plinky-preview-mocks"): the per-branch Cloudflare
 // previews run on origins Sanity's CORS allowlist doesn't know, so the live

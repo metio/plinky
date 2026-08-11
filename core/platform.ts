@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // True for iPhone / iPad / iPod. iPadOS 13+ reports a desktop-Safari user agent
 // that says "Macintosh", so it is only distinguishable by exposing multi-touch —

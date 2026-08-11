@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Builds the site once per locale, each bundle tree-shaken down to its own
 // language (see dev/compile-messages.mjs + react-router.config.ts), and merges

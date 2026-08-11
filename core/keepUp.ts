@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The tempo-locked play-along scorer: a pure reducer over the steps the clock
 // opens and closes. The rendering surface walks the cursor on its timer, feeds

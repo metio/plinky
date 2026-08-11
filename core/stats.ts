@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Small pure statistics shared across the analysis code, so the tempo curve and the
 // flow score measure "the middle value" the same way instead of each rolling its own.

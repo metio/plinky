@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Enforces that every CI gate has a matching nix command, so a local
 // `nix develop --command ci-<name>` runs exactly what CI runs. Two rules:

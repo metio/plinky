@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The three piano pedals. Sustain (the damper) holds released notes ringing; sostenuto
 // holds only the notes already down when it is pressed; soft (una corda) gentles the

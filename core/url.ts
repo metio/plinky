@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A well-formed https URL is the one shape safe to drop into an <img src> or an
 // <a href> from editor-supplied content: it rules out http, data:, javascript:,

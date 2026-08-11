@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The Web MIDI API types ship in TypeScript's DOM lib. At runtime, though, only
 // Chromium browsers and Firefox expose `requestMIDIAccess`; Safari (macOS and

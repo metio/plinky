@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { maxOf, minOf } from "../../../core/stats";
 import type { Hotspot, TempoPoint } from "../../../core/tempo";

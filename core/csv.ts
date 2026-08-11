@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A cell a spreadsheet would RUN rather than read. Excel, LibreOffice and Sheets all
 // treat a leading =, +, - or @ as the start of a formula, and a leading tab or carriage

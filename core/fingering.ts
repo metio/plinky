@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A rule-based fingering suggester. Each note's finger (1 = thumb … 5 = pinky) is
 // chosen by dynamic programming over a comfort cost: staying in position is

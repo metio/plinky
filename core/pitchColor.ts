@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A Boomwhacker-style colour per note name, so a beginner can read the notes by hue —
 // every C the same red, every D the same orange — the way coloured percussion tubes and

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The fingering difficulty heat-map: how hard each bar is to finger *at its
 // best* — the comfort cost of the optimal fingering, per position so long bars

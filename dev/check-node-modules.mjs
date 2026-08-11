@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Fails loudly when the installed node_modules tree has drifted from
 // package-lock.json — a rebase or pull that bumps a dependency leaves the old

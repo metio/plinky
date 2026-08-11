@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Cosmetic skins for the on-screen keyboard's resting keys — the unpressed white and
 // black key colours. Purely decorative: the lit / expected-next / wrong-note feedback

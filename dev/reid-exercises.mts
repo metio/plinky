@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // One-shot migration: re-id the finger-exercise catalogue to content-fingerprint ids, the
 // same scheme as songs. Studies keep their stored .mxl (renamed to <id>.mxl); generated

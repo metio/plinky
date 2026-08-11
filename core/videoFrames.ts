@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The pure half of exporting a take as a video: sampling a recorded performance
 // into per-frame states a renderer can draw. A frame knows which keys are

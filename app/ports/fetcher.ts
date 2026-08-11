@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The network seam: how an asset (a catalogue manifest, a song's compressed
 // MusicXML, the third-party news query) is fetched. A function type rather than an

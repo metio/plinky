@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Applies dev/creditOverrides.mjs to the shipped catalogue: the manifest's
 // composer field (what the library shows) and the .mxl's own composer creator

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // How closely a run followed the expression the score asks for: the loudness shape
 // the dynamics mark out, and the note lengths the articulations mark out.

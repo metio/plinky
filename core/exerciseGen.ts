@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Finger exercises are formulaic, so rather than ship one file per variant we
 // generate them from a config: pick a type and key, then dial in octaves, hands,

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Simulates a browser that blocks site storage: merely *accessing* the `localStorage`
 // global throws a SecurityError — the way Firefox does with cookies/site-data disabled,

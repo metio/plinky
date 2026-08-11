@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Assembles build/client from the per-locale build artifacts a parallel CI
 // matrix produced (see .github/workflows/website.yml). Same merge as the local

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The XML boundary seam: how a MusicXML string becomes a walkable document and
 // back. Core functions that read or rewrite notation take a codec as a

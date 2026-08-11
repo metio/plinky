@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Walking an ordered list of pieces as steps — used to show progress through an
 // assignment. Nothing is ever locked: every step is playable, the order is a

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { RecordedNote } from "../../core/composition";
 import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";

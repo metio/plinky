@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The ear exercises: a question is generated, sounded, and checked, and none of those
 // three steps needs a score, a matcher or a rendered staff. That's why ear training

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The metronome's feel: which beats of the bar it accents. "straight" is the plain
 // downbeat accent (the default, and how every metronome starts); "backbeat" leans on

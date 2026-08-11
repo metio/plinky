@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // One-shot migration: re-id the already-imported catalogue in place to content-fingerprint
 // ids, moving each .mxl into its per-licence subdirectory (public/songs/<licence>/<id>.mxl).

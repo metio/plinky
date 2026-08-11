@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The review-scheduling knobs of the progression model. They live in core because
 // both the preference model and the grade ladder speak in these terms.

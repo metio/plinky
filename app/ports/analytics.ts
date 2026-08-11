@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The parameters carried by a tracked event. GA4 event params are scalar, so this
 // stays flat — no nested objects. Nothing here is user-specific: only which controls,

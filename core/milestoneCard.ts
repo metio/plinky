@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A milestone share card: a branded 1080×1350 portrait announcing an achievement —
 // a grade reached, a skill rating — to rasterise to PNG and share to a feed. Pure

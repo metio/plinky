@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Cleans the song catalogue: collapses it to one score per title, then re-balances the
 // grade boundaries over what remains.

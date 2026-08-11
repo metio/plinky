@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The pure half of painting a rendered score: the colour language every score
 // surface shares, and the geometry of picking a bar from a click. The

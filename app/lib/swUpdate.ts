@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Watches the offline service worker for a newer build and, when one is ready,
 // surfaces it as a prompt instead of letting it seize the tab. Everything

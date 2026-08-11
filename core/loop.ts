@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Section looping: a bar range the player builds by clicking the score, drilled
 // over and over. Ranges here are 1-based, as the player reads them off the staff.

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The run recorder: everything a practice run captures as it is played — each
 // cleared note's ideal and actual timing, the velocities, the real key-hold

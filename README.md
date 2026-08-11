@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: The Plinky Authors
-SPDX-License-Identifier: 0BSD
+SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <p align="center">
@@ -672,4 +672,17 @@ site to <https://plinky.fun>.
 
 ## License
 
-[0BSD](LICENSES/0BSD.txt), [REUSE](https://reuse.software)-compliant.
+[AGPL-3.0-or-later](LICENSES/AGPL-3.0-or-later.txt),
+[REUSE](https://reuse.software)-compliant.
+
+Run it, self-host it, change it: the licence guarantees all three. The one condition
+is that if you modify Plinky and let other people use your version over a network,
+those people get its source too.
+
+The catalogue is licensed separately and is unaffected — every piece keeps its own
+Creative Commons terms, credited in the app and declared in `REUSE.toml`.
+
+Contributions are taken under the [Developer Certificate of
+Origin](https://developercertificate.org): sign each commit with `git commit
+--signoff`, which certifies you wrote it or may submit it. CI checks every commit in
+a pull request.

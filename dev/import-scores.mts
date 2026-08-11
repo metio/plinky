@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Imports curated open score corpora into the catalogue alongside the PDMX base.
 // Unlike PDMX (a 30 GB local dataset of user uploads whose CC0 tags can't be trusted),

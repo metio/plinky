@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Curates a public-domain solo-piano subset of the local PDMX corpus into the song
 // catalogue. Reads pdmx/PDMX.csv + pdmx/mxl (a local, gitignored build input — never

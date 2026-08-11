@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A single MIDI input as the connection reports it: a stable id, the device name a held
 // note is stamped with, and whether it is currently connected.

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Decides whether a MusicXML score belongs in a *piano* catalogue. Shared by the
 // import pipeline (to reject non-piano scores up front) and the catalogue audit (to

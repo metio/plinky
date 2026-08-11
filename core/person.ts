@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Composer identity for the person pages: the catalogue's composer strings come
 // from many corpora that spell the same person a dozen ways — "J.S. Bach",

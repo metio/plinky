@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { ReviewSession } from "../components/features/reviewSession";
 import { noindexMeta, routeMeta } from "../../core/site";

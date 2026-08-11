@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { fluentNotes } from "./flow";
 import { PRECISE_TOLERANCE, rate, type Rating, timingDeltas } from "./rhythm";

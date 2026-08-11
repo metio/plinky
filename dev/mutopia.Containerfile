@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: The Plinky Authors
-# SPDX-License-Identifier: 0BSD
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Import-only image for the Mutopia harvest, and one of the two things left that still
 # want a container — the toolchain is otherwise a nix flake. LilyPond is large (Guile,

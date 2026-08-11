@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The attributes of a clicked control the analytics needs to name it — extracted from
 // the DOM by the app layer and passed here as plain data, so the naming logic stays a

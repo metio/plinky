@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The two MIDI messages the app ever sends. Echoing what Plinky plays to a
 // connected instrument lights its keys, so a player can watch a piece move under

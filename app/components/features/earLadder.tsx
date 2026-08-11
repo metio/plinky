@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { IntervalId } from "../../../core/theory";
 import { semitonesOf, SEMITONES_PER_OCTAVE } from "../../../core/theory";

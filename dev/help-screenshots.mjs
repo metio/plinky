@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Illustrates the help page with real screenshots: serves the built site, drives
 // Chromium to each app section, screenshots it, uploads each picture as a Sanity

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: The Plinky Authors
-// SPDX-License-Identifier: 0BSD
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Navigation-depth guardrail. Models the app as a directed graph — nodes are pages,
 // edges are the one-tap navigations a page renders (every <Link to>, navigate() and
