@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 14 August 2026 — later
+
+**Keep a piece without leaving it.** There is a star beside the title on a piece's own
+page now. Starring is how something you keep coming back to stays findable — the library
+filters by it — and until now the only place to do that was the library list, which meant
+walking away from the piece to go and mark it.
+
 ## 14 August 2026
 
 **The sketch follows what you play.** On the compose page the staff kept growing

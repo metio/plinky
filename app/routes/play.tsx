@@ -14,6 +14,7 @@ import { ExerciseForms } from "../components/features/exerciseForms";
 import { BacklogButton } from "../components/features/backlogButton";
 import { MarkLearnedButton } from "../components/features/markLearnedButton";
 import { type PlayMode, PlayModeBar } from "../components/features/playModeBar";
+import { FavoriteButton } from "../components/features/favoriteButton";
 import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
@@ -98,6 +99,10 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                         <div className="flex items-start justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
                                 <h1 className="text-2xl font-semibold">{score.title}</h1>
+                                {/* Right beside the name, so keeping a piece is a thought
+                                you can act on while playing it rather than an errand in
+                                the library. */}
+                                <FavoriteButton id={score.id} />
                                 <ScoreGrade id={score.id} xml={score.xml} />
                             </div>
                             {/* The piece's secondary actions, on the title line so a
