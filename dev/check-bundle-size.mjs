@@ -270,7 +270,12 @@ const BUDGET_VENDOR_KB = 324;
 // instrument are removed from the sheet before it loads, so the cursor and the matcher
 // see the grand staff a piano learner came for. The cost is one MusicXML rewrite and
 // the Settings switch that brings the rest back.
-const BUDGET_APP_KB = 329;
+//
+// 330. Reading a position as the several instructions it is: what the score asks of each
+// key of a chord, what each was struck at, and how long each was held — carried per pitch
+// through the matcher, the capture and the expressive reading rather than collapsed onto
+// the position's longest note.
+const BUDGET_APP_KB = 330;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

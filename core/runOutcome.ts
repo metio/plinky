@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { summarizeDynamics } from "./dynamics";
-import { summarizeExpression } from "./expressionGrade";
+import { type ExpressionNote, summarizeExpression } from "./expressionGrade";
 import { computeFlow } from "./flow";
 import { computeGrade, type Grade } from "./grade";
 import {
@@ -28,13 +28,51 @@ export type OutcomeNote = RunNote & {
     // pedal is still played staccato, and dividing by the ringing length would read
     // every pedalled note as several times its written value.
     keyHeldMs?: number;
-    // What the score asked for at this position: the standing dynamic with any accent
-    // applied (null when the score marks none), and how long the note is meant to
-    // sound — its written length narrowed by its articulation. Absent for a run with
-    // no engraved score behind it.
-    expectedVelocity?: number | null;
-    expectedHoldMs?: number;
+    // What the score asked of each of `pitches`, index-aligned: the standing dynamic with
+    // that note's own accent (null where the score marks none), and how long that key is
+    // meant to be down — its own written length narrowed by its own articulation. Absent
+    // for a run with no engraved score behind it.
+    //
+    // Per pitch because a chord is not one note. A held bass under a staccato treble is
+    // two instructions, and reading the position off its longest note grades the player
+    // against a mark the score never put on the notes they were actually playing.
+    expectedVelocities?: (number | null)[];
+    expectedHoldsMs?: number[];
+    // How hard each of `pitches` was struck, and how long each key was held, both
+    // index-aligned with `pitches`.
+    velocities?: number[];
+    keyHoldsMs?: number[];
 };
+
+// One entry per KEY struck, not per position: a chord is several instructions played at
+// once, and the expressive reading judges each of them. A position whose per-pitch record
+// is missing — a run with no engraved score behind it, or a take recorded before there
+// was one — contributes its position-level figures once, which is what there is to say
+// about it.
+function expressionNotes(notes: OutcomeNote[]): ExpressionNote[] {
+    const out: ExpressionNote[] = [];
+    for (const note of notes) {
+        const expected = note.expectedVelocities;
+        if (!expected) {
+            out.push({
+                velocity: note.velocity,
+                keyHeldMs: note.keyHeldMs,
+                expectedVelocity: null,
+                expectedHoldMs: 0,
+            });
+            continue;
+        }
+        for (const [index] of expected.entries()) {
+            out.push({
+                velocity: note.velocities?.[index] ?? note.velocity,
+                keyHeldMs: note.keyHoldsMs?.[index] || note.keyHeldMs,
+                expectedVelocity: expected[index] ?? null,
+                expectedHoldMs: note.expectedHoldsMs?.[index] ?? 0,
+            });
+        }
+    }
+    return out;
+}
 
 // The player's own pace read back out of the run, with the passages where they sped up or
 // dragged; null when too few notes to plot a curve.
@@ -106,12 +144,7 @@ export function deriveRunOutcome({
         // expressive reading needs no second walk of the engraved score. It returns
         // null by itself when there is nothing to measure.
         expression: summarizeExpression(
-            notes.map((note) => ({
-                velocity: note.velocity,
-                keyHeldMs: note.keyHeldMs,
-                expectedVelocity: note.expectedVelocity ?? null,
-                expectedHoldMs: note.expectedHoldMs ?? 0,
-            })),
+            expressionNotes(notes),
             imprecise ? "imprecise" : "precise",
         ),
     });

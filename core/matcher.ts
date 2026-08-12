@@ -73,23 +73,32 @@ export type MatchStep = {
     // indicator reads it off the step model, never the live cursor. Zero when
     // the score marks no length.
     holdQuarters: number;
-    // How long the position is meant to keep ringing, in milliseconds at the written
-    // tempi — `holdQuarters` at the tempo in force here, extended by a fermata. Scaled
-    // by the same dial ratio as `elapsedMs`.
+    // How long the position is meant to keep RINGING, in milliseconds at the written
+    // tempi — its longest note at the tempo in force here, extended by a fermata. This
+    // is the chord's own length, what the hold indicator draws; `expected` carries what
+    // each individual key is asked for. Scaled by the same dial ratio as `elapsedMs`.
     holdMs: number;
-    // What the score asks for here: the standing dynamic with any accent applied
-    // (null when the score marks none), and the fraction of its written length the
-    // note is meant to sound. Absent on a step model lifted for something other than
-    // a graded run — the duet's other hand, a fingering walk — which needs the
-    // pitches and nothing about how they are meant to sound.
-    expected?: { velocity: number | null; lengthScale: number };
+    // What the score asks for at each pitch, index-aligned with `pitches`: the standing
+    // dynamic with that note's own accent applied (null when the score marks none), and
+    // how long it is meant to sound in milliseconds at the written tempi — its own
+    // written length narrowed by its own articulation.
+    //
+    // Per pitch because a chord is not one note. A held bass under a staccato treble, an
+    // accent on the top of the chord and not the rest: reading the whole position off
+    // its longest note grades the player against marks the score never put there, and
+    // silently ignores the ones it did.
+    //
+    // Absent on a step model lifted for something other than a graded run — the duet's
+    // other hand, a fingering walk — which needs the pitches and nothing about how they
+    // are meant to sound.
+    expected?: { velocity: number | null; holdMs: number }[];
 };
 
 // A pitch of the current position that has sounded, and when. The time comes from the
 // caller — this module reads no clock — and is kept because a chord's notes do not all
 // land together: on hands-together music the two hands arrive at measurably different
 // moments, and that difference is the only evidence of which hand is trailing.
-export type Arrival = { note: number; at: number };
+export type Arrival = { note: number; at: number; velocity: number };
 
 export type MatcherState = {
     steps: MatchStep[];
@@ -117,6 +126,10 @@ export type ClearedEvent = {
     // pitch, so a single time for the whole position says nothing about the hand that
     // arrived first — which is exactly what a per-hand verdict needs.
     arrivals: number[];
+    // How hard each of `playedPitches` was struck, index-aligned. A chord's notes are not
+    // all played equally, and a score that accents one of them asks for exactly that, so
+    // one velocity for the position would hide both the instruction and the performance.
+    velocities: number[];
     wrongBefore: number;
 };
 
@@ -200,6 +213,11 @@ function clear(
         arrivals: playedPitches.map(
             (pitch) => state.hit.find((arrival) => arrival.note === pitch)?.at ?? at,
         ),
+        // A pitch the forgiving advance credited without it ever being played reports no
+        // strike at all, which the expressive reading skips rather than scoring as soft.
+        velocities: playedPitches.map(
+            (pitch) => state.hit.find((arrival) => arrival.note === pitch)?.velocity ?? 0,
+        ),
         wrongBefore: state.sinceWrong,
     });
     const index = state.index + 1;
@@ -224,6 +242,8 @@ export function matchNote(
     // When the note landed, on the caller's own clock. This module reads no clock.
     at: number,
     forgiving = false,
+    // How hard it was struck, 0..127, or 0 from an input that cannot say.
+    velocity = 0,
 ): { state: MatcherState; events: MatchEvent[] } {
     if (state.complete) {
         return { state, events: [] };
@@ -236,7 +256,7 @@ export function matchNote(
         // re-strike while the rest of the chord is still coming does not undo that.
         const hit = state.hit.some((arrival) => arrival.note === note)
             ? state.hit
-            : [...state.hit, { note, at }];
+            : [...state.hit, { note, at, velocity }];
         if (expected.every((pitch) => hit.some((arrival) => arrival.note === pitch))) {
             return { state: clear({ ...state, hit }, expected, events, at), events };
         }
@@ -253,7 +273,7 @@ export function matchNote(
                     next = clear(next, nextExpected, events, at);
                 } else {
                     events.push({ kind: "hit", note });
-                    next = { ...next, hit: [{ note, at }] };
+                    next = { ...next, hit: [{ note, at, velocity }] };
                 }
             }
         }

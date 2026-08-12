@@ -84,8 +84,11 @@ export type ClearedNote = {
     // What the score asked for at this position, carried through so the expressive
     // reading can compare intention with performance without a second walk of the
     // engraved score. Absent for a run with no score behind it.
-    expectedVelocity?: number | null;
-    expectedHoldMs?: number;
+    expectedVelocities?: (number | null)[];
+    expectedHoldsMs?: number[];
+    // How hard each of `pitches` was struck, index-aligned. A chord's notes are not all
+    // played equally, and a score that accents one of them asks for exactly that.
+    velocities?: number[];
 };
 
 function staffOffsets(
@@ -120,8 +123,10 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         // its last pitch — so on a chord the two hands share it and neither can be seen
         // to trail. These are when each hand actually struck.
         staffMs: staffOffsets(info, capture.startedAt),
-        expectedVelocity: info.expectedVelocity,
-        expectedHoldMs: info.expectedHoldMs,
+        expectedVelocities: info.expectedVelocities,
+        expectedHoldsMs: info.expectedHoldsMs,
+        velocities: info.velocities,
+        keyHoldsMs: info.pitches.map(() => 0),
     });
     const index = capture.notes.length - 1;
     for (const pitch of info.pitches) {
@@ -158,8 +163,16 @@ export function captureRelease(capture: RunCapture, pitch: number, offMs: number
 function noteKeyRelease(capture: RunCapture, pitch: number, offMs: number): void {
     const hold = capture.holds.get(pitch);
     const note = hold ? capture.notes[hold.index] : undefined;
-    if (hold && note) {
-        note.keyHeldMs = Math.max(note.keyHeldMs ?? 0, offMs - hold.onMs);
+    if (!hold || !note) {
+        return;
+    }
+    const heldMs = offMs - hold.onMs;
+    note.keyHeldMs = Math.max(note.keyHeldMs ?? 0, heldMs);
+    // …and against the pitch itself, so a chord played with one key clipped and another
+    // held is read as the two lengths the score asked for rather than as its longest.
+    const at = note.pitches.indexOf(pitch);
+    if (note.keyHoldsMs && at >= 0) {
+        note.keyHoldsMs[at] = Math.max(note.keyHoldsMs[at] ?? 0, heldMs);
     }
 }
 

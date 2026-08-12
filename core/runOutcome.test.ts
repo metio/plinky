@@ -5,6 +5,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { LENIENT_TOLERANCE, PRECISE_TOLERANCE } from "./rhythm";
 import { parseGrade } from "./grade";
+import { captureCleared, captureRelease, startCapture } from "./runCapture";
 import { type OutcomeNote, deriveRunOutcome, tempoScale } from "./runOutcome";
 
 // A run note played exactly on its notated onset (perfect timing), on the treble staff,
@@ -208,5 +209,35 @@ describe("tempoScale", () => {
         expect(tempoScale(50, 100)).toBe(0.5);
         // The slower run's grid is scored on the lower scale, so it cannot match.
         expect(JSON.stringify(outcome.grid)).not.toBe(JSON.stringify(halfSpeed.grid));
+    });
+});
+
+describe("expression across a chord", () => {
+    it("judges every key of a position, not just one of them", () => {
+        // Two keys struck together, one asked for twice the loudness and a quarter of the
+        // hold of the other. Reading the position as a single note would score one of
+        // them and silently drop the other.
+        const capture = startCapture();
+        captureCleared(capture, {
+            pitches: [60, 64],
+            ordinal: 0,
+            timestamp: 0,
+            timeMs: 0,
+            velocity: 60,
+            velocities: [40, 90],
+            wrongBefore: 0,
+            staves: [0],
+            expectedVelocities: [40, 90],
+            expectedHoldsMs: [1000, 250],
+        });
+        const note = capture.notes[0];
+        expect(note?.expectedVelocities).toEqual([40, 90]);
+        expect(note?.velocities).toEqual([40, 90]);
+        // A key released on its own records against that key, not against the chord.
+        captureRelease(capture, 64, 250);
+        captureRelease(capture, 60, 1000);
+        expect(note?.keyHoldsMs).toEqual([1000, 250]);
+        // …while the position-level figure stays the longest, which is what a replay needs.
+        expect(note?.keyHeldMs).toBe(1000);
     });
 });

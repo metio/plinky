@@ -61,7 +61,10 @@ function stepAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
-): Omit<MatchStep, "bar" | "elapsedMs" | "holdMs"> & Omit<Position, "whole"> {
+): Omit<MatchStep, "bar" | "elapsedMs" | "holdMs" | "expected"> &
+    Omit<Position, "whole"> & {
+        expected: { velocity: number | null; soundQuarters: number }[];
+    } {
     const pitches: number[] = [];
     // One entry per pitch, in the same order. A note whose staff the engraver does not
     // report reads as the treble, which is where a single-staff piece is played.
@@ -70,7 +73,10 @@ function stepAtCursor(
     // The dynamic in force at this position, read once per step: it is a property of
     // where the cursor sits, not of any one note under it.
     const dynamicVolume = readActiveDynamic(osmd.cursor.iterator);
-    let expected: MatchStep["expected"];
+    // What each pitch is asked for, pushed alongside `pitches` so the two stay aligned.
+    // Kept in quarter notes here and turned into milliseconds once the position's tempo
+    // is known, which is the same place the chord's own hold is converted.
+    const expected: { velocity: number | null; soundQuarters: number }[] = [];
     // A fermata belongs to the position, not to one note: it holds whatever is sounding,
     // and a rest can carry one too. So it is read across everything under the cursor,
     // including the notes the practised hand does not play.
@@ -96,16 +102,16 @@ function stepAtCursor(
         }
         pitches.push(note.halfTone + 12);
         pitchStaves.push(staff ?? 0);
-        // The sounding length, not the written one: a tied minim is held for the whole
-        // tie. The longest note under the cursor is the one the hold indicator follows,
-        // so the expression graded is the expression of that same note.
-        if (expression.soundQuarters >= holdQuarters) {
-            expected = {
-                velocity:
-                    dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
-                lengthScale: lengthScaleOf(expression),
-            };
-        }
+        // Each key of the chord is asked for on its own terms: its own accent over the
+        // standing dynamic, and its own sounding length narrowed by its own articulation.
+        // The sounding length, not the written one — a tied minim is held for the whole
+        // tie.
+        expected.push({
+            velocity: dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
+            soundQuarters: expression.soundQuarters * lengthScaleOf(expression),
+        });
+        // The chord's own length is its longest note: what the hold indicator draws, and
+        // how long the position keeps ringing.
         holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
     }
     return {
@@ -124,6 +130,27 @@ function stepAtCursor(
         holdQuarters,
         expected,
     };
+}
+
+// What the score asked of each pitch the player actually struck, index-aligned with the
+// event's `playedPitches` rather than with the step's own order — the two differ, because
+// a chord is cleared in whatever order the hands find it.
+//
+// A pitch with no expectation of its own (nothing matched it in the step, which forgiving
+// mode can produce) reports none, and the expressive reading skips it rather than scoring
+// it against a neighbour's mark.
+function askedFor(
+    event: { step: MatchStep; playedPitches: number[] },
+    ratio: number,
+): { expectedVelocities: (number | null)[]; expectedHoldsMs: number[] } {
+    const expectedVelocities: (number | null)[] = [];
+    const expectedHoldsMs: number[] = [];
+    for (const pitch of event.playedPitches) {
+        const asked = event.step.expected?.[event.step.pitches.indexOf(pitch)];
+        expectedVelocities.push(asked?.velocity ?? null);
+        expectedHoldsMs.push(asked ? asked.holdMs / ratio : 0);
+    }
+    return { expectedVelocities, expectedHoldsMs };
 }
 
 // When each hand got to this position: the EARLIEST arrival among the pitches that
@@ -162,7 +189,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // real gap — except where a repeat jumps, which is exactly what the accumulation is
     // for. Filtering to the playable ones first would leave gaps indistinguishable from
     // jumps.
-    const walked: (Omit<MatchStep, "elapsedMs" | "holdMs"> & Omit<Position, "whole">)[] = [];
+    const walked: (ReturnType<typeof stepAtCursor> & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
             ...stepAtCursor(osmd, hand, parts),
@@ -176,11 +203,16 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     const steps: MatchStep[] = [];
     for (const [index, step] of walked.entries()) {
         if (step.pitches.length > 0) {
-            const { advanceQuarters: _advance, bpm, stretch, ...rest } = step;
+            const { advanceQuarters: _advance, bpm, stretch, expected, ...rest } = step;
             steps.push({
                 ...rest,
                 elapsedMs: onsets[index] as number,
                 holdMs: quartersMs(step.holdQuarters * stretch, bpm),
+                // Each key's own asked-for length, on the same clock as the chord's.
+                expected: expected.map((pitch) => ({
+                    velocity: pitch.velocity,
+                    holdMs: quartersMs(pitch.soundQuarters * stretch, bpm),
+                })),
             });
         }
     }
@@ -242,8 +274,12 @@ export type CorrectInfo = {
     // with any accent applied (null when the score marks none), and how long the note
     // is meant to SOUND — the written length narrowed by its articulation, which is
     // what holdMs deliberately is not (the hold indicator shows the written value).
-    expectedVelocity: number | null;
-    expectedHoldMs: number;
+    // What the score asked of each struck pitch, index-aligned with `pitches`: the
+    // dynamic with that note's own accent, and how long that key is meant to be down.
+    expectedVelocities: (number | null)[];
+    expectedHoldsMs: number[];
+    // How hard each was actually struck, index-aligned with `pitches`.
+    velocities: number[];
     velocity: number;
     // How many wrong notes were played at this position before it was cleared —
     // zero means a clean first try, the signal Flow and per-segment accuracy are
@@ -412,6 +448,7 @@ export function useScoreMatcher(
                 note,
                 timestamp,
                 optionsRef.current.forgiving ?? false,
+                velocity,
             );
             stateRef.current = next;
             for (const event of events) {
@@ -438,10 +475,9 @@ export function useScoreMatcher(
                     // The written length to hold, taken from the cleared step itself,
                     // so it stays right regardless of where the visual cursor sits.
                     holdMs: event.step.holdMs / dialRatio(),
-                    expectedVelocity: event.step.expected?.velocity ?? null,
-                    expectedHoldMs:
-                        (event.step.holdMs / dialRatio()) * (event.step.expected?.lengthScale ?? 1),
+                    ...askedFor(event, dialRatio()),
                     velocity,
+                    velocities: event.velocities,
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,
                     staffTimes: staffArrivals(event),

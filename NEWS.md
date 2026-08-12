@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 August 2026 — later still
+
+**A chord is heard as the several notes it is.** When you play two notes at once that the
+score marks differently — a bass note held under a clipped melody note, one voice moving
+under another that sustains — Plinky used to read the whole moment off its longest note.
+So the shorter one was measured against an instruction meant for its neighbour, and
+whatever was written on it went unnoticed. Each key you press is now compared with what
+the score asked of that key: its own length, its own weight. Your expression feedback on
+anything written in more than one voice should make a good deal more sense.
+
 ## 12 August 2026 — later
 
 **Tempo marks and fermatas are followed, not flattened.** A piece that speeds up or

@@ -21,7 +21,17 @@ import {
 // already sounding, so nothing for the player to do.
 type Voice =
     | number
-    | { midi: number; staff?: number; tie?: "start" | "held"; tieQuarters?: number };
+    | {
+          midi: number;
+          staff?: number;
+          tie?: "start" | "held";
+          tieQuarters?: number;
+          // Marks that belong to this note alone, which is what a per-pitch expectation
+          // is for: an accent strikes it harder, staccato clips it.
+          accent?: boolean;
+          staccato?: boolean;
+          quarters?: number;
+      };
 type Position = Voice[];
 
 function midiToHalfTone(midi: number): number {
@@ -43,6 +53,9 @@ function fakeOsmd(
             return {
                 EndReached: index >= positions.length,
                 currentTimeStamp: { RealValue: wholes?.[index] ?? index * 0.25 },
+                // A standing mezzo-forte, so a note's own accent has something to be
+                // louder than.
+                ActiveDynamicExpressions: [{ MidiVolume: 80 }],
                 // Four quarter-note positions per 4/4 bar.
                 CurrentMeasureIndex: Math.floor(index / 4),
             };
@@ -54,13 +67,22 @@ function fakeOsmd(
                 const staff = typeof voice === "number" ? 0 : (voice.staff ?? 0);
                 const tie = typeof voice === "number" ? undefined : voice.tie;
                 const tieQuarters = typeof voice === "number" ? 1 : (voice.tieQuarters ?? 1);
+                const marks: Exclude<Voice, number> = typeof voice === "number" ? { midi } : voice;
+                const codes: { articulationEnum: number }[] = [];
+                if (marks.accent) {
+                    codes.push({ articulationEnum: 0 });
+                }
+                if (marks.staccato) {
+                    codes.push({ articulationEnum: 6 });
+                }
                 const note: Record<string, unknown> = {
                     isRest: () => false,
                     halfTone: midiToHalfTone(midi),
                     ParentStaff: { idInMusicSheet: staff },
-                    // Every fake position is one quarter note long, so holdMs reads a
-                    // known written length off the score.
-                    Length: { RealValue: 0.25 },
+                    // A fake position is one quarter note long unless the voice says
+                    // otherwise, so holdMs reads a known written length off the score.
+                    Length: { RealValue: (marks.quarters ?? 1) / 4 },
+                    ParentVoiceEntry: { Articulations: codes },
                 };
                 if (tie === "start") {
                     // The struck note of the tie: OSMD names it first in the tie, and the
@@ -457,5 +479,54 @@ describe("elapsed time across a repeat", () => {
             });
         }
         expect(times).toEqual([0, 1000, 2000, 3000]);
+    });
+});
+
+describe("what the score asks of each key", () => {
+    it("is index-aligned with the position's pitches", () => {
+        const { osmd } = fakeOsmd([
+            [
+                { midi: 60, quarters: 4 },
+                { midi: 64, staccato: true },
+            ],
+        ]);
+        const step = collectMatchSteps(osmd, "both")[0];
+        expect(step?.pitches).toEqual([60, 64]);
+        expect(step?.expected).toHaveLength(2);
+        // The held note keeps its full length; the staccato one is clipped well inside it.
+        const [held, clipped] = step?.expected ?? [];
+        expect(clipped?.holdMs).toBeLessThan((held?.holdMs ?? 0) / 2);
+        // The chord's own ringing length stays the longest note in it.
+        expect(step?.holdMs).toBe(held?.holdMs);
+    });
+
+    it("gives the accented note of a chord its own loudness", () => {
+        const { osmd } = fakeOsmd([[{ midi: 60 }, { midi: 67, accent: true }]]);
+        const [plain, accented] = collectMatchSteps(osmd, "both")[0]?.expected ?? [];
+        expect(plain?.velocity).not.toBeNull();
+        expect(accented?.velocity as number).toBeGreaterThan(plain?.velocity as number);
+    });
+
+    it("reports what each struck key was asked for, in the order they were played", () => {
+        // The chord is cleared low-then-high here; the expectations must follow the
+        // player's order, not the score's, or an accent lands on the wrong key.
+        const view = render([[{ midi: 60 }, { midi: 67, accent: true }]], {});
+        const cleared: CorrectInfo[] = [];
+        view.rerender({ opts: { onCorrect: (info: CorrectInfo) => cleared.push(info) } });
+        act(() => {
+            view.result.current.start();
+        });
+        act(() => {
+            view.result.current.registerNote(67, 0, 100);
+        });
+        act(() => {
+            view.result.current.registerNote(60, 0, 40);
+        });
+        const info = cleared[0];
+        expect(info?.pitches).toEqual([60, 67]);
+        const [plainAsked, accentedAsked] = info?.expectedVelocities ?? [];
+        expect(accentedAsked as number).toBeGreaterThan(plainAsked as number);
+        // …and each key's own strike is carried alongside it.
+        expect(info?.velocities).toEqual([40, 100]);
     });
 });

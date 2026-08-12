@@ -170,7 +170,7 @@ describe("matchNote", () => {
         expect(cleared(result.events)).toHaveLength(1); // only the forgiven position
         state = result.state;
         // The note counts toward the new chord, and keeps the moment it landed.
-        expect(state.hit).toEqual([{ note: 62, at: 0 }]);
+        expect(state.hit).toEqual([{ note: 62, at: 0, velocity: 0 }]);
         const finish = matchNote(state, 65, 0, true);
         expect(cleared(finish.events)[0]?.playedPitches).toEqual([62, 65]);
         expect(finish.state.complete).toBe(true);
