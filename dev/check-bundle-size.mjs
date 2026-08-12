@@ -275,7 +275,13 @@ const BUDGET_VENDOR_KB = 324;
 // key of a chord, what each was struck at, and how long each was held — carried per pitch
 // through the matcher, the capture and the expressive reading rather than collapsed onto
 // the position's longest note.
-const BUDGET_APP_KB = 330;
+//
+// 331. Following the sustain pedal the score marks, and the notation reading around it —
+// the pedal spans, the ornament split, and the per-position timing the graded run and
+// Listen now share. The line moved by one because the previous one measured 329.95 here
+// and 330.04 on CI: both print as 330.0, so the gate passed locally and failed there.
+// Displayed KB is rounded; the comparison is not.
+const BUDGET_APP_KB = 331;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
