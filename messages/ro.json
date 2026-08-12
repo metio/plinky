@@ -663,6 +663,8 @@
   "meta_about_description": "Cunoaște-i pe cei doi oameni din spatele Plinky — și de ce au construit o cale mai calmă de a învăța pianul.",
   "help_title": "Ajutor",
   "help_intro": "Cum funcționează Plinky, zonă cu zonă — aruncă o privire oriunde te intrigă.",
+  "help_section_welcome": "Bine ai venit",
+  "help_section_extras": "Extra utile",
   "help_section_getting_started": "Primii pași",
   "help_section_play": "Cântarea unei piese",
   "help_section_assignments": "Teme",

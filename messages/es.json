@@ -663,6 +663,8 @@
   "meta_about_description": "Conoce a las dos personas detrás de Plinky y por qué crearon una forma más tranquila de aprender piano.",
   "help_title": "Ayuda",
   "help_intro": "Cómo funciona Plinky, sección por sección: échale un vistazo donde tengas curiosidad.",
+  "help_section_welcome": "Bienvenida",
+  "help_section_extras": "Extras útiles",
   "help_section_getting_started": "Primeros pasos",
   "help_section_play": "Tocar una pieza",
   "help_section_assignments": "Tareas",

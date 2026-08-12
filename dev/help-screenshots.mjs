@@ -53,6 +53,11 @@ const SEED = new Map(
 // SVG exists. Alt text comes from the seed, in every locale.
 const SECTIONS = [
     {
+        key: "intro",
+        path: "/en/",
+        selector: "main",
+    },
+    {
         key: "gettingStarted",
         path: "/en/",
         selector: "main",
@@ -105,6 +110,11 @@ const SECTIONS = [
     {
         key: "settings",
         path: "/en/settings",
+        selector: "main",
+    },
+    {
+        key: "extras",
+        path: "/en/tools",
         selector: "main",
     },
 ];

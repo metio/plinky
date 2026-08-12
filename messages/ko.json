@@ -663,6 +663,8 @@
   "meta_about_description": "Plinky를 만드는 두 사람과, 그들이 더 차분하게 피아노를 배우는 방법을 만든 이유를 만나 보세요.",
   "help_title": "도움말",
   "help_intro": "Plinky가 작동하는 방식을 영역별로 담았어요 — 궁금한 곳부터 둘러보세요.",
+  "help_section_welcome": "환영합니다",
+  "help_section_extras": "유용한 추가 기능",
   "help_section_getting_started": "시작하기",
   "help_section_play": "곡 연주하기",
   "help_section_assignments": "과제",

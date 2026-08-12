@@ -663,6 +663,8 @@
   "meta_about_description": "Plinky を支える二人と、彼らがもっとおだやかなピアノの学び方を作った理由をご紹介します。",
   "help_title": "ヘルプ",
   "help_intro": "Plinky の使い方を、場所ごとに。気になるところから覗いてみてください。",
+  "help_section_welcome": "ようこそ",
+  "help_section_extras": "便利なおまけ",
   "help_section_getting_started": "はじめに",
   "help_section_play": "曲を演奏する",
   "help_section_assignments": "課題",

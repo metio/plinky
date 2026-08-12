@@ -663,6 +663,8 @@
   "meta_about_description": "Познакомься с двумя людьми, стоящими за Plinky, — и узнай, почему они создали более спокойный способ учиться играть на пианино.",
   "help_title": "Помощь",
   "help_intro": "Как работает Plinky, раздел за разделом — загляните туда, где любопытно.",
+  "help_section_welcome": "Добро пожаловать",
+  "help_section_extras": "Полезные дополнения",
   "help_section_getting_started": "Начало работы",
   "help_section_play": "Игра пьесы",
   "help_section_assignments": "Задания",

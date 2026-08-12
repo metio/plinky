@@ -34,6 +34,7 @@ export function meta(_args: Route.MetaArgs) {
 // mirrors the app even before any content exists. The `key` is both the Sanity
 // `pageKey` an item is tagged with and the hash the header ? links to.
 const SECTIONS: { key: string; title: () => string }[] = [
+    { key: "intro", title: m.help_section_welcome },
     { key: "gettingStarted", title: m.help_section_getting_started },
     { key: "home", title: m.nav_home },
     { key: "play", title: m.help_section_play },
@@ -45,6 +46,7 @@ const SECTIONS: { key: string; title: () => string }[] = [
     { key: "you", title: m.nav_you },
     { key: "review", title: m.help_section_review },
     { key: "settings", title: m.nav_settings },
+    { key: "extras", title: m.help_section_extras },
 ];
 
 function HelpBlock({ item }: { item: HelpItem }) {

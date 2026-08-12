@@ -663,6 +663,8 @@
   "meta_about_description": "认识 Plinky 背后的两个人——以及他们为什么打造了一种更从容的学琴方式。",
   "help_title": "帮助",
   "help_intro": "Plinky 各个角落是怎么运作的——好奇哪里，就点开看看。",
+  "help_section_welcome": "欢迎",
+  "help_section_extras": "更多好用的功能",
   "help_section_getting_started": "入门",
   "help_section_play": "弹奏乐曲",
   "help_section_assignments": "作业",

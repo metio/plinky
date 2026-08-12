@@ -663,6 +663,8 @@
   "meta_about_description": "Познайомтеся з двома людьми за Plinky — і дізнайтеся, чому вони створили спокійніший спосіб учитися грати на фортепіано.",
   "help_title": "Довідка",
   "help_intro": "Як працює Plinky, розділ за розділом — зазирніть туди, куди тягне цікавість.",
+  "help_section_welcome": "Ласкаво просимо",
+  "help_section_extras": "Корисні додатки",
   "help_section_getting_started": "Початок роботи",
   "help_section_play": "Гра твору",
   "help_section_assignments": "Завдання",

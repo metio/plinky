@@ -663,6 +663,8 @@
   "meta_about_description": "Упознај двоје људи иза Plinky-ја — и зашто су направили мирнији начин да се научи клавир.",
   "help_title": "Помоћ",
   "help_intro": "Како Plinky ради, област по област — погледај где год те занима.",
+  "help_section_welcome": "Добро дошли",
+  "help_section_extras": "Корисни додаци",
   "help_section_getting_started": "Први кораци",
   "help_section_play": "Свирање композиције",
   "help_section_assignments": "Задаци",

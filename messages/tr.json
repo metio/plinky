@@ -663,6 +663,8 @@
   "meta_about_description": "Plinky'nin arkasındaki iki kişiyle tanış — ve piyano öğrenmenin daha sakin bir yolunu neden kurduklarını öğren.",
   "help_title": "Yardım",
   "help_intro": "Plinky nasıl çalışır, bölüm bölüm — merak ettiğin yere göz at.",
+  "help_section_welcome": "Hoş geldin",
+  "help_section_extras": "Faydalı ekstralar",
   "help_section_getting_started": "Başlarken",
   "help_section_play": "Bir parça çalmak",
   "help_section_assignments": "Ödevler",

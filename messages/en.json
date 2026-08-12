@@ -138,6 +138,8 @@
   "meta_about_description": "Meet the two people behind Plinky — and why they built a calmer way to learn the piano.",
   "help_title": "Help",
   "help_intro": "How Plinky works, area by area — have a look wherever you're curious.",
+  "help_section_welcome": "Welcome",
+  "help_section_extras": "Helpful extras",
   "help_section_getting_started": "Getting started",
   "help_section_play": "Playing a piece",
   "help_section_assignments": "Assignments",

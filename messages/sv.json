@@ -663,6 +663,8 @@
   "meta_about_description": "Möt de två personerna bakom Plinky — och varför de byggde ett lugnare sätt att lära sig spela piano.",
   "help_title": "Hjälp",
   "help_intro": "Så fungerar Plinky, område för område — ta en titt där du är nyfiken.",
+  "help_section_welcome": "Välkommen",
+  "help_section_extras": "Nyttiga extrafunktioner",
   "help_section_getting_started": "Kom igång",
   "help_section_play": "Spela ett stycke",
   "help_section_assignments": "Uppgifter",

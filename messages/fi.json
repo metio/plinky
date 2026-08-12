@@ -663,6 +663,8 @@
   "meta_about_description": "Tutustu kahteen ihmiseen Plinkyn takana — ja siihen, miksi he rakensivat rauhallisemman tavan oppia pianonsoittoa.",
   "help_title": "Ohje",
   "help_intro": "Näin Plinky toimii, osa kerrallaan — katso sitä kohtaa, joka juuri nyt kiinnostaa.",
+  "help_section_welcome": "Tervetuloa",
+  "help_section_extras": "Hyödyllisiä lisiä",
   "help_section_getting_started": "Aloitus",
   "help_section_play": "Kappaleen soittaminen",
   "help_section_assignments": "Tehtävät",
