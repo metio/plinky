@@ -438,7 +438,7 @@ describe("elapsed time across a repeat", () => {
         const { osmd } = fakeOsmd(REPEATED, WHOLES);
         const steps = collectMatchSteps(osmd, "both");
         expect(steps.map((step) => step.whole)).toEqual(WHOLES);
-        expect(steps.map((step) => step.elapsed)).toEqual([0, 0.25, 0.5, 0.75]);
+        expect(steps.map((step) => step.elapsedMs)).toEqual([0, 1000, 2000, 3000]);
     });
 
     it("gives the second pass its own onsets in the graded run", () => {

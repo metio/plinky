@@ -8,6 +8,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 August 2026 — later
+
+**Tempo marks and fermatas are followed, not flattened.** A piece that speeds up or
+slows down halfway was played and graded at one speed throughout, so obeying the mark on
+the page counted against your timing — and a fermata, which asks you to hold a note as
+long as you judge right, was scored as if you had simply come in late. Listen, the
+play-along and your timing feedback now all follow what the score says: a tempo change
+takes effect where it is written, and a fermata waits. Your tempo dial still means what
+it always did — it sets the opening tempo, and everything the composer marked keeps its
+proportion to it, so a piece holds its shape at any speed.
+
 ## 12 August 2026
 
 **Repeats are counted as time played, not time printed.** When a piece repeats a

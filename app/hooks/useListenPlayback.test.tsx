@@ -5,6 +5,7 @@
 import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { NOMINAL_BPM } from "../../core/elapsed";
 import type { Take } from "../../core/takes";
 import { collectListenSteps, useListenPlayback } from "./useListenPlayback";
 
@@ -104,6 +105,8 @@ describe("collectListenSteps", () => {
             lengths: [1],
             whole: 0,
             measureIndex: 0,
+            bpm: NOMINAL_BPM,
+            stretch: 1,
         });
     });
 

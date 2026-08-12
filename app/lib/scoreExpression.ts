@@ -21,6 +21,7 @@ const ART = {
     staccato: 6,
     staccatissimo: 7,
     tenuto: 9,
+    fermata: 10,
     detachedlegato: 25,
 } as const;
 
@@ -43,6 +44,10 @@ export type ScoreExpression = {
     accent: boolean;
     marcato: boolean;
     slurred: boolean;
+    // The note is held beyond its written length at the performer's discretion. The
+    // score says to wait, not how long, so a fixed stretch stands in for the judgement
+    // a performer makes.
+    fermata: boolean;
 };
 
 function articulationOf(codes: Set<number>): Articulation {
@@ -102,7 +107,27 @@ export function readScoreExpression(note: unknown): ScoreExpression {
         accent,
         marcato,
         slurred,
+        fermata: codes.has(ART.fermata),
     };
+}
+
+type MeasureShape = { CurrentMeasure?: { TempoInBPM?: number } };
+
+// The tempo in force at the cursor, in beats per minute, or null where the score marks
+// none. OSMD resolves it per measure and carries the last mark forward, so a piece that
+// changes tempo reports the new one from the measure the mark sits in. Sub-measure
+// resolution is not available: a mark placed mid-bar takes effect at the barline.
+export function readTempo(iterator: unknown): number | null {
+    const bpm = (iterator as MeasureShape | null)?.CurrentMeasure?.TempoInBPM;
+    return typeof bpm === "number" && bpm > 0 ? bpm : null;
+}
+
+// The tempo the score opens at, which the practice dial is read against: setting the
+// dial to 80 asks for the opening at 80, and every later mark keeps its ratio to it.
+export function readStartTempo(osmd: unknown): number | null {
+    const sheet = (osmd as { sheet?: { DefaultStartTempoInBpm?: number } } | null)?.sheet;
+    const bpm = sheet?.DefaultStartTempoInBpm;
+    return typeof bpm === "number" && bpm > 0 ? bpm : null;
 }
 
 type ExpressionShape = {

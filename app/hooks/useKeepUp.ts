@@ -14,8 +14,9 @@ import {
     strikeKeepUp,
 } from "../../core/keepUp";
 import { type Hand, isPracticedHand } from "../../core/matcher";
-import { readParts } from "../lib/scoreExpression";
-import { listenStepMs } from "../../core/playback";
+import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
+import { readParts, readScoreExpression, readStartTempo, readTempo } from "../lib/scoreExpression";
+import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
 import { useTimerChain } from "./useTimerChain";
@@ -39,7 +40,11 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
         const play: KeepUpStep["play"] = [];
         const accompany: KeepUpStep["accompany"] = [];
         const lengths: number[] = [];
+        // A fermata holds whatever is sounding, so read it across the position rather
+        // than off any one note.
+        let fermata = false;
         for (const note of cursor.NotesUnderCursor()) {
+            fermata ||= readScoreExpression(note).fermata;
             const quarters = note.Length.RealValue * 4;
             lengths.push(quarters);
             if (note.isRest() || note.halfTone <= 0) {
@@ -57,7 +62,13 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 accompany.push(entry);
             }
         }
-        steps.push({ play, accompany, lengths });
+        steps.push({
+            play,
+            accompany,
+            lengths,
+            bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
+            stretch: fermata ? FERMATA_STRETCH : 1,
+        });
         cursor.next();
     }
     cursor.reset();
@@ -147,6 +158,10 @@ export function useKeepUp({
         // from this and the cursor is only walked to mirror the position and hold
         // the notes the painter recolours. `step` tracks the position being opened.
         const steps = collectKeepUpSteps(osmd, hand);
+        // Every step carries the score's own tempo; the dial is read against the opening
+        // one, so the written shape survives at whatever speed is being practised.
+        const startBpm = readStartTempo(osmd) ?? NOMINAL_BPM;
+        const localTempo = (at: KeepUpStep) => effectiveTempo(tempo(), at.bpm, startBpm);
         let step = 0;
         cursor.reset();
         cursor.show();
@@ -183,7 +198,8 @@ export function useKeepUp({
             // which is stopped, so its `expected` would otherwise freeze the keys.
             setExpected(pitches);
             // The synth duration is in seconds — 60/BPM per quarter note.
-            const seconds = (quarters: number) => quarters * (60 / tempo());
+            const seconds = (quarters: number) =>
+                quarters * (60 / localTempo(current)) * current.stretch;
             if (guideNotes) {
                 for (const entry of current.play) {
                     synth.playNote(entry.pitch, { duration: seconds(entry.quarters) });
@@ -235,7 +251,7 @@ export function useKeepUp({
             cursor.next();
             step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(current.lengths, tempo()));
+            chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));
         };
 
         // A one-bar count-in on the metronome (already ticking) before the first note.

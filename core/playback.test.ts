@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { listenStepMs, MIN_STEP_MS } from "./playback";
+import { effectiveTempo, listenStepMs, MIN_STEP_MS } from "./playback";
 
 describe("listenStepMs", () => {
     it("dwells a note for its own length at the tempo", () => {
@@ -50,5 +50,28 @@ describe("listenStepMs", () => {
     it("stays finite for a non-positive tempo rather than scheduling forever", () => {
         expect(Number.isFinite(listenStepMs([1], 0))).toBe(true);
         expect(Number.isFinite(listenStepMs([1], -50))).toBe(true);
+    });
+});
+
+describe("effectiveTempo", () => {
+    it("leaves a piece that keeps one tempo at the dial", () => {
+        expect(effectiveTempo(80, 120, 120)).toBe(80);
+    });
+
+    it("keeps a later mark in proportion to the opening", () => {
+        // Written 120 then 60 — half speed — played at a dial of 80: the slow section is
+        // 40, so the shape survives wherever the dial is set.
+        expect(effectiveTempo(80, 60, 120)).toBe(40);
+        expect(effectiveTempo(80, 240, 120)).toBe(160);
+    });
+
+    it("refuses to divide by a stopped clock", () => {
+        expect(Number.isFinite(effectiveTempo(80, 120, 0))).toBe(true);
+    });
+});
+
+describe("listenStepMs under a fermata", () => {
+    it("waits longer than the written length", () => {
+        expect(listenStepMs([1], 60, 2)).toBe(2000);
     });
 });

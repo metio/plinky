@@ -5,6 +5,7 @@
 import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { NOMINAL_BPM } from "../../core/elapsed";
 import { collectKeepUpSteps, useKeepUp } from "./useKeepUp";
 
 // The painting reaches into OSMD's rendered SVG, which only exists in a real
@@ -82,15 +83,25 @@ describe("collectKeepUpSteps", () => {
                 play: [{ pitch: 60, quarters: 1 }],
                 accompany: [{ pitch: 48, quarters: 2 }],
                 lengths: [1, 2],
+                bpm: NOMINAL_BPM,
+                stretch: 1,
             },
-            { play: [], accompany: [], lengths: [1] },
-            { play: [{ pitch: 62, quarters: 1 }], accompany: [], lengths: [1] },
+            { play: [], accompany: [], lengths: [1], bpm: NOMINAL_BPM, stretch: 1 },
+            {
+                play: [{ pitch: 62, quarters: 1 }],
+                accompany: [],
+                lengths: [1],
+                bpm: NOMINAL_BPM,
+                stretch: 1,
+            },
         ]);
         // The left hand catches staff-1 pitches instead, accompanied by staff 0.
         expect(collectKeepUpSteps(osmd, "left")[0]).toEqual({
             play: [{ pitch: 48, quarters: 2 }],
             accompany: [{ pitch: 60, quarters: 1 }],
             lengths: [1, 2],
+            bpm: NOMINAL_BPM,
+            stretch: 1,
         });
     });
 

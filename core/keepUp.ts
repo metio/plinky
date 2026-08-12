@@ -26,6 +26,11 @@ export type KeepUpStep = {
     // the beat's duration comes from the shortest, so the clock advances in step
     // with the notation regardless of which hand is being practised.
     lengths: number[];
+    // The tempo in force here and how much longer than written the position is held, so
+    // the clock follows a tempo change and waits at a fermata rather than running the
+    // whole piece at one speed.
+    bpm: number;
+    stretch: number;
 };
 
 export type KeepUpState = {

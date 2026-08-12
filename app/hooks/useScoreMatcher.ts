@@ -3,10 +3,22 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useCallback, useRef, useState } from "react";
-import { elapsedWholes } from "../../core/elapsed";
+import {
+    FERMATA_STRETCH,
+    NOMINAL_BPM,
+    type Position,
+    quartersMs,
+    writtenOnsetsMs,
+} from "../../core/elapsed";
 import { lengthScaleOf, velocityOf } from "../../core/expression";
 import type { ScoreParts } from "../../core/parts";
-import { readActiveDynamic, readParts, readScoreExpression } from "../lib/scoreExpression";
+import {
+    readActiveDynamic,
+    readParts,
+    readScoreExpression,
+    readStartTempo,
+    readTempo,
+} from "../lib/scoreExpression";
 import {
     currentBar,
     expectedPitches,
@@ -49,7 +61,7 @@ function stepAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
-): Omit<MatchStep, "bar" | "elapsed"> & { advanceQuarters: number } {
+): Omit<MatchStep, "bar" | "elapsedMs" | "holdMs"> & Omit<Position, "whole"> {
     const pitches: number[] = [];
     // One entry per pitch, in the same order. A note whose staff the engraver does not
     // report reads as the treble, which is where a single-staff piece is played.
@@ -59,7 +71,12 @@ function stepAtCursor(
     // where the cursor sits, not of any one note under it.
     const dynamicVolume = readActiveDynamic(osmd.cursor.iterator);
     let expected: MatchStep["expected"];
+    // A fermata belongs to the position, not to one note: it holds whatever is sounding,
+    // and a rest can carry one too. So it is read across everything under the cursor,
+    // including the notes the practised hand does not play.
+    let fermata = false;
     for (const note of osmd.cursor.NotesUnderCursor()) {
+        fermata ||= readScoreExpression(note).fermata;
         if (note.isRest() || note.halfTone <= 0) {
             continue;
         }
@@ -100,6 +117,10 @@ function stepAtCursor(
         // the same measure playback advances the cursor by. Only the repeat arithmetic
         // reads it, and only where the printed onsets jump.
         advanceQuarters: shortestLength(osmd),
+        // The tempo in force, so a piece that changes speed is measured by the clock it
+        // is written against rather than one average for the whole score.
+        bpm: readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
+        stretch: fermata ? FERMATA_STRETCH : 1,
         holdQuarters,
         expected,
     };
@@ -141,7 +162,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // real gap — except where a repeat jumps, which is exactly what the accumulation is
     // for. Filtering to the playable ones first would leave gaps indistinguishable from
     // jumps.
-    const walked: (Omit<MatchStep, "elapsed"> & { advanceQuarters: number })[] = [];
+    const walked: (Omit<MatchStep, "elapsedMs" | "holdMs"> & Omit<Position, "whole">)[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
             ...stepAtCursor(osmd, hand, parts),
@@ -151,12 +172,16 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     }
     osmd.cursor.reset();
 
-    const elapsed = elapsedWholes(walked);
+    const onsets = writtenOnsetsMs(walked);
     const steps: MatchStep[] = [];
     for (const [index, step] of walked.entries()) {
         if (step.pitches.length > 0) {
-            const { advanceQuarters: _advance, ...rest } = step;
-            steps.push({ ...rest, elapsed: elapsed[index] as number });
+            const { advanceQuarters: _advance, bpm, stretch, ...rest } = step;
+            steps.push({
+                ...rest,
+                elapsedMs: onsets[index] as number,
+                holdMs: quartersMs(step.holdQuarters * stretch, bpm),
+            });
         }
     }
     return steps;
@@ -282,6 +307,17 @@ export function useScoreMatcher(
     // slider change rebase later notes against the first note's old tempo and
     // corrupt the timing and flow grades.
     const runTempoRef = useRef(options.tempo ?? 100);
+    // The tempo the score opens at, captured with the run for the same reason. Every
+    // baked time is at the written tempi, and this is what the dial is read against:
+    // asking for 80 asks for the opening at 80, and a later mark keeps its ratio to it.
+    // A score that marks no tempo is counted at the nominal one, so the ratio reduces to
+    // the dial over that constant and the piece plays at the dial, as it always did.
+    const runStartBpmRef = useRef(NOMINAL_BPM);
+    // How much faster than written the run is being played.
+    const dialRatio = useCallback(
+        () => runTempoRef.current / Math.max(1, runStartBpmRef.current),
+        [],
+    );
     // The hand is fixed for the duration of a run, captured at start, so a change
     // to the selector mid-run can't desync the position count from what's matched.
     const runHandRef = useRef<Hand>(options.hand ?? "both");
@@ -345,6 +381,7 @@ export function useScoreMatcher(
             // so the first step's position anchors every later relative index.
             runStartIndexRef.current = steps[0] ? all.indexOf(steps[0]) : 0;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
+            runStartBpmRef.current = readStartTempo(osmd) ?? NOMINAL_BPM;
             runHandRef.current = hand;
             practicingRef.current = true;
             setBar(currentBar(state));
@@ -397,15 +434,13 @@ export function useScoreMatcher(
                     ordinal: event.ordinal,
                     index: runStartIndexRef.current + event.ordinal,
                     timestamp,
-                    timeMs: event.step.elapsed * 4 * (60000 / runTempoRef.current),
+                    timeMs: event.step.elapsedMs / dialRatio(),
                     // The written length to hold, taken from the cleared step itself,
                     // so it stays right regardless of where the visual cursor sits.
-                    holdMs: event.step.holdQuarters * (60000 / runTempoRef.current),
+                    holdMs: event.step.holdMs / dialRatio(),
                     expectedVelocity: event.step.expected?.velocity ?? null,
                     expectedHoldMs:
-                        event.step.holdQuarters *
-                        (60000 / runTempoRef.current) *
-                        (event.step.expected?.lengthScale ?? 1),
+                        (event.step.holdMs / dialRatio()) * (event.step.expected?.lengthScale ?? 1),
                     velocity,
                     wrongBefore: event.wrongBefore,
                     staves: event.step.staves,
@@ -443,7 +478,7 @@ export function useScoreMatcher(
                 setPracticing(false);
             }
         },
-        [getOsmd],
+        [getOsmd, dialRatio],
     );
 
     return {

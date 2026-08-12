@@ -5,10 +5,16 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
-import { listenStepMs } from "../../core/playback";
+import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
+import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
-import { readActiveDynamic, readScoreExpression } from "../lib/scoreExpression";
+import {
+    readActiveDynamic,
+    readScoreExpression,
+    readStartTempo,
+    readTempo,
+} from "../lib/scoreExpression";
 import {
     highlightCursorNotes,
     type PaintedNote,
@@ -55,6 +61,11 @@ export type ListenStep = {
     // of the live cursor's iterator.
     whole: number;
     measureIndex: number;
+    // The tempo in force here and how much longer than written the position is held, so
+    // playback follows a tempo change and waits at a fermata — the same reading the
+    // graded run measures against, or the two would ask for different performances.
+    bpm: number;
+    stretch: number;
 };
 
 // Walk the engraved score once and lift the listening timeline into the pure step
@@ -72,8 +83,12 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
         // The dynamic in force is the same for every note under the cursor, so read
         // it once per position.
         const dynamicVolume = readActiveDynamic(cursor.iterator);
+        // A fermata holds whatever is sounding, so it is a property of the position —
+        // read across every note under the cursor, rests included.
+        let fermata = false;
         for (const note of cursor.NotesUnderCursor()) {
             const expression = readScoreExpression(note);
+            fermata ||= expression.fermata;
             // A tie's later notes are already sounding from the tie start, so skip the
             // re-strike; rests never sound.
             if (!note.isRest() && note.halfTone > 0 && expression.strike) {
@@ -96,6 +111,8 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
             lengths,
             whole: cursor.iterator.currentTimeStamp?.RealValue ?? 0,
             measureIndex: cursor.iterator.CurrentMeasureIndex,
+            bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
+            stretch: fermata ? FERMATA_STRETCH : 1,
         });
         cursor.next();
     }
@@ -201,6 +218,10 @@ export function useListenPlayback({
         // this and the cursor is only walked to mirror the position and hold the
         // notes the trail colours. `step` tracks the position being sounded.
         const steps = collectListenSteps(osmd);
+        // Every baked tempo is the score's own; the dial is read against the opening one.
+        const startBpm = readStartTempo(osmd) ?? NOMINAL_BPM;
+        // The tempo to sound the position under the cursor at.
+        const localTempo = (at: ListenStep) => effectiveTempo(tempo(), at.bpm, startBpm);
         // The first playable index at the loop's start bar, or the resume onset, or
         // the top — and seek the visual cursor to match.
         const barStart = (bar: number) =>
@@ -270,7 +291,7 @@ export function useListenPlayback({
                         slurred: note.slurred,
                         dynamicVolume: current.dynamicVolume,
                     },
-                    tempo(),
+                    localTempo(current),
                 );
                 synth.playNote(note.pitch, { duration: durationSeconds, velocity });
                 // …and light the same note on a connected instrument, so the piece
@@ -280,7 +301,7 @@ export function useListenPlayback({
             cursor.next();
             step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(current.lengths, tempo()));
+            chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));
         };
         tick();
     };

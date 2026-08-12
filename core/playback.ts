@@ -18,8 +18,16 @@ export const MIN_STEP_MS = 40;
 // the step UP to a whole beat, as a naive one-beat minimum does, flattens every run to a
 // quarter-note plod. The floor here is a few milliseconds only, purely to keep the step
 // positive; an empty step (nothing under the cursor) falls back to a single beat.
-export function listenStepMs(quarterLengths: number[], tempo: number): number {
+export function listenStepMs(quarterLengths: number[], tempo: number, stretch = 1): number {
     const beatMs = 60_000 / Math.max(1, tempo);
     const nextOnset = quarterLengths.length > 0 ? Math.min(...quarterLengths) : 1;
-    return Math.max(MIN_STEP_MS, nextOnset * beatMs);
+    return Math.max(MIN_STEP_MS, nextOnset * beatMs * stretch);
+}
+
+// The tempo to count a position at: the dial, held in the same proportion to the mark in
+// force as it is to the tempo the score opens at. A piece that doubles its speed halfway
+// does so at whatever dial the player sets, and a piece that marks nothing plays at the
+// dial itself, because both readings then report the same nominal tempo.
+export function effectiveTempo(dial: number, bpm: number, startBpm: number): number {
+    return dial * (bpm / Math.max(1, startBpm));
 }

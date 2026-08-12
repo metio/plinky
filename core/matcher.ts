@@ -60,10 +60,12 @@ export type MatchStep = {
     // PRINTED. Repeats revisit it, so several steps of one run can share a value; use it
     // to find a place in the score, never to say when a note is due.
     whole: number;
-    // Elapsed whole notes at this position once the repeats are played out — where it
-    // falls in TIME. Rises across the whole run even where `whole` rewinds, and it is
-    // this the caller scales by the run's tempo into milliseconds.
-    elapsed: number;
+    // Where the position falls in TIME: milliseconds from the start of the performance,
+    // with the repeats played out and at the tempi the score writes. Rises across the
+    // whole run even where `whole` rewinds. The caller scales it by the ratio between
+    // the practice dial and the score's opening tempo, so a tempo change or a fermata
+    // keeps its proportion at any speed.
+    elapsedMs: number;
     // The 0-based bar the position sits in, for a focus view.
     bar: number;
     // The longest written length here, in quarter notes — how long the key is
@@ -71,6 +73,10 @@ export type MatchStep = {
     // indicator reads it off the step model, never the live cursor. Zero when
     // the score marks no length.
     holdQuarters: number;
+    // How long the position is meant to keep ringing, in milliseconds at the written
+    // tempi — `holdQuarters` at the tempo in force here, extended by a fermata. Scaled
+    // by the same dial ratio as `elapsedMs`.
+    holdMs: number;
     // What the score asks for here: the standing dynamic with any accent applied
     // (null when the score marks none), and the fraction of its written length the
     // note is meant to sound. Absent on a step model lifted for something other than

@@ -48,7 +48,9 @@ describe("a score with a repeat", () => {
         expect(steps.map((step) => step.pitches)).toEqual([[60], [62], [60], [62], [64]]);
         // The printed onset rewinds with the repeat — the second C is the same C.
         expect(steps.map((step) => step.whole)).toEqual([0, 1, 0, 1, 2]);
-        // The moment each is due does not.
-        expect(steps.map((step) => step.elapsed)).toEqual([0, 1, 2, 3, 4]);
+        // The moment each is due does not. The score marks no tempo, so OSMD counts it at
+        // its own default of 120 — a whole note is two seconds. The dial is read against
+        // that same default, so the run's clock is unchanged by the choice.
+        expect(steps.map((step) => step.elapsedMs)).toEqual([0, 2000, 4000, 6000, 8000]);
     });
 });
