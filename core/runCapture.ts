@@ -89,6 +89,9 @@ export type ClearedNote = {
     // How hard each of `pitches` was struck, index-aligned. A chord's notes are not all
     // played equally, and a score that accents one of them asks for exactly that.
     velocities?: number[];
+    // How much the timing windows are widened here — non-zero only around an ornament,
+    // whose moment the notation leaves to the player.
+    slackMs?: number;
 };
 
 function staffOffsets(
@@ -126,6 +129,7 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         expectedVelocities: info.expectedVelocities,
         expectedHoldsMs: info.expectedHoldsMs,
         velocities: info.velocities,
+        slackMs: info.slackMs,
         keyHoldsMs: info.pitches.map(() => 0),
     });
     const index = capture.notes.length - 1;

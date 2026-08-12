@@ -30,18 +30,37 @@ export type RhythmSummary = {
     averageAbsMs: number;
 };
 
-export function rate(absDeltaMs: number, tolerance = PRECISE_TOLERANCE): Rating {
-    if (absDeltaMs <= PERFECT_MS * tolerance) {
+// `slackMs` widens the windows for a note whose moment the notation does not actually
+// fix. An ornament is the case that needs it: the score says to play the little note
+// before the big one, but not by how much, and the two standard readings — crushed just
+// before the beat, or leaning on it and taking time from the note it decorates — are a
+// good part of a beat apart. Both are right. Grading either against the other's moment
+// marks a player down for a choice the notation left to them, so the window is widened
+// to span the pair rather than picking a side.
+//
+// Zero everywhere else, which leaves every other note scored exactly as before.
+export function rate(
+    absDeltaMs: number,
+    tolerance = PRECISE_TOLERANCE,
+    slackMs = 0,
+): Rating {
+    const slack = Math.max(0, slackMs);
+    if (absDeltaMs <= PERFECT_MS * tolerance + slack) {
         return "perfect";
     }
-    if (absDeltaMs <= GOOD_MS * tolerance) {
+    if (absDeltaMs <= GOOD_MS * tolerance + slack) {
         return "good";
     }
     return "off";
 }
 
-export function makeHit(index: number, deltaMs: number, tolerance = PRECISE_TOLERANCE): Hit {
-    return { index, deltaMs, rating: rate(Math.abs(deltaMs), tolerance) };
+export function makeHit(
+    index: number,
+    deltaMs: number,
+    tolerance = PRECISE_TOLERANCE,
+    slackMs = 0,
+): Hit {
+    return { index, deltaMs, rating: rate(Math.abs(deltaMs), tolerance, slackMs) };
 }
 
 // One played note relative to the run's first note: its notated onset (the ideal)

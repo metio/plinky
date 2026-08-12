@@ -73,6 +73,11 @@ export type MatchStep = {
     // there while the player works through them, and only the last step at a position
     // moves it along.
     advancesCursor: boolean;
+    // How much to widen this step's timing windows, in milliseconds at the written tempi.
+    // Non-zero only around an ornament, whose moment the notation does not fix: it may be
+    // crushed in before the beat or leaned on and given time from the note it decorates,
+    // and a player choosing either should not be marked down for it.
+    slackMs: number;
     // The longest written length here, in quarter notes — how long the key is
     // meant to keep ringing. Collected with the position so the hold-duration
     // indicator reads it off the step model, never the live cursor. Zero when

@@ -23,6 +23,7 @@ const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep 
     elapsedMs: 0,
     holdMs: 0,
     advancesCursor: true,
+    slackMs: 0,
     bar: 0,
     holdQuarters: 0,
     ...overrides,
@@ -247,6 +248,7 @@ describe("the staff of each pitch", () => {
             elapsedMs: 0,
     holdMs: 0,
     advancesCursor: true,
+    slackMs: 0,
             bar: 0,
             holdQuarters: 1,
         };

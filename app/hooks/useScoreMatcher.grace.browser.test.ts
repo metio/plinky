@@ -89,6 +89,25 @@ describe("a note with a grace note before it", () => {
         expect(collectStepNotes(osmd, "both")).toHaveLength(collectMatchSteps(osmd, "both").length);
     });
 
+    it("does not mark a player down for leaning on the ornament", async () => {
+        // The notation says to play the little note before the big one, not by how much.
+        // Crushed just before the beat and leaned on — taking half the value of the note
+        // it decorates — are both right, so the windows reach from one to the other.
+        const osmd = await load(
+            score(`<measure number="1">${ATTR}${half("C")}${grace("B")}${half("D")}</measure>`),
+        );
+
+        const [first, ornament, principal] = collectMatchSteps(osmd, "both");
+        // Nothing is widened at an ordinary note…
+        expect(first?.slackMs).toBe(0);
+        // …the ornament reaches back to the beat it might instead have been played on…
+        expect(ornament?.slackMs).toBe(
+            (principal?.elapsedMs as number) - (ornament?.elapsedMs as number),
+        );
+        // …and its principal reaches forward by the half of itself an appoggiatura takes.
+        expect(principal?.slackMs).toBe((principal?.holdMs as number) / 2);
+    });
+
     it("leaves a piece with no ornaments exactly as it was", async () => {
         const osmd = await load(
             score(`<measure number="1">${ATTR}${half("C")}${half("D")}</measure>`),
@@ -97,5 +116,7 @@ describe("a note with a grace note before it", () => {
         const steps = collectMatchSteps(osmd, "both");
         expect(steps.map((step) => step.pitches)).toEqual([[60], [62]]);
         expect(steps.every((step) => step.advancesCursor)).toBe(true);
+        // …including the timing windows, which are widened only around an ornament.
+        expect(steps.every((step) => step.slackMs === 0)).toBe(true);
     });
 });

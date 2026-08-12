@@ -42,6 +42,9 @@ export type OutcomeNote = RunNote & {
     // index-aligned with `pitches`.
     velocities?: number[];
     keyHoldsMs?: number[];
+    // How much the timing windows are widened here, for a note whose moment the notation
+    // leaves to the player — an ornament and the note it decorates. Zero everywhere else.
+    slackMs?: number;
 };
 
 // One entry per KEY struck, not per position: a chord is several instructions played at
@@ -133,7 +136,9 @@ export function deriveRunOutcome({
     // dynamics rather than crediting a constant.
     const hasDynamics = new Set(velocities).size > 1;
     const tolerance = imprecise ? LENIENT_TOLERANCE : PRECISE_TOLERANCE;
-    const hits = timingDeltas(notes).map((delta, index) => makeHit(index, delta, tolerance));
+    const hits = timingDeltas(notes).map((delta, index) =>
+        makeHit(index, delta, tolerance, notes[index]?.slackMs ?? 0),
+    );
     const grade = computeGrade({
         correct,
         wrong,

@@ -8,6 +8,7 @@ import {
     makeHit,
     type Onset,
     PERFECT_MS,
+    PRECISE_TOLERANCE,
     rate,
     summarize,
     tempoScale,
@@ -148,5 +149,39 @@ describe("summarize", () => {
 
     it("handles an empty run", () => {
         expect(summarize([])).toEqual({ perfect: 0, good: 0, off: 0, total: 0, averageAbsMs: 0 });
+    });
+});
+
+describe("timing slack", () => {
+    it("changes nothing when there is none", () => {
+        for (const delta of [0, 59, 60, 61, 139, 140, 141, 900]) {
+            expect(rate(delta, PRECISE_TOLERANCE, 0)).toBe(rate(delta, PRECISE_TOLERANCE));
+        }
+    });
+
+    it("never rates a note worse than it would without slack", () => {
+        const order = { off: 0, good: 1, perfect: 2 } as const;
+        for (const delta of [0, 50, 100, 200, 500, 1200]) {
+            for (const slack of [0, 10, 250, 1000]) {
+                expect(order[rate(delta, PRECISE_TOLERANCE, slack)]).toBeGreaterThanOrEqual(
+                    order[rate(delta, PRECISE_TOLERANCE)],
+                );
+            }
+        }
+    });
+
+    it("accepts a note as far out as the slack allows", () => {
+        // A player who leans on an ornament rather than crushing it lands half a beat
+        // from where the step model put it, and is not marked down for the choice.
+        expect(rate(500, PRECISE_TOLERANCE)).toBe("off");
+        expect(rate(500, PRECISE_TOLERANCE, 500)).toBe("perfect");
+    });
+
+    it("still calls a note that misses by more than the slack off", () => {
+        expect(rate(2000, PRECISE_TOLERANCE, 500)).toBe("off");
+    });
+
+    it("ignores a negative slack rather than tightening the window", () => {
+        expect(rate(50, PRECISE_TOLERANCE, -1000)).toBe("perfect");
     });
 });

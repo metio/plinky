@@ -31,6 +31,7 @@ const stepsArb: fc.Arbitrary<MatchStep[]> = fc
             elapsedMs: index * 1000,
             holdMs: 1000,
             advancesCursor: true,
+            slackMs: 0,
             bar: index >> 2,
             holdQuarters: 1,
         })),
@@ -130,8 +131,8 @@ describe("matcher properties", () => {
         // position 0 only — the match branch wins over the forgiving skip, so the
         // run does not jump two positions on one keypress.
         const steps: MatchStep[] = [
-            { pitches: [60], pitchStaves: [0], staves: [0], whole: 0, elapsedMs: 0, holdMs: 1000, bar: 0, holdQuarters: 1, advancesCursor: true },
-            { pitches: [60], pitchStaves: [0], staves: [0], whole: 1, elapsedMs: 1000, holdMs: 1000, bar: 0, holdQuarters: 1, advancesCursor: true },
+            { pitches: [60], pitchStaves: [0], staves: [0], whole: 0, elapsedMs: 0, holdMs: 1000, bar: 0, holdQuarters: 1, advancesCursor: true, slackMs: 0 },
+            { pitches: [60], pitchStaves: [0], staves: [0], whole: 1, elapsedMs: 1000, holdMs: 1000, bar: 0, holdQuarters: 1, advancesCursor: true, slackMs: 0 },
         ];
         const first = matchNote(startMatch(steps), 60, 0, true);
         expect(first.events.map((e) => e.kind)).toEqual(["cleared"]);

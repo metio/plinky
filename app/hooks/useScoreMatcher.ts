@@ -82,7 +82,10 @@ function shortestLength(osmd: OpenSheetMusicDisplay): number {
 // One group of a position: what is struck together there. An ordinary position has a
 // single group; a position carrying an ornament has one per grace entry and then the
 // notes that fall on the beat.
-type StepGroup = Omit<MatchStep, "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor"> & {
+type StepGroup = Omit<
+    MatchStep,
+    "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor" | "slackMs"
+> & {
     expected: { velocity: number | null; soundQuarters: number }[];
     // The ornament's own written length, for placing it before the beat. Zero on the
     // group that IS the beat.
@@ -274,11 +277,24 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
                 continue;
             }
             const { graceQuarters: _grace, expected, ...rest } = group;
+            const onset = graceMs[order] ?? beatMs;
             atPosition.push({
                 ...rest,
                 bar,
-                elapsedMs: graceMs[order] ?? beatMs,
+                elapsedMs: onset,
                 holdMs: quartersMs(group.holdQuarters * stretch, bpm),
+                // An ornament may be crushed in before the beat or leaned on, taking half
+                // the value of the note it decorates. The step model places it before the
+                // beat; the window is widened to reach the other reading, so a player who
+                // leans is not marked late. On the ornament that is the distance it was
+                // placed ahead of the beat; on the note it decorates, the half of its own
+                // length an appoggiatura would take.
+                slackMs:
+                    ornament.length === 0
+                        ? 0
+                        : order < groups.length - 1
+                          ? beatMs - onset
+                          : quartersMs(group.holdQuarters * stretch, bpm) / 2,
                 // Each key's own asked-for length, on the same clock as the group's.
                 expected: expected.map((pitch) => ({
                     velocity: pitch.velocity,
@@ -359,6 +375,8 @@ export type CorrectInfo = {
     expectedHoldsMs: number[];
     // How hard each was actually struck, index-aligned with `pitches`.
     velocities: number[];
+    // How much the timing windows are widened here — non-zero only around an ornament.
+    slackMs: number;
     velocity: number;
     // How many wrong notes were played at this position before it was cleared —
     // zero means a clean first try, the signal Flow and per-segment accuracy are
@@ -554,6 +572,7 @@ export function useScoreMatcher(
                     // The written length to hold, taken from the cleared step itself,
                     // so it stays right regardless of where the visual cursor sits.
                     holdMs: event.step.holdMs / dialRatio(),
+                    slackMs: event.step.slackMs / dialRatio(),
                     ...askedFor(event, dialRatio()),
                     velocity,
                     velocities: event.velocities,
