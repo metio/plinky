@@ -76,10 +76,115 @@ function effortOf(right: number[][], left: number[][]): number {
     return (handEffort(right, "right") + handEffort(left, "left")) / notes;
 }
 
-// The score's raw playing effort, parsed from its MusicXML.
+// How fast the hands have to move, and how many independent lines they have to keep
+// apart. Fingering effort alone measures the SHAPE of a piece — stretch, position
+// changes — and is blind to both, which is how a Czerny étude of running sixteenths in
+// three voices scored below the grade-1 boundary while a slow Satie piece with wide
+// left-hand chords scored top of the scale. Speed and texture are what a player means by
+// "hard" at least as often as stretch is.
+
+// Notes per second in the piece's quick passages. Read off the tenth percentile of note
+// lengths rather than the mean: a piece is as fast as its fastest sustained writing, and
+// averaging buries a run of sixteenths under the long notes around it.
+export const SPEED_PERCENTILE = 0.1;
+// Below this the writing is comfortable at sight and costs nothing — around a note every
+// third of a second, quarter notes at a walking tempo.
+export const SPEED_FLOOR_NPS = 3;
+// What one note per second beyond the floor is worth, on the same scale as fingering
+// cost. Sixteenths at 120 (eight a second) land about two points up.
+export const SPEED_WEIGHT = 0.4;
+// What each independent voice beyond the first, within one hand, is worth. Two lines in
+// one hand is a real step up in coordination; three is another.
+export const TEXTURE_WEIGHT = 0.6;
+
+function beatsPerNote(note: Element, divisions: number): number | null {
+    // A chord member sounds with the note before it and takes no time of its own; a grace
+    // note carries no duration at all.
+    if (note.querySelector("chord") || note.querySelector("grace")) {
+        return null;
+    }
+    const raw = Number(note.querySelector("duration")?.textContent ?? "");
+    if (!Number.isFinite(raw) || raw <= 0 || divisions <= 0) {
+        return null;
+    }
+    return raw / divisions;
+}
+
+// The speed and texture of an already-parsed document, in one walk.
+function readPace(doc: Document): { notesPerSecond: number; voices: number } {
+    let divisions = 1;
+    let tempo = 0;
+    const beats: number[] = [];
+    // Distinct voice numbers seen per staff — two lines in one hand, not two hands.
+    const voicesByStaff = new Map<string, Set<string>>();
+    for (const node of doc.querySelectorAll("divisions, sound, note")) {
+        if (node.tagName === "divisions") {
+            const value = Number(node.textContent ?? "");
+            if (Number.isFinite(value) && value > 0) {
+                divisions = value;
+            }
+            continue;
+        }
+        if (node.tagName === "sound") {
+            const value = Number(node.getAttribute("tempo") ?? "");
+            if (Number.isFinite(value) && value > 0 && tempo === 0) {
+                tempo = value;
+            }
+            continue;
+        }
+        if (node.querySelector("rest")) {
+            continue;
+        }
+        const staff = node.querySelector("staff")?.textContent?.trim() ?? "1";
+        const voice = node.querySelector("voice")?.textContent?.trim() ?? "1";
+        let seen = voicesByStaff.get(staff);
+        if (!seen) {
+            seen = new Set();
+            voicesByStaff.set(staff, seen);
+        }
+        seen.add(voice);
+        const beat = beatsPerNote(node, divisions);
+        if (beat !== null) {
+            beats.push(beat);
+        }
+    }
+    // A score that states no tempo is read at a moderate one rather than assumed still.
+    const played = tempo > 0 ? tempo : 100;
+    let notesPerSecond = 0;
+    if (beats.length > 0) {
+        const sorted = [...beats].sort((a, b) => a - b);
+        const quick = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * SPEED_PERCENTILE))]!;
+        notesPerSecond = quick > 0 ? played / 60 / quick : 0;
+    }
+    const voices = Math.max(1, ...[...voicesByStaff.values()].map((set) => set.size));
+    return { notesPerSecond, voices };
+}
+
+// What speed and texture add to a score's cost. Zero for a slow single line, which is
+// what a beginner piece is, so an easy piece keeps the cost its fingering earned it.
+export function paceCost(pace: { notesPerSecond: number; voices: number }): number {
+    const speed = Math.max(0, pace.notesPerSecond - SPEED_FLOOR_NPS) * SPEED_WEIGHT;
+    const texture = Math.max(0, pace.voices - 1) * TEXTURE_WEIGHT;
+    return speed + texture;
+}
+
+// The score's raw playing effort, parsed from its MusicXML: what the hands must shape,
+// plus what they must do at speed and hold apart.
 export function rawDifficulty(codec: XmlCodec, xml: string): number {
+    const doc = codec.parse(xml);
+    if (!doc) {
+        return 0;
+    }
     const { right, left } = parsePositions(codec, xml);
-    return effortOf(right, left);
+    // Nothing FINGERABLE means nothing to measure; callers read 0 that way, and a pace
+    // term added to it would dress an unreadable import up as a plausible score. Note
+    // that this is emptiness, not cheapness: a real line that happens to cost nothing to
+    // finger — a repeated note, a gentle in-hand phrase — still has a speed and a
+    // texture, and reading its effort of 0 as "nothing here" would silently drop both.
+    if (right.length + left.length === 0) {
+        return 0;
+    }
+    return effortOf(right, left) + paceCost(readPace(doc));
 }
 
 export type Category = "scale" | "arpeggio" | "piece";
@@ -106,7 +211,7 @@ export const MAX_GRADE = 8;
 // `npm run songs:import` if the corpus changes. Scale/arpeggio remain measured
 // against the beginner exercises (scales ~0.6–1.1, arpeggios ~1.3–1.8).
 const GRADE_THRESHOLDS: Record<Category, number[]> = {
-    piece: [1.264, 1.907, 2.431, 2.941, 3.505, 4.233, 5.608],
+    piece: [2.258, 3.061, 3.689, 4.399, 5.181, 6.266, 7.929],
     scale: [0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.4],
     arpeggio: [1.4, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1],
 };
@@ -130,7 +235,7 @@ export function gradeOf(codec: XmlCodec, id: string, xml: string): number {
         gradeCache.set(id, MAX_GRADE);
         return MAX_GRADE;
     }
-    const cost = effortOf(right, left);
+    const cost = rawDifficulty(codec, xml);
     let grade = 1;
     for (const threshold of GRADE_THRESHOLDS[categoryOf(id)]) {
         if (cost <= threshold) {

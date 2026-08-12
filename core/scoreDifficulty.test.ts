@@ -4,7 +4,17 @@
 
 import { domXmlCodec } from "../app/adapters/domXmlCodec";
 import { describe, expect, it } from "vitest";
-import { categoryOf, gradeOf, MAX_GRADE, parsePositions, rawDifficulty } from "./scoreDifficulty";
+import {
+    categoryOf,
+    gradeOf,
+    MAX_GRADE,
+    paceCost,
+    parsePositions,
+    rawDifficulty,
+    SPEED_FLOOR_NPS,
+    SPEED_WEIGHT,
+    TEXTURE_WEIGHT,
+} from "./scoreDifficulty";
 
 // A minimal one-part score builder for the tests.
 const score = (notes: string) =>
@@ -203,3 +213,75 @@ function noteFor(midi: number): string {
     const octave = Math.floor(midi / 12) - 1;
     return `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>2</duration></note>`;
 }
+
+// A one-part score with a stated tempo and note length, for the pace terms. `divisions`
+// is per quarter note, so duration 1 with divisions 4 is a sixteenth.
+const paced = (tempo: number, divisions: number, duration: number, count: number, voices = 1) => {
+    let notes = "";
+    for (let i = 0; i < count; i++) {
+        for (let voice = 1; voice <= voices; voice++) {
+            notes += `<note><pitch><step>C</step><octave>4</octave></pitch><duration>${duration}</duration><voice>${voice}</voice><staff>1</staff></note>`;
+        }
+    }
+    return `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1"><attributes><divisions>${divisions}</divisions></attributes><sound tempo="${tempo}"/>${notes}</measure></part></score-partwise>`;
+};
+
+describe("paceCost", () => {
+    it("costs nothing for a slow single line", () => {
+        // What a beginner piece is: an easy piece keeps the cost its fingering earned it.
+        expect(paceCost({ notesPerSecond: 2, voices: 1 })).toBe(0);
+        expect(paceCost({ notesPerSecond: SPEED_FLOOR_NPS, voices: 1 })).toBe(0);
+    });
+
+    it("charges for speed above the comfortable floor", () => {
+        expect(paceCost({ notesPerSecond: SPEED_FLOOR_NPS + 1, voices: 1 })).toBeCloseTo(SPEED_WEIGHT);
+        expect(paceCost({ notesPerSecond: 8, voices: 1 })).toBeCloseTo((8 - SPEED_FLOOR_NPS) * SPEED_WEIGHT);
+    });
+
+    it("charges for each line beyond the first in one hand", () => {
+        expect(paceCost({ notesPerSecond: 0, voices: 2 })).toBeCloseTo(TEXTURE_WEIGHT);
+        expect(paceCost({ notesPerSecond: 0, voices: 3 })).toBeCloseTo(2 * TEXTURE_WEIGHT);
+    });
+
+    it("adds the two rather than trading one off against the other", () => {
+        // A fast piece in three voices is both, and a comfortable hand position must not
+        // excuse either — the fault this whole term exists to fix.
+        expect(paceCost({ notesPerSecond: 8, voices: 3 })).toBeCloseTo(
+            (8 - SPEED_FLOOR_NPS) * SPEED_WEIGHT + 2 * TEXTURE_WEIGHT,
+        );
+    });
+});
+
+describe("rawDifficulty reads speed and texture", () => {
+    it("rates running sixteenths above the same notes held long", () => {
+        const slow = paced(60, 4, 16, 12);
+        const fast = paced(120, 4, 1, 12);
+        expect(rawDifficulty(domXmlCodec, fast)).toBeGreaterThan(rawDifficulty(domXmlCodec, slow));
+    });
+
+    it("rates two voices in one hand above one", () => {
+        const single = paced(80, 4, 4, 8, 1);
+        const double = paced(80, 4, 4, 8, 2);
+        expect(rawDifficulty(domXmlCodec, double)).toBeGreaterThan(rawDifficulty(domXmlCodec, single));
+    });
+
+    it("reads an unstated tempo as moderate rather than as motionless", () => {
+        const noTempo = `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1"><attributes><divisions>4</divisions></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration></note><note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration></note></measure></part></score-partwise>`;
+        expect(rawDifficulty(domXmlCodec, noTempo)).toBeGreaterThan(0);
+    });
+
+    it("leaves a score with nothing fingerable at zero", () => {
+        // Zero means "nothing to measure", and a pace term added to it would dress an
+        // unreadable import up as a plausible score.
+        expect(rawDifficulty(domXmlCodec, score("<note><rest/><duration>4</duration></note>"))).toBe(0);
+    });
+
+    it("ignores grace notes and chord members when reading speed", () => {
+        // Neither takes time of its own; counting them would read every rolled chord as a
+        // burst of speed.
+        const chordy = `<?xml version="1.0"?><score-partwise><part id="P1"><measure number="1"><attributes><divisions>4</divisions></attributes><sound tempo="60"/><note><pitch><step>C</step><octave>4</octave></pitch><duration>16</duration></note><note><chord/><pitch><step>E</step><octave>4</octave></pitch><duration>16</duration></note></measure></part></score-partwise>`;
+        // One whole note at 60: nowhere near the speed floor, so pace adds nothing.
+        const positions = parsePositions(domXmlCodec, chordy);
+        expect(positions.right).toEqual([[60, 64]]);
+    });
+});

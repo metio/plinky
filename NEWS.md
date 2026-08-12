@@ -8,6 +8,21 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 15 August 2026
+
+**Grades now know the difference between hard to reach and hard to play.** Until now a
+piece's grade came entirely from how awkward it is to *finger* — how far your hands
+stretch, how much they move. That is a real part of difficulty, and it was the only part
+Plinky measured, so a study of racing sixteenths in three voices could sit at grade 1
+because the notes happened to fall under the hand, while a slow, gentle piece with wide
+left-hand chords sat at grade 8.
+
+Two things now count as well: how fast the notes actually come at the piece's own tempo,
+and how many independent lines one hand has to hold apart. Every piece in the library has
+been re-graded, so some will have moved — a few by several grades. Nothing you have
+learned or reviewed is affected, and where a piece sits on your roadmap is the only thing
+that changes.
+
 ## 14 August 2026 — night
 
 **Scores that looked like nonsense are gone, and the Gymnopédies are here.** A handful of

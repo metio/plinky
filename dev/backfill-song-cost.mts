@@ -9,6 +9,7 @@
 
 import { rawDifficulty } from "../core/scoreDifficulty.ts";
 import { linkedomXmlCodec } from "./linkedomXmlCodec.mts";
+import { existsSync, readdirSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 
 const { decompressMxl } = await import("../core/musicxmlFile.ts");
@@ -28,10 +29,24 @@ type Entry = {
 
 const manifest: Entry[] = JSON.parse(await readFile(`${DIR}/manifest.json`, "utf8"));
 
+// A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path is
+// found, not assumed. Reading `${DIR}/<id>.mxl` throws for every score in the catalogue.
+function scorePath(id: string): string {
+    for (const bucket of readdirSync(DIR, { withFileTypes: true })) {
+        if (bucket.isDirectory()) {
+            const path = `${DIR}/${bucket.name}/${id}.mxl`;
+            if (existsSync(path)) {
+                return path;
+            }
+        }
+    }
+    throw new Error(`no .mxl for ${id}`);
+}
+
 const enriched = [];
 let done = 0;
 for (const song of manifest) {
-    const bytes = await readFile(`${DIR}/${song.id}.mxl`);
+    const bytes = await readFile(scorePath(song.id));
     const xml = decompressMxl(new Uint8Array(bytes));
     const cost = xml ? Number(rawDifficulty(linkedomXmlCodec, xml).toFixed(3)) : 0;
     // Keep the field order the import writes, so a re-import yields an identical file.
