@@ -57,13 +57,13 @@ not return without meeting the argument.
 - [Open questions](#open-questions)
 - [Maintaining this document](#maintaining-this-document)
 
-> **Sanity is gone (2026-08-13).** Everything below that describes reading or writing
-> Sanity — the news banner, the board, the help page, the artist-page proxy, the
-> `sanity.ts` adapter, the mock handler — describes a state the app no longer has. The
-> passages are left standing because this document is append-only about decisions: the
-> reasoning was real, and a reader who cannot see the abandoned path will propose it
-> again. Help content now ships in the tree; the board and the news banner were removed;
-> nothing in the app fetches from a third party. See the last row of the decision log.
+> **Sanity is gone (2026-08-13).** Nothing in the app fetches from a third party any
+> more: help content ships in the tree, and the board and the news banner were removed.
+> [Artist pages](#capability-artist-pages) has been redesigned around that, and keeps a
+> short account of the proxy it replaced. Elsewhere — the platform alternatives, the
+> decision log — Sanity is named as history and left standing, because this document is
+> append-only about decisions and a reader who cannot see an abandoned path will propose
+> it again.
 
 ## Scope
 
@@ -103,9 +103,9 @@ change to this document first.
    backend unreachable, misconfigured, or switched off. The backend adds
    capabilities; it never becomes the path through which an existing one runs.
 2. **Unconfigured means silent.** With no API base URL in the build, the client
-   makes no requests and renders no backend UI. This mirrors the Sanity sources
-   exactly: no configured project yields nothing, with no error surfaced
-   (`app/adapters/sanity.ts`).
+   makes no requests and renders no backend UI — no error surfaced, nothing to
+   dismiss. The app already holds this line for everything it fetches: an absent
+   catalogue is an empty catalogue, not a broken screen.
 3. **A failed fetch degrades to nothing.** No spinner that never resolves, no
    error dialog, no emptied screen. The existing three-layer collapse — transport
    to `null`, adapter to the empty value, hook to its initial state — is the
@@ -150,7 +150,8 @@ Alternatives considered and rejected: a small VPS (a machine to patch, back up
 and pay for, plus egress); Deno Deploy or Fly.io (comparable free tiers, new
 vendor, no existing credential); Supabase or Firebase (a full account system is
 the opposite of the no-accounts posture, and the free tiers are the ones most
-prone to change); extending Sanity (a content CMS, unsuited to per-run writes).
+prone to change); extending Sanity (a content CMS, unsuited to per-run writes —
+and since removed from Plinky altogether).
 
 ## Free-tier budget
 
@@ -344,8 +345,8 @@ because the first is worth telling the player about and the second is not.
 
 **Adapters.** In `app/adapters/`, named `plinkyApi<Domain>.ts`, each a
 `createPlinkyApi<Domain>(fetchUrl: Fetcher, config: ApiConfig | null = apiConfigFromEnv())`
-factory. A shared `app/adapters/plinkyApi.ts` holds what `sanity.ts` holds for
-Sanity: config from environment, URL construction, and the single defensive
+factory. A shared `app/adapters/plinkyApi.ts` holds the boundary in one place:
+config from environment, URL construction, and the single defensive
 chokepoint that collapses a network throw, a non-OK status and a malformed body
 to one value.
 
@@ -669,55 +670,44 @@ Selling is a different proposition entirely and is
 
 **Most of this needs no backend, and that half should ship first.** `/person/:slug`
 is generated entirely from the catalogue — `personFor(bundledPieces(), slug)`
-canonicalises composer spellings and lists that person's pieces. The Sanity artist
-documents behind `/board` already carry a name, a blurb, a picture and a follow
-link. The two have never been joined: `BoardArtist` has no person slug and the
-person page never reads Sanity.
+canonicalises composer spellings and lists that person's pieces. What it cannot show
+is the person: a photo, a blurb, where to follow them.
 
-Adding a `personSlug` to the artist document and having the person page read the
-matching record through the existing source gives artists a bio, a photo and
-social links **with no server involved at all**, degrading to today's page when no
-record matches. One schema change is worth making at the same time: a single
-`linkUrl` becomes a short list of `{label, url}`, since an artist will want
-Instagram and YouTube and Bandcamp rather than one of them. The https-only
-validation stays as it is, and the brand icons from the share work are reusable.
+That belongs in the catalogue, beside the music it describes. A profile is a file in
+the repository — a slug, a blurb per language, a picture, and a short list of
+`{label, url}` links, since an artist will want Instagram and YouTube and Bandcamp
+rather than one of them. The build folds them into the people index the person page
+already reads, so a page with no profile is exactly today's page and a page with one
+gains a header. **No server is involved, it works offline, and the profile a reader
+sees is the one that shipped with their build** — the same properties the help page
+gained when its content moved in-tree.
 
-**The backend is only needed so an artist can edit it themselves.** The design
-keeps Sanity as the one content store and puts the Worker in front of it as a
-scoped proxy:
+**The backend is only needed so an artist can change it without a maintainer typing
+it in.** That is the [catalogue submission](#capability-catalogue-submission) path,
+not a second mechanism: a profile edit is a submission like a piece is, it lands in
+the review queue, and a maintainer merges it. The decision that living artists
+publish through submission and curation was already taken for their music; their
+profile is the same act with a smaller payload.
 
-```text
-POST /v1/artist/:id     Authorization: Bearer <editToken>
-```
+So there is no artist-editing endpoint, no scoped write token, no field whitelist and
+no link allowlist to maintain. The moderation surface an editable public profile
+would open on a site children use closes with it: nothing an artist writes is live
+until a person has read it. What the Worker carries is one more submission kind.
 
-The Worker validates the token, then patches **that one document** through Sanity's
-mutate API using a write token held as a Worker secret. The read path is untouched
-— `sanityBoard.ts` keeps fetching from apicdn exactly as now — so there is no
-second content source and no divergence between what an artist edits and what a
-visitor sees.
+**Superseded design, kept because it will otherwise be proposed again.** Until
+2026-08-13 the artist record was a Sanity document behind `/board`, and this section
+designed a Worker that proxied a scoped patch into Sanity's mutate API — a per-artist
+edit token, a server-side field whitelist, an allowlist deciding which links published
+immediately and which queued for review, and revocation by rotating the token. Studio
+logins had been rejected because the free plan's roles could not confine an editor to
+one document. All of it rested on there being a live CMS to patch. Sanity is gone from
+Plinky entirely, `/board` with it, so the proxy has nothing to proxy; the machinery
+listed above went with the store it guarded, not because it was wrong.
 
-The alternative, giving artists Sanity Studio logins, was rejected: the free plan's
-roles are not fine-grained enough to confine an editor to one document, so a Studio
-account would also grant control of the news banner and the help content.
-
-**Field whitelist, enforced server-side.** An artist may change their blurb, their
-links and their photo. They may not change their name, their sort order, whether
-they are published, or anything on another document. The whitelist lives in the
-Worker, so a crafted request cannot reach a field the interface declines to offer.
-
-**Links on an allowlist go live; anything else queues.** An editable public profile
-on a site children use is a moderation surface, however small. A link to a domain
-on the allowlist — the major social and music-hosting hosts — publishes
-immediately, which keeps the ordinary case genuinely self-serve. Anything else
-waits for review. Blurbs are length-capped and stay plain text, which the board
-already enforces by rendering text nodes rather than markup. Revocation is
-rotating the token, and any change is revertible through Sanity's document
-history.
-
-**Consent works here in a way it does not for pupils.** An artist is an adult
-asking for a public profile, so consent is freely given and valid, and the
-obligations are ordinary: name the processing in the privacy policy and offer
-removal on request. This capability carries none of the phase-1 blockers in
+**Consent works here in a way it does not for pupils.** An artist is an adult asking
+for a public profile, so consent is freely given and valid, and the obligations are
+ordinary: name the processing in the privacy policy and offer removal on request.
+This capability carries none of the phase-1 blockers in
 [Privacy and law](#privacy-and-law).
 
 ## Capability: daily comparison
@@ -1149,15 +1139,10 @@ CREATE TABLE vault_entry (
 );
 CREATE INDEX vault_by_rev ON vault_entry(vault, rev);
 
--- Artists who may edit their own Sanity document. Rows are created by the
--- maintainer alongside the document; there is no self-registration.
-CREATE TABLE artist (
-    id              TEXT PRIMARY KEY,
-    sanity_doc_id   TEXT NOT NULL,          -- the one document this token may patch
-    edit_token_hash TEXT NOT NULL,          -- SHA-256; rotate to revoke
-    created_at      INTEGER NOT NULL,
-    last_edit_at    INTEGER
-);
+-- No artist table. Profiles live in the repository and change through the submission
+-- queue like any other contribution, so there is no per-artist edit token to store and
+-- nothing for the Worker to authorise. The table that stood here held the scoped
+-- credential for patching a Sanity document; both are gone.
 
 -- Catalogue submissions awaiting review.
 CREATE TABLE submission (
@@ -1379,8 +1364,9 @@ the vault, because consent is per-browser as a matter of law.
 | DPIA covering result collection | Phase 1 in real classrooms |
 | DPIA extension covering the vault | Phase 4 |
 
-**The claim to preserve, stated accurately.** Plinky today collects nothing
-beyond consent-gated analytics and content fetched from Sanity. After phase 1 that
+**The claim to preserve, stated accurately.** Plinky today collects nothing beyond
+consent-gated analytics, and since 2026-08-13 it fetches nothing from anyone but its
+own origin. After phase 1 that
 becomes "collects nothing unless a teacher opts in, and then a nickname and a
 score". That remains an unusually strong position and the competitive argument the
 ledger identifies for the individual-teacher market, and it is worth protecting in
@@ -1502,9 +1488,9 @@ returning a `Response`, no MSW. Every failure row in the degradation table gets 
 case.
 
 **Whole-pipeline tests.** MSW handlers for the API host, added to
-`app/mocks/handlers.ts` alongside the catalogue and Sanity defaults, defaulting to
-unavailable so that a test that does not opt in sees the degraded path. This
-matches how the Sanity default handler returns an empty result.
+`app/mocks/handlers.ts` alongside the catalogue defaults, defaulting to unavailable
+so that a test that does not opt in sees the degraded path — the same shape as the
+catalogue handlers, which answer empty until a test says otherwise.
 
 **Load and CPU.** A test that drives each handler with a worst-case body and
 asserts CPU stays inside 10 ms. The vault's merge over a full push batch is the
@@ -1628,9 +1614,11 @@ artist publishing their own CC-licensed work, and
 [artist pages](#capability-artist-pages). Requires R2, and therefore a payment
 method on file and a billing alert.
 
-The client-only half of artist pages — joining `/person/:slug` to the Sanity
-artist record so a bio and social links appear — has no backend dependency and can
-ship at any time, including before phase 0.
+The client-only half of artist pages — a profile in the repository, folded into the
+people index so `/person/:slug` gains a bio, a photo and social links — has no
+backend dependency and can ship at any time, including before phase 0. Only editing
+a profile without a maintainer needs the backend, and that rides the submission
+queue rather than an endpoint of its own.
 
 Exit criteria: a submission travels from `/library/import` through review to a
 pull request without the submitter holding a GitHub account; fingerprinting runs
@@ -1697,6 +1685,7 @@ never rewritten.
 | 2026-08-09 | Artist page editing proxies Sanity rather than adding a store | Keeps one content source and leaves the read path untouched; Studio logins were rejected because free-plan roles cannot confine an editor to one document |
 | 2026-08-09 | The artist marketplace is deferred pending evidence, not declined | Its obligations are the substance of the feature, and publishing is the first step of selling regardless — so shipping the free half answers the question that decides it at no cost |
 | 2026-08-13 | Sanity is removed from the app entirely; help content ships in the tree, the board and the news banner are gone | Nothing should load from a third party at runtime: the help text now lives in the message catalogue and its pictures in `public/help/`, so the help a reader sees matches the build they are running and works offline. This reverses the artist-page proxy above — there is no Sanity document left to patch, so that capability would need a store of its own if it is ever revived |
+| 2026-08-13 | Artist profiles live in the repository and change through the submission queue, not through an editing endpoint | With no CMS to proxy, a live-edit path would mean building a store, a token, a field whitelist and a link allowlist to guard it. A profile edit is a submission like a piece is, which the artist decision above already chose as the mechanism — so the read path is a file that ships with the build, and nothing an artist writes is public until a person has read it |
 
 ## Open questions
 
