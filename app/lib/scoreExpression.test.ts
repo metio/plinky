@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { readActiveDynamic, readScoreExpression } from "./scoreExpression";
+import { readDynamics, readScoreExpression } from "./scoreExpression";
 
 // The reader works by shape, so plain objects shaped like OSMD's Note stand in for
 // the real thing — no OSMD instance or DOM needed.
@@ -88,58 +88,80 @@ describe("readScoreExpression ties", () => {
     });
 });
 
-describe("readActiveDynamic", () => {
-    it("reads the standing instantaneous dynamic's MIDI volume", () => {
-        expect(readActiveDynamic({ ActiveDynamicExpressions: [{ MidiVolume: 80 }] })).toBe(80);
+describe("readDynamics", () => {
+    // The measure shape OSMD really produces: the marks hang off the source measures,
+    // each measure knowing where it starts, each mark knowing where it sits inside it.
+    const sheet = (measures: unknown[]) => ({ sheet: { SourceMeasures: measures } });
+    const measure = (start: number, entries: unknown[]) => ({
+        AbsoluteTimestamp: { RealValue: start },
+        staffLinkedExpressions: [entries],
+    });
+    const mark = (at: number, volume: number, wedge = false) => ({
+        timestamp: { RealValue: at },
+        instantaneousDynamic: { MidiVolume: volume },
+        startingContinuousDynamic: wedge ? {} : null,
     });
 
-    it("prefers an interpolated wedge value for a crescendo in progress", () => {
-        const iterator = {
-            CurrentSourceTimestamp: {},
-            ActiveDynamicExpressions: [{ MidiVolume: 40 }, { getInterpolatedDynamic: () => 96 }],
-        };
-        expect(readActiveDynamic(iterator)).toBe(96);
+    it("reads every mark as a whole-note position and a loudness", () => {
+        const osmd = sheet([measure(0, [mark(0, 28)]), measure(2, [mark(0, 108)])]);
+        expect(readDynamics(osmd)).toEqual([
+            { whole: 0, volume: 28, ramp: false },
+            { whole: 2, volume: 108, ramp: false },
+        ]);
     });
 
-    it("returns null when no dynamic is in force", () => {
-        expect(readActiveDynamic({ ActiveDynamicExpressions: [] })).toBeNull();
-        expect(readActiveDynamic({})).toBeNull();
+    it("places a mark written inside a bar at its own position", () => {
+        const osmd = sheet([measure(2, [mark(0.25, 76)])]);
+        expect(readDynamics(osmd)[0]?.whole).toBe(2.25);
     });
 
-    it("falls back to null rather than throwing on an odd shape", () => {
-        const throwing = {
-            ActiveDynamicExpressions: [
-                {
-                    get MidiVolume(): number {
-                        throw new Error("boom");
+    it("marks a hairpin so the loudness slides toward the next mark", () => {
+        const osmd = sheet([measure(0, [mark(0, 28, true)])]);
+        expect(readDynamics(osmd)[0]?.ramp).toBe(true);
+    });
+
+    it("gathers the staves together and puts them in printed order", () => {
+        // A grand staff marks its dynamic under whichever staff the engraver chose, and
+        // means it for both hands.
+        const osmd = {
+            sheet: {
+                SourceMeasures: [
+                    {
+                        AbsoluteTimestamp: { RealValue: 0 },
+                        staffLinkedExpressions: [[mark(0.5, 108)], [mark(0, 28)]],
                     },
-                },
-            ],
+                ],
+            },
         };
-        expect(readActiveDynamic(throwing)).toBeNull();
+        expect(readDynamics(osmd).map((point) => point.volume)).toEqual([28, 108]);
     });
 
-    it("skips OSMD's sparse per-staff undefined slots instead of dereferencing them", () => {
-        // OSMD keeps ActiveDynamicExpressions staff-indexed: a staff with no dynamic holds
-        // an undefined slot. Dereferencing it would throw and drop the real dynamic below.
+    it("skips an expression that carries no instantaneous dynamic", () => {
+        // A wedge's closing expression, a mood direction: parsed, but not a loudness.
+        const osmd = sheet([measure(0, [{ timestamp: { RealValue: 0 } }, mark(0, 76)])]);
+        expect(readDynamics(osmd)).toHaveLength(1);
+    });
+
+    it("tolerates a staff slot the engraving left empty", () => {
+        const osmd = {
+            sheet: {
+                SourceMeasures: [
+                    { AbsoluteTimestamp: { RealValue: 0 }, staffLinkedExpressions: [undefined] },
+                ],
+            },
+        };
+        expect(readDynamics(osmd)).toEqual([]);
+    });
+
+    it("reports an unmarked score rather than throwing on an odd shape", () => {
+        expect(readDynamics(null)).toEqual([]);
+        expect(readDynamics({})).toEqual([]);
         expect(
-            readActiveDynamic({ ActiveDynamicExpressions: [undefined, { MidiVolume: 80 }] }),
-        ).toBe(80);
-        expect(readActiveDynamic({ ActiveDynamicExpressions: [undefined, undefined] })).toBeNull();
-    });
-
-    it("ignores a wedge's negative out-of-range sentinel instead of muting the note", () => {
-        // getInterpolatedDynamic returns −1 before the wedge and −2 after it; treat those as
-        // "no value here" and fall through, not as a loudness that clamps velocity to 1.
-        const after = {
-            CurrentSourceTimestamp: {},
-            ActiveDynamicExpressions: [{ getInterpolatedDynamic: () => -2 }, { MidiVolume: 64 }],
-        };
-        expect(readActiveDynamic(after)).toBe(64);
-        const before = {
-            CurrentSourceTimestamp: {},
-            ActiveDynamicExpressions: [{ getInterpolatedDynamic: () => -1 }],
-        };
-        expect(readActiveDynamic(before)).toBeNull();
+            readDynamics({
+                get sheet(): never {
+                    throw new Error("boom");
+                },
+            }),
+        ).toEqual([]);
     });
 });

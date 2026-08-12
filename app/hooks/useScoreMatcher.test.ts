@@ -53,9 +53,6 @@ function fakeOsmd(
             return {
                 EndReached: index >= positions.length,
                 currentTimeStamp: { RealValue: wholes?.[index] ?? index * 0.25 },
-                // A standing mezzo-forte, so a note's own accent has something to be
-                // louder than.
-                ActiveDynamicExpressions: [{ MidiVolume: 80 }],
                 // Four quarter-note positions per 4/4 bar.
                 CurrentMeasureIndex: Math.floor(index / 4),
             };
@@ -108,7 +105,22 @@ function fakeOsmd(
             shown = false;
         },
     };
-    return { osmd: { cursor } as unknown as OpenSheetMusicDisplay, shown: () => shown };
+    // A standing mezzo-forte at the top of the piece, written where OSMD really keeps a
+    // parsed dynamic, so a note's own accent has something to be louder than.
+    const sheet = {
+        SourceMeasures: [
+            {
+                AbsoluteTimestamp: { RealValue: 0 },
+                staffLinkedExpressions: [
+                    [{ timestamp: { RealValue: 0 }, instantaneousDynamic: { MidiVolume: 80 } }],
+                ],
+            },
+        ],
+    };
+    return {
+        osmd: { cursor, sheet } as unknown as OpenSheetMusicDisplay,
+        shown: () => shown,
+    };
 }
 
 function render(positions: Position[], options: Parameters<typeof useScoreMatcher>[1] = {}) {

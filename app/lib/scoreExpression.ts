@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Articulation } from "../../core/expression";
+import type { DynamicPoint } from "../../core/dynamics";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
 // Reads the expression marks OSMD parsed from the MusicXML — articulations, slurs,
@@ -130,55 +131,63 @@ export function readStartTempo(osmd: unknown): number | null {
     return typeof bpm === "number" && bpm > 0 ? bpm : null;
 }
 
-type ExpressionShape = {
-    getInterpolatedDynamic?: (at: unknown) => number;
-    MidiVolume?: number;
+// Where OSMD keeps the dynamics it parsed: on the measure, not on the cursor.
+//
+// The iterator advertises an ActiveDynamicExpressions array, one slot per staff, and it
+// is the obvious place to look — but through the cursor it is never filled. Reading the
+// loudness there returns null on every position of every score, which is silent: the
+// expressive reading has nothing to measure and says so, and playback sounds every note
+// at one volume. So the marks are gathered off the source measures instead, where they
+// certainly are, and turned into a timeline the printed position is looked up in.
+type DynamicShape = { MidiVolume?: number };
+// A continuous dynamic starting here — a hairpin, or a written "cresc." — which is what
+// makes the mark a ramp toward the next one. Its presence is the whole signal; the
+// object's own start and end volumes are not read, because the marks either side of it
+// are what the score actually asks for.
+type ContinuousShape = object;
+type MultiExpressionShape = {
+    timestamp?: { RealValue?: number };
+    instantaneousDynamic?: DynamicShape | null;
+    startingContinuousDynamic?: ContinuousShape | null;
+};
+type SourceMeasureShape = {
+    AbsoluteTimestamp?: { RealValue?: number };
+    staffLinkedExpressions?: (MultiExpressionShape[] | undefined)[];
 };
 
-type IteratorShape = {
-    ActiveDynamicExpressions?: unknown[];
-    CurrentSourceTimestamp?: unknown;
-};
-
-// The loudness in force at the cursor as a 0..127 velocity, or null when the score
-// marks no dynamic here (the default velocity then stands). A crescendo/diminuendo
-// wedge is read at its interpolated value for the current position; otherwise the
-// standing instantaneous dynamic's MIDI volume is used.
-export function readActiveDynamic(iterator: unknown): number | null {
+// Every dynamic the score writes, in printed order, as whole-note positions with the
+// loudness they ask for. A hairpin starting at a mark makes it a ramp toward the next.
+//
+// Read across all staves together: a piano score marks its dynamic once, under whichever
+// staff the engraver chose, and means it for both hands.
+export function readDynamics(osmd: unknown): DynamicPoint[] {
+    const points: DynamicPoint[] = [];
     try {
-        const shape = (iterator ?? {}) as IteratorShape;
-        const active = shape.ActiveDynamicExpressions ?? [];
-        for (const raw of active) {
-            // OSMD keeps this array staff-indexed and sparse — a staff with no dynamic in
-            // force holds an undefined slot, so skip empties rather than dereference them.
-            if (!raw) {
-                continue;
-            }
-            const expr = raw as ExpressionShape;
-            if (typeof expr.getInterpolatedDynamic === "function") {
-                const value = expr.getInterpolatedDynamic(shape.CurrentSourceTimestamp);
-                // A wedge returns a negative sentinel (−1 before it starts, −2 after it
-                // ends) when the cursor is outside it — that is "no value here", not a
-                // loudness, so fall through rather than mute the note to velocity 1.
-                if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
-                    return value;
+        const measures =
+            (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
+                ?.SourceMeasures ?? [];
+        for (const measure of measures) {
+            const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
+            for (const staff of measure?.staffLinkedExpressions ?? []) {
+                for (const entry of staff ?? []) {
+                    const volume = entry?.instantaneousDynamic?.MidiVolume;
+                    if (typeof volume !== "number" || !Number.isFinite(volume)) {
+                        continue;
+                    }
+                    points.push({
+                        whole: measureStart + (entry.timestamp?.RealValue ?? 0),
+                        volume,
+                        ramp: entry.startingContinuousDynamic != null,
+                    });
                 }
             }
         }
-        for (const raw of active) {
-            if (!raw) {
-                continue;
-            }
-            const expr = raw as ExpressionShape;
-            if (typeof expr.MidiVolume === "number" && Number.isFinite(expr.MidiVolume)) {
-                return expr.MidiVolume;
-            }
-        }
     } catch {
-        // A shape OSMD changed, or an expression that threw, falls back to no dynamic
-        // rather than breaking playback.
+        // A shape OSMD changed falls back to an unmarked score rather than breaking
+        // playback: no dynamics is what every score without them already reports.
+        return [];
     }
-    return null;
+    return points.sort((a, b) => a.whole - b.whole);
 }
 
 // How the engraved sheet lays its instruments out, as staff counts in score order —

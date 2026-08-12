@@ -8,6 +8,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 August 2026 — evening
+
+**Plinky can hear the dynamics again — and it turns out it never could.** Loud and soft
+markings were being read from the wrong place, so on every piece Plinky behaved as though
+none were written: Listen played each note at the same volume however the music was
+marked, and the expression score simply had nothing to say about your shading. Marked
+loudness now reaches both. A mark holds until the next one, so an *mf* in the first bar is
+still in force ten bars later, and a crescendo swells across the passage rather than
+jumping at the end of it. If you play pieces with dynamics, expect Listen to sound like
+music and your expression feedback to start appearing where it used to stay blank.
+
 ## 12 August 2026 — later still
 
 **A chord is heard as the several notes it is.** When you play two notes at once that the

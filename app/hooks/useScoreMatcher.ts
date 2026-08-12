@@ -10,10 +10,14 @@ import {
     quartersMs,
     writtenOnsetsMs,
 } from "../../core/elapsed";
+import { type DynamicPoint, volumeAt } from "../../core/dynamics";
+
+// For the walks that only ask whether a position is playable.
+const NO_DYNAMICS: DynamicPoint[] = [];
 import { lengthScaleOf, velocityOf } from "../../core/expression";
 import type { ScoreParts } from "../../core/parts";
 import {
-    readActiveDynamic,
+    readDynamics,
     readParts,
     readScoreExpression,
     readStartTempo,
@@ -61,6 +65,7 @@ function stepAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
+    dynamics: readonly DynamicPoint[],
 ): Omit<MatchStep, "bar" | "elapsedMs" | "holdMs" | "expected"> &
     Omit<Position, "whole"> & {
         expected: { velocity: number | null; soundQuarters: number }[];
@@ -72,7 +77,7 @@ function stepAtCursor(
     let holdQuarters = 0;
     // The dynamic in force at this position, read once per step: it is a property of
     // where the cursor sits, not of any one note under it.
-    const dynamicVolume = readActiveDynamic(osmd.cursor.iterator);
+    const dynamicVolume = volumeAt(dynamics, osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0);
     // What each pitch is asked for, pushed alongside `pitches` so the two stay aligned.
     // Kept in quarter notes here and turned into milliseconds once the position's tempo
     // is known, which is the same place the chord's own hold is converted.
@@ -182,6 +187,9 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // Which staves are the practised instrument's, worked out from the sheet rather than
     // assumed: on an art song the piano is staves 1 and 2, and staff 0 is the singer.
     const parts = readParts(osmd);
+    // Every dynamic the score writes, read once for the walk: a mark stands until the
+    // next one, so it is a property of where a position sits rather than of the position.
+    const dynamics = readDynamics(osmd);
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -192,7 +200,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     const walked: (ReturnType<typeof stepAtCursor> & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
-            ...stepAtCursor(osmd, hand, parts),
+            ...stepAtCursor(osmd, hand, parts, dynamics),
             bar: osmd.cursor.iterator.CurrentMeasureIndex,
         });
         osmd.cursor.next();
@@ -233,7 +241,9 @@ function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): vo
     while (
         !osmd.cursor.iterator.EndReached &&
         ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
-            stepAtCursor(osmd, hand, parts).pitches.length === 0)
+            // Only whether the position is playable is asked here, so it needs no
+            // dynamics: seeking is about finding a note, not about how it sounds.
+            stepAtCursor(osmd, hand, parts, NO_DYNAMICS).pitches.length === 0)
     ) {
         osmd.cursor.next();
     }
@@ -247,7 +257,7 @@ function advanceCursor(osmd: OpenSheetMusicDisplay, hand: Hand): void {
     osmd.cursor.next();
     while (
         !osmd.cursor.iterator.EndReached &&
-        stepAtCursor(osmd, hand, parts).pitches.length === 0
+        stepAtCursor(osmd, hand, parts, NO_DYNAMICS).pitches.length === 0
     ) {
         osmd.cursor.next();
     }

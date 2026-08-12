@@ -23,9 +23,10 @@ vi.mock("../lib/scoreCursor", () => ({
 
 // A score whose cursor ends after `steps` voice entries, each holding one
 // sounding quarter note (halfTone 48 ≈ C4 after the +12 octave shift). Extra note
-// fields (articulations, ties, slurs) and the iterator's active dynamics can be
-// injected to drive the expressive reader.
-function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, dynamics: unknown[] = []) {
+// fields (articulations, ties, slurs) can be injected to drive the expressive reader, and
+// `volume` writes a dynamic onto the sheet the way OSMD parses one — on the measure, at
+// the top of the piece, standing over every position.
+function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?: number) {
     let position = 0;
     const cursor = {
         reset: vi.fn(() => {
@@ -43,7 +44,6 @@ function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, dynamic
             get CurrentMeasureIndex() {
                 return position;
             },
-            ActiveDynamicExpressions: dynamics,
         },
         NotesUnderCursor: () => [
             {
@@ -54,7 +54,25 @@ function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, dynamic
             },
         ],
     };
-    return { cursor } as unknown as OpenSheetMusicDisplay;
+    const sheet = {
+        SourceMeasures:
+            volume === undefined
+                ? []
+                : [
+                      {
+                          AbsoluteTimestamp: { RealValue: 0 },
+                          staffLinkedExpressions: [
+                              [
+                                  {
+                                      timestamp: { RealValue: 0 },
+                                      instantaneousDynamic: { MidiVolume: volume },
+                                  },
+                              ],
+                          ],
+                      },
+                  ],
+    };
+    return { cursor, sheet } as unknown as OpenSheetMusicDisplay;
 }
 
 const playNote = vi.fn();
@@ -213,7 +231,7 @@ describe("useListenPlayback", () => {
         playNote.mockClear();
 
         // A marked dynamic sets the loudness outright.
-        const soft = mount(fakeOsmd(1, {}, [{ MidiVolume: 40 }]));
+        const soft = mount(fakeOsmd(1, {}, 40));
         act(() => soft.result.current.start(0));
         expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 40 });
         act(() => soft.result.current.stop());

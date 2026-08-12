@@ -5,12 +5,13 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
+import { volumeAt } from "../../core/dynamics";
 import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
 import {
-    readActiveDynamic,
+    readDynamics,
     readScoreExpression,
     readStartTempo,
     readTempo,
@@ -75,6 +76,9 @@ export type ListenStep = {
 // the cursor only mirrors the position and carries the notes the trail colours.
 export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
     const cursor = osmd.cursor;
+    // Every dynamic the score writes, read once for the walk: a mark stands until the
+    // next one, so it belongs to the position's place in the piece, not to the position.
+    const dynamics = readDynamics(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -82,7 +86,7 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
         const lengths: number[] = [];
         // The dynamic in force is the same for every note under the cursor, so read
         // it once per position.
-        const dynamicVolume = readActiveDynamic(cursor.iterator);
+        const dynamicVolume = volumeAt(dynamics, cursor.iterator.currentTimeStamp?.RealValue ?? 0);
         // A fermata holds whatever is sounding, so it is a property of the position —
         // read across every note under the cursor, rests included.
         let fermata = false;
