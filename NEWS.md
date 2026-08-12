@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 August 2026 — evening
+
+**Unplugging your piano now registers.** Pulling the USB cable used to leave the little
+green tick sitting there as though the keyboard were still attached, and plugging it back
+in often left the keys silent until you went to Settings and reconnected by hand. The
+badge now goes grey when the cable comes out, and a keyboard that comes back should simply
+start playing again.
+
 ## 13 August 2026 — later
 
 **The sustain pedal in the score is followed.** Where a piece marks the pedal down,

@@ -13,6 +13,17 @@ function wrapInput(input: MIDIInput): MidiInput {
         manufacturer: input.manufacturer ?? "",
         state: input.state,
         onMessage(handler) {
+            // Unplugging a cable closes the port; plugging it back in leaves it closed
+            // until something opens it. Attaching a listener is specified to open it
+            // implicitly, but a port that was open, closed under us and came back does not
+            // reliably reopen on its own — which is the difference between a keyboard that
+            // works again on replug and one that stays silent until the player goes to
+            // Settings and reconnects by hand. Asking explicitly costs nothing on a port
+            // that is already open.
+            input.open?.().catch(() => {
+                // A port that refuses to open is one the state change will report
+                // disconnected anyway; playing carries on with whatever else is plugged in.
+            });
             input.onmidimessage = (event) => {
                 // A message without payload carries nothing to parse.
                 if (event.data) {

@@ -371,3 +371,67 @@ describe("MidiProvider", () => {
         ]);
     });
 });
+
+describe("a cable pulled out and put back", () => {
+    it("stops reporting a connected piano while the cable is out", async () => {
+        // Unplugging leaves the port in the browser's list with its state flipped, so a
+        // count of the list alone still says a piano is there — and the badge stays green
+        // over a cable lying on the floor.
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+        expect(result.current.devices.some((device) => device.state === "connected")).toBe(true);
+
+        act(() => {
+            input.setState("disconnected");
+            midi.connection.stateChange();
+        });
+        expect(result.current.devices.some((device) => device.state === "connected")).toBe(false);
+    });
+
+    it("plays again when the cable goes back in, without a trip to the settings", async () => {
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+
+        act(() => {
+            input.setState("disconnected");
+            midi.connection.stateChange();
+        });
+        act(() => {
+            input.setState("connected");
+            midi.connection.stateChange();
+        });
+
+        act(() => input.emit([0x90, 60, 100]));
+        expect(result.current.heldNotes).toContain(60);
+    });
+
+    it("plays again when the browser hands back a different port for the same piano", async () => {
+        // A replug can arrive as a NEW port rather than the old one waking up: the stale
+        // one stays in the list reporting itself disconnected, and the notes now come from
+        // a port the app has never bound a handler to.
+        const input = fakeMidiInput({ id: "in-1", name: "Test Piano" });
+        const midi = fakeMidi({ inputs: [input] });
+        const { result } = renderHook(() => useMidiConnection(), { wrapper: wrapperWith(midi) });
+        await act(async () => {
+            result.current.requestAccess();
+        });
+
+        const replaced = fakeMidiInput({ id: "in-2", name: "Test Piano" });
+        act(() => {
+            input.setState("disconnected");
+            midi.connection.inputs = () => [input, replaced];
+            midi.connection.stateChange();
+        });
+
+        act(() => replaced.emit([0x90, 62, 100]));
+        expect(result.current.heldNotes).toContain(62);
+    });
+});

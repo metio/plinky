@@ -141,6 +141,30 @@ describe("Midi", () => {
         setConnection({ support: "supported", status: "ready", devices: [] });
         expect(renderHook(() => useMidiConnected()).result.current).toBe(false);
     });
+
+    it("stops claiming a piano whose cable has been pulled out", () => {
+        // An unplugged port stays in the browser's list with its state flipped, so the
+        // count alone would keep the badge green over a cable lying on the floor.
+        const unplugged: MidiDevice = { ...device, state: "disconnected" };
+        setConnection({ support: "supported", status: "ready", devices: [unplugged] });
+        expect(renderHook(() => useMidiConnected()).result.current).toBe(false);
+
+        render(
+            <Midi disconnected>
+                <span>none</span>
+            </Midi>,
+        );
+        expect(screen.queryByText("none")).toBeTruthy();
+    });
+
+    it("still claims a piano when a second one is unplugged beside it", () => {
+        setConnection({
+            support: "supported",
+            status: "ready",
+            devices: [{ ...device, id: "2", state: "disconnected" }, device],
+        });
+        expect(renderHook(() => useMidiConnected()).result.current).toBe(true);
+    });
 });
 
 describe("Media", () => {

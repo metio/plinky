@@ -64,9 +64,14 @@ export function FullScreen({
 
 // Whether a MIDI instrument is connected and ready — the one derivation the badge,
 // the connect prompt and the trainer all share, kept here so they can't drift.
+//
+// A device must report itself CONNECTED, not merely be in the list. Unplugging a cable
+// leaves the port where it was with its state flipped, so counting the list alone keeps
+// the badge green over a cable lying on the floor — and the one thing the badge must
+// never do is claim a piano that is not there.
 export function useMidiConnected(): boolean {
     const { status, devices } = useMidiConnection();
-    return status === "ready" && devices.length > 0;
+    return status === "ready" && devices.some((device) => device.state === "connected");
 }
 
 // Renders its children for one MIDI state: a ready instrument (`connected`), none
@@ -88,7 +93,8 @@ export function Midi({
     fallback?: Renderable;
 }) {
     const { support, status, devices } = useMidiConnection();
-    const isConnected = status === "ready" && devices.length > 0;
+    const isConnected =
+        status === "ready" && devices.some((device) => device.state === "connected");
     const active =
         (connected && isConnected) ||
         (disconnected && !isConnected) ||

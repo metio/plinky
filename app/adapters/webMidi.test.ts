@@ -77,3 +77,54 @@ describe("webMidi outputs", () => {
         expect((await webMidi.request()).outputs()).toEqual([]);
     });
 });
+
+// A port that was open, closed when the cable came out, and came back on replug. The
+// difference between a keyboard that plays again by itself and one that stays silent
+// until the player goes to Settings and reconnects by hand.
+function stubAccessWithInput(input: Record<string, unknown>) {
+    vi.stubGlobal("navigator", {
+        ...navigator,
+        requestMIDIAccess: () =>
+            Promise.resolve({
+                inputs: new Map([[input.id as string, input]]),
+                outputs: new Map(),
+                onstatechange: null,
+            }),
+    });
+}
+
+describe("webMidi inputs", () => {
+    it("opens the port it attaches a listener to", async () => {
+        const open = vi.fn(() => Promise.resolve());
+        stubAccessWithInput({ id: "in-1", name: "Piano", open, onmidimessage: null });
+        const connection = await webMidi.request();
+        connection.inputs()[0]?.onMessage(() => {});
+        expect(open).toHaveBeenCalled();
+    });
+
+    it("still delivers messages when the port refuses to open", async () => {
+        const open = vi.fn(() => Promise.reject(new Error("gone")));
+        const input: Record<string, unknown> = {
+            id: "in-1",
+            name: "Piano",
+            open,
+            onmidimessage: null,
+        };
+        stubAccessWithInput(input);
+        const connection = await webMidi.request();
+        const seen: number[][] = [];
+        connection.inputs()[0]?.onMessage((data) => seen.push([...data]));
+        (input.onmidimessage as (event: { data: Uint8Array }) => void)({
+            data: new Uint8Array([0x90, 60, 100]),
+        });
+        expect(seen).toEqual([[0x90, 60, 100]]);
+    });
+
+    it("attaches to a browser whose ports cannot be opened at all", async () => {
+        // open() is optional in the type and absent in older implementations.
+        const input: Record<string, unknown> = { id: "in-1", name: "Piano", onmidimessage: null };
+        stubAccessWithInput(input);
+        const connection = await webMidi.request();
+        expect(() => connection.inputs()[0]?.onMessage(() => {})).not.toThrow();
+    });
+});
