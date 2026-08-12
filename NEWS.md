@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 12 August 2026 — night
+
+**Grace notes are played, not stacked.** An ornament is printed on top of the note it
+decorates, and Plinky was reading that literally: it asked you to press the little note
+and the big one at the same instant, which is the opposite of what the music says and
+impossible to get right. A grace note is now a note of its own, played just before the
+one it belongs to — in a run, in Listen, and in the play-along alike. Pieces with
+ornaments in them are playable now, and Listen sounds them the way you would.
+
 ## 12 August 2026 — evening
 
 **Plinky can hear the dynamics again — and it turns out it never could.** Loud and soft

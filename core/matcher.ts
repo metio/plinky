@@ -68,6 +68,11 @@ export type MatchStep = {
     elapsedMs: number;
     // The 0-based bar the position sits in, for a focus view.
     bar: number;
+    // Whether clearing this step moves the visual cursor on. False for an ornament: a
+    // grace note and the note it decorates are printed in one place, so the cursor stays
+    // there while the player works through them, and only the last step at a position
+    // moves it along.
+    advancesCursor: boolean;
     // The longest written length here, in quarter notes — how long the key is
     // meant to keep ringing. Collected with the position so the hold-duration
     // indicator reads it off the step model, never the live cursor. Zero when

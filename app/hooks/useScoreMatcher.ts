@@ -10,13 +10,31 @@ import {
     quartersMs,
     writtenOnsetsMs,
 } from "../../core/elapsed";
+import { graceOnsetsMs } from "../../core/grace";
 import { type DynamicPoint, volumeAt } from "../../core/dynamics";
 
-// For the walks that only ask whether a position is playable.
-const NO_DYNAMICS: DynamicPoint[] = [];
+// How many notes the practised hand has to play at the cursor. Only whether a position is
+// worth stopping at is asked here, so it needs neither dynamics nor timing: seeking is
+// about finding a note, not about how it sounds.
+function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreParts): number {
+    let playable = 0;
+    for (const note of osmd.cursor.NotesUnderCursor()) {
+        if (
+            !note.isRest() &&
+            note.halfTone > 0 &&
+            isPracticedHand(note.ParentStaff?.idInMusicSheet, hand, parts) &&
+            readScoreExpression(note).strike
+        ) {
+            playable += 1;
+        }
+    }
+    return playable;
+}
 import { lengthScaleOf, velocityOf } from "../../core/expression";
 import type { ScoreParts } from "../../core/parts";
 import {
+    isGraceNote,
+    playOrder,
     readDynamics,
     readParts,
     readScoreExpression,
@@ -61,68 +79,97 @@ function shortestLength(osmd: OpenSheetMusicDisplay): number {
     return Number.isFinite(shortest) ? shortest : 1;
 }
 
-function stepAtCursor(
+// One group of a position: what is struck together there. An ordinary position has a
+// single group; a position carrying an ornament has one per grace entry and then the
+// notes that fall on the beat.
+type StepGroup = Omit<MatchStep, "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor"> & {
+    expected: { velocity: number | null; soundQuarters: number }[];
+    // The ornament's own written length, for placing it before the beat. Zero on the
+    // group that IS the beat.
+    graceQuarters: number;
+};
+
+// Everything one cursor position contributes: its groups in playing order, and the
+// position-level facts the timeline is built from.
+type PositionSteps = Omit<Position, "whole"> & { whole: number; groups: StepGroup[] };
+
+function stepsAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
     dynamics: readonly DynamicPoint[],
-): Omit<MatchStep, "bar" | "elapsedMs" | "holdMs" | "expected"> &
-    Omit<Position, "whole"> & {
-        expected: { velocity: number | null; soundQuarters: number }[];
-    } {
-    const pitches: number[] = [];
-    // One entry per pitch, in the same order. A note whose staff the engraver does not
-    // report reads as the treble, which is where a single-staff piece is played.
-    const pitchStaves: number[] = [];
-    let holdQuarters = 0;
-    // The dynamic in force at this position, read once per step: it is a property of
-    // where the cursor sits, not of any one note under it.
+): PositionSteps {
+    // The dynamic in force at this position, read once: it is a property of where the
+    // cursor sits, not of any one note under it.
     const dynamicVolume = volumeAt(dynamics, osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0);
-    // What each pitch is asked for, pushed alongside `pitches` so the two stay aligned.
-    // Kept in quarter notes here and turned into milliseconds once the position's tempo
-    // is known, which is the same place the chord's own hold is converted.
-    const expected: { velocity: number | null; soundQuarters: number }[] = [];
-    // A fermata belongs to the position, not to one note: it holds whatever is sounding,
-    // and a rest can carry one too. So it is read across everything under the cursor,
-    // including the notes the practised hand does not play.
+    // A fermata belongs to the position too: it holds whatever is sounding, and a rest can
+    // carry one. So it is read across everything under the cursor, including the notes the
+    // practised hand does not play.
     let fermata = false;
     for (const note of osmd.cursor.NotesUnderCursor()) {
         fermata ||= readScoreExpression(note).fermata;
-        if (note.isRest() || note.halfTone <= 0) {
-            continue;
-        }
-        const staff = note.ParentStaff?.idInMusicSheet;
-        if (!isPracticedHand(staff, hand, parts)) {
-            continue;
-        }
-        const expression = readScoreExpression(note);
-        // A tie's later notes are the same sound continuing, not a note to play again:
-        // the key is already down and the score is asking for it to stay down. Demanding
-        // a re-strike contradicts what the page says, and contradicts Listen, which
-        // honours the tie — the two would ask for different performances of one bar.
-        // A position whose notes are ALL continuations collects no pitches and is
-        // dropped, which is right: there is nothing to do there.
-        if (!expression.strike) {
-            continue;
-        }
-        pitches.push(note.halfTone + 12);
-        pitchStaves.push(staff ?? 0);
-        // Each key of the chord is asked for on its own terms: its own accent over the
-        // standing dynamic, and its own sounding length narrowed by its own articulation.
-        // The sounding length, not the written one — a tied minim is held for the whole
-        // tie.
-        expected.push({
-            velocity: dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
-            soundQuarters: expression.soundQuarters * lengthScaleOf(expression),
-        });
-        // The chord's own length is its longest note: what the hold indicator draws, and
-        // how long the position keeps ringing.
-        holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
     }
+
+    const groups: StepGroup[] = [];
+    for (const group of playOrder([...osmd.cursor.NotesUnderCursor()], (note) => note)) {
+        const pitches: number[] = [];
+        // One entry per pitch, in the same order. A note whose staff the engraver does
+        // not report reads as the treble, which is where a single-staff piece is played.
+        const pitchStaves: number[] = [];
+        // What each pitch is asked for, pushed alongside `pitches` so the two stay
+        // aligned. Kept in quarter notes here and turned into milliseconds once the
+        // position's tempo is known, which is where the chord's own hold is converted.
+        const expected: { velocity: number | null; soundQuarters: number }[] = [];
+        let holdQuarters = 0;
+        let graceQuarters = 0;
+        for (const note of group) {
+            if (note.isRest() || note.halfTone <= 0) {
+                continue;
+            }
+            const staff = note.ParentStaff?.idInMusicSheet;
+            if (!isPracticedHand(staff, hand, parts)) {
+                continue;
+            }
+            const expression = readScoreExpression(note);
+            // A tie's later notes are the same sound continuing, not a note to play
+            // again: the key is already down and the score is asking for it to stay
+            // down. Demanding a re-strike contradicts what the page says, and
+            // contradicts Listen, which honours the tie — the two would ask for
+            // different performances of one bar. A group whose notes are ALL
+            // continuations collects no pitches and is dropped, which is right: there
+            // is nothing to do there.
+            if (!expression.strike) {
+                continue;
+            }
+            pitches.push(note.halfTone + 12);
+            pitchStaves.push(staff ?? 0);
+            // Each key is asked for on its own terms: its own accent over the standing
+            // dynamic, and its own sounding length narrowed by its own articulation. The
+            // sounding length, not the written one — a tied minim is held for the tie.
+            expected.push({
+                velocity:
+                    dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
+                soundQuarters: expression.soundQuarters * lengthScaleOf(expression),
+            });
+            // The group's own length is its longest note: what the hold indicator draws,
+            // and how long it keeps ringing.
+            holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
+            if (isGraceNote(note)) {
+                graceQuarters = Math.max(graceQuarters, expression.notatedQuarters);
+            }
+        }
+        groups.push({
+            pitches,
+            pitchStaves,
+            staves: [...new Set(pitchStaves)].sort((a, b) => a - b),
+            whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+            holdQuarters,
+            expected,
+            graceQuarters,
+        });
+    }
+
     return {
-        pitches,
-        pitchStaves,
-        staves: [...new Set(pitchStaves)].sort((a, b) => a - b),
         whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
         // The SHORTEST written length here, rests included — the gap to the next onset,
         // the same measure playback advances the cursor by. Only the repeat arithmetic
@@ -132,8 +179,7 @@ function stepAtCursor(
         // is written against rather than one average for the whole score.
         bpm: readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
         stretch: fermata ? FERMATA_STRETCH : 1,
-        holdQuarters,
-        expected,
+        groups,
     };
 }
 
@@ -197,10 +243,10 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // real gap — except where a repeat jumps, which is exactly what the accumulation is
     // for. Filtering to the playable ones first would leave gaps indistinguishable from
     // jumps.
-    const walked: (ReturnType<typeof stepAtCursor> & { bar: number })[] = [];
+    const walked: (PositionSteps & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
-            ...stepAtCursor(osmd, hand, parts, dynamics),
+            ...stepsAtCursor(osmd, hand, parts, dynamics),
             bar: osmd.cursor.iterator.CurrentMeasureIndex,
         });
         osmd.cursor.next();
@@ -209,20 +255,46 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
 
     const onsets = writtenOnsetsMs(walked);
     const steps: MatchStep[] = [];
-    for (const [index, step] of walked.entries()) {
-        if (step.pitches.length > 0) {
-            const { advanceQuarters: _advance, bpm, stretch, expected, ...rest } = step;
-            steps.push({
+    for (const [index, position] of walked.entries()) {
+        const { bpm, stretch, groups, bar } = position;
+        const beatMs = onsets[index] as number;
+        // An ornament is played before the note it decorates, in the space since the
+        // previous position — never at the same instant as its principal, which is what
+        // one position for both would ask for.
+        const ornament = groups.slice(0, -1);
+        const graceMs = graceOnsetsMs(
+            beatMs,
+            onsets[index - 1] ?? beatMs,
+            ornament.map((group) => quartersMs(group.graceQuarters, bpm)),
+        );
+
+        const atPosition: MatchStep[] = [];
+        for (const [order, group] of groups.entries()) {
+            if (group.pitches.length === 0) {
+                continue;
+            }
+            const { graceQuarters: _grace, expected, ...rest } = group;
+            atPosition.push({
                 ...rest,
-                elapsedMs: onsets[index] as number,
-                holdMs: quartersMs(step.holdQuarters * stretch, bpm),
-                // Each key's own asked-for length, on the same clock as the chord's.
+                bar,
+                elapsedMs: graceMs[order] ?? beatMs,
+                holdMs: quartersMs(group.holdQuarters * stretch, bpm),
+                // Each key's own asked-for length, on the same clock as the group's.
                 expected: expected.map((pitch) => ({
                     velocity: pitch.velocity,
                     holdMs: quartersMs(pitch.soundQuarters * stretch, bpm),
                 })),
+                // Overwritten below for all but the last.
+                advancesCursor: true,
             });
         }
+        // Only the last step at a position moves the visual cursor on: an ornament and
+        // its principal are printed in one place, so the cursor stays there while the
+        // player works through them.
+        for (const [order, step] of atPosition.entries()) {
+            step.advancesCursor = order === atPosition.length - 1;
+        }
+        steps.push(...atPosition);
     }
     return steps;
 }
@@ -243,7 +315,7 @@ function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): vo
         ((osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0) < from ||
             // Only whether the position is playable is asked here, so it needs no
             // dynamics: seeking is about finding a note, not about how it sounds.
-            stepAtCursor(osmd, hand, parts, NO_DYNAMICS).pitches.length === 0)
+            playableAtCursor(osmd, hand, parts) === 0)
     ) {
         osmd.cursor.next();
     }
@@ -255,10 +327,7 @@ function seekCursorTo(osmd: OpenSheetMusicDisplay, hand: Hand, from: number): vo
 function advanceCursor(osmd: OpenSheetMusicDisplay, hand: Hand): void {
     const parts = readParts(osmd);
     osmd.cursor.next();
-    while (
-        !osmd.cursor.iterator.EndReached &&
-        stepAtCursor(osmd, hand, parts, NO_DYNAMICS).pitches.length === 0
-    ) {
+    while (!osmd.cursor.iterator.EndReached && playableAtCursor(osmd, hand, parts) === 0) {
         osmd.cursor.next();
     }
 }
@@ -492,8 +561,12 @@ export function useScoreMatcher(
                     staves: event.step.staves,
                     staffTimes: staffArrivals(event),
                 });
-                // Mirror the reducer's advance onto the visual cursor.
-                advanceCursor(osmd, runHandRef.current);
+                // Mirror the reducer's advance onto the visual cursor — unless the step
+                // just cleared was an ornament, which is printed on the very note it
+                // decorates, so the cursor has not left that note yet.
+                if (event.step.advancesCursor) {
+                    advanceCursor(osmd, runHandRef.current);
+                }
                 setDone((value) => value + 1);
                 // A new position clears the per-position miss flag, so the "reveal
                 // on mistake" hint hides again until the next slip.

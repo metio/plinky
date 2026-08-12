@@ -112,6 +112,52 @@ export function readScoreExpression(note: unknown): ScoreExpression {
     };
 }
 
+type GraceShape = {
+    IsGraceNote?: boolean;
+    ParentVoiceEntry?: unknown;
+};
+
+// Whether a note is an ornament rather than the note it decorates.
+export function isGraceNote(note: unknown): boolean {
+    return (note as GraceShape | null)?.IsGraceNote === true;
+}
+
+// The notes at one cursor position, split into the order they are actually played: each
+// ornament on its own, in written order, then everything that falls on the beat.
+//
+// The engraver gives a grace note and its principal one position, so a walk that takes a
+// position as a chord asks for both keys at once — which is precisely what the score
+// says not to do. Grouping by voice entry keeps a grace CHORD together (its notes are
+// struck as one) while separating one ornament from the next.
+//
+// Shared by every walker over the score — the matcher, the note colouring, Listen and the
+// play-along — because they index into each other's results. Two walkers splitting a
+// position differently would slide every later ghost marker, trail note and highway
+// block onto the wrong note.
+export function playOrder<T>(items: readonly T[], noteOf: (item: T) => unknown): T[][] {
+    const groups: T[][] = [];
+    const onBeat: T[] = [];
+    let graceEntry: unknown;
+    for (const item of items) {
+        const note = noteOf(item);
+        if (!isGraceNote(note)) {
+            onBeat.push(item);
+            continue;
+        }
+        const entry = (note as GraceShape).ParentVoiceEntry;
+        if (groups.length === 0 || entry !== graceEntry) {
+            groups.push([]);
+            graceEntry = entry;
+        }
+        (groups[groups.length - 1] as T[]).push(item);
+    }
+    // The on-beat notes are a group even when there are none: a position of nothing but
+    // ornaments still ends at the beat, and an empty tail keeps every walker agreeing on
+    // how many steps a position is worth.
+    groups.push(onBeat);
+    return groups;
+}
+
 type MeasureShape = { CurrentMeasure?: { TempoInBPM?: number } };
 
 // The tempo in force at the cursor, in beats per minute, or null where the score marks

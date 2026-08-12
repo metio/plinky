@@ -15,7 +15,13 @@ import {
 } from "../../core/keepUp";
 import { type Hand, isPracticedHand } from "../../core/matcher";
 import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
-import { readParts, readScoreExpression, readStartTempo, readTempo } from "../lib/scoreExpression";
+import {
+    playOrder,
+    readParts,
+    readScoreExpression,
+    readStartTempo,
+    readTempo,
+} from "../lib/scoreExpression";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { PLAYED_COLOR, SELECT_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import { highlightCursorNotes, litHalo } from "../lib/scoreColor";
@@ -37,38 +43,47 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
     cursor.reset();
     const steps: KeepUpStep[] = [];
     while (!cursor.iterator.EndReached) {
-        const play: KeepUpStep["play"] = [];
-        const accompany: KeepUpStep["accompany"] = [];
-        const lengths: number[] = [];
         // A fermata holds whatever is sounding, so read it across the position rather
         // than off any one note.
         let fermata = false;
         for (const note of cursor.NotesUnderCursor()) {
             fermata ||= readScoreExpression(note).fermata;
-            const quarters = note.Length.RealValue * 4;
-            lengths.push(quarters);
-            if (note.isRest() || note.halfTone <= 0) {
-                continue;
-            }
-            const entry = { pitch: note.halfTone + 12, quarters };
-            // The practised hand's notes are yours to catch; the other hand's are the
-            // accompaniment a duet sounds for you. A both-hands run has no other hand.
-            // The same split the self-paced matcher uses, so choosing a hand narrows the
-            // beats to catch — and the notes the guide sounds — identically in both modes.
-            const staffId = note.ParentStaff?.idInMusicSheet;
-            if (isPracticedHand(staffId, hand, parts)) {
-                play.push(entry);
-            } else {
-                accompany.push(entry);
-            }
         }
-        steps.push({
-            play,
-            accompany,
-            lengths,
-            bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
-            stretch: fermata ? FERMATA_STRETCH : 1,
-        });
+        // An ornament is its own beat, ahead of the note it decorates — the same split
+        // the matcher makes, through the same rule.
+        const groups = playOrder([...cursor.NotesUnderCursor()], (note) => note);
+        for (const [order, group] of groups.entries()) {
+            const play: KeepUpStep["play"] = [];
+            const accompany: KeepUpStep["accompany"] = [];
+            const lengths: number[] = [];
+            for (const note of group) {
+                const quarters = note.Length.RealValue * 4;
+                lengths.push(quarters);
+                if (note.isRest() || note.halfTone <= 0) {
+                    continue;
+                }
+                const entry = { pitch: note.halfTone + 12, quarters };
+                // The practised hand's notes are yours to catch; the other hand's are the
+                // accompaniment a duet sounds for you. A both-hands run has no other hand.
+                // The same split the self-paced matcher uses, so choosing a hand narrows
+                // the beats to catch — and the notes the guide sounds — identically in
+                // both modes.
+                const staffId = note.ParentStaff?.idInMusicSheet;
+                if (isPracticedHand(staffId, hand, parts)) {
+                    play.push(entry);
+                } else {
+                    accompany.push(entry);
+                }
+            }
+            steps.push({
+                play,
+                accompany,
+                lengths,
+                bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
+                stretch: fermata ? FERMATA_STRETCH : 1,
+                advancesCursor: order === groups.length - 1,
+            });
+        }
         cursor.next();
     }
     cursor.reset();
@@ -247,8 +262,11 @@ export function useKeepUp({
             }
             openStep(current);
             // Mirror the reducer's position onto the visual cursor, in lock-step
-            // with the collected steps, so the painter recolours the right notes.
-            cursor.next();
+            // with the collected steps, so the painter recolours the right notes — an
+            // ornament leaves it where it is, being printed on the note it decorates.
+            if (current.advancesCursor) {
+                cursor.next();
+            }
             step += 1;
             centerCursor();
             chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));

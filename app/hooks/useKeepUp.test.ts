@@ -85,14 +85,23 @@ describe("collectKeepUpSteps", () => {
                 lengths: [1, 2],
                 bpm: NOMINAL_BPM,
                 stretch: 1,
+                advancesCursor: true,
             },
-            { play: [], accompany: [], lengths: [1], bpm: NOMINAL_BPM, stretch: 1 },
+            {
+                play: [],
+                accompany: [],
+                lengths: [1],
+                bpm: NOMINAL_BPM,
+                stretch: 1,
+                advancesCursor: true,
+            },
             {
                 play: [{ pitch: 62, quarters: 1 }],
                 accompany: [],
                 lengths: [1],
                 bpm: NOMINAL_BPM,
                 stretch: 1,
+                advancesCursor: true,
             },
         ]);
         // The left hand catches staff-1 pitches instead, accompanied by staff 0.
@@ -102,6 +111,7 @@ describe("collectKeepUpSteps", () => {
             lengths: [1, 2],
             bpm: NOMINAL_BPM,
             stretch: 1,
+            advancesCursor: true,
         });
     });
 

@@ -3,7 +3,7 @@
 
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { type Hand, isPracticedHand } from "../../core/matcher";
-import { readParts } from "./scoreExpression";
+import { playOrder, readParts } from "./scoreExpression";
 import { type MeasureBox, PLAYED_COLOR, SELECT_COLOR } from "../../core/scoreCanvas";
 
 // OSMD's graphical notes expose their rendered SVG only on the VexFlow subclass; the
@@ -64,28 +64,33 @@ export function collectStepNotes(osmd: OpenSheetMusicDisplay, hand: Hand): StepN
     osmd.cursor.reset();
     const parts = readParts(osmd);
     while (!osmd.cursor.iterator.EndReached) {
-        const elements: SVGGElement[] = [];
-        let playable = false;
-        for (const gNote of osmd.cursor.GNotesUnderCursor()) {
-            const note = gNote.sourceNote;
-            if (note.isRest() || note.halfTone <= 0) {
-                continue;
+        // An ornament is a step of its own, ahead of the note it decorates — the same
+        // split the matcher makes, through the same rule, because index i here is the
+        // note the ghost's i-th onset belongs to.
+        for (const group of playOrder([...osmd.cursor.GNotesUnderCursor()], (g) => g.sourceNote)) {
+            const elements: SVGGElement[] = [];
+            let playable = false;
+            for (const gNote of group) {
+                const note = gNote.sourceNote;
+                if (note.isRest() || note.halfTone <= 0) {
+                    continue;
+                }
+                if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand, parts)) {
+                    continue;
+                }
+                // This group counts as a step the moment it holds a playable note,
+                // matching the matcher's collectSteps. The SVG group may be missing (a
+                // note OSMD didn't render a glyph for); push the step regardless so a
+                // bare position can't shift every later ghost marker onto the wrong note.
+                playable = true;
+                const element = svgOf(gNote);
+                if (element) {
+                    elements.push(element);
+                }
             }
-            if (!isPracticedHand(note.ParentStaff?.idInMusicSheet, hand, parts)) {
-                continue;
+            if (playable) {
+                steps.push({ elements, measure: osmd.cursor.iterator.CurrentMeasureIndex });
             }
-            // This position counts as a step the moment it holds a playable note,
-            // matching the matcher's collectSteps. The SVG group may be missing (a
-            // note OSMD didn't render a glyph for); push the step regardless so a
-            // bare position can't shift every later ghost marker onto the wrong note.
-            playable = true;
-            const element = svgOf(gNote);
-            if (element) {
-                elements.push(element);
-            }
-        }
-        if (playable) {
-            steps.push({ elements, measure: osmd.cursor.iterator.CurrentMeasureIndex });
         }
         osmd.cursor.next();
     }

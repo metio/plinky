@@ -31,6 +31,9 @@ export type KeepUpStep = {
     // whole piece at one speed.
     bpm: number;
     stretch: number;
+    // Whether this beat moves the visual cursor on. False for an ornament, which is
+    // printed on the very note it decorates.
+    advancesCursor: boolean;
 };
 
 export type KeepUpState = {

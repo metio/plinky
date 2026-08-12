@@ -11,6 +11,7 @@ import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
 import {
+    playOrder,
     readDynamics,
     readScoreExpression,
     readStartTempo,
@@ -67,6 +68,9 @@ export type ListenStep = {
     // graded run measures against, or the two would ask for different performances.
     bpm: number;
     stretch: number;
+    // Whether sounding this step moves the visual cursor on. False for an ornament,
+    // which is printed on the very note it decorates.
+    advancesCursor: boolean;
 };
 
 // Walk the engraved score once and lift the listening timeline into the pure step
@@ -82,8 +86,6 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
-        const notes: ListenNote[] = [];
-        const lengths: number[] = [];
         // The dynamic in force is the same for every note under the cursor, so read
         // it once per position.
         const dynamicVolume = volumeAt(dynamics, cursor.iterator.currentTimeStamp?.RealValue ?? 0);
@@ -91,33 +93,44 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
         // read across every note under the cursor, rests included.
         let fermata = false;
         for (const note of cursor.NotesUnderCursor()) {
-            const expression = readScoreExpression(note);
-            fermata ||= expression.fermata;
-            // A tie's later notes are already sounding from the tie start, so skip the
-            // re-strike; rests never sound.
-            if (!note.isRest() && note.halfTone > 0 && expression.strike) {
-                notes.push({
-                    pitch: note.halfTone + 12,
-                    soundQuarters: expression.soundQuarters,
-                    articulation: expression.articulation,
-                    accent: expression.accent,
-                    marcato: expression.marcato,
-                    slurred: expression.slurred,
-                });
-            }
-            // Rests count too, so a written gap dwells its own length — the cursor
-            // advances by the notated rhythm regardless of what sounds.
-            lengths.push(expression.notatedQuarters);
+            fermata ||= readScoreExpression(note).fermata;
         }
-        steps.push({
-            notes,
-            dynamicVolume,
-            lengths,
-            whole: cursor.iterator.currentTimeStamp?.RealValue ?? 0,
-            measureIndex: cursor.iterator.CurrentMeasureIndex,
-            bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
-            stretch: fermata ? FERMATA_STRETCH : 1,
-        });
+        // An ornament sounds before the note it decorates, not with it — the same split
+        // the matcher makes, through the same rule, so Listen and the graded run ask for
+        // one performance rather than two.
+        const groups = playOrder([...cursor.NotesUnderCursor()], (note) => note);
+        for (const [order, group] of groups.entries()) {
+            const notes: ListenNote[] = [];
+            const lengths: number[] = [];
+            for (const note of group) {
+                const expression = readScoreExpression(note);
+                // A tie's later notes are already sounding from the tie start, so skip
+                // the re-strike; rests never sound.
+                if (!note.isRest() && note.halfTone > 0 && expression.strike) {
+                    notes.push({
+                        pitch: note.halfTone + 12,
+                        soundQuarters: expression.soundQuarters,
+                        articulation: expression.articulation,
+                        accent: expression.accent,
+                        marcato: expression.marcato,
+                        slurred: expression.slurred,
+                    });
+                }
+                // Rests count too, so a written gap dwells its own length — the cursor
+                // advances by the notated rhythm regardless of what sounds.
+                lengths.push(expression.notatedQuarters);
+            }
+            steps.push({
+                notes,
+                dynamicVolume,
+                lengths,
+                whole: cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+                measureIndex: cursor.iterator.CurrentMeasureIndex,
+                bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
+                stretch: fermata ? FERMATA_STRETCH : 1,
+                advancesCursor: order === groups.length - 1,
+            });
+        }
         cursor.next();
     }
     cursor.reset();
@@ -302,7 +315,9 @@ export function useListenPlayback({
                 // can be watched as well as heard. Inert unless asked for.
                 echoNote(note.pitch, velocity, durationSeconds * 1000);
             }
-            cursor.next();
+            if (current.advancesCursor) {
+                cursor.next();
+            }
             step += 1;
             centerCursor();
             chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));

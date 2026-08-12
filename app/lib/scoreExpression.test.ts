@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { readDynamics, readScoreExpression } from "./scoreExpression";
+import { playOrder, readDynamics, readScoreExpression } from "./scoreExpression";
 
 // The reader works by shape, so plain objects shaped like OSMD's Note stand in for
 // the real thing — no OSMD instance or DOM needed.
@@ -163,5 +163,42 @@ describe("readDynamics", () => {
                 },
             }),
         ).toEqual([]);
+    });
+});
+
+describe("playOrder", () => {
+    const beat = (name: string) => ({ name, IsGraceNote: false });
+    const grace = (name: string, entry: object) => ({
+        name,
+        IsGraceNote: true,
+        ParentVoiceEntry: entry,
+    });
+    const names = (groups: { name: string }[][]) => groups.map((group) => group.map((n) => n.name));
+
+    it("leaves an ordinary position as one group", () => {
+        expect(names(playOrder([beat("C"), beat("E")], (n) => n))).toEqual([["C", "E"]]);
+    });
+
+    it("plays an ornament before the note it decorates", () => {
+        const entry = {};
+        expect(names(playOrder([grace("B", entry), beat("C")], (n) => n))).toEqual([["B"], ["C"]]);
+    });
+
+    it("separates one ornament from the next but keeps a grace chord together", () => {
+        const first = {};
+        const second = {};
+        const items = [grace("B", first), grace("D", first), grace("E", second), beat("C")];
+        expect(names(playOrder(items, (n) => n))).toEqual([["B", "D"], ["E"], ["C"]]);
+    });
+
+    it("still ends a position of nothing but ornaments at the beat", () => {
+        // The empty on-beat group keeps every walker agreeing on how many steps the
+        // position is worth; a collector drops it when it holds nothing playable.
+        const entry = {};
+        expect(names(playOrder([grace("B", entry)], (n) => n))).toEqual([["B"], []]);
+    });
+
+    it("gives an empty position one empty group", () => {
+        expect(names(playOrder([], (n) => n))).toEqual([[]]);
     });
 });
