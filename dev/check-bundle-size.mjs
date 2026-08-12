@@ -281,7 +281,13 @@ const BUDGET_VENDOR_KB = 324;
 // Listen now share. The line moved by one because the previous one measured 329.95 here
 // and 330.04 on CI: both print as 330.0, so the gate passed locally and failed there.
 // Displayed KB is rounded; the comparison is not.
-const BUDGET_APP_KB = 331;
+//
+// 333. The help page's own words. The text moved out of Sanity and into the message
+// catalogue, so it is bundled per locale like every other string and a reader gets the
+// help that belongs to their build, offline included. Most of its weight was paid for by
+// deleting what it replaced — the three content adapters, the board page and the news
+// banner — leaving barely a kilobyte net.
+const BUDGET_APP_KB = 333;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

@@ -6,7 +6,7 @@ version = 1
 # JSON carries no comment syntax, so these files get their declaration here
 # rather than inline.
 [[annotations]]
-path = ["package.json", "package-lock.json", "tsconfig.json", "studio/package.json", "studio/package-lock.json", "studio/tsconfig.json", "studio/seed/*.ndjson", "renovate.json", "biome.json", "knip.json", "lighthouserc.json", "public/manifest.webmanifest", "messages/*.json", "project.inlang/settings.json"]
+path = ["package.json", "package-lock.json", "tsconfig.json", "renovate.json", "biome.json", "knip.json", "lighthouserc.json", "public/manifest.webmanifest", "messages/*.json", "project.inlang/settings.json"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
@@ -101,7 +101,7 @@ SPDX-License-Identifier = "CC0-1.0"
 # image, and the founder portraits on the About page: declared here so the asset
 # files stay untouched.
 [[annotations]]
-path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp"]
+path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp", "public/help/*.webp"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

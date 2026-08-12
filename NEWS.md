@@ -8,6 +8,20 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 August 2026 — night
+
+**The help page comes with the app now.** Its words and its pictures used to be fetched
+from a content service every time you opened it; they are part of Plinky itself from now
+on. So help loads instantly, reads correctly in all 26 languages, works with no
+connection at all, and always describes the version you are actually running. The page
+also gained two sections while it was being rebuilt: a short welcome, and a round-up of
+the corners worth exploring — the theory course, the glossary of notation marks, the
+little tools, the practice methods.
+
+**The board is gone**, and so is the what's-new banner on the home page. Both were
+pinboards fed from outside the app, and Plinky no longer talks to anything but your own
+device.
+
 ## 13 August 2026 — evening
 
 **Unplugging your piano now registers.** Pulling the USB cable used to leave the little

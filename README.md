@@ -566,50 +566,17 @@ instructs, and never nags about a missed day. [VOICE.md](VOICE.md) is the contra
 every string keeps — worth a read before writing copy or translating it, since the
 register is part of the string.
 
-## News banner
-
-The home page can show a small "what's new" picture that links somewhere — a new
-piece, an announcement, a seasonal note. It's optional and edited outside the code
-so anyone can change it live, with no redeploy: the running app fetches the current
-items from a [Sanity](https://www.sanity.io) project at load time. The document
-schemas live in [studio/](studio/), and every change to them redeploys the hosted
-Studio from CI.
-
-Publish more than one item (up to three, newest first) and the banner becomes a
-gentle carousel: it advances on its own every few seconds, and a reader can step
-through it with the chevrons, the position dots, or a swipe. The moment they
-navigate by hand it stops advancing on its own, so it never pulls a picture out
-from under someone who is reading it — and it doesn't auto-advance at all when the
-device asks for reduced motion.
-
-To connect it, copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`
-and `VITE_SANITY_DATASET`. In Sanity, add a `news` document type with an `image`
-(plus `alt` text), a `link` URL, an optional `headline`, and a `show` boolean, and a
-singleton `siteSettings` document with a `newsEnabled` boolean — the master switch
-for the whole board. The editor uploads a picture and publishes, and the banner
-appears; the most-recently-updated shown items rotate, newest first. Flipping
-`newsEnabled` off (or a single item's `show` off) hides them again, all without a
-redeploy. Only `https` image and link URLs are shown, and a missing or
-unreachable source simply shows nothing — the banner never blocks or breaks the
-page. Leave the variables unset and no banner appears and no network call is made.
-
 ## Help page
 
 The **?** in the header opens a help page that explains Plinky area by area — one
 section per part of the app, and it drops you on the section for the page you came
-from. Like the news banner, the content is edited outside the code in the same
-[Sanity](https://www.sanity.io) project, so anyone can write and update it live with
-no redeploy, and it's translated: a reader downloads only their own language.
+from. The text is translated with the rest of the UI, so a reader gets it in their own
+language, and the pictures of each page live in `public/help/`.
 
-The app owns the sections (their titles are translated with the rest of the UI); Sanity
-holds the blocks inside them. The `helpItem` document type (see [studio/](studio/)) carries a `pageKey` (which
-section it belongs to — `gettingStarted`, `home`, `play`, `library`, `daily`, `compose`,
-`assignments`, `you`, `review`, or `settings`), an `order`, an optional `image` (shared
-across languages) with internationalized `alt` text, an internationalized `text` body,
-and an optional `link`. Publish a block and it appears under its section; a section with
-no blocks shows a short "on the way" note. Only `https` image and link URLs are shown,
-and an unreachable source falls back to the section skeleton — help never breaks the
-page. It reuses the news banner's `VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
+Content and app ship together: the words are messages like every other string, held to
+all 26 languages by `npm run messages:check`, and the pictures are files in the tree. So
+the help you read always matches the build you are running, and it works offline like the
+rest of the app.
 
 ## About page
 
@@ -619,25 +586,6 @@ Sebastian writes the code. The page is a plain prerendered route (their portrait
 live in `public/`, the copy is translated with the rest of the UI), with a short
 note on why Plinky is a calm place to play rather than one more thing to keep a
 streak on.
-
-## The board
-
-The board is Plinky's pin-board of artists worth following — pianists and
-composers the content team wants to put in front of players, each with a
-picture, a short blurb, and a follow link. Recognized social links (Instagram,
-TikTok, YouTube, X, Bluesky, Threads) get their platform's icon on the follow
-button; anything else becomes a plain visit link. Like the news banner and help
-page, the content lives in the same [Sanity](https://www.sanity.io) project and
-is edited live with no redeploy, and blurbs are translated: a reader downloads
-only their own language.
-
-The `boardArtist` document type (see [studio/](studio/)) carries a `name`, an
-`image` (shared across languages) with internationalized `alt` text, an
-internationalized `text` blurb, a `link` URL, an `order`, and a `show` boolean. Publish an artist and the card
-appears; flip `show` off and it disappears, all without a redeploy. Only `https`
-image and link URLs are shown, and an unreachable source simply shows an empty
-board — the page never breaks. It reuses the news banner's
-`VITE_SANITY_PROJECT_ID` / `VITE_SANITY_DATASET`.
 
 ## Composer pages
 

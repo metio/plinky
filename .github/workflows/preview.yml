@@ -61,12 +61,9 @@ jobs:
         run: nix develop --command npm run build:locales
         env:
           PLINKY_LOCALES: en
-          VITE_PREVIEW_MOCKS: "1"
           # The adapters stay silent without a project id; previews never reach
           # the real API (MSW answers first), so a placeholder works when the
           # repo variable is unset.
-          VITE_SANITY_PROJECT_ID: ${{ vars.VITE_SANITY_PROJECT_ID || 'preview0' }}
-          VITE_SANITY_DATASET: ${{ vars.VITE_SANITY_DATASET || 'production' }}
       - name: Add SPA fallback
         # Cloudflare Pages serves 404.html for an unmatched path, so a deep-link refresh
         # (or an unprerendered locale) lands on the shell and the client router takes over.

@@ -30,7 +30,6 @@ export default [
         route("about", "routes/about.tsx"),
         route("impressum", "routes/impressum.tsx"),
         route("datenschutz", "routes/datenschutz.tsx"),
-        route("board", "routes/board.tsx"),
         route("person/:slug", "routes/person.tsx"),
     ]),
 ] satisfies RouteConfig;

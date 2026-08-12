@@ -57,6 +57,14 @@ not return without meeting the argument.
 - [Open questions](#open-questions)
 - [Maintaining this document](#maintaining-this-document)
 
+> **Sanity is gone (2026-08-13).** Everything below that describes reading or writing
+> Sanity — the news banner, the board, the help page, the artist-page proxy, the
+> `sanity.ts` adapter, the mock handler — describes a state the app no longer has. The
+> passages are left standing because this document is append-only about decisions: the
+> reasoning was real, and a reader who cannot see the abandoned path will propose it
+> again. Help content now ships in the tree; the board and the news banner were removed;
+> nothing in the app fetches from a third party. See the last row of the decision log.
+
 ## Scope
 
 Five capabilities, each independently shippable and independently switchable.
@@ -1688,6 +1696,7 @@ never rewritten.
 | 2026-08-09 | Living artists publish through the existing submission endpoint, verified by curation | The maintainer already curates the board, so no claiming flow or identity service is needed; attribution at review time is the whole mechanism |
 | 2026-08-09 | Artist page editing proxies Sanity rather than adding a store | Keeps one content source and leaves the read path untouched; Studio logins were rejected because free-plan roles cannot confine an editor to one document |
 | 2026-08-09 | The artist marketplace is deferred pending evidence, not declined | Its obligations are the substance of the feature, and publishing is the first step of selling regardless — so shipping the free half answers the question that decides it at no cost |
+| 2026-08-13 | Sanity is removed from the app entirely; help content ships in the tree, the board and the news banner are gone | Nothing should load from a third party at runtime: the help text now lives in the message catalogue and its pictures in `public/help/`, so the help a reader sees matches the build they are running and works offline. This reverses the artist-page proxy above — there is no Sanity document left to patch, so that capability would need a store of its own if it is ever revived |
 
 ## Open questions
 
