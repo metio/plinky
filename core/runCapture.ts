@@ -92,6 +92,8 @@ export type ClearedNote = {
     // How much the timing windows are widened here — non-zero only around an ornament,
     // whose moment the notation leaves to the player.
     slackMs?: number;
+    // The score asks for the sustain pedal here.
+    pedalled?: boolean;
 };
 
 function staffOffsets(
@@ -130,6 +132,7 @@ export function captureCleared(capture: RunCapture, info: ClearedNote): void {
         expectedHoldsMs: info.expectedHoldsMs,
         velocities: info.velocities,
         slackMs: info.slackMs,
+        pedalled: info.pedalled,
         keyHoldsMs: info.pitches.map(() => 0),
     });
     const index = capture.notes.length - 1;

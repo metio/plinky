@@ -78,6 +78,10 @@ export type MatchStep = {
     // crushed in before the beat or leaned on and given time from the note it decorates,
     // and a player choosing either should not be marked down for it.
     slackMs: number;
+    // The score asks for the sustain pedal here. Under it the damper holds the sound, so
+    // a pianist releases keys early and on purpose; how long a key was down says nothing
+    // about the length being played, and the expressive reading leaves it alone.
+    pedalled: boolean;
     // The longest written length here, in quarter notes — how long the key is
     // meant to keep ringing. Collected with the position so the hold-duration
     // indicator reads it off the step model, never the live cursor. Zero when

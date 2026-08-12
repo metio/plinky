@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
 import { volumeAt } from "../../core/dynamics";
+import { ringUntil } from "../../core/pedal";
 import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
@@ -13,6 +14,7 @@ import type { Take } from "../../core/takes";
 import {
     playOrder,
     readDynamics,
+    readPedalSpans,
     readScoreExpression,
     readStartTempo,
     readTempo,
@@ -83,6 +85,9 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it belongs to the position's place in the piece, not to the position.
     const dynamics = readDynamics(osmd);
+    // Where the score asks for the sustain pedal: under it the harmony pools, and a note
+    // keeps sounding past its written length until the pedal comes up.
+    const pedals = readPedalSpans(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -102,6 +107,7 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
         for (const [order, group] of groups.entries()) {
             const notes: ListenNote[] = [];
             const lengths: number[] = [];
+            const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
             for (const note of group) {
                 const expression = readScoreExpression(note);
                 // A tie's later notes are already sounding from the tie start, so skip
@@ -109,7 +115,9 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
                 if (!note.isRest() && note.halfTone > 0 && expression.strike) {
                     notes.push({
                         pitch: note.halfTone + 12,
-                        soundQuarters: expression.soundQuarters,
+                        // Under the pedal the damper holds the note, so it rings on
+                        // whether or not the written value is up.
+                        soundQuarters: ringUntil(pedals, whole, expression.soundQuarters / 4) * 4,
                         articulation: expression.articulation,
                         accent: expression.accent,
                         marcato: expression.marcato,
@@ -124,7 +132,7 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
                 notes,
                 dynamicVolume,
                 lengths,
-                whole: cursor.iterator.currentTimeStamp?.RealValue ?? 0,
+                whole,
                 measureIndex: cursor.iterator.CurrentMeasureIndex,
                 bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
                 stretch: fermata ? FERMATA_STRETCH : 1,

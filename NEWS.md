@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 August 2026 — later
+
+**The sustain pedal in the score is followed.** Where a piece marks the pedal down,
+Plinky now knows it: Listen lets the harmony pool the way the marking asks instead of
+playing each note dry and stopping it dead, and your expression feedback no longer reads
+a pedalled passage as choppy. That last one was a real unfairness — under the pedal you
+are meant to let go of the keys early and let the piano hold the sound, and doing exactly
+that used to look like clipping every note short.
+
 ## 13 August 2026
 
 **Ornaments are no longer graded on a detail the music leaves to you.** A grace note is

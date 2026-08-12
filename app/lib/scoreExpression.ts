@@ -3,6 +3,7 @@
 
 import type { Articulation } from "../../core/expression";
 import type { DynamicPoint } from "../../core/dynamics";
+import type { PedalSpan } from "../../core/pedal";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
 // Reads the expression marks OSMD parsed from the MusicXML — articulations, slurs,
@@ -158,6 +159,46 @@ export function playOrder<T>(items: readonly T[], noteOf: (item: T) => unknown):
     return groups;
 }
 
+// Where the score asks for the sustain pedal, as whole-note spans. A pedal the engraving
+// never lifts runs to the end of the piece, which is what a reader would do with it.
+export function readPedalSpans(osmd: unknown): PedalSpan[] {
+    const spans: PedalSpan[] = [];
+    try {
+        const measures =
+            (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
+                ?.SourceMeasures ?? [];
+        // Where the music stops, for a pedal the engraving never lifts.
+        let end = 0;
+        let open: number | null = null;
+        for (const measure of measures) {
+            const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
+            end = Math.max(end, measureStart + (measure?.Duration?.RealValue ?? 0));
+            for (const staff of measure?.staffLinkedExpressions ?? []) {
+                for (const entry of staff ?? []) {
+                    const at = measureStart + (entry?.timestamp?.RealValue ?? 0);
+                    end = Math.max(end, at);
+                    // A second start without a lift between them is a re-pedal on the
+                    // spot: the sound carries on either way, so the span simply runs on.
+                    if (entry?.PedalStart != null && open === null) {
+                        open = at;
+                    } else if (entry?.PedalEnd != null && open !== null) {
+                        spans.push({ from: open, to: at });
+                        open = null;
+                    }
+                }
+            }
+        }
+        if (open !== null) {
+            spans.push({ from: open, to: Math.max(open, end) });
+        }
+    } catch {
+        // A shape OSMD changed falls back to an unpedalled score rather than breaking
+        // playback: no pedal is what every score without markings already reports.
+        return [];
+    }
+    return spans;
+}
+
 type MeasureShape = { CurrentMeasure?: { TempoInBPM?: number } };
 
 // The tempo in force at the cursor, in beats per minute, or null where the score marks
@@ -195,9 +236,14 @@ type MultiExpressionShape = {
     timestamp?: { RealValue?: number };
     instantaneousDynamic?: DynamicShape | null;
     startingContinuousDynamic?: ContinuousShape | null;
+    // The sustain pedal going down and coming up, which OSMD hangs on the same measure
+    // expressions as the dynamics.
+    PedalStart?: unknown;
+    PedalEnd?: unknown;
 };
 type SourceMeasureShape = {
     AbsoluteTimestamp?: { RealValue?: number };
+    Duration?: { RealValue?: number };
     staffLinkedExpressions?: (MultiExpressionShape[] | undefined)[];
 };
 

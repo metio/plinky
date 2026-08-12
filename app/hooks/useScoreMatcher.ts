@@ -11,6 +11,7 @@ import {
     writtenOnsetsMs,
 } from "../../core/elapsed";
 import { graceOnsetsMs } from "../../core/grace";
+import { pedalledAt } from "../../core/pedal";
 import { type DynamicPoint, volumeAt } from "../../core/dynamics";
 
 // How many notes the practised hand has to play at the cursor. Only whether a position is
@@ -36,6 +37,7 @@ import {
     isGraceNote,
     playOrder,
     readDynamics,
+    readPedalSpans,
     readParts,
     readScoreExpression,
     readStartTempo,
@@ -84,7 +86,7 @@ function shortestLength(osmd: OpenSheetMusicDisplay): number {
 // notes that fall on the beat.
 type StepGroup = Omit<
     MatchStep,
-    "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor" | "slackMs"
+    "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor" | "slackMs" | "pedalled"
 > & {
     expected: { velocity: number | null; soundQuarters: number }[];
     // The ornament's own written length, for placing it before the beat. Zero on the
@@ -239,6 +241,9 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it is a property of where a position sits rather than of the position.
     const dynamics = readDynamics(osmd);
+    // Where the score asks for the sustain pedal, so a passage meant to be pedalled is
+    // not read as one played staccato.
+    const pedals = readPedalSpans(osmd);
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -289,6 +294,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
                 // leans is not marked late. On the ornament that is the distance it was
                 // placed ahead of the beat; on the note it decorates, the half of its own
                 // length an appoggiatura would take.
+                pedalled: pedalledAt(pedals, position.whole),
                 slackMs:
                     ornament.length === 0
                         ? 0
@@ -377,6 +383,9 @@ export type CorrectInfo = {
     velocities: number[];
     // How much the timing windows are widened here — non-zero only around an ornament.
     slackMs: number;
+    // The score asks for the pedal here, so how long the keys were down is not evidence
+    // of the length being played.
+    pedalled: boolean;
     velocity: number;
     // How many wrong notes were played at this position before it was cleared —
     // zero means a clean first try, the signal Flow and per-segment accuracy are
@@ -573,6 +582,7 @@ export function useScoreMatcher(
                     // so it stays right regardless of where the visual cursor sits.
                     holdMs: event.step.holdMs / dialRatio(),
                     slackMs: event.step.slackMs / dialRatio(),
+                    pedalled: event.step.pedalled,
                     ...askedFor(event, dialRatio()),
                     velocity,
                     velocities: event.velocities,

@@ -45,6 +45,10 @@ export type OutcomeNote = RunNote & {
     // How much the timing windows are widened here, for a note whose moment the notation
     // leaves to the player — an ornament and the note it decorates. Zero everywhere else.
     slackMs?: number;
+    // The score asks for the sustain pedal at this position. Under it a pianist releases
+    // keys early on purpose and lets the damper hold the sound, so the key-hold length
+    // carries no information about the length being played.
+    pedalled?: boolean;
 };
 
 // One entry per KEY struck, not per position: a chord is several instructions played at
@@ -68,7 +72,10 @@ function expressionNotes(notes: OutcomeNote[]): ExpressionNote[] {
         for (const [index] of expected.entries()) {
             out.push({
                 velocity: note.velocities?.[index] ?? note.velocity,
-                keyHeldMs: note.keyHoldsMs?.[index] || note.keyHeldMs,
+                // Under the pedal the fingers are not what holds the note, so there is no
+                // articulation here to be right or wrong about — reporting no hold leaves
+                // it out of that half of the reading, which still measures the dynamics.
+                keyHeldMs: note.pedalled ? undefined : note.keyHoldsMs?.[index] || note.keyHeldMs,
                 expectedVelocity: expected[index] ?? null,
                 expectedHoldMs: note.expectedHoldsMs?.[index] ?? 0,
             });
