@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 13 August 2026
+
+**Ornaments are no longer graded on a detail the music leaves to you.** A grace note is
+played before the note it decorates — but how far before is your call, and the two usual
+answers are a good distance apart: crushed in right against the beat, or leaned on so that
+it borrows time from the note it belongs to. Both are right. Plinky had to pick one to
+draw the ornament at, and was quietly marking down anyone who chose the other. The timing
+feedback now accepts either. Nothing else about your timing has changed — every ordinary
+note is judged exactly as before.
+
 ## 12 August 2026 — night
 
 **Grace notes are played, not stacked.** An ornament is printed on top of the note it
