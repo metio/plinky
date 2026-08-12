@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 14 August 2026
+
+**The sketch follows what you play.** On the compose page the staff kept growing
+downward while the panel stayed put, so after a while your newest notes were somewhere
+below the fold and you were watching an empty stave. It now keeps the end of the sketch
+in view as you record. Scroll back to look at an earlier bar and it leaves you there —
+it picks the thread up again when you scroll back to the end.
+
 ## 13 August 2026 — night
 
 **The help page comes with the app now.** Its words and its pictures used to be fetched

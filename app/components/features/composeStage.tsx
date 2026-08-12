@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { type ReactNode, type RefObject, useState } from "react";
+import { type ReactNode, type RefObject, useCallback, useRef, useState } from "react";
+import { atEnd } from "../../../core/followScroll";
 import type { Span } from "../../../core/keyboardWindow";
 import { usePrefsStore } from "../../contexts/services";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
@@ -44,6 +45,22 @@ export function ComposeStage({
     const noteLabels = useNoteLabels();
     const [hideKeyboard, setHideKeyboard] = useState(false);
 
+    // The sketch grows downward as you play, so the notes you just played are the ones
+    // at the bottom — and without this the panel keeps its scroll position and your own
+    // playing disappears below the fold. It follows only while you are already at the
+    // end of it, so scrolling back to look at an earlier bar keeps you there.
+    //
+    // Driven off the staff's own render rather than off the XML changing: the engraving
+    // is asynchronous, and scrolling before it lands measures the previous staff.
+    const sketchRef = useRef<HTMLDivElement>(null);
+    const followRef = useRef(true);
+    const onStaffRendered = useCallback(() => {
+        const box = sketchRef.current;
+        if (box && followRef.current) {
+            box.scrollTop = box.scrollHeight;
+        }
+    }, []);
+
     return (
         <FullscreenProvider active={fullscreen}>
             <section
@@ -69,8 +86,16 @@ export function ComposeStage({
                 </div>
                 <div className={fullscreen ? "flex min-h-0 flex-1 flex-col" : ""}>
                     <div
-                        className={`rounded-lg border border-line bg-raised p-3 ${
-                            fullscreen ? "relative min-h-0 flex-1 overflow-y-auto" : ""
+                        ref={sketchRef}
+                        onScroll={(event) => {
+                            followRef.current = atEnd(event.currentTarget);
+                        }}
+                        // Bounded either way, so the sketch is a panel that scrolls rather
+                        // than a block that grows without end — outside full screen an
+                        // unbounded staff pushes the recording controls off the screen,
+                        // which is the same complaint from the other side.
+                        className={`overflow-y-auto rounded-lg border border-line bg-raised p-3 ${
+                            fullscreen ? "relative min-h-0 flex-1" : "max-h-[60vh]"
                         }`}
                     >
                         {/* The keys' quick controls ride the sketch's corner, the same
@@ -88,7 +113,11 @@ export function ComposeStage({
                             />
                         )}
                         {staffXml ? (
-                            <StaffPreview xml={staffXml} label={m.compose_staff_label()} />
+                            <StaffPreview
+                                xml={staffXml}
+                                label={m.compose_staff_label()}
+                                onRendered={onStaffRendered}
+                            />
                         ) : (
                             <p className="px-2 py-10 text-center text-sm text-muted">
                                 {m.compose_staff_empty()}

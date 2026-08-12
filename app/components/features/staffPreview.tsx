@@ -7,7 +7,19 @@ import { useEffect, useRef } from "react";
 // A read-only staff: loads MusicXML into OpenSheetMusicDisplay and renders it, with
 // none of the playback or matching the full viewer carries. OSMD needs a real DOM
 // and is large, so it loads on the client only; nothing renders during prerender.
-export function StaffPreview({ xml, label }: { xml: string; label: string }) {
+export function StaffPreview({
+    xml,
+    label,
+    onRendered,
+}: {
+    xml: string;
+    label: string;
+    // Called once the staff is actually on screen. A caller that reacts to the drawing
+    // — scrolling to follow it as it grows — has to wait for this: the engraving happens
+    // after a dynamic import and an async load, so anything measured before it reads the
+    // previous staff's height.
+    onRendered?: () => void;
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
 
@@ -29,6 +41,7 @@ export function StaffPreview({ xml, label }: { xml: string; label: string }) {
                 return osmd.load(xml).then(() => {
                     if (!cancelled) {
                         osmd.render();
+                        onRendered?.();
                     }
                 });
             })
@@ -38,7 +51,7 @@ export function StaffPreview({ xml, label }: { xml: string; label: string }) {
         return () => {
             cancelled = true;
         };
-    }, [xml]);
+    }, [xml, onRendered]);
 
     // Release OSMD (and its resize listener) when the preview unmounts.
     useEffect(() => () => osmdRef.current?.clear(), []);

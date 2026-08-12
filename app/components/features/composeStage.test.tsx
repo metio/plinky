@@ -12,13 +12,22 @@ import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
 import { ComposeStage } from "./composeStage";
 
-const mount = (fullscreen: boolean, onExitFullscreen = () => {}) =>
+// The real staff pulls in OpenSheetMusicDisplay and engraves asynchronously; what matters
+// here is only that it reports having drawn, which is the signal the panel follows.
+vi.mock("./staffPreview", () => ({
+    StaffPreview: ({ onRendered }: { onRendered?: () => void }) => {
+        onRendered?.();
+        return <div data-testid="staff" />;
+    },
+}));
+
+const mount = (fullscreen: boolean, onExitFullscreen = () => {}, staffXml: string | null = null) =>
     render(
         <MemoryRouter>
             <ServicesProvider services={{ store: memoryStore(), midi: fakeMidi() }}>
                 <MidiProvider>
                     <ComposeStage
-                        staffXml={null}
+                        staffXml={staffXml}
                         keyWindow={{ from: 48, to: 72 }}
                         controls={<button type="button">controls-slot</button>}
                         stageRef={createRef<HTMLElement>()}
@@ -69,5 +78,76 @@ describe("ComposeStage", () => {
 
         fireEvent.click(screen.getByLabelText("Show keys"));
         expect(screen.getByLabelText("C 4")).toBeTruthy();
+    });
+});
+
+// The sketch's own scroll panel — the staff's parent, since the full-screen wrapper
+// around it scrolls as well — given a real geometry, which jsdom gives no element.
+function sizePanel(scrollHeight: number, clientHeight: number) {
+    const panel = screen.getByTestId("staff").parentElement;
+    if (!panel) {
+        throw new Error("no scroll panel");
+    }
+    Object.defineProperty(panel, "scrollHeight", { value: scrollHeight, configurable: true });
+    Object.defineProperty(panel, "clientHeight", { value: clientHeight, configurable: true });
+    return panel;
+}
+
+describe("the sketch following what you play", () => {
+    it("keeps the newest notes in view as the staff grows", () => {
+        const { rerender } = mount(true, () => {}, "<score/>");
+        const panel = sizePanel(1000, 400);
+        // The staff redraws with the note just played; the panel goes to the end of it.
+        fireEvent.scroll(panel, { target: { scrollTop: 600 } });
+        panel.scrollTop = 0;
+        rerender(
+            <MemoryRouter>
+                <ServicesProvider services={{ store: memoryStore(), midi: fakeMidi() }}>
+                    <MidiProvider>
+                        <ComposeStage
+                            staffXml="<score>2</score>"
+                            keyWindow={{ from: 48, to: 72 }}
+                            controls={<button type="button">controls-slot</button>}
+                            stageRef={createRef<HTMLElement>()}
+                            fullscreen
+                            onExitFullscreen={() => {}}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        expect(panel.scrollTop).toBe(1000);
+    });
+
+    it("leaves you where you are once you scroll back to look at something", () => {
+        const { rerender } = mount(true, () => {}, "<score/>");
+        const panel = sizePanel(1000, 400);
+        // Scrolled well away from the end: the panel must not yank you back.
+        fireEvent.scroll(panel, { target: { scrollTop: 0 } });
+        rerender(
+            <MemoryRouter>
+                <ServicesProvider services={{ store: memoryStore(), midi: fakeMidi() }}>
+                    <MidiProvider>
+                        <ComposeStage
+                            staffXml="<score>2</score>"
+                            keyWindow={{ from: 48, to: 72 }}
+                            controls={<button type="button">controls-slot</button>}
+                            stageRef={createRef<HTMLElement>()}
+                            fullscreen
+                            onExitFullscreen={() => {}}
+                        />
+                    </MidiProvider>
+                </ServicesProvider>
+            </MemoryRouter>,
+        );
+        expect(panel.scrollTop).toBe(0);
+    });
+
+    it("is a scroll panel outside full screen too, where you can also record", () => {
+        // Playing without pressing Count in records just the same, and an unbounded staff
+        // would push the controls off the page.
+        mount(false, () => {}, "<score/>");
+        const panel = screen.getByTestId("staff").parentElement;
+        expect(panel?.className).toContain("overflow-y-auto");
     });
 });
