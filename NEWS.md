@@ -8,6 +8,18 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 14 August 2026 — night
+
+**Scores that looked like nonsense are gone, and the Gymnopédies are here.** A handful of
+pieces were guitar tablature rather than piano music: they sounded right but drew six
+lines of fret numbers, which is unreadable if you came to play the piano. Satie's
+Gymnopédie No.1 was one of them — it has been replaced with a proper piano edition, and
+Nos. 2 and 3 joined it. Twelve more pieces that had been wrongly kept out of the library
+are now in it, including several that only looked non-piano because their staves were
+labelled "treble" and "bass".
+
+Also: the leftover link to the retired board page has gone from the home page.
+
 ## 14 August 2026 — later
 
 **Keep a piece without leaving it.** There is a star beside the title on a piece's own

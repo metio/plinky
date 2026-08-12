@@ -75,7 +75,7 @@ describe("the derived noindex list", () => {
     it("leaves the indexable pages out", () => {
         const paths = noindexPaths();
 
-        for (const path of ["/", "/about", "/help", "/glossary", "/library", "/daily", "/board"]) {
+        for (const path of ["/", "/about", "/help", "/glossary", "/library", "/daily"]) {
             expect(paths).not.toContain(path);
         }
     });

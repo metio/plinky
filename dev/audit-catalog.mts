@@ -9,7 +9,7 @@
 //
 // Run under tsx: `npx tsx dev/audit-catalog.mts`
 
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { strFromU8, unzipSync } from "fflate";
 import { copyrightReason } from "./copyrightSignals.mts";
 import { nonPianoReason } from "./scoreInstrument.mts";
@@ -20,13 +20,35 @@ const DIR = "public/songs";
 type Song = { id: string; title: string; composer: string; grade: number; cost: number };
 const manifest: Song[] = JSON.parse(readFileSync(`${DIR}/manifest.json`, "utf8"));
 
+// A score sits under its licence bucket — public/songs/<spdx>/<id>.mxl — so the path has
+// to be found rather than assumed. Reading `${DIR}/<id>.mxl` directly, as this did until
+// the buckets arrived, throws for every score in the catalogue and reports the whole thing
+// unreadable; an audit that flags everything is one nobody reads, which is how seven
+// tablature scores sat here unnoticed.
+function scorePath(id: string): string {
+    for (const bucket of readdirSync(DIR, { withFileTypes: true })) {
+        if (bucket.isDirectory()) {
+            const path = `${DIR}/${bucket.name}/${id}.mxl`;
+            if (existsSync(path)) {
+                return path;
+            }
+        }
+    }
+    throw new Error(`no .mxl for ${id}`);
+}
+
 // The MusicXML hides inside the .mxl zip; META-INF/container.xml names the rootfile.
 function readMusicXml(id: string): string {
-    const entries = unzipSync(new Uint8Array(readFileSync(`${DIR}/${id}.mxl`)));
+    const entries = unzipSync(new Uint8Array(readFileSync(scorePath(id))));
     const container = strFromU8(entries["META-INF/container.xml"] ?? new Uint8Array());
     const root =
         container.match(/full-path="([^"]+)"/)?.[1] ??
-        Object.keys(entries).find((name) => name.endsWith(".xml") && !name.startsWith("META-INF"));
+        // Mutopia names its entry .musicxml, so match both rather than ".xml" alone.
+        Object.keys(entries).find(
+            (name) =>
+                (name.endsWith(".xml") || name.endsWith(".musicxml")) &&
+                !name.startsWith("META-INF"),
+        );
     if (!root || !entries[root]) {
         throw new Error("no rootfile");
     }

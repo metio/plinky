@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Brand glyphs for the share links and the board's follow links, drawn in the
+// Brand glyphs for the share links, drawn in the
 // current text colour so they sit quietly on their buttons and adapt to light and
 // dark. The path data comes from Simple Icons (https://simpleicons.org), released
 // into the public domain (CC0); the marks remain each platform's trademark, used

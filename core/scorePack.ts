@@ -35,8 +35,8 @@ function isPositiveNumber(value: unknown): value is number {
 }
 
 // An id is how a score is found again — the library keys on it and /play/<id> links
-// to it — so the empty string names nothing and is dropped, as the board and the
-// progress bundle drop theirs.
+// to it — so the empty string names nothing and is dropped, the way the progress
+// bundle drops its own.
 function parseScore(value: unknown): PackScore | null {
     if (
         !isRecord(value) ||

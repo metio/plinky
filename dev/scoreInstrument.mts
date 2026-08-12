@@ -16,25 +16,44 @@ const OTHER_INSTRUMENT =
 const INSTRUMENTAL =
     /drum|percussion|cymbal|guitar|violin|cello|viola|contrabass|double.?bass|flute|trumpet|saxophone|\bsax\b|clarinet|oboe|bassoon|trombone|tuba|\bhorn\b|ukulele|banjo|mandolin|\bharp\b|recorder|piccolo|accordion|\bsynth|string|brass|orchestr/;
 
+// A staff that is not a five-line pitched staff is not piano music, whatever its parts
+// are called. Guitar tablature (TAB) engraves as six lines of fret numbers, jianpu as
+// cipher digits, a percussion staff as one line — each renders as something a pianist
+// cannot read, while the pitches underneath stay correct, so the piece PLAYS fine and
+// only LOOKS wrong. That combination is invisible to every other check here, which reads
+// part names.
+//
+// This is not hypothetical: seven guitar and lute pieces reached the catalogue as
+// tablature, Satie's Gymnopédie No.1 among them, and were only found when a player asked
+// why one of them looked so strange.
+const NON_PIANO_CLEF = /<sign>\s*(TAB|jianpu)\s*<\/sign>/i;
+const NON_STANDARD_STAFF = /<staff-lines>\s*(?!5\s*<)\d+\s*<\/staff-lines>/i;
+
 // Returns the disqualifying reason, or null when the score is a (probable) piano piece.
 export function nonPianoReason(xml: string): string | null {
     // Unpitched notes / a percussion clef are unambiguous — a drum kit, not a piano.
     if (/<sign>\s*percussion\s*<\/sign>/i.test(xml) || /<unpitched\b/i.test(xml)) {
         return "percussion";
     }
-    const names = [
-        ...xml.matchAll(
-            /<(?:part-name|instrument-name)[^>]*>([^<]*)<\/(?:part-name|instrument-name)>/gi,
-        ),
-    ]
-        .map((match) => match[1]!.trim().toLowerCase())
-        .join(" | ");
+    if (NON_PIANO_CLEF.test(xml)) {
+        return "tablature";
+    }
+    if (NON_STANDARD_STAFF.test(xml)) {
+        return "non-standard-staff";
+    }
+    const names = instrumentNames(xml);
     // A clearly-named other instrument with no keyboard part anywhere.
     if (!KEYBOARD.test(names) && OTHER_INSTRUMENT.test(names)) {
         return "named-instrument";
     }
     return null;
 }
+
+// Clef names used as staff labels, not instruments. A converted piano score often names
+// its two staves "treble" and "bass" — LilyPond does — and reading that "bass" as a bass
+// instrument threw out real piano music, Satie's Gymnopédies among them. A double bass
+// says so ("contrabass", "double bass"), which these patterns still catch.
+const STAFF_LABEL = /^(treble|bass|right|left|upper|lower|rh|lh)\b[\s:.-]*$/;
 
 function instrumentNames(xml: string): string {
     return [
@@ -43,6 +62,7 @@ function instrumentNames(xml: string): string {
         ),
     ]
         .map((match) => match[1]!.trim().toLowerCase())
+        .filter((name) => !STAFF_LABEL.test(name))
         .join(" | ");
 }
 
@@ -72,6 +92,12 @@ export function nonSoloPianoReason(xml: string): string | null {
 export function nonPianoVocalReason(xml: string): string | null {
     if (/<sign>\s*percussion\s*<\/sign>/i.test(xml) || /<unpitched\b/i.test(xml)) {
         return "percussion";
+    }
+    if (NON_PIANO_CLEF.test(xml)) {
+        return "tablature";
+    }
+    if (NON_STANDARD_STAFF.test(xml)) {
+        return "non-standard-staff";
     }
     const names = [
         ...xml.matchAll(
