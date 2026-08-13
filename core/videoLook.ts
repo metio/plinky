@@ -19,6 +19,12 @@ export type NoteColor = {
     hex: string;
 };
 
+// Colouring a note by the finger that plays it, rather than by one colour for the whole
+// performance. Only offered because the fingering engine can answer it: a score-derived
+// performance is fingered by the same cost model the fingering trainer uses, so the
+// colour is the app's own advice about how to play the passage, not decoration.
+export const BY_FINGER = "finger";
+
 // The app's own accent first, so an export left alone looks like the app.
 export const NOTE_COLORS: readonly NoteColor[] = [
     { id: "indigo", hex: "#6366f1" },
@@ -26,9 +32,30 @@ export const NOTE_COLORS: readonly NoteColor[] = [
     { id: "teal", hex: "#14b8a6" },
     { id: "amber", hex: "#f59e0b" },
     { id: "lime", hex: "#84cc16" },
+    // The by-finger option carries a hex too: it is what an unfingered note paints in, so
+    // a take with no score behind it still looks deliberate.
+    { id: BY_FINGER, hex: "#ffd23f" },
 ];
 
 export const DEFAULT_NOTE_COLOR = "indigo";
+
+// One colour per finger, thumb (1) to little finger (5), warm and cheerful and far
+// enough apart in hue to tell at a glance on a dark stage. Fixed forever: a viewer who
+// watches two clips learns that the red notes are the thumb, and that only holds if the
+// mapping never moves.
+export const FINGER_COLORS: readonly string[] = [
+    "#ff5757", // 1 thumb — warm red
+    "#ff9f45", // 2 index — orange
+    "#ffd23f", // 3 middle — sunny yellow
+    "#ff6fb5", // 4 ring — pink
+    "#b06bff", // 5 little — violet
+];
+
+// The colour of a given finger; an unfingered note falls back to the panel's chosen
+// colour, which the caller passes in, so a take nobody fingered still paints.
+export function fingerColorHex(finger: number | undefined, fallback: string): string {
+    return FINGER_COLORS[(finger ?? 0) - 1] ?? fallback;
+}
 
 export function noteColorHex(id: string): string {
     return NOTE_COLORS.find((color) => color.id === id)?.hex ?? NOTE_COLORS[0]!.hex;

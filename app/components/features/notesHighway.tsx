@@ -34,9 +34,9 @@ const SHADES = {
 // because a chord spanning the grand staff is the common case — 41% of positions in the
 // catalogue — and colouring it all one hand tells the reader the opposite of what the
 // two colours are for.
-function blockClass(staff: number | undefined, row: number): string {
+function blockClass(hand: "left" | "right" | undefined, row: number): string {
     const tier = row === 0 ? 0 : 1;
-    return SHADES[staff === 1 ? "left" : "right"][tier]!;
+    return SHADES[hand ?? "right"][tier]!;
 }
 
 export function NotesHighway({
@@ -74,7 +74,7 @@ export function NotesHighway({
                             <span
                                 key={`${step.index}-${pitch}`}
                                 aria-hidden="true"
-                                className={`absolute rounded-sm shadow-sm transition-[bottom] duration-200 ease-out motion-reduce:transition-none ${blockClass(step.pitchStaves[note], row)}`}
+                                className={`absolute rounded-sm shadow-sm transition-[bottom] duration-200 ease-out motion-reduce:transition-none ${blockClass(step.pitchHands[note], row)}`}
                                 style={{
                                     left: `${lane.leftPct}%`,
                                     width: `${lane.widthPct}%`,

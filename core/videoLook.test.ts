@@ -3,8 +3,11 @@
 
 import { describe, expect, it } from "vitest";
 import {
+    BY_FINGER,
     DEFAULT_KEYBOARD_DEPTH,
     DEFAULT_NOTE_COLOR,
+    FINGER_COLORS,
+    fingerColorHex,
     KEYBOARD_DEPTHS,
     keyboardDepthFraction,
     NOTE_COLORS,
@@ -50,5 +53,27 @@ describe("keyboard depth", () => {
 
     it("falls back to the default for an unknown depth", () => {
         expect(keyboardDepthFraction("colossal")).toBe(keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH));
+    });
+});
+
+describe("finger colours", () => {
+    it("names one colour per finger", () => {
+        expect(FINGER_COLORS).toHaveLength(5);
+        expect(new Set(FINGER_COLORS).size).toBe(5);
+    });
+
+    it("maps a finger to its own colour, thumb first", () => {
+        expect(fingerColorHex(1, "#000000")).toBe(FINGER_COLORS[0]);
+        expect(fingerColorHex(5, "#000000")).toBe(FINGER_COLORS[4]);
+    });
+
+    it("falls back for a note nobody fingered, so the frame is never blank", () => {
+        expect(fingerColorHex(undefined, "#123456")).toBe("#123456");
+        expect(fingerColorHex(9, "#123456")).toBe("#123456");
+    });
+
+    it("offers by-finger as a note colour, with a hex for the unfingered case", () => {
+        const option = NOTE_COLORS.find((color) => color.id === BY_FINGER);
+        expect(option?.hex).toMatch(/^#[0-9a-f]{6}$/);
     });
 });

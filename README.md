@@ -253,7 +253,9 @@ one-tap **review session** walks you through everything that's fading, and you c
   and licence burnt in, ready for any chat or feed — offered on browsers that can encode
   one, Chrome and friends today — pick **16:9 or 9:16** right beside Save, choose the
   **style** — the **Staff** sheet music or a **notes-highway** of blocks falling onto the
-  keys (Synthesia-style, sized by how long each note is held) — and switch the
+  keys (Synthesia-style, sized by how long each note is held, with a **note colour** that
+  can be one shade or **one colour per finger**, thumb to little finger, on both the block
+  and the key it lands on) — and switch the
   **title** or the **plinky.fun watermark** off if you'd rather (the composer-and-licence
   credit always stays)), **challenge a
   friend** to race it by link, or delete it. From the top of the tab you can **challenge

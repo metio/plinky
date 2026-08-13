@@ -26,11 +26,11 @@ type Story = StoryObj<typeof NotesHighway>;
 export const RightHand: Story = {
     args: {
         upcoming: [
-            { index: 0, pitches: [60], pitchStaves: [0], staves: [0] },
-            { index: 1, pitches: [64], pitchStaves: [0], staves: [0] },
-            { index: 2, pitches: [67], pitchStaves: [0], staves: [0] },
-            { index: 3, pitches: [72], pitchStaves: [0], staves: [0] },
-            { index: 4, pitches: [71], pitchStaves: [0], staves: [0] },
+            { index: 0, pitches: [60], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 1, pitches: [64], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 2, pitches: [67], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 3, pitches: [72], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 4, pitches: [71], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
         ],
     },
 };
@@ -42,10 +42,10 @@ export const TwoHands: Story = {
         from: 48,
         to: 84,
         upcoming: [
-            { index: 0, pitches: [48], pitchStaves: [1], staves: [1] },
-            { index: 1, pitches: [72], pitchStaves: [0], staves: [0] },
-            { index: 2, pitches: [52], pitchStaves: [1], staves: [1] },
-            { index: 3, pitches: [76], pitchStaves: [0], staves: [0] },
+            { index: 0, pitches: [48], pitchStaves: [1], pitchHands: ["left"], staves: [1] },
+            { index: 1, pitches: [72], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 2, pitches: [52], pitchStaves: [1], pitchHands: ["left"], staves: [1] },
+            { index: 3, pitches: [76], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
         ],
     },
 };
@@ -54,8 +54,20 @@ export const TwoHands: Story = {
 export const Chord: Story = {
     args: {
         upcoming: [
-            { index: 0, pitches: [60, 64, 67], pitchStaves: [0, 0, 0], staves: [0] },
-            { index: 1, pitches: [62, 65, 69], pitchStaves: [0, 0, 0], staves: [0] },
+            {
+                index: 0,
+                pitches: [60, 64, 67],
+                pitchStaves: [0, 0, 0],
+                pitchHands: ["right"],
+                staves: [0],
+            },
+            {
+                index: 1,
+                pitches: [62, 65, 69],
+                pitchStaves: [0, 0, 0],
+                pitchHands: ["right"],
+                staves: [0],
+            },
         ],
     },
 };
@@ -71,8 +83,20 @@ export const HandsTogether: Story = {
         from: 36,
         to: 84,
         upcoming: [
-            { index: 0, pitches: [48, 55, 64, 67], pitchStaves: [1, 1, 0, 0], staves: [0, 1] },
-            { index: 1, pitches: [50, 57, 65, 69], pitchStaves: [1, 1, 0, 0], staves: [0, 1] },
+            {
+                index: 0,
+                pitches: [48, 55, 64, 67],
+                pitchStaves: [1, 1, 0, 0],
+                pitchHands: ["right"],
+                staves: [0, 1],
+            },
+            {
+                index: 1,
+                pitches: [50, 57, 65, 69],
+                pitchStaves: [1, 1, 0, 0],
+                pitchHands: ["right"],
+                staves: [0, 1],
+            },
         ],
     },
 };

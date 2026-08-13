@@ -79,6 +79,8 @@ export function sceneKeys(from: number, to: number): SceneKey[] {
 // the drawable region.
 export type HighwayBlock = {
     pitch: number;
+    // The finger the note is played with, where the performance knows it.
+    finger?: number;
     x: number;
     width: number;
     onsetFrac: number;
@@ -91,7 +93,7 @@ export type HighwayBlock = {
 // so blocks fall and are sized by real duration, unlike the position-indexed
 // on-screen highway.
 export function highwayBlocks(
-    notes: readonly { pitch: number; startMs: number; durationMs: number }[],
+    notes: readonly { pitch: number; startMs: number; durationMs: number; finger?: number }[],
     keys: readonly SceneKey[],
     tMs: number,
     windowMs: number,
@@ -108,7 +110,14 @@ export function highwayBlocks(
         if (endFrac <= 0 || onsetFrac >= 1) {
             continue;
         }
-        blocks.push({ pitch: note.pitch, x: key.x, width: key.width, onsetFrac, endFrac });
+        blocks.push({
+            pitch: note.pitch,
+            finger: note.finger,
+            x: key.x,
+            width: key.width,
+            onsetFrac,
+            endFrac,
+        });
     }
     return blocks;
 }

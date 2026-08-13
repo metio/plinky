@@ -16,7 +16,7 @@ export type FrameState = {
     // The keys sounding at this instant, for the on-screen keyboard; heldMs is
     // how long each note has been sounding, so a renderer can let the press
     // visibly decay and re-light on a repeat.
-    down: { pitch: number; velocity: number; heldMs: number }[];
+    down: { pitch: number; velocity: number; heldMs: number; finger?: number }[];
     // The onset (ms on the notes' clock) of the latest note started by this
     // instant — the cursor's chord — or null before the first onset. An onset
     // rather than an index, so the state is independent of the note list's
@@ -69,7 +69,12 @@ export function frameAt(notes: RecordedNote[], timeMs: number): FrameState {
     const t = timeMs - LEAD_IN_MS;
     const down = notes
         .filter((note) => note.startMs <= t && t < note.startMs + note.durationMs)
-        .map((note) => ({ pitch: note.pitch, velocity: note.velocity, heldMs: t - note.startMs }));
+        .map((note) => ({
+            pitch: note.pitch,
+            velocity: note.velocity,
+            heldMs: t - note.startMs,
+            finger: note.finger,
+        }));
     let currentOnsetMs: number | null = null;
     let done = 0;
     for (const note of notes) {

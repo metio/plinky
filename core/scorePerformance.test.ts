@@ -3,11 +3,17 @@
 
 import { describe, expect, it } from "vitest";
 import type { MatchStep } from "./matcher";
-import { EVEN_VELOCITY, performanceLengthMs, performanceOf } from "./scorePerformance";
+import {
+    EVEN_VELOCITY,
+    fingeredFreely,
+    performanceLengthMs,
+    performanceOf,
+} from "./scorePerformance";
 
 const step = (elapsedMs: number, pitches: number[], holdMs = 500, holds?: number[]): MatchStep => ({
     pitches,
     pitchStaves: pitches.map(() => 0),
+    pitchHands: pitches.map(() => "right" as const),
     staves: [0],
     whole: 0,
     elapsedMs,
@@ -23,7 +29,13 @@ const step = (elapsedMs: number, pitches: number[], holdMs = 500, holds?: number
 describe("performanceOf", () => {
     it("plays every note of every position, on time and held as written", () => {
         const notes = performanceOf([step(0, [60]), step(500, [62, 64])]);
-        expect(notes).toEqual([
+        // Fingering rides along on every note; the timing is what this pins.
+        expect(notes.map(({ pitch, startMs, durationMs, velocity }) => ({
+            pitch,
+            startMs,
+            durationMs,
+            velocity,
+        }))).toEqual([
             { pitch: 60, startMs: 0, durationMs: 500, velocity: EVEN_VELOCITY },
             { pitch: 62, startMs: 500, durationMs: 500, velocity: EVEN_VELOCITY },
             { pitch: 64, startMs: 500, durationMs: 500, velocity: EVEN_VELOCITY },
@@ -79,5 +91,42 @@ describe("performanceLengthMs", () => {
 
     it("is zero for nothing played", () => {
         expect(performanceLengthMs([])).toBe(0);
+    });
+});
+
+describe("fingering", () => {
+    it("gives every note of a score-derived performance a finger and a hand", () => {
+        const notes = performanceOf([
+            step(0, [60]),
+            step(500, [62]),
+            step(1000, [64]),
+        ]);
+        for (const note of notes) {
+            expect(note.finger).toBeGreaterThanOrEqual(1);
+            expect(note.finger).toBeLessThanOrEqual(5);
+            expect(note.hand).toBe("right");
+        }
+    });
+
+    it("fingers a chord's notes distinctly, so a colour per finger reads as a shape", () => {
+        const notes = performanceOf([step(0, [60, 64, 67])]);
+        expect(new Set(notes.map((note) => note.finger)).size).toBe(3);
+    });
+
+    it("fingers a take nobody wrote down, splitting the hands at middle C", () => {
+        const played = fingeredFreely([
+            { pitch: 48, startMs: 0, durationMs: 400, velocity: 80 },
+            { pitch: 64, startMs: 0, durationMs: 400, velocity: 80 },
+            { pitch: 67, startMs: 400, durationMs: 400, velocity: 80 },
+        ]);
+        expect(played.map((note) => note.hand)).toEqual(["left", "right", "right"]);
+        for (const note of played) {
+            expect(note.finger).toBeGreaterThanOrEqual(1);
+        }
+    });
+
+    it("leaves a performance that already knows its fingers alone", () => {
+        const scored = performanceOf([step(0, [60])]);
+        expect(fingeredFreely(scored)).toEqual(scored);
     });
 });

@@ -12,6 +12,7 @@
 import { decompressMxl } from "../../core/musicxmlFile";
 import { performanceLengthMs, performanceOf } from "../../core/scorePerformance";
 import {
+    BY_FINGER,
     DEFAULT_KEYBOARD_DEPTH,
     DEFAULT_NOTE_COLOR,
     keyboardDepthFraction,
@@ -89,6 +90,9 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         // The same looks the export panel offers, so a promo clip is a take export with
         // its options set rather than a second renderer with its own palette.
         accent: noteColorHex(request.noteColor ?? DEFAULT_NOTE_COLOR),
+        // The performance is fingered by the cost model, so "by finger" paints each note
+        // in that finger's colour — the same mapping in every clip.
+        byFinger: (request.noteColor ?? DEFAULT_NOTE_COLOR) === BY_FINGER,
         keyboardDepth: keyboardDepthFraction(request.keyboardDepth ?? DEFAULT_KEYBOARD_DEPTH),
     });
 

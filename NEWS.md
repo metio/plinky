@@ -11,10 +11,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 ## 15 August 2026 — later
 
 **Your exported videos, your look.** Exporting a notes-highway video now offers a colour
-for the falling notes — indigo, pink, teal, amber or lime — and a choice of how deep the
+for the falling notes — indigo, pink, teal, amber, lime, or **one colour per finger** — and a choice of how deep the
 keyboard sits. The keys are shallower by default than they were: at the old depth each one
 read as a long pale column and the whole strip looked like a wall rather than a keyboard,
 and the room it frees goes to the notes, which are what you are watching.
+
+Colouring by finger uses the same engine behind the fingering trainer: each note is
+painted in its finger's colour — thumb red, index orange, middle yellow, ring pink, little
+violet — on the falling block and on the key it lands on, so a video shows the shape of
+the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 

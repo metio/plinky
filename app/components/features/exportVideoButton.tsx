@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import type { Take } from "../../../core/takes";
+import { fingeredFreely } from "../../../core/scorePerformance";
 import { videoDurationMs } from "../../../core/videoFrames";
 import { useAnalytics, useVideoExporter } from "../../contexts/services";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
@@ -16,6 +17,7 @@ import {
     KEYBOARD_DEPTHS,
     keyboardDepthFraction,
     NOTE_COLORS,
+    BY_FINGER,
     noteColorHex,
 } from "../../../core/videoLook";
 import { m } from "../../paraglide/messages.js";
@@ -42,6 +44,7 @@ const NOTE_COLOR_LABELS: Record<string, () => string> = {
     teal: m.video_note_color_teal,
     amber: m.video_note_color_amber,
     lime: m.video_note_color_lime,
+    finger: m.video_note_color_finger,
 };
 
 const DEPTH_LABELS: Record<string, () => string> = {
@@ -110,7 +113,13 @@ export function ExportVideoButton({
             const base = SIZES[quality];
             const width = orientation === "portrait" ? base.height : base.width;
             const height = orientation === "portrait" ? base.width : base.height;
-            const notes = take.composition.notes;
+            // Colouring by finger needs a finger on every note. A take carries none — it
+            // is somebody playing, not a score — so the cost model is asked for one,
+            // which is also what decides the hands.
+            const notes =
+                format === "highway" && noteColor === BY_FINGER
+                    ? fingeredFreely(take.composition.notes)
+                    : take.composition.notes;
             const durationMs = videoDurationMs(notes);
             const keyColors = { white: theme.whiteHex, black: theme.blackHex };
             // The take's own notation, rendered off-screen and rasterized once, so
@@ -134,6 +143,7 @@ export function ExportVideoButton({
                           showWordmark,
                           keyColors,
                           accent: noteColorHex(noteColor),
+                          byFinger: noteColor === BY_FINGER,
                           keyboardDepth: keyboardDepthFraction(keyboardDepth),
                       })
                     : takeScenePainter({

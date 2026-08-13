@@ -17,6 +17,11 @@ export type RecordedNote = {
     startMs: number;
     durationMs: number;
     velocity: number; // 0..127
+    // Which finger plays it, 1 (thumb) to 5 (little finger), and on which hand — known
+    // when a performance is derived from a score, absent when somebody simply played. A
+    // renderer that colours by finger falls back to one colour where this is missing.
+    finger?: number;
+    hand?: "left" | "right";
 };
 
 export type Composition = {

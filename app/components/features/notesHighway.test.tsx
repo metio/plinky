@@ -16,6 +16,10 @@ const step = (index: number, pitches: number[], staves = [0]): UpcomingStep => (
     // One staff per pitch: a fixture that names a single staff means every note of the
     // position is on it.
     pitchStaves: pitches.map((_, note) => staves[note] ?? staves[0] ?? 0),
+    // Staff 1 is the left hand in these fixtures, matching the two-staff piano layout.
+    pitchHands: pitches.map((_, note) =>
+        (staves[note] ?? staves[0] ?? 0) === 1 ? "left" : "right",
+    ),
     staves: [...new Set(staves)],
 });
 

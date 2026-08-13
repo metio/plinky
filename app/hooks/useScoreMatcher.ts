@@ -47,6 +47,8 @@ import {
     currentBar,
     expectedPitches,
     type Hand,
+    type Hand2,
+    handOfStaff,
     type MatcherState,
     type MatchStep,
     matchNote,
@@ -121,6 +123,9 @@ function stepsAtCursor(
         // One entry per pitch, in the same order. A note whose staff the engraver does
         // not report reads as the treble, which is where a single-staff piece is played.
         const pitchStaves: number[] = [];
+        // Which hand plays each pitch, worked out from the score's parts rather than from
+        // the raw staff index — on an art song the piano's staves are 1 and 2.
+        const pitchHands: Hand2[] = [];
         // What each pitch is asked for, pushed alongside `pitches` so the two stay
         // aligned. Kept in quarter notes here and turned into milliseconds once the
         // position's tempo is known, which is where the chord's own hold is converted.
@@ -148,6 +153,7 @@ function stepsAtCursor(
             }
             pitches.push(note.halfTone + 12);
             pitchStaves.push(staff ?? 0);
+            pitchHands.push(handOfStaff(staff, parts));
             // Each key is asked for on its own terms: its own accent over the standing
             // dynamic, and its own sounding length narrowed by its own articulation. The
             // sounding length, not the written one — a tied minim is held for the tie.
@@ -166,6 +172,7 @@ function stepsAtCursor(
         groups.push({
             pitches,
             pitchStaves,
+            pitchHands,
             staves: [...new Set(pitchStaves)].sort((a, b) => a - b),
             whole: osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0,
             holdQuarters,

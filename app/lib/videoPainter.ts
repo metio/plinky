@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { RecordedNote } from "../../core/composition";
-import { DEFAULT_KEYBOARD_DEPTH, keyboardDepthFraction } from "../../core/videoLook";
+import {
+    DEFAULT_KEYBOARD_DEPTH,
+    fingerColorHex,
+    keyboardDepthFraction,
+} from "../../core/videoLook";
 import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";
 import {
     highwayBlocks,
@@ -195,12 +199,18 @@ type KeyLayout = {
 // A sounding key is the resting colour blended toward the accent by its glow —
 // full at the press, decaying while held — so a repeated press of the same key
 // visibly re-lights it instead of merging into one long hold.
-function paintKey(context: Context2D, key: SceneKey, glow: number | null, l: KeyLayout): void {
+function paintKey(
+    context: Context2D,
+    key: SceneKey,
+    glow: number | null,
+    l: KeyLayout,
+    lit: string = ACCENT,
+): void {
     const x = l.margin + key.x * (l.width - l.margin * 2);
     const w = key.width * (l.width - l.margin * 2);
     const h = key.black ? l.keyboardHeight * 0.62 : l.keyboardHeight;
     const rest = key.black ? l.black : l.white;
-    context.fillStyle = glow === null ? rest : mixHex(rest, ACCENT, glow);
+    context.fillStyle = glow === null ? rest : mixHex(rest, lit, glow);
     context.beginPath();
     context.roundRect(x + w * 0.04, l.keyboardTop, w * 0.92, h, 4);
     context.fill();
@@ -400,7 +410,8 @@ const HIGHWAY_WINDOW_MS = 2_500;
 // highway, but time-based (a take carries every note's onset and duration, so a
 // block falls in real time and its height is the note's real length). No staff;
 // the keyboard sits at the foot with the blocks above it. The take records no
-// hand, so blocks share one accent colour rather than the on-screen two.
+// hand unless a score put one there, so blocks share one accent colour — except when
+// colouring by finger, where the fingering the performance carries decides each note.
 export function takeHighwayPainter({
     title,
     credit,
@@ -412,6 +423,7 @@ export function takeHighwayPainter({
     showWordmark = true,
     keyColors,
     accent = ACCENT,
+    byFinger = false,
     keyboardDepth = keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH),
 }: {
     title: string;
@@ -428,6 +440,10 @@ export function takeHighwayPainter({
     // blocks follow it — the lit key, the progress bar and the chrome keep the accent,
     // since those carry meaning rather than decoration.
     accent?: string;
+    // Colour each note by the finger that plays it instead of by one accent — falling
+    // block and lit key alike, so the two agree. Notes the performance did not finger
+    // keep the accent.
+    byFinger?: boolean;
     // How much of the frame's height the keyboard takes; see core/videoLook.
     keyboardDepth?: number;
 }): (context: Context2D, timeMs: number) => void {
@@ -477,7 +493,8 @@ export function takeHighwayPainter({
             const top = keyboardTop - Math.min(1, block.endFrac) * regionHeight;
             const bottom = keyboardTop - Math.max(0, block.onsetFrac) * regionHeight;
             const nearness = Math.max(0, Math.min(1, 1 - block.onsetFrac));
-            context.fillStyle = mixHex(farOf(accent), accent, nearness);
+            const near = byFinger ? fingerColorHex(block.finger, accent) : accent;
+            context.fillStyle = mixHex(farOf(near), near, nearness);
             context.beginPath();
             context.roundRect(x + w * 0.04, top, w * 0.92, Math.max(2, bottom - top), 4);
             context.fill();
@@ -490,11 +507,16 @@ export function takeHighwayPainter({
         // The keyboard, sounding keys lit by their freshest press.
         const glows = keyGlows(frame.down);
         const glowOf = (pitch: number) => glows.get(pitch) ?? null;
+        // The finger sounding each key right now, so a lit key matches the colour of the
+        // block that just landed on it.
+        const fingers = new Map(frame.down.map((entry) => [entry.pitch, entry.finger]));
+        const litOf = (pitch: number) =>
+            byFinger ? fingerColorHex(fingers.get(pitch), accent) : ACCENT;
         for (const key of keys.filter((entry) => !entry.black)) {
-            paintKey(context, key, glowOf(key.pitch), keyLayout);
+            paintKey(context, key, glowOf(key.pitch), keyLayout, litOf(key.pitch));
         }
         for (const key of keys.filter((entry) => entry.black)) {
-            paintKey(context, key, glowOf(key.pitch), keyLayout);
+            paintKey(context, key, glowOf(key.pitch), keyLayout, litOf(key.pitch));
         }
 
         paintCredit(context, cfg);

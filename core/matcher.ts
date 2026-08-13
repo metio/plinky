@@ -14,7 +14,16 @@ import { GRAND_STAFF, type ScoreParts } from "./parts";
 // practice.
 export type Hand = "both" | "right" | "left";
 
-export function staffFor(hand: Exclude<Hand, "both">, parts: ScoreParts): number {
+// A hand that actually plays — "both" is a practice mode, not a hand.
+export type Hand2 = Exclude<Hand, "both">;
+
+// Which hand a staff belongs to, given the score's parts. An accompaniment staff has no
+// hand of its own; it reads as the right, which is where a single-staff piece is played.
+export function handOfStaff(staff: number | undefined, parts: ScoreParts): Hand2 {
+    return staff === parts.left ? "left" : "right";
+}
+
+export function staffFor(hand: Hand2, parts: ScoreParts): number {
     return hand === "right" ? parts.right : parts.left;
 }
 
@@ -47,6 +56,11 @@ export function isPracticedHand(
 export type MatchStep = {
     // The MIDI pitches that sound here — a chord gives several.
     pitches: number[];
+    // Which hand plays each pitch, index-aligned with `pitches`. Derived where the
+    // score's part layout is known, so it stays right on music whose piano is not the
+    // first instrument — on an art song the piano's staves are 1 and 2, and reading
+    // "staff 1 is the left hand" off the raw index inverts the hands.
+    pitchHands: Hand2[];
     // The staff each pitch sits on, index-aligned with `pitches` (0 = treble/right,
     // 1 = bass/left). A chord spanning the grand staff has both here, one per note,
     // which is what lets a reader of this model say WHICH hand plays which key rather
@@ -172,6 +186,9 @@ export type UpcomingStep = {
     // Index-aligned with `pitches`, so a look-ahead can colour or light each note by
     // the hand that plays it rather than by the hands the position involves.
     pitchStaves: number[];
+    // Index-aligned with `pitches`: which hand plays each note, worked out from the
+    // score's parts rather than from the staff index alone.
+    pitchHands: Hand2[];
     staves: number[];
 };
 
@@ -182,6 +199,7 @@ export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[
             index: state.index + offset,
             pitches: step.pitches,
             pitchStaves: step.pitchStaves,
+            pitchHands: step.pitchHands,
             staves: step.staves,
         }));
 }

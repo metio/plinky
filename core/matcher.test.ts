@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type { Hand2 } from "./matcher";
 import { describe, expect, it } from "vitest";
 import {
     type ClearedEvent,
@@ -18,7 +19,9 @@ import { GRAND_STAFF, partsOf } from "./parts";
 
 const step = (pitches: number[], overrides: Partial<MatchStep> = {}): MatchStep => ({
     pitches,
-    pitchStaves: [0], staves: [0],
+    pitchStaves: [0],
+    pitchHands: ["right"],
+    staves: [0],
     whole: 0,
     elapsedMs: 0,
     holdMs: 0,
@@ -72,8 +75,8 @@ describe("upcomingSteps", () => {
             step([64, 67], { pitchStaves: [0], staves: [0] }),
         ]);
         expect(upcomingSteps(state, 2)).toEqual([
-            { index: 0, pitches: [60], pitchStaves: [0], staves: [0] },
-            { index: 1, pitches: [48], pitchStaves: [1], staves: [1] },
+            { index: 0, pitches: [60], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 1, pitches: [48], pitchStaves: [1], pitchHands: ["right"], staves: [1] },
         ]);
     });
 
@@ -81,8 +84,8 @@ describe("upcomingSteps", () => {
         const start = startMatch([step([60]), step([62]), step([64])]);
         const { state: next } = matchNote(start, 60, 0);
         expect(upcomingSteps(next, 6)).toEqual([
-            { index: 1, pitches: [62], pitchStaves: [0], staves: [0] },
-            { index: 2, pitches: [64], pitchStaves: [0], staves: [0] },
+            { index: 1, pitches: [62], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            { index: 2, pitches: [64], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
         ]);
     });
 
@@ -244,6 +247,7 @@ describe("the staff of each pitch", () => {
         const step = {
             pitches: [48, 64],
             pitchStaves: [1, 0],
+            pitchHands: ["left", "right"] as Hand2[],
             staves: [0, 1],
             whole: 0,
             elapsedMs: 0,
