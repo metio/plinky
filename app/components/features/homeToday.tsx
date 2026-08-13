@@ -41,6 +41,7 @@ import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { BakedIncipit } from "../ui/incipit";
 import { linkClasses } from "../ui/classes";
+import { SettingsSection } from "../ui/settingsSection";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
 
@@ -115,18 +116,12 @@ const LEARN_BLURB: Record<LearnPickId, () => string> = {
     tools: m.tools_intro,
 };
 
-// A named part of the session. Headings, never steps: nothing counts them, nothing
-// ticks them off, and skipping one costs nothing — a counter here would be a streak
-// wearing a different hat.
+// A named part of the session. Headings, never steps: nothing counts them, nothing ticks
+// them off, and skipping one costs nothing — a counter here would be a streak wearing a
+// different hat. It is the same labelled group the set-up panel and Settings use, so a
+// reader meets one shape rather than three.
 function Moment({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <section className="space-y-3">
-            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
-                {label}
-            </h2>
-            {children}
-        </section>
-    );
+    return <SettingsSection title={label}>{children}</SettingsSection>;
 }
 
 // One press, one start. `lead` marks the day's own thing — the challenge everybody

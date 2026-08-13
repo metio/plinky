@@ -41,7 +41,7 @@ export function MidiConnect() {
             <KeyboardHint octaveOffset={octaveOffset} />
 
             <div>
-                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
                     {m.midi_debug_inputs()}
                 </h3>
                 {devices.length === 0 ? (
@@ -68,7 +68,7 @@ export function MidiConnect() {
             </div>
 
             <div>
-                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
                     {m.midi_debug_held_notes()}
                 </h3>
                 {heldNotes.length === 0 ? (

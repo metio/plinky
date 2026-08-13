@@ -38,7 +38,9 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export default function Datenschutz() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">{m.datenschutz_title()}</h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">
+                {m.datenschutz_title()}
+            </h1>
             <p className="text-sm text-muted">{m.datenschutz_updated()}</p>
 
             <LegalTranslationNotice page="datenschutz" />

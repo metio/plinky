@@ -8,11 +8,15 @@ const CHIP: Record<"accent" | "danger", string> = {
     danger: "bg-danger-surface text-danger",
 };
 
-// A titled block of related settings. With an `icon` it renders as a card — the
-// icon in a soft chip, a plain-language title and hint, the controls below — so
-// each group of settings reads as one friendly, self-explaining unit. Without an
-// icon it is the quiet inline variant for a panel nested inside a card (Hand size
-// under Fingering); `level` keeps the document outline sound there.
+// A titled block of related things. With an `icon` it renders as a card — the icon in a
+// soft chip, a plain-language title and hint, the controls below — so each group of
+// settings reads as one friendly, self-explaining unit.
+//
+// Without an icon it is the quiet variant: a small brass label over a hairline, which is
+// how every labelled group in the app announces itself — the day's three moments, the
+// groups inside a run's set-up panel, a panel nested in a settings card. One definition,
+// so a reader learns the shape once. `level` keeps the document outline sound where it
+// nests.
 export function SettingsSection({
     title,
     hint,
@@ -32,7 +36,7 @@ export function SettingsSection({
 
     if (icon === undefined) {
         const heading = (
-            <Heading className="text-sm font-medium uppercase tracking-wide text-muted">
+            <Heading className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
                 {title}
             </Heading>
         );
@@ -41,7 +45,7 @@ export function SettingsSection({
                 {hint === undefined ? (
                     heading
                 ) : (
-                    <div>
+                    <div className="space-y-1.5">
                         {heading}
                         <p className="text-sm text-muted">{hint}</p>
                     </div>

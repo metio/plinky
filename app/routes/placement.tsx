@@ -75,7 +75,9 @@ export default function PlacementRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.placement_title()}</h1>
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    {m.placement_title()}
+                </h1>
                 <p className="text-sm text-muted">{m.placement_intro()}</p>
             </header>
 

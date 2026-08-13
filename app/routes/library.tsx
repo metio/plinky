@@ -78,7 +78,9 @@ export default function LibraryRoute() {
             <header className="space-y-1">
                 {/* The page is named for the tab that leads here: a bar that teaches a
                     model only works while the place agrees with the word on it. */}
-                <h1 className="text-2xl font-semibold">{m.nav_music()}</h1>
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    {m.nav_music()}
+                </h1>
                 <p className="text-sm text-muted">{m.library_intro()}</p>
                 <Show when={due > 0}>
                     <p className="text-sm font-medium text-warn">

@@ -145,7 +145,9 @@ export default function Compose() {
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h1 className="text-3xl font-bold tracking-tight">{m.compose_heading()}</h1>
+                    <h1 className="font-display text-3xl font-semibold tracking-tight">
+                        {m.compose_heading()}
+                    </h1>
                     {/* Capture is always on, so a live indicator makes that legible —
                         otherwise a first-timer can't tell their playing is being kept. */}
                     <span className="flex items-center gap-2 text-sm font-medium text-body">

@@ -80,7 +80,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                     <header className="space-y-1">
                         <div className="flex items-start justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-2xl font-semibold">{score.title}</h1>
+                                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                                    {score.title}
+                                </h1>
                                 {/* Right beside the name, so keeping a piece is a thought
                                 you can act on while playing it rather than an errand in
                                 the library. */}

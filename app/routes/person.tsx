@@ -125,7 +125,7 @@ export default function PersonPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                     {m.person_eyebrow()}
                 </p>
-                <h1 className="text-3xl font-bold tracking-tight">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
                     {person?.name ?? nameFromSlug(slug ?? "")}
                 </h1>
                 {person && (person.pieces.length > 0 || known) && (

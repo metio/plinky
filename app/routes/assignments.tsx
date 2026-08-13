@@ -260,7 +260,9 @@ export default function AssignmentsRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.assignments_heading()}</h1>
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    {m.assignments_heading()}
+                </h1>
                 <p className="text-sm text-muted">{m.assignments_intro()}</p>
             </header>
 
