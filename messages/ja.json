@@ -230,6 +230,7 @@
     "today_daily_done": "デイリー完了 — 結果を見る",
     "today_learn": "「{title}」を覚える",
     "today_browse": "ライブラリを見る",
+    "today_something_else": "ほかのことも",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "楽譜を検索…",
     "scores_filter_all": "すべて",

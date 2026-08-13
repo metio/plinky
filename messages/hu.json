@@ -230,6 +230,7 @@
     "today_daily_done": "Napi kész — nézd meg az eredményed",
     "today_learn": "Tanuld meg: „{title}”",
     "today_browse": "Böngészd a könyvtárat",
+    "today_something_else": "Vagy valami más",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Kották keresése…",
     "scores_filter_all": "Mind",

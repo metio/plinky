@@ -230,6 +230,7 @@
     "today_daily_done": "每日挑战已完成——看看你的成绩",
     "today_learn": "学习《{title}》",
     "today_browse": "浏览曲库",
+    "today_something_else": "或者别的",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "搜索乐谱…",
     "scores_filter_all": "全部",

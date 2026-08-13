@@ -230,6 +230,7 @@
     "today_daily_done": "Το ημερήσιο ολοκληρώθηκε — δες το αποτέλεσμά σου",
     "today_learn": "Μάθε το «{title}»",
     "today_browse": "Περιήγηση στη βιβλιοθήκη",
+    "today_something_else": "Ή κάτι άλλο",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Αναζήτηση παρτιτουρών…",
     "scores_filter_all": "Όλα",

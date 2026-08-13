@@ -39,6 +39,7 @@ import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { BakedIncipit } from "../ui/incipit";
+import { linkClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
 
@@ -57,8 +58,19 @@ const ICON: Record<Task["key"], string> = {
 // underneath, and the step only once there is a step to be at.
 function rowFor(task: Task, titles: Map<string, string>): { label: string; hint?: string } {
     switch (task.key) {
-        case "review":
-            return { label: m.today_review({ count: task.count }) };
+        case "review": {
+            // Name what is fading: three of them is enough to recognise the week's
+            // work, and a row that says only "three pieces" makes you press it to
+            // find out which.
+            const named = task.ids
+                .map((id) => titles.get(id))
+                .filter((title): title is string => Boolean(title))
+                .slice(0, 3);
+            return {
+                label: m.today_review({ count: task.count }),
+                hint: named.length > 0 ? named.join(" · ") : undefined,
+            };
+        }
         case "daily":
             return { label: task.done ? m.today_daily_done() : m.today_daily() };
         case "assignment": {
@@ -108,7 +120,7 @@ const LEARN_BLURB: Record<LearnPickId, () => string> = {
 function Moment({ label, children }: { label: string; children: ReactNode }) {
     return (
         <section className="space-y-3">
-            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
                 {label}
             </h2>
             {children}
@@ -137,7 +149,7 @@ function Chip({
             aria-label={label}
             className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
                 lead
-                    ? "border-accent-line-strong bg-accent-surface text-accent-strong hover:border-accent"
+                    ? "border-spark bg-spark-surface text-spark-strong hover:border-spark-strong"
                     : "border-line-strong bg-sunken text-ink hover:border-accent-line-strong hover:text-accent-strong"
             }`}
         >
@@ -153,6 +165,7 @@ function Row({
     hint,
     mark,
     action,
+    primary = false,
 }: {
     to: string;
     icon: string;
@@ -164,11 +177,14 @@ function Row({
     // What pressing the row does, said in a word. Only where the row's own text is the
     // name of something rather than an instruction.
     action?: string;
+    // The day's first piece of work carries the filled action; everything under it is
+    // quiet, so the eye lands somewhere rather than on four equal offers.
+    primary?: boolean;
 }) {
     return (
         <Link
             to={to}
-            className="group flex items-center gap-3 rounded-lg border border-line bg-raised p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm"
+            className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition hover:bg-subtle"
         >
             {mark ? (
                 <BakedIncipit mark={mark} label={label} className="shrink-0 text-faint" />
@@ -185,7 +201,11 @@ function Row({
             </span>
             <span
                 aria-hidden="true"
-                className="ml-auto shrink-0 rounded-full border border-line-strong px-2.5 py-1 text-xs font-medium text-accent-strong group-hover:border-accent-line-strong"
+                className={`ml-auto shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                    primary
+                        ? "bg-accent-solid text-white"
+                        : "border border-line-strong text-accent-strong group-hover:border-accent-line-strong"
+                }`}
             >
                 {action ?? "→"}
             </span>
@@ -362,7 +382,9 @@ export function HomeToday() {
                 "tiistai" — which is correct for the word and wrong for the start of a
                 heading. Lifting the first letter in CSS fixes every language at once,
                 and does nothing at all to a script that has no capitals. */}
-            <h1 className="text-2xl font-semibold first-letter:uppercase">{heading}</h1>
+            <h1 className="font-display text-4xl font-semibold tracking-tight first-letter:uppercase sm:text-5xl">
+                {heading}
+            </h1>
             {/* Holds its line before the standing resolves, so the day's practice does
                 not arrive by shoving the page down. */}
             <p className="min-h-5 text-sm text-muted">
@@ -416,7 +438,7 @@ export function HomeToday() {
 
             <Moment label={m.today_moment_work()}>
                 <ul className="space-y-2">
-                    {work.map((task) => {
+                    {work.map((task, index) => {
                         const { label, hint } = rowFor(task, session.titles);
                         const id = "id" in task ? task.id : undefined;
                         return (
@@ -432,6 +454,7 @@ export function HomeToday() {
                                             ? m.action_practice()
                                             : undefined
                                     }
+                                    primary={index === 0}
                                 />
                             </li>
                         );
@@ -460,6 +483,23 @@ export function HomeToday() {
                     hint={LEARN_BLURB[session.learn]()}
                 />
             </Moment>
+
+            {/* The way out, for somebody who fancies none of it. Quiet on purpose: the
+                page has already made its offers, and this is the shrug after them. */}
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-4 text-sm text-muted">
+                <span>{m.today_something_else()}</span>
+                <Link to="/library" className={linkClasses}>
+                    {m.today_browse()}
+                </Link>
+                <span aria-hidden="true">·</span>
+                <Link to="/compose" className={linkClasses}>
+                    {m.play_compose()}
+                </Link>
+                <span aria-hidden="true">·</span>
+                <Link to="/placement" className={linkClasses}>
+                    {m.placement_title()}
+                </Link>
+            </p>
         </div>
     );
 }

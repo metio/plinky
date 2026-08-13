@@ -230,6 +230,7 @@
     "today_daily_done": "오늘의 도전 완료 — 결과 보기",
     "today_learn": "“{title}” 익히기",
     "today_browse": "라이브러리 둘러보기",
+    "today_something_else": "다른 것도",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "악보 검색…",
     "scores_filter_all": "전체",

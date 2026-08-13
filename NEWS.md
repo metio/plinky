@@ -47,6 +47,12 @@ Collect results existed, you would not have found it.
 Compose, which moved here from the front page — music you make yourself belongs on the
 same shelf as music you find.
 
+**Plinky has a face now.** The wordmark and each page's own title are set in a schoolbook
+serif — the kind of type a piano album is printed in — while everything you press stays in
+the plain face it was, because a control should disappear and a title should not. The word
+you're on in the bar is underlined in brass rather than tinted blue, so the bar reads as a
+place you're standing in.
+
 **And Plinky looks like the book it teaches from.** Warm ivory paper, soft brown-black
 ink, brass on the things you've earned, and a deep ink blue on anything you can press.
 The page is now the same paper the staff is printed on, so a score sits on the page

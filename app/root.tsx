@@ -39,6 +39,8 @@ import {
 // the render-blocking Google Fonts request.
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import "@fontsource-variable/inter/wght.css";
+// The display face, for the wordmark and page titles only (see --font-display).
+import "@fontsource-variable/literata/wght.css";
 import "@fontsource-variable/inter/wght-italic.css";
 import "./app.css";
 
@@ -98,7 +100,7 @@ function Header() {
                         <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-md" />
                         <span
                             aria-hidden="true"
-                            className="text-xl font-bold tracking-tight text-ink"
+                            className="font-display text-xl font-semibold tracking-tight text-ink"
                         >
                             Pl
                             <span className="relative">
