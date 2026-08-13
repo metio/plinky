@@ -8,6 +8,44 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 17 August 2026
+
+**Plinky has four places now, and a shape to the day.** The bar along the bottom (or
+the top, on a wide screen) used to name five things of five different kinds, and a good
+quarter of the app lived behind the **?** — the theory course, the glossary of marks,
+the little tools and the keyboard tour were only ever reachable through a few links at
+the top of the help page. All of that is over.
+
+**Today** is where you land, and it is the day's practice in the shape a piano teacher
+gives an hour: something to **warm up** on — the day's challenge, your next arcade rung,
+a fresh drill, a round of ear training — then the piece you're **working on**, and then
+**one thing to learn**, picked for the day. They are headings, not a list of chores:
+nothing counts them, nothing ticks them off, and skipping one costs you nothing.
+
+**Learn** is a page of its own, and it holds the schoolroom in the order you meet it:
+meeting the keyboard, how the music works, what the marks mean, ear training, ways to
+practise, the little tools, and finding your level. Nothing new was built — these have
+all been here for a while, with nowhere to find them.
+
+At the foot of Learn, under **Teaching**, are the two halves of setting work for somebody
+else: your **assignments**, and **Collect results**, where a teacher reads back the codes
+their students send. Those two had never linked to each other, so unless you already knew
+Collect results existed, you would not have found it.
+
+**Music** is everything there is to play: the catalogue, anything you've imported, and
+Compose, which moved here from the front page — music you make yourself belongs on the
+same shelf as music you find.
+
+**And Plinky looks like the book it teaches from.** Warm ivory paper, soft brown-black
+ink, brass on the things you've earned, and a deep ink blue on anything you can press.
+The page is now the same paper the staff is printed on, so a score sits on the page
+instead of in a white box on it. The colours that *mean* something haven't moved: green
+is still the note you found, red the one you didn't, and your share grid is exactly the
+grid it was.
+
+The daily challenge and Compose keep their own web addresses, so any link or bookmark
+you have still works.
+
 ## 16 August 2026 — later
 
 **Plinky moved to a new home.** The site is now served from Cloudflare Pages instead of

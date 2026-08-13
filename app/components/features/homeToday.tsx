@@ -3,9 +3,7 @@
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
-import { buildExerciseId } from "../../../core/exerciseGen";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { practiceHref } from "../../../core/practisable";
 import {
@@ -17,11 +15,11 @@ import {
     loadGradedMastery,
     surprisePick,
 } from "../../lib/gradeProgress";
+import { ArcadeCard } from "./arcadeCard";
 import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
     useExerciseSource,
-    useMasteryStore,
     useOnboardingStore,
     usePlacementStore,
     usePrefsStore,
@@ -134,7 +132,6 @@ function Row({
 
 type Session = {
     tasks: Task[];
-    arcadeLevel: number;
     learn: LearnPickId;
     surprise: { catalogue: GradeCatalogItem[]; grade: number; mastered: Set<string> };
 };
@@ -149,7 +146,6 @@ type Session = {
 export function HomeToday() {
     const prefsStore = usePrefsStore();
     const assignmentsStore = useAssignmentsStore();
-    const masteryStore = useMasteryStore();
     const onboarding = useOnboardingStore();
     const placement = usePlacementStore();
     const exercises = useExerciseSource();
@@ -217,12 +213,6 @@ export function HomeToday() {
                         ? { id: suggestion.id, title: suggestion.title, kind: suggestion.kind }
                         : null,
                 }),
-                // The first arcade rung not yet cleared, read from the same mastery the
-                // play surface records — so clearing a level advances it with no bespoke
-                // loop behind it.
-                arcadeLevel: currentArcadeLevel(
-                    (lv) => masteryStore.load(buildExerciseId(arcadeConfig(lv)))?.learned === true,
-                ),
                 learn: learnPick({
                     keyboardMet: onboarding.marked().has("keyboardMet"),
                     placementTaken: placement.load() !== null,
@@ -238,7 +228,6 @@ export function HomeToday() {
         prefsStore.load,
         assignmentsStore.list,
         exercises.manifest,
-        masteryStore.load,
         onboarding.marked,
         placement.load,
         services,
@@ -252,19 +241,19 @@ export function HomeToday() {
     // The daily belongs to the warm-up; everything else is the work.
     const daily = session.tasks.find((task) => task.key === "daily");
     const work = session.tasks.filter((task) => task.key !== "daily");
-    const arcadeId = buildExerciseId(arcadeConfig(session.arcadeLevel));
 
     return (
         <div className="space-y-8">
             <Moment label={m.today_moment_warmup()}>
                 <div className="flex flex-wrap gap-2">
                     {daily && <Chip to={daily.to}>{taskLabel(daily)}</Chip>}
-                    <Chip to={`/play/${arcadeId}`}>
-                        {m.arcade_play({ level: session.arcadeLevel })}
-                    </Chip>
                     <Chip to="/daily?tab=warmup">{m.today_drill()}</Chip>
                     <Chip to="/ear">{m.ear_title()}</Chip>
                 </div>
+                {/* The endless ladder keeps its card: a chip reading "Play level 7"
+                    names nothing, and the arcade is the one warm-up that has to say
+                    what it is before anybody presses it. */}
+                <ArcadeCard />
             </Moment>
 
             <Moment label={m.today_moment_work()}>

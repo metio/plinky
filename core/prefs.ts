@@ -75,10 +75,6 @@ export type Prefs = {
     // note (often the wrong hand on a two-hand piece) was missed, so a mistake never
     // freezes you mid-piece. Off waits for every note, which builds accuracy.
     forgiving: boolean;
-    // Live green/amber/red feedback as you finger a passage. On by default, but the
-    // guidance-hypothesis warns constant feedback can stunt self-judgement, so a learner
-    // can fade it off and rely on the post-phrase summary.
-    fingerHints: boolean;
     // How a grade decays when its pieces go unreviewed: gentle keeps the grade and
     // only dulls its shine, competitive lets it actually slip — the opt-in challenge.
     decayMode: DecayMode;
@@ -223,7 +219,6 @@ function defaults(): Prefs {
         lightLeftChannel: defaultChannels("casio").left,
         lightRightChannel: defaultChannels("casio").right,
         forgiving: true,
-        fingerHints: true,
         decayMode: "gentle",
         reviewCap: REVIEW_CAP,
         barsPerRow: 0,
@@ -306,7 +301,6 @@ export function parsePrefs(raw: string | null): Prefs {
             noteHints: oneOf(parsed.noteHints, NOTE_HINTS, base.noteHints),
             noteLabels: oneOf(parsed.noteLabels, NOTE_LABELS, base.noteLabels),
             forgiving: bool(parsed.forgiving, base.forgiving),
-            fingerHints: bool(parsed.fingerHints, base.fingerHints),
             decayMode: oneOf(parsed.decayMode, DECAY_MODES, base.decayMode),
             reviewCap: oneOf(parsed.reviewCap, REVIEW_CAPS, base.reviewCap),
             barsPerRow: oneOf(parsed.barsPerRow, BARS_PER_ROW, base.barsPerRow),

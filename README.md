@@ -324,25 +324,41 @@ whichever you have. A key that isn't the one asked for still sounds and simply d
 count: wandering along the keys is how a keyboard gets learned, and nothing here keeps
 score. It's entirely optional, and it never asks twice.
 
-On the **home page**, a gentle, dismissible **Getting started** checklist explains how
-Plinky works and walks the first session in order — set yourself up (connect your MIDI
-piano in Settings, then hand size and key mapping, so everything after is tailored to
-you), then play your first piece (your
-first assignment when you have one), then find the level you read at — before pointing
-out the app's other corners. The
-steps that put your fingers on keys right away carry a small **Jump right in** marker,
-the shortcut for anyone who'd rather play first and configure later. Finding your level
-sits just after that first piece rather than before it: by then the cursor and the
-feedback colours are familiar, so the placement test measures your reading instead of a
-screen you've never seen — and anyone who already plays meets the shortcut past the
-beginner grades without going looking for it. The **Today**
-panel alongside it lists the day's practice as one-tap links — pieces due for review,
-the daily challenge, and **your open assignment's next step** ("Continue *First
-steps* — step 2 of 5"), which goes straight into that piece; while an assignment is
-open, its next step stands in for the generic something-new suggestion, so the path
-you (or your teacher) chose is always one tap from the front page. The first time you
-open a score a one-time tip explains the three modes and the listen-then-play-slowly
-loop — a guided tour where you land, never a gate on progress.
+## Four places, and the shape of a day
+
+Plinky has four permanent places, each answering a different question: **Today** (what
+shall I play now), **Music** (what is there to play), **Learn** (what does this mean),
+and **You** (how am I getting on). Settings and Help stay as the two icons in the corner.
+
+**Today** is the front page, and it is the day's practice in the shape a teacher gives
+an hour:
+
+- **Warm up** — the day's challenge, your next rung of the sight-reading arcade, a fresh
+  drill, a round of ear training.
+- **Work on** — your open assignment's next step ("Continue *First steps* — step 2 of
+  5"), which goes straight into that piece, whatever is fading and wants a refresh, or
+  the gentlest piece you haven't learned yet. A **Surprise me** button picks one for you.
+- **Learn one thing** — a lesson from the theory course, a mark from the glossary, a way
+  to practise, or the keyboard tour if you've never played. The pick comes from the day's
+  number, so it holds still while you look at it and moves on tomorrow.
+
+They are headings, never steps. Nothing counts them, nothing ticks them off, and skipping
+one costs nothing — the same promise as the missing streak. Below them, a small
+**Getting started** strip carries the three things that tailor everything after them:
+connecting a MIDI piano (or letting Plinky listen), your hand size, and your
+computer-keyboard keys. It goes away for good once they're done, or when you dismiss it.
+
+**Learn** gathers the schoolroom in the order you meet it — meet the keyboard, how the
+music works, what the marks mean, ear training, ways to practise, the little tools, and
+finding your level. Under a **Teaching** heading at the foot of it sit the two halves of
+setting work for somebody else: **assignments** (an ordered set of pieces is a course of
+study, whoever laid it out — your teacher, or you) and **Collect results**, where a
+teacher reads back the codes their students send. **Music** is everything there is to
+play: the catalogue, anything you import, and Compose for music you make yourself. The
+daily challenge and Compose keep their own web addresses, so existing links still work.
+
+The first time you open a score a one-time tip explains the three modes and the
+listen-then-play-slowly loop — a guided tour where you land, never a gate on progress.
 
 **What the marks mean** — a glossary of notation, linked from Help. Every symbol you
 meet in a score, grouped by what it controls: how long a note lasts, how you touch it,
@@ -570,9 +586,11 @@ register is part of the string.
 
 ## Help page
 
-The **?** in the header opens a help page that explains Plinky area by area — one
-section per part of the app, and it drops you on the section for the page you came
-from. The text is translated with the rest of the UI, so a reader gets it in their own
+The **?** in the header opens a help page that explains how each part of Plinky
+behaves — one section per area, and it drops you on the section for the page you came
+from. It is a manual rather than a table of contents: the pages it used to list at the
+top now live on **Learn**, where they can be found without knowing to look under a
+question mark. The text is translated with the rest of the UI, so a reader gets it in their own
 language, and the pictures of each page live in `public/help/`.
 
 Content and app ship together: the words are messages like every other string, held to

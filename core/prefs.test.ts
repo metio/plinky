@@ -23,7 +23,6 @@ const BASE: Prefs = {
     lightRightChannel: 4,
     highway: true,
     forgiving: true,
-    fingerHints: true,
     decayMode: "gentle",
     reviewCap: 8,
     barsPerRow: 0,
