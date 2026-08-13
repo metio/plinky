@@ -29,6 +29,8 @@ const FPS = 30;
 const NOTE_COLOR = "finger";
 const KEYBOARD_DEPTH = "shallow";
 const PORT = 5199;
+// Render only the pieces whose title contains this, for a re-run of one clip.
+const ONLY = argValue("--only");
 
 // The pieces worth leading with: recognisable in three seconds, and CC0, so nothing is
 // owed by a post that carries only the picture. Ids are content fingerprints, so a
@@ -119,6 +121,15 @@ function toAac(file) {
 
 // A filename somebody can pick out of a folder: the piece, not its fingerprint. Accents
 // and punctuation go, spaces become dashes — "Gymnopédie No. 1" becomes gymnopedie-no-1.
+// The file a piece is written to. Two pieces can share a title — the catalogue holds a
+// Schubert Ave Maria and a Bach/Gounod one — and a bare title slug would have the second
+// silently overwrite the first, so a repeated title takes its composer along.
+function fileFor(piece, out) {
+    const shares = PIECES.filter((other) => other.title === piece.title).length > 1;
+    const name = shares ? `${slug(piece.title)}-${slug(piece.composer)}` : slug(piece.title);
+    return `${out}/${name}.mp4`;
+}
+
 function slug(title) {
     return title
         .normalize("NFD")
@@ -187,6 +198,9 @@ try {
 
     let failed = 0;
     for (const piece of PIECES) {
+        if (ONLY && !piece.title.toLowerCase().includes(ONLY.toLowerCase())) {
+            continue;
+        }
         process.stdout.write(`${piece.title} … `);
         try {
         const { url, song } = scoreUrl(piece.id, manifest);
@@ -211,7 +225,7 @@ try {
                 keyboardDepth: KEYBOARD_DEPTH,
             },
         );
-        const file = `${OUT}/${slug(piece.title)}.mp4`;
+        const file = fileFor(piece, OUT);
         writeFileSync(file, Buffer.from(bytes));
         toAac(file);
         const seconds = ((Date.now() - started) / 1000).toFixed(1);
