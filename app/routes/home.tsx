@@ -3,7 +3,6 @@
 
 import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { FeatureBoundary } from "../components/features/featureBoundary";
-import { HeroKeyboard } from "../components/features/heroKeyboard";
 import { HomeToday } from "../components/features/homeToday";
 import { socialMeta, structuredData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -34,7 +33,10 @@ export default function Home() {
                 lands in empty space instead of pushing the rest of it down. A page that
                 rearranges itself while you are reading it is the one thing every visit
                 would otherwise have in common. */}
-            <section className="space-y-6 returning:hidden">
+            {/* What Plinky is, for a stranger and for anything reading the page without
+                running it. The keyboard that used to sit here is in the warm-up now,
+                where putting your hands on it is the first thing the day asks. */}
+            <section className="space-y-3 returning:hidden">
                 <div className="space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                         {m.home_eyebrow()}
@@ -43,26 +45,6 @@ export default function Home() {
                         {m.home_heading()}
                     </h2>
                     <p className="text-pretty leading-relaxed text-muted">{m.home_intro()}</p>
-                </div>
-
-                {/* Signature: a real keyboard you play right here, resting on a staff
-                    line. The brand gradient glows behind it; the keys are the one
-                    bold, characteristic thing on the page. */}
-                <div className="space-y-2">
-                    <div className="relative">
-                        <div
-                            aria-hidden="true"
-                            className="pointer-events-none absolute -inset-x-6 -top-8 bottom-2 -z-10 bg-gradient-to-r from-accent-ring/15 via-spark/15 to-transparent blur-2xl"
-                        />
-                        <div
-                            aria-hidden="true"
-                            className="mx-auto mb-2 h-px max-w-md bg-gradient-to-r from-accent-ring via-spark to-transparent"
-                        />
-                        <FeatureBoundary feature="HeroKeyboard">
-                            <HeroKeyboard />
-                        </FeatureBoundary>
-                    </div>
-                    <p className="text-center text-sm text-muted">{m.home_keyboard_hint()}</p>
                 </div>
             </section>
 

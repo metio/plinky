@@ -3,7 +3,9 @@
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
+import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
+import { buildExerciseId } from "../../../core/exerciseGen";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { practiceHref } from "../../../core/practisable";
 import {
@@ -15,11 +17,12 @@ import {
     loadGradedMastery,
     surprisePick,
 } from "../../lib/gradeProgress";
-import { ArcadeCard } from "./arcadeCard";
+import { HeroKeyboard } from "./heroKeyboard";
 import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
     useExerciseSource,
+    useMasteryStore,
     useOnboardingStore,
     usePlacementStore,
     usePrefsStore,
@@ -44,18 +47,37 @@ const ICON: Record<Task["key"], string> = {
     browse: "📚",
 };
 
-function taskLabel(task: Task): string {
+// What a row says, and what pressing it will do. A row that opens a piece names the
+// piece: "Continue First steps — step 1 of 5" told a player who had never pressed
+// anything that they were resuming, counted them against a list nobody handed them, and
+// still did not say which piece was about to open. The set it came from is the line
+// underneath, and the step only once there is a step to be at.
+function rowFor(task: Task, titles: Map<string, string>): { label: string; hint?: string } {
     switch (task.key) {
         case "review":
-            return m.today_review({ count: task.count });
+            return { label: m.today_review({ count: task.count }) };
         case "daily":
-            return task.done ? m.today_daily_done() : m.today_daily();
-        case "assignment":
-            return m.today_assignment({ name: task.name, step: task.step, total: task.total });
+            return { label: task.done ? m.today_daily_done() : m.today_daily() };
+        case "assignment": {
+            // Where in the set this is, said only once there is somewhere to be: a
+            // player on the first step has not started, and counting them against a
+            // list nobody handed them is the checklist this page is not.
+            const hint =
+                task.step > 1
+                    ? m.today_assignment_step({
+                          name: task.name,
+                          step: task.step,
+                          total: task.total,
+                      })
+                    : m.today_assignment_set({ name: task.name });
+            // The catalogue does not know this piece — a shared set naming something
+            // this device has not got. Name the set rather than invent a title.
+            return { label: titles.get(task.id) ?? task.name, hint };
+        }
         case "learn":
-            return m.today_learn({ title: task.title });
+            return { label: m.today_learn({ title: task.title }) };
         case "browse":
-            return m.today_browse();
+            return { label: m.today_browse() };
     }
 }
 
@@ -91,11 +113,30 @@ function Moment({ label, children }: { label: string; children: ReactNode }) {
     );
 }
 
-function Chip({ to, children }: { to: string; children: ReactNode }) {
+// One press, one start. `lead` marks the day's own thing — the challenge everybody
+// gets, while it is still unopened — which is the only reason to weigh one of these
+// more than the others.
+function Chip({
+    to,
+    lead = false,
+    label,
+    children,
+}: {
+    to: string;
+    lead?: boolean;
+    // The accessible name, when the visible text is not the whole of it.
+    label?: string;
+    children: ReactNode;
+}) {
     return (
         <Link
             to={to}
-            className="rounded-full border border-line-strong bg-sunken px-3.5 py-1.5 text-sm font-medium text-ink transition hover:border-accent-line-strong hover:text-accent-strong"
+            aria-label={label}
+            className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
+                lead
+                    ? "border-accent-line-strong bg-accent-surface text-accent-strong hover:border-accent"
+                    : "border-line-strong bg-sunken text-ink hover:border-accent-line-strong hover:text-accent-strong"
+            }`}
         >
             {children}
         </Link>
@@ -108,6 +149,7 @@ function Row({
     label,
     hint,
     mark,
+    action,
 }: {
     to: string;
     icon: string;
@@ -116,6 +158,9 @@ function Row({
     // The piece's opening bars, when the catalogue carries them: a row about a piece of
     // music is better off showing the music than a pictogram of a piano.
     mark?: string;
+    // What pressing the row does, said in a word. Only where the row's own text is the
+    // name of something rather than an instruction.
+    action?: string;
 }) {
     return (
         <Link
@@ -131,9 +176,15 @@ function Row({
             )}
             <span className="min-w-0 space-y-0.5">
                 <span className="block font-medium text-ink group-hover:text-accent-strong">
-                    {label} →
+                    {label}
                 </span>
                 {hint && <span className="block text-sm leading-snug text-muted">{hint}</span>}
+            </span>
+            <span
+                aria-hidden="true"
+                className="ml-auto shrink-0 rounded-full border border-line-strong px-2.5 py-1 text-xs font-medium text-accent-strong group-hover:border-accent-line-strong"
+            >
+                {action ?? "→"}
             </span>
         </Link>
     );
@@ -141,6 +192,9 @@ function Row({
 
 type Session = {
     tasks: Task[];
+    arcadeLevel: number;
+    // Every catalogue title by id, so a row can name the piece it opens.
+    titles: Map<string, string>;
     // The opening bars of every piece the catalogue knows, so a row draws its own.
     marks: Map<string, string>;
     learn: LearnPickId;
@@ -157,6 +211,7 @@ type Session = {
 export function HomeToday() {
     const prefsStore = usePrefsStore();
     const assignmentsStore = useAssignmentsStore();
+    const masteryStore = useMasteryStore();
     const onboarding = useOnboardingStore();
     const placement = usePlacementStore();
     const exercises = useExerciseSource();
@@ -229,6 +284,13 @@ export function HomeToday() {
                     placementTaken: placement.load() !== null,
                     day,
                 }),
+                // The first arcade rung not yet cleared, read from the same mastery the
+                // play surface records — so clearing a level advances it with nothing
+                // bespoke behind it.
+                arcadeLevel: currentArcadeLevel(
+                    (lv) => masteryStore.load(buildExerciseId(arcadeConfig(lv)))?.learned === true,
+                ),
+                titles: new Map(catalogue.map((item) => [item.id, item.title])),
                 marks: new Map(
                     catalogue.flatMap((item) => (item.incipit ? [[item.id, item.incipit]] : [])),
                 ),
@@ -242,6 +304,7 @@ export function HomeToday() {
         prefsStore.load,
         assignmentsStore.list,
         exercises.manifest,
+        masteryStore.load,
         onboarding.marked,
         placement.load,
         services,
@@ -255,35 +318,62 @@ export function HomeToday() {
     // The daily belongs to the warm-up; everything else is the work.
     const daily = session.tasks.find((task) => task.key === "daily");
     const work = session.tasks.filter((task) => task.key !== "daily");
+    const arcadeId = buildExerciseId(arcadeConfig(session.arcadeLevel));
 
     return (
         <div className="space-y-8">
             <Moment label={m.today_moment_warmup()}>
                 <div className="flex flex-wrap gap-2">
-                    {daily && <Chip to={daily.to}>{taskLabel(daily)}</Chip>}
+                    {daily && (
+                        <Chip to={daily.to} lead={!daily.done}>
+                            {rowFor(daily, session.titles).label}
+                        </Chip>
+                    )}
+                    {/* The endless ladder is one of the four, not a billboard beside
+                        them: its name, and the rung you are on as a quiet number. */}
+                    <Chip
+                        to={`/play/${arcadeId}`}
+                        label={m.arcade_play({ level: session.arcadeLevel })}
+                    >
+                        {m.arcade_title()}
+                        <span className="rounded-full bg-subtle px-1.5 text-xs tabular-nums text-muted">
+                            {session.arcadeLevel}
+                        </span>
+                    </Chip>
                     <Chip to="/daily?tab=warmup">{m.today_drill()}</Chip>
                     <Chip to="/ear">{m.ear_title()}</Chip>
                 </div>
-                {/* The endless ladder keeps its card: a chip reading "Play level 7"
-                    names nothing, and the arcade is the one warm-up that has to say
-                    what it is before anybody presses it. */}
-                <ArcadeCard />
+                {/* Somewhere to put your hands before anything is asked of them. It is
+                    the same instrument the practice surfaces use, so a warm-up here and
+                    a run on a piece feel like one keyboard. */}
+                <div className="space-y-1.5 pt-1">
+                    <HeroKeyboard />
+                    <p className="text-center text-sm text-muted">{m.home_keyboard_hint()}</p>
+                </div>
             </Moment>
 
             <Moment label={m.today_moment_work()}>
                 <ul className="space-y-2">
-                    {work.map((task) => (
-                        <li key={task.key}>
-                            <Row
-                                to={task.to}
-                                icon={ICON[task.key]}
-                                label={taskLabel(task)}
-                                mark={
-                                    "id" in task && task.id ? session.marks.get(task.id) : undefined
-                                }
-                            />
-                        </li>
-                    ))}
+                    {work.map((task) => {
+                        const { label, hint } = rowFor(task, session.titles);
+                        const id = "id" in task ? task.id : undefined;
+                        return (
+                            <li key={task.key}>
+                                <Row
+                                    to={task.to}
+                                    icon={ICON[task.key]}
+                                    label={label}
+                                    hint={hint}
+                                    mark={id ? session.marks.get(id) : undefined}
+                                    action={
+                                        task.key === "assignment" || task.key === "learn"
+                                            ? m.action_practice()
+                                            : undefined
+                                    }
+                                />
+                            </li>
+                        );
+                    })}
                 </ul>
                 <SurpriseButton
                     onClick={() => {

@@ -180,17 +180,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-deep: var(--color-indigo-800);
     /* A race has two runners: you in indigo, the ghost in fuchsia. */
     --color-ghost: var(--color-fuchsia-500);
-    /* The arcade's filled call to action, carrying white text. Both steps have to
-       clear WCAG 4.5:1 against white, which rules out everything lighter than
-       fuchsia-600 (fuchsia-500 is 3.5:1) — so the hover darkens rather than
-       brightens, the way every other filled button here does. `ghost` itself stays
-       the lighter fuchsia: it only ever carries an icon, which needs 3:1. */
-    --color-ghost-solid: var(--color-fuchsia-600);
-    --color-ghost-solid-hover: var(--color-fuchsia-700);
     --color-ghost-text: var(--color-fuchsia-600);
     --color-ghost-surface: var(--color-fuchsia-50);
     --color-ghost-line: var(--color-fuchsia-200);
-    --color-ghost-ink: var(--color-fuchsia-900);
     /* The notes highway tints the two hands apart. */
     --color-hand-right: var(--color-indigo-500);
     --color-hand-right-soft: var(--color-indigo-300);
@@ -309,12 +301,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-deep: var(--color-indigo-300);
 
     --color-ghost: var(--color-fuchsia-500);
-    --color-ghost-solid: var(--color-fuchsia-600);
-    --color-ghost-solid-hover: var(--color-fuchsia-700);
     --color-ghost-text: var(--color-fuchsia-400);
     --color-ghost-surface: var(--color-fuchsia-950);
     --color-ghost-line: var(--color-fuchsia-900);
-    --color-ghost-ink: var(--color-fuchsia-100);
 
     --color-hand-right: var(--color-indigo-300);
     --color-hand-right-soft: var(--color-indigo-500);
