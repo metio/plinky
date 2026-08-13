@@ -76,6 +76,25 @@ describe("readIncipit", () => {
         expect(incipit?.notes.map((n) => n.alter)).toEqual([1, -1]);
     });
 
+    it("runs on past a pickup, so a two-note first bar is not the whole mark", () => {
+        const incipit = readIncipit(
+            codec,
+            score(
+                `${bar(note("G", 4))}<measure number="2">${note("C", 5) + note("B", 4) + note("A", 4)}</measure>`,
+            ),
+        );
+        expect(incipit?.notes).toHaveLength(4);
+    });
+
+    it("stops after the opening phrase rather than reading the page", () => {
+        const measures = Array.from(
+            { length: 9 },
+            (_, index) => `<measure number="${index + 1}">${note("C", 4)}</measure>`,
+        ).join("");
+        // Four bars that gave something, and no more, even though eight notes were asked for.
+        expect(readIncipit(codec, score(measures))?.notes).toHaveLength(4);
+    });
+
     it("keeps reading past a bar that is only rests", () => {
         const incipit = readIncipit(
             codec,

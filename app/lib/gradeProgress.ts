@@ -3,6 +3,7 @@
 
 import { loadBundledScores, loadUserScores } from "./catalog";
 import { earCatalogItems } from "./earProgress";
+import { encodeIncipit, readIncipit } from "../../core/incipit";
 import type { ItemKind } from "../../core/practisable";
 import type { Letter } from "../../core/grade";
 import type { XmlCodec } from "../../core/xml";
@@ -35,6 +36,9 @@ export type GradedMastery = {
     cost: number;
     kind: ItemKind;
     mastery: Mastery;
+    // Rides along from the catalogue entry, so a list of what is fading can draw each
+    // piece rather than only naming it.
+    incipit?: string;
 };
 
 // Whether a piece counts toward its grade under the decay rule. Gentle counts every
@@ -150,6 +154,9 @@ export type GradeCatalogItem = {
     grade: number;
     cost: number;
     kind: ItemKind;
+    // The piece's opening bars, encoded — what a row draws to name it. Rides along from
+    // the manifest, or is read straight off a bundled or imported score's own notation.
+    incipit?: string;
 };
 
 // Where the fetched manifests come from — structurally the song/exercise
@@ -157,7 +164,13 @@ export type GradeCatalogItem = {
 // catalogue.
 // What a source manifest carries per item — a ladder item minus its kind, since a
 // manifest only ever describes pieces. buildCatalogue stamps the kind on.
-export type ManifestItem = { id: string; title: string; grade: number; cost: number };
+export type ManifestItem = {
+    id: string;
+    title: string;
+    grade: number;
+    cost: number;
+    incipit?: string;
+};
 
 export type CatalogSources = {
     // Null signals a failed fetch (see the source contracts); the catalogue
@@ -205,12 +218,17 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
         if (right.length + left.length === 0) {
             continue;
         }
+        // The notation is already open here, so the mark costs one more read of it —
+        // which is why a bundled demo and a score you imported yourself carry one just
+        // as a catalogue piece does.
+        const opening = readIncipit(sources.xml, score.xml);
         index.set(score.id, {
             id: score.id,
             title: score.title,
             grade: gradeOf(sources.xml, score.id, score.xml),
             cost: rawDifficulty(sources.xml, score.xml),
             kind: "piece",
+            ...(opening ? { incipit: encodeIncipit(opening) } : {}),
         });
     }
     return index;

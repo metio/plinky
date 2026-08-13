@@ -7,11 +7,14 @@
 
 import { type ItemKind, practiceHref } from "./practisable";
 
+// `id` names the one piece a task is about, where there is one — what a row draws its
+// opening bars from. A review of several is about no single piece, and neither is the
+// daily or a browse.
 export type Task =
-    | { key: "review"; count: number; to: string }
+    | { key: "review"; count: number; to: string; id?: string }
     | { key: "daily"; to: string; done: boolean }
-    | { key: "assignment"; name: string; step: number; total: number; to: string }
-    | { key: "learn"; title: string; to: string }
+    | { key: "assignment"; name: string; step: number; total: number; to: string; id: string }
+    | { key: "learn"; title: string; to: string; id: string }
     | { key: "browse"; to: string };
 
 // A due or suggested item, carrying the kind that decides where practising it goes.
@@ -42,7 +45,7 @@ export function todayTasks({ due, dailyDoneToday, assignment, suggestion }: Toda
         // aren't hidden behind one.
         const only = due.length === 1 ? due[0] : undefined;
         const to = only ? practiceHref(only) : "/review";
-        tasks.push({ key: "review", count: due.length, to });
+        tasks.push({ key: "review", count: due.length, to, ...(only ? { id: only.id } : {}) });
     }
     // Not yet done, the daily is an action and sits up in the priority list.
     if (!dailyDoneToday) {
@@ -57,9 +60,15 @@ export function todayTasks({ due, dailyDoneToday, assignment, suggestion }: Toda
             // Straight into the current step's play page — continuing must never
             // require finding the assignment on its own page first.
             to: `/play/${assignment.scoreId}`,
+            id: assignment.scoreId,
         });
     } else if (suggestion) {
-        tasks.push({ key: "learn", title: suggestion.title, to: practiceHref(suggestion) });
+        tasks.push({
+            key: "learn",
+            title: suggestion.title,
+            to: practiceHref(suggestion),
+            id: suggestion.id,
+        });
     }
     if (tasks.length === 0) {
         tasks.push({ key: "browse", to: "/library" });

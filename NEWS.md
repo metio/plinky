@@ -52,6 +52,11 @@ centuries, since you recognise a piece by how it begins long before you recognis
 catalogue number. If you have the note colours on, the mark is coloured the same way the
 score below it is.
 
+The same mark now names pieces in lists too: what you're working on today, what's
+fading and wants a refresh, and every piece on a composer's page. It comes with the
+catalogue rather than being worked out on the spot, so a list of music reads as music
+without waiting for anything to load.
+
 **Each key now shows its own length.** When the shrinking fill on a key told you how long
 to hold it, every key struck at that moment drained at the same rate — the longest note's.
 So a quaver in the right hand emptied as slowly as the whole note under it in the left,

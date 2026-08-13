@@ -28,6 +28,10 @@ export type SongMeta = {
     tempo: number;
     beatsPerBar: number;
     bars: number;
+    // The piece's opening bars, baked by dev/bake-incipits so a list can draw the mark
+    // that names a piece without fetching its notation. Absent on a piece whose opening
+    // would not read, and on any manifest written before it was baked.
+    incipit?: string;
 };
 
 const MANIFEST_URL = "/songs/manifest.json";
