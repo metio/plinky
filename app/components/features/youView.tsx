@@ -8,6 +8,7 @@ import { useHistoryStore } from "../../contexts/services";
 import { useYouData } from "../../hooks/useYouData";
 import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";
+import { SettingsSection } from "../ui/settingsSection";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
@@ -47,7 +48,7 @@ export function YouView() {
     const pieceTitle = (id: string) => titles.get(id) ?? id;
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                     {m.you_heading()}
@@ -57,38 +58,13 @@ export function YouView() {
 
             <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
 
-            {summary && (
-                <ActivityStats
-                    daysPracticed={summary.daysPracticed}
-                    totalNotes={summary.totalNotes}
-                />
-            )}
-
-            {recap.totalNotes > 0 && (
-                <FeatureBoundary feature="RecapCard">
-                    <RecapCard recap={recap} />
-                </FeatureBoundary>
-            )}
-
-            <Show when={level >= 1}>
-                <section className="space-y-2">
-                    <h2 className="text-sm font-medium text-muted">{m.grades_share_heading()}</h2>
-                    <ShareButtons
-                        text={m.milestone_grade_boast({ level })}
-                        imageSvg={svgMilestone({
-                            title: m.grades_current({ level }),
-                            detail: skill > 0 ? m.grades_skill({ rating: skill }) : undefined,
-                        })}
-                        imageText={m.milestone_grade_boast({ level })}
-                    />
-                </section>
-            </Show>
-
+            {/* The page's own intro promises three things — where you stand, what is
+                ready for you, and how it has been going — and for a long time it
+                delivered twelve blocks in the order they were built. What you could act
+                on now comes first, the ladder underneath it, and the record of how it
+                went after both, so the page reads forwards. */}
             <Show when={upNext.length > 0}>
-                <section className="space-y-2 rounded-md border border-accent-line bg-accent-surface/50 p-4 dark:bg-accent-surface/30">
-                    <h2 className="text-sm font-medium text-accent-deep">
-                        {m.grades_up_next({ grade: workingGrade })}
-                    </h2>
+                <SettingsSection title={m.grades_up_next({ grade: workingGrade })}>
                     <ul className="space-y-1 text-sm">
                         {upNext.map((item) => (
                             <li key={item.id}>
@@ -98,20 +74,12 @@ export function YouView() {
                             </li>
                         ))}
                     </ul>
-                </section>
+                </SettingsSection>
             </Show>
 
-            {/* Where the ladder starts for someone who has no idea. Sits above the
-            roadmap because it answers the question the roadmap raises. */}
-            <section className="rounded-xl border border-line p-4">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
-                    {m.placement_cta()}
-                </h2>
-                <p className="mt-1 text-sm text-muted">{m.placement_cta_hint()}</p>
-                <Link to="/placement" className={`${linkClasses} mt-2 inline-block text-sm`}>
-                    {m.placement_start()} →
-                </Link>
-            </section>
+            <FeatureBoundary feature="RefreshQueue">
+                <RefreshQueue reviews={data.reviews} />
+            </FeatureBoundary>
 
             <GradeRoadmap
                 items={data.items}
@@ -121,17 +89,28 @@ export function YouView() {
                 poolSizes={data.poolSizes}
             />
 
-            <FeatureBoundary feature="SlowNotes">
-                <SlowNotes />
-            </FeatureBoundary>
-
-            <FeatureBoundary feature="RefreshQueue">
-                <RefreshQueue reviews={data.reviews} />
-            </FeatureBoundary>
+            {/* Where the ladder starts for someone who has no idea. It answers the
+                question the roadmap raises, so it sits directly under it. */}
+            <SettingsSection title={m.placement_cta()} hint={m.placement_cta_hint()}>
+                <Link to="/placement" className={`${linkClasses} inline-block text-sm`}>
+                    {m.placement_start()} →
+                </Link>
+            </SettingsSection>
 
             <FeatureBoundary feature="AchievementGallery">
                 <AchievementGallery achievements={data.achievements} />
             </FeatureBoundary>
+
+            <FeatureBoundary feature="RepertoirePanel">
+                <RepertoirePanel items={data.items} now={new Date()} />
+            </FeatureBoundary>
+
+            {summary && (
+                <ActivityStats
+                    daysPracticed={summary.daysPracticed}
+                    totalNotes={summary.totalNotes}
+                />
+            )}
 
             {summary && (
                 <FeatureBoundary feature="WeekChart">
@@ -139,13 +118,34 @@ export function YouView() {
                 </FeatureBoundary>
             )}
 
-            <FeatureBoundary feature="RepertoirePanel">
-                <RepertoirePanel items={data.items} now={new Date()} />
-            </FeatureBoundary>
-
             <FeatureBoundary feature="PracticeReport">
                 <PracticeReport pieceTitle={pieceTitle} />
             </FeatureBoundary>
+
+            <FeatureBoundary feature="SlowNotes">
+                <SlowNotes />
+            </FeatureBoundary>
+
+            {/* Everything worth showing somebody else, together at the foot rather than
+                a share button in the middle of the page and a share card at the end. */}
+            {recap.totalNotes > 0 && (
+                <FeatureBoundary feature="RecapCard">
+                    <RecapCard recap={recap} />
+                </FeatureBoundary>
+            )}
+
+            <Show when={level >= 1}>
+                <SettingsSection title={m.grades_share_heading()}>
+                    <ShareButtons
+                        text={m.milestone_grade_boast({ level })}
+                        imageSvg={svgMilestone({
+                            title: m.grades_current({ level }),
+                            detail: skill > 0 ? m.grades_skill({ rating: skill }) : undefined,
+                        })}
+                        imageText={m.milestone_grade_boast({ level })}
+                    />
+                </SettingsSection>
+            </Show>
 
             {fingerprint && (
                 <ShareCard
