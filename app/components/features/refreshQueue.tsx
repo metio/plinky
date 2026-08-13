@@ -3,6 +3,7 @@
 
 import { type ItemKind, practiceHref } from "../../../core/practisable";
 import { buttonClasses } from "../ui/button";
+import { BakedIncipit } from "../ui/incipit";
 import { linkClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { m } from "../../paraglide/messages.js";
@@ -15,7 +16,7 @@ import { m } from "../../paraglide/messages.js";
 export function RefreshQueue({
     reviews,
 }: {
-    reviews: Array<{ id: string; title: string; kind: ItemKind }>;
+    reviews: Array<{ id: string; title: string; kind: ItemKind; incipit?: string }>;
 }) {
     const due = reviews.length > 0;
     return (
@@ -30,7 +31,14 @@ export function RefreshQueue({
                     </Link>
                     <ul className="space-y-1 text-sm">
                         {reviews.map((review) => (
-                            <li key={review.id}>
+                            <li key={review.id} className="flex items-center gap-2">
+                                {/* What is fading, drawn: the opening bars are the
+                                    quickest way to remember which piece this was. */}
+                                <BakedIncipit
+                                    mark={review.incipit}
+                                    label={review.title}
+                                    className="shrink-0 text-faint"
+                                />
                                 <Link to={practiceHref(review)} className={linkClasses}>
                                     {review.title}
                                 </Link>

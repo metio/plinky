@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { type Person, type PersonPiece, personFor } from "../../core/person";
+import { BakedIncipit } from "../components/ui/incipit";
 import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
 import { loadBundledScores } from "../lib/catalog";
@@ -144,6 +145,14 @@ export default function PersonPage() {
                                 to={`/play/${piece.id}`}
                                 className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm hover:border-accent-line-strong hover:bg-accent-surface/50 dark:hover:bg-accent-surface/30"
                             >
+                                {/* A catalogue of one composer's works is exactly where
+                                    an opening bar earns its place: the titles rhyme with
+                                    each other, and the music does not. */}
+                                <BakedIncipit
+                                    mark={piece.incipit}
+                                    label={piece.title}
+                                    className="shrink-0 text-faint"
+                                />
                                 <span className="min-w-0 truncate font-medium">{piece.title}</span>
                                 <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
                                     {piece.grade !== undefined && (

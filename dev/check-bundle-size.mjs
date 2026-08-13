@@ -304,7 +304,13 @@ const BUDGET_VENDOR_KB = 324;
 // to describe them. Copy is inlined per locale, so a paragraph costs more than the
 // component that renders it — most of the kilobyte and a half is the new help sections
 // and the Learn page's own prose, not the route.
-const BUDGET_APP_KB = 333;
+//
+// 336. Incipits: the reader that lifts a piece's opening bars, the drawing that puts
+// them on a staff, and the encoding that carries one per piece in the catalogue
+// manifest. Two kilobytes of app code; the marks themselves are manifest bytes, not
+// bundle bytes, and cost about 39 KB gzipped on a file the browsing visitor already
+// fetches.
+const BUDGET_APP_KB = 336;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

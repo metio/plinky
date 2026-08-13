@@ -13,6 +13,7 @@
     "songs:dedup": "tsx dev/dedup-songs.mts",
     "songs:bake": "tsx dev/bake-grades.mts",
     "songs:cost": "tsx dev/backfill-song-cost.mts",
+    "songs:incipits": "tsx dev/bake-incipits.mts",
     "songs:audit": "tsx dev/audit-catalog.mts",
     "promo:videos": "node dev/promo-videos.mjs",
     "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",

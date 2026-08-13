@@ -177,6 +177,9 @@ export type PersonPiece = {
     grade?: number;
     license?: string;
     source?: string;
+    // The piece's opening bars as the manifest bakes them, so a composer's list can be
+    // read as music rather than as a column of titles.
+    incipit?: string;
 };
 
 export type Person = {

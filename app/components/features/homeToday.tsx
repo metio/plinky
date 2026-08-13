@@ -32,6 +32,7 @@ import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { type Task, todayTasks } from "../../../core/today";
 import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
+import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
 
@@ -106,20 +107,28 @@ function Row({
     icon,
     label,
     hint,
+    mark,
 }: {
     to: string;
     icon: string;
     label: string;
     hint?: string;
+    // The piece's opening bars, when the catalogue carries them: a row about a piece of
+    // music is better off showing the music than a pictogram of a piano.
+    mark?: string;
 }) {
     return (
         <Link
             to={to}
             className="group flex items-center gap-3 rounded-lg border border-line bg-raised p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm"
         >
-            <span aria-hidden="true" className="text-xl">
-                {icon}
-            </span>
+            {mark ? (
+                <BakedIncipit mark={mark} label={label} className="shrink-0 text-faint" />
+            ) : (
+                <span aria-hidden="true" className="text-xl">
+                    {icon}
+                </span>
+            )}
             <span className="min-w-0 space-y-0.5">
                 <span className="block font-medium text-ink group-hover:text-accent-strong">
                     {label} →
@@ -132,6 +141,8 @@ function Row({
 
 type Session = {
     tasks: Task[];
+    // The opening bars of every piece the catalogue knows, so a row draws its own.
+    marks: Map<string, string>;
     learn: LearnPickId;
     surprise: { catalogue: GradeCatalogItem[]; grade: number; mastered: Set<string> };
 };
@@ -218,6 +229,9 @@ export function HomeToday() {
                     placementTaken: placement.load() !== null,
                     day,
                 }),
+                marks: new Map(
+                    catalogue.flatMap((item) => (item.incipit ? [[item.id, item.incipit]] : [])),
+                ),
                 surprise: { catalogue, grade: workingGrade, mastered },
             });
         });
@@ -260,7 +274,14 @@ export function HomeToday() {
                 <ul className="space-y-2">
                     {work.map((task) => (
                         <li key={task.key}>
-                            <Row to={task.to} icon={ICON[task.key]} label={taskLabel(task)} />
+                            <Row
+                                to={task.to}
+                                icon={ICON[task.key]}
+                                label={taskLabel(task)}
+                                mark={
+                                    "id" in task && task.id ? session.marks.get(task.id) : undefined
+                                }
+                            />
                         </li>
                     ))}
                 </ul>

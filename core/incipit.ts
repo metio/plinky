@@ -50,6 +50,12 @@ export type Incipit = { clef: Clef; notes: IncipitNote[] };
 // enough to stay a mark rather than a score.
 export const INCIPIT_NOTES = 8;
 
+// How many bars it will read to find them. A piece that opens on a pickup gives one or
+// two notes in its first bar, which is not a shape anybody recognises, so the mark runs
+// on into the phrase — but it stops well short of the first page, because an opening is
+// what identifies a work and a page is what plays it.
+const INCIPIT_BARS = 4;
+
 function textOf(parent: Element, tag: string): string {
     return parent.getElementsByTagName(tag)[0]?.textContent?.trim() ?? "";
 }
@@ -106,7 +112,9 @@ export function readIncipit(codec: XmlCodec, xml: string, limit = INCIPIT_NOTES)
     const notes: IncipitNote[] = [];
     let clef: Clef = "treble";
     let seenClef = false;
+    let bars = 0;
     for (const measure of Array.from(part.getElementsByTagName("measure"))) {
+        const before = notes.length;
         const declared = Number(textOf(measure, "divisions") || "0");
         if (Number.isFinite(declared) && declared > 0) {
             divisions = declared;
@@ -134,9 +142,13 @@ export function readIncipit(codec: XmlCodec, xml: string, limit = INCIPIT_NOTES)
                 return { clef, notes };
             }
         }
-        // A first bar that is only rests (a pickup of silence, an accompaniment
-        // entering later) says nothing, so keep reading into the next one.
-        if (notes.length > 0) {
+        // A bar of rests — a pickup of silence, an accompaniment entering later — is
+        // not one of the bars this is allowed; only bars that gave something count
+        // toward the limit, so the mark always carries notes rather than a bar count.
+        if (notes.length > before) {
+            bars += 1;
+        }
+        if (bars >= INCIPIT_BARS) {
             break;
         }
     }
@@ -194,4 +206,80 @@ export function layoutIncipit(incipit: Incipit): IncipitGlyph[] {
             ledgers: ledgersFor(y),
         };
     });
+}
+
+// ── Baking ───────────────────────────────────────────────────────────────────
+// A list of pieces holds ids and titles, not notation, so a row can only carry a mark
+// if the mark travels with the catalogue. The encoded form is what the manifest ships:
+// one short string per piece, a few dozen bytes, read without fetching the score.
+//
+// `G` or `F` for the clef, then one note after another: an optional accidental, the
+// diatonic position, and a letter for the length. No separators — the letter ends each
+// note — because this is multiplied by every piece in the catalogue.
+//
+// The length is rounded to the nearest of the six common values. The mark draws no
+// flags and no dots, and uses the length only to decide a hollow head and a stem, so
+// the rounding costs the drawing nothing and keeps the string short.
+const LENGTHS: readonly [string, number][] = [
+    ["w", 4],
+    ["h", 2],
+    ["q", 1],
+    ["e", 0.5],
+    ["s", 0.25],
+    ["t", 0.125],
+];
+
+const ACCIDENTAL: Record<string, number> = { "#": 1, b: -1 };
+
+function lengthLetter(quarters: number): string {
+    let best = LENGTHS[0]!;
+    for (const candidate of LENGTHS) {
+        // The list runs longest to shortest and a tie takes the later, shorter value:
+        // a dotted crotchet sits exactly between a crotchet and a minim, and drawing it
+        // as a crotchet keeps the head filled, which is what the page shows.
+        if (Math.abs(candidate[1] - quarters) <= Math.abs(best[1] - quarters)) {
+            best = candidate;
+        }
+    }
+    return best[0];
+}
+
+export function encodeIncipit(incipit: Incipit): string {
+    const notes = incipit.notes
+        .map((note) => {
+            const accidental = note.alter > 0 ? "#" : note.alter < 0 ? "b" : "";
+            return `${accidental}${Math.max(0, Math.round(note.diatonic))}${lengthLetter(note.quarters)}`;
+        })
+        .join("");
+    return `${incipit.clef === "bass" ? "F" : "G"}${notes}`;
+}
+
+const NOTE_PATTERN = /([#b]?)(\d+)([whqest])/g;
+
+// Null for anything that is not a mark this drew — an older manifest without the field,
+// a truncated string, a value from somewhere else. A row then shows its plain self.
+export function decodeIncipit(text: string): Incipit | null {
+    const clefLetter = text.slice(0, 1);
+    if (clefLetter !== "G" && clefLetter !== "F") {
+        return null;
+    }
+    const body = text.slice(1);
+    const notes: IncipitNote[] = [];
+    let consumed = 0;
+    NOTE_PATTERN.lastIndex = 0;
+    for (const match of body.matchAll(NOTE_PATTERN)) {
+        consumed += match[0].length;
+        const length = LENGTHS.find(([letter]) => letter === match[3]);
+        notes.push({
+            diatonic: Number(match[2]),
+            alter: ACCIDENTAL[match[1] ?? ""] ?? 0,
+            quarters: length ? length[1] : 1,
+        });
+    }
+    // Every character has to belong to a note, so a string with anything else in it is
+    // rejected whole rather than half-read.
+    if (notes.length === 0 || consumed !== body.length) {
+        return null;
+    }
+    return { clef: clefLetter === "F" ? "bass" : "treble", notes };
 }
