@@ -46,6 +46,12 @@ grid it was.
 The daily challenge and Compose keep their own web addresses, so any link or bookmark
 you have still works.
 
+**Every piece shows how it starts.** Under the title of a piece there's now a small staff
+carrying its opening notes — the way a thematic catalogue has named works for two
+centuries, since you recognise a piece by how it begins long before you recognise its
+catalogue number. If you have the note colours on, the mark is coloured the same way the
+score below it is.
+
 **Each key now shows its own length.** When the shrinking fill on a key told you how long
 to hold it, every key struck at that moment drained at the same rate — the longest note's.
 So a quaver in the right hand emptied as slowly as the whole note under it in the left,

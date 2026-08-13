@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { Attribution } from "../components/ui/attribution";
+import { ScoreIncipit } from "../components/features/scoreIncipit";
 import { Button } from "../components/ui/button";
 import { attributionFor } from "../../core/attribution";
 import { canonicalComposer, personSlug } from "../../core/person";
@@ -112,6 +113,9 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                                 )}
                             </p>
                         )}
+                        {/* The piece's opening bar, under its name — the mark a
+                            thematic catalogue would file it by. */}
+                        <ScoreIncipit xml={score.xml} title={score.title} />
                         <Attribution
                             composer={score.composer}
                             license={score.license}

@@ -26,7 +26,9 @@ There are no version numbers to wait for — every change goes live as it lands.
 
 ## Practising a score
 
-Open any score and Plinky renders it as real notation, led by a single action:
+Open any score and Plinky renders it as real notation. Under the title sits the piece's
+**incipit** — its opening bar on a small staff, the way a thematic catalogue names a work,
+coloured by note name when you have that reading aid on. Then a single action leads:
 **Practice**. Pressing it drops into **full screen** — the score and keyboard to
 themselves, the screen kept awake (and on a phone the browser's URL bar reclaimed for
 the music) — and starts a note-by-note guide: read the note, play it, and the cursor
