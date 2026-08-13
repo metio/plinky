@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import {
-    useAssignmentsStore,
     useDailyStore,
     useHintsStore,
     useHistoryStore,
@@ -18,86 +17,65 @@ import {
     discoveries,
     discoveryProgress,
 } from "../../../core/onboarding";
-import { FIRST_SONG_ID } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { CheckIcon, CloseIcon } from "../ui/icons";
 import { linkClasses } from "../ui/classes";
 import { useMidiConnected } from "./conditional";
 import { LocalizedLink as Link } from "../ui/localizedLink";
-import { Show } from "./conditional";
 
-// The Getting-started checklist — the home page's one front door for a new player:
-// an opt-in tour of how Plinky works, each step completed by doing it and
-// deep-linking to where you do it. The two set-up steps come first (a hand size and
-// key mapping tailor everything after), then the hands-on steps — and the ones that
-// put fingers on keys right away carry a "jump right in" pill, the shortcut for
-// anyone who'd rather play first and configure later. The ✕ dismisses it for good
-// (for fast starters), and it hides itself once every step is done. The played
-// step's link is resolved at render time, so `to` here is only its fallback.
+// Setting yourself up: the three things that tailor everything after them — a piano
+// (or a microphone) to play on, how far your hands reach, and which computer keys
+// carry which notes. None of it is a gate, and none of it is a tour of the app's
+// features: the day's practice already offers those, and a second list of suggestions
+// beside it would only ask the reader to choose which list to read.
+//
+// The ✕ dismisses it for good, and it hides itself once all three are done.
 const DISCOVERY: {
     key: DiscoveryId;
     icon: string;
     label: () => string;
     to: string;
-    quick?: boolean;
 }[] = [
-    // First: the only step that needs no piano, no MIDI cable and no reading — for
-    // someone who has never touched a keyboard, everything else assumes too much.
-    { key: "keyboardMet", icon: "🎼", label: m.discover_keyboard, to: "/basics" },
     { key: "midiConnected", icon: "🔌", label: m.discover_midi, to: "/settings" },
     { key: "handSet", icon: "✋", label: m.grades_start_hand, to: "/settings" },
     { key: "keysCustomized", icon: "⌨️", label: m.discover_keys, to: "/settings" },
-    {
-        key: "played",
-        icon: "🎹",
-        label: m.grades_start_play,
-        to: `/play/${FIRST_SONG_ID}`,
-        quick: true,
-    },
-    // Straight after the first piece, and before every corner: by now the reader knows
-    // the cursor and the feedback colours, so the test measures their reading rather
-    // than their unfamiliarity — and a pianist who does not need a beginner ladder finds
-    // the shortcut in the first screenful instead of hunting for it on the You page.
-    { key: "placed", icon: "📊", label: m.discover_placement, to: "/placement" },
-    { key: "dailyDone", icon: "📅", label: m.grades_start_daily, to: "/daily", quick: true },
-    { key: "earTried", icon: "👂", label: m.discover_ear, to: `/play/${FIRST_SONG_ID}?mode=ear` },
-    {
-        key: "fingeringTried",
-        icon: "🎯",
-        label: m.discover_fingering,
-        to: `/play/${FIRST_SONG_ID}?mode=fingering`,
-    },
-    { key: "composed", icon: "🎼", label: m.discover_compose, to: "/compose" },
-    { key: "imported", icon: "📥", label: m.discover_import, to: "/library?tab=manage" },
 ];
 
 const DISCOVERY_DISMISSED = "discovery-panel";
 const LINK = linkClasses;
 
 // The fresh-visitor state: nothing done, nothing dismissed. Rendering it by default
-// puts the checklist into the prerendered shell, so the common first visit sees it in
+// puts the strip into the prerendered shell, so the common first visit sees it in
 // the first paint with no layout shift.
 const FRESH: Record<DiscoveryId, boolean> = Object.fromEntries(
     DISCOVERY.map((step) => [step.key, false]),
 ) as Record<DiscoveryId, boolean>;
 
+// Only the steps shown here decide whether the strip has anything left to say — the
+// rest of the discovery record tracks corners of the app that the day's practice
+// offers on its own.
+function setupProgress(done: Record<DiscoveryId, boolean>): DiscoveryProgress {
+    return discoveryProgress(
+        Object.fromEntries(DISCOVERY.map((step) => [step.key, done[step.key] === true])) as Record<
+            DiscoveryId,
+            boolean
+        >,
+    );
+}
+
 export function DiscoveryChecklist() {
     // Shown in its fresh state by default: completion and dismissal live in
     // localStorage, absent at prerender, so a true newcomer — the state every
-    // prerender captures — gets the checklist in the static shell. A returning
+    // prerender captures — gets the strip in the static shell. A returning
     // player's real progress (or dismissal) is reconciled on the client after mount.
     const [state, setState] = useState<{
         done: Record<DiscoveryId, boolean>;
         progress: DiscoveryProgress;
         dismissed: boolean;
-        // Where "play your first piece" leads: the first step of the player's first
-        // assignment when they have one, a single demo tune otherwise.
-        playTo: string;
     }>({
         done: FRESH,
-        progress: discoveryProgress(FRESH),
+        progress: setupProgress(FRESH),
         dismissed: false,
-        playTo: `/play/${FIRST_SONG_ID}`,
     });
 
     const prefsStore = usePrefsStore();
@@ -107,7 +85,6 @@ export function DiscoveryChecklist() {
     const onboarding = useOnboardingStore();
     const placement = usePlacementStore();
     const hints = useHintsStore();
-    const assignmentsStore = useAssignmentsStore();
     // A plugged-in piano completes the connect step wherever it happens — the
     // provider reconnects a remembered device on any page, so the mark can't
     // depend on visiting Settings. Marked before the read below, so a live
@@ -125,12 +102,10 @@ export function DiscoveryChecklist() {
             placementTaken: placement.load() !== null,
             marked: onboarding.marked(),
         });
-        const firstItem = assignmentsStore.list()[0]?.items[0];
         setState({
             done,
-            progress: discoveryProgress(done),
+            progress: setupProgress(done),
             dismissed: hints.seen(DISCOVERY_DISMISSED),
-            playTo: firstItem ? `/play/${firstItem.id}` : `/play/${FIRST_SONG_ID}`,
         });
     }, [
         prefsStore,
@@ -140,7 +115,6 @@ export function DiscoveryChecklist() {
         onboarding,
         placement,
         hints,
-        assignmentsStore,
         midiConnected,
     ]);
 
@@ -166,15 +140,6 @@ export function DiscoveryChecklist() {
                     <CloseIcon className="h-4 w-4" />
                 </button>
             </div>
-            <p className="text-sm text-muted">
-                {m.discover_intro()}{" "}
-                <span className="font-medium tabular-nums">
-                    {m.discover_progress({
-                        done: state.progress.done,
-                        total: state.progress.total,
-                    })}
-                </span>
-            </p>
             <ul className="space-y-1.5 text-sm">
                 {DISCOVERY.map((step) => {
                     const stepDone = state.done[step.key];
@@ -192,18 +157,11 @@ export function DiscoveryChecklist() {
                             </span>
                             <span aria-hidden="true">{step.icon}</span>
                             <Link
-                                to={step.key === "played" ? state.playTo : step.to}
+                                to={step.to}
                                 className={stepDone ? "text-muted line-through" : LINK}
                             >
                                 {step.label()}
                             </Link>
-                            {/* The shortcut marker for the itchy-fingered: these
-                            steps start you playing immediately, no set-up needed. */}
-                            <Show when={step.quick && !stepDone}>
-                                <span className="rounded-full bg-warn-fill px-2 py-0.5 text-xs font-medium text-warn">
-                                    {m.discover_jump_in()}
-                                </span>
-                            </Show>
                         </li>
                     );
                 })}

@@ -5,23 +5,26 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router";
 import { withTrailingSlash } from "../../../core/site";
 import { m } from "../../paraglide/messages.js";
-import { BookIcon, CalendarIcon, GradCapIcon, HomeIcon, NotesIcon } from "./icons";
+import { BookIcon, CalendarIcon, GradCapIcon, NotesIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
 import { localizedHref } from "./href";
 
-// The app's primary destinations. Before this, every section was reachable only as a
-// home-page tile, so moving between Library/Daily/Compose/You meant a round-trip
-// through home — these get a persistent bar (a bottom tab bar on phones, header links
-// on wide screens). Settings stays the header gear; the rest reach from here or home.
+// The app's four permanent places, each answering a different question: what shall I
+// play now, what is there to play, what does this mean, how am I getting on. Naming
+// them as one kind of thing is the point — a bar that mixes a page, a place, a piece
+// and a verb teaches no model, so nothing can be predicted from it.
+//
+// The daily challenge is a *today* thing and leads the warm-up on Today; Compose is
+// music you make and sits on Music beside the music you import. Both keep their URLs.
+// Settings and Help stay the header icons.
 const DESTINATIONS: {
     to: string;
     label: () => string;
     Icon: (props: { className?: string }) => ReactNode;
 }[] = [
-    { to: "/", label: m.nav_home, Icon: HomeIcon },
-    { to: "/library", label: m.nav_library, Icon: BookIcon },
-    { to: "/daily", label: m.nav_daily, Icon: CalendarIcon },
-    { to: "/compose", label: m.nav_compose, Icon: NotesIcon },
+    { to: "/", label: m.nav_today, Icon: CalendarIcon },
+    { to: "/library", label: m.nav_music, Icon: NotesIcon },
+    { to: "/learn", label: m.nav_learn, Icon: BookIcon },
     { to: "/you", label: m.nav_you, Icon: GradCapIcon },
 ];
 

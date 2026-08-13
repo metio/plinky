@@ -22,6 +22,7 @@ import { createSwUpdateWatcher, type SwUpdateWatcher } from "./lib/swUpdate";
 import { MidiProvider } from "./contexts/midi";
 import { ServicesProvider } from "./contexts/services";
 import { applyTheme } from "./lib/theme";
+import { returningBootstrapScript } from "./stores/historyStore";
 import { createThemeStore, themeBootstrapScript } from "./stores/themeStore";
 import { ogLocale, SITE_URL } from "../core/site";
 import { m } from "./paraglide/messages.js";
@@ -59,6 +60,9 @@ const themeStore = createThemeStore(browserStore);
 // class-free HTML paint light first and flash for dark-mode users. It mutates
 // the class outside React, which React's hydration leaves untouched.
 const THEME_INIT_SCRIPT = themeBootstrapScript();
+// Stamps a device that has played before, so Today opens on the practice rather than
+// on the introduction. Runs before paint for the same reason the theme does.
+const RETURNING_INIT_SCRIPT = returningBootstrapScript();
 
 export const links: Route.LinksFunction = () => [
     { rel: "icon", href: "/icon-192.png", type: "image/png" },
@@ -256,7 +260,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained theme bootstrap that must run before paint */}
                 <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-                <meta name="theme-color" content="#4f46e5" />
+                {/* biome-ignore lint/security/noDangerouslySetInnerHtml: a static, self-contained returning-visitor bootstrap that must run before paint */}
+                <script dangerouslySetInnerHTML={{ __html: RETURNING_INIT_SCRIPT }} />
+                <meta name="theme-color" content="#2b4374" />
                 <link rel="canonical" href={pageUrl} />
                 {/* One alternate per language so search engines serve the right
                     locale and share ranking signals across the cluster. */}

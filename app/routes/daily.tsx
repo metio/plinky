@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Button } from "../components/ui/button";
 import { DailyReveal } from "../components/features/dailyReveal";
 import { ExportMenu } from "../components/features/exportMenu";
@@ -41,8 +42,13 @@ const WARMUP: DrillOptions = { ...DEFAULT_DRILL, bars: 8, beatsPerBar: 4, low: 7
 
 export default function DailyRoute() {
     const daily = useDailyStore();
+    const [searchParams] = useSearchParams();
     const [today, setToday] = useState<Today | null>(null);
-    const [mode, setMode] = useState<"challenge" | "warmup">("challenge");
+    // ?tab=warmup opens the warm-up directly — Today's warm-up offers a fresh drill,
+    // and landing on the day's challenge instead would be a different thing entirely.
+    const [mode, setMode] = useState<"challenge" | "warmup">(
+        searchParams.get("tab") === "warmup" ? "warmup" : "challenge",
+    );
 
     // Warm-up (the old sprint): a fresh generated phrase each run; bumping the
     // counter regenerates and remounts the viewer.
@@ -70,6 +76,13 @@ export default function DailyRoute() {
             regenerate(drill);
         }
     };
+    // A deep link lands on the tab with no press to generate its phrase, so the first
+    // one is made here instead. Runs once: the guard clears as soon as it lands.
+    useEffect(() => {
+        if (mode === "warmup" && !warmupXml) {
+            regenerate(drill);
+        }
+    });
     // Changing the shape of the drill regenerates it: the panel describes the piece
     // in front of you, so leaving the old one up would make every control read as
     // broken until the next press.

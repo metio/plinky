@@ -50,8 +50,8 @@ export function meta({ params }: Route.MetaArgs) {
     // matching the prerendered /person/:slug and the on-page composer link.
     const slug = score.composer ? personSlug(score.composer) : "";
     const trail = [
-        { name: m.nav_home(), path: "/" },
-        { name: m.nav_library(), path: "/library/" },
+        { name: m.nav_today(), path: "/" },
+        { name: m.nav_music(), path: "/library/" },
         ...(slug ? [{ name: canonicalComposer(score.composer), path: `/person/${slug}/` }] : []),
         { name: score.title, path: `/play/${score.id}/` },
     ];

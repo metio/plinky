@@ -5,6 +5,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
+import { m } from "../../paraglide/messages.js";
 import { localizeHref } from "../../paraglide/runtime.js";
 import { localizedHref } from "./href";
 import { BottomNav } from "./navBar";
@@ -27,29 +28,29 @@ const current = () =>
         ?.textContent;
 
 describe("BottomNav active section", () => {
-    it("lights Home only on the exact root path", () => {
+    it("lights Today only on the exact root path", () => {
         at("/");
-        expect(current()).toMatch(/home/i);
+        expect(current()).toBe(m.nav_today());
     });
 
     it("lights the section that owns the current path", () => {
         at("/library");
-        expect(current()).toMatch(/library/i);
+        expect(current()).toBe(m.nav_music());
     });
 
     it("keeps a section lit while on one of its sub-pages", () => {
         at("/library/some-piece");
-        expect(current()).toMatch(/library/i);
+        expect(current()).toBe(m.nav_music());
     });
 
-    it("does not light Home on a sub-page of another section", () => {
+    it("does not light Today on a sub-page of another section", () => {
         at("/you");
-        expect(current()).not.toMatch(/home/i);
+        expect(current()).not.toBe(m.nav_today());
     });
 
     it("lights the section on the trailing-slash path the links carry", () => {
         at("/library/");
-        expect(current()).toMatch(/library/i);
+        expect(current()).toBe(m.nav_music());
     });
 
     it("does not light a section whose name only prefixes the current path", () => {
@@ -63,6 +64,7 @@ describe("BottomNav hrefs", () => {
         at("/");
         const hrefs = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
         expect(hrefs).toContain(localizedHref("/library"));
+        expect(hrefs).toContain(localizedHref("/learn"));
         for (const href of hrefs) {
             expect(href).toMatch(/\/$/);
         }

@@ -59,12 +59,16 @@ describe("the help page", () => {
         }
     });
 
-    it("still points at the glossary, theory, tools and the keyboard tour", () => {
+    it("explains how the app behaves rather than listing the pages of it", () => {
         show();
-        expect(screen.getByRole("link", { name: m.glossary_title() })).toBeTruthy();
-        expect(screen.getByRole("link", { name: m.theory_title() })).toBeTruthy();
-        expect(screen.getByRole("link", { name: m.tools_title() })).toBeTruthy();
-        expect(screen.getByRole("link", { name: m.basics_title() })).toBeTruthy();
+        // The glossary, the theory course, the tools and the keyboard tour reached the
+        // reader through four hand-written paragraphs here, which put a quarter of the
+        // app behind an icon that reads as support. They live on Learn now, and a
+        // manual answers "how does this behave" again.
+        expect(screen.queryByRole("link", { name: m.glossary_title() })).toBeNull();
+        expect(screen.queryByRole("link", { name: m.theory_title() })).toBeNull();
+        expect(screen.queryByRole("link", { name: m.tools_title() })).toBeNull();
+        expect(screen.queryByRole("link", { name: m.basics_title() })).toBeNull();
     });
 });
 
