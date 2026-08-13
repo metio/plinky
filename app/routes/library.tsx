@@ -9,10 +9,8 @@ import { LibraryRow } from "../components/features/libraryRow";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { ScoreImport } from "../components/features/scoreImport";
 import { Button } from "../components/ui/button";
-import { linkClasses } from "../components/ui/classes";
 import { HubList } from "../components/ui/hubList";
-import { LocalizedLink } from "../components/ui/localizedLink";
-import { KeysIcon, ListIcon } from "../components/ui/icons";
+import { KeysIcon } from "../components/ui/icons";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/library";
 import { isDue } from "../../core/mastery";
@@ -25,7 +23,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.library_heading(), m.meta_library_description());
+    return routeMeta(m.nav_music(), m.meta_library_description());
 }
 
 // The library's two jobs as two tabs: Search finds something to play in the
@@ -33,18 +31,11 @@ export function meta(_args: Route.MetaArgs) {
 // (backup and restore). ?tab=manage deep-links straight to the second.
 type LibraryTab = "search" | "manage";
 
-// Music is everything there is to play, and the catalogue is only the middle of it:
-// an assignment is a path someone laid through it, and Compose is how music you make
-// yourself gets onto the shelf. Both used to be home-page tiles, which left the shelf
-// looking like the catalogue alone.
+// Music is everything there is to play, and the catalogue is only half of it: the
+// other half is what you make yourself. Compose used to be a home-page tile, which
+// left the shelf looking like a catalogue and nothing else. (A set of pieces in a
+// deliberate order is a course of study, so assignments live on Learn.)
 const SHELVES = [
-    {
-        to: "/assignments",
-        label: m.home_assignments,
-        blurb: m.home_assignments_blurb,
-        Icon: ListIcon,
-        note: 64,
-    },
     {
         to: "/compose",
         label: m.play_compose,
@@ -85,7 +76,9 @@ export default function LibraryRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.library_heading()}</h1>
+                {/* The page is named for the tab that leads here: a bar that teaches a
+                    model only works while the place agrees with the word on it. */}
+                <h1 className="text-2xl font-semibold">{m.nav_music()}</h1>
                 <p className="text-sm text-muted">{m.library_intro()}</p>
                 <Show when={due > 0}>
                     <p className="text-sm font-medium text-warn">
@@ -94,31 +87,16 @@ export default function LibraryRoute() {
                 </Show>
             </header>
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
-                    {m.home_explore_heading()}
-                </h2>
-                <HubList
-                    entries={SHELVES.map((shelf) => ({
-                        ...shelf,
-                        label: shelf.label(),
-                        blurb: shelf.blurb(),
-                    }))}
-                    onEnter={(note) =>
-                        synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
-                    }
-                />
-                {/* The teacher's end of the assignment loop. It reads the codes the
-                    student's device writes, so it belongs beside the sets rather than
-                    another page deeper — a feature whose two halves never link to each
-                    other is a feature only its author can find. */}
-                <p className="text-sm text-muted">
-                    {m.assignments_collect_hint()}{" "}
-                    <LocalizedLink to="/collect" className={linkClasses}>
-                        {m.collect_title()}
-                    </LocalizedLink>
-                </p>
-            </section>
+            <HubList
+                entries={SHELVES.map((shelf) => ({
+                    ...shelf,
+                    label: shelf.label(),
+                    blurb: shelf.blurb(),
+                }))}
+                onEnter={(note) =>
+                    synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
+                }
+            />
 
             <SegmentedControl
                 options={[

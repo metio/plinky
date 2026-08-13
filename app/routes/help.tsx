@@ -74,6 +74,11 @@ const SECTIONS: {
         imageAlt: m.help_shot_library,
     },
     {
+        key: "learn",
+        title: m.nav_learn,
+        text: m.help_text_learn,
+    },
+    {
         key: "daily",
         title: m.nav_daily,
         text: m.help_text_daily,

@@ -10,6 +10,7 @@ import {
     ListIcon,
     MetronomeIcon,
     SlidersIcon,
+    UploadIcon,
 } from "../components/ui/icons";
 import { routeMeta, webPageData } from "../../core/site";
 import { useSynth } from "../hooks/useSynth";
@@ -32,16 +33,16 @@ export function meta(_args: Route.MetaArgs) {
     ];
 }
 
-// The schoolroom, in the order someone actually meets it: find the keys, learn how
-// the music is built, look up what a mark means, train the ear that reads it, then
-// the two reference benches and the test that says where you are.
+// The schoolroom, in the order someone meets it: find the keys, learn how the music is
+// built, look up what a mark means, train the ear that reads it — then the ways to work
+// at it, the bench you reach for mid-practice, and the test that says where you are.
 //
-// Every one of these used to be reachable only through a paragraph at the top of the
-// Help page or the foot of the You page, which put a quarter of the app behind an
-// icon that reads as support. Each entry carries the page's own title and opening
-// line, so this list and the page it leads to always say the same thing.
+// Most of these used to be reachable only through a paragraph at the top of the Help
+// page or the foot of the You page, which put a quarter of the app behind an icon that
+// reads as support. Each entry carries the page's own title and opening line, so this
+// list and the page it leads to always say the same thing.
 //
-// The notes climb a major scale, so running a mouse down the list plays it.
+// The notes climb an octave, so running a mouse down the list plays a scale.
 const ENTRIES = [
     { to: "/basics", label: m.basics_title, blurb: m.basics_intro, Icon: KeysIcon, note: 60 },
     { to: "/theory", label: m.theory_title, blurb: m.theory_intro, Icon: BookIcon, note: 62 },
@@ -70,8 +71,34 @@ const ENTRIES = [
     },
 ];
 
+// Setting work for somebody else is a different job from doing it, and it has two
+// halves that never used to link to each other: the list you hand out, and the codes
+// that come back. They sit together, under their own heading, rather than as a fifth
+// place in the navigation — a teacher is a person, not a kind of thing to look for,
+// and a permanent tab that is empty for almost everybody is the clutter this
+// redesign is undoing. A set is also something plenty of players build for
+// themselves, which is why it stays reachable here rather than behind a role.
+const TEACHING = [
+    {
+        to: "/assignments",
+        label: m.home_assignments,
+        blurb: m.home_assignments_blurb,
+        Icon: ListIcon,
+        note: 72,
+    },
+    {
+        to: "/collect",
+        label: m.collect_title,
+        blurb: m.collect_intro,
+        Icon: UploadIcon,
+        note: 74,
+    },
+];
+
 export default function Learn() {
     const synth = useSynth();
+    const play = (note: number) =>
+        synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true });
     return (
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
@@ -85,10 +112,22 @@ export default function Learn() {
                     label: entry.label(),
                     blurb: entry.blurb(),
                 }))}
-                onEnter={(note) =>
-                    synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
-                }
+                onEnter={play}
             />
+
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
+                    {m.learn_teaching_heading()}
+                </h2>
+                <HubList
+                    entries={TEACHING.map((entry) => ({
+                        ...entry,
+                        label: entry.label(),
+                        blurb: entry.blurb(),
+                    }))}
+                    onEnter={play}
+                />
+            </section>
         </main>
     );
 }

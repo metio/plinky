@@ -35,7 +35,7 @@ export function loadBundledScores(): Score[] {
     return Object.entries(files).map(([_path, xml]) => {
         // Same content-fingerprint id scheme as every other piece. The bundled
         // MusicXML is our own generated output, so the pure text pass reads it —
-        // no parser, which also keeps FIRST_SONG_ID's module-load derivation pure.
+        // no parser.
         return {
             id: songId(xml),
             ...readScoreMetaFromText(xml),
@@ -45,11 +45,6 @@ export function loadBundledScores(): Score[] {
         };
     });
 }
-
-// The bundled piece a true beginner starts on — a Grade 1 demo, resolved by title so links
-// to it track its content-fingerprint id instead of a hard-coded filename.
-export const FIRST_SONG_ID =
-    loadBundledScores().find((score) => score.title.toLowerCase().includes("twinkle"))?.id ?? "";
 
 // Coerce a stored entry into a usable Score, or drop it. A missing string title
 // would otherwise throw in the catalogue's localeCompare sort and take down the

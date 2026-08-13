@@ -8,10 +8,7 @@ import { MidiProvider } from "../contexts/midi";
 import { fakeMidi } from "../adapters/fakeMidi";
 import { ServicesProvider } from "../contexts/services";
 import { loadBundledScores } from "../lib/catalog";
-import { browserStore } from "../adapters/browserStore";
 import { httpFetcher } from "../adapters/httpFetcher";
-import { createOnboardingStore } from "../stores/onboardingStore";
-import { parsePrefs } from "../../core/prefs";
 import Play from "./play";
 import type { Route } from "./+types/play";
 
@@ -89,25 +86,4 @@ describe("Play", () => {
         expect(screen.queryByRole("button", { name: "Connect MIDI" })).toBeNull();
         expect(screen.queryByText(/No piano\?/)).toBeNull();
     }, 90000);
-
-    it("switches hidden-notes practice on from a ?mode=ear deep link and marks it tried", async () => {
-        const id = bundledId("twinkle");
-        const props = { params: { scoreId: id } } as unknown as Route.ComponentProps;
-        render(
-            <MemoryRouter initialEntries={[`/play/${id}?mode=ear`]}>
-                <ServicesProvider services={midiFake}>
-                    <MidiProvider>
-                        <Play {...props} />
-                    </MidiProvider>
-                </ServicesProvider>
-            </MemoryRouter>,
-        );
-        // The drill lives inside Practice now: the link lands on the score with
-        // the hidden-notes pref switched on and the discovery step ticked.
-        await screen.findByRole("button", { name: "Practice" }, { timeout: 30000 });
-        await expect
-            .poll(() => createOnboardingStore(browserStore).marked().has("earTried"))
-            .toBe(true);
-        expect(parsePrefs(browserStore.get("plinky:prefs")).hiddenNotes).toBe(true);
-    });
 });

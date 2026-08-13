@@ -58,10 +58,7 @@ describe("DiscoveryChecklist", () => {
     it("goes once every part of the set-up is done", async () => {
         // A hand span on both hands, a remembered MIDI device and a touched key map
         // are the three; with all of them the strip has nothing left to say.
-        localStorage.setItem(
-            "plinky:prefs",
-            JSON.stringify({ handSpan: { left: 9, right: 9 } }),
-        );
+        localStorage.setItem("plinky:prefs", JSON.stringify({ handSpan: { left: 9, right: 9 } }));
         localStorage.setItem(
             "plinky:discovered",
             JSON.stringify(["midiConnected", "keysCustomized"]),

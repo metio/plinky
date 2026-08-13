@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useState } from "react";
 import { Attribution } from "../components/ui/attribution";
 import { Button } from "../components/ui/button";
 import { attributionFor } from "../../core/attribution";
@@ -19,7 +18,6 @@ import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { TransposeProvider } from "../components/features/transposeContext";
-import { useOnboardingStore, usePrefsStore } from "../contexts/services";
 import { useScore } from "../hooks/useScore";
 // meta() runs outside the React tree (the router calls it statically), so it
 // cannot receive injected services — the real adapter is wired here directly,
@@ -63,8 +61,6 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export default function PlayRoute({ params }: Route.ComponentProps) {
-    const onboarding = useOnboardingStore();
-    const prefsStore = usePrefsStore();
     // Resolves a tick after paint: undefined while loading, null when there is no
     // such score, "unavailable" when a fetch failed — a retry bumps `attempt`
     // to ask again (a failed fetch is never cached).
@@ -75,21 +71,6 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
     const [transpose, setTranspose] = useState(0);
-
-    // The drills live inside Practice now, but the discovery checklist's old
-    // ?mode=ear|fingering deep links keep working: an ear link switches the
-    // hidden-notes practice pref on, and both mark their discovery step — the
-    // page stays on the score, where the drill actually happens.
-    const [searchParams] = useSearchParams();
-    useEffect(() => {
-        const requested = searchParams.get("mode");
-        if (requested === "ear") {
-            prefsStore.save({ ...prefsStore.load(), hiddenNotes: true });
-            onboarding.markDiscovered("earTried");
-        } else if (requested === "fingering") {
-            onboarding.markDiscovered("fingeringTried");
-        }
-    }, [searchParams, onboarding, prefsStore]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
