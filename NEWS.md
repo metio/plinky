@@ -18,9 +18,18 @@ the top of the help page. All of that is over.
 
 **Today** is where you land, and it is the day's practice in the shape a piano teacher
 gives an hour: something to **warm up** on — the day's challenge, your next arcade rung,
-a fresh drill, a round of ear training — then the piece you're **working on**, and then
-**one thing to learn**, picked for the day. They are headings, not a list of chores:
-nothing counts them, nothing ticks them off, and skipping one costs you nothing.
+a fresh drill, a round of ear training, and a keyboard to put your hands on before
+anything is asked of them — then the piece you're **working on**, and then **one thing to
+learn**, picked for the day. They are headings, not a list of chores: nothing counts them,
+nothing ticks them off, and skipping one costs you nothing.
+
+Each row names the piece it opens, with the set it came from underneath, so you can see
+what pressing it will do before you press it.
+
+**What Plinky is** now has a permanent home at the top of the [about
+page](https://plinky.fun/en/about/), with the two of us below it. The front page still
+opens with it on a first visit and then gets out of the way — but if you ever want to
+show somebody what this is, there is somewhere to point.
 
 **Learn** is a page of its own, and it holds the schoolroom in the order you meet it:
 meeting the keyboard, how the music works, what the marks mean, ear training, ways to

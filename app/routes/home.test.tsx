@@ -37,7 +37,14 @@ describe("Home", () => {
         // bootstrap hides it on a device that has played, which is a class on
         // <html> rather than a different tree — so it is always rendered here.
         expect(screen.getByText(m.home_heading())).toBeTruthy();
-        expect(screen.getByText(m.home_keyboard_hint())).toBeTruthy();
+        expect(screen.getByText(m.home_eyebrow())).toBeTruthy();
+    });
+
+    it("leaves the keyboard to the warm-up rather than the pitch", () => {
+        renderHome();
+        // Somewhere to put your hands belongs to the day's practice, where it is the
+        // first thing asked of them — not to the paragraph explaining what Plinky is.
+        expect(screen.queryByText(m.home_keyboard_hint())).toBeNull();
     });
 
     it("sends browsing to the two hubs instead of listing destinations itself", () => {
