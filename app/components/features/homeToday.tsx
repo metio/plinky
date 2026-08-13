@@ -5,6 +5,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
+import { partOfDay } from "../../../core/greeting";
 import { buildExerciseId } from "../../../core/exerciseGen";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { practiceHref } from "../../../core/practisable";
@@ -15,6 +16,7 @@ import {
     gradeSuggestions,
     loadGradeCatalogue,
     loadGradedMastery,
+    skillRating,
     surprisePick,
 } from "../../lib/gradeProgress";
 import { HeroKeyboard } from "./heroKeyboard";
@@ -35,6 +37,7 @@ import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { type Task, todayTasks } from "../../../core/today";
 import { loadBundledScores } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
@@ -190,8 +193,30 @@ function Row({
     );
 }
 
+const GREETING = {
+    morning: m.today_greeting_morning,
+    afternoon: m.today_greeting_afternoon,
+    evening: m.today_greeting_evening,
+    night: m.today_greeting_night,
+};
+
+// Where you stand, in one line: the grade you read at, the skill that rises as the
+// music gets harder, and how much is on the stand. It answers "how am I doing" without
+// asking anybody to go and look, and it is a description rather than a target — no
+// progress bar, nothing to fill.
+type Standing = { level: number; skill: number; onStand: number };
+
+function standingLine({ level, skill, onStand }: Standing): string {
+    return [
+        level === 0 ? m.grades_not_started() : m.grade_label({ level }),
+        m.grades_skill({ rating: skill }),
+        onStand === 1 ? m.today_stand_one({ count: 1 }) : m.today_stand_other({ count: onStand }),
+    ].join(" · ");
+}
+
 type Session = {
     tasks: Task[];
+    standing: Standing;
     arcadeLevel: number;
     // Every catalogue title by id, so a row can name the piece it opens.
     titles: Map<string, string>;
@@ -224,6 +249,11 @@ export function HomeToday() {
     const navigate = useNavigate();
     const [session, setSession] = useState<Session | null>(null);
     const seedRef = useRef(0);
+    // The heading names the moment the reader arrived, which only their own clock
+    // knows. Both the prerendered document and the first client render say "Today", so
+    // hydration matches; the greeting arrives a tick later, in place, on one line.
+    const [arrived, setArrived] = useState<Date | null>(null);
+    useEffect(() => setArrived(new Date()), []);
 
     useEffect(() => {
         let cancelled = false;
@@ -290,6 +320,13 @@ export function HomeToday() {
                 arcadeLevel: currentArcadeLevel(
                     (lv) => masteryStore.load(buildExerciseId(arcadeConfig(lv)))?.learned === true,
                 ),
+                standing: {
+                    level,
+                    skill: skillRating(items, prefs.decayMode, now),
+                    // What is on the stand: everything learned and not shelved — the
+                    // same set the grades count, so the line agrees with the You page.
+                    onStand: mastered.size,
+                },
                 titles: new Map(catalogue.map((item) => [item.id, item.title])),
                 marks: new Map(
                     catalogue.flatMap((item) => (item.incipit ? [[item.id, item.incipit]] : [])),
@@ -311,8 +348,31 @@ export function HomeToday() {
         known,
     ]);
 
+    const heading = arrived
+        ? GREETING[partOfDay(arrived.getHours())]({
+              // The weekday is spelled and cased by the reader's own language, so the
+              // message only has to say how its own words go around it.
+              day: new Intl.DateTimeFormat(getLocale(), { weekday: "long" }).format(arrived),
+          })
+        : m.today_heading();
+
+    const header = (
+        <header className="space-y-1">
+            {/* Most languages hand back a lowercase weekday — "mardi", "вторник",
+                "tiistai" — which is correct for the word and wrong for the start of a
+                heading. Lifting the first letter in CSS fixes every language at once,
+                and does nothing at all to a script that has no capitals. */}
+            <h1 className="text-2xl font-semibold first-letter:uppercase">{heading}</h1>
+            {/* Holds its line before the standing resolves, so the day's practice does
+                not arrive by shoving the page down. */}
+            <p className="min-h-5 text-sm text-muted">
+                {session ? standingLine(session.standing) : ""}
+            </p>
+        </header>
+    );
+
     if (session === null) {
-        return null;
+        return header;
     }
 
     // The daily belongs to the warm-up; everything else is the work.
@@ -322,6 +382,8 @@ export function HomeToday() {
 
     return (
         <div className="space-y-8">
+            {header}
+
             <Moment label={m.today_moment_warmup()}>
                 <div className="flex flex-wrap gap-2">
                     {daily && (

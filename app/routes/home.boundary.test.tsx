@@ -45,8 +45,10 @@ describe("Home with a broken panel", () => {
         // The panel is replaced in place…
         expect(screen.getByText(m.feature_broken())).toBeTruthy();
         // …and everything around it still works.
-        expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(m.today_heading());
+        // The day's heading goes down with the panel that owns it; what the page says
+        // Plinky is does not.
         expect(screen.getByText(m.home_heading())).toBeTruthy();
+        expect(screen.getByText(m.home_eyebrow())).toBeTruthy();
         expect(screen.getByRole("button", { name: m.action_try_again() })).toBeTruthy();
     });
 });

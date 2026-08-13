@@ -54,8 +54,6 @@ export default function Home() {
                 <DiscoveryChecklist />
             </FeatureBoundary>
 
-            <h1 className="text-2xl font-semibold">{m.today_heading()}</h1>
-
             <FeatureBoundary feature="HomeToday">
                 <HomeToday />
             </FeatureBoundary>

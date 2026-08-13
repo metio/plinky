@@ -16,7 +16,9 @@ quarter of the app lived behind the **?** — the theory course, the glossary of
 the little tools and the keyboard tour were only ever reachable through a few links at
 the top of the help page. All of that is over.
 
-**Today** is where you land, and it is the day's practice in the shape a piano teacher
+**Today** is where you land. It opens by naming the moment you arrived — "Tuesday
+morning" — over a quiet line saying where you stand: your grade, your skill, and how much
+is on the music stand. Under that is the day's practice, in the shape a piano teacher
 gives an hour: something to **warm up** on — the day's challenge, your next arcade rung,
 a fresh drill, a round of ear training, and a keyboard to put your hands on before
 anything is asked of them — then the piece you're **working on**, and then **one thing to
