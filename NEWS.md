@@ -16,6 +16,10 @@ uses no cookies, stores nothing on your device and identifies nobody, so there i
 left to ask you and nothing left for you to turn off. The Privacy block in Settings now
 just says what happens, and the privacy policy has been rewritten to match.
 
+With nothing left to configure there, the Privacy block has since been taken out of
+Settings altogether — the privacy policy is still linked from the footer of every page,
+and the discovery checklist no longer sends you to look at a setting that isn't there.
+
 ## 15 August 2026 — later
 
 **Your exported videos, your look.** Exporting a notes-highway video now offers a colour

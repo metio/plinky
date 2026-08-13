@@ -1,13 +1,11 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { linkClasses } from "../components/ui/classes";
 import { ChoiceField, SwitchField } from "../components/ui/fields";
 import {
     BookIcon,
-    EyeIcon,
     FingersIcon,
     GradCapIcon,
     KeysIcon,
@@ -29,12 +27,10 @@ import { ReadingLevel } from "../components/features/readingLevel";
 import { KeyMapping } from "../components/features/keyMapping";
 import { KeyboardThemePicker } from "../components/features/keyboardThemePicker";
 import { LanguageSwitcher } from "../components/ui/languageSwitcher";
-import { LocalizedLink } from "../components/ui/localizedLink";
 import { MicConnect } from "../components/features/micConnect";
 import { MidiConnect } from "../components/features/midiConnect";
 import { KeyLightsSettings } from "../components/features/keyLightsSettings";
 import { ThemeToggle } from "../components/features/themeToggle";
-import { useOnboardingStore } from "../contexts/services";
 import { useMidiConnection } from "../contexts/midi";
 import { usePrefs } from "../hooks/usePrefs";
 import { useSynth } from "../hooks/useSynth";
@@ -71,14 +67,6 @@ export default function Settings() {
     const { prefs, update } = usePrefs();
     const synth = useSynth();
     const { support: midiSupport, micStatus, keyLights } = useMidiConnection();
-    const onboarding = useOnboardingStore();
-
-    // Opening Settings — where the Privacy block leads the page — marks the "check
-    // your privacy settings" discovery step. Awareness only: there is nothing here to
-    // switch on, so the checklist asks nothing of the reader.
-    useEffect(() => {
-        onboarding.markDiscovered("privacyChecked");
-    }, [onboarding]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
@@ -86,22 +74,6 @@ export default function Settings() {
                 <h1 className="text-2xl font-semibold">{m.nav_settings()}</h1>
                 <p className="text-sm text-muted">{m.settings_subtitle()}</p>
             </header>
-
-            {/* Privacy leads the page. There is no switch here because there is no
-            choice to make: nothing about a visitor is collected, so the block says what
-            happens and points at the detail. A monetisation opt-in would land here. */}
-            <SettingsSection
-                title={m.settings_privacy_title()}
-                hint={m.settings_privacy_hint()}
-                icon={<EyeIcon className={ICON} />}
-            >
-                <p className="text-xs text-muted">
-                    {m.settings_privacy_body()}{" "}
-                    <LocalizedLink to="/datenschutz" className={linkClasses}>
-                        {m.settings_privacy_link()}
-                    </LocalizedLink>
-                </p>
-            </SettingsSection>
 
             <SettingsSection
                 title={m.settings_appearance()}

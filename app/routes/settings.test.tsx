@@ -67,14 +67,6 @@ describe("Settings", () => {
         expect(prefs.colorNotes).toBe(false);
     });
 
-    it("marks the privacy step discovered on opening Settings", () => {
-        const { services } = mount();
-        // Awareness — opening the page, where Privacy leads, is enough. There is nothing
-        // to switch on: the block states what happens and links to the detail.
-        expect(services.onboarding.marked().has("privacyChecked")).toBe(true);
-        expect(screen.getByText(m.settings_privacy_link())).toBeTruthy();
-    });
-
     it("disables the volume slider while sound is off, and persists the level", () => {
         const { services } = mount();
         const slider = screen.getByLabelText<HTMLInputElement>(m.settings_volume());
