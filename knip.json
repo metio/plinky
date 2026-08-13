@@ -1,7 +1,22 @@
 {
-  "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["app/routes/*.tsx"],
-  "project": ["app/**/*.{ts,tsx}", "core/**/*.ts"],
-  "ignoreDependencies": ["tailwindcss", "axe-core", "linkedom"],
-  "ignoreExportsUsedInFile": true
+    "$schema": "https://unpkg.com/knip@6/schema.json",
+    "entry": [
+        "app/routes/*.tsx"
+    ],
+    "project": [
+        "app/**/*.{ts,tsx}",
+        "core/**/*.ts"
+    ],
+    "ignoreDependencies": [
+        "tailwindcss",
+        "axe-core",
+        "linkedom"
+    ],
+    "ignoreExportsUsedInFile": true,
+    "ignoreBinaries": [
+        "ffmpeg"
+    ],
+    "ignoreUnresolved": [
+        "/dev/promo/renderPromo.ts"
+    ]
 }

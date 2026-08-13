@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { RecordedNote } from "../../core/composition";
+import { DEFAULT_KEYBOARD_DEPTH, keyboardDepthFraction } from "../../core/videoLook";
 import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";
 import {
     highwayBlocks,
@@ -383,9 +384,13 @@ export function takeScenePainter({
     }
 }
 
-// A deep-to-accent block colour so a note reads as descending "into" the strike
-// line, brightening as it lands.
+// A deep-to-accent block colour so a note reads as descending "into" the strike line,
+// brightening as it lands. The far end is the note colour darkened toward black rather
+// than a second constant, so a caller that sets its own accent gets the same descent.
 const HIGHWAY_FAR = "#3730a3";
+function farOf(accent: string): string {
+    return accent === ACCENT ? HIGHWAY_FAR : mixHex("#000000", accent, 0.45);
+}
 // How far ahead (ms on the notes' clock) a note first appears at the top of the
 // fall region before it lands on the keys.
 const HIGHWAY_WINDOW_MS = 2_500;
@@ -406,6 +411,8 @@ export function takeHighwayPainter({
     showTitle = true,
     showWordmark = true,
     keyColors,
+    accent = ACCENT,
+    keyboardDepth = keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH),
 }: {
     title: string;
     credit: string;
@@ -416,6 +423,13 @@ export function takeHighwayPainter({
     showTitle?: boolean;
     showWordmark?: boolean;
     keyColors?: { white: string; black: string };
+    // The colour a falling note lands in. Defaults to the app's accent, which is what an
+    // exported take uses; a caller rendering for somewhere else can set its own. Only the
+    // blocks follow it — the lit key, the progress bar and the chrome keep the accent,
+    // since those carry meaning rather than decoration.
+    accent?: string;
+    // How much of the frame's height the keyboard takes; see core/videoLook.
+    keyboardDepth?: number;
 }): (context: Context2D, timeMs: number) => void {
     const { from, to } = sceneRange(notes.map((note) => note.pitch));
     const keys = sceneKeys(from, to);
@@ -423,8 +437,11 @@ export function takeHighwayPainter({
     const unit = Math.min(width, height);
     // The keyboard sits at the foot; the blocks fall through the band above it,
     // from just below the title down to the keys' top (the strike line).
-    const keyboardTop = height * 0.72;
-    const keyboardHeight = height * 0.24;
+    //
+    // The keys sit on the floor of the frame whatever depth is chosen, so a deeper
+    // keyboard grows upward into the fall region rather than hanging in mid-air.
+    const keyboardHeight = height * keyboardDepth;
+    const keyboardTop = height * 0.96 - keyboardHeight;
     const laneTop = height * 0.3;
     const regionHeight = keyboardTop - laneTop;
     const cfg: ChromeConfig = {
@@ -460,7 +477,7 @@ export function takeHighwayPainter({
             const top = keyboardTop - Math.min(1, block.endFrac) * regionHeight;
             const bottom = keyboardTop - Math.max(0, block.onsetFrac) * regionHeight;
             const nearness = Math.max(0, Math.min(1, 1 - block.onsetFrac));
-            context.fillStyle = mixHex(HIGHWAY_FAR, ACCENT, nearness);
+            context.fillStyle = mixHex(farOf(accent), accent, nearness);
             context.beginPath();
             context.roundRect(x + w * 0.04, top, w * 0.92, Math.max(2, bottom - top), 4);
             context.fill();

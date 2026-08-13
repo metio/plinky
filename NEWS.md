@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 15 August 2026 — later
+
+**Your exported videos, your look.** Exporting a notes-highway video now offers a colour
+for the falling notes — indigo, pink, teal, amber or lime — and a choice of how deep the
+keyboard sits. The keys are shallower by default than they were: at the old depth each one
+read as a long pale column and the whole strip looked like a wall rather than a keyboard,
+and the room it frees goes to the notes, which are what you are watching.
+
 ## 15 August 2026
 
 **Grades now know the difference between hard to reach and hard to play.** Until now a

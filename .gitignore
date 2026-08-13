@@ -48,3 +48,6 @@ __pycache__/
 /.stryker-tmp/
 /reports/
 
+
+# Promo clips rendered by npm run promo:videos — generated, never committed
+/promo/

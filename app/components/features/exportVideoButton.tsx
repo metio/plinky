@@ -10,6 +10,14 @@ import { downloadBlob } from "../../lib/download";
 import { buildScoreSnapshot, type OriginalScore } from "../../lib/scoreSnapshot";
 import { takeFileStem } from "../../lib/takeFile";
 import { takeHighwayPainter, takeScenePainter } from "../../lib/videoPainter";
+import {
+    DEFAULT_KEYBOARD_DEPTH,
+    DEFAULT_NOTE_COLOR,
+    KEYBOARD_DEPTHS,
+    keyboardDepthFraction,
+    NOTE_COLORS,
+    noteColorHex,
+} from "../../../core/videoLook";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
@@ -25,6 +33,23 @@ const SIZES = { "720": { width: 1280, height: 720 }, "1080": { width: 1920, heig
 // gives the options room: format, quality, frame rate, and which layers the
 // stage shows. Only offered where the engine can actually encode one; while
 // rendering, the label counts progress so a long take visibly works.
+// Named one by one rather than composed from the id: the message gate reads literal
+// `m.key` references, and a key built at runtime is invisible to it — which is the point,
+// since a message nothing names is a message nobody translates.
+const NOTE_COLOR_LABELS: Record<string, () => string> = {
+    indigo: m.video_note_color_indigo,
+    pink: m.video_note_color_pink,
+    teal: m.video_note_color_teal,
+    amber: m.video_note_color_amber,
+    lime: m.video_note_color_lime,
+};
+
+const DEPTH_LABELS: Record<string, () => string> = {
+    shallow: m.video_keyboard_depth_shallow,
+    standard: m.video_keyboard_depth_standard,
+    deep: m.video_keyboard_depth_deep,
+};
+
 export function ExportVideoButton({
     take,
     title,
@@ -57,6 +82,10 @@ export function ExportVideoButton({
     // Treadmill: the score as one horizontal line scrolling under a fixed gaze
     // — the densest layout, made for the vertical feeds.
     const [treadmill, setTreadmill] = useState(true);
+    // How the highway looks. Taste rather than meaning — the person making the video is
+    // the one who knows what it is for — so both are offered rather than fixed.
+    const [noteColor, setNoteColor] = useState(DEFAULT_NOTE_COLOR);
+    const [keyboardDepth, setKeyboardDepth] = useState(DEFAULT_KEYBOARD_DEPTH);
 
     useEffect(() => {
         let cancelled = false;
@@ -104,6 +133,8 @@ export function ExportVideoButton({
                           showTitle,
                           showWordmark,
                           keyColors,
+                          accent: noteColorHex(noteColor),
+                          keyboardDepth: keyboardDepthFraction(keyboardDepth),
                       })
                     : takeScenePainter({
                           title,
@@ -171,6 +202,31 @@ export function ExportVideoButton({
                     onChange={(id) => setFps(Number(id) as 30 | 60)}
                     label={m.video_fps()}
                 />
+                {/* Highway looks only: the staff format draws no falling notes, and its
+                keyboard shares the stage with the notation rather than sitting on the
+                floor of the frame. */}
+                {format === "highway" && (
+                    <>
+                        <SegmentedControl
+                            options={NOTE_COLORS.map((color) => ({
+                                id: color.id,
+                                label: (NOTE_COLOR_LABELS[color.id] ?? color.id.toString)(),
+                            }))}
+                            value={noteColor}
+                            onChange={setNoteColor}
+                            label={m.video_note_color()}
+                        />
+                        <SegmentedControl
+                            options={KEYBOARD_DEPTHS.map((depth) => ({
+                                id: depth.id,
+                                label: (DEPTH_LABELS[depth.id] ?? depth.id.toString)(),
+                            }))}
+                            value={keyboardDepth}
+                            onChange={setKeyboardDepth}
+                            label={m.video_keyboard_depth()}
+                        />
+                    </>
+                )}
                 {/* Staff-format layers only — the highway is always blocks over the
                 keyboard, so the score/treadmill/keyboard switches don't apply. */}
                 {format === "staff" && (

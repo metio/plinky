@@ -127,6 +127,9 @@ module.exports = {
                     // meta() runs outside the React tree, so the play route wires
                     // the real adapter for its prerender/title resolution directly.
                     "^app/routes/play\\.tsx$",
+                    // The promo renderer is a composition root of its own: a dev entry
+                    // point that wires the real exporter to the real painter in a browser.
+                    "^dev/promo/",
                 ],
             },
             to: { path: "^app/adapters/" },
@@ -136,9 +139,13 @@ module.exports = {
             comment:
                 "Build/import scripts under dev/ may only reach down into core/ (pure, shared music " +
                 "tooling), never sideways into the app UI layers — the app is the consumer of the " +
-                "catalogue dev builds, not a dependency of it.",
+                "catalogue dev builds, not a dependency of it. dev/promo/ is the one exception: it " +
+                "runs IN a browser (the video export needs WebCodecs and an audio context), and its " +
+                "whole purpose is to drive the app's own painter and exporter, so that a promo clip " +
+                "is a take export with its options set rather than a second renderer free to drift " +
+                "from what a player sees. It is a composition root, not app code.",
             severity: "error",
-            from: { path: "^dev/" },
+            from: { path: "^dev/", pathNot: "^dev/promo/" },
             to: { path: ["^app/"] },
         },
         {
