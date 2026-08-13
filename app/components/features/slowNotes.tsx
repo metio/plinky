@@ -34,7 +34,7 @@ export function SlowNotes() {
 
     return (
         <section className="space-y-3">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
+            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
                 {m.slow_notes_heading()}
             </h2>
             <p className="text-sm text-muted">

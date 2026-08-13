@@ -77,7 +77,9 @@ export function ReviewSession() {
     if (total === 0) {
         return (
             <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-                <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    {m.review_heading()}
+                </h1>
                 <p className="text-sm text-muted">{m.review_empty()}</p>
                 <p className="text-sm text-muted">{m.refresh_why()}</p>
                 <div className="flex flex-wrap items-center gap-4">
@@ -95,7 +97,9 @@ export function ReviewSession() {
     if (done) {
         return (
             <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-                <h1 className="text-2xl font-semibold">🎉 {m.review_complete_heading()}</h1>
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    🎉 {m.review_complete_heading()}
+                </h1>
                 <p className="text-sm text-muted">
                     {m.review_complete_summary({ refreshed, shelved })}
                 </p>
@@ -138,7 +142,9 @@ export function ReviewSession() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h1 className="text-2xl font-semibold">{m.review_heading()}</h1>
+                    <h1 className="font-display text-3xl font-semibold tracking-tight">
+                        {m.review_heading()}
+                    </h1>
                     <span className="text-sm tabular-nums text-muted">
                         {m.review_progress({ index: index + 1, total })}
                     </span>

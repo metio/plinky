@@ -26,7 +26,7 @@ export function meta(_args: Route.MetaArgs) {
 export default function Impressum() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">Impressum</h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">Impressum</h1>
 
             <LegalTranslationNotice page="impressum" />
 

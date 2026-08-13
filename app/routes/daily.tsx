@@ -95,7 +95,7 @@ export default function DailyRoute() {
         <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
             <header className="space-y-1">
                 <div className="flex items-start justify-between gap-2">
-                    <h1 className="text-2xl font-semibold">
+                    <h1 className="font-display text-3xl font-semibold tracking-tight">
                         {today
                             ? m.daily_title({ number: today.number })
                             : m.daily_title({ number: "…" })}

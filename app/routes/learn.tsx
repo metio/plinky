@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { HubList } from "../components/ui/hubList";
+import { SettingsSection } from "../components/ui/settingsSection";
 import {
     ArrowUpIcon,
     BookIcon,
@@ -102,7 +103,9 @@ export default function Learn() {
     return (
         <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
-                <h1 className="text-2xl font-semibold">{m.nav_learn()}</h1>
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
+                    {m.nav_learn()}
+                </h1>
                 <p className="text-sm text-muted">{m.learn_intro()}</p>
             </header>
 
@@ -115,10 +118,7 @@ export default function Learn() {
                 onEnter={play}
             />
 
-            <section className="space-y-3">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
-                    {m.learn_teaching_heading()}
-                </h2>
+            <SettingsSection title={m.learn_teaching_heading()}>
                 <HubList
                     entries={TEACHING.map((entry) => ({
                         ...entry,
@@ -127,7 +127,7 @@ export default function Learn() {
                     }))}
                     onEnter={play}
                 />
-            </section>
+            </SettingsSection>
         </main>
     );
 }
