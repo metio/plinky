@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "Na",
     "repertoire_days_left": "{date} — za {count} dni",
     "repertoire_date_passed": "{date} — ten termin już minął",
-    "methods_link": "Sposoby ćwiczenia",
     "methods_title": "Sposoby ćwiczenia",
     "methods_intro": "Sześć rzeczy, które podpowiedziałby nauczyciel, i miejsce w Plinky, w którym zrobisz każdą z nich.",
     "methods_dose": "około {count} minut",

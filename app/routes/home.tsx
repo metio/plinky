@@ -30,19 +30,10 @@ export function meta(_args: Route.MetaArgs) {
 export default function Home() {
     return (
         <main className="mx-auto max-w-3xl space-y-10 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">{m.today_heading()}</h1>
-
-            <FeatureBoundary feature="HomeToday">
-                <HomeToday />
-            </FeatureBoundary>
-
-            {/* Setting up a piano, a hand span and the keys tailors everything after
-            it — and none of it is a gate, so it waits below the practice rather than
-            standing in front of it. Reconciles itself away as its steps complete. */}
-            <FeatureBoundary feature="DiscoveryChecklist">
-                <DiscoveryChecklist />
-            </FeatureBoundary>
-
+            {/* Everything that arrives after mount sits at the foot of the page, so it
+                lands in empty space instead of pushing the rest of it down. A page that
+                rearranges itself while you are reading it is the one thing every visit
+                would otherwise have in common. */}
             <section className="space-y-6 returning:hidden">
                 <div className="space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
@@ -74,6 +65,18 @@ export default function Home() {
                     <p className="text-center text-sm text-muted">{m.home_keyboard_hint()}</p>
                 </div>
             </section>
+
+            {/* Setting up a piano, a hand span and the keys tailors everything after it.
+                None of it is a gate; it reconciles itself away as its steps complete. */}
+            <FeatureBoundary feature="DiscoveryChecklist">
+                <DiscoveryChecklist />
+            </FeatureBoundary>
+
+            <h1 className="text-2xl font-semibold">{m.today_heading()}</h1>
+
+            <FeatureBoundary feature="HomeToday">
+                <HomeToday />
+            </FeatureBoundary>
         </main>
     );
 }

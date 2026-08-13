@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "Mennessä",
     "repertoire_days_left": "{date} — {count} päivän päässä",
     "repertoire_date_passed": "{date} — se päivä on jo mennyt",
-    "methods_link": "Tapoja harjoitella",
     "methods_title": "Tapoja harjoitella",
     "methods_intro": "Kuusi asiaa, joita opettaja ehdottaisi, ja mistä kohtaa Plinkyä kukin niistä löytyy.",
     "methods_dose": "noin {count} minuuttia",

@@ -298,7 +298,13 @@ const BUDGET_VENDOR_KB = 324;
 // consent banner, the Settings toggle and the click tracker. Cloudflare's beacon is a
 // script tag in the document rather than anything bundled, so what replaced roughly
 // three kilobytes of app code weighs nothing here.
-const BUDGET_APP_KB = 331;
+//
+// 333. Four places instead of five: a Learn hub gathering the pages that used to hang
+// off the help page, the day's practice as three moments, and the help text rewritten
+// to describe them. Copy is inlined per locale, so a paragraph costs more than the
+// component that renders it — most of the kilobyte and a half is the new help sections
+// and the Learn page's own prose, not the route.
+const BUDGET_APP_KB = 333;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

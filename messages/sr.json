@@ -1013,7 +1013,6 @@
     "repertoire_deadline": "До",
     "repertoire_days_left": "{date} — за {count} дана",
     "repertoire_date_passed": "{date} — тај датум је прошао",
-    "methods_link": "Начини вежбања",
     "methods_title": "Начини вежбања",
     "methods_intro": "Шест ствари које би наставник предложио, и где се свака од њих ради у Plinky-ју.",
     "methods_dose": "око {count} мин",

@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "目标日",
     "repertoire_days_left": "{date} — 还有 {count} 天",
     "repertoire_date_passed": "{date} — 这个日子已经过去了",
-    "methods_link": "练琴的方法",
     "methods_title": "练琴的方法",
     "methods_intro": "老师常说的六件事，以及在 Plinky 里各自去哪儿做。",
     "methods_dose": "大约 {count} 分钟",

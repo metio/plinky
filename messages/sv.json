@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "Till",
     "repertoire_days_left": "{date} — om {count} dagar",
     "repertoire_date_passed": "{date} — det datumet har passerat",
-    "methods_link": "Sätt att öva",
     "methods_title": "Sätt att öva",
     "methods_intro": "Sex saker en lärare skulle föreslå, och var i Plinky du gör var och en.",
     "methods_dose": "ungefär {count} minuter",

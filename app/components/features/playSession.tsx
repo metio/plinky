@@ -527,7 +527,14 @@ function usePlaySessionValue({
             // — the same beginner crutch the pre-highlight belongs to. A sight-reader
             // who dialled hints down gets no afterglow.
             if (aids.noteHints === "always") {
-                holdIndicator.begin(info.pitches, info.holdMs);
+                holdIndicator.begin(
+                    info.pitches.map((note, index) => ({
+                        note,
+                        // Its own written length, falling back to the position's when
+                        // the step had no expectation for this key.
+                        durationMs: info.writtenHoldsMs[index] ?? info.holdMs,
+                    })),
+                );
             }
             // Record the cleared note — its timing, a hold per pitch for the release
             // to close — and ease the adaptive metronome toward the player's own pace.
