@@ -100,12 +100,19 @@ jobs:
           # A native GitHub Deployment rather than a PR comment: the PR then shows the
           # environment and a "View deployment" link, and no comment email lands on every
           # push. auto_merge off and no required contexts so it is created immediately for
-          # this exact commit; transient so GitHub retires the environment once a newer
-          # deploy supersedes it.
+          # this exact commit; transient so GitHub retires it once a newer deploy
+          # supersedes it.
+          #
+          # ONE shared "preview" environment, not one per branch. A deployment is recorded
+          # against this commit, so each pull request still shows its own link — while the
+          # repository accumulates a single environment that never needs deleting.
+          # Per-branch environments did: deleting one requires repo-admin, which the
+          # built-in token cannot hold, so it needed a PAT that eventually expired and
+          # took the cleanup down with it.
           cat > deployment.json <<JSON
           {
             "ref": "${GITHUB_SHA}",
-            "environment": "preview/${SLUG}",
+            "environment": "preview",
             "auto_merge": false,
             "required_contexts": [],
             "transient_environment": true,

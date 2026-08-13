@@ -2,21 +2,22 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Preview cleanup
 # Tears down branch previews on Cloudflare Pages. preview.yml publishes each push to
-# <slug>.plinky-preview.pages.dev and records a GitHub Deployment under the preview/<slug>
-# environment; nothing there is bound to the branch's lifetime, so a deleted branch would
-# otherwise leave its preview deployments and its PR environment hanging around forever.
+# <slug>.plinky-preview.pages.dev; nothing there is bound to the branch's lifetime, so a
+# deleted branch would otherwise leave its preview deployments serving forever.
+#
+# Only Cloudflare needs cleaning. The GitHub Deployment side takes care of itself: every
+# preview records against one shared "preview" environment, which GitHub retires as each
+# newer deploy supersedes it, so there is nothing to delete and no admin token to hold.
 #
 # Two entry points:
 #   * delete event — fires once per removed branch (merge-and-delete or manual delete) and
 #     cleans exactly that branch. This only covers branches deleted AFTER this workflow
 #     landed on the default branch: GitHub runs the default branch's copy at delete time
 #     and never replays past deletions.
-#   * workflow_dispatch — clean one named branch, or (prune_orphans) reconcile both the
-#     Cloudflare deployments and the preview/* GitHub environments against the set of live
-#     branches, removing everything whose branch no longer exists on GitHub — including
-#     environments whose deployment is already gone. One run handles every pruning action;
-#     it is the backfill for branches deleted before this existed, and a periodic drift
-#     cleanup.
+#   * workflow_dispatch — clean one named branch, or (prune_orphans) reconcile the
+#     Cloudflare deployments against the set of live branches, removing every deployment
+#     whose branch no longer exists on GitHub. It is the backfill for branches deleted
+#     before this existed, and a periodic drift cleanup.
 #
 # The slug derivation MUST match preview.yml exactly, or this would look under the wrong
 # branch alias and delete nothing.
@@ -33,8 +34,6 @@ on:
         default: false
 permissions:
   contents: read
-  # Retire the transient GitHub Deployment environments the previews created.
-  deployments: write
 concurrency:
   # Serialise per target so two rapid runs can't race the Cloudflare API; a shared 'prune'
   # slot keeps sweeps from overlapping each other.
@@ -108,17 +107,10 @@ jobs:
             fi
             echo "keep=$keep" >> "$GITHUB_OUTPUT"
           fi
-      - name: Delete matching deployments and retire environments
+      - name: Delete matching deployments
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Deleting an environment needs repo-admin, which the built-in GITHUB_TOKEN
-          # cannot be granted (its permissions block has no administration scope). Supply
-          # PREVIEW_CLEANUP_TOKEN — a PAT with admin (fine-grained: Administration read/write;
-          # classic: repo) — to enable it. Absent, this falls back to the built-in token and
-          # the environment deletions are skipped (best-effort), while the Cloudflare
-          # teardown still runs in full.
-          GH_TOKEN: ${{ secrets.PREVIEW_CLEANUP_TOKEN || github.token }}
           MODE: ${{ steps.plan.outputs.mode }}
           TARGET: ${{ steps.plan.outputs.target }}
           KEEP: ${{ steps.plan.outputs.keep }}
@@ -172,40 +164,3 @@ jobs:
             done
             echo "Deleted ${#targets[@]} Cloudflare deployment(s)."
           fi
-
-          # Retire the transient GitHub Deployment environments; this also clears their
-          # deployment records from the PR. In prune mode reconcile the FULL set of
-          # preview/* environments against the keep-set, so orphans whose Cloudflare
-          # deployment is already gone are removed too — one run handles every pruning
-          # action. In single mode just the one target. Needs the admin-scoped
-          # PREVIEW_CLEANUP_TOKEN; with only the built-in token these 403 and are skipped —
-          # tolerated, since the Cloudflare teardown above still counts as a cleanup.
-          env_slugs=()
-          if [ "$MODE" = single ]; then
-            [ -n "${TARGET:-}" ] && env_slugs+=("$TARGET")
-          else
-            while read -r name; do
-              slug=${name#preview/}
-              [ -n "$slug" ] || continue
-              kept "$slug" && continue
-              env_slugs+=("$slug")
-            done < <(gh api "repos/${GITHUB_REPOSITORY}/environments" --paginate \
-              --jq '.environments[].name | select(startswith("preview/"))')
-          fi
-
-          if [ "${#env_slugs[@]}" -eq 0 ]; then
-            echo "No GitHub environments to retire."
-            exit 0
-          fi
-          for slug in "${env_slugs[@]}"; do
-            env_name="preview/${slug}"
-            # The environments API takes the name as a single URL-encoded path segment, so
-            # the slash in preview/<slug> MUST be %2F — passed literally it resolves to a
-            # different, missing route and 404s. Surface the real API error rather than
-            # blaming token scope, so a genuine 403 (missing admin PAT) is distinguishable.
-            if err=$(gh api -X DELETE "repos/${GITHUB_REPOSITORY}/environments/preview%2F${slug}" 2>&1); then
-              echo "Removed GitHub environment '${env_name}'."
-            else
-              echo "Could not delete GitHub environment '${env_name}': ${err//$'\n'/ }"
-            fi
-          done
