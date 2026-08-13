@@ -13,8 +13,29 @@ export type HistoryStore = JsonStore<History> & {
     record(notes: number, now?: Date): void;
 };
 
+// The pre-paint bootstrap script in the app root reads this key directly (it runs
+// before React), so the key is exported for it.
+export const HISTORY_STORAGE_KEY = "plinky:history";
+
+// The pre-paint bootstrap the app root inlines beside the theme's: marks a device
+// that has played before, so Today can open on the day's practice while the
+// prerendered document still carries the introduction for a first visit and for
+// anything reading the page without running it.
+//
+// It has to run before paint for the same reason the theme's does — deciding after
+// hydration would show the introduction and then take it away, and a page that
+// rearranges itself on every visit is worse than either version of it.
+export function returningBootstrapScript(): string {
+    return (
+        "(function(){try{" +
+        `var h=localStorage.getItem(${JSON.stringify(HISTORY_STORAGE_KEY)});` +
+        'if(h&&h!=="{}"){document.documentElement.setAttribute("data-returning","");}' +
+        "}catch(e){}})();"
+    );
+}
+
 export function createHistoryStore(kv: KeyValueStore): HistoryStore {
-    const store = createJsonStore(kv, "plinky:history", parseHistory);
+    const store = createJsonStore(kv, HISTORY_STORAGE_KEY, parseHistory);
     return {
         ...store,
         record(notes, now = new Date()) {

@@ -9,6 +9,7 @@ import { makeAssignment } from "../../../core/assignment";
 import { markLearned } from "../../../core/mastery";
 import type { GradeCatalogItem, GradedMastery } from "../../lib/gradeProgress";
 import { loadBundledScores } from "../../lib/catalog";
+import { m } from "../../paraglide/messages.js";
 import { renderWithServices } from "../../testing/renderWithServices";
 import { HomeToday } from "./homeToday";
 
@@ -52,7 +53,7 @@ describe("HomeToday", () => {
             { id: "g1-easy", title: "First Steps Song", grade: 1, cost: 1, kind: "piece" },
         ]);
         mount();
-        expect(await screen.findByText("Today")).toBeTruthy();
+        expect(await screen.findByText(m.today_moment_work())).toBeTruthy();
         // The guided path outranks the generated suggestion, and its link goes
         // straight into the current step's play page.
         const cont = await screen.findByRole("link", { name: /Continue “First steps”/ });
@@ -71,7 +72,7 @@ describe("HomeToday", () => {
         for (const score of loadBundledScores()) {
             services.mastery.save(score.id, markLearned(null, 0));
         }
-        expect(await screen.findByText("Today")).toBeTruthy();
+        expect(await screen.findByText(m.today_moment_work())).toBeTruthy();
         const learn = await screen.findByRole("link", { name: /Learn “First Steps Song”/ });
         expect(learn.getAttribute("href")).toContain("/play/g1-easy");
     });

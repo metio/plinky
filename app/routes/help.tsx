@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect } from "react";
-import { linkClasses } from "../components/ui/classes";
-import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { paragraphs } from "../../core/help";
 import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
@@ -54,7 +52,7 @@ const SECTIONS: {
     },
     {
         key: "home",
-        title: m.nav_home,
+        title: m.nav_today,
         text: m.help_text_home,
         image: "home",
         imageAlt: m.help_shot_home,
@@ -70,7 +68,7 @@ const SECTIONS: {
     { key: "playGrading", title: m.help_section_play_grading, text: m.help_text_play_grading },
     {
         key: "library",
-        title: m.nav_library,
+        title: m.nav_music,
         text: m.help_text_library,
         image: "library",
         imageAlt: m.help_shot_library,
@@ -168,43 +166,6 @@ export default function Help() {
                 <h1 className="text-2xl font-semibold">{m.help_title()}</h1>
                 <p className="text-sm text-muted">{m.help_intro()}</p>
             </header>
-
-            <p className="text-sm text-body">
-                {m.help_glossary_lead()}{" "}
-                <Link to="/glossary/" className={linkClasses}>
-                    {m.glossary_title()}
-                </Link>
-            </p>
-
-            {/* The theory the glossary assumes: it says what a mark means, this says
-                why the music is built that way. Reached from here rather than from the
-                home page, because it is something you come looking for. */}
-            <p className="text-sm text-body">
-                {m.help_theory_lead()}{" "}
-                <Link to="/theory/" className={linkClasses}>
-                    {m.theory_title()}
-                </Link>
-            </p>
-
-            {/* The small look-it-up things — a circle of fifths, a scale, a tempo read
-                off your own tapping. They belong beside the glossary: both answer a
-                question that comes up in the middle of practising. */}
-            <p className="text-sm text-body">
-                {m.help_tools_lead()}{" "}
-                <Link to="/tools/" className={linkClasses}>
-                    {m.tools_title()}
-                </Link>
-            </p>
-
-            {/* The keyboard tour's only other door is the home checklist, which goes away
-                once it is dismissed or finished — so this is where it stays findable, and
-                where someone comes back to it having forgotten where middle C was. */}
-            <p className="text-sm text-body">
-                {m.help_basics_lead()}{" "}
-                <Link to="/basics/" className={linkClasses}>
-                    {m.basics_title()}
-                </Link>
-            </p>
 
             {SECTIONS.map((section) => (
                 <section key={section.key} id={section.key} className="scroll-mt-20 space-y-4">

@@ -5,11 +5,9 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { makeAssignment } from "../../../core/assignment";
 import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
-import { FIRST_SONG_ID } from "../../lib/catalog";
 import { DiscoveryChecklist } from "./discoveryChecklist";
 import { m } from "../../paraglide/messages.js";
 
@@ -35,68 +33,48 @@ function mount() {
 }
 
 describe("DiscoveryChecklist", () => {
-    it("offers a brand-new player the tour with its feature steps", async () => {
-        // Empty device → nothing discovered yet → the checklist shows.
+    it("offers a brand-new player the three things that tailor the rest", async () => {
+        // Empty device → nothing set up yet → the strip shows.
         mount();
-        expect(await screen.findByText("Getting started")).toBeTruthy();
-        expect(screen.getByRole("link", { name: m.discover_compose() })).toBeTruthy();
+        expect(await screen.findByText(m.discover_heading())).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.discover_midi() })).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.grades_start_hand() })).toBeTruthy();
+        expect(screen.getByRole("link", { name: m.discover_keys() })).toBeTruthy();
     });
 
-    it("opens with the keyboard tour, then settings, then the first piece", async () => {
+    it("carries setting up and nothing else", async () => {
         mount();
-        await screen.findByText("Getting started");
+        await screen.findByText(m.discover_heading());
+        // Meeting the keyboard, the first piece, the daily and the app's corners are
+        // all offered by the day's practice above. A second list of suggestions beside
+        // it would only ask the reader which list to read.
         const links = screen.getAllByRole("link");
-        // Meeting the keyboard leads: it is the only step that needs no piano, no cable
-        // and no reading, and everything after it assumes you know what a key is.
-        expect(links[0]?.getAttribute("href")).toBe("/en/basics/");
-        // Then setting yourself up — the MIDI piano, hand size, the key mapping — and
-        // playing your first piece follows.
-        expect(links[1]?.getAttribute("href")).toBe("/en/settings/");
-        expect(links[2]?.getAttribute("href")).toBe("/en/settings/");
-        expect(links[3]?.getAttribute("href")).toBe("/en/settings/");
-        expect(links[4]?.getAttribute("href")).toBe(`/en/play/${FIRST_SONG_ID}/`);
-        // Then finding your level — after the first piece on purpose, so the test reads
-        // someone who already knows the cursor and the colours, and ahead of every
-        // corner so a pianist meets their shortcut in the first screenful.
-        expect(links[5]?.getAttribute("href")).toBe("/en/placement/");
-        expect(links[6]?.getAttribute("href")).toBe("/en/daily/");
+        expect(links).toHaveLength(3);
+        for (const link of links) {
+            expect(link.getAttribute("href")).toBe("/en/settings/");
+        }
     });
 
-    it("leaves finding your level off the jump-straight-in shortcuts", async () => {
-        mount();
-        await screen.findByText("Getting started");
-
-        // The pill is for steps that put fingers on keys now. A graded test that climbs
-        // until you fail is not that, however early it sits.
-        const level = screen.getByRole("link", { name: m.discover_placement() });
-        expect(level.textContent).not.toContain(m.discover_jump_in());
-    });
-
-    it("marks the straight-to-the-keys steps with the jump-in pill", async () => {
-        mount();
-        await screen.findByText("Getting started");
-        // Exactly the two steps that start you playing immediately — the first
-        // piece and the daily challenge — carry the shortcut marker.
-        expect(screen.getAllByText("Jump right in")).toHaveLength(2);
-    });
-
-    it("points the play step at the first assignment when one exists", async () => {
+    it("goes once every part of the set-up is done", async () => {
+        // A hand span on both hands, a remembered MIDI device and a touched key map
+        // are the three; with all of them the strip has nothing left to say.
         localStorage.setItem(
-            "plinky:assignments",
-            JSON.stringify([makeAssignment({ name: "My set", items: [{ id: "some-piece" }] })]),
+            "plinky:prefs",
+            JSON.stringify({ handSpan: { left: 9, right: 9 } }),
+        );
+        localStorage.setItem(
+            "plinky:discovered",
+            JSON.stringify(["midiConnected", "keysCustomized"]),
         );
         mount();
-        await screen.findByText("Getting started");
-        expect(
-            screen.getByRole("link", { name: "Play your first piece" }).getAttribute("href"),
-        ).toBe("/en/play/some-piece/");
+        await waitFor(() => expect(screen.queryByText(m.discover_heading())).toBeNull());
     });
 
     it("dismisses for good when the ✕ is clicked", async () => {
         mount();
-        await screen.findByText("Getting started");
-        fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-        await waitFor(() => expect(screen.queryByText("Getting started")).toBeNull());
+        await screen.findByText(m.discover_heading());
+        fireEvent.click(screen.getByRole("button", { name: m.action_dismiss() }));
+        await waitFor(() => expect(screen.queryByText(m.discover_heading())).toBeNull());
         // The dismissal persists, so it stays gone on the next visit.
         expect(localStorage.getItem("plinky:seen-hints")).toContain("discovery-panel");
     });
@@ -105,6 +83,6 @@ describe("DiscoveryChecklist", () => {
         localStorage.setItem("plinky:seen-hints", JSON.stringify(["discovery-panel"]));
         mount();
         // Give the post-mount read a chance to run, then confirm it never appears.
-        await waitFor(() => expect(screen.queryByText("Getting started")).toBeNull());
+        await waitFor(() => expect(screen.queryByText(m.discover_heading())).toBeNull());
     });
 });

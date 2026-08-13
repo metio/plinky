@@ -64,8 +64,8 @@ export function meta({ params }: Route.MetaArgs) {
         tags.push({ "script:ld+json": personData(person, locale) });
         tags.push({
             "script:ld+json": breadcrumbData(locale, [
-                { name: m.nav_home(), path: "/" },
-                { name: m.nav_library(), path: "/library/" },
+                { name: m.nav_today(), path: "/" },
+                { name: m.nav_music(), path: "/library/" },
                 { name: person.name, path: `/person/${person.slug}/` },
             ]),
         });
@@ -162,7 +162,7 @@ export default function PersonPage() {
                     <p className="text-sm text-muted">
                         {m.person_empty()}{" "}
                         <Link to="/library" className="font-medium text-accent hover:underline">
-                            {m.nav_library()}
+                            {m.nav_music()}
                         </Link>
                     </p>
                 )

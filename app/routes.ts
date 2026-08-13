@@ -21,6 +21,7 @@ export default [
         route("placement", "routes/placement.tsx"),
         route("review", "routes/review.tsx"),
         route("settings", "routes/settings.tsx"),
+        route("learn", "routes/learn.tsx"),
         route("basics", "routes/basics.tsx"),
         route("help", "routes/help.tsx"),
         route("glossary", "routes/glossary.tsx"),

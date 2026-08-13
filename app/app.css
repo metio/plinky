@@ -30,41 +30,55 @@ SPDX-License-Identifier: AGPL-3.0-or-later
    Tailwind tracks `var(--color-*)` references across the whole stylesheet.
 
    Opacity modifiers work as usual: `bg-accent-surface/50`. */
+/* ── The Album ───────────────────────────────────────────────────────────────
+   The chrome is a piano album: warm ivory paper, soft brown-black ink, a hairline
+   the weight of a staff line, ink blue for anything you act on, and brass for
+   anything you earned. Timeless without austere — a scholarly urtext edition is
+   beautiful and has never once been pleased to see anybody.
+
+   The page is the same paper the staff is printed on (`surface` and `paper` are
+   one value), so the music is not an object sitting inside a product.
+
+   Warmth cannot come from the accent, because every warm hue is already spoken
+   for by the grading: green means you found the note, red means you did not,
+   amber is caution and the S grade, and the share grid runs green through to red.
+   So the accent stays cool and the joy lives in the ground, in brass, and in the
+   noteheads — colour belongs to the music, never to the furniture. */
 @theme {
     /* Surfaces, back to front. */
-    --color-surface: var(--color-white); /* the page itself */
-    --color-raised: var(--color-white); /* cards and popovers over it */
-    --color-sunken: var(--color-gray-50); /* inset panels */
-    --color-subtle: var(--color-gray-100); /* quiet fills, chips, hovers */
-    --color-subtle-strong: var(--color-gray-200);
+    --color-surface: #fcf7ea; /* the page itself — the score's own paper */
+    --color-raised: #fffdf7; /* cards and popovers over it, a shade lighter */
+    --color-sunken: #f5eeda; /* inset panels */
+    --color-subtle: #efe6cf; /* quiet fills, chips, hovers */
+    --color-subtle-strong: #e6dbc4;
 
-    /* Hairlines. */
-    --color-line-faint: var(--color-gray-100);
-    --color-line: var(--color-gray-200); /* the default border */
-    --color-line-strong: var(--color-gray-300); /* inputs and controls */
+    /* Hairlines, at the weight a staff line is printed. */
+    --color-line-faint: #efe6cf;
+    --color-line: #e6dbc4; /* the default border */
+    --color-line-strong: #d2c3a4; /* inputs and controls */
 
-    /* Text, strongest to quietest. */
-    --color-ink: var(--color-gray-900); /* headings, primary text */
-    --color-ink-soft: var(--color-gray-800);
-    --color-body: var(--color-gray-700); /* running copy */
-    --color-muted: var(--color-gray-500); /* secondary and helper text */
-    --color-faint: var(--color-gray-400); /* receded, decorative glyphs */
-    --color-ink-disabled: var(--color-gray-300); /* quieter still than faint */
+    /* Text, strongest to quietest. Printing ink is brown-black, not blue-black. */
+    --color-ink: #241c14; /* headings, primary text */
+    --color-ink-soft: #382e22;
+    --color-body: #4a3f31; /* running copy */
+    --color-muted: #6e6154; /* secondary and helper text — the pencil */
+    --color-faint: #8b7f70; /* receded, decorative glyphs */
+    --color-ink-disabled: #b9ae9c; /* quieter still than faint */
 
-    /* Indigo carries the brand: links, selection, the primary action. */
-    --color-accent: var(--color-indigo-600);
-    --color-accent-strong: var(--color-indigo-700); /* link text */
-    --color-accent-deep: var(--color-indigo-800);
-    --color-accent-ink: var(--color-indigo-900); /* text on accent-surface */
-    --color-accent-solid: var(--color-indigo-600); /* filled button */
-    --color-accent-solid-hover: var(--color-indigo-700);
-    --color-accent-surface: var(--color-indigo-50); /* tinted panel */
-    --color-accent-fill: var(--color-indigo-100); /* tinted hover */
-    --color-accent-line: var(--color-indigo-200);
-    --color-accent-line-strong: var(--color-indigo-300);
-    --color-accent-ring: var(--color-indigo-500); /* focus ring */
+    /* Ink blue carries the brand: links, selection, the primary action. */
+    --color-accent: #2b4374;
+    --color-accent-strong: #23375f; /* link text */
+    --color-accent-deep: #1b2b4a;
+    --color-accent-ink: #1b2b4a; /* text on accent-surface */
+    --color-accent-solid: #2b4374; /* filled button */
+    --color-accent-solid-hover: #1f3159;
+    --color-accent-surface: #edf0f7; /* tinted panel */
+    --color-accent-fill: #dde4f0; /* tinted hover */
+    --color-accent-line: #c9d4e7;
+    --color-accent-line-strong: #a9bad8;
+    --color-accent-ring: #2b4374; /* focus ring */
     /* A lighter accent fill: progress bars, the race track, a decorative mark. */
-    --color-accent-soft: var(--color-indigo-400);
+    --color-accent-soft: #7e97c4;
 
     /* Correct, saved, on target. Green only — `emerald` said the same thing. */
     --color-success: var(--color-green-700);
@@ -91,7 +105,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-warn: var(--color-amber-700);
     --color-warn-ink: var(--color-amber-900);
     --color-warn-surface: var(--color-amber-50);
-    --color-warn-fill: var(--color-amber-100);
     --color-warn-line: var(--color-amber-300);
     --color-warn-solid: var(--color-amber-500);
 
@@ -104,9 +117,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     /* Domain colours. These are not chrome — each one means something on
        screen, so they stay separate hues on purpose rather than folding into
        the accent. */
-    --color-paper: var(--color-stone-50); /* the score sheet, warm not grey */
-    --color-paper-line: var(--color-stone-300);
-    --color-paper-ink: var(--color-stone-500);
+    /* The score sheet. The page carries the same value, so a staff sits on the
+       page rather than in a card on it. */
+    --color-paper: #fcf7ea;
+    --color-paper-line: #d2c3a4;
+    --color-paper-ink: #8b7f70;
     /* Piano keys are a physical object: a white key stays white in dark mode,
        the same way the score sheet stays paper. Inverting them would be a
        different instrument. */
@@ -119,7 +134,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-black-ink: var(--color-gray-300);
     --color-key-spent: var(--color-gray-400); /* a key the round is done with */
     --color-key-spent-ink: var(--color-gray-200);
-    --color-key-hover: var(--color-indigo-50);
+    --color-key-hover: #edf0f7;
     --color-key-held: var(--color-green-500); /* a key you are holding down */
     /* What the score asks of a key — which one comes next, and the hold bar
        draining down it for as long as the note is written to last. */
@@ -181,11 +196,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-hand-right-soft: var(--color-indigo-300);
     --color-hand-left: var(--color-teal-500);
     --color-hand-left-soft: var(--color-teal-300);
-    /* Violet partners indigo in the hero's gradients and free-play keys. */
-    --color-spark: var(--color-violet-500);
-    --color-spark-strong: var(--color-violet-600);
-    --color-spark-soft: var(--color-violet-400);
-    --color-spark-surface: var(--color-violet-50);
+    /* Brass partners the ink blue in the hero's gradients and free-play keys —
+       the pedals, the hinges, the gilt on a fallboard. It is also the only warm
+       colour the chrome is allowed, and it goes on things you earned. */
+    --color-spark: #a67c2e;
+    --color-spark-strong: #8a6520;
+    --color-spark-soft: #c09a4e;
+    --color-spark-surface: #f4e9cf;
     /* The footer's heart, on hover. */
     --color-love: var(--color-rose-500);
     --color-love-ring: var(--color-rose-400);
@@ -193,36 +210,37 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 /* The dark half of every token above. Unlayered on purpose, so it outranks the
    `@layer theme` defaults; `.dark` sits on <html>, which is also `:root`. */
+/* The same album under a lamp. */
 .dark {
-    --color-surface: var(--color-gray-950);
-    --color-raised: var(--color-gray-900);
-    --color-sunken: var(--color-gray-900);
-    --color-subtle: var(--color-gray-800);
-    --color-subtle-strong: var(--color-gray-800);
+    --color-surface: #14110c;
+    --color-raised: #1c1710;
+    --color-sunken: #1c1710;
+    --color-subtle: #272117;
+    --color-subtle-strong: #322a1e;
 
-    --color-line-faint: var(--color-gray-900);
-    --color-line: var(--color-gray-800);
-    --color-line-strong: var(--color-gray-700);
+    --color-line-faint: #1c1710;
+    --color-line: #302a21;
+    --color-line-strong: #493f31;
 
-    --color-ink: var(--color-gray-100);
-    --color-ink-soft: var(--color-gray-200);
-    --color-body: var(--color-gray-300);
-    --color-muted: var(--color-gray-400);
-    --color-faint: var(--color-gray-500);
-    --color-ink-disabled: var(--color-gray-700);
+    --color-ink: #f0e8d9;
+    --color-ink-soft: #e4dac8;
+    --color-body: #d2c7b2;
+    --color-muted: #a09480;
+    --color-faint: #857a68;
+    --color-ink-disabled: #4a4234;
 
-    --color-accent: var(--color-indigo-400);
-    --color-accent-strong: var(--color-indigo-300);
-    --color-accent-deep: var(--color-indigo-200);
-    --color-accent-ink: var(--color-indigo-200);
-    --color-accent-solid: var(--color-indigo-500);
-    --color-accent-solid-hover: var(--color-indigo-400);
-    --color-accent-surface: var(--color-indigo-950);
-    --color-accent-fill: var(--color-indigo-900);
-    --color-accent-line: var(--color-indigo-900);
-    --color-accent-line-strong: var(--color-indigo-700);
-    --color-accent-ring: var(--color-indigo-500);
-    --color-accent-soft: var(--color-indigo-500);
+    --color-accent: #93b3e0;
+    --color-accent-strong: #b3cbec;
+    --color-accent-deep: #cbdcf4;
+    --color-accent-ink: #cbdcf4;
+    --color-accent-solid: #3a5a93;
+    --color-accent-solid-hover: #4a6eaf;
+    --color-accent-surface: #17203a;
+    --color-accent-fill: #1f2c4c;
+    --color-accent-line: #26365c;
+    --color-accent-line-strong: #3a5183;
+    --color-accent-ring: #6d8cc0;
+    --color-accent-soft: #4a6eaf;
 
     --color-success: var(--color-green-300);
     --color-success-solid: var(--color-green-700);
@@ -241,7 +259,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-warn: var(--color-amber-400);
     --color-warn-ink: var(--color-amber-200);
     --color-warn-surface: var(--color-amber-950);
-    --color-warn-fill: var(--color-amber-950);
     --color-warn-line: var(--color-amber-800);
     --color-warn-solid: var(--color-amber-400);
 
@@ -252,9 +269,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
     /* The score sheet keeps its light paper in both themes — a staff is read as
        ink on paper, and inverting it costs legibility for no gain. */
-    --color-paper: var(--color-stone-50);
-    --color-paper-line: var(--color-stone-300);
-    --color-paper-ink: var(--color-stone-500);
+    --color-paper: #fcf7ea;
+    --color-paper-line: #d2c3a4;
+    --color-paper-ink: #8b7f70;
 
     --color-key-white: var(--color-gray-100);
     --color-key-ink: var(--color-gray-900);
@@ -262,7 +279,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-key-black-ink: var(--color-gray-300);
     --color-key-spent: var(--color-gray-700);
     --color-key-spent-ink: var(--color-gray-500);
-    --color-key-hover: var(--color-indigo-100);
+    --color-key-hover: #dde4f0;
     --color-key-held: var(--color-green-500);
     --color-key-next: var(--color-indigo-400);
     --color-key-label: var(--color-gray-600);
@@ -304,10 +321,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-hand-left: var(--color-teal-300);
     --color-hand-left-soft: var(--color-teal-500);
 
-    --color-spark: var(--color-violet-500);
-    --color-spark-strong: var(--color-violet-600);
-    --color-spark-soft: var(--color-violet-400);
-    --color-spark-surface: var(--color-violet-950);
+    --color-spark: #e0b25c;
+    --color-spark-strong: #d9aa52;
+    --color-spark-soft: #c79b45;
+    --color-spark-surface: #261e10;
 
     --color-love: var(--color-rose-400);
     --color-love-ring: var(--color-rose-400);
@@ -406,6 +423,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 /* Drive the dark: variant from a .dark class on <html> so the theme can be
    toggled; "system" is resolved to the class by the app. */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* A device that has played before, stamped on <html> before paint by the root's
+   bootstrap script (app/stores/historyStore.ts). Today opens on the day's practice
+   for a returning player and on the introduction for everybody else — including
+   every crawler and unfurler, which never run the script and so always read the
+   introduction out of the static document. */
+@custom-variant returning (&:where([data-returning], [data-returning] *));
 
 html,
 body {

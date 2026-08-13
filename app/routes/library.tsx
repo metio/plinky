@@ -9,6 +9,10 @@ import { LibraryRow } from "../components/features/libraryRow";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { ScoreImport } from "../components/features/scoreImport";
 import { Button } from "../components/ui/button";
+import { linkClasses } from "../components/ui/classes";
+import { HubList } from "../components/ui/hubList";
+import { LocalizedLink } from "../components/ui/localizedLink";
+import { KeysIcon, ListIcon } from "../components/ui/icons";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/library";
 import { isDue } from "../../core/mastery";
@@ -16,6 +20,7 @@ import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
 import { useLibraryFilters } from "../hooks/useLibraryFilters";
 import { useLibraryItems } from "../hooks/useLibraryItems";
+import { useSynth } from "../hooks/useSynth";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
 
@@ -25,11 +30,32 @@ export function meta(_args: Route.MetaArgs) {
 
 // The library's two jobs as two tabs: Search finds something to play in the
 // combined catalogue; Manage grows it (add your own score) and keeps it safe
-// (backup and restore). ?tab=manage deep-links straight to the second — the
-// discovery checklist's "add a score" step lands there.
+// (backup and restore). ?tab=manage deep-links straight to the second.
 type LibraryTab = "search" | "manage";
 
+// Music is everything there is to play, and the catalogue is only the middle of it:
+// an assignment is a path someone laid through it, and Compose is how music you make
+// yourself gets onto the shelf. Both used to be home-page tiles, which left the shelf
+// looking like the catalogue alone.
+const SHELVES = [
+    {
+        to: "/assignments",
+        label: m.home_assignments,
+        blurb: m.home_assignments_blurb,
+        Icon: ListIcon,
+        note: 64,
+    },
+    {
+        to: "/compose",
+        label: m.play_compose,
+        blurb: m.play_compose_blurb,
+        Icon: KeysIcon,
+        note: 67,
+    },
+];
+
 export default function LibraryRoute() {
+    const synth = useSynth();
     const favoritesStore = useFavoritesStore();
     const { items, mastery, loaded, remove, assignmentsUsing } = useLibraryItems();
     const filters = useLibraryFilters(items, mastery);
@@ -67,6 +93,32 @@ export default function LibraryRoute() {
                     </p>
                 </Show>
             </header>
+
+            <section className="space-y-3">
+                <h2 className="text-sm font-medium uppercase tracking-wide text-muted">
+                    {m.home_explore_heading()}
+                </h2>
+                <HubList
+                    entries={SHELVES.map((shelf) => ({
+                        ...shelf,
+                        label: shelf.label(),
+                        blurb: shelf.blurb(),
+                    }))}
+                    onEnter={(note) =>
+                        synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
+                    }
+                />
+                {/* The teacher's end of the assignment loop. It reads the codes the
+                    student's device writes, so it belongs beside the sets rather than
+                    another page deeper — a feature whose two halves never link to each
+                    other is a feature only its author can find. */}
+                <p className="text-sm text-muted">
+                    {m.assignments_collect_hint()}{" "}
+                    <LocalizedLink to="/collect" className={linkClasses}>
+                        {m.collect_title()}
+                    </LocalizedLink>
+                </p>
+            </section>
 
             <SegmentedControl
                 options={[

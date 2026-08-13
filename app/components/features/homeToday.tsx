@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
+import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
+import { buildExerciseId } from "../../../core/exerciseGen";
+import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { practiceHref } from "../../../core/practisable";
 import {
     currentGrade,
@@ -18,6 +21,9 @@ import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
     useExerciseSource,
+    useMasteryStore,
+    useOnboardingStore,
+    usePlacementStore,
     usePrefsStore,
     useServices,
 } from "../../contexts/services";
@@ -54,13 +60,98 @@ function taskLabel(task: Task): string {
     }
 }
 
-// The home page's "open the app, here's what to do" panel: a short, prioritised task
-// list (refresh what's fading, the daily, something new) — each a one-tap link
-// straight into practice. Reads local state after mount, so it's absent from the
-// prerendered shell and appears once the client resolves it.
+const LEARN_LABEL: Record<LearnPickId, () => string> = {
+    basics: m.basics_title,
+    placement: m.placement_title,
+    theory: m.theory_title,
+    glossary: m.glossary_title,
+    methods: m.methods_title,
+    tools: m.tools_title,
+};
+
+const LEARN_BLURB: Record<LearnPickId, () => string> = {
+    basics: m.basics_intro,
+    placement: m.placement_intro,
+    theory: m.theory_intro,
+    glossary: m.glossary_intro,
+    methods: m.methods_intro,
+    tools: m.tools_intro,
+};
+
+// A named part of the session. Headings, never steps: nothing counts them, nothing
+// ticks them off, and skipping one costs nothing — a counter here would be a streak
+// wearing a different hat.
+function Moment({ label, children }: { label: string; children: ReactNode }) {
+    return (
+        <section className="space-y-3">
+            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+                {label}
+            </h2>
+            {children}
+        </section>
+    );
+}
+
+function Chip({ to, children }: { to: string; children: ReactNode }) {
+    return (
+        <Link
+            to={to}
+            className="rounded-full border border-line-strong bg-sunken px-3.5 py-1.5 text-sm font-medium text-ink transition hover:border-accent-line-strong hover:text-accent-strong"
+        >
+            {children}
+        </Link>
+    );
+}
+
+function Row({
+    to,
+    icon,
+    label,
+    hint,
+}: {
+    to: string;
+    icon: string;
+    label: string;
+    hint?: string;
+}) {
+    return (
+        <Link
+            to={to}
+            className="group flex items-center gap-3 rounded-lg border border-line bg-raised p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm"
+        >
+            <span aria-hidden="true" className="text-xl">
+                {icon}
+            </span>
+            <span className="min-w-0 space-y-0.5">
+                <span className="block font-medium text-ink group-hover:text-accent-strong">
+                    {label} →
+                </span>
+                {hint && <span className="block text-sm leading-snug text-muted">{hint}</span>}
+            </span>
+        </Link>
+    );
+}
+
+type Session = {
+    tasks: Task[];
+    arcadeLevel: number;
+    learn: LearnPickId;
+    surprise: { catalogue: GradeCatalogItem[]; grade: number; mastered: Set<string> };
+};
+
+// The day's practice, in the shape a teacher gives an hour: something to warm up on,
+// the piece you're working on, and one thing you didn't know before. Every part is
+// composed from what the device already knows, so the page decides for the player
+// instead of offering four lists and letting them choose which list to read.
+//
+// Reads local state after mount, so it is absent from the prerendered shell and
+// appears once the client resolves it.
 export function HomeToday() {
     const prefsStore = usePrefsStore();
     const assignmentsStore = useAssignmentsStore();
+    const masteryStore = useMasteryStore();
+    const onboarding = useOnboardingStore();
+    const placement = usePlacementStore();
     const exercises = useExerciseSource();
     const services = useServices();
     // Skips steps whose pieces no longer resolve, so the Continue link never
@@ -69,14 +160,7 @@ export function HomeToday() {
     // or degrades with, the network.
     const known = useKnownPieces();
     const navigate = useNavigate();
-    const [tasks, setTasks] = useState<Task[] | null>(null);
-    // The catalogue slice the "surprise me" pick draws from, resolved with the tasks; a
-    // rotating seed varies the pick each press.
-    const [surprise, setSurprise] = useState<{
-        catalogue: GradeCatalogItem[];
-        grade: number;
-        mastered: Set<string>;
-    } | null>(null);
+    const [session, setSession] = useState<Session | null>(null);
     const seedRef = useRef(0);
 
     useEffect(() => {
@@ -85,8 +169,8 @@ export function HomeToday() {
             loadGradedMastery(services.mastery, services),
             loadGradeCatalogue(services),
             // The manifest only feeds the starter assignment; without it the
-            // panel still stands, so a fetch failure degrades to no starter
-            // rather than an empty panel.
+            // session still stands, so a fetch failure degrades to no starter
+            // rather than an empty page.
             exercises.manifest().then((list) => list ?? []),
         ]).then(([items, catalogue, exerciseList]) => {
             if (cancelled) {
@@ -100,8 +184,8 @@ export function HomeToday() {
                 items.filter((i) => i.mastery.learned && !i.mastery.backlog).map((i) => i.id),
             );
             const suggestion = gradeSuggestions(catalogue, workingGrade, mastered, 1)[0] ?? null;
-            setSurprise({ catalogue, grade: workingGrade, mastered });
-            const dailyDoneToday = services.daily.lastDone() === dailyNumber(todayKey(new Date()));
+            const day = dailyNumber(todayKey(new Date(now)));
+            const dailyDoneToday = services.daily.lastDone() === day;
             // The player's own assignments first — a saved set is a deliberate
             // path — then the built-in starter, so a fresh device has a guided
             // path in the panel from day one. Same construction as on
@@ -121,8 +205,8 @@ export function HomeToday() {
             // The due ids resolve back to their kind through the loaded items, so the
             // task knows whether opening one means a score or an ear drill.
             const kindById = new Map(items.map((i) => [i.id, i.kind]));
-            setTasks(
-                todayTasks({
+            setSession({
+                tasks: todayTasks({
                     due: dueReviews(items, now, prefs.reviewCap).map((id) => ({
                         id,
                         kind: kindById.get(id) ?? "piece",
@@ -133,46 +217,70 @@ export function HomeToday() {
                         ? { id: suggestion.id, title: suggestion.title, kind: suggestion.kind }
                         : null,
                 }),
-            );
+                // The first arcade rung not yet cleared, read from the same mastery the
+                // play surface records — so clearing a level advances it with no bespoke
+                // loop behind it.
+                arcadeLevel: currentArcadeLevel(
+                    (lv) => masteryStore.load(buildExerciseId(arcadeConfig(lv)))?.learned === true,
+                ),
+                learn: learnPick({
+                    keyboardMet: onboarding.marked().has("keyboardMet"),
+                    placementTaken: placement.load() !== null,
+                    day,
+                }),
+                surprise: { catalogue, grade: workingGrade, mastered },
+            });
         });
         return () => {
             cancelled = true;
         };
-    }, [prefsStore.load, assignmentsStore.list, exercises.manifest, services, known]);
+    }, [
+        prefsStore.load,
+        assignmentsStore.list,
+        exercises.manifest,
+        masteryStore.load,
+        onboarding.marked,
+        placement.load,
+        services,
+        known,
+    ]);
 
-    if (tasks === null) {
+    if (session === null) {
         return null;
     }
 
+    // The daily belongs to the warm-up; everything else is the work.
+    const daily = session.tasks.find((task) => task.key === "daily");
+    const work = session.tasks.filter((task) => task.key !== "daily");
+    const arcadeId = buildExerciseId(arcadeConfig(session.arcadeLevel));
+
     return (
-        <section className="space-y-3 rounded-xl border border-accent-line bg-accent-surface/50 p-5 dark:bg-accent-surface/30">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-accent-strong">
-                {m.today_heading()}
-            </h2>
-            <ul className="space-y-2">
-                {tasks.map((task) => (
-                    <li key={task.key}>
-                        <Link
-                            to={task.to}
-                            className="group flex items-center gap-3 rounded-lg border border-line bg-raised p-3 transition hover:-translate-y-0.5 hover:border-accent-line-strong hover:shadow-sm"
-                        >
-                            <span aria-hidden="true" className="text-xl">
-                                {task.key === "daily" && task.done ? "✅" : ICON[task.key]}
-                            </span>
-                            <span className="font-medium text-ink group-hover:text-accent-strong">
-                                {taskLabel(task)} →
-                            </span>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-            {surprise && (
+        <div className="space-y-8">
+            <Moment label={m.today_moment_warmup()}>
+                <div className="flex flex-wrap gap-2">
+                    {daily && <Chip to={daily.to}>{taskLabel(daily)}</Chip>}
+                    <Chip to={`/play/${arcadeId}`}>
+                        {m.arcade_play({ level: session.arcadeLevel })}
+                    </Chip>
+                    <Chip to="/daily?tab=warmup">{m.today_drill()}</Chip>
+                    <Chip to="/ear">{m.ear_title()}</Chip>
+                </div>
+            </Moment>
+
+            <Moment label={m.today_moment_work()}>
+                <ul className="space-y-2">
+                    {work.map((task) => (
+                        <li key={task.key}>
+                            <Row to={task.to} icon={ICON[task.key]} label={taskLabel(task)} />
+                        </li>
+                    ))}
+                </ul>
                 <SurpriseButton
                     onClick={() => {
                         const pick = surprisePick(
-                            surprise.catalogue,
-                            surprise.grade,
-                            surprise.mastered,
+                            session.surprise.catalogue,
+                            session.surprise.grade,
+                            session.surprise.mastered,
                             seedRef.current++,
                         );
                         if (pick) {
@@ -180,7 +288,16 @@ export function HomeToday() {
                         }
                     }}
                 />
-            )}
-        </section>
+            </Moment>
+
+            <Moment label={m.today_moment_learn()}>
+                <Row
+                    to={LEARN_PICK_HREF[session.learn]}
+                    icon="💡"
+                    label={LEARN_LABEL[session.learn]()}
+                    hint={LEARN_BLURB[session.learn]()}
+                />
+            </Moment>
+        </div>
     );
 }
