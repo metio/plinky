@@ -19,6 +19,7 @@ import {
     skillRating,
     surprisePick,
 } from "../../lib/gradeProgress";
+import { DiscoveryChecklist } from "./discoveryChecklist";
 import { HeroKeyboard } from "./heroKeyboard";
 import { SurpriseButton } from "./surpriseButton";
 import {
@@ -483,6 +484,13 @@ export function HomeToday() {
                     hint={LEARN_BLURB[session.learn]()}
                 />
             </Moment>
+
+            {/* Setting up a piano, a hand span and the keys tailors everything after it,
+                and none of it is a gate — so it reads as a footnote under the day's
+                practice rather than standing between the reader and it. It arrives with
+                the practice for the same reason everything else does: a block that lands
+                late above static content pushes that content down the screen. */}
+            <DiscoveryChecklist />
 
             {/* The way out, for somebody who fancies none of it. Quiet on purpose: the
                 page has already made its offers, and this is the shrug after them. */}
