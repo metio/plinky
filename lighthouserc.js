@@ -66,7 +66,13 @@ const named = [...new Set([...notation, ...noindex])];
 // Lighthouse measures the single-locale build (per-visitor weight), as transfer size. The
 // light cap is a tight ratchet on the shared/app code a plain page ships; the notation cap
 // carries the score-rendering machinery as well.
-const SCRIPT_LIGHT = 235520;
+//
+// Transfer size counts THIRD-PARTY script too, so the analytics beacon rides in this
+// number even though it is not ours and is not bundled — and its size is Cloudflare's to
+// change, not ours. That is what the headroom above the app's own weight is for. It also
+// means this budget can pass locally and fail on CI: a run that never fetches the beacon
+// measures a page the CI runner does not.
+const SCRIPT_LIGHT = 239616;
 const SCRIPT_NOTATION = 655360;
 
 const common = {
