@@ -230,6 +230,7 @@
     "today_daily_done": "Défi terminé — voyez votre résultat",
     "today_learn": "Apprendre « {title} »",
     "today_browse": "Parcourir la bibliothèque",
+    "today_something_else": "Ou autre chose",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Rechercher des partitions…",
     "scores_filter_all": "Tous",

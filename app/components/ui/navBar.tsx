@@ -60,8 +60,10 @@ export function BottomNav() {
                             <Link
                                 to={to}
                                 aria-current={active ? "page" : undefined}
-                                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium ${
-                                    active ? "text-accent" : "text-muted"
+                                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 border-t-2 py-2 text-xs font-medium ${
+                                    active
+                                        ? "border-spark text-ink"
+                                        : "border-transparent text-muted"
                                 }`}
                             >
                                 <Icon className="h-6 w-6" />
@@ -87,8 +89,10 @@ export function HeaderNav({ className = "" }: { className?: string }) {
                         key={to}
                         to={to}
                         aria-current={active ? "page" : undefined}
-                        className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                            active ? "text-accent" : "text-muted hover:text-ink"
+                        className={`border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                            active
+                                ? "border-spark text-ink"
+                                : "border-transparent text-muted hover:text-ink"
                         }`}
                     >
                         {label()}

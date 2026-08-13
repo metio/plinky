@@ -230,6 +230,7 @@
     "today_daily_done": "Dagens er klaret — se dit resultat",
     "today_learn": "Lær “{title}”",
     "today_browse": "Gennemse biblioteket",
+    "today_something_else": "Eller noget andet",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Søg i stykker…",
     "scores_filter_all": "Alle",

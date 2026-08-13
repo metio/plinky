@@ -230,6 +230,7 @@
     "today_daily_done": "Щоденне виконано — перегляньте результат",
     "today_learn": "Розучіть «{title}»",
     "today_browse": "Переглянути бібліотеку",
+    "today_something_else": "Або щось інше",
     "home_bpm": "{tempo} уд/хв",
     "scores_search_placeholder": "Пошук партитур…",
     "scores_filter_all": "Усі",

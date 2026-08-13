@@ -342,6 +342,7 @@
     "today_daily_done": "Daily done — see your result",
     "today_learn": "Learn “{title}”",
     "today_browse": "Browse the library",
+    "today_something_else": "Something else",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Search scores…",
     "scores_filter_all": "All",

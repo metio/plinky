@@ -230,6 +230,7 @@
     "today_daily_done": "Diário concluído — vê o teu resultado",
     "today_learn": "Aprenda “{title}”",
     "today_browse": "Explorar a biblioteca",
+    "today_something_else": "Ou outra coisa",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Pesquisar partituras…",
     "scores_filter_all": "Todas",

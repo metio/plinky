@@ -230,6 +230,7 @@
     "today_daily_done": "Päivän haaste tehty — katso tuloksesi",
     "today_learn": "Opettele ”{title}”",
     "today_browse": "Selaa kirjastoa",
+    "today_something_else": "Tai jotain muuta",
     "home_bpm": "{tempo} BPM",
     "scores_search_placeholder": "Hae nuotteja…",
     "scores_filter_all": "Kaikki",

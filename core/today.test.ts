@@ -25,7 +25,12 @@ describe("todayTasks", () => {
         );
         expect(tasks.map((t) => t.key)).toEqual(["review", "daily", "learn"]);
         // Several due items start the guided review session, not just the first.
-        expect(tasks[0]).toEqual({ key: "review", count: 2, to: "/review" });
+        expect(tasks[0]).toEqual({
+            key: "review",
+            count: 2,
+            to: "/review",
+            ids: expect.any(Array),
+        });
         expect(tasks[2]).toEqual({
             key: "learn",
             title: "A New Piece",
@@ -36,7 +41,13 @@ describe("todayTasks", () => {
 
     it("links a single due piece straight to it", () => {
         const tasks = todayTasks(input({ due: [piece("only")], dailyDoneToday: true }));
-        expect(tasks[0]).toEqual({ key: "review", count: 1, to: "/play/only", id: "only" });
+        expect(tasks[0]).toEqual({
+            key: "review",
+            count: 1,
+            to: "/play/only",
+            id: "only",
+            ids: ["only"],
+        });
     });
 
     it("opens a single due ear item on its drill, not a score", () => {
@@ -48,6 +59,7 @@ describe("todayTasks", () => {
             count: 1,
             to: "/ear?exercise=intervals&level=0",
             id: "ear-intervals-0",
+            ids: ["ear-intervals-0"],
         });
     });
 
