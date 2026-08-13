@@ -1013,7 +1013,6 @@
     "repertoire_deadline": "목표일",
     "repertoire_days_left": "{date} — {count}일 남았어요",
     "repertoire_date_passed": "{date} — 그 날짜는 지났어요",
-    "methods_link": "연습하는 방법",
     "methods_title": "연습하는 방법",
     "methods_intro": "선생님이 권할 만한 여섯 가지, 그리고 Plinky에서 각각을 해볼 수 있는 곳이에요.",
     "methods_dose": "약 {count}분",

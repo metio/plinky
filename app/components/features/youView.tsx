@@ -145,12 +145,6 @@ export function YouView() {
                 <PracticeReport pieceTitle={pieceTitle} />
             </FeatureBoundary>
 
-            <p className="text-sm text-muted">
-                <Link className={linkClasses} to="/methods/">
-                    {m.methods_link()}
-                </Link>
-            </p>
-
             {fingerprint && (
                 <ShareCard
                     grid={fingerprint}

@@ -134,11 +134,17 @@ function HelpBlock({ section }: { section: (typeof SECTIONS)[number] }) {
     return (
         <div className="space-y-3">
             {section.image && (
+                // Every shot is captured at the same size by dev/help-screenshots, and
+                // saying so reserves the space before the file arrives. Without it each
+                // lazy-loaded picture pushes the rest of the page down as it lands, and
+                // fifteen sections of that is a page that will not sit still.
                 <img
                     src={`/help/${section.image}.webp`}
                     alt={section.imageAlt?.() ?? ""}
                     loading="lazy"
-                    className="w-full rounded-lg border border-line"
+                    width={1200}
+                    height={750}
+                    className="h-auto w-full rounded-lg border border-line"
                 />
             )}
             <div className="space-y-2 text-sm text-body">

@@ -23,7 +23,7 @@ const step = (elapsedMs: number, pitches: number[], holdMs = 500, holds?: number
     advancesCursor: true,
     slackMs: 0,
     pedalled: false,
-    expected: holds?.map((h) => ({ velocity: null, holdMs: h })),
+    expected: holds?.map((h) => ({ velocity: null, holdMs: h, writtenHoldMs: h })),
 });
 
 describe("performanceOf", () => {

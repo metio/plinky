@@ -46,6 +46,12 @@ grid it was.
 The daily challenge and Compose keep their own web addresses, so any link or bookmark
 you have still works.
 
+**Each key now shows its own length.** When the shrinking fill on a key told you how long
+to hold it, every key struck at that moment drained at the same rate — the longest note's.
+So a quaver in the right hand emptied as slowly as the whole note under it in the left,
+long after your right hand had moved on. Each key now drains on the length that is
+actually written for it.
+
 ## 16 August 2026 — later
 
 **Plinky moved to a new home.** The site is now served from Cloudflare Pages instead of

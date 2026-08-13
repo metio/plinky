@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "Innen",
     "repertoire_days_left": "{date} — om {count} dager",
     "repertoire_date_passed": "{date} — den datoen er passert",
-    "methods_link": "Måter å øve på",
     "methods_title": "Måter å øve på",
     "methods_intro": "Seks ting en lærer ville foreslått, og hvor i Plinky du gjør hver av dem.",
     "methods_dose": "omtrent {count} minutter",

@@ -17,7 +17,7 @@ const EMPTY: ReadonlyMap<number, number> = new Map();
 // every fill has emptied.
 export function useHoldIndicator(): {
     holdFractions: ReadonlyMap<number, number>;
-    begin: (notes: Iterable<number>, durationMs: number) => void;
+    begin: (holds: Iterable<{ note: number; durationMs: number }>) => void;
     clear: () => void;
 } {
     const scheduler = useScheduler();
@@ -45,13 +45,21 @@ export function useHoldIndicator(): {
     }, []);
 
     const begin = useCallback(
-        (notes: Iterable<number>, durationMs: number) => {
-            if (!(durationMs > 0)) {
-                return;
-            }
+        (holds: Iterable<{ note: number; durationMs: number }>) => {
             const now = schedulerRef.current.now();
-            for (const note of notes) {
+            let armed = false;
+            // Each key carries its own written length: two hands rarely hold for the
+            // same time, and one figure for the whole position drains a quaver's fill
+            // at the whole note's pace beside it.
+            for (const { note, durationMs } of holds) {
+                if (!(durationMs > 0)) {
+                    continue;
+                }
                 holdsRef.current = beginHold(holdsRef.current, note, now, durationMs);
+                armed = true;
+            }
+            if (!armed) {
+                return;
             }
             setHoldFractions(holdFractionsByNote(holdsRef.current, now));
             if (frameRef.current === null) {

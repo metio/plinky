@@ -1013,7 +1013,6 @@
     "repertoire_deadline": "К",
     "repertoire_days_left": "{date} — осталось дней: {count}",
     "repertoire_date_passed": "{date} — эта дата уже прошла",
-    "methods_link": "Способы заниматься",
     "methods_title": "Способы заниматься",
     "methods_intro": "Шесть вещей, которые посоветовал бы преподаватель, — и где в Plinky сделать каждую из них.",
     "methods_dose": "около {count} мин",

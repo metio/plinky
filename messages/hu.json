@@ -1013,7 +1013,6 @@
     "repertoire_deadline": "Eddigre",
     "repertoire_days_left": "{date} — {count} nap múlva",
     "repertoire_date_passed": "{date} — ez a nap elmúlt",
-    "methods_link": "Gyakorlási módok",
     "methods_title": "Gyakorlási módok",
     "methods_intro": "Hat dolog, amit egy tanár javasolna, és hogy a Plinkyben hol csinálhatod meg mindegyiket.",
     "methods_dose": "körülbelül {count} perc",

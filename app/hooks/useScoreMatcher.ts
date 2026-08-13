@@ -90,7 +90,7 @@ type StepGroup = Omit<
     MatchStep,
     "bar" | "elapsedMs" | "holdMs" | "expected" | "advancesCursor" | "slackMs" | "pedalled"
 > & {
-    expected: { velocity: number | null; soundQuarters: number }[];
+    expected: { velocity: number | null; soundQuarters: number; writtenQuarters: number }[];
     // The ornament's own written length, for placing it before the beat. Zero on the
     // group that IS the beat.
     graceQuarters: number;
@@ -129,7 +129,11 @@ function stepsAtCursor(
         // What each pitch is asked for, pushed alongside `pitches` so the two stay
         // aligned. Kept in quarter notes here and turned into milliseconds once the
         // position's tempo is known, which is where the chord's own hold is converted.
-        const expected: { velocity: number | null; soundQuarters: number }[] = [];
+        const expected: {
+            velocity: number | null;
+            soundQuarters: number;
+            writtenQuarters: number;
+        }[] = [];
         let holdQuarters = 0;
         let graceQuarters = 0;
         for (const note of group) {
@@ -161,9 +165,15 @@ function stepsAtCursor(
                 velocity:
                     dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
                 soundQuarters: expression.soundQuarters * lengthScaleOf(expression),
+                // The same length before articulation narrows it: what this one key is
+                // written to last, which is what its hold indicator draws. A whole note
+                // under a quaver is the ordinary case for two hands, and one length for
+                // the whole position would drain the quaver's fill at the whole note's
+                // pace long after that hand had moved on.
+                writtenQuarters: expression.soundQuarters,
             });
-            // The group's own length is its longest note: what the hold indicator draws,
-            // and how long it keeps ringing.
+            // The group's own length is its longest note: how long the position keeps
+            // ringing, which is not the same as how long any one key is held.
             holdQuarters = Math.max(holdQuarters, expression.soundQuarters);
             if (isGraceNote(note)) {
                 graceQuarters = Math.max(graceQuarters, expression.notatedQuarters);
@@ -205,15 +215,21 @@ function stepsAtCursor(
 function askedFor(
     event: { step: MatchStep; playedPitches: number[] },
     ratio: number,
-): { expectedVelocities: (number | null)[]; expectedHoldsMs: number[] } {
+): {
+    expectedVelocities: (number | null)[];
+    expectedHoldsMs: number[];
+    writtenHoldsMs: number[];
+} {
     const expectedVelocities: (number | null)[] = [];
     const expectedHoldsMs: number[] = [];
+    const writtenHoldsMs: number[] = [];
     for (const pitch of event.playedPitches) {
         const asked = event.step.expected?.[event.step.pitches.indexOf(pitch)];
         expectedVelocities.push(asked?.velocity ?? null);
         expectedHoldsMs.push(asked ? asked.holdMs / ratio : 0);
+        writtenHoldsMs.push(asked ? asked.writtenHoldMs / ratio : 0);
     }
-    return { expectedVelocities, expectedHoldsMs };
+    return { expectedVelocities, expectedHoldsMs, writtenHoldsMs };
 }
 
 // When each hand got to this position: the EARLIEST arrival among the pitches that
@@ -312,6 +328,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
                 expected: expected.map((pitch) => ({
                     velocity: pitch.velocity,
                     holdMs: quartersMs(pitch.soundQuarters * stretch, bpm),
+                    writtenHoldMs: quartersMs(pitch.writtenQuarters * stretch, bpm),
                 })),
                 // Overwritten below for all but the last.
                 advancesCursor: true,
@@ -386,6 +403,9 @@ export type CorrectInfo = {
     // dynamic with that note's own accent, and how long that key is meant to be down.
     expectedVelocities: (number | null)[];
     expectedHoldsMs: number[];
+    // How long each struck key is WRITTEN to last, index-aligned with `pitches` — the
+    // hold indicator's own figure, per key rather than per position.
+    writtenHoldsMs: number[];
     // How hard each was actually struck, index-aligned with `pitches`.
     velocities: number[];
     // How much the timing windows are widened here — non-zero only around an ornament.

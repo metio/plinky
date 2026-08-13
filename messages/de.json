@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "Bis",
     "repertoire_days_left": "{date} — noch {count} Tage",
     "repertoire_date_passed": "{date} — dieses Datum ist vorbei",
-    "methods_link": "Wege zum Üben",
     "methods_title": "Wege zum Üben",
     "methods_intro": "Sechs Dinge, die dir eine Lehrkraft vorschlagen würde, und wo in Plinky du sie findest.",
     "methods_dose": "etwa {count} Minuten",

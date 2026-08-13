@@ -1014,7 +1014,6 @@
     "repertoire_deadline": "Έως",
     "repertoire_days_left": "{date} — σε {count} μέρες",
     "repertoire_date_passed": "{date} — αυτή η μέρα πέρασε",
-    "methods_link": "Τρόποι εξάσκησης",
     "methods_title": "Τρόποι εξάσκησης",
     "methods_intro": "Έξι πράγματα που θα πρότεινε ένας δάσκαλος, και πού στο Plinky γίνεται το καθένα.",
     "methods_dose": "περίπου {count} λεπτά",
