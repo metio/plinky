@@ -266,7 +266,6 @@
     "share_grid_label": "Genauigkeit, Timing und Fluss über sechs Momente des Durchlaufs",
     "mastery_learned": "Gelernt",
     "mastery_due": "Wiederholung fällig",
-    "mastery_due_count": "{count} zur Wiederholung fällig",
     "mastery_mark_learned": "Als gelernt markieren",
     "mastery_backlog": "Zurück in die Liste",
     "mastery_resume": "Wiederholungen fortsetzen",

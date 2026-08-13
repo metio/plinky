@@ -82,11 +82,6 @@ export default function LibraryRoute() {
                     {m.nav_music()}
                 </h1>
                 <p className="text-sm text-muted">{m.library_intro()}</p>
-                <Show when={due > 0}>
-                    <p className="text-sm font-medium text-warn">
-                        {m.mastery_due_count({ count: due })}
-                    </p>
-                </Show>
             </header>
 
             <HubList
@@ -158,7 +153,7 @@ export default function LibraryRoute() {
                             {matches.length === 0 ? (
                                 <p className="text-sm text-muted">{m.scores_empty()}</p>
                             ) : (
-                                <ul className="space-y-1">
+                                <ul className="divide-y divide-line-faint">
                                     {matches.slice(0, visible).map((item) => {
                                         const entry = mastery[item.id];
                                         return (

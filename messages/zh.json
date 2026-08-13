@@ -266,7 +266,6 @@
     "share_grid_label": "演奏六个时刻的准确度、节奏与流畅",
     "mastery_learned": "已掌握",
     "mastery_due": "需复习",
-    "mastery_due_count": "{count} 首待复习",
     "mastery_mark_learned": "标记为已掌握",
     "mastery_backlog": "移入待办",
     "mastery_resume": "恢复复习",

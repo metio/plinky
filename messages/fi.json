@@ -266,7 +266,6 @@
     "share_grid_label": "Tarkkuus, ajoitus ja sujuvuus suorituksen kuudessa hetkessä",
     "mastery_learned": "Opittu",
     "mastery_due": "Kertaus odottaa",
-    "mastery_due_count": "{count} kerrattavaa",
     "mastery_mark_learned": "Merkitse opituksi",
     "mastery_backlog": "Siirrä jonoon",
     "mastery_resume": "Jatka kertauksia",

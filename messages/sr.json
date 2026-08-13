@@ -266,7 +266,6 @@
     "share_grid_label": "Тачност, ритам и течност кроз шест тренутака покушаја",
     "mastery_learned": "Научено",
     "mastery_due": "Време за понављање",
-    "mastery_due_count": "{count} за понављање",
     "mastery_mark_learned": "Означи као научено",
     "mastery_backlog": "Премести у листу чекања",
     "mastery_resume": "Настави понављања",

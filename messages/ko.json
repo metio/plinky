@@ -266,7 +266,6 @@
     "share_grid_label": "연주의 여섯 순간에 걸친 정확도, 타이밍, 흐름",
     "mastery_learned": "익힘",
     "mastery_due": "복습 필요",
-    "mastery_due_count": "복습 대상 {count}개",
     "mastery_mark_learned": "익힘으로 표시",
     "mastery_backlog": "보류로 이동",
     "mastery_resume": "복습 재개",
