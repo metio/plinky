@@ -47,6 +47,13 @@ Collect results existed, you would not have found it.
 Compose, which moved here from the front page — music you make yourself belongs on the
 same shelf as music you find.
 
+**The same page, wherever you are.** Every page's own name is now set the same way and in
+the same place, section headings look the same whether they are on the front page, in a
+run's set-up panel or in Settings, and lists of music are lists rather than grids of
+boxes. The You page reads in the order its opening line promises: what you can play right
+now, then the ladder, then how it has been going, with everything worth sharing together
+at the foot.
+
 **Plinky has a face now.** The wordmark and each page's own title are set in a schoolbook
 serif — the kind of type a piano album is printed in — while everything you press stays in
 the plain face it was, because a control should disappear and a title should not. The word
