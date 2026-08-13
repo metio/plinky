@@ -8,7 +8,6 @@ import { flushHolds, type RunCapture } from "../../core/runCapture";
 import { deriveRunOutcome, type RunOutcome, tempoScale } from "../../core/runOutcome";
 import { sectionScores } from "../../core/sectionBest";
 import type { AppServices } from "../contexts/services";
-import type { Analytics } from "../ports/analytics";
 import { recordRun } from "../lib/recordRun";
 import type { Milestone } from "../../core/milestones";
 
@@ -58,7 +57,6 @@ export type RunGradingOptions = {
     // the full-screen exit already do.
     holdingNote: boolean;
     services: AppServices;
-    analytics: Analytics;
     // Sounds the finishing flourish. Muted playback no-ops inside the engine.
     playNote: (
         note: number,
@@ -126,13 +124,6 @@ export function useRunGrading(options: RunGradingOptions): RunGrading {
         gradeFromRunRef.current = true;
         finishedGradeRef.current = outcome.grade;
         o.recordResult({ ...outcome, notes });
-        o.analytics.track("run_completed", {
-            mode: "self_paced",
-            grade: outcome.grade.letter,
-            correct: o.correct,
-            wrong: o.wrong,
-            daily: o.daily !== undefined,
-        });
         // A short major flourish for finishing — fuller for a stronger grade, a gentle
         // lift for a weaker one, never a penalty.
         for (const beat of cadence(outcome.grade.letter)) {

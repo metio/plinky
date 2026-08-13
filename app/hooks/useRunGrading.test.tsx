@@ -50,7 +50,6 @@ function harness(overrides: Partial<RunGradingOptions> = {}, services?: Partial<
         publishMilestone: vi.fn(),
         onGraded: vi.fn(),
         onRunComplete: vi.fn(),
-        track: vi.fn(),
     };
     const options: RunGradingOptions = {
         complete: false,
@@ -67,7 +66,6 @@ function harness(overrides: Partial<RunGradingOptions> = {}, services?: Partial<
         sightReading: false,
         atTempo: false,
         services: resolved,
-        analytics: { track: calls.track, setConsent: () => {} },
         playNote: calls.playNote,
         publishMilestone: calls.publishMilestone,
         recordResult: calls.recordResult,
@@ -135,15 +133,6 @@ describe("useRunGrading", () => {
         rerender({ ...options, complete: false });
         finish();
         expect(calls.recordResult).toHaveBeenCalledTimes(2);
-    });
-
-    it("reports the run to analytics with its grade", () => {
-        const { finish, calls } = harness();
-        finish();
-
-        const [event, params] = calls.track.mock.calls[0] as [string, Record<string, unknown>];
-        expect(event).toBe("run_completed");
-        expect(params).toMatchObject({ mode: "self_paced", correct: 8, wrong: 0, daily: false });
     });
 
     it("holds an ephemeral run back from the completion callback", () => {

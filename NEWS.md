@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 16 August 2026
+
+**No more cookie banner.** The consent box that met you on your first visit is gone, and
+so is the switch in Settings behind it. Plinky counts page views with a measurement that
+uses no cookies, stores nothing on your device and identifies nobody, so there is nothing
+left to ask you and nothing left for you to turn off. The Privacy block in Settings now
+just says what happens, and the privacy policy has been rewritten to match.
+
 ## 15 August 2026 — later
 
 **Your exported videos, your look.** Exporting a notes-highway video now offers a colour

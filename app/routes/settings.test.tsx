@@ -67,18 +67,12 @@ describe("Settings", () => {
         expect(prefs.colorNotes).toBe(false);
     });
 
-    it("marks the privacy step discovered on opening Settings, without touching the toggle", () => {
+    it("marks the privacy step discovered on opening Settings", () => {
         const { services } = mount();
-        // Awareness — opening the page (where Privacy leads) is enough; consent stays off.
+        // Awareness — opening the page, where Privacy leads, is enough. There is nothing
+        // to switch on: the block states what happens and links to the detail.
         expect(services.onboarding.marked().has("privacyChecked")).toBe(true);
-        expect(services.prefs.load().analyticsConsent).toBe(false);
-    });
-
-    it("persists the analytics opt-in, off by default", () => {
-        const { services } = mount();
-        expect(services.prefs.load().analyticsConsent).toBe(false);
-        toggle(m.settings_analytics_toggle);
-        expect(services.prefs.load().analyticsConsent).toBe(true);
+        expect(screen.getByText(m.settings_privacy_link())).toBeTruthy();
     });
 
     it("disables the volume slider while sound is off, and persists the level", () => {

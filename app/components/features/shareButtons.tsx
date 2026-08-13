@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
-import { useAnalytics } from "../../contexts/services";
 import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
 import { SITE_URL } from "../../../core/site";
@@ -74,22 +73,17 @@ async function saveImage(svg: string, boast: string): Promise<void> {
 // Copy / save-image / per-platform buttons shared by every card. `text` is the
 // clipboard and social-link payload; `imageSvg` rasterises to the shareable PNG, with
 // `imageText` as the accompanying caption when handed to the system share sheet.
-// `context` names what is being shared (a run, lifetime progress, a milestone), since
-// the buttons themselves can't tell — it rides the share analytics event.
 export function ShareButtons({
     text,
     imageSvg,
     imageText,
-    context,
 }: {
     text: string;
     imageSvg: string;
     imageText: string;
-    context: string;
 }) {
     // The "Copied!" label reverts after a moment.
     const [copied, flashCopied] = useCopied();
-    const analytics = useAnalytics();
     // Whether this device can hand a file to the system share sheet — the only web
     // path to Instagram and TikTok. Resolved after mount: the prerendered HTML is
     // device-agnostic, so the button reads "Save image" until the client confirms.
@@ -105,7 +99,7 @@ export function ShareButtons({
     return (
         // Every control here sends its own `share` event naming the channel, so the
         // delegated click tracker skips the whole row rather than counting each press twice.
-        <div className="flex flex-wrap items-center gap-2" data-analytics-skip="">
+        <div className="flex flex-wrap items-center gap-2">
             <button
                 type="button"
                 onClick={() => {
@@ -115,7 +109,6 @@ export function ShareButtons({
                     navigator.clipboard
                         ?.writeText(text)
                         .then(() => {
-                            analytics.track("share", { context, channel: "copy" });
                             flashCopied();
                         })
                         .catch(() => {});
@@ -129,10 +122,6 @@ export function ShareButtons({
                 // A cancelled share or a failed rasterise rejects; saving the card is
                 // best-effort, so swallow it rather than crash the page.
                 onClick={() => {
-                    analytics.track("share", {
-                        context,
-                        channel: canShareFiles ? "share_sheet" : "image",
-                    });
                     saveImage(imageSvg, imageText).catch(() => {});
                 }}
                 className={LINK}
@@ -147,7 +136,6 @@ export function ShareButtons({
                     rel="noreferrer"
                     aria-label={m.share_on({ platform: target.label })}
                     title={m.share_on({ platform: target.label })}
-                    onClick={() => analytics.track("share", { context, channel: target.brand })}
                     className={`${LINK} inline-flex items-center`}
                 >
                     <BrandIcon brand={target.brand} />
@@ -159,7 +147,6 @@ export function ShareButtons({
                 // card is an image: hand the PNG to the system share sheet (where
                 // Instagram appears), or save it and open Instagram to post there.
                 onClick={() => {
-                    analytics.track("share", { context, channel: "instagram" });
                     if (!canShareFiles) {
                         window.open("https://www.instagram.com/", "_blank", "noreferrer");
                     }

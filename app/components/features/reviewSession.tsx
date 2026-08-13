@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 import { linkClasses } from "../ui/classes";
 import { dueReviews, loadGradedMastery } from "../../lib/gradeProgress";
 import { setBacklog } from "../../../core/mastery";
-import { useAnalytics, usePrefsStore, useServices } from "../../contexts/services";
+import { usePrefsStore, useServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { EarSession } from "./earSession";
 import { LocalizedLink as Link } from "../ui/localizedLink";
@@ -26,7 +26,6 @@ type Due = { id: string; title: string; kind: ItemKind };
 export function ReviewSession() {
     const prefsStore = usePrefsStore();
     const services = useServices();
-    const analytics = useAnalytics();
     const [queue, setQueue] = useState<Due[] | null>(null);
     const [index, setIndex] = useState(0);
     const [refreshed, setRefreshed] = useState(0);
@@ -57,36 +56,6 @@ export function ReviewSession() {
             cancelled = true;
         };
     }, [prefsStore.load, services]);
-
-    // The review funnel's two ends. Both live here, above the early returns, so they obey
-    // the rules of hooks; each keys on the transition rather than the render, so a
-    // re-render never re-reports. An empty queue is the explainer state, not a session,
-    // so it opens nothing.
-    useEffect(() => {
-        if (queue === null || queue.length === 0) {
-            return;
-        }
-        analytics.track("review_started", {
-            count: queue.length,
-            pieces: queue.filter((item) => item.kind === "piece").length,
-            ear: queue.filter((item) => item.kind === "ear").length,
-        });
-    }, [analytics, queue]);
-
-    const finished = queue !== null && queue.length > 0 && index >= queue.length;
-    // biome-ignore lint/correctness/useExhaustiveDependencies: finishing is the event; the tallies are read at that moment
-    useEffect(() => {
-        if (!finished) {
-            return;
-        }
-        const total = queue?.length ?? 0;
-        analytics.track("review_completed", {
-            total,
-            refreshed,
-            shelved,
-            skipped: total - refreshed - shelved,
-        });
-    }, [analytics, finished]);
 
     const current = queue?.[index];
     const resolved = useScore(current?.kind === "piece" ? current.id : "");

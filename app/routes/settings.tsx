@@ -74,8 +74,8 @@ export default function Settings() {
     const onboarding = useOnboardingStore();
 
     // Opening Settings — where the Privacy block leads the page — marks the "check
-    // your privacy settings" discovery step. Awareness only: never tied to turning
-    // analytics on, so the checklist can't pressure a consent.
+    // your privacy settings" discovery step. Awareness only: there is nothing here to
+    // switch on, so the checklist asks nothing of the reader.
     useEffect(() => {
         onboarding.markDiscovered("privacyChecked");
     }, [onboarding]);
@@ -87,31 +87,20 @@ export default function Settings() {
                 <p className="text-sm text-muted">{m.settings_subtitle()}</p>
             </header>
 
-            {/* Privacy leads the page: these opt-ins involve a third party and are
-            off unless turned on, so they sit up top where they're seen. The analytics
-            toggle lives here now; a monetisation opt-in joins it later. */}
+            {/* Privacy leads the page. There is no switch here because there is no
+            choice to make: nothing about a visitor is collected, so the block says what
+            happens and points at the detail. A monetisation opt-in would land here. */}
             <SettingsSection
                 title={m.settings_privacy_title()}
                 hint={m.settings_privacy_hint()}
                 icon={<EyeIcon className={ICON} />}
             >
-                <div className="space-y-1">
-                    <SwitchField
-                        label={m.settings_analytics_toggle()}
-                        checked={prefs.analyticsConsent}
-                        // Using the toggle is itself a consent choice, so the
-                        // first-visit banner won't ask again.
-                        onChange={(analyticsConsent) =>
-                            update({ analyticsConsent, analyticsAsked: true })
-                        }
-                    />
-                    <p className="text-xs text-muted">
-                        {m.settings_analytics_desc()}{" "}
-                        <LocalizedLink to="/datenschutz" className={linkClasses}>
-                            {m.settings_analytics_link()}
-                        </LocalizedLink>
-                    </p>
-                </div>
+                <p className="text-xs text-muted">
+                    {m.settings_privacy_body()}{" "}
+                    <LocalizedLink to="/datenschutz" className={linkClasses}>
+                        {m.settings_privacy_link()}
+                    </LocalizedLink>
+                </p>
             </SettingsSection>
 
             <SettingsSection

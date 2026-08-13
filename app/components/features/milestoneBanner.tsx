@@ -51,7 +51,6 @@ export function MilestoneBanner({
             emphasis
             footer={
                 <ShareButtons
-                    context={`milestone-${milestone.kind}`}
                     text={boast}
                     imageSvg={svgMilestone({ title: cardTitle, detail })}
                     imageText={boast}

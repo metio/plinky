@@ -10,8 +10,7 @@ import { ShareButtons } from "./shareButtons";
 // A minimal valid SVG so the rasterise path has something to decode.
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>';
 
-const mount = () =>
-    render(<ShareButtons context="test" text="I hit Grade 3" imageSvg={SVG} imageText="boast" />);
+const mount = () => render(<ShareButtons text="I hit Grade 3" imageSvg={SVG} imageText="boast" />);
 
 beforeEach(() => {
     URL.createObjectURL = vi.fn(() => "blob:card");

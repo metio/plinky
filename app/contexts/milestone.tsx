@@ -3,7 +3,6 @@
 
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import type { Milestone } from "../../core/milestones";
-import { useAnalytics } from "./services";
 
 // The earned-moment channel: a run completing anywhere (play, review, sprint, the daily
 // challenge) publishes its milestone here, and the app shell's single banner subscribes
@@ -24,21 +23,9 @@ const MilestoneContext = createContext<MilestoneChannel | null>(null);
 
 export function MilestoneProvider({ children }: { children: ReactNode }) {
     const [current, setCurrent] = useState<Milestone | null>(null);
-    const analytics = useAnalytics();
     // Publishing is the one funnel every earned moment passes through, wherever the run
-    // happened, so the analytics event rides along here rather than at each call site.
-    // Only the kind and the grade reached travel — the piece's title is the player's own
-    // (an imported score's name can be anything), so it never leaves the app.
-    const publish = useCallback(
-        (milestone: Milestone) => {
-            analytics.track("milestone", {
-                kind: milestone.kind,
-                grade: milestone.kind === "grade-up" ? milestone.grade : 0,
-            });
-            setCurrent(milestone);
-        },
-        [analytics],
-    );
+    // happened — play, review, sprint or the daily challenge.
+    const publish = useCallback((milestone: Milestone) => setCurrent(milestone), []);
     const dismiss = useCallback(() => setCurrent(null), []);
     const value = useMemo(() => ({ current, publish, dismiss }), [current, publish, dismiss]);
     return <MilestoneContext.Provider value={value}>{children}</MilestoneContext.Provider>;

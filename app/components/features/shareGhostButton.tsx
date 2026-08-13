@@ -3,7 +3,6 @@
 
 import { encodeGhost } from "../../../core/ghost";
 import { SITE_URL } from "../../../core/site";
-import { useAnalytics } from "../../contexts/services";
 import { useCopied } from "../../hooks/useCopied";
 import { m } from "../../paraglide/messages.js";
 import { Button, type ButtonVariant, IconButton } from "../ui/button";
@@ -38,16 +37,13 @@ export function ShareGhostButton({
 }) {
     // Briefly confirm a clipboard copy on the surface where no native share sheet ran.
     const [copied, flashCopied] = useCopied();
-    const analytics = useAnalytics();
     const share = async () => {
         const url = `${SITE_URL}${localizedHref(`/play/${id}`)}?ghost=${encodeGhost(onsets)}`;
         try {
             if (typeof navigator.share === "function") {
                 await navigator.share({ url, text: m.ghost_share_boast({ title }) });
-                analytics.track("share", { context: "ghost", channel: "share_sheet" });
             } else {
                 await navigator.clipboard?.writeText(url);
-                analytics.track("share", { context: "ghost", channel: "copy" });
                 flashCopied();
             }
         } catch {
@@ -61,7 +57,7 @@ export function ShareGhostButton({
     if (showLabel) {
         return (
             // Sharing sends its own `share` event, so the click tracker skips this.
-            <div className="flex items-center gap-2" data-analytics-skip="">
+            <div className="flex items-center gap-2">
                 <Button onClick={share} className="text-ghost-text">
                     <GhostIcon />
                     {label}
@@ -71,7 +67,7 @@ export function ShareGhostButton({
         );
     }
     return (
-        <span className="inline-flex items-center gap-1" data-analytics-skip="">
+        <span className="inline-flex items-center gap-1">
             {copiedNote}
             <IconButton label={label} onClick={share} variant={variant} className="text-ghost-text">
                 <GhostIcon />

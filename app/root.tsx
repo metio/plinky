@@ -8,9 +8,6 @@ import type { Route } from "./+types/root";
 import { LocalizedLink as Link } from "./components/ui/localizedLink";
 import { GradeBadge } from "./components/features/gradeBadge";
 import { HeaderNav } from "./components/ui/navBar";
-import { AnalyticsConsent } from "./components/features/analyticsConsent";
-import { AnalyticsTracking } from "./components/features/analyticsTracking";
-import { ConsentBanner } from "./components/features/consentBanner";
 import { StorageBanner } from "./components/features/storageBanner";
 import { UpdateBanner } from "./components/features/updateBanner";
 import { MilestoneBannerHost } from "./components/features/milestoneBanner";
@@ -302,6 +299,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta name="twitter:image:alt" content={m.meta_home_title()} />
                 <Meta />
                 <Links />
+                {/* Cloudflare Web Analytics: page views and Core Web Vitals, measured
+                    without cookies and without anything that identifies a visitor, so
+                    there is no consent to ask for and no banner to dismiss. The token
+                    identifies the site, not the reader, and is public by design — it
+                    travels in the page source of every site that uses the beacon. What
+                    it cannot do is custom events; a question about a specific feature
+                    needs its own endpoint, not a flag flipped here. */}
+                <script
+                    type="module"
+                    src="https://static.cloudflareinsights.com/beacon.min.js"
+                    data-cf-beacon='{"token": "9b87198c106648e9ab7e874be5e02527"}'
+                />
             </head>
             <body>
                 {/* Services wrap the header too — GradeBadge reads the injected prefs
@@ -309,15 +318,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     the header on the default services, silently ignoring any override. */}
                 <ServicesProvider>
                     <Header />
-                    {/* Loads or stops analytics to follow the consent pref; renders
-                        nothing and stays inert until a deliberate opt-in. */}
-                    <AnalyticsConsent />
-                    {/* Sends page views and setting-change events; every call is a
-                        no-op until the same consent is granted. */}
-                    <AnalyticsTracking />
-                    {/* The first-visit consent banner that sets that pref; shows until
-                        the visitor accepts or declines, then never again. */}
-                    <ConsentBanner />
                     {/* The layout is the composition root: it hands the banner the
                         adapter's health signal so the banner itself stays oblivious
                         to where the signal comes from. */}

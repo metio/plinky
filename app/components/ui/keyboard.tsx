@@ -478,9 +478,7 @@ export function Keyboard({
     const flashNote = flash?.note ?? null;
 
     return (
-        // The keybed is the instrument, not UI chrome: mark it so the analytics click
-        // tracker never counts a key press (playing a piece would flood it otherwise).
-        <div className={`${KEYBED_WELL} ${well}`} data-analytics-skip="">
+        <div className={`${KEYBED_WELL} ${well}`}>
             {/* biome-ignore lint/a11y/useSemanticElements: a keybed is a group of piano keys, not a fieldset */}
             <div
                 ref={keysRef}

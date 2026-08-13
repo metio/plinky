@@ -8,7 +8,7 @@ import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreViewer } from "../components/features/scoreViewer";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { type DailyResult, dailyChallenge, dailyNumber, todayKey } from "../../core/daily";
-import { useAnalytics, useDailyStore } from "../contexts/services";
+import { useDailyStore } from "../contexts/services";
 import { DEFAULT_DRILL, type DrillOptions, generateDrill } from "../../core/drill";
 import { DrillSetup } from "../components/features/drillSetup";
 import { routeMeta, webPageData } from "../../core/site";
@@ -42,7 +42,6 @@ const WARMUP: DrillOptions = { ...DEFAULT_DRILL, bars: 8, beatsPerBar: 4, low: 7
 export default function DailyRoute() {
     const daily = useDailyStore();
     const [today, setToday] = useState<Today | null>(null);
-    const analytics = useAnalytics();
     const [mode, setMode] = useState<"challenge" | "warmup">("challenge");
 
     // Warm-up (the old sprint): a fresh generated phrase each run; bumping the
@@ -113,15 +112,7 @@ export default function DailyRoute() {
                 today && (
                     // The unplayed daily arrives as a present to open; a finished
                     // one shows its result without ceremony.
-                    <DailyReveal
-                        alreadyOpen={today.result !== null}
-                        onOpen={() =>
-                            analytics.track("daily_opened", {
-                                day: today.number,
-                                tempo: today.tempo,
-                            })
-                        }
-                    >
+                    <DailyReveal alreadyOpen={today.result !== null}>
                         <ScoreViewer
                             key={today.number}
                             id={`daily-${today.number}`}

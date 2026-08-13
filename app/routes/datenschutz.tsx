@@ -11,11 +11,11 @@ import type { Route } from "./+types/datenschutz";
 // the authoritative version is German and alone legally binding; every other
 // locale renders a machine translation carrying LegalTranslationNotice. It
 // describes what Plinky ACTUALLY does today: a client-only app that keeps its data
-// in the browser, hosted static files, one third-party content fetch for the news
-// banner, and opt-in analytics — no accounts, no cookies by default, no ads. NOTE:
-// the German text is a grounded DRAFT, not vetted legal wording — verify it against
-// a current generator (e.g. eRecht24) or a lawyer, and UPDATE it (and re-translate)
-// before relying on the analytics/ads sections.
+// in the browser, hosted static files, and a cookie-free reach measurement — no
+// accounts, no cookies, no ads, and nothing to consent to. NOTE: the German text is a
+// grounded DRAFT, not vetted legal wording — verify it against a current generator
+// (e.g. eRecht24) or a lawyer, and UPDATE it (and re-translate) before relying on the
+// analytics/ads sections.
 export function meta(_args: Route.MetaArgs) {
     // A privacy policy has no place in search results; it stays reachable from every
     // footer, so noindex it (and it is left out of the sitemap). Its translations
@@ -73,10 +73,6 @@ export default function Datenschutz() {
 
             <Section title={m.datenschutz_fonts_heading()}>
                 <p>{m.datenschutz_fonts_body()}</p>
-            </Section>
-
-            <Section title={m.datenschutz_thirdparty_heading()}>
-                <p>{m.datenschutz_thirdparty_body()}</p>
             </Section>
 
             <Section title={m.datenschutz_analytics_heading()}>

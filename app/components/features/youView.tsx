@@ -72,7 +72,6 @@ export function YouView() {
                 <section className="space-y-2">
                     <h2 className="text-sm font-medium text-muted">{m.grades_share_heading()}</h2>
                     <ShareButtons
-                        context="grade"
                         text={m.milestone_grade_boast({ level })}
                         imageSvg={svgMilestone({
                             title: m.grades_current({ level }),
@@ -154,7 +153,6 @@ export function YouView() {
 
             {fingerprint && (
                 <ShareCard
-                    context="progress"
                     grid={fingerprint}
                     caption={m.progress_share_caption()}
                     gridLabel={m.progress_grid_label()}

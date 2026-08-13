@@ -24,7 +24,6 @@ import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
 import {
-    useAnalytics,
     useHintsStore,
     useOnboardingStore,
     useScheduler,
@@ -139,7 +138,6 @@ function usePlaySessionValue({
     const stumbledRef = useRef<Set<number>>(new Set());
     const synth = useSynth();
     const scheduler = useScheduler();
-    const analytics = useAnalytics();
     // The shrinking hold-duration fill on the on-screen keys — armed per correct
     // note below, cleared whenever a run stops.
     const holdIndicator = useHoldIndicator();
@@ -377,8 +375,8 @@ function usePlaySessionValue({
 
     // The hand the run drills. A single-staff piece has no hand to choose — the selector
     // never shows for one — so it is always both. Derived once: the matcher, the ghost,
-    // the duet, the reading aids and the two analytics events all have to name the same
-    // hand, and six copies of the same ternary is six chances for one to drift.
+    // the duet and the reading aids all have to name the same hand, and six copies of
+    // the same ternary is six chances for one to drift.
     const activeHand: Hand = staffCount < 2 ? "both" : hand;
 
     // Frame the on-screen keyboard around the notes THIS piece uses, so a narrow
@@ -412,13 +410,7 @@ function usePlaySessionValue({
         if (!ready) {
             return;
         }
-        analytics.track("song_opened", {
-            grade,
-            daily: daily !== undefined,
-            ephemeral: ephemeral === true,
-            two_hands: staffCount >= 2,
-        });
-    }, [analytics, ready, id]);
+    }, [ready, id]);
 
     // The cursor's current position in whole notes — the shared place Listen and Practice
     // hand off at, so switching between them (or leaving and re-entering the play surface)
@@ -436,26 +428,6 @@ function usePlaySessionValue({
         markPainted,
         onFinish: exitFullscreen,
     });
-
-    // The finish half of the keep-up funnel, mirroring the self-paced run_completed that
-    // the completion effect sends. A result appears only when a run reached the end — an
-    // early stop scores nothing and clears it — so the transition to non-null IS the
-    // completion, and the run's own settings are reported the way run_started reported them.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: the result's arrival is the event; the run's settings are read at that moment
-    useEffect(() => {
-        if (!keepUp.result) {
-            return;
-        }
-        analytics.track("run_completed", {
-            mode: "keep_up",
-            grade: keepUp.result.letter,
-            in_time: keepUp.result.inTime,
-            total: keepUp.result.total,
-            hand: activeHand,
-            guide: guideNotes,
-            daily: daily !== undefined,
-        });
-    }, [analytics, keepUp.result]);
 
     // A metronome on demand: fixed at the chosen tempo, or following the player's own pace
     // when adaptive. Keep-up mode always ticks (a count-in then the beat you're racing),
@@ -705,7 +677,6 @@ function usePlaySessionValue({
         sightReading: sightRead.on,
         atTempo: enforceTempo,
         services,
-        analytics,
         playNote: synth.playNote,
         publishMilestone,
         recordResult: runResult.record,
@@ -828,7 +799,6 @@ function usePlaySessionValue({
         // the phrase sounds over a blanked staff, ready to be played back.
         hidden.conceal();
         listenPlayback.start(from);
-        analytics.track("run_started", { mode: "listen", hidden: hiddenNotes });
     };
 
     // Restart Listen from the top (or the loop's start bar). The trail wipes like a
@@ -874,12 +844,6 @@ function usePlaySessionValue({
         }
         const accompany = duet && staffCount >= 2 && hand !== "both";
         keepUp.start({ hand: activeHand, guideNotes, accompany });
-        analytics.track("run_started", {
-            mode: "keep_up",
-            hand: activeHand,
-            guide: guideNotes,
-            duet: accompany,
-        });
     };
 
     const saveCurrentTake = () => takes.saveNow(runResult.grade);
@@ -960,19 +924,6 @@ function usePlaySessionValue({
             // With the section loop on, Practice drills the selected bars on repeat, the
             // same range Listen laps, instead of running the whole piece once.
             matcher.start(from, loop.on ? { from: loop.from, to: loop.to } : null);
-            analytics.track("run_started", {
-                mode: "self_paced",
-                hand: activeHand,
-                hidden: hiddenNotes,
-                forgiving,
-                loop: loop.on,
-                // The session-only view toggles. They never reach the preferences store, so
-                // no setting_changed reports them; carrying them here records how the run was
-                // actually set up, which is what the toggle was a proxy for anyway.
-                fingerings: reading.showFingerings,
-                follow: reading.scrollFollow,
-                trainer: trainerOn,
-            });
         };
         // A sight-read gets its moment to take the piece in first — key, metre, shape —
         // exactly as a real sight-reading test does. Off the mode, the run starts now:

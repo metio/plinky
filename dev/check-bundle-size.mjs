@@ -293,7 +293,12 @@ const BUDGET_VENDOR_KB = 324;
 // measured cost is a tenth of a kilobyte over the previous line — the controls and the
 // look table were already there, and only the labels are new — but the comparison is
 // against the unrounded figure, so the line has to move for it to pass.
-const BUDGET_APP_KB = 334;
+//
+// 331. Google Analytics is gone, and with it the gtag adapter, the analytics port, the
+// consent banner, the Settings toggle and the click tracker. Cloudflare's beacon is a
+// script tag in the document rather than anything bundled, so what replaced roughly
+// three kilobytes of app code weighs nothing here.
+const BUDGET_APP_KB = 331;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

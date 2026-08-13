@@ -9,7 +9,6 @@ import {
     toMusicXml,
 } from "../../core/composition";
 import { buildMidiFile } from "../../core/midiFile";
-import { useAnalytics } from "../contexts/services";
 import { downloadBlob } from "../lib/download";
 import { fileStem } from "../lib/printScore";
 import { useCopied } from "./useCopied";
@@ -21,7 +20,6 @@ import { localizedHref } from "../components/ui/href";
 // one hook all three buttons drive, so the export bar stays presentational.
 export function useCompositionExport(composition: Composition, title: string) {
     const [copied, flashCopied] = useCopied();
-    const analytics = useAnalytics();
 
     const share = useCallback(() => {
         const code = encodeComposition(composition);
@@ -30,16 +28,10 @@ export function useCompositionExport(composition: Composition, title: string) {
             ?.writeText(url)
             // Only a landed clipboard write counts as a share.
             .then(() => {
-                analytics.track("compose_export", {
-                    format: "link",
-                    notes: composition.notes.length,
-                    tempo: composition.tempo,
-                    beats_per_bar: composition.beatsPerBar,
-                });
                 flashCopied();
             })
             .catch(() => {});
-    }, [composition, flashCopied, analytics]);
+    }, [composition, flashCopied]);
 
     const downloadMidi = useCallback(() => {
         const data = buildMidiFile(toMidiNotes(composition), {
@@ -47,24 +39,12 @@ export function useCompositionExport(composition: Composition, title: string) {
             beatsPerBar: composition.beatsPerBar,
         });
         downloadBlob(data, "audio/midi", `${fileStem(title)}.mid`);
-        analytics.track("compose_export", {
-            format: "midi",
-            notes: composition.notes.length,
-            tempo: composition.tempo,
-            beats_per_bar: composition.beatsPerBar,
-        });
-    }, [composition, title, analytics]);
+    }, [composition, title]);
 
     const downloadMusicXml = useCallback(() => {
         const xml = toMusicXml(composition, { title });
         downloadBlob(xml, "application/vnd.recordare.musicxml+xml", `${fileStem(title)}.musicxml`);
-        analytics.track("compose_export", {
-            format: "musicxml",
-            notes: composition.notes.length,
-            tempo: composition.tempo,
-            beats_per_bar: composition.beatsPerBar,
-        });
-    }, [composition, title, analytics]);
+    }, [composition, title]);
 
     return { copied: copied !== null, share, downloadMidi, downloadMusicXml };
 }

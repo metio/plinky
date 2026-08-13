@@ -444,8 +444,8 @@ working tokens. They travel in an `Authorization: Bearer` header.
 
 **A token in a URL is a token that leaks, including in the fragment.** The
 fragment is not sent to the origin server, and in this app that is not enough:
-the GA4 tag reports the full page URL including the hash, so a token in a
-fragment reaches Google on the next page view. The existing share links are also
+the analytics beacon reports the page it is loaded on, so a token left in the URL
+can reach a third party on the next page view. The existing share links are also
 not the precedent this design first assumed — `core/shareCode.ts` codes travel in
 a query string, not a fragment. Both facts point the same way. A link that must
 carry a token puts it in the fragment, and the receiving route reads it on mount,
@@ -874,9 +874,7 @@ key exists in the app with no policy in this table, so the table cannot silently
 fall behind the stores. Three keys were missing from the first draft of this
 table, which is the argument for the gate.
 
-**Do-not-sync list.** `analyticsConsent` and `analyticsAsked` never leave the
-device: consent is per-browser as a matter of law, and transporting it would load
-GA4 in a browser that never showed the banner. `micCalibration`, `barsPerRow` and
+**Do-not-sync list.** `micCalibration`, `barsPerRow` and
 `noteScale` are documented in `core/prefs.ts` as per-device, and syncing them
 pushes one room's tuning onto another piano and a phone's layout onto a desktop.
 
@@ -1349,10 +1347,12 @@ Worker secret (never present in the client) can locate and delete a specific
 record on a written request. The no-listing posture survives; a data subject
 asking for erasure gets an answer.
 
-**Analytics.** Existing GA4 is consent-gated with Consent Mode v2 defaulting to
-denied. Backend endpoints add no analytics of their own beyond aggregate
-operational counters carrying no identifier. Analytics consent never syncs through
-the vault, because consent is per-browser as a matter of law.
+**Analytics.** Since 2026-08-13 reach is measured by Cloudflare Web Analytics: no
+cookies, no local storage, no device fingerprint, and no custom events. There is no
+consent to gather, so there is no consent state to carry anywhere. Backend endpoints
+add no analytics of their own beyond aggregate operational counters carrying no
+identifier. Anything a phase wants to *count* about behaviour needs its own endpoint —
+the beacon cannot answer a question about a feature.
 
 **Compliance artefacts, and the phase each blocks.**
 
@@ -1364,9 +1364,9 @@ the vault, because consent is per-browser as a matter of law.
 | DPIA covering result collection | Phase 1 in real classrooms |
 | DPIA extension covering the vault | Phase 4 |
 
-**The claim to preserve, stated accurately.** Plinky today collects nothing beyond
-consent-gated analytics, and since 2026-08-13 it fetches nothing from anyone but its
-own origin. After phase 1 that
+**The claim to preserve, stated accurately.** Plinky today collects nothing beyond a
+cookie-free page-view count, and it fetches nothing from anyone but its own origin and
+the analytics beacon. After phase 1 that
 becomes "collects nothing unless a teacher opts in, and then a nickname and a
 score". That remains an unusually strong position and the competitive argument the
 ledger identifies for the individual-teacher market, and it is worth protecting in
@@ -1685,6 +1685,7 @@ never rewritten.
 | 2026-08-09 | Artist page editing proxies Sanity rather than adding a store | Keeps one content source and leaves the read path untouched; Studio logins were rejected because free-plan roles cannot confine an editor to one document |
 | 2026-08-09 | The artist marketplace is deferred pending evidence, not declined | Its obligations are the substance of the feature, and publishing is the first step of selling regardless — so shipping the free half answers the question that decides it at no cost |
 | 2026-08-13 | Sanity is removed from the app entirely; help content ships in the tree, the board and the news banner are gone | Nothing should load from a third party at runtime: the help text now lives in the message catalogue and its pictures in `public/help/`, so the help a reader sees matches the build they are running and works offline. This reverses the artist-page proxy above — there is no Sanity document left to patch, so that capability would need a store of its own if it is ever revived |
+| 2026-08-13 | Google Analytics is replaced by Cloudflare Web Analytics, and the consent banner, the consent setting and the whole analytics port go with it | The beacon uses no cookies, no local storage and no fingerprint, so there is nothing to consent to: the banner every visitor met on arrival and the Settings toggle behind it both existed only to gate GA. The cost is real and deliberate — Cloudflare Web Analytics has no custom events, so the 33 tracked events (runs, shares, imports, exports, milestones) stop being collected. A question about a specific feature now needs its own endpoint rather than a flag |
 | 2026-08-13 | Artist profiles live in the repository and change through the submission queue, not through an editing endpoint | With no CMS to proxy, a live-edit path would mean building a store, a token, a field whitelist and a link allowlist to guard it. A profile edit is a submission like a piece is, which the artist decision above already chose as the mechanism — so the read path is a file that ships with the build, and nothing an artist writes is public until a person has read it |
 
 ## Open questions
