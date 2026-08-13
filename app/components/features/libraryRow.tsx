@@ -35,7 +35,7 @@ export function LibraryRow({
     removeConfirmLabel,
 }: LibraryRowProps) {
     return (
-        <li className="flex items-center gap-2">
+        <li className="flex items-center gap-2 py-1">
             <IconButton
                 variant="ghost"
                 onClick={onToggleStar}
@@ -50,7 +50,7 @@ export function LibraryRow({
                 the viewport (which would clip the fixed bottom nav). The title link
                 stretches over the whole card (after:inset-0); the composer link stacks
                 above the stretch (z-10) so it opens the person page instead. */}
-            <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md border border-line-strong px-3 py-2 hover:bg-sunken">
+            <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-subtle">
                 <span className="min-w-0 flex-1">
                     <Link
                         to={`/play/${item.id}`}

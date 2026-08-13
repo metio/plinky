@@ -266,7 +266,6 @@
     "share_grid_label": "Точность, ритм и плавность на шести моментах прохождения",
     "mastery_learned": "Выучено",
     "mastery_due": "Пора повторить",
-    "mastery_due_count": "{count} на повторение",
     "mastery_mark_learned": "Отметить как выученное",
     "mastery_backlog": "В список ожидания",
     "mastery_resume": "Возобновить повторения",
