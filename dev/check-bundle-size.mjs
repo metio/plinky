@@ -310,7 +310,10 @@ const BUDGET_VENDOR_KB = 324;
 // manifest. Two kilobytes of app code; the marks themselves are manifest bytes, not
 // bundle bytes, and cost about 39 KB gzipped on a file the browsing visitor already
 // fetches.
-const BUDGET_APP_KB = 336;
+//
+// 337. The front page greets the moment you arrived — the weekday from the reader's own
+// clock, the part of day from a pure hour test — over a line saying where you stand.
+const BUDGET_APP_KB = 337;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

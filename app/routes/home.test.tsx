@@ -26,9 +26,13 @@ function renderHome() {
 }
 
 describe("Home", () => {
-    it("leads with the day rather than with a pitch", () => {
+    it("leads with the day rather than with a pitch", async () => {
         renderHome();
-        expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(m.today_heading());
+        // The day's own session owns the heading, since only the reader's clock knows
+        // which day it is. It arrives naming the weekday and the part of it.
+        const heading = await screen.findByRole("heading", { level: 1 });
+        expect(heading.textContent).toBeTruthy();
+        expect(screen.queryByRole("heading", { level: 1, name: m.home_heading() })).toBeNull();
     });
 
     it("keeps the introduction in the document for a first visit", () => {
