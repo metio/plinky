@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 16 August 2026 — later
+
+**Plinky moved to a new home.** The site is now served from Cloudflare Pages instead of
+GitHub Pages. Nothing about the app changes and nothing you have saved is affected — it
+should simply load a little faster, since the files a browser has already downloaded no
+longer need re-checking on every visit. The privacy policy names the new host.
+
 ## 16 August 2026
 
 **No more cookie banner.** The consent box that met you on your first visit is gone, and

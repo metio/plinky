@@ -39,7 +39,7 @@ const MIME = {
 
 const axeSrc = readFileSync("node_modules/axe-core/axe.min.js", "utf8");
 
-// A static server matching how GitHub Pages serves the build: directory URLs map
+// A static server matching how Cloudflare Pages serves the build: directory URLs map
 // to their index.html, and unknown paths fall back to the SPA shell.
 const server = createServer((req, res) => {
     let path = decodeURIComponent(new URL(req.url, "http://localhost").pathname);

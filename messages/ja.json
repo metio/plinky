@@ -973,7 +973,7 @@
   "datenschutz_short_heading": "要約",
   "datenschutz_short_body": "Plinky はブラウザーだけで動くアプリです。設定、進み具合、録音はブラウザー内にローカル保存されるだけで、当方が収集することもサーバーへ送信することもありません。アカウントも広告も Cookie もありません。訪問数は、端末に何も保存せず誰も特定しない Cookie 不要の計測で数えています。したがって、ここに同意すべきものも、オフにすべきものもありません。",
   "datenschutz_hosting_heading": "ホスティングとサーバーログファイル",
-  "datenschutz_hosting_body": "本ウェブサイトは静的ファイルとして GitHub Pages（GitHub, Inc.、米国）を通じて配信されます。ページの呼び出し時に、ホスティング事業者はページを配信し運用の安全を保つために、あなたの IP アドレス、アクセスの日時、転送されたデータ量といった技術的に必要なデータを処理します。法的根拠は、安全かつ安定した提供に対する当方の正当な利益（GDPR 第6条第1項f号）です。米国への移転は、EU-US Data Privacy Framework に基づく提供者の認証に依拠しています。",
+  "datenschutz_hosting_body": "本ウェブサイトは Cloudflare Pages（提供者: Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA）を通じて静的ファイルとして配信されます。ページの呼び出し時、ホスティング提供者は、ページを配信し運用を安全に保つために、IP アドレス、アクセスの日時、転送データ量といった技術的に必要なデータを処理します。法的根拠は、安全かつ安定した配信に対する当方の正当な利益です（GDPR 第6条1項f）。米国への移転が生じる場合は、提供者の EU-US Data Privacy Framework に基づく認証に依拠します。",
   "datenschutz_localstorage_heading": "ブラウザ内でのローカル保存",
   "datenschutz_localstorage_body": "アプリの動作のために、当方はお使いのブラウザのローカルストレージ（Local Storage）を利用します。たとえば、あなたの設定、練習の進捗、保存された録音などです。これらのデータはあなたの端末上に留まり、当方に送信されることはなく、設定またはブラウザを通じていつでも削除できます。法的根拠は GDPR 第6条第1項f号（機能的で快適なアプリの提供）です。",
   "datenschutz_fonts_heading": "フォント",

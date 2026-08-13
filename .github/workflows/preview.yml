@@ -1,11 +1,10 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Preview
-# Per-branch preview deploys to Cloudflare Pages. Production stays on GitHub Pages
-# (website.yml) — this exists because GitHub Pages serves one site per repo at one
-# domain, so it can't give each branch its own origin. Cloudflare Pages can, and a
-# distinct origin per branch matters here: all of Plinky's state lives in localStorage
-# (per-origin), so a preview must never share production's origin or it could read and
+# Per-branch preview deploys to Cloudflare Pages, in a project of their own
+# ("plinky-preview") separate from production's ("plinky", website.yml). A distinct
+# origin per branch is the point: all of Plinky's state lives in localStorage, which is
+# per-origin, so a preview must never share production's origin or it could read and
 # corrupt real users' data. Each push publishes to <slug>.plinky-preview.pages.dev
 # (and <slug>.preview.plinky.fun once the custom domain is attached), and records a
 # GitHub Deployment so the PR shows the environment and a "View deployment" link —
@@ -52,18 +51,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
       - run: nix develop --command npm ci
-      - name: Add the Mock Service Worker script
-        # Previews answer Sanity queries from MSW (the preview origins are not on
-        # Sanity's CORS allowlist), so the worker script ships with the build.
-        run: nix develop --command npx msw init public
       - name: Build (English prerender, all languages at runtime)
         # Set PLINKY_LOCALES to a comma list to prerender more languages.
         run: nix develop --command npm run build:locales
         env:
           PLINKY_LOCALES: en
-          # The adapters stay silent without a project id; previews never reach
-          # the real API (MSW answers first), so a placeholder works when the
-          # repo variable is unset.
       - name: Add SPA fallback
         # Cloudflare Pages serves 404.html for an unmatched path, so a deep-link refresh
         # (or an unprerendered locale) lands on the shell and the client router takes over.

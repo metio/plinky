@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Cache rules for Cloudflare Pages. Without this file every response is served
+# must-revalidate, so a returning visitor re-checks each chunk it already has.
+
+# Build assets are content-addressed — a changed file is a changed URL — so a copy
+# in a browser cache can never be stale. This is the same reasoning the service
+# worker's cache-first strategy for /assets/ already rests on.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The service worker decides when everything else is refreshed, so it must never be
+# the stale thing: a cached sw.js would pin a visitor to a deploy that has gone.
+/sw.js
+  Cache-Control: no-cache

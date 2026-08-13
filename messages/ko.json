@@ -973,7 +973,7 @@
   "datenschutz_short_heading": "요약",
   "datenschutz_short_body": "Plinky는 브라우저에서만 동작하는 앱입니다. 설정, 진행 상황, 녹음은 브라우저에 로컬로만 저장되며, 저희가 수집하거나 서버로 전송하지 않습니다. 계정도, 광고도, 쿠키도 없습니다. 방문 수는 기기에 아무것도 저장하지 않고 누구도 식별하지 않는 쿠키 없는 측정으로 집계합니다 — 그러므로 여기에는 동의할 것도, 끌 것도 없습니다.",
   "datenschutz_hosting_heading": "호스팅 및 서버 로그 파일",
-  "datenschutz_hosting_body": "본 웹사이트는 GitHub Pages(GitHub, Inc., 미국)를 통해 정적 파일로 제공됩니다. 페이지를 호출할 때 호스팅 제공자는 페이지를 전달하고 운영을 안전하게 유지하기 위해 귀하의 IP 주소, 접속 일시 및 전송된 데이터 양과 같은 기술적으로 필요한 데이터를 처리합니다. 법적 근거는 안전하고 안정적인 제공에 대한 저희의 정당한 이익(GDPR 제6조 제1항 f호)입니다. 미국으로의 전송은 제공자의 EU-US Data Privacy Framework 인증에 근거합니다.",
+  "datenschutz_hosting_body": "본 웹사이트는 Cloudflare Pages(제공자: Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, USA)를 통해 정적 파일로 제공됩니다. 페이지를 호출할 때 호스팅 제공자는 페이지를 전달하고 운영을 안전하게 유지하기 위해 IP 주소, 접속 일시 및 전송된 데이터 양과 같은 기술적으로 필요한 데이터를 처리합니다. 법적 근거는 안전하고 안정적인 제공에 대한 저희의 정당한 이익(GDPR 제6조 제1항 f호)입니다. 미국으로의 전송은 제공자의 EU-US Data Privacy Framework 인증에 근거합니다.",
   "datenschutz_localstorage_heading": "브라우저 내 로컬 저장",
   "datenschutz_localstorage_body": "앱을 운영하기 위해 저희는 귀하 브라우저의 로컬 저장소(Local Storage)를 사용합니다. 예를 들어 귀하의 설정, 연습 진행 상황 및 저장된 녹음이 이에 해당합니다. 이 데이터는 귀하의 기기에 남아 있으며 저희에게 전송되지 않고, 설정 또는 브라우저를 통해 언제든지 삭제할 수 있습니다. 법적 근거는 GDPR 제6조 제1항 f호(기능적이고 편리한 앱 제공)입니다.",
   "datenschutz_fonts_heading": "글꼴",

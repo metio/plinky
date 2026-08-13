@@ -973,7 +973,7 @@
   "datenschutz_short_heading": "简要说明",
   "datenschutz_short_body": "Plinky 是一个只在浏览器中运行的应用。你的设置、进度和录音仅保存在浏览器本地；我们不会收集，也不会传输到服务器。没有账号，没有广告，也没有 Cookie。访问量通过一种不使用 Cookie 的统计方式计数，它不在你的设备上保存任何内容，也不识别任何人——因此这里没有需要同意的内容，也没有需要关闭的开关。",
   "datenschutz_hosting_heading": "托管与服务器日志文件",
-  "datenschutz_hosting_body": "本网站以静态文件形式通过 GitHub Pages（GitHub, Inc.，美国）提供。在页面被访问时，托管方会处理为交付页面并保障运行安全所必需的技术性数据，例如你的 IP 地址、访问的日期和时间以及传输的数据量。法律依据是我们在安全、稳定地提供服务方面的正当利益（《通用数据保护条例》第 6 条第 1 款 f 项）。向美国的任何传输均以服务商依据 EU-US Data Privacy Framework 所获得的认证为依据。",
+  "datenschutz_hosting_body": "本网站通过 Cloudflare Pages（提供方：Cloudflare, Inc., 101 Townsend St., San Francisco, CA 94107, 美国）以静态文件的形式提供。在请求页面时，托管提供方会处理技术上必要的数据，例如你的 IP 地址、访问的日期和时间以及传输的数据量，以便交付页面并保持运行安全。法律依据是我们对安全稳定交付的正当利益（GDPR 第 6 条第 1 款 f 项）。如发生向美国的传输，则依据提供方在 EU-US Data Privacy Framework 下的认证。",
   "datenschutz_localstorage_heading": "浏览器中的本地存储",
   "datenschutz_localstorage_body": "为运行本应用，我们使用你浏览器的本地存储（Local Storage）——例如用于保存你的设置、你的练习进度和已保存的录音。这些数据保留在你的设备上，不会传输给我们，并且可随时通过设置或你的浏览器删除。法律依据是《通用数据保护条例》第 6 条第 1 款 f 项（提供功能完善、使用便捷的应用）。",
   "datenschutz_fonts_heading": "字体",

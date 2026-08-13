@@ -1,6 +1,19 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: Publish Website
+# Production deploys to Cloudflare Pages (project "plinky"), by direct upload from
+# here rather than through Cloudflare's Git integration: the build must run in the
+# repo's nix devshell and across the per-locale matrix below, neither of which
+# Cloudflare's own builder can reproduce.
+#
+# Setup this workflow depends on:
+#   1. A Cloudflare Pages project named "plinky" (Direct Upload / no Git connection)
+#      with its production branch set to "main".
+#   2. Repo secrets CLOUDFLARE_API_TOKEN (template "Cloudflare Pages — Edit") and
+#      CLOUDFLARE_ACCOUNT_ID. The preview workflow uses the same two.
+#   3. plinky.fun attached as a custom domain on that project. The zone is already in
+#      the same Cloudflare account, so adding the domain writes the records itself;
+#      the old GitHub Pages A/CNAME records go at the same time.
 on:
   workflow_dispatch:
   push:
@@ -19,9 +32,9 @@ on:
 permissions:
   contents: read
 concurrency:
-  # Serialize deploys so two quick merges can't race the gh-pages branch; queue
-  # rather than cancel so an in-flight publish always finishes.
-  group: pages
+  # Serialize deploys so two quick merges can't race each other onto production;
+  # queue rather than cancel so an in-flight publish always finishes.
+  group: publish
   cancel-in-progress: false
 jobs:
   # Per-locale build: each language builds in parallel, tree-shaken to its own
@@ -90,8 +103,6 @@ jobs:
     name: Merge & deploy
     needs: [build-root, build-locale]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # peaceiris pushes the built site to the gh-pages branch
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
@@ -104,13 +115,18 @@ jobs:
         # No npm install: both scripts use only Node built-ins + settings.json.
         run: nix develop --command node dev/stamp-sw.mjs && nix develop --command node dev/gen-sitemap.mjs
       - name: Add SPA fallback
-        # GitHub Pages has no SPA rewrite, so a deep link 404s on refresh. Serving
-        # the prerendered shell as 404.html lets the client router take over.
+        # Cloudflare Pages serves 404.html for a path it cannot match, so a deep link
+        # refreshed on an unprerendered route lands on the shell and the client router
+        # takes over.
         run: cp build/client/__spa-fallback.html build/client/404.html
       - name: Deploy Website
-        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/client
-          force_orphan: true
-          cname: plinky.fun
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # --branch=main is what makes this a production deploy rather than a preview:
+        # Cloudflare decides by comparing it against the project's production branch.
+        run: >-
+          nix develop --command npx --yes wrangler@4 pages deploy build/client
+          --project-name=plinky
+          --branch=main
+          --commit-dirty=true

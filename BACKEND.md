@@ -234,8 +234,9 @@ an abuser or an enrolment wave rather than organic growth.
 
 ## Topology
 
-Production serves from GitHub Pages at `plinky.fun` today, and that does not
-change. The API needs a host, and there are two ways to give it one.
+Production serves from Cloudflare Pages at `plinky.fun` (moved from GitHub Pages on
+2026-08-13; the site is still a static build uploaded by `website.yml`, only the host
+changed). The API needs a host, and there are two ways to give it one.
 
 **Option A — `api.plinky.fun`, a separate origin.** A Worker on its own subdomain.
 Simple, independent of the website deploy, and reversible by deleting a DNS
@@ -244,12 +245,16 @@ preflight is a billable Worker request, so browser API calls roughly double
 against the 100k/day allowance.
 
 **Option B — `plinky.fun/api/*`, the same origin.** A Worker route on the apex,
-with GitHub Pages continuing to serve everything else. No preflights, no CORS
-configuration, and cookies would work if they were ever wanted. Requires putting
-the apex behind Cloudflare's proxy (currently DNS-only, pointing at GitHub Pages
-IPs), which changes how the production site is served — TLS mode must be Full,
-GitHub's certificate validation interacts with the proxy, and a misconfiguration
-takes down the live site rather than the API.
+with Pages continuing to serve everything else. No preflights, no CORS
+configuration, and cookies would work if they were ever wanted.
+
+Its cost has fallen since this was first weighed. The objection was that same-origin
+routing meant putting an apex pointing at GitHub Pages IPs behind Cloudflare's proxy —
+a TLS-mode and certificate-validation change to the live site, where a mistake takes
+down the website rather than the API. On Cloudflare Pages the apex is already served by
+Cloudflare, so that step no longer exists, and the remaining question is only whether
+the route belongs to a Pages Function or a Worker. The decision below stands for now,
+but its reasoning is weaker than when it was made.
 
 **Decision: Option A for phases 0 to 3, with Option B reconsidered at phase 4.**
 The preflight cost is affordable at the volumes above, and the risk profile
@@ -1685,6 +1690,7 @@ never rewritten.
 | 2026-08-09 | Artist page editing proxies Sanity rather than adding a store | Keeps one content source and leaves the read path untouched; Studio logins were rejected because free-plan roles cannot confine an editor to one document |
 | 2026-08-09 | The artist marketplace is deferred pending evidence, not declined | Its obligations are the substance of the feature, and publishing is the first step of selling regardless — so shipping the free half answers the question that decides it at no cost |
 | 2026-08-13 | Sanity is removed from the app entirely; help content ships in the tree, the board and the news banner are gone | Nothing should load from a third party at runtime: the help text now lives in the message catalogue and its pictures in `public/help/`, so the help a reader sees matches the build they are running and works offline. This reverses the artist-page proxy above — there is no Sanity document left to patch, so that capability would need a store of its own if it is ever revived |
+| 2026-08-13 | Production moves from GitHub Pages to Cloudflare Pages, by direct upload from Actions rather than Cloudflare's Git integration | One vendor for the site, the previews and (later) the API, and an apex Cloudflare already serves — which removes the proxy/TLS step that was the main objection to same-origin `/api/*` routing above. Direct upload because the build must run in the repo's nix devshell across the per-locale matrix, which Cloudflare's own builder cannot reproduce. The privacy policy's hosting section names Cloudflare in all 26 locales as of the same change |
 | 2026-08-13 | Google Analytics is replaced by Cloudflare Web Analytics, and the consent banner, the consent setting and the whole analytics port go with it | The beacon uses no cookies, no local storage and no fingerprint, so there is nothing to consent to: the banner every visitor met on arrival and the Settings toggle behind it both existed only to gate GA. The cost is real and deliberate — Cloudflare Web Analytics has no custom events, so the 33 tracked events (runs, shares, imports, exports, milestones) stop being collected. A question about a specific feature now needs its own endpoint rather than a flag |
 | 2026-08-13 | Artist profiles live in the repository and change through the submission queue, not through an editing endpoint | With no CMS to proxy, a live-edit path would mean building a store, a token, a field whitelist and a link allowlist to guard it. A profile edit is a submission like a piece is, which the artist decision above already chose as the mechanism — so the read path is a file that ships with the build, and nothing an artist writes is public until a person has read it |
 
