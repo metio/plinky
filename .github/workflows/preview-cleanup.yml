@@ -89,9 +89,9 @@ jobs:
 
           if [ "$mode" = prune ]; then
             # Slug every branch that still exists on GitHub; the execute step keeps those
-            # and deletes deployments for any slug not in this set. Live main/gh-pages/
-            # renovate branches are in the set, so they're protected (they carry no preview
-            # anyway — preview.yml ignores them). Capture into a variable so a failed API
+            # and deletes deployments for any slug not in this set. Live main and renovate
+            # branches are in the set, so they're protected (they carry no preview anyway —
+            # preview.yml ignores them). Capture into a variable so a failed API
             # call aborts here under set -e rather than yielding an empty keep-set.
             branches=$(gh api "repos/${GITHUB_REPOSITORY}/branches" --paginate --jq '.[].name')
             keep=""

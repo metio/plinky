@@ -29,7 +29,6 @@ on:
   push:
     branches-ignore:
       - main
-      - gh-pages
       - renovate/**
 permissions:
   contents: read
