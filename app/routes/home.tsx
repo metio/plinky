@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { DiscoveryChecklist } from "../components/features/discoveryChecklist";
 import { FeatureBoundary } from "../components/features/featureBoundary";
 import { HomeToday } from "../components/features/homeToday";
 import { socialMeta, structuredData } from "../../core/site";
@@ -47,12 +46,6 @@ export default function Home() {
                     <p className="text-pretty leading-relaxed text-muted">{m.home_intro()}</p>
                 </div>
             </section>
-
-            {/* Setting up a piano, a hand span and the keys tailors everything after it.
-                None of it is a gate; it reconciles itself away as its steps complete. */}
-            <FeatureBoundary feature="DiscoveryChecklist">
-                <DiscoveryChecklist />
-            </FeatureBoundary>
 
             <FeatureBoundary feature="HomeToday">
                 <HomeToday />
