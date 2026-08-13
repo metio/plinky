@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { CIRCLE, type CircleKey, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
 import { bpmOf, NO_TAPS, type TapState, tap, tapCount } from "../../core/tapTempo";
@@ -16,11 +16,9 @@ import {
     type ScaleId,
     scalePitches,
 } from "../../core/theory";
-import { Keyboard } from "../components/ui/keyboard";
+import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
-import { useScheduler } from "../contexts/services";
-import type { SchedulerHandle } from "../ports/scheduler";
 import { useSynth } from "../hooks/useSynth";
 import { chordName, scaleName } from "../lib/theoryNames";
 import { m } from "../paraglide/messages.js";
@@ -44,14 +42,9 @@ export function meta(_args: Route.MetaArgs) {
 
 // Middle C's octave, so every tool sounds and draws in the same register a beginner
 // sits in front of.
-const ROOT = 60;
-const KEY_FROM = 60;
-const KEY_TO = 84;
+const ROOT = DEMO_FROM;
 
-// One beat's sound for a scale or chord button — long enough to hear, short enough
-// that a whole scale plays in a couple of seconds.
 const NOTE_SECONDS = 0.45;
-const STEP_MS = 260;
 
 function Panel({
     title,
@@ -124,34 +117,8 @@ function CircleOfFifths() {
 // Plays a sequence one note at a time through the injected scheduler, so a scale
 // unfolds rather than sounding as a cluster. Timers are the scheduler's, never the
 // browser's — the architecture confines them and a test needs to advance them.
-function useSequencePlayer() {
-    const synth = useSynth();
-    const scheduler = useScheduler();
-    // Every strike still waiting to happen. A scale left running when the page goes —
-    // or a second press landing on top of the first — would otherwise keep striking
-    // notes into a route nobody is on any more.
-    const pending = useRef<SchedulerHandle[]>([]);
-    const stop = useCallback(() => {
-        for (const handle of pending.current) {
-            scheduler.cancel(handle);
-        }
-        pending.current = [];
-    }, [scheduler]);
-    useEffect(() => stop, [stop]);
-    return (pitches: number[]) => {
-        stop();
-        for (const [index, pitch] of pitches.entries()) {
-            pending.current.push(
-                scheduler.after(index * STEP_MS, () =>
-                    synth.playNote(pitch, { duration: NOTE_SECONDS }),
-                ),
-            );
-        }
-    };
-}
-
-// The twelve roots, spelled from the same table the computer keyboard and the
-// perfect-pitch answer keys use, so a note reads identically wherever it appears.
+// The twelve roots, labelled the way the keyboard is: a root here is a key under the
+// hand rather than a key signature.
 function tonicOptions(): { id: string; label: string }[] {
     return Array.from({ length: 12 }, (_, pitch) => ({
         id: String(pitch),
@@ -162,7 +129,6 @@ function tonicOptions(): { id: string; label: string }[] {
 function ScaleExplorer() {
     const [tonic, setTonic] = useState("0");
     const [scale, setScale] = useState<ScaleId>("major");
-    const play = useSequencePlayer();
     const pitches = scalePitches(ROOT + Number(tonic), scale);
     return (
         <Panel title={m.tools_scales_title()} hint={m.tools_scales_hint()}>
@@ -178,10 +144,11 @@ function ScaleExplorer() {
                 onChange={setScale}
                 options={SCALE_IDS.map((id) => ({ id, label: scaleName(id) }))}
             />
-            <Keyboard from={KEY_FROM} to={KEY_TO} lit={new Set(pitches)} labels="c" />
-            <Button variant="secondary" onClick={() => play(pitches)}>
-                {m.tools_hear_it()}
-            </Button>
+            <SoundingKeyboard
+                lit={pitches}
+                phrases={[{ notes: pitches, spread: true }]}
+                label={m.tools_hear_it()}
+            />
         </Panel>
     );
 }
@@ -189,7 +156,6 @@ function ScaleExplorer() {
 function ChordExplorer() {
     const [root, setRoot] = useState("0");
     const [quality, setQuality] = useState<ChordQuality>("major");
-    const synth = useSynth();
     const pitches = chordPitches(ROOT + Number(root), quality);
     return (
         <Panel title={m.tools_chords_title()} hint={m.tools_chords_hint()}>
@@ -205,17 +171,11 @@ function ChordExplorer() {
                 onChange={setQuality}
                 options={CHORD_QUALITIES.map((id) => ({ id, label: chordName(id) }))}
             />
-            <Keyboard from={KEY_FROM} to={KEY_TO} lit={new Set(pitches)} labels="c" />
-            <Button
-                variant="secondary"
-                onClick={() => {
-                    for (const pitch of pitches) {
-                        synth.playNote(pitch, { duration: NOTE_SECONDS * 2 });
-                    }
-                }}
-            >
-                {m.tools_hear_it()}
-            </Button>
+            <SoundingKeyboard
+                lit={pitches}
+                phrases={[{ notes: pitches }]}
+                label={m.tools_hear_it()}
+            />
         </Panel>
     );
 }

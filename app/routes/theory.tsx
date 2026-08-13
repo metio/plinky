@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useCallback, useEffect, useRef } from "react";
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
 import { NOTE_TEXT, noteNameOf, type ScaleId, scalePitches } from "../../core/theory";
@@ -14,11 +13,7 @@ import {
     UNITS,
     type UnitId,
 } from "../../core/theoryCourse";
-import { Button } from "../components/ui/button";
-import { Keyboard } from "../components/ui/keyboard";
-import { useScheduler } from "../contexts/services";
-import type { SchedulerHandle } from "../ports/scheduler";
-import { useSynth } from "../hooks/useSynth";
+import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/theory";
@@ -38,10 +33,8 @@ export function meta(_args: Route.MetaArgs) {
     ];
 }
 
-const KEY_FROM = 60;
-const KEY_TO = 84;
-const NOTE_SECONDS = 0.5;
-const STEP_MS = 320;
+// Middle C: where a lesson's tonic sits, matching the register the shared demo draws.
+const KEY_FROM = DEMO_FROM;
 // The pause between the two halves of a comparison: long enough that they are heard as
 // two things rather than one, short enough to hold both in the ear at once.
 const COMPARE_GAP_MS = 900;
@@ -97,48 +90,20 @@ function litNotes(demo: Demo): number[] {
 }
 
 function LessonDemo({ demo }: { demo: Demo }) {
-    const synth = useSynth();
-    const scheduler = useScheduler();
-    // Strikes still waiting to happen, so a comparison left half-played when the reader
-    // moves on does not go on sounding, and a second press replaces the first.
-    const pending = useRef<SchedulerHandle[]>([]);
-    const stop = useCallback(() => {
-        for (const handle of pending.current) {
-            scheduler.cancel(handle);
-        }
-        pending.current = [];
-    }, [scheduler]);
-    useEffect(() => stop, [stop]);
-
-    // A scale unfolds one note at a time; a chord sounds together. Both go through the
-    // injected scheduler rather than a bare timer, which the architecture confines.
-    const play = (notes: number[], atMs = 0, spread = false) => {
-        for (const [index, pitch] of notes.entries()) {
-            const at = atMs + (spread ? index * STEP_MS : 0);
-            const strike = () => synth.playNote(pitch, { duration: NOTE_SECONDS });
-            if (at === 0) {
-                strike();
-            } else {
-                pending.current.push(scheduler.after(at, strike));
-            }
-        }
-    };
-
-    const hear = () => {
-        stop();
-        if (demo.kind === "compare") {
-            play(demo.first);
-            play(demo.second, COMPARE_GAP_MS);
-            return;
-        }
-        play(litNotes(demo), 0, demo.kind === "scale");
-    };
-
     const key = demo.kind === "circle" ? CIRCLE.find((one) => one.tonic === demo.tonic) : null;
+    // A comparison plays the same idea twice — the second reading after a gap, so the
+    // ear hears them as a pair rather than a single run.
+    const phrases =
+        demo.kind === "compare"
+            ? [{ notes: demo.first }, { notes: demo.second, afterMs: COMPARE_GAP_MS }]
+            : [{ notes: litNotes(demo), spread: demo.kind === "scale" }];
 
     return (
-        <div className="space-y-3">
-            <Keyboard from={KEY_FROM} to={KEY_TO} lit={new Set(litNotes(demo))} labels="c" />
+        <SoundingKeyboard
+            lit={litNotes(demo)}
+            phrases={phrases}
+            label={demo.kind === "compare" ? m.theory_hear_both() : m.theory_hear_it()}
+        >
             {key && (
                 <p className="text-sm text-muted">
                     {m.theory_signature_reads({
@@ -149,10 +114,7 @@ function LessonDemo({ demo }: { demo: Demo }) {
                     })}
                 </p>
             )}
-            <Button variant="secondary" onClick={hear}>
-                {demo.kind === "compare" ? m.theory_hear_both() : m.theory_hear_it()}
-            </Button>
-        </div>
+        </SoundingKeyboard>
     );
 }
 
