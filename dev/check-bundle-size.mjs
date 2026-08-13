@@ -287,7 +287,13 @@ const BUDGET_VENDOR_KB = 324;
 // help that belongs to their build, offline included. Most of its weight was paid for by
 // deleting what it replaced — the three content adapters, the board page and the news
 // banner — leaving barely a kilobyte net.
-const BUDGET_APP_KB = 333;
+//
+// 334. The export panel's look options: a note colour and a keyboard depth for the
+// notes-highway video, each a segmented control with its own labels in every locale. The
+// measured cost is a tenth of a kilobyte over the previous line — the controls and the
+// look table were already there, and only the labels are new — but the comparison is
+// against the unrounded figure, so the line has to move for it to pass.
+const BUDGET_APP_KB = 334;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
