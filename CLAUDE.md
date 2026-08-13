@@ -47,18 +47,34 @@ flake only defines the gates that are Plinky's own.
 
 ## The gate
 
-**Run every gate locally before pushing, and check the exit code of each one.**
-Not a subset, not "the ones the change looks related to" — a gate you skip is a
-gate CI runs for you, slower and after the push. The whole point of the flake is
-that local and CI resolve identical tools, so there is no gate here that is
-"CI's job".
+**Run every cheap gate locally before pushing, and check the exit code of each
+one.** Not a subset of those, not "the ones the change looks related to" — a
+cheap gate you skip is a gate CI runs for you, slower and after the push. The
+whole point of the flake is that local and CI resolve identical tools.
 
-The only acceptable reason to skip one is that this host physically cannot run
-it. This is a Fedora Atomic (ostree) machine with rootless Podman and
-nix-portable, so a gate needing `kind`, a privileged container, a system-level
-nix daemon, or real MIDI/audio hardware could qualify. **Plinky has no such gate
-today** — everything below runs here, so the local list and CI are the same list.
-If that ever changes, name the excluded gate and the host reason right here.
+**Four gates belong to CI, and must not be run here.** They saturate this
+machine for tens of minutes at a time and make it unusable while they do —
+which is a host limit like any other, and CI has a fleet for exactly this:
+
+| Gate | Why it stays on CI |
+| --- | --- |
+| `npm run coverage` | Instruments the whole tree and reruns every project; load average past 30 on this box. |
+| `npm run test:storybook` | 290 screenshots across two themes, one browser round-trip each. Run it only when baselines genuinely need refreshing (`-- -u` after a deliberate visual change), never as a check. |
+| `ci-lighthouse` | Builds the site, then drives 22 pages through headless Chrome. |
+| `npm run a11y:light` / `a11y:dark` | Builds the site, then axe over the same 22 pages, twice. |
+
+Push and read the run instead. If one of them fails on CI and the failure is not
+obvious from the log, *then* reproduce that single gate locally, alone, and say
+so — a deliberate one-off, not the routine.
+
+The other host limit is the ordinary one: this is a Fedora Atomic (ostree)
+machine with rootless Podman and nix-portable, so a gate needing `kind`, a
+privileged container, a system-level nix daemon, or real MIDI/audio hardware
+could not run here at all. Plinky has no such gate today.
+
+Never run two `nix develop --command npm …` invocations concurrently: each
+regenerates the gitignored `app/paraglide/`, and a mid-read resolve error fails
+a dozen files spuriously. One at a time.
 
 Check exit codes directly — `$?` after a pipe reports the *last* command's
 status, so `npm run x | tail` reports `tail`'s success and hides the failure.
@@ -70,9 +86,9 @@ The repo's own gates:
 npm run typecheck
 npm test              # node project (vitest)
 npm run test:browser  # real chromium + firefox (vitest browser mode)
-npm run test:storybook # every story, light and dark, against its baseline
-npm run coverage      # ratchet thresholds — a drop fails the build (skips the
-                      # storybook project: screenshots measure no lines and starve
+npm run test:storybook # CI ONLY as a check; locally only `-- -u` to refresh baselines
+npm run coverage      # CI ONLY — ratchet thresholds; a drop fails the build (skips
+                      # the storybook project: screenshots measure no lines and starve
                       # under instrumentation, so CI runs them as their own gate)
 npm run arch          # layer rules + confined globals
 npm run tailwind      # every class name compiles against app.css (blocking)
@@ -88,9 +104,9 @@ npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # as an empty diff
 nix develop --command ci-build   # the single-locale (en) build CI + the deploy measure
 npm run size          # bundle budget — measures the ci-build output
-npm run a11y:light    # axe over the built site (builds it first)
-npm run a11y:dark
-nix develop --command ci-lighthouse  # perf/SEO/CLS budgets (builds the site it audits)
+npm run a11y:light    # CI ONLY — axe over the built site (builds it first)
+npm run a11y:dark     # CI ONLY
+nix develop --command ci-lighthouse  # CI ONLY — perf/SEO/CLS budgets (builds the site)
 ```
 
 **Every per-visitor budget measures the same build, and each gate now produces it.**
