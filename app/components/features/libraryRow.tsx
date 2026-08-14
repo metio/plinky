@@ -79,7 +79,7 @@ export function LibraryRow({
                         (personSlug(item.composer) ? (
                             <Link
                                 to={`/person/${personSlug(item.composer)}`}
-                                className="relative z-10 block w-fit max-w-full truncate text-xs text-muted hover:text-accent hover:underline"
+                                className="relative z-10 block w-fit max-w-full truncate text-xs text-muted hover:text-accent-strong hover:underline"
                             >
                                 {canonicalComposer(item.composer)}
                             </Link>

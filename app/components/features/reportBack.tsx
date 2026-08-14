@@ -9,6 +9,7 @@ import { useMasteryStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
+import { fieldClasses } from "../ui/classes";
 
 // Handing an assignment back to whoever set it. The student types a name, and the
 // device turns what it knows about the list into one code to paste into a message.
@@ -61,7 +62,7 @@ export function ReportBack({ assignment }: { assignment: Assignment }) {
                             // older one on screen looking current.
                             setCode(null);
                         }}
-                        className="w-full rounded-lg border border-line-strong px-3 py-2 text-sm dark:bg-raised"
+                        className={`w-full ${fieldClasses}`}
                     />
                 </label>
                 <Button variant="secondary" onClick={make} disabled={who.trim().length === 0}>

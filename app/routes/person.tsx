@@ -165,7 +165,10 @@ export default function PersonPage() {
                 !loading && (
                     <p className="text-sm text-muted">
                         {m.person_empty()}{" "}
-                        <Link to="/library" className="font-medium text-accent hover:underline">
+                        <Link
+                            to="/library"
+                            className="font-medium text-accent-strong hover:underline"
+                        >
                             {m.nav_music()}
                         </Link>
                     </p>

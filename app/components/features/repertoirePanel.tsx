@@ -9,7 +9,7 @@ import { useMasteryStore } from "../../contexts/services";
 import { useStoreVersion } from "../../hooks/useStoreVersion";
 import type { GradedMastery } from "../../lib/gradeProgress";
 import { m } from "../../paraglide/messages.js";
-import { linkClasses, sectionHeadingClasses } from "../ui/classes";
+import { compactFieldClasses, linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
 // What is on the music stand: the pieces being worked on, where each one has got to,
@@ -92,7 +92,7 @@ export function RepertoirePanel({ items, now }: { items: GradedMastery[]; now: D
                                         ),
                                     )
                                 }
-                                className="rounded-md border border-line bg-surface px-2 py-1 text-body"
+                                className={compactFieldClasses}
                             />
                         </label>
                     </li>
