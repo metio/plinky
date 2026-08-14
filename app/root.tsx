@@ -96,7 +96,11 @@ function Header() {
                     {/* The wordmark is text (it follows the theme for free); its i is the
                         dotless ı with a pink dot drawn above, echoing the app icon's
                         accent. Decorative only — the link carries the accessible name. */}
-                    <Link to="/" aria-label="Plinky home" className="flex items-center gap-2">
+                    <Link
+                        to="/"
+                        aria-label="Plinky home"
+                        className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
+                    >
                         <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-md" />
                         <span
                             aria-hidden="true"
@@ -120,7 +124,7 @@ function Header() {
                     <Link
                         to="/settings"
                         aria-label={m.nav_settings()}
-                        className="text-muted hover:text-ink"
+                        className="rounded-md p-1 text-muted hover:text-ink focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
