@@ -107,6 +107,11 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**A lighted keyboard knows its own name.** Switch the key lights on with a Yamaha EZ-300
+or a Casio LK-S plugged in and Plinky now sets that maker's channels itself, instead of
+asking you to pick the make of the piano in front of you. It is a starting point, not a
+lock: the picker is right underneath and Test the lights settles it in a second.
+
 **Picking one of twelve looks like picking one of twelve.** A row of choices sat in a
 tinted track, which works for two or three and turns into a solid slab the moment it
 wraps — the twelve keys of the circle of fifths and the thirteen scale names filled half a

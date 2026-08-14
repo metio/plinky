@@ -67,7 +67,7 @@ function grooveLabel(groove: Groove): string {
 export default function Settings() {
     const { prefs, update } = usePrefs();
     const synth = useSynth();
-    const { support: midiSupport, micStatus, keyLights } = useMidiConnection();
+    const { support: midiSupport, micStatus, keyLights, devices } = useMidiConnection();
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
@@ -92,7 +92,12 @@ export default function Settings() {
                         onChange={(midiEcho) => update({ midiEcho })}
                         help={m.settings_midi_echo_help()}
                     />
-                    <KeyLightsSettings prefs={prefs} update={update} keyLights={keyLights} />
+                    <KeyLightsSettings
+                        prefs={prefs}
+                        update={update}
+                        keyLights={keyLights}
+                        deviceNames={devices.map((device) => device.name)}
+                    />
                 </SettingsSection>
             )}
 
