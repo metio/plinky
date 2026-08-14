@@ -13,6 +13,7 @@ import { HubList } from "../components/ui/hubList";
 import { KeysIcon } from "../components/ui/icons";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/library";
+import { MAX_GRADE } from "../../core/scoreDifficulty";
 import { isDue } from "../../core/mastery";
 import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
@@ -49,9 +50,18 @@ export default function LibraryRoute() {
     const synth = useSynth();
     const favoritesStore = useFavoritesStore();
     const { items, mastery, loaded, remove, assignmentsUsing } = useLibraryItems();
-    const filters = useLibraryFilters(items, mastery);
-    const searchRef = useRef<HTMLInputElement>(null);
     const [searchParams] = useSearchParams();
+    // ?grade=6 opens the shelf on that grade — the roadmap's rows link here, so pressing
+    // a grade you have not reached lands on its pieces rather than on an explanation.
+    const startGrade = Number(searchParams.get("grade"));
+    const filters = useLibraryFilters(
+        items,
+        mastery,
+        Number.isInteger(startGrade) && startGrade >= 1 && startGrade <= MAX_GRADE
+            ? startGrade
+            : undefined,
+    );
+    const searchRef = useRef<HTMLInputElement>(null);
     const [tab, setTab] = useState<LibraryTab>(
         searchParams.get("tab") === "manage" ? "manage" : "search",
     );

@@ -16,7 +16,6 @@ import {
     type GradedMastery,
     gradeSuggestions,
     masteredInGrade,
-    poolSizes,
     skillRating,
     starTier,
 } from "./gradeProgress";
@@ -38,7 +37,6 @@ export type YouData = {
     // Pieces due a refresh, resolved to titles for linking.
     reviews: Array<{ id: string; title: string; kind: ItemKind; incipit?: string }>;
     // How many catalogue pieces each grade holds.
-    poolSizes: Map<number, number>;
     summary: PracticeSummary | null;
     fingerprint: Grid | null;
     // The collectible badge set, earned flags included.
@@ -91,7 +89,6 @@ export function buildYouData(input: YouInput): YouData {
                 ...(item?.incipit ? { incipit: item.incipit } : {}),
             };
         }),
-        poolSizes: poolSizes(catalogue),
         summary: input.summary,
         fingerprint: input.fingerprint,
         achievements: earnedAchievements(input, level),

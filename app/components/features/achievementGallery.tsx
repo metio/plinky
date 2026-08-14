@@ -52,17 +52,21 @@ export function AchievementGallery({ achievements }: { achievements: Achievement
                     return (
                         <li
                             key={badge.id}
-                            className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center ${
+                            // A dashed outline and a greyed glyph is the vocabulary of a
+                            // padlock, and nothing here is locked — these are simply the
+                            // ones that have not happened yet. Same frame as an earned
+                            // badge, quieter ground.
+                            className={`flex flex-col items-center gap-1 rounded-xl border border-line p-3 text-center ${
                                 badge.earned
                                     ? "border-accent-line bg-accent-surface/60 dark:bg-accent-surface/40"
-                                    : "border-dashed border-line"
+                                    : ""
                             }`}
                         >
                             {/* Only the decorative emoji dims for a locked badge — fading
                                 the label too would sink it below the contrast floor. */}
                             <span
                                 aria-hidden="true"
-                                className={`text-2xl ${badge.earned ? "" : "opacity-45 grayscale"}`}
+                                className={`text-2xl ${badge.earned ? "" : "opacity-50"}`}
                             >
                                 {emoji}
                             </span>

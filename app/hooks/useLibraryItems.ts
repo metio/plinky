@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { assignmentsReferencing } from "../../core/assignment";
 import { type LibraryItem, libraryOrder } from "../../core/library";
 import type { Mastery } from "../../core/mastery";
-import { gradeOf } from "../../core/scoreDifficulty";
+import { gradeOf, rawDifficulty } from "../../core/scoreDifficulty";
 import { useServices } from "../contexts/services";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
 
@@ -29,6 +29,10 @@ export function useLibraryItems() {
                 title: score.title,
                 composer: score.composer,
                 grade: gradeOf(services.xml, score.id, score.xml),
+                // Measured like every other row, so the bundled demos take their real
+                // place among the gentlest of grade 1 rather than falling to the end of
+                // it for want of a number.
+                cost: rawDifficulty(services.xml, score.xml),
                 removable: !score.bundled,
                 kind: "song" as const,
             })),

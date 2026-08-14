@@ -330,12 +330,3 @@ export function surprisePick(
     }
     return pool[((seed % pool.length) + pool.length) % pool.length]!;
 }
-
-// How many pieces each grade's pool holds, indexed by grade.
-export function poolSizes(catalogue: GradeCatalogItem[]): Map<number, number> {
-    const sizes = new Map<number, number>();
-    for (const item of catalogue) {
-        sizes.set(item.grade, (sizes.get(item.grade) ?? 0) + 1);
-    }
-    return sizes;
-}

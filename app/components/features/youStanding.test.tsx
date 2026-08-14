@@ -12,7 +12,7 @@ afterEach(cleanup);
 describe("YouStanding", () => {
     it("reads 'not graded yet' before the first grade is earned", () => {
         render(<YouStanding level={0} skill={0} competitive={false} />);
-        expect(screen.getByText("Not graded yet")).toBeTruthy();
+        expect(screen.getByText(m.grades_not_started())).toBeTruthy();
         expect(screen.queryByText(/Competitive/)).toBeNull();
     });
 
