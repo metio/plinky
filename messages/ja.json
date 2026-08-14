@@ -7,6 +7,8 @@
     "library_intro": "曲、音階とアルペジオ、練習曲、それに自分で持ち込んだ楽譜も、ぜんぶここに。",
     "library_tab_search": "検索",
     "library_tab_manage": "管理",
+    "library_tab_people": "作曲家",
+    "library_people_hint": "カタログがクレジットしている人たちと、その中から弾ける曲。",
     "library_tabs_label": "音楽のセクション",
     "library_show_more": "もっと見る",
     "library_filter_due": "⏰ 復習の時期",

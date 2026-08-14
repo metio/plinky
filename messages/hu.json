@@ -7,6 +7,8 @@
     "library_intro": "Dalok, skálák és arpeggiók, etűdök, és bármi, amit magaddal hoztál — mind egy helyen.",
     "library_tab_search": "Keresés",
     "library_tab_manage": "Kezelés",
+    "library_tab_people": "Zeneszerzők",
+    "library_people_hint": "Mindenki, akit a katalógus feltüntet, és mi játszható tőlük.",
     "library_tabs_label": "Zene szakaszai",
     "library_show_more": "Több megjelenítése",
     "library_filter_due": "⏰ Most esedékes",

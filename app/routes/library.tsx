@@ -25,6 +25,8 @@ import type { Route } from "./+types/library";
 import { PageHeader } from "../components/ui/pageHeader";
 import { sectionHeadingClasses } from "../components/ui/classes";
 import { YourTakes } from "../components/features/yourTakes";
+import { ComposerList } from "../components/features/composerList";
+import { fieldClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.nav_music(), m.meta_library_description());
@@ -33,7 +35,7 @@ export function meta(_args: Route.MetaArgs) {
 // The library's two jobs as two tabs: Search finds something to play in the
 // combined catalogue; Manage grows it (add your own score) and keeps it safe
 // (backup and restore). ?tab=manage deep-links straight to the second.
-type LibraryTab = "search" | "manage";
+type LibraryTab = "search" | "people" | "manage";
 
 // Music is everything there is to play, and the catalogue is only half of it: the
 // other half is what you make yourself, which is why writing your own sits on the shelf
@@ -66,7 +68,11 @@ export default function LibraryRoute() {
     );
     const searchRef = useRef<HTMLInputElement>(null);
     const [tab, setTab] = useState<LibraryTab>(
-        searchParams.get("tab") === "manage" ? "manage" : "search",
+        searchParams.get("tab") === "manage"
+            ? "manage"
+            : searchParams.get("tab") === "people"
+              ? "people"
+              : "search",
     );
 
     // The confirm label for a removable score names how many saved assignments
@@ -93,12 +99,34 @@ export default function LibraryRoute() {
             <SegmentedControl
                 options={[
                     { id: "search", label: m.library_tab_search() },
+                    { id: "people", label: m.library_tab_people() },
                     { id: "manage", label: m.library_tab_manage() },
                 ]}
                 value={tab}
                 onChange={setTab}
                 label={m.library_tabs_label()}
             />
+
+            {/* One search box for two lists: the same words find a piece or the person
+                who wrote it, which is how somebody actually looks for music. */}
+            {tab !== "manage" && (
+                <input
+                    ref={searchRef}
+                    type="search"
+                    value={filters.query}
+                    onChange={(event) => filters.setQuery(event.target.value)}
+                    placeholder={m.scores_search_placeholder()}
+                    aria-label={m.scores_search_placeholder()}
+                    className={`w-full ${fieldClasses}`}
+                />
+            )}
+
+            {tab === "people" && (
+                <div className="space-y-3">
+                    <p className="text-sm text-muted">{m.library_people_hint()}</p>
+                    <ComposerList query={filters.query} />
+                </div>
+            )}
 
             {tab === "manage" ? (
                 <>
@@ -118,18 +146,8 @@ export default function LibraryRoute() {
                     <ScoreImport />
                     <ScoreBackup />
                 </>
-            ) : (
+            ) : tab === "people" ? null : (
                 <>
-                    <input
-                        ref={searchRef}
-                        type="search"
-                        value={filters.query}
-                        onChange={(event) => filters.setQuery(event.target.value)}
-                        placeholder={m.scores_search_placeholder()}
-                        aria-label={m.scores_search_placeholder()}
-                        className="w-full rounded-md border border-line-strong px-3 py-2 text-sm dark:bg-raised"
-                    />
-
                     <LibraryFilters
                         kind={filters.kind}
                         onKind={filters.setKind}
