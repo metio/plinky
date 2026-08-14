@@ -35,7 +35,9 @@ export const METHODS: PracticeMethod[] = [
     { id: "chunking", minutes: 10, href: "/library/" },
     { id: "slow", minutes: 10, href: "/library/" },
     { id: "handsApart", minutes: 10, href: "/library/" },
-    { id: "hearingFirst", minutes: 5, href: "/ear/" },
+    // Its own words are "listen to the phrase, then turn the noteheads blank and find it
+    // by ear" — which is the hidden-notes switch on a piece, not the interval drill.
+    { id: "hearingFirst", minutes: 5, href: "/library/" },
     { id: "interleaving", minutes: 15, href: "/review/" },
     { id: "spacing", minutes: 10, href: "/you/" },
 ];

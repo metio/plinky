@@ -486,6 +486,7 @@
     "progress_backup_error_storage": "This device's storage is full or blocked, so the restore didn't land. Nothing here has changed.",
     "sight_read": "Sight-read this piece",
     "sight_read_caption": "One cold read, nothing to lean on — the names, colours, hints and highway all step aside for the run. Your first read is kept as your sight-read of this piece.",
+    "sight_read_aids_note": "A sight-read run reads at the top of the ladder: no colours, no highway, no second try.",
     "sight_read_study": "Time to study",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "A moment to take in the key, the metre and the shape before the first note.",

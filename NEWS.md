@@ -107,6 +107,17 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Sight-reading no longer leaves switches lying.** Turning it on reads the piece at the
+top of the ladder — no note colours, no highway, no second try at a note you missed — but
+the switches for those went on showing whatever you had saved, so the score stripped
+itself and the panel said nothing had changed. They now read as unavailable for the run,
+showing what the run will actually do, and the skill level says so in a line instead of
+offering a rung this run will not use.
+
+"Hear it before you play it", one of the six ways to practise, sent you to ear training —
+but what it describes is turning the noteheads blank on a piece you are reading, so it
+opens the music now.
+
 **Every page introduces itself the same way.** Each one used to write its own title
 block, and twenty-two copies had drifted apart: three different spacings, two pages that
 had no title line at all, and three different things floating beside a title with nowhere

@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Le stockage de cet appareil est plein ou bloqué, la restauration n'a pas abouti. Rien n'a changé ici.",
     "sight_read": "Déchiffrer ce morceau",
     "sight_read_caption": "Une seule lecture à froid, sans appui — les noms, les couleurs, les indices et l'autoroute s'effacent le temps du passage. Ta première lecture reste ton déchiffrage de ce morceau.",
+    "sight_read_aids_note": "Un déchiffrage se lit au sommet de l'échelle : pas de couleurs, pas de couloir, pas de seconde chance.",
     "sight_read_study": "Temps d'observation",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Un moment pour saisir la tonalité, la mesure et la forme avant la première note.",

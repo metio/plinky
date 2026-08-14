@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "La memoria di questo dispositivo è piena o bloccata e il ripristino non è andato a buon fine. Qui non è cambiato nulla.",
     "sight_read": "Leggere questo brano a prima vista",
     "sight_read_caption": "Una sola lettura a freddo, senza appoggi: nomi, colori, suggerimenti e autostrada si fanno da parte per la corsa. La tua prima lettura resta la tua lettura a prima vista di questo brano.",
+    "sight_read_aids_note": "Una lettura a prima vista si legge dal gradino più alto: niente colori, niente autostrada, nessun secondo tentativo.",
     "sight_read_study": "Tempo per osservarlo",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Un attimo per cogliere tonalità, metro e forma prima della prima nota.",

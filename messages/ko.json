@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "이 기기의 저장 공간이 가득 찼거나 막혀 있어서 복원하지 못했어요. 여기 있는 것은 그대로예요.",
     "sight_read": "이 곡을 초견으로 연주하기",
     "sight_read_caption": "기댈 것 없는 단 한 번의 초견이에요. 음 이름도 색도 힌트도 하이웨이도 이번만큼은 물러나요. 첫 연주가 이 곡의 초견 기록으로 남아요.",
+    "sight_read_aids_note": "초견 연주는 맨 윗 단계로 읽어요. 색도, 노트 하이웨이도, 두 번째 기회도 없어요.",
     "sight_read_study": "살펴볼 시간",
     "sight_read_study_seconds": "{seconds}초",
     "sight_read_study_caption": "첫 음 전에 조성과 박자와 형태를 잡아보는 잠깐이에요.",

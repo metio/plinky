@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Spațiul de stocare al acestui dispozitiv este plin sau blocat, așa că restaurarea nu a reușit. Aici nu s-a schimbat nimic.",
     "sight_read": "Citește piesa asta la prima vedere",
     "sight_read_caption": "O singură citire la rece, fără sprijin — numele, culorile, indiciile și autostrada se dau la o parte pentru trecerea asta. Prima ta citire rămâne ca citirea ta la prima vedere a acestei piese.",
+    "sight_read_aids_note": "O citire la prima vedere se citește de pe treapta de sus: fără culori, fără autostradă, fără a doua încercare.",
     "sight_read_study": "Timp de studiu",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "O clipă ca să prinzi tonalitatea, măsura și forma înainte de prima notă.",

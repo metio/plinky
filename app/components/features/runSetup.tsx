@@ -19,6 +19,7 @@ import { SettingsSection } from "../ui/settingsSection";
 import { Stepper } from "../ui/stepper";
 import { ReadingLevel } from "./readingLevel";
 import { usePlaySession } from "./playSession";
+import { Show } from "./conditional";
 
 const ICON = "h-5 w-5";
 
@@ -147,11 +148,16 @@ function RunSetupPanel() {
                         help={m.duet_hint()}
                     />
                 )}
+                {/* Sight-read reads at the top rung for one run: no colours, no highway,
+                    no second try at a missed note. The switches showed the saved values
+                    while the run ignored them; they read as unavailable now, and what
+                    they show is what this run will actually do. */}
                 <SwitchField
                     label={m.forgiving_toggle()}
-                    checked={forgiving}
+                    checked={sightRead.on ? false : forgiving}
                     onChange={setForgiving}
                     help={m.forgiving_hint()}
+                    disabled={sightRead.on}
                 />
                 <SwitchField
                     label={m.action_metronome()}
@@ -266,7 +272,14 @@ function RunSetupPanel() {
                         hint={m.run_group_skill_hint()}
                         icon={<GradCapIcon className={ICON} />}
                     >
-                        <ReadingLevel labelled={false} />
+                        {/* A sight-read run reads at the top rung whatever is chosen here,
+                            so the picker would be showing a level this run is not using. */}
+                        <Show when={!sightRead.on}>
+                            <ReadingLevel labelled={false} />
+                        </Show>
+                        <Show when={sightRead.on}>
+                            <p className="text-sm text-muted">{m.sight_read_aids_note()}</p>
+                        </Show>
                     </SettingsSection>
 
                     <ScoreSymbols xml={xml} />
@@ -283,10 +296,10 @@ function RunSetupPanel() {
                             rather than what the preference says. */}
                         <SwitchField
                             label={m.hidden_notes_toggle()}
-                            checked={enforceTempo ? false : hiddenNotes}
+                            checked={enforceTempo || sightRead.on ? false : hiddenNotes}
                             onChange={setHiddenNotes}
                             help={m.hidden_notes_hint()}
-                            disabled={enforceTempo}
+                            disabled={enforceTempo || sightRead.on}
                         />
                         {hiddenNotes && !enforceTempo && (
                             <ChoiceField
@@ -302,15 +315,17 @@ function RunSetupPanel() {
                         )}
                         <SwitchField
                             label={m.color_notes_toggle()}
-                            checked={reading.colorNotes}
+                            checked={sightRead.on ? false : reading.colorNotes}
                             onChange={reading.setColorNotes}
                             help={m.color_notes_hint()}
+                            disabled={sightRead.on}
                         />
                         <SwitchField
                             label={m.highway_toggle()}
-                            checked={reading.highway}
+                            checked={sightRead.on ? false : reading.highway}
                             onChange={reading.setHighway}
                             help={m.highway_hint()}
+                            disabled={sightRead.on}
                         />
                         <SwitchField
                             label={m.action_finger_numbers()}

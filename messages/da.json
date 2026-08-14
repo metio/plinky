@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Enhedens lagerplads er fuld eller blokeret, så gendannelsen gik ikke igennem. Intet her er ændret.",
     "sight_read": "Spil dette stykke fra bladet",
     "sight_read_caption": "Én kold gennemlæsning, uden støtte — navnene, farverne, hintene og motorvejen træder til side under runden. Din første læsning bliver stående som dit bladspil af dette stykke.",
+    "sight_read_aids_note": "En bladspilsomgang læses på øverste trin: ingen farver, ingen nodebane, intet andet forsøg.",
     "sight_read_study": "Tid til at se på det",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Et øjeblik til at fange toneart, taktart og form før første tone.",

@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "この端末の保存領域がいっぱいか使えないため、復元できませんでした。ここの内容は変わっていません。",
     "sight_read": "この曲を初見で弾く",
     "sight_read_caption": "頼るもののない一回きりの初見です。音名も色もヒントもハイウェイも、この一回は下がります。最初の読みがこの曲の初見の記録として残ります。",
+    "sight_read_aids_note": "初見の演奏はいちばん上の段で読みます。色も、ノートハイウェイも、二度目もありません。",
     "sight_read_study": "下読みの時間",
     "sight_read_study_seconds": "{seconds}秒",
     "sight_read_study_caption": "最初の音の前に、調と拍子と形をつかむひととき。",

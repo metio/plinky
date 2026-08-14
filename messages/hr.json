@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Pohrana ovog uređaja je puna ili blokirana pa vraćanje nije uspjelo. Ovdje se ništa nije promijenilo.",
     "sight_read": "Odsviraj ovaj komad s lista",
     "sight_read_caption": "Jedno čitanje na hladno, bez oslonca — imena, boje, natuknice i autocesta sklanjaju se za ovu vožnju. Prvo čitanje ostaje kao tvoje sviranje s lista ovog komada.",
+    "sight_read_aids_note": "Sviranje s lista čita se s najvišeg stupnja: bez boja, bez trake, bez drugog pokušaja.",
     "sight_read_study": "Vrijeme za pregled",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Trenutak da uhvatiš tonalitet, mjeru i oblik prije prve note.",
