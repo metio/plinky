@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { atEnd, FOLLOW_SLACK_PX } from "./followScroll";
+import { atEnd, FOLLOW_SLACK_PX, outOfView } from "./followScroll";
 
 describe("atEnd", () => {
     it("is true for a panel with nothing to scroll", () => {
@@ -37,5 +37,25 @@ describe("atEnd", () => {
         const box = { scrollTop: 500, clientHeight: 400, scrollHeight: 1000 };
         expect(atEnd(box, 0)).toBe(false);
         expect(atEnd(box, 100)).toBe(true);
+    });
+});
+
+describe("outOfView", () => {
+    const PHONE = 844;
+
+    it("leaves a panel the reader can already see where it is", () => {
+        expect(outOfView(0, PHONE)).toBe(false);
+        expect(outOfView(320, PHONE)).toBe(false);
+        // Its top edge on the last line of the screen still counts as seen: the reader
+        // knows something is there, and a scroll would move the page under them.
+        expect(outOfView(PHONE, PHONE)).toBe(false);
+    });
+
+    it("fetches a panel that has scrolled off either edge", () => {
+        // Above: the reader has read down the list past the explanation.
+        expect(outOfView(-1, PHONE)).toBe(true);
+        expect(outOfView(-900, PHONE)).toBe(true);
+        // Below: the list fills the screen and the explanation is under all of it.
+        expect(outOfView(PHONE + 1, PHONE)).toBe(true);
     });
 });

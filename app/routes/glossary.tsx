@@ -10,6 +10,7 @@ import {
     performSnippet,
     snippetSeconds,
 } from "../../core/glossary";
+import { outOfView } from "../../core/followScroll";
 import { buildSnippet, type Snippet } from "../../core/glossaryScore";
 import { routeMeta, webPageData } from "../../core/site";
 import { GlossaryDetail } from "../components/features/glossaryDetail";
@@ -97,8 +98,26 @@ export default function Glossary() {
         });
     };
 
+    const detailRef = useRef<HTMLDivElement>(null);
+
     const choose = (id: string) => {
         setSelected(id);
+        // Stacked on a phone, the list runs the height of the screen and the mark's
+        // explanation sits under all of it, so a tap looks like it did nothing. Bring the
+        // detail up — only when it is actually off screen, which on the two-column layout
+        // it never is.
+        const frame = scheduler.frame(() => {
+            const box = detailRef.current?.getBoundingClientRect();
+            if (box && outOfView(box.top, window.innerHeight)) {
+                detailRef.current?.scrollIntoView({
+                    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                        ? "auto"
+                        : "smooth",
+                    block: "start",
+                });
+            }
+            scheduler.cancelFrame(frame);
+        });
         // The previous phrase may still be ringing, but it belongs to a symbol no longer
         // on screen — the new one's buttons should be ready immediately.
         if (until.current) {
@@ -122,29 +141,31 @@ export default function Glossary() {
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
                 <GlossaryIndex selected={entry.id} onSelect={choose} />
-                <GlossaryDetail
-                    entry={entry}
-                    example={
-                        // A drawing engine given a file it dislikes can throw rather than
-                        // reject, which the load path's catch never sees — and the reader
-                        // would lose the words explaining the symbol along with the picture.
-                        <FeatureBoundary feature="NotationExample">
-                            <NotationExample
-                                // A fresh element per symbol, so the engine tears down and
-                                // redraws rather than trying to swap a score under itself.
-                                key={entry.id}
-                                xml={xml}
-                                // The gloss is already read out as text right above the
-                                // drawing, so labelling the picture with it again would say
-                                // the same sentence twice. The name identifies it instead.
-                                label={symbolName(entry.id)}
-                            />
-                        </FeatureBoundary>
-                    }
-                    sounding={sounding}
-                    onHear={() => play(entry.shown)}
-                    onHearPlain={entry.plain ? () => play(entry.plain as Snippet) : null}
-                />
+                <div ref={detailRef}>
+                    <GlossaryDetail
+                        entry={entry}
+                        example={
+                            // A drawing engine given a file it dislikes can throw rather than
+                            // reject, which the load path's catch never sees — and the reader
+                            // would lose the words explaining the symbol along with the picture.
+                            <FeatureBoundary feature="NotationExample">
+                                <NotationExample
+                                    // A fresh element per symbol, so the engine tears down and
+                                    // redraws rather than trying to swap a score under itself.
+                                    key={entry.id}
+                                    xml={xml}
+                                    // The gloss is already read out as text right above the
+                                    // drawing, so labelling the picture with it again would say
+                                    // the same sentence twice. The name identifies it instead.
+                                    label={symbolName(entry.id)}
+                                />
+                            </FeatureBoundary>
+                        }
+                        sounding={sounding}
+                        onHear={() => play(entry.shown)}
+                        onHearPlain={entry.plain ? () => play(entry.plain as Snippet) : null}
+                    />
+                </div>
             </div>
         </main>
     );

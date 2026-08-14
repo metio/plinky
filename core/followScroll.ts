@@ -29,3 +29,15 @@ export type ScrollBox = {
 export function atEnd(box: ScrollBox, slack = FOLLOW_SLACK_PX): boolean {
     return box.scrollHeight - box.scrollTop - box.clientHeight <= slack;
 }
+
+
+// Whether a panel the reader has just chosen is somewhere they can see.
+//
+// The glossary stacks into one column on a phone: a list of marks the height of the
+// screen, with the chosen mark's explanation under it. Tapping a mark changes something
+// the reader may not be looking at, so the explanation is brought to them — but only when
+// it is genuinely out of sight, since scrolling a panel that is already in view yanks the
+// page for no reason, and on a wide screen the two sit side by side and it never is.
+export function outOfView(top: number, viewportHeight: number): boolean {
+    return top < 0 || top > viewportHeight;
+}
