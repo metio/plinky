@@ -73,7 +73,9 @@ export function Disclosure({
 export function FieldGroup({ label, children }: { label: string; children: ReactNode }) {
     return (
         <section className="border-t border-line/70 pt-4 first:border-t-0 first:pt-0 dark:border-line">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">{label}</h3>
+            <h3 className="mb-2 border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
+                {label}
+            </h3>
             <div className="flex flex-wrap items-start gap-x-4 gap-y-3">{children}</div>
         </section>
     );

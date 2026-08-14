@@ -78,8 +78,12 @@ export default function MethodsRoute() {
                         </div>
                         <p className="text-sm text-body">{HOW[method.id]()}</p>
                         <p className="text-xs text-muted">{WHY[method.id]()}</p>
+                        {/* Three of these are done with a control inside a run's set-up
+                            panel, so the honest offer is a piece to try them on rather
+                            than "Try it" landing on a catalogue. The other three lead
+                            straight to the thing itself. */}
                         <Link className={buttonClasses("secondary")} to={method.href}>
-                            {m.methods_try()}
+                            {method.href === "/library/" ? m.today_browse() : m.methods_try()}
                         </Link>
                     </li>
                 ))}
