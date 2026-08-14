@@ -94,7 +94,9 @@ const MINOR_SLUGS = [
     "d",
 ];
 
-const niceKey = (slug: string): string =>
+// A key slug as a musician writes it — "eflat" is E♭. Exported because a warm-up that
+// offers the next rung of the arcade should say which key it is about to ask for.
+export const keyName = (slug: string): string =>
     slug.endsWith("sharp")
         ? `${slug[0]!.toUpperCase()}♯`
         : slug.endsWith("flat")
@@ -395,7 +397,7 @@ const SCALE_LABEL: Record<string, string> = {
 
 export function exerciseTitle(raw: ExerciseConfig): string {
     const config = normalizeExercise(raw);
-    const parts = [`${niceKey(config.key)} ${SCALE_LABEL[config.type]}`];
+    const parts = [`${keyName(config.key)} ${SCALE_LABEL[config.type]}`];
     const hands = config.hands;
     const forms: string[] = [];
     if (config.interval === "thirds") forms.push("in thirds");

@@ -219,7 +219,6 @@
     "today_stand_one": "{count} morceau sur le pupitre",
     "today_stand_other": "{count} morceaux sur le pupitre",
     "arcade_title": "Arcade de déchiffrage",
-    "arcade_play": "Jouer le niveau {level}",
     "surprise_me": "Surprends-moi",
     "recap_heading": "Ton {month} en musique",
     "recap_best_day": "Meilleur jour : {count} notes",

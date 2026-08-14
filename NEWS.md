@@ -20,8 +20,9 @@ the top of the help page. All of that is over.
 morning" — over a quiet line saying where you stand: your grade, your skill, and how much
 is on the music stand. Under that is the day's practice, in the shape a piano teacher
 gives an hour: something to **warm up** on — the day's challenge, your next arcade rung,
-a fresh drill, a round of ear training, and a keyboard to put your hands on before
-anything is asked of them — then the piece you're **working on**, and then **one thing to
+a fresh drill — the arcade says which key it is about to ask you to read, rather than a
+rung number, since the ladder has no end and seven was never seven of anything — a round
+of ear training, and a keyboard to put your hands on before anything is asked of them — then the piece you're **working on**, and then **one thing to
 learn**, picked for the day. They are headings, not a list of chores: nothing counts them,
 nothing ticks them off, and skipping one costs you nothing.
 

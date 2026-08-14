@@ -219,7 +219,6 @@
     "today_stand_one": "보면대 위에 {count}곡",
     "today_stand_other": "보면대 위에 {count}곡",
     "arcade_title": "초견 아케이드",
-    "arcade_play": "레벨 {level} 하기",
     "surprise_me": "무작위 선곡",
     "recap_heading": "음악으로 보는 {month}",
     "recap_best_day": "최고의 날: {count}개 음표",
