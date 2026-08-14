@@ -584,6 +584,12 @@ Plinky speaks 26 languages, and contributions are welcome — see
 [TRANSLATING.md](TRANSLATING.md) for how to add a translation. Untranslated strings
 fall back to English, so every language always works while it catches up.
 
+Music has its own vocabulary in each of them, so the pieces are named in the reader's
+language too: a scale is a *Tonleiter*, a *gamme*, a *音階*, and the key goes where that
+language puts it — `{key}-Dur-Tonleiter` in German, `Gamme de {key} majeur` in French.
+Every generated scale and arpeggio is titled from the message catalogue rather than from
+the English name baked into the score.
+
 Plinky talks like a piano teacher who is glad you showed up: it invites rather than
 instructs, and never nags about a missed day. [VOICE.md](VOICE.md) is the contract
 every string keeps — worth a read before writing copy or translating it, since the

@@ -316,7 +316,11 @@ const BUDGET_VENDOR_KB = 324;
 //
 // 338. The theory course remembers which lessons have been met, so the day's practice
 // offers the next one and stops offering a course there is nothing left of.
-const BUDGET_APP_KB = 338;
+// 339. Scales and arpeggios are named in the reader's language: seventeen title and form
+// strings per locale, plus the table that picks one. The manifest's English titles are
+// still there — they name the score's own <work-title> — so this pays for the language
+// the reader actually gets, in a build carrying one locale.
+const BUDGET_APP_KB = 339;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

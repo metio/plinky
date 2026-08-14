@@ -4,12 +4,14 @@
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import { arcadeConfig } from "../../core/arcade";
-import { buildExerciseId, type ExerciseConfig } from "../../core/exerciseGen";
+import { buildExerciseId, type ExerciseConfig, exerciseTitle } from "../../core/exerciseGen";
 import type { Fetcher } from "../ports/fetcher";
 import { createExerciseSource, type ExerciseMeta } from "./exerciseSource";
 
 // The source takes its fetcher as a lambda, so a canned-response fake replaces
-// a whole mock server.
+// a whole mock server. Names come in the same way: the English name core knows stands
+// in for the app's translated one.
+const sourceOver = (fetchUrl: Fetcher) => createExerciseSource(fetchUrl, exerciseTitle);
 
 const scaleConfig: ExerciseConfig = {
     type: "major-scale",
@@ -59,7 +61,7 @@ const withManifest =
 describe("exerciseSource.manifest", () => {
     it("caches a completed manifest for the session", async () => {
         let fetches = 0;
-        const source = createExerciseSource(() => {
+        const source = sourceOver(() => {
             fetches++;
             return Promise.resolve(Response.json([scaleMeta]));
         });
@@ -70,7 +72,7 @@ describe("exerciseSource.manifest", () => {
 
     it("answers null on a failed fetch but retries — a transient failure must not read as an empty catalogue for the session", async () => {
         let calls = 0;
-        const source = createExerciseSource(() => {
+        const source = sourceOver(() => {
             calls++;
             return calls === 1
                 ? Promise.reject(new TypeError("network down"))
@@ -85,7 +87,7 @@ describe("exerciseSource.manifest", () => {
 
     it("retries after a non-OK response too", async () => {
         let calls = 0;
-        const source = createExerciseSource(() => {
+        const source = sourceOver(() => {
             calls++;
             return calls === 1
                 ? Promise.resolve(new Response(null, { status: 503 }))
@@ -96,14 +98,14 @@ describe("exerciseSource.manifest", () => {
     });
 
     it("treats a non-array manifest body as a failure rather than crashing consumers", async () => {
-        const source = createExerciseSource(withManifest({ unexpected: "object" }));
+        const source = sourceOver(withManifest({ unexpected: "object" }));
         expect(await source.manifest()).toBeNull();
     });
 });
 
 describe("exerciseSource.resolve", () => {
     it("rebuilds a generated scale from its stored config", async () => {
-        const source = createExerciseSource(withManifest([scaleMeta]));
+        const source = sourceOver(withManifest([scaleMeta]));
         const resolved = await source.resolve("ex-scale");
         const score = typeof resolved === "object" ? resolved : null;
         expect(score?.title).toBe("C major scale");
@@ -113,9 +115,7 @@ describe("exerciseSource.resolve", () => {
     });
 
     it("fetches and decompresses a study's .mxl", async () => {
-        const source = createExerciseSource(
-            withManifest([studyMeta], () => new Response(studyMxl())),
-        );
+        const source = sourceOver(withManifest([studyMeta], () => new Response(studyMxl())));
         const resolved = await source.resolve("ex-study");
         const score = typeof resolved === "object" ? resolved : null;
         expect(score?.xml).toBe(STUDY_XML);
@@ -124,12 +124,12 @@ describe("exerciseSource.resolve", () => {
     });
 
     it("is null for an unknown id, so the play flow can fall through", async () => {
-        const source = createExerciseSource(withManifest([scaleMeta]));
+        const source = sourceOver(withManifest([scaleMeta]));
         expect(await source.resolve("not-an-exercise")).toBeNull();
     });
 
     it("generates a valid exercise id that isn't in the manifest, so the arcade climbs beyond it", async () => {
-        const source = createExerciseSource(withManifest([scaleMeta]));
+        const source = sourceOver(withManifest([scaleMeta]));
         // A far arcade rung: a valid config, but no manifest entry names it.
         const id = buildExerciseId(arcadeConfig(50));
         const resolved = await source.resolve(id);
@@ -142,16 +142,14 @@ describe("exerciseSource.resolve", () => {
     it("is unavailable — not null — when a study's .mxl cannot be fetched", async () => {
         // The manifest names the study, so the piece exists; only the fetch
         // failed, and "gone" would be a lie the play page repeats to the user.
-        const source = createExerciseSource(
+        const source = sourceOver(
             withManifest([studyMeta], () => new Response(null, { status: 500 })),
         );
         expect(await source.resolve("ex-study")).toBe("unavailable");
     });
 
     it("is unavailable when the manifest itself cannot be fetched", async () => {
-        const source = createExerciseSource(() =>
-            Promise.resolve(new Response(null, { status: 500 })),
-        );
+        const source = sourceOver(() => Promise.resolve(new Response(null, { status: 500 })));
         expect(await source.resolve("ex-study")).toBe("unavailable");
     });
 });
