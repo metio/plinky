@@ -24,7 +24,7 @@ import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
-import { sectionHeadingClasses } from "../ui/classes";
+import { compactFieldClasses, sectionHeadingClasses } from "../ui/classes";
 
 // The practice diary, rolled up. How long, on which days, and what it felt like —
 // the retrospective a player keeps for themselves and the summary a teacher asks
@@ -196,7 +196,7 @@ function BackLogForm({ now }: { now: Date }) {
                         value={date}
                         max={todayKey(now)}
                         onChange={(event) => setDate(event.target.value)}
-                        className="rounded-md border border-line bg-surface px-2 py-1 text-body"
+                        className={compactFieldClasses}
                     />
                 </label>
                 <label className="space-y-1 text-sm">
@@ -208,7 +208,7 @@ function BackLogForm({ now }: { now: Date }) {
                         max={MAX_MANUAL_MINUTES}
                         value={minutes}
                         onChange={(event) => setMinutes(event.target.value)}
-                        className="w-24 rounded-md border border-line bg-surface px-2 py-1 text-body"
+                        className={`w-24 ${compactFieldClasses}`}
                     />
                 </label>
             </div>
@@ -219,7 +219,7 @@ function BackLogForm({ now }: { now: Date }) {
                     value={label}
                     maxLength={MAX_LABEL_LENGTH}
                     onChange={(event) => setLabel(event.target.value)}
-                    className="w-full rounded-md border border-line bg-surface px-2 py-1 text-body"
+                    className={`w-full ${compactFieldClasses}`}
                 />
             </label>
             <Button onClick={submit}>{m.practice_add_action()}</Button>
