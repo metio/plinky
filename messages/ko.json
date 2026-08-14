@@ -12,6 +12,7 @@
     "library_tabs_label": "음악 섹션",
     "library_show_more": "더 보기",
     "library_filter_due": "⏰ 복습 시간",
+    "library_filter_fresh": "✨ 아직 안 쳐 본 곡",
     "library_remove_used_one": "과제 {count}개에서 사용 중이에요 — 삭제할까요?",
     "library_remove_used_other": "과제 {count}개에서 사용 중이에요 — 삭제할까요?",
     "library_group_kind": "종류",

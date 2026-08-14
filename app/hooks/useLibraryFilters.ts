@@ -33,20 +33,21 @@ export function useLibraryFilters(
     );
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const [dueOnly, setDueOnly] = useState(false);
+    const [freshOnly, setFreshOnly] = useState(false);
     const [visible, setVisible] = useState(PER_PAGE);
 
     // A new filter starts from the top of its (possibly long) result set.
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset paging when the filter changes
-    useEffect(() => setVisible(PER_PAGE), [query, kind, grades, favoritesOnly, dueOnly]);
+    useEffect(() => setVisible(PER_PAGE), [query, kind, grades, favoritesOnly, dueOnly, freshOnly]);
 
     const matches = useMemo(
         () =>
             filterLibrary(
                 items,
-                { query, kind, grades, favoritesOnly, dueOnly },
+                { query, kind, grades, favoritesOnly, dueOnly, freshOnly },
                 { favorites, mastery, now: Date.now() },
             ),
-        [items, query, kind, grades, favoritesOnly, dueOnly, favorites, mastery],
+        [items, query, kind, grades, favoritesOnly, dueOnly, freshOnly, favorites, mastery],
     );
 
     return {
@@ -58,6 +59,8 @@ export function useLibraryFilters(
         toggleGrade: (grade: number) => setGrades((prev) => toggledGrade(prev, grade)),
         clearGrades: () => setGrades(new Set()),
         favoritesOnly,
+        freshOnly,
+        toggleFreshOnly: () => setFreshOnly((on) => !on),
         toggleFavoritesOnly: () => setFavoritesOnly((on) => !on),
         dueOnly,
         toggleDueOnly: () => setDueOnly((on) => !on),

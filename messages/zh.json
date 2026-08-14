@@ -12,6 +12,7 @@
     "library_tabs_label": "音乐栏目",
     "library_show_more": "显示更多",
     "library_filter_due": "⏰ 待复习",
+    "library_filter_fresh": "✨ 还没弹过",
     "library_remove_used_one": "被 {count} 个作业使用——确定移除？",
     "library_remove_used_other": "被 {count} 个作业使用——确定移除？",
     "library_group_kind": "类型",

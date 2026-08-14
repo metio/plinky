@@ -12,6 +12,7 @@
     "library_tabs_label": "Одељци Музике",
     "library_show_more": "Прикажи још",
     "library_filter_due": "⏰ На реду",
+    "library_filter_fresh": "✨ Још непробано",
     "library_remove_used_one": "Користи га {count} задатак — уклонити?",
     "library_remove_used_other": "Користи га {count} задатака — уклонити?",
     "library_group_kind": "Врста",

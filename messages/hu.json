@@ -12,6 +12,7 @@
     "library_tabs_label": "Zene szakaszai",
     "library_show_more": "Több megjelenítése",
     "library_filter_due": "⏰ Most esedékes",
+    "library_filter_fresh": "✨ Még nem próbált",
     "library_remove_used_one": "{count} feladat használja — eltávolítod?",
     "library_remove_used_other": "{count} feladat használja — eltávolítod?",
     "library_group_kind": "Típus",

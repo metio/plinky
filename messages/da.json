@@ -12,6 +12,7 @@
     "library_tabs_label": "Musikafsnit",
     "library_show_more": "Vis mere",
     "library_filter_due": "⏰ Klar nu",
+    "library_filter_fresh": "✨ Ikke prøvet endnu",
     "library_remove_used_one": "Bruges af {count} opgave — fjern?",
     "library_remove_used_other": "Bruges af {count} opgaver — fjern?",
     "library_group_kind": "Type",

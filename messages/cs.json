@@ -12,6 +12,7 @@
     "library_tabs_label": "Sekce Hudby",
     "library_show_more": "Zobrazit více",
     "library_filter_due": "⏰ K opakování",
+    "library_filter_fresh": "✨ Ještě nezkoušené",
     "library_remove_used_one": "Používá ho {count} zadání — odebrat?",
     "library_remove_used_other": "Používá ho {count} zadání — odebrat?",
     "library_group_kind": "Druh",

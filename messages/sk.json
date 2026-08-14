@@ -12,6 +12,7 @@
     "library_tabs_label": "Sekcie Hudby",
     "library_show_more": "Zobraziť viac",
     "library_filter_due": "⏰ Na rade",
+    "library_filter_fresh": "✨ Ešte neskúšané",
     "library_remove_used_one": "Používa ho {count} zadanie — odstrániť?",
     "library_remove_used_other": "Používa ho {count} zadaní — odstrániť?",
     "library_group_kind": "Druh",

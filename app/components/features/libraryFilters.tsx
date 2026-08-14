@@ -33,6 +33,8 @@ type LibraryFiltersProps = {
     favoritesOnly: boolean;
     onToggleFavoritesOnly: () => void;
     dueOnly: boolean;
+    freshOnly: boolean;
+    onToggleFreshOnly: () => void;
     onToggleDueOnly: () => void;
     // The Due chip only appears while something is actually due.
     showDue: boolean;
@@ -50,6 +52,8 @@ export function LibraryFilters({
     favoritesOnly,
     onToggleFavoritesOnly,
     dueOnly,
+    freshOnly,
+    onToggleFreshOnly,
     onToggleDueOnly,
     showDue,
 }: LibraryFiltersProps) {
@@ -97,6 +101,12 @@ export function LibraryFilters({
                     onClick={onToggleFavoritesOnly}
                 >
                     {m.scores_filter_favorites()}
+                </Chip>
+                {/* What is left to discover — the mastery record already knows which
+                    pieces have no history at all. Unlike "due", it is worth offering from
+                    the first visit: on a fresh device it simply matches everything. */}
+                <Chip selected={freshOnly} aria-pressed={freshOnly} onClick={onToggleFreshOnly}>
+                    {m.library_filter_fresh()}
                 </Chip>
                 <Show when={showDue}>
                     <Chip selected={dueOnly} aria-pressed={dueOnly} onClick={onToggleDueOnly}>

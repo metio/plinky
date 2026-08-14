@@ -12,6 +12,7 @@
     "library_tabs_label": "Music sections",
     "library_show_more": "Show more",
     "library_filter_due": "⏰ Due now",
+    "library_filter_fresh": "✨ Not tried yet",
     "library_remove_used_one": "Used by {count} assignment — remove?",
     "library_remove_used_other": "Used by {count} assignments — remove?",
     "library_group_kind": "Kind",

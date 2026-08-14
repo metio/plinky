@@ -24,16 +24,19 @@ export type LibraryItem = {
     kind: LibraryKind;
 };
 
-// The five filter axes of the library list. An empty kind means every kind and
-// an empty grade set means every grade; the grades are multi-select, so a
-// player can line up e.g. grades 3 and 4 at once — each still means exactly
-// that grade.
+// The filter axes of the library list. An empty kind means every kind and an empty grade
+// set means every grade; the grades are multi-select, so a player can line up e.g. grades
+// 3 and 4 at once — each still means exactly that grade.
 export type LibraryFilter = {
     query: string;
     kind: LibraryKind | "";
     grades: ReadonlySet<number>;
     favoritesOnly: boolean;
     dueOnly: boolean;
+    // Pieces with no history at all: what is left to discover, once a shelf has been
+    // played through for a while. "Something I have not tried" is a real way to browse
+    // three thousand pieces, and the mastery record already knows the answer.
+    freshOnly: boolean;
 };
 
 export const EMPTY_LIBRARY_FILTER: LibraryFilter = {
@@ -42,6 +45,7 @@ export const EMPTY_LIBRARY_FILTER: LibraryFilter = {
     grades: new Set(),
     favoritesOnly: false,
     dueOnly: false,
+    freshOnly: false,
 };
 
 // The per-player state the filters consult: the starred set, the mastery
@@ -95,6 +99,9 @@ export function filterLibrary(
             return false;
         }
         if (filter.favoritesOnly && !context.favorites.has(item.id)) {
+            return false;
+        }
+        if (filter.freshOnly && context.mastery[item.id] !== undefined) {
             return false;
         }
         if (filter.dueOnly) {

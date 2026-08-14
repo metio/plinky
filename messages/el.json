@@ -12,6 +12,7 @@
     "library_tabs_label": "Ενότητες της Μουσικής",
     "library_show_more": "Εμφάνιση περισσότερων",
     "library_filter_due": "⏰ Εκκρεμεί τώρα",
+    "library_filter_fresh": "✨ Αδοκίμαστα ακόμη",
     "library_remove_used_one": "Χρησιμοποιείται από {count} εργασία — αφαίρεση;",
     "library_remove_used_other": "Χρησιμοποιείται από {count} εργασίες — αφαίρεση;",
     "library_group_kind": "Είδος",

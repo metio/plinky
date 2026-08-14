@@ -12,6 +12,7 @@
     "library_tabs_label": "Sections de Musique",
     "library_show_more": "Afficher plus",
     "library_filter_due": "⏰ À réviser",
+    "library_filter_fresh": "✨ Pas encore essayé",
     "library_remove_used_one": "Utilisé par {count} devoir — supprimer ?",
     "library_remove_used_other": "Utilisé par {count} devoirs — supprimer ?",
     "library_group_kind": "Type",

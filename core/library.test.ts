@@ -138,6 +138,7 @@ describe("filterLibrary", () => {
                 grades: new Set([2]),
                 favoritesOnly: true,
                 dueOnly: false,
+                freshOnly: false,
             },
             { ...emptyContext, favorites: new Set(["hit", "wrong-grade", "wrong-kind"]) },
         );
@@ -260,5 +261,37 @@ describe("libraryOrder", () => {
         const shelf = [item({ id: "b", grade: 2 }), item({ id: "a", grade: 1 })];
         libraryOrder(shelf);
         expect(shelf.map((one) => one.id)).toEqual(["b", "a"]);
+    });
+});
+
+describe("the fresh filter", () => {
+    const shelf = [item({ id: "played" }), item({ id: "never" })];
+    const context = {
+        favorites: new Set<string>(),
+        mastery: { played: mastery({}) },
+        now: NOW,
+    };
+
+    it("keeps only the pieces with no history at all", () => {
+        const fresh = filterLibrary(
+            shelf,
+            { ...EMPTY_LIBRARY_FILTER, freshOnly: true },
+            context,
+        ).map((one) => one.id);
+        expect(fresh).toEqual(["never"]);
+    });
+
+    it("counts a piece as played the moment it has a record, however bad the run", () => {
+        // A stumbled-through attempt is still an answer to "have I tried this?".
+        const stumbled = { ...context, mastery: { played: mastery({ learned: false, bestScore: 10 }) } };
+        expect(
+            filterLibrary(shelf, { ...EMPTY_LIBRARY_FILTER, freshOnly: true }, stumbled).map(
+                (one) => one.id,
+            ),
+        ).toEqual(["never"]);
+    });
+
+    it("is off by default, so the shelf is the whole shelf", () => {
+        expect(filterLibrary(shelf, EMPTY_LIBRARY_FILTER, context)).toHaveLength(2);
     });
 });

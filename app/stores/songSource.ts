@@ -27,6 +27,10 @@ export type SongMeta = {
     source?: string;
     tempo: number;
     beatsPerBar: number;
+    // How many bars the piece runs to. The app reads it nowhere — it is the catalogue
+    // pipeline's own tie-break when two transcriptions of one work collapse into one row
+    // (dev/dedup-songs prefers the shorter), and the manifest is where that lives. Kept
+    // deliberately, so an audit that spots "written, never read" finds the reason here.
     bars: number;
     // The piece's opening bars, baked by dev/bake-incipits so a list can draw the mark
     // that names a piece without fetching its notation. Absent on a piece whose opening
