@@ -7,6 +7,7 @@ import { downloadBlob } from "../../lib/download";
 import { useStore, useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
+import { sectionHeadingClasses } from "../ui/classes";
 
 function pluralScores(count: number): string {
     return count === 1 ? m.backup_scores_one({ count }) : m.backup_scores_other({ count });
@@ -61,9 +62,7 @@ export function ScoreBackup() {
 
     return (
         <section className="space-y-3">
-            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
-                {m.backup_heading()}
-            </h2>
+            <h2 className={sectionHeadingClasses}>{m.backup_heading()}</h2>
             <p className="text-sm text-muted">{m.backup_intro({ count: pluralScores(count) })}</p>
             <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" onClick={download} disabled={count === 0}>

@@ -3,6 +3,7 @@
 
 import { type ReactNode, useId, useState } from "react";
 import { ChevronIcon } from "./icons";
+import { sectionHeadingClasses } from "./classes";
 
 // A disclosure whose panel grows to its own intrinsic height — the `grid-rows 0fr→1fr`
 // trick, so there's no max-height to guess and no dead air on close. The content fades
@@ -73,9 +74,7 @@ export function Disclosure({
 export function FieldGroup({ label, children }: { label: string; children: ReactNode }) {
     return (
         <section className="border-t border-line/70 pt-4 first:border-t-0 first:pt-0 dark:border-line">
-            <h3 className="mb-2 border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
-                {label}
-            </h3>
+            <h3 className={`mb-2 ${sectionHeadingClasses}`}>{label}</h3>
             <div className="flex flex-wrap items-start gap-x-4 gap-y-3">{children}</div>
         </section>
     );

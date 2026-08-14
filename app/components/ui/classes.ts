@@ -15,3 +15,12 @@ export const compactFieldClasses =
 
 // The inline text link.
 export const linkClasses = "text-accent-strong underline";
+
+// The label over a group of things — a section of a page, a panel in Settings, a unit of
+// a course. Small, letter-spaced brass caps: the app's one way of saying "these belong
+// together", so a reader learns it once and recognises it everywhere.
+export const sectionLabelClasses =
+    "text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong";
+
+// The same label with the hairline under it, for a group that owns the width it sits in.
+export const sectionHeadingClasses = `border-b border-line pb-1.5 ${sectionLabelClasses}`;

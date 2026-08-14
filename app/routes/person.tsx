@@ -143,7 +143,13 @@ export default function PersonPage() {
                                     label={piece.title}
                                     className="shrink-0 text-faint"
                                 />
-                                <span className="min-w-0 truncate font-medium">{piece.title}</span>
+                                {/* flex-1, so the titles start in one column right after
+                                    the marks: justify-between alone floats each one
+                                    somewhere different, and a list is read down its left
+                                    edge. */}
+                                <span className="min-w-0 flex-1 truncate font-medium">
+                                    {piece.title}
+                                </span>
                                 <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
                                     {piece.grade !== undefined && (
                                         <span className="rounded bg-subtle px-1.5 py-0.5 font-medium tabular-nums">
