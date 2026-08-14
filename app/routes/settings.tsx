@@ -76,25 +76,44 @@ export default function Settings() {
                 </h1>
                 <p className="text-sm text-muted">{m.settings_subtitle()}</p>
             </header>
-
-            <SettingsSection
-                title={m.settings_appearance()}
-                hint={m.settings_appearance_hint()}
-                icon={<SlidersIcon className={ICON} />}
-            >
-                <div className="flex items-center justify-between">
-                    <span className="text-sm text-body">{m.settings_theme()}</span>
-                    <ThemeToggle />
-                </div>
-                <div className="flex items-center justify-between">
-                    <span className="text-sm text-body">{m.settings_language()}</span>
-                    <LanguageSwitcher />
-                </div>
-                {/* The on-screen keyboard's colours are an appearance choice too, so
-                they sit here rather than in a section of their own. */}
-                <SettingsSection title={m.settings_keyboard_theme()} level={3}>
-                    <KeyboardThemePicker />
+            {/* Settings are ordered by what somebody came here to change, not by which
+                part of the app owns them: first the instrument you play on, then how the
+                music reads while you play it, then what counts as learned, and last the
+                device itself. Before this the first thing on the page was the theme
+                picker and the microphone was tenth. */}
+            {/* No Web MIDI (Safari, all iOS) means no device to connect — the
+                keyboard is the input there, so the whole panel is hidden. */}
+            {midiSupport !== "unsupported" && (
+                <SettingsSection
+                    title={m.settings_connect_midi()}
+                    hint={m.settings_midi_hint()}
+                    icon={<PlugIcon className={ICON} />}
+                >
+                    <MidiConnect />
+                    <SwitchField
+                        label={m.settings_midi_echo()}
+                        checked={prefs.midiEcho}
+                        onChange={(midiEcho) => update({ midiEcho })}
+                        help={m.settings_midi_echo_help()}
+                    />
+                    <KeyLightsSettings prefs={prefs} update={update} keyLights={keyLights} />
                 </SettingsSection>
+            )}
+
+            {/* No microphone API (very old browsers, some webviews) means nothing
+                to listen with, so the whole panel is hidden. */}
+            {micStatus !== "unsupported" && (
+                <SettingsSection
+                    title={m.mic_heading()}
+                    hint={m.mic_hint()}
+                    icon={<MicIcon className={ICON} />}
+                >
+                    <MicConnect />
+                </SettingsSection>
+            )}
+
+            <SettingsSection title={m.settings_keyboard()} icon={<KeysIcon className={ICON} />}>
+                <KeyMapping />
             </SettingsSection>
 
             <SettingsSection
@@ -123,100 +142,6 @@ export default function Settings() {
                         {m.settings_test()}
                     </Button>
                 </div>
-            </SettingsSection>
-
-            <SettingsSection
-                title={m.settings_mastery()}
-                hint={m.settings_mastery_hint()}
-                icon={<GradCapIcon className={ICON} />}
-            >
-                <ChoiceField
-                    label={m.settings_mastery_threshold()}
-                    value={prefs.masteryThreshold}
-                    onChange={(masteryThreshold: Letter) => update({ masteryThreshold })}
-                    options={(["S", "A", "B", "C", "D"] as Letter[]).map((letter) => ({
-                        id: letter,
-                        label: letter,
-                    }))}
-                    help={m.settings_mastery_help()}
-                />
-            </SettingsSection>
-
-            <SettingsSection
-                title={m.settings_grades()}
-                hint={m.settings_grades_hint()}
-                icon={<StarIcon className={ICON} />}
-            >
-                <ChoiceField
-                    label={m.settings_decay()}
-                    value={prefs.decayMode}
-                    onChange={(decayMode: DecayMode) => update({ decayMode })}
-                    options={[
-                        { id: "gentle", label: m.settings_decay_gentle() },
-                        { id: "competitive", label: m.settings_decay_competitive() },
-                    ]}
-                    help={
-                        prefs.decayMode === "competitive"
-                            ? m.settings_decay_competitive_help()
-                            : m.settings_decay_gentle_help()
-                    }
-                />
-                <ChoiceField
-                    label={m.settings_review_cap()}
-                    value={String(prefs.reviewCap)}
-                    onChange={(value) => update({ reviewCap: Number(value) })}
-                    options={REVIEW_CAPS.map((cap) => ({ id: String(cap), label: String(cap) }))}
-                    help={m.settings_review_cap_help()}
-                />
-            </SettingsSection>
-
-            <SettingsSection
-                title={m.settings_fingering()}
-                hint={m.settings_fingering_hint()}
-                icon={<FingersIcon className={ICON} />}
-            >
-                <SwitchField
-                    label={m.settings_show_fingerings()}
-                    checked={prefs.showFingerings}
-                    onChange={(showFingerings) => update({ showFingerings })}
-                />
-                <ChoiceField
-                    label={m.settings_note_hints()}
-                    value={prefs.noteHints}
-                    onChange={(noteHints: NoteHints) => update({ noteHints })}
-                    options={[
-                        { id: "always", label: m.note_hints_always() },
-                        { id: "miss", label: m.note_hints_miss() },
-                        { id: "never", label: m.note_hints_never() },
-                    ]}
-                    help={m.settings_note_hints_help()}
-                />
-                <ChoiceField
-                    label={m.settings_note_labels()}
-                    value={prefs.noteLabels}
-                    onChange={(noteLabels: NoteLabels) => update({ noteLabels })}
-                    options={[
-                        { id: "all", label: m.note_labels_all() },
-                        { id: "c", label: m.note_labels_c() },
-                        { id: "solfege", label: m.note_labels_solfege() },
-                        { id: "off", label: m.note_labels_off() },
-                    ]}
-                    help={m.settings_note_labels_help()}
-                />
-                {/* The choice, demonstrated: a real octave that re-labels itself as the
-                    pick above changes, and plays when tapped — the same keyboard the
-                    practice modes render. */}
-                <div className="space-y-1">
-                    <Keyboard
-                        from={60}
-                        to={72}
-                        labels={prefs.noteLabels}
-                        well="w-full max-w-sm"
-                        onPress={(note) => synth.playNote(note)}
-                    />
-                    <p className="text-xs text-muted">{m.settings_labels_example()}</p>
-                </div>
-                <HandSize />
             </SettingsSection>
 
             {/* Reading: the level preset up top sets the aids together, then every
@@ -318,6 +243,55 @@ export default function Settings() {
             </SettingsSection>
 
             <SettingsSection
+                title={m.settings_fingering()}
+                hint={m.settings_fingering_hint()}
+                icon={<FingersIcon className={ICON} />}
+            >
+                <SwitchField
+                    label={m.settings_show_fingerings()}
+                    checked={prefs.showFingerings}
+                    onChange={(showFingerings) => update({ showFingerings })}
+                />
+                <ChoiceField
+                    label={m.settings_note_hints()}
+                    value={prefs.noteHints}
+                    onChange={(noteHints: NoteHints) => update({ noteHints })}
+                    options={[
+                        { id: "always", label: m.note_hints_always() },
+                        { id: "miss", label: m.note_hints_miss() },
+                        { id: "never", label: m.note_hints_never() },
+                    ]}
+                    help={m.settings_note_hints_help()}
+                />
+                <ChoiceField
+                    label={m.settings_note_labels()}
+                    value={prefs.noteLabels}
+                    onChange={(noteLabels: NoteLabels) => update({ noteLabels })}
+                    options={[
+                        { id: "all", label: m.note_labels_all() },
+                        { id: "c", label: m.note_labels_c() },
+                        { id: "solfege", label: m.note_labels_solfege() },
+                        { id: "off", label: m.note_labels_off() },
+                    ]}
+                    help={m.settings_note_labels_help()}
+                />
+                {/* The choice, demonstrated: a real octave that re-labels itself as the
+                    pick above changes, and plays when tapped — the same keyboard the
+                    practice modes render. */}
+                <div className="space-y-1">
+                    <Keyboard
+                        from={60}
+                        to={72}
+                        labels={prefs.noteLabels}
+                        well="w-full max-w-sm"
+                        onPress={(note) => synth.playNote(note)}
+                    />
+                    <p className="text-xs text-muted">{m.settings_labels_example()}</p>
+                </div>
+                <HandSize />
+            </SettingsSection>
+
+            <SettingsSection
                 title={m.settings_metronome()}
                 hint={m.settings_metronome_hint()}
                 icon={<MetronomeIcon className={ICON} />}
@@ -350,40 +324,72 @@ export default function Settings() {
                 />
             </SettingsSection>
 
-            <SettingsSection title={m.settings_keyboard()} icon={<KeysIcon className={ICON} />}>
-                <KeyMapping />
+            <SettingsSection
+                title={m.settings_mastery()}
+                hint={m.settings_mastery_hint()}
+                icon={<GradCapIcon className={ICON} />}
+            >
+                <ChoiceField
+                    label={m.settings_mastery_threshold()}
+                    value={prefs.masteryThreshold}
+                    onChange={(masteryThreshold: Letter) => update({ masteryThreshold })}
+                    options={(["S", "A", "B", "C", "D"] as Letter[]).map((letter) => ({
+                        id: letter,
+                        label: letter,
+                    }))}
+                    help={m.settings_mastery_help()}
+                />
             </SettingsSection>
 
-            {/* No Web MIDI (Safari, all iOS) means no device to connect — the
-                keyboard is the input there, so the whole panel is hidden. */}
-            {midiSupport !== "unsupported" && (
-                <SettingsSection
-                    title={m.settings_connect_midi()}
-                    hint={m.settings_midi_hint()}
-                    icon={<PlugIcon className={ICON} />}
-                >
-                    <MidiConnect />
-                    <SwitchField
-                        label={m.settings_midi_echo()}
-                        checked={prefs.midiEcho}
-                        onChange={(midiEcho) => update({ midiEcho })}
-                        help={m.settings_midi_echo_help()}
-                    />
-                    <KeyLightsSettings prefs={prefs} update={update} keyLights={keyLights} />
-                </SettingsSection>
-            )}
+            <SettingsSection
+                title={m.settings_grades()}
+                hint={m.settings_grades_hint()}
+                icon={<StarIcon className={ICON} />}
+            >
+                <ChoiceField
+                    label={m.settings_decay()}
+                    value={prefs.decayMode}
+                    onChange={(decayMode: DecayMode) => update({ decayMode })}
+                    options={[
+                        { id: "gentle", label: m.settings_decay_gentle() },
+                        { id: "competitive", label: m.settings_decay_competitive() },
+                    ]}
+                    help={
+                        prefs.decayMode === "competitive"
+                            ? m.settings_decay_competitive_help()
+                            : m.settings_decay_gentle_help()
+                    }
+                />
+                <ChoiceField
+                    label={m.settings_review_cap()}
+                    value={String(prefs.reviewCap)}
+                    onChange={(value) => update({ reviewCap: Number(value) })}
+                    options={REVIEW_CAPS.map((cap) => ({ id: String(cap), label: String(cap) }))}
+                    help={m.settings_review_cap_help()}
+                />
+            </SettingsSection>
 
-            {/* No microphone API (very old browsers, some webviews) means nothing
-                to listen with, so the whole panel is hidden. */}
-            {micStatus !== "unsupported" && (
-                <SettingsSection
-                    title={m.mic_heading()}
-                    hint={m.mic_hint()}
-                    icon={<MicIcon className={ICON} />}
-                >
-                    <MicConnect />
+            <SettingsSection
+                title={m.settings_appearance()}
+                hint={m.settings_appearance_hint()}
+                icon={<SlidersIcon className={ICON} />}
+            >
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-body">{m.settings_theme()}</span>
+                    <ThemeToggle />
+                </div>
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-body">{m.settings_language()}</span>
+                    <LanguageSwitcher />
+                </div>
+                {/* The on-screen keyboard's colours are an appearance choice too, so
+                they sit here rather than in a section of their own. */}
+                <SettingsSection title={m.settings_keyboard_theme()} level={3}>
+                    <KeyboardThemePicker />
                 </SettingsSection>
-            )}
+            </SettingsSection>
+
+            <ProgressBackup />
 
             <SettingsSection title={m.settings_help()} icon={<QuestionIcon className={ICON} />}>
                 <a
@@ -395,8 +401,6 @@ export default function Settings() {
                     {m.settings_get_help()} →
                 </a>
             </SettingsSection>
-
-            <ProgressBackup />
 
             <DangerZone />
         </main>
