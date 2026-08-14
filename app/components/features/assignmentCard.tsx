@@ -55,10 +55,14 @@ export function AssignmentStepList({
                     ) : (
                         <Link
                             to={`/play/${step.scoreId}`}
-                            className={`flex min-w-0 items-center gap-2 ${
+                            // Every step opens its piece, not only the one you are on, and
+                            // a row of plain text does not say so on a screen with no
+                            // hover. The same tinted row the library uses marks them as
+                            // things you can press.
+                            className={`flex min-w-0 items-center gap-2 rounded-md px-1.5 py-1 hover:bg-subtle ${
                                 step.status === "current"
                                     ? "font-medium text-accent-strong"
-                                    : "text-body hover:underline"
+                                    : "text-body"
                             }`}
                         >
                             <BakedIncipit
