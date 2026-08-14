@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { assignmentsReferencing } from "../../core/assignment";
-import type { LibraryItem } from "../../core/library";
+import { type LibraryItem, libraryOrder } from "../../core/library";
 import type { Mastery } from "../../core/mastery";
 import { gradeOf } from "../../core/scoreDifficulty";
 import { useServices } from "../contexts/services";
@@ -50,6 +50,8 @@ export function useLibraryItems() {
                         title: exercise.title,
                         composer: exercise.composer ?? "",
                         grade: exercise.grade,
+                        cost: exercise.cost,
+                        ...(exercise.incipit ? { incipit: exercise.incipit } : {}),
                         removable: false,
                         kind: exercise.kind,
                     })),
@@ -60,6 +62,10 @@ export function useLibraryItems() {
                         title: song.title,
                         composer: song.composer,
                         grade: song.grade,
+                        cost: song.cost,
+                        // Drawn in the row: the catalogue carries one per piece, so a
+                        // list of music can look like music without fetching anything.
+                        ...(song.incipit ? { incipit: song.incipit } : {}),
                         removable: false,
                         kind: "song" as const,
                     })),
@@ -69,7 +75,13 @@ export function useLibraryItems() {
         );
     }, [reloadLocal, services.mastery, services.songs.manifest, services.exercises.manifest]);
 
-    const items = useMemo(() => [...local, ...exercises, ...songs], [local, exercises, songs]);
+    // Gentlest first within each grade. Both manifests arrive in that order and
+    // concatenating them throws it away, which put a hundred and forty scales and studies
+    // in front of every piece of music on the shelf.
+    const items = useMemo(
+        () => libraryOrder([...local, ...exercises, ...songs]),
+        [local, exercises, songs],
+    );
 
     const remove = useCallback(
         (id: string) => {

@@ -7,6 +7,7 @@ import { m } from "../../paraglide/messages.js";
 import { IconButton } from "../ui/button";
 import { ConfirmButton } from "../ui/confirmButton";
 import { CheckIcon, ClockIcon, CloseIcon, StarIcon } from "../ui/icons";
+import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { GradeChip } from "./scoreGrade";
 
@@ -51,6 +52,10 @@ export function LibraryRow({
                 stretches over the whole card (after:inset-0); the composer link stacks
                 above the stretch (z-10) so it opens the person page instead. */}
             <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-subtle">
+                {/* The piece's opening bars, from the catalogue's own baked mark — so a
+                    shelf of three thousand titles reads as music, and a tune somebody
+                    half-remembers is recognisable before they can spell its name. */}
+                <BakedIncipit mark={item.incipit} label={item.title} className="text-faint" />
                 <span className="min-w-0 flex-1">
                     <Link
                         to={`/play/${item.id}`}

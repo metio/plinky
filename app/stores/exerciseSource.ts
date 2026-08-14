@@ -28,6 +28,9 @@ export type ExerciseMeta = {
     // Curated studies are public-domain transcriptions from PDMX (CC0); generated
     // scales/arpeggios are our own and carry no external licence.
     license?: string;
+    // The opening bars, encoded — baked by dev/bake-exercise-incipits.mts so a shelf can
+    // draw a scale's shape without generating it.
+    incipit?: string;
     tempo: number;
     beatsPerBar: number;
 };

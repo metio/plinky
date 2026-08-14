@@ -14,6 +14,12 @@ export type LibraryItem = {
     title: string;
     composer: string;
     grade: number;
+    // The playing effort the grade was binned from, so a grade's own pieces can be
+    // ordered gentlest first. Both manifests carry it; a local import is measured the
+    // same way. Absent means unmeasured, which sorts last within its grade.
+    cost?: number;
+    // The opening bars, encoded, where the catalogue carries them.
+    incipit?: string;
     removable: boolean;
     kind: LibraryKind;
 };
@@ -49,12 +55,33 @@ export type LibraryContext = {
 // An imported score can share a fingerprint id with a catalogue piece (import
 // only warns, it still saves), so the combined list keeps the first occurrence
 // of each id — a duplicate would collide as a React key and render twice.
+// What somebody types and what a title is spelled with are rarely the same string:
+// "hanschen" is how a reader without an umlaut key looks for Hänschen Klein, and 473 of
+// the catalogue's titles carry a mark of some kind. Folding both sides to their bare
+// letters means the search finds the piece either way, and costs nothing to anybody who
+// does type the accent.
+export function foldForSearch(text: string): string {
+    return (
+        text
+            .normalize("NFD")
+            // Only a Latin letter gives up its marks. A kana's dakuten is not an accent —
+            // it is what tells ハ from バ from パ — and folding those together would make
+            // three different syllables match each other.
+            .replace(/(\p{Script=Latin})\p{M}+/gu, "$1")
+            .replace(/[\u2018\u2019\u02bc]/g, "'")
+            // Put back together what was only taken apart to look at: a kana keeps its
+            // mark, and a folded string is comparable to one that never decomposed.
+            .normalize("NFC")
+            .toLowerCase()
+    );
+}
+
 export function filterLibrary(
     items: readonly LibraryItem[],
     filter: LibraryFilter,
     context: LibraryContext,
 ): LibraryItem[] {
-    const needle = filter.query.trim().toLowerCase();
+    const needle = foldForSearch(filter.query.trim());
     const seen = new Set<string>();
     return items.filter((item) => {
         if (seen.has(item.id)) {
@@ -80,10 +107,20 @@ export function filterLibrary(
             return true;
         }
         return (
-            item.title.toLowerCase().includes(needle) ||
-            item.composer.toLowerCase().includes(needle)
+            foldForSearch(item.title).includes(needle) ||
+            foldForSearch(item.composer).includes(needle)
         );
     });
+}
+
+// The order a shelf is read in: by grade, then gentlest first inside a grade — which is
+// what `cost` measures and what both manifests are already sorted by before they are
+// concatenated here. Without it the two bundled demos come first, then every scale and
+// study, and no piece of music appears until the third screen.
+export function libraryOrder(items: readonly LibraryItem[]): LibraryItem[] {
+    return [...items].sort(
+        (a, b) => a.grade - b.grade || (a.cost ?? Number.POSITIVE_INFINITY) - (b.cost ?? Number.POSITIVE_INFINITY) || a.title.localeCompare(b.title),
+    );
 }
 
 // One grade chip flips without touching its neighbours.
