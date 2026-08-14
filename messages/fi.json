@@ -740,6 +740,7 @@
     "board_follow": "Seuraa palvelussa {platform}",
     "today_assignment_set": "Tehtävästä ”{name}”",
     "today_assignment_step": "Tehtävästä ”{name}” — vaihe {step}/{total}",
+    "today_best_so_far": "paras arvosana toistaiseksi {best}, opittu arvosanalla {target}",
     "takes_download_video": "Tallenna video",
     "takes_download_video_portrait": "Tallenna pystyvideo (9:16, Reelsiä ja Shortsia varten)",
     "takes_video_progress": "Hahmonnetaan… {percent}%",

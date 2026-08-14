@@ -27,7 +27,11 @@ learn**, picked for the day. They are headings, not a list of chores: nothing co
 nothing ticks them off, and skipping one costs you nothing.
 
 Each row names the piece it opens, with the set it came from underneath, so you can see
-what pressing it will do before you press it.
+what pressing it will do before you press it — and where a piece stands, if you've played
+it: *best C so far, learned at A*. A step moves on when the piece counts as learned, and
+learned means a run reaching the grade you set in Settings, so playing something through
+once and finding it offered again is Plinky holding the door rather than ignoring you. It
+says so now instead of leaving you to guess.
 
 **What Plinky is** now has a permanent home at the top of the [about
 page](https://plinky.fun/en/about/), with the two of us below it. The front page still

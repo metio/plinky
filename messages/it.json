@@ -740,6 +740,7 @@
     "board_follow": "Segui su {platform}",
     "today_assignment_set": "Da “{name}”",
     "today_assignment_step": "Da “{name}” — passo {step} di {total}",
+    "today_best_so_far": "miglior voto finora {best}, imparato a partire da {target}",
     "takes_download_video": "Salva video",
     "takes_download_video_portrait": "Salva un video verticale (9:16, per Reels e Shorts)",
     "takes_video_progress": "Rendering… {percent}%",

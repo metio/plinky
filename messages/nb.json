@@ -740,6 +740,7 @@
     "board_follow": "Følg på {platform}",
     "today_assignment_set": "Fra «{name}»",
     "today_assignment_step": "Fra «{name}» — steg {step} av {total}",
+    "today_best_so_far": "beste karakter så langt {best}, lært ved {target}",
     "takes_download_video": "Lagre video",
     "takes_download_video_portrait": "Lagre en stående video (9:16, for Reels og Shorts)",
     "takes_video_progress": "Gjengir… {percent}%",

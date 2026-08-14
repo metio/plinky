@@ -740,6 +740,7 @@
     "board_follow": "在{platform}上关注",
     "today_assignment_set": "来自《{name}》",
     "today_assignment_step": "来自《{name}》——第 {step}/{total} 步",
+    "today_best_so_far": "目前最好 {best} 级，{target} 级算已掌握",
     "takes_download_video": "保存视频",
     "takes_download_video_portrait": "保存竖屏视频（9:16，适用于 Reels 和 Shorts）",
     "takes_video_progress": "正在渲染… {percent}%",

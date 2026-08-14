@@ -743,6 +743,7 @@
     "theme_aria": "Theme: {theme}. Click to change.",
     "today_assignment_set": "From “{name}”",
     "today_assignment_step": "From “{name}” — step {step} of {total}",
+    "today_best_so_far": "best {best} so far, learned at {target}",
     "today_moment_warmup": "Warm up",
     "today_moment_work": "Work on",
     "today_moment_learn": "Learn one thing",

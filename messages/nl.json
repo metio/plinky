@@ -740,6 +740,7 @@
     "board_follow": "Volgen op {platform}",
     "today_assignment_set": "Uit “{name}”",
     "today_assignment_step": "Uit “{name}” — stap {step} van {total}",
+    "today_best_so_far": "beste cijfer tot nu toe {best}, geleerd vanaf {target}",
     "takes_download_video": "Video opslaan",
     "takes_download_video_portrait": "Een staande video opslaan (9:16, voor Reels en Shorts)",
     "takes_video_progress": "Renderen… {percent}%",

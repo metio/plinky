@@ -739,6 +739,7 @@
     "board_follow": "{platform}에서 팔로우",
     "today_assignment_set": "“{name}”에서",
     "today_assignment_step": "“{name}”에서 — {step}/{total} 단계",
+    "today_best_so_far": "지금까지 최고 {best}등급, {target}등급이면 익힘",
     "takes_download_video": "동영상 저장",
     "takes_download_video_portrait": "세로 영상 저장 (9:16, 릴스·쇼츠용)",
     "takes_video_progress": "렌더링 중… {percent}%",

@@ -739,6 +739,7 @@
     "board_follow": "{platform}でフォロー",
     "today_assignment_set": "「{name}」から",
     "today_assignment_step": "「{name}」から — ステップ {step}/{total}",
+    "today_best_so_far": "これまでのベスト {best}、{target} で習得済み",
     "takes_download_video": "動画を保存",
     "takes_download_video_portrait": "縦型動画を保存（9:16、リール・ショート向け）",
     "takes_video_progress": "書き出し中… {percent}%",

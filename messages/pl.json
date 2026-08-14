@@ -740,6 +740,7 @@
     "board_follow": "Obserwuj na {platform}",
     "today_assignment_set": "Z zadania „{name}”",
     "today_assignment_step": "Z zadania „{name}” — krok {step} z {total}",
+    "today_best_so_far": "najlepsza ocena jak dotąd {best}, opanowany przy {target}",
     "takes_download_video": "Zapisz wideo",
     "takes_download_video_portrait": "Zapisz pionowe wideo (9:16, do Reels i Shorts)",
     "takes_video_progress": "Renderowanie… {percent}%",

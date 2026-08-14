@@ -740,6 +740,7 @@
     "board_follow": "Seguir en {platform}",
     "today_assignment_set": "De «{name}»",
     "today_assignment_step": "De «{name}» — paso {step} de {total}",
+    "today_best_so_far": "mejor nota hasta ahora {best}, aprendida a partir de {target}",
     "takes_download_video": "Guardar vídeo",
     "takes_download_video_portrait": "Guardar un vídeo vertical (9:16, para Reels y Shorts)",
     "takes_video_progress": "Generando… {percent}%",

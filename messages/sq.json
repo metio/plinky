@@ -739,6 +739,7 @@
     "board_follow": "Ndiq në {platform}",
     "today_assignment_set": "Nga detyra “{name}”",
     "today_assignment_step": "Nga detyra “{name}” — hapi {step} nga {total}",
+    "today_best_so_far": "nota më e mirë deri tani {best}, e mësuar te {target}",
     "takes_download_video": "Ruaj videon",
     "takes_download_video_portrait": "Ruaj një video vertikale (9:16, për Reels dhe Shorts)",
     "takes_video_progress": "Duke përpunuar… {percent}%",

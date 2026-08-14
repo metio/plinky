@@ -739,6 +739,7 @@
     "board_follow": "Követés itt: {platform}",
     "today_assignment_set": "„{name}” feladatból",
     "today_assignment_step": "„{name}” feladatból — {step}/{total}. lépés",
+    "today_best_so_far": "eddigi legjobb {best}, {target} osztályzatnál megtanulva",
     "takes_download_video": "Videó mentése",
     "takes_download_video_portrait": "Álló videó mentése (9:16, Reels és Shorts számára)",
     "takes_video_progress": "Renderelés… {percent}%",

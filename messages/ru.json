@@ -739,6 +739,7 @@
     "board_follow": "Подписаться в {platform}",
     "today_assignment_set": "Из задания «{name}»",
     "today_assignment_step": "Из задания «{name}» — шаг {step} из {total}",
+    "today_best_so_far": "лучшая оценка пока что {best}, выучено при {target}",
     "takes_download_video": "Сохранить видео",
     "takes_download_video_portrait": "Сохранить вертикальное видео (9:16, для Reels и Shorts)",
     "takes_video_progress": "Рендеринг… {percent}%",
