@@ -16,7 +16,6 @@ import {
     SEMITONES,
 } from "../../../core/keyMap";
 import { type PedalKind, PEDAL_KINDS } from "../../../core/pedals";
-import { useOnboardingStore } from "../../contexts/services";
 import { usePrefs } from "../../hooks/usePrefs";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
@@ -44,17 +43,11 @@ type Arming = { kind: "note"; hand: Hand; semitone: number } | { kind: "pedal"; 
 export function KeyMapping() {
     const { prefs, update } = usePrefs();
     const map = prefs.keyMap;
-    const onboarding = useOnboardingStore();
     // The slot or pedal currently listening for a key, or null when idle.
     const [arming, setArming] = useState<Arming | null>(null);
     // Set when a pedal bind is refused because the pressed key already plays a note, so the
     // editor can say why rather than appearing to swallow the keystroke.
     const [pedalClash, setPedalClash] = useState(false);
-
-    // Engaging with the editor — arming a cap to rebind, or resetting to the standard
-    // layout — ticks off the "set up your keys" discovery step, so a player content with
-    // the defaults completes it too, not only one who lands on a non-default binding.
-    const markEngaged = () => onboarding.markDiscovered("keysCustomized");
 
     const persist = useCallback((next: KeyMap) => update({ keyMap: next }), [update]);
 
@@ -123,7 +116,6 @@ export function KeyMapping() {
                                     key={semitone}
                                     type="button"
                                     onClick={() => {
-                                        markEngaged();
                                         setPedalClash(false);
                                         setArming(armed ? null : { kind: "note", hand, semitone });
                                     }}
@@ -160,7 +152,6 @@ export function KeyMapping() {
                                 key={pedal}
                                 type="button"
                                 onClick={() => {
-                                    markEngaged();
                                     setPedalClash(false);
                                     setArming(armed ? null : { kind: "pedal", pedal });
                                 }}
@@ -197,7 +188,6 @@ export function KeyMapping() {
                 <Button
                     variant="secondary"
                     onClick={() => {
-                        markEngaged();
                         setArming(null);
                         persist(DEFAULT_KEY_MAP);
                     }}

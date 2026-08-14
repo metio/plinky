@@ -34,7 +34,7 @@ const COMPOSE_REACH: Span = { from: 21, to: 108 };
 const KEYBOARD_SPAN = 24;
 
 export default function Compose() {
-    const onboarding = useOnboardingStore();
+    const _onboarding = useOnboardingStore();
     const [searchParams] = useSearchParams();
     const [title, setTitle] = useState("Improvisation");
     const [tempo, setTempo] = useState(120);
@@ -48,7 +48,6 @@ export default function Compose() {
 
     const recorder = useCompositionRecorder({
         // The first recorded note means the player has tried composing.
-        onFirstNote: () => onboarding.markDiscovered("composed"),
         // Slide the on-screen keyboard to keep what's being played in view.
         onPitch: (note) =>
             setKeyWindow((prev) => followKeyboardWindow(prev, note, KEYBOARD_SPAN, COMPOSE_REACH)),

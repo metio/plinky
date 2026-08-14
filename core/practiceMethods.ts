@@ -41,15 +41,3 @@ export const METHODS: PracticeMethod[] = [
     { id: "interleaving", minutes: 15, href: "/review/" },
     { id: "spacing", minutes: 10, href: "/you/" },
 ];
-
-export function methodById(id: string): PracticeMethod | null {
-    return METHODS.find((method) => method.id === id) ?? null;
-}
-
-// The methods that fit in the time available, shortest first. A player with ten
-// minutes should not be handed the fifteen-minute one and told to hurry.
-export function methodsWithin(minutes: number): PracticeMethod[] {
-    return METHODS.filter((method) => method.minutes <= minutes).sort(
-        (left, right) => left.minutes - right.minutes,
-    );
-}
