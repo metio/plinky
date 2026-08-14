@@ -59,6 +59,16 @@ function cloneMap(map: KeyMap): KeyMap {
 
 // The pedal a key works, or null when it works none — the input layer's lookup, the
 // mirror of keyToNote for pedals.
+// The label printed on a key cap in the mapping editor: an unbound slot shows a dash,
+// the space bar shows the glyph for it (a blank cap reads as broken), and every other key
+// shows uppercased, the way it is printed on the keyboard itself.
+export function keyCapOf(key: string | null): string {
+    if (key === null) {
+        return "—";
+    }
+    return key === " " ? "␣" : key.toUpperCase();
+}
+
 export function pedalForKey(map: KeyMap, key: string): PedalKind | null {
     const lower = key.toLowerCase();
     return PEDAL_KINDS.find((kind) => map.pedals[kind] === lower) ?? null;

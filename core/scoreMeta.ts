@@ -3,6 +3,10 @@
 
 import type { XmlCodec } from "./xml";
 
+// What a document with no work or movement title reads as. It is a placeholder rather
+// than a title, so a screen that lets somebody name the piece starts from an empty box.
+export const NO_TITLE = "Untitled";
+
 // The metadata a score needs from its MusicXML: what the catalogue shows and
 // what the count-in and playback math run on.
 export type ScoreMeta = { title: string; composer: string; tempo: number; beatsPerBar: number };
@@ -49,7 +53,7 @@ export function readScoreMetaFromText(xml: string): ScoreMeta {
     const title =
         pick(/<work-title>([\s\S]*?)<\/work-title>/) ||
         pick(/<movement-title>([\s\S]*?)<\/movement-title>/) ||
-        "Untitled";
+        NO_TITLE;
     return {
         title,
         composer: pick(/<creator\b[^>]{0,500}type="composer"[^>]{0,500}>([\s\S]*?)<\/creator>/),
@@ -69,7 +73,7 @@ export function readScoreMeta(codec: XmlCodec, xml: string): ScoreMeta {
     const title =
         doc.querySelector("work-title")?.textContent?.trim() ||
         doc.querySelector("movement-title")?.textContent?.trim() ||
-        "Untitled";
+        NO_TITLE;
     const composer = doc.querySelector('creator[type="composer"]')?.textContent?.trim() || "";
     const beats = Number(doc.querySelector("time > beats")?.textContent);
     // A non-numeric tempo attribute (e.g. "andante") would otherwise feed NaN into

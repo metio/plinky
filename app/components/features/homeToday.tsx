@@ -8,6 +8,8 @@ import { dailyNumber, todayKey } from "../../../core/daily";
 import { partOfDay } from "../../../core/greeting";
 import { buildExerciseId, keyName } from "../../../core/exerciseGen";
 import { type Letter, letterFor } from "../../../core/grade";
+import { summarizePractice } from "../../../core/history";
+import { type Standing, type StandingPart, standingParts } from "../../../core/standing";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
@@ -27,6 +29,7 @@ import { SurpriseButton } from "./surpriseButton";
 import {
     useAssignmentsStore,
     useExerciseSource,
+    useHistoryStore,
     useMasteryStore,
     useOnboardingStore,
     usePlacementStore,
@@ -233,27 +236,20 @@ const GREETING = {
 // music gets harder, and how much is on the stand. It answers "how am I doing" without
 // asking anybody to go and look, and it is a description rather than a target — no
 // progress bar, nothing to fill.
-type Standing = { level: number; skill: number; onStand: number };
+// The line under the greeting: core decides what there is to say, this says it.
+const STANDING_PART: Record<StandingPart, (standing: Standing) => string> = {
+    grade: ({ level }) => m.grade_label({ level }),
+    "not-graded": () => m.grades_not_started(),
+    skill: ({ skill }) => m.grades_skill({ rating: skill }),
+    stand: ({ onStand }) =>
+        onStand === 1 ? m.today_stand_one({ count: 1 }) : m.today_stand_other({ count: onStand }),
+    notes: ({ notes }) => m.achievement_notes({ count: notes }),
+};
 
-function standingLine({ level, skill, onStand }: Standing): string {
-    // Only what there is. A first visit read "Not graded yet · Skill 0 · 0 pieces on the
-    // stand" — three ways of saying you have not started, under a line that had just
-    // said hello. Where nothing has happened yet the greeting stands on its own.
-    const parts: string[] = [];
-    if (level > 0) {
-        parts.push(m.grade_label({ level }));
-    }
-    if (skill > 0) {
-        parts.push(m.grades_skill({ rating: skill }));
-    }
-    if (onStand > 0) {
-        parts.push(
-            onStand === 1
-                ? m.today_stand_one({ count: 1 })
-                : m.today_stand_other({ count: onStand }),
-        );
-    }
-    return parts.join(" · ");
+function standingLine(standing: Standing): string {
+    return standingParts(standing)
+        .map((part) => STANDING_PART[part](standing))
+        .join(" · ");
 }
 
 type Session = {
@@ -284,6 +280,7 @@ export function HomeToday() {
     const prefsStore = usePrefsStore();
     const assignmentsStore = useAssignmentsStore();
     const masteryStore = useMasteryStore();
+    const history = useHistoryStore();
     const onboarding = useOnboardingStore();
     const placement = usePlacementStore();
     const theory = useTheoryStore();
@@ -378,6 +375,7 @@ export function HomeToday() {
                     // What is on the stand: everything learned and not shelved — the
                     // same set the grades count, so the line agrees with the You page.
                     onStand: mastered.size,
+                    notes: summarizePractice(history.load(), new Date(now)).totalNotes,
                 },
                 titles: new Map(catalogue.map((item) => [item.id, item.title])),
                 bests: new Map(
@@ -399,6 +397,7 @@ export function HomeToday() {
         prefsStore.load,
         assignmentsStore.list,
         exercises.manifest,
+        history.load,
         masteryStore.load,
         onboarding.marked,
         placement.load,

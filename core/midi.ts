@@ -50,6 +50,14 @@ export function pitchClass(note: number): string {
     return PITCH_CLASSES[((note % 12) + 12) % 12]!;
 }
 
+// A pitch as a screen reader should say it: "C sharp 4", not "C♯4". The glyph is
+// announced as "number" or read as nothing at all, and an octave digit run onto the
+// letter is spoken as one word, so both are spelled out.
+export function spokenPitch(note: number): string {
+    const octave = Math.floor(note / 12) - 1;
+    return `${pitchClass(note).replace("♯", " sharp")} ${octave}`;
+}
+
 // The MIDI control-change number each pedal speaks on: sustain 64, sostenuto 66, soft 67.
 const PEDAL_CC: Record<number, PedalKind> = { 64: "sustain", 66: "sostenuto", 67: "soft" };
 

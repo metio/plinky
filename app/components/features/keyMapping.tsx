@@ -7,6 +7,7 @@ import {
     type Hand,
     HANDS,
     type KeyMap,
+    keyCapOf,
     keyForSlot,
     keyPlaysNote,
     NOTE_LABELS,
@@ -34,15 +35,6 @@ const PEDAL_LABEL: Record<PedalKind, () => string> = {
 // What the editor is currently listening for a key to bind — a hand's note slot, or a
 // pedal — or null when idle.
 type Arming = { kind: "note"; hand: Hand; semitone: number } | { kind: "pedal"; pedal: PedalKind };
-
-// The label shown on a key cap. The space key prints as a word so it isn't a blank
-// cap; everything else shows uppercased, the way it's printed on a real keyboard.
-function keyCap(key: string | null): string {
-    if (key === null) {
-        return "—";
-    }
-    return key === " " ? "␣" : key.toUpperCase();
-}
 
 // Remap which computer key plays each note, per hand. Each note is a cap showing its
 // current key; clicking it arms the cap, and the next key pressed becomes its binding.
@@ -150,7 +142,7 @@ export function KeyMapping() {
                                         {NOTE_LABELS[semitone]}
                                     </span>
                                     <span className="font-mono text-sm font-semibold">
-                                        {armed ? "…" : keyCap(keyForSlot(map, hand, semitone))}
+                                        {armed ? "…" : keyCapOf(keyForSlot(map, hand, semitone))}
                                     </span>
                                 </button>
                             );
@@ -184,7 +176,7 @@ export function KeyMapping() {
                                     {PEDAL_LABEL[pedal]()}
                                 </span>
                                 <span className="font-mono text-sm font-semibold">
-                                    {armed ? "…" : keyCap(map.pedals[pedal])}
+                                    {armed ? "…" : keyCapOf(map.pedals[pedal])}
                                 </span>
                             </button>
                         );

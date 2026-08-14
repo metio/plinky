@@ -10,6 +10,9 @@
 // the first. The generator, the exercise builder, the transposer, the MusicXML
 // writer and the fingering scorer each had one.
 
+import { pitchClass } from "./midi";
+import type { NoteLabels } from "./prefs";
+
 // The seven natural letters, in the order a scale walks them.
 export const LETTERS = ["C", "D", "E", "F", "G", "A", "B"];
 
@@ -58,6 +61,30 @@ export function solfegeOf(midi: number): SolfegeName {
     const degree = SOLFEGE_DEGREE[pc] ?? 0;
     // A pitch class sharing its degree with the one below it is that note raised.
     return { degree, sharp: pc > 0 && SOLFEGE_DEGREE[pc - 1] === degree };
+}
+
+// What to print on a piano key, given how much naming the player has asked for. "all"
+// letters every key; "c" prints only on the C keys, the landmark that orients a beginner;
+// "solfege" names every key the way a reader raised on do-re-mi already thinks of it;
+// "off" prints nothing. The solfège syllables are spelled differently from one language
+// to the next, so this returns which syllable and the caller names it.
+export type KeyLabel =
+    | { kind: "letter"; letter: string }
+    | { kind: "solfege"; degree: number; sharp: boolean }
+    | null;
+
+export function keyLabelOf(midi: number, labels: NoteLabels): KeyLabel {
+    const pc = ((midi % 12) + 12) % 12;
+    if (labels === "all") {
+        return { kind: "letter", letter: pitchClass(midi) };
+    }
+    if (labels === "c") {
+        return pc === 0 ? { kind: "letter", letter: "C" } : null;
+    }
+    if (labels === "solfege") {
+        return { kind: "solfege", ...solfegeOf(midi) };
+    }
+    return null;
 }
 
 // The MIDI number for a written pitch. Octave 4 holds middle C (MIDI 60), the

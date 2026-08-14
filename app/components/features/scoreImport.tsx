@@ -4,9 +4,15 @@
 import { useState } from "react";
 import { readScoreFile } from "../../../core/musicxmlFile";
 import { gradeOf } from "../../../core/scoreDifficulty";
+import {
+    hasPitchedNotes,
+    importTempo,
+    seedTitle,
+    TEMPO_MAX,
+    TEMPO_MIN,
+} from "../../../core/scoreImport";
 import { readScoreMeta } from "../../../core/scoreMeta";
 import { songId } from "../../../core/songId";
-import type { XmlCodec } from "../../../core/xml";
 import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../../contexts/services";
 import { loadCatalog, type Score, saveUserScore } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
@@ -17,12 +23,6 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { GradeChip } from "./scoreGrade";
 import { StaffPreview } from "./staffPreview";
 
-// Accept anything that parses as MusicXML with at least one pitched note; OSMD
-// renders whatever it can, so the bar for import is just "has notes".
-function looksPlayable(codec: XmlCodec, xml: string): boolean {
-    return codec.parse(xml)?.querySelector("note > pitch") != null;
-}
-
 // What a dropped file becomes once read and parsed: the MusicXML plus the editable
 // fields, seeded from the score's own metadata, that the player confirms or amends.
 type Draft = {
@@ -30,6 +30,9 @@ type Draft = {
     title: string;
     composer: string;
     tempo: string;
+    // What the score itself is marked at, kept beside the editable field so emptying the
+    // box falls back to the figure it started with.
+    marked: number;
     description: string;
     beatsPerBar: number;
     grade: number;
@@ -64,7 +67,7 @@ export function ScoreImport() {
             setError(m.import_read_error());
             return;
         }
-        if (!looksPlayable(xmlCodec, xml)) {
+        if (!hasPitchedNotes(xmlCodec, xml)) {
             setError(m.import_no_notes());
             return;
         }
@@ -78,9 +81,10 @@ export function ScoreImport() {
         const meta = readScoreMeta(xmlCodec, xml);
         setDraft({
             xml,
-            title: meta.title === "Untitled" ? "" : meta.title,
+            title: seedTitle(meta.title),
             composer: meta.composer,
             tempo: String(meta.tempo),
+            marked: meta.tempo,
             description: "",
             beatsPerBar: meta.beatsPerBar,
             // Grade by the content fingerprint, the same id the score is saved under and the
@@ -101,7 +105,6 @@ export function ScoreImport() {
             return;
         }
         const title = draft.title.trim() || m.import_untitled();
-        const tempo = Number(draft.tempo);
         const score: Score = {
             // The id is the content fingerprint, so re-importing the same file (or one the
             // catalogue already has) resolves to the same piece rather than a duplicate.
@@ -110,7 +113,7 @@ export function ScoreImport() {
             composer: draft.composer.trim(),
             description: draft.description.trim(),
             xml: draft.xml,
-            tempo: Number.isFinite(tempo) && tempo > 0 ? Math.round(tempo) : 90,
+            tempo: importTempo(draft.tempo, draft.marked),
             beatsPerBar: draft.beatsPerBar,
             bundled: false,
         };
@@ -225,8 +228,8 @@ export function ScoreImport() {
                                     </span>
                                     <input
                                         type="number"
-                                        min={20}
-                                        max={400}
+                                        min={TEMPO_MIN}
+                                        max={TEMPO_MAX}
                                         className={FIELD}
                                         value={draft.tempo}
                                         onChange={(event) => set({ tempo: event.target.value })}

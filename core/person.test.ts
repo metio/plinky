@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { canonicalComposer, peopleFrom, personFor, personSlug } from "./person";
+import {
+    canonicalComposer,
+    nameFromSlug,
+    peopleFrom,
+    personFor,
+    personSlug,
+} from "./person";
 
 // Spellings lifted verbatim from the shipped manifest — the whole point of the
 // canonicalization is that these real variants land on one name.
@@ -188,5 +194,25 @@ describe("an arrangement's aside is not a claim about who wrote it", () => {
         for (const credit of ["Gregorian chant", "Volkslied", "Traditional", "Anonymous"]) {
             expect(personSlug(credit)).toBe("");
         }
+    });
+});
+
+describe("nameFromSlug", () => {
+    it("reads a slug back as words, for a composer the catalogue credits nobody by", () => {
+        expect(nameFromSlug("clara-schumann")).toBe("Clara Schumann");
+        expect(nameFromSlug("bach")).toBe("Bach");
+    });
+
+    it("survives the shapes a hand-typed URL arrives in", () => {
+        expect(nameFromSlug("")).toBe("");
+        expect(nameFromSlug("-")).toBe("");
+        expect(nameFromSlug("--erik--satie--")).toBe("Erik Satie");
+    });
+
+    it("round-trips a slug this very module made, up to the diacritics it dropped", () => {
+        // personSlug strips accents and case, so the name cannot come back whole. What
+        // must come back is the word boundaries: a page title of "Faure" is a spelling a
+        // reader forgives, "faure" is not.
+        expect(nameFromSlug(personSlug("Gabriel Faur\u00e9"))).toBe("Gabriel Faure");
     });
 });
