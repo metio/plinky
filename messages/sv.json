@@ -7,6 +7,8 @@
     "library_intro": "Låtar, skalor och arpeggion, etyder, och allt du själv har tagit med dig — allt på ett ställe.",
     "library_tab_search": "Sök",
     "library_tab_manage": "Hantera",
+    "library_tab_people": "Tonsättare",
+    "library_people_hint": "Alla som katalogen anger, och vad av deras du kan spela.",
     "library_tabs_label": "Musiksektioner",
     "library_show_more": "Visa mer",
     "library_filter_due": "⏰ Dags nu",

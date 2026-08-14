@@ -7,6 +7,8 @@
     "library_intro": "곡, 음계와 아르페지오, 연습곡, 그리고 직접 가져온 악보까지 — 모두 한곳에 있어요.",
     "library_tab_search": "검색",
     "library_tab_manage": "관리",
+    "library_tab_people": "작곡가",
+    "library_people_hint": "카탈로그가 밝힌 모든 사람과, 그중 연주할 수 있는 곡.",
     "library_tabs_label": "음악 섹션",
     "library_show_more": "더 보기",
     "library_filter_due": "⏰ 복습 시간",

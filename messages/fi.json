@@ -7,6 +7,8 @@
     "library_intro": "Kappaleet, asteikot ja arpeggiot, etydit ja kaikki itse tuomasi — samassa paikassa.",
     "library_tab_search": "Haku",
     "library_tab_manage": "Hallinnoi",
+    "library_tab_people": "Säveltäjät",
+    "library_people_hint": "Kaikki, jotka luettelo mainitsee, ja mitä heiltä voit soittaa.",
     "library_tabs_label": "Musiikin osiot",
     "library_show_more": "Näytä lisää",
     "library_filter_due": "⏰ Kerrattavaa nyt",

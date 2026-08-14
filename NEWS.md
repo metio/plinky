@@ -107,6 +107,12 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Music has a Composers tab.** Seven hundred and fifty people are credited in the
+catalogue, each with a page of their own — and the only way to reach one was to find a
+piece of theirs first, which is backwards if what you want is "something by Satie". They
+are all listed now, alphabetically, with how much of theirs there is to play, and the same
+search box finds a person or a piece: type "faure" and you get Fauré either way.
+
 **Cards look like each other.** A lesson, a tool, a way to practise and a badge were four
 hand-drawn panels at four different corner radii, so a card's shape meant nothing. They
 share one now, with one hairline and one ground, and the title inside a card is one rank
