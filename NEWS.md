@@ -107,6 +107,10 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Every step of an assignment opens its piece.** They always did, but only the step you
+were on looked like a link — the rest were plain text that underlined on hover, which a
+touch screen never shows. Each one now sits in the same tinted row the library uses.
+
 **Tapping a mark in the glossary takes you to it.** On a phone the list of marks and the
 explanation stack, so reading down the list leaves the explanation behind you — and
 tapping a mark changed something you could not see. It comes to you now, and on a wide
