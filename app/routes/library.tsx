@@ -74,7 +74,7 @@ export default function LibraryRoute() {
     const { matches, visible } = filters;
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 {/* The page is named for the tab that leads here: a bar that teaches a
                     model only works while the place agrees with the word on it. */}

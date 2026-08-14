@@ -76,7 +76,7 @@ export function ReviewSession() {
     // Landing here early should reward the curiosity, not dead-end it.
     if (total === 0) {
         return (
-            <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
+            <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                     {m.review_heading()}
                 </h1>
@@ -96,7 +96,7 @@ export function ReviewSession() {
 
     if (done) {
         return (
-            <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
+            <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                     🎉 {m.review_complete_heading()}
                 </h1>
@@ -139,7 +139,7 @@ export function ReviewSession() {
     const ear = current?.kind === "ear" ? earItemById(current.id) : undefined;
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h1 className="font-display text-3xl font-semibold tracking-tight">
