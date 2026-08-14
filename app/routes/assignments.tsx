@@ -156,7 +156,12 @@ export default function AssignmentsRoute() {
         );
 
     const steps = (list: AssignmentSteps) => (
-        <AssignmentStepList steps={list} titleOf={titleOf} isMissing={known.isMissing} />
+        <AssignmentStepList
+            steps={list}
+            titleOf={titleOf}
+            isMissing={known.isMissing}
+            incipitOf={known.incipitOf}
+        />
     );
 
     const onSave = () => {
