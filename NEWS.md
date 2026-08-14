@@ -107,6 +107,10 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Music opens on the music.** The card offering to write your own piece sat above the
+search box, so the first thing on the shelf led away from it. It is now at the foot,
+after the looking, and the page says what it is in one line instead of three.
+
 **Scales and arpeggios are named in your language.** Every generated exercise was
 titled in English wherever it appeared — the library, today's warm-up, an assignment
 step, the page you played it on — so "C major scale · both hands" turned up in the

@@ -32,9 +32,9 @@ export function meta(_args: Route.MetaArgs) {
 type LibraryTab = "search" | "manage";
 
 // Music is everything there is to play, and the catalogue is only half of it: the
-// other half is what you make yourself. Compose used to be a home-page tile, which
-// left the shelf looking like a catalogue and nothing else. (A set of pieces in a
-// deliberate order is a course of study, so assignments live on Learn.)
+// other half is what you make yourself, which is why writing your own sits on the shelf
+// rather than on the home page. (A set of pieces in a deliberate order is a course of
+// study, so assignments live on Learn.)
 const SHELVES = [
     {
         to: "/compose",
@@ -83,17 +83,6 @@ export default function LibraryRoute() {
                 </h1>
                 <p className="text-sm text-muted">{m.library_intro()}</p>
             </header>
-
-            <HubList
-                entries={SHELVES.map((shelf) => ({
-                    ...shelf,
-                    label: shelf.label(),
-                    blurb: shelf.blurb(),
-                }))}
-                onEnter={(note) =>
-                    synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
-                }
-            />
 
             <SegmentedControl
                 options={[
@@ -192,6 +181,20 @@ export default function LibraryRoute() {
                     )}
                 </>
             )}
+
+            {/* Last, because it leads away: somebody arriving at the shelf came to find
+                something to play, and the offer to write your own belongs after the
+                looking rather than in front of it. */}
+            <HubList
+                entries={SHELVES.map((shelf) => ({
+                    ...shelf,
+                    label: shelf.label(),
+                    blurb: shelf.blurb(),
+                }))}
+                onEnter={(note) =>
+                    synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
+                }
+            />
         </main>
     );
 }
