@@ -22,6 +22,7 @@ import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/theory";
 import { sectionHeadingClasses } from "../components/ui/classes";
 import { PageHeader } from "../components/ui/pageHeader";
+import { Card } from "../components/ui/card";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -129,21 +130,22 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
     return (
         // The id is what the day's practice points at when it offers the next lesson,
         // so the reader lands on the lesson rather than on the top of the course.
-        <li
-            id={lesson.id}
-            className="scroll-mt-20 space-y-3 rounded-lg border border-line bg-surface p-4"
-        >
-            <div className="flex flex-wrap items-baseline gap-x-3">
-                <span className="font-mono text-xs tabular-nums text-muted">{index}</span>
-                <h3 className="font-medium text-body">{LESSON_TITLE[lesson.id]?.()}</h3>
-            </div>
-            <p className="max-w-prose text-sm leading-relaxed text-body">
-                {LESSON_BODY[lesson.id]?.()}
-            </p>
-            {/* Hearing the idea is what meeting the lesson means, so playing it is what
+        <li id={lesson.id} className="scroll-mt-20">
+            <Card className="space-y-3">
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                    <span className="font-mono text-xs tabular-nums text-muted">{index}</span>
+                    <h3 className="text-base font-semibold text-ink">
+                        {LESSON_TITLE[lesson.id]?.()}
+                    </h3>
+                </div>
+                <p className="max-w-prose text-sm leading-relaxed text-body">
+                    {LESSON_BODY[lesson.id]?.()}
+                </p>
+                {/* Hearing the idea is what meeting the lesson means, so playing it is what
                 records it — there is nothing to tick, and the course never asks the
                 reader to mark their own homework. */}
-            <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
+                <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
+            </Card>
         </li>
     );
 }

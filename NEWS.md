@@ -107,6 +107,13 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Cards look like each other.** A lesson, a tool, a way to practise and a badge were four
+hand-drawn panels at four different corner radii, so a card's shape meant nothing. They
+share one now, with one hairline and one ground, and the title inside a card is one rank
+rather than three. A composer's page also draws the grade the way every other list does,
+and drops the licence code on a phone, where sixty rows of "CC0-1.0" were taking the width
+the titles needed.
+
 **Your recordings have a home.** A take was only ever reachable from the piece it was
 recorded on — you had to remember which piece, find it, open it and switch tabs, and if
 the title had gone from your head the recording was gone with it. Music's second tab now
