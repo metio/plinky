@@ -328,7 +328,10 @@ const BUDGET_VENDOR_KB = 324;
 // 342. Your own recordings are listed on the shelf — a piece was the only way to reach
 // one, so a take whose title you had forgotten was unreachable — and Today's setup steps
 // moved into the three moments, which cost a component and gave one back.
-const BUDGET_APP_KB = 342;
+// 343. One Card and one PageHeader replaced eight hand-rolled panels and twenty-two
+// title blocks. A shared component costs a little more than the markup it replaces, and
+// buys a page that cannot drift again.
+const BUDGET_APP_KB = 343;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
