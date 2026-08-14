@@ -274,7 +274,9 @@ export function PracticeReport({
     return (
         <section className="space-y-4">
             <div className="space-y-1">
-                <h2 className="text-sm font-medium text-body">{m.practice_report_title()}</h2>
+                <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
+                    {m.practice_report_title()}
+                </h2>
                 <p className="text-xs text-muted">{m.practice_report_intro()}</p>
             </div>
 

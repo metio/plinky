@@ -57,6 +57,10 @@ Practice methods stop promising more than they can give, too. Three of the six a
 with a control inside a run's set-up panel, and their button said "Try it" and landed on
 the catalogue; they now offer what they actually can — a piece to try it on.
 
+**The help page shows the app you're actually using.** Its pictures were taken by hand
+and had drifted a long way behind — a navigation bar and a colour scheme Plinky stopped
+having. They're taken from a real build now, so they can't drift again.
+
 **The same page, wherever you are.** Every page's own name is now set the same way and in
 the same place, section headings look the same whether they are on the front page, in a
 run's set-up panel or in Settings, and lists of music are lists rather than grids of

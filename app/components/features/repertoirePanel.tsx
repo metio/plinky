@@ -51,7 +51,9 @@ export function RepertoirePanel({ items, now }: { items: GradedMastery[]; now: D
     return (
         <section className="space-y-3">
             <div className="space-y-1">
-                <h2 className="text-sm font-medium text-body">{m.repertoire_title()}</h2>
+                <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
+                    {m.repertoire_title()}
+                </h2>
                 <p className="text-xs text-muted">{m.repertoire_intro()}</p>
             </div>
             <ul className="space-y-2">

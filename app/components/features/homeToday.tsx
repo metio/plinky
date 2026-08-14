@@ -225,11 +225,24 @@ const GREETING = {
 type Standing = { level: number; skill: number; onStand: number };
 
 function standingLine({ level, skill, onStand }: Standing): string {
-    return [
-        level === 0 ? m.grades_not_started() : m.grade_label({ level }),
-        m.grades_skill({ rating: skill }),
-        onStand === 1 ? m.today_stand_one({ count: 1 }) : m.today_stand_other({ count: onStand }),
-    ].join(" · ");
+    // Only what there is. A first visit read "Not graded yet · Skill 0 · 0 pieces on the
+    // stand" — three ways of saying you have not started, under a line that had just
+    // said hello. Where nothing has happened yet the greeting stands on its own.
+    const parts: string[] = [];
+    if (level > 0) {
+        parts.push(m.grade_label({ level }));
+    }
+    if (skill > 0) {
+        parts.push(m.grades_skill({ rating: skill }));
+    }
+    if (onStand > 0) {
+        parts.push(
+            onStand === 1
+                ? m.today_stand_one({ count: 1 })
+                : m.today_stand_other({ count: onStand }),
+        );
+    }
+    return parts.join(" · ");
 }
 
 type Session = {
