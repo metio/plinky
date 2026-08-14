@@ -107,6 +107,12 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**An empty screen looks like an empty screen.** "Nothing here yet, and here's how to
+start" was drawn four different ways — a centred box on ear training, a bare button on the
+placement test, two underlined links and no button on the review session, one muted
+sentence on assignments. Same moment, one shape now: the page's own left edge, a line
+saying what it means, and something to press.
+
 **The score pack says what it is not.** Downloading your scores from Music reads as "my
 progress is safe" — it is sheet music and nothing else, and grades, recordings and
 settings live in the whole-device backup in Settings. The block now says so, and links
