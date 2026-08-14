@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
 import { partOfDay } from "../../../core/greeting";
-import { buildExerciseId } from "../../../core/exerciseGen";
+import { buildExerciseId, keyName } from "../../../core/exerciseGen";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
@@ -129,22 +129,10 @@ function Moment({ label, children }: { label: string; children: ReactNode }) {
 // One press, one start. `lead` marks the day's own thing — the challenge everybody
 // gets, while it is still unopened — which is the only reason to weigh one of these
 // more than the others.
-function Chip({
-    to,
-    lead = false,
-    label,
-    children,
-}: {
-    to: string;
-    lead?: boolean;
-    // The accessible name, when the visible text is not the whole of it.
-    label?: string;
-    children: ReactNode;
-}) {
+function Chip({ to, lead = false, children }: { to: string; lead?: boolean; children: ReactNode }) {
     return (
         <Link
             to={to}
-            aria-label={label}
             className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
                 lead
                     ? "border-spark bg-spark-surface text-spark-strong hover:border-spark-strong"
@@ -432,14 +420,14 @@ export function HomeToday() {
                         </Chip>
                     )}
                     {/* The endless ladder is one of the four, not a billboard beside
-                        them: its name, and the rung you are on as a quiet number. */}
-                    <Chip
-                        to={`/play/${arcadeId}`}
-                        label={m.arcade_play({ level: session.arcadeLevel })}
-                    >
+                        them. It used to carry the rung as a number, which told a reader
+                        nothing: the ladder has no end, so seven is not seven of
+                        anything. The key it is about to ask for is what a sight-reader
+                        actually wants to know before pressing it. */}
+                    <Chip to={`/play/${arcadeId}`}>
                         {m.arcade_title()}
-                        <span className="rounded-full bg-subtle px-1.5 text-xs tabular-nums text-muted">
-                            {session.arcadeLevel}
+                        <span className="rounded-full bg-subtle px-1.5 text-xs text-muted">
+                            {keyName(arcadeConfig(session.arcadeLevel).key)}
                         </span>
                     </Chip>
                     <Chip to="/daily?tab=warmup">{m.today_drill()}</Chip>
