@@ -18,6 +18,7 @@ import { useSynth } from "../hooks/useSynth";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/learn";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -102,12 +103,7 @@ export default function Learn() {
         synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true });
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.nav_learn()}
-                </h1>
-                <p className="text-sm text-muted">{m.learn_intro()}</p>
-            </header>
+            <PageHeader title={m.nav_learn()} hint={m.learn_intro()} />
 
             <HubList
                 entries={ENTRIES.map((entry) => ({

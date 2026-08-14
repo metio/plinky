@@ -24,6 +24,7 @@ import { symbolName } from "../lib/glossaryLabels";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/glossary";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -132,12 +133,7 @@ export default function Glossary() {
         // two columns, and the list of marks beside its detail needs the room. Everything
         // else is a single column and shares one frame.
         <main className="mx-auto max-w-4xl space-y-6 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.glossary_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.glossary_intro()}</p>
-            </header>
+            <PageHeader title={m.glossary_title()} hint={m.glossary_intro()} />
 
             <div className="grid gap-6 md:grid-cols-[14rem_1fr]">
                 <GlossaryIndex selected={entry.id} onSelect={choose} />

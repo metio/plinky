@@ -24,6 +24,7 @@ import { chordName, scaleName } from "../lib/theoryNames";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/tools";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -215,12 +216,7 @@ function TapTempo() {
 export default function ToolsRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.tools_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.tools_intro()}</p>
-            </header>
+            <PageHeader title={m.tools_title()} hint={m.tools_intro()} />
             <CircleOfFifths />
             <ScaleExplorer />
             <ChordExplorer />

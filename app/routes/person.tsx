@@ -13,6 +13,7 @@ import { useSongSource } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
+import { PageHeader } from "../components/ui/pageHeader";
 
 // The bundled catalogue as person pieces — available synchronously (no storage,
 // no network), so both meta() and the first render resolve the composer at
@@ -111,21 +112,15 @@ export default function PersonPage() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
-                    {m.person_eyebrow()}
-                </p>
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {person?.name ?? nameFromSlug(slug ?? "")}
-                </h1>
-                {person && (person.pieces.length > 0 || known) && (
-                    <p className="text-sm text-muted">
-                        {m.person_pieces({
-                            count: person.pieces.length || (known?.pieces ?? 0),
-                        })}
-                    </p>
-                )}
-            </header>
+            <PageHeader
+                eyebrow={m.person_eyebrow()}
+                title={person?.name ?? nameFromSlug(slug ?? "")}
+                hint={
+                    person && (person.pieces.length > 0 || known)
+                        ? m.person_pieces({ count: person.pieces.length || (known?.pieces ?? 0) })
+                        : undefined
+                }
+            />
 
             {person ? (
                 <ul className="space-y-1.5">

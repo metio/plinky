@@ -107,6 +107,14 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Every page introduces itself the same way.** Each one used to write its own title
+block, and twenty-two copies had drifted apart: three different spacings, two pages that
+had no title line at all, and three different things floating beside a title with nowhere
+to sit. There is one page header now — the name, the line under it, and a slot on the
+right for whatever that page offers — so whichever page you land on, it looks like the
+same app. Section headings within a page had six spellings and now have one, and the
+review session finally has a heading in both of its quiet states.
+
 **A piece tells you what you can do with it.** Everything Plinky can put on a piece —
 one hand at a time, keeping up with the beat, the duet, sight-reading it cold, hidden
 notes, the vanishing bars, racing your ghost, looping a passage, transposing it, the tempo

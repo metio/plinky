@@ -9,6 +9,7 @@ import { useOnboardingStore, usePrefsStore } from "../contexts/services";
 import { localizedHref } from "../components/ui/href";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/basics";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     // A hands-on tour rather than a page of prose: there is nothing here for a crawler
@@ -28,12 +29,7 @@ export default function Basics() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.basics_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.basics_intro()}</p>
-            </header>
+            <PageHeader title={m.basics_title()} hint={m.basics_intro()} />
 
             <KeyboardTour
                 onFinished={() => {
