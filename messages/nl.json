@@ -12,6 +12,7 @@
     "library_tabs_label": "Muzieksecties",
     "library_show_more": "Meer tonen",
     "library_filter_due": "⏰ Nu aan de beurt",
+    "library_filter_fresh": "✨ Nog niet geprobeerd",
     "library_remove_used_one": "In gebruik door {count} opdracht — verwijderen?",
     "library_remove_used_other": "In gebruik door {count} opdrachten — verwijderen?",
     "library_group_kind": "Soort",

@@ -12,6 +12,7 @@
     "library_tabs_label": "Seksionet e Muzikës",
     "library_show_more": "Shfaq më shumë",
     "library_filter_due": "⏰ Për tani",
+    "library_filter_fresh": "✨ Ende të paprovuara",
     "library_remove_used_one": "Përdoret nga {count} detyrë — ta heq?",
     "library_remove_used_other": "Përdoret nga {count} detyra — ta heq?",
     "library_group_kind": "Lloji",

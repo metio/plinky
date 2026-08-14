@@ -12,6 +12,7 @@
     "library_tabs_label": "Secțiunile din Muzică",
     "library_show_more": "Arată mai multe",
     "library_filter_due": "⏰ De recapitulat acum",
+    "library_filter_fresh": "✨ Neîncercate încă",
     "library_remove_used_one": "Folosită de {count} temă — elimini?",
     "library_remove_used_other": "Folosită de {count} teme — elimini?",
     "library_group_kind": "Tip",

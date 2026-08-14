@@ -12,6 +12,7 @@
     "library_tabs_label": "Musiikin osiot",
     "library_show_more": "Näytä lisää",
     "library_filter_due": "⏰ Kerrattavaa nyt",
+    "library_filter_fresh": "✨ Ei vielä kokeiltu",
     "library_remove_used_one": "Käytössä {count} tehtävässä — poistetaanko?",
     "library_remove_used_other": "Käytössä {count} tehtävässä — poistetaanko?",
     "library_group_kind": "Tyyppi",

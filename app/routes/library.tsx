@@ -157,6 +157,8 @@ export default function LibraryRoute() {
                         favoritesOnly={filters.favoritesOnly}
                         onToggleFavoritesOnly={filters.toggleFavoritesOnly}
                         dueOnly={filters.dueOnly}
+                        freshOnly={filters.freshOnly}
+                        onToggleFreshOnly={filters.toggleFreshOnly}
                         onToggleDueOnly={filters.toggleDueOnly}
                         showDue={due > 0}
                     />

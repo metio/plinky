@@ -12,6 +12,7 @@
     "library_tabs_label": "Deler av Musikk",
     "library_show_more": "Vis mer",
     "library_filter_due": "⏰ Klar nå",
+    "library_filter_fresh": "✨ Ikke prøvd ennå",
     "library_remove_used_one": "Brukes av {count} oppgave — fjerne?",
     "library_remove_used_other": "Brukes av {count} oppgaver — fjerne?",
     "library_group_kind": "Type",

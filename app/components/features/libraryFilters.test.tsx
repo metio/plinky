@@ -21,6 +21,8 @@ const mount = (overrides: Partial<Parameters<typeof LibraryFilters>[0]> = {}) =>
             onToggleFavoritesOnly={noop}
             dueOnly={false}
             onToggleDueOnly={noop}
+            freshOnly={false}
+            onToggleFreshOnly={noop}
             showDue={false}
             {...overrides}
         />,
@@ -67,5 +69,14 @@ describe("LibraryFilters", () => {
         expect(chip.getAttribute("aria-pressed")).toBe("true");
         fireEvent.click(chip);
         expect(onToggleFavoritesOnly).toHaveBeenCalledTimes(1);
+    });
+
+    it("offers a filter for what has not been tried yet", () => {
+        const onToggle = vi.fn();
+        mount({ onToggleFreshOnly: onToggle });
+        const chip = screen.getByRole("button", { name: m.library_filter_fresh() });
+        expect(chip.getAttribute("aria-pressed")).toBe("false");
+        fireEvent.click(chip);
+        expect(onToggle).toHaveBeenCalledTimes(1);
     });
 });

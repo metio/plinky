@@ -12,6 +12,7 @@
     "library_tabs_label": "Sezioni di Musica",
     "library_show_more": "Mostra altro",
     "library_filter_due": "⏰ Da ripassare",
+    "library_filter_fresh": "✨ Non ancora provato",
     "library_remove_used_one": "Usato da {count} compito — rimuovere?",
     "library_remove_used_other": "Usato da {count} compiti — rimuovere?",
     "library_group_kind": "Tipo",

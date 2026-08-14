@@ -12,6 +12,7 @@
     "library_tabs_label": "Musiksektioner",
     "library_show_more": "Visa mer",
     "library_filter_due": "⏰ Dags nu",
+    "library_filter_fresh": "✨ Inte provat än",
     "library_remove_used_one": "Används av {count} uppgift — ta bort?",
     "library_remove_used_other": "Används av {count} uppgifter — ta bort?",
     "library_group_kind": "Typ",

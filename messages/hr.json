@@ -12,6 +12,7 @@
     "library_tabs_label": "Odjeljci Glazbe",
     "library_show_more": "Prikaži više",
     "library_filter_due": "⏰ Na redu",
+    "library_filter_fresh": "✨ Još neisprobano",
     "library_remove_used_one": "Koristi ga {count} zadatak — ukloniti?",
     "library_remove_used_other": "Koristi ga {count} zadataka — ukloniti?",
     "library_group_kind": "Vrsta",

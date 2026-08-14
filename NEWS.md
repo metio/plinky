@@ -107,6 +107,10 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**A filter for what you haven't tried.** Three thousand pieces and a shelf you've been
+playing for months is a hard place to find something new. "✨ Not tried yet" keeps only
+the pieces with no history at all — one tap beside Favourites and Due now.
+
 **An empty screen looks like an empty screen.** "Nothing here yet, and here's how to
 start" was drawn four different ways — a centred box on ear training, a bare button on the
 placement test, two underlined links and no button on the review session, one muted

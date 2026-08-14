@@ -12,6 +12,7 @@
     "library_tabs_label": "Sekcje Muzyki",
     "library_show_more": "Pokaż więcej",
     "library_filter_due": "⏰ Do powtórki",
+    "library_filter_fresh": "✨ Jeszcze niegrane",
     "library_remove_used_one": "Używane przez {count} zadanie — usunąć?",
     "library_remove_used_other": "Używane przez {count} zadań — usunąć?",
     "library_group_kind": "Rodzaj",

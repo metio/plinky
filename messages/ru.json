@@ -12,6 +12,7 @@
     "library_tabs_label": "Разделы Музыки",
     "library_show_more": "Показать ещё",
     "library_filter_due": "⏰ Пора повторить",
+    "library_filter_fresh": "✨ Ещё не пробовали",
     "library_remove_used_one": "Используется в {count} задании — удалить?",
     "library_remove_used_other": "Используется в {count} заданиях — удалить?",
     "library_group_kind": "Тип",

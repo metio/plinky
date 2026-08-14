@@ -12,6 +12,7 @@
     "library_tabs_label": "Musikbereiche",
     "library_show_more": "Mehr anzeigen",
     "library_filter_due": "⏰ Jetzt fällig",
+    "library_filter_fresh": "✨ Noch nicht probiert",
     "library_remove_used_one": "Wird von {count} Aufgabe verwendet — entfernen?",
     "library_remove_used_other": "Wird von {count} Aufgaben verwendet — entfernen?",
     "library_group_kind": "Art",

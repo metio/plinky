@@ -12,6 +12,7 @@
     "library_tabs_label": "Müzik bölümleri",
     "library_show_more": "Daha fazla göster",
     "library_filter_due": "⏰ Zamanı geldi",
+    "library_filter_fresh": "✨ Henüz denenmedi",
     "library_remove_used_one": "{count} ödevde kullanılıyor — kaldırılsın mı?",
     "library_remove_used_other": "{count} ödevde kullanılıyor — kaldırılsın mı?",
     "library_group_kind": "Tür",

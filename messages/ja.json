@@ -12,6 +12,7 @@
     "library_tabs_label": "音楽のセクション",
     "library_show_more": "もっと見る",
     "library_filter_due": "⏰ 復習の時期",
+    "library_filter_fresh": "✨ まだ弾いてない",
     "library_remove_used_one": "{count} 件の課題で使われています — 削除しますか？",
     "library_remove_used_other": "{count} 件の課題で使われています — 削除しますか？",
     "library_group_kind": "種類",
