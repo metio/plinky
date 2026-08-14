@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { useEffect } from "react";
+
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
 import { NOTE_TEXT, noteNameOf, type ScaleId, scalePitches } from "../../core/theory";
@@ -14,6 +16,7 @@ import {
     type UnitId,
 } from "../../core/theoryCourse";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
+import { useTheoryStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/theory";
@@ -89,7 +92,7 @@ function litNotes(demo: Demo): number[] {
     }
 }
 
-function LessonDemo({ demo }: { demo: Demo }) {
+function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
     const key = demo.kind === "circle" ? CIRCLE.find((one) => one.tonic === demo.tonic) : null;
     // A comparison plays the same idea twice — the second reading after a gap, so the
     // ear hears them as a pair rather than a single run.
@@ -103,6 +106,7 @@ function LessonDemo({ demo }: { demo: Demo }) {
             lit={litNotes(demo)}
             phrases={phrases}
             label={demo.kind === "compare" ? m.theory_hear_both() : m.theory_hear_it()}
+            onPlay={onPlay}
         >
             {key && (
                 <p className="text-sm text-muted">
@@ -119,8 +123,14 @@ function LessonDemo({ demo }: { demo: Demo }) {
 }
 
 function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
+    const theory = useTheoryStore();
     return (
-        <li className="space-y-3 rounded-lg border border-line bg-surface p-4">
+        // The id is what the day's practice points at when it offers the next lesson,
+        // so the reader lands on the lesson rather than on the top of the course.
+        <li
+            id={lesson.id}
+            className="scroll-mt-20 space-y-3 rounded-lg border border-line bg-surface p-4"
+        >
             <div className="flex flex-wrap items-baseline gap-x-3">
                 <span className="font-mono text-xs tabular-nums text-muted">{index}</span>
                 <h3 className="font-medium text-body">{LESSON_TITLE[lesson.id]?.()}</h3>
@@ -128,7 +138,10 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
             <p className="max-w-prose text-sm leading-relaxed text-body">
                 {LESSON_BODY[lesson.id]?.()}
             </p>
-            <LessonDemo demo={lesson.demo} />
+            {/* Hearing the idea is what meeting the lesson means, so playing it is what
+                records it — there is nothing to tick, and the course never asks the
+                reader to mark their own homework. */}
+            <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
         </li>
     );
 }
@@ -138,6 +151,14 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
 // something to play — the glossary says what a mark means, this says why the music is
 // built that way.
 export default function TheoryRoute() {
+    // The day's practice links to a single lesson; a client-router navigation does not
+    // scroll to a hash on its own.
+    useEffect(() => {
+        const anchor = window.location.hash.slice(1);
+        if (anchor) {
+            document.getElementById(anchor)?.scrollIntoView();
+        }
+    }, []);
     let counter = 0;
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">

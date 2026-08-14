@@ -313,7 +313,10 @@ const BUDGET_VENDOR_KB = 324;
 //
 // 337. The front page greets the moment you arrived — the weekday from the reader's own
 // clock, the part of day from a pure hour test — over a line saying where you stand.
-const BUDGET_APP_KB = 337;
+//
+// 338. The theory course remembers which lessons have been met, so the day's practice
+// offers the next one and stops offering a course there is nothing left of.
+const BUDGET_APP_KB = 338;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

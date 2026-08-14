@@ -4,23 +4,31 @@
 import { describe, expect, it } from "vitest";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "./learnPick";
 
-const settled = { keyboardMet: true, placementTaken: true };
+const settled = { keyboardMet: true, placementTaken: true, courseDone: false };
 
 describe("learnPick", () => {
     it("offers the keyboard before anything else to someone who has never found middle C", () => {
-        expect(learnPick({ keyboardMet: false, placementTaken: false, day: 3 })).toBe("basics");
+        expect(learnPick({ keyboardMet: false, placementTaken: false, courseDone: false, day: 3 })).toBe("basics");
         // Still first even for a reader the test has already placed: the tour is the
         // one step that assumes nothing at all.
-        expect(learnPick({ keyboardMet: false, placementTaken: true, day: 3 })).toBe("basics");
+        expect(learnPick({ keyboardMet: false, placementTaken: true, courseDone: false, day: 3 })).toBe("basics");
     });
 
     it("offers the level test once the keyboard is met", () => {
-        expect(learnPick({ keyboardMet: true, placementTaken: false, day: 3 })).toBe("placement");
+        expect(learnPick({ keyboardMet: true, placementTaken: false, courseDone: false, day: 3 })).toBe("placement");
     });
 
     it("rotates the four references once both one-off steps are behind you", () => {
         const week = [0, 1, 2, 3, 4, 5].map((day) => learnPick({ ...settled, day }));
         expect(week).toEqual(["theory", "glossary", "methods", "tools", "theory", "glossary"]);
+    });
+
+    it("stops offering the course once there is nothing left of it", () => {
+        const week = [0, 1, 2, 3].map((day) =>
+            learnPick({ ...settled, courseDone: true, day }),
+        );
+        expect(week).toEqual(["glossary", "methods", "tools", "glossary"]);
+        expect(week).not.toContain("theory");
     });
 
     it("holds still through a day and moves on the next one", () => {
