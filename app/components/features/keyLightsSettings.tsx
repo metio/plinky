@@ -9,6 +9,7 @@ import {
     type LightProfileId,
     MAX_CHANNEL,
     MIN_CHANNEL,
+    suggestProfile,
 } from "../../../core/lightProfile";
 import type { Prefs } from "../../../core/prefs";
 import type { KeyLightsPort } from "../../ports/keyLights";
@@ -66,10 +67,15 @@ export function KeyLightsSettings({
     // composition site and already holds the connection, which leaves this component
     // pure and mountable without Web MIDI.
     keyLights,
+    // The names of the connected instruments. A Casio LK-S450 says so in its own name,
+    // and asking somebody to pick the maker of the piano in front of them is a question
+    // the app can usually answer itself.
+    deviceNames = [],
 }: {
     prefs: Prefs;
     update: (patch: Partial<Prefs>) => void;
     keyLights: KeyLightsPort;
+    deviceNames?: string[];
 }) {
     // The test chord is lit by a button press and has nothing else to take it back, so
     // leaving Settings with it showing would strand six keys on the instrument until
@@ -97,6 +103,16 @@ export function KeyLightsSettings({
                 label={m.lights_enable()}
                 checked={prefs.keyLights}
                 onChange={(keyLightsOn) => {
+                    // Switching lighting on is the moment somebody is asking for it, and
+                    // an LK-S450 says what it is in its own name — so the maker comes from
+                    // the instrument rather than from a question. It is a starting point:
+                    // the picker is right below, and Test the lights settles any doubt.
+                    if (keyLightsOn) {
+                        const suggested = deviceNames.map(suggestProfile).find((id) => id !== null);
+                        if (suggested && suggested !== prefs.lightProfile) {
+                            chooseProfile(suggested);
+                        }
+                    }
                     if (!keyLightsOn) {
                         // Switching off with keys still lit would leave them glowing
                         // until something else happened to clear them.
