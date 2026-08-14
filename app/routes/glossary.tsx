@@ -109,6 +109,9 @@ export default function Glossary() {
     };
 
     return (
+        // Wider than the rest of the app on purpose: this is the one page laid out as
+        // two columns, and the list of marks beside its detail needs the room. Everything
+        // else is a single column and shares one frame.
         <main className="mx-auto max-w-4xl space-y-6 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">

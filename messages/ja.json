@@ -702,7 +702,7 @@
     "tour_progress": "どこまで進んだか",
     "tour_next": "次へ",
     "tour_got_it": "そのとおり。",
-    "tour_waiting": "好きなときに鍵盤で弾いてみて。",
+    "tour_waiting": "鍵盤で試してみて。そうすると「次へ」が開きます。",
     "tour_done_title": "これが鍵盤です。",
     "tour_done_body": "ここからどの鍵盤でも見つけられます。Plinky のほかのすべてはこの六つの上に乗っていて、明日も同じように正しいままです。",
     "tour_done_action": "はじめに戻る",

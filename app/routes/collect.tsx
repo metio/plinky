@@ -48,7 +48,7 @@ export default function CollectRoute() {
         downloadBlob(reportsToCsv(reports, titleOf), "text/csv", "plinky-assignment.csv");
 
     return (
-        <main className="mx-auto max-w-5xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                     {m.collect_title()}
