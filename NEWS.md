@@ -107,6 +107,11 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The brass reads properly in daylight.** The gold used for the small labels — a section
+heading, a grade chip, the day's warm-up — sat a hair under the contrast a caption needs
+against the paper it is printed on. It is a shade deeper now, on both the page and the
+warm panels, and unchanged in the dark.
+
 **Every step of an assignment opens its piece.** They always did, but only the step you
 were on looked like a link — the rest were plain text that underlined on hover, which a
 touch screen never shows. Each one now sits in the same tinted row the library uses.
