@@ -13,7 +13,7 @@ import {
 } from "../../../core/scoreImport";
 import { readScoreMeta } from "../../../core/scoreMeta";
 import { songId } from "../../../core/songId";
-import { useOnboardingStore, useSongSource, useStore, useXmlCodec } from "../../contexts/services";
+import { useSongSource, useStore, useXmlCodec } from "../../contexts/services";
 import { loadCatalog, type Score, saveUserScore } from "../../lib/catalog";
 import { m } from "../../paraglide/messages.js";
 import { Button, buttonClasses } from "../ui/button";
@@ -46,7 +46,6 @@ const FIELD = `w-full ${fieldClasses}`;
 // library's Manage tab render the identical flow.
 export function ScoreImport() {
     const store = useStore();
-    const onboarding = useOnboardingStore();
     const xmlCodec = useXmlCodec();
     const songs = useSongSource();
     const [draft, setDraft] = useState<Draft | null>(null);
@@ -121,9 +120,6 @@ export function ScoreImport() {
             setError(m.import_save_failed());
             return;
         }
-        // A landed import: the piece's shape, never its title or composer — those are the
-        // player's own words on a score they brought.
-        onboarding.markDiscovered("imported");
         setDraft(null);
         setSavedId(score.id);
     };

@@ -5,8 +5,8 @@ import { useEffect } from "react";
 
 import { CIRCLE, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
-import { NOTE_TEXT, noteNameOf, type ScaleId, scalePitches } from "../../core/theory";
-import { chordPitches, type ChordQuality } from "../../core/theory";
+import { NOTE_TEXT, noteNameOf, scalePitches } from "../../core/theory";
+import { chordPitches } from "../../core/theory";
 import {
     type Demo,
     type Lesson,
@@ -81,9 +81,9 @@ function litNotes(demo: Demo): number[] {
         case "keyboard":
             return demo.notes;
         case "scale":
-            return scalePitches(demo.tonic, demo.scale as ScaleId);
+            return scalePitches(demo.tonic, demo.scale);
         case "chord":
-            return chordPitches(demo.root, demo.quality as ChordQuality);
+            return chordPitches(demo.root, demo.quality);
         case "compare":
             // Both halves at once: the lesson is about the difference between them, and
             // a keyboard showing only the first one draws the question without the

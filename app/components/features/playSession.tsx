@@ -284,7 +284,6 @@ function usePlaySessionValue({
     // the function ran twice, against a value from this render rather than the live one.
     const setFingerStrip = (open: boolean) => {
         if (open) {
-            onboarding.markDiscovered("fingeringTried");
         }
         setFingerStripState(open);
     };
@@ -430,13 +429,12 @@ function usePlaySessionValue({
 
     // Hidden-notes (ear) practice: noteheads start blank and reveal green as they are
     // found, red once the tries budget is spent. Persisted like the other play prefs.
-    const onboarding = useOnboardingStore();
+    const _onboarding = useOnboardingStore();
     const [hiddenNotes, setHiddenNotesPref] = usePref(prefsStore, "hiddenNotes");
     // Turning the ear drill on ticks its discovery step — the toggle IS the
     // feature now that the Ear tab is gone.
     const setHiddenNotes = (value: boolean) => {
         if (value) {
-            onboarding.markDiscovered("earTried");
         }
         setHiddenNotesPref(value);
     };

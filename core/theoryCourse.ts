@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A short course in the theory a reader needs to make sense of the page in front of
+import type { ChordQuality, ScaleId } from "./theory";
 // them, in the order that need arises.
 //
 // The glossary answers "what is this mark?" for someone already looking at one, and
@@ -23,8 +24,8 @@ export type UnitId = "reading" | "keys" | "harmony";
 export type Demo =
     | { kind: "keyboard"; notes: number[] }
     // A scale or chord lit on the keys and playable, named by its theory id.
-    | { kind: "scale"; tonic: number; scale: string }
-    | { kind: "chord"; root: number; quality: string }
+    | { kind: "scale"; tonic: number; scale: ScaleId }
+    | { kind: "chord"; root: number; quality: ChordQuality }
     // The circle of fifths, focused on one key.
     | { kind: "circle"; tonic: number }
     // Two chords played one after the other, so the difference is audible rather than
