@@ -525,6 +525,7 @@
     "home_assignments": "課題",
     "home_assignments_blurb": "曲を並べた一連の流れ — 先生が作ったものでも、自分で組んだものでも、道しるべのように進めます。クリアするたびに各ステップが採点されます。",
     "progress_days_practiced": "練習した日数",
+    "progress_all_time": "これまで",
     "progress_notes_played": "演奏した音符数",
     "progress_last_7_days": "過去7日間",
     "progress_notes_one": "{count}音符",

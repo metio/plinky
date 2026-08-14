@@ -525,6 +525,7 @@
     "home_assignments": "Zadaci",
     "home_assignments_blurb": "Niz skladbi — učiteljev ili onaj koji sam sastaviš — kao vođena staza vježbanja, uz ocjenu svakog koraka koji svladaš.",
     "progress_days_practiced": "Dana vježbanja",
+    "progress_all_time": "Ukupno",
     "progress_notes_played": "Odsviranih nota",
     "progress_last_7_days": "Zadnjih 7 dana",
     "progress_notes_one": "{count} nota",

@@ -525,6 +525,7 @@
     "home_assignments": "Devoirs",
     "home_assignments_blurb": "Une suite de morceaux — celle d'un professeur, ou la vôtre — comme un parcours guidé, chaque étape étant notée à mesure que vous la franchissez.",
     "progress_days_practiced": "Jours d'entraînement",
+    "progress_all_time": "Depuis le début",
     "progress_notes_played": "Notes jouées",
     "progress_last_7_days": "7 derniers jours",
     "progress_notes_one": "{count} notes",

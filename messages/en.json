@@ -638,6 +638,7 @@
     "home_assignments": "Assignments",
     "home_assignments_blurb": "A sequence of pieces — a teacher's, or one you build yourself — as a guided path, with each step graded as you clear it.",
     "progress_days_practiced": "Days practised",
+    "progress_all_time": "All time",
     "progress_notes_played": "Notes played",
     "progress_last_7_days": "Last 7 days",
     "progress_notes_one": "{count} note",

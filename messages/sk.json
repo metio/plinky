@@ -525,6 +525,7 @@
     "home_assignments": "Zadania",
     "home_assignments_blurb": "Postupnosť skladieb — od učiteľa, alebo taká, ktorú si zostavíte sami — ako vedená cesta, kde každý krok dostane známku, keď ho zvládnete.",
     "progress_days_practiced": "Precvičené dni",
+    "progress_all_time": "Celkovo",
     "progress_notes_played": "Zahrané noty",
     "progress_last_7_days": "Posledných 7 dní",
     "progress_notes_one": "{count} nôt",

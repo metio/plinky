@@ -525,6 +525,7 @@
     "home_assignments": "Feladatok",
     "home_assignments_blurb": "Darabok sorozata — egy tanáré, vagy amit magad állítasz össze — vezetett gyakorlóútként, ahol minden lépés értékelést kap, ahogy teljesíted.",
     "progress_days_practiced": "Gyakorolt napok",
+    "progress_all_time": "Összesen",
     "progress_notes_played": "Lejátszott hangok",
     "progress_last_7_days": "Utolsó 7 nap",
     "progress_notes_one": "{count} hang",

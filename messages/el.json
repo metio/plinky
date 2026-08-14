@@ -525,6 +525,7 @@
     "home_assignments": "Εργασίες",
     "home_assignments_blurb": "Μια σειρά κομματιών — ενός δασκάλου, ή μια που φτιάχνεις μόνος σου — σαν καθοδηγούμενη διαδρομή, με κάθε βήμα να βαθμολογείται καθώς το ολοκληρώνεις.",
     "progress_days_practiced": "Μέρες που έπαιξες",
+    "progress_all_time": "Συνολικά",
     "progress_notes_played": "Νότες που παίχτηκαν",
     "progress_last_7_days": "Τελευταίες 7 ημέρες",
     "progress_notes_one": "{count} νότες",

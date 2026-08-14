@@ -525,6 +525,7 @@
     "home_assignments": "Opgaver",
     "home_assignments_blurb": "En række af stykker — en lærers, eller en du selv bygger — som en guidet vej, hvor hvert trin bedømmes, når du klarer det.",
     "progress_days_practiced": "Dage øvet",
+    "progress_all_time": "I alt",
     "progress_notes_played": "Noder spillet",
     "progress_last_7_days": "Sidste 7 dage",
     "progress_notes_one": "{count} noder",

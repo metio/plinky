@@ -525,6 +525,7 @@
     "home_assignments": "作业",
     "home_assignments_blurb": "一串曲目——老师留的，或你自己编排的——组成一条引导式练习路线，每闯过一步都会评级。",
     "progress_days_practiced": "练习天数",
+    "progress_all_time": "累计",
     "progress_notes_played": "已弹奏音符",
     "progress_last_7_days": "最近 7 天",
     "progress_notes_one": "{count} 个音符",
