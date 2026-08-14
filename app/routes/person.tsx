@@ -14,6 +14,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
 import { PageHeader } from "../components/ui/pageHeader";
+import { GradeChip } from "../components/features/scoreGrade";
 
 // The bundled catalogue as person pieces — available synchronously (no storage,
 // no network), so both meta() and the first render resolve the composer at
@@ -145,13 +146,16 @@ export default function PersonPage() {
                                 <span className="min-w-0 flex-1 truncate font-medium">
                                     {piece.title}
                                 </span>
+                                {/* The grade as the app draws it everywhere else, and the
+                                    licence only where there is room: on a phone the title
+                                    is what a reader is scanning for, and a licence code on
+                                    every row of sixty takes the width the titles need. It
+                                    is on the piece's own page in full. */}
                                 <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
-                                    {piece.grade !== undefined && (
-                                        <span className="rounded bg-subtle px-1.5 py-0.5 font-medium tabular-nums">
-                                            G{piece.grade}
-                                        </span>
+                                    {piece.grade !== undefined && <GradeChip grade={piece.grade} />}
+                                    {piece.license && (
+                                        <span className="hidden sm:inline">{piece.license}</span>
                                     )}
-                                    {piece.license && <span>{piece.license}</span>}
                                 </span>
                             </Link>
                         </li>

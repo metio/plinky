@@ -25,6 +25,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/tools";
 import { PageHeader } from "../components/ui/pageHeader";
+import { Card } from "../components/ui/card";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -57,13 +58,13 @@ function Panel({
     children: React.ReactNode;
 }) {
     return (
-        <section className="space-y-3 rounded-lg border border-line bg-surface p-4">
+        <Card className="space-y-3">
             <div className="space-y-1">
-                <h2 className="font-medium text-body">{title}</h2>
-                <p className="text-xs text-muted">{hint}</p>
+                <h2 className="text-base font-semibold text-ink">{title}</h2>
+                <p className="text-sm text-muted">{hint}</p>
             </div>
             {children}
-        </section>
+        </Card>
     );
 }
 

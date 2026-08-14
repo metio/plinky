@@ -9,6 +9,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/methods";
 import { PageHeader } from "../components/ui/pageHeader";
+import { Card } from "../components/ui/card";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -62,25 +63,26 @@ export default function MethodsRoute() {
 
             <ul className="space-y-4">
                 {METHODS.map((method) => (
-                    <li
-                        key={method.id}
-                        className="space-y-2 rounded-lg border border-line bg-surface p-4"
-                    >
-                        <div className="flex flex-wrap items-baseline gap-x-3">
-                            <h2 className="font-medium text-body">{NAME[method.id]()}</h2>
-                            <span className="text-xs text-muted">
-                                {m.methods_dose({ count: method.minutes })}
-                            </span>
-                        </div>
-                        <p className="text-sm text-body">{HOW[method.id]()}</p>
-                        <p className="text-xs text-muted">{WHY[method.id]()}</p>
-                        {/* Three of these are done with a control inside a run's set-up
+                    <li key={method.id}>
+                        <Card className="space-y-2">
+                            <div className="flex flex-wrap items-baseline gap-x-3">
+                                <h2 className="text-base font-semibold text-ink">
+                                    {NAME[method.id]()}
+                                </h2>
+                                <span className="text-xs text-muted">
+                                    {m.methods_dose({ count: method.minutes })}
+                                </span>
+                            </div>
+                            <p className="text-sm text-body">{HOW[method.id]()}</p>
+                            <p className="text-sm text-muted">{WHY[method.id]()}</p>
+                            {/* Three of these are done with a control inside a run's set-up
                             panel, so the honest offer is a piece to try them on rather
                             than "Try it" landing on a catalogue. The other three lead
                             straight to the thing itself. */}
-                        <Link className={buttonClasses("secondary")} to={method.href}>
-                            {method.href === "/library/" ? m.today_browse() : m.methods_try()}
-                        </Link>
+                            <Link className={buttonClasses("secondary")} to={method.href}>
+                                {method.href === "/library/" ? m.today_browse() : m.methods_try()}
+                            </Link>
+                        </Card>
                     </li>
                 ))}
             </ul>
