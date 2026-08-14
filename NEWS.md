@@ -87,7 +87,8 @@ catalogue number. If you have the note colours on, the mark is coloured the same
 score below it is.
 
 The same mark now names pieces in lists too: what you're working on today, what's
-fading and wants a refresh, and every piece on a composer's page. It comes with the
+fading and wants a refresh, every step of an assignment, and every piece on a
+composer's page. It comes with the
 catalogue rather than being worked out on the spot, so a list of music reads as music
 without waiting for anything to load.
 

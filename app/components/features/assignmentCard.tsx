@@ -9,6 +9,7 @@ import type { trackSteps } from "../../../core/tracks";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { CheckIcon } from "../ui/icons";
+import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 
 export type AssignmentSteps = ReturnType<typeof trackSteps>;
@@ -23,10 +24,15 @@ export function AssignmentStepList({
     steps,
     titleOf,
     isMissing,
+    incipitOf,
 }: {
     steps: AssignmentSteps;
     titleOf: (id: string) => string;
     isMissing: (id: string) => boolean;
+    // A step's opening bars, where the catalogue carries them. An ordered set of pieces
+    // is where the mark earns most: a list of titles somebody else chose tells you
+    // nothing about the music until you open each one.
+    incipitOf?: (id: string) => string | undefined;
 }) {
     return (
         <ol className="space-y-1">
@@ -49,13 +55,18 @@ export function AssignmentStepList({
                     ) : (
                         <Link
                             to={`/play/${step.scoreId}`}
-                            className={
+                            className={`flex min-w-0 items-center gap-2 ${
                                 step.status === "current"
                                     ? "font-medium text-accent-strong"
                                     : "text-body hover:underline"
-                            }
+                            }`}
                         >
-                            {titleOf(step.scoreId)}
+                            <BakedIncipit
+                                mark={incipitOf?.(step.scoreId)}
+                                label={titleOf(step.scoreId)}
+                                className="shrink-0 text-faint"
+                            />
+                            <span className="min-w-0 truncate">{titleOf(step.scoreId)}</span>
                         </Link>
                     )}
                 </li>
