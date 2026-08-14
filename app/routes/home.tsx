@@ -40,7 +40,10 @@ export default function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                         {m.home_eyebrow()}
                     </p>
-                    <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+                    {/* Set like the About page's title, which is the same words in their
+                        permanent home: a first visit meets them here, and anybody who
+                        wants them again finds them there looking the same. */}
+                    <h2 className="text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
                         {m.home_heading()}
                     </h2>
                     <p className="text-pretty leading-relaxed text-muted">{m.home_intro()}</p>

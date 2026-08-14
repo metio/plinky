@@ -68,7 +68,10 @@ export default function About() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                     {m.home_eyebrow()}
                 </p>
-                <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+                {/* The same display face every page's title is set in — this one keeps a
+                    step of extra size on a wide screen, being the page that says what
+                    Plinky is rather than one you work on. */}
+                <h1 className="text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
                     {m.home_heading()}
                 </h1>
                 <p className="text-pretty leading-relaxed text-muted">{m.home_intro()}</p>
