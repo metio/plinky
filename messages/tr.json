@@ -739,6 +739,7 @@
     "board_follow": "{platform} üzerinde takip et",
     "today_assignment_set": "“{name}” ödevinden",
     "today_assignment_step": "“{name}” ödevinden — {step}/{total}. adım",
+    "today_best_so_far": "şimdiye kadar en iyi not {best}, {target} notunda öğrenildi",
     "takes_download_video": "Videoyu kaydet",
     "takes_download_video_portrait": "Dikey video kaydet (9:16, Reels ve Shorts için)",
     "takes_video_progress": "İşleniyor… {percent}%",

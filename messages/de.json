@@ -740,6 +740,7 @@
     "board_follow": "Auf {platform} folgen",
     "today_assignment_set": "Aus „{name}“",
     "today_assignment_step": "Aus „{name}“ — Schritt {step} von {total}",
+    "today_best_so_far": "bisher beste Note {best}, gelernt ab {target}",
     "takes_download_video": "Video speichern",
     "takes_download_video_portrait": "Video im Hochformat speichern (9:16, für Reels und Shorts)",
     "takes_video_progress": "Rendern… {percent}%",

@@ -740,6 +740,7 @@
     "board_follow": "Стежити в {platform}",
     "today_assignment_set": "Із завдання «{name}»",
     "today_assignment_step": "Із завдання «{name}» — крок {step} з {total}",
+    "today_best_so_far": "найкраща оцінка поки що {best}, вивчено за оцінкою {target}",
     "takes_download_video": "Зберегти відео",
     "takes_download_video_portrait": "Зберегти вертикальне відео (9:16, для Reels і Shorts)",
     "takes_video_progress": "Рендеринг… {percent}%",

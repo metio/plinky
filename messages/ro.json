@@ -739,6 +739,7 @@
     "board_follow": "Urmărește pe {platform}",
     "today_assignment_set": "Din tema „{name}”",
     "today_assignment_step": "Din tema „{name}” — pasul {step} din {total}",
+    "today_best_so_far": "cea mai bună notă până acum {best}, învățată la {target}",
     "takes_download_video": "Salvează videoclipul",
     "takes_download_video_portrait": "Salvează un video vertical (9:16, pentru Reels și Shorts)",
     "takes_video_progress": "Se redă… {percent}%",

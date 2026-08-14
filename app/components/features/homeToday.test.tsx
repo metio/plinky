@@ -80,6 +80,46 @@ describe("HomeToday", () => {
         expect(screen.getByRole("link", { name: /daily challenge/i })).toBeTruthy();
     });
 
+    it("says where a piece stands, so a played one is not silently offered again", async () => {
+        // A step advances when the piece counts as learned, which means a run reaching
+        // the grade set in Settings. Playing it through at less than that leaves the
+        // step where it was — correct, and baffling until the row says so.
+        masteryMock.mockResolvedValue([
+            {
+                id: loadBundledScores()[0]!.id,
+                title: loadBundledScores()[0]!.title,
+                grade: 1,
+                cost: 1,
+                kind: "piece" as const,
+                mastery: {
+                    bestScore: 70,
+                    learned: false,
+                    backlog: false,
+                    intervalDays: 0,
+                    reviewAt: 0,
+                    updatedAt: 0,
+                    deadline: "",
+                },
+            },
+        ]);
+        catalogueMock.mockResolvedValue(
+            loadBundledScores().map((score) => ({
+                id: score.id,
+                title: score.title,
+                grade: 1,
+                cost: 1,
+                kind: "piece" as const,
+            })),
+        );
+        mount();
+        // 70 reads as a C, and the default bar is an A.
+        expect(
+            await screen.findByText(m.today_best_so_far({ best: "C", target: "A" }), {
+                exact: false,
+            }),
+        ).toBeTruthy();
+    });
+
     it("returns to the gentlest suggestion once the starter is finished", async () => {
         masteryMock.mockResolvedValue([]);
         catalogueMock.mockResolvedValue([

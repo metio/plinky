@@ -740,6 +740,7 @@
     "board_follow": "Prati na {platform}",
     "today_assignment_set": "Iz zadatka “{name}”",
     "today_assignment_step": "Iz zadatka “{name}” — korak {step} od {total}",
+    "today_best_so_far": "najbolja ocjena dosad {best}, naučeno pri {target}",
     "takes_download_video": "Spremi video",
     "takes_download_video_portrait": "Spremi uspravni video (9:16, za Reels i Shorts)",
     "takes_video_progress": "Iscrtavanje… {percent}%",

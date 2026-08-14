@@ -7,6 +7,7 @@ import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
 import { partOfDay } from "../../../core/greeting";
 import { buildExerciseId, keyName } from "../../../core/exerciseGen";
+import { type Letter, letterFor } from "../../../core/grade";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
 import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
@@ -60,7 +61,22 @@ const ICON: Record<Task["key"], string> = {
 // anything that they were resuming, counted them against a list nobody handed them, and
 // still did not say which piece was about to open. The set it came from is the line
 // underneath, and the step only once there is a step to be at.
-function rowFor(task: Task, titles: Map<string, string>): { label: string; hint?: string } {
+// Where a piece stands, for a row about a piece you have already played. A step
+// advances when the piece is *learned*, and learned means a run reaching the grade set
+// in Settings — so playing a piece through and seeing it offered again the next day is
+// correct and, until this line existed, completely unexplained.
+function bestLine(best: number | undefined, target: Letter): string | undefined {
+    return best === undefined || best <= 0
+        ? undefined
+        : m.today_best_so_far({ best: letterFor(best), target });
+}
+
+function rowFor(
+    task: Task,
+    titles: Map<string, string>,
+    bests: Map<string, number>,
+    target: Letter,
+): { label: string; hint?: string } {
     switch (task.key) {
         case "review": {
             // Name what is fading: three of them is enough to recognise the week's
@@ -81,7 +97,7 @@ function rowFor(task: Task, titles: Map<string, string>): { label: string; hint?
             // Where in the set this is, said only once there is somewhere to be: a
             // player on the first step has not started, and counting them against a
             // list nobody handed them is the checklist this page is not.
-            const hint =
+            const where =
                 task.step > 1
                     ? m.today_assignment_step({
                           name: task.name,
@@ -89,12 +105,19 @@ function rowFor(task: Task, titles: Map<string, string>): { label: string; hint?
                           total: task.total,
                       })
                     : m.today_assignment_set({ name: task.name });
+            const best = bestLine(bests.get(task.id), target);
             // The catalogue does not know this piece — a shared set naming something
             // this device has not got. Name the set rather than invent a title.
-            return { label: titles.get(task.id) ?? task.name, hint };
+            return {
+                label: titles.get(task.id) ?? task.name,
+                hint: best ? `${where} · ${best}` : where,
+            };
         }
         case "learn":
-            return { label: m.today_learn({ title: task.title }) };
+            return {
+                label: m.today_learn({ title: task.title }),
+                hint: bestLine(bests.get(task.id), target),
+            };
         case "browse":
             return { label: m.today_browse() };
     }
@@ -239,6 +262,10 @@ type Session = {
     arcadeLevel: number;
     // Every catalogue title by id, so a row can name the piece it opens.
     titles: Map<string, string>;
+    // The best a piece has been played, for the rows that say where one stands.
+    bests: Map<string, number>;
+    // The grade a run has to reach for a piece to count as learned (a Settings choice).
+    target: Letter;
     nextLesson: string | undefined;
     // The opening bars of every piece the catalogue knows, so a row draws its own.
     marks: Map<string, string>;
@@ -353,6 +380,12 @@ export function HomeToday() {
                     onStand: mastered.size,
                 },
                 titles: new Map(catalogue.map((item) => [item.id, item.title])),
+                bests: new Map(
+                    items.flatMap((item) =>
+                        item.mastery.bestScore > 0 ? [[item.id, item.mastery.bestScore]] : [],
+                    ),
+                ),
+                target: prefs.masteryThreshold,
                 marks: new Map(
                     catalogue.flatMap((item) => (item.incipit ? [[item.id, item.incipit]] : [])),
                 ),
@@ -416,7 +449,7 @@ export function HomeToday() {
                 <div className="flex flex-wrap gap-2">
                     {daily && (
                         <Chip to={daily.to} lead={!daily.done}>
-                            {rowFor(daily, session.titles).label}
+                            {rowFor(daily, session.titles, session.bests, session.target).label}
                         </Chip>
                     )}
                     {/* The endless ladder is one of the four, not a billboard beside
@@ -445,7 +478,12 @@ export function HomeToday() {
             <Moment label={m.today_moment_work()}>
                 <ul className="space-y-2">
                     {work.map((task, index) => {
-                        const { label, hint } = rowFor(task, session.titles);
+                        const { label, hint } = rowFor(
+                            task,
+                            session.titles,
+                            session.bests,
+                            session.target,
+                        );
                         const id = "id" in task ? task.id : undefined;
                         return (
                             <li key={task.key}>

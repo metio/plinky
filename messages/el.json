@@ -740,6 +740,7 @@
     "board_follow": "Ακολούθησε στο {platform}",
     "today_assignment_set": "Από την εργασία «{name}»",
     "today_assignment_step": "Από την εργασία «{name}» — βήμα {step} από {total}",
+    "today_best_so_far": "καλύτερος βαθμός μέχρι τώρα {best}, κατακτημένο στο {target}",
     "takes_download_video": "Αποθήκευση βίντεο",
     "takes_download_video_portrait": "Αποθήκευση κάθετου βίντεο (9:16, για Reels και Shorts)",
     "takes_video_progress": "Απόδοση… {percent}%",

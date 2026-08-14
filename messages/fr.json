@@ -740,6 +740,7 @@
     "board_follow": "Suivre sur {platform}",
     "today_assignment_set": "Du devoir « {name} »",
     "today_assignment_step": "Du devoir « {name} » — étape {step} sur {total}",
+    "today_best_so_far": "meilleure note {best} jusqu'ici, appris à partir de {target}",
     "takes_download_video": "Enregistrer la vidéo",
     "takes_download_video_portrait": "Enregistrer une vidéo verticale (9:16, pour Reels et Shorts)",
     "takes_video_progress": "Rendu… {percent}%",

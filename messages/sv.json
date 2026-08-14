@@ -740,6 +740,7 @@
     "board_follow": "Följ på {platform}",
     "today_assignment_set": "Från ”{name}”",
     "today_assignment_step": "Från ”{name}” — steg {step} av {total}",
+    "today_best_so_far": "bästa betyg hittills {best}, inlärt vid {target}",
     "takes_download_video": "Spara video",
     "takes_download_video_portrait": "Spara en stående video (9:16, för Reels och Shorts)",
     "takes_video_progress": "Renderar… {percent}%",

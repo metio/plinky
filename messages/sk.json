@@ -739,6 +739,7 @@
     "board_follow": "Sledovať na {platform}",
     "today_assignment_set": "Zo zadania „{name}“",
     "today_assignment_step": "Zo zadania „{name}“ — krok {step} z {total}",
+    "today_best_so_far": "zatiaľ najlepšia známka {best}, naučené pri {target}",
     "takes_download_video": "Uložiť video",
     "takes_download_video_portrait": "Uložiť video na výšku (9:16, pre Reels a Shorts)",
     "takes_video_progress": "Vykresľovanie… {percent}%",
