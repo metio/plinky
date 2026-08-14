@@ -20,6 +20,9 @@ export type LearnPickState = {
     keyboardMet: boolean;
     // Whether a placement test has ever been completed.
     placementTaken: boolean;
+    // Whether every lesson of the theory course has been met. A finished course is a
+    // dead offer, so it drops out of the rotation rather than coming round again.
+    courseDone: boolean;
     // The day's number (the daily challenge's), so the rotation advances once a day.
     day: number;
 };
@@ -27,17 +30,23 @@ export type LearnPickState = {
 // Someone who has never found middle C is offered that before anything else, and the
 // level test comes next — both are one-off, so each drops out once it is done and the
 // rotation takes over for good.
-export function learnPick({ keyboardMet, placementTaken, day }: LearnPickState): LearnPickId {
+export function learnPick({
+    keyboardMet,
+    placementTaken,
+    courseDone,
+    day,
+}: LearnPickState): LearnPickId {
     if (!keyboardMet) {
         return "basics";
     }
     if (!placementTaken) {
         return "placement";
     }
+    const rotation = courseDone ? ROTATION.filter((id) => id !== "theory") : ROTATION;
     // Negative or fractional days would land off the end; the modulo is taken on a
-    // whole, non-negative number so the pick is always one of the four.
-    const index = Math.abs(Math.trunc(day)) % ROTATION.length;
-    return ROTATION[index] as LearnPickId;
+    // whole, non-negative number so the pick is always one of the rotation.
+    const index = Math.abs(Math.trunc(day)) % rotation.length;
+    return rotation[index] as LearnPickId;
 }
 
 export const LEARN_PICK_HREF: Record<LearnPickId, string> = {

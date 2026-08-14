@@ -47,6 +47,16 @@ Collect results existed, you would not have found it.
 Compose, which moved here from the front page — music you make yourself belongs on the
 same shelf as music you find.
 
+**The theory course knows where you are.** A lesson counts as met the moment you play it —
+hearing the idea is the lesson, so there is nothing to tick off — and Today now offers the
+next one you haven't met rather than a lesson picked at random, landing you on it rather
+than at the top of the page. Once you've been through all eight, the course stops being
+offered: there is nothing left of it to suggest.
+
+Practice methods stop promising more than they can give, too. Three of the six are done
+with a control inside a run's set-up panel, and their button said "Try it" and landed on
+the catalogue; they now offer what they actually can — a piece to try it on.
+
 **The same page, wherever you are.** Every page's own name is now set the same way and in
 the same place, section headings look the same whether they are on the front page, in a
 run's set-up panel or in Settings, and lists of music are lists rather than grids of

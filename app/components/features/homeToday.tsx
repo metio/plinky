@@ -8,6 +8,7 @@ import { dailyNumber, todayKey } from "../../../core/daily";
 import { partOfDay } from "../../../core/greeting";
 import { buildExerciseId } from "../../../core/exerciseGen";
 import { LEARN_PICK_HREF, type LearnPickId, learnPick } from "../../../core/learnPick";
+import { courseProgress, LESSONS } from "../../../core/theoryCourse";
 import { practiceHref } from "../../../core/practisable";
 import {
     currentGrade,
@@ -28,6 +29,7 @@ import {
     useMasteryStore,
     useOnboardingStore,
     usePlacementStore,
+    useTheoryStore,
     usePrefsStore,
     useServices,
 } from "../../contexts/services";
@@ -236,6 +238,7 @@ type Session = {
     arcadeLevel: number;
     // Every catalogue title by id, so a row can name the piece it opens.
     titles: Map<string, string>;
+    nextLesson: string | undefined;
     // The opening bars of every piece the catalogue knows, so a row draws its own.
     marks: Map<string, string>;
     learn: LearnPickId;
@@ -255,6 +258,7 @@ export function HomeToday() {
     const masteryStore = useMasteryStore();
     const onboarding = useOnboardingStore();
     const placement = usePlacementStore();
+    const theory = useTheoryStore();
     const exercises = useExerciseSource();
     const services = useServices();
     // Skips steps whose pieces no longer resolve, so the Continue link never
@@ -328,8 +332,12 @@ export function HomeToday() {
                 learn: learnPick({
                     keyboardMet: onboarding.marked().has("keyboardMet"),
                     placementTaken: placement.load() !== null,
+                    courseDone: courseProgress(theory.met()) >= 1,
                     day,
                 }),
+                // Where the course has got to, so offering it opens the lesson you have
+                // not met rather than the top of a page you are halfway down.
+                nextLesson: LESSONS.find((lesson) => !theory.met().has(lesson.id))?.id,
                 // The first arcade rung not yet cleared, read from the same mastery the
                 // play surface records — so clearing a level advances it with nothing
                 // bespoke behind it.
@@ -360,6 +368,7 @@ export function HomeToday() {
         masteryStore.load,
         onboarding.marked,
         placement.load,
+        theory.met,
         services,
         known,
     ]);
@@ -473,7 +482,11 @@ export function HomeToday() {
 
             <Moment label={m.today_moment_learn()}>
                 <Row
-                    to={LEARN_PICK_HREF[session.learn]}
+                    to={
+                        session.learn === "theory" && session.nextLesson
+                            ? `${LEARN_PICK_HREF.theory}#${session.nextLesson}`
+                            : LEARN_PICK_HREF[session.learn]
+                    }
                     icon="💡"
                     label={LEARN_LABEL[session.learn]()}
                     hint={LEARN_BLURB[session.learn]()}

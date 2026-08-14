@@ -24,6 +24,7 @@ import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSou
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
 import { createOnboardingStore, type OnboardingStore } from "../stores/onboardingStore";
+import { createTheoryStore, type TheoryStore } from "../stores/theoryStore";
 import { createNoteStatsStore, type NoteStatsStore } from "../stores/noteStatsStore";
 import { createPlacementStore, type PlacementStore } from "../stores/placementStore";
 import { createSectionBestStore, type SectionBestStore } from "../stores/sectionBestStore";
@@ -62,6 +63,8 @@ export type AppServices = {
     theme: ThemeStore;
     hints: HintsStore;
     onboarding: OnboardingStore;
+    // Which theory lessons have been met, so the course knows where you are.
+    theory: TheoryStore;
     daily: DailyStore;
     milestones: MilestonesStore;
     lifetime: LifetimeStore;
@@ -122,6 +125,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         theme: overrides.theme ?? createThemeStore(store),
         hints: overrides.hints ?? createHintsStore(store),
         onboarding: overrides.onboarding ?? createOnboardingStore(store),
+        theory: overrides.theory ?? createTheoryStore(store),
         daily: overrides.daily ?? createDailyStore(store),
         milestones: overrides.milestones ?? createMilestonesStore(store),
         lifetime: overrides.lifetime ?? createLifetimeStore(store),
@@ -162,6 +166,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     theme: true,
     hints: true,
     onboarding: true,
+    theory: true,
     daily: true,
     milestones: true,
     lifetime: true,
@@ -272,6 +277,10 @@ export function useHintsStore(): HintsStore {
 
 export function useOnboardingStore(): OnboardingStore {
     return useServices().onboarding;
+}
+
+export function useTheoryStore(): TheoryStore {
+    return useServices().theory;
 }
 
 export function useDailyStore(): DailyStore {

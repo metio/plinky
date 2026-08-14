@@ -38,6 +38,7 @@ export function SoundingKeyboard({
     phrases,
     label,
     children,
+    onPlay,
 }: {
     // What to light. Usually the notes of the first phrase, but a comparison lights only
     // what it is about to play first.
@@ -48,6 +49,9 @@ export function SoundingKeyboard({
     // Anything to say between the keyboard and the button, such as what a key signature
     // spells out.
     children?: ReactNode;
+    // Called when the idea is played. The theory course uses it to remember that the
+    // lesson has been met — hearing it is what meeting it means.
+    onPlay?: () => void;
 }) {
     const synth = useSynth();
     const scheduler = useScheduler();
@@ -64,6 +68,7 @@ export function SoundingKeyboard({
 
     const hear = () => {
         stop();
+        onPlay?.();
         for (const phrase of phrases) {
             for (const [index, pitch] of phrase.notes.entries()) {
                 const at = (phrase.afterMs ?? 0) + (phrase.spread ? index * STEP_MS : 0);
