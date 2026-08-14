@@ -3,6 +3,7 @@
 // @vitest-environment jsdom
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { ScoreBackup } from "./scoreBackup";
 
@@ -27,7 +28,11 @@ afterEach(() => localStorage.clear());
 
 describe("ScoreBackup", () => {
     it("imports a bundle from a file and reports the count", async () => {
-        const { container } = render(<ScoreBackup />);
+        const { container } = render(
+            <MemoryRouter>
+                <ScoreBackup />
+            </MemoryRouter>,
+        );
         fireEvent.change(fileInput(container), {
             target: { files: [new File([PACK], "pack.json", { type: "application/json" })] },
         });
@@ -35,7 +40,11 @@ describe("ScoreBackup", () => {
     });
 
     it("reports a friendly error for a file that is not a pack", async () => {
-        const { container } = render(<ScoreBackup />);
+        const { container } = render(
+            <MemoryRouter>
+                <ScoreBackup />
+            </MemoryRouter>,
+        );
         fireEvent.change(fileInput(container), {
             target: { files: [new File(["not json"], "x.json")] },
         });
@@ -43,7 +52,11 @@ describe("ScoreBackup", () => {
     });
 
     it("ignores a slower earlier read once a newer file has been picked", async () => {
-        const { container } = render(<ScoreBackup />);
+        const { container } = render(
+            <MemoryRouter>
+                <ScoreBackup />
+            </MemoryRouter>,
+        );
         const pack = (n: number) =>
             JSON.stringify({
                 format: "plinky-scores",

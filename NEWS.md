@@ -107,6 +107,16 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The score pack says what it is not.** Downloading your scores from Music reads as "my
+progress is safe" — it is sheet music and nothing else, and grades, recordings and
+settings live in the whole-device backup in Settings. The block now says so, and links
+there.
+
+**A fingering you regret can be undone.** Working out finger numbers for a piece and
+changing your mind meant overwriting every note by hand, or wiping the whole device: the
+"start this piece over" the store has always been able to do was never offered. It is a
+button in the fingering strip now, behind a confirm.
+
 **A lighted keyboard knows its own name.** Switch the key lights on with a Yamaha EZ-300
 or a Casio LK-S plugged in and Plinky now sets that maker's channels itself, instead of
 asking you to pick the make of the piano in front of you. It is a starting point, not a
