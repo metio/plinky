@@ -153,8 +153,11 @@ export const METRONOME_SUBDIVISIONS = [1, 2, 3, 4];
 export const REVEAL_TRIES = [1, 2, 3];
 
 const LETTERS: Letter[] = ["S", "A", "B", "C", "D"];
-const NOTE_HINTS: NoteHints[] = ["always", "miss", "never"];
-const NOTE_LABELS: NoteLabels[] = ["all", "c", "solfege", "off"];
+// Both orders run from most help to none, and the keyboard's tap-to-cycle controls walk
+// them in that order — so this is the one list of what each setting may be, rather than a
+// validation list and a cycle that can disagree about what exists.
+export const NOTE_HINT_CYCLE: NoteHints[] = ["always", "miss", "never"];
+export const NOTE_LABEL_CYCLE: NoteLabels[] = ["all", "c", "solfege", "off"];
 const DECAY_MODES: DecayMode[] = ["gentle", "competitive"];
 
 export function clampVolume(value: number): number {
@@ -298,8 +301,8 @@ export function parsePrefs(raw: string | null): Prefs {
             beams: oneOf(parsed.beams, BEAMS, base.beams),
             showAccompaniment: bool(parsed.showAccompaniment, base.showAccompaniment),
             colorNotes: bool(parsed.colorNotes, base.colorNotes),
-            noteHints: oneOf(parsed.noteHints, NOTE_HINTS, base.noteHints),
-            noteLabels: oneOf(parsed.noteLabels, NOTE_LABELS, base.noteLabels),
+            noteHints: oneOf(parsed.noteHints, NOTE_HINT_CYCLE, base.noteHints),
+            noteLabels: oneOf(parsed.noteLabels, NOTE_LABEL_CYCLE, base.noteLabels),
             forgiving: bool(parsed.forgiving, base.forgiving),
             decayMode: oneOf(parsed.decayMode, DECAY_MODES, base.decayMode),
             reviewCap: oneOf(parsed.reviewCap, REVIEW_CAPS, base.reviewCap),

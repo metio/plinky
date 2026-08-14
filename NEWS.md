@@ -107,6 +107,11 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**An imported score keeps a sensible tempo.** The tempo box on the import screen accepted
+anything typed into it, so a slipped key could save a piece at 5000 beats a minute and a
+cleared box saved 90 whatever the score itself was marked at. It now holds to the range
+the box offers, and an empty one falls back to the piece's own marking.
+
 ## 16 August 2026 — later
 
 **Plinky moved to a new home.** The site is now served from Cloudflare Pages instead of

@@ -4,8 +4,8 @@
 import type React from "react";
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_THEME } from "../../../core/keyboardTheme";
-import { pitchClass } from "../../../core/midi";
-import { solfegeOf } from "../../../core/notes";
+import { spokenPitch } from "../../../core/midi";
+import { keyLabelOf } from "../../../core/notes";
 import type { NoteLabels } from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { BLACK_KEY, KEYBED_WELL, WHITE_KEY } from "./keyboardStyles";
@@ -41,34 +41,20 @@ const SYLLABLES: Array<() => string> = [
     m.solfege_si,
 ];
 
-// The label to print on a key, or null for none. "all" labels every key by letter;
-// "c" prints only on the C keys, the landmark that orients a beginner (the white key
-// just left of each two-black-key group); "solfege" names every key the way a reader
-// raised on do-re-mi already thinks of it; "off" prints nothing.
-function keyLabel(note: number, labels: NoteLabels): string | null {
-    if (labels === "all") {
-        return pitchClass(note);
-    }
-    if (labels === "c" && ((note % 12) + 12) % 12 === 0) {
-        return "C";
-    }
-    if (labels === "solfege") {
-        const { degree, sharp } = solfegeOf(note);
-        return `${SYLLABLES[degree]?.() ?? ""}${sharp ? SHARP_GLYPH : ""}`;
-    }
-    return null;
-}
-
-// The typographic sharp pitchClass prints, and the word a screen reader should say
-// instead — a bare "#" (or the "♯" glyph) is read as "number"/"pound", not "sharp".
+// The typographic sharp a solfège syllable takes when it names a raised note.
 const SHARP_GLYPH = "♯";
-const SPOKEN_SHARP = " sharp";
 
-// A key's spoken name: "C sharp 4", not "C#4" — the sharp is spelled and the octave is
-// spaced off the letter so a screen reader announces the pitch a player expects.
-function spokenNote(note: number): string {
-    const octave = Math.floor(note / 12) - 1;
-    return `${pitchClass(note).replace(SHARP_GLYPH, SPOKEN_SHARP)} ${octave}`;
+// Which label the setting calls for, said in the reader's own language: the syllables
+// are translated copy, so core decides what to print and this spells it.
+function keyLabel(note: number, labels: NoteLabels): string | null {
+    const label = keyLabelOf(note, labels);
+    if (label === null) {
+        return null;
+    }
+    if (label.kind === "letter") {
+        return label.letter;
+    }
+    return `${SYLLABLES[label.degree]?.() ?? ""}${label.sharp ? SHARP_GLYPH : ""}`;
 }
 
 const NONE: ReadonlySet<number> = new Set();
@@ -498,7 +484,7 @@ export function Keyboard({
                         <button
                             key={note}
                             type="button"
-                            aria-label={spokenNote(note)}
+                            aria-label={spokenPitch(note)}
                             aria-pressed={lit.has(note)}
                             tabIndex={note === roved ? 0 : -1}
                             data-note={note}
@@ -535,7 +521,7 @@ export function Keyboard({
                         <button
                             key={note}
                             type="button"
-                            aria-label={spokenNote(note)}
+                            aria-label={spokenPitch(note)}
                             aria-pressed={lit.has(note)}
                             tabIndex={note === roved ? 0 : -1}
                             data-note={note}
@@ -570,7 +556,7 @@ export function Keyboard({
                 )}
             </div>
             <span key={flash?.seq} className="sr-only" role="status" aria-live="assertive">
-                {flashNote !== null ? m.keyboard_wrong_note({ note: spokenNote(flashNote) }) : ""}
+                {flashNote !== null ? m.keyboard_wrong_note({ note: spokenPitch(flashNote) }) : ""}
             </span>
         </div>
     );

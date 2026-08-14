@@ -168,6 +168,18 @@ export function personSlug(raw: string): string {
         .replace(/^-+|-+$/g, "");
 }
 
+// The best a slug can be turned back into a name, for the composer nobody in the
+// catalogue is credited as — a player's own import, or a hand-typed URL. The slug has
+// lost the diacritics and the capitalisation, so this recovers only word boundaries;
+// a name the catalogue does know is always read from the catalogue instead.
+export function nameFromSlug(slug: string): string {
+    return slug
+        .split("-")
+        .filter(Boolean)
+        .map((word) => (word[0] ?? "").toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
 // What a person page needs to know about one piece, whatever catalogue it
 // came from.
 export type PersonPiece = {

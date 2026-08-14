@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { IntervalId } from "../../../core/theory";
-import { semitonesOf, SEMITONES_PER_OCTAVE } from "../../../core/theory";
+import { ladderOffset } from "../../../core/earAnswer";
+import { type IntervalId, SEMITONES_PER_OCTAVE, semitonesOf } from "../../../core/theory";
 import { intervalName } from "../../lib/theoryNames";
 import { answerClasses, type Verdict } from "./earVerdict";
 import { m } from "../../paraglide/messages.js";
@@ -34,10 +34,6 @@ const BOX_HEIGHT = LADDER_HEIGHT + RUNG_HEIGHT;
 
 // Where a rung sits, as a percentage from the foot of the ladder. The rung is centred
 // on its height, so the label lines up with the distance it names.
-function offsetOf(interval: IntervalId): number {
-    return (semitonesOf(interval) / SEMITONES_PER_OCTAVE) * 100;
-}
-
 export function EarLadder({
     choices,
     answer,
@@ -88,7 +84,7 @@ export function EarLadder({
                             height: `${RUNG_HEIGHT}px`,
                             // Measured against the inset span, not the padded box, so a
                             // rung still lands on the exact height it names.
-                            bottom: `${INSET + (offsetOf(interval) / 100) * LADDER_HEIGHT - RUNG_HEIGHT / 2}px`,
+                            bottom: `${INSET + (ladderOffset(interval) / 100) * LADDER_HEIGHT - RUNG_HEIGHT / 2}px`,
                         }}
                     >
                         {interval === answer && settled ? (

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { type Person, type PersonPiece, personFor } from "../../core/person";
+import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../core/person";
 import { BakedIncipit } from "../components/ui/incipit";
 import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
@@ -39,16 +39,6 @@ function knownPerson(slug: string): Person | null {
     }
     const indexed = indexedPerson(slug);
     return indexed ? { slug, name: indexed.name, pieces: [] } : null;
-}
-
-// The fallback for a slug the catalogue credits nobody by — a user's own import, or a
-// hand-typed URL: prettify the slug so the tab still reads as a name.
-function nameFromSlug(slug: string): string {
-    return slug
-        .split("-")
-        .filter(Boolean)
-        .map((word) => word[0]?.toUpperCase() + word.slice(1))
-        .join(" ");
 }
 
 export function meta({ params }: Route.MetaArgs) {

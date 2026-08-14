@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { NoteHints, NoteLabels } from "../../../core/prefs";
+import { nextIn } from "../../../core/cycle";
+import {
+    NOTE_HINT_CYCLE,
+    NOTE_LABEL_CYCLE,
+    type NoteHints,
+    type NoteLabels,
+} from "../../../core/prefs";
 import { m } from "../../paraglide/messages.js";
 import { KeysIcon } from "../ui/icons";
 import { ToggleIconButton } from "../ui/toggleIconButton";
@@ -12,16 +18,8 @@ import { ToggleIconButton } from "../ui/toggleIconButton";
 // edit with full captions — one source of truth, two doors — so a change here
 // is a change everywhere.
 
-// Tap-to-cycle orders, each walking from most help to none.
-const LABELS_CYCLE: NoteLabels[] = ["all", "c", "solfege", "off"];
-const HINTS_CYCLE: NoteHints[] = ["always", "miss", "never"];
 // Filled / half / empty: how much the keyboard gives away about the next note.
 const hintGlyph: Record<NoteHints, string> = { always: "◉", miss: "◐", never: "○" };
-
-function nextIn<T>(cycle: readonly T[], current: T): T {
-    const index = cycle.indexOf(current);
-    return cycle[(index + 1) % cycle.length] as T;
-}
 
 const CYCLE_BUTTON =
     "min-w-9 rounded-md px-2 py-1 text-xs font-medium tabular-nums text-muted hover:bg-subtle hover:text-ink";
@@ -69,7 +67,7 @@ export function KeyboardQuickControls({
                 <>
                     <button
                         type="button"
-                        onClick={() => onNoteLabels(nextIn(LABELS_CYCLE, noteLabels))}
+                        onClick={() => onNoteLabels(nextIn(NOTE_LABEL_CYCLE, noteLabels))}
                         aria-label={`${m.settings_note_labels()}: ${
                             noteLabels === "all"
                                 ? m.note_labels_all()
@@ -84,7 +82,7 @@ export function KeyboardQuickControls({
                     {noteHints !== undefined && onNoteHints !== undefined && (
                         <button
                             type="button"
-                            onClick={() => onNoteHints(nextIn(HINTS_CYCLE, noteHints))}
+                            onClick={() => onNoteHints(nextIn(NOTE_HINT_CYCLE, noteHints))}
                             aria-label={`${m.settings_note_hints()}: ${
                                 noteHints === "always"
                                     ? m.note_hints_always()

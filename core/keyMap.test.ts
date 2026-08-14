@@ -6,12 +6,13 @@ import {
     cleanKeyMap,
     DEFAULT_KEY_MAP,
     isDefaultKeyMap,
-    type KeyMap,
+    keyCapOf,
     keyForSlot,
     keyPlaysNote,
     pedalForKey,
     rebind,
     rebindPedal,
+    type KeyMap,
 } from "./keyMap";
 
 describe("keyForSlot", () => {
@@ -195,5 +196,20 @@ describe("pedal bindings", () => {
 
     it("counts a bound pedal as a customised layout", () => {
         expect(isDefaultKeyMap(rebindPedal(DEFAULT_KEY_MAP, "sustain", " "))).toBe(false);
+    });
+});
+
+describe("keyCapOf", () => {
+    it("prints the key the way it is printed on the keyboard itself", () => {
+        expect(keyCapOf("a")).toBe("A");
+        expect(keyCapOf(";")).toBe(";");
+    });
+
+    it("shows a glyph for the space bar, which would otherwise be a blank cap", () => {
+        expect(keyCapOf(" ")).toBe("\u2423");
+    });
+
+    it("shows a dash for a slot nothing is bound to", () => {
+        expect(keyCapOf(null)).toBe("\u2014");
     });
 });
