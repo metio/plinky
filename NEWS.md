@@ -107,6 +107,10 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The daily challenge is wrapped in the right colour.** The unopened present was drawn
+in a washed-out blue that came out grey against the paper — the one cold thing on a warm
+page. It now wears the same brass as the warm-up chip that leads to it.
+
 **You says less until you've done something, and more once you have.** The page opened
 with a pair of zeros over an empty week chart, and eight grade rows each reading "0 /
 447" — a denominator nobody is meant to finish. The counts now appear with your first

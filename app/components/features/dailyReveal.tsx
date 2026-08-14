@@ -36,12 +36,15 @@ export function DailyReveal({
                 setOpened(true);
                 onOpen?.();
             }}
-            className="flex w-full flex-col items-center gap-3 rounded-xl border border-accent-line bg-accent-surface/50 px-6 py-12 text-center transition hover:border-accent-line-strong hover:shadow-md dark:bg-accent-surface/30"
+            // Wrapped in the same brass the day's warm-up is chipped in, because that
+            // chip is what leads here. Half-strength accent over the paper came out a
+            // cold grey — the one cool block in a warm app, and a poor present.
+            className="flex w-full flex-col items-center gap-3 rounded-xl border border-spark-soft bg-spark-surface px-6 py-12 text-center transition hover:border-spark hover:shadow-md"
         >
             <span aria-hidden="true" className="animate-bounce text-5xl motion-reduce:animate-none">
                 🎁
             </span>
-            <span className="text-lg font-medium text-accent-deep">{m.daily_reveal()}</span>
+            <span className="text-lg font-medium text-spark-strong">{m.daily_reveal()}</span>
         </button>
     );
 }
