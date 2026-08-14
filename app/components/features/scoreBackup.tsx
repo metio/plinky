@@ -7,7 +7,8 @@ import { downloadBlob } from "../../lib/download";
 import { useStore, useXmlCodec } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
-import { sectionHeadingClasses } from "../ui/classes";
+import { linkClasses, sectionHeadingClasses } from "../ui/classes";
+import { LocalizedLink as Link } from "../ui/localizedLink";
 
 function pluralScores(count: number): string {
     return count === 1 ? m.backup_scores_one({ count }) : m.backup_scores_other({ count });
@@ -64,6 +65,15 @@ export function ScoreBackup() {
         <section className="space-y-3">
             <h2 className={sectionHeadingClasses}>{m.backup_heading()}</h2>
             <p className="text-sm text-muted">{m.backup_intro({ count: pluralScores(count) })}</p>
+            {/* Downloading a score pack reads as "my progress is safe" — it is sheet music
+                and nothing else, and the file that carries the rest lives somewhere else
+                entirely. Saying so here is cheaper than the day somebody finds out. */}
+            <p className="text-sm text-muted">
+                {m.backup_not_progress()}{" "}
+                <Link to="/settings" className={linkClasses}>
+                    {m.progress_backup_heading()}
+                </Link>
+            </p>
             <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" onClick={download} disabled={count === 0}>
                     {m.backup_download()}
