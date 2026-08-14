@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { DEFAULT_SONG_SOURCE } from "../../core/attribution";
-import {
-    type ExerciseConfig,
-    exerciseTitle,
-    generateExercise,
-    parseExerciseId,
-} from "../../core/exerciseGen";
+import { type ExerciseConfig, generateExercise, parseExerciseId } from "../../core/exerciseGen";
 import type { Fetcher } from "../ports/fetcher";
 import { cachedManifest, fetchMxlXml, type ResolvedScore } from "./manifest";
 
@@ -44,6 +39,12 @@ const MANIFEST_URL = "/exercises/manifest.json";
 const GENERATED_TEMPO = 90;
 const GENERATED_BEATS = 4;
 
+// How a generated scale or arpeggio is named. Injected, because the name is the reader's
+// language and this layer has none: the manifest is built in English, and a player who
+// reads Japanese must not be handed "C major scale · both hands" for a piece the app
+// generates on the spot.
+export type ExerciseNamer = (config: ExerciseConfig) => string;
+
 // A generated scale/arpeggio as a playable score — our own work at runtime, so it credits
 // no external source and rides into the public domain like the manifest's own generated set.
 function generatedExercise(
@@ -51,10 +52,11 @@ function generatedExercise(
     config: ExerciseConfig,
     tempo: number,
     beatsPerBar: number,
+    nameOf: ExerciseNamer,
 ): ResolvedScore {
     return {
         id,
-        title: exerciseTitle(config),
+        title: nameOf(config),
         composer: "",
         description: "",
         xml: generateExercise(config),
@@ -77,8 +79,22 @@ export type ExerciseSource = {
     resolve(id: string): Promise<ResolvedScore>;
 };
 
-export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
-    const manifest = cachedManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL);
+export function createExerciseSource(fetchUrl: Fetcher, nameOf: ExerciseNamer): ExerciseSource {
+    const fetchManifest = cachedManifest<ExerciseMeta>(fetchUrl, MANIFEST_URL);
+
+    // The manifest ships one English title per exercise, baked when it was generated. A
+    // generated scale carries the config it was made from, so its name is worked out here
+    // instead — the studies keep theirs, being the names their composers gave them.
+    const manifest = async (): Promise<ExerciseMeta[] | null> => {
+        const list = await fetchManifest();
+        return (
+            list?.map((meta) =>
+                meta.kind === "scale-arpeggio" && meta.config
+                    ? { ...meta, title: nameOf(meta.config) }
+                    : meta,
+            ) ?? null
+        );
+    };
 
     // A study's MusicXML lives in a compressed .mxl named by its fingerprint id.
     const fetchStudyXml = (id: string): Promise<string | null> =>
@@ -99,11 +115,11 @@ export function createExerciseSource(fetchUrl: Fetcher): ExerciseSource {
                 // absent. Generated exercises share the manifest's scale tempo and metre.
                 const config = parseExerciseId(id);
                 return config
-                    ? generatedExercise(id, config, GENERATED_TEMPO, GENERATED_BEATS)
+                    ? generatedExercise(id, config, GENERATED_TEMPO, GENERATED_BEATS, nameOf)
                     : null;
             }
             if (meta.kind === "scale-arpeggio" && meta.config) {
-                return generatedExercise(id, meta.config, meta.tempo, meta.beatsPerBar);
+                return generatedExercise(id, meta.config, meta.tempo, meta.beatsPerBar, nameOf);
             }
             const xml = await fetchStudyXml(id);
             if (xml === null) {

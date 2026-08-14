@@ -7,6 +7,7 @@ import {
     EXERCISE_TILES,
     type ExerciseConfig,
     exerciseTitle,
+    exerciseTitleParts,
     generateExercise,
     type Hands,
     type Interval,
@@ -318,5 +319,74 @@ describe("an id names the exercise, not the route taken to it", () => {
             }
         }
         expect([...new Set(duplicates)].slice(0, 5)).toEqual([]);
+    });
+});
+
+describe("exerciseTitleParts", () => {
+    const base: ExerciseConfig = {
+        type: "major-scale",
+        key: "c",
+        octaves: 1,
+        hands: "right",
+        inversion: 0,
+        interval: "single",
+    };
+
+    it("names the key as a musician writes it, and leaves the words to the caller", () => {
+        // The parts, not a sentence: "C major scale" has a different shape in every
+        // language, so nothing here may assume English word order.
+        expect(exerciseTitleParts({ ...base, key: "eflat" })).toEqual({
+            key: "E\u266d",
+            type: "major-scale",
+            forms: [],
+        });
+        expect(exerciseTitleParts({ ...base, key: "fsharp" }).key).toBe("F\u266f");
+    });
+
+    it("says only what makes this one different from the plain form", () => {
+        expect(exerciseTitleParts({ ...base, octaves: 2, hands: "both" }).forms).toEqual([
+            "two-octaves",
+            "both-hands",
+        ]);
+        expect(exerciseTitleParts({ ...base, interval: "thirds" }).forms).toEqual(["thirds"]);
+    });
+
+    it("never claims a form the notes do not have", () => {
+        // Normalisation drops an inversion from a scale and contrary motion from an
+        // arpeggio; a title that kept them would describe a piece nobody is playing.
+        expect(exerciseTitleParts({ ...base, inversion: 2 }).forms).toEqual([]);
+        expect(
+            exerciseTitleParts({ ...base, type: "major-arpeggio", hands: "contrary" }).forms,
+        ).toEqual(["both-hands"]);
+    });
+
+    it("orders the forms the same way whatever the exercise", () => {
+        // The list reads as one phrase, so its order has to be fixed rather than falling
+        // out of which branches happened to run.
+        expect(
+            exerciseTitleParts({
+                ...base,
+                interval: "sixths",
+                octaves: 2,
+                hands: "left",
+            }).forms,
+        ).toEqual(["sixths", "two-octaves", "left-hand"]);
+    });
+
+    it("agrees with the English title the score itself carries", () => {
+        const config: ExerciseConfig = { ...base, type: "dim7-arpeggio", inversion: 1 };
+        const { key, forms } = exerciseTitleParts(config);
+        const title = exerciseTitle(config);
+        expect(title.startsWith(key)).toBe(true);
+        expect(forms).toEqual(["inversion-1"]);
+        expect(title).toContain("1st inversion");
+    });
+
+    it("has a name for every kind of exercise the tiles offer", () => {
+        for (const tile of EXERCISE_TILES) {
+            const { type } = exerciseTitleParts(tile);
+            expect(type).toBe(tile.type);
+            expect(exerciseTitle(tile).length).toBeGreaterThan(0);
+        }
     });
 });

@@ -20,6 +20,7 @@ import { httpFetcher } from "../adapters/httpFetcher";
 import type { VideoExporter } from "../ports/videoExporter";
 import { createAssignmentsStore, type AssignmentsStore } from "../stores/assignmentsStore";
 import { createDailyStore, type DailyStore } from "../stores/dailyStore";
+import { exerciseName } from "../lib/exerciseNames";
 import { createExerciseSource, type ExerciseSource } from "../stores/exerciseSource";
 import { createHintsStore, type HintsStore } from "../stores/hintsStore";
 import { createMilestonesStore, type MilestonesStore } from "../stores/milestonesStore";
@@ -144,7 +145,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         scheduler,
         xml: overrides.xml ?? domXmlCodec,
         songs: overrides.songs ?? createSongSource(fetcher),
-        exercises: overrides.exercises ?? createExerciseSource(fetcher),
+        exercises: overrides.exercises ?? createExerciseSource(fetcher, exerciseName),
         video: overrides.video ?? lazyVideoExporter,
         // The shared app-wide instance by default — the composition root watches
         // the same signal the screens write to.

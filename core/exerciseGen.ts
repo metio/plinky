@@ -395,21 +395,57 @@ const SCALE_LABEL: Record<string, string> = {
     "dim7-arpeggio": "diminished 7th arpeggio",
 };
 
-export function exerciseTitle(raw: ExerciseConfig): string {
+// What an exercise is called, before anything says it: the key it is in, what it is, and
+// the ways this one differs from the plain form. The words are the caller's, because
+// "C major scale" is a sentence with a different shape in every language — Germans join
+// it up, Japanese puts the key inside the word — so a translator writes the whole title
+// rather than a noun somebody else concatenates a key onto.
+export type ExerciseForm =
+    | "thirds"
+    | "sixths"
+    | "two-octaves"
+    | "left-hand"
+    | "both-hands"
+    | "contrary"
+    | "inversion-1"
+    | "inversion-2";
+
+export type ExerciseTitle = { key: string; type: ExerciseType; forms: ExerciseForm[] };
+
+export function exerciseTitleParts(raw: ExerciseConfig): ExerciseTitle {
     const config = normalizeExercise(raw);
-    const parts = [`${keyName(config.key)} ${SCALE_LABEL[config.type]}`];
-    const hands = config.hands;
-    const forms: string[] = [];
-    if (config.interval === "thirds") forms.push("in thirds");
-    if (config.interval === "sixths") forms.push("in sixths");
-    if (config.octaves === 2) forms.push("2 octaves");
-    if (hands === "left") forms.push("left hand");
-    if (hands === "both") forms.push("both hands");
-    if (hands === "contrary") forms.push("contrary motion");
-    if (config.inversion === 1) forms.push("1st inversion");
-    if (config.inversion === 2) forms.push("2nd inversion");
-    return forms.length ? `${parts[0]} · ${forms.join(", ")}` : parts[0]!;
+    const forms: ExerciseForm[] = [];
+    if (config.interval === "thirds") forms.push("thirds");
+    if (config.interval === "sixths") forms.push("sixths");
+    if (config.octaves === 2) forms.push("two-octaves");
+    if (config.hands === "left") forms.push("left-hand");
+    if (config.hands === "both") forms.push("both-hands");
+    if (config.hands === "contrary") forms.push("contrary");
+    if (config.inversion === 1) forms.push("inversion-1");
+    if (config.inversion === 2) forms.push("inversion-2");
+    return { key: keyName(config.key), type: config.type, forms };
 }
+
+// The English name, for the score's own <work-title> and for the tooling that builds the
+// exercise manifest. What a player reads is named in their language by the app; a
+// MusicXML file exported from here carries the one spelling every catalogue of scales
+// has used, whoever opens it.
+export function exerciseTitle(raw: ExerciseConfig): string {
+    const { key, type, forms } = exerciseTitleParts(raw);
+    const named = `${key} ${SCALE_LABEL[type]}`;
+    return forms.length ? `${named} · ${forms.map((form) => FORM_LABEL[form]).join(", ")}` : named;
+}
+
+const FORM_LABEL: Record<ExerciseForm, string> = {
+    thirds: "in thirds",
+    sixths: "in sixths",
+    "two-octaves": "2 octaves",
+    "left-hand": "left hand",
+    "both-hands": "both hands",
+    contrary: "contrary motion",
+    "inversion-1": "1st inversion",
+    "inversion-2": "2nd inversion",
+};
 
 // --- id <-> config ----------------------------------------------------------
 
