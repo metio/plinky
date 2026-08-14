@@ -17,11 +17,20 @@ const PER_PAGE = 60;
 // starred/due toggles — plus paging, applied over the pure core filter. The
 // starred set is subscribed, so starring anywhere (this list, seeding) refreshes
 // the matches.
-export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record<string, Mastery>) {
+export function useLibraryFilters(
+    items: readonly LibraryItem[],
+    mastery: Record<string, Mastery>,
+    // A grade to open on, from the link that arrived here — the roadmap sends a reader to
+    // "everything at grade 6" so that pressing a grade proves it is theirs to open. It
+    // seeds the filter and nothing more: the All chip is right there.
+    startGrade?: number,
+) {
     const favorites = useFavorites();
     const [query, setQuery] = useState("");
     const [kind, setKind] = useState<LibraryKind | "">("");
-    const [grades, setGrades] = useState<ReadonlySet<number>>(new Set());
+    const [grades, setGrades] = useState<ReadonlySet<number>>(() =>
+        startGrade === undefined ? new Set() : new Set([startGrade]),
+    );
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const [dueOnly, setDueOnly] = useState(false);
     const [visible, setVisible] = useState(PER_PAGE);

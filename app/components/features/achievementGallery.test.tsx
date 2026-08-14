@@ -37,7 +37,10 @@ describe("AchievementGallery", () => {
         const firstS = screen.getByText(m.achievement_first_s()).closest("li");
         expect(firstS?.innerHTML).not.toContain("grayscale");
         const flawless = screen.getByText(m.achievement_flawless()).closest("li");
-        expect(flawless?.querySelector('[aria-hidden="true"]')?.className).toContain("grayscale");
-        expect(flawless?.querySelector('[aria-hidden="true"]')?.className).toContain("opacity-45");
+        // Quieter, not locked: an unearned badge keeps its colour and its frame — a
+        // dashed grey outline is the vocabulary of a padlock, and nothing here is one.
+        expect(flawless?.querySelector('[aria-hidden="true"]')?.className).toContain("opacity-50");
+        expect(flawless?.className).not.toContain("dashed");
+        expect(flawless?.querySelector('[aria-hidden="true"]')?.className).toContain("opacity-50");
     });
 });

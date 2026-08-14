@@ -85,13 +85,11 @@ export function YouView() {
                 <RefreshQueue reviews={data.reviews} />
             </FeatureBoundary>
 
-            <GradeRoadmap
-                items={data.items}
-                level={level}
-                mode={mode}
-                now={data.now}
-                poolSizes={data.poolSizes}
-            />
+            {/* Named and framed like every other block on the page — and the frame is
+                where the app finally says out loud what has always been true of it. */}
+            <SettingsSection title={m.grades_roadmap_heading()} hint={m.grades_roadmap_hint()}>
+                <GradeRoadmap items={data.items} level={level} mode={mode} now={data.now} />
+            </SettingsSection>
 
             {/* Where the ladder starts for someone who has no idea. It answers the
                 question the roadmap raises, so it sits directly under it. */}

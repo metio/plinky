@@ -107,6 +107,17 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Nothing in Plinky is locked, and now it says so.** Grades describe how hard the music
+is to read; they have never decided what you may open. The eight-grade map on You now
+carries that in as many words, and every grade on it is a link: press Grade 8 on your
+first day and you land on its four hundred pieces, all of them yours to try. The map also
+stops printing "3 / 447" beside each grade — a denominator nobody is meant to finish turns
+a shelf into a requirement, and the distance to the next star is the number that actually
+guides. Unearned badges keep their colour and their frame instead of the dashed grey
+outline every game uses for "you may not have this", the placement test says it is a
+starting point rather than a limit, and a device with no grade yet reads "No grade yet —
+everything's open."
+
 **The shelf reads as music.** Music opened on a hundred and forty scales and studies —
 no actual piece appeared until the third screenful — because three lists were stacked end
 to end and the order each of them arrived in was thrown away. One shelf now, easiest first
