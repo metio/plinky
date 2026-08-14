@@ -27,6 +27,10 @@ export type TakesStore = {
     // Remove a take by id. On a failed rewrite the take is still in storage,
     // and the returned list says so instead of pretending it is gone.
     remove(songId: string, takeId: string): TakesResult;
+    // Every piece that has a take, newest first — what the shelf needs to show somebody
+    // their own playing. Without it a recording is reachable only by remembering which
+    // piece it was on and opening that piece's runs.
+    all(): Array<{ songId: string; takes: Take[] }>;
     subscribe(onChange: () => void): () => void;
 };
 
@@ -51,6 +55,13 @@ export function createTakesStore(kv: KeyValueStore): TakesStore {
 
     return {
         list,
+        all() {
+            return store
+                .loadAll()
+                .map(({ id }) => ({ songId: id, takes: list(id) }))
+                .filter((entry) => entry.takes.length > 0)
+                .sort((a, b) => (b.takes[0]?.createdAt ?? 0) - (a.takes[0]?.createdAt ?? 0));
+        },
         save(songId, take) {
             const next = [take, ...list(songId).filter((other) => other.id !== take.id)].slice(
                 0,

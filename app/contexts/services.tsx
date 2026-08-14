@@ -288,6 +288,10 @@ export function useDailyStore(): DailyStore {
     return useServices().daily;
 }
 
+export function useTakesStore(): TakesStore {
+    return useServices().takes;
+}
+
 export function useFingeringStore(): FingeringStore {
     return useServices().fingering;
 }

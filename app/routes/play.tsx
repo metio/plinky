@@ -31,6 +31,7 @@ import { breadcrumbData, musicCompositionData, routeMeta } from "../../core/site
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/play";
+import { useSearchParams } from "react-router";
 
 export function meta({ params }: Route.MetaArgs) {
     // Bundled scores resolve at prerender (no localStorage), so each one gets its
@@ -68,7 +69,12 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     const [attempt, setAttempt] = useState(0);
     const resolved = useScore(params.scoreId, attempt);
     const score = resolved === "unavailable" ? undefined : resolved;
-    const [mode, setMode] = useState<PlayMode>("play");
+    // ?tab=runs opens straight onto your saved runs, so a recording can be linked to —
+    // the shelf's list of takes points here.
+    const [searchParams] = useSearchParams();
+    const [mode, setMode] = useState<PlayMode>(
+        searchParams.get("tab") === "runs" ? "runs" : "play",
+    );
     // Transposition is a page option shared by the score and the title-line Print /
     // Export buttons, so all three render in the same key.
     const [transpose, setTranspose] = useState(0);

@@ -107,6 +107,13 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Your recordings have a home.** A take was only ever reachable from the piece it was
+recorded on — you had to remember which piece, find it, open it and switch tabs, and if
+the title had gone from your head the recording was gone with it. Music's second tab now
+lists every piece you have recorded, newest first, with how many takes and when; each one
+opens straight onto that piece's runs. That link works as a bookmark too, which it never
+did before.
+
 **Getting started stopped being a separate list.** The three setup steps sat in their own
 tinted card at the foot of Today, with tick circles and a count — the one chore list in an
 app that refuses chore lists, and the loudest thing on a beginner's first visit. They are

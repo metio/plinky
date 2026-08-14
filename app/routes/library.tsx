@@ -24,6 +24,7 @@ import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
 import { PageHeader } from "../components/ui/pageHeader";
 import { sectionHeadingClasses } from "../components/ui/classes";
+import { YourTakes } from "../components/features/yourTakes";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.nav_music(), m.meta_library_description());
@@ -101,6 +102,14 @@ export default function LibraryRoute() {
 
             {tab === "manage" ? (
                 <>
+                    {/* Everything of your own, on one shelf: what you recorded, what you
+                        brought, and the backup that keeps both. Your takes were reachable
+                        only from the piece they belong to, which meant remembering which
+                        piece it was. */}
+                    <section className="space-y-2">
+                        <h2 className={sectionHeadingClasses}>{m.takes_panel_heading()}</h2>
+                        <YourTakes />
+                    </section>
                     <section className="space-y-2">
                         <h2 className={sectionHeadingClasses}>{m.import_heading()}</h2>
                         <p className="text-sm text-muted">{m.import_intro()}</p>
