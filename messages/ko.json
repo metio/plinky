@@ -525,6 +525,7 @@
     "home_assignments": "과제",
     "home_assignments_blurb": "곡들을 순서대로 이어놓은 안내 경로예요 — 선생님이 만든 것이든 직접 만든 것이든, 단계를 통과할 때마다 채점돼요.",
     "progress_days_practiced": "연습한 날",
+    "progress_all_time": "전체 기간",
     "progress_notes_played": "연주한 음표",
     "progress_last_7_days": "지난 7일",
     "progress_notes_one": "{count}개 음표",

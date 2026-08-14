@@ -525,6 +525,7 @@
     "home_assignments": "Tareas",
     "home_assignments_blurb": "Una secuencia de piezas, de un profesor o creada por ti mismo, como un camino guiado, con cada paso calificado al superarlo.",
     "progress_days_practiced": "Días practicados",
+    "progress_all_time": "En total",
     "progress_notes_played": "Notas tocadas",
     "progress_last_7_days": "Últimos 7 días",
     "progress_notes_one": "{count} notas",

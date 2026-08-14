@@ -10,6 +10,7 @@ import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";
 import { SettingsSection } from "../ui/settingsSection";
 import { LocalizedLink as Link } from "../ui/localizedLink";
+import { BakedIncipit } from "../ui/incipit";
 import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
@@ -67,7 +68,10 @@ export function YouView() {
                 <SettingsSection title={m.grades_up_next({ grade: workingGrade })}>
                     <ul className="space-y-1 text-sm">
                         {upNext.map((item) => (
-                            <li key={item.id}>
+                            <li key={item.id} className="flex items-center gap-2">
+                                {/* Drawn the way every other list of pieces names one:
+                                    the opening bars, then the title. */}
+                                <BakedIncipit mark={item.incipit} label={item.title} />
                                 <Link to={practiceHref(item)} className={linkClasses}>
                                     {item.title}
                                 </Link>
@@ -105,17 +109,22 @@ export function YouView() {
                 <RepertoirePanel items={data.items} now={new Date()} />
             </FeatureBoundary>
 
-            {summary && (
-                <ActivityStats
-                    daysPracticed={summary.daysPracticed}
-                    totalNotes={summary.totalNotes}
-                />
-            )}
-
-            {summary && (
-                <FeatureBoundary feature="WeekChart">
-                    <WeekChart recent={summary.recent} />
-                </FeatureBoundary>
+            {/* Both count what has happened, so before anything has they are a pair of
+                zeros over an empty week — a frame promising insight it does not have. The
+                diary below says the same thing in a sentence, and offers what to do. */}
+            {summary && (summary.daysPracticed > 0 || summary.totalNotes > 0) && (
+                <SettingsSection title={m.progress_all_time()}>
+                    {/* Said out loud, because the month's recap further down counts the
+                        same two things and a reader cannot tell two unlabelled pairs of
+                        numbers apart. */}
+                    <ActivityStats
+                        daysPracticed={summary.daysPracticed}
+                        totalNotes={summary.totalNotes}
+                    />
+                    <FeatureBoundary feature="WeekChart">
+                        <WeekChart recent={summary.recent} />
+                    </FeatureBoundary>
+                </SettingsSection>
             )}
 
             <FeatureBoundary feature="PracticeReport">

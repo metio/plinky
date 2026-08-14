@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { decodeIncipit, type Incipit, layoutIncipit } from "../../../core/incipit";
+import { decodeIncipit, type Incipit, INCIPIT_NOTES, layoutIncipit } from "../../../core/incipit";
 import { BOOMWHACKER_SET } from "../../../core/pitchColor";
 
 // One staff space, in pixels. Every other measurement is a multiple of it, so the mark
@@ -182,8 +182,14 @@ export function IncipitMark({
 }
 
 // The mark as the catalogue carries it — one short string baked into the manifest, so a
-// list can draw a piece without fetching its notation. Nothing at all when a piece has
-// no mark, which keeps a row that cannot have one looking deliberate rather than broken.
+// list can draw a piece without fetching its notation.
+//
+// The slot a row's mark occupies, whether or not the piece has one: wide enough for a
+// full-length mark at row size. A list where only some pieces are drawn would otherwise
+// start each title at a different place, which reads as a mistake rather than as a piece
+// whose opening is not on file.
+const SLOT_WIDTH = 2 * INCIPIT_ROW_SPACE + INCIPIT_NOTES * 2.5 * INCIPIT_ROW_SPACE;
+
 export function BakedIncipit({
     mark,
     label,
@@ -194,15 +200,20 @@ export function BakedIncipit({
     className?: string;
 }) {
     const incipit = mark ? decodeIncipit(mark) : null;
-    if (!incipit) {
-        return null;
-    }
     return (
-        <IncipitMark
-            incipit={incipit}
-            label={label}
-            space={INCIPIT_ROW_SPACE}
-            className={className}
-        />
+        <span
+            className="flex shrink-0 items-center"
+            style={{ minWidth: `${SLOT_WIDTH}px` }}
+            aria-hidden={incipit ? undefined : "true"}
+        >
+            {incipit && (
+                <IncipitMark
+                    incipit={incipit}
+                    label={label}
+                    space={INCIPIT_ROW_SPACE}
+                    className={className}
+                />
+            )}
+        </span>
     );
 }

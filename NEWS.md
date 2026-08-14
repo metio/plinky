@@ -107,6 +107,15 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**You says less until you've done something, and more once you have.** The page opened
+with a pair of zeros over an empty week chart, and eight grade rows each reading "0 /
+447" — a denominator nobody is meant to finish. The counts now appear with your first
+practice, under a heading saying they are all-time totals (the month's recap further down
+counts the same two things), and a grade row shows how far it is to its next star until
+there is a tally worth printing. What's ready for you next is drawn with each piece's
+opening bars, like every other list of music in Plinky — and a piece with no mark on file
+now keeps its place in the column instead of jumping left.
+
 **The badge beside the wordmark waits until it has news.** A device that had mastered
 nothing showed a grey cap reading 0 next to a skill of 0 — the first thing on the page,
 saying only that you hadn't started. It now appears the moment you master your first

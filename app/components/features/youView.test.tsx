@@ -5,6 +5,9 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { memoryStore } from "../../adapters/memoryStore";
+import { createHistoryStore } from "../../stores/historyStore";
+import { renderWithServices } from "../../testing/renderWithServices";
 import type { GradeCatalogItem, GradedMastery } from "../../lib/gradeProgress";
 import type { Mastery } from "../../../core/mastery";
 import { YouView } from "./youView";
@@ -65,7 +68,43 @@ describe("YouView", () => {
         // Standing (Grade 1 shows in the headline and the roadmap row) and the
         // retrospective stats merged in from /progress.
         expect(screen.getAllByText("Grade 1").length).toBeGreaterThan(0);
-        expect(screen.getByText(m.progress_days_practiced())).toBeTruthy();
+    });
+
+    it("counts the days and the notes once there are some", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([
+            { id: "g1", title: "First Piece", grade: 1, cost: 1, kind: "piece" },
+        ]);
+        const kv = memoryStore();
+        createHistoryStore(kv).record(240);
+
+        renderWithServices(
+            <MemoryRouter>
+                <YouView />
+            </MemoryRouter>,
+            { store: kv },
+        );
+
+        expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
+        expect(screen.getAllByText(m.progress_days_practiced()).length).toBeGreaterThan(0);
+    });
+
+    it("says nothing about days and notes before anything has been played", async () => {
+        // A pair of zeros over an empty week is a frame promising insight it does not
+        // have; the practice diary further down says it in a sentence, with what to do.
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([
+            { id: "g1", title: "First Piece", grade: 1, cost: 1, kind: "piece" },
+        ]);
+
+        render(
+            <MemoryRouter>
+                <YouView />
+            </MemoryRouter>,
+        );
+
+        expect(await screen.findByRole("link", { name: "First Piece" })).toBeTruthy();
+        expect(screen.queryByText(m.progress_days_practiced())).toBeNull();
     });
 
     it("no longer carries the discovery checklist — it lives on the home page now", async () => {

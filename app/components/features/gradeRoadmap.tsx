@@ -79,9 +79,15 @@ export function GradeRoadmap({
                                 )}
                             </span>
                             <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm text-muted">
-                                <span className="tabular-nums">
-                                    {m.grades_pool({ mastered, total })}
-                                </span>
+                                {/* The ratio only says something once the left-hand side
+                                    does: eight rows reading "0 / 447" tell a new player
+                                    they have nothing, with a denominator nobody is meant
+                                    to finish. The star target is the number that guides. */}
+                                <Show when={mastered > 0}>
+                                    <span className="tabular-nums">
+                                        {m.grades_pool({ mastered, total })}
+                                    </span>
+                                </Show>
                                 <span className="text-muted">
                                     {next
                                         ? m.grades_to_next({
