@@ -107,6 +107,11 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The keyboard tour says what it is waiting for.** Its Next button opens once you have
+played the thing the step describes, but the line beside it — "try it whenever you like" —
+made that sound optional, so the button just looked broken. It now says that Next opens
+once you have had a go.
+
 **Compose has keys on it.** The page said "play on a MIDI keyboard, your computer keys,
 or the keys below" and had none below — they only appeared once you pressed Count in and
 the page went full screen. On a phone, which has neither a MIDI socket nor a computer

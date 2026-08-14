@@ -703,7 +703,7 @@
     "tour_progress": "Où tu en es",
     "tour_next": "Suivant",
     "tour_got_it": "C'est ça.",
-    "tour_waiting": "Essaie-le sur les touches quand tu veux.",
+    "tour_waiting": "Essaie-le sur les touches — « Suivant » s'ouvre ensuite.",
     "tour_done_title": "Voilà le clavier.",
     "tour_done_body": "À partir de là tu trouves n'importe quelle touche. Tout le reste de Plinky s'appuie sur ces six choses — et elles seront encore vraies demain.",
     "tour_done_action": "Retour au début",
