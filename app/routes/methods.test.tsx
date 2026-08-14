@@ -18,7 +18,14 @@ describe("MethodsRoute", () => {
                 <MethodsRoute />
             </MemoryRouter>,
         );
-        expect(screen.getAllByRole("link", { name: m.methods_try() })).toHaveLength(METHODS.length);
+        // Three methods are done with a control inside a run's set-up panel, so what
+        // they can honestly offer is a piece to try them on; the other three lead
+        // straight to the thing itself. Every method has a way in either way.
+        const straight = METHODS.filter((method) => method.href !== "/library/").length;
+        expect(screen.getAllByRole("link", { name: m.methods_try() })).toHaveLength(straight);
+        expect(screen.getAllByRole("link", { name: m.today_browse() })).toHaveLength(
+            METHODS.length - straight,
+        );
     });
 
     it("names each method and says roughly how long it takes", () => {
