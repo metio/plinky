@@ -101,7 +101,11 @@ function Header() {
                         aria-label="Plinky home"
                         className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
-                        <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-md" />
+                        {/* The mark's own corners are cut at about 27% of its width — near enough
+                            8px once it is drawn at 32 — so the clip is set to agree with them.
+                            A squarer clip leaves the two radii disagreeing by a pixel at each
+                            corner, which is what a focus ring then draws attention to. */}
+                        <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-lg" />
                         <span
                             aria-hidden="true"
                             className="font-display text-xl font-semibold tracking-tight text-ink"
