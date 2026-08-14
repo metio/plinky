@@ -107,6 +107,16 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The badge beside the wordmark waits until it has news.** A device that had mastered
+nothing showed a grey cap reading 0 next to a skill of 0 — the first thing on the page,
+saying only that you hadn't started. It now appears the moment you master your first
+piece, which is also when the skill rating becomes a real number. You is in the
+navigation the whole time either way.
+
+**The footer says About.** The heart at the foot of every page led to the page about
+Plinky and the people who make it, but a heart on its own doesn't say so — it sat beside
+two labelled legal links as the one thing you had to guess at. It now carries the word.
+
 **Music opens on the music.** The card offering to write your own piece sat above the
 search box, so the first thing on the shelf led away from it. It is now at the foot,
 after the looking, and the page says what it is in one line instead of three.

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { type Standing, standingParts } from "./standing";
+import { hasStanding, type Standing, standingParts } from "./standing";
 
 const nothing: Standing = { level: 0, skill: 0, onStand: 0, notes: 0 };
 
@@ -54,5 +54,30 @@ describe("standingParts", () => {
         // empty line is a better failure than "Grade -1".
         expect(standingParts({ level: -1, skill: -5, onStand: -2, notes: -3 })).toEqual([]);
         expect(standingParts({ ...nothing, notes: 0.4 })).toEqual(["not-graded", "notes"]);
+    });
+});
+
+describe("hasStanding", () => {
+    it("says nothing on a device that has mastered nothing", () => {
+        expect(hasStanding({ level: 0, skill: 0 })).toBe(false);
+    });
+
+    it("speaks up as soon as anything has been mastered, grade or not", () => {
+        // A first mastered piece raises the skill rating long before five of them raise
+        // the grade; that is worth showing, and it is the moment the badge appears.
+        expect(hasStanding({ level: 0, skill: 12 })).toBe(true);
+        expect(hasStanding({ level: 1, skill: 0 })).toBe(true);
+    });
+
+    it("agrees with the line under the greeting", () => {
+        // Two places answering the same question must not disagree: whenever the badge
+        // shows, the standing line has something to say about the grade or the skill.
+        for (const level of [0, 1]) {
+            for (const skill of [0, 40]) {
+                const parts = standingParts({ level, skill, onStand: 0, notes: 0 });
+                const speaks = parts.includes("grade") || parts.includes("skill");
+                expect(hasStanding({ level, skill })).toBe(speaks);
+            }
+        }
     });
 });

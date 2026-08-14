@@ -46,3 +46,11 @@ export function standingParts({ level, skill, onStand, notes }: Standing): Stand
     }
     return parts;
 }
+
+// Whether the badge beside the wordmark has anything to report. It is a second way to
+// the same page the navigation already names, so at nothing-yet it says nothing: a
+// greyed cap reading "0" beside a "0" is the first thing a first visit would see, and
+// it says only that you have not started.
+export function hasStanding({ level, skill }: Pick<Standing, "level" | "skill">): boolean {
+    return level > 0 || skill > 0;
+}

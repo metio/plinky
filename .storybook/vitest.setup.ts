@@ -20,6 +20,9 @@ beforeAll(project.beforeAll);
 const EMOJI_STORIES = new Set([
     "discoveryChecklist.stories.tsx > Fresh",
     "discoveryChecklist.stories.tsx > Partly Done",
+    "gradeBadge.stories.tsx > Starting",
+    "gradeBadge.stories.tsx > Earned",
+    "gradeBadge.stories.tsx > Competitive Mode",
 ]);
 
 // Stories whose thin, absolutely-positioned colour blocks rasterise
