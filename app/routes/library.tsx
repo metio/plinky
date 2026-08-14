@@ -22,6 +22,8 @@ import { useLibraryItems } from "../hooks/useLibraryItems";
 import { useSynth } from "../hooks/useSynth";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
+import { PageHeader } from "../components/ui/pageHeader";
+import { sectionHeadingClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
     return routeMeta(m.nav_music(), m.meta_library_description());
@@ -85,14 +87,7 @@ export default function LibraryRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                {/* The page is named for the tab that leads here: a bar that teaches a
-                    model only works while the place agrees with the word on it. */}
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.nav_music()}
-                </h1>
-                <p className="text-sm text-muted">{m.library_intro()}</p>
-            </header>
+            <PageHeader title={m.nav_music()} hint={m.library_intro()} />
 
             <SegmentedControl
                 options={[
@@ -107,7 +102,7 @@ export default function LibraryRoute() {
             {tab === "manage" ? (
                 <>
                     <section className="space-y-2">
-                        <h2 className="text-lg font-semibold">{m.import_heading()}</h2>
+                        <h2 className={sectionHeadingClasses}>{m.import_heading()}</h2>
                         <p className="text-sm text-muted">{m.import_intro()}</p>
                         <p className="text-sm text-muted">{m.import_local_note()}</p>
                     </section>

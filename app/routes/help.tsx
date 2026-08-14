@@ -7,6 +7,8 @@ import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/help";
+import { PageHeader } from "../components/ui/pageHeader";
+import { sectionHeadingClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -173,18 +175,11 @@ export default function Help() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.help_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.help_intro()}</p>
-            </header>
+            <PageHeader title={m.help_title()} hint={m.help_intro()} />
 
             {SECTIONS.map((section) => (
                 <section key={section.key} id={section.key} className="scroll-mt-20 space-y-4">
-                    <h2 className="border-b border-line pb-1 text-lg font-semibold">
-                        {section.title()}
-                    </h2>
+                    <h2 className={sectionHeadingClasses}>{section.title()}</h2>
                     <HelpBlock section={section} />
                 </section>
             ))}

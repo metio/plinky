@@ -8,6 +8,7 @@ import { LocalizedLink as Link } from "../components/ui/localizedLink";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/methods";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -57,12 +58,7 @@ const WHY: Record<MethodId, () => string> = {
 export default function MethodsRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.methods_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.methods_intro()}</p>
-            </header>
+            <PageHeader title={m.methods_title()} hint={m.methods_intro()} />
 
             <ul className="space-y-4">
                 {METHODS.map((method) => (

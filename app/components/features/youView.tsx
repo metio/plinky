@@ -24,6 +24,7 @@ import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
 import { WeekChart } from "./weekChart";
 import { ActivityStats, YouStanding } from "./youStanding";
+import { PageHeader } from "../ui/pageHeader";
 
 // The "You" page: how good you are at playing, in one place. Standing (grade + skill)
 // and activity (days, notes) up top; what to play next and the grade roadmap;
@@ -50,12 +51,7 @@ export function YouView() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.you_heading()}
-                </h1>
-                <p className="text-sm text-muted">{m.you_intro()}</p>
-            </header>
+            <PageHeader title={m.you_heading()} hint={m.you_intro()} />
 
             <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
 

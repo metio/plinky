@@ -20,6 +20,7 @@ import { Button } from "../components/ui/button";
 import { usePlacementStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/placement";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     // A personal, data-driven page like the review session: it needs a title (a document
@@ -74,12 +75,7 @@ export default function PlacementRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.placement_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.placement_intro()}</p>
-            </header>
+            <PageHeader title={m.placement_title()} hint={m.placement_intro()} />
 
             {!live && (
                 <div className="space-y-3">

@@ -6,6 +6,7 @@ import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/about";
+import { sectionHeadingClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -79,7 +80,7 @@ export default function About() {
 
             <section className="space-y-4">
                 <div className="space-y-2">
-                    <h2 className="flex items-center gap-3 text-lg font-semibold">
+                    <h2 className={`flex items-center gap-3 ${sectionHeadingClasses}`}>
                         {m.about_title()}
                         <DuetMark />
                     </h2>
@@ -147,7 +148,7 @@ export default function About() {
                                     portrait
                                 )}
                                 <div className="space-y-1">
-                                    <h2 className="text-lg font-semibold text-ink">
+                                    <h2 className="text-base font-semibold text-ink">
                                         {founder.name}
                                     </h2>
                                     <span className="inline-block rounded-full bg-accent-surface px-3 py-0.5 text-xs font-medium text-accent-strong">
@@ -164,14 +165,14 @@ export default function About() {
             </section>
 
             <section className="space-y-3 border-t border-line pt-8">
-                <h2 className="text-lg font-semibold">{m.about_why_title()}</h2>
+                <h2 className={sectionHeadingClasses}>{m.about_why_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_why_body()}
                 </p>
             </section>
 
             <section className="space-y-3 border-t border-line pt-8">
-                <h2 className="text-lg font-semibold">{m.about_contact_title()}</h2>
+                <h2 className={sectionHeadingClasses}>{m.about_contact_title()}</h2>
                 <p className="max-w-prose text-sm leading-relaxed text-muted">
                     {m.about_contact_body()}
                 </p>

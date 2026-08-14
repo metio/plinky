@@ -21,6 +21,7 @@ import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/theory";
 import { sectionHeadingClasses } from "../components/ui/classes";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -163,12 +164,7 @@ export default function TheoryRoute() {
     let counter = 0;
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.theory_title()}
-                </h1>
-                <p className="text-sm text-muted">{m.theory_intro()}</p>
-            </header>
+            <PageHeader title={m.theory_title()} hint={m.theory_intro()} />
 
             {UNITS.map((unit) => (
                 <section key={unit} className="space-y-3">

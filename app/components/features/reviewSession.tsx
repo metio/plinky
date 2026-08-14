@@ -14,6 +14,7 @@ import { m } from "../../paraglide/messages.js";
 import { EarSession } from "./earSession";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ScoreViewer } from "./scoreViewer";
+import { PageHeader } from "../ui/pageHeader";
 
 const BACK = `text-sm ${linkClasses}`;
 
@@ -77,10 +78,7 @@ export function ReviewSession() {
     if (total === 0) {
         return (
             <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.review_heading()}
-                </h1>
-                <p className="text-sm text-muted">{m.review_empty()}</p>
+                <PageHeader title={m.review_heading()} hint={m.review_empty()} />
                 <p className="text-sm text-muted">{m.refresh_why()}</p>
                 <div className="flex flex-wrap items-center gap-4">
                     <Link to="/library" className={BACK}>

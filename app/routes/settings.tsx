@@ -43,6 +43,7 @@ import { type NoteHints, type NoteLabels, REVIEW_CAPS } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/settings";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     // A utility page for the visitor's own device — no place in the index, so
@@ -70,12 +71,7 @@ export default function Settings() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <h1 className="font-display text-3xl font-semibold tracking-tight">
-                    {m.nav_settings()}
-                </h1>
-                <p className="text-sm text-muted">{m.settings_subtitle()}</p>
-            </header>
+            <PageHeader title={m.nav_settings()} hint={m.settings_subtitle()} />
             {/* Settings are ordered by what somebody came here to change, not by which
                 part of the app owns them: first the instrument you play on, then how the
                 music reads while you play it, then what counts as learned, and last the

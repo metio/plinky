@@ -16,6 +16,7 @@ import { routeMeta, webPageData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/daily";
+import { PageHeader } from "../components/ui/pageHeader";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -93,23 +94,17 @@ export default function DailyRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <header className="space-y-1">
-                <div className="flex items-start justify-between gap-2">
-                    <h1 className="font-display text-3xl font-semibold tracking-tight">
-                        {today
-                            ? m.daily_title({ number: today.number })
-                            : m.daily_title({ number: "…" })}
-                    </h1>
-                    {/* The same take-it-with-you actions a play page's title line
-                    carries: print the phrase, or download it as MIDI/MusicXML. */}
-                    {today && (
-                        <div className="flex shrink-0 items-center gap-1">
-                            <ExportMenu xml={today.xml} title={`Plinky #${today.number}`} />
-                        </div>
-                    )}
-                </div>
-                <p className="text-sm text-muted">{m.daily_intro()}</p>
-            </header>
+            <PageHeader
+                title={
+                    today ? m.daily_title({ number: today.number }) : m.daily_title({ number: "…" })
+                }
+                hint={m.daily_intro()}
+                // The same take-it-with-you actions a play page's title line carries:
+                // print the phrase, or download it as MIDI/MusicXML.
+                actions={
+                    today ? <ExportMenu xml={today.xml} title={`Plinky #${today.number}`} /> : null
+                }
+            />
 
             <SegmentedControl
                 options={[
