@@ -184,7 +184,7 @@ repetition**, resurfacing for review on a widening schedule so it actually stick
 one-tap **review session** walks you through everything that's fading, and you can
 **shelve** anything you're not working on right now.
 
-## Modes
+## Features, one by one
 
 - **Library** — the catalogue: bundled scales, arpeggios, and familiar tunes like
   *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import, in two tabs.
@@ -319,8 +319,8 @@ one-tap **review session** walks you through everything that's fading, and you c
   pieces **due for review** — with a one-tap review session to refresh them. Each grade
   carries an optional *About this grade* note.
 
-**Meet the keyboard** — the first item on that checklist, and the only one that needs no
-piano, no cable and no reading. Six steps for someone who has never touched a keyboard:
+**Meet the keyboard** — the first thing on **Learn**, and the only part of Plinky that
+needs no piano, no cable and no reading. Six steps for someone who has never touched a keyboard:
 the black keys come in twos and threes, middle C sits left of a group of two, the white
 keys are seven names that start over, a black key has two names — and then the leap
 beginners find hardest, that a dot printed on a staff is a key under your hand. Every
