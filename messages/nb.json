@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Lagringen på denne enheten er full eller blokkert, så gjenopprettingen gikk ikke gjennom. Ingenting her er endret.",
     "sight_read": "Spill dette stykket fra bladet",
     "sight_read_caption": "Én kald gjennomlesing, uten støtte — navnene, fargene, hintene og motorveien trekker seg unna for denne runden. Den første lesingen din blir stående som bladspillet ditt av dette stykket.",
+    "sight_read_aids_note": "En bladspillrunde leses på øverste trinn: ingen farger, ingen notebane, ingen andre forsøk.",
     "sight_read_study": "Tid til å se på det",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Et øyeblikk til å fange tonearten, taktarten og formen før første tone.",

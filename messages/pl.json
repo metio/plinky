@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Pamięć tego urządzenia jest pełna lub zablokowana, więc przywracanie się nie powiodło. Tutaj nic się nie zmieniło.",
     "sight_read": "Zagraj ten utwór a vista",
     "sight_read_caption": "Jedno czytanie na zimno, bez podpórek — nazwy, kolory, podpowiedzi i autostrada ustępują na czas przebiegu. Pierwsze czytanie zostaje jako twoje a vista tego utworu.",
+    "sight_read_aids_note": "Granie a vista czyta się z najwyższego szczebla: bez kolorów, bez autostrady, bez drugiej próby.",
     "sight_read_study": "Czas na przyjrzenie się",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Chwila, by wychwycić tonację, metrum i kształt przed pierwszą nutą.",

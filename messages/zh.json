@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "这台设备的存储已满或被禁用，恢复没有完成。这里的内容没有变化。",
     "sight_read": "视奏这首曲子",
     "sight_read_caption": "一次不靠任何提示的冷读——音名、颜色、提示和音符高速都为这一遍让路。你的第一次视奏会被记下来。",
+    "sight_read_aids_note": "视奏按最高一档来读：没有颜色，没有音符高速路，也没有第二次机会。",
     "sight_read_study": "读谱时间",
     "sight_read_study_seconds": "{seconds}秒",
     "sight_read_study_caption": "在第一个音之前，花点时间看清调号、拍号和结构。",

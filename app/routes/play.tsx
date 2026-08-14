@@ -127,30 +127,28 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
 
                     <PlayModeBar mode={mode} onChange={setMode} />
 
-                    <Show when={mode === "play" || mode === "runs"}>
-                        {parseExerciseId(score.id) && (
-                            <ExerciseForms config={parseExerciseId(score.id)!} />
+                    {parseExerciseId(score.id) && (
+                        <ExerciseForms config={parseExerciseId(score.id)!} />
+                    )}
+                    <ScoreViewer
+                        key={score.id}
+                        id={score.id}
+                        xml={score.xml}
+                        title={score.title}
+                        credit={creditLine(
+                            score.title,
+                            attributionFor({
+                                composer: score.composer,
+                                license: score.license,
+                                source: score.source,
+                            }),
                         )}
-                        <ScoreViewer
-                            key={score.id}
-                            id={score.id}
-                            xml={score.xml}
-                            title={score.title}
-                            credit={creditLine(
-                                score.title,
-                                attributionFor({
-                                    composer: score.composer,
-                                    license: score.license,
-                                    source: score.source,
-                                }),
-                            )}
-                            initialTempo={score.tempo}
-                            beatsPerBar={score.beatsPerBar}
-                            canShareGhost
-                            runsView={mode === "runs"}
-                            onShowScore={() => setMode("play")}
-                        />
-                    </Show>
+                        initialTempo={score.tempo}
+                        beatsPerBar={score.beatsPerBar}
+                        canShareGhost
+                        runsView={mode === "runs"}
+                        onShowScore={() => setMode("play")}
+                    />
                 </TransposeProvider>
             )}
             <Show when={score === null}>

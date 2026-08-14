@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "El almacenamiento de este dispositivo está lleno o bloqueado y la restauración no se completó. Aquí no ha cambiado nada.",
     "sight_read": "Leer esta pieza a primera vista",
     "sight_read_caption": "Una sola lectura en frío, sin apoyos: los nombres, los colores, las pistas y la autopista se apartan durante la pasada. Tu primera lectura queda como tu lectura a vista de esta pieza.",
+    "sight_read_aids_note": "Una lectura a primera vista se lee en el último peldaño: sin colores, sin autopista, sin segundo intento.",
     "sight_read_study": "Tiempo para mirarla",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Un momento para captar la tonalidad, el compás y la forma antes de la primera nota.",

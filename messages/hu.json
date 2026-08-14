@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Az eszköz tárhelye tele van vagy le van tiltva, így a visszaállítás nem sikerült. Itt semmi nem változott.",
     "sight_read": "Játszd le ezt a darabot lapról",
     "sight_read_caption": "Egyetlen hideg olvasás, támasz nélkül — a nevek, a színek, a súgások és az autópálya félreáll erre a menetre. Az első olvasásod megmarad ennek a darabnak a lapról játszásaként.",
+    "sight_read_aids_note": "A lapról olvasás a létra tetejéről olvas: nincs szín, nincs hangsáv, nincs második próba.",
     "sight_read_study": "Idő az áttekintésre",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Egy pillanat a hangnemre, az ütemmutatóra és a formára az első hang előtt.",

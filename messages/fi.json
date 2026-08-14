@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Laitteen tallennustila on täynnä tai estetty, joten palautus ei mennyt läpi. Täällä ei muuttunut mikään.",
     "sight_read": "Soita tämä kappale prima vista",
     "sight_read_caption": "Yksi kylmä luku, ilman tukea — nimet, värit, vihjeet ja valtatie väistyvät tämän ajon ajaksi. Ensimmäinen lukusi jää tämän kappaleen prima vista -tulokseksi.",
+    "sight_read_aids_note": "Prima vista -soitto luetaan ylimmältä portaalta: ei värejä, ei nuottiväylää, ei toista yritystä.",
     "sight_read_study": "Aikaa katsoa",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Hetki poimia sävellaji, tahtilaji ja muoto ennen ensimmäistä säveltä.",

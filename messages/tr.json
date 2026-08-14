@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Bu cihazın depolaması dolu ya da engelli, bu yüzden geri yükleme tamamlanmadı. Burada hiçbir şey değişmedi.",
     "sight_read": "Bu parçayı deşifre çal",
     "sight_read_caption": "Tek bir soğuk okuma, dayanacak bir şey yok — isimler, renkler, ipuçları ve otoyol bu tur için kenara çekiliyor. İlk okuyuşun bu parçadaki deşifren olarak kalır.",
+    "sight_read_aids_note": "Deşifre okuma en üst basamaktan okunur: renk yok, şerit yok, ikinci deneme yok.",
     "sight_read_study": "İnceleme süresi",
     "sight_read_study_seconds": "{seconds}sn",
     "sight_read_study_caption": "İlk notadan önce tonaliteyi, ölçüyü ve biçimi kavramak için bir an.",

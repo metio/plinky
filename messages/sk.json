@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Úložisko tohto zariadenia je plné alebo blokované, obnovenie neprebehlo. Tu sa nič nezmenilo.",
     "sight_read": "Zahrať túto skladbu z listu",
     "sight_read_caption": "Jedno čítanie nastudeno, bez opory — názvy, farby, nápovedy aj diaľnica na čas behu ustúpia. Prvé čítanie ti zostane ako tvoja hra z listu tejto skladby.",
+    "sight_read_aids_note": "Hra z listu sa číta z najvyššieho stupňa: bez farieb, bez diaľnice, bez druhého pokusu.",
     "sight_read_study": "Čas na prezretie",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Chvíľa na tóninu, takt a tvar, kým príde prvá nota.",

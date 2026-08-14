@@ -374,6 +374,7 @@
     "progress_backup_error_storage": "Úložiště tohohle zařízení je plné nebo blokované, obnovení neproběhlo. Tady se nic nezměnilo.",
     "sight_read": "Zahrát tuhle skladbu z listu",
     "sight_read_caption": "Jedno čtení nastudra, bez opory — názvy, barvy, nápovědy i dálnice na dobu běhu ustoupí. První čtení ti zůstane jako tvoje hra z listu téhle skladby.",
+    "sight_read_aids_note": "Hra z listu se čte z nejvyššího stupně: bez barev, bez dálnice, bez druhého pokusu.",
     "sight_read_study": "Čas na prohlédnutí",
     "sight_read_study_seconds": "{seconds}s",
     "sight_read_study_caption": "Chvilka na tóninu, takt a tvar, než přijde první nota.",
