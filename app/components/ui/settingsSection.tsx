@@ -27,7 +27,8 @@ export function SettingsSection({
     children,
 }: {
     title: string;
-    hint?: string;
+    // Usually a sentence; a node where the hint is itself somewhere to go.
+    hint?: ReactNode;
     icon?: ReactNode;
     tone?: "accent" | "danger";
     level?: 2 | 3;

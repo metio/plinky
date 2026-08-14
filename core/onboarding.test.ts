@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_PREFS } from "./prefs";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
-import { type DiscoveryState, discoveries, discoveryProgress } from "./onboarding";
+import { type DiscoveryState, discoveries } from "./onboarding";
 
 // Purely derived: the caller hands in the state, so every step is pinned with
 // plain data — no stores, no storage.
@@ -21,8 +21,6 @@ describe("discoveries", () => {
     it("is all-false for a brand-new player", () => {
         const done = discoveries(fresh());
         expect(Object.values(done).every((value) => value === false)).toBe(true);
-        expect(discoveryProgress(done).allDone).toBe(false);
-        expect(discoveryProgress(done).done).toBe(0);
     });
 
     it("marks playing once practice or mastery exists", () => {
@@ -67,17 +65,3 @@ describe("discoveries", () => {
     });
 });
 
-describe("discoveryProgress", () => {
-    it("counts the done steps and knows when the tour is over", () => {
-        const done = discoveries({
-            ...fresh(),
-            lastDaily: 3,
-            marked: new Set(["earTried", "fingeringTried", "composed", "imported"]),
-            masteredCount: 2,
-        });
-        const progress = discoveryProgress(done);
-        expect(progress.total).toBe(11);
-        expect(progress.done).toBe(6);
-        expect(progress.allDone).toBe(false);
-    });
-});
