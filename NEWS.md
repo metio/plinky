@@ -107,6 +107,11 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Tapping a mark in the glossary takes you to it.** On a phone the list of marks and the
+explanation stack, so reading down the list leaves the explanation behind you — and
+tapping a mark changed something you could not see. It comes to you now, and on a wide
+screen, where the two sit side by side, nothing moves.
+
 **The keyboard tour says what it is waiting for.** Its Next button opens once you have
 played the thing the step describes, but the line beside it — "try it whenever you like" —
 made that sound optional, so the button just looked broken. It now says that Next opens
