@@ -13,6 +13,7 @@ import { RunResult } from "./runResult";
 import { SectionBest } from "./sectionBest";
 import { ScoreCanvas } from "./scoreCanvas";
 import { TakesPanel } from "./takesPanel";
+import { RunSetup } from "./runSetup";
 
 // The play surface: everything inside the full-screen shell, arranged from siblings that
 // each read the shared play session. It owns no state — the transport bar, the score, the
@@ -102,6 +103,13 @@ export function PlaySurface() {
                     />
                 )}
                 <ScoreCanvas />
+
+                {/* Under the music: how you play this piece, and the challenges you can
+                    put on it. They used to be one fold called "Set up your run" — two for
+                    a beginner — so nothing on the page named a single one of them. */}
+                <FullScreen off>
+                    <RunSetup />
+                </FullScreen>
 
                 <FullScreen off>
                     <Show when={ghostRace.sharedFromLink}>

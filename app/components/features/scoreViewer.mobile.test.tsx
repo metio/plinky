@@ -143,7 +143,6 @@ describe("ScoreViewer on a phone", () => {
             { timeout: 30000 },
         );
         // With the loop on (whole song), a tap narrows the range to the tapped bar.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
         await waitFor(
             () => {

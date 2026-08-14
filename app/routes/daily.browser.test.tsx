@@ -101,7 +101,6 @@ describe("Daily", () => {
         await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
         // A locked-tempo challenge offers no tempo control anywhere at rest: the
         // Run-setup disclosure holds no trainer or transpose, and no slider exists.
-        fireEvent.click(screen.getByRole("button", { name: "Set up your run" }));
         expect(screen.queryByText("Transpose")).toBeNull();
         expect(screen.queryByRole("switch", { name: "Tempo trainer" })).toBeNull();
         expect(document.querySelector('input[type="range"]')).toBeNull();

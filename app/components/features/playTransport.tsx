@@ -11,7 +11,6 @@ import { Button, IconButton } from "../ui/button";
 import { CloseIcon, FingersIcon, PlayIcon, RotateIcon, SpeakerIcon, StopIcon } from "../ui/icons";
 import { FullScreen, Show } from "./conditional";
 import { usePlaySession } from "./playSession";
-import { RunSetup } from "./runSetup";
 
 // The play controls. Full screen keeps only what you reach for WHILE playing — Listen,
 // Practice/Stop, progress, restart, tempo, and the fingering-editor workspace. Settings
@@ -148,12 +147,11 @@ export function PlayTransport() {
             the rest of the transport live in the full-screen top bar (above), reachable
             once play begins, so the resting /play view stays uncluttered. */}
             <FullScreen off>
-                {/* Run setup sits right beside Practice — the disclosure's button
-                joins the action row, its panel wraps to a full-width line below. */}
-                <div className="flex flex-wrap items-center gap-3">
-                    {practiceButton}
-                    <RunSetup />
-                </div>
+                {/* One primary action above the score, where it is first in reach. What
+                    the piece can be played AS is named under the score (see PlaySurface):
+                    the staff is what a reader came for, and two cards of controls between
+                    the title and the music would push it off a phone. */}
+                <div className="flex flex-wrap items-center gap-3">{practiceButton}</div>
             </FullScreen>
         </>
     );

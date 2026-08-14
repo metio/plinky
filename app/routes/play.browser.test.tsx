@@ -11,6 +11,7 @@ import { loadBundledScores } from "../lib/catalog";
 import { httpFetcher } from "../adapters/httpFetcher";
 import Play from "./play";
 import type { Route } from "./+types/play";
+import { m } from "../paraglide/messages.js";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
 // The browser context arrives with MIDI pre-granted; without a fake seam the
@@ -75,6 +76,22 @@ describe("Play", () => {
         offline = false;
         fireEvent.click(screen.getByRole("button", { name: "Try again" }));
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
+    });
+
+    it("names what you can do to a piece on the piece's own page", async () => {
+        // The twelve ways to work a piece used to live behind a fold called "Set up your
+        // run" — and behind a second one for a beginner. What is about THIS piece is on
+        // the page now; only the reading settings, which Settings owns as well, fold.
+        renderPlay(bundledId("ode to joy"));
+        expect(await screen.findByText(m.run_group_practice_title())).toBeTruthy();
+        expect(screen.getByText(m.run_group_challenge_title())).toBeTruthy();
+        // Named where they are chosen, rather than listed where they are not.
+        expect(screen.getByText(m.sight_read())).toBeTruthy();
+        expect(screen.getByText(m.race_ghost_toggle())).toBeTruthy();
+        expect(screen.getByText(m.run_pace_label())).toBeTruthy();
+        // The one fold left, closed at rest.
+        const sheet = screen.getByRole("button", { name: m.run_group_sheet_title() });
+        expect(sheet.getAttribute("aria-expanded")).toBe("false");
     });
 
     it("keeps the play surface free of MIDI-connect chrome", async () => {
