@@ -186,13 +186,19 @@ function RunSetupPanel() {
                     hint={m.run_group_reading_hint()}
                     icon={<EyeIcon className={ICON} />}
                 >
+                    {/* Keep up drives the cursor on the beat, which leaves no room to
+                        hunt for a note nobody can see — the run forces the noteheads
+                        back on. The switch used to sit here on and ignored; it reads as
+                        unavailable now, and what it shows is what this run will do
+                        rather than what the preference says. */}
                     <SwitchField
                         label={m.hidden_notes_toggle()}
-                        checked={hiddenNotes}
+                        checked={enforceTempo ? false : hiddenNotes}
                         onChange={setHiddenNotes}
                         help={m.hidden_notes_hint()}
+                        disabled={enforceTempo}
                     />
-                    {hiddenNotes && (
+                    {hiddenNotes && !enforceTempo && (
                         <ChoiceField
                             label={m.reveal_tries()}
                             value={String(revealTries)}
