@@ -90,18 +90,24 @@ function CircleOfFifths() {
     };
     return (
         <Panel title={m.tools_circle_title()} hint={m.tools_circle_hint()}>
-            <ul className="flex flex-wrap gap-2">
-                {CIRCLE.map((key) => (
-                    <li key={key.tonic}>
-                        <Button
-                            variant={key.tonic === selected.tonic ? "primary" : "secondary"}
-                            onClick={() => pick(key)}
-                        >
-                            {spell(key.tonic, key)}
-                        </Button>
-                    </li>
-                ))}
-            </ul>
+            {/* Picking one of twelve is the same gesture as picking one of thirteen
+                scales two panels down, so it is the same control — a filled primary
+                Button meant "the thing to press", which a key you have not chosen is
+                not. */}
+            <SegmentedControl
+                options={CIRCLE.map((key) => ({
+                    id: String(key.tonic),
+                    label: spell(key.tonic, key),
+                }))}
+                value={String(selected.tonic)}
+                onChange={(tonic) => {
+                    const key = CIRCLE.find((one) => String(one.tonic) === tonic);
+                    if (key) {
+                        pick(key);
+                    }
+                }}
+                label={m.tools_circle_title()}
+            />
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
                 <dt className="text-muted">{m.tools_circle_signature()}</dt>
                 <dd>
