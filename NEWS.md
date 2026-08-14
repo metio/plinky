@@ -107,6 +107,16 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Getting started stopped being a separate list.** The three setup steps sat in their own
+tinted card at the foot of Today, with tick circles and a count — the one chore list in an
+app that refuses chore lists, and the loudest thing on a beginner's first visit. They are
+now where each of them belongs: **Connect MIDI** and **Set up your computer-keyboard keys**
+sit under the keyboard in Warm up, and only while you have no instrument; **Set your hand
+size** is the line under Work on, and only until you have set it. Nothing ticks itself
+off — an offer you take simply stops being made. Dismissing the old card used to hide the
+connect prompt forever, including from somebody who bought a MIDI keyboard the following
+month; there is nothing to dismiss now.
+
 **Sight-reading no longer leaves switches lying.** Turning it on reads the piece at the
 top of the ladder — no note colours, no highway, no second try at a note you missed — but
 the switches for those went on showing whatever you had saved, so the score stripped

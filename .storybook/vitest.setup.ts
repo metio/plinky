@@ -18,8 +18,6 @@ beforeAll(project.beforeAll);
 // version the machine has. These stories still run (render, play functions,
 // coverage); only the pixel comparison is skipped.
 const EMOJI_STORIES = new Set([
-    "discoveryChecklist.stories.tsx > Fresh",
-    "discoveryChecklist.stories.tsx > Partly Done",
     "gradeBadge.stories.tsx > Starting",
     "gradeBadge.stories.tsx > Earned",
     "gradeBadge.stories.tsx > Competitive Mode",

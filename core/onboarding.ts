@@ -80,11 +80,3 @@ export function discoveries(state: DiscoveryState): Record<DiscoveryId, boolean>
         keysCustomized: marked.has("keysCustomized") || !isDefaultKeyMap(prefs.keyMap),
     };
 }
-
-export type DiscoveryProgress = { done: number; total: number; allDone: boolean };
-
-export function discoveryProgress(done: Record<DiscoveryId, boolean>): DiscoveryProgress {
-    const values = Object.values(done);
-    const count = values.filter(Boolean).length;
-    return { done: count, total: values.length, allDone: count === values.length };
-}

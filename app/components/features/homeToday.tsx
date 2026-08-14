@@ -23,7 +23,6 @@ import {
     skillRating,
     surprisePick,
 } from "../../lib/gradeProgress";
-import { DiscoveryChecklist } from "./discoveryChecklist";
 import { HeroKeyboard } from "./heroKeyboard";
 import { SurpriseButton } from "./surpriseButton";
 import {
@@ -50,6 +49,8 @@ import { linkClasses } from "../ui/classes";
 import { SettingsSection } from "../ui/settingsSection";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { localizedHref } from "../ui/href";
+import { Show, useMidiConnected } from "./conditional";
+import { usePrefs } from "../../hooks/usePrefs";
 
 const ICON: Record<Task["key"], string> = {
     review: "🔁",
@@ -136,7 +137,7 @@ const LEARN_LABEL: Record<LearnPickId, () => string> = {
 };
 
 const LEARN_BLURB: Record<LearnPickId, () => string> = {
-    basics: m.basics_intro,
+    basics: m.learn_basics_blurb,
     placement: m.placement_intro,
     theory: m.theory_intro,
     glossary: m.glossary_intro,
@@ -148,8 +149,34 @@ const LEARN_BLURB: Record<LearnPickId, () => string> = {
 // them off, and skipping one costs nothing — a counter here would be a streak wearing a
 // different hat. It is the same labelled group the set-up panel and Settings use, so a
 // reader meets one shape rather than three.
-function Moment({ label, children }: { label: string; children: ReactNode }) {
-    return <SettingsSection title={label}>{children}</SettingsSection>;
+function Moment({
+    label,
+    hint,
+    hintTo,
+    children,
+}: {
+    label: string;
+    // A line under the moment's name. Where it is a thing to go and do, it links.
+    hint?: string;
+    hintTo?: string;
+    children: ReactNode;
+}) {
+    return (
+        <SettingsSection
+            title={label}
+            hint={
+                hint && hintTo ? (
+                    <Link to={hintTo} className={linkClasses}>
+                        {hint}
+                    </Link>
+                ) : (
+                    hint
+                )
+            }
+        >
+            {children}
+        </SettingsSection>
+    );
 }
 
 // One press, one start. `lead` marks the day's own thing — the challenge everybody
@@ -278,6 +305,11 @@ type Session = {
 // appears once the client resolves it.
 export function HomeToday() {
     const prefsStore = usePrefsStore();
+    // The two things the day's practice can offer to set up, read live: an instrument to
+    // play on, and the hand the finger positions are fitted to.
+    const midiReady = useMidiConnected();
+    const { prefs } = usePrefs();
+    const handSet = prefs.handSpan.left !== null || prefs.handSpan.right !== null;
     const assignmentsStore = useAssignmentsStore();
     const masteryStore = useMasteryStore();
     const history = useHistoryStore();
@@ -470,11 +502,33 @@ export function HomeToday() {
                     a run on a piece feel like one keyboard. */}
                 <div className="space-y-1.5 pt-1">
                     <HeroKeyboard />
-                    <p className="text-center text-sm text-muted">{m.home_keyboard_hint()}</p>
+                    <p className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-center text-sm text-muted">
+                        <span>{m.home_keyboard_hint()}</span>
+                        {/* The getting-started card used to ask for a piano in a list of
+                            three chores at the foot of the page. It belongs here, under
+                            the keys it is about, and only while there is no instrument —
+                            taken, the offer disappears rather than ticking itself off. */}
+                        <Show when={!midiReady}>
+                            <Link to="/settings" className={linkClasses}>
+                                {m.settings_connect_midi()}
+                            </Link>
+                            <span aria-hidden="true">·</span>
+                            <Link to="/settings" className={linkClasses}>
+                                {m.discover_keys()}
+                            </Link>
+                        </Show>
+                    </p>
                 </div>
             </Moment>
 
-            <Moment label={m.today_moment_work()}>
+            <Moment
+                label={m.today_moment_work()}
+                // What a piece needs to know about you, asked where the pieces are and
+                // only until it is answered: finger positions fit a hand, and a hand is
+                // the one thing Plinky cannot measure for itself.
+                hint={handSet ? undefined : m.grades_start_hand()}
+                hintTo={handSet ? undefined : "/settings"}
+            >
                 <ul className="space-y-2">
                     {work.map((task, index) => {
                         const { label, hint } = rowFor(
@@ -530,13 +584,6 @@ export function HomeToday() {
                     hint={LEARN_BLURB[session.learn]()}
                 />
             </Moment>
-
-            {/* Setting up a piano, a hand span and the keys tailors everything after it,
-                and none of it is a gate — so it reads as a footnote under the day's
-                practice rather than standing between the reader and it. It arrives with
-                the practice for the same reason everything else does: a block that lands
-                late above static content pushes that content down the screen. */}
-            <DiscoveryChecklist />
 
             {/* The way out, for somebody who fancies none of it. Quiet on purpose: the
                 page has already made its offers, and this is the shrug after them. */}
