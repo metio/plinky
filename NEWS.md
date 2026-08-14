@@ -107,6 +107,14 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Picking one of twelve looks like picking one of twelve.** A row of choices sat in a
+tinted track, which works for two or three and turns into a solid slab the moment it
+wraps — the twelve keys of the circle of fifths and the thirteen scale names filled half a
+phone screen with tan, and the one you had chosen was lost in it. Past six options the
+same control now drops the track and outlines each choice instead. The circle of fifths
+also stops using filled buttons for the twelve keys: a key you have not picked was drawn
+as "the thing to press", which is what the button style means everywhere else in Plinky.
+
 **Music has a Composers tab.** Seven hundred and fifty people are credited in the
 catalogue, each with a page of their own — and the only way to reach one was to find a
 piece of theirs first, which is backwards if what you want is "something by Satie". They

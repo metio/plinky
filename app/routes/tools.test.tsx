@@ -18,7 +18,9 @@ describe("ToolsRoute", () => {
         for (const key of CIRCLE) {
             // Each key spells its own tonic: the flat side reads D♭, not C♯.
             const name = NOTE_TEXT[noteNameOf(key.tonic, key.spelling)];
-            expect(screen.getAllByRole("button", { name }).length).toBeGreaterThan(0);
+            // The keys are one control now, not twelve buttons: picking one of twelve is
+            // the same gesture as picking one of thirteen scales below them.
+            expect(screen.getAllByRole("tab", { name }).length).toBeGreaterThan(0);
         }
     });
 
@@ -31,7 +33,7 @@ describe("ToolsRoute", () => {
     it("names the signature and relative minor of the key picked", () => {
         renderWithServices(<ToolsRoute />);
         // D major: two sharps, F♯ and C♯, relative minor B.
-        fireEvent.click(screen.getAllByRole("button", { name: "D" })[0] as HTMLElement);
+        fireEvent.click(screen.getAllByRole("tab", { name: "D" })[0] as HTMLElement);
         expect(screen.getByText("F♯ · C♯")).toBeTruthy();
         expect(screen.getByText(m.tools_circle_minor({ note: "B" }))).toBeTruthy();
     });
