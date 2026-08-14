@@ -325,7 +325,10 @@ const BUDGET_VENDOR_KB = 324;
 // else; now How you play and Extra challenge are on it, the eight-grade map says every
 // piece is open and links to each grade's shelf, and every library row draws its opening
 // bars. The marks themselves are manifest bytes, not bundle bytes.
-const BUDGET_APP_KB = 340;
+// 342. Your own recordings are listed on the shelf — a piece was the only way to reach
+// one, so a take whose title you had forgotten was unreachable — and Today's setup steps
+// moved into the three moments, which cost a component and gave one back.
+const BUDGET_APP_KB = 342;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
