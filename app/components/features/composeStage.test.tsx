@@ -42,19 +42,22 @@ const mount = (fullscreen: boolean, onExitFullscreen = () => {}, staffXml: strin
 afterEach(cleanup);
 
 describe("ComposeStage", () => {
-    it("rests as just the controls and the sketch — no keyboard, no MIDI chrome", () => {
+    it("rests as the controls, the sketch and the keys — no MIDI chrome", () => {
         mount(false);
         expect(screen.getByRole("button", { name: "controls-slot" })).toBeTruthy();
         expect(screen.getByText("Play a few notes and they'll appear here.")).toBeTruthy();
-        // No on-screen keys, no connect button, no computer-keys disclosure —
-        // device setup lives in Settings alone.
-        expect(screen.queryByLabelText("Hide keys")).toBeNull();
+        // The keys are the only input a phone has, and the page's opening line promises
+        // them, so they are here before full screen is.
+        expect(screen.getByLabelText("C 4")).toBeTruthy();
+        // No connect button, no computer-keys disclosure — device setup lives in
+        // Settings alone — and no full-screen chrome until full screen.
         expect(screen.queryByRole("button", { name: "Connect MIDI" })).toBeNull();
         expect(screen.queryByText(/No piano\?/)).toBeNull();
+        expect(screen.queryByLabelText("Hide keys")).toBeNull();
         expect(screen.queryByLabelText("Exit full screen")).toBeNull();
     });
 
-    it("shows the keys with play's quick controls only in full screen", () => {
+    it("adds play's quick controls and the overlay in full screen", () => {
         const onExit = vi.fn();
         mount(true, onExit);
         // The overlay pins the stage over the page.

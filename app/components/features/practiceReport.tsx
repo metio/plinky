@@ -24,6 +24,7 @@ import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { Disclosure } from "../ui/disclosure";
 import { SegmentedControl } from "../ui/segmentedControl";
+import { sectionHeadingClasses } from "../ui/classes";
 
 // The practice diary, rolled up. How long, on which days, and what it felt like —
 // the retrospective a player keeps for themselves and the summary a teacher asks
@@ -274,9 +275,7 @@ export function PracticeReport({
     return (
         <section className="space-y-4">
             <div className="space-y-1">
-                <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
-                    {m.practice_report_title()}
-                </h2>
+                <h2 className={sectionHeadingClasses}>{m.practice_report_title()}</h2>
                 <p className="text-xs text-muted">{m.practice_report_intro()}</p>
             </div>
 

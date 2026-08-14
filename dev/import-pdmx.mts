@@ -22,6 +22,7 @@ import { isPublicDomain } from "./publicDomain.mts";
 import { nonSoloPianoReason } from "./scoreInstrument.mts";
 import { songId } from "../core/songId.ts";
 import { licenseDir } from "../core/attribution.ts";
+import { legibleTitle } from "./legibleTitle.mts";
 
 
 const ROOT = process.env.PDMX_DIR ?? "pdmx";
@@ -42,7 +43,11 @@ type Candidate = {
 type Scored = Candidate & { cost: number; tempo: number; beatsPerBar: number; src: string };
 
 const clean = (value: string | undefined): string => {
-    const text = (value ?? "").replace(/\s+/g, " ").trim();
+    // legibleTitle repairs — or, where the bytes are gone, drops — text that came through
+    // a wrong decoding. One title in the corpus reached the library as "Beethoven
+    // Silence" followed by a line of rubble, and a reader has no way to tell that from a
+    // piece that is genuinely called that.
+    const text = legibleTitle(value ?? "");
     return text === "NA" || text === "N/A" ? "" : text;
 };
 
@@ -61,6 +66,10 @@ function passes(row: Record<string, string>): boolean {
         // PDMX's CC0 tag is unreliable — only admit compositions we can show are public
         // domain. Sheet music of a copyrighted song infringes the composition.
         isPublicDomain(composer, title) &&
+        // A piece nobody can name is a piece nobody can find. A few corpus titles are
+        // text that came through a wrong decoding and lost bytes on the way; where
+        // nothing legible survives, the row is not a catalogue entry.
+        legibleTitle(title) !== "" &&
         row["subset:rated_deduplicated"] === "True" &&
         row["subset:no_license_conflict"] === "True" &&
         row.is_draft === "False" &&

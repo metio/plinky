@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
+import { sectionHeadingClasses } from "./classes";
 
 const CHIP: Record<"accent" | "danger", string> = {
     accent: "bg-accent-surface text-accent",
@@ -35,11 +36,7 @@ export function SettingsSection({
     const Heading = level === 2 ? "h2" : "h3";
 
     if (icon === undefined) {
-        const heading = (
-            <Heading className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
-                {title}
-            </Heading>
-        );
+        const heading = <Heading className={sectionHeadingClasses}>{title}</Heading>;
         return (
             <section className="space-y-3">
                 {hint === undefined ? (

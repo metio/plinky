@@ -6,6 +6,7 @@ import { noteName } from "../../../core/midi";
 import { type NoteStats, slowestNotes, typicalMs } from "../../../core/noteStats";
 import { useNoteStatsStore } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
+import { sectionHeadingClasses } from "../ui/classes";
 
 // The notes you are slowest to find, longest first.
 //
@@ -34,9 +35,7 @@ export function SlowNotes() {
 
     return (
         <section className="space-y-3">
-            <h2 className="border-b border-line pb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-spark-strong">
-                {m.slow_notes_heading()}
-            </h2>
+            <h2 className={sectionHeadingClasses}>{m.slow_notes_heading()}</h2>
             <p className="text-sm text-muted">
                 {m.slow_notes_intro({ typical: (typical / 1000).toFixed(1) })}
             </p>

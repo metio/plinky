@@ -107,6 +107,20 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**Compose has keys on it.** The page said "play on a MIDI keyboard, your computer keys,
+or the keys below" and had none below — they only appeared once you pressed Count in and
+the page went full screen. On a phone, which has neither a MIDI socket nor a computer
+keyboard, that left nothing to play at all. The keys are on the page now, under the
+sketch, and full screen still gives them the whole width.
+
+**Five pieces nobody could name have left the catalogue.** Their titles reached us as
+text that had been through a wrong decoding somewhere upstream and lost bytes on the way,
+so they arrived as a line of rubble — unsearchable, and unrecognisable in a list. One that
+was still half-readable is now "Beethoven Silence"; the five with nothing left are gone,
+and the import that let them in now turns such titles away. A composer's page also reads
+as the catalogue it is: the marks in one column, the titles in another, the grade and
+licence at the right.
+
 **The daily challenge is wrapped in the right colour.** The unopened present was drawn
 in a washed-out blue that came out grey against the paper — the one cold thing on a warm
 page. It now wears the same brass as the warm-up chip that leads to it.

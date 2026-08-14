@@ -20,6 +20,7 @@ import { useTheoryStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/theory";
+import { sectionHeadingClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
     return [
@@ -171,7 +172,7 @@ export default function TheoryRoute() {
 
             {UNITS.map((unit) => (
                 <section key={unit} className="space-y-3">
-                    <h2 className="text-sm font-medium text-body">{UNIT_NAME[unit]()}</h2>
+                    <h2 className={sectionHeadingClasses}>{UNIT_NAME[unit]()}</h2>
                     <ul className="space-y-4">
                         {lessonsIn(unit).map((lesson) => {
                             counter += 1;
