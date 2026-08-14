@@ -74,7 +74,7 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
     const [transpose, setTranspose] = useState(0);
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             {score && (
                 <TransposeProvider value={{ transpose, setTranspose }}>
                     <header className="space-y-1">

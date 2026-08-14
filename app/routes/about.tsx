@@ -59,7 +59,7 @@ export default function About() {
     // someone finds it.
     const [kiss, setKiss] = useState(0);
     return (
-        <main className="mx-auto max-w-3xl space-y-10 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             {/* What Plinky is, kept somewhere it stays. The front page offers this to a
                 first visit and then steps aside for the day's practice, which is right
                 there and would leave a player who wanted to explain Plinky to somebody

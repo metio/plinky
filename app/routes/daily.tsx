@@ -92,7 +92,7 @@ export default function DailyRoute() {
     };
 
     return (
-        <main className="mx-auto max-w-3xl space-y-5 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <div className="flex items-start justify-between gap-2">
                     <h1 className="font-display text-3xl font-semibold tracking-tight">

@@ -120,7 +120,7 @@ export default function PersonPage() {
     }, [songs.manifest, slug]);
 
     return (
-        <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-strong">
                     {m.person_eyebrow()}

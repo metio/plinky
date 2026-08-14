@@ -371,8 +371,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const reportUrl = issueUrl(REPO_ISSUES, report, where, userAgent);
 
     return (
-        <main className="mx-auto max-w-3xl space-y-4 p-6 font-sans">
-            <h1 className="text-2xl font-semibold">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
+            <h1 className="font-display text-3xl font-semibold tracking-tight">
                 {notFound ? "We couldn't find that" : "Something went wrong"}
             </h1>
             <p className="text-muted">

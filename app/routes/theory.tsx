@@ -140,7 +140,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
 export default function TheoryRoute() {
     let counter = 0;
     return (
-        <main className="mx-auto max-w-3xl space-y-6 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <header className="space-y-1">
                 <h1 className="font-display text-3xl font-semibold tracking-tight">
                     {m.theory_title()}

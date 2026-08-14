@@ -27,7 +27,7 @@ export function meta(_args: Route.MetaArgs) {
 // shows the introduction and then takes it away).
 export default function Home() {
     return (
-        <main className="mx-auto max-w-3xl space-y-10 p-6 font-sans">
+        <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             {/* Everything that arrives after mount sits at the foot of the page, so it
                 lands in empty space instead of pushing the rest of it down. A page that
                 rearranges itself while you are reading it is the one thing every visit
