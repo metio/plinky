@@ -15,6 +15,7 @@ import { EarSession } from "./earSession";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { ScoreViewer } from "./scoreViewer";
 import { PageHeader } from "../ui/pageHeader";
+import { EmptyState } from "../ui/emptyState";
 
 const BACK = `text-sm ${linkClasses}`;
 
@@ -79,15 +80,14 @@ export function ReviewSession() {
         return (
             <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
                 <PageHeader title={m.review_heading()} hint={m.review_empty()} />
-                <p className="text-sm text-muted">{m.refresh_why()}</p>
-                <div className="flex flex-wrap items-center gap-4">
+                <EmptyState body={m.refresh_why()}>
                     <Link to="/library" className={BACK}>
                         {m.today_browse()}
                     </Link>
                     <Link to="/you" className={BACK}>
                         {m.review_back()}
                     </Link>
-                </div>
+                </EmptyState>
             </main>
         );
     }

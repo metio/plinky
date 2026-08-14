@@ -28,6 +28,7 @@ import { EarKeyboard } from "./earKeyboard";
 import { EarLadder } from "./earLadder";
 import { EarSequence } from "./earSequence";
 import { EarStage } from "./earStage";
+import { EmptyState } from "../ui/emptyState";
 
 // The one-line prompt on the resting start card, per exercise.
 const BLURB: Record<EarExerciseId, () => string> = {
@@ -146,12 +147,11 @@ export function EarSession({
 
     if (question === null) {
         return (
-            <div className="space-y-4 rounded-xl border border-line p-8 text-center">
-                <p className="text-sm text-muted">{BLURB[exercise]()}</p>
+            <EmptyState body={BLURB[exercise]()}>
                 <Button variant="primary" onClick={next}>
                     {m.ear_start()}
                 </Button>
-            </div>
+            </EmptyState>
         );
     }
 
