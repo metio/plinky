@@ -72,6 +72,11 @@ machine with rootless Podman and nix-portable, so a gate needing `kind`, a
 privileged container, a system-level nix daemon, or real MIDI/audio hardware
 could not run here at all. Plinky has no such gate today.
 
+`ci-build` dies with `EMFILE: too many open files, watch` when this host's inotify
+instances (`fs.inotify.max_user_instances`, 128) are exhausted — an editor plus a few
+builds is enough. `CHOKIDAR_USEPOLLING=true nix develop --command ci-build` polls
+instead of watching and completes.
+
 Never run two `nix develop --command npm …` invocations concurrently: each
 regenerates the gitignored `app/paraglide/`, and a mid-read resolve error fails
 a dozen files spuriously. One at a time.
