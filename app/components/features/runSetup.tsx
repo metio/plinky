@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { Dispatch, ReactNode, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { type Beams, BEAMS } from "../../../core/beams";
 import type { Hand } from "../../../core/matcher";
 import { BARS_PER_ROW, NOTE_SCALES, REVEAL_TRIES } from "../../../core/prefs";
@@ -34,28 +34,14 @@ const beamsLabel: Record<Beams, string> = {
     off: m.beams_off(),
 };
 
-// The run-setup panel: everything that shapes the run you are ABOUT to play. Changing
-// any of it mid-piece would mean starting over, so it lives before the run rather than
-// in the mid-play controls. It reads as the Settings page does — each theme grouped in
-// its own titled, icon-led card that explains itself. Folded behind the at-rest
-// disclosure below; full-screen play carries no settings.
-// Everything past the essentials, folded away for a true beginner and shown outright
-// for everyone else.
+// What shapes the run you are about to play. Changing any of it mid-piece would mean
+// starting over, so it lives before the run rather than in the mid-play controls, and it
+// reads as the Settings page does — each theme in its own titled, icon-led card.
 //
-// A starter has all the reading help on and has usually never played; two dozen further
-// switches is not a choice, it is a wall. The fold is the same Disclosure the panel
-// itself lives behind, so nothing is hidden — one press opens all of it, and the moment
-// they move off Starter the panel is simply whole again.
-export function AdvancedOptions({ starter, children }: { starter: boolean; children: ReactNode }) {
-    if (!starter) {
-        return <>{children}</>;
-    }
-    return (
-        <Disclosure summary={m.run_more_options()}>
-            <div className="space-y-4">{children}</div>
-        </Disclosure>
-    );
-}
+// What is about THIS PIECE is on the page: how you play it, and the challenges you can
+// put on it. What is about every piece — the skill level, the reading aids, the score
+// layout — folds away, because Settings owns it too and a reader loses nothing by
+// opening it there instead.
 
 function RunSetupPanel() {
     const {
@@ -106,313 +92,311 @@ function RunSetupPanel() {
 
     return (
         <div className="space-y-4">
-            {/* Skill level leads: one choice sets the reading aids in the cards below,
-            so a newcomer is set up before touching anything else. */}
-            <SettingsSection
-                title={m.run_group_skill_title()}
-                hint={m.run_group_skill_hint()}
-                icon={<GradCapIcon className={ICON} />}
-            >
-                <ReadingLevel labelled={false} />
-            </SettingsSection>
-
-            <ScoreSymbols xml={xml} />
-
             {starter && (
                 // The space the folded controls free up says the one thing a beginner
                 // actually needs to hear before a first run.
                 <p className="text-sm text-muted">{m.run_starter_hint()}</p>
             )}
 
-            <AdvancedOptions starter={starter}>
-                <SettingsSection
-                    title={m.run_group_practice_title()}
-                    hint={m.run_group_practice_hint()}
-                    icon={<SlidersIcon className={ICON} />}
-                >
-                    {staffCount >= 2 && (
-                        <ChoiceField
-                            label={m.hand_label()}
-                            value={hand}
-                            onChange={setHand}
-                            options={(["both", "right", "left"] as const).map((option) => ({
-                                id: option,
-                                label: handLabel[option],
-                            }))}
-                            help={m.hand_caption()}
-                            disabled={matcher.practicing}
-                        />
-                    )}
-                    <SwitchField
-                        label={m.keep_up_toggle()}
-                        checked={enforceTempo}
-                        onChange={setEnforceTempo}
-                        help={m.keep_up_hint()}
-                    />
-                    {enforceTempo && (
-                        <SwitchField
-                            label={m.guide_notes_toggle()}
-                            checked={guideNotes}
-                            onChange={setGuideNotes}
-                            help={m.guide_notes_hint()}
-                        />
-                    )}
-                    {/* A duet needs one hand sitting out for the app to play — in keep-up it
-                follows the clock, self-paced it follows your own pace note by note. */}
-                    {staffCount >= 2 && hand !== "both" && (
-                        <SwitchField
-                            label={m.duet_toggle()}
-                            checked={duet}
-                            onChange={setDuet}
-                            help={m.duet_hint()}
-                        />
-                    )}
-                    <SwitchField
-                        label={m.forgiving_toggle()}
-                        checked={forgiving}
-                        onChange={setForgiving}
-                        help={m.forgiving_hint()}
-                    />
-                    <SwitchField
-                        label={m.action_metronome()}
-                        checked={metronomeOn}
-                        onChange={setMetronomeOn}
-                        help={m.metronome_toggle_hint()}
-                    />
-                </SettingsSection>
-
-                <SettingsSection
-                    title={m.run_group_reading_title()}
-                    hint={m.run_group_reading_hint()}
-                    icon={<EyeIcon className={ICON} />}
-                >
-                    {/* Keep up drives the cursor on the beat, which leaves no room to
-                        hunt for a note nobody can see — the run forces the noteheads
-                        back on. The switch used to sit here on and ignored; it reads as
-                        unavailable now, and what it shows is what this run will do
-                        rather than what the preference says. */}
-                    <SwitchField
-                        label={m.hidden_notes_toggle()}
-                        checked={enforceTempo ? false : hiddenNotes}
-                        onChange={setHiddenNotes}
-                        help={m.hidden_notes_hint()}
-                        disabled={enforceTempo}
-                    />
-                    {hiddenNotes && !enforceTempo && (
-                        <ChoiceField
-                            label={m.reveal_tries()}
-                            value={String(revealTries)}
-                            onChange={(id) => setRevealTries(Number(id))}
-                            options={REVEAL_TRIES.map((n) => ({ id: String(n), label: String(n) }))}
-                            help={m.reveal_tries_caption()}
-                        />
-                    )}
-                    <SwitchField
-                        label={m.color_notes_toggle()}
-                        checked={reading.colorNotes}
-                        onChange={reading.setColorNotes}
-                        help={m.color_notes_hint()}
-                    />
-                    <SwitchField
-                        label={m.highway_toggle()}
-                        checked={reading.highway}
-                        onChange={reading.setHighway}
-                        help={m.highway_hint()}
-                    />
-                    <SwitchField
-                        label={m.action_finger_numbers()}
-                        checked={reading.showFingerings}
-                        onChange={(on) => reading.setShowFingerings(on)}
-                        help={m.finger_numbers_hint()}
-                    />
-                    {hasSaved && reading.showFingerings && (
-                        <SwitchField
-                            label={m.fingering_show_mine()}
-                            checked={showMine}
-                            onChange={setShowMine}
-                            help={m.fingering_show_mine_caption()}
-                        />
-                    )}
-                </SettingsSection>
-
-                <SettingsSection
-                    title={m.run_group_layout_title()}
-                    hint={m.run_group_layout_hint()}
-                    icon={<BookIcon className={ICON} />}
-                >
-                    {/* Follow drives its own scrolling in both layouts; the treadmill
-                already scrolls under a fixed gaze, so the toggle is moot there. */}
-                    {!reading.treadmill && (
-                        <SwitchField
-                            label={m.action_scroll_follow()}
-                            checked={reading.scrollFollow}
-                            onChange={(on) => reading.setScrollFollow(on)}
-                            help={m.scroll_follow_hint()}
-                        />
-                    )}
-                    <SwitchField
-                        label={m.treadmill_toggle()}
-                        checked={reading.treadmill}
-                        onChange={reading.setTreadmill}
-                        help={m.treadmill_hint()}
-                    />
-                    {!reading.treadmill && (
-                        <ChoiceField
-                            label={m.bars_per_row()}
-                            value={String(reading.barsPerRow)}
-                            onChange={(id) => reading.setBarsPerRow(Number(id))}
-                            options={BARS_PER_ROW.map((n) => ({
-                                id: String(n),
-                                label: n === 0 ? m.bars_per_row_auto() : String(n),
-                            }))}
-                            help={m.bars_per_row_caption()}
-                        />
-                    )}
-                    <SwitchField
-                        label={m.bar_numbers_toggle()}
-                        checked={reading.barNumbers}
-                        onChange={reading.setBarNumbers}
-                        help={m.bar_numbers_hint()}
-                    />
+            <SettingsSection
+                title={m.run_group_practice_title()}
+                hint={m.run_group_practice_hint()}
+                icon={<SlidersIcon className={ICON} />}
+            >
+                {staffCount >= 2 && (
                     <ChoiceField
-                        label={m.beams_label()}
-                        value={reading.beams}
-                        onChange={(id) => reading.setBeams(id as Beams)}
-                        options={BEAMS.map((option) => ({ id: option, label: beamsLabel[option] }))}
-                        help={m.beams_caption()}
-                    />
-                    <ChoiceField
-                        label={m.note_size_label()}
-                        value={String(reading.noteScale)}
-                        onChange={(id) => reading.setNoteScale(Number(id))}
-                        options={NOTE_SCALES.map((scale) => ({
-                            id: String(scale),
-                            label: `${Math.round(scale * 100)}%`,
+                        label={m.hand_label()}
+                        value={hand}
+                        onChange={setHand}
+                        options={(["both", "right", "left"] as const).map((option) => ({
+                            id: option,
+                            label: handLabel[option],
                         }))}
-                        help={m.note_size_caption()}
+                        help={m.hand_caption()}
+                        disabled={matcher.practicing}
                     />
-                </SettingsSection>
+                )}
+                {/* One control for the pace, where there used to be two writing the
+                    same state from opposite ends of the same open panel: this switch
+                    and the sight-read tempo choice below it. */}
+                <ChoiceField
+                    label={m.run_pace_label()}
+                    value={enforceTempo ? "tempo" : "own"}
+                    onChange={(value: string) => setEnforceTempo(value === "tempo")}
+                    options={[
+                        { id: "own", label: m.sight_read_tempo_own() },
+                        { id: "tempo", label: m.keep_up_toggle() },
+                    ]}
+                    help={m.keep_up_hint()}
+                />
+                {enforceTempo && (
+                    <SwitchField
+                        label={m.guide_notes_toggle()}
+                        checked={guideNotes}
+                        onChange={setGuideNotes}
+                        help={m.guide_notes_hint()}
+                    />
+                )}
+                {/* A duet needs one hand sitting out for the app to play — in keep-up it
+            follows the clock, self-paced it follows your own pace note by note. */}
+                {staffCount >= 2 && hand !== "both" && (
+                    <SwitchField
+                        label={m.duet_toggle()}
+                        checked={duet}
+                        onChange={setDuet}
+                        help={m.duet_hint()}
+                    />
+                )}
+                <SwitchField
+                    label={m.forgiving_toggle()}
+                    checked={forgiving}
+                    onChange={setForgiving}
+                    help={m.forgiving_hint()}
+                />
+                <SwitchField
+                    label={m.action_metronome()}
+                    checked={metronomeOn}
+                    onChange={setMetronomeOn}
+                    help={m.metronome_toggle_hint()}
+                />
+            </SettingsSection>
 
-                <SettingsSection
-                    title={m.run_group_challenge_title()}
-                    hint={m.run_group_challenge_hint()}
-                    icon={<StarIcon className={ICON} />}
-                >
+            <SettingsSection
+                title={m.run_group_challenge_title()}
+                hint={m.run_group_challenge_hint()}
+                icon={<StarIcon className={ICON} />}
+            >
+                <SwitchField
+                    label={m.sight_read()}
+                    checked={sightRead.on}
+                    onChange={sightRead.setOn}
+                    help={m.sight_read_caption()}
+                />
+                {sightRead.on && (
+                    <>
+                        <ChoiceField
+                            label={m.sight_read_study()}
+                            value={String(sightRead.studySeconds)}
+                            onChange={(value: string) =>
+                                sightRead.setStudySeconds(Number(value) as StudySeconds)
+                            }
+                            options={STUDY_SECONDS.map((seconds) => ({
+                                id: String(seconds),
+                                label: m.sight_read_study_seconds({ seconds }),
+                            }))}
+                            help={m.sight_read_study_caption()}
+                        />
+                        {!enforceTempo && (
+                            <SwitchField
+                                label={m.sight_read_vanish()}
+                                checked={sightRead.vanish}
+                                onChange={sightRead.setVanish}
+                                help={m.sight_read_vanish_caption()}
+                            />
+                        )}
+                        {sightReadRecord && (
+                            <p className="text-sm text-muted">
+                                {m.sight_read_already({
+                                    letter: sightReadRecord.letter,
+                                    score: sightReadRecord.score,
+                                })}
+                            </p>
+                        )}
+                    </>
+                )}
+                {!lockTempo && <TransposeRow transpose={transpose} setTranspose={setTranspose} />}
+                {!lockTempo && (
                     <SwitchField
-                        label={m.sight_read()}
-                        checked={sightRead.on}
-                        onChange={sightRead.setOn}
-                        help={m.sight_read_caption()}
+                        label={m.tempo_trainer()}
+                        checked={trainerOn}
+                        onChange={setTrainerOn}
+                        help={m.tempo_trainer_caption()}
                     />
-                    {sightRead.on && (
-                        <>
+                )}
+                {!lockTempo && trainerOn && (
+                    <div className="space-y-1">
+                        <label className="flex items-center gap-2 text-sm text-body">
+                            <span>{m.tempo_trainer_target()}</span>
+                            <input
+                                type="range"
+                                min={40}
+                                max={180}
+                                value={trainerTarget}
+                                onChange={(event) => setTrainerTarget(Number(event.target.value))}
+                                aria-label={m.tempo_trainer_target()}
+                            />
+                            <Bpm tempo={trainerTarget} term />
+                        </label>
+                        <p className="text-xs text-muted">{m.tempo_trainer_target_caption()}</p>
+                    </div>
+                )}
+                <SwitchField
+                    label={m.race_ghost_toggle()}
+                    checked={raceGhost}
+                    onChange={setRaceGhost}
+                    help={m.race_ghost_hint()}
+                />
+                {ready && measureCount > 1 && (
+                    <SwitchField
+                        label={m.loop_section()}
+                        checked={loop.on}
+                        onChange={loop.toggle}
+                        help={m.loop_caption()}
+                    />
+                )}
+                {/* Only offered with a loop set: "just these bars" needs bars to mean. */}
+                {ready && measureCount > 1 && loop.on && (
+                    <SwitchField
+                        label={m.focus_loop()}
+                        checked={focusLoop}
+                        onChange={setFocusLoop}
+                        help={m.focus_loop_caption()}
+                    />
+                )}
+            </SettingsSection>
+
+            {/* The one fold that is left, and everything in it is a second door onto
+                Settings → Reading — so folding it hides nothing a reader cannot reach
+                anyway, and the two cards above, which are about this piece and no other,
+                are on the page where they are chosen. */}
+            <Disclosure summary={m.run_group_sheet_title()}>
+                <div className="space-y-4">
+                    <SettingsSection
+                        title={m.run_group_skill_title()}
+                        hint={m.run_group_skill_hint()}
+                        icon={<GradCapIcon className={ICON} />}
+                    >
+                        <ReadingLevel labelled={false} />
+                    </SettingsSection>
+
+                    <ScoreSymbols xml={xml} />
+
+                    <SettingsSection
+                        title={m.run_group_reading_title()}
+                        hint={m.run_group_reading_hint()}
+                        icon={<EyeIcon className={ICON} />}
+                    >
+                        {/* Keep up drives the cursor on the beat, which leaves no room to
+                            hunt for a note nobody can see — the run forces the noteheads
+                            back on. The switch used to sit here on and ignored; it reads as
+                            unavailable now, and what it shows is what this run will do
+                            rather than what the preference says. */}
+                        <SwitchField
+                            label={m.hidden_notes_toggle()}
+                            checked={enforceTempo ? false : hiddenNotes}
+                            onChange={setHiddenNotes}
+                            help={m.hidden_notes_hint()}
+                            disabled={enforceTempo}
+                        />
+                        {hiddenNotes && !enforceTempo && (
                             <ChoiceField
-                                label={m.sight_read_study()}
-                                value={String(sightRead.studySeconds)}
-                                onChange={(value: string) =>
-                                    sightRead.setStudySeconds(Number(value) as StudySeconds)
-                                }
-                                options={STUDY_SECONDS.map((seconds) => ({
-                                    id: String(seconds),
-                                    label: m.sight_read_study_seconds({ seconds }),
+                                label={m.reveal_tries()}
+                                value={String(revealTries)}
+                                onChange={(id) => setRevealTries(Number(id))}
+                                options={REVEAL_TRIES.map((n) => ({
+                                    id: String(n),
+                                    label: String(n),
                                 }))}
-                                help={m.sight_read_study_caption()}
+                                help={m.reveal_tries_caption()}
                             />
+                        )}
+                        <SwitchField
+                            label={m.color_notes_toggle()}
+                            checked={reading.colorNotes}
+                            onChange={reading.setColorNotes}
+                            help={m.color_notes_hint()}
+                        />
+                        <SwitchField
+                            label={m.highway_toggle()}
+                            checked={reading.highway}
+                            onChange={reading.setHighway}
+                            help={m.highway_hint()}
+                        />
+                        <SwitchField
+                            label={m.action_finger_numbers()}
+                            checked={reading.showFingerings}
+                            onChange={(on) => reading.setShowFingerings(on)}
+                            help={m.finger_numbers_hint()}
+                        />
+                        {hasSaved && reading.showFingerings && (
+                            <SwitchField
+                                label={m.fingering_show_mine()}
+                                checked={showMine}
+                                onChange={setShowMine}
+                                help={m.fingering_show_mine_caption()}
+                            />
+                        )}
+                    </SettingsSection>
+
+                    <SettingsSection
+                        title={m.run_group_layout_title()}
+                        hint={m.run_group_layout_hint()}
+                        icon={<BookIcon className={ICON} />}
+                    >
+                        {/* Follow drives its own scrolling in both layouts; the treadmill
+                    already scrolls under a fixed gaze, so the toggle is moot there. */}
+                        {!reading.treadmill && (
+                            <SwitchField
+                                label={m.action_scroll_follow()}
+                                checked={reading.scrollFollow}
+                                onChange={(on) => reading.setScrollFollow(on)}
+                                help={m.scroll_follow_hint()}
+                            />
+                        )}
+                        <SwitchField
+                            label={m.treadmill_toggle()}
+                            checked={reading.treadmill}
+                            onChange={reading.setTreadmill}
+                            help={m.treadmill_hint()}
+                        />
+                        {!reading.treadmill && (
                             <ChoiceField
-                                label={m.sight_read_tempo()}
-                                value={enforceTempo ? "tempo" : "own"}
-                                onChange={(value: string) => setEnforceTempo(value === "tempo")}
-                                options={[
-                                    { id: "own", label: m.sight_read_tempo_own() },
-                                    { id: "tempo", label: m.sight_read_tempo_piece() },
-                                ]}
-                                help={m.sight_read_tempo_caption()}
+                                label={m.bars_per_row()}
+                                value={String(reading.barsPerRow)}
+                                onChange={(id) => reading.setBarsPerRow(Number(id))}
+                                options={BARS_PER_ROW.map((n) => ({
+                                    id: String(n),
+                                    label: n === 0 ? m.bars_per_row_auto() : String(n),
+                                }))}
+                                help={m.bars_per_row_caption()}
                             />
-                            {!enforceTempo && (
-                                <SwitchField
-                                    label={m.sight_read_vanish()}
-                                    checked={sightRead.vanish}
-                                    onChange={sightRead.setVanish}
-                                    help={m.sight_read_vanish_caption()}
-                                />
-                            )}
-                            {sightReadRecord && (
-                                <p className="text-sm text-muted">
-                                    {m.sight_read_already({
-                                        letter: sightReadRecord.letter,
-                                        score: sightReadRecord.score,
-                                    })}
-                                </p>
-                            )}
-                        </>
-                    )}
-                    {!lockTempo && (
-                        <TransposeRow transpose={transpose} setTranspose={setTranspose} />
-                    )}
-                    {!lockTempo && (
+                        )}
                         <SwitchField
-                            label={m.tempo_trainer()}
-                            checked={trainerOn}
-                            onChange={setTrainerOn}
-                            help={m.tempo_trainer_caption()}
+                            label={m.bar_numbers_toggle()}
+                            checked={reading.barNumbers}
+                            onChange={reading.setBarNumbers}
+                            help={m.bar_numbers_hint()}
                         />
-                    )}
-                    {!lockTempo && trainerOn && (
-                        <div className="space-y-1">
-                            <label className="flex items-center gap-2 text-sm text-body">
-                                <span>{m.tempo_trainer_target()}</span>
-                                <input
-                                    type="range"
-                                    min={40}
-                                    max={180}
-                                    value={trainerTarget}
-                                    onChange={(event) =>
-                                        setTrainerTarget(Number(event.target.value))
-                                    }
-                                    aria-label={m.tempo_trainer_target()}
-                                />
-                                <Bpm tempo={trainerTarget} term />
-                            </label>
-                            <p className="text-xs text-muted">{m.tempo_trainer_target_caption()}</p>
-                        </div>
-                    )}
-                    <SwitchField
-                        label={m.race_ghost_toggle()}
-                        checked={raceGhost}
-                        onChange={setRaceGhost}
-                        help={m.race_ghost_hint()}
-                    />
-                    {ready && measureCount > 1 && (
-                        <SwitchField
-                            label={m.loop_section()}
-                            checked={loop.on}
-                            onChange={loop.toggle}
-                            help={m.loop_caption()}
+                        <ChoiceField
+                            label={m.beams_label()}
+                            value={reading.beams}
+                            onChange={(id) => reading.setBeams(id as Beams)}
+                            options={BEAMS.map((option) => ({
+                                id: option,
+                                label: beamsLabel[option],
+                            }))}
+                            help={m.beams_caption()}
                         />
-                    )}
-                    {/* Only offered with a loop set: "just these bars" needs bars to mean. */}
-                    {ready && measureCount > 1 && loop.on && (
-                        <SwitchField
-                            label={m.focus_loop()}
-                            checked={focusLoop}
-                            onChange={setFocusLoop}
-                            help={m.focus_loop_caption()}
+                        <ChoiceField
+                            label={m.note_size_label()}
+                            value={String(reading.noteScale)}
+                            onChange={(id) => reading.setNoteScale(Number(id))}
+                            options={NOTE_SCALES.map((scale) => ({
+                                id: String(scale),
+                                label: `${Math.round(scale * 100)}%`,
+                            }))}
+                            help={m.note_size_caption()}
                         />
-                    )}
-                </SettingsSection>
-            </AdvancedOptions>
+                    </SettingsSection>
+                </div>
+            </Disclosure>
         </div>
     );
 }
 
-// At rest, the panel folds behind one disclosure on the play surface, so the setup
-// is a click away without crowding the resting page.
+// The piece's own controls, on the piece's page.
 export function RunSetup() {
-    return (
-        <Disclosure summary={m.run_setup()}>
-            <RunSetupPanel />
-        </Disclosure>
-    );
+    return <RunSetupPanel />;
 }
 
 // Transposition shifts the whole piece into a friendlier key before the run.

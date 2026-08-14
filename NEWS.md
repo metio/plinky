@@ -107,6 +107,20 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**A piece tells you what you can do with it.** Everything Plinky can put on a piece —
+one hand at a time, keeping up with the beat, the duet, sight-reading it cold, hidden
+notes, the vanishing bars, racing your ghost, looping a passage, transposing it, the tempo
+trainer — lived inside a fold called "Set up your run", and behind a *second* fold if you
+were a beginner. Nobody met any of it by accident. Under the score there are now two
+plainly named groups: **How you play** and **Extra challenge**, both open, each control
+where you would look for it. One fold is left — **How the sheet looks** — and everything
+in it is the same reading setting Settings already carries, so folding it costs you
+nothing.
+
+Keeping up with the beat was also two controls writing one thing: a "Keep up" switch, and
+a tempo choice inside sight-reading that quietly moved the same lever. It is one **Pace**
+control now: at your own pace, or keep up.
+
 **Nothing in Plinky is locked, and now it says so.** Grades describe how hard the music
 is to read; they have never decided what you may open. The eight-grade map on You now
 carries that in as many words, and every grade on it is a link: press Grade 8 on your

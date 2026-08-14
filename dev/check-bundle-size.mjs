@@ -320,7 +320,12 @@ const BUDGET_VENDOR_KB = 324;
 // strings per locale, plus the table that picks one. The manifest's English titles are
 // still there — they name the score's own <work-title> — so this pays for the language
 // the reader actually gets, in a build carrying one locale.
-const BUDGET_APP_KB = 339;
+// 340. A piece's page names what can be done to it. The twelve ways to work a piece used
+// to sit behind a fold — two for a beginner — so the page carried a summary and nothing
+// else; now How you play and Extra challenge are on it, the eight-grade map says every
+// piece is open and links to each grade's shelf, and every library row draws its opening
+// bars. The marks themselves are manifest bytes, not bundle bytes.
+const BUDGET_APP_KB = 340;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
