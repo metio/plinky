@@ -107,6 +107,19 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The shelf reads as music.** Music opened on a hundred and forty scales and studies —
+no actual piece appeared until the third screenful — because three lists were stacked end
+to end and the order each of them arrived in was thrown away. One shelf now, easiest first
+inside each grade, so the gentlest things to play are the first things you see. Every row
+draws the piece's opening bars, exercises included, which is how you recognise a tune you
+can't quite name.
+
+**Search finds the piece you can't spell.** Typing "hanschen" found nothing, because the
+title is *Hänschen Klein* and the search wanted the umlaut; "fur elise" found one of the
+three. Accents are now optional in what you type and in what you are looking for. Japanese
+and Cyrillic titles are untouched — a dakuten is not an accent, it is what tells one
+syllable from another.
+
 **The brass reads properly in daylight.** The gold used for the small labels — a section
 heading, a grade chip, the day's warm-up — sat a hair under the contrast a caption needs
 against the paper it is printed on. It is a shade deeper now, on both the page and the

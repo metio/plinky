@@ -33,7 +33,7 @@ const emptySources = () => ({
 });
 
 describe("useLibraryItems", () => {
-    it("combines local scores with both manifests, local first, and flags loaded", async () => {
+    it("combines local scores with both manifests, gentlest first, and flags loaded", async () => {
         const store = memoryStore();
         saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
         const exercises = source<ExerciseSource>(() =>
@@ -48,12 +48,15 @@ describe("useLibraryItems", () => {
             wrapper: wrap(store, exercises, songs),
         });
         await waitFor(() => expect(result.current.loaded).toBe(true));
-        // Local scores (the user import plus the bundled demos) come first, then
-        // the exercise manifest, then the song manifest.
+        // One shelf in reading order — by grade, then gentlest first — rather than three
+        // lists end to end, which used to put every scale and study in front of the music.
         const titles = result.current.items.map((item) => item.title);
-        expect(titles[0]).toBe("My Tune");
-        expect(titles.slice(-2)).toEqual(["Scale of C", "Air"]);
         expect(titles.length).toBe(loadBundledScores().length + 3);
+        const grades = result.current.items.map((item) => item.grade);
+        expect([...grades].sort((a, b) => a - b)).toEqual(grades);
+        // The grade-3 song sorts behind the grade-1 exercise, whichever manifest they
+        // arrived in.
+        expect(titles.indexOf("Scale of C")).toBeLessThan(titles.indexOf("Air"));
         // Only the user import is removable; an absent composer reads as "".
         const byTitle = (title: string) =>
             result.current.items.find((entry) => entry.title === title);

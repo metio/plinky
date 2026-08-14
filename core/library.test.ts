@@ -6,7 +6,9 @@ import {
     dueCount,
     EMPTY_LIBRARY_FILTER,
     filterLibrary,
+    foldForSearch,
     type LibraryItem,
+    libraryOrder,
     toggledGrade,
 } from "./library";
 import type { Mastery } from "./mastery";
@@ -174,5 +176,89 @@ describe("dueCount", () => {
 
     it("is zero with no mastery at all", () => {
         expect(dueCount({}, NOW)).toBe(0);
+    });
+});
+
+describe("foldForSearch", () => {
+    it("takes the marks off a letter, so a keyboard without them still finds the piece", () => {
+        expect(foldForSearch("Hänschen Klein")).toBe("hanschen klein");
+        expect(foldForSearch("Für Elise")).toBe("fur elise");
+        expect(foldForSearch("Gabriel Fauré")).toBe("gabriel faure");
+        expect(foldForSearch("Antonín Dvořák")).toBe("antonin dvorak");
+    });
+
+    it("settles the apostrophes a title can be typed with", () => {
+        expect(foldForSearch("O\u2019Carolan")).toBe("o'carolan");
+        expect(foldForSearch("O'Carolan")).toBe("o'carolan");
+    });
+
+    it("leaves a script whose marks are not accents exactly as it is", () => {
+        // The dakuten is what tells \u30cf from \u30d0 from \u30d1: stripping it would fold three
+        // syllables into one and match a title nobody typed.
+        expect(foldForSearch("\u30a2\u30eb\u30da\u30b8\u30aa")).toBe("\u30a2\u30eb\u30da\u30b8\u30aa");
+        expect(foldForSearch("Прелюдия")).toBe("прелюдия");
+    });
+});
+
+describe("searching the shelf", () => {
+    const shelf = [
+        item({ id: "a", title: "Hänschen Klein", composer: "Deutsches Kinderlied" }),
+        item({ id: "b", title: "Für Elise", composer: "Ludwig van Beethoven" }),
+        item({ id: "c", title: "Clair de lune", composer: "Claude Debussy" }),
+    ];
+    const found = (query: string) =>
+        filterLibrary(shelf, { ...EMPTY_LIBRARY_FILTER, query }, emptyContext).map((one) => one.id);
+
+    it("finds a piece typed without its accents", () => {
+        // The case that sent a reader away empty-handed: no umlaut key, no result.
+        expect(found("hanschen")).toEqual(["a"]);
+        expect(found("fur elise")).toEqual(["b"]);
+    });
+
+    it("still finds it typed with them", () => {
+        expect(found("hänschen")).toEqual(["a"]);
+        expect(found("Für")).toEqual(["b"]);
+    });
+
+    it("searches the composer the same way", () => {
+        expect(found("debussy")).toEqual(["c"]);
+    });
+});
+
+describe("libraryOrder", () => {
+    it("puts the gentlest of a grade first, and every grade in order", () => {
+        const shelf = [
+            item({ id: "g2-hard", grade: 2, cost: 9 }),
+            item({ id: "g1-hard", grade: 1, cost: 5 }),
+            item({ id: "g1-easy", grade: 1, cost: 1 }),
+            item({ id: "g2-easy", grade: 2, cost: 2 }),
+        ];
+        expect(libraryOrder(shelf).map((one) => one.id)).toEqual([
+            "g1-easy",
+            "g1-hard",
+            "g2-easy",
+            "g2-hard",
+        ]);
+    });
+
+    it("sorts an unmeasured piece last within its grade rather than first", () => {
+        // A missing cost is "we never measured this", not "this is the gentlest thing
+        // here" — which is what a zero would have claimed.
+        const shelf = [item({ id: "unknown", grade: 1 }), item({ id: "measured", grade: 1, cost: 4 })];
+        expect(libraryOrder(shelf).map((one) => one.id)).toEqual(["measured", "unknown"]);
+    });
+
+    it("settles a tie by title, so the same shelf always reads the same way", () => {
+        const shelf = [
+            item({ id: "b", title: "Bourrée", grade: 1, cost: 2 }),
+            item({ id: "a", title: "Aria", grade: 1, cost: 2 }),
+        ];
+        expect(libraryOrder(shelf).map((one) => one.id)).toEqual(["a", "b"]);
+    });
+
+    it("leaves the shelf it was given alone", () => {
+        const shelf = [item({ id: "b", grade: 2 }), item({ id: "a", grade: 1 })];
+        libraryOrder(shelf);
+        expect(shelf.map((one) => one.id)).toEqual(["b", "a"]);
     });
 });
