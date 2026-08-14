@@ -192,7 +192,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
        the pedals, the hinges, the gilt on a fallboard. It is also the only warm
        colour the chrome is allowed, and it goes on things you earned. */
     --color-spark: #a67c2e;
-    --color-spark-strong: #8a6520;
+    /* Dark enough to carry text on every warm surface it is printed on: at #8a6520 it
+       measured 4.39:1 against spark-surface, under the 4.5 a caption or a chip label
+       needs, and the accessibility gate reads that as a real failure — which it is, on a
+       screen in daylight. */
+    --color-spark-strong: #7d5b1c;
     --color-spark-soft: #c09a4e;
     --color-spark-surface: #f4e9cf;
     /* The footer's heart, on hover. */
