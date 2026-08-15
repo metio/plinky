@@ -134,10 +134,7 @@ export default function LibraryRoute() {
                         brought, and the backup that keeps both. Your takes were reachable
                         only from the piece they belong to, which meant remembering which
                         piece it was. */}
-                    <section className="space-y-2">
-                        <h2 className={sectionHeadingClasses}>{m.takes_panel_heading()}</h2>
-                        <YourTakes />
-                    </section>
+                    <YourTakes />
                     <section className="space-y-2">
                         <h2 className={sectionHeadingClasses}>{m.import_heading()}</h2>
                         <p className="text-sm text-muted">{m.import_intro()}</p>
