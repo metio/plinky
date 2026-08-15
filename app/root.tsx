@@ -117,11 +117,14 @@ function Header() {
                             Pl
                             <span className="relative">
                                 ı
-                                {/* Where Literata sets its own tittle: measured against a
-                                    real i at this size and line height, not guessed. The
-                                    offset is from the top of the line box, so it does not
-                                    survive a change of leading. */}
-                                <span className="absolute left-1/2 top-[0.54em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-plink" />
+                                {/* Sits where Literata's own tittle sits: rasterised beside a
+                                    real i at this size, the dot lands within a device pixel
+                                    of the glyph's, leaving the same gap over the x-height.
+                                    The offset is relative to the inline box, which is the
+                                    ascent — not the line box — so it holds only at this font
+                                    size, and the browser snaps it to whole pixels. Measure
+                                    again rather than carrying the number anywhere else. */}
+                                <span className="absolute left-1/2 top-[0.43em] h-[0.15em] w-[0.15em] -translate-x-1/2 rounded-full bg-plink" />
                             </span>
                             nky
                         </span>

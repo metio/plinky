@@ -105,7 +105,7 @@ const lockup = (ground, ink) => `
 <div style="width:960px;height:320px;background:${ground};display:flex;align-items:center;justify-content:center;gap:28px">
   <div style="width:132px;height:132px;border-radius:22%;overflow:hidden">${icon}</div>
   <div style="font-family:Literata,Georgia,serif;font-size:104px;font-weight:600;letter-spacing:-0.01em;color:${ink};line-height:1">
-    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.36em;width:.14em;height:.14em;transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.17em;width:.15em;height:.15em;transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
   </div>
 </div>`;
 await shoot(lockup(colour.paper, colour.ink), {
