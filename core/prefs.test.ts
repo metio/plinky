@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
-import { parsePrefs, type Prefs } from "./prefs";
+import { assessmentPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
 
 const BASE: Prefs = {
     sound: true,
@@ -210,5 +210,45 @@ describe("mic calibration prefs", () => {
 
     it("defaults to null when nothing is stored", () => {
         expect(parsePrefs(null).micCalibration).toBeNull();
+    });
+});
+
+describe("assessmentPrefs", () => {
+    it("turns off every reading aid, whatever the player set", () => {
+        const helped: Prefs = {
+            ...DEFAULT_PREFS,
+            colorNotes: true,
+            noteLabels: "all",
+            noteHints: "always",
+            showFingerings: true,
+            highway: true,
+            treadmill: true,
+            hiddenNotes: true,
+            keyLights: true,
+            raceGhost: true,
+            beams: "off",
+        };
+        const strict = assessmentPrefs(helped);
+        expect(strict.colorNotes).toBe(false);
+        expect(strict.noteLabels).toBe("off");
+        expect(strict.noteHints).toBe("never");
+        expect(strict.showFingerings).toBe(false);
+        expect(strict.highway).toBe(false);
+        expect(strict.treadmill).toBe(false);
+        expect(strict.hiddenNotes).toBe(false);
+        expect(strict.keyLights).toBe(false);
+        expect(strict.raceGhost).toBe(false);
+        expect(strict.beams).toBe("on");
+    });
+
+    it("leaves the player's own instrument alone", () => {
+        // How loud, which keys, how big a hand: those are the person's setup, not the
+        // page helping them read.
+        const mine: Prefs = { ...DEFAULT_PREFS, volume: 30, sound: false, keyboardTheme: "wood" };
+        const strict = assessmentPrefs(mine);
+        expect(strict.volume).toBe(30);
+        expect(strict.sound).toBe(false);
+        expect(strict.keyboardTheme).toBe("wood");
+        expect(strict.keyMap).toEqual(mine.keyMap);
     });
 });

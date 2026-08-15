@@ -341,6 +341,13 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**Find your level now reads the way a sight-reading test is meant to.** It used to run on
+whatever you had set for practice, so the notes could fall down the highway, the noteheads
+could be coloured, the keys could be labelled and the next one always shown — and a test
+you cannot fail says nothing about your level. The drill now brings its own settings: the
+staff as it is printed, every aid off, nothing on the page to change. Your sound, your keys
+and your hand size are still yours — those are your instrument, not help with reading.
+
 **The bar at the top is four places now: Music, Learn, Compose and Teach.** Today has
 gone from it — the mark in the corner has always led home, so the tab was a second way to
 the same place — and so has You, which the grade beside the mark already opens. That badge
