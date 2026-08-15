@@ -115,6 +115,14 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
+# The design-sync settings: our own configuration for the component sync, in a format that
+# holds no comment.
+[[annotations]]
+path = [".design-sync/config.json", ".design-sync/tsconfig.types.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
 # Story screenshot baselines: rendered from our own components by the visual
 # regression suite (vitest toMatchScreenshot over the Storybook stories).
 [[annotations]]

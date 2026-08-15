@@ -587,12 +587,11 @@ poster cannot end up in a palette the app has moved on from. `brand/README.md` c
 rules, including the three colours that mean something and must never be borrowed for
 decoration.
 
-`design-system/` is the same vocabulary in the form a design tool can read: one standalone
-page per foundation and per primitive — colour, type, the mark, buttons, cards, page
-headers, sections, the segmented control, chips, empty states, the row a piece is listed
-in. `npm run design-system` rebuilds it from the same two sources, and the bundle is what
-gets pushed to Claude's design pane, so anything drawn there starts from Plinky's own
-vocabulary rather than a framework default.
+Plinky's components are also published as a design system, so a design tool builds with
+the real parts rather than generic ones: every storied component compiles into a bundle
+alongside its type contract and a preview, and each preview is verified against this
+repo's own Storybook render before it ships. `.design-sync/` holds the settings and the
+notes; the sync itself is run with `/design-sync` in Claude Code.
 
 ## Translations
 

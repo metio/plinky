@@ -1,0 +1,14 @@
+{
+    "extends": "../tsconfig.json",
+    "files": [
+        "pkg/entry.ts"
+    ],
+    "include": [],
+    "compilerOptions": {
+        "noEmit": false,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "rootDir": "..",
+        "outDir": "types"
+    }
+}
