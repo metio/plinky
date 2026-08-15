@@ -31,6 +31,24 @@ const VALUE_DIVISIONS: Record<NoteValue, number> = {
 
 // The mark on a note. Length articulations and the accent are independent — a note
 // can be both — which is why they are separate fields rather than one enum.
+// The natural letter each white key carries; black keys have none, and nothing that uses
+// this staffs one — spelling a black key would mean choosing between a sharp and a flat,
+// a decision these callers are not making.
+export const NATURAL_OF: readonly (string | null)[] = [
+    "C",
+    null,
+    "D",
+    null,
+    "E",
+    "F",
+    null,
+    "G",
+    null,
+    "A",
+    null,
+    "B",
+];
+
 export type SnippetNote = {
     // The written pitch, or null for a rest.
     step: string | null;

@@ -15,6 +15,8 @@ import {
     UNITS,
     type UnitId,
 } from "../../core/theoryCourse";
+import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../core/glossaryScore";
+import { NotationExample } from "../components/features/notationExample";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useTheoryStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
@@ -95,6 +97,25 @@ function litNotes(demo: Demo): number[] {
     }
 }
 
+// The reading unit talks about the page — five lines, four gaps, a dot's height saying
+// which key — while every demonstration was a keyboard. The lesson that names the stave
+// now shows one, with the very notes it is about, so the reader can look at the thing the
+// sentence describes instead of taking it on trust.
+function readingXml(demo: Demo): string | null {
+    const notes: SnippetNote[] = [];
+    for (const pitch of litNotes(demo)) {
+        const letter = NATURAL_OF[((pitch % 12) + 12) % 12];
+        // Only the naturals are drawn: an accidental needs the sharp or flat spelling the
+        // lesson has not introduced yet, and the shape of the stave is what is being shown.
+        if (letter) {
+            notes.push({ step: letter, octave: Math.floor(pitch / 12) - 1, value: "half" });
+        }
+    }
+    return notes.length > 0
+        ? buildSnippet({ clef: "treble", fifths: 0, beatsPerBar: 4, notes })
+        : null;
+}
+
 function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
     const key = demo.kind === "circle" ? CIRCLE.find((one) => one.tonic === demo.tonic) : null;
     // A comparison plays the same idea twice — the second reading after a gap, so the
@@ -144,6 +165,12 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
                 {/* Hearing the idea is what meeting the lesson means, so playing it is what
                 records it — there is nothing to tick, and the course never asks the
                 reader to mark their own homework. */}
+                {lesson.unit === "reading" && readingXml(lesson.demo) && (
+                    <NotationExample
+                        xml={readingXml(lesson.demo) ?? ""}
+                        label={LESSON_TITLE[lesson.id]?.() ?? ""}
+                    />
+                )}
                 <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
             </Card>
         </li>

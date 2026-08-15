@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { DEFAULT_KEY_MAP, rebind } from "./keyMap";
-import { assessmentPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
+import { unaidedPrefs, DEFAULT_PREFS, parsePrefs, type Prefs } from "./prefs";
 
 const BASE: Prefs = {
     sound: true,
@@ -213,7 +213,7 @@ describe("mic calibration prefs", () => {
     });
 });
 
-describe("assessmentPrefs", () => {
+describe("unaidedPrefs", () => {
     it("turns off every reading aid, whatever the player set", () => {
         const helped: Prefs = {
             ...DEFAULT_PREFS,
@@ -228,7 +228,7 @@ describe("assessmentPrefs", () => {
             raceGhost: true,
             beams: "off",
         };
-        const strict = assessmentPrefs(helped);
+        const strict = unaidedPrefs(helped);
         expect(strict.colorNotes).toBe(false);
         expect(strict.noteLabels).toBe("off");
         expect(strict.noteHints).toBe("never");
@@ -245,7 +245,7 @@ describe("assessmentPrefs", () => {
         // How loud, which keys, how big a hand: those are the person's setup, not the
         // page helping them read.
         const mine: Prefs = { ...DEFAULT_PREFS, volume: 30, sound: false, keyboardTheme: "wood" };
-        const strict = assessmentPrefs(mine);
+        const strict = unaidedPrefs(mine);
         expect(strict.volume).toBe(30);
         expect(strict.sound).toBe(false);
         expect(strict.keyboardTheme).toBe("wood");

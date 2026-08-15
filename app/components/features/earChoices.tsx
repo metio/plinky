@@ -28,9 +28,14 @@ export function EarChoices<T extends string>({
     label: string;
 }) {
     const settled = answer !== null;
+    // Wrapping rather than a fixed grid: the drill can be set to as few as two answers, and
+    // three columns then stretched each one across a third of the width with the row half
+    // empty — a lot of space between two things that belong together. They keep a common
+    // minimum so a short name and a long one still make a tidy row, and the group stays
+    // centred however many there are.
     return (
         <fieldset
-            className="mx-auto grid w-full min-w-0 max-w-md grid-cols-2 gap-2 sm:grid-cols-3"
+            className="mx-auto flex w-full min-w-0 max-w-md flex-wrap justify-center gap-2"
             aria-label={label}
         >
             {choices.map((choice) => {
@@ -47,7 +52,7 @@ export function EarChoices<T extends string>({
                         key={choice}
                         disabled={settled}
                         onClick={() => onChoose(choice)}
-                        className={`flex min-h-11 items-center justify-center rounded-md border px-3 text-center text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, settled)}`}
+                        className={`flex min-h-11 min-w-28 flex-auto items-center justify-center rounded-md border px-3 text-center text-sm font-medium transition-colors disabled:cursor-default ${answerClasses(verdict, settled)}`}
                     >
                         {nameOf(choice)}
                     </button>
