@@ -113,7 +113,7 @@ function Header() {
                             Pl
                             <span className="relative">
                                 ı
-                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-ghost" />
+                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-plink" />
                             </span>
                             nky
                         </span>
