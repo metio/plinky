@@ -105,6 +105,7 @@ npm run lint          # biome lint + format; a WARNING fails it too
                       # (--error-on-warnings), so dead code cannot accumulate
 npm run nav           # navigation-depth budget
 npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
+npm run design-system # regenerates design-system/ from app.css + the icon (not a gate)
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
                       # as an empty diff
