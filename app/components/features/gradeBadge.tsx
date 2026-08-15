@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
-import { hasStanding } from "../../../core/standing";
 import { currentGrade, loadGradedMastery, skillRating } from "../../lib/gradeProgress";
 import { usePrefsStore, useServices } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
@@ -49,7 +48,12 @@ export function GradeBadge() {
         };
     }, [prefsStore, services]);
 
-    if (level === null || !hasStanding({ level, skill })) {
+    // Shown at every standing, including none: it is the way to the stats page from
+    // anywhere, and a door that appears only once you have earned something is a door a
+    // new player cannot find. `null` is the tick before the store has been read — not a
+    // standing of zero — so it still renders nothing rather than flashing a grade 0 that
+    // is about to become a 3.
+    if (level === null) {
         return null;
     }
     return <GradeBadgeView level={level} skill={skill} competitive={competitive} />;
@@ -69,7 +73,7 @@ export function GradeBadgeView({
     const earned = level > 0;
     return (
         <Link
-            to="/you"
+            to="/stats"
             aria-label={
                 competitive ? m.grade_label_competitive({ level }) : m.grade_label({ level })
             }

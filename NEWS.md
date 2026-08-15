@@ -341,6 +341,27 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**The bar at the top is four places now: Music, Learn, Compose and Teach.** Today has
+gone from it — the mark in the corner has always led home, so the tab was a second way to
+the same place — and so has You, which the grade beside the mark already opens. That badge
+now shows from the very first visit rather than waiting until you have earned something,
+because it is the way to your figures.
+
+**"You" is now "Stats"**, at a web address to match. It is the same page: your grade, your
+skill, what is ready for you next, and how it has been going.
+
+**Compose has come up out of the library** and into the bar, where a thing you can make is
+easier to find than at the foot of a list of things to play.
+
+**Setting work for somebody else has a page of its own — Teach.** Handing out a path of
+pieces and reading the results that come back were two halves of the same job, sitting at
+the bottom of Learn; they are together now.
+
+**The six ways to practise are on the front page**, at the foot, instead of two taps inside
+Learn. They lost their buttons: four of the six only ever offered to send you to the
+library, and three of them are done with a control inside a run — the reading was the
+point.
+
 **Plinky has a new icon.** The old one was a little keyboard with a dot above it — the
 same picture as every other music app, and at the size a browser tab shows it, an
 unreadable smudge. The new one is the letter **P** set in Literata, the typeface the app

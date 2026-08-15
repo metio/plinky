@@ -54,13 +54,14 @@ const mount = () =>
     );
 
 describe("GradeBadge", () => {
-    it("says nothing on a device that has mastered nothing", async () => {
-        // Two zeros beside the wordmark would be the first thing a first visit sees, and
-        // the navigation names You regardless, so the badge waits until it has news.
+    it("shows on a device that has mastered nothing, because it is the way to the stats", async () => {
+        // It used to wait until it had news, on the grounds that the navigation named the
+        // page anyway. The navigation no longer does — this badge is the door — and a door
+        // that appears only once you have earned something is one a new player never finds.
         loadMock.mockResolvedValue([]);
         mount();
         await waitFor(() => expect(loadMock).toHaveBeenCalled());
-        expect(screen.queryByRole("link", { name: /grade/i })).toBeNull();
+        expect(screen.getByRole("link", { name: /grade/i })).toBeTruthy();
     });
 
     it("appears with the skill rating before there is a grade to show", async () => {

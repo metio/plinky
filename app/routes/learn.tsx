@@ -2,16 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { HubList } from "../components/ui/hubList";
-import { SettingsSection } from "../components/ui/settingsSection";
 import {
     ArrowUpIcon,
     BookIcon,
     EarIcon,
     KeysIcon,
     ListIcon,
-    MetronomeIcon,
     SlidersIcon,
-    UploadIcon,
 } from "../components/ui/icons";
 import { routeMeta, webPageData } from "../../core/site";
 import { useSynth } from "../hooks/useSynth";
@@ -44,6 +41,10 @@ export function meta(_args: Route.MetaArgs) {
 // reads as support. Each entry carries the page's own title and opening line, so this
 // list and the page it leads to always say the same thing.
 //
+// Read the keyboard, then the music, then the marks — and only then find where you stand,
+// because the level a drill puts you at means little before you can read what it shows.
+// The extras follow.
+//
 // The notes climb an octave, so running a mouse down the list plays a scale.
 const ENTRIES = [
     { to: "/basics", label: m.basics_title, blurb: m.basics_intro, Icon: KeysIcon, note: 60 },
@@ -55,46 +56,15 @@ const ENTRIES = [
         Icon: ListIcon,
         note: 64,
     },
-    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 65 },
-    {
-        to: "/methods",
-        label: m.methods_title,
-        blurb: m.methods_intro,
-        Icon: MetronomeIcon,
-        note: 67,
-    },
-    { to: "/tools", label: m.tools_title, blurb: m.tools_intro, Icon: SlidersIcon, note: 69 },
     {
         to: "/placement",
         label: m.placement_title,
         blurb: m.placement_intro,
         Icon: ArrowUpIcon,
-        note: 71,
+        note: 65,
     },
-];
-
-// Setting work for somebody else is a different job from doing it, and it has two
-// halves that never used to link to each other: the list you hand out, and the codes
-// that come back. They sit together, under their own heading, rather than as a fifth
-// place in the navigation — a teacher is a person, not a kind of thing to look for,
-// and a permanent tab that is empty for almost everybody is the clutter this
-// redesign is undoing. A set is also something plenty of players build for
-// themselves, which is why it stays reachable here rather than behind a role.
-const TEACHING = [
-    {
-        to: "/assignments",
-        label: m.home_assignments,
-        blurb: m.home_assignments_blurb,
-        Icon: ListIcon,
-        note: 72,
-    },
-    {
-        to: "/collect",
-        label: m.collect_title,
-        blurb: m.collect_intro,
-        Icon: UploadIcon,
-        note: 74,
-    },
+    { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 67 },
+    { to: "/tools", label: m.tools_title, blurb: m.tools_intro, Icon: SlidersIcon, note: 69 },
 ];
 
 export default function Learn() {
@@ -113,17 +83,6 @@ export default function Learn() {
                 }))}
                 onEnter={play}
             />
-
-            <SettingsSection title={m.learn_teaching_heading()}>
-                <HubList
-                    entries={TEACHING.map((entry) => ({
-                        ...entry,
-                        label: entry.label(),
-                        blurb: entry.blurb(),
-                    }))}
-                    onEnter={play}
-                />
-            </SettingsSection>
         </main>
     );
 }

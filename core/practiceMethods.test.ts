@@ -5,11 +5,10 @@ import { describe, expect, it } from "vitest";
 import { METHODS } from "./practiceMethods";
 
 describe("practiceMethods", () => {
-    it("gives every method a dose and somewhere to try it", () => {
+    it("gives every method a dose that fits an evening", () => {
         for (const method of METHODS) {
             expect(method.minutes).toBeGreaterThan(0);
-            expect(method.href.startsWith("/")).toBe(true);
-            expect(method.href.endsWith("/")).toBe(true);
+            expect(method.minutes).toBeLessThanOrEqual(20);
         }
     });
 
