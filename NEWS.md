@@ -341,6 +341,10 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**The music page is called the Library**, which is what its address has always said. The
+offer to write your own has left the foot of it — Compose is in the bar at the top now, so
+it no longer needs a door at the bottom of a list of things to play.
+
 **Find your level now reads the way a sight-reading test is meant to.** It used to run on
 whatever you had set for practice, so the notes could fall down the highway, the noteheads
 could be coloured, the keys could be labelled and the next one always shown — and a test
