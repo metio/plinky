@@ -18,11 +18,25 @@ import type { Score } from "../../core/score";
 
 export type { Score } from "../../core/score";
 
-const files = import.meta.glob("../../scores/*.musicxml", {
-    query: "?raw",
-    import: "default",
-    eager: true,
-}) as Record<string, string>;
+// Vite replaces this call with the scores' text at build time. `import.meta.glob` is
+// Vite's own, and under any other bundler it is undefined — so the read is deferred and
+// guarded, and a tool that compiles these components outside the app (the design-system
+// sync) gets an empty catalogue rather than a module that throws as it loads.
+let bundled: Record<string, string> | undefined;
+function bundledFiles(): Record<string, string> {
+    if (bundled === undefined) {
+        try {
+            bundled = import.meta.glob("../../scores/*.musicxml", {
+                query: "?raw",
+                import: "default",
+                eager: true,
+            }) as Record<string, string>;
+        } catch {
+            bundled = {};
+        }
+    }
+    return bundled;
+}
 
 const STORAGE_KEY = "plinky:scores";
 
@@ -32,7 +46,7 @@ export { slugify };
 // The demo pieces inlined into the bundle, identical for everyone. Finger exercises
 // and the song catalogue load as on-demand assets instead, keeping the JS small.
 export function loadBundledScores(): Score[] {
-    return Object.entries(files).map(([_path, xml]) => {
+    return Object.entries(bundledFiles()).map(([_path, xml]) => {
         // Same content-fingerprint id scheme as every other piece. The bundled
         // MusicXML is our own generated output, so the pure text pass reads it —
         // no parser.

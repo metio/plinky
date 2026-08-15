@@ -13,7 +13,13 @@ const config: StorybookConfig = {
     // test runner), so drop it and keep Tailwind for the stylesheet.
     viteFinal: async (viteConfig) => {
         const { default: tailwindcss } = await import("@tailwindcss/vite");
-        const plugins = (viteConfig.plugins ?? []).filter((plugin) => {
+        // A Vite plugin entry may be a nested array or a promise — one factory
+        // contributes several plugins — so the list has to be flattened and settled
+        // before the names are legible. Filtering the raw list only ever sees the
+        // outer array, which is how the React Router plugin survives to throw
+        // "requires the use of a Vite config file" during a Storybook build.
+        const settled = await Promise.all((viteConfig.plugins ?? []).flat(Number.POSITIVE_INFINITY));
+        const plugins = settled.flat(Number.POSITIVE_INFINITY).filter((plugin) => {
             const name =
                 plugin && typeof plugin === "object" && "name" in plugin
                     ? String((plugin as { name?: string }).name)
