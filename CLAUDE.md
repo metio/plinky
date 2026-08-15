@@ -105,7 +105,6 @@ npm run lint          # biome lint + format; a WARNING fails it too
                       # (--error-on-warnings), so dead code cannot accumulate
 npm run nav           # navigation-depth budget
 npm run brand         # regenerates brand/ from app.css + the icon (not a gate)
-npm run design-system # regenerates design-system/ from app.css + the icon (not a gate)
 npm run bytes         # no control bytes in tracked source (blocking) — a NUL
                       # makes git call a file binary, and a binary file reviews
                       # as an empty diff
@@ -149,6 +148,22 @@ nix develop --command ci-markdown
 installed `node_modules` still matches `package-lock.json` — after a rebase or
 pull that bumps a dependency, run `npm ci` first, or the local gate runs older
 tools than CI's fresh install and can pass what CI fails.
+
+## The design system on claude.ai/design
+
+Plinky's components are published as a design system, so a design agent builds with the
+real parts instead of generic ones. `/design-sync` in Claude Code runs it: it compiles
+every storied component into a bundle, screenshots each preview against this repo's own
+Storybook render, and uploads only what matched. `.design-sync/` holds the settings
+(`config.json`), the repo-specific gotchas (`NOTES.md`), the conventions header the agent
+reads (`conventions.md`), and the four hand-owned previews; everything else there is
+generated and gitignored.
+
+Two things to know before running it. It compiles `app/paraglide/` for **English and
+German alone** — all 26 locales are three quarters of the bundle and push it past the
+upload's size cap — so **run `npm run messages` afterwards** or the tree stays
+two-language. And it builds a reference Storybook into `.design-sync/sb-reference/`, which
+no repo gate builds, so a `.storybook/` change can break it while every gate stays green.
 
 ## Conventions the tools don't fully enforce
 

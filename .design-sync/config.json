@@ -1,0 +1,64 @@
+{
+    "projectId": "ef40add0-2cca-45b8-8ce9-510a7558ff9d",
+    "shape": "storybook",
+    "storybookConfigDir": ".storybook",
+    "storybookStatic": ".design-sync/sb-reference",
+    "pkg": "plinky",
+    "globalName": "Plinky",
+    "entry": ".design-sync/pkg/entry.ts",
+    "srcDir": "app",
+    "buildCmd": "node .design-sync/messages-en.mjs && node .design-sync/make-entry.mjs && npx tsc -p .design-sync/tsconfig.types.json",
+    "titleMap": {
+        "Glossary": "GlossaryDetail",
+        "KeyboardThemeSwatch": "ThemeSwatch",
+        "NavBar": "BottomNav",
+        "Icons": null,
+        "VideoFrame": null
+    },
+    "provider": {
+        "component": "MemoryRouter",
+        "inner": {
+            "component": "MidiProvider"
+        }
+    },
+    "storyImports": {
+        "shim": [
+            "/app/components/",
+            "/app/routes/",
+            "/app/contexts/"
+        ]
+    },
+    "overrides": {
+        "Button": {
+            "cardMode": "column"
+        },
+        "RecapCard": {
+            "cardMode": "column"
+        },
+        "Drawer": {
+            "cardMode": "single",
+            "primaryStory": "Open"
+        },
+        "BottomNav": {
+            "cardMode": "single",
+            "primaryStory": "Bottom",
+            "viewport": "390x844"
+        },
+        "DrillSetup": {
+            "viewport": "900x1000"
+        },
+        "PracticeReport": {
+            "viewport": "900x1900"
+        },
+        "RunResult": {
+            "viewport": "900x900"
+        },
+        "Theory": {
+            "viewport": "900x1400"
+        },
+        "Tools": {
+            "viewport": "900x1400"
+        }
+    },
+    "readmeHeader": ".design-sync/conventions.md"
+}

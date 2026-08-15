@@ -51,3 +51,15 @@ __pycache__/
 
 # Promo clips rendered by npm run promo:videos — generated, never committed
 /promo/
+
+# design-sync: build artifacts, transient scratch and verification working state.
+# The durable set (config.json, NOTES.md, conventions.md, previews/, overrides/) is committed.
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.design-sync/pkg/
+.design-sync/project.inlang/
+.design-sync/types/
+.ds-sync/
+ds-bundle/
