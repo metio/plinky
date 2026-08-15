@@ -23,7 +23,7 @@ import { RefreshQueue } from "./refreshQueue";
 import { ShareButtons } from "./shareButtons";
 import { ShareCard } from "./shareCard";
 import { WeekChart } from "./weekChart";
-import { ActivityStats, YouStanding } from "./youStanding";
+import { ActivityStats, YouStanding, StandingKey } from "./youStanding";
 import { PageHeader } from "../ui/pageHeader";
 
 // The "You" page: how good you are at playing, in one place. Standing (grade + skill)
@@ -54,6 +54,7 @@ export function StatsView() {
             <PageHeader title={m.stats_heading()} hint={m.stats_intro()} />
 
             <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
+            <StandingKey />
 
             {/* The page's own intro promises three things — where you stand, what is
                 ready for you, and how it has been going — and for a long time it

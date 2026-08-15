@@ -123,3 +123,20 @@ describe("StatsView", () => {
         expect(screen.queryByText("Getting started")).toBeNull();
     });
 });
+
+describe("the standing key", () => {
+    it("says what a grade and a skill actually are", async () => {
+        masteryMock.mockResolvedValue([]);
+        catalogueMock.mockResolvedValue([]);
+        renderWithServices(
+            <MemoryRouter>
+                <StatsView />
+            </MemoryRouter>,
+        );
+        await screen.findByText(m.stats_grade_help());
+        // They were explained in a title attribute, which a touch screen cannot open.
+        expect(screen.getByText(m.stats_grade_help())).toBeTruthy();
+        expect(screen.getByText(m.grades_skill_help())).toBeTruthy();
+        expect(document.querySelector("[title]")).toBeNull();
+    });
+});
