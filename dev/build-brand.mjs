@@ -50,7 +50,12 @@ function valueOf(css, built, name) {
 }
 
 const css = await readFile(CSS, "utf8");
-const icon = await readFile(ICON, "utf8");
+// The file carries width="192" height="192" so it renders standalone; inside a lockup it
+// has to take the size of the box it is given, or it overflows and lands on the wordmark.
+const icon = (await readFile(ICON, "utf8"))
+    .replace(/ width="\d+"/, "")
+    .replace(/ height="\d+"/, "")
+    .replace("<svg ", '<svg style="width:100%;height:100%;display:block" ');
 // The built stylesheet, for the palette values Tailwind resolves. Any build will do —
 // these are theme constants, not per-page output.
 const assets = await readdir("build/client/assets").catch(() => []);
@@ -98,9 +103,9 @@ await writeFile(`${OUT}/icon/plinky.svg`, icon);
 // The lockup: mark plus wordmark, on paper and on ink blue.
 const lockup = (ground, ink) => `
 <div style="width:960px;height:320px;background:${ground};display:flex;align-items:center;justify-content:center;gap:28px">
-  <div style="width:132px;height:132px">${icon}</div>
+  <div style="width:132px;height:132px;border-radius:22%;overflow:hidden">${icon}</div>
   <div style="font-family:Literata,Georgia,serif;font-size:104px;font-weight:600;letter-spacing:-0.01em;color:${ink};line-height:1">
-    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.16em;width:.15em;height:.15em;transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.36em;width:.14em;height:.14em;transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
   </div>
 </div>`;
 await shoot(lockup(colour.paper, colour.ink), {
@@ -156,7 +161,7 @@ await shoot(
 // The places we post, at the sizes they want.
 const social = (width, height, titleSize) => `
 <div style="width:${width}px;height:${height}px;background:${colour["ink blue"]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${Math.round(height / 16)}px;text-align:center;padding:${Math.round(width / 12)}px;box-sizing:border-box">
-  <div style="width:${Math.round(height / 4)}px;height:${Math.round(height / 4)}px">${icon}</div>
+  <div style="width:${Math.round(height / 4)}px;height:${Math.round(height / 4)}px;border-radius:22%;overflow:hidden">${icon}</div>
   <div style="font-family:Literata,Georgia,serif;font-size:${titleSize}px;font-weight:600;color:${colour.paper};line-height:1.1;letter-spacing:-0.01em">Practise piano in your browser</div>
   <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(titleSize / 2.6)}px;color:${colour.paper};opacity:.82">Free · no account · nothing to install</div>
 </div>`;

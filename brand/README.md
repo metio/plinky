@@ -22,13 +22,18 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 
 ## The mark
 
-A keyboard, and one note leaving it. That note is the plink — the name is what a single
-note sounds like — and it is the only pink in Plinky. It appears twice: above the keys in
-the icon, and on the i of the wordmark. Spending it anywhere else would make it decoration
+The lowercase **p** of Literata — the face every title in the app is set in — with the
+counter of its bowl inked pink. A note whose stem points down is a head with the stem
+descending from its left, which is the same silhouette as the letter, so the initial of the
+name and a notehead are one shape and the pink lands where the typeface already left a
+hole. That pink is the plink, and it is the only pink in Plinky: in the counter of the
+icon, and on the i of the wordmark. Spending it anywhere else would make it decoration
 rather than a signature.
 
-The icon is drawn inside the middle 80% of its square, so a launcher can round or crop it
-without taking a key off the end. Keep that margin if you redraw it.
+The outline is a derivative of Literata (SIL Open Font License 1.1) at weight 700, optical
+size 7 — the small-text cut, whose sturdier serifs and more generous counter are what
+survive a favicon. The letter sits inside the middle 80% of its square, so a launcher can
+round or crop it without biting into it. Keep that margin if you redraw it.
 
 ## The colours
 

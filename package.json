@@ -17,6 +17,7 @@
     "exercises:incipits": "tsx dev/bake-exercise-incipits.mts",
     "help:shots": "node dev/help-screenshots.mjs",
     "brand": "node dev/build-brand.mjs",
+    "icons": "node dev/build-icons.mjs",
     "songs:audit": "tsx dev/audit-catalog.mts",
     "promo:videos": "node dev/promo-videos.mjs",
     "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",

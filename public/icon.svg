@@ -1,17 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <!-- Plinky's own ink blue, the accent every pressable thing in the app already wears.
-       The keyboard and the plink sit inside the maskable safe zone (the middle 80%), so a
-       launcher may round or crop the square without eating a key. -->
+<!-- Plinky's mark: the lowercase p of Literata, the face the app sets every title in,
+     with the counter of its bowl inked pink. A note whose stem points down is a head with
+     the stem descending from its left — the same silhouette as the letter — so the initial
+     of the name and a notehead are one shape, and the pink lands where the typeface
+     already left a hole.
+
+     The outline is a derivative of Literata (SIL Open Font License 1.1), cut at weight 700
+     and optical size 7 — the small-text cut, whose sturdier serifs and more generous
+     counter are what survive a 16-pixel favicon.
+
+     The letter sits inside the maskable safe zone (the middle 80%), so a launcher may round
+     or crop the square without eating it. Everything else — the PNG renders, the favicon,
+     the brand kit — is generated from this file by `npm run icons` and `npm run brand`. -->
   <rect width="192" height="192" fill="#2b4374"/>
-  <g>
-    <rect x="44" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
-    <rect x="69" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
-    <rect x="94" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
-    <rect x="119" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
-    <rect x="60" y="72" width="13" height="47" rx="3.5" fill="#1b2b4a"/>
-    <rect x="86" y="72" width="13" height="47" rx="3.5" fill="#1b2b4a"/>
-    <rect x="112" y="72" width="13" height="47" rx="3.5" fill="#1b2b4a"/>
+  <g transform="translate(26.8 123.6) scale(0.1963 -0.1963)">
+    <path d="M38 -216L38 -141L85 -138Q100 -137 108 -127Q116 -117 116 -90L116 375Q116 409 109 421.5Q102 434 77 435L31 439L40 518L233 531L250 521L258 436L263 436Q286 467 312 489.5Q338 512 373 525Q408 538 454 538Q523 538 572.5 508.5Q622 479 648 422Q674 365 674 281Q674 191 644.5 124.5Q615 58 556.5 22Q498 -14 411 -14Q374 -14 337.5 -6.5Q301 1 275 16L275 -89Q275 -113 281.5 -123.5Q288 -134 310 -136L381 -142L381 -216Z" fill="#fcf7ea"/>
+    <path d="M385 84Q426 84 452.5 103.5Q479 123 493 164Q507 205 507 268Q507 325 494.5 361.5Q482 398 457.5 416Q433 434 395 434Q356 434 329.5 418Q303 402 289 374.5Q275 347 275 308L275 115Q292 102 323.5 93Q355 84 385 84Z" fill="#d81b7a"/>
   </g>
-  <!-- The plink: one note, played, on its way up. -->
-  <circle cx="96" cy="50" r="12" fill="#d81b7a"/>
 </svg>
