@@ -91,17 +91,30 @@ describe("cleanKeyMap", () => {
         expect(isDefaultKeyMap(cleanKeyMap({}))).toBe(true);
     });
 
-    it("rejects a hand that is missing a slot", () => {
+    it("keeps a hand with an unbound slot", () => {
         const { g: _drop, ...partialLeft } = DEFAULT_KEY_MAP.left;
         const cleaned = cleanKeyMap({ left: partialLeft, right: DEFAULT_KEY_MAP.right });
-        // Left reverts to default; right is preserved.
-        expect(cleaned.left).toEqual(DEFAULT_KEY_MAP.left);
+        // The slot stays empty — the editor draws it as a dash — rather than the hand
+        // reverting and taking every other customisation with it.
+        expect(keyForSlot(cleaned, "left", 6)).toBeNull();
+        expect(cleaned.left).toEqual(partialLeft);
         expect(cleaned.right).toEqual(DEFAULT_KEY_MAP.right);
     });
 
-    it("rejects a map saved when a hand spanned fewer slots", () => {
-        // The eight-slot C–G span an earlier layout stored: too narrow to be
-        // usable now, so the whole hand reverts to the full-octave default.
+    it("survives a rebind that takes a key from the other hand", () => {
+        // 'j' is the left hand's B. Binding it to the right hand's C leaves the left
+        // hand eleven keys — which is what the editor writes the moment a player does
+        // this, so a load that rejected it would reset the layout they just made.
+        const moved = rebind(DEFAULT_KEY_MAP, "right", 0, "j");
+        const cleaned = cleanKeyMap(moved);
+        expect(keyForSlot(cleaned, "right", 0)).toBe("j");
+        expect(keyForSlot(cleaned, "left", 10)).toBeNull();
+        expect(isDefaultKeyMap(cleaned)).toBe(false);
+    });
+
+    it("resets a map whose hands both hold the same narrow span", () => {
+        // Two hands cannot share a key, whatever the span: one keystroke would fire
+        // two notes, so the layout goes back to the default.
         const narrow = { a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7 };
         expect(isDefaultKeyMap(cleanKeyMap({ left: narrow, right: narrow }))).toBe(true);
     });

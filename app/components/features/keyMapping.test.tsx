@@ -33,6 +33,25 @@ describe("KeyMapping", () => {
         expect(services.prefs.load().keyMap.left.a).toBe(0);
     });
 
+    it("keeps a binding that took its key from the other hand", () => {
+        const { services } = renderWithServices(<KeyMapping />);
+        // 'j' is the left hand's A♯. Give it to the right hand's C, then read the layout
+        // back the way a reload does — through the store's validator.
+        fireEvent.click(screen.getByRole("button", { name: /Rebind C, Right hand/i }));
+        fireEvent.keyDown(window, { key: "j" });
+
+        const stored = services.prefs.load().keyMap;
+        expect(stored.right.j).toBe(0);
+        expect("j" in stored.left).toBe(false);
+        expect(screen.getByRole("button", { name: /Rebind C, Right hand/i }).textContent).toContain(
+            "J",
+        );
+        // The slot it came from reads as unbound, not as the default layout returning.
+        expect(screen.getByRole("button", { name: /Rebind A♯, Left hand/i }).textContent).toContain(
+            "—",
+        );
+    });
+
     it("cancels an armed rebind on Escape without changing the binding", () => {
         const { services } = renderWithServices(<KeyMapping />);
         const cap = screen.getByRole("button", { name: /Rebind C, Left hand/i });

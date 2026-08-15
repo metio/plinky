@@ -341,6 +341,13 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**Your own key layout stays put.** If you play on the computer keyboard and gave a note a
+key that the other hand was already using, the layout looked right at the time and then
+came back as the standard one the next time you opened Plinky — quietly, without saying
+anything. It now keeps what you set. The note whose key you took reads as a dash until you
+give it one of its own, and **Reset to default** is there whenever you want the standard
+layout back.
+
 **Grades now know the difference between hard to reach and hard to play.** Until now a
 piece's grade came entirely from how awkward it is to *finger* — how far your hands
 stretch, how much they move. That is a real part of difficulty, and it was the only part
