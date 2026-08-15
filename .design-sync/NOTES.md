@@ -91,6 +91,23 @@ What a run of `/design-sync` needs to know about this repo. The durable settings
   that size it renders the real bar. No frame can defeat a viewport media query, so this
   warning cannot be cleared — confirm the card at 390px rather than reworking the preview.
 
+## The pane does not index from the markers here
+
+Uploading the bundle is not enough to make the cards appear. The Design System pane builds
+its index from `_ds_manifest.json`, which the app compiles from each card's first-line
+`@dsCard` marker — and for this project it never compiled one, however often the
+`_ds_needs_recompile` sentinel was re-armed. The markers upload intact (fetch any card back
+and its first line is there); the manifest simply stays a 404.
+
+What makes the cards appear is registering them explicitly: `DesignSync register_assets`
+with all 69, each with its own capture viewport. Do that after the upload, and re-arm the
+sentinel afterwards.
+
+The matching hazard: an explicit registration outlives the file it points at. A card
+registered at a path that is later deleted leaves the pane broken rather than merely
+missing an entry — which is what happened when the hand-made cards were replaced.
+`unregister_assets` the old paths whenever registered files move or go.
+
 ## Re-sync risks
 
 - **Build the reference storybook AFTER `node .design-sync/messages-en.mjs`, never
