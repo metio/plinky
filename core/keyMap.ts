@@ -141,16 +141,22 @@ export function rebind(map: KeyMap, hand: Hand, semitone: number, key: string): 
     return next;
 }
 
-// A hand is usable only as a complete, unambiguous span: exactly the twelve slots
-// 0–11, each held by a distinct non-empty key. A partially-corrupt hand — or a map
-// saved when the span was narrower — is rejected wholesale (the caller substitutes
-// the default) rather than half-repaired into a surprising layout.
+// A hand is usable when it is unambiguous: every entry a non-empty key holding a
+// distinct slot in 0–11. Ambiguity is rejected wholesale (the caller substitutes the
+// default) rather than half-repaired into a surprising layout.
+//
+// An *unbound* slot is not ambiguity. Binding a key that the other hand holds takes it
+// away from there — that is what `rebind` is for — which leaves the hand it came from one
+// short, and the editor draws that slot as a dash. Requiring all twelve would reject the
+// map the editor just wrote: the short hand would fall back to the default, whose copy of
+// the moved key then collides with its new home, and the player's whole layout would
+// silently reset the next time it loaded.
 function validHand(value: unknown): Record<string, number> | null {
     if (!value || typeof value !== "object") {
         return null;
     }
     const entries = Object.entries(value as Record<string, unknown>);
-    if (entries.length !== SEMITONES.length) {
+    if (entries.length > SEMITONES.length) {
         return null;
     }
     const slots = new Set<number>();
