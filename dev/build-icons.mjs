@@ -85,7 +85,7 @@ await shoot(
     `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:20px">
        <div style="width:96px;height:96px;border-radius:22%;overflow:hidden">${icon}</div>
        <div style="font-family:'Literata Variable',Literata,Georgia,serif;font-variation-settings:'wght' 600;font-size:76px;font-weight:600;letter-spacing:-0.01em;color:${INK};line-height:1">
-         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.36em;width:.14em;height:.14em;transform:translateX(-50%);border-radius:999px;background:#d81b7a"></span></span>nky
+         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.17em;width:.15em;height:.15em;transform:translateX(-50%);border-radius:999px;background:#d81b7a"></span></span>nky
        </div>
      </div>`,
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
