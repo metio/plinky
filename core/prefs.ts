@@ -333,3 +333,31 @@ export function parsePrefs(raw: string | null): Prefs {
         return base;
     }
 }
+
+// The reading a sight-reading assessment measures: the staff as it is printed, with every
+// aid off. A placement drill that can be taken with the notes falling down a highway, the
+// noteheads coloured by name and the keys labelled is not measuring reading — and one
+// taken with hidden notes or the cursor waiting is measuring something else again. So the
+// test supplies its own preferences instead of the player's, and nothing on the page can
+// change them.
+//
+// What it does NOT touch: sound, volume, the key map, hand span, the keyboard's theme.
+// Those are how a person's instrument is set up rather than how much the page is helping,
+// and taking them away would leave a player unable to use their own keyboard.
+export function assessmentPrefs(base: Prefs): Prefs {
+    return {
+        ...base,
+        colorNotes: false,
+        noteLabels: "off",
+        noteHints: "never",
+        showFingerings: false,
+        highway: false,
+        treadmill: false,
+        hiddenNotes: false,
+        keyLights: false,
+        raceGhost: false,
+        // Printed music beams its quavers; reading them one flag at a time is the aid.
+        beams: "on",
+        barNumbers: true,
+    };
+}

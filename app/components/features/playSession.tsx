@@ -974,6 +974,7 @@ function usePlaySessionValue({
         credit: credit ?? "",
         daily,
         ephemeral,
+        assessment,
         lockTempo,
         // The layout shell + full-screen state.
         containerRef,

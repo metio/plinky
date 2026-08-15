@@ -38,6 +38,7 @@ export function PlaySurface() {
         runResult,
         runTempoScale,
         gradePanelRef,
+        assessment,
         runsView,
         showScore,
         takes,
@@ -107,9 +108,15 @@ export function PlaySurface() {
                 {/* Under the music: how you play this piece, and the challenges you can
                     put on it. They used to be one fold called "Set up your run" — two for
                     a beginner — so nothing on the page named a single one of them. */}
-                <FullScreen off>
-                    <RunSetup />
-                </FullScreen>
+                {/* An assessment supplies its own preferences — the aids it measures the
+                    absence of — so there is nothing here to set. Rendering the panel with
+                    every control inert would be worse than leaving it out: a switch that
+                    does nothing reads as a bug. */}
+                {!assessment && (
+                    <FullScreen off>
+                        <RunSetup />
+                    </FullScreen>
+                )}
 
                 <FullScreen off>
                     <Show when={ghostRace.sharedFromLink}>
