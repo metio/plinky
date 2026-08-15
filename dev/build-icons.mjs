@@ -11,10 +11,13 @@ import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const ICON = "public/icon.svg";
+// The tab's own mark: the letter alone, with no tile behind it.
+const TAB = "public/favicon.svg";
 const PAPER = "#fcf7ea";
 const INK = "#241c14";
 
 const icon = await readFile(ICON, "utf8");
+const tab = await readFile(TAB, "utf8");
 // The banner sets the wordmark in the app's own display face, so it has to carry the font
 // with it — a headless browser has no Literata installed, and the fallback serif is not
 // the face the app ships.
@@ -52,9 +55,15 @@ for (const size of [512, 192, 180, 64, 32]) {
     );
 }
 
-// The favicon: an ICO wrapping the 32px PNG. The format allows a PNG payload outright, so
-// there is no bitmap to encode — a six-byte directory, a sixteen-byte entry, the image.
-const png32 = renders.get(32);
+// The favicon: an ICO wrapping a 32px render of the tab mark. The format allows a PNG
+// payload outright, so there is no bitmap to encode — a six-byte directory, a sixteen-byte
+// entry, the image. It carries the light-tab colour, since an ICO cannot answer the
+// browser's theme the way the SVG beside it does.
+const png32 = await shoot(`<div style="width:32px;height:32px">${tab}</div>`, {
+    width: 32,
+    height: 32,
+    path: "public/favicon-32.png",
+});
 const ico = Buffer.alloc(22 + png32.length);
 ico.writeUInt16LE(0, 0); // reserved
 ico.writeUInt16LE(1, 2); // type: icon
@@ -87,8 +96,8 @@ await browser.close();
 // The sizes that only existed to be rendered here are not shipped; drop them so the
 // directory holds exactly what the app references.
 const { unlink } = await import("node:fs/promises");
-for (const size of [64, 32]) {
-    await unlink(`public/icon-${size}.png`);
+for (const path of ["public/icon-64.png", "public/icon-32.png", "public/favicon-32.png"]) {
+    await unlink(path);
 }
 
-console.log("public/: icon-512, icon-192, icon-180, favicon.ico, icon-banner-512 — from icon.svg");
+console.log("public/: icon-512, icon-192, icon-180, icon-banner-512 from icon.svg; favicon.ico from favicon.svg");
