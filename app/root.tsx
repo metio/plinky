@@ -101,10 +101,10 @@ function Header() {
                         aria-label="Plinky home"
                         className="-mx-1 flex items-center gap-2 rounded-lg px-1 py-0.5 focus-visible:ring-2 focus-visible:ring-accent-ring"
                     >
-                        {/* The mark's own corners are cut at about 27% of its width — near enough
-                            8px once it is drawn at 32 — so the clip is set to agree with them.
-                            A squarer clip leaves the two radii disagreeing by a pixel at each
-                            corner, which is what a focus ring then draws attention to. */}
+                        {/* The mark is drawn square to the edges of its own file, the way a
+                            launcher wants it, so the rounding here is the only rounding it
+                            gets — and it matches the radius everything else pressable in the
+                            header carries. */}
                         <img src="/icon-192.png" alt="" className="h-8 w-8 rounded-lg" />
                         <span
                             aria-hidden="true"
@@ -113,7 +113,11 @@ function Header() {
                             Pl
                             <span className="relative">
                                 ı
-                                <span className="absolute left-1/2 top-[0.16em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-plink" />
+                                {/* Where Literata sets its own tittle: measured against a
+                                    real i at this size and line height, not guessed. The
+                                    offset is from the top of the line box, so it does not
+                                    survive a change of leading. */}
+                                <span className="absolute left-1/2 top-[0.54em] h-[0.14em] w-[0.14em] -translate-x-1/2 rounded-full bg-plink" />
                             </span>
                             nky
                         </span>
