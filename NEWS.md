@@ -341,6 +341,21 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**Meet the keyboard now shows you a real one.** The lesson teaches finding a key by the
+pattern of the black ones — twos and threes, middle C to the left of a two — and every key
+was labelled while it did, which answers the question before it is asked. The tour runs
+with the labels, colours and hints off whatever you have set elsewhere; your sound, your
+keys and your keyboard's look are untouched.
+
+**How the music works finally shows the page it talks about.** The first lessons describe
+five lines and four gaps, and a dot's height saying which key, while the only picture was a
+keyboard. Each reading lesson now prints the stave with the very notes it is about, above
+the keys.
+
+**Ear training keeps its answers together.** With fewer than the full set of answers, three
+columns stretched two of them across the width with a gap between the size of a third
+answer. They wrap and stay centred now, whatever you have set it to ask.
+
 **The music page is called the Library**, which is what its address has always said. The
 offer to write your own has left the foot of it — Compose is in the bar at the top now, so
 it no longer needs a door at the bottom of a list of things to play.

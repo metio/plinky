@@ -49,3 +49,17 @@ export const Missed: Story = {
         label: "Chord choices",
     },
 };
+
+// The narrowest the drill goes. Three columns used to stretch two answers across two
+// thirds of the width with a gap between them the size of a third answer; wrapping keeps
+// them together and centred, which is what this story is here to hold.
+export const TwoAnswers: Story = {
+    args: {
+        choices: ["major", "minor"] satisfies ChordQuality[],
+        answer: null,
+        given: null,
+        onChoose: () => {},
+        nameOf: chordName,
+        label: "Chord choices",
+    },
+};

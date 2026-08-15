@@ -14,7 +14,7 @@ import {
     placementRating,
     startPlacement,
 } from "../../core/placement";
-import { assessmentPrefs } from "../../core/prefs";
+import { unaidedPrefs } from "../../core/prefs";
 import { noindexMeta, routeMeta } from "../../core/site";
 import { createFixedPrefsStore } from "../stores/fixedPrefsStore";
 import { ScoreViewer } from "../components/features/scoreViewer";
@@ -55,7 +55,7 @@ export default function PlacementRoute() {
     const assessed = useMemo(
         () => ({
             ...services,
-            prefs: createFixedPrefsStore(assessmentPrefs(services.prefs.load())),
+            prefs: createFixedPrefsStore(unaidedPrefs(services.prefs.load())),
         }),
         [services],
     );

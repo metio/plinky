@@ -334,8 +334,10 @@ export function parsePrefs(raw: string | null): Prefs {
     }
 }
 
-// The reading a sight-reading assessment measures: the staff as it is printed, with every
-// aid off. A placement drill that can be taken with the notes falling down a highway, the
+// The staff and the keyboard as they really are, with every aid off. Two surfaces want
+// this for two reasons: the placement drill, whose result would otherwise depend on how
+// much help the player had switched on, and the keyboard tour, which teaches finding a key
+// by the pattern of the black ones — a lesson that labelled keys skip entirely. A placement drill that can be taken with the notes falling down a highway, the
 // noteheads coloured by name and the keys labelled is not measuring reading — and one
 // taken with hidden notes or the cursor waiting is measuring something else again. So the
 // test supplies its own preferences instead of the player's, and nothing on the page can
@@ -344,7 +346,7 @@ export function parsePrefs(raw: string | null): Prefs {
 // What it does NOT touch: sound, volume, the key map, hand span, the keyboard's theme.
 // Those are how a person's instrument is set up rather than how much the page is helping,
 // and taking them away would leave a player unable to use their own keyboard.
-export function assessmentPrefs(base: Prefs): Prefs {
+export function unaidedPrefs(base: Prefs): Prefs {
     return {
         ...base,
         colorNotes: false,
