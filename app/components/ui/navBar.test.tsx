@@ -28,9 +28,9 @@ const current = () =>
         ?.textContent;
 
 describe("BottomNav active section", () => {
-    it("lights Today only on the exact root path", () => {
+    it("lights nothing on the home page, which the mark leads to instead", () => {
         at("/");
-        expect(current()).toBe(m.nav_today());
+        expect(current()).toBeUndefined();
     });
 
     it("lights the section that owns the current path", () => {
@@ -43,9 +43,9 @@ describe("BottomNav active section", () => {
         expect(current()).toBe(m.nav_music());
     });
 
-    it("does not light Today on a sub-page of another section", () => {
-        at("/you");
-        expect(current()).not.toBe(m.nav_today());
+    it("lights nothing on a page no section owns", () => {
+        at("/stats");
+        expect(current()).toBeUndefined();
     });
 
     it("lights the section on the trailing-slash path the links carry", () => {

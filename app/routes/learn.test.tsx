@@ -31,7 +31,6 @@ describe("the Learn page", () => {
             m.theory_title(),
             m.glossary_title(),
             m.ear_title(),
-            m.methods_title(),
             m.tools_title(),
             m.placement_title(),
         ]) {
@@ -49,19 +48,7 @@ describe("the Learn page", () => {
         expect(hrefFor(m.theory_title())).toBe("/en/theory/");
         expect(hrefFor(m.tools_title())).toBe("/en/tools/");
         expect(hrefFor(m.basics_title())).toBe("/en/basics/");
-        expect(hrefFor(m.methods_title())).toBe("/en/methods/");
         expect(hrefFor(m.placement_title())).toBe("/en/placement/");
-    });
-
-    it("gathers setting work for somebody else under its own heading", () => {
-        show();
-        expect(screen.getByRole("heading", { name: m.learn_teaching_heading() })).toBeTruthy();
-        // An assignment is an ordered path someone laid — a teacher's, or your own —
-        // so it is a course of study rather than a shelf to browse.
-        expect(hrefFor(m.home_assignments())).toBe("/en/assignments/");
-        // And the other half of the loop, which reads the codes a student sends back.
-        // The two used never to link to each other.
-        expect(hrefFor(m.collect_title())).toBe("/en/collect/");
     });
 
     it("climbs a scale under a mouse, and stays quiet under a finger", () => {

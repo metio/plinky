@@ -3,6 +3,7 @@
 
 import { FeatureBoundary } from "../components/features/featureBoundary";
 import { HomeToday } from "../components/features/homeToday";
+import { PracticeMethods } from "../components/features/practiceMethods";
 import { socialMeta, structuredData } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
@@ -53,6 +54,12 @@ export default function Home() {
             <FeatureBoundary feature="HomeToday">
                 <HomeToday />
             </FeatureBoundary>
+
+            {/* Six ways to practise, at the foot of the page where somebody who has
+                finished the day's work can read them. They used to be a page of their
+                own, two taps inside Learn, which is nowhere for the one part of Plinky
+                that explains how to use the rest of it. */}
+            <PracticeMethods />
         </main>
     );
 }

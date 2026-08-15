@@ -600,6 +600,14 @@ export function HomeToday() {
                 <Link to="/placement" className={linkClasses}>
                     {m.placement_title()}
                 </Link>
+                <span aria-hidden="true">·</span>
+                {/* The badge beside the mark leads here too, but it is quiet until there
+                    is a standing to show — so on a fresh device this is the only door,
+                    and the page a player looks for after a while cannot depend on having
+                    already earned something. */}
+                <Link to="/stats" className={linkClasses}>
+                    {m.nav_stats()}
+                </Link>
             </p>
         </div>
     );

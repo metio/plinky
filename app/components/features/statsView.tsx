@@ -32,7 +32,7 @@ import { PageHeader } from "../ui/pageHeader";
 // Accuracy/Timing/Flow fingerprint. All the data arrives through useYouData, which
 // waits for the personal data before the page paints anything — a single full paint
 // keeps CLS at zero on this client-only page.
-export function YouView() {
+export function StatsView() {
     const data = useYouData();
     const history = useHistoryStore();
     if (data === null) {
@@ -51,7 +51,7 @@ export function YouView() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <PageHeader title={m.you_heading()} hint={m.you_intro()} />
+            <PageHeader title={m.stats_heading()} hint={m.stats_intro()} />
 
             <YouStanding level={level} skill={skill} competitive={mode === "competitive"} />
 

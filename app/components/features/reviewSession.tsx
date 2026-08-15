@@ -84,7 +84,7 @@ export function ReviewSession() {
                     <Link to="/library" className={BACK}>
                         {m.today_browse()}
                     </Link>
-                    <Link to="/you" className={BACK}>
+                    <Link to="/stats" className={BACK}>
                         {m.review_back()}
                     </Link>
                 </EmptyState>
@@ -101,7 +101,7 @@ export function ReviewSession() {
                 <p className="text-sm text-muted">
                     {m.review_complete_summary({ refreshed, shelved })}
                 </p>
-                <Link to="/you" className={BACK}>
+                <Link to="/stats" className={BACK}>
                     {m.review_back()}
                 </Link>
             </main>
@@ -191,7 +191,7 @@ export function ReviewSession() {
                 <Button variant="ghost" onClick={shelve}>
                     {m.review_shelve()}
                 </Button>
-                <Link to="/you" className={`${BACK} ml-auto`}>
+                <Link to="/stats" className={`${BACK} ml-auto`}>
                     {m.review_end()}
                 </Link>
             </div>

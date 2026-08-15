@@ -10,7 +10,7 @@ import { createHistoryStore } from "../../stores/historyStore";
 import { renderWithServices } from "../../testing/renderWithServices";
 import type { GradeCatalogItem, GradedMastery } from "../../lib/gradeProgress";
 import type { Mastery } from "../../../core/mastery";
-import { YouView } from "./youView";
+import { StatsView } from "./statsView";
 import { m } from "../../paraglide/messages.js";
 
 const { masteryMock, catalogueMock } = vi.hoisted(() => ({
@@ -40,7 +40,7 @@ const fresh: Mastery = {
     deadline: "",
 };
 
-describe("YouView", () => {
+describe("StatsView", () => {
     it("shows standing, activity stats, and the next grade's gentlest pieces", async () => {
         masteryMock.mockResolvedValue(
             Array.from({ length: 5 }, (_, i) => ({
@@ -59,7 +59,7 @@ describe("YouView", () => {
 
         render(
             <MemoryRouter>
-                <YouView />
+                <StatsView />
             </MemoryRouter>,
         );
 
@@ -80,7 +80,7 @@ describe("YouView", () => {
 
         renderWithServices(
             <MemoryRouter>
-                <YouView />
+                <StatsView />
             </MemoryRouter>,
             { store: kv },
         );
@@ -99,7 +99,7 @@ describe("YouView", () => {
 
         render(
             <MemoryRouter>
-                <YouView />
+                <StatsView />
             </MemoryRouter>,
         );
 
@@ -115,7 +115,7 @@ describe("YouView", () => {
 
         render(
             <MemoryRouter>
-                <YouView />
+                <StatsView />
             </MemoryRouter>,
         );
 

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router";
 import { withTrailingSlash } from "../../../core/site";
 import { m } from "../../paraglide/messages.js";
-import { BookIcon, CalendarIcon, GradCapIcon, NotesIcon } from "./icons";
+import { BookIcon, GradCapIcon, MicIcon, NotesIcon } from "./icons";
 import { LocalizedLink as Link } from "./localizedLink";
 import { localizedHref } from "./href";
 
@@ -22,10 +22,10 @@ const DESTINATIONS: {
     label: () => string;
     Icon: (props: { className?: string }) => ReactNode;
 }[] = [
-    { to: "/", label: m.nav_today, Icon: CalendarIcon },
     { to: "/library", label: m.nav_music, Icon: NotesIcon },
     { to: "/learn", label: m.nav_learn, Icon: BookIcon },
-    { to: "/you", label: m.nav_you, Icon: GradCapIcon },
+    { to: "/compose", label: m.nav_compose, Icon: MicIcon },
+    { to: "/teach", label: m.nav_teach, Icon: GradCapIcon },
 ];
 
 // Marks the current section. Home matches only its exact path; the rest also match

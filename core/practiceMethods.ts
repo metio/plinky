@@ -26,18 +26,15 @@ export type PracticeMethod = {
     // Roughly how long one go at it takes, in minutes — the "dose" that turns a
     // method from an idea into something that fits in tonight's practice.
     minutes: number;
-    // Where in Plinky to do it. A route the player can follow straight from the
-    // page, so reading about a method and trying it are one step apart.
-    href: string;
 };
 
 export const METHODS: PracticeMethod[] = [
-    { id: "chunking", minutes: 10, href: "/library/" },
-    { id: "slow", minutes: 10, href: "/library/" },
-    { id: "handsApart", minutes: 10, href: "/library/" },
+    { id: "chunking", minutes: 10 },
+    { id: "slow", minutes: 10 },
+    { id: "handsApart", minutes: 10 },
     // Its own words are "listen to the phrase, then turn the noteheads blank and find it
     // by ear" — which is the hidden-notes switch on a piece, not the interval drill.
-    { id: "hearingFirst", minutes: 5, href: "/library/" },
-    { id: "interleaving", minutes: 15, href: "/review/" },
-    { id: "spacing", minutes: 10, href: "/you/" },
+    { id: "hearingFirst", minutes: 5 },
+    { id: "interleaving", minutes: 15 },
+    { id: "spacing", minutes: 10 },
 ];

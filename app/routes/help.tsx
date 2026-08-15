@@ -110,7 +110,7 @@ const SECTIONS: {
     },
     {
         key: "you",
-        title: m.nav_you,
+        title: m.nav_stats,
         text: m.help_text_you,
         image: "you",
         imageAlt: m.help_shot_you,
