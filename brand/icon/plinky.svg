@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Plinky's own ink blue, the accent every pressable thing in the app already wears.
+       The keyboard and the plink sit inside the maskable safe zone (the middle 80%), so a
+       launcher may round or crop the square without eating a key. -->
+  <rect width="192" height="192" fill="#2b4374"/>
+  <g>
+    <rect x="44" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
+    <rect x="69" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
+    <rect x="94" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
+    <rect x="119" y="72" width="21" height="76" rx="4.5" fill="#fcf7ea"/>
+    <rect x="60" y="72" width="13" height="47" rx="3.5" fill="#1b2b4a"/>
+    <rect x="86" y="72" width="13" height="47" rx="3.5" fill="#1b2b4a"/>
+    <rect x="112" y="72" width="13" height="47" rx="3.5" fill="#1b2b4a"/>
+  </g>
+  <!-- The plink: one note, played, on its way up. -->
+  <circle cx="96" cy="50" r="12" fill="#d81b7a"/>
+</svg>

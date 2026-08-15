@@ -7,7 +7,7 @@ import { useTakesStore } from "../../contexts/services";
 import { useKnownPieces } from "../../hooks/useKnownPieces";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
-import { linkClasses } from "../ui/classes";
+import { linkClasses, sectionHeadingClasses } from "../ui/classes";
 import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { formatAgo } from "./takesPanel";
@@ -33,6 +33,10 @@ export function YourTakes() {
     const now = Date.now();
     return (
         <section className="space-y-2">
+            {/* The heading belongs to the list, so a device with nothing recorded gets
+                neither — a section header over an empty space is the frame promising
+                insight it does not have. */}
+            <h2 className={sectionHeadingClasses}>{m.takes_panel_heading()}</h2>
             <ul className="space-y-1">
                 {pieces.map(({ songId, takes: saved }: { songId: string; takes: Take[] }) => (
                     <li key={songId} className="flex items-center gap-2 py-1">

@@ -106,6 +106,15 @@ precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
+# The brand kit: every file in it is rendered by dev/build-brand.mjs from the app's own
+# tokens and the icon, so they are our own art and carry the project's licence. The
+# JSON and the images cannot hold a comment; the README does and is left alone.
+[[annotations]]
+path = ["brand/**/*.png", "brand/**/*.svg", "brand/palette.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
 # Story screenshot baselines: rendered from our own components by the visual
 # regression suite (vitest toMatchScreenshot over the Storybook stories).
 [[annotations]]
