@@ -179,6 +179,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-strong: var(--color-indigo-600);
     --color-heat-deep: var(--color-indigo-800);
     /* A race has two runners: you in indigo, the ghost in fuchsia. */
+    /* The plink: one note, played. It is the dot on the i, and the dot in the app icon,
+       and nothing else — the brand's whole spark, spent in one place.
+
+       It had been borrowing the ghost's fuchsia, so the wordmark and the "race your own
+       recording" colour were one variable: moving either moved the other, and they mean
+       entirely different things. */
+    --color-plink: #d81b7a;
+
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-600);
     --color-ghost-surface: var(--color-fuchsia-50);
@@ -303,6 +311,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     --color-heat-mid: var(--color-indigo-700);
     --color-heat-strong: var(--color-indigo-500);
     --color-heat-deep: var(--color-indigo-300);
+
+    --color-plink: #f04d9b;
 
     --color-ghost: var(--color-fuchsia-500);
     --color-ghost-text: var(--color-fuchsia-400);

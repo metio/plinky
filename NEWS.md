@@ -107,6 +107,14 @@ So a quaver in the right hand emptied as slowly as the whole note under it in th
 long after your right hand had moved on. Each key now drains on the length that is
 actually written for it.
 
+**The icon looks like the app now.** Everything on screen moved to ivory paper and ink
+last week; the icon stayed behind in the violet it was born in, so the square in your tab
+and on your home screen belonged to a different-looking product from the page it opened.
+It is Plinky's own ink blue now, with ivory keys — and the pink dot, the plink, is the
+same one that sits on the i in the name. The dot also got a colour of its own in the code:
+it had been borrowing the shade the ghost-race replay uses, which meant the brand and a
+feature shared one setting.
+
 **A filter for what you haven't tried.** Three thousand pieces and a shelf you've been
 playing for months is a hard place to find something new. "✨ Not tried yet" keeps only
 the pieces with no history at all — one tap beside Favourites and Due now.
