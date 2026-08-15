@@ -343,9 +343,13 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 **Plinky has a new icon.** The old one was a little keyboard with a dot above it — the
 same picture as every other music app, and at the size a browser tab shows it, an
-unreadable smudge. The new one is the letter **p** set in Literata, the typeface the app
-prints its titles in, with a pink note sitting in the bowl. It is the same pink as the dot
-on the i in the name, and it is still the only pink Plinky uses.
+unreadable smudge. The new one is the letter **P** set in Literata, the typeface the app
+prints its titles in, with a pink note sitting in the bowl of the letter. It is the same
+pink as the dot on the i in the name, and it is still the only pink Plinky uses.
+
+In the browser tab you get the letter on its own, without the blue tile — a tab is the
+browser's furniture, not Plinky's, so the mark sits on it rather than carrying a box along.
+It turns pale on a dark browser so it stays readable either way.
 
 **Your own key layout stays put.** If you play on the computer keyboard and gave a note a
 key that the other hand was already using, the layout looked right at the time and then

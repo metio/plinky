@@ -22,18 +22,22 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 
 ## The mark
 
-The lowercase **p** of Literata — the face every title in the app is set in — with the
-counter of its bowl inked pink. A note whose stem points down is a head with the stem
-descending from its left, which is the same silhouette as the letter, so the initial of the
-name and a notehead are one shape and the pink lands where the typeface already left a
-hole. That pink is the plink, and it is the only pink in Plinky: in the counter of the
-icon, and on the i of the wordmark. Spending it anywhere else would make it decoration
-rather than a signature.
+The capital **P** of Literata — the face every title in the app is set in, and the letter
+the name begins with — with the counter of its bowl inked pink. That pink is the plink, and
+it is the only pink in Plinky: in the counter of the mark, and on the i of the wordmark.
+Spending it anywhere else would make it decoration rather than a signature.
 
 The outline is a derivative of Literata (SIL Open Font License 1.1) at weight 700, optical
-size 7 — the small-text cut, whose sturdier serifs and more generous counter are what
-survive a favicon. The letter sits inside the middle 80% of its square, so a launcher can
-round or crop it without biting into it. Keep that margin if you redraw it.
+size 24. The optical size is the whole tuning: it is where the counter is fullest and
+roundest while the serifs are still sturdy enough to hold at a favicon's size. Below it the
+counter narrows to a sliver; above 40 the strokes thin and the bowl starts to part from the
+stem.
+
+The mark comes two ways. On a tile — ink blue, paper letter — it is the app icon, and the
+letter sits inside the middle 80% of the square so a launcher can round or crop it without
+biting in. On nothing, as `public/favicon.svg`, it is the browser tab's: the letter alone,
+ink blue on a light browser and paper on a dark one, because a tab is the browser's
+furniture and a tile there only wedges a coloured box between the mark and the chrome.
 
 ## The colours
 

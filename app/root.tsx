@@ -67,7 +67,11 @@ const THEME_INIT_SCRIPT = themeBootstrapScript();
 const RETURNING_INIT_SCRIPT = returningBootstrapScript();
 
 export const links: Route.LinksFunction = () => [
-    { rel: "icon", href: "/icon-192.png", type: "image/png" },
+    // The tab takes the letter alone — it sits on the browser's chrome, where a tile would
+    // only wedge a coloured box between the mark and whatever the browser paints. The SVG
+    // answers the browser's theme; the ICO is the fallback for those that cannot read it.
+    { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+    { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     { rel: "manifest", href: "/manifest.webmanifest" },
     { rel: "apple-touch-icon", href: "/icon-180.png" },
     // Preload the Latin variable font so text paints in Inter without a swap;
