@@ -578,6 +578,15 @@ drives playback from one shared audio clock.
 Plinky walks its cursor to match the pitches under each position against what you
 play — the same engine behind every mode.
 
+## The brand kit
+
+`brand/` holds the mark, the palette with each colour's role, a type specimen and
+ready-made social images — everything somebody needs to make something *about* Plinky. It
+is generated: `npm run brand` rebuilds it from `app/app.css` and `public/icon.svg`, so a
+poster cannot end up in a palette the app has moved on from. `brand/README.md` carries the
+rules, including the three colours that mean something and must never be borrowed for
+decoration.
+
 ## Translations
 
 Plinky speaks 26 languages, and contributions are welcome — see
