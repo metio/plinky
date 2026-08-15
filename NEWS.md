@@ -341,6 +341,12 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**Stats says what a grade and a skill are.** Both numbers were explained in a tooltip —
+which a touch screen cannot open and most people never hover — so the one page whose whole
+subject is those two figures never told you what either meant. They are spelled out under
+them now, including the part worth repeating: a grade describes what a piece expects of
+you, and never locks anything.
+
 **Meet the keyboard now shows you a real one.** The lesson teaches finding a key by the
 pattern of the black ones — twos and threes, middle C to the left of a two — and every key
 was labelled while it did, which answers the question before it is asked. The tour runs

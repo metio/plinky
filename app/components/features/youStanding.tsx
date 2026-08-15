@@ -26,7 +26,7 @@ export function YouStanding({
                 </span>
             </span>
             <span className="flex flex-col items-end gap-0.5 text-right text-sm text-muted">
-                <span title={m.grades_skill_help()}>{m.grades_skill({ rating: skill })}</span>
+                <span>{m.grades_skill({ rating: skill })}</span>
                 <Show when={competitive}>
                     <span title={m.grades_competitive_help()} className="font-medium text-warn">
                         ⚔️ {m.grades_competitive()}
@@ -34,6 +34,26 @@ export function YouStanding({
                 </Show>
             </span>
         </div>
+    );
+}
+
+// What the two numbers above actually mean. They used to be explained in a `title`, which
+// is a tooltip nobody on a touch screen can open and most readers never hover — so the one
+// page whose whole subject is those two figures never said what either of them was. The
+// grade line repeats the roadmap's promise on purpose: this is where a reader wonders
+// whether a number is holding them back, and the answer is that nothing is locked.
+export function StandingKey() {
+    return (
+        <dl className="space-y-2 text-sm">
+            <div>
+                <dt className="inline font-medium text-ink">{m.stats_grade_label()}</dt>{" "}
+                <dd className="inline text-muted">{m.stats_grade_help()}</dd>
+            </div>
+            <div>
+                <dt className="inline font-medium text-ink">{m.stats_skill_label()}</dt>{" "}
+                <dd className="inline text-muted">{m.grades_skill_help()}</dd>
+            </div>
+        </dl>
     );
 }
 
