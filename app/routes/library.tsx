@@ -9,8 +9,6 @@ import { LibraryRow } from "../components/features/libraryRow";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { ScoreImport } from "../components/features/scoreImport";
 import { Button } from "../components/ui/button";
-import { HubList } from "../components/ui/hubList";
-import { KeysIcon } from "../components/ui/icons";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/library";
 import { MAX_GRADE } from "../../core/scoreDifficulty";
@@ -19,7 +17,6 @@ import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
 import { useLibraryFilters } from "../hooks/useLibraryFilters";
 import { useLibraryItems } from "../hooks/useLibraryItems";
-import { useSynth } from "../hooks/useSynth";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/library";
 import { PageHeader } from "../components/ui/pageHeader";
@@ -29,7 +26,7 @@ import { ComposerList } from "../components/features/composerList";
 import { fieldClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.nav_music(), m.meta_library_description());
+    return routeMeta(m.library_title(), m.meta_library_description());
 }
 
 // The library's two jobs as two tabs: Search finds something to play in the
@@ -37,22 +34,7 @@ export function meta(_args: Route.MetaArgs) {
 // (backup and restore). ?tab=manage deep-links straight to the second.
 type LibraryTab = "search" | "people" | "manage";
 
-// Music is everything there is to play, and the catalogue is only half of it: the
-// other half is what you make yourself, which is why writing your own sits on the shelf
-// rather than on the home page. (A set of pieces in a deliberate order is a course of
-// study, so assignments live on Learn.)
-const SHELVES = [
-    {
-        to: "/compose",
-        label: m.play_compose,
-        blurb: m.play_compose_blurb,
-        Icon: KeysIcon,
-        note: 67,
-    },
-];
-
 export default function LibraryRoute() {
-    const synth = useSynth();
     const favoritesStore = useFavoritesStore();
     const { items, mastery, loaded, remove, assignmentsUsing } = useLibraryItems();
     const [searchParams] = useSearchParams();
@@ -94,7 +76,7 @@ export default function LibraryRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <PageHeader title={m.nav_music()} hint={m.library_intro()} />
+            <PageHeader title={m.library_title()} hint={m.library_intro()} />
 
             <SegmentedControl
                 options={[
@@ -212,20 +194,6 @@ export default function LibraryRoute() {
                     )}
                 </>
             )}
-
-            {/* Last, because it leads away: somebody arriving at the shelf came to find
-                something to play, and the offer to write your own belongs after the
-                looking rather than in front of it. */}
-            <HubList
-                entries={SHELVES.map((shelf) => ({
-                    ...shelf,
-                    label: shelf.label(),
-                    blurb: shelf.blurb(),
-                }))}
-                onEnter={(note) =>
-                    synth.playNote(note, { velocity: 55, duration: 0.4, decorative: true })
-                }
-            />
         </main>
     );
 }
