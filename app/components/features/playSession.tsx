@@ -56,6 +56,7 @@ import {
     type Hand,
     useScoreMatcher,
 } from "../../hooks/useScoreMatcher";
+import { useSamplePrefetch } from "../../hooks/useSamplePrefetch";
 import { useHiddenNotes } from "../../hooks/useHiddenNotes";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSightRead } from "../../hooks/useSightRead";
@@ -482,6 +483,10 @@ function usePlaySessionValue({
         enabled: duet && !enforceTempo && staffCount >= 2 && activeHand !== "both",
         hand: activeHand,
     });
+
+    // The recordings this piece will ask for, fetched while it is being read. Nothing
+    // waits on them: a note whose recording has not landed is played by the synth.
+    useSamplePrefetch(getOsmd, ready);
 
     const matcher = useScoreMatcher(getOsmd, {
         tempo,

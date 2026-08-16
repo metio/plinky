@@ -18,6 +18,7 @@ import {
     StarIcon,
 } from "../components/ui/icons";
 import { Keyboard } from "../components/ui/keyboard";
+import { GrandPianoSetting } from "../components/features/grandPianoSetting";
 import { SettingsSection } from "../components/ui/settingsSection";
 
 import { DangerZone } from "../components/features/dangerZone";
@@ -127,6 +128,7 @@ export default function Settings() {
                     checked={prefs.sound}
                     onChange={(sound) => update({ sound })}
                 />
+                <GrandPianoSetting />
                 <div className="flex items-center gap-3">
                     <span className="text-sm text-body">{m.settings_volume()}</span>
                     <input

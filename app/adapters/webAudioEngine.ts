@@ -474,6 +474,13 @@ export function playFromSamples(lookup: () => { source: SampleLookup | null }): 
     samples = lookup;
 }
 
+// The recording for a note, or nothing. Exported so the offline render behind the video
+// export plays the same instrument the speakers just did — an exported take that sounds
+// different from the take is a bug nobody would report as one.
+export function sampleVoiceFor(pitch: number, gain: number): SampleVoice | undefined {
+    return voiceFor(pitch, gain);
+}
+
 function voiceFor(pitch: number, gain: number): SampleVoice | undefined {
     // The gain the caller passes has the volume setting in it; the recording is chosen by
     // how hard the key was hit, which is what the caller's velocity said before that.
