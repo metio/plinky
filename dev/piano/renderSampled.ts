@@ -79,7 +79,19 @@ async function notesOf(request: SampledRequest) {
     osmd.render();
     const steps = collectMatchSteps(osmd, "both");
     host.remove();
-    return performanceOf(steps, { speed: request.speed, withinMs: request.clipMs });
+    return performanceOf(
+        steps,
+        // No window means the whole piece, which is what a session plays.
+        request.clipMs > 0 ? { speed: request.speed, withinMs: request.clipMs } : {},
+    );
+}
+
+// The (pitch, velocity) pairs a whole piece plays, for measuring what a session would have
+// to fetch. Exported from here because a bare module specifier only resolves inside a
+// module the dev server served — an inline evaluate cannot import the engraver.
+export async function playedPairs(scoreUrl: string): Promise<[number, number][]> {
+    const notes = await notesOf({ scoreUrl, samplesBase: "", clipMs: 0, regions: [] });
+    return notes.map((note) => [note.pitch, note.velocity]);
 }
 
 export async function renderSampled(request: SampledRequest): Promise<SampledResult> {
