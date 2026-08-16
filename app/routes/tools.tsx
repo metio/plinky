@@ -4,23 +4,35 @@
 import { useState } from "react";
 import { CIRCLE, type CircleKey, signatureNotes } from "../../core/circleOfFifths";
 import { routeMeta, webPageData } from "../../core/site";
-import { bpmOf, NO_TAPS, type TapState, tap, tapCount } from "../../core/tapTempo";
+import {
+    bpmOf,
+    MAX_BPM,
+    MIN_BPM,
+    NO_TAPS,
+    type TapState,
+    tap,
+    tapCount,
+} from "../../core/tapTempo";
 import { NOTE_LABELS } from "../../core/keyMap";
 import {
     CHORD_QUALITIES,
     type ChordQuality,
     chordPitches,
+    INTERVAL_IDS,
+    type IntervalId,
     NOTE_TEXT,
     noteNameOf,
     SCALE_IDS,
     type ScaleId,
     scalePitches,
+    semitonesOf,
 } from "../../core/theory";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
+import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
-import { chordName, scaleName } from "../lib/theoryNames";
+import { chordName, intervalName, scaleName } from "../lib/theoryNames";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/tools";
@@ -188,10 +200,90 @@ function ChordExplorer() {
     );
 }
 
+// Two notes and the distance between them. The scale and chord panels answer "what is
+// in this?"; this one answers "how far is that?", which is the question a reader asks
+// with a finger on the page rather than on the keys.
+function IntervalFinder() {
+    const [root, setRoot] = useState("0");
+    const [interval, pickInterval] = useState<IntervalId>("perfect-fifth");
+    const from = ROOT + Number(root);
+    const to = from + semitonesOf(interval);
+    return (
+        <Panel title={m.tools_interval_title()} hint={m.tools_interval_hint()}>
+            <SegmentedControl
+                label={m.tools_root()}
+                value={root}
+                onChange={setRoot}
+                options={tonicOptions()}
+            />
+            <SegmentedControl
+                label={m.tools_interval_label()}
+                value={interval}
+                onChange={pickInterval}
+                options={INTERVAL_IDS.map((id) => ({ id, label: intervalName(id) }))}
+            />
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-body">
+                <dt className="text-muted">{m.tools_interval_lands()}</dt>
+                <dd>{NOTE_LABELS[to % 12] ?? ""}</dd>
+            </dl>
+            {/* Sounded together and then apart: an interval is a distance you can hear
+                either way round, and hearing both is how the name sticks. */}
+            <SoundingKeyboard
+                lit={[from, to]}
+                phrases={[{ notes: [from, to] }, { notes: [from, to], spread: true }]}
+                label={m.tools_hear_it()}
+            />
+        </Panel>
+    );
+}
+
+// The click on its own, away from a piece. The tempo it keeps is the one the tap tool
+// found, because tapping along to something and then playing at that speed is one
+// errand rather than two.
+const BEATS_IN_A_BAR = ["2", "3", "4", "6"];
+
+// A walking pace: fast enough to be a pulse, slow enough to play something over.
+const DEFAULT_BPM = 90;
+
+function Metronome({ bpm, onBpm }: { bpm: number; onBpm: (bpm: number) => void }) {
+    const [on, setOn] = useState(false);
+    const [beats, setBeats] = useState("4");
+    useMetronome(on, bpm, Number(beats));
+    return (
+        <Panel title={m.tools_metro_title()} hint={m.tools_metro_hint()}>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-body">
+                <label className="flex flex-1 items-center gap-3">
+                    <span className="text-muted">{m.tools_metro_tempo()}</span>
+                    <input
+                        type="range"
+                        min={MIN_BPM}
+                        max={MAX_BPM}
+                        value={bpm}
+                        onChange={(event) => onBpm(Number(event.target.value))}
+                        className="h-11 min-w-48 flex-1 accent-accent-solid"
+                    />
+                </label>
+                <span className="font-mono text-2xl tabular-nums text-body">
+                    {m.tools_tap_bpm({ bpm })}
+                </span>
+            </div>
+            <SegmentedControl
+                label={m.tools_metro_beats()}
+                value={beats}
+                onChange={setBeats}
+                options={BEATS_IN_A_BAR.map((id) => ({ id, label: id }))}
+            />
+            <Button variant={on ? "secondary" : "primary"} onClick={() => setOn((was) => !was)}>
+                {on ? m.tools_metro_stop() : m.tools_metro_start()}
+            </Button>
+        </Panel>
+    );
+}
+
 // Tap along and read the tempo back. Wall-clock rather than the monotonic scheduler
 // clock: a tap is an event in the player's own time, and the reading is handed to a
 // metronome that speaks in beats a minute.
-function TapTempo() {
+function TapTempo({ onFound }: { onFound: (bpm: number) => void }) {
     const [state, setState] = useState<TapState>(NO_TAPS);
     const bpm = bpmOf(state);
     return (
@@ -199,7 +291,14 @@ function TapTempo() {
             <div className="flex flex-wrap items-center gap-3">
                 <Button
                     variant="primary"
-                    onClick={() => setState((current) => tap(current, Date.now()))}
+                    onClick={() => {
+                        const next = tap(state, Date.now());
+                        setState(next);
+                        const found = bpmOf(next);
+                        if (found !== null) {
+                            onFound(found);
+                        }
+                    }}
                 >
                     {m.tools_tap_action()}
                 </Button>
@@ -221,13 +320,18 @@ function TapTempo() {
 // tapping. Each one is a thing a player looks up mid-practice, and each is built from
 // the same engines the rest of Plinky runs on.
 export default function ToolsRoute() {
+    // The tempo the tap tool finds is the tempo the metronome should keep, so the number
+    // lives in the one place both panels can see rather than being typed in twice.
+    const [bpm, setBpm] = useState(DEFAULT_BPM);
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.tools_title()} hint={m.tools_intro()} />
             <CircleOfFifths />
             <ScaleExplorer />
             <ChordExplorer />
-            <TapTempo />
+            <IntervalFinder />
+            <TapTempo onFound={setBpm} />
+            <Metronome bpm={bpm} onBpm={setBpm} />
         </main>
     );
 }

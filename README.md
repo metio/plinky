@@ -385,13 +385,15 @@ in it says nothing at all.
 
 ## How the music works
 
-[How the music works](https://plinky.fun/en/theory/) is a short course — eight lessons
-on the theory the page assumes you already have. The stave as a picture of the
-keyboard; half steps and whole steps; the octave; the major and minor scales; why a
-piece carries sharps; triads; and the one key that turns a major chord minor. Each
-lesson is a paragraph and something to play, so the idea arrives through your ears as
-well as your eyes. The glossary tells you what a mark means, this tells you why the
-music is built that way.
+[How the music works](https://plinky.fun/en/theory/) is a short course — fourteen
+lessons on the theory the page assumes you already have. The stave as a picture of the
+keyboard; half steps and whole steps; the octave; what a notehead's shape says about
+length; rests; the two staves a piano reads at once; the major and minor scales; why a
+piece carries sharps; the pair of keys that share one signature; triads; the one key
+that turns a major chord minor; the three chords that carry most tunes; and the sound of
+a phrase ending. Each lesson is a paragraph and something to play or a bar of real
+notation to read, so the idea arrives through your ears as well as your eyes. The
+glossary tells you what a mark means, this tells you why the music is built that way.
 
 ## Little tools
 
@@ -400,7 +402,10 @@ instrument, nothing to set up. A **circle of fifths** where picking a key names 
 signature and its relative minor and sounds its chord — and where each key spells its
 own notes, so D flat major reads as D flat and never as C sharp. A **scale explorer**
 and a **chord explorer** that light the notes on a keyboard from any root and play
-them back. And a **tap tempo** reader: tap along and it tells you the number.
+them back. An **interval finder**: pick a starting note and a distance to see where it
+lands and hear it struck together and apart. A **tap tempo** reader: tap along and it
+tells you the number. And a **metronome** that takes that number straight from it, so
+finding a tempo and playing at it is one job.
 
 ## Composing
 

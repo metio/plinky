@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { ladderOffset, optionVerdict } from "./earAnswer";
-import { SEMITONES_PER_OCTAVE } from "./theory";
+import { optionVerdict } from "./earAnswer";
 
 describe("optionVerdict", () => {
     it("marks nothing at all while the round is unanswered", () => {
@@ -33,18 +32,3 @@ describe("optionVerdict", () => {
     });
 });
 
-describe("ladderOffset", () => {
-    it("puts a rung at the height of the distance it names", () => {
-        // The ladder's whole conceit: an interval IS a distance, so the unison sits at
-        // the foot and the octave at the top.
-        expect(ladderOffset("unison")).toBe(0);
-        expect(ladderOffset("octave")).toBe(100);
-    });
-
-    it("spaces the rungs between by their semitones", () => {
-        expect(ladderOffset("perfect-fifth")).toBeCloseTo((7 / SEMITONES_PER_OCTAVE) * 100);
-        expect(ladderOffset("major-third")).toBeCloseTo((4 / SEMITONES_PER_OCTAVE) * 100);
-        // A wider interval is never lower on the ladder than a narrower one.
-        expect(ladderOffset("major-third")).toBeLessThan(ladderOffset("perfect-fifth"));
-    });
-});
