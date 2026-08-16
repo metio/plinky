@@ -20,6 +20,8 @@
     "icons": "node dev/build-icons.mjs",
     "songs:audit": "tsx dev/audit-catalog.mts",
     "promo:videos": "node dev/promo-videos.mjs",
+    "piano:demo": "node dev/piano/demo.mjs",
+    "piano:pack": "node dev/piano/measure-pack.mjs",
     "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "build:single": "PLINKY_LOCALE=en npm run build",
     "build:locales": "node dev/build-locales.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
