@@ -93,6 +93,15 @@ describe("library export packs", () => {
         expect(pack.scores.map((s: { title: string }) => s.title)).toEqual(["Mine"]);
     });
 
+    it("credits the bundled pieces under the terms the repository declares", () => {
+        // The two demos everybody meets first are transcriptions we made, so the page that
+        // credits every other piece has something to say about them too.
+        for (const bundled of loadBundledScores()) {
+            expect(bundled.license).toBe("CC0-1.0");
+            expect(bundled.source).toBe("plinky");
+        }
+    });
+
     it("includes the bundled pieces alongside imports in the full pack", () => {
         saveUserScore(kv, buildScore(codec, xml("Mine"), []));
         const pack = JSON.parse(exportFullPack(kv));

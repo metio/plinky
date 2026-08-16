@@ -101,6 +101,12 @@ composer's page. It comes with the
 catalogue rather than being worked out on the spot, so a list of music reads as music
 without waiting for anything to load.
 
+The two pieces that ship inside Plinky — *Ode to Joy* and *Twinkle, Twinkle, Little
+Star* — were the exception, and so is anything you've imported yourself: those are read
+straight from the score, so every row on the shelf now opens with its own first bar.
+The two of ours also say where they came from at last: our own transcriptions, given
+away under CC0, credited beside every other piece in the catalogue.
+
 **Each key now shows its own length.** When the shrinking fill on a key told you how long
 to hold it, every key struck at that moment drained at the same rate — the longest note's.
 So a quaver in the right hand emptied as slowly as the whole note under it in the left,

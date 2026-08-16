@@ -33,6 +33,22 @@ const emptySources = () => ({
 });
 
 describe("useLibraryItems", () => {
+    it("reads the opening bars off every score held on the device", async () => {
+        // Catalogue songs carry a baked incipit; the bundled demos and anything imported
+        // have none, so the library row has to read it from the score itself.
+        const store = memoryStore();
+        saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
+        const { exercises, songs } = emptySources();
+        const { result } = renderHook(() => useLibraryItems(), {
+            wrapper: wrap(store, exercises, songs),
+        });
+        await waitFor(() => expect(result.current.loaded).toBe(true));
+        expect(result.current.items.length).toBe(loadBundledScores().length + 1);
+        for (const item of result.current.items) {
+            expect(item.incipit, item.title).toBeTruthy();
+        }
+    });
+
     it("combines local scores with both manifests, gentlest first, and flags loaded", async () => {
         const store = memoryStore();
         saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
