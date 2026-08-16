@@ -110,10 +110,18 @@ for (const size of [1024, 512, 192, 180, 64, 32]) {
 }
 await writeFile(`${OUT}/icon/plinky.svg`, icon);
 
-// Where Literata puts its own tittle at this size, measured by rasterising a real i and
-// matching the gap it leaves over the x-height. The app header carries a different number
-// for its own size: an offset like this is measured where it is used, never copied.
-const TITTLE = "top:.5em;width:.1525em;height:.1525em";
+// The pink dot, anchored to the text baseline rather than to the top of the box it sits
+// in. Literata puts its tittle's underside .545em above the baseline, and the box an
+// absolutely positioned child is measured against reaches .3em below it — both measured
+// here, the first by rasterising a real i at this weight, the second by reading the box
+// off the DOM — so .845em from the bottom lands the dot where the glyph would.
+//
+// Anchoring from the top instead needs a different number at every size, because the
+// box's top moves with the line height; that is why the app header carries its own value
+// and why its comment says to measure again rather than carry the number here. Below
+// about 24px the gap over the x-height is under two device pixels and rounding decides
+// it, so this rule is for display sizes.
+const TITTLE = "bottom:.845em;width:.1525em;height:.1525em";
 
 // The mark on a ground it would otherwise vanish into. Its own tile is ink blue, so on an
 // ink-blue sheet it disappears and leaves a bare P standing next to the P the wordmark
