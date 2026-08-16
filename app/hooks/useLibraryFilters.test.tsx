@@ -4,6 +4,7 @@
 
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { MemoryRouter, useLocation } from "react-router";
 import { describe, expect, it } from "vitest";
 import type { LibraryItem } from "../../core/library";
 import { memoryStore } from "../adapters/memoryStore";
@@ -20,10 +21,13 @@ const item = (parts: Partial<LibraryItem>): LibraryItem => ({
     ...parts,
 });
 
-const world = () => {
+// The filters live in the address, so every render needs a router around them.
+const world = (start = "/library") => {
     const services = createServices({ store: memoryStore() });
     const wrapper = ({ children }: { children: ReactNode }) => (
-        <ServicesProvider services={services}>{children}</ServicesProvider>
+        <MemoryRouter initialEntries={[start]}>
+            <ServicesProvider services={services}>{children}</ServicesProvider>
+        </MemoryRouter>
     );
     return { services, wrapper };
 };
@@ -78,6 +82,34 @@ describe("useLibraryFilters", () => {
         // A new filter starts from the top of its result set.
         act(() => result.current.setQuery("piece"));
         expect(result.current.visible).toBe(60);
+    });
+
+    it("opens on the grade the address names, and writes every filter back to it", () => {
+        // What the shelf forgets, it forgets on the way to a piece and back. The address
+        // makes the trip; component state does not.
+        const items = [item({ id: "g1", grade: 1 }), item({ id: "g6", grade: 6 })];
+        const { wrapper } = world("/library?grade=6");
+        const { result } = renderHook(
+            () => ({ filters: useLibraryFilters(items, {}), location: useLocation() }),
+            { wrapper },
+        );
+        expect(result.current.filters.matches.map((entry) => entry.id)).toEqual(["g6"]);
+        act(() => result.current.filters.setQuery("piece"));
+        act(() => result.current.filters.toggleFreshOnly());
+        const params = new URLSearchParams(result.current.location.search);
+        expect(params.get("grade")).toBe("6");
+        expect(params.get("q")).toBe("piece");
+        expect(params.get("fresh")).toBe("1");
+    });
+
+    it("leaves the rest of the address alone", () => {
+        const { wrapper } = world("/library?tab=people");
+        const { result } = renderHook(
+            () => ({ filters: useLibraryFilters([], {}), location: useLocation() }),
+            { wrapper },
+        );
+        act(() => result.current.filters.setQuery("bach"));
+        expect(new URLSearchParams(result.current.location.search).get("tab")).toBe("people");
     });
 
     it("filters to due pieces from the mastery map", () => {

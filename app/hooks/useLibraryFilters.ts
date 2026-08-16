@@ -1,13 +1,16 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import {
     filterLibrary,
+    type LibraryFilter,
     type LibraryItem,
     type LibraryKind,
     toggledGrade,
 } from "../../core/library";
+import { libraryFilterParams, readLibraryFilter } from "../../core/libraryQuery";
 import type { Mastery } from "../../core/mastery";
 import { useFavorites } from "./useFavorites";
 
@@ -17,53 +20,63 @@ const PER_PAGE = 60;
 // starred/due toggles — plus paging, applied over the pure core filter. The
 // starred set is subscribed, so starring anywhere (this list, seeding) refreshes
 // the matches.
-export function useLibraryFilters(
-    items: readonly LibraryItem[],
-    mastery: Record<string, Mastery>,
-    // A grade to open on, from the link that arrived here — the roadmap sends a reader to
-    // "everything at grade 6" so that pressing a grade proves it is theirs to open. It
-    // seeds the filter and nothing more: the All chip is right there.
-    startGrade?: number,
-) {
+//
+// The filters live in the page's address rather than in this hook, so opening a piece and
+// coming back finds the shelf as it was left; `core/libraryQuery` is the whole of the
+// reading and writing. Every change replaces the current history entry instead of adding
+// one, so Back leaves the library rather than walking a search back a letter at a time.
+export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record<string, Mastery>) {
     const favorites = useFavorites();
-    const [query, setQuery] = useState("");
-    const [kind, setKind] = useState<LibraryKind | "">("");
-    const [grades, setGrades] = useState<ReadonlySet<number>>(() =>
-        startGrade === undefined ? new Set() : new Set([startGrade]),
-    );
-    const [favoritesOnly, setFavoritesOnly] = useState(false);
-    const [dueOnly, setDueOnly] = useState(false);
-    const [freshOnly, setFreshOnly] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
     const [visible, setVisible] = useState(PER_PAGE);
+
+    const filter = useMemo(
+        () => readLibraryFilter(Object.fromEntries(searchParams)),
+        [searchParams],
+    );
+
+    const update = useCallback(
+        (next: LibraryFilter) => {
+            setSearchParams(
+                (prev) => {
+                    // Everything the shelf does not own — the tab, above all — stays put.
+                    const kept = Object.fromEntries(prev);
+                    for (const key of ["q", "kind", "grade", "starred", "due", "fresh"]) {
+                        delete kept[key];
+                    }
+                    return { ...kept, ...libraryFilterParams(next) };
+                },
+                { replace: true, preventScrollReset: true },
+            );
+        },
+        [setSearchParams],
+    );
+
+    const { query, kind, grades, favoritesOnly, dueOnly, freshOnly } = filter;
 
     // A new filter starts from the top of its (possibly long) result set.
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset paging when the filter changes
     useEffect(() => setVisible(PER_PAGE), [query, kind, grades, favoritesOnly, dueOnly, freshOnly]);
 
     const matches = useMemo(
-        () =>
-            filterLibrary(
-                items,
-                { query, kind, grades, favoritesOnly, dueOnly, freshOnly },
-                { favorites, mastery, now: Date.now() },
-            ),
-        [items, query, kind, grades, favoritesOnly, dueOnly, freshOnly, favorites, mastery],
+        () => filterLibrary(items, filter, { favorites, mastery, now: Date.now() }),
+        [items, filter, favorites, mastery],
     );
 
     return {
         query,
-        setQuery,
+        setQuery: (next: string) => update({ ...filter, query: next }),
         kind,
-        setKind,
+        setKind: (next: LibraryKind | "") => update({ ...filter, kind: next }),
         grades,
-        toggleGrade: (grade: number) => setGrades((prev) => toggledGrade(prev, grade)),
-        clearGrades: () => setGrades(new Set()),
+        toggleGrade: (grade: number) => update({ ...filter, grades: toggledGrade(grades, grade) }),
+        clearGrades: () => update({ ...filter, grades: new Set() }),
         favoritesOnly,
         freshOnly,
-        toggleFreshOnly: () => setFreshOnly((on) => !on),
-        toggleFavoritesOnly: () => setFavoritesOnly((on) => !on),
+        toggleFreshOnly: () => update({ ...filter, freshOnly: !freshOnly }),
+        toggleFavoritesOnly: () => update({ ...filter, favoritesOnly: !favoritesOnly }),
         dueOnly,
-        toggleDueOnly: () => setDueOnly((on) => !on),
+        toggleDueOnly: () => update({ ...filter, dueOnly: !dueOnly }),
         favorites,
         matches,
         visible,
