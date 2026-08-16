@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useSearchParams } from "react-router";
 import { Show } from "../components/features/conditional";
 import { LibraryFilters } from "../components/features/libraryFilters";
@@ -11,7 +11,6 @@ import { ScoreImport } from "../components/features/scoreImport";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/library";
-import { MAX_GRADE } from "../../core/scoreDifficulty";
 import { isDue } from "../../core/mastery";
 import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
@@ -37,25 +36,28 @@ type LibraryTab = "search" | "people" | "manage";
 export default function LibraryRoute() {
     const favoritesStore = useFavoritesStore();
     const { items, mastery, loaded, remove, assignmentsUsing } = useLibraryItems();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     // ?grade=6 opens the shelf on that grade — the roadmap's rows link here, so pressing
     // a grade you have not reached lands on its pieces rather than on an explanation.
-    const startGrade = Number(searchParams.get("grade"));
-    const filters = useLibraryFilters(
-        items,
-        mastery,
-        Number.isInteger(startGrade) && startGrade >= 1 && startGrade <= MAX_GRADE
-            ? startGrade
-            : undefined,
-    );
+    const filters = useLibraryFilters(items, mastery);
     const searchRef = useRef<HTMLInputElement>(null);
-    const [tab, setTab] = useState<LibraryTab>(
-        searchParams.get("tab") === "manage"
-            ? "manage"
-            : searchParams.get("tab") === "people"
-              ? "people"
-              : "search",
-    );
+    // The tab rides in the address beside the filters, so a piece opened from the shelf and
+    // then left comes back to the list it was opened from.
+    const param = searchParams.get("tab");
+    const tab: LibraryTab =
+        param === "manage" ? "manage" : param === "people" ? "people" : "search";
+    const setTab = (next: LibraryTab) =>
+        setSearchParams(
+            (prev) => {
+                const kept = Object.fromEntries(prev);
+                if (next === "search") {
+                    delete kept.tab;
+                    return kept;
+                }
+                return { ...kept, tab: next };
+            },
+            { replace: true, preventScrollReset: true },
+        );
 
     // The confirm label for a removable score names how many saved assignments
     // still reference it — the delete proceeds either way, and those steps then
