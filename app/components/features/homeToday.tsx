@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { arcadeConfig, currentArcadeLevel } from "../../../core/arcade";
 import { dailyNumber, todayKey } from "../../../core/daily";
@@ -325,7 +325,6 @@ export function HomeToday() {
     const known = useKnownPieces();
     const navigate = useNavigate();
     const [session, setSession] = useState<Session | null>(null);
-    const seedRef = useRef(0);
     // The heading names the moment the reader arrived, which only their own clock
     // knows. Both the prerendered document and the first client render say "Today", so
     // hydration matches; the greeting arrives a tick later, in place, on one line.
@@ -559,11 +558,15 @@ export function HomeToday() {
                 </ul>
                 <SurpriseButton
                     onClick={() => {
+                        // A fresh seed per press. It used to be a counter starting at
+                        // zero, held for as long as the page was mounted — so it rotated
+                        // while you stayed, and every arrival began at zero again. Coming
+                        // back from a piece meant being handed the same piece.
                         const pick = surprisePick(
                             session.surprise.catalogue,
                             session.surprise.grade,
                             session.surprise.mastered,
-                            seedRef.current++,
+                            Math.floor(Math.random() * 1_000_000),
                         );
                         if (pick) {
                             navigate(localizedHref(practiceHref(pick)));
