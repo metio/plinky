@@ -49,3 +49,48 @@ export function readSfz(sfzPath) {
     }
     return regions.filter((region) => !region.release);
 }
+
+// The release group: key-off noises and the string resonance a lifted damper leaves
+// behind. They carry no velocity layers and a decay rate rather than a length, so they are
+// read apart from the notes rather than filtered out of them.
+export function readSfzExtras(sfzPath) {
+    const text = readFileSync(sfzPath, "utf8");
+    const root = dirname(sfzPath);
+    const regions = [];
+    let decay = 4;
+    let inRelease = false;
+    for (const line of text.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("<group>")) {
+            inRelease = /trigger=release/.test(trimmed);
+            const found = /\brt_decay=([\d.]+)/.exec(trimmed);
+            decay = found ? Number(found[1]) : decay;
+            continue;
+        }
+        if (!inRelease || !trimmed.startsWith("<region>")) {
+            continue;
+        }
+        const field = (name) => {
+            const found = new RegExp(`\\b${name}=([^\\s]+)`).exec(trimmed);
+            return found ? found[1] : undefined;
+        };
+        const sample = field("sample");
+        if (!sample) {
+            continue;
+        }
+        const keyCentre = Number(field("pitch_keycenter") ?? 60);
+        regions.push({
+            file: join(root, sample.replace(/\\/g, "/")),
+            keyCentre,
+            lowKey: Number(field("lokey") ?? keyCentre),
+            highKey: Number(field("hikey") ?? keyCentre),
+            lowVelocity: Number(field("lovel") ?? 1),
+            highVelocity: Number(field("hivel") ?? 127),
+            // A resonance rings; a key-off knock does not.
+            kind: /harm/.test(sample) ? "resonance" : "knock",
+            decay,
+            tailSeconds: /harm/.test(sample) ? 8 : 2,
+        });
+    }
+    return regions;
+}
