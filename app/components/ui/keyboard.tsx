@@ -443,16 +443,16 @@ export function Keyboard({
               : expected.includes(note)
                 ? "bg-accent-surface"
                 : theme.white;
+    // An expected black key is ringed, not repainted. Filling it with the next-note colour
+    // stops it being a black key — fine mid-piece, where the key is pointed at rather than
+    // named, and wrong in the first lesson of all, which says "press any black key" over a
+    // keyboard whose black keys have turned blue.
     const blackState = (note: number) =>
         flash?.note === note
             ? "bg-danger"
             : lit.has(note)
               ? "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held"
               : expected.includes(note)
-                // Ringed, not repainted. Filling a black key with the next-note colour
-                // stops it being a black key, which is fine mid-piece and wrong in the
-                // lesson that says "press a black key" — a beginner then hunts for
-                // something black and finds none.
                 ? `${theme.black} ring-2 ring-inset ring-key-next`
                 : theme.black;
     // A black key's name is pale because the key is nearly black — but every state that
