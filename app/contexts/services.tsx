@@ -3,7 +3,10 @@
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { browserStore } from "../adapters/browserStore";
-import { webAudioEngine } from "../adapters/webAudioEngine";
+import { audioContext, playFromSamples, webAudioEngine } from "../adapters/webAudioEngine";
+import { webSampleSource } from "../adapters/webSampleSource";
+import { sampleLookup } from "../lib/sampleVoices";
+import type { SampleSource } from "../ports/sampleSource";
 import { lazyVideoExporter } from "../adapters/lazyVideo";
 import { micPitch } from "../adapters/micPitch";
 import { webMidi } from "../adapters/webMidi";
@@ -82,6 +85,9 @@ export type AppServices = {
     fetcher: Fetcher;
     // Where sound comes out (see AudioEngine).
     audio: AudioEngine;
+    // Where recordings of a real piano come from (see SampleSource). Absent recordings are
+    // not an absent instrument: the engine plays its own voice for anything not yet here.
+    samples: SampleSource;
     // Where MIDI comes from (see MidiAccessPort).
     midi: MidiAccessPort;
     // Where microphone pitch detection comes from (see PitchInput), so an
@@ -102,6 +108,35 @@ export type AppServices = {
     video: VideoExporter;
     activity: ActivitySignal;
 };
+
+// Where the recordings are published. A version sits in the path because a pack is
+// immutable once uploaded: the app caches every recording by URL, and a changed encoding
+// under an unchanged name is the one thing a cache cannot notice.
+const SAMPLES_BASE = "https://samples.plinky.fun/v1";
+
+// The key that remembers whether the player asked for the real piano. The recordings
+// themselves live in the browser's cache, which the player never has to think about; this
+// is the choice.
+const SAMPLES_ENABLED = "plinky:samples";
+
+function defaultSamples(overrides: Partial<AppServices>): SampleSource {
+    const store = overrides.store ?? browserStore;
+    const source = webSampleSource({
+        baseUrl: SAMPLES_BASE,
+        enabled: store.get(SAMPLES_ENABLED) === "1",
+        remember: (enabled) => {
+            store.set(SAMPLES_ENABLED, enabled ? "1" : "0");
+        },
+        // The engine's own context, so a decoded recording belongs to the context that
+        // will play it. Null before the first gesture unlocks audio, which is exactly when
+        // nothing is being played anyway.
+        context: async () => audioContext(),
+    });
+    // The engine asks this at every note-on. Handing it over here rather than importing it
+    // there keeps the engine's one job — making a sound — free of where recordings live.
+    playFromSamples(() => ({ source: sampleLookup(source) }));
+    return source;
+}
 
 // Assembles a full service set from a partial override. Derived services follow the
 // pieces they are built on: overriding just `store` gives every state store over
@@ -140,6 +175,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
         assignments: overrides.assignments ?? createAssignmentsStore(store),
         fetcher,
         audio: overrides.audio ?? webAudioEngine,
+        samples: overrides.samples ?? defaultSamples(overrides),
         midi: overrides.midi ?? webMidi,
         pitch: overrides.pitch ?? micPitch(scheduler),
         scheduler,
@@ -181,6 +217,7 @@ const SERVICE_KEY_SET: Record<keyof AppServices, true> = {
     assignments: true,
     fetcher: true,
     audio: true,
+    samples: true,
     midi: true,
     pitch: true,
     scheduler: true,
