@@ -4,6 +4,7 @@
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { memoryStore } from "../adapters/memoryStore";
+import { fakeSampleSource } from "../adapters/fakeSampleSource";
 import { type AppServices, createServices, ServicesProvider } from "../contexts/services";
 import { createActivitySignal } from "../lib/activity";
 
@@ -22,6 +23,10 @@ export function renderWithServices(ui: ReactElement, overrides: Partial<AppServi
         // shared singleton, and a leaked begin() from one test must not read as
         // "active" in the next.
         activity: overrides.activity ?? createActivitySignal(),
+        // Recordings a test hands over itself, never a cache and never a fetch: the real
+        // source would reach for an origin that does not exist here, and a test that
+        // wants the recorded piano says which recordings it has.
+        samples: overrides.samples ?? fakeSampleSource(),
     });
     const view = render(<ServicesProvider services={services}>{ui}</ServicesProvider>);
     return {

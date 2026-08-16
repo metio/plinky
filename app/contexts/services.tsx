@@ -341,6 +341,10 @@ export function useAudioEngine(): AudioEngine {
     return useServices().audio;
 }
 
+export function useSampleSource(): SampleSource {
+    return useServices().samples;
+}
+
 export function useXmlCodec(): XmlCodec {
     return useServices().xml;
 }

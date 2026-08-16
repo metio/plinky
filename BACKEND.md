@@ -43,6 +43,7 @@ not return without meeting the argument.
 - [Capability: artist pages](#capability-artist-pages)
 - [Capability: daily comparison](#capability-daily-comparison)
 - [Capability: progress vault](#capability-progress-vault)
+- [Capability: the recorded piano](#capability-the-recorded-piano)
 - [Declined: ranked competition](#declined-ranked-competition)
 - [Deferred: the artist marketplace](#deferred-the-artist-marketplace)
 - [Data model](#data-model)
@@ -972,6 +973,76 @@ language, what leaves the device.
 supported way to move a device and the supported way to recover. The vault is a
 convenience layered on top of it, and it is designed so that its worst failure
 costs a player nothing they still hold locally.
+
+## Capability: the recorded piano
+
+**Live as of 2026-08-16, and not a backend.** The recorded grand piano is static bytes on
+object storage, no Worker, no state, no identity — the first thing Plinky serves from
+anywhere but its own origin. It is recorded here because it is the first non-Pages origin
+and because the next person to add one should find the reasoning.
+
+The instrument is the Salamander Grand Piano V3 by Alexander Holm, CC-BY-3.0: 29 sampled
+keys on a minor-third grid, sixteen velocity layers each, plus key-off noises and string
+resonances. Encoded to Opus at 96 kb/s it is 621 files and about 82 MB — and **nobody
+downloads that.** Each recording is its own URL, a piece asks for a couple of dozen of
+them, and the app knows which before it plays a note, so the cost that matters is a
+session. Measured across the catalogue, grade 1 to grade 8:
+
+| what | files | fetched |
+| --- | --- | --- |
+| a first study | 3 | 0.4 MB |
+| a grade 4 piece | 15 | 2.9 MB |
+| a grade 8 piece | 24 | 4.2 MB |
+| sixteen pieces, every grade | — | **4.8 MB in total** |
+
+The curve flattens almost at once, because pieces reuse the same recordings. That is why
+there is no download button, no progress bar and no quality tier: the instrument arrives
+while somebody plays, and a recording that has not arrived is a note the synthesised voice
+plays. **A note-on never waits** — the port's `bufferFor` is synchronous and answers null,
+which is what makes all of the above safe.
+
+### The bucket
+
+An R2 bucket, `plinky-samples`, published read-only at `samples.plinky.fun`. R2 has no
+egress charge, which is the whole reason it is R2 rather than anything else: this is a
+read-mostly pile of immutable audio served to browsers.
+
+The path carries a version — `/v1/…` — and **a published version is immutable**. Every
+recording is cached by URL on the player's device; a re-encode under an unchanged name is
+the one change a cache cannot notice. A new encoding is `/v2/`, and the client's base URL
+moves with it.
+
+Setting it up, once:
+
+1. **Create the bucket.** Cloudflare dashboard → R2 → *Create bucket*, named
+   `plinky-samples`, in the automatic location. Leave it private for now.
+2. **Build the pack**, with the library unpacked somewhere outside the repository:
+   `npm run piano:build -- --library <dir> --out piano-pack`. It writes
+   `piano-pack/v1/` — 621 `.opus` files, a `manifest.json` carrying the licence, and a
+   `README.txt` beside it with the credit and the byte count.
+3. **Upload it** under the same `v1/` prefix, either by dragging the folder into the
+   dashboard or with `npx wrangler r2 object put plinky-samples/v1/<name> --file <path>`
+   per file. The manifest must land at `v1/manifest.json`.
+4. **Give it a domain.** Bucket → *Settings* → *Public access* → *Custom domain* →
+   `samples.plinky.fun`. Cloudflare adds the DNS record itself when the zone is on the
+   same account. Do **not** enable the `r2.dev` public URL: it is rate-limited and its
+   hostname would end up in a cache somewhere.
+5. **Allow the app to read it.** Bucket → *Settings* → *CORS policy*: `GET` and `HEAD`
+   from `https://plinky.fun` and the preview origin, no credentials. Without this the
+   fetches fail as CORS errors even though the objects are public.
+6. **Cache it hard.** A Cache Rule on `samples.plinky.fun/*` with an edge TTL of a year
+   and *Respect origin* off. The bytes are immutable by construction, so nothing here can
+   go stale.
+
+Nothing in CI touches the bucket. The pack is built and uploaded by hand when the
+instrument changes, which — for a library published in 2016 — is close to never.
+
+### What is owed
+
+CC-BY means the credit is a condition, not a courtesy. `manifest.json` carries the
+instrument, the author, the licence and the source; `core/sampledPiano.ts` renders it, and
+Settings shows it under the switch whenever the recorded piano is on. A pack that travels
+without its licence is a pack that cannot ship.
 
 ## Declined: ranked competition
 

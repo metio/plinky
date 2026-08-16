@@ -30,6 +30,15 @@ it lands, hear it both struck together and one after the other. And a **metronom
 which takes its tempo from the tap tool right above it — tapping along to something and
 then playing at that speed was always one job.
 
+**A recorded grand piano, if you want one.** Settings → Sound has a switch for it: real
+recordings of a concert grand instead of the sound Plinky makes itself, sixteen different
+recordings of every key depending on how hard you hit it. There is no download to sit
+through — the recordings arrive while you play, a few hundred kilobytes a piece, and stay
+on your device — and nothing ever waits for them: a note whose recording has not landed
+yet is played the way it always was. Your videos are exported with whichever piano you
+heard. The instrument is the Salamander Grand Piano by Alexander Holm, and Plinky credits
+it under the switch.
+
 **A piece that opens on a vamp shows its tune.** The little staff under a title draws the
 first few notes, and it used to spend all of them on whatever the opening bars held —
 which for *Gymnopédie No. 1* is the same chord, four times, and names no piece at all. A

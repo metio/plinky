@@ -338,7 +338,11 @@ const BUDGET_VENDOR_KB = 324;
 // 348. Six more marks in the glossary, and the rule that finds each of them in a piece —
 // including ledger lines, which nothing in a file marks, so they are worked out from the
 // pitch and the clef.
-const BUDGET_APP_KB = 348;
+// 350. The recorded grand piano: the mapping from a key and a force to a recording, the
+// cache that holds them, the sampled voice, and the switch that asks for it. The
+// recordings themselves are not here and never will be — they are fetched from their own
+// origin, a piece's worth at a time.
+const BUDGET_APP_KB = 350;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
