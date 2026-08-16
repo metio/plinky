@@ -69,6 +69,13 @@ export type SnippetNote = {
     // Force the accidental to be drawn. A pitch already carried by the key signature
     // is not normally re-marked, so an example about accidentals has to ask.
     accidental?: "sharp" | "flat" | "natural";
+    // Hold it past its written length.
+    fermata?: boolean;
+    // The beam joining fast notes into a beat group. Written out rather than left to the
+    // engraver, so the example about beams draws the beam it is about.
+    beam?: "begin" | "continue" | "end";
+    // A hairpin opening at this note and closing at the one carrying "stop".
+    wedge?: "crescendo" | "diminuendo" | "stop";
 };
 
 export type Snippet = {
@@ -77,6 +84,9 @@ export type Snippet = {
     fifths: number;
     beatsPerBar: number;
     notes: SnippetNote[];
+    // Wrap the whole example in repeat barlines, and play it twice — the mark means "go
+    // back and do that again", so an example that sounded once would contradict itself.
+    repeat?: boolean;
 };
 
 // How many divisions a note occupies, dot included.
@@ -118,6 +128,9 @@ function notationsXml(note: SnippetNote): string {
     if (articulations.length > 0) {
         parts.push(`<articulations>${articulations.join("")}</articulations>`);
     }
+    if (note.fermata) {
+        parts.push("<fermata/>");
+    }
     return parts.length > 0 ? `<notations>${parts.join("")}</notations>` : "";
 }
 
@@ -127,18 +140,28 @@ function noteXml(note: SnippetNote): string {
     const tie = note.tie ? `<tie type="${note.tie}"/>` : "";
     const dot = note.dotted ? "<dot/>" : "";
     const accidental = note.accidental ? `<accidental>${note.accidental}</accidental>` : "";
+    const beam = note.beam ? `<beam number="1">${note.beam}</beam>` : "";
     // Child order is fixed by the MusicXML schema: pitch, duration, tie, type, dot,
-    // accidental, then notations.
-    return `      <note>${pitchXml(note)}<duration>${noteDivisions(note)}</duration>${tie}<type>${note.value}</type>${dot}${accidental}${notationsXml(note)}</note>`;
+    // accidental, beam, then notations.
+    return `      <note>${pitchXml(note)}<duration>${noteDivisions(note)}</duration>${tie}<type>${note.value}</type>${dot}${accidental}${beam}${notationsXml(note)}</note>`;
 }
 
-// A dynamic is a direction placed under the staff, written just before the note it
-// takes effect at.
+// A dynamic or a hairpin is a direction placed under the staff, written just before the
+// note it takes effect at.
 function directionXml(note: SnippetNote): string {
-    if (!note.dynamic) {
-        return "";
+    const parts: string[] = [];
+    if (note.dynamic) {
+        parts.push(`<dynamics><${note.dynamic}/></dynamics>`);
     }
-    return `      <direction placement="below"><direction-type><dynamics><${note.dynamic}/></dynamics></direction-type></direction>\n`;
+    if (note.wedge) {
+        parts.push(`<wedge type="${note.wedge}"/>`);
+    }
+    return parts
+        .map(
+            (type) =>
+                `      <direction placement="below"><direction-type>${type}</direction-type></direction>\n`,
+        )
+        .join("");
 }
 
 function clefXml(clef: Snippet["clef"]): string {
@@ -170,12 +193,21 @@ function intoMeasures(notes: SnippetNote[], beatsPerBar: number): SnippetNote[][
 export function buildSnippet(snippet: Snippet): string {
     const measures = intoMeasures(snippet.notes, snippet.beatsPerBar);
     const body = measures.map((notes, index) => {
+        // The repeat's two barlines belong to the first and last bars of the example.
+        const open =
+            snippet.repeat && index === 0
+                ? `      <barline location="left"><bar-style>heavy-light</bar-style><repeat direction="forward"/></barline>\n`
+                : "";
+        const close =
+            snippet.repeat && index === measures.length - 1
+                ? `\n      <barline location="right"><bar-style>light-heavy</bar-style><repeat direction="backward"/></barline>`
+                : "";
         const attributes =
             index === 0
                 ? `      <attributes><divisions>${DIVISIONS}</divisions><key><fifths>${snippet.fifths}</fifths></key><time><beats>${snippet.beatsPerBar}</beats><beat-type>4</beat-type></time>${clefXml(snippet.clef)}</attributes>\n`
                 : "";
         const written = notes.map((note) => `${directionXml(note)}${noteXml(note)}`).join("\n");
-        return `    <measure number="${index + 1}">\n${attributes}${written}\n    </measure>`;
+        return `    <measure number="${index + 1}">\n${attributes}${open}${written}${close}\n    </measure>`;
     });
     return `<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">

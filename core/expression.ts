@@ -48,6 +48,10 @@ const LENGTH_SCALE: Record<Articulation, number> = {
 
 const ACCENT_BOOST = 1.3;
 const MARCATO_BOOST = 1.5;
+// A tenuto asks for the note's full length AND a little weight behind it. The length half
+// is already what an unmarked note gets, so without the weight the mark would ask for
+// nothing at all — a score could carry it on every note and sound identical.
+const TENUTO_BOOST = 1.12;
 
 // The fraction of its written length a note is meant to sound. Split out of
 // performNote because grading needs the shape of the intention without the tempo
@@ -62,10 +66,17 @@ export function lengthScaleOf(marks: Pick<NoteMarks, "articulation" | "slurred">
 // The loudness a note is meant to be struck at, 0..127 — the standing dynamic with
 // any accent applied. Split out for the same reason as lengthScaleOf.
 export function velocityOf(
-    marks: Pick<NoteMarks, "accent" | "marcato" | "dynamicVolume">,
+    marks: Pick<NoteMarks, "accent" | "marcato" | "dynamicVolume" | "articulation">,
 ): number {
     const base = marks.dynamicVolume ?? DEFAULT_VELOCITY;
-    const boosted = marks.marcato ? base * MARCATO_BOOST : marks.accent ? base * ACCENT_BOOST : base;
+    // One weight applies: the loudest instruction present wins rather than compounding.
+    const boosted = marks.marcato
+        ? base * MARCATO_BOOST
+        : marks.accent
+          ? base * ACCENT_BOOST
+          : marks.articulation === "tenuto"
+            ? base * TENUTO_BOOST
+            : base;
     return Math.max(1, Math.min(127, Math.round(boosted)));
 }
 

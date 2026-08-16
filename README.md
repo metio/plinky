@@ -365,7 +365,7 @@ daily challenge and Compose keep their own web addresses, so existing links stil
 The first time you open a score a one-time tip explains the three modes and the
 listen-then-play-slowly loop — a guided tour where you land, never a gate on progress.
 
-**What the marks mean** — a glossary of notation, linked from Help. Every symbol you
+**What the marks mean** — a glossary of notation, linked from Help. Eighteen symbols you
 meet in a score, grouped by what it controls: how long a note lasts, how you touch it,
 how loud it is, and where on the page you are. Each one gets a bar of real notation,
 drawn by the same engine that draws your pieces, and a **Hear it** button. Where the

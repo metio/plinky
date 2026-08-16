@@ -27,21 +27,50 @@ import { GLOSSARY } from "./glossary";
 // a <dynamics>, not the p of a <mp/> — so the element is matched whole.
 const DYNAMIC = (mark: string) => new RegExp(`<dynamics[^>]*>\\s*<${mark}/>`);
 
+// Where the five lines sit, as a diatonic index (octave × 7 + the letter's place from C).
+// A note two steps past a line needs a line of its own to sit on, which is the only way
+// to know a ledger line is there: nothing in the file says so, the engraver works it out
+// from the pitch and the clef, and so does this.
+const STEPS = "CDEFGAB";
+const STAVE = {
+    // Treble runs E4 to F5, bass G2 to A3 — bottom line to top line.
+    treble: { low: 30, high: 38 },
+    bass: { low: 18, high: 26 },
+};
+
+function needsLedger(xml: string): boolean {
+    const lines = /<sign>F<\/sign>/.test(xml) ? STAVE.bass : STAVE.treble;
+    const pitches = xml.matchAll(/<step>\s*([A-G])\s*<\/step>[\s\S]*?<octave>\s*(-?\d+)\s*<\/octave>/g);
+    for (const [, step, octave] of pitches) {
+        const index = Number(octave) * 7 + STEPS.indexOf(step ?? "C");
+        if (index <= lines.low - 2 || index >= lines.high + 2) {
+            return true;
+        }
+    }
+    return false;
+}
+
 const PRESENT: Record<string, (xml: string) => boolean> = {
     dotted: (xml) => /<dot\s*\/?>/.test(xml),
     // <tied> is the drawn curve; <tie> alone is the sounding instruction and can appear
     // without anything visible to ask about.
     tie: (xml) => /<tied[\s/>]/.test(xml),
     rest: (xml) => /<rest[\s/>]/.test(xml),
+    fermata: (xml) => /<fermata[\s/>]/.test(xml),
+    beam: (xml) => /<beam[\s>]/.test(xml),
     staccato: (xml) => /<staccato\s*\/?>/.test(xml),
+    tenuto: (xml) => /<tenuto\s*\/?>/.test(xml),
     accent: (xml) => /<accent\s*\/?>/.test(xml),
     slur: (xml) => /<slur[\s/>]/.test(xml),
     piano: (xml) => DYNAMIC("p").test(xml),
     forte: (xml) => DYNAMIC("f").test(xml),
+    hairpin: (xml) => /<wedge[\s/>]/.test(xml),
     // A signature of no sharps or flats is C major: nothing on the staff to explain.
     keySignature: (xml) => /<fifths>\s*-?[1-9]\d*\s*<\/fifths>/.test(xml),
     accidental: (xml) => /<accidental[\s>]/.test(xml),
     bassClef: (xml) => /<sign>F<\/sign>/.test(xml),
+    ledger: needsLedger,
+    repeat: (xml) => /<repeat[\s/>]/.test(xml),
     // Every piece has a time signature, so its presence says nothing. Four beats to the
     // bar is what a reader assumes without being told; anything else is the thing worth
     // pointing at.

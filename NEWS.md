@@ -30,6 +30,19 @@ it lands, hear it both struck together and one after the other. And a **metronom
 which takes its tempo from the tap tool right above it — tapping along to something and
 then playing at that speed was always one job.
 
+**Six more marks in the glossary.** The fermata that lets you hold a note as long as it
+feels right, the beam that groups quick notes by beat, the tenuto, the hairpin that gets
+louder or softer across the notes it covers, the ledger lines that carry music past the
+five, and the repeat marks — which, being repeat marks, play their bar twice. Each one is
+drawn as real notation and most can be heard both ways. Any piece carrying one of them
+now lists it in the set-up panel before a run, ledger lines included: nothing in a score
+marks those, so Plinky works them out from the pitch and the clef.
+
+**Tenuto now sounds like something.** The mark asks for a note's full length and a little
+weight behind it. Plinky was giving it the length — which is what an unmarked note gets
+anyway — and none of the weight, so a piece could carry the mark on every note and sound
+identical. It plays with that weight now, and is graded for it.
+
 **Plinky has a subreddit.** [r/plinky_piano](https://www.reddit.com/r/plinky_piano/),
 linked at the foot of every page beside the others.
 

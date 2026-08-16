@@ -56,6 +56,17 @@ describe("performNote velocity", () => {
         expect(performNote({ ...plain, dynamicVolume: 112 }, 120).velocity).toBe(112);
     });
 
+    it("gives a tenuto a little weight, since its length is already full", () => {
+        // Without this the mark asks for nothing: a tenuto note lasts exactly as long as
+        // an unmarked one, so a score could carry it on every note and sound identical.
+        const held = performNote({ ...plain, articulation: "tenuto" }, 120).velocity;
+        expect(held).toBeGreaterThan(DEFAULT_VELOCITY);
+        // An accent is the louder instruction of the two, and they never compound.
+        const both = performNote({ ...plain, articulation: "tenuto", accent: true }, 120).velocity;
+        expect(both).toBeGreaterThan(held);
+        expect(both).toBe(performNote({ ...plain, accent: true }, 120).velocity);
+    });
+
     it("strikes harder for an accent, harder still for a marcato", () => {
         const accent = performNote({ ...plain, accent: true }, 120).velocity;
         const marcato = performNote({ ...plain, marcato: true }, 120).velocity;

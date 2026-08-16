@@ -335,7 +335,10 @@ const BUDGET_VENDOR_KB = 324;
 // minor and the two chord lessons — and two more little tools, an interval finder and the
 // metronome the tap tool now hands its number to. The lessons are copy and a table; the
 // tools are two panels over engines that were already running.
-const BUDGET_APP_KB = 346;
+// 348. Six more marks in the glossary, and the rule that finds each of them in a piece —
+// including ledger lines, which nothing in a file marks, so they are worked out from the
+// pitch and the clef.
+const BUDGET_APP_KB = 348;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
