@@ -33,6 +33,34 @@ describe("symbolsInScore", () => {
         }
     });
 
+    it("finds ledger lines from the pitch and the clef, since nothing marks them", () => {
+        const treble = (step: string, octave: number) =>
+            ids(
+                buildSnippet({
+                    clef: "treble",
+                    fifths: 0,
+                    beatsPerBar: 4,
+                    notes: [{ step, octave, value: "whole" }],
+                }),
+            );
+        // Middle C hangs a line below the treble stave; the D above it sits in the space
+        // under the bottom line and needs nothing.
+        expect(treble("C", 4)).toContain("ledger");
+        expect(treble("D", 4)).not.toContain("ledger");
+        expect(treble("A", 5)).toContain("ledger");
+        expect(treble("G", 5)).not.toContain("ledger");
+        // The same pitch, read in the other clef, is nowhere near the edge.
+        const bass = ids(
+            buildSnippet({
+                clef: "bass",
+                fifths: 0,
+                beatsPerBar: 4,
+                notes: [{ step: "C", octave: 3, value: "whole" }],
+            }),
+        );
+        expect(bass).not.toContain("ledger");
+    });
+
     it("reports a piece's marks in the glossary's order", () => {
         const xml = buildSnippet({
             clef: "treble",

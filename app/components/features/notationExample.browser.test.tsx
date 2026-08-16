@@ -105,4 +105,36 @@ describe("the glossary's examples", () => {
 
         expect(marked).toBeGreaterThan(paths());
     });
+
+    // The same question for every other mark that adds something to the page, on the one
+    // browser the sweep runs on: each render is an OSMD layout, and Gecko's OSMD tests
+    // already sit close to the timeout.
+    it.skipIf(navigator.userAgent.includes("Firefox"))(
+        "draw every mark that adds ink over its plain reading",
+        async () => {
+            const display = open();
+            for (const id of ["tenuto", "fermata", "hairpin", "dotted", "tie"]) {
+                const entry = must(id);
+                await display.load(buildSnippet(entry.shown));
+                display.render();
+                const marked = paths();
+                await display.load(buildSnippet(entry.plain ?? entry.shown));
+                display.render();
+                expect(marked, id).toBeGreaterThan(paths());
+            }
+        },
+    );
+
+    it.skipIf(navigator.userAgent.includes("Firefox"))("draw the repeat's barlines", async () => {
+        // The repeat is the one mark that is not on a note, so the comparison is the
+        // same bar without the flag rather than a plain reading.
+        const entry = must("repeat");
+        const display = open();
+        await display.load(buildSnippet(entry.shown));
+        display.render();
+        const marked = paths();
+        await display.load(buildSnippet({ ...entry.shown, repeat: false }));
+        display.render();
+        expect(marked).toBeGreaterThan(paths());
+    });
 });

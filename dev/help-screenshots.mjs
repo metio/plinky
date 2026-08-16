@@ -44,7 +44,7 @@ const SHOTS = [
     ["ear", "/en/ear/"],
     ["compose", "/en/compose/"],
     ["assignments", "/en/assignments/"],
-    ["you", "/en/you/"],
+    ["stats", "/en/stats/"],
     ["review", "/en/review/"],
     ["settings", "/en/settings/"],
 ];
