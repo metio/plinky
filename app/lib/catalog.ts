@@ -56,6 +56,10 @@ export function loadBundledScores(): Score[] {
             description: "",
             xml,
             bundled: true,
+            // Recorded here rather than in each file: these are our own transcriptions,
+            // under the terms REUSE.toml already declares for scores/*.musicxml.
+            license: "CC0-1.0",
+            source: "plinky",
         };
     });
 }

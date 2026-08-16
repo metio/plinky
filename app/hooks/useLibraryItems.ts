@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { assignmentsReferencing } from "../../core/assignment";
 import { type LibraryItem, libraryOrder } from "../../core/library";
 import type { Mastery } from "../../core/mastery";
+import { encodeIncipit, readIncipit } from "../../core/incipit";
+import type { XmlCodec } from "../../core/xml";
 import { gradeOf, rawDifficulty } from "../../core/scoreDifficulty";
 import { useServices } from "../contexts/services";
 import { loadCatalog, removeUserScore } from "../lib/catalog";
@@ -14,6 +16,13 @@ import { loadCatalog, removeUserScore } from "../lib/catalog";
 // map the due-filtering reads. Local scores render first; the exercise and song
 // manifests load over the network. A failed manifest (null) lists nothing for
 // now — the library is display only, so the gap heals on the next visit.
+// The opening bars, encoded the way the manifest stores them, or nothing when the score
+// has no readable notes.
+function incipitOf(codec: XmlCodec, xml: string): { incipit?: string } {
+    const read = readIncipit(codec, xml);
+    return read ? { incipit: encodeIncipit(read) } : {};
+}
+
 export function useLibraryItems() {
     const services = useServices();
     const [local, setLocal] = useState<LibraryItem[]>([]);
@@ -33,6 +42,12 @@ export function useLibraryItems() {
                 // place among the gentlest of grade 1 rather than falling to the end of
                 // it for want of a number.
                 cost: rawDifficulty(services.xml, score.xml),
+                // Read from the score itself. Catalogue songs carry a baked incipit from
+                // the import manifest, and everything held on the device — the two bundled
+                // demos and anything you brought yourself — had none, so the pieces a
+                // player meets first were the only rows in the library with no opening
+                // bars beside them. The score is already parsed here for grade and cost.
+                ...incipitOf(services.xml, score.xml),
                 removable: !score.bundled,
                 kind: "song" as const,
             })),
