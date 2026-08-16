@@ -1134,7 +1134,6 @@
     "lights_test": "Kokeile valoja",
     "lights_test_off": "Sammuta valot",
     "lights_test_help": "Sytyttää C-duurisoinnun molemmissa käsissä. Eikö mitään tapahdu? Tarkista, että koskettimien valaistus on kytketty päälle itse soittimesta — Casiolla se on MIDI In Navigate, Yamahalla Light Guide.",
-    "nav_music": "Musiikki",
     "nav_today": "Tänään",
     "nav_learn": "Opi",
     "nav_teach": "Opeta",

@@ -70,7 +70,7 @@ const SECTIONS: {
     { key: "playGrading", title: m.help_section_play_grading, text: m.help_text_play_grading },
     {
         key: "library",
-        title: m.nav_music,
+        title: m.library_title,
         text: m.help_text_library,
         image: "library",
         imageAlt: m.help_shot_library,

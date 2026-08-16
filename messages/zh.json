@@ -1134,7 +1134,6 @@
     "lights_test": "测试灯光",
     "lights_test_off": "关掉灯光",
     "lights_test_help": "在双手各点亮一个 C 大调和弦。没有反应？看看键盘本身的按键提示灯有没有打开——Casio 叫它 MIDI In Navigate，Yamaha 叫它 Light Guide。",
-    "nav_music": "音乐",
     "nav_today": "今天",
     "nav_learn": "学习",
     "nav_teach": "教学",

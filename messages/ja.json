@@ -1132,7 +1132,6 @@
     "lights_test": "ライトを試す",
     "lights_test_off": "ライトを消す",
     "lights_test_help": "両手でハ長調の和音を光らせます。何も光りませんか？ 鍵盤側で鍵盤ライトがオンになっているか確かめてください。Casio では MIDI In Navigate、Yamaha では Light Guide という名前です。",
-    "nav_music": "音楽",
     "nav_today": "今日",
     "nav_learn": "学ぶ",
     "nav_teach": "指導",
