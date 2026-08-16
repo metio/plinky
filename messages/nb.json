@@ -1134,7 +1134,6 @@
     "lights_test": "Test lysene",
     "lights_test_off": "Lys av",
     "lights_test_help": "Lyser opp en C-durakkord i begge hender. Skjer det ingenting? Sjekk at tangentlyset er slått på i selve keyboardet — Casio kaller det MIDI In Navigate, Yamaha kaller det Light Guide.",
-    "nav_music": "Musikk",
     "nav_today": "I dag",
     "nav_learn": "Lær",
     "nav_teach": "Undervis",

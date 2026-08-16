@@ -1134,7 +1134,6 @@
     "lights_test": "Tester les lumières",
     "lights_test_off": "Éteindre les lumières",
     "lights_test_help": "Allume un accord de do majeur aux deux mains. Rien ne se passe ? Vérifie que l'éclairage des touches est activé sur le clavier lui-même — Casio l'appelle MIDI In Navigate, Yamaha Light Guide.",
-    "nav_music": "Musique",
     "nav_today": "Aujourd'hui",
     "nav_learn": "Apprendre",
     "nav_teach": "Enseigner",

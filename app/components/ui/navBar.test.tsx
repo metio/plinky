@@ -35,12 +35,12 @@ describe("BottomNav active section", () => {
 
     it("lights the section that owns the current path", () => {
         at("/library");
-        expect(current()).toBe(m.nav_music());
+        expect(current()).toBe(m.library_title());
     });
 
     it("keeps a section lit while on one of its sub-pages", () => {
         at("/library/some-piece");
-        expect(current()).toBe(m.nav_music());
+        expect(current()).toBe(m.library_title());
     });
 
     it("lights nothing on a page no section owns", () => {
@@ -50,7 +50,7 @@ describe("BottomNav active section", () => {
 
     it("lights the section on the trailing-slash path the links carry", () => {
         at("/library/");
-        expect(current()).toBe(m.nav_music());
+        expect(current()).toBe(m.library_title());
     });
 
     it("does not light a section whose name only prefixes the current path", () => {
