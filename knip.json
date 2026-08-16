@@ -17,6 +17,7 @@
         "ffmpeg"
     ],
     "ignoreUnresolved": [
-        "/dev/promo/renderPromo.ts"
+        "/dev/promo/renderPromo.ts",
+        "/dev/piano/renderSampled.ts"
     ]
 }

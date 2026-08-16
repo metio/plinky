@@ -127,9 +127,11 @@ module.exports = {
                     // meta() runs outside the React tree, so the play route wires
                     // the real adapter for its prerender/title resolution directly.
                     "^app/routes/play\\.tsx$",
-                    // The promo renderer is a composition root of its own: a dev entry
-                    // point that wires the real exporter to the real painter in a browser.
+                    // The promo renderer and the piano demo are composition roots of their
+                    // own: dev entry points that wire the real exporter and the real
+                    // offline audio render in a browser.
                     "^dev/promo/",
+                    "^dev/piano/",
                 ],
             },
             to: { path: "^app/adapters/" },
@@ -139,13 +141,14 @@ module.exports = {
             comment:
                 "Build/import scripts under dev/ may only reach down into core/ (pure, shared music " +
                 "tooling), never sideways into the app UI layers — the app is the consumer of the " +
-                "catalogue dev builds, not a dependency of it. dev/promo/ is the one exception: it " +
-                "runs IN a browser (the video export needs WebCodecs and an audio context), and its " +
-                "whole purpose is to drive the app's own painter and exporter, so that a promo clip " +
-                "is a take export with its options set rather than a second renderer free to drift " +
-                "from what a player sees. It is a composition root, not app code.",
+                "catalogue dev builds, not a dependency of it. dev/promo/ and dev/piano/ are the " +
+                "exceptions: both run IN a browser (the video export needs WebCodecs and an audio " +
+                "context), and the whole purpose of each is to drive the app's own machinery — the " +
+                "painter and exporter for a promo clip, the offline audio render for the sampled " +
+                "piano — so that what they produce is what the app produces rather than a second " +
+                "renderer free to drift from it. They are composition roots, not app code.",
             severity: "error",
-            from: { path: "^dev/", pathNot: "^dev/promo/" },
+            from: { path: "^dev/", pathNot: "^dev/(promo|piano)/" },
             to: { path: ["^app/"] },
         },
         {
