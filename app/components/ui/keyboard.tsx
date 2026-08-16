@@ -449,15 +449,19 @@ export function Keyboard({
             : lit.has(note)
               ? "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held"
               : expected.includes(note)
-                ? "bg-key-next"
+                // Ringed, not repainted. Filling a black key with the next-note colour
+                // stops it being a black key, which is fine mid-piece and wrong in the
+                // lesson that says "press a black key" — a beginner then hunts for
+                // something black and finds none.
+                ? `${theme.black} ring-2 ring-inset ring-key-next`
                 : theme.black;
     // A black key's name is pale because the key is nearly black — but every state that
     // means something (wrong, held, play this) fills it with a bright colour, and pale
     // grey on those is well under the contrast floor. The name follows the fill.
     const blackLabel = (note: number) =>
-        flash?.note === note || lit.has(note) || expected.includes(note)
-            ? "text-key-ink"
-            : "text-key-black-ink";
+        // The expected key keeps its black fill now, so its name keeps the pale ink that
+        // reads on black; only the states that flood the key with colour change it.
+        flash?.note === note || lit.has(note) ? "text-key-ink" : "text-key-black-ink";
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.

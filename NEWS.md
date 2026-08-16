@@ -341,6 +341,15 @@ the hand as well as the notes. The mapping is the same in every video you make.
 
 ## 15 August 2026
 
+**Surprise me is a surprise again.** It rotated through pieces while you stayed on the
+page, and started from the same place every time you arrived — so coming back from a piece
+handed you that same piece again. Each press now picks afresh.
+
+**The key you are asked for keeps its colour.** A black key you were meant to press was
+filled with the next-note blue, which stops it being a black key — awkward mid-piece and
+plainly wrong in the lesson that says "press any black key", where a beginner then looks
+for something black and finds none. Those keys are ringed now instead of repainted.
+
 **Stats says what a grade and a skill are.** Both numbers were explained in a tooltip —
 which a touch screen cannot open and most people never hover — so the one page whose whole
 subject is those two figures never told you what either meant. They are spelled out under
