@@ -15,6 +15,8 @@ const ICON = "public/icon.svg";
 const TAB = "public/favicon.svg";
 const PAPER = "#fcf7ea";
 const INK = "#241c14";
+const INK_BLUE = "#2b4374";
+const PLINK = "#d81b7a";
 
 const icon = await readFile(ICON, "utf8");
 const tab = await readFile(TAB, "utf8");
@@ -79,16 +81,41 @@ ico.writeUInt32LE(22, 18); // offset of the image data
 png32.copy(ico, 22);
 await writeFile("public/favicon.ico", ico);
 
+// Where Literata puts its own tittle at this size, measured by rasterising a real i and
+// matching the gap it leaves over the x-height. The app header carries a different number
+// for its own size: an offset like this is measured where it is used, never copied.
+const TITTLE = "top:.5em;width:.1525em;height:.1525em";
+
 // The README banner: the mark beside the wordmark, with the pink dot the wordmark always
 // carries on its i.
 await shoot(
     `<div style="width:512px;height:160px;background:${PAPER};display:flex;align-items:center;justify-content:center;gap:20px">
        <div style="width:96px;height:96px;border-radius:22%;overflow:hidden">${icon}</div>
        <div style="font-family:'Literata Variable',Literata,Georgia,serif;font-variation-settings:'wght' 600;font-size:76px;font-weight:600;letter-spacing:-0.01em;color:${INK};line-height:1">
-         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.17em;width:.15em;height:.15em;transform:translateX(-50%);border-radius:999px;background:#d81b7a"></span></span>nky
+         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>nky
        </div>
      </div>`,
     { width: 512, height: 160, path: "public/icon-banner-512.png" },
+);
+
+// The social card every link to Plinky unfurls as. It is made here, from the same mark
+// as the launcher icons, because it was made by hand once and then sat two identities
+// out of date while every gate stayed green.
+const siteUrl = (await readFile("core/site.ts", "utf8")).match(/SITE_URL\s*=\s*"([^"]+)"/)?.[1];
+if (!siteUrl) {
+    throw new Error("could not find SITE_URL in core/site.ts");
+}
+await shoot(
+    // The wordmark alone. Setting the mark beside it puts two capital Ps in a row —
+    // the icon is a P, and so is the first letter of the name.
+    `<div style="width:1200px;height:630px;background:${INK_BLUE};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;padding:80px">
+       <div style="font-family:'Literata Variable',Literata,Georgia,serif;font-variation-settings:'wght' 600;font-size:132px;font-weight:600;letter-spacing:-0.015em;color:${PAPER};line-height:1">
+         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${PLINK}"></span></span>nky
+       </div>
+       <div style="font-family:'Literata Variable',Literata,Georgia,serif;font-variation-settings:'wght' 600;font-size:54px;font-weight:600;color:${PAPER};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
+       <div style="font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:26px;color:${PAPER};opacity:.75">${new URL(siteUrl).host} · free, no account, nothing to install</div>
+     </div>`,
+    { width: 1200, height: 630, path: "public/og.png" },
 );
 
 await browser.close();
@@ -100,4 +127,6 @@ for (const path of ["public/icon-64.png", "public/icon-32.png", "public/favicon-
     await unlink(path);
 }
 
-console.log("public/: icon-512, icon-192, icon-180, icon-banner-512 from icon.svg; favicon.ico from favicon.svg");
+console.log(
+    "public/: icon-512, icon-192, icon-180, icon-banner-512, og.png from icon.svg; favicon.ico from favicon.svg",
+);

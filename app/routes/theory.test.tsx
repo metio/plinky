@@ -24,7 +24,8 @@ describe("TheoryRoute", () => {
         expect(screen.getByText(m.theory_staff_body())).toBeTruthy();
         const hear = screen.getAllByRole("button", { name: m.theory_hear_it() });
         const both = screen.getAllByRole("button", { name: m.theory_hear_both() });
-        expect(hear.length + both.length).toBe(LESSONS.length);
+        const inTurn = screen.getAllByRole("button", { name: m.theory_hear_them() });
+        expect(hear.length + both.length + inTurn.length).toBe(LESSONS.length);
     });
 
     it("offers a side-by-side listen wherever the lesson is about a difference", () => {
@@ -33,6 +34,10 @@ describe("TheoryRoute", () => {
         expect(screen.getAllByRole("button", { name: m.theory_hear_both() })).toHaveLength(
             comparisons,
         );
+        // A run of chords is heard the same way, and says so in its own words: "both" is
+        // not what three of them are.
+        const runs = LESSONS.filter((lesson) => lesson.demo.kind === "progression").length;
+        expect(screen.getAllByRole("button", { name: m.theory_hear_them() })).toHaveLength(runs);
     });
 
     it("spells the key signature lesson out in the key it shows", () => {

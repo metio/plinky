@@ -42,9 +42,29 @@ describe("ToolsRoute", () => {
         renderWithServices(<ToolsRoute />);
         expect(screen.getByRole("tablist", { name: m.tools_scale() })).toBeTruthy();
         expect(screen.getByRole("tablist", { name: m.tools_chord() })).toBeTruthy();
-        // One root chooser per explorer — they are independent, so picking a scale on
-        // D leaves the chord explorer where it was.
-        expect(screen.getAllByRole("tablist", { name: m.tools_root() })).toHaveLength(2);
+        // One root chooser per panel that starts from a note — scale, chord, interval.
+        // They are independent, so picking a scale on D leaves the others where they were.
+        expect(screen.getAllByRole("tablist", { name: m.tools_root() })).toHaveLength(3);
+    });
+
+    it("hands the tapped tempo to the metronome", () => {
+        renderWithServices(<ToolsRoute />);
+        // Two errands, one number: tapping along to something and then playing at that
+        // speed is the same job.
+        const slider = screen.getByRole("slider", { name: m.tools_metro_tempo() });
+        const before = (slider as HTMLInputElement).value;
+        const tap = screen.getByRole("button", { name: m.tools_tap_action() });
+        fireEvent.click(tap);
+        fireEvent.click(tap);
+        expect((slider as HTMLInputElement).value).not.toBe(before);
+        expect(screen.getByRole("button", { name: m.tools_metro_start() })).toBeTruthy();
+    });
+
+    it("names the note an interval lands on", () => {
+        renderWithServices(<ToolsRoute />);
+        // A fifth up from C is G, and the panel says so rather than only lighting it.
+        expect(screen.getByText(m.tools_interval_lands())).toBeTruthy();
+        expect(screen.getByRole("tablist", { name: m.tools_interval_label() })).toBeTruthy();
     });
 
     it("reads a tempo back once there are two taps", () => {

@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// How one answerable option reads once a round has been answered, and where a rung sits
-// on the interval ladder. Both are decisions about what the player is shown, taken away
-// from the surfaces that draw them so each surface only draws.
-
-import { type IntervalId, SEMITONES_PER_OCTAVE, semitonesOf } from "./theory";
+// How one answerable option reads once a round has been answered — a decision about what
+// the player is shown, taken away from the surfaces that draw it so each surface only
+// draws.
 
 export type OptionVerdict = "correct" | "wrong" | null;
 
@@ -25,11 +23,4 @@ export function optionVerdict<Id>(
         return "correct";
     }
     return option === given ? "wrong" : null;
-}
-
-// Where a rung sits on the ladder, as a percentage of its height: an octave is the whole
-// ladder, a fifth is seven twelfths of it. The conceit of the ladder is that the rungs
-// sit at the distance they name, so this is the feature rather than a layout detail.
-export function ladderOffset(interval: IntervalId): number {
-    return (semitonesOf(interval) / SEMITONES_PER_OCTAVE) * 100;
 }

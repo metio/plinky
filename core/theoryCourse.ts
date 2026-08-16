@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 // A short course in the theory a reader needs to make sense of the page in front of
+import type { SnippetNote } from "./glossaryScore";
 import type { ChordQuality, ScaleId } from "./theory";
 // them, in the order that need arises.
 //
@@ -30,7 +31,19 @@ export type Demo =
     | { kind: "circle"; tonic: number }
     // Two chords played one after the other, so the difference is audible rather than
     // described — the only way a lesson about how something sounds can be honest.
-    | { kind: "compare"; first: number[]; second: number[] };
+    | { kind: "compare"; first: number[]; second: number[] }
+    // Chords in turn, for the lessons about what one chord does after another.
+    | { kind: "progression"; chords: number[][] }
+    // A written example is itself the demonstration: length, silence and the left hand's
+    // clef are facts about the page, and no arrangement of lit keys can show them.
+    // `play` is what the example sounds when pressed.
+    | {
+          kind: "stave";
+          clef: "treble" | "bass";
+          fifths: number;
+          notes: SnippetNote[];
+          play: number[];
+      };
 
 export type Lesson = {
     id: string;
@@ -48,11 +61,67 @@ export const LESSONS: Lesson[] = [
     { id: "staff", unit: "reading", demo: { kind: "keyboard", notes: [C, C + 4, C + 7] } },
     { id: "steps", unit: "reading", demo: { kind: "compare", first: [C], second: [C + 1] } },
     { id: "octave", unit: "reading", demo: { kind: "compare", first: [C], second: [C + 12] } },
+    {
+        id: "values",
+        unit: "reading",
+        demo: {
+            kind: "stave",
+            clef: "treble",
+            fifths: 0,
+            notes: [
+                { step: "C", octave: 4, value: "whole" },
+                { step: "C", octave: 4, value: "half" },
+                { step: "C", octave: 4, value: "half" },
+                ...Array.from({ length: 4 }, () => ({
+                    step: "C",
+                    octave: 4,
+                    value: "quarter" as const,
+                })),
+            ],
+            play: [C, C, C, C, C, C, C],
+        },
+    },
+    {
+        id: "rests",
+        unit: "reading",
+        demo: {
+            kind: "stave",
+            clef: "treble",
+            fifths: 0,
+            notes: [
+                { step: "G", octave: 4, value: "quarter" },
+                { step: null, value: "quarter" },
+                { step: "E", octave: 4, value: "quarter" },
+                { step: null, value: "quarter" },
+            ],
+            play: [C + 7, C + 4],
+        },
+    },
+    {
+        id: "bass",
+        unit: "reading",
+        demo: {
+            kind: "stave",
+            clef: "bass",
+            fifths: 0,
+            notes: [
+                { step: "C", octave: 3, value: "half" },
+                { step: "G", octave: 2, value: "half" },
+                { step: "C", octave: 2, value: "whole" },
+            ],
+            play: [C - 12, C - 17, C - 24],
+        },
+    },
 
     // Keys: why a piece carries sharps or flats, and what a scale is.
     { id: "major", unit: "keys", demo: { kind: "scale", tonic: C, scale: "major" } },
     { id: "minor", unit: "keys", demo: { kind: "scale", tonic: C + 9, scale: "natural-minor" } },
     { id: "signature", unit: "keys", demo: { kind: "circle", tonic: 7 } },
+    {
+        id: "relative",
+        unit: "keys",
+        demo: { kind: "compare", first: [C, C + 4, C + 7], second: [C - 3, C, C + 4] },
+    },
 
     // Harmony: stacking those notes up.
     { id: "triads", unit: "harmony", demo: { kind: "chord", root: C, quality: "major" } },
@@ -60,6 +129,29 @@ export const LESSONS: Lesson[] = [
         id: "colour",
         unit: "harmony",
         demo: { kind: "compare", first: [C, C + 4, C + 7], second: [C, C + 3, C + 7] },
+    },
+    {
+        id: "family",
+        unit: "harmony",
+        demo: {
+            kind: "progression",
+            chords: [
+                [C, C + 4, C + 7],
+                [C + 5, C + 9, C + 12],
+                [C + 7, C + 11, C + 14],
+            ],
+        },
+    },
+    {
+        id: "cadence",
+        unit: "harmony",
+        demo: {
+            kind: "progression",
+            chords: [
+                [C + 7, C + 11, C + 14],
+                [C, C + 4, C + 7],
+            ],
+        },
     },
 ];
 

@@ -45,7 +45,6 @@
     "mutation": "npm run messages && stryker run",
     "storybook": "npm run messages && storybook dev -p 6006",
     "build-storybook": "npm run messages && storybook build",
-    "og": "node dev/make-og.mjs",
     "a11y:light": "npm run build:single && A11Y_MODE=light node dev/a11y.mjs",
     "a11y:dark": "npm run build:single && A11Y_MODE=dark node dev/a11y.mjs",
     "songs:reid": "tsx dev/reid-songs.mts",

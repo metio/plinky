@@ -331,7 +331,11 @@ const BUDGET_VENDOR_KB = 324;
 // 343. One Card and one PageHeader replaced eight hand-rolled panels and twenty-two
 // title blocks. A shared component costs a little more than the markup it replaces, and
 // buys a page that cannot drift again.
-const BUDGET_APP_KB = 343;
+// 346. Six more theory lessons — length, silence, the left hand's clef, the relative
+// minor and the two chord lessons — and two more little tools, an interval finder and the
+// metronome the tap tool now hands its number to. The lessons are copy and a table; the
+// tools are two panels over engines that were already running.
+const BUDGET_APP_KB = 346;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

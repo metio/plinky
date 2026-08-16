@@ -55,6 +55,12 @@ const UNIT_NAME: Record<UnitId, () => string> = {
 
 const LESSON_TITLE: Record<string, () => string> = {
     staff: () => m.theory_staff_title(),
+    values: () => m.theory_values_title(),
+    rests: () => m.theory_rests_title(),
+    bass: () => m.theory_bass_title(),
+    relative: () => m.theory_relative_title(),
+    family: () => m.theory_family_title(),
+    cadence: () => m.theory_cadence_title(),
     steps: () => m.theory_steps_title(),
     octave: () => m.theory_octave_title(),
     major: () => m.theory_major_title(),
@@ -66,6 +72,12 @@ const LESSON_TITLE: Record<string, () => string> = {
 
 const LESSON_BODY: Record<string, () => string> = {
     staff: () => m.theory_staff_body(),
+    values: () => m.theory_values_body(),
+    rests: () => m.theory_rests_body(),
+    bass: () => m.theory_bass_body(),
+    relative: () => m.theory_relative_body(),
+    family: () => m.theory_family_body(),
+    cadence: () => m.theory_cadence_body(),
     steps: () => m.theory_steps_body(),
     octave: () => m.theory_octave_body(),
     major: () => m.theory_major_body(),
@@ -94,6 +106,10 @@ function litNotes(demo: Demo): number[] {
             return [...demo.first, ...demo.second];
         case "circle":
             return chordPitches(KEY_FROM + demo.tonic, "major");
+        case "progression":
+            return [...new Set(demo.chords.flat())];
+        case "stave":
+            return demo.play;
     }
 }
 
@@ -102,6 +118,16 @@ function litNotes(demo: Demo): number[] {
 // now shows one, with the very notes it is about, so the reader can look at the thing the
 // sentence describes instead of taking it on trust.
 function readingXml(demo: Demo): string | null {
+    // A written example carries its own engraving: the lesson is about the marks, so the
+    // marks are given rather than derived from a set of pitches.
+    if (demo.kind === "stave") {
+        return buildSnippet({
+            clef: demo.clef,
+            fifths: demo.fifths,
+            beatsPerBar: 4,
+            notes: demo.notes,
+        });
+    }
     const notes: SnippetNote[] = [];
     for (const pitch of litNotes(demo)) {
         const letter = NATURAL_OF[((pitch % 12) + 12) % 12];
@@ -123,13 +149,26 @@ function LessonDemo({ demo, onPlay }: { demo: Demo; onPlay: () => void }) {
     const phrases =
         demo.kind === "compare"
             ? [{ notes: demo.first }, { notes: demo.second, afterMs: COMPARE_GAP_MS }]
-            : [{ notes: litNotes(demo), spread: demo.kind === "scale" }];
+            : demo.kind === "progression"
+              ? // One after another with the same gap a comparison uses, so a pair of
+                // chords reads as a pair rather than as one long sound.
+                demo.chords.map((notes, index) => ({
+                    notes,
+                    ...(index > 0 ? { afterMs: COMPARE_GAP_MS } : {}),
+                }))
+              : [{ notes: litNotes(demo), spread: demo.kind === "scale" }];
 
     return (
         <SoundingKeyboard
             lit={litNotes(demo)}
             phrases={phrases}
-            label={demo.kind === "compare" ? m.theory_hear_both() : m.theory_hear_it()}
+            label={
+                demo.kind === "compare"
+                    ? m.theory_hear_both()
+                    : demo.kind === "progression"
+                      ? m.theory_hear_them()
+                      : m.theory_hear_it()
+            }
             onPlay={onPlay}
         >
             {key && (

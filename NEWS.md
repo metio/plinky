@@ -10,6 +10,29 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**Six more theory lessons, and they show you the page.** How long a notehead's shape
+says to hold it, that silence is written down and counted just as carefully, and the two
+staves a piano reads at once with middle C sitting between them — each one printed as
+real notation rather than described. Then the pair of keys that share a single signature,
+the three chords that carry an enormous number of tunes, and the sound of a phrase
+ending. Fourteen lessons now, still a paragraph and something to hear apiece.
+
+**Ear training reads top to bottom.** The answers to an interval round used to hang at
+their true distance apart, which looked handsome with all thirteen offered and left the
+opening round as three rungs adrift in a lot of empty space. They stack in order now,
+widest leap at the top, however many the round offers. The score sits under the dots that
+show the music playing, the question sits under the buttons, and there is a **Skip**
+beside Play again — walk away from a question you would rather not answer and it counts
+for nothing. It becomes **Next** once you have answered.
+
+**Two more little tools.** An **interval finder**: pick a note and a distance, see where
+it lands, hear it both struck together and one after the other. And a **metronome**,
+which takes its tempo from the tap tool right above it — tapping along to something and
+then playing at that speed was always one job.
+
+**Plinky has a subreddit.** [r/plinky_piano](https://www.reddit.com/r/plinky_piano/),
+linked at the foot of every page beside the others.
+
 **Plinky has four places now, and a shape to the day.** The bar along the bottom (or
 the top, on a wide screen) used to name five things of five different kinds, and a good
 quarter of the app lived behind the **?** — the theory course, the glossary of marks,

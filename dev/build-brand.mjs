@@ -72,6 +72,16 @@ const colour = Object.fromEntries(
 await mkdir(`${OUT}/icon`, { recursive: true });
 await mkdir(`${OUT}/social`, { recursive: true });
 
+// The sheets set the app's own faces, so they have to carry them: a headless browser has
+// none installed, and a fallback serif is not the identity these files exist to record.
+// It also moves the metrics the wordmark's dot is positioned against.
+const literata = await readFile(
+    "node_modules/@fontsource-variable/literata/files/literata-latin-wght-normal.woff2",
+);
+const inter = await readFile("node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2");
+const FACES = `@font-face{font-family:Literata;src:url(data:font/woff2;base64,${literata.toString("base64")}) format("woff2-variations");font-weight:200 900;font-display:block}
+@font-face{font-family:Inter;src:url(data:font/woff2;base64,${inter.toString("base64")}) format("woff2-variations");font-weight:100 900;font-display:block}`;
+
 const browser = await chromium.launch();
 
 async function shoot(html, { width, height, path, scale = 1, full = false }) {
@@ -82,7 +92,7 @@ async function shoot(html, { width, height, path, scale = 1, full = false }) {
     // border-box everywhere: a sheet that sets its own padding must still be exactly as
     // wide as the shot, or the last column is cropped off the edge.
     await page.setContent(
-        `<style>html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>${html}`,
+        `<style>${FACES}html,body{margin:0;padding:0}*,*::before,*::after{box-sizing:border-box}</style>${html}`,
     );
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(150);
@@ -100,21 +110,41 @@ for (const size of [1024, 512, 192, 180, 64, 32]) {
 }
 await writeFile(`${OUT}/icon/plinky.svg`, icon);
 
+// Where Literata puts its own tittle at this size, measured by rasterising a real i and
+// matching the gap it leaves over the x-height. The app header carries a different number
+// for its own size: an offset like this is measured where it is used, never copied.
+const TITTLE = "top:.5em;width:.1525em;height:.1525em";
+
+// The mark on a ground it would otherwise vanish into. Its own tile is ink blue, so on an
+// ink-blue sheet it disappears and leaves a bare P standing next to the P the wordmark
+// starts with. A paper surround gives it its edge back.
+const framed = (size) =>
+    `<div style="background:${colour.paper};border-radius:26%;padding:${Math.round(size / 11)}px">
+       <div style="width:${size}px;height:${size}px;border-radius:22%;overflow:hidden">${icon}</div>
+     </div>`;
+
 // The lockup: mark plus wordmark, on paper and on ink blue.
-const lockup = (ground, ink) => `
+const lockup = (ground, ink, mark) => `
 <div style="width:960px;height:320px;background:${ground};display:flex;align-items:center;justify-content:center;gap:28px">
-  <div style="width:132px;height:132px;border-radius:22%;overflow:hidden">${icon}</div>
+  ${mark}
   <div style="font-family:Literata,Georgia,serif;font-size:104px;font-weight:600;letter-spacing:-0.01em;color:${ink};line-height:1">
-    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;top:.17em;width:.15em;height:.15em;transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
   </div>
 </div>`;
-await shoot(lockup(colour.paper, colour.ink), {
+await shoot(
+    lockup(
+        colour.paper,
+        colour.ink,
+        `<div style="width:132px;height:132px;border-radius:22%;overflow:hidden">${icon}</div>`,
+    ),
+    {
     width: 960,
     height: 320,
-    path: `${OUT}/icon/lockup-paper.png`,
-    scale: 2,
-});
-await shoot(lockup(colour["ink blue"], colour.paper), {
+        path: `${OUT}/icon/lockup-paper.png`,
+        scale: 2,
+    },
+);
+await shoot(lockup(colour["ink blue"], colour.paper, framed(132)), {
     width: 960,
     height: 320,
     path: `${OUT}/icon/lockup-ink-blue.png`,
@@ -161,13 +191,39 @@ await shoot(
 // The places we post, at the sizes they want.
 const social = (width, height, titleSize) => `
 <div style="width:${width}px;height:${height}px;background:${colour["ink blue"]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${Math.round(height / 16)}px;text-align:center;padding:${Math.round(width / 12)}px;box-sizing:border-box">
-  <div style="width:${Math.round(height / 4)}px;height:${Math.round(height / 4)}px;border-radius:22%;overflow:hidden">${icon}</div>
+  ${framed(Math.round(height / 4))}
   <div style="font-family:Literata,Georgia,serif;font-size:${titleSize}px;font-weight:600;color:${colour.paper};line-height:1.1;letter-spacing:-0.01em">Practise piano in your browser</div>
   <div style="font-family:Inter,system-ui,sans-serif;font-size:${Math.round(titleSize / 2.6)}px;color:${colour.paper};opacity:.82">Free · no account · nothing to install</div>
 </div>`;
 await shoot(social(1200, 630, 62), { width: 1200, height: 630, path: `${OUT}/social/open-graph-1200x630.png` });
 await shoot(social(1080, 1080, 74), { width: 1080, height: 1080, path: `${OUT}/social/square-1080.png` });
 await shoot(social(1080, 1920, 86), { width: 1080, height: 1920, path: `${OUT}/social/story-1080x1920.png` });
+
+// Reddit crops a community icon to a circle, which cuts the corners off the rounded
+// square the launcher icons use and leaves the letter looking hung too low. This one is
+// drawn as the circle it will become, with the P set smaller so it clears the curve on
+// every side.
+await shoot(
+    `<div style="width:256px;height:256px;border-radius:50%;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center;overflow:hidden">
+       <div style="width:172px;height:172px">${icon}</div>
+     </div>`,
+    { width: 256, height: 256, path: `${OUT}/social/reddit-icon-256.png` },
+);
+
+// The banner strip. Reddit lays the community icon and name over the left of it on a
+// wide screen, so nothing goes there — the mark and the wordmark sit right of that,
+// where no overlay reaches and no crop takes them.
+// No mark on it: the community icon is already the P, and it sits over the left of the
+// banner on a wide screen. The wordmark carries the strip on its own.
+const banner = (width) => `
+<div style="width:${width}px;height:128px;background:${colour["ink blue"]};display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;padding-left:${Math.round(width * 0.3)}px;box-sizing:border-box">
+  <div style="font-family:Literata,Georgia,serif;font-size:50px;font-weight:600;letter-spacing:-0.01em;color:${colour.paper};line-height:1">
+    Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+  </div>
+  <div style="font-family:Inter,system-ui,sans-serif;font-size:20px;color:${colour.paper};opacity:.8;line-height:1.3">Practise piano in your browser</div>
+</div>`;
+await shoot(banner(1072), { width: 1072, height: 128, path: `${OUT}/social/reddit-banner-desktop-1072x128.png` });
+await shoot(banner(1080), { width: 1080, height: 128, path: `${OUT}/social/reddit-banner-mobile-1080x128.png` });
 
 await browser.close();
 
