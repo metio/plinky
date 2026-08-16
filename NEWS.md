@@ -30,6 +30,16 @@ it lands, hear it both struck together and one after the other. And a **metronom
 which takes its tempo from the tap tool right above it — tapping along to something and
 then playing at that speed was always one job.
 
+**A piece that opens on a vamp shows its tune.** The little staff under a title draws the
+first few notes, and it used to spend all of them on whatever the opening bars held —
+which for *Gymnopédie No. 1* is the same chord, four times, and names no piece at all. A
+bar that only says again what the bar before it said no longer counts against the mark's
+budget, so it reaches the melody. Sixty-six pieces got a better opening out of it.
+
+**The front page stops jumping.** The day's three moments now hold their places while the
+music catalogue loads, instead of appearing all at once and shoving the ways to practise
+two thirds of a screen down the page as you read them.
+
 **Six more marks in the glossary.** The fermata that lets you hold a note as long as it
 feels right, the beam that groups quick notes by beat, the tenuto, the hairpin that gets
 louder or softer across the notes it covers, the ledger lines that carry music past the

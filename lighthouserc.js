@@ -17,9 +17,11 @@
 //   * Which pages pull the notation machinery in as they load. The source cannot be read
 //     for this — a route that merely imports a score viewer may never mount one — so it
 //     is an observed property, measured. Every page that opens onto a piece (the score
-//     page, the daily, the review session, the placement drill) and the glossary, whose
-//     examples draw immediately, land well past the light cap. A wrong guess fails loudly
-//     here rather than silently, which is how each of them was found.
+//     page, the daily, the review session, the placement drill), the glossary, whose
+//     examples draw immediately, and the theory course, whose reading lessons print the
+//     bar they are about, land well past the light cap. A wrong guess fails loudly here
+//     rather than silently, which is how each of them was found — theory included, on the
+//     run after its lessons started engraving.
 //
 // Whether a page is noindex IS readable from the route that declares it, so the SEO
 // assertion turns itself off for those pages without anyone maintaining a list.
@@ -48,7 +50,7 @@ const noindex = noindexPaths()
 // Pages that bring the notation machinery with them as they load. Budgeted apart so its
 // bulk cannot hide an app-code regression on the lighter pages, while the fifteen pages
 // that carry no notation keep a tight cap that trips on a real one.
-const notation = ["play", "daily", "review", "placement", "glossary"];
+const notation = ["play", "daily", "review", "placement", "glossary", "theory"];
 
 const group = (names) => `.*/(${names.join("|")})/.*`;
 const outside = (names) => `^(?!.*/(${names.join("|")})/).*$`;
@@ -72,7 +74,11 @@ const named = [...new Set([...notation, ...noindex])];
 // change, not ours. That is what the headroom above the app's own weight is for. It also
 // means this budget can pass locally and fail on CI: a run that never fetches the beacon
 // measures a page the CI runner does not.
-const SCRIPT_LIGHT = 239616;
+// 234 KiB → 252 KiB: six theory lessons, two more tools, six more glossary marks and the
+// shelf's filters all live in code every page loads, and the library — the heaviest page
+// under this cap — measured 252,969 with them. Raised deliberately, the way the app
+// bundle's own ratchet is; it still trips on a regression, from a higher floor.
+const SCRIPT_LIGHT = 258048;
 const SCRIPT_NOTATION = 655360;
 
 const common = {

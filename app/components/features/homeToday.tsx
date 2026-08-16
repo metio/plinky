@@ -179,6 +179,17 @@ function Moment({
     );
 }
 
+// What each moment takes up once it has arrived, measured off the settled page at a
+// desktop width — the warm-up carries a keyboard, the work a row per piece, and the
+// lesson a single line. Reserving it keeps the page still while the manifests land. A
+// narrow screen wraps more and will still grow a little; the alternative is a page that
+// jumps by two thirds of a screen, which is what this replaced.
+const WAITING = [
+    { label: m.today_moment_warmup, chips: 4, height: 216 },
+    { label: m.today_moment_work, chips: 2, height: 112 },
+    { label: m.today_moment_learn, chips: 1, height: 40 },
+];
+
 // One press, one start. `lead` marks the day's own thing — the challenge everybody
 // gets, while it is still unopened — which is the only reason to weigh one of these
 // more than the others.
@@ -462,8 +473,35 @@ export function HomeToday() {
         </header>
     );
 
+    // The day's three moments, in their places, before the manifests they are built from
+    // have arrived. Without this the page was a header for a moment and then eight hundred
+    // pixels taller, which shoves everything below it — the ways to practise, at the foot
+    // of the page — down as you read. The shape is the real one; only the words are
+    // waiting.
     if (session === null) {
-        return header;
+        return (
+            <div className="space-y-8" aria-busy="true">
+                {header}
+                {WAITING.map(({ label, chips, height }) => (
+                    <Moment key={label()} label={label()}>
+                        <div
+                            className="flex flex-wrap content-start gap-2"
+                            style={{ minHeight: `${height}px` }}
+                            aria-hidden="true"
+                        >
+                            {Array.from({ length: chips }, (_, chip) => (
+                                <span
+                                    // biome-ignore lint/suspicious/noArrayIndexKey: a placeholder has no identity but its place in the row
+                                    key={`${label()}-${chip}`}
+                                    className="h-8 w-32 animate-pulse rounded-full bg-sunken motion-reduce:animate-none"
+                                />
+                            ))}
+                        </div>
+                    </Moment>
+                ))}
+                <p className="h-4" aria-hidden="true" />
+            </div>
+        );
     }
 
     // The daily belongs to the warm-up; everything else is the work.

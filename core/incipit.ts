@@ -37,8 +37,9 @@ export type IncipitNote = {
     // steps to a staff line, so this is what places it without knowing anything about
     // semitones — a B sharp and a C natural are different places on the page.
     diatonic: number;
-    // -1 flat, 0 natural, 1 sharp, as written on this note. Only a note carrying its
-    // own accidental has a non-zero value; a key signature is not read here.
+    // -1 flat, 0 natural, 1 sharp: how the note is altered, from the key signature as
+    // well as from any accidental written on it. The mark draws no key signature, so the
+    // alteration has to travel with the notehead or the pitch it shows is the wrong one.
     alter: number;
     // The written length in quarter notes, which decides a hollow head and a stem.
     quarters: number;
@@ -50,10 +51,10 @@ export type Incipit = { clef: Clef; notes: IncipitNote[] };
 // enough to stay a mark rather than a score.
 export const INCIPIT_NOTES = 8;
 
-// How many bars it will read to find them. A piece that opens on a pickup gives one or
-// two notes in its first bar, which is not a shape anybody recognises, so the mark runs
-// on into the phrase — but it stops well short of the first page, because an opening is
-// what identifies a work and a page is what plays it.
+// How many bars of MOVING music it will read to find them. A piece that opens on a
+// pickup gives one or two notes in its first bar, which is not a shape anybody
+// recognises, so the mark runs on into the phrase — but it stops well short of the first
+// page, because an opening is what identifies a work and a page is what plays it.
 const INCIPIT_BARS = 4;
 
 function textOf(parent: Element, tag: string): string {
@@ -145,7 +146,18 @@ export function readIncipit(codec: XmlCodec, xml: string, limit = INCIPIT_NOTES)
         // A bar of rests — a pickup of silence, an accompaniment entering later — is
         // not one of the bars this is allowed; only bars that gave something count
         // toward the limit, so the mark always carries notes rather than a bar count.
-        if (notes.length > before) {
+        //
+        // Nor does a bar that only says again what the bar before it said. A piece can
+        // open on bars of vamp before its theme arrives — Gymnopédie No. 1 holds one
+        // chord for four — and four noteheads at one height identify nothing. Those bars
+        // are still drawn, because they are how the piece begins, but they do not spend
+        // the budget, so the mark reaches the phrase that follows. The note limit stops it
+        // either way.
+        const previous = notes[before - 1];
+        const repeated =
+            previous !== undefined &&
+            notes.slice(before).every((one) => one.diatonic === previous.diatonic);
+        if (notes.length > before && !repeated) {
             bars += 1;
         }
         if (bars >= INCIPIT_BARS) {

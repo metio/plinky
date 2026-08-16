@@ -87,12 +87,29 @@ describe("readIncipit", () => {
     });
 
     it("stops after the opening phrase rather than reading the page", () => {
-        const measures = Array.from(
-            { length: 9 },
-            (_, index) => `<measure number="${index + 1}">${note("C", 4)}</measure>`,
-        ).join("");
-        // Four bars that gave something, and no more, even though eight notes were asked for.
+        const steps = ["C", "D", "E", "F", "G", "A", "B", "C", "D"];
+        const measures = steps
+            .map((step, index) => `<measure number="${index + 1}">${note(step, 4)}</measure>`)
+            .join("");
+        // Four bars that moved, and no more, even though eight notes were asked for.
         expect(readIncipit(codec, score(measures))?.notes).toHaveLength(4);
+    });
+
+    it("plays a vamp through rather than spending the mark on it", () => {
+        // Gymnopédie No. 1 holds one chord for four bars before the melody arrives. Four
+        // noteheads at one height name no piece, so bars that only repeat what is already
+        // shown do not count against the four the mark is allowed.
+        const vamp = Array.from(
+            { length: 4 },
+            (_, index) => `<measure number="${index + 1}">${note("F", 4)}</measure>`,
+        ).join("");
+        const tune = ["G", "A", "B", "C"]
+            .map((step, index) => `<measure number="${index + 5}">${note(step, 4)}</measure>`)
+            .join("");
+        const incipit = readIncipit(codec, score(vamp + tune));
+        // The vamp is still drawn — it is how the piece begins — and the theme follows it.
+        // Three bars of theme, because the vamp's first bar was the one it did say.
+        expect(incipit?.notes.map((one) => one.diatonic)).toEqual([31, 31, 31, 31, 32, 33, 34]);
     });
 
     it("keeps reading past a bar that is only rests", () => {
