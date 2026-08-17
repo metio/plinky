@@ -47,7 +47,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "chiquinha-gonzaga": {"name":"Chiquinha Gonzaga","pieces":11},
     "clara-faisst": {"name":"Clara Faisst","pieces":25},
     "clara-schumann": {"name":"Clara Schumann","pieces":17},
-    "claude-debussy": {"name":"Claude Debussy","pieces":30},
+    "claude-debussy": {"name":"Claude Debussy","pieces":31},
     "clemence-de-grandval": {"name":"Clémence de Grandval","pieces":12},
     "corona-elisabeth-wilhelmine-schroter": {"name":"Corona Elisabeth Wilhelmine Schröter","pieces":24},
     "daniel-belknap": {"name":"Daniel Belknap","pieces":11},

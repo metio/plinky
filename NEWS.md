@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**Clair de lune says what it is.** The catalogue's score is the opening phrase, not the
+whole piece, and it is now titled that way rather than promising five minutes of Debussy
+and giving one. His name was also misspelled on it, which had quietly kept that piece off
+his composer page — it is there now, with the other thirty.
+
 **The recorded piano follows a piece into a new key.** Transposing a piece — by hand, or
 because it moved to fit your keyboard — left the moved notes playing the synthesised voice
 in Firefox, because nothing went and fetched the recordings for the notes it now sounds.
