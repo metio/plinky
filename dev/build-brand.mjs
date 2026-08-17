@@ -210,18 +210,29 @@ await shoot(social(1080, 1920, 86), { width: 1080, height: 1920, path: `${OUT}/s
 // anything; the reverse is not true, so a portrait is the one worth making.
 await shoot(social(1080, 1350, 78), { width: 1080, height: 1350, path: `${OUT}/social/instagram-portrait-1080x1350.png` });
 
-// Every platform crops a profile picture to a circle — Reddit, Facebook, Instagram, all of
-// them — which cuts the corners off the rounded square the launcher icons use and leaves
-// the letter looking hung too low. This one is drawn as the circle it will become, with the
-// P set smaller so it clears the curve on every side. One file for all three, because it is
-// one mark and three names for it would drift.
+// The profile picture. Every platform crops one to a circle — Reddit, Facebook, Instagram,
+// YouTube — so this is a full-bleed square of ground with the letter well inside the
+// inscribed circle, and the crop is left to them.
+//
+// Drawing the circle here instead put white in the corners (a screenshot paints white
+// where nothing is drawn) and YouTube's crop is a hair wider than the circle, so the
+// corners showed as pale arcs along the top. A square has no edge to reveal.
+//
+// The letter is placed by its centre of GRAVITY, not its bounding box. A capital P carries
+// its mass in the stem and the bowl and leaves a void at the lower right, so a box-centred
+// P reads as sitting high and left — measured on the 800px render, its ink sat 1.5% left
+// and 4.2% above the middle. Nudging it back by that much is what makes it look centred,
+// which is the only kind of centred anybody sees.
+const OPTICAL_X = 0.015;
+const OPTICAL_Y = 0.042;
 // 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
 for (const size of [256, 512, 800]) {
+    const letter = Math.round(size * 0.67);
     await shoot(
-        `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center;overflow:hidden">
-           <div style="width:${Math.round(size * 0.67)}px;height:${Math.round(size * 0.67)}px">${icon}</div>
+        `<div style="width:${size}px;height:${size}px;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center;overflow:hidden">
+           <div style="width:${letter}px;height:${letter}px;transform:translate(${(size * OPTICAL_X).toFixed(1)}px, ${(size * OPTICAL_Y).toFixed(1)}px)">${icon}</div>
          </div>`,
-        { width: size, height: size, path: `${OUT}/social/profile-circle-${size}.png` },
+        { width: size, height: size, path: `${OUT}/social/profile-square-${size}.png` },
     );
 }
 

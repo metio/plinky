@@ -18,7 +18,7 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |
-| `social/profile-circle-*.png` | The profile picture, at 256 and 512. Every platform crops one to a circle, so it is drawn as a circle. |
+| `social/profile-square-*.png` | The profile picture, at 256 · 512 · 800. A full-bleed square; every platform crops it to a circle itself. |
 | `social/open-graph-1200x630.png` | What a shared link unfurls as. |
 | `social/square-1080.png` | A square post. |
 | `social/instagram-portrait-1080x1350.png` | Instagram's tallest feed size — a square crops out of it without loss, and not the other way round. |
@@ -32,13 +32,25 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 
 | Platform | Profile | Header | Post |
 | --- | --- | --- | --- |
-| Facebook | `profile-circle-512` | `facebook-cover-1640x624` | `square-1080`, `open-graph-1200x630` |
-| Instagram | `profile-circle-512` | — | `instagram-portrait-1080x1350`, `square-1080`, `story-1080x1920` |
-| Reddit | `profile-circle-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
-| YouTube | `profile-circle-800` | `youtube-banner-2048x1152` | `youtube-thumbnail-1280x720` |
+| Facebook | `profile-square-512` | `facebook-cover-1640x624` | `square-1080`, `open-graph-1200x630` |
+| Instagram | `profile-square-512` | — | `instagram-portrait-1080x1350`, `square-1080`, `story-1080x1920` |
+| Reddit | `profile-square-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
+| YouTube | `profile-square-800` | `youtube-banner-2048x1152` | `youtube-thumbnail-1280x720` |
 
-One profile picture serves all three: it is one mark, and three names for it would drift
-apart the first time somebody edited only one. The covers differ because the crops do —
+One profile picture serves them all: it is one mark, and a name each would drift apart the
+first time somebody edited only one.
+
+It is a **square**, not a circle, even though every platform shows it as one. Drawing the
+circle here put white in the corners — a screenshot paints white where nothing is drawn —
+and YouTube's crop is a hair wider than the circle, so those corners showed as pale arcs
+along the top edge. A square has no edge to reveal, and the letter sits well inside the
+inscribed circle, so nothing is ever clipped.
+
+The letter is placed by its centre of **gravity**, not its bounding box. A capital P
+carries its mass in the stem and the bowl and leaves a void at the lower right, so a
+box-centred P reads as sitting high and left: measured on the 800px render, its ink sat
+1.5% left and 4.2% above the middle. It is nudged back by exactly that, which is the only
+kind of centred anybody sees. The covers differ because the crops do —
 Facebook takes a wide strip and narrows it on a phone, Reddit takes a thin one and lays the
 community's own icon and name over the left of it. Both keep everything that matters in the
 middle for that reason, and nothing but ground at the edges.
