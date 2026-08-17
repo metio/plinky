@@ -20,6 +20,7 @@
     "icons": "node dev/build-icons.mjs",
     "songs:audit": "tsx dev/audit-catalog.mts",
     "promo:videos": "node dev/promo-videos.mjs",
+    "promo:thumbs": "node dev/promo/thumbnails.mjs",
     "piano:demo": "node dev/piano/demo.mjs",
     "piano:pack": "node dev/piano/measure-pack.mjs",
     "piano:build": "node dev/piano/build-pack.mjs",
