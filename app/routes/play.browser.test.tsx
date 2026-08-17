@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { reveal } from "../testing/controls";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { MidiProvider } from "../contexts/midi";
@@ -78,20 +79,35 @@ describe("Play", () => {
         expect(await screen.findByText("That score isn't on this device.")).toBeTruthy();
     });
 
-    it("names what you can do to a piece on the piece's own page", async () => {
-        // The twelve ways to work a piece used to live behind a fold called "Set up your
-        // run" — and behind a second one for a beginner. What is about THIS piece is on
-        // the page now; only the reading settings, which Settings owns as well, fold.
+    it("puts the score first, with what you can do to the piece one fold away", async () => {
+        // Both folds are closed at rest, so a piece's page opens on the piece.
+        //
+        // Closed is asserted through the fold itself rather than by looking for what it
+        // holds. The panel collapses to a zero-height grid row and marks its contents
+        // inert — which is what takes them out of the tab order and the accessibility
+        // tree — but the nodes stay in the DOM, so a query for a control inside a shut
+        // fold still finds it and proves nothing about what a player can reach.
         renderPlay(bundledId("ode to joy"));
-        expect(await screen.findByText(m.run_group_practice_title())).toBeTruthy();
-        expect(screen.getByText(m.run_group_challenge_title())).toBeTruthy();
-        // Named where they are chosen, rather than listed where they are not.
-        expect(screen.getByText(m.sight_read())).toBeTruthy();
-        expect(screen.getByText(m.race_ghost_toggle())).toBeTruthy();
-        expect(screen.getByText(m.run_pace_label())).toBeTruthy();
-        // The one fold left, closed at rest.
+        const play = await screen.findByRole("button", { name: m.run_group_practice_title() });
         const sheet = screen.getByRole("button", { name: m.run_group_sheet_title() });
-        expect(sheet.getAttribute("aria-expanded")).toBe("false");
+        for (const fold of [play, sheet]) {
+            expect(fold.getAttribute("aria-expanded")).toBe("false");
+            const panel = document.getElementById(fold.getAttribute("aria-controls") ?? "");
+            expect(panel?.querySelector("[inert]")).toBeTruthy();
+        }
+    });
+
+    it("opens onto everything that is about this piece and no other", async () => {
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_practice_title() });
+        reveal(m.run_group_practice_title);
+        // Both cards are in the one fold: how the run behaves, and what you can put on
+        // top of it.
+        expect(screen.getByText(m.run_group_pace_title())).toBeTruthy();
+        expect(screen.getByText(m.run_group_challenge_title())).toBeTruthy();
+        expect(screen.getByRole("tablist", { name: m.run_pace_label() })).toBeTruthy();
+        expect(screen.getByRole("switch", { name: m.sight_read() })).toBeTruthy();
+        expect(screen.getByRole("switch", { name: m.race_ghost_toggle() })).toBeTruthy();
     });
 
     it("keeps the play surface free of MIDI-connect chrome", async () => {

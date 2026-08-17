@@ -388,9 +388,9 @@
     "sight_read": "Bu parçayı deşifre çal",
     "sight_read_caption": "Tek bir soğuk okuma, dayanacak bir şey yok — isimler, renkler, ipuçları ve otoyol bu tur için kenara çekiliyor. İlk okuyuşun bu parçadaki deşifren olarak kalır.",
     "sight_read_aids_note": "Deşifre okuma en üst basamaktan okunur: renk yok, şerit yok, ikinci deneme yok.",
-    "sight_read_study": "İnceleme süresi",
+    "sight_read_study": "Çalmadan önce mola",
     "sight_read_study_seconds": "{seconds}sn",
-    "sight_read_study_caption": "İlk notadan önce tonaliteyi, ölçüyü ve biçimi kavramak için bir an.",
+    "sight_read_study_caption": "Alıştır'a bastıktan sonra bir nefes — ilk notadan önce tonu, ölçüyü ve biçimi görmek için.",
     "sight_read_tempo_own": "Kendi hızında",
     "sight_read_vanish": "Ölçüler arkanda kayboluyor",
     "sight_read_vanish_caption": "Çalınan ölçü kaybolur, böylece gözlerin ellerinin önünde kalır.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Klavyene sığsın diye {count} oktav aşağı alındı",
     "play_fit_up_one": "Klavyene sığsın diye bir oktav yukarı alındı",
     "play_fit_up_other": "Klavyene sığsın diye {count} oktav yukarı alındı",
-    "play_fit_beyond": "Bu parça klavyeni iki uçtan da aşıyor, bu yüzden yazıldığı gibi çalıyor"
+    "play_fit_beyond": "Bu parça klavyeni iki uçtan da aşıyor, bu yüzden yazıldığı gibi çalıyor",
+    "run_group_pace_title": "Eller ve tempo"
 }

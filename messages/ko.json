@@ -388,9 +388,9 @@
     "sight_read": "이 곡을 초견으로 연주하기",
     "sight_read_caption": "기댈 것 없는 단 한 번의 초견이에요. 음 이름도 색도 힌트도 하이웨이도 이번만큼은 물러나요. 첫 연주가 이 곡의 초견 기록으로 남아요.",
     "sight_read_aids_note": "초견 연주는 맨 윗 단계로 읽어요. 색도, 노트 하이웨이도, 두 번째 기회도 없어요.",
-    "sight_read_study": "살펴볼 시간",
+    "sight_read_study": "연주 전 한 박자",
     "sight_read_study_seconds": "{seconds}초",
-    "sight_read_study_caption": "첫 음 전에 조성과 박자와 형태를 잡아보는 잠깐이에요.",
+    "sight_read_study_caption": "'연습'을 누른 뒤의 한 호흡이에요. 첫 음 전에 조성과 박자, 흐름을 볼 수 있어요.",
     "sight_read_tempo_own": "내 속도로",
     "sight_read_vanish": "지나간 마디가 사라져요",
     "sight_read_vanish_caption": "친 마디는 사라지니 눈이 손보다 앞서 가요.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "건반에 맞도록 {count}옥타브 내렸어요",
     "play_fit_up_one": "건반에 맞도록 한 옥타브 올렸어요",
     "play_fit_up_other": "건반에 맞도록 {count}옥타브 올렸어요",
-    "play_fit_beyond": "이 곡은 건반 양쪽을 모두 벗어나서 악보 그대로 울려요"
+    "play_fit_beyond": "이 곡은 건반 양쪽을 모두 벗어나서 악보 그대로 울려요",
+    "run_group_pace_title": "손과 템포"
 }

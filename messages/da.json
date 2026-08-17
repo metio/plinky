@@ -388,9 +388,9 @@
     "sight_read": "Spil dette stykke fra bladet",
     "sight_read_caption": "Én kold gennemlæsning, uden støtte — navnene, farverne, hintene og motorvejen træder til side under runden. Din første læsning bliver stående som dit bladspil af dette stykke.",
     "sight_read_aids_note": "En bladspilsomgang læses på øverste trin: ingen farver, ingen nodebane, intet andet forsøg.",
-    "sight_read_study": "Tid til at se på det",
+    "sight_read_study": "Pause før du spiller",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Et øjeblik til at fange toneart, taktart og form før første tone.",
+    "sight_read_study_caption": "Et åndedrag efter du trykker på Øv, så du når at se toneart, taktart og form før første tone.",
     "sight_read_tempo_own": "I dit eget tempo",
     "sight_read_vanish": "Takterne forsvinder bag dig",
     "sight_read_vanish_caption": "En spillet takt er væk, så øjnene bliver foran hænderne.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Sænket {count} oktaver, så det passer på dit klaviatur",
     "play_fit_up_one": "Hævet en oktav, så det passer på dit klaviatur",
     "play_fit_up_other": "Hævet {count} oktaver, så det passer på dit klaviatur",
-    "play_fit_beyond": "Dette stykke rækker ud over dit klaviatur i begge ender, så det lyder, som det er skrevet"
+    "play_fit_beyond": "Dette stykke rækker ud over dit klaviatur i begge ender, så det lyder, som det er skrevet",
+    "run_group_pace_title": "Hænder og tempo"
 }

@@ -388,9 +388,9 @@
     "sight_read": "Dieses Stück vom Blatt spielen",
     "sight_read_caption": "Einmal kalt lesen, ohne Hilfen — Namen, Farben, Hinweise und Highway treten für diesen Lauf beiseite. Dein erstes Lesen bleibt als dein Blattspiel dieses Stücks erhalten.",
     "sight_read_aids_note": "Ein Blattspiel-Durchgang liest auf der obersten Stufe: keine Farben, kein Notenband, kein zweiter Versuch.",
-    "sight_read_study": "Zeit zum Anschauen",
+    "sight_read_study": "Pause vor dem Lauf",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Ein Moment, um Tonart, Takt und Form aufzunehmen, bevor die erste Note kommt.",
+    "sight_read_study_caption": "Ein Atemzug, nachdem du auf Üben gedrückt hast — für Tonart, Takt und Form vor dem ersten Ton.",
     "sight_read_tempo_own": "In deinem Tempo",
     "sight_read_vanish": "Takte verschwinden hinter dir",
     "sight_read_vanish_caption": "Ein gespielter Takt ist weg, so bleiben deine Augen vor deinen Händen.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "{count} Oktaven tiefer gelegt, damit es auf deine Tastatur passt",
     "play_fit_up_one": "Eine Oktave höher gelegt, damit es auf deine Tastatur passt",
     "play_fit_up_other": "{count} Oktaven höher gelegt, damit es auf deine Tastatur passt",
-    "play_fit_beyond": "Dieses Stück reicht an beiden Enden über deine Tastatur hinaus und erklingt daher wie notiert"
+    "play_fit_beyond": "Dieses Stück reicht an beiden Enden über deine Tastatur hinaus und erklingt daher wie notiert",
+    "run_group_pace_title": "Hände und Tempo"
 }

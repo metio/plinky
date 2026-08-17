@@ -10,6 +10,17 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**Everything about a piece is behind one heading.** "How you play" and "Extra challenge"
+were two open panels under every score; they are now one fold called *How you play*, shut
+until you want it, so a piece's page opens on the music. *How the sheet looks* is beside
+it, as before.
+
+**Sight-reading's timer says what it does.** "Time to study" sounded like a limit, but the
+score is on screen the whole time and always was — nothing was being withheld. It is
+called *Pause before the run* now: a breath after you press Practice, before the first
+note is expected. What makes a sight-read a sight-read is unchanged — the first cold read
+of a piece is the one that is kept.
+
 **Seven composers stop being two people each.** A misspelling in a credit — "Eric Satie",
 "Wolfgang Amedeus Mozart", a second misspelt Debussy — used to make its own composer,
 holding the single piece that carried the typo and reachable from nowhere. Those pieces

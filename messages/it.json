@@ -388,9 +388,9 @@
     "sight_read": "Leggere questo brano a prima vista",
     "sight_read_caption": "Una sola lettura a freddo, senza appoggi: nomi, colori, suggerimenti e autostrada si fanno da parte per la corsa. La tua prima lettura resta la tua lettura a prima vista di questo brano.",
     "sight_read_aids_note": "Una lettura a prima vista si legge dal gradino più alto: niente colori, niente autostrada, nessun secondo tentativo.",
-    "sight_read_study": "Tempo per osservarlo",
+    "sight_read_study": "Pausa prima di suonare",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Un attimo per cogliere tonalità, metro e forma prima della prima nota.",
+    "sight_read_study_caption": "Un respiro dopo aver premuto Esercitati, per cogliere tonalità, metro e forma prima della prima nota.",
     "sight_read_tempo_own": "Al tuo passo",
     "sight_read_vanish": "Le battute spariscono dietro di te",
     "sight_read_vanish_caption": "Una battuta suonata sparisce, così gli occhi restano avanti alle mani.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Abbassato di {count} ottave per stare sulla tua tastiera",
     "play_fit_up_one": "Alzato di un'ottava per stare sulla tua tastiera",
     "play_fit_up_other": "Alzato di {count} ottave per stare sulla tua tastiera",
-    "play_fit_beyond": "Questo brano esce dalla tua tastiera da entrambi i lati, quindi suona com'è scritto"
+    "play_fit_beyond": "Questo brano esce dalla tua tastiera da entrambi i lati, quindi suona com'è scritto",
+    "run_group_pace_title": "Mani e andatura"
 }

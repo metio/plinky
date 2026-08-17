@@ -388,9 +388,9 @@
     "sight_read": "Soita tämä kappale prima vista",
     "sight_read_caption": "Yksi kylmä luku, ilman tukea — nimet, värit, vihjeet ja valtatie väistyvät tämän ajon ajaksi. Ensimmäinen lukusi jää tämän kappaleen prima vista -tulokseksi.",
     "sight_read_aids_note": "Prima vista -soitto luetaan ylimmältä portaalta: ei värejä, ei nuottiväylää, ei toista yritystä.",
-    "sight_read_study": "Aikaa katsoa",
+    "sight_read_study": "Tauko ennen soittoa",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Hetki poimia sävellaji, tahtilaji ja muoto ennen ensimmäistä säveltä.",
+    "sight_read_study_caption": "Henkäys sen jälkeen kun painat Harjoittele — sävellaji, tahtilaji ja muoto ennen ensimmäistä säveltä.",
     "sight_read_tempo_own": "Omaan tahtiisi",
     "sight_read_vanish": "Tahdit katoavat takanasi",
     "sight_read_vanish_caption": "Soitettu tahti katoaa, joten silmäsi pysyvät käsiäsi edellä.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Siirretty {count} oktaavia alaspäin, jotta se mahtuu koskettimistollesi",
     "play_fit_up_one": "Siirretty oktaavi ylöspäin, jotta se mahtuu koskettimistollesi",
     "play_fit_up_other": "Siirretty {count} oktaavia ylöspäin, jotta se mahtuu koskettimistollesi",
-    "play_fit_beyond": "Tämä kappale ylittää koskettimistosi molemmista päistä, joten se soi kuten se on kirjoitettu"
+    "play_fit_beyond": "Tämä kappale ylittää koskettimistosi molemmista päistä, joten se soi kuten se on kirjoitettu",
+    "run_group_pace_title": "Kädet ja tempo"
 }

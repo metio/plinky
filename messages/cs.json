@@ -388,9 +388,9 @@
     "sight_read": "Zahrát tuhle skladbu z listu",
     "sight_read_caption": "Jedno čtení nastudra, bez opory — názvy, barvy, nápovědy i dálnice na dobu běhu ustoupí. První čtení ti zůstane jako tvoje hra z listu téhle skladby.",
     "sight_read_aids_note": "Hra z listu se čte z nejvyššího stupně: bez barev, bez dálnice, bez druhého pokusu.",
-    "sight_read_study": "Čas na prohlédnutí",
+    "sight_read_study": "Pauza před hraním",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Chvilka na tóninu, takt a tvar, než přijde první nota.",
+    "sight_read_study_caption": "Nádech po stisknutí Cvičit, aby sis stihl všimnout tóniny, metra a tvaru před první notou.",
     "sight_read_tempo_own": "Vlastním tempem",
     "sight_read_vanish": "Takty za tebou mizí",
     "sight_read_vanish_caption": "Zahraný takt zmizí, takže oči zůstanou před rukama.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Posunuto o {count} oktávy níž, aby se to vešlo na tvou klaviaturu",
     "play_fit_up_one": "Posunuto o oktávu výš, aby se to vešlo na tvou klaviaturu",
     "play_fit_up_other": "Posunuto o {count} oktávy výš, aby se to vešlo na tvou klaviaturu",
-    "play_fit_beyond": "Tahle skladba přesahuje tvou klaviaturu na obou koncích, takže zní tak, jak je zapsaná"
+    "play_fit_beyond": "Tahle skladba přesahuje tvou klaviaturu na obou koncích, takže zní tak, jak je zapsaná",
+    "run_group_pace_title": "Ruce a tempo"
 }

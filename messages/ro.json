@@ -388,9 +388,9 @@
     "sight_read": "Citește piesa asta la prima vedere",
     "sight_read_caption": "O singură citire la rece, fără sprijin — numele, culorile, indiciile și autostrada se dau la o parte pentru trecerea asta. Prima ta citire rămâne ca citirea ta la prima vedere a acestei piese.",
     "sight_read_aids_note": "O citire la prima vedere se citește de pe treapta de sus: fără culori, fără autostradă, fără a doua încercare.",
-    "sight_read_study": "Timp de studiu",
+    "sight_read_study": "Pauză înainte de a cânta",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "O clipă ca să prinzi tonalitatea, măsura și forma înainte de prima notă.",
+    "sight_read_study_caption": "O respirație după ce apeși Exersează, ca să prinzi tonalitatea, măsura și forma înainte de prima notă.",
     "sight_read_tempo_own": "În ritmul tău",
     "sight_read_vanish": "Măsurile dispar în urma ta",
     "sight_read_vanish_caption": "O măsură cântată dispare, ca ochii să rămână înaintea mâinilor.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Coborâtă cu {count} octave ca să încapă pe claviatura ta",
     "play_fit_up_one": "Urcată cu o octavă ca să încapă pe claviatura ta",
     "play_fit_up_other": "Urcată cu {count} octave ca să încapă pe claviatura ta",
-    "play_fit_beyond": "Piesa aceasta depășește claviatura ta la ambele capete, așa că sună așa cum e scrisă"
+    "play_fit_beyond": "Piesa aceasta depășește claviatura ta la ambele capete, așa că sună așa cum e scrisă",
+    "run_group_pace_title": "Mâini și ritm"
 }

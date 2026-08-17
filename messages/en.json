@@ -513,9 +513,9 @@
     "sight_read": "Sight-read this piece",
     "sight_read_caption": "One cold read, nothing to lean on — the names, colours, hints and highway all step aside for the run. Your first read is kept as your sight-read of this piece.",
     "sight_read_aids_note": "A sight-read run reads at the top of the ladder: no colours, no highway, no second try.",
-    "sight_read_study": "Time to study",
+    "sight_read_study": "Pause before the run",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "A moment to take in the key, the metre and the shape before the first note.",
+    "sight_read_study_caption": "A breath after you press Practice, to take in the key, the metre and the shape before the first note.",
     "sight_read_tempo_own": "At your own pace",
     "sight_read_vanish": "Bars disappear behind you",
     "sight_read_vanish_caption": "Once you've played a bar it's gone, so your eyes stay ahead of your hands.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Moved down {count} octaves to fit your keyboard",
     "play_fit_up_one": "Moved up an octave to fit your keyboard",
     "play_fit_up_other": "Moved up {count} octaves to fit your keyboard",
-    "play_fit_beyond": "This piece reaches past your keyboard at both ends, so it plays as written"
+    "play_fit_beyond": "This piece reaches past your keyboard at both ends, so it plays as written",
+    "run_group_pace_title": "Hands and pace"
 }

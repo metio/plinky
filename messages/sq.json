@@ -388,9 +388,9 @@
     "sight_read": "Lexoje këtë pjesë në të parë",
     "sight_read_caption": "Një lexim i ftohtë, pa mbështetje — emrat, ngjyrat, sugjerimet dhe autostrada tërhiqen për këtë kalim. Leximi yt i parë ruhet si leximi yt në të parë i kësaj pjese.",
     "sight_read_aids_note": "Një lexim i parë lexohet nga shkalla më e lartë: pa ngjyra, pa korsi, pa provë të dytë.",
-    "sight_read_study": "Kohë për ta parë",
+    "sight_read_study": "Pauzë para se të luash",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Një çast për të kapur tonalitetin, masën dhe formën para notës së parë.",
+    "sight_read_study_caption": "Një frymë pasi shtyp Ushtrohu, që të kapësh tonalitetin, masën dhe formën para notës së parë.",
     "sight_read_tempo_own": "Me ritmin tënd",
     "sight_read_vanish": "Masat zhduken pas teje",
     "sight_read_vanish_caption": "Një masë e luajtur zhduket, që sytë të rrinë para duarve.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Ulur {count} oktava që të hyjë në tastierën tënde",
     "play_fit_up_one": "Ngritur një oktavë që të hyjë në tastierën tënde",
     "play_fit_up_other": "Ngritur {count} oktava që të hyjë në tastierën tënde",
-    "play_fit_beyond": "Kjo pjesë del jashtë tastierës sate në të dy skajet, prandaj tingëllon siç është shkruar"
+    "play_fit_beyond": "Kjo pjesë del jashtë tastierës sate në të dy skajet, prandaj tingëllon siç është shkruar",
+    "run_group_pace_title": "Duart dhe ritmi"
 }

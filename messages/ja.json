@@ -388,9 +388,9 @@
     "sight_read": "この曲を初見で弾く",
     "sight_read_caption": "頼るもののない一回きりの初見です。音名も色もヒントもハイウェイも、この一回は下がります。最初の読みがこの曲の初見の記録として残ります。",
     "sight_read_aids_note": "初見の演奏はいちばん上の段で読みます。色も、ノートハイウェイも、二度目もありません。",
-    "sight_read_study": "下読みの時間",
+    "sight_read_study": "弾き始める前の間",
     "sight_read_study_seconds": "{seconds}秒",
-    "sight_read_study_caption": "最初の音の前に、調と拍子と形をつかむひととき。",
+    "sight_read_study_caption": "「練習」を押したあとのひと呼吸。最初の音の前に調号、拍子、形を見ておけます。",
     "sight_read_tempo_own": "自分のペースで",
     "sight_read_vanish": "弾いた小節が消えていく",
     "sight_read_vanish_caption": "弾き終えた小節は消えるので、目が手より先を行きます。",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "鍵盤に収まるよう{count}オクターブ下げました",
     "play_fit_up_one": "鍵盤に収まるよう1オクターブ上げました",
     "play_fit_up_other": "鍵盤に収まるよう{count}オクターブ上げました",
-    "play_fit_beyond": "この曲は両端とも鍵盤からはみ出すので、楽譜どおりに鳴ります"
+    "play_fit_beyond": "この曲は両端とも鍵盤からはみ出すので、楽譜どおりに鳴ります",
+    "run_group_pace_title": "手とテンポ"
 }

@@ -388,9 +388,9 @@
     "sight_read": "Ler esta peça à primeira vista",
     "sight_read_caption": "Uma leitura a frio, sem apoios — os nomes, as cores, as pistas e a autoestrada afastam-se durante a passagem. A tua primeira leitura fica como a tua leitura à primeira vista desta peça.",
     "sight_read_aids_note": "Uma leitura à primeira vista lê-se no degrau mais alto: sem cores, sem autoestrada, sem segunda tentativa.",
-    "sight_read_study": "Tempo para observar",
+    "sight_read_study": "Pausa antes de tocar",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Um momento para apanhar a tonalidade, o compasso e a forma antes da primeira nota.",
+    "sight_read_study_caption": "Um fôlego depois de carregares em Praticar, para veres a tonalidade, o compasso e a forma antes da primeira nota.",
     "sight_read_tempo_own": "Ao teu ritmo",
     "sight_read_vanish": "Os compassos desaparecem atrás de ti",
     "sight_read_vanish_caption": "Um compasso tocado desaparece, para os teus olhos irem à frente das mãos.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Descida {count} oitavas para caber no teu teclado",
     "play_fit_up_one": "Subida uma oitava para caber no teu teclado",
     "play_fit_up_other": "Subida {count} oitavas para caber no teu teclado",
-    "play_fit_beyond": "Esta peça passa do teu teclado dos dois lados, por isso soa tal como está escrita"
+    "play_fit_beyond": "Esta peça passa do teu teclado dos dois lados, por isso soa tal como está escrita",
+    "run_group_pace_title": "Mãos e andamento"
 }
