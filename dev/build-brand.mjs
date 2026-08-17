@@ -215,7 +215,8 @@ await shoot(social(1080, 1350, 78), { width: 1080, height: 1350, path: `${OUT}/s
 // the letter looking hung too low. This one is drawn as the circle it will become, with the
 // P set smaller so it clears the curve on every side. One file for all three, because it is
 // one mark and three names for it would drift.
-for (const size of [256, 512]) {
+// 800 is what YouTube asks for; 512 covers Facebook and Instagram; 256 is Reddit's.
+for (const size of [256, 512, 800]) {
     await shoot(
         `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center;overflow:hidden">
            <div style="width:${Math.round(size * 0.67)}px;height:${Math.round(size * 0.67)}px">${icon}</div>
@@ -223,6 +224,38 @@ for (const size of [256, 512]) {
         { width: size, height: size, path: `${OUT}/social/profile-circle-${size}.png` },
     );
 }
+
+// A YouTube channel banner. YouTube crops one image four ways — a TV shows the whole
+// 2048×1152, a desktop a wide strip, a phone the middle — so everything that must survive
+// sits in the 1235×338 box at the centre that every device shows, and the rest is ground.
+// That box is a sixth of the picture: a banner designed edge to edge loses its ends on
+// three devices out of four.
+await shoot(
+    `<div style="width:2048px;height:1152px;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center">
+       <div style="width:1235px;height:338px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center">
+         <div style="font-family:Literata,Georgia,serif;font-size:128px;font-weight:600;letter-spacing:-0.015em;color:${colour.paper};line-height:1">
+           Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+         </div>
+         <div style="font-family:Literata,Georgia,serif;font-size:46px;font-weight:600;color:${colour.paper};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
+         <div style="font-family:Inter,system-ui,sans-serif;font-size:24px;color:${colour.paper};opacity:.75">Free · no account · nothing to install</div>
+       </div>
+     </div>`,
+    { width: 2048, height: 1152, path: `${OUT}/social/youtube-banner-2048x1152.png` },
+);
+
+// A video thumbnail. It is chosen at about a fifth of this size in a list of a dozen
+// others, so it carries the fewest words that still say what the channel is, set as large
+// as they go. The piece's own name belongs on the video, not burnt in here — a template
+// that has to be edited per upload stops being used by the third one.
+await shoot(
+    `<div style="width:1280px;height:720px;background:${colour["ink blue"]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;padding:80px">
+       <div style="font-family:Literata,Georgia,serif;font-size:150px;font-weight:600;letter-spacing:-0.015em;color:${colour.paper};line-height:1">
+         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+       </div>
+       <div style="font-family:Literata,Georgia,serif;font-size:56px;font-weight:600;color:${colour.paper};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
+     </div>`,
+    { width: 1280, height: 720, path: `${OUT}/social/youtube-thumbnail-1280x720.png` },
+);
 
 // A Facebook page cover. Facebook shows it at 820×312 on a desktop and crops it to a
 // taller, narrower window on a phone, and it lays the page's own name and buttons over the

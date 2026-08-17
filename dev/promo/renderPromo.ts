@@ -94,7 +94,13 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     const steps = collectMatchSteps(osmd, "both");
     host.remove();
 
-    const notes = performanceOf(steps, { speed: request.speed, withinMs: request.clipMs });
+    const notes = performanceOf(
+        steps,
+        // No window means the whole piece, which is what a full-length upload is.
+        request.clipMs > 0
+            ? { speed: request.speed, withinMs: request.clipMs }
+            : { speed: request.speed },
+    );
     if (notes.length === 0) {
         throw new Error(`${request.scoreUrl}: nothing to play`);
     }
