@@ -16,6 +16,13 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const [ready, setReady] = useState(false);
+    // Raised each time the strip finishes a render, and what the halo painting below waits
+    // on. `ready` alone cannot serve as that signal: a reload sets it false and then true
+    // again, and where those land without a committed render between them — a two-bar strip
+    // whose module is already imported resolves very fast — the value never appears to
+    // change, the painting effect's dependencies look untouched, and the freshly rendered
+    // bars keep none of their highlight.
+    const [renders, setRenders] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
@@ -38,6 +45,7 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
                     if (!cancelled) {
                         osmd.render();
                         setReady(true);
+                        setRenders((count) => count + 1);
                     }
                 });
             })
@@ -49,6 +57,10 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
     }, [xml]);
 
     // Light the current two bars and slide them to the centre as the cursor advances.
+    //
+    // `renders` is not read in the body — it is the trigger, standing for "the strip drew
+    // itself again", which is when the halo has to go back on.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: renders is the render-completed trigger
     useEffect(() => {
         const osmd = osmdRef.current;
         const container = containerRef.current;
@@ -61,7 +73,7 @@ export function FocusStrip({ xml, bar, label }: { xml: string; bar: number; labe
         }
         paintMeasureRange(osmd, bar, bar + 2, WINDOW_COLOR);
         scrollMeasureIntoView(osmd, bar, container);
-    }, [bar, ready]);
+    }, [bar, ready, renders]);
 
     useEffect(() => () => osmdRef.current?.clear(), []);
 

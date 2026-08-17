@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**The recorded piano follows a piece into a new key.** Transposing a piece — by hand, or
+because it moved to fit your keyboard — left the moved notes playing the synthesised voice
+in Firefox, because nothing went and fetched the recordings for the notes it now sounds.
+It does now. The bar highlight on the phone's focus strip could go missing after the same
+kind of redraw, and stays put.
+
 **Pieces fit the keyboard you actually have.** Not every keyboard has 88 keys, and a
 61-key one simply has no key for the low notes a piece might reach. Plinky now reads the
 size off your keyboard's name where it can — a "Keystation 61" says what it is — and you

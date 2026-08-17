@@ -18,8 +18,28 @@ import { collectMatchSteps } from "./useScoreMatcher";
 //
 // Nothing waits on it. A recording that has not arrived is a note the synthesised voice
 // plays, so the worst case for a slow connection is the instrument Plinky always had.
-export function useSamplePrefetch(getOsmd: () => OpenSheetMusicDisplay | null, ready: boolean) {
+//
+// It asks again every time the sheet is re-engraved, because a piece in another key is a
+// different set of recordings — a transposed passage needs the notes it now sounds, not the
+// ones it was printed with. The trigger is the counter the score hook raises when a render
+// completes, rather than `ready`: a reload quick enough to set that false and true again
+// inside one commit leaves the dependency list unchanged, and then nothing is ever fetched
+// for the new key. That is not hypothetical — it is what Firefox does, and it left every
+// transposed note falling back to the synthesised voice while Chromium sounded recorded.
+export function useSamplePrefetch({
+    getOsmd,
+    ready,
+    renderVersion,
+}: {
+    getOsmd: () => OpenSheetMusicDisplay | null;
+    ready: boolean;
+    // Raised by the score hook once a render has finished; see useOsmdScore.
+    renderVersion: number;
+}) {
     const samples = useSampleSource();
+    // renderVersion is not read in the body — it is the trigger, standing for "the sheet on
+    // screen changed".
+    // biome-ignore lint/correctness/useExhaustiveDependencies: renderVersion is the render-completed trigger
     useEffect(() => {
         const osmd = getOsmd();
         if (!ready || !osmd || !samples.state().enabled) {
@@ -30,5 +50,5 @@ export function useSamplePrefetch(getOsmd: () => OpenSheetMusicDisplay | null, r
         // the source's question: it holds the manifest, and waiting for one here is what
         // made this never run at all.
         void samples.prepare(performanceOf(collectMatchSteps(osmd, "both")));
-    }, [getOsmd, ready, samples]);
+    }, [getOsmd, ready, renderVersion, samples]);
 }
