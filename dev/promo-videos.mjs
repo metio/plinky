@@ -15,7 +15,7 @@
 // share-alike travels with the video, and a feed is the worst place to argue about it.
 
 import { spawn, spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { createWriteStream, mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
 import { chromium } from "playwright";
 
 const OUT = argValue("--out") ?? "promo";
@@ -202,9 +202,12 @@ async function waitForServer(url, attempts = 120) {
 const manifest = JSON.parse(readFileSync("public/songs/manifest.json", "utf8"));
 mkdirSync(OUT, { recursive: true });
 
+// The dev server is here only to compile modules for the browser; nothing is being edited
+// while a render runs, and a watcher would reload the page mid-frame the moment anything in
+// the tree changed. An hour-long batch should not be hostage to a stray save.
 const server = spawn("npx", ["react-router", "dev", "--port", String(PORT)], {
     stdio: "inherit",
-    env: process.env,
+    env: { ...process.env, PLINKY_NO_WATCH: "1" },
 });
 const base = `http://localhost:${PORT}`;
 
@@ -216,6 +219,17 @@ try {
         args: ["--autoplay-policy=no-user-gesture-required", "--disable-gpu"],
     });
     const page = await browser.newPage();
+    // The finished video comes back a megabyte at a time, straight to disk.
+    //
+    // It used to cross as one Array.from(bytes), which turns a video into a JS array of a
+    // few million numbers and then JSON on both sides of the bridge. A twenty-second clip
+    // survives that; a whole piece is several times the size and killed node with a heap
+    // OOM partway through the batch. Streaming it bounds the memory at one chunk, however
+    // long the piece.
+    let sink = null;
+    await page.exposeFunction("__promoChunk", (encoded) => {
+        sink?.write(Buffer.from(encoded, "base64"));
+    });
     page.on("console", (message) => {
         if (message.type() === "error") {
             console.error("  browser:", message.text());
@@ -232,11 +246,25 @@ try {
         try {
         const { url, song } = scoreUrl(piece.id, manifest);
         const started = Date.now();
-        const bytes = await page.evaluate(
+        const file = fileFor(piece, OUT);
+        sink = createWriteStream(file);
+        const size = await page.evaluate(
             async (request) => {
                 const module = await import("/dev/promo/renderPromo.ts");
                 const data = await module.renderPromo(request);
-                return Array.from(data);
+                // A megabyte per message, and base64 built in small runs — spreading a
+                // whole megabyte into String.fromCharCode overflows the argument stack.
+                const CHUNK = 1 << 20;
+                const RUN = 0x8000;
+                for (let at = 0; at < data.length; at += CHUNK) {
+                    const slice = data.subarray(at, at + CHUNK);
+                    let binary = "";
+                    for (let index = 0; index < slice.length; index += RUN) {
+                        binary += String.fromCharCode(...slice.subarray(index, index + RUN));
+                    }
+                    await window.__promoChunk(btoa(binary));
+                }
+                return data.length;
             },
             {
                 scoreUrl: url,
@@ -254,14 +282,22 @@ try {
                 samplesBase: SAMPLES,
             },
         );
-        const file = fileFor(piece, OUT);
-        writeFileSync(file, Buffer.from(bytes));
+        await new Promise((done) => sink.end(done));
+        sink = null;
         toAac(file);
         const seconds = ((Date.now() - started) / 1000).toFixed(1);
-        console.log(`${(bytes.length / 1_000_000).toFixed(1)} MB in ${seconds}s → ${file}`);
+        console.log(`${(size / 1_000_000).toFixed(1)} MB in ${seconds}s → ${file}`);
         void song;
         } catch (error) {
             failed += 1;
+            // A piece that failed partway has a half-written file open on it; close it and
+            // take it away, so a skipped clip is absent rather than truncated.
+            if (sink) {
+                const partial = sink.path;
+                await new Promise((done) => sink.end(done));
+                sink = null;
+                rmSync(partial, { force: true });
+            }
             console.log(`skipped: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
