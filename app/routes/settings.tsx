@@ -129,10 +129,15 @@ export default function Settings() {
                     onChange={(sound) => update({ sound })}
                 />
                 <GrandPianoSetting />
-                <div className="flex items-center gap-3">
+                {/* Wraps, and the slider gives up its width first: a label, a slider, a
+                    reading and a button do not fit across a 320px phone in one line, and
+                    the slider is the only one of the four that is still itself when it is
+                    narrower. */}
+                <div className="flex flex-wrap items-center gap-3">
                     <span className="text-sm text-body">{m.settings_volume()}</span>
                     <input
                         type="range"
+                        className="min-w-24 flex-1"
                         aria-label={m.settings_volume()}
                         min={0}
                         max={100}
