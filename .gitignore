@@ -55,6 +55,7 @@ __pycache__/
 # Piano demos rendered by npm run piano:demo, and any sample library unpacked to compare
 # against. The library is 1.2 GB and is not ours to redistribute.
 /piano-demo/
+/piano-pack/
 
 # design-sync: build artifacts, transient scratch and verification working state.
 # The durable set (config.json, NOTES.md, conventions.md, previews/, overrides/) is committed.
