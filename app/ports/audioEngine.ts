@@ -13,6 +13,11 @@ import type { PedalKind } from "../../core/pedals";
 export type NoteStrike = {
     note: number; // MIDI note number
     gain: number;
+    // How hard the key was hit, 0..127, before the volume preference was folded into
+    // `gain`. A synthesised voice needs only the gain; a recorded one needs this, because
+    // which recording answers the note IS the dynamic — scaling it by velocity again would
+    // play a pianissimo layer pianissimo twice.
+    velocity: number;
     duration: number; // seconds
     delay: number; // seconds from now on the audio clock
 };
@@ -48,7 +53,7 @@ export interface AudioEngine {
     // so the sound follows the player's own key hold — a quick release sounds staccato, a
     // long hold sustains. Re-pressing a still-sounding note restarts it. `gain` is the final
     // loudness (0..1), velocity and volume already applied.
-    press(note: number, gain: number): void;
+    press(note: number, gain: number, velocity: number): void;
     // End a sustaining voice, ringing it out over a tail scaled to how long it was held —
     // unless a pedal is holding it, when it keeps ringing until the pedal lifts. holdScale
     // (default 1) lengthens the ring as if the key had been held that many times longer, so

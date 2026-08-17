@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { playbackRateFor, regionFor } from "../../core/sampledPiano";
-import type { SampleSource } from "../ports/sampleSource";
-import type { SampleLookup, SampleVoice } from "../adapters/webAudioEngine";
+import type { SampleLookup, SampleSource, SampleVoice } from "../ports/sampleSource";
 
 // Turns "this key, this hard" into "this recording, played this fast" — the pure mapping in
 // core over whatever the source has decoded so far.

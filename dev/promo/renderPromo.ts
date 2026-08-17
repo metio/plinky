@@ -19,6 +19,9 @@ import {
     noteColorHex,
 } from "../../core/videoLook";
 import { webCodecsVideoExporter } from "../../app/adapters/webCodecsVideo";
+import { webSampleSource } from "../../app/adapters/webSampleSource";
+import { playFromSamples } from "../../app/adapters/webAudioEngine";
+import { sampleLookup } from "../../app/lib/sampleVoices";
 import { takeHighwayPainter } from "../../app/lib/videoPainter";
 import { collectMatchSteps } from "../../app/hooks/useScoreMatcher";
 
@@ -39,7 +42,32 @@ export type PromoRequest = {
     // Named looks from core/videoLook, the same set the export panel offers.
     noteColor?: string;
     keyboardDepth?: string;
+    // Where the recorded piano is published. Absent means the synthesised voice, which is
+    // what a player without the recordings hears.
+    samplesBase?: string;
 };
+
+// Fetches the recordings this clip will play and hands them to the engine, so the export
+// carries the recorded piano rather than the synth.
+//
+// A clip is posted once and watched by people deciding whether to open the app at all, so
+// unlike a player's own export it waits: nothing here is racing a pair of hands, and a
+// promo that falls back mid-phrase would advertise the wrong instrument. It still falls
+// back per note rather than failing — a recording that will not come is one the synth
+// covers, and no clip is worth losing to it.
+async function loadSamples(base: string, notes: { pitch: number; velocity: number }[]) {
+    const samples = webSampleSource({
+        baseUrl: base,
+        enabled: true,
+        remember: () => {},
+        // Decoded straight into the rate the export renders at, so nothing is resampled
+        // between the fetch and the file.
+        context: async () => new OfflineAudioContext(2, 1, 48_000),
+    });
+    playFromSamples(() => ({ source: sampleLookup(samples) }));
+    await samples.prepare(notes);
+    return samples.state();
+}
 
 export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
     if (!(await webCodecsVideoExporter.supported())) {
@@ -95,6 +123,13 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         byFinger: (request.noteColor ?? DEFAULT_NOTE_COLOR) === BY_FINGER,
         keyboardDepth: keyboardDepthFraction(request.keyboardDepth ?? DEFAULT_KEYBOARD_DEPTH),
     });
+
+    if (request.samplesBase) {
+        const held = await loadSamples(request.samplesBase, notes);
+        if (held.ready === 0) {
+            throw new Error(`no recordings loaded from ${request.samplesBase}`);
+        }
+    }
 
     const blob = await webCodecsVideoExporter.export({
         width: request.width,

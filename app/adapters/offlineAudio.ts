@@ -32,6 +32,7 @@ export function renderTakeAudio(
             {
                 note: note.pitch,
                 gain,
+                velocity: note.velocity,
                 duration: note.durationMs / 1000,
                 delay: (LEAD_IN_MS + note.startMs) / 1000,
             },
@@ -39,7 +40,7 @@ export function renderTakeAudio(
             // arrived is played by the synth here exactly as it was in the room, so an
             // export always sounds like the take it is of — and never fails for the want
             // of a recording.
-            sampleVoiceFor(note.pitch, gain),
+            sampleVoiceFor(note.pitch, note.velocity),
         );
     }
     return ctx.startRendering();

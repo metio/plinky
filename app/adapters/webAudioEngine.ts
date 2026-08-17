@@ -3,6 +3,7 @@
 
 import { midiToFrequency } from "../../core/pitch";
 import type { AudioEngine, ClickKind, NoteStrike } from "../ports/audioEngine";
+import type { SampleLookup, SampleVoice } from "../ports/sampleSource";
 
 // The Web Audio implementation of the sound seam: one shared AudioContext (a
 // browser limits how many a page may open, and one context keeps the metronome
@@ -190,11 +191,6 @@ export type StruckStrike = {
     releaseEnd: number;
 };
 
-// A recording ready to sound this note: the decoded audio, and how fast to play it so the
-// pitch is right. Absent means the synthesised voice, which is what every note uses until
-// the recordings arrive.
-export type SampleVoice = { buffer: AudioBuffer; rate: number };
-
 export function renderStrike(
     ctx: BaseAudioContext,
     strike: NoteStrike,
@@ -267,14 +263,24 @@ export function renderStrike(
 // caller's volume setting asks for, not the dynamic.
 const DAMPER_S = 0.35;
 
-// The recordings are made to use the whole scale, one layer per dynamic, and the caller's
-// gain already carries the volume setting — so this is only the headroom that keeps a
-// ten-note chord of real piano off the limiter.
-const SAMPLE_TRIM = 0.55;
+// A recording is made at the dynamic it was played at, so the loudness that belongs to a
+// sampled note is the volume preference alone. The caller folds velocity into `gain`, which
+// is right for a synthesised voice and would be applied twice here — a soft note picking a
+// soft recording and then being turned down again. This takes the velocity back out and
+// leaves the preference.
+//
+// The trim is what keeps a ten-note chord of real piano off the limiter: the recordings
+// reach for the whole scale where the synth's partials sit well under it.
+const SAMPLE_TRIM = 1.9;
+
+function sampledLevel(gain: number, velocity: number): number {
+    const preference = velocity > 0 ? gain * (127 / velocity) : gain;
+    return Math.min(1, preference * SAMPLE_TRIM);
+}
 
 function renderSampledStrike(
     ctx: BaseAudioContext,
-    { gain, duration, delay }: NoteStrike,
+    { gain, velocity, duration, delay }: NoteStrike,
     sample: SampleVoice,
 ): StruckStrike {
     const now = ctx.currentTime + Math.max(0, delay);
@@ -282,12 +288,11 @@ function renderSampledStrike(
     source.buffer = sample.buffer;
     source.playbackRate.value = sample.rate;
 
+    const level = sampledLevel(gain, velocity);
     const envelope = ctx.createGain();
-    // The recording's own level is the dynamic; SAMPLE_TRIM keeps a chord of them off the
-    // limiter, since sixteen layers of a real piano are recorded to use the whole scale.
-    envelope.gain.setValueAtTime(gain * SAMPLE_TRIM, now);
+    envelope.gain.setValueAtTime(level, now);
     const damperFrom = now + Math.max(0.05, duration);
-    envelope.gain.setValueAtTime(gain * SAMPLE_TRIM, damperFrom);
+    envelope.gain.setValueAtTime(level, damperFrom);
     envelope.gain.exponentialRampToValueAtTime(0.0001, damperFrom + DAMPER_S);
     envelope.connect(master(ctx));
 
@@ -305,9 +310,14 @@ function renderSampledStrike(
 // long hold rings on. These live on the shared context; the offline export uses renderStrike.
 type Voice = {
     envelope: GainNode;
-    oscillators: OscillatorNode[];
+    // Oscillators for the synthesised voice, one buffer source for a recorded one. Both are
+    // scheduled sources, and a held voice only ever starts and stops them.
+    oscillators: AudioScheduledSourceNode[];
     frequency: number;
     startedAt: number; // ctx.currentTime at press, for the held-scaled tail
+    // A recording rings the way the string did; there is no synthesised tail to model, so
+    // the ending is a damper falling and nothing else.
+    sampled?: boolean;
 };
 const voices = new Map<number, Voice>();
 // Notes whose key is physically down right now. A voice ends only once nothing holds it:
@@ -331,6 +341,34 @@ function maybeEnd(ctx: AudioContext, note: number, holdScale = 1): void {
     if (!stillHeld(note)) {
         endVoice(ctx, note, holdScale);
     }
+}
+
+// A held voice played from a recording of a real piano. The recording carries the attack
+// and the decay of a string struck that hard, so nothing is shaped on the way in: it starts
+// at the level the volume preference asks for and holds until the key comes up. That is the
+// whole difference between a sampled piano and a synthesised one — there is nothing to
+// imitate, only something to stop.
+function buildSampledVoice(
+    ctx: AudioContext,
+    frequency: number,
+    gain: number,
+    velocity: number,
+    sample: SampleVoice,
+): Voice {
+    const now = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = sample.buffer;
+    source.playbackRate.value = sample.rate;
+
+    const envelope = ctx.createGain();
+    envelope.gain.setValueAtTime(sampledLevel(gain, velocity), now);
+    envelope.connect(master(ctx));
+    source.connect(envelope);
+    source.start(now);
+    // Long enough that a held key never runs out of recording before the player lifts it;
+    // the buffer simply ends if they hold it longer than the string rang.
+    source.stop(now + sample.buffer.duration);
+    return { envelope, oscillators: [source], frequency, startedAt: now, sampled: true };
 }
 
 // A held voice: the same partials, attack and darkening filter as a struck note, but with
@@ -398,7 +436,11 @@ function endVoice(ctx: AudioContext, note: number, holdScale = 1): void {
     const held = ctx.currentTime - voice.startedAt;
     const effective = held * holdScale;
     const extra = Math.min(Math.max(0, effective - held), MAX_HOLD_EXTRA);
-    fadeVoice(ctx, voice, ringTail(voice.frequency, effective), extra);
+    // A recording is the string's own ring, so the ending is the damper landing on it —
+    // one fall, the same for every note. The synthesised voice models a tail instead,
+    // because it has none of its own.
+    const tail = voice.sampled ? DAMPER_S : ringTail(voice.frequency, effective);
+    fadeVoice(ctx, voice, tail, extra);
     voices.delete(note);
 }
 
@@ -464,10 +506,6 @@ export function audioContext(): BaseAudioContext | null {
 // difference between a note that sounds and one that waits.
 let samples: (() => { source: SampleLookup | null }) | null = null;
 
-export type SampleLookup = {
-    voiceFor(pitch: number, velocity: number): SampleVoice | null;
-};
-
 // Hand the engine the recordings to play from. Not a hook and not a subscription: one
 // module-level wire, set once at the composition root.
 export function playFromSamples(lookup: () => { source: SampleLookup | null }): void {
@@ -477,15 +515,15 @@ export function playFromSamples(lookup: () => { source: SampleLookup | null }): 
 // The recording for a note, or nothing. Exported so the offline render behind the video
 // export plays the same instrument the speakers just did — an exported take that sounds
 // different from the take is a bug nobody would report as one.
-export function sampleVoiceFor(pitch: number, gain: number): SampleVoice | undefined {
-    return voiceFor(pitch, gain);
+export function sampleVoiceFor(pitch: number, velocity: number): SampleVoice | undefined {
+    return voiceFor(pitch, velocity);
 }
 
-function voiceFor(pitch: number, gain: number): SampleVoice | undefined {
-    // The gain the caller passes has the volume setting in it; the recording is chosen by
-    // how hard the key was hit, which is what the caller's velocity said before that.
-    const velocity = Math.max(1, Math.min(127, Math.round((gain / 0.32) * 127)));
-    return samples?.().source?.voiceFor(pitch, velocity) ?? undefined;
+function voiceFor(pitch: number, velocity: number): SampleVoice | undefined {
+    return (
+        samples?.().source?.voiceFor(pitch, Math.max(1, Math.min(127, Math.round(velocity)))) ??
+        undefined
+    );
 }
 
 export const webAudioEngine: AudioEngine = {
@@ -515,7 +553,7 @@ export const webAudioEngine: AudioEngine = {
     strike(note) {
         const ctx = context();
         if (ctx && note.gain > 0) {
-            const strike = renderStrike(ctx, note, voiceFor(note.note, note.gain));
+            const strike = renderStrike(ctx, note, voiceFor(note.note, note.velocity));
             scheduledStrikes.add(strike);
             // Drop it from the tracked set once it has finished ringing, so the set holds
             // only strikes that are still (or not yet) sounding.
@@ -528,7 +566,7 @@ export const webAudioEngine: AudioEngine = {
             );
         }
     },
-    press(note, gain) {
+    press(note, gain, velocity) {
         const ctx = context();
         if (!ctx || gain <= 0) {
             return;
@@ -541,9 +579,13 @@ export const webAudioEngine: AudioEngine = {
         }
         keyDown.add(note);
         // The soft pedal gentles a note struck while it is held.
+        const level = softDown ? gain * SOFT_GAIN : gain;
+        const sample = voiceFor(note, velocity);
         voices.set(
             note,
-            buildVoice(ctx, midiToFrequency(note), softDown ? gain * SOFT_GAIN : gain),
+            sample
+                ? buildSampledVoice(ctx, midiToFrequency(note), level, velocity, sample)
+                : buildVoice(ctx, midiToFrequency(note), level),
         );
         // The voice rings for at least ~1.5s; enough of a window for the mic echo probe,
         // which mic input skips anyway (a mic player hears their own piano, not this).

@@ -35,6 +35,13 @@ wider than a narrow screen — and the footer is on every page, so the whole sit
 sideways with it. It stacks now instead of squeezing, and the volume row in Settings, which
 had the same problem, does too.
 
+**The recorded piano plays under your own hands too.** It was only ever reaching Listen,
+replay and the video export — press a key yourself and you still got the synthesised one.
+Every note you play comes from the recordings now, and each key you strike picks the
+recording of that key struck that hard. It was also much too quiet: the recordings already
+carry the dynamic they were played at, and Plinky was turning them down by how hard you
+hit the key on top of that, so a soft note was played softly twice.
+
 **A recorded grand piano, if you want one.** Settings → Sound has a switch for it: real
 recordings of a concert grand instead of the sound Plinky makes itself, sixteen different
 recordings of every key depending on how hard you hit it. There is no download to sit

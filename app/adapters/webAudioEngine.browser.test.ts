@@ -15,7 +15,7 @@ describe("webAudioEngine", () => {
     it("builds a strike and a click without throwing", () => {
         expect(() => {
             webAudioEngine.resume();
-            webAudioEngine.strike({ note: 60, gain: 0.2, duration: 0.2, delay: 0 });
+            webAudioEngine.strike({ note: 60, gain: 0.2, velocity: 90, duration: 0.2, delay: 0 });
             webAudioEngine.click((webAudioEngine.now() ?? 0) + 0.05, "accent", 0.2);
         }).not.toThrow();
     });
@@ -24,24 +24,24 @@ describe("webAudioEngine", () => {
         expect(() => {
             webAudioEngine.resume();
             // Press, re-press (replaces), release under the pedal (held), then lift it.
-            webAudioEngine.press(64, 0.2);
-            webAudioEngine.press(64, 0.2);
+            webAudioEngine.press(64, 0.2, 90);
+            webAudioEngine.press(64, 0.2, 90);
             webAudioEngine.setPedal("sustain", true);
             webAudioEngine.release(64); // held by the pedal, not ended
             webAudioEngine.setPedal("sustain", false); // now ended
             // The other two pedals build and tear down cleanly too.
-            webAudioEngine.press(67, 0.2);
+            webAudioEngine.press(67, 0.2, 90);
             webAudioEngine.setPedal("sostenuto", true);
             webAudioEngine.release(67); // held by sostenuto's snapshot
             webAudioEngine.setPedal("soft", true);
-            webAudioEngine.press(69, 0.2); // struck softly
+            webAudioEngine.press(69, 0.2, 90); // struck softly
             webAudioEngine.setPedal("soft", false);
             webAudioEngine.setPedal("sostenuto", false);
             // A release for a note that never pressed is a harmless no-op.
             webAudioEngine.release(99);
             // A generous release (an imprecise input's tap let ring) schedules a longer
             // envelope without throwing.
-            webAudioEngine.press(72, 0.2);
+            webAudioEngine.press(72, 0.2, 90);
             webAudioEngine.release(72, 1.8);
         }).not.toThrow();
     });
@@ -71,7 +71,7 @@ describe("webAudioEngine", () => {
         // (an ear-training question's later notes) rings on past a panic or a page change.
         expect(() => {
             webAudioEngine.resume();
-            webAudioEngine.strike({ note: 60, gain: 0.2, duration: 0.5, delay: 2 });
+            webAudioEngine.strike({ note: 60, gain: 0.2, velocity: 90, duration: 0.5, delay: 2 });
             webAudioEngine.allNotesOff();
             // A second panic with nothing pending is a clean no-op.
             webAudioEngine.allNotesOff();
@@ -81,7 +81,7 @@ describe("webAudioEngine", () => {
     it("ignores a zero-gain strike instead of feeding it to a ramp", () => {
         // An exponential ramp to 0 is a RangeError; the engine must drop it.
         expect(() =>
-            webAudioEngine.strike({ note: 60, gain: 0, duration: 0.2, delay: 0 }),
+            webAudioEngine.strike({ note: 60, gain: 0, velocity: 90, duration: 0.2, delay: 0 }),
         ).not.toThrow();
     });
 
