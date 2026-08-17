@@ -15,7 +15,14 @@
 // share-alike travels with the video, and a feed is the worst place to argue about it.
 
 import { spawn, spawnSync } from "node:child_process";
-import { createWriteStream, mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
+import {
+    createWriteStream,
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    renameSync,
+    rmSync,
+} from "node:fs";
 import { chromium } from "playwright";
 
 const OUT = argValue("--out") ?? "promo";
@@ -42,6 +49,11 @@ const KEYBOARD_DEPTH = "shallow";
 const PORT = 5199;
 // Render only the pieces whose title contains this, for a re-run of one clip.
 const ONLY = argValue("--only");
+// Pick up where a previous run stopped, rather than re-rendering an hour of finished
+// clips. A whole-catalogue batch takes long enough that something will interrupt it —
+// a machine that goes to sleep, a stray edit that trips the dev server's own config
+// watcher — and re-running from the top is a poor answer to any of them.
+const RESUME = process.argv.includes("--resume");
 
 // The pieces worth leading with: recognisable in three seconds, and CC0, so nothing is
 // owed by a post that carries only the picture. Ids are content fingerprints, so a
@@ -238,8 +250,13 @@ try {
     await page.goto(`${base}/en/`, { waitUntil: "domcontentloaded" });
 
     let failed = 0;
+    let skipped = 0;
     for (const piece of PIECES) {
         if (ONLY && !piece.title.toLowerCase().includes(ONLY.toLowerCase())) {
+            continue;
+        }
+        if (RESUME && existsSync(fileFor(piece, OUT))) {
+            skipped += 1;
             continue;
         }
         process.stdout.write(`${piece.title} … `);
@@ -301,7 +318,13 @@ try {
             console.log(`skipped: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
-    console.log(`${PIECES.length - failed}/${PIECES.length} rendered into ${OUT}/`);
+    // Named rather than folded into the total: a run that quietly reports "55/55" after
+    // rendering eight of them reads as complete coverage when it is not.
+    const attempted = PIECES.length - skipped;
+    console.log(
+        `${attempted - failed}/${attempted} rendered into ${OUT}/` +
+            (skipped > 0 ? `, ${skipped} already there` : ""),
+    );
     await browser.close();
 } finally {
     server.kill("SIGTERM");
