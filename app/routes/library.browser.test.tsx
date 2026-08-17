@@ -3,7 +3,7 @@
 
 import { testMasteryStore } from "../testing/stores";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { browserStore } from "../adapters/browserStore";
 import { domXmlCodec } from "../adapters/domXmlCodec";
@@ -35,10 +35,19 @@ afterEach(() => {
 // Renders in the browser project so the catalogue glob and DOMParser-based grading
 // run as they do in the app; the song manifest fetch 404s here, leaving the bundled
 // exercises, which is what these assertions cover.
+// The address the router holds, which under MemoryRouter is not window.location.
+let seenSearch = "";
+function AddressProbe() {
+    seenSearch = useLocation().search;
+    return null;
+}
+
 function renderLibrary() {
+    seenSearch = "";
     return render(
         <MemoryRouter>
             <Library />
+            <AddressProbe />
         </MemoryRouter>,
     );
 }
@@ -57,6 +66,35 @@ describe("Library", () => {
         await screen.findByText("Ode to Joy");
         fireEvent.change(screen.getByRole("searchbox"), { target: { value: "no-such-piece" } });
         expect(await screen.findByText("No scores match your search.")).toBeTruthy();
+    });
+
+    it("types without putting a navigation between the key and the letter", async () => {
+        // The reported bug: the box was fed from the page's address, so every keystroke
+        // was a router navigation and the value shown had been through one. Typed at
+        // speed the field lagged and characters went missing.
+        //
+        // What is asserted is the shape of the fix rather than the symptom, because the
+        // symptom needs real keystroke timing that fireEvent cannot produce: the letters
+        // are in the box immediately, and the address has not moved at all yet. Wired the
+        // old way the address changes on the first keystroke, and this fails there.
+        renderLibrary();
+        await screen.findByText("Ode to Joy");
+        const box = screen.getByRole("searchbox") as HTMLInputElement;
+
+        const word = "moonlight";
+        for (let at = 1; at <= word.length; at++) {
+            fireEvent.change(box, { target: { value: word.slice(0, at) } });
+            expect(box.value).toBe(word.slice(0, at));
+        }
+        expect(seenSearch).not.toContain("q=");
+
+        // Late rather than never: the address is what carries a search through opening a
+        // piece and coming back, and what a shared link holds.
+        await waitFor(() => expect(seenSearch).toContain("q=moonlight"), { timeout: 5000 });
+        // And the shelf agrees with the box.
+        await waitFor(() => expect(screen.queryByText("Ode to Joy")).toBeNull(), {
+            timeout: 5000,
+        });
     });
 
     it("offers a multi-select grade filter", async () => {

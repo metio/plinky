@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**The library's search box keeps up with you.** Every letter you typed used to travel
+through the page's address before it appeared, so typing quickly felt like it was being
+blocked and characters went missing. The box is its own now — letters land as you press
+them, the shelf catches up a moment later, and the address still records the search so a
+link carries it and coming back from a piece finds it.
+
 **Everything about a piece is behind one heading.** "How you play" and "Extra challenge"
 were two open panels under every score; they are now one fold called *How you play*, shut
 until you want it, so a piece's page opens on the music. *How the sheet looks* is beside

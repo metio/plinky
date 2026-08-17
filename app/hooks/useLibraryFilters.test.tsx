@@ -7,9 +7,15 @@ import type { ReactNode } from "react";
 import { MemoryRouter, useLocation } from "react-router";
 import { describe, expect, it } from "vitest";
 import type { LibraryItem } from "../../core/library";
+import { fakeScheduler } from "../testing/fakeScheduler";
+import { advanceScheduler } from "../testing/advanceScheduler";
 import { memoryStore } from "../adapters/memoryStore";
 import { createServices, ServicesProvider } from "../contexts/services";
 import { useLibraryFilters } from "./useLibraryFilters";
+
+// The search text reaches the address on a timer, so a test that wants to see it there
+// drives the clock rather than waiting on one.
+const SETTLE_MS = 500;
 
 const item = (parts: Partial<LibraryItem>): LibraryItem => ({
     id: "id",
@@ -23,13 +29,14 @@ const item = (parts: Partial<LibraryItem>): LibraryItem => ({
 
 // The filters live in the address, so every render needs a router around them.
 const world = (start = "/library") => {
-    const services = createServices({ store: memoryStore() });
+    const scheduler = fakeScheduler();
+    const services = createServices({ store: memoryStore(), scheduler });
     const wrapper = ({ children }: { children: ReactNode }) => (
         <MemoryRouter initialEntries={[start]}>
             <ServicesProvider services={services}>{children}</ServicesProvider>
         </MemoryRouter>
     );
-    return { services, wrapper };
+    return { services, scheduler, wrapper };
 };
 
 describe("useLibraryFilters", () => {
@@ -84,11 +91,11 @@ describe("useLibraryFilters", () => {
         expect(result.current.visible).toBe(60);
     });
 
-    it("opens on the grade the address names, and writes every filter back to it", () => {
+    it("opens on the grade the address names, and writes every filter back to it", async () => {
         // What the shelf forgets, it forgets on the way to a piece and back. The address
         // makes the trip; component state does not.
         const items = [item({ id: "g1", grade: 1 }), item({ id: "g6", grade: 6 })];
-        const { wrapper } = world("/library?grade=6");
+        const { wrapper, scheduler } = world("/library?grade=6");
         const { result } = renderHook(
             () => ({ filters: useLibraryFilters(items, {}), location: useLocation() }),
             { wrapper },
@@ -96,20 +103,25 @@ describe("useLibraryFilters", () => {
         expect(result.current.filters.matches.map((entry) => entry.id)).toEqual(["g6"]);
         act(() => result.current.filters.setQuery("piece"));
         act(() => result.current.filters.toggleFreshOnly());
+        // The typing reaches the address once it pauses; the chips go straight there.
+        await advanceScheduler(scheduler, SETTLE_MS);
         const params = new URLSearchParams(result.current.location.search);
         expect(params.get("grade")).toBe("6");
         expect(params.get("q")).toBe("piece");
         expect(params.get("fresh")).toBe("1");
     });
 
-    it("leaves the rest of the address alone", () => {
-        const { wrapper } = world("/library?tab=people");
+    it("leaves the rest of the address alone", async () => {
+        const { wrapper, scheduler } = world("/library?tab=people");
         const { result } = renderHook(
             () => ({ filters: useLibraryFilters([], {}), location: useLocation() }),
             { wrapper },
         );
         act(() => result.current.filters.setQuery("bach"));
-        expect(new URLSearchParams(result.current.location.search).get("tab")).toBe("people");
+        await advanceScheduler(scheduler, SETTLE_MS);
+        const params = new URLSearchParams(result.current.location.search);
+        expect(params.get("tab")).toBe("people");
+        expect(params.get("q")).toBe("bach");
     });
 
     it("filters to due pieces from the mastery map", () => {

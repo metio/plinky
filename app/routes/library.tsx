@@ -108,7 +108,7 @@ export default function LibraryRoute() {
             {tab === "people" && (
                 <div className="space-y-3">
                     <p className="text-sm text-muted">{m.library_people_hint()}</p>
-                    <ComposerList query={filters.query} />
+                    <ComposerList query={filters.applied} />
                 </div>
             )}
 
