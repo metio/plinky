@@ -26,6 +26,9 @@ const MANIFEST: SampleManifest = {
 
 const REGION: SampleRegion = MANIFEST.notes[0]!;
 
+// A note the one recording in this manifest answers.
+const NOTE = { pitch: 60, velocity: 100 };
+
 // A cache that remembers what it was given, so a second run can be shown to ask the
 // network for nothing.
 function fakeCache() {
@@ -65,6 +68,15 @@ function world(options: { failManifest?: boolean; cache?: Cache } = {}) {
 }
 
 describe("webSampleSource", () => {
+    it("maps a note to its recording itself, so a caller needs no manifest first", async () => {
+        // The port takes notes rather than recordings for exactly this reason: on any page
+        // load the manifest is not here yet, and a caller made to fetch it before it can
+        // prefetch simply never prefetches.
+        const { source, asked } = world();
+        await source.prepare([NOTE]);
+        expect(asked.at(-1)).toBe("https://samples.test/v1/C4v4.opus");
+    });
+
     it("has nothing to play until a recording has been prepared", () => {
         const { source } = world();
         expect(source.bufferFor(REGION)).toBeNull();
@@ -73,7 +85,7 @@ describe("webSampleSource", () => {
 
     it("fetches the manifest and the recordings a piece asked for", async () => {
         const { source, asked } = world();
-        await source.prepare([REGION]);
+        await source.prepare([NOTE]);
         expect(asked).toEqual([
             "https://samples.test/v1/manifest.json",
             "https://samples.test/v1/C4v4.opus",
@@ -84,17 +96,17 @@ describe("webSampleSource", () => {
 
     it("asks for a recording once, however many notes want it", async () => {
         const { source, asked } = world();
-        await Promise.all([source.prepare([REGION]), source.prepare([REGION])]);
-        await source.prepare([REGION]);
+        await Promise.all([source.prepare([NOTE]), source.prepare([NOTE])]);
+        await source.prepare([NOTE]);
         expect(asked.filter((url) => url.endsWith("C4v4.opus"))).toHaveLength(1);
     });
 
     it("takes a second visit's recordings from the cache instead of the network", async () => {
         const { cache } = fakeCache();
         const first = world({ cache });
-        await first.source.prepare([REGION]);
+        await first.source.prepare([NOTE]);
         const second = world({ cache });
-        await second.source.prepare([REGION]);
+        await second.source.prepare([NOTE]);
         // The manifest and the recording both came from the cache this time.
         expect(second.asked).toEqual([]);
         expect(second.source.bufferFor(REGION)).not.toBeNull();
@@ -102,7 +114,7 @@ describe("webSampleSource", () => {
 
     it("stays quiet rather than failing when the recordings cannot be reached", async () => {
         const { source } = world({ failManifest: true });
-        await source.prepare([REGION]);
+        await source.prepare([NOTE]);
         expect(source.manifest()).toBeNull();
         expect(source.bufferFor(REGION)).toBeNull();
         // Nothing threw: a piece with no recordings is a piece the synth plays.
@@ -112,13 +124,13 @@ describe("webSampleSource", () => {
     it("fetches nothing at all until the player has asked for the real piano", async () => {
         const { source, asked } = world();
         await source.forget();
-        await source.prepare([REGION]);
+        await source.prepare([NOTE]);
         expect(asked).toEqual([]);
     });
 
     it("remembers the choice both ways, and forgets what it decoded", async () => {
         const { source, remembered } = world();
-        await source.prepare([REGION]);
+        await source.prepare([NOTE]);
         expect(source.state().ready).toBe(1);
         await source.forget();
         expect(remembered.at(-1)).toBe(false);
@@ -132,7 +144,7 @@ describe("webSampleSource", () => {
         const { source } = world();
         const seen: number[] = [];
         const stop = source.subscribe(() => seen.push(source.state().ready));
-        await source.prepare([REGION]);
+        await source.prepare([NOTE]);
         expect(seen.at(-1)).toBe(1);
         stop();
         await source.forget();

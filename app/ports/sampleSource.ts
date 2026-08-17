@@ -3,6 +3,9 @@
 
 import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
 
+// A note a piece will play: enough to choose its recording, and nothing else.
+export type PlayedNote = { pitch: number; velocity: number };
+
 // Where recordings of a real piano come from.
 //
 // The seam exists because of one rule: **a note-on never waits.** A key pressed now sounds
@@ -21,10 +24,13 @@ export interface SampleSource {
     // Decoded and ready to sound this instant, or null. Never fetches: the answer to "is
     // this note ready" has to arrive within the same key press that asked.
     bufferFor(region: SampleRegion): AudioBuffer | null;
-    // Fetch and decode these recordings, ahead of the notes that need them. Resolves when
-    // they are playable; failures are not thrown, because a missing recording is a note
+    // Fetch and decode whatever these notes will need, ahead of the hands that play them.
+    // Takes NOTES rather than recordings on purpose: which recording answers a note is a
+    // question only the manifest can settle, the manifest lives in here, and a caller made
+    // to fetch it first cannot prefetch until something else already has. Resolves when the
+    // recordings are playable; failures are not thrown, because a missing one is a note
     // played by the synth rather than an error a player can act on.
-    prepare(regions: readonly SampleRegion[]): Promise<void>;
+    prepare(notes: readonly PlayedNote[]): Promise<void>;
     // Whether this device has the instrument at all — the manifest fetched, some of it
     // cached. What Settings shows and what an export checks before it promises anything.
     state(): SampleState;
