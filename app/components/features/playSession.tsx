@@ -523,7 +523,7 @@ function usePlaySessionValue({
 
     // The recordings this piece will ask for, fetched while it is being read. Nothing
     // waits on them: a note whose recording has not landed is played by the synth.
-    useSamplePrefetch(getOsmd, ready);
+    useSamplePrefetch({ getOsmd, ready, renderVersion });
 
     const matcher = useScoreMatcher(getOsmd, {
         tempo,

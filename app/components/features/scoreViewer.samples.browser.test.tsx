@@ -10,7 +10,8 @@ import { fakeMidi } from "../../adapters/fakeMidi";
 import { fakeSampleSource } from "../../adapters/fakeSampleSource";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
-import { ScoreViewer } from "./scoreViewer";
+import { PlaySessionProvider, usePlaySession } from "./playSession";
+import { PlaySurface } from "./playSurface";
 
 // Whether opening a piece actually asks for its recordings.
 //
@@ -43,12 +44,24 @@ afterEach(() => {
     localStorage.clear();
 });
 
+// The session's own transpose control, so a test can put the piece in another key the way
+// the player does rather than by rebuilding the score.
+let transposeTo: (semitones: number) => void = () => {};
+function Probe() {
+    const session = usePlaySession();
+    transposeTo = session.setTranspose;
+    return null;
+}
+
 async function mount(samples: ReturnType<typeof fakeSampleSource>) {
     render(
         <MemoryRouter>
             <ServicesProvider services={{ midi: fakeMidi(), audio: fakeAudioEngine(), samples }}>
                 <MidiProvider>
-                    <ScoreViewer id="prefetch" xml={SCORE} title="Prefetch" />
+                    <PlaySessionProvider id="prefetch" xml={SCORE} title="Prefetch">
+                        <PlaySurface />
+                        <Probe />
+                    </PlaySessionProvider>
                 </MidiProvider>
             </ServicesProvider>
         </MemoryRouter>,
@@ -75,6 +88,32 @@ describe("a piece opening with the recorded piano on", () => {
         // underneath, each with the velocity the performance gives it.
         expect(asked.map((note) => note.pitch).sort((a, b) => a - b)).toEqual([48, 64, 67]);
         expect(asked.every((note) => note.velocity > 0)).toBe(true);
+    });
+
+    it("asks again for the notes it sounds once the piece moves to another key", async () => {
+        // A transposed passage needs the recordings of the notes it now plays. Nothing else
+        // asks for them: the piece was prefetched in its written key and the re-engraving
+        // carries no request of its own.
+        //
+        // The guard is against a reload finishing inside a single commit, which leaves the
+        // effect's dependencies looking untouched — Firefox does that, and every transposed
+        // note there fell back to the synthesised voice while Chromium sounded recorded.
+        const samples = fakeSampleSource(null);
+        await samples.enable();
+        await mount(samples);
+        await expect.poll(() => samples.prepared.length, { timeout: 30000 }).toBeGreaterThan(0);
+
+        transposeTo(12);
+        // C3, E4 and G4 an octave up.
+        await expect
+            .poll(
+                () =>
+                    [...new Set(samples.prepared.flat().map((note) => note.pitch))].sort(
+                        (a, b) => a - b,
+                    ),
+                { timeout: 30000 },
+            )
+            .toEqual([48, 60, 64, 67, 76, 79]);
     });
 
     it("asks for nothing while the player is on the synthesised piano", async () => {
