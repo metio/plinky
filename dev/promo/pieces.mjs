@@ -18,7 +18,7 @@ export const PIECES = [
     { id: "OlYvqHsXwB63", title: "Für Elise", composer: "Ludwig van Beethoven" },
     { id: "8EKlMBPOS5dj", title: "The Entertainer", composer: "Scott Joplin" },
     { id: "zCR5qNmpjcYD", title: "Solace", composer: "Scott Joplin" },
-    { id: "3hknjVHy3gan", title: "Clair de lune", composer: "Claude Debussy" },
+    { id: "3hknjVHy3gan", title: "Clair de lune (opening)", composer: "Claude Debussy" },
     { id: "8p8IBmci1d2l", title: "Première arabesque", composer: "Claude Debussy" },
     { id: "0nlCL3JvtjCl", title: "Nocturne in C-sharp minor", composer: "Frédéric Chopin" },
     { id: "gZKH4xnshzeG", title: "Fantaisie-impromptu, Op. 66", composer: "Frédéric Chopin" },
