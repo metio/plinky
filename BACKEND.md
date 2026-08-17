@@ -1057,6 +1057,28 @@ sounds like nothing being wrong.
 Nothing in CI touches the bucket. The pack is built and uploaded by hand when the
 instrument changes, which — for a library published in 2016 — is close to never.
 
+### Checking it works
+
+Three checks, at three levels, because this feature failed at a level none of the others
+could see. `npm run piano:verify` asks the origin about every object the manifest names —
+an upload of six hundred objects fails partially and quietly. `scoreViewer.samples.browser`
+mounts a piece against a **cold** sample source (enabled, no manifest, nothing decoded —
+the state after any page load) and asserts it asks for its own recordings; a warm fixture
+passes whether the prefetch works or not, which is what made the hole easy to leave. And
+`npm run piano:smoke -- --base <url>` drives a real deployment: turns the switch on, opens
+a piece on a fresh load, and fails if no recordings are fetched or a CORS error appears.
+
+The smoke check is not a CI gate. It needs a deployment, an origin and a bucket, and a gate
+depending on three live things cries wolf. Run it after deploying, and after touching
+anything about where the recordings come from — the bucket's CORS, the custom domain, the
+base URL, the prefetch.
+
+**The failure it exists for:** `prepare()` once took recordings rather than notes, so a
+caller had to resolve them through the manifest first; the manifest only ever lives in
+memory; and so on every page load the prefetch waited for something only it would have
+fetched. Every unit test passed. The feature was inert in production and nothing in the
+suite could tell.
+
 ### What is owed
 
 CC-BY means the credit is a condition, not a courtesy. `manifest.json` carries the

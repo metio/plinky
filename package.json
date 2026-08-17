@@ -25,6 +25,7 @@
     "piano:build": "node dev/piano/build-pack.mjs",
     "piano:upload": "node dev/piano/upload-pack.mjs",
     "piano:verify": "node dev/piano/verify-pack.mjs",
+    "piano:smoke": "node dev/piano/smoke.mjs",
     "piano:session": "node dev/piano/measure-session.mjs",
     "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "build:single": "PLINKY_LOCALE=en npm run build",
