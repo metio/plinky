@@ -388,9 +388,9 @@
     "sight_read": "视奏这首曲子",
     "sight_read_caption": "一次不靠任何提示的冷读——音名、颜色、提示和音符高速都为这一遍让路。你的第一次视奏会被记下来。",
     "sight_read_aids_note": "视奏按最高一档来读：没有颜色，没有音符高速路，也没有第二次机会。",
-    "sight_read_study": "读谱时间",
+    "sight_read_study": "开始前的停顿",
     "sight_read_study_seconds": "{seconds}秒",
-    "sight_read_study_caption": "在第一个音之前，花点时间看清调号、拍号和结构。",
+    "sight_read_study_caption": "按下「练习」后的一次呼吸，让你在第一个音之前看清调号、拍号和乐句走向。",
     "sight_read_tempo_own": "按你自己的速度",
     "sight_read_vanish": "小节在身后消失",
     "sight_read_vanish_caption": "弹过的小节就消失，让眼睛始终走在手前面。",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "下移了 {count} 个八度，好放进你的键盘",
     "play_fit_up_one": "上移了一个八度，好放进你的键盘",
     "play_fit_up_other": "上移了 {count} 个八度，好放进你的键盘",
-    "play_fit_beyond": "这首曲子两端都超出你的键盘，所以按谱面原样演奏"
+    "play_fit_beyond": "这首曲子两端都超出你的键盘，所以按谱面原样演奏",
+    "run_group_pace_title": "双手与速度"
 }

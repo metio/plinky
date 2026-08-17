@@ -101,178 +101,187 @@ function RunSetupPanel() {
                 <p className="text-sm text-muted">{m.run_starter_hint()}</p>
             )}
 
-            <SettingsSection
-                title={m.run_group_practice_title()}
-                hint={m.run_group_practice_hint()}
-                icon={<SlidersIcon className={ICON} />}
-            >
-                {staffCount >= 2 && (
-                    <ChoiceField
-                        label={m.hand_label()}
-                        value={hand}
-                        onChange={setHand}
-                        options={(["both", "right", "left"] as const).map((option) => ({
-                            id: option,
-                            label: handLabel[option],
-                        }))}
-                        help={m.hand_caption()}
-                        disabled={matcher.practicing}
-                    />
-                )}
-                {/* One control for the pace, where there used to be two writing the
+            {/* Both cards are about this piece and no other, so they stay together and
+                stay here — folded only because a piece's page is read far more often than
+                its settings are changed, and a closed fold puts the score first. */}
+            <Disclosure summary={m.run_group_practice_title()}>
+                <div className="space-y-4">
+                    <SettingsSection
+                        title={m.run_group_pace_title()}
+                        hint={m.run_group_practice_hint()}
+                        icon={<SlidersIcon className={ICON} />}
+                    >
+                        {staffCount >= 2 && (
+                            <ChoiceField
+                                label={m.hand_label()}
+                                value={hand}
+                                onChange={setHand}
+                                options={(["both", "right", "left"] as const).map((option) => ({
+                                    id: option,
+                                    label: handLabel[option],
+                                }))}
+                                help={m.hand_caption()}
+                                disabled={matcher.practicing}
+                            />
+                        )}
+                        {/* One control for the pace, where there used to be two writing the
                     same state from opposite ends of the same open panel: this switch
                     and the sight-read tempo choice below it. */}
-                <ChoiceField
-                    label={m.run_pace_label()}
-                    value={enforceTempo ? "tempo" : "own"}
-                    onChange={(value: string) => setEnforceTempo(value === "tempo")}
-                    options={[
-                        { id: "own", label: m.sight_read_tempo_own() },
-                        { id: "tempo", label: m.keep_up_toggle() },
-                    ]}
-                    help={m.keep_up_hint()}
-                />
-                {enforceTempo && (
-                    <SwitchField
-                        label={m.guide_notes_toggle()}
-                        checked={guideNotes}
-                        onChange={setGuideNotes}
-                        help={m.guide_notes_hint()}
-                    />
-                )}
-                {/* A duet needs one hand sitting out for the app to play — in keep-up it
+                        <ChoiceField
+                            label={m.run_pace_label()}
+                            value={enforceTempo ? "tempo" : "own"}
+                            onChange={(value: string) => setEnforceTempo(value === "tempo")}
+                            options={[
+                                { id: "own", label: m.sight_read_tempo_own() },
+                                { id: "tempo", label: m.keep_up_toggle() },
+                            ]}
+                            help={m.keep_up_hint()}
+                        />
+                        {enforceTempo && (
+                            <SwitchField
+                                label={m.guide_notes_toggle()}
+                                checked={guideNotes}
+                                onChange={setGuideNotes}
+                                help={m.guide_notes_hint()}
+                            />
+                        )}
+                        {/* A duet needs one hand sitting out for the app to play — in keep-up it
             follows the clock, self-paced it follows your own pace note by note. */}
-                {staffCount >= 2 && hand !== "both" && (
-                    <SwitchField
-                        label={m.duet_toggle()}
-                        checked={duet}
-                        onChange={setDuet}
-                        help={m.duet_hint()}
-                    />
-                )}
-                {/* Sight-read reads at the top rung for one run: no colours, no highway,
+                        {staffCount >= 2 && hand !== "both" && (
+                            <SwitchField
+                                label={m.duet_toggle()}
+                                checked={duet}
+                                onChange={setDuet}
+                                help={m.duet_hint()}
+                            />
+                        )}
+                        {/* Sight-read reads at the top rung for one run: no colours, no highway,
                     no second try at a missed note. The switches showed the saved values
                     while the run ignored them; they read as unavailable now, and what
                     they show is what this run will actually do. */}
-                <SwitchField
-                    label={m.forgiving_toggle()}
-                    checked={sightRead.on ? false : forgiving}
-                    onChange={setForgiving}
-                    help={m.forgiving_hint()}
-                    disabled={sightRead.on}
-                />
-                <SwitchField
-                    label={m.action_metronome()}
-                    checked={metronomeOn}
-                    onChange={setMetronomeOn}
-                    help={m.metronome_toggle_hint()}
-                />
-            </SettingsSection>
-
-            <SettingsSection
-                title={m.run_group_challenge_title()}
-                hint={m.run_group_challenge_hint()}
-                icon={<StarIcon className={ICON} />}
-            >
-                <SwitchField
-                    label={m.sight_read()}
-                    checked={sightRead.on}
-                    onChange={sightRead.setOn}
-                    help={m.sight_read_caption()}
-                />
-                {sightRead.on && (
-                    <>
-                        <ChoiceField
-                            label={m.sight_read_study()}
-                            value={String(sightRead.studySeconds)}
-                            onChange={(value: string) =>
-                                sightRead.setStudySeconds(Number(value) as StudySeconds)
-                            }
-                            options={STUDY_SECONDS.map((seconds) => ({
-                                id: String(seconds),
-                                label: m.sight_read_study_seconds({ seconds }),
-                            }))}
-                            help={m.sight_read_study_caption()}
+                        <SwitchField
+                            label={m.forgiving_toggle()}
+                            checked={sightRead.on ? false : forgiving}
+                            onChange={setForgiving}
+                            help={m.forgiving_hint()}
+                            disabled={sightRead.on}
                         />
-                        {!enforceTempo && (
-                            <SwitchField
-                                label={m.sight_read_vanish()}
-                                checked={sightRead.vanish}
-                                onChange={sightRead.setVanish}
-                                help={m.sight_read_vanish_caption()}
-                            />
-                        )}
-                        {sightReadRecord && (
-                            <p className="text-sm text-muted">
-                                {m.sight_read_already({
-                                    letter: sightReadRecord.letter,
-                                    score: sightReadRecord.score,
-                                })}
-                            </p>
-                        )}
-                    </>
-                )}
-                {!lockTempo && (
-                    <TransposeRow
-                        transpose={transpose}
-                        setTranspose={setTranspose}
-                        fit={instrumentFit}
-                    />
-                )}
-                {!lockTempo && (
-                    <SwitchField
-                        label={m.tempo_trainer()}
-                        checked={trainerOn}
-                        onChange={setTrainerOn}
-                        help={m.tempo_trainer_caption()}
-                    />
-                )}
-                {!lockTempo && trainerOn && (
-                    <div className="space-y-1">
-                        <label className="flex items-center gap-2 text-sm text-body">
-                            <span>{m.tempo_trainer_target()}</span>
-                            <input
-                                type="range"
-                                min={40}
-                                max={180}
-                                value={trainerTarget}
-                                onChange={(event) => setTrainerTarget(Number(event.target.value))}
-                                aria-label={m.tempo_trainer_target()}
-                            />
-                            <Bpm tempo={trainerTarget} term />
-                        </label>
-                        <p className="text-xs text-muted">{m.tempo_trainer_target_caption()}</p>
-                    </div>
-                )}
-                <SwitchField
-                    label={m.race_ghost_toggle()}
-                    checked={raceGhost}
-                    onChange={setRaceGhost}
-                    help={m.race_ghost_hint()}
-                />
-                {ready && measureCount > 1 && (
-                    <SwitchField
-                        label={m.loop_section()}
-                        checked={loop.on}
-                        onChange={loop.toggle}
-                        help={m.loop_caption()}
-                    />
-                )}
-                {/* Only offered with a loop set: "just these bars" needs bars to mean. */}
-                {ready && measureCount > 1 && loop.on && (
-                    <SwitchField
-                        label={m.focus_loop()}
-                        checked={focusLoop}
-                        onChange={setFocusLoop}
-                        help={m.focus_loop_caption()}
-                    />
-                )}
-            </SettingsSection>
+                        <SwitchField
+                            label={m.action_metronome()}
+                            checked={metronomeOn}
+                            onChange={setMetronomeOn}
+                            help={m.metronome_toggle_hint()}
+                        />
+                    </SettingsSection>
 
-            {/* The one fold that is left, and everything in it is a second door onto
-                Settings → Reading — so folding it hides nothing a reader cannot reach
-                anyway, and the two cards above, which are about this piece and no other,
-                are on the page where they are chosen. */}
+                    <SettingsSection
+                        title={m.run_group_challenge_title()}
+                        hint={m.run_group_challenge_hint()}
+                        icon={<StarIcon className={ICON} />}
+                    >
+                        <SwitchField
+                            label={m.sight_read()}
+                            checked={sightRead.on}
+                            onChange={sightRead.setOn}
+                            help={m.sight_read_caption()}
+                        />
+                        {sightRead.on && (
+                            <>
+                                <ChoiceField
+                                    label={m.sight_read_study()}
+                                    value={String(sightRead.studySeconds)}
+                                    onChange={(value: string) =>
+                                        sightRead.setStudySeconds(Number(value) as StudySeconds)
+                                    }
+                                    options={STUDY_SECONDS.map((seconds) => ({
+                                        id: String(seconds),
+                                        label: m.sight_read_study_seconds({ seconds }),
+                                    }))}
+                                    help={m.sight_read_study_caption()}
+                                />
+                                {!enforceTempo && (
+                                    <SwitchField
+                                        label={m.sight_read_vanish()}
+                                        checked={sightRead.vanish}
+                                        onChange={sightRead.setVanish}
+                                        help={m.sight_read_vanish_caption()}
+                                    />
+                                )}
+                                {sightReadRecord && (
+                                    <p className="text-sm text-muted">
+                                        {m.sight_read_already({
+                                            letter: sightReadRecord.letter,
+                                            score: sightReadRecord.score,
+                                        })}
+                                    </p>
+                                )}
+                            </>
+                        )}
+                        {!lockTempo && (
+                            <TransposeRow
+                                transpose={transpose}
+                                setTranspose={setTranspose}
+                                fit={instrumentFit}
+                            />
+                        )}
+                        {!lockTempo && (
+                            <SwitchField
+                                label={m.tempo_trainer()}
+                                checked={trainerOn}
+                                onChange={setTrainerOn}
+                                help={m.tempo_trainer_caption()}
+                            />
+                        )}
+                        {!lockTempo && trainerOn && (
+                            <div className="space-y-1">
+                                <label className="flex items-center gap-2 text-sm text-body">
+                                    <span>{m.tempo_trainer_target()}</span>
+                                    <input
+                                        type="range"
+                                        min={40}
+                                        max={180}
+                                        value={trainerTarget}
+                                        onChange={(event) =>
+                                            setTrainerTarget(Number(event.target.value))
+                                        }
+                                        aria-label={m.tempo_trainer_target()}
+                                    />
+                                    <Bpm tempo={trainerTarget} term />
+                                </label>
+                                <p className="text-xs text-muted">
+                                    {m.tempo_trainer_target_caption()}
+                                </p>
+                            </div>
+                        )}
+                        <SwitchField
+                            label={m.race_ghost_toggle()}
+                            checked={raceGhost}
+                            onChange={setRaceGhost}
+                            help={m.race_ghost_hint()}
+                        />
+                        {ready && measureCount > 1 && (
+                            <SwitchField
+                                label={m.loop_section()}
+                                checked={loop.on}
+                                onChange={loop.toggle}
+                                help={m.loop_caption()}
+                            />
+                        )}
+                        {/* Only offered with a loop set: "just these bars" needs bars to mean. */}
+                        {ready && measureCount > 1 && loop.on && (
+                            <SwitchField
+                                label={m.focus_loop()}
+                                checked={focusLoop}
+                                onChange={setFocusLoop}
+                                help={m.focus_loop_caption()}
+                            />
+                        )}
+                    </SettingsSection>
+                </div>
+            </Disclosure>
+
+            {/* The other fold, and everything in it is a second door onto Settings →
+                Reading — so folding it hides nothing a reader cannot reach anyway. */}
             <Disclosure summary={m.run_group_sheet_title()}>
                 <div className="space-y-4">
                     <SettingsSection

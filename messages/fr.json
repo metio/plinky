@@ -388,9 +388,9 @@
     "sight_read": "Déchiffrer ce morceau",
     "sight_read_caption": "Une seule lecture à froid, sans appui — les noms, les couleurs, les indices et l'autoroute s'effacent le temps du passage. Ta première lecture reste ton déchiffrage de ce morceau.",
     "sight_read_aids_note": "Un déchiffrage se lit au sommet de l'échelle : pas de couleurs, pas de couloir, pas de seconde chance.",
-    "sight_read_study": "Temps d'observation",
+    "sight_read_study": "Pause avant le passage",
     "sight_read_study_seconds": "{seconds}s",
-    "sight_read_study_caption": "Un moment pour saisir la tonalité, la mesure et la forme avant la première note.",
+    "sight_read_study_caption": "Le temps d'un souffle après avoir appuyé sur Pratiquer, pour saisir la tonalité, la mesure et la forme avant la première note.",
     "sight_read_tempo_own": "À ton rythme",
     "sight_read_vanish": "Les mesures disparaissent derrière toi",
     "sight_read_vanish_caption": "Une mesure jouée s'efface, pour que tes yeux restent devant tes mains.",
@@ -1198,5 +1198,6 @@
     "play_fit_down_other": "Descendu de {count} octaves pour tenir sur ton clavier",
     "play_fit_up_one": "Monté d'une octave pour tenir sur ton clavier",
     "play_fit_up_other": "Monté de {count} octaves pour tenir sur ton clavier",
-    "play_fit_beyond": "Ce morceau dépasse ton clavier des deux côtés, il est donc joué tel qu'il est écrit"
+    "play_fit_beyond": "Ce morceau dépasse ton clavier des deux côtés, il est donc joué tel qu'il est écrit",
+    "run_group_pace_title": "Mains et allure"
 }

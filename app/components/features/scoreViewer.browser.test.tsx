@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { choose } from "../../testing/controls";
+import { choose, reveal } from "../../testing/controls";
 import { testPrefsStore } from "../../testing/stores";
 import { m } from "../../paraglide/messages.js";
 import { useState } from "react";
@@ -237,6 +237,7 @@ describe("ScoreViewer", () => {
         });
         // Turn on Keep up, then start — with no notes played every beat is a miss, but the
         // clock-driven run still counts in, runs to the end, and reports the tally.
+        reveal(m.run_group_practice_title);
         choose(m.run_pace_label, m.keep_up_toggle);
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         expect(
@@ -258,6 +259,7 @@ describe("ScoreViewer", () => {
         await waitFor(() => expect((practice as HTMLButtonElement).disabled).toBe(false), {
             timeout: 30000,
         });
+        reveal(m.run_group_practice_title);
         choose(m.run_pace_label, m.keep_up_toggle);
         // Draw the fingering numbers before the run, then let the run play over them.
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
@@ -315,6 +317,7 @@ describe("ScoreViewer", () => {
         // interactive — a keep-up run bails while osmd is still null.
         await awaitReady();
         // Turn on Keep up and start the tempo-locked run.
+        reveal(m.run_group_practice_title);
         choose(m.run_pace_label, m.keep_up_toggle);
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         // The keep-up run counts in, runs to the end and reports its tally, leaving full
@@ -385,6 +388,7 @@ describe("ScoreViewer", () => {
         // can re-layout after its first paint (Gecko especially), so the measure boxes
         // may still be settling; a 30%-width point on a three-bar line sits in bar 1,
         // so poll the click until it lands rather than firing once.
+        reveal(m.run_group_practice_title);
         fireEvent.click(screen.getByRole("switch", { name: "Loop" }));
         await waitFor(
             () => {
@@ -1314,16 +1318,17 @@ describe("ScoreViewer", () => {
             mount(phrase, { beatsPerBar: 4 });
             await awaitReady();
 
-            expect(screen.queryByText("Time to study")).toBeNull();
-            fireEvent.click(screen.getByRole("switch", { name: "Sight-read this piece" }));
+            reveal(m.run_group_practice_title);
+            expect(screen.queryByText(m.sight_read_study())).toBeNull();
+            fireEvent.click(screen.getByRole("switch", { name: m.sight_read() }));
 
-            expect(screen.getByText("Time to study")).toBeTruthy();
+            expect(screen.getByText(m.sight_read_study())).toBeTruthy();
             // The pace lives in "How you play", one control for the whole run, rather
             // than a second copy inside this block writing the same state.
             expect(screen.getAllByText(m.run_pace_label())).toHaveLength(1);
             // The read-ahead drill needs your own progress through the score, so it is
             // offered only while the run waits for you.
-            expect(screen.getByRole("switch", { name: "Bars disappear behind you" })).toBeTruthy();
+            expect(screen.getByRole("switch", { name: m.sight_read_vanish() })).toBeTruthy();
         });
 
         it("studies the piece before the run rather than starting one", async () => {
