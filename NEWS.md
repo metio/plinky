@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**Seven composers stop being two people each.** A misspelling in a credit — "Eric Satie",
+"Wolfgang Amedeus Mozart", a second misspelt Debussy — used to make its own composer,
+holding the single piece that carried the typo and reachable from nowhere. Those pieces
+now sit with the rest of that composer's work.
+
 **Clair de lune says what it is.** The catalogue's score is the opening phrase, not the
 whole piece, and it is now titled that way rather than promising five minutes of Debussy
 and giving one. His name was also misspelled on it, which had quietly kept that piece off

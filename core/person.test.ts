@@ -30,6 +30,28 @@ describe("canonicalComposer", () => {
         }
     });
 
+    it("folds a misspelled credit onto the composer it meant", () => {
+        // Each of these is one score in the catalogue, spelled a letter away from a
+        // composer with dozens. Nothing in the string says it is wrong, so only the table
+        // can merge them — and unmerged, each owned a page holding a single piece that
+        // could not be reached from the real composer's.
+        expect(canonicalComposer("CRAUDE DEBUSSY")).toBe("Claude Debussy");
+        expect(canonicalComposer("Calude Debussy")).toBe("Claude Debussy");
+        expect(canonicalComposer("Wolfgang Amedeus Mozart")).toBe("Wolfgang Amadeus Mozart");
+        expect(canonicalComposer("Eric Satie")).toBe("Erik Satie");
+        expect(canonicalComposer("George Frederic Handel")).toBe("George Frideric Handel");
+        expect(canonicalComposer("Sergeï Rachmaninov")).toBe("Sergei Rachmaninoff");
+        // Cleaned of its work number first, then folded.
+        expect(canonicalComposer("Edward Grieg Op. 54 No.3")).toBe("Edvard Grieg");
+        // A catalogue number the work-number stripping does not recognise.
+        expect(canonicalComposer("Maurice Ravel M. 19")).toBe("Maurice Ravel");
+    });
+
+    it("gives a folded misspelling the same page as the name it folds to", () => {
+        expect(personSlug("CRAUDE DEBUSSY")).toBe(personSlug("Claude Debussy"));
+        expect(personSlug("Eric Satie")).toBe(personSlug("Erik Satie"));
+    });
+
     it("strips parenthesized asides and bare trailing dates", () => {
         expect(canonicalComposer("Erik Satie (1866 1925)")).toBe("Erik Satie");
         expect(canonicalComposer("Giuseppe Verdi (1813-1901)")).toBe("Giuseppe Verdi");
