@@ -94,10 +94,37 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
         }
     }
 
-    async function loadManifest(): Promise<SampleManifest | null> {
-        if (manifest) {
-            return manifest;
+    // How many recordings this device is already holding. One listing of the cache, not a
+    // read of every object: the count is what a player can act on, and reading six hundred
+    // bodies to add up their bytes would cost more than the answer is worth.
+    async function countHeld(): Promise<void> {
+        const store = await cache();
+        if (!store) {
+            return;
         }
+        try {
+            const keys = await store.keys();
+            settle({ held: keys.filter((request) => request.url.endsWith(".opus")).length });
+        } catch {
+            // A cache that will not list is one this figure simply cannot report.
+        }
+    }
+
+    // One fetch, however many callers. A revisit loads the manifest as the app starts and a
+    // piece asks for it a moment later; without this they race and fetch it twice.
+    let manifestInFlight: Promise<SampleManifest | null> | null = null;
+
+    function loadManifest(): Promise<SampleManifest | null> {
+        if (manifest) {
+            return Promise.resolve(manifest);
+        }
+        manifestInFlight ??= fetchManifest().finally(() => {
+            manifestInFlight = null;
+        });
+        return manifestInFlight;
+    }
+
+    async function fetchManifest(): Promise<SampleManifest | null> {
         const bytes = await bytesFor("manifest.json");
         if (!bytes) {
             return null;
@@ -123,12 +150,9 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
                 return;
             }
             try {
-                // decodeAudioData detaches the buffer it is given, so the size is read off
-                // it first — after this call the length is zero.
-                const size = bytes.byteLength;
                 const decoded = await context.decodeAudioData(bytes);
                 buffers.set(region.file, decoded);
-                settle({ ready: buffers.size, bytes: state.bytes + size });
+                settle({ ready: buffers.size });
             } catch {
                 // A recording that will not decode is one the synth covers.
             }
@@ -139,6 +163,15 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
         } finally {
             inFlight.delete(region.file);
         }
+    }
+
+    // A device that already asked for the real piano gets it back on the next visit
+    // without being asked again. The choice survives in storage and the manifest does not,
+    // so without this the panel would sit claiming to fetch something nothing had started,
+    // and the first piece would pay for a round trip already owed.
+    if (state.enabled) {
+        settle({ loading: true });
+        void Promise.all([loadManifest(), countHeld()]).finally(() => settle({ loading: false }));
     }
 
     return {
@@ -164,6 +197,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
                 await Promise.all(
                     regionsNeeded(found.notes, notes).map((region) => decode(region)),
                 );
+                await countHeld();
             } finally {
                 settle({ loading: false });
             }
@@ -172,7 +206,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             options.remember(true);
             settle({ enabled: true, loading: true });
             try {
-                await loadManifest();
+                await Promise.all([loadManifest(), countHeld()]);
             } finally {
                 settle({ loading: false });
             }
@@ -186,7 +220,7 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             } catch {
                 // Nothing to delete, or no cache to delete it from.
             }
-            settle({ enabled: false, ready: 0, bytes: 0, loading: false });
+            settle({ enabled: false, ready: 0, held: 0, loading: false });
         },
     };
 }
