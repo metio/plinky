@@ -103,6 +103,41 @@ function once(file) {
     return encoded.get(file);
 }
 
+// Every key on the instrument must be answerable, at every force. This is checked before
+// a single file is encoded, because the way it failed was silent: sixteen recordings of
+// middle C carry no pitch_keycenter — the SFZ defaults it — and reading that absence as
+// "not a region" dropped them, leaving the most-played key on the piano to be played by a
+// recording of the A below it. Nothing downstream would have noticed; the pack simply
+// sounded slightly wrong forever.
+const KEYS = { low: 21, high: 108 };
+const gaps = [];
+for (let pitch = KEYS.low; pitch <= KEYS.high; pitch++) {
+    for (const velocity of [1, 32, 64, 96, 127]) {
+        const covering = notes.find(
+            (region) =>
+                pitch >= region.lowKey &&
+                pitch <= region.highKey &&
+                velocity >= region.lowVelocity &&
+                velocity <= region.highVelocity,
+        );
+        if (!covering) {
+            gaps.push(`${pitch}@${velocity}`);
+        }
+    }
+}
+if (gaps.length > 0) {
+    console.error(`${gaps.length} key/velocity pairs no recording covers: ${gaps.slice(0, 12).join(", ")}…`);
+    process.exit(1);
+}
+// And nothing that a key cannot trigger may masquerade as a note: the key-off knocks, the
+// string resonances and the pedal noises. A note played from one of those is a note that
+// never speaks.
+const strays = notes.filter((region) => /\/(harm|rel\d|pedal)/.test(region.file));
+if (strays.length > 0) {
+    console.error(`${strays.length} release samples ended up among the notes, e.g. ${strays[0].file}`);
+    process.exit(1);
+}
+
 console.log(`${notes.length} note regions, ${extras.length} release regions → ${outDir}`);
 
 const manifest = {
