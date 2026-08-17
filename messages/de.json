@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Aufwärmen",
     "today_moment_work": "Dranbleiben",
     "today_moment_learn": "Eine Sache lernen",
-    "today_drill": "Frische Übung"
+    "today_drill": "Frische Übung",
+    "settings_instrument_range": "Tastaturgröße",
+    "settings_instrument_range_hint": "Ein Stück, das über deine Tasten hinausgeht, rückt in ganzen Oktaven hinein – so verlangt nichts eine Taste, die du nicht hast.",
+    "instrument_range_all_keys": "Alle 88 Tasten",
+    "instrument_range_keys": "{count} Tasten",
+    "instrument_range_from_name": "aus dem Namen deiner Tastatur",
+    "instrument_range_measure": "Messen",
+    "instrument_range_reset": "Alle 88 nutzen",
+    "instrument_range_awaiting_lowest": "Drück deine tiefste Taste…",
+    "instrument_range_awaiting_highest": "jetzt deine höchste",
+    "instrument_range_too_close": "Diese zwei Tasten liegen weniger als eine Oktave auseinander – nimm die Tasten an beiden Enden.",
+    "instrument_range_no_device": "Schließ eine Tastatur an, dann kann Plinky sie ausmessen.",
+    "play_fit_down_one": "Eine Oktave tiefer gelegt, damit es auf deine Tastatur passt",
+    "play_fit_down_other": "{count} Oktaven tiefer gelegt, damit es auf deine Tastatur passt",
+    "play_fit_up_one": "Eine Oktave höher gelegt, damit es auf deine Tastatur passt",
+    "play_fit_up_other": "{count} Oktaven höher gelegt, damit es auf deine Tastatur passt",
+    "play_fit_beyond": "Dieses Stück reicht an beiden Enden über deine Tastatur hinaus und erklingt daher wie notiert"
 }

@@ -1182,5 +1182,21 @@
     "today_moment_learn": "Tanulj meg egy dolgot",
     "today_drill": "Friss gyakorlat",
     "learn_intro": "Mindaz, amit a Plinky a darabokon kívül taníthat neked — hogyan épül fel a zene, mit jelentenek a jelei, és az apróságok, amiknek gyakorlás közben utánanéznél.",
-    "meta_learn_description": "Tanulj zongorázni a böngésződben: bevezetés a billentyűzetbe kezdőknek, nyolcleckés zeneelmélet, a kottajelek hangzó szótára, hallásfejlesztés és kis eszközök."
+    "meta_learn_description": "Tanulj zongorázni a böngésződben: bevezetés a billentyűzetbe kezdőknek, nyolcleckés zeneelmélet, a kottajelek hangzó szótára, hallásfejlesztés és kis eszközök.",
+    "settings_instrument_range": "Billentyűzet mérete",
+    "settings_instrument_range_hint": "Az a darab, amelyik túlnyúlik a billentyűidön, egész oktávokkal beljebb kerül — semmi nem kér olyan billentyűt, amid nincs.",
+    "instrument_range_all_keys": "Mind a 88 billentyű",
+    "instrument_range_keys": "{count} billentyű",
+    "instrument_range_from_name": "a billentyűzeted nevéből",
+    "instrument_range_measure": "Mérés",
+    "instrument_range_reset": "Mind a 88 használata",
+    "instrument_range_awaiting_lowest": "Nyomd le a legmélyebb billentyűdet…",
+    "instrument_range_awaiting_highest": "most a legmagasabbat",
+    "instrument_range_too_close": "Ez a két billentyű kevesebb mint egy oktávra van — próbáld a két szélső billentyűt.",
+    "instrument_range_no_device": "Csatlakoztass egy billentyűzetet, és Plinky megméri.",
+    "play_fit_down_one": "Egy oktávval lejjebb, hogy elférjen a billentyűzeteden",
+    "play_fit_down_other": "{count} oktávval lejjebb, hogy elférjen a billentyűzeteden",
+    "play_fit_up_one": "Egy oktávval feljebb, hogy elférjen a billentyűzeteden",
+    "play_fit_up_other": "{count} oktávval feljebb, hogy elférjen a billentyűzeteden",
+    "play_fit_beyond": "Ez a darab mindkét végén túlnyúlik a billentyűzeteden, ezért úgy szól, ahogy le van írva"
 }

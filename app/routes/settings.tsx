@@ -19,6 +19,7 @@ import {
 } from "../components/ui/icons";
 import { Keyboard } from "../components/ui/keyboard";
 import { GrandPianoSetting } from "../components/features/grandPianoSetting";
+import { InstrumentRangeSetting } from "../components/features/instrumentRangeSetting";
 import { SettingsSection } from "../components/ui/settingsSection";
 
 import { DangerZone } from "../components/features/dangerZone";
@@ -99,6 +100,7 @@ export default function Settings() {
                         keyLights={keyLights}
                         deviceNames={devices.map((device) => device.name)}
                     />
+                    <InstrumentRangeSetting />
                 </SettingsSection>
             )}
 

@@ -1182,5 +1182,21 @@
     "today_moment_learn": "Un lucru de învățat",
     "today_drill": "Un exercițiu nou",
     "learn_intro": "Tot ce te poate învăța Plinky departe de o piesă — cum funcționează muzica, ce înseamnă semnele ei și lucrurile mărunte pe care le cauți în mijlocul exersatului.",
-    "meta_learn_description": "Învață pianul în browser: un tur al claviaturii pentru începători absoluți, un curs de teorie în opt lecții, un glosar de notație pe care îl poți asculta, exerciții de auz și câteva unelte mici."
+    "meta_learn_description": "Învață pianul în browser: un tur al claviaturii pentru începători absoluți, un curs de teorie în opt lecții, un glosar de notație pe care îl poți asculta, exerciții de auz și câteva unelte mici.",
+    "settings_instrument_range": "Dimensiunea claviaturii",
+    "settings_instrument_range_hint": "O piesă care depășește clapele tale intră în ele cu octave întregi — nimic nu cere o clapă pe care nu o ai.",
+    "instrument_range_all_keys": "Toate cele 88 de clape",
+    "instrument_range_keys": "{count} clape",
+    "instrument_range_from_name": "din numele claviaturii tale",
+    "instrument_range_measure": "Măsoară",
+    "instrument_range_reset": "Folosește toate cele 88",
+    "instrument_range_awaiting_lowest": "Apasă cea mai gravă clapă a ta…",
+    "instrument_range_awaiting_highest": "acum cea mai înaltă",
+    "instrument_range_too_close": "Cele două clape sunt la mai puțin de o octavă — încearcă clapele de la fiecare capăt.",
+    "instrument_range_no_device": "Conectează o claviatură și Plinky o poate măsura.",
+    "play_fit_down_one": "Coborâtă cu o octavă ca să încapă pe claviatura ta",
+    "play_fit_down_other": "Coborâtă cu {count} octave ca să încapă pe claviatura ta",
+    "play_fit_up_one": "Urcată cu o octavă ca să încapă pe claviatura ta",
+    "play_fit_up_other": "Urcată cu {count} octave ca să încapă pe claviatura ta",
+    "play_fit_beyond": "Piesa aceasta depășește claviatura ta la ambele capete, așa că sună așa cum e scrisă"
 }

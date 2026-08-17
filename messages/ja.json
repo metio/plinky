@@ -1182,5 +1182,21 @@
     "today_moment_learn": "ひとつ学ぶ",
     "today_drill": "新しい練習をひとつ",
     "learn_intro": "曲から離れて Plinky が教えられること — 音楽のしくみ、記号の意味、そして練習の合間にふと調べたくなる小さなこと。",
-    "meta_learn_description": "ブラウザでピアノを学ぶ：まったくの初心者のための鍵盤入門、8レッスンの音楽理論コース、音を聴ける記号の用語集、耳のトレーニング、そしてちょっとした道具たち。"
+    "meta_learn_description": "ブラウザでピアノを学ぶ：まったくの初心者のための鍵盤入門、8レッスンの音楽理論コース、音を聴ける記号の用語集、耳のトレーニング、そしてちょっとした道具たち。",
+    "settings_instrument_range": "鍵盤の大きさ",
+    "settings_instrument_range_hint": "鍵盤からはみ出す曲は、オクターブ単位で中に収まります。持っていない鍵を求められることはありません。",
+    "instrument_range_all_keys": "88鍵すべて",
+    "instrument_range_keys": "{count} 鍵",
+    "instrument_range_from_name": "キーボードの名前から",
+    "instrument_range_measure": "測る",
+    "instrument_range_reset": "88鍵すべてを使う",
+    "instrument_range_awaiting_lowest": "いちばん低い鍵を押して…",
+    "instrument_range_awaiting_highest": "次にいちばん高い鍵を",
+    "instrument_range_too_close": "その2つは1オクターブ未満です。両端の鍵を押してみてください。",
+    "instrument_range_no_device": "キーボードをつなぐと、Plinky が測れます。",
+    "play_fit_down_one": "鍵盤に収まるよう1オクターブ下げました",
+    "play_fit_down_other": "鍵盤に収まるよう{count}オクターブ下げました",
+    "play_fit_up_one": "鍵盤に収まるよう1オクターブ上げました",
+    "play_fit_up_other": "鍵盤に収まるよう{count}オクターブ上げました",
+    "play_fit_beyond": "この曲は両端とも鍵盤からはみ出すので、楽譜どおりに鳴ります"
 }

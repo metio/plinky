@@ -39,6 +39,7 @@ const BASE: Prefs = {
     hiddenNotes: false,
     revealTries: 1,
     micCalibration: null,
+    instrumentRange: null,
 };
 
 const CALIBRATION = { noiseFloor: 0.02, softLevel: 0.03, loudLevel: 0.2, octaveShift: -1 };
@@ -182,6 +183,20 @@ describe("mic calibration prefs", () => {
         expect(parsePrefs(stored({ micCalibration: CALIBRATION })).micCalibration).toEqual(
             CALIBRATION,
         );
+    });
+
+    it("keeps a measured instrument range", () => {
+        const range = { from: 36, to: 96 };
+        expect(parsePrefs(stored({ instrumentRange: range })).instrumentRange).toEqual(range);
+    });
+
+    it("drops an instrument range that no piece could be played on", () => {
+        // Backwards, and under an octave wide: both would leave every piece unplayable
+        // while looking like a deliberate setting.
+        expect(parsePrefs(stored({ instrumentRange: { from: 96, to: 36 } })).instrumentRange).toBeNull();
+        expect(parsePrefs(stored({ instrumentRange: { from: 60, to: 64 } })).instrumentRange).toBeNull();
+        expect(parsePrefs(stored({ instrumentRange: { from: 21.5, to: 108 } })).instrumentRange).toBeNull();
+        expect(parsePrefs(stored({ instrumentRange: { from: 21 } })).instrumentRange).toBeNull();
     });
 
     it("drops a calibration whose velocity anchors collapsed", () => {

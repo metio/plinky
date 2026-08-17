@@ -1182,5 +1182,21 @@
     "today_moment_learn": "한 가지 배우기",
     "today_drill": "새 연습 하나",
     "learn_intro": "곡에서 잠시 벗어나 Plinky가 알려줄 수 있는 모든 것 — 음악의 원리, 기호의 뜻, 그리고 연습하다 잠깐 찾아보게 되는 작은 것들.",
-    "meta_learn_description": "브라우저에서 배우는 피아노: 완전한 초보자를 위한 건반 입문, 여덟 개의 이론 수업, 들어볼 수 있는 악보 기호 용어집, 청음 훈련, 그리고 작은 도구 몇 가지."
+    "meta_learn_description": "브라우저에서 배우는 피아노: 완전한 초보자를 위한 건반 입문, 여덟 개의 이론 수업, 들어볼 수 있는 악보 기호 용어집, 청음 훈련, 그리고 작은 도구 몇 가지.",
+    "settings_instrument_range": "건반 크기",
+    "settings_instrument_range_hint": "건반을 벗어나는 곡은 옥타브 단위로 안쪽으로 옮겨져요. 없는 건반을 누르라고 하지 않아요.",
+    "instrument_range_all_keys": "88건반 전체",
+    "instrument_range_keys": "{count}건반",
+    "instrument_range_from_name": "건반 이름에서",
+    "instrument_range_measure": "재기",
+    "instrument_range_reset": "88건반 모두 쓰기",
+    "instrument_range_awaiting_lowest": "가장 낮은 건반을 눌러 주세요…",
+    "instrument_range_awaiting_highest": "이제 가장 높은 건반을",
+    "instrument_range_too_close": "두 건반이 한 옥타브도 떨어져 있지 않아요 — 양쪽 끝 건반을 눌러 보세요.",
+    "instrument_range_no_device": "건반을 연결하면 Plinky가 재어 볼 수 있어요.",
+    "play_fit_down_one": "건반에 맞도록 한 옥타브 내렸어요",
+    "play_fit_down_other": "건반에 맞도록 {count}옥타브 내렸어요",
+    "play_fit_up_one": "건반에 맞도록 한 옥타브 올렸어요",
+    "play_fit_up_other": "건반에 맞도록 {count}옥타브 올렸어요",
+    "play_fit_beyond": "이 곡은 건반 양쪽을 모두 벗어나서 악보 그대로 울려요"
 }

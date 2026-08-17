@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Warming-up",
     "today_moment_work": "Waar je aan werkt",
     "today_moment_learn": "Eén ding leren",
-    "today_drill": "Nieuwe oefening"
+    "today_drill": "Nieuwe oefening",
+    "settings_instrument_range": "Klaviergrootte",
+    "settings_instrument_range_hint": "Een stuk dat buiten je toetsen valt, schuift er in hele octaven in — zo vraagt niets om een toets die je niet hebt.",
+    "instrument_range_all_keys": "Alle 88 toetsen",
+    "instrument_range_keys": "{count} toetsen",
+    "instrument_range_from_name": "uit de naam van je klavier",
+    "instrument_range_measure": "Meten",
+    "instrument_range_reset": "Alle 88 gebruiken",
+    "instrument_range_awaiting_lowest": "Speel je laagste toets…",
+    "instrument_range_awaiting_highest": "nu je hoogste",
+    "instrument_range_too_close": "Die twee toetsen liggen minder dan een octaaf uit elkaar — neem de toetsen aan beide uiteinden.",
+    "instrument_range_no_device": "Sluit een klavier aan, dan kan Plinky het meten.",
+    "play_fit_down_one": "Een octaaf omlaag gezet zodat het op je klavier past",
+    "play_fit_down_other": "{count} octaven omlaag gezet zodat het op je klavier past",
+    "play_fit_up_one": "Een octaaf omhoog gezet zodat het op je klavier past",
+    "play_fit_up_other": "{count} octaven omhoog gezet zodat het op je klavier past",
+    "play_fit_beyond": "Dit stuk valt aan beide kanten buiten je klavier en klinkt daarom zoals het genoteerd staat"
 }

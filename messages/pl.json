@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Rozgrzewka",
     "today_moment_work": "Nad czym pracujesz",
     "today_moment_learn": "Jedna rzecz do nauki",
-    "today_drill": "Nowe ćwiczenie"
+    "today_drill": "Nowe ćwiczenie",
+    "settings_instrument_range": "Rozmiar klawiatury",
+    "settings_instrument_range_hint": "Utwór, który wychodzi poza twoje klawisze, wraca na nie o całe oktawy — nic nie poprosi o klawisz, którego nie masz.",
+    "instrument_range_all_keys": "Wszystkie 88 klawiszy",
+    "instrument_range_keys": "{count} klawiszy",
+    "instrument_range_from_name": "z nazwy twojej klawiatury",
+    "instrument_range_measure": "Zmierz",
+    "instrument_range_reset": "Użyj wszystkich 88",
+    "instrument_range_awaiting_lowest": "Naciśnij swój najniższy klawisz…",
+    "instrument_range_awaiting_highest": "teraz najwyższy",
+    "instrument_range_too_close": "Te dwa klawisze dzieli mniej niż oktawa — spróbuj klawiszy na obu końcach.",
+    "instrument_range_no_device": "Podłącz klawiaturę, a Plinky ją zmierzy.",
+    "play_fit_down_one": "Obniżony o oktawę, żeby zmieścił się na twojej klawiaturze",
+    "play_fit_down_other": "Obniżony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
+    "play_fit_up_one": "Podniesiony o oktawę, żeby zmieścił się na twojej klawiaturze",
+    "play_fit_up_other": "Podniesiony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
+    "play_fit_beyond": "Ten utwór wychodzi poza twoją klawiaturę z obu stron, więc brzmi tak, jak został zapisany"
 }

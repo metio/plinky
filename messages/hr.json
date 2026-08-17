@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Zagrijavanje",
     "today_moment_work": "Vježbaj",
     "today_moment_learn": "Nauči jednu stvar",
-    "today_drill": "Nova vježba"
+    "today_drill": "Nova vježba",
+    "settings_instrument_range": "Veličina klavijature",
+    "settings_instrument_range_hint": "Skladba koja prelazi tvoje tipke pomiče se u njih za cijele oktave — ništa ne traži tipku koju nemaš.",
+    "instrument_range_all_keys": "Svih 88 tipki",
+    "instrument_range_keys": "{count} tipki",
+    "instrument_range_from_name": "iz naziva tvoje klavijature",
+    "instrument_range_measure": "Izmjeri",
+    "instrument_range_reset": "Koristi svih 88",
+    "instrument_range_awaiting_lowest": "Pritisni svoju najnižu tipku…",
+    "instrument_range_awaiting_highest": "sada najvišu",
+    "instrument_range_too_close": "Te dvije tipke dijeli manje od oktave — probaj tipke na oba kraja.",
+    "instrument_range_no_device": "Priključi klavijaturu i Plinky je može izmjeriti.",
+    "play_fit_down_one": "Spušteno za oktavu da stane na tvoju klavijaturu",
+    "play_fit_down_other": "Spušteno za {count} oktave da stane na tvoju klavijaturu",
+    "play_fit_up_one": "Podignuto za oktavu da stane na tvoju klavijaturu",
+    "play_fit_up_other": "Podignuto za {count} oktave da stane na tvoju klavijaturu",
+    "play_fit_beyond": "Ova skladba prelazi tvoju klavijaturu na oba kraja, pa zvuči kako je zapisana"
 }

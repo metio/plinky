@@ -16,6 +16,9 @@ import { beamsVisible } from "../../../core/beams";
 import { tempoScale } from "../../../core/runOutcome";
 import { gradeOf } from "../../../core/scoreDifficulty";
 import { DEFAULT_KEY_RANGE, songKeyRange } from "../../../core/keyboardRange";
+import { type InstrumentRange, pitchRange } from "../../../core/instrumentRange";
+import { useInstrumentFit } from "../../hooks/useInstrumentFit";
+import { useInstrumentRange } from "../../hooks/useInstrumentRange";
 import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import type { Take } from "../../../core/takes";
@@ -370,8 +373,16 @@ function usePlaySessionValue({
             vanishing.rearm();
         },
     });
-    const { getOsmd, ready, staffCount, measureCount, measureBoxes, centerCursor, markPainted } =
-        score;
+    const {
+        getOsmd,
+        ready,
+        renderVersion,
+        staffCount,
+        measureCount,
+        measureBoxes,
+        centerCursor,
+        markPainted,
+    } = score;
 
     // The hand the run drills. A single-staff piece has no hand to choose — the selector
     // never shows for one — so it is always both. Derived once: the matcher, the ghost,
@@ -385,19 +396,45 @@ function usePlaySessionValue({
     // transposition — never on a layout relayout or a mid-run repaint, so reading
     // the steps (which walks and resets the cursor) can't disturb a live run.
     const [keyRange, setKeyRange] = useState<{ from: number; to: number }>(DEFAULT_KEY_RANGE);
-    // xml/transpose/staffCount aren't read in the body — they are the triggers:
-    // the sounding pitches change only when the piece or its key does, and gating
-    // on them keeps collectSteps (which walks the cursor) off the mid-run repaint
+    // The raw span of what the engraving sounds, before any padding — the keyboard framing
+    // above rounds outward to whole keys, and fitting the piece to an instrument needs the
+    // notes themselves. Read in the same pass, so the cursor is walked once.
+    const [sounding, setSounding] = useState<InstrumentRange | null>(null);
+    // renderVersion/staffCount aren't read in the body — they are the triggers, and
+    // gating on them keeps collectSteps (which walks the cursor) off the mid-run repaint
     // path. The osmd is read imperatively through the stable getOsmd.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: xml/transpose/staffCount are content-change triggers
+    //
+    // The trigger is the counter the score hook raises when a render completes, rather
+    // than the inputs that asked for one. Those inputs change in the commit that STARTS a
+    // reload, when the sheet on screen is still the old one — and `ready` cannot stand in
+    // for the finish, because a reload quick enough to set it false and true again inside
+    // one commit leaves the dependency list unchanged and the stale reading in place. That
+    // is not hypothetical: it is what happens on Firefox when a piece is transposed to fit
+    // a small keyboard, and it left the keybed framed around the notes the piece used to
+    // have.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: renderVersion/staffCount are render-completed triggers
     useEffect(() => {
         const osmd = getOsmd();
         if (!ready || !osmd) {
             return;
         }
         // Both hands, so switching the practised hand never resizes the keyboard.
-        setKeyRange(songKeyRange(collectSteps(osmd, "both").flat()));
-    }, [ready, xml, transpose, staffCount, getOsmd]);
+        const pitches = collectSteps(osmd, "both").flat();
+        setKeyRange(songKeyRange(pitches));
+        setSounding(pitchRange(pitches));
+    }, [ready, renderVersion, staffCount, getOsmd]);
+
+    // Move the piece into the octave the player's instrument can reach, when it does not
+    // already sit there. Nothing happens on a full piano, which is what the scores are
+    // written for and what every player without a connected controller is assumed to have.
+    const instrument = useInstrumentRange();
+    const instrumentFit = useInstrumentFit({
+        sounding,
+        xml,
+        instrument,
+        transpose,
+        setTranspose,
+    });
 
     // The cursor's current position in whole notes — the shared place Listen and Practice
     // hand off at, so switching between them (or leaving and re-entering the play surface)
@@ -1007,6 +1044,9 @@ function usePlaySessionValue({
         // Reading + keyboard framing.
         reading,
         keyRange,
+        // The same reading unrounded: the notes the engraving sounds, which is what
+        // deciding whether they fit an instrument needs.
+        sounding,
         hintNotes,
         holdFractions: holdIndicator.holdFractions,
         noteHints,
@@ -1049,6 +1089,9 @@ function usePlaySessionValue({
         setRevealTries,
         transpose,
         setTranspose,
+        // Whether the piece had to be moved to fit the instrument in the room, so the
+        // transpose control can say why it is not on zero.
+        instrumentFit,
         showMine,
         setShowMine,
         hasSaved,

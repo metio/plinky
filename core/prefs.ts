@@ -11,6 +11,7 @@ import {
     type LightProfileId,
 } from "./lightProfile";
 import { cleanKeyMap, DEFAULT_KEY_MAP, type KeyMap } from "./keyMap";
+import type { InstrumentRange } from "./instrumentRange";
 import type { MicCalibration } from "./pitch";
 import { type DecayMode, REVIEW_CAP } from "./review";
 
@@ -132,6 +133,11 @@ export type Prefs = {
     // wizard, or null when the player has never run it (the detector's own defaults
     // stand in). Stored per device — a different room needs a different tuning.
     micCalibration: MicCalibration | null;
+    // Which keys the player's instrument has, when it is not a full piano — measured by
+    // playing its lowest and highest key. Null leaves it to be read off a connected
+    // device's name, and failing that assumed to be all 88 (see core/instrumentRange).
+    // Stored per device, because the keyboard in this room is what it describes.
+    instrumentRange: InstrumentRange | null;
 };
 
 // The review-cap choices, all bounded: there is deliberately no "unlimited", so the
@@ -239,7 +245,25 @@ function defaults(): Prefs {
         hiddenNotes: false,
         revealTries: 1,
         micCalibration: null,
+        instrumentRange: null,
     };
+}
+
+// A stored instrument range is trusted only when it is two whole notes on a piano, the
+// right way round, and at least an octave apart. A backwards or one-key range would make
+// every piece unplayable while looking like a setting, so it is dropped rather than
+// honoured.
+function cleanInstrumentRange(value: unknown): InstrumentRange | null {
+    if (!value || typeof value !== "object") {
+        return null;
+    }
+    const range = value as Record<string, unknown>;
+    const key = (x: unknown): x is number =>
+        typeof x === "number" && Number.isInteger(x) && x >= 0 && x <= 127;
+    if (!key(range.from) || !key(range.to) || range.to - range.from < 12) {
+        return null;
+    }
+    return { from: range.from, to: range.to };
 }
 
 // A stored calibration is trusted only when every field is a finite number in a
@@ -328,6 +352,7 @@ export function parsePrefs(raw: string | null): Prefs {
             hiddenNotes: bool(parsed.hiddenNotes, base.hiddenNotes),
             revealTries: oneOf(parsed.revealTries, REVEAL_TRIES, base.revealTries),
             micCalibration: cleanCalibration(parsed.micCalibration),
+            instrumentRange: cleanInstrumentRange(parsed.instrumentRange),
         };
     } catch {
         return base;

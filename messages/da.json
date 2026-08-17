@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Varm op",
     "today_moment_work": "Arbejd med dette",
     "today_moment_learn": "Lær én ting",
-    "today_drill": "En frisk øvelse"
+    "today_drill": "En frisk øvelse",
+    "settings_instrument_range": "Klaviaturets størrelse",
+    "settings_instrument_range_hint": "Et stykke, der rækker ud over dine tangenter, flytter ind i hele oktaver — så beder intet om en tangent, du ikke har.",
+    "instrument_range_all_keys": "Alle 88 tangenter",
+    "instrument_range_keys": "{count} tangenter",
+    "instrument_range_from_name": "fra klaviaturets navn",
+    "instrument_range_measure": "Mål",
+    "instrument_range_reset": "Brug alle 88",
+    "instrument_range_awaiting_lowest": "Tryk på din dybeste tangent…",
+    "instrument_range_awaiting_highest": "nu din højeste",
+    "instrument_range_too_close": "De to tangenter ligger mindre end en oktav fra hinanden — prøv tangenterne i hver ende.",
+    "instrument_range_no_device": "Tilslut et klaviatur, så kan Plinky måle det.",
+    "play_fit_down_one": "Sænket en oktav, så det passer på dit klaviatur",
+    "play_fit_down_other": "Sænket {count} oktaver, så det passer på dit klaviatur",
+    "play_fit_up_one": "Hævet en oktav, så det passer på dit klaviatur",
+    "play_fit_up_other": "Hævet {count} oktaver, så det passer på dit klaviatur",
+    "play_fit_beyond": "Dette stykke rækker ud over dit klaviatur i begge ender, så det lyder, som det er skrevet"
 }

@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Aquecer",
     "today_moment_work": "Trabalhar",
     "today_moment_learn": "Aprender uma coisa",
-    "today_drill": "Um exercício novo"
+    "today_drill": "Um exercício novo",
+    "settings_instrument_range": "Tamanho do teclado",
+    "settings_instrument_range_hint": "Uma peça que passa das tuas teclas entra nelas por oitavas inteiras, para que nada te peça uma tecla que não tens.",
+    "instrument_range_all_keys": "As 88 teclas",
+    "instrument_range_keys": "{count} teclas",
+    "instrument_range_from_name": "a partir do nome do teu teclado",
+    "instrument_range_measure": "Medir",
+    "instrument_range_reset": "Usar as 88",
+    "instrument_range_awaiting_lowest": "Carrega na tua tecla mais grave…",
+    "instrument_range_awaiting_highest": "agora a mais aguda",
+    "instrument_range_too_close": "Essas duas teclas estão a menos de uma oitava — experimenta as teclas de cada ponta.",
+    "instrument_range_no_device": "Liga um teclado e o Plinky consegue medi-lo.",
+    "play_fit_down_one": "Descida uma oitava para caber no teu teclado",
+    "play_fit_down_other": "Descida {count} oitavas para caber no teu teclado",
+    "play_fit_up_one": "Subida uma oitava para caber no teu teclado",
+    "play_fit_up_other": "Subida {count} oitavas para caber no teu teclado",
+    "play_fit_beyond": "Esta peça passa do teu teclado dos dois lados, por isso soa tal como está escrita"
 }
