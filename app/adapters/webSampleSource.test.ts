@@ -38,11 +38,12 @@ function fakeCache() {
         put: async (url: string, response: Response) => {
             held.set(url, response);
         },
+        keys: async () => [...held.keys()].map((url) => ({ url }) as Request),
     } as unknown as Cache;
     return { cache, held };
 }
 
-function world(options: { failManifest?: boolean; cache?: Cache } = {}) {
+function world(options: { failManifest?: boolean; cache?: Cache; enabled?: boolean } = {}) {
     const asked: string[] = [];
     const fetcher = (async (input: RequestInfo | URL) => {
         const url = String(input);
@@ -62,12 +63,42 @@ function world(options: { failManifest?: boolean; cache?: Cache } = {}) {
         cache: async () => options.cache ?? null,
         context: async () => ({ decodeAudioData }) as unknown as BaseAudioContext,
         remember: (enabled) => remembered.push(enabled),
-        enabled: true,
+        enabled: options.enabled ?? true,
     });
     return { source, asked, remembered, decodeAudioData };
 }
 
 describe("webSampleSource", () => {
+    it("fetches its manifest on a revisit, without waiting to be asked", async () => {
+        // The choice lives on the device and the manifest lives in memory, so every reload
+        // starts enabled with nothing loaded. Nothing else fetches it: the switch is not
+        // touched and no piece is open yet. Without this the panel sat saying "fetching"
+        // over work nobody had started.
+        const { source, asked } = world();
+        await vi.waitFor(() => expect(source.manifest()).not.toBeNull());
+        expect(asked).toEqual(["https://samples.test/v1/manifest.json"]);
+    });
+
+    it("reports what the device holds, not what this session fetched", async () => {
+        // The figure is read off the cache, so it survives a reload — a count that reset
+        // would describe a session while claiming to describe a device.
+        const { cache } = fakeCache();
+        const first = world({ cache });
+        await first.source.prepare([NOTE]);
+        expect(first.source.state().held).toBe(1);
+
+        const second = world({ cache });
+        await vi.waitFor(() => expect(second.source.state().held).toBe(1));
+        // And it knew that before decoding anything this time.
+        expect(second.source.state().ready).toBe(0);
+    });
+
+    it("says it is loading only while it is", async () => {
+        const { source } = world();
+        await vi.waitFor(() => expect(source.manifest()).not.toBeNull());
+        expect(source.state().loading).toBe(false);
+    });
+
     it("maps a note to its recording itself, so a caller needs no manifest first", async () => {
         // The port takes notes rather than recordings for exactly this reason: on any page
         // load the manifest is not here yet, and a caller made to fetch it before it can
@@ -86,6 +117,7 @@ describe("webSampleSource", () => {
     it("fetches the manifest and the recordings a piece asked for", async () => {
         const { source, asked } = world();
         await source.prepare([NOTE]);
+        // Once each: the revisit's own manifest load and this one are the same fetch.
         expect(asked).toEqual([
             "https://samples.test/v1/manifest.json",
             "https://samples.test/v1/C4v4.opus",
@@ -122,10 +154,11 @@ describe("webSampleSource", () => {
     });
 
     it("fetches nothing at all until the player has asked for the real piano", async () => {
-        const { source, asked } = world();
-        await source.forget();
+        // The default a device starts on: not a request, not a byte, until it is asked for.
+        const { source, asked } = world({ enabled: false });
         await source.prepare([NOTE]);
         expect(asked).toEqual([]);
+        expect(source.manifest()).toBeNull();
     });
 
     it("remembers the choice both ways, and forgets what it decoded", async () => {
@@ -134,7 +167,7 @@ describe("webSampleSource", () => {
         expect(source.state().ready).toBe(1);
         await source.forget();
         expect(remembered.at(-1)).toBe(false);
-        expect(source.state()).toMatchObject({ enabled: false, ready: 0, bytes: 0 });
+        expect(source.state()).toMatchObject({ enabled: false, ready: 0, held: 0 });
         await source.enable();
         expect(remembered.at(-1)).toBe(true);
         expect(source.state().enabled).toBe(true);

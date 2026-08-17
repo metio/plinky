@@ -42,15 +42,35 @@ describe("GrandPianoSetting", () => {
         ).toBeTruthy();
     });
 
-    it("says the instrument is on its way before its manifest has landed", async () => {
+    it("says the instrument is on its way only while it is actually on its way", async () => {
+        // The bug this pins: on a revisit the choice is remembered and the manifest is not
+        // here, and the panel sat saying "fetching" over work nobody had started. The line
+        // follows the fetch, not the absence.
         const samples = fakeSampleSource(null);
         await samples.enable();
         renderWithServices(<GrandPianoSetting />, { samples });
-        expect(screen.getByText(m.settings_grand_piano_arriving())).toBeTruthy();
+        expect(screen.queryByText(m.settings_grand_piano_arriving())).toBeNull();
+        expect(screen.getByText(m.settings_grand_piano_offline())).toBeTruthy();
+    });
+
+    it("counts what the device holds, in the words that fit the number", () => {
+        const samples = fakeSampleSource(MANIFEST);
+        samples.put("C4v8.opus");
+        renderWithServices(<GrandPianoSetting />, { samples });
+        expect(screen.getByText(/\b1 recording on this device/)).toBeTruthy();
+        cleanup();
+
+        const more = fakeSampleSource(MANIFEST);
+        more.put("C4v8.opus");
+        more.put("C4v12.opus");
+        renderWithServices(<GrandPianoSetting />, { samples: more });
+        expect(screen.getByText(/\b2 recordings on this device/)).toBeTruthy();
     });
 
     it("says nothing about storage until something has been fetched", () => {
         renderWithServices(<GrandPianoSetting />, { samples: fakeSampleSource(MANIFEST) });
-        expect(screen.queryByText(/MB/)).toBeNull();
+        // The switch's own caption ends "kept on this device", so the count is what is
+        // being looked for rather than the phrase.
+        expect(screen.queryByText(/\d+ recordings? on this device/)).toBeNull();
     });
 });

@@ -47,12 +47,14 @@ export interface SampleSource {
 export type SampleState = {
     // The player asked for the real piano.
     enabled: boolean;
-    // Recordings decoded and playable right now.
+    // Recordings decoded and playable right now, this session.
     ready: number;
-    // Bytes fetched into the cache on this device.
-    bytes: number;
+    // Recordings this device is holding, across every visit. Read from the cache rather
+    // than counted as they arrive: a figure that resets on reload would describe a session
+    // while claiming to describe a device.
+    held: number;
     // A fetch is in flight, so a panel can say so rather than looking broken.
     loading: boolean;
 };
 
-export const NO_SAMPLES: SampleState = { enabled: false, ready: 0, bytes: 0, loading: false };
+export const NO_SAMPLES: SampleState = { enabled: false, ready: 0, held: 0, loading: false };

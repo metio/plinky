@@ -41,13 +41,20 @@ export function GrandPianoSetting() {
             />
             {state.enabled && (
                 <p className="text-xs text-muted">
-                    {manifest ? sampleCredit(manifest) : m.settings_grand_piano_arriving()}
-                    {state.bytes > 0 && (
+                    {/* "Fetching" only while something is actually being fetched. It used to
+                        stand for "no manifest yet", which on a revisit meant it sat there
+                        describing work nobody had started. */}
+                    {manifest
+                        ? sampleCredit(manifest)
+                        : state.loading
+                          ? m.settings_grand_piano_arriving()
+                          : m.settings_grand_piano_offline()}
+                    {state.held > 0 && (
                         <>
                             {" · "}
-                            {m.settings_grand_piano_held({
-                                megabytes: (state.bytes / 1_000_000).toFixed(1),
-                            })}
+                            {state.held === 1
+                                ? m.settings_grand_piano_held_one({ count: state.held })
+                                : m.settings_grand_piano_held_other({ count: state.held })}
                         </>
                     )}
                 </p>

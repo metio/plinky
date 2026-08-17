@@ -60,10 +60,9 @@ export const Recorded: Story = {
 export const Holding: Story = {
     render: function Render() {
         const samples = fakeSampleSource(MANIFEST);
-        // A piece's worth of recordings, at the size the pack's own files are, so the
-        // figure reads the way it will in life.
-        samples.put("C4v8.opus", { duration: 4 } as AudioBuffer, 180_000);
-        samples.put("C4v12.opus", { duration: 4 } as AudioBuffer, 190_000);
+        // A piece's worth of recordings, so the figure reads the way it will in life.
+        samples.put("C4v8.opus", { duration: 4 } as AudioBuffer);
+        samples.put("C4v12.opus", { duration: 4 } as AudioBuffer);
         return (
             <ServicesProvider services={{ samples }}>
                 <GrandPianoSetting />
