@@ -12,7 +12,7 @@ import {
 import { noindexMeta, routeMeta } from "../../core/site";
 import { Button } from "../components/ui/button";
 import { useStore } from "../contexts/services";
-import { resolveScore } from "../lib/catalog";
+import { loadCatalog } from "../lib/catalog";
 import { downloadBlob } from "../lib/download";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/collect";
@@ -28,7 +28,15 @@ export function meta(_args: Route.MetaArgs) {
 // blank column nobody can identify.
 function usePieceTitles(): (id: string) => string {
     const store = useStore();
-    return useCallback((id: string) => resolveScore(store, id)?.title ?? id, [store]);
+    // One pass over the catalogue, not one per lookup. Resolving a score by id reads and
+    // parses the whole stored library each time, and this is called once per column while
+    // the page re-renders on every keystroke in the paste box — so a class list of ten
+    // steps rebuilt the catalogue ten times per letter typed.
+    const titles = useMemo(
+        () => new Map(loadCatalog(store).map((score) => [score.id, score.title])),
+        [store],
+    );
+    return useCallback((id: string) => titles.get(id) ?? id, [titles]);
 }
 
 // The other end of a handed-back assignment: paste in whatever arrived and read it

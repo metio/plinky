@@ -21,7 +21,10 @@ export function ConfirmButton({
 }: {
     onConfirm: () => void;
     // The label on the red confirm button once armed — phrase it as the question.
-    confirmLabel: string;
+    // A function is resolved only once the button is armed, for a label whose text costs
+    // something to work out — the library's names how many assignments a score is in, and
+    // computing that for every row on every render is work for a question nobody asked.
+    confirmLabel: string | (() => string);
     children: ReactNode;
     // When set, the resting trigger is an icon button with this accessible name.
     label?: string;
@@ -41,7 +44,7 @@ export function ConfirmButton({
                         onConfirm();
                     }}
                 >
-                    {confirmLabel}
+                    {typeof confirmLabel === "function" ? confirmLabel() : confirmLabel}
                 </Button>
                 <Button variant="ghost" onClick={() => setArmed(false)}>
                     {m.action_cancel()}

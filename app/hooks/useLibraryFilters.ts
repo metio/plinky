@@ -22,6 +22,10 @@ const PER_PAGE = 60;
 // search.
 const ADDRESS_DELAY_MS = 400;
 
+// Handed to the filter whenever the starred filter is off — a stable reference, so
+// starring a piece does not count as a change to what is being filtered.
+const NO_STARRED: ReadonlySet<string> = new Set();
+
 // The library list's filter state — search, kind, multi-select grades, and the
 // starred/due toggles — plus paging, applied over the pure core filter. The
 // starred set is subscribed, so starring anywhere (this list, seeding) refreshes
@@ -121,9 +125,13 @@ export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record
     // search text as typed rather than as last written to it.
     const showing = useMemo(() => ({ ...filter, query: applied }), [filter, applied]);
 
+    // The filter reads the starred set only to answer the starred filter, so while that is
+    // off it is handed a stable empty one. Otherwise every star tapped anywhere in the app
+    // re-filtered three thousand pieces to produce the same list back.
+    const starred = favoritesOnly ? favorites : NO_STARRED;
     const matches = useMemo(
-        () => filterLibrary(items, showing, { favorites, mastery, now: Date.now() }),
-        [items, showing, favorites, mastery],
+        () => filterLibrary(items, showing, { favorites: starred, mastery, now: Date.now() }),
+        [items, showing, starred, mastery],
     );
 
     return {

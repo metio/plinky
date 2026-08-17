@@ -49,8 +49,13 @@ ist = "ist"
 # route components — typos only knows English, so it flags those legitimate German
 # words. The prose itself now lives in messages/ (the English base stays checked);
 # the German is authoritative and every other locale is a machine translation.
+# dev/catalog-curation.json is keyed by the same content-addressed song ids as the
+# manifest above, and their letter runs read as misspellings ("…jqyY", "6Ue…"). Every
+# entry added would flag a new one. The cost is that the short "why" notes in it go
+# unchecked, which is the same bargain the manifest already makes.
 [files]
 extend-exclude = [
+    "dev/catalog-curation.json",
     "messages/*",
     "!messages/en.json",
     "studio/seed/help.ndjson",

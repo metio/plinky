@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { Show } from "../components/features/conditional";
 import { LibraryFilters } from "../components/features/libraryFilters";
@@ -12,6 +12,7 @@ import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { dueCount } from "../../core/library";
 import { isDue } from "../../core/mastery";
+import { composerCounts } from "../../core/person";
 import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
 import { useLibraryFilters } from "../hooks/useLibraryFilters";
@@ -72,6 +73,11 @@ export default function LibraryRoute() {
             : m.library_remove_used_other({ count: used });
     };
 
+    // The composers this shelf actually holds, grouped from the same items it lists — so
+    // the directory and the search agree about who is in the catalogue. Grouping three
+    // thousand credits is ~10ms, so it waits until somebody asks to see them.
+    const people = useMemo(() => (tab === "people" ? composerCounts(items) : []), [tab, items]);
+
     const now = Date.now();
     const due = dueCount(mastery, now);
     const { matches, visible } = filters;
@@ -108,7 +114,7 @@ export default function LibraryRoute() {
             {tab === "people" && (
                 <div className="space-y-3">
                     <p className="text-sm text-muted">{m.library_people_hint()}</p>
-                    <ComposerList query={filters.applied} />
+                    <ComposerList people={people} query={filters.applied} />
                 </div>
             )}
 
@@ -178,7 +184,7 @@ export default function LibraryRoute() {
                                                 }
                                                 removeConfirmLabel={
                                                     item.removable
-                                                        ? removeConfirmLabel(item.id)
+                                                        ? () => removeConfirmLabel(item.id)
                                                         : undefined
                                                 }
                                             />

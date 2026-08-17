@@ -26,6 +26,9 @@
 // stored data of one named piece. A composer typo can be worth both: the alias so any
 // piece that arrives with it lands on the right page, the curation so the shipped data is
 // simply right.
+//
+// One trap when writing a composer here: a comma is read as "Surname, Forename" and
+// reordered, so a credit naming several people joins them with "&" rather than commas.
 
 import { readFile } from "node:fs/promises";
 
