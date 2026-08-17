@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
-import type { SampleSource, SampleState } from "../ports/sampleSource";
+import type { PlayedNote, SampleSource, SampleState } from "../ports/sampleSource";
 import { NO_SAMPLES } from "../ports/sampleSource";
 
 // A sample source that holds whatever a test hands it, so a test can say "this note has a
@@ -11,16 +11,16 @@ export type FakeSampleSource = SampleSource & {
     // Make this recording playable, as if it had been fetched and decoded. `bytes` is what
     // it cost to fetch, for the one figure the panel shows.
     put(file: string, buffer?: AudioBuffer, bytes?: number): void;
-    // Everything prepare() was asked for, in order, so a test can assert that the app looks
-    // ahead of the hands rather than fetching a note at a time.
-    prepared: string[][];
+    // Every prepare() call's notes, in order, so a test can assert that the app looks ahead
+    // of the hands rather than fetching a note at a time.
+    prepared: PlayedNote[][];
 };
 
 export function fakeSampleSource(manifest: SampleManifest | null = null): FakeSampleSource {
     const buffers = new Map<string, AudioBuffer>();
     const listeners = new Set<() => void>();
     let state: SampleState = { ...NO_SAMPLES, enabled: manifest !== null };
-    const prepared: string[][] = [];
+    const prepared: PlayedNote[][] = [];
     const announce = () => {
         for (const listener of listeners) {
             listener();
@@ -42,8 +42,8 @@ export function fakeSampleSource(manifest: SampleManifest | null = null): FakeSa
             listeners.add(listener);
             return () => listeners.delete(listener);
         },
-        async prepare(regions) {
-            prepared.push(regions.map((region) => region.file));
+        async prepare(notes) {
+            prepared.push([...notes]);
         },
         async enable() {
             state = { ...state, enabled: true };

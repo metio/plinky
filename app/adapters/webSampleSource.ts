@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
-import type { SampleSource, SampleState } from "../ports/sampleSource";
+import { regionsNeeded } from "../../core/sampledPiano";
+import type { PlayedNote, SampleSource, SampleState } from "../ports/sampleSource";
 import { NO_SAMPLES } from "../ports/sampleSource";
 
 // The real piano, fetched a recording at a time and kept in the browser's cache.
@@ -148,17 +149,21 @@ export function webSampleSource(options: WebSampleOptions): SampleSource {
             listeners.add(listener);
             return () => listeners.delete(listener);
         },
-        async prepare(regions) {
-            if (!state.enabled || regions.length === 0) {
+        async prepare(notes: readonly PlayedNote[]) {
+            if (!state.enabled || notes.length === 0) {
                 return;
             }
+            // The manifest first, always: it is what turns a note into a recording, and on
+            // any page load it is not here yet.
             const found = await loadManifest();
             if (!found) {
                 return;
             }
             settle({ loading: true });
             try {
-                await Promise.all(regions.map((region) => decode(region)));
+                await Promise.all(
+                    regionsNeeded(found.notes, notes).map((region) => decode(region)),
+                );
             } finally {
                 settle({ loading: false });
             }

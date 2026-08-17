@@ -3,7 +3,6 @@
 
 import { useEffect } from "react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { regionsNeeded } from "../../core/sampledPiano";
 import { performanceOf } from "../../core/scorePerformance";
 import { useSampleSource } from "../contexts/services";
 import { collectMatchSteps } from "./useScoreMatcher";
@@ -23,13 +22,13 @@ export function useSamplePrefetch(getOsmd: () => OpenSheetMusicDisplay | null, r
     const samples = useSampleSource();
     useEffect(() => {
         const osmd = getOsmd();
-        const manifest = samples.manifest();
-        if (!ready || !osmd || !manifest || !samples.state().enabled) {
+        if (!ready || !osmd || !samples.state().enabled) {
             return;
         }
         // The written performance, dynamics and all — the same reading the video export
-        // plays from, so what is fetched is what will sound.
-        const notes = performanceOf(collectMatchSteps(osmd, "both"));
-        void samples.prepare(regionsNeeded(manifest.notes, notes));
+        // plays from, so what is fetched is what will sound. Which recordings that means is
+        // the source's question: it holds the manifest, and waiting for one here is what
+        // made this never run at all.
+        void samples.prepare(performanceOf(collectMatchSteps(osmd, "both")));
     }, [getOsmd, ready, samples]);
 }
