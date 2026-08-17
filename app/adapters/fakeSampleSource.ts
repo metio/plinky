@@ -8,8 +8,9 @@ import { NO_SAMPLES } from "../ports/sampleSource";
 // A sample source that holds whatever a test hands it, so a test can say "this note has a
 // recording and that one does not" without a network, a cache or an audio context.
 export type FakeSampleSource = SampleSource & {
-    // Make this recording playable, as if it had been fetched and decoded.
-    put(file: string, buffer?: AudioBuffer): void;
+    // Make this recording playable, as if it had been fetched and decoded. `bytes` is what
+    // it cost to fetch, for the one figure the panel shows.
+    put(file: string, buffer?: AudioBuffer, bytes?: number): void;
     // Everything prepare() was asked for, in order, so a test can assert that the app looks
     // ahead of the hands rather than fetching a note at a time.
     prepared: string[][];
@@ -27,11 +28,11 @@ export function fakeSampleSource(manifest: SampleManifest | null = null): FakeSa
     };
     return {
         prepared,
-        put(file, buffer) {
+        put(file, buffer, bytes = 0) {
             // The buffer is only ever handed back, never inspected, so a stand-in is
             // enough where a test cares about which recording rather than what is in it.
             buffers.set(file, buffer ?? ({ duration: 1 } as AudioBuffer));
-            state = { ...state, ready: buffers.size };
+            state = { ...state, ready: buffers.size, bytes: state.bytes + bytes };
             announce();
         },
         manifest: () => manifest,
