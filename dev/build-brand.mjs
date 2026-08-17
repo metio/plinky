@@ -206,16 +206,37 @@ const social = (width, height, titleSize) => `
 await shoot(social(1200, 630, 62), { width: 1200, height: 630, path: `${OUT}/social/open-graph-1200x630.png` });
 await shoot(social(1080, 1080, 74), { width: 1080, height: 1080, path: `${OUT}/social/square-1080.png` });
 await shoot(social(1080, 1920, 86), { width: 1080, height: 1920, path: `${OUT}/social/story-1080x1920.png` });
+// Instagram's tallest feed size. A square post is cropped from this without losing
+// anything; the reverse is not true, so a portrait is the one worth making.
+await shoot(social(1080, 1350, 78), { width: 1080, height: 1350, path: `${OUT}/social/instagram-portrait-1080x1350.png` });
 
-// Reddit crops a community icon to a circle, which cuts the corners off the rounded
-// square the launcher icons use and leaves the letter looking hung too low. This one is
-// drawn as the circle it will become, with the P set smaller so it clears the curve on
-// every side.
+// Every platform crops a profile picture to a circle — Reddit, Facebook, Instagram, all of
+// them — which cuts the corners off the rounded square the launcher icons use and leaves
+// the letter looking hung too low. This one is drawn as the circle it will become, with the
+// P set smaller so it clears the curve on every side. One file for all three, because it is
+// one mark and three names for it would drift.
+for (const size of [256, 512]) {
+    await shoot(
+        `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center;overflow:hidden">
+           <div style="width:${Math.round(size * 0.67)}px;height:${Math.round(size * 0.67)}px">${icon}</div>
+         </div>`,
+        { width: size, height: size, path: `${OUT}/social/profile-circle-${size}.png` },
+    );
+}
+
+// A Facebook page cover. Facebook shows it at 820×312 on a desktop and crops it to a
+// taller, narrower window on a phone, and it lays the page's own name and buttons over the
+// bottom left — so everything that matters sits in the middle, and the edges carry nothing
+// but ground. Rendered at twice the size it is shown, which is what keeps it crisp on the
+// screens people actually have.
 await shoot(
-    `<div style="width:256px;height:256px;border-radius:50%;background:${colour["ink blue"]};display:flex;align-items:center;justify-content:center;overflow:hidden">
-       <div style="width:172px;height:172px">${icon}</div>
+    `<div style="width:1640px;height:624px;background:${colour["ink blue"]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;padding:0 24%">
+       <div style="font-family:Literata,Georgia,serif;font-size:132px;font-weight:600;letter-spacing:-0.015em;color:${colour.paper};line-height:1">
+         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
+       </div>
+       <div style="font-family:Literata,Georgia,serif;font-size:52px;font-weight:600;color:${colour.paper};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
      </div>`,
-    { width: 256, height: 256, path: `${OUT}/social/reddit-icon-256.png` },
+    { width: 1640, height: 624, path: `${OUT}/social/facebook-cover-1640x624.png` },
 );
 
 // The banner strip. Reddit lays the community icon and name over the left of it on a

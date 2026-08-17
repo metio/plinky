@@ -18,7 +18,30 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | `palette.png` | Every colour with its role, as a sheet. |
 | `palette.json` | The same, for tools. Hex plus the token each comes from. |
 | `type.png` | The two faces, set as the app sets them. |
-| `social/*.png` | Open Graph 1200×630, square 1080, story 1080×1920. |
+| `social/profile-circle-*.png` | The profile picture, at 256 and 512. Every platform crops one to a circle, so it is drawn as a circle. |
+| `social/open-graph-1200x630.png` | What a shared link unfurls as. |
+| `social/square-1080.png` | A square post. |
+| `social/instagram-portrait-1080x1350.png` | Instagram's tallest feed size — a square crops out of it without loss, and not the other way round. |
+| `social/story-1080x1920.png` | A story or a reel. |
+| `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
+| `social/reddit-banner-*.png` | Reddit's community banner, desktop and mobile. |
+
+## Where each one goes
+
+| Platform | Profile | Header | Post |
+| --- | --- | --- | --- |
+| Facebook | `profile-circle-512` | `facebook-cover-1640x624` | `square-1080`, `open-graph-1200x630` |
+| Instagram | `profile-circle-512` | — | `instagram-portrait-1080x1350`, `square-1080`, `story-1080x1920` |
+| Reddit | `profile-circle-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
+
+One profile picture serves all three: it is one mark, and three names for it would drift
+apart the first time somebody edited only one. The covers differ because the crops do —
+Facebook takes a wide strip and narrows it on a phone, Reddit takes a thin one and lays the
+community's own icon and name over the left of it. Both keep everything that matters in the
+middle for that reason, and nothing but ground at the edges.
+
+Reddit's community colours, from the palette: **base** `#2b4374` (ink blue), **key**
+`#d81b7a` (plink), **pinned post** `#a67c2e` (brass).
 
 ## The mark
 
