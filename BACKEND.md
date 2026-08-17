@@ -1020,9 +1020,20 @@ Setting it up, once:
    `npm run piano:build -- --library <dir> --out piano-pack`. It writes
    `piano-pack/v1/` — 621 `.opus` files, a `manifest.json` carrying the licence, and a
    `README.txt` beside it with the credit and the byte count.
-3. **Upload it** under the same `v1/` prefix, either by dragging the folder into the
-   dashboard or with `npx wrangler r2 object put plinky-samples/v1/<name> --file <path>`
-   per file. The manifest must land at `v1/manifest.json`.
+3. **Upload it** under the same `v1/` prefix. The dashboard refuses more than a hundred
+   files at a time and a pack is six hundred, so `npm run piano:upload -- --bucket
+   plinky-samples` drives wrangler once per object, eight at a time, and remembers what
+   landed so a dropped connection costs only the rest. It needs `CLOUDFLARE_ACCOUNT_ID`
+   and `CLOUDFLARE_API_TOKEN` in the environment — an R2 token with object read/write on
+   this bucket alone — and never takes them as arguments, because a token on a command
+   line ends up in shell history.
+
+   By hand it is `npx wrangler r2 object put plinky-samples/v1/<name> --file <path>
+   --remote`. **`--remote` is not optional**: without it wrangler writes to a local
+   simulator and reports success. Upload `manifest.json` **last** — while it is absent the
+   app has no pack at all, which is a better half-uploaded state than a manifest naming
+   recordings that have not arrived. Serve the audio as `audio/ogg` and everything with
+   `cache-control: public, max-age=31536000, immutable`.
 4. **Give it a domain.** Bucket → *Settings* → *Public access* → *Custom domain* →
    `samples.plinky.fun`. Cloudflare adds the DNS record itself when the zone is on the
    same account. Do **not** enable the `r2.dev` public URL: it is rate-limited and its
