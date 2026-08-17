@@ -76,6 +76,40 @@ loudness a feed plays at. Two shapes come out of the same machinery:
 Only CC0 pieces are eligible: the catalogue's CC-BY and CC-BY-SA scores carry obligations
 that a feed strips, and share-alike travels with a video.
 
+### What to write under them
+
+The channel's About, in the app's own voice:
+
+> Piano, one piece at a time.
+>
+> Every clip here is played by Plinky itself — the notes falling, the keys lighting under
+> them, each finger in its own colour. The music is public domain. The piano is a real one:
+> the Salamander Grand Piano, recorded by Alexander Holm and shared under CC-BY 3.0.
+>
+> Plinky is free piano practice in your browser. No account, nothing to install. Bring a
+> MIDI keyboard or use your computer keys, then play any score you like — or drill
+> sight-reading, rhythm, tempo and ear training. Every run is graded, and your scores stay
+> on your device.
+>
+> Have a go: https://plinky.fun
+
+And under each video, with the piece and composer filled in:
+
+> **{Piece} — {Composer}**
+>
+> Played by Plinky, free piano practice in your browser: https://plinky.fun
+>
+> The score is public domain (CC0). The piano is the Salamander Grand Piano by Alexander
+> Holm, under CC-BY 3.0:
+> https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
+>
+> The colours are fingers — thumb to little finger — worked out for the hand as it plays.
+
+**The piano's credit goes on every video, not only the channel.** CC-BY asks for
+attribution wherever the work travels, and a video carries the recordings with it: somebody
+who finds one clip has met the recordings without ever seeing the About page. It costs two
+lines and it is the licence's one condition.
+
 ## The mark
 
 The capital **P** of Literata — the face every title in the app is set in, and the letter
