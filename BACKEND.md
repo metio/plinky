@@ -1043,7 +1043,16 @@ Setting it up, once:
    fetches fail as CORS errors even though the objects are public.
 6. **Cache it hard.** A Cache Rule on `samples.plinky.fun/*` with an edge TTL of a year
    and *Respect origin* off. The bytes are immutable by construction, so nothing here can
-   go stale.
+   go stale. Objects uploaded through the dashboard carry no `cache-control` of their own
+   — `npm run piano:upload` sets one, the dashboard does not — so without the rule every
+   recording is revalidated on each visit. It still works, because the app keeps its own
+   copy in Cache Storage; it is just paid for twice.
+
+Then **check it**: `npm run piano:verify` asks the origin about every object the manifest
+names, compares each size with what was built, and reads the headers a browser will need.
+An upload of six hundred objects fails partially and quietly — a few time out, the manifest
+lands anyway, and the app plays a synthesised note wherever a recording is missing, which
+sounds like nothing being wrong.
 
 Nothing in CI touches the bucket. The pack is built and uploaded by hand when the
 instrument changes, which — for a library published in 2016 — is close to never.
