@@ -261,6 +261,16 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   key (or carrying an orphan one), so a string can't ship English-only and
   silently fall back. Then `npm run messages` regenerates the gitignored
   `app/paraglide/`.
+- **A hand-made correction to catalogue metadata goes in `dev/catalog-curation.json`**,
+  never straight into `public/songs/manifest.json`. The manifest is written by
+  `songs:import` from the harvested corpora, so an edit there survives until the next
+  import and no longer; the curation file is keyed by song id (a fingerprint of the notes,
+  so it outlives re-slugging and re-licensing) and re-applied by `npm run songs:bake`,
+  which is the CI gate. Only `title` and `composer` may be corrected — a licence is a
+  legal fact about the score, and grade and cost are derived from the notes. Each entry
+  carries a `why`. A composer's *spelling* is a different question: `ALIASES` in
+  `core/person.ts` maps a spelling to one person for display, across every piece bearing
+  it, now and in future.
 - **Every file** carries the two SPDX header lines declaring the Plinky Authors
   and the AGPL-3.0-or-later licence (or a `REUSE.toml` entry when the format can't
   hold comments), like the top of this file. The catalogue is the exception: scores
