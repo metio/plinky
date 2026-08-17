@@ -20,7 +20,7 @@ type LibraryRowProps = {
     // Present only for removable (user-imported) scores; the label names the
     // blast radius when saved assignments still reference the piece.
     onRemove?: () => void;
-    removeConfirmLabel?: string;
+    removeConfirmLabel?: string | (() => string);
 };
 
 // One library list row: star toggle, the piece card linking to its play page

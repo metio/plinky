@@ -10,6 +10,16 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**Every composer the catalogue credits is in Composers now.** The tab was listing 154 of
+them; the rest — anyone with only a piece or two — could not be found there even by typing
+their name exactly, though their music was on the shelf all along. All 487 are listed, and
+searching finds any of them.
+
+**And their names read like names.** Harvested credits arrive as whatever the engraver
+typed, so a few dozen pieces were filed under an arranger, a catalogue number, a source
+URL, or a paragraph of singing instructions in French — each one a "composer" of its own
+holding a single piece. Those pieces now sit with the composer who wrote them.
+
 **The library's search box keeps up with you.** Every letter you typed used to travel
 through the page's address before it appeared, so typing quickly felt like it was being
 blocked and characters went missing. The box is its own now — letters land as you press
