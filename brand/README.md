@@ -25,6 +25,8 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | `social/story-1080x1920.png` | A story or a reel. |
 | `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop and mobile. |
+| `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
+| `social/youtube-thumbnail-1280x720.png` | A video thumbnail, with no per-video text to edit. |
 
 ## Where each one goes
 
@@ -33,6 +35,7 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | Facebook | `profile-circle-512` | `facebook-cover-1640x624` | `square-1080`, `open-graph-1200x630` |
 | Instagram | `profile-circle-512` | — | `instagram-portrait-1080x1350`, `square-1080`, `story-1080x1920` |
 | Reddit | `profile-circle-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
+| YouTube | `profile-circle-800` | `youtube-banner-2048x1152` | `youtube-thumbnail-1280x720` |
 
 One profile picture serves all three: it is one mark, and three names for it would drift
 apart the first time somebody edited only one. The covers differ because the crops do —
@@ -42,6 +45,24 @@ middle for that reason, and nothing but ground at the edges.
 
 Reddit's community colours, from the palette: **base** `#2b4374` (ink blue), **key**
 `#d81b7a` (plink), **pinned post** `#a67c2e` (brass).
+
+YouTube crops its banner four ways — a TV shows the whole 2048×1152, a desktop a wide
+strip, a phone the middle — so only the 1235×338 box at the centre is on every device. That
+is a sixth of the picture, and a banner designed edge to edge loses its ends on three
+devices out of four.
+
+## Videos
+
+`npm run promo:videos` renders the clips, playing the recorded piano and levelled to the
+loudness a feed plays at. Two shapes come out of the same machinery:
+
+| For | Command | What it is |
+| --- | --- | --- |
+| Instagram, a feed | `npm run promo:videos` | 1080×1080, the opening 20 seconds |
+| YouTube | `npm run promo:videos -- --youtube` | 1920×1080, the whole piece |
+
+Only CC0 pieces are eligible: the catalogue's CC-BY and CC-BY-SA scores carry obligations
+that a feed strips, and share-alike travels with a video.
 
 ## The mark
 

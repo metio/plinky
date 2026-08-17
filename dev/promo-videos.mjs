@@ -21,6 +21,12 @@ import { chromium } from "playwright";
 const OUT = argValue("--out") ?? "promo";
 const SECONDS = Number(argValue("--seconds") ?? 20);
 const SIZE = Number(argValue("--size") ?? 1080);
+// YouTube wants a landscape frame and the whole piece rather than a feed's twenty seconds.
+// The painter keeps the waterfall over the keyboard at any aspect that is not taller than
+// it is wide, so this is a shape and a length, not a second renderer.
+const YOUTUBE = process.argv.includes("--youtube");
+const WIDTH = YOUTUBE ? 1920 : SIZE;
+const HEIGHT = YOUTUBE ? 1080 : SIZE;
 const FPS = 30;
 // The looks these clips use, named from core/videoLook — the same choices the export
 // panel offers a player, so nothing here is a palette of its own. Colouring by finger is
@@ -238,10 +244,11 @@ try {
                 // No plinky.fun here: the wordmark already rides the top-right corner, and
                 // the credit line is for what the catalogue owes the source.
                 credit: `${piece.composer} · CC0`,
-                width: SIZE,
-                height: SIZE,
+                width: WIDTH,
+                height: HEIGHT,
                 fps: FPS,
-                clipMs: SECONDS * 1000,
+                // A whole piece for YouTube; a feed gets the opening.
+                clipMs: YOUTUBE ? 0 : SECONDS * 1000,
                 noteColor: NOTE_COLOR,
                 keyboardDepth: KEYBOARD_DEPTH,
                 samplesBase: SAMPLES,
