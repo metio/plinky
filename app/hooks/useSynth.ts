@@ -76,6 +76,10 @@ export function useSynth(): UseSynthResult {
             audio.strike({
                 note,
                 gain,
+                // The force, before the volume preference was folded into the gain: a
+                // recorded piano picks its recording by this, and scaling that recording by
+                // velocity again would apply the dynamic twice.
+                velocity: options.velocity ?? 90,
                 duration: options.duration ?? 1.1,
                 delay: Math.max(0, options.delay ?? 0),
             });
@@ -90,7 +94,7 @@ export function useSynth(): UseSynthResult {
                 return;
             }
             audio.resume();
-            audio.press(note, gain);
+            audio.press(note, gain, options.velocity ?? 90);
         },
         [gainFor, audio],
     );

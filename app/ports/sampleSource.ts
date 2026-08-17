@@ -6,6 +6,17 @@ import type { SampleManifest, SampleRegion } from "../../core/sampledPiano";
 // A note a piece will play: enough to choose its recording, and nothing else.
 export type PlayedNote = { pitch: number; velocity: number };
 
+// A recording ready to sound a note: the decoded audio, and how fast to play it so the
+// pitch comes out right. Absent means the synthesised voice, which is what every note uses
+// until the recordings arrive.
+export type SampleVoice = { buffer: AudioBuffer; rate: number };
+
+// What the engine asks at every note-on. It answers from what is decoded THIS INSTANT, so
+// the question can be asked inside the key press that prompted it.
+export type SampleLookup = {
+    voiceFor(pitch: number, velocity: number): SampleVoice | null;
+};
+
 // Where recordings of a real piano come from.
 //
 // The seam exists because of one rule: **a note-on never waits.** A key pressed now sounds

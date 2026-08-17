@@ -27,6 +27,11 @@ const FPS = 30;
 // fixed across every clip: a viewer who watches two of them learns that the red notes are
 // the thumb, and that only holds while the mapping never moves.
 const NOTE_COLOR = "finger";
+// The recorded piano, unless asked for the synthesised one. A clip is the first time most
+// people hear Plinky, and the instrument it advertises should be the good one.
+const SAMPLES = process.argv.includes("--synth")
+    ? undefined
+    : (argValue("--samples") ?? "https://samples.plinky.fun/v1");
 const KEYBOARD_DEPTH = "shallow";
 const PORT = 5199;
 // Render only the pieces whose title contains this, for a re-run of one clip.
@@ -100,6 +105,12 @@ const PIECES = [
 // plays everywhere except the one place these clips are going. Instagram's ingest expects
 // AAC. The picture is left exactly as encoded and only the sound is recoded, so nothing
 // the painter drew is touched.
+//
+// The sound is brought to the loudness a feed plays at while it is being recoded. The
+// recorded piano plays the dynamics that are written — Gymnopédie is marked lent et
+// douloureux and comes out quiet, correctly — and a feed does not care why a clip is
+// quieter than the one before it. Normalising the post rather than the instrument keeps the
+// piano honest in the app and the clip audible where it is watched.
 function toAac(file) {
     const probe = spawnSync("ffmpeg", ["-version"], { stdio: "ignore" });
     if (probe.error) {
@@ -109,7 +120,17 @@ function toAac(file) {
     const temp = `${file}.aac.mp4`;
     const run = spawnSync(
         "ffmpeg",
-        ["-y", "-loglevel", "error", "-i", file, "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", temp],
+        [
+            "-y", "-loglevel", "error",
+            "-i", file,
+            "-c:v", "copy",
+            // Instagram plays at about -14 LUFS; anything quieter is turned up by the
+            // platform anyway, and unevenly.
+            "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
+            "-ar", "48000",
+            "-c:a", "aac", "-b:a", "256k",
+            temp,
+        ],
         { stdio: "inherit" },
     );
     if (run.status === 0) {
@@ -223,6 +244,7 @@ try {
                 clipMs: SECONDS * 1000,
                 noteColor: NOTE_COLOR,
                 keyboardDepth: KEYBOARD_DEPTH,
+                samplesBase: SAMPLES,
             },
         );
         const file = fileFor(piece, OUT);
