@@ -30,6 +30,11 @@ it lands, hear it both struck together and one after the other. And a **metronom
 which takes its tempo from the tap tool right above it — tapping along to something and
 then playing at that speed was always one job.
 
+**The page stops scrolling sideways on a phone.** Adding the Reddit link left the footer
+wider than a narrow screen — and the footer is on every page, so the whole site drifted
+sideways with it. It stacks now instead of squeezing, and the volume row in Settings, which
+had the same problem, does too.
+
 **A recorded grand piano, if you want one.** Settings → Sound has a switch for it: real
 recordings of a concert grand instead of the sound Plinky makes itself, sixteen different
 recordings of every key depending on how hard you hit it. There is no download to sit

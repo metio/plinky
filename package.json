@@ -44,6 +44,7 @@
     "tokens": "node dev/check-design-tokens.mjs",
     "size": "node dev/check-bundle-size.mjs",
     "nav": "node dev/nav-graph.mjs",
+    "widths": "node dev/check-widths.mjs",
     "bytes": "node dev/check-source-bytes.mjs",
     "format": "biome check --write .",
     "knip": "npm run messages && react-router typegen && knip",
