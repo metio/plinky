@@ -26,7 +26,7 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | `social/facebook-cover-1640x624.png` | A Facebook page cover, at twice its shown size. |
 | `social/reddit-banner-*.png` | Reddit's community banner, desktop and mobile. |
 | `social/youtube-banner-2048x1152.png` | The channel banner. Everything that must survive is inside the 1235×338 centre every device shows. |
-| `social/youtube-thumbnail-1280x720.png` | A video thumbnail, with no per-video text to edit. |
+| `social/youtube-watermark-150.png` | The watermark YouTube overlays on a playing video. Transparent, so it is the letter and nothing else. |
 
 ## Where each one goes
 
@@ -35,7 +35,7 @@ there is no second copy to keep in step. Edit the app; rerun the script.
 | Facebook | `profile-square-512` | `facebook-cover-1640x624` | `square-1080`, `open-graph-1200x630` |
 | Instagram | `profile-square-512` | — | `instagram-portrait-1080x1350`, `square-1080`, `story-1080x1920` |
 | Reddit | `profile-square-256` | `reddit-banner-desktop-1072x128`, `reddit-banner-mobile-1080x128` | — |
-| YouTube | `profile-square-800` | `youtube-banner-2048x1152` | `youtube-thumbnail-1280x720` |
+| YouTube | `profile-square-800` | `youtube-banner-2048x1152` | `npm run promo:thumbs` — one per video |
 
 One profile picture serves them all: it is one mark, and a name each would drift apart the
 first time somebody edited only one.
@@ -72,38 +72,49 @@ loudness a feed plays at. Two shapes come out of the same machinery:
 | --- | --- | --- |
 | Instagram, a feed | `npm run promo:videos` | 1080×1080, the opening 20 seconds |
 | YouTube | `npm run promo:videos -- --youtube` | 1920×1080, the whole piece |
+| Thumbnails | `npm run promo:thumbs` | 1280×720, one per clip, named to match it |
+
+A thumbnail belongs to a video, not to a channel: YouTube asks for one per upload, and the
+same picture on fifty-five of them makes a channel read as a wall of identical tiles, which
+is the one thing a thumbnail exists to prevent. So each names its own piece, from the same
+list the clips are rendered from — a thumbnail can never be of a different piece than the
+video under it.
 
 Only CC0 pieces are eligible: the catalogue's CC-BY and CC-BY-SA scores carry obligations
 that a feed strips, and share-alike travels with a video.
 
 ### What to write under them
 
-The channel's About, in the app's own voice:
+The channel's About, in the app's own voice. It is fenced because it is meant to be
+pasted, not read as markdown:
 
-> Piano, one piece at a time.
->
-> Every clip here is played by Plinky itself — the notes falling, the keys lighting under
-> them, each finger in its own colour. The music is public domain. The piano is a real one:
-> the Salamander Grand Piano, recorded by Alexander Holm and shared under CC-BY 3.0.
->
-> Plinky is free piano practice in your browser. No account, nothing to install. Bring a
-> MIDI keyboard or use your computer keys, then play any score you like — or drill
-> sight-reading, rhythm, tempo and ear training. Every run is graded, and your scores stay
-> on your device.
->
-> Have a go: https://plinky.fun
+```text
+Piano, one piece at a time.
+
+Every clip here is played by Plinky itself — the notes falling, the keys lighting under
+them, each finger in its own colour. The music is public domain. The piano is a real one:
+the Salamander Grand Piano, recorded by Alexander Holm and shared under CC-BY 3.0.
+
+Plinky is free piano practice in your browser. No account, nothing to install. Bring a
+MIDI keyboard or use your computer keys, then play any score you like — or drill
+sight-reading, rhythm, tempo and ear training. Every run is graded, and your scores stay
+on your device.
+
+Have a go: https://plinky.fun
+```
 
 And under each video, with the piece and composer filled in:
 
-> **{Piece} — {Composer}**
->
-> Played by Plinky, free piano practice in your browser: https://plinky.fun
->
-> The score is public domain (CC0). The piano is the Salamander Grand Piano by Alexander
-> Holm, under CC-BY 3.0:
-> https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
->
-> The colours are fingers — thumb to little finger — worked out for the hand as it plays.
+```text
+{Piece} — {Composer}
+
+Played by Plinky, free piano practice in your browser: https://plinky.fun
+
+The score is public domain (CC0). The piano is the Salamander Grand Piano by Alexander
+Holm, under CC-BY 3.0: https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
+
+The colours are fingers — thumb to little finger — worked out for the hand as it plays.
+```
 
 **The piano's credit goes on every video, not only the channel.** CC-BY asks for
 attribution wherever the work travels, and a video carries the recordings with it: somebody

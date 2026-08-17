@@ -53,6 +53,7 @@ __pycache__/
 # full-length cut for YouTube lands beside them.
 /promo/
 /promo-youtube/
+/promo-thumbs/
 
 # Piano demos rendered by npm run piano:demo, and any sample library unpacked to compare
 # against. The library is 1.2 GB and is not ours to redistribute.

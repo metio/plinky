@@ -52,6 +52,12 @@ function valueOf(css, built, name) {
 const css = await readFile(CSS, "utf8");
 // The file carries width="192" height="192" so it renders standalone; inside a lockup it
 // has to take the size of the box it is given, or it overflows and lands on the wordmark.
+// The letter alone, as the browser tab wears it. Its own stylesheet paints it ink blue on
+// a light page, which is the wrong colour over a video, so the fill is replaced outright.
+const letterOnly = (await readFile("public/favicon.svg", "utf8"))
+    .replace(/<style>[\s\S]*?<\/style>/, "")
+    .replace(/class="letter"/g, 'fill="currentColor"')
+    .replace("<svg ", '<svg style="width:100%;height:100%;display:block" ');
 const icon = (await readFile(ICON, "utf8"))
     .replace(/ width="\d+"/, "")
     .replace(/ height="\d+"/, "")
@@ -84,7 +90,7 @@ const FACES = `@font-face{font-family:Literata;src:url(data:font/woff2;base64,${
 
 const browser = await chromium.launch();
 
-async function shoot(html, { width, height, path, scale = 1, full = false }) {
+async function shoot(html, { width, height, path, scale = 1, full = false, transparent = false }) {
     const page = await browser.newPage({
         viewport: { width, height },
         deviceScaleFactor: scale,
@@ -96,7 +102,9 @@ async function shoot(html, { width, height, path, scale = 1, full = false }) {
     );
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(150);
-    await writeFile(path, await page.screenshot({ fullPage: full }));
+    // Without omitBackground a screenshot paints white wherever nothing is drawn, which is
+    // how the profile picture ended up with white corners under a circular crop.
+    await writeFile(path, await page.screenshot({ fullPage: full, omitBackground: transparent }));
     await page.close();
 }
 
@@ -252,20 +260,6 @@ await shoot(
        </div>
      </div>`,
     { width: 2048, height: 1152, path: `${OUT}/social/youtube-banner-2048x1152.png` },
-);
-
-// A video thumbnail. It is chosen at about a fifth of this size in a list of a dozen
-// others, so it carries the fewest words that still say what the channel is, set as large
-// as they go. The piece's own name belongs on the video, not burnt in here — a template
-// that has to be edited per upload stops being used by the third one.
-await shoot(
-    `<div style="width:1280px;height:720px;background:${colour["ink blue"]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;padding:80px">
-       <div style="font-family:Literata,Georgia,serif;font-size:150px;font-weight:600;letter-spacing:-0.015em;color:${colour.paper};line-height:1">
-         Pl<span style="position:relative">ı<span style="position:absolute;left:50%;${TITTLE};transform:translateX(-50%);border-radius:999px;background:${colour.plink}"></span></span>nky
-       </div>
-       <div style="font-family:Literata,Georgia,serif;font-size:56px;font-weight:600;color:${colour.paper};line-height:1.15;letter-spacing:-0.01em">Practise piano in your browser</div>
-     </div>`,
-    { width: 1280, height: 720, path: `${OUT}/social/youtube-thumbnail-1280x720.png` },
 );
 
 // A Facebook page cover. Facebook shows it at 820×312 on a desktop and crops it to a
