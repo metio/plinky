@@ -55,6 +55,25 @@ const ALIASES: Record<string, string> = {
     ravel: "Maurice Ravel",
     "n. rimsky-korsakov": "Nikolai Rimsky-Korsakov",
     "chopinff": "Frédéric Chopin",
+    // Misspellings, each carried by a single score. Mechanical cleanup cannot reach these
+    // — nothing in the string says it is wrong — so a page held one piece under a name a
+    // letter away from the composer's, invisible from his own page and too thin to be
+    // prerendered. Found by baking the index and comparing rare names against populated
+    // ones; a manifest edit would not have lasted, since the import scripts rewrite it.
+    "craude debussy": "Claude Debussy",
+    "calude debussy": "Claude Debussy",
+    "wolfgang amedeus mozart": "Wolfgang Amadeus Mozart",
+    "eric satie": "Erik Satie",
+    "george frederic handel": "George Frideric Handel",
+    "edward grieg": "Edvard Grieg",
+    // A transliteration rather than an error, folded because one catalogue should spell a
+    // person one way.
+    "sergeï rachmaninov": "Sergei Rachmaninoff",
+    // The only credit in the catalogue carrying a Ravel catalogue number, which the
+    // work-number stripping does not know ("M." is not among the prefixes it recognises).
+    // One entry rather than a new prefix: a bare "M" before digits is a likelier initial
+    // than a catalogue mark.
+    "maurice ravel m. 19": "Maurice Ravel",
     "frédérick chopin": "Frédéric Chopin",
     "g. f. händel": "George Frideric Handel",
     "georg friedrich händel": "George Frideric Handel",

@@ -24,6 +24,7 @@ import {
     rmSync,
 } from "node:fs";
 import { chromium } from "playwright";
+import { fileNameFor, PIECES } from "./promo/pieces.mjs";
 
 const OUT = argValue("--out") ?? "promo";
 const SECONDS = Number(argValue("--seconds") ?? 20);
@@ -97,22 +98,10 @@ function toAac(file) {
 
 // A filename somebody can pick out of a folder: the piece, not its fingerprint. Accents
 // and punctuation go, spaces become dashes — "Gymnopédie No. 1" becomes gymnopedie-no-1.
-// The file a piece is written to. Two pieces can share a title — the catalogue holds a
-// Schubert Ave Maria and a Bach/Gounod one — and a bare title slug would have the second
-// silently overwrite the first, so a repeated title takes its composer along.
+// The file a piece is written to, named by the shared helper so a clip and the thumbnail
+// made for it cannot end up under different names.
 function fileFor(piece, out) {
-    const shares = PIECES.filter((other) => other.title === piece.title).length > 1;
-    const name = shares ? `${slug(piece.title)}-${slug(piece.composer)}` : slug(piece.title);
-    return `${out}/${name}.mp4`;
-}
-
-function slug(title) {
-    return title
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+    return `${out}/${fileNameFor(piece)}.mp4`;
 }
 
 function argValue(flag) {
