@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Riscaldamento",
     "today_moment_work": "Al lavoro",
     "today_moment_learn": "Impara una cosa",
-    "today_drill": "Un esercizio nuovo"
+    "today_drill": "Un esercizio nuovo",
+    "settings_instrument_range": "Dimensione della tastiera",
+    "settings_instrument_range_hint": "Un brano che va oltre i tuoi tasti rientra per ottave intere, così niente ti chiede un tasto che non hai.",
+    "instrument_range_all_keys": "Tutti gli 88 tasti",
+    "instrument_range_keys": "{count} tasti",
+    "instrument_range_from_name": "dal nome della tua tastiera",
+    "instrument_range_measure": "Misura",
+    "instrument_range_reset": "Usa tutti gli 88",
+    "instrument_range_awaiting_lowest": "Premi il tuo tasto più grave…",
+    "instrument_range_awaiting_highest": "ora il più acuto",
+    "instrument_range_too_close": "Questi due tasti distano meno di un'ottava — prova quelli alle due estremità.",
+    "instrument_range_no_device": "Collega una tastiera e Plinky può misurarla.",
+    "play_fit_down_one": "Abbassato di un'ottava per stare sulla tua tastiera",
+    "play_fit_down_other": "Abbassato di {count} ottave per stare sulla tua tastiera",
+    "play_fit_up_one": "Alzato di un'ottava per stare sulla tua tastiera",
+    "play_fit_up_other": "Alzato di {count} ottave per stare sulla tua tastiera",
+    "play_fit_beyond": "Questo brano esce dalla tua tastiera da entrambi i lati, quindi suona com'è scritto"
 }

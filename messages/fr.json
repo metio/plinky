@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Échauffement",
     "today_moment_work": "À travailler",
     "today_moment_learn": "Une chose à apprendre",
-    "today_drill": "Un nouvel exercice"
+    "today_drill": "Un nouvel exercice",
+    "settings_instrument_range": "Taille du clavier",
+    "settings_instrument_range_hint": "Un morceau qui dépasse tes touches y rentre par octaves entières – rien ne te demande une touche que tu n'as pas.",
+    "instrument_range_all_keys": "Les 88 touches",
+    "instrument_range_keys": "{count} touches",
+    "instrument_range_from_name": "d'après le nom de ton clavier",
+    "instrument_range_measure": "Mesurer",
+    "instrument_range_reset": "Utiliser les 88",
+    "instrument_range_awaiting_lowest": "Appuie sur ta touche la plus grave…",
+    "instrument_range_awaiting_highest": "maintenant la plus aiguë",
+    "instrument_range_too_close": "Ces deux touches sont à moins d'une octave – prends les touches de chaque extrémité.",
+    "instrument_range_no_device": "Branche un clavier et Plinky peut le mesurer.",
+    "play_fit_down_one": "Descendu d'une octave pour tenir sur ton clavier",
+    "play_fit_down_other": "Descendu de {count} octaves pour tenir sur ton clavier",
+    "play_fit_up_one": "Monté d'une octave pour tenir sur ton clavier",
+    "play_fit_up_other": "Monté de {count} octaves pour tenir sur ton clavier",
+    "play_fit_beyond": "Ce morceau dépasse ton clavier des deux côtés, il est donc joué tel qu'il est écrit"
 }

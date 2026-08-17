@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Προθέρμανση",
     "today_moment_work": "Εξάσκηση",
     "today_moment_learn": "Κάτι να μάθεις",
-    "today_drill": "Μια καινούργια άσκηση"
+    "today_drill": "Μια καινούργια άσκηση",
+    "settings_instrument_range": "Μέγεθος κλαβιέ",
+    "settings_instrument_range_hint": "Ένα κομμάτι που ξεπερνά τα πλήκτρα σου μετακινείται μέσα τους κατά ολόκληρες οκτάβες — τίποτα δεν ζητά πλήκτρο που δεν έχεις.",
+    "instrument_range_all_keys": "Και τα 88 πλήκτρα",
+    "instrument_range_keys": "{count} πλήκτρα",
+    "instrument_range_from_name": "από το όνομα του κλαβιέ σου",
+    "instrument_range_measure": "Μέτρησε",
+    "instrument_range_reset": "Χρήση και των 88",
+    "instrument_range_awaiting_lowest": "Πάτα το πιο χαμηλό σου πλήκτρο…",
+    "instrument_range_awaiting_highest": "τώρα το πιο ψηλό",
+    "instrument_range_too_close": "Αυτά τα δύο πλήκτρα απέχουν λιγότερο από μία οκτάβα — δοκίμασε τα πλήκτρα στις δύο άκρες.",
+    "instrument_range_no_device": "Σύνδεσε ένα κλαβιέ και ο Plinky μπορεί να το μετρήσει.",
+    "play_fit_down_one": "Κατέβηκε μία οκτάβα για να χωρέσει στο κλαβιέ σου",
+    "play_fit_down_other": "Κατέβηκε {count} οκτάβες για να χωρέσει στο κλαβιέ σου",
+    "play_fit_up_one": "Ανέβηκε μία οκτάβα για να χωρέσει στο κλαβιέ σου",
+    "play_fit_up_other": "Ανέβηκε {count} οκτάβες για να χωρέσει στο κλαβιέ σου",
+    "play_fit_beyond": "Αυτό το κομμάτι ξεπερνά το κλαβιέ σου και από τις δύο άκρες, οπότε παίζεται όπως είναι γραμμένο"
 }

@@ -499,6 +499,13 @@ nothing already there is touched.
   *Connect MIDI*; Plinky reconnects it automatically on your next visit. Web MIDI is
   available in Chrome, Edge, and Firefox on desktop and Android; Safari and iOS do
   not expose it — there, let Plinky listen instead (below) or use the keyboard fallback.
+- **With fewer than 88 keys** — a 61-key or 49-key keyboard has no key for the notes at
+  the ends of the piano, so a piece that reaches past yours moves into it by whole
+  octaves: same intervals, same fingering, a different register. Plinky reads the size
+  off the instrument's name where the name gives it away, and **Keyboard size** in
+  Settings measures it exactly — press the key at each end and it has the range. The
+  caption beside the transpose control says when a piece has been moved, and *Reset to
+  the written key* puts it back where it was printed.
 - **With an acoustic piano (or any piano, no cable)** — start **listening** in
   Settings and Plinky hears your playing through the microphone, one note at a
   time, feeding the same practice flow a MIDI keyboard does. Pitch heard from a

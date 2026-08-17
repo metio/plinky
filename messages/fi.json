@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Lämmittely",
     "today_moment_work": "Työn alla",
     "today_moment_learn": "Opi yksi asia",
-    "today_drill": "Uusi harjoitus"
+    "today_drill": "Uusi harjoitus",
+    "settings_instrument_range": "Koskettimiston koko",
+    "settings_instrument_range_hint": "Kappale, joka ylittää koskettimesi, siirtyy niiden sisään kokonaisin oktaavein — mikään ei pyydä kosketinta, jota sinulla ei ole.",
+    "instrument_range_all_keys": "Kaikki 88 kosketinta",
+    "instrument_range_keys": "{count} kosketinta",
+    "instrument_range_from_name": "koskettimiston nimestä",
+    "instrument_range_measure": "Mittaa",
+    "instrument_range_reset": "Käytä kaikkia 88:aa",
+    "instrument_range_awaiting_lowest": "Paina matalinta kosketintasi…",
+    "instrument_range_awaiting_highest": "nyt korkeinta",
+    "instrument_range_too_close": "Nuo kaksi kosketinta ovat alle oktaavin päässä toisistaan — kokeile kummankin pään koskettimia.",
+    "instrument_range_no_device": "Kytke koskettimisto, niin Plinky voi mitata sen.",
+    "play_fit_down_one": "Siirretty oktaavi alaspäin, jotta se mahtuu koskettimistollesi",
+    "play_fit_down_other": "Siirretty {count} oktaavia alaspäin, jotta se mahtuu koskettimistollesi",
+    "play_fit_up_one": "Siirretty oktaavi ylöspäin, jotta se mahtuu koskettimistollesi",
+    "play_fit_up_other": "Siirretty {count} oktaavia ylöspäin, jotta se mahtuu koskettimistollesi",
+    "play_fit_beyond": "Tämä kappale ylittää koskettimistosi molemmista päistä, joten se soi kuten se on kirjoitettu"
 }

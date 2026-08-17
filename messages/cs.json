@@ -1182,5 +1182,21 @@
     "today_moment_learn": "Naučit se jednu věc",
     "today_drill": "Nové cvičení",
     "learn_intro": "Všechno, co tě Plinky naučí mimo skladbu — jak hudba funguje, co znamenají její značky a drobnosti, které si během cvičení potřebuješ ověřit.",
-    "meta_learn_description": "Nauč se hrát na klavír v prohlížeči: prohlídka klaviatury pro úplné začátečníky, kurz hudební nauky v osmi lekcích, slovníček notového zápisu k poslechu, sluchová výchova a pár malých pomůcek."
+    "meta_learn_description": "Nauč se hrát na klavír v prohlížeči: prohlídka klaviatury pro úplné začátečníky, kurz hudební nauky v osmi lekcích, slovníček notového zápisu k poslechu, sluchová výchova a pár malých pomůcek.",
+    "settings_instrument_range": "Velikost klaviatury",
+    "settings_instrument_range_hint": "Skladba, která přesahuje tvé klávesy, se do nich posune o celé oktávy — nic si neřekne o klávesu, kterou nemáš.",
+    "instrument_range_all_keys": "Všech 88 kláves",
+    "instrument_range_keys": "{count} kláves",
+    "instrument_range_from_name": "podle názvu tvé klaviatury",
+    "instrument_range_measure": "Změřit",
+    "instrument_range_reset": "Použít všech 88",
+    "instrument_range_awaiting_lowest": "Stiskni svou nejnižší klávesu…",
+    "instrument_range_awaiting_highest": "teď tu nejvyšší",
+    "instrument_range_too_close": "Ty dvě klávesy dělí méně než oktáva — zkus klávesy na obou koncích.",
+    "instrument_range_no_device": "Připoj klaviaturu a Plinky ji změří.",
+    "play_fit_down_one": "Posunuto o oktávu níž, aby se to vešlo na tvou klaviaturu",
+    "play_fit_down_other": "Posunuto o {count} oktávy níž, aby se to vešlo na tvou klaviaturu",
+    "play_fit_up_one": "Posunuto o oktávu výš, aby se to vešlo na tvou klaviaturu",
+    "play_fit_up_other": "Posunuto o {count} oktávy výš, aby se to vešlo na tvou klaviaturu",
+    "play_fit_beyond": "Tahle skladba přesahuje tvou klaviaturu na obou koncích, takže zní tak, jak je zapsaná"
 }

@@ -1182,5 +1182,21 @@
     "today_moment_learn": "Bir şey öğren",
     "today_drill": "Yepyeni bir alıştırma",
     "learn_intro": "Plinky'nin bir parçadan uzakta öğretebileceği her şey — müziğin nasıl kurulduğu, işaretlerinin ne anlama geldiği ve çalışmanın ortasında bakıverdiğin küçük şeyler.",
-    "meta_learn_description": "Tarayıcında piyano öğren: sıfırdan başlayanlar için klavye turu, sekiz derslik teori, dinlenebilir bir nota sözlüğü, kulak eğitimi ve birkaç küçük araç."
+    "meta_learn_description": "Tarayıcında piyano öğren: sıfırdan başlayanlar için klavye turu, sekiz derslik teori, dinlenebilir bir nota sözlüğü, kulak eğitimi ve birkaç küçük araç.",
+    "settings_instrument_range": "Klavye boyutu",
+    "settings_instrument_range_hint": "Tuşlarını aşan bir parça, tam oktavlarla içeri kayar — hiçbir şey sende olmayan bir tuşu istemez.",
+    "instrument_range_all_keys": "88 tuşun hepsi",
+    "instrument_range_keys": "{count} tuş",
+    "instrument_range_from_name": "klavyenin adından",
+    "instrument_range_measure": "Ölç",
+    "instrument_range_reset": "88'in hepsini kullan",
+    "instrument_range_awaiting_lowest": "En pes tuşuna bas…",
+    "instrument_range_awaiting_highest": "şimdi en tize",
+    "instrument_range_too_close": "Bu iki tuş bir oktavdan yakın — iki uçtaki tuşları dene.",
+    "instrument_range_no_device": "Bir klavye bağla, Plinky ölçebilsin.",
+    "play_fit_down_one": "Klavyene sığsın diye bir oktav aşağı alındı",
+    "play_fit_down_other": "Klavyene sığsın diye {count} oktav aşağı alındı",
+    "play_fit_up_one": "Klavyene sığsın diye bir oktav yukarı alındı",
+    "play_fit_up_other": "Klavyene sığsın diye {count} oktav yukarı alındı",
+    "play_fit_beyond": "Bu parça klavyeni iki uçtan da aşıyor, bu yüzden yazıldığı gibi çalıyor"
 }

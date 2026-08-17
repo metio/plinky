@@ -1182,5 +1182,21 @@
     "lights_channel_up": "{hand}: one higher",
     "lights_test": "Test the lights",
     "lights_test_off": "Lights off",
-    "lights_test_help": "Lights a C major chord in both hands. Nothing happening? Check that key lighting is switched on at the keyboard itself — Casio calls it MIDI In Navigate, Yamaha calls it Light Guide."
+    "lights_test_help": "Lights a C major chord in both hands. Nothing happening? Check that key lighting is switched on at the keyboard itself — Casio calls it MIDI In Navigate, Yamaha calls it Light Guide.",
+    "settings_instrument_range": "Keyboard size",
+    "settings_instrument_range_hint": "A piece that reaches past your keys moves into them by whole octaves, so nothing asks for a key you haven't got.",
+    "instrument_range_all_keys": "All 88 keys",
+    "instrument_range_keys": "{count} keys",
+    "instrument_range_from_name": "from your keyboard's name",
+    "instrument_range_measure": "Measure",
+    "instrument_range_reset": "Use all 88",
+    "instrument_range_awaiting_lowest": "Press your lowest key…",
+    "instrument_range_awaiting_highest": "now your highest",
+    "instrument_range_too_close": "Those two keys are less than an octave apart — try the keys at each end.",
+    "instrument_range_no_device": "Connect a keyboard and Plinky can measure it.",
+    "play_fit_down_one": "Moved down an octave to fit your keyboard",
+    "play_fit_down_other": "Moved down {count} octaves to fit your keyboard",
+    "play_fit_up_one": "Moved up an octave to fit your keyboard",
+    "play_fit_up_other": "Moved up {count} octaves to fit your keyboard",
+    "play_fit_beyond": "This piece reaches past your keyboard at both ends, so it plays as written"
 }

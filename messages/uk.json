@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Розминка",
     "today_moment_work": "У роботі",
     "today_moment_learn": "Одна нова річ",
-    "today_drill": "Нова вправа"
+    "today_drill": "Нова вправа",
+    "settings_instrument_range": "Розмір клавіатури",
+    "settings_instrument_range_hint": "П'єса, що виходить за твої клавіші, зсувається всередину на цілі октави — ніщо не просить клавіші, якої в тебе немає.",
+    "instrument_range_all_keys": "Усі 88 клавіш",
+    "instrument_range_keys": "{count} клавіш",
+    "instrument_range_from_name": "з назви твоєї клавіатури",
+    "instrument_range_measure": "Виміряти",
+    "instrument_range_reset": "Узяти всі 88",
+    "instrument_range_awaiting_lowest": "Натисни свою найнижчу клавішу…",
+    "instrument_range_awaiting_highest": "тепер найвищу",
+    "instrument_range_too_close": "Ці дві клавіші ближче за октаву — візьми клавіші на обох кінцях.",
+    "instrument_range_no_device": "Підключи клавіатуру, і Plinky її виміряє.",
+    "play_fit_down_one": "Опущено на октаву, щоб умістилося на твоїй клавіатурі",
+    "play_fit_down_other": "Опущено на {count} октави, щоб умістилося на твоїй клавіатурі",
+    "play_fit_up_one": "Піднято на октаву, щоб умістилося на твоїй клавіатурі",
+    "play_fit_up_other": "Піднято на {count} октави, щоб умістилося на твоїй клавіатурі",
+    "play_fit_beyond": "Ця п'єса виходить за твою клавіатуру з обох боків, тож звучить так, як записана"
 }

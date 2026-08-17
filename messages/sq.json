@@ -1182,5 +1182,21 @@
     "today_moment_learn": "Mëso një gjë",
     "today_drill": "Ushtrim i freskët",
     "learn_intro": "Gjithçka që Plinky mund të të mësojë larg një pjese — si ndërtohet muzika, çfarë kuptimi kanë shenjat e saj dhe gjërat e vogla që i shikon mes praktikës.",
-    "meta_learn_description": "Mëso pianon në shfletues: njohje me tastierën për fillestarë, teori në tetë mësime, fjalorth notacioni që e dëgjon, stërvitje veshi dhe disa vegla të vogla."
+    "meta_learn_description": "Mëso pianon në shfletues: njohje me tastierën për fillestarë, teori në tetë mësime, fjalorth notacioni që e dëgjon, stërvitje veshi dhe disa vegla të vogla.",
+    "settings_instrument_range": "Madhësia e tastierës",
+    "settings_instrument_range_hint": "Një pjesë që del jashtë tasteve të tua zhvendoset brenda tyre me oktava të plota — asgjë nuk kërkon një tast që nuk e ke.",
+    "instrument_range_all_keys": "Të 88 tastet",
+    "instrument_range_keys": "{count} taste",
+    "instrument_range_from_name": "nga emri i tastierës sate",
+    "instrument_range_measure": "Mat",
+    "instrument_range_reset": "Përdor të 88-tat",
+    "instrument_range_awaiting_lowest": "Shtyp tastin tënd më të ulët…",
+    "instrument_range_awaiting_highest": "tani më të lartin",
+    "instrument_range_too_close": "Ata dy taste janë më pak se një oktavë larg — provo tastet në të dy skajet.",
+    "instrument_range_no_device": "Lidh një tastierë dhe Plinky mund ta masë.",
+    "play_fit_down_one": "Ulur një oktavë që të hyjë në tastierën tënde",
+    "play_fit_down_other": "Ulur {count} oktava që të hyjë në tastierën tënde",
+    "play_fit_up_one": "Ngritur një oktavë që të hyjë në tastierën tënde",
+    "play_fit_up_other": "Ngritur {count} oktava që të hyjë në tastierën tënde",
+    "play_fit_beyond": "Kjo pjesë del jashtë tastierës sate në të dy skajet, prandaj tingëllon siç është shkruar"
 }

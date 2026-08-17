@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "热身",
     "today_moment_work": "练一练",
     "today_moment_learn": "学一样新东西",
-    "today_drill": "来段新练习"
+    "today_drill": "来段新练习",
+    "settings_instrument_range": "键盘大小",
+    "settings_instrument_range_hint": "超出你键盘的曲子会整八度地移进来，不会要你按一个没有的键。",
+    "instrument_range_all_keys": "全部 88 键",
+    "instrument_range_keys": "{count} 键",
+    "instrument_range_from_name": "来自键盘名称",
+    "instrument_range_measure": "测量",
+    "instrument_range_reset": "用全部 88 键",
+    "instrument_range_awaiting_lowest": "按一下最低的键…",
+    "instrument_range_awaiting_highest": "现在按最高的键",
+    "instrument_range_too_close": "这两个键不到一个八度 — 试试两端的键。",
+    "instrument_range_no_device": "接上键盘，Plinky 就能测量。",
+    "play_fit_down_one": "下移了一个八度，好放进你的键盘",
+    "play_fit_down_other": "下移了 {count} 个八度，好放进你的键盘",
+    "play_fit_up_one": "上移了一个八度，好放进你的键盘",
+    "play_fit_up_other": "上移了 {count} 个八度，好放进你的键盘",
+    "play_fit_beyond": "这首曲子两端都超出你的键盘，所以按谱面原样演奏"
 }

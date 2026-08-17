@@ -1182,5 +1182,21 @@
     "today_moment_warmup": "Calentar",
     "today_moment_work": "A trabajar",
     "today_moment_learn": "Aprender una cosa",
-    "today_drill": "Un ejercicio nuevo"
+    "today_drill": "Un ejercicio nuevo",
+    "settings_instrument_range": "Tamaño del teclado",
+    "settings_instrument_range_hint": "Una pieza que se sale de tus teclas entra en ellas por octavas enteras, así nada te pide una tecla que no tienes.",
+    "instrument_range_all_keys": "Las 88 teclas",
+    "instrument_range_keys": "{count} teclas",
+    "instrument_range_from_name": "según el nombre de tu teclado",
+    "instrument_range_measure": "Medir",
+    "instrument_range_reset": "Usar las 88",
+    "instrument_range_awaiting_lowest": "Pulsa tu tecla más grave…",
+    "instrument_range_awaiting_highest": "ahora la más aguda",
+    "instrument_range_too_close": "Esas dos teclas están a menos de una octava — prueba con las de cada extremo.",
+    "instrument_range_no_device": "Conecta un teclado y Plinky puede medirlo.",
+    "play_fit_down_one": "Bajada una octava para caber en tu teclado",
+    "play_fit_down_other": "Bajada {count} octavas para caber en tu teclado",
+    "play_fit_up_one": "Subida una octava para caber en tu teclado",
+    "play_fit_up_other": "Subida {count} octavas para caber en tu teclado",
+    "play_fit_beyond": "Esta pieza se sale de tu teclado por los dos lados, así que suena tal como está escrita"
 }

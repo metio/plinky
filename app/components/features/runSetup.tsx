@@ -6,6 +6,7 @@ import { type Beams, BEAMS } from "../../../core/beams";
 import type { Hand } from "../../../core/matcher";
 import { BARS_PER_ROW, NOTE_SCALES, REVEAL_TRIES } from "../../../core/prefs";
 import { STUDY_SECONDS, type StudySeconds } from "../../../core/sightRead";
+import type { RangeFit } from "../../../core/instrumentRange";
 import { m } from "../../paraglide/messages.js";
 import { Bpm } from "../ui/bpm";
 import { IconButton } from "../ui/button";
@@ -59,6 +60,7 @@ function RunSetupPanel() {
         setDuet,
         transpose,
         setTranspose,
+        instrumentFit,
         hiddenNotes,
         setHiddenNotes,
         revealTries,
@@ -210,7 +212,13 @@ function RunSetupPanel() {
                         )}
                     </>
                 )}
-                {!lockTempo && <TransposeRow transpose={transpose} setTranspose={setTranspose} />}
+                {!lockTempo && (
+                    <TransposeRow
+                        transpose={transpose}
+                        setTranspose={setTranspose}
+                        fit={instrumentFit}
+                    />
+                )}
                 {!lockTempo && (
                     <SwitchField
                         label={m.tempo_trainer()}
@@ -414,14 +422,35 @@ export function RunSetup() {
     return <RunSetupPanel />;
 }
 
-// Transposition shifts the whole piece into a friendlier key before the run.
+// The octave move that fitted the piece to the player's keyboard, in the words a player
+// would use for it. A shift is always whole octaves, so it divides exactly.
+function fitLine(fit: RangeFit): string | null {
+    if (fit.kind === "beyond") {
+        return m.play_fit_beyond();
+    }
+    if (fit.kind === "fits") {
+        return null;
+    }
+    const octaves = Math.abs(fit.shift) / 12;
+    if (fit.shift < 0) {
+        return octaves === 1 ? m.play_fit_down_one() : m.play_fit_down_other({ count: octaves });
+    }
+    return octaves === 1 ? m.play_fit_up_one() : m.play_fit_up_other({ count: octaves });
+}
+
+// Transposition shifts the whole piece into a friendlier key before the run. It is also
+// where a piece lands when it had to be moved to fit the player's keyboard, so the caption
+// explains that where it happened — with the reset button beside it as the way back.
 function TransposeRow({
     transpose,
     setTranspose,
+    fit,
 }: {
     transpose: number;
     setTranspose: Dispatch<SetStateAction<number>>;
+    fit: RangeFit;
 }) {
+    const fitted = fitLine(fit);
     return (
         <div className="space-y-1">
             <span className="flex items-center gap-2 text-sm text-body">
@@ -452,7 +481,7 @@ function TransposeRow({
                     </IconButton>
                 )}
             </span>
-            <p className="text-xs text-muted">{m.transpose_caption()}</p>
+            <p className="text-xs text-muted">{fitted ?? m.transpose_caption()}</p>
         </div>
     );
 }

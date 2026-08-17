@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 17 August 2026
 
+**Pieces fit the keyboard you actually have.** Not every keyboard has 88 keys, and a
+61-key one simply has no key for the low notes a piece might reach. Plinky now reads the
+size off your keyboard's name where it can — a "Keystation 61" says what it is — and you
+can measure it exactly by pressing the two end keys under *Keyboard size* in Settings. A
+piece that reaches past your keys then moves into them by whole octaves, so nothing asks
+for a key you haven't got. The line beside the transpose control says when it happened,
+and *Reset to the written key* puts it back. At a full piano nothing changes at all.
+
 **Six more theory lessons, and they show you the page.** How long a notehead's shape
 says to hold it, that silence is written down and counted just as carefully, and the two
 staves a piano reads at once with middle C sitting between them — each one printed as
