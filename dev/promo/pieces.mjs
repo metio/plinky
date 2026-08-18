@@ -8,6 +8,12 @@
 //
 // One list, read by the video renderer and by the thumbnail generator, so a clip and its
 // thumbnail can never be of different pieces.
+//
+// The titles and credits here are written for a video card and are meant to differ from the
+// catalogue's: "Canon in D" rather than "Canon and Gigue in D major P.37", "J. S. Bach"
+// rather than the credit line a corpus supplied. Most of these fifty-five already read
+// differently from the manifest, and that is the point — a title with three seconds to land
+// is not the title a catalogue entry needs. Do not sync them.
 
 export const PIECES = [
     { id: "TOBNVaraGATl", title: "Gymnopédie No. 1", composer: "Erik Satie" },
