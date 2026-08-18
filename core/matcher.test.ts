@@ -75,8 +75,24 @@ describe("upcomingSteps", () => {
             step([64, 67], { pitchStaves: [0], staves: [0] }),
         ]);
         expect(upcomingSteps(state, 2)).toEqual([
-            { index: 0, pitches: [60], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
-            { index: 1, pitches: [48], pitchStaves: [1], pitchHands: ["right"], staves: [1] },
+            {
+                index: 0,
+                pitches: [60],
+                pitchStaves: [0],
+                pitchHands: ["right"],
+                staves: [0],
+                atMs: 0,
+                pitchHoldsMs: [0],
+            },
+            {
+                index: 1,
+                pitches: [48],
+                pitchStaves: [1],
+                pitchHands: ["right"],
+                staves: [1],
+                atMs: 0,
+                pitchHoldsMs: [0],
+            },
         ]);
     });
 
@@ -84,8 +100,24 @@ describe("upcomingSteps", () => {
         const start = startMatch([step([60]), step([62]), step([64])]);
         const { state: next } = matchNote(start, 60, 0);
         expect(upcomingSteps(next, 6)).toEqual([
-            { index: 1, pitches: [62], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
-            { index: 2, pitches: [64], pitchStaves: [0], pitchHands: ["right"], staves: [0] },
+            {
+                index: 1,
+                pitches: [62],
+                pitchStaves: [0],
+                pitchHands: ["right"],
+                staves: [0],
+                atMs: 0,
+                pitchHoldsMs: [0],
+            },
+            {
+                index: 2,
+                pitches: [64],
+                pitchStaves: [0],
+                pitchHands: ["right"],
+                staves: [0],
+                atMs: 0,
+                pitchHoldsMs: [0],
+            },
         ]);
     });
 
@@ -93,6 +125,48 @@ describe("upcomingSteps", () => {
         const state = startMatch([step([60])]);
         const { state: done } = matchNote(state, 60, 0);
         expect(upcomingSteps(done, 6)).toEqual([]);
+    });
+
+    it("carries when each position sounds, so a look-ahead can space by the music", () => {
+        const state = startMatch([
+            step([60], { elapsedMs: 0 }),
+            step([62], { elapsedMs: 250 }),
+            step([64], { elapsedMs: 2000 }),
+        ]);
+        expect(upcomingSteps(state, 3).map((one) => one.atMs)).toEqual([0, 250, 2000]);
+    });
+
+    it("carries each pitch's own written length, not the position's longest note", () => {
+        // A whole note under a quaver is the ordinary case. Reading the position off
+        // holdMs — its longest note — draws the quaver as long as the note held under it.
+        const state = startMatch([
+            step([48, 72], {
+                holdMs: 2000,
+                expected: [
+                    { velocity: null, holdMs: 2000, writtenHoldMs: 2000 },
+                    { velocity: null, holdMs: 200, writtenHoldMs: 250 },
+                ],
+            }),
+        ]);
+        expect(upcomingSteps(state, 1)[0]?.pitchHoldsMs).toEqual([2000, 250]);
+    });
+
+    it("takes the written length rather than the sounded one", () => {
+        // Articulation shortens what you do with a note, not what is printed: a staccato
+        // crotchet drawn as a semiquaver would teach the touch as the value.
+        const state = startMatch([
+            step([60], {
+                holdMs: 500,
+                expected: [{ velocity: null, holdMs: 125, writtenHoldMs: 500 }],
+            }),
+        ]);
+        expect(upcomingSteps(state, 1)[0]?.pitchHoldsMs).toEqual([500]);
+    });
+
+    it("falls back to the position's length on a step model carrying no per-key detail", () => {
+        // The duet's other hand and the fingering walk lift steps without `expected`.
+        const state = startMatch([step([60, 64], { holdMs: 750 })]);
+        expect(upcomingSteps(state, 1)[0]?.pitchHoldsMs).toEqual([750, 750]);
     });
 });
 

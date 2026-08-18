@@ -197,6 +197,24 @@ export type UpcomingStep = {
     // score's parts rather than from the staff index alone.
     pitchHands: Hand2[];
     staves: number[];
+    // When the position sounds, on the step model's own clock. A look-ahead drawn from
+    // this spaces its notes by the music rather than by how many of them there are: a
+    // count of positions says a minim and a semiquaver are the same distance apart,
+    // which is the one thing a falling-note picture exists to show.
+    atMs: number;
+    // How long each pitch is WRITTEN to last, index-aligned with `pitches`.
+    //
+    // Per pitch because a whole note under a quaver is the ordinary case, and the
+    // position's own length is its longest note — reading the picture off that draws the
+    // quaver as long as the whole note beneath it.
+    //
+    // Written rather than sounded, so it agrees with the hold indicator the key itself
+    // draws: articulation shortens what you do with a note, not what is printed, and a
+    // staccato crotchet drawn as a semiquaver would teach the touch as the value.
+    //
+    // Falls back to the position's own length on a step model lifted without `expected`
+    // — the duet's other hand, a fingering walk — which carries no per-key detail.
+    pitchHoldsMs: number[];
 };
 
 export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[] {
@@ -208,6 +226,10 @@ export function upcomingSteps(state: MatcherState, count: number): UpcomingStep[
             pitchStaves: step.pitchStaves,
             pitchHands: step.pitchHands,
             staves: step.staves,
+            atMs: step.elapsedMs,
+            pitchHoldsMs: step.pitches.map(
+                (_, note) => step.expected?.[note]?.writtenHoldMs ?? step.holdMs,
+            ),
         }));
 }
 

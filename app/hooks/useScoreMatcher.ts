@@ -59,9 +59,11 @@ import {
     upcomingSteps,
 } from "../../core/matcher";
 
-// How many positions ahead the notes-highway look-ahead surfaces — enough to fill the
-// tall highway panel that stands in for the score.
-const HIGHWAY_LOOKAHEAD = 8;
+// How many positions ahead the notes-highway look-ahead surfaces. The panel spans a
+// fixed stretch of music, so what fills it is a question about the music rather than a
+// count: this is generous enough that a run of semiquavers still reaches the top, and
+// the ones that fall off it are dropped without being drawn.
+const HIGHWAY_LOOKAHEAD = 32;
 
 export type { Hand } from "../../core/matcher";
 
