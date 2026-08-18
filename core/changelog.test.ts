@@ -2,7 +2,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { headingFor, parseChangelog, type Release, renderNews, roundUp } from "./changelog";
+import {
+    headingFor,
+    parseChangelog,
+    POST_LIMIT,
+    type Release,
+    renderNews,
+    roundUp,
+    roundUpBody,
+    roundUpTitle,
+} from "./changelog";
 
 const release = (patch: Partial<Release> = {}): Release => ({
     date: "2026-08-18",
@@ -164,5 +173,67 @@ describe("roundUp", () => {
             "2026-08-11",
             "2026-08-10",
         ]);
+    });
+});
+
+describe("roundUpTitle", () => {
+    it("is dated, because a number would be a version and there are none", () => {
+        expect(roundUpTitle("2026-08-18")).toBe("This week in Plinky — 18 August 2026");
+    });
+});
+
+describe("roundUpBody", () => {
+    const many = (count: number): Release[] => [
+        release({
+            entries: Array.from({ length: count }, (_, index) => ({
+                body: `**Change ${index}.** ${"Something happened that week. ".repeat(20)}`,
+                twip: true,
+            })),
+        }),
+    ];
+
+    it("posts a quiet week in full, with nothing about what was left out", () => {
+        const body = roundUpBody([release()]);
+        expect(body).toContain("**Something changed.** And here is what it means.");
+        expect(body).not.toContain("more change");
+        expect(body).toContain("https://plinky.fun");
+    });
+
+    it("dates each day it covers", () => {
+        expect(roundUpBody([release({ date: "2026-08-13", label: "night" })])).toContain(
+            "**13 August 2026 — night**",
+        );
+    });
+
+    it("fits a busy week inside what Reddit will take, and says what it left", () => {
+        // A body over the limit is refused outright, so on an unattended weekly run a
+        // hundred-change week would post nothing at all — the one week people would most
+        // want to read about.
+        const body = roundUpBody(many(400));
+        expect(body.length).toBeLessThanOrEqual(POST_LIMIT);
+        expect(body).toMatch(/…and \d+ more changes this week/);
+        // The sign-off survives the trim: the budget is measured against the finished
+        // post, not against the entries alone.
+        expect(body.endsWith("Play at https://plinky.fun — free, in your browser, nothing to install.")).toBe(true);
+    });
+
+    it("counts one left-out change in the singular", () => {
+        const entry = `**Change.** ${"x".repeat(500)}`;
+        const two: Release[] = [
+            release({
+                entries: [
+                    { body: entry, twip: true },
+                    { body: entry, twip: true },
+                ],
+            }),
+        ];
+        // A limit that fits the frame and one entry but not the second.
+        expect(roundUpBody(two, 1_000)).toContain("…and 1 more change this week");
+    });
+
+    it("keeps the frame even when nothing fits", () => {
+        const body = roundUpBody(many(4), 400);
+        expect(body).toContain("…and 4 more changes this week");
+        expect(body).toContain("https://plinky.fun");
     });
 });

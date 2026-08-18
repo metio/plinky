@@ -180,6 +180,63 @@ export function renderNews(releases: readonly Release[]): string {
     return `${blocks.join("\n\n")}\n`;
 }
 
+// The title the weekly round-up is posted under. Dated rather than numbered: a number
+// would be a version, and Plinky does not have those.
+export function roundUpTitle(on: string): string {
+    return `This week in Plinky — ${headingFor({ date: on, label: null, entries: [] })}`;
+}
+
+// What a Reddit self post will hold. A body over this is refused outright, which on an
+// unattended weekly run means a busy week posts nothing at all.
+export const POST_LIMIT = 40_000;
+
+const OPENING =
+    "Everything that changed in Plinky this week. Plinky has no version numbers — every change goes live the moment it's ready, so this is just what landed.";
+const CLOSING = "Play at https://plinky.fun — free, in your browser, nothing to install.";
+const FULL_LIST = "https://github.com/metio/plinky/blob/main/NEWS.md";
+
+// The round-up's body. The entries are already written for a player, so they go out as
+// they were written; what is added is only the frame — a line saying what this is, and
+// where to go and try it.
+//
+// It is trimmed to fit. A quiet week is every entry in full, which is the case worth
+// optimising for; a week that shipped a hundred things takes as many as fit and says how
+// many it left, because a post refused for length is a week nobody hears about, and
+// fifty thousand characters was never going to be read anyway.
+export function roundUpBody(releases: readonly Release[], limit = POST_LIMIT): string {
+    const frame = (blocks: string[], dropped: number) =>
+        [
+            OPENING,
+            ...blocks,
+            ...(dropped === 0
+                ? []
+                : [
+                      `…and ${dropped} more ${dropped === 1 ? "change" : "changes"} this week — the full list is at ${FULL_LIST}.`,
+                  ]),
+            "---",
+            CLOSING,
+        ].join("\n\n");
+
+    const blocks: string[] = [];
+    let dropped = releases.reduce((count, release) => count + release.entries.length, 0);
+    for (const release of releases) {
+        const heading = `**${headingFor(release)}**`;
+        for (const entry of release.entries) {
+            const grown = blocks.at(-1)?.startsWith(heading)
+                ? [...blocks.slice(0, -1), `${blocks.at(-1)}\n\n${entry.body}`]
+                : [...blocks, `${heading}\n\n${entry.body}`];
+            // Measured against the finished post, frame and sign-off included, so the
+            // budget cannot be spent on entries and then overrun by the closing line.
+            if (frame(grown, dropped - 1).length > limit) {
+                return frame(blocks, dropped);
+            }
+            blocks.splice(0, blocks.length, ...grown);
+            dropped -= 1;
+        }
+    }
+    return frame(blocks, 0);
+}
+
 // The releases a round-up covers: those within `days` of `on`, carrying only the entries
 // that asked to be in it, and none that end up empty.
 //
