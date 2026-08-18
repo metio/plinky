@@ -342,7 +342,13 @@ const BUDGET_VENDOR_KB = 324;
 // cache that holds them, the sampled voice, and the switch that asks for it. The
 // recordings themselves are not here and never will be — they are fetched from their own
 // origin, a piece's worth at a time.
-const BUDGET_APP_KB = 350;
+// 360. Fitting a piece to the keyboard actually plugged in: the range read off a score,
+// the octave shift that brings it into reach, and the panel that remembers which
+// instrument it is. Step entry, which writes a piece down a note at a time rather than
+// playing it. The composer directory, which lists everybody the catalogue credits
+// instead of the few with pages the prerender holds. And the baked opening bars taking
+// a colour, so the shelf and the piece it opens agree about what a note is called.
+const BUDGET_APP_KB = 360;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
