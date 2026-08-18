@@ -65,18 +65,82 @@ const painted = () =>
 // thousand pixels, and a small control — an icon button, a badge, a row — draws
 // fewer than that, so it could change beyond recognition and still match. Cropped
 // to the story's own bounds, the allowance is a fraction of the component.
-//
-// A story whose content leaves the container — a portal, a `fixed` overlay, an
-// element the viewport width hides — draws nothing inside it, so there the whole
-// viewport is the only thing there is to compare and the body stands in.
 const storyRoot = () => {
     const root = document.querySelector("body > div:not(.sb-wrapper)");
     if (!(root instanceof HTMLElement)) {
         throw new Error("no story container on the body");
     }
-    const box = root.getBoundingClientRect();
-    const target = box.width > 0 && box.height > 0 ? root : document.body;
-    return page.elementLocator(target);
+    return root;
+};
+
+const area = (el: Element) => {
+    const box = el.getBoundingClientRect();
+    return box.width * box.height;
+};
+
+const drawn = (el: Element) => area(el) > 0;
+
+// The tightest element that still holds everything the story drew.
+//
+// The container Storybook renders into is a plain block div, so it is as wide as the
+// viewport whatever sits in it — and the allowance is a fraction of what gets captured,
+// which a lone icon button in a full-width box spends on the empty margin either side.
+// Where an element has one drawn child occupying strictly less space, that child is the
+// same picture in a smaller frame, so the crop follows it down. A branch is where the
+// composition itself starts, and the descent stops there.
+const tightest = (el: Element): Element => {
+    const children = Array.from(el.children).filter(drawn);
+    const only = children.length === 1 ? children[0] : undefined;
+    return only && area(only) < area(el) ? tightest(only) : el;
+};
+
+// The outermost thing the story actually put on screen inside its container, when the
+// container itself has no box. A `fixed` or absolute child does not contribute to its
+// parent's, so an empty container is not the same question as an empty story — the
+// descendants have to be asked separately, or content that is merely out of the flow
+// reads as content that isn't there. Document order puts the outermost first, which is
+// the whole of what was drawn rather than a part of it.
+const drawnInside = (root: HTMLElement) => Array.from(root.querySelectorAll("*")).find(drawn);
+
+// The same phone box the browser-mobile project uses, for a story the wide one hides.
+const PHONE = { width: 390, height: 844 };
+
+// What to compare, and at what size.
+//
+// The container is the subject wherever the story fills it. Two things stop it being:
+//
+// A `fixed` bar leaves the container zero-sized however much of it is on screen, so what
+// gets compared is the bar rather than the container that nominally holds it.
+//
+// Content the viewport width hides is the other case, and it wants a different remedy.
+// The bottom tab bar is `md:hidden`, so at the wide box it can never appear: its
+// baseline was an empty frame, asserting nothing about a bar nobody could see. A story
+// with nothing on screen at all is retried at a phone box and captured there.
+//
+// A portal is the last case, and the only one with nothing in the container to point at:
+// its content hangs off the body, so the body is what there is to compare.
+//
+// Both sizes are fixed, so a baseline stays reproducible either way; the box to return
+// to is read rather than restated, so it cannot drift from what the project renders at.
+const captureTarget = async (root: HTMLElement) => {
+    const of = (target: Element, restore: { width: number; height: number } | null) => ({
+        locator: page.elementLocator(tightest(target)),
+        restore,
+    });
+    const inFlow = drawn(root) ? root : drawnInside(root);
+    if (inFlow) {
+        return of(inFlow, null);
+    }
+    const wide = { width: window.innerWidth, height: window.innerHeight };
+    await page.viewport(PHONE.width, PHONE.height);
+    await painted();
+    const narrow = drawn(root) ? root : drawnInside(root);
+    if (narrow) {
+        return of(narrow, wide);
+    }
+    await page.viewport(wide.width, wide.height);
+    await painted();
+    return of(document.body, null);
 };
 
 // Every story doubles as a visual regression test in both themes: after it
@@ -108,15 +172,18 @@ afterEach(async (ctx) => {
     await painted();
     // Headroom for the retries a genuinely slow render still needs.
     const options = { timeout: 15_000 };
-    const story = storyRoot();
+    const { locator, restore } = await captureTarget(storyRoot());
     try {
-        await expect(story).toMatchScreenshot(options);
+        await expect(locator).toMatchScreenshot(options);
         document.documentElement.classList.add("dark");
         // The theme flip restyles the whole tree; the same first-capture rule
         // applies, so let it reach the screen before comparing.
         await painted();
-        await expect(story).toMatchScreenshot(`${ctx.task.name}-dark`, options);
+        await expect(locator).toMatchScreenshot(`${ctx.task.name}-dark`, options);
     } finally {
         document.documentElement.classList.remove("dark");
+        if (restore) {
+            await page.viewport(restore.width, restore.height);
+        }
     }
 });
