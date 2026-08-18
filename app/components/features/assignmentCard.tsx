@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
+import { usePrefs } from "../../hooks/usePrefs";
 import type { Assignment } from "../../../core/assignment";
 import { todayKey } from "../../../core/daily";
 import { deadlineFor } from "../../../core/repertoire";
@@ -34,6 +35,9 @@ export function AssignmentStepList({
     // nothing about the music until you open each one.
     incipitOf?: (id: string) => string | undefined;
 }) {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     return (
         <ol className="space-y-1">
             {steps.map((step, index) => (
@@ -68,6 +72,7 @@ export function AssignmentStepList({
                             <BakedIncipit
                                 mark={incipitOf?.(step.scoreId)}
                                 label={titleOf(step.scoreId)}
+                                colored={prefs.colorNotes}
                                 className="shrink-0 text-faint"
                             />
                             <span className="min-w-0 truncate">{titleOf(step.scoreId)}</span>
