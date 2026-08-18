@@ -180,10 +180,33 @@ export function renderNews(releases: readonly Release[]): string {
     return `${blocks.join("\n\n")}\n`;
 }
 
+// What every round-up's title begins with, which is how last week's is recognised when
+// this week's takes its place at the top of the subreddit. Exported so the two are one
+// string: a reworded title that no longer matched would quietly leave every previous week
+// pinned until the slots ran out.
+export const ROUND_UP_PREFIX = "This week in Plinky";
+
 // The title the weekly round-up is posted under. Dated rather than numbered: a number
 // would be a version, and Plinky does not have those.
 export function roundUpTitle(on: string): string {
-    return `This week in Plinky — ${headingFor({ date: on, label: null, entries: [] })}`;
+    return `${ROUND_UP_PREFIX} — ${headingFor({ date: on, label: null, entries: [] })}`;
+}
+
+// A post as the subreddit listing describes it, which is all that is needed to decide
+// what to unpin.
+export type PostedRoundUp = { name: string; title: string; stickied: boolean };
+
+// The round-ups to take down before this week's goes up.
+//
+// A subreddit holds two stickied posts and refuses a third, so a weekly post that only
+// ever pinned would work for one week, half-work for another, and then quietly stop —
+// with the newest week the one missing. Only previous round-ups are touched: whatever
+// else is pinned up there belongs to somebody and is not this job's to move.
+export function roundUpsToUnpin(posts: readonly PostedRoundUp[], keep: string): string[] {
+    return posts
+        .filter((post) => post.stickied && post.title !== keep)
+        .filter((post) => post.title.startsWith(ROUND_UP_PREFIX))
+        .map((post) => post.name);
 }
 
 // What a Reddit self post will hold. A body over this is refused outright, which on an

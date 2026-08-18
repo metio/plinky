@@ -8,8 +8,10 @@ import {
     POST_LIMIT,
     type Release,
     renderNews,
+    ROUND_UP_PREFIX,
     roundUp,
     roundUpBody,
+    roundUpsToUnpin,
     roundUpTitle,
 } from "./changelog";
 
@@ -235,5 +237,44 @@ describe("roundUpBody", () => {
         const body = roundUpBody(many(4), 400);
         expect(body).toContain("…and 4 more changes this week");
         expect(body).toContain("https://plinky.fun");
+    });
+});
+
+describe("roundUpsToUnpin", () => {
+    const post = (title: string, stickied: boolean, name = title) => ({ name, title, stickied });
+
+    it("takes down last week's so this week's can go up", () => {
+        // A subreddit holds two stickied posts and refuses a third, so a job that only
+        // ever pinned would work once, half-work once, and then stop — with the newest
+        // week the one missing.
+        const posts = [
+            post("This week in Plinky — 18 August 2026", false),
+            post("This week in Plinky — 11 August 2026", true, "t3_last"),
+        ];
+        expect(roundUpsToUnpin(posts, "This week in Plinky — 18 August 2026")).toEqual(["t3_last"]);
+    });
+
+    it("leaves somebody else's pinned post where it is", () => {
+        const posts = [post("Welcome to r/plinky_piano — start here", true, "t3_welcome")];
+        expect(roundUpsToUnpin(posts, "This week in Plinky — 18 August 2026")).toEqual([]);
+    });
+
+    it("leaves this week's own post alone when it is already up", () => {
+        // The retry path pins a post that a previous run posted but failed to pin;
+        // unpinning it first would undo the thing being fixed.
+        const title = "This week in Plinky — 18 August 2026";
+        expect(roundUpsToUnpin([post(title, true, "t3_this")], title)).toEqual([]);
+    });
+
+    it("ignores a round-up that is not pinned", () => {
+        expect(
+            roundUpsToUnpin([post("This week in Plinky — 4 August 2026", false)], "anything"),
+        ).toEqual([]);
+    });
+
+    it("recognises a round-up by the title it is actually posted under", () => {
+        // The prefix and the title are one string, so a reworded title cannot leave every
+        // previous week pinned until the slots run out.
+        expect(roundUpTitle("2026-08-18").startsWith(ROUND_UP_PREFIX)).toBe(true);
     });
 });
