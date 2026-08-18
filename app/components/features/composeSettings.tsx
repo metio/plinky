@@ -13,6 +13,8 @@ type ComposeSettingsProps = {
     beatsPerBar: number;
     onBeatsPerBar: (beats: number) => void;
     quantizeOn: boolean;
+    // Step entry writes exact lengths, so there is nothing to tidy and the switch is held.
+    quantizeLocked?: boolean;
     onQuantize: (on: boolean) => void;
     metronomeOn: boolean;
     onMetronome: (on: boolean) => void;
@@ -31,6 +33,7 @@ export function ComposeSettings({
     beatsPerBar,
     onBeatsPerBar,
     quantizeOn,
+    quantizeLocked = false,
     onQuantize,
     metronomeOn,
     onMetronome,
@@ -74,7 +77,8 @@ export function ComposeSettings({
             </label>
             <SwitchField
                 label={m.compose_quantize_label()}
-                checked={quantizeOn}
+                disabled={quantizeLocked}
+                checked={quantizeOn && !quantizeLocked}
                 onChange={onQuantize}
             />
             <SwitchField

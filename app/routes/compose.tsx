@@ -54,7 +54,12 @@ export default function Compose() {
     const [stepping, setStepping] = useState(false);
     const [stepValue, setStepValue] = useState<StepValue>("quarter");
     const [stepDotted, setStepDotted] = useState(false);
-    const stepMs = stepping ? stepDurationMs(stepValue, tempo, stepDotted) : null;
+    // A dotted sixteenth is one and a half of the engraving's finest cell, so the staff
+    // cannot draw it whatever it is told. The dot is dropped rather than written and then
+    // silently rounded to something the player did not ask for.
+    const dottable = stepValue !== "sixteenth";
+    const dotted = stepDotted && dottable;
+    const stepMs = stepping ? stepDurationMs(stepValue, tempo, dotted) : null;
 
     const recorder = useCompositionRecorder({
         stepMs,
@@ -70,12 +75,17 @@ export default function Compose() {
     // underneath it would take the composition with it, and unlike a practice run there
     // is nothing on disk to fall back to.
     const { activity } = useServices();
+    // Keyed on whether there is work at all, not on how much of it. Depending on the count
+    // ended and re-began the signal on every note — and in the instant between the two the
+    // app reads as idle, which is exactly when a waiting update is free to reload the page
+    // and take the take with it.
+    const hasWork = notes.length > 0;
     useEffect(() => {
-        if (notes.length === 0) {
+        if (!hasWork) {
             return;
         }
         return activity.begin();
-    }, [notes.length, activity]);
+    }, [hasWork, activity]);
 
     const transport = useCompositionTransport({
         notes,
@@ -114,7 +124,11 @@ export default function Compose() {
         [notes, tempo, beatsPerBar],
     );
 
-    const staffXml = useStaffSketch(composition, title, quantizeOn);
+    // Stepped notes are already exact multiples of the beat, so there is no played timing
+    // to tidy — and the tidying grid is eighths, which would round a written sixteenth up
+    // to an eighth and a dotted eighth to something that is neither. While step entry is
+    // on, the staff is drawn on the engraving grid itself.
+    const staffXml = useStaffSketch(composition, title, quantizeOn && !stepping);
     const exporter = useCompositionExport(composition, title);
 
     // Swap the canvas over to a loaded composition.
@@ -211,8 +225,9 @@ export default function Compose() {
                 onOn={setStepping}
                 value={stepValue}
                 onValue={setStepValue}
-                dotted={stepDotted}
+                dotted={dotted}
                 onDotted={setStepDotted}
+                canDot={dottable}
                 onRest={recorder.rest}
                 onBack={recorder.back}
                 canGoBack={notes.length > 0}
@@ -227,6 +242,7 @@ export default function Compose() {
                 onBeatsPerBar={setBeatsPerBar}
                 quantizeOn={quantizeOn}
                 onQuantize={setQuantizeOn}
+                quantizeLocked={stepping}
                 metronomeOn={metronomeOn}
                 onMetronome={setMetronomeOn}
             />

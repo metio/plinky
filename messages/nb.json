@@ -1211,5 +1211,6 @@
     "step_dotted": "Punktert",
     "step_dotted_caption": "Halvparten lengre.",
     "step_rest": "Legg til en pause",
-    "step_back": "En tilbake"
+    "step_back": "En tilbake",
+    "step_dotted_unavailable": "En sekstendedel er det korteste notesystemet tegner, så den kan ikke punkteres."
 }

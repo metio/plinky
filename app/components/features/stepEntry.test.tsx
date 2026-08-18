@@ -20,6 +20,7 @@ const props = {
     onRest: vi.fn(),
     onBack: vi.fn(),
     canGoBack: true,
+    canDot: true,
 };
 
 const show = (overrides: Partial<typeof props> = {}) =>
@@ -50,6 +51,17 @@ describe("StepEntry", () => {
         expect(onValue).toHaveBeenCalledWith("eighth");
         toggle(m.step_dotted);
         expect(onDotted).toHaveBeenCalledWith(true);
+    });
+
+    it("does not offer a dot the staff could not draw", () => {
+        // A dotted sixteenth is one and a half of the engraving's finest cell. Offering it
+        // would promise a length the sketch then rounds to something else.
+        show({ canDot: false });
+        const dot = screen.getByRole("switch", { name: m.step_dotted() });
+        expect(
+            dot.getAttribute("aria-disabled") ?? String((dot as HTMLButtonElement).disabled),
+        ).toContain("true");
+        expect(screen.getByText(m.step_dotted_unavailable())).toBeTruthy();
     });
 
     it("cannot take a step back from an empty take", () => {

@@ -1211,5 +1211,6 @@
     "step_dotted": "Punkterad",
     "step_dotted_caption": "Hälften längre.",
     "step_rest": "Lägg till en paus",
-    "step_back": "En tillbaka"
+    "step_back": "En tillbaka",
+    "step_dotted_unavailable": "En sextondel är det kortaste notsystemet ritar, så den kan inte punkteras."
 }

@@ -1211,5 +1211,6 @@
     "step_dotted": "Pointée",
     "step_dotted_caption": "Une demie de plus.",
     "step_rest": "Ajouter un silence",
-    "step_back": "Revenir d'une note"
+    "step_back": "Revenir d'une note",
+    "step_dotted_unavailable": "La double croche est la plus courte que la portée dessine : pas de point ici."
 }

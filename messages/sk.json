@@ -1211,5 +1211,6 @@
     "step_dotted": "S bodkou",
     "step_dotted_caption": "O polovicu dlhšia.",
     "step_rest": "Pridať pomlčku",
-    "step_back": "O jednu späť"
+    "step_back": "O jednu späť",
+    "step_dotted_unavailable": "Šestnástinová je najkratšia, akú notová osnova nakreslí — bodka tu nejde."
 }

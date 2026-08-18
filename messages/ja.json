@@ -1211,5 +1211,6 @@
     "step_dotted": "付点",
     "step_dotted_caption": "1.5倍の長さ。",
     "step_rest": "休符を入れる",
-    "step_back": "ひとつ戻す"
+    "step_back": "ひとつ戻す",
+    "step_dotted_unavailable": "16分音符は楽譜が描ける最短の音符なので、付点は付けられません。"
 }

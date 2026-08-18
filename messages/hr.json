@@ -1211,5 +1211,6 @@
     "step_dotted": "S točkom",
     "step_dotted_caption": "Za polovinu dulja.",
     "step_rest": "Dodaj pauzu",
-    "step_back": "Jednu natrag"
+    "step_back": "Jednu natrag",
+    "step_dotted_unavailable": "Šesnaestinka je najkraća koju crtovlje crta, pa ovdje nema točke."
 }
