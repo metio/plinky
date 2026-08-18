@@ -109,16 +109,16 @@ export async function loadCuration(): Promise<{ curations: Curation[]; problems:
 
 type Piece = { id: string; title?: string; composer?: string };
 
-// Applies the corrections, and reports any that found nothing to correct.
+// Applies the corrections, and reports which of them found something.
 //
-// An entry whose piece has left the catalogue is an error rather than a no-op: dedup and
-// re-import do drop scores, and a correction silently applying to nothing is how this file
-// would fill with entries nobody can evaluate. The fix is to delete the line, which
-// somebody has to be told to do.
+// What it does NOT do is decide that an entry matched nothing: corrections are written
+// against one catalogue but there are two manifests, songs and exercises, and an entry for
+// a study would look unmatched to the songs pass. The caller collects what every pass
+// applied and asks `unapplied` once — see below.
 export function curate<T extends Piece>(
     pieces: readonly T[],
     curations: readonly Curation[],
-): { pieces: T[]; problems: string[] } {
+): { pieces: T[]; applied: Set<string> } {
     const byId = new Map(curations.map((one) => [one.id, one]));
     const applied = new Set<string>();
     const next = pieces.map((piece) => {
@@ -135,8 +135,17 @@ export function curate<T extends Piece>(
         }
         return { ...piece, ...patch };
     });
-    const problems = curations
+    return { pieces: next, applied };
+}
+
+// The corrections that matched nothing anywhere.
+//
+// An entry whose piece has left the catalogue is an error rather than a no-op: dedup and
+// re-import do drop scores, and a correction silently applying to nothing is how this file
+// would fill with entries nobody can evaluate. The fix is to delete the line, which
+// somebody has to be told to do.
+export function unapplied(curations: readonly Curation[], applied: ReadonlySet<string>): string[] {
+    return curations
         .filter((one) => !applied.has(one.id))
         .map((one) => `${CURATION_FILE}: ${one.id} is not in the catalogue — remove the entry`);
-    return { pieces: next, problems };
 }

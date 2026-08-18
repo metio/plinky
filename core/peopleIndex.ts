@@ -70,6 +70,7 @@ export const PEOPLE_INDEX: Record<string, PersonEntry> = {
     "ezra-goff": {"name":"Ezra Goff","pieces":4},
     "fanny-hensel": {"name":"Fanny Hensel","pieces":29},
     "felix-mendelssohn": {"name":"Felix Mendelssohn","pieces":23},
+    "ferdinand-beyer": {"name":"Ferdinand Beyer","pieces":3},
     "filippo-azzaiolo": {"name":"Filippo Azzaiolo","pieces":10},
     "francesco-paolo-tosti": {"name":"Francesco Paolo Tosti","pieces":4},
     "frank-bridge": {"name":"Frank Bridge","pieces":12},

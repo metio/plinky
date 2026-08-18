@@ -22,7 +22,7 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { bakePeopleIndex } from "./bake-people.mts";
-import { curate, loadCuration } from "./curation.mts";
+import { curate, loadCuration, unapplied } from "./curation.mts";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 
 const MAX_GRADE = 8;
@@ -34,7 +34,14 @@ const PIECE_RE = /(piece:\s*\[)([^\]]*)(\])/;
 const check = process.argv.includes("--check");
 
 type Song = { id: string; cost: number; grade: number; title?: string; composer?: string };
-type Exercise = { id: string; cost: number; grade: number; kind: string };
+type Exercise = {
+    id: string;
+    cost: number;
+    grade: number;
+    kind: string;
+    title?: string;
+    composer?: string;
+};
 
 function arraysEqual(a: number[], b: number[]): boolean {
     return a.length === b.length && a.every((value, i) => value === b[i]);
@@ -49,8 +56,14 @@ async function main() {
     // A problem here stops both modes: a curation nobody can apply is one nobody can
     // evaluate either, and silently skipping it is how the file would rot.
     const curation = await loadCuration();
-    const corrected = curate(songs, curation.curations);
-    const curationProblems = [...curation.problems, ...corrected.problems];
+    // Both manifests, because a study is as correctable as a song and the file does not
+    // distinguish them — an id belongs to whichever catalogue holds it.
+    const correctedSongs = curate(songs, curation.curations);
+    const correctedExercises = curate(exercises, curation.curations);
+    const curationProblems = [
+        ...curation.problems,
+        ...unapplied(curation.curations, new Set([...correctedSongs.applied, ...correctedExercises.applied])),
+    ];
     if (curationProblems.length > 0) {
         console.error("Catalogue curation cannot be applied:");
         for (const problem of curationProblems) {
@@ -67,10 +80,10 @@ async function main() {
     // The freshly-graded catalogue these boundaries imply. Re-grading can move a piece
     // across a grade boundary, so re-establish the shipped order both manifests are
     // pinned to: songs easiest-first (grade follows cost), exercises by grade then cost.
-    const bakedSongs = corrected.pieces
+    const bakedSongs = correctedSongs.pieces
         .map((song) => ({ ...song, grade: gradeForCost(song.cost, boundaries) }))
         .sort((a, b) => a.cost - b.cost);
-    const bakedExercises = exercises
+    const bakedExercises = correctedExercises.pieces
         .map((exercise) =>
             exercise.kind === "study"
                 ? { ...exercise, grade: gradeForCost(exercise.cost, boundaries) }
@@ -95,7 +108,7 @@ async function main() {
             problems.push("public/songs/manifest.json is stale (grades, order or curation)");
         }
         if (JSON.stringify(exercises) !== JSON.stringify(bakedExercises)) {
-            problems.push("public/exercises/manifest.json is stale (grades or order)");
+            problems.push("public/exercises/manifest.json is stale (grades, order or curation)");
         }
         if (problems.length > 0) {
             console.error("Catalogue grades are not baked:");

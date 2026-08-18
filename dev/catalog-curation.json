@@ -244,5 +244,38 @@
         "id": "3iOKUnhz4Yes",
         "composer": "Traditional",
         "why": "The credit names a tradition rather than a person; filing it under Traditional keeps it out of the composer directory."
+    },
+    {
+        "id": "QYSdLNSnJvnA",
+        "title": "Beyer No. 8",
+        "composer": "Ferdinand Beyer",
+        "why": "The catalogue writes a numbered piece as 'No.' in a hundred and forty-eight titles; this corpus upload used 'Nro', which is correct Spanish and Finnish for numero but the only three of its kind here. The upload credited nobody, so Beyer had three pieces in the catalogue and no place among the composers."
+    },
+    {
+        "id": "KeBIHcqQGDPd",
+        "title": "Beyer No. 9",
+        "composer": "Ferdinand Beyer",
+        "why": "The catalogue writes a numbered piece as 'No.' in a hundred and forty-eight titles; this corpus upload used 'Nro', which is correct Spanish and Finnish for numero but the only three of its kind here. The upload credited nobody, so Beyer had three pieces in the catalogue and no place among the composers."
+    },
+    {
+        "id": "XBR5ykgctHZg",
+        "title": "Beyer No. 10",
+        "composer": "Ferdinand Beyer",
+        "why": "The catalogue writes a numbered piece as 'No.' in a hundred and forty-eight titles; this corpus upload used 'Nro', which is correct Spanish and Finnish for numero but the only three of its kind here. The upload credited nobody, so Beyer had three pieces in the catalogue and no place among the composers."
+    },
+    {
+        "id": "SicBc6XnnJS3",
+        "composer": "Traditional",
+        "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
+    },
+    {
+        "id": "byjPRqA0tanr",
+        "composer": "Traditional",
+        "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
+    },
+    {
+        "id": "hJT8580qxS59",
+        "composer": "Traditional",
+        "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
     }
 ]

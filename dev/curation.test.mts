@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { curate, type Curation, parseCuration } from "./curation.mts";
+import { curate, type Curation, parseCuration, unapplied } from "./curation.mts";
 
 const PIECES = [
     { id: "aaa", title: "Clair de lune", composer: "Calude Debussy", cost: 12 },
@@ -69,8 +69,8 @@ describe("curate", () => {
     ];
 
     it("corrects the piece it names and leaves the rest alone", () => {
-        const { pieces, problems } = curate(PIECES, curation);
-        expect(problems).toEqual([]);
+        const { pieces, applied } = curate(PIECES, curation);
+        expect([...applied]).toEqual(["aaa"]);
         expect(pieces[0]).toEqual({
             id: "aaa",
             title: "Clair de lune (opening)",
@@ -86,11 +86,22 @@ describe("curate", () => {
         expect(pieces[0]?.composer).toBe("Claude Debussy");
     });
 
-    it("reports a correction whose piece has left the catalogue", () => {
+    it("reports a correction that matched nothing anywhere", () => {
         // Dedup and re-import do drop scores. A correction quietly applying to nothing is
         // how this file fills with entries nobody can evaluate, so it has to be said.
-        const { problems } = curate(PIECES, [{ id: "gone", title: "Anything", why: "typo" }]);
-        expect(problems[0]).toContain("gone is not in the catalogue");
+        const gone: Curation[] = [{ id: "gone", title: "Anything", why: "typo" }];
+        const { applied } = curate(PIECES, gone);
+        expect(unapplied(gone, applied)[0]).toContain("gone is not in the catalogue");
+    });
+
+    it("counts a correction applied by another catalogue as applied", () => {
+        // Corrections are written against one file but there are two manifests, songs and
+        // exercises. An entry for a study must not read as missing to the songs pass.
+        const study: Curation[] = [{ id: "study-1", composer: "Ferdinand Beyer", why: "uncredited" }];
+        const songs = curate(PIECES, study);
+        const exercises = curate([{ id: "study-1", title: "Beyer No. 8" }], study);
+        expect(unapplied(study, new Set([...songs.applied, ...exercises.applied]))).toEqual([]);
+        expect(exercises.pieces[0]?.composer).toBe("Ferdinand Beyer");
     });
 
     it("leaves the catalogue untouched when there is nothing to correct", () => {
