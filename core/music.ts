@@ -7,9 +7,9 @@ import { isDue, type Mastery } from "./mastery";
 // songs, generated scales/arpeggios, and curated studies. Exercises and songs
 // carry a precomputed grade from their manifest; local scores are graded from
 // their inlined MusicXML. Only user imports are removable.
-export type LibraryKind = "song" | "scale-arpeggio" | "study";
+export type MusicKind = "song" | "scale-arpeggio" | "study";
 
-export type LibraryItem = {
+export type MusicItem = {
     id: string;
     title: string;
     composer: string;
@@ -21,15 +21,15 @@ export type LibraryItem = {
     // The opening bars, encoded, where the catalogue carries them.
     incipit?: string;
     removable: boolean;
-    kind: LibraryKind;
+    kind: MusicKind;
 };
 
 // The filter axes of the library list. An empty kind means every kind and an empty grade
 // set means every grade; the grades are multi-select, so a player can line up e.g. grades
 // 3 and 4 at once — each still means exactly that grade.
-export type LibraryFilter = {
+export type MusicFilter = {
     query: string;
-    kind: LibraryKind | "";
+    kind: MusicKind | "";
     grades: ReadonlySet<number>;
     favoritesOnly: boolean;
     dueOnly: boolean;
@@ -39,7 +39,7 @@ export type LibraryFilter = {
     freshOnly: boolean;
 };
 
-export const EMPTY_LIBRARY_FILTER: LibraryFilter = {
+export const EMPTY_MUSIC_FILTER: MusicFilter = {
     query: "",
     kind: "",
     grades: new Set(),
@@ -50,7 +50,7 @@ export const EMPTY_LIBRARY_FILTER: LibraryFilter = {
 
 // The per-player state the filters consult: the starred set, the mastery
 // record per piece, and the clock for the due check.
-export type LibraryContext = {
+export type MusicContext = {
     favorites: ReadonlySet<string>;
     mastery: Record<string, Mastery>;
     now: number;
@@ -80,11 +80,11 @@ export function foldForSearch(text: string): string {
     );
 }
 
-export function filterLibrary(
-    items: readonly LibraryItem[],
-    filter: LibraryFilter,
-    context: LibraryContext,
-): LibraryItem[] {
+export function filterMusic(
+    items: readonly MusicItem[],
+    filter: MusicFilter,
+    context: MusicContext,
+): MusicItem[] {
     const needle = foldForSearch(filter.query.trim());
     const seen = new Set<string>();
     return items.filter((item) => {
@@ -124,7 +124,7 @@ export function filterLibrary(
 // what `cost` measures and what both manifests are already sorted by before they are
 // concatenated here. Without it the two bundled demos come first, then every scale and
 // study, and no piece of music appears until the third screen.
-export function libraryOrder(items: readonly LibraryItem[]): LibraryItem[] {
+export function musicOrder(items: readonly MusicItem[]): MusicItem[] {
     return [...items].sort(
         (a, b) => a.grade - b.grade || (a.cost ?? Number.POSITIVE_INFINITY) - (b.cost ?? Number.POSITIVE_INFINITY) || a.title.localeCompare(b.title),
     );

@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { assignmentsReferencing } from "../../core/assignment";
-import { type LibraryItem, libraryOrder } from "../../core/library";
+import { type MusicItem, musicOrder } from "../../core/music";
 import type { Mastery } from "../../core/mastery";
 import { encodeIncipit, readIncipit } from "../../core/incipit";
 import type { XmlCodec } from "../../core/xml";
@@ -23,11 +23,11 @@ function incipitOf(codec: XmlCodec, xml: string): { incipit?: string } {
     return read ? { incipit: encodeIncipit(read) } : {};
 }
 
-export function useLibraryItems() {
+export function useMusicItems() {
     const services = useServices();
-    const [local, setLocal] = useState<LibraryItem[]>([]);
-    const [exercises, setExercises] = useState<LibraryItem[]>([]);
-    const [songs, setSongs] = useState<LibraryItem[]>([]);
+    const [local, setLocal] = useState<MusicItem[]>([]);
+    const [exercises, setExercises] = useState<MusicItem[]>([]);
+    const [songs, setSongs] = useState<MusicItem[]>([]);
     const [mastery, setMastery] = useState<Record<string, Mastery>>({});
     const [loaded, setLoaded] = useState(false);
 
@@ -98,7 +98,7 @@ export function useLibraryItems() {
     // concatenating them throws it away, which put a hundred and forty scales and studies
     // in front of every piece of music on the shelf.
     const items = useMemo(
-        () => libraryOrder([...local, ...exercises, ...songs]),
+        () => musicOrder([...local, ...exercises, ...songs]),
         [local, exercises, songs],
     );
 

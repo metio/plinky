@@ -12,7 +12,7 @@ import { createAssignmentsStore } from "../stores/assignmentsStore";
 import { buildScore, loadBundledScores, saveUserScore } from "../lib/catalog";
 
 import AssignmentsRoute from "./assignments";
-import Library from "./library";
+import Music from "./music";
 import { m } from "../paraglide/messages.js";
 
 // Bundled scores are keyed by their content-fingerprint id, so look one up by title.
@@ -42,19 +42,19 @@ function AddressProbe() {
     return null;
 }
 
-function renderLibrary() {
+function renderMusic() {
     seenSearch = "";
     return render(
         <MemoryRouter>
-            <Library />
+            <Music />
             <AddressProbe />
         </MemoryRouter>,
     );
 }
 
-describe("Library", () => {
+describe("Music", () => {
     it("lists bundled scores and links each to its play page", async () => {
-        renderLibrary();
+        renderMusic();
         const ode = await screen.findByText("Ode to Joy");
         expect(ode.closest("a")?.getAttribute("href")).toContain(
             `/play/${bundledId("ode to joy")}`,
@@ -62,7 +62,7 @@ describe("Library", () => {
     });
 
     it("filters the list by the search box", async () => {
-        renderLibrary();
+        renderMusic();
         await screen.findByText("Ode to Joy");
         fireEvent.change(screen.getByRole("searchbox"), { target: { value: "no-such-piece" } });
         expect(await screen.findByText("No scores match your search.")).toBeTruthy();
@@ -77,7 +77,7 @@ describe("Library", () => {
         // symptom needs real keystroke timing that fireEvent cannot produce: the letters
         // are in the box immediately, and the address has not moved at all yet. Wired the
         // old way the address changes on the first keystroke, and this fails there.
-        renderLibrary();
+        renderMusic();
         await screen.findByText("Ode to Joy");
         const box = screen.getByRole("searchbox") as HTMLInputElement;
 
@@ -98,7 +98,7 @@ describe("Library", () => {
     });
 
     it("offers a multi-select grade filter", async () => {
-        renderLibrary();
+        renderMusic();
         await screen.findByText("Ode to Joy");
         // Grade chips 1–8 narrow the catalogue by difficulty.
         const one = screen.getByLabelText("Grade 1");
@@ -117,7 +117,7 @@ describe("Library", () => {
     });
 
     it("stars and unstars a piece", async () => {
-        renderLibrary();
+        renderMusic();
         await screen.findByText("Ode to Joy");
         const star = screen.getAllByLabelText(m.scores_favorite())[0];
         if (!star) {
@@ -129,7 +129,7 @@ describe("Library", () => {
 
     it("removes an imported score only after the delete is confirmed", async () => {
         saveUserScore(browserStore, buildScore(domXmlCodec, USER_XML, []));
-        renderLibrary();
+        renderMusic();
         expect(await screen.findByText("My Tune")).toBeTruthy();
         // The first click only arms the confirm — the unrecoverable delete shouldn't
         // fire on a single misclick.
@@ -145,7 +145,7 @@ describe("Library", () => {
         createAssignmentsStore(browserStore).save(
             makeAssignment({ id: "set", name: "Set", items: [{ id: score.id }] }),
         );
-        const view = renderLibrary();
+        const view = renderMusic();
         expect(await screen.findByText("My Tune")).toBeTruthy();
         fireEvent.click(screen.getByLabelText("Remove"));
         // The armed confirm names the blast radius instead of a bare "Remove?".
@@ -164,7 +164,7 @@ describe("Library", () => {
 
     it("gives a long title the shrink-and-truncate contract so it can't widen the row", async () => {
         saveUserScore(browserStore, buildScore(domXmlCodec, LONG_TITLE_XML, []));
-        renderLibrary();
+        renderMusic();
         const title = await screen.findByText(LONG_TITLE);
         // The title link clips with an ellipsis…
         expect(title.className).toContain("truncate");
@@ -190,7 +190,7 @@ describe("Library", () => {
             updatedAt: 0,
             deadline: "",
         });
-        renderLibrary();
+        renderMusic();
         expect(await screen.findByText("Twinkle, Twinkle, Little Star")).toBeTruthy();
 
         fireEvent.click(screen.getByRole("button", { name: /due now/i }));

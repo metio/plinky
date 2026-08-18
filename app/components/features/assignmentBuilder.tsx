@@ -120,7 +120,7 @@ export function AssignmentBuilder({
             </Show>
             <Show when={draft.visible < matches.length}>
                 <Button variant="secondary" onClick={draft.showMore}>
-                    {m.library_show_more()}
+                    {m.music_show_more()}
                 </Button>
             </Show>
 

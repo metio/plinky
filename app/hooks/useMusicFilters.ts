@@ -4,13 +4,13 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import {
-    filterLibrary,
-    type LibraryFilter,
-    type LibraryItem,
-    type LibraryKind,
+    filterMusic,
+    type MusicFilter,
+    type MusicItem,
+    type MusicKind,
     toggledGrade,
-} from "../../core/library";
-import { libraryFilterParams, readLibraryFilter } from "../../core/libraryQuery";
+} from "../../core/music";
+import { musicFilterParams, readMusicFilter } from "../../core/musicQuery";
 import type { Mastery } from "../../core/mastery";
 import { useScheduler } from "../contexts/services";
 import { useFavorites } from "./useFavorites";
@@ -32,7 +32,7 @@ const NO_STARRED: ReadonlySet<string> = new Set();
 // the matches.
 //
 // The filters live in the page's address rather than in this hook, so opening a piece and
-// coming back finds the shelf as it was left; `core/libraryQuery` is the whole of the
+// coming back finds the shelf as it was left; `core/musicQuery` is the whole of the
 // reading and writing. Every change replaces the current history entry instead of adding
 // one, so Back leaves the library rather than walking a search back a letter at a time.
 //
@@ -43,19 +43,16 @@ const NO_STARRED: ReadonlySet<string> = new Set();
 // waiting on anything — and the address is brought up to date once the typing pauses. The
 // list follows through useDeferredValue, so filtering three thousand pieces is work React
 // may interrupt rather than work that must finish before the next keystroke can be drawn.
-export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record<string, Mastery>) {
+export function useMusicFilters(items: readonly MusicItem[], mastery: Record<string, Mastery>) {
     const favorites = useFavorites();
     const scheduler = useScheduler();
     const [searchParams, setSearchParams] = useSearchParams();
     const [visible, setVisible] = useState(PER_PAGE);
 
-    const filter = useMemo(
-        () => readLibraryFilter(Object.fromEntries(searchParams)),
-        [searchParams],
-    );
+    const filter = useMemo(() => readMusicFilter(Object.fromEntries(searchParams)), [searchParams]);
 
     const update = useCallback(
-        (next: LibraryFilter) => {
+        (next: MusicFilter) => {
             setSearchParams(
                 (prev) => {
                     // Everything the shelf does not own — the tab, above all — stays put.
@@ -63,7 +60,7 @@ export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record
                     for (const key of ["q", "kind", "grade", "starred", "due", "fresh"]) {
                         delete kept[key];
                     }
-                    return { ...kept, ...libraryFilterParams(next) };
+                    return { ...kept, ...musicFilterParams(next) };
                 },
                 { replace: true, preventScrollReset: true },
             );
@@ -130,7 +127,7 @@ export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record
     // re-filtered three thousand pieces to produce the same list back.
     const starred = favoritesOnly ? favorites : NO_STARRED;
     const matches = useMemo(
-        () => filterLibrary(items, showing, { favorites: starred, mastery, now: Date.now() }),
+        () => filterMusic(items, showing, { favorites: starred, mastery, now: Date.now() }),
         [items, showing, starred, mastery],
     );
 
@@ -142,7 +139,7 @@ export function useLibraryFilters(items: readonly LibraryItem[], mastery: Record
         applied,
         setQuery: setTyped,
         kind,
-        setKind: (next: LibraryKind | "") => update({ ...filter, kind: next }),
+        setKind: (next: MusicKind | "") => update({ ...filter, kind: next }),
         grades,
         toggleGrade: (grade: number) => update({ ...filter, grades: toggledGrade(grades, grade) }),
         clearGrades: () => update({ ...filter, grades: new Set() }),

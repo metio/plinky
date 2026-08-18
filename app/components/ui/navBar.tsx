@@ -22,7 +22,7 @@ const DESTINATIONS: {
     label: () => string;
     Icon: (props: { className?: string }) => ReactNode;
 }[] = [
-    { to: "/music", label: m.library_title, Icon: NotesIcon },
+    { to: "/music", label: m.music_title, Icon: NotesIcon },
     { to: "/learn", label: m.nav_learn, Icon: BookIcon },
     { to: "/compose", label: m.nav_compose, Icon: MicIcon },
     { to: "/teach", label: m.nav_teach, Icon: GradCapIcon },

@@ -4,21 +4,21 @@
 import { useMemo, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { Show } from "../components/features/conditional";
-import { LibraryFilters } from "../components/features/libraryFilters";
-import { LibraryRow } from "../components/features/libraryRow";
+import { MusicFilters } from "../components/features/musicFilters";
+import { MusicRow } from "../components/features/musicRow";
 import { ScoreBackup } from "../components/features/scoreBackup";
 import { ScoreImport } from "../components/features/scoreImport";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
-import { dueCount } from "../../core/library";
+import { dueCount } from "../../core/music";
 import { isDue } from "../../core/mastery";
 import { composerCounts } from "../../core/person";
 import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
-import { useLibraryFilters } from "../hooks/useLibraryFilters";
-import { useLibraryItems } from "../hooks/useLibraryItems";
+import { useMusicFilters } from "../hooks/useMusicFilters";
+import { useMusicItems } from "../hooks/useMusicItems";
 import { m } from "../paraglide/messages.js";
-import type { Route } from "./+types/library";
+import type { Route } from "./+types/music";
 import { PageHeader } from "../components/ui/pageHeader";
 import { sectionHeadingClasses } from "../components/ui/classes";
 import { YourTakes } from "../components/features/yourTakes";
@@ -26,28 +26,27 @@ import { ComposerList } from "../components/features/composerList";
 import { fieldClasses } from "../components/ui/classes";
 
 export function meta(_args: Route.MetaArgs) {
-    return routeMeta(m.library_title(), m.meta_library_description());
+    return routeMeta(m.music_title(), m.meta_music_description());
 }
 
-// The library's two jobs as two tabs: Search finds something to play in the
+// Music's two jobs as two tabs: Search finds something to play in the
 // combined catalogue; Manage grows it (add your own score) and keeps it safe
 // (backup and restore). ?tab=manage deep-links straight to the second.
-type LibraryTab = "search" | "people" | "manage";
+type MusicTab = "search" | "people" | "manage";
 
-export default function LibraryRoute() {
+export default function MusicRoute() {
     const favoritesStore = useFavoritesStore();
-    const { items, mastery, loaded, remove, assignmentsUsing } = useLibraryItems();
+    const { items, mastery, loaded, remove, assignmentsUsing } = useMusicItems();
     const [searchParams, setSearchParams] = useSearchParams();
     // ?grade=6 opens the shelf on that grade — the roadmap's rows link here, so pressing
     // a grade you have not reached lands on its pieces rather than on an explanation.
-    const filters = useLibraryFilters(items, mastery);
+    const filters = useMusicFilters(items, mastery);
     const searchRef = useRef<HTMLInputElement>(null);
     // The tab rides in the address beside the filters, so a piece opened from the shelf and
     // then left comes back to the list it was opened from.
     const param = searchParams.get("tab");
-    const tab: LibraryTab =
-        param === "manage" ? "manage" : param === "people" ? "people" : "search";
-    const setTab = (next: LibraryTab) =>
+    const tab: MusicTab = param === "manage" ? "manage" : param === "people" ? "people" : "search";
+    const setTab = (next: MusicTab) =>
         setSearchParams(
             (prev) => {
                 const kept = Object.fromEntries(prev);
@@ -69,8 +68,8 @@ export default function LibraryRoute() {
             return m.action_remove_confirm();
         }
         return used === 1
-            ? m.library_remove_used_one({ count: used })
-            : m.library_remove_used_other({ count: used });
+            ? m.music_remove_used_one({ count: used })
+            : m.music_remove_used_other({ count: used });
     };
 
     // The composers this shelf actually holds, grouped from the same items it lists — so
@@ -84,17 +83,17 @@ export default function LibraryRoute() {
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
-            <PageHeader title={m.library_title()} hint={m.library_intro()} />
+            <PageHeader title={m.music_title()} hint={m.music_intro()} />
 
             <SegmentedControl
                 options={[
-                    { id: "search", label: m.library_tab_search() },
-                    { id: "people", label: m.library_tab_people() },
-                    { id: "manage", label: m.library_tab_manage() },
+                    { id: "search", label: m.music_tab_search() },
+                    { id: "people", label: m.music_tab_people() },
+                    { id: "manage", label: m.music_tab_manage() },
                 ]}
                 value={tab}
                 onChange={setTab}
-                label={m.library_tabs_label()}
+                label={m.music_tabs_label()}
             />
 
             {/* One search box for two lists: the same words find a piece or the person
@@ -113,7 +112,7 @@ export default function LibraryRoute() {
 
             {tab === "people" && (
                 <div className="space-y-3">
-                    <p className="text-sm text-muted">{m.library_people_hint()}</p>
+                    <p className="text-sm text-muted">{m.music_people_hint()}</p>
                     <ComposerList people={people} query={filters.applied} />
                 </div>
             )}
@@ -135,7 +134,7 @@ export default function LibraryRoute() {
                 </>
             ) : tab === "people" ? null : (
                 <>
-                    <LibraryFilters
+                    <MusicFilters
                         kind={filters.kind}
                         onKind={filters.setKind}
                         grades={filters.grades}
@@ -167,7 +166,7 @@ export default function LibraryRoute() {
                                     {matches.slice(0, visible).map((item) => {
                                         const entry = mastery[item.id];
                                         return (
-                                            <LibraryRow
+                                            <MusicRow
                                                 key={item.id}
                                                 item={item}
                                                 starred={filters.favorites.has(item.id)}
@@ -195,7 +194,7 @@ export default function LibraryRoute() {
 
                             <Show when={visible < matches.length}>
                                 <Button variant="secondary" onClick={filters.showMore}>
-                                    {m.library_show_more()}
+                                    {m.music_show_more()}
                                 </Button>
                             </Show>
                         </>

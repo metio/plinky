@@ -14,7 +14,7 @@ export default [
         route("compose", "routes/compose.tsx"),
         route("daily", "routes/daily.tsx"),
         route("ear", "routes/ear.tsx"),
-        route("music", "routes/library.tsx"),
+        route("music", "routes/music.tsx"),
         route("assignments", "routes/assignments.tsx"),
         route("collect", "routes/collect.tsx"),
         route("stats", "routes/stats.tsx"),

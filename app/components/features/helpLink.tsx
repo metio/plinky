@@ -16,7 +16,7 @@ export function helpAnchorFor(pathname: string): string {
     if (rest.startsWith("/play")) return "play";
     if (rest.startsWith("/compose")) return "compose";
     if (rest.startsWith("/daily")) return "daily";
-    if (rest.startsWith("/music")) return "library";
+    if (rest.startsWith("/music")) return "music";
     if (rest.startsWith("/learn")) return "learn";
     if (rest.startsWith("/assignments")) return "assignments";
     if (rest.startsWith("/stats")) return "you";

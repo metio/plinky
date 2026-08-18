@@ -4,14 +4,14 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LibraryFilters } from "./libraryFilters";
+import { MusicFilters } from "./musicFilters";
 import { m } from "../../paraglide/messages.js";
 
 const noop = () => {};
 
-const mount = (overrides: Partial<Parameters<typeof LibraryFilters>[0]> = {}) =>
+const mount = (overrides: Partial<Parameters<typeof MusicFilters>[0]> = {}) =>
     render(
-        <LibraryFilters
+        <MusicFilters
             kind=""
             onKind={noop}
             grades={new Set<number>()}
@@ -30,7 +30,7 @@ const mount = (overrides: Partial<Parameters<typeof LibraryFilters>[0]> = {}) =>
 
 afterEach(cleanup);
 
-describe("LibraryFilters", () => {
+describe("MusicFilters", () => {
     it("reports the picked kind, and All clears it", () => {
         const onKind = vi.fn();
         mount({ kind: "study", onKind });
@@ -74,7 +74,7 @@ describe("LibraryFilters", () => {
     it("offers a filter for what has not been tried yet", () => {
         const onToggle = vi.fn();
         mount({ onToggleFreshOnly: onToggle });
-        const chip = screen.getByRole("button", { name: m.library_filter_fresh() });
+        const chip = screen.getByRole("button", { name: m.music_filter_fresh() });
         expect(chip.getAttribute("aria-pressed")).toBe("false");
         fireEvent.click(chip);
         expect(onToggle).toHaveBeenCalledTimes(1);

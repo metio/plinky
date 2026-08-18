@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { ReactNode } from "react";
-import type { LibraryKind } from "../../../core/library";
+import type { MusicKind } from "../../../core/music";
 import { MAX_GRADE } from "../../../core/scoreDifficulty";
 import { m } from "../../paraglide/messages.js";
 import { Chip } from "../ui/chip";
@@ -25,8 +25,8 @@ function FilterGroup({ label, children }: { label: string; children: ReactNode }
 }
 
 type LibraryFiltersProps = {
-    kind: LibraryKind | "";
-    onKind: (kind: LibraryKind | "") => void;
+    kind: MusicKind | "";
+    onKind: (kind: MusicKind | "") => void;
     grades: ReadonlySet<number>;
     onToggleGrade: (grade: number) => void;
     onClearGrades: () => void;
@@ -43,7 +43,7 @@ type LibraryFiltersProps = {
 // The library's filter bar: three labelled groups so the chips read as
 // Kind / Grade / Show rather than one undifferentiated wall, and the toggles
 // (Show) sit apart from the single-select Kind and multi-select Grade.
-export function LibraryFilters({
+export function MusicFilters({
     kind,
     onKind,
     grades,
@@ -59,16 +59,16 @@ export function LibraryFilters({
 }: LibraryFiltersProps) {
     return (
         <>
-            <FilterGroup label={m.library_group_kind()}>
+            <FilterGroup label={m.music_group_kind()}>
                 <Chip selected={kind === ""} onClick={() => onKind("")}>
                     {m.scores_filter_all()}
                 </Chip>
                 {(
                     [
-                        ["song", m.library_kind_songs()],
-                        ["scale-arpeggio", m.library_kind_scales()],
-                        ["study", m.library_kind_studies()],
-                    ] as [LibraryKind, string][]
+                        ["song", m.music_kind_songs()],
+                        ["scale-arpeggio", m.music_kind_scales()],
+                        ["study", m.music_kind_studies()],
+                    ] as [MusicKind, string][]
                 ).map(([value, label]) => (
                     <Chip key={value} selected={kind === value} onClick={() => onKind(value)}>
                         {label}
@@ -76,7 +76,7 @@ export function LibraryFilters({
                 ))}
             </FilterGroup>
 
-            <FilterGroup label={m.library_group_grade()}>
+            <FilterGroup label={m.music_group_grade()}>
                 <Chip selected={grades.size === 0} onClick={onClearGrades}>
                     {m.scores_filter_all()}
                 </Chip>
@@ -94,7 +94,7 @@ export function LibraryFilters({
                 ))}
             </FilterGroup>
 
-            <FilterGroup label={m.library_group_show()}>
+            <FilterGroup label={m.music_group_show()}>
                 <Chip
                     selected={favoritesOnly}
                     aria-pressed={favoritesOnly}
@@ -106,11 +106,11 @@ export function LibraryFilters({
                     pieces have no history at all. Unlike "due", it is worth offering from
                     the first visit: on a fresh device it simply matches everything. */}
                 <Chip selected={freshOnly} aria-pressed={freshOnly} onClick={onToggleFreshOnly}>
-                    {m.library_filter_fresh()}
+                    {m.music_filter_fresh()}
                 </Chip>
                 <Show when={showDue}>
                     <Chip selected={dueOnly} aria-pressed={dueOnly} onClick={onToggleDueOnly}>
-                        {m.library_filter_due()}
+                        {m.music_filter_due()}
                     </Chip>
                 </Show>
             </FilterGroup>

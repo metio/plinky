@@ -14,7 +14,7 @@ import { createAssignmentsStore } from "../stores/assignmentsStore";
 import { createMasteryStore } from "../stores/masteryStore";
 import type { ExerciseSource } from "../stores/exerciseSource";
 import type { SongSource } from "../stores/songSource";
-import { useLibraryItems } from "./useLibraryItems";
+import { useMusicItems } from "./useMusicItems";
 
 // Only `manifest` is exercised; the rest of each source is unused here.
 const source = <T,>(manifest: () => Promise<unknown>): T => ({ manifest }) as unknown as T;
@@ -32,14 +32,14 @@ const emptySources = () => ({
     songs: source<SongSource>(() => Promise.resolve([])),
 });
 
-describe("useLibraryItems", () => {
+describe("useMusicItems", () => {
     it("reads the opening bars off every score held on the device", async () => {
         // Catalogue songs carry a baked incipit; the bundled demos and anything imported
         // have none, so the library row has to read it from the score itself.
         const store = memoryStore();
         saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
         const { exercises, songs } = emptySources();
-        const { result } = renderHook(() => useLibraryItems(), {
+        const { result } = renderHook(() => useMusicItems(), {
             wrapper: wrap(store, exercises, songs),
         });
         await waitFor(() => expect(result.current.loaded).toBe(true));
@@ -60,7 +60,7 @@ describe("useLibraryItems", () => {
         const songs = source<SongSource>(() =>
             Promise.resolve([{ id: "song-1", title: "Air", composer: "Bach", grade: 3 }]),
         );
-        const { result } = renderHook(() => useLibraryItems(), {
+        const { result } = renderHook(() => useMusicItems(), {
             wrapper: wrap(store, exercises, songs),
         });
         await waitFor(() => expect(result.current.loaded).toBe(true));
@@ -87,7 +87,7 @@ describe("useLibraryItems", () => {
         saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
         const pending = source<ExerciseSource>(() => new Promise(() => {}));
         const songs = source<SongSource>(() => Promise.resolve([]));
-        const { result } = renderHook(() => useLibraryItems(), {
+        const { result } = renderHook(() => useMusicItems(), {
             wrapper: wrap(store, pending, songs),
         });
         expect(result.current.loaded).toBe(false);
@@ -99,7 +99,7 @@ describe("useLibraryItems", () => {
         const store = memoryStore();
         const exercises = source<ExerciseSource>(() => Promise.resolve(null));
         const songs = source<SongSource>(() => Promise.resolve(null));
-        const { result } = renderHook(() => useLibraryItems(), {
+        const { result } = renderHook(() => useMusicItems(), {
             wrapper: wrap(store, exercises, songs),
         });
         await waitFor(() => expect(result.current.loaded).toBe(true));
@@ -111,7 +111,7 @@ describe("useLibraryItems", () => {
         const score = buildScore(domXmlCodec, USER_XML, []);
         saveUserScore(store, score);
         const { exercises, songs } = emptySources();
-        const { result } = renderHook(() => useLibraryItems(), {
+        const { result } = renderHook(() => useMusicItems(), {
             wrapper: wrap(store, exercises, songs),
         });
         await waitFor(() => expect(result.current.loaded).toBe(true));
@@ -139,7 +139,7 @@ describe("useLibraryItems", () => {
             makeAssignment({ id: "set", name: "Set", items: [{ id: score.id }] }),
         );
         const { exercises, songs } = emptySources();
-        const { result } = renderHook(() => useLibraryItems(), {
+        const { result } = renderHook(() => useMusicItems(), {
             wrapper: wrap(store, exercises, songs),
         });
         await waitFor(() => expect(result.current.loaded).toBe(true));

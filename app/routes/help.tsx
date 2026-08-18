@@ -69,11 +69,11 @@ const SECTIONS: {
     { key: "playSetup", title: m.help_section_play_setup, text: m.help_text_play_setup },
     { key: "playGrading", title: m.help_section_play_grading, text: m.help_text_play_grading },
     {
-        key: "library",
-        title: m.library_title,
-        text: m.help_text_library,
-        image: "library",
-        imageAlt: m.help_shot_library,
+        key: "music",
+        title: m.music_title,
+        text: m.help_text_music,
+        image: "music",
+        imageAlt: m.help_shot_music,
     },
     {
         key: "learn",

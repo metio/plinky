@@ -66,7 +66,7 @@ export function meta({ params }: Route.MetaArgs) {
         tags.push({
             "script:ld+json": breadcrumbData(locale, [
                 { name: m.nav_today(), path: "/" },
-                { name: m.library_title(), path: "/music/" },
+                { name: m.music_title(), path: "/music/" },
                 { name: person.name, path: `/person/${person.slug}/` },
             ]),
         });
@@ -195,7 +195,7 @@ export default function PersonPage() {
                             to="/music"
                             className="font-medium text-accent-strong hover:underline"
                         >
-                            {m.library_title()}
+                            {m.music_title()}
                         </Link>
                     </p>
                 )

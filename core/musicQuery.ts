@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { EMPTY_LIBRARY_FILTER, type LibraryFilter, type LibraryKind } from "./library";
+import { EMPTY_MUSIC_FILTER, type MusicFilter, type MusicKind } from "./music";
 import { MAX_GRADE } from "./scoreDifficulty";
 
 // The shelf's filters, read from and written to the page's own address.
@@ -15,7 +15,7 @@ import { MAX_GRADE } from "./scoreDifficulty";
 // the same thing with one entry: the roadmap's `?grade=6` keeps meaning what it always
 // meant.
 
-const KINDS: readonly LibraryKind[] = ["song", "scale-arpeggio", "study"];
+const KINDS: readonly MusicKind[] = ["song", "scale-arpeggio", "study"];
 
 function grades(raw: string | undefined): ReadonlySet<number> {
     const found = (raw ?? "")
@@ -25,11 +25,11 @@ function grades(raw: string | undefined): ReadonlySet<number> {
     return new Set(found);
 }
 
-export function readLibraryFilter(params: Readonly<Record<string, string>>): LibraryFilter {
+export function readMusicFilter(params: Readonly<Record<string, string>>): MusicFilter {
     const kind = params.kind ?? "";
     return {
         query: params.q ?? "",
-        kind: (KINDS as readonly string[]).includes(kind) ? (kind as LibraryKind) : "",
+        kind: (KINDS as readonly string[]).includes(kind) ? (kind as MusicKind) : "",
         grades: grades(params.grade),
         favoritesOnly: params.starred === "1",
         dueOnly: params.due === "1",
@@ -39,12 +39,12 @@ export function readLibraryFilter(params: Readonly<Record<string, string>>): Lib
 
 // Only what differs from the plain shelf, so an unfiltered library keeps a clean address
 // and every filter that is on can be read off the link.
-export function libraryFilterParams(filter: LibraryFilter): Record<string, string> {
+export function musicFilterParams(filter: MusicFilter): Record<string, string> {
     const params: Record<string, string> = {};
-    if (filter.query !== EMPTY_LIBRARY_FILTER.query) {
+    if (filter.query !== EMPTY_MUSIC_FILTER.query) {
         params.q = filter.query;
     }
-    if (filter.kind !== EMPTY_LIBRARY_FILTER.kind) {
+    if (filter.kind !== EMPTY_MUSIC_FILTER.kind) {
         params.kind = filter.kind;
     }
     if (filter.grades.size > 0) {

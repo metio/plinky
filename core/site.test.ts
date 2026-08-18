@@ -125,7 +125,7 @@ describe("breadcrumbData", () => {
     it("numbers the trail and makes each crumb a locale-prefixed URL", () => {
         const data = breadcrumbData("en", [
             { name: "Home", path: "/" },
-            { name: "Library", path: "/library/" },
+            { name: "Music", path: "/music/" },
             { name: "Chopin", path: "/person/frederic-chopin/" },
         ]);
         expect(data["@type"]).toBe("BreadcrumbList");
@@ -146,11 +146,11 @@ describe("withTrailingSlash", () => {
     it("leaves an already-slashed path untouched", () => {
         expect(withTrailingSlash("/de/")).toBe("/de/");
         expect(withTrailingSlash("/de/daily/")).toBe("/de/daily/");
-        expect(withTrailingSlash("/de/library/?tab=manage")).toBe("/de/library/?tab=manage");
+        expect(withTrailingSlash("/de/music/?tab=manage")).toBe("/de/music/?tab=manage");
     });
 
     it("keeps a query or fragment after the slash", () => {
-        expect(withTrailingSlash("/de/library?tab=manage")).toBe("/de/library/?tab=manage");
+        expect(withTrailingSlash("/de/music?tab=manage")).toBe("/de/music/?tab=manage");
         expect(withTrailingSlash("/de/help#daily")).toBe("/de/help/#daily");
         expect(withTrailingSlash("/de/play/abc?mode=ear#top")).toBe("/de/play/abc/?mode=ear#top");
     });
