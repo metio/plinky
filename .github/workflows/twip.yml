@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: The Plinky Authors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+---
+name: This week in Plinky
+# Sunday evening UTC, after the week it reports on has finished.
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: 17 18 * * SUN
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Render the post without submitting it
+        type: boolean
+        default: true
+      on-date:
+        description: The day to report up to (YYYY-MM-DD); today if blank
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  post:
+    name: post
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: metio/nix-devshell@1976169d4c51b321be318ade369ccf689849f9f0 # 2026.7.6091757
+      - run: nix develop --command npm ci
+      # A dispatch defaults to a dry run, so seeing what would go out never risks
+      # sending it; the schedule posts for real. A week with nothing worth posting
+      # exits without submitting rather than announcing that nothing happened.
+      - run: nix develop --command ci-twip ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run && '--dry-run' || '' }} ${{ inputs.on-date }}
+        env:
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
