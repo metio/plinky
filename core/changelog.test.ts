@@ -133,14 +133,34 @@ describe("roundUp", () => {
         release({ date: "2026-08-10", entries: [{ body: "**Too old.** Yes.", twip: true }] }),
     ];
 
-    it("covers the week up to and including the day seven back", () => {
-        // Inclusive at both ends: a run firing weekly on the same weekday would otherwise
-        // drop whatever shipped on the morning it last ran.
+    it("covers seven days, ending the day before the last run's", () => {
+        // The far end is exclusive so consecutive runs tile rather than overlap: 08-11 is
+        // exactly seven days back, which the run of 08-11 already covered as its own day.
         expect(roundUp(week, "2026-08-18", 7).map((one) => one.date)).toEqual([
             "2026-08-18",
             "2026-08-14",
-            "2026-08-11",
         ]);
+    });
+
+    it("posts no release twice across consecutive weekly runs", () => {
+        // The property that matters more than either boundary: run it every seven days
+        // and each release appears in exactly one round-up.
+        const every: string[] = [];
+        for (const day of ["2026-08-11", "2026-08-18"]) {
+            for (const release of roundUp(week, day, 7)) {
+                every.push(release.date);
+            }
+        }
+        expect(every).toEqual([...new Set(every)]);
+        expect(every).toContain("2026-08-11");
+        expect(every).toContain("2026-08-18");
+    });
+
+    it("covers nothing at all for a day that is not a real day", () => {
+        // daysBetween reports 0 for a date it cannot read, which without this guard puts
+        // every release ever written inside the window — the whole changelog, posted.
+        expect(roundUp(week, "2026-18-08", 7)).toEqual([]);
+        expect(roundUp(week, "not-a-day", 7)).toEqual([]);
     });
 
     it("leaves out an entry that asked to stay out", () => {
@@ -165,16 +185,16 @@ describe("roundUp", () => {
         expect(roundUp(releases, "2026-08-18", 7)).toEqual([]);
     });
 
-    it("is empty for a week that shipped nothing worth posting", () => {
-        // What stops the round-up posting "nothing happened" every week.
-        expect(roundUp(week, "2026-09-30", 7)).toEqual([]);
-    });
-
     it("ignores a release dated after the round-up's day", () => {
         expect(roundUp(week, "2026-08-12", 7).map((one) => one.date)).toEqual([
             "2026-08-11",
             "2026-08-10",
         ]);
+    });
+
+    it("is empty for a week that shipped nothing worth posting", () => {
+        // What stops the round-up posting "nothing happened" every week.
+        expect(roundUp(week, "2026-09-30", 7)).toEqual([]);
     });
 });
 

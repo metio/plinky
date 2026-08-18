@@ -51,7 +51,22 @@ if (current === rendered) {
     process.exit(0);
 }
 
-const at = [...rendered].findIndex((character, index) => character !== current[index]);
+// Where the two first disagree, counted in the units a string is actually indexed by.
+// Spreading into an array walks code points while the comparison indexes code units, so
+// the two disagree the moment anything outside the basic plane appears — and findIndex
+// answers -1 when one file is merely the other with something added, which is the case
+// most likely to be reported and the one that would point nowhere.
+const firstDifference = (one: string, other: string): number => {
+    const shared = Math.min(one.length, other.length);
+    for (let index = 0; index < shared; index++) {
+        if (one[index] !== other[index]) {
+            return index;
+        }
+    }
+    return shared;
+};
+
+const at = firstDifference(rendered, current);
 console.error(
     `${NEWS_FILE} does not match ${CHANGELOG_FILE}. Run \`npm run news\` and commit the result.\n` +
         `First difference at character ${at}:\n` +
