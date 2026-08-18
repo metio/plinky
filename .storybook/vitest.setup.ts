@@ -54,15 +54,39 @@ const RASTER_UNSTABLE_STORIES = new Set([
 const painted = () =>
     new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
+// The element a story renders into, which is what gets compared.
+//
+// Storybook keeps four zero-sized `sb-wrapper` divs on the body for its own
+// preparing and error displays; the story's container is the remaining one.
+//
+// Comparing this rather than `document.body` is what makes the comparison mean
+// anything. `allowedMismatchedPixelRatio` is a fraction of the frame, so a body
+// shot spends it on empty page: at a 800x600 viewport the allowance is a few
+// thousand pixels, and a small control — an icon button, a badge, a row — draws
+// fewer than that, so it could change beyond recognition and still match. Cropped
+// to the story's own bounds, the allowance is a fraction of the component.
+//
+// A story whose content leaves the container — a portal, a `fixed` overlay, an
+// element the viewport width hides — draws nothing inside it, so there the whole
+// viewport is the only thing there is to compare and the body stands in.
+const storyRoot = () => {
+    const root = document.querySelector("body > div:not(.sb-wrapper)");
+    if (!(root instanceof HTMLElement)) {
+        throw new Error("no story container on the body");
+    }
+    const box = root.getBoundingClientRect();
+    const target = box.width > 0 && box.height > 0 ? root : document.body;
+    return page.elementLocator(target);
+};
+
 // Every story doubles as a visual regression test in both themes: after it
-// renders (and any play function has run), the rendered document is compared
-// against a committed per-story baseline, then the `.dark` class — the same
-// switch the app's theme store flips — goes on the root element and a second,
-// `-dark`-named baseline is compared. The project runs only on chromium pinned
-// by the flake, so local and CI rasterize with the same engine; the preview
-// self-hosts the fonts (awaited here) and freezes animations, which is what
-// makes a pixel comparison meaningful. Refresh baselines with
-// `npm run test:storybook -- -u`.
+// renders (and any play function has run), what it rendered is compared against a
+// committed per-story baseline, then the `.dark` class — the same switch the app's
+// theme store flips — goes on the root element and a second, `-dark`-named
+// baseline is compared. The project runs only on chromium pinned by the flake, so
+// local and CI rasterize with the same engine; the preview self-hosts the fonts
+// (awaited here) and freezes animations, which is what makes a pixel comparison
+// meaningful. Refresh baselines with `npm run test:storybook -- -u`.
 afterEach(async (ctx) => {
     const key = `${ctx.task.file.name.split("/").pop()} > ${ctx.task.name}`;
     if (EMOJI_STORIES.has(key) || RASTER_UNSTABLE_STORIES.has(key)) {
@@ -84,14 +108,14 @@ afterEach(async (ctx) => {
     await painted();
     // Headroom for the retries a genuinely slow render still needs.
     const options = { timeout: 15_000 };
-    const body = page.elementLocator(document.body);
+    const story = storyRoot();
     try {
-        await expect(body).toMatchScreenshot(options);
+        await expect(story).toMatchScreenshot(options);
         document.documentElement.classList.add("dark");
         // The theme flip restyles the whole tree; the same first-capture rule
         // applies, so let it reach the screen before comparing.
         await painted();
-        await expect(body).toMatchScreenshot(`${ctx.task.name}-dark`, options);
+        await expect(story).toMatchScreenshot(`${ctx.task.name}-dark`, options);
     } finally {
         document.documentElement.classList.remove("dark");
     }
