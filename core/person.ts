@@ -75,6 +75,7 @@ const ALIASES: Record<string, string> = {
     // than a catalogue mark.
     "maurice ravel m. 19": "Maurice Ravel",
     "nikolai andreyevitch rimsky-korsakov": "Nikolai Rimsky-Korsakov",
+    "turlough carolan": "Turlough O'Carolan",
     "frédérick chopin": "Frédéric Chopin",
     "g. f. händel": "George Frideric Handel",
     "georg friedrich händel": "George Frideric Handel",
@@ -165,7 +166,7 @@ export function canonicalComposer(raw: string): string {
 // link, no page. Matched as words anywhere in the credit, so an enriched
 // attribution ("Traditional — …, 1761") stays a non-person too.
 const NOT_A_PERSON =
-    /\b(trad|traditional|traditionnel|anonymous|anonymus|anon|volkslied|gregorian|plainchant|folk\s?song|spiritual|shanty)\b/i;
+    /\b(trad|traditional|traditionnel|anonymous|anonymus|anonimo|anónimo|anon|volkslied|gregorian|plainchant|folk\s?song|spiritual|shanty)\b/i;
 
 // The longest a credit can be and still be somebody's name. Real ones run well under
 // this — the catalogue's longest genuine composer is "Corona Elisabeth Wilhelmine

@@ -23,6 +23,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { bakePeopleIndex } from "./bake-people.mts";
 import { curate, loadCuration, unapplied } from "./curation.mts";
+import { tidied, tidyCredit, tidyTitle } from "./titles.mts";
 import { gradeForCost, octileBoundaries } from "./grading.mts";
 
 const MAX_GRADE = 8;
@@ -55,11 +56,19 @@ async function main() {
     // The hand-made corrections, applied before anything is derived from the credits.
     // A problem here stops both modes: a curation nobody can apply is one nobody can
     // evaluate either, and silently skipping it is how the file would rot.
+    // The mechanical tidying first — entities, links, a missing capital — then the
+    // hand-written corrections on top, so a curated title is always the last word.
+    const tidy = <T extends { title?: string; composer?: string }>(entry: T): T => ({
+        ...entry,
+        ...(entry.title === undefined ? {} : { title: tidied(entry.title, tidyTitle) }),
+        ...(entry.composer === undefined ? {} : { composer: tidied(entry.composer, tidyCredit) }),
+    });
+
     const curation = await loadCuration();
     // Both manifests, because a study is as correctable as a song and the file does not
     // distinguish them — an id belongs to whichever catalogue holds it.
-    const correctedSongs = curate(songs, curation.curations);
-    const correctedExercises = curate(exercises, curation.curations);
+    const correctedSongs = curate(songs.map(tidy), curation.curations);
+    const correctedExercises = curate(exercises.map(tidy), curation.curations);
     const curationProblems = [
         ...curation.problems,
         ...unapplied(curation.curations, new Set([...correctedSongs.applied, ...correctedExercises.applied])),
