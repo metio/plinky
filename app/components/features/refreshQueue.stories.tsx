@@ -3,7 +3,6 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
-import { MemoryRouter } from "react-router";
 import { RefreshQueue } from "./refreshQueue";
 
 // What is due for review, and the empty state that says nothing is. The empty one earns
@@ -12,13 +11,7 @@ import { RefreshQueue } from "./refreshQueue";
 const meta: Meta<typeof RefreshQueue> = {
     title: "Features/RefreshQueue",
     component: RefreshQueue,
-    decorators: [
-        (Story: () => ReactNode) => (
-            <MemoryRouter>
-                <div className="max-w-xl">{Story()}</div>
-            </MemoryRouter>
-        ),
-    ],
+    decorators: [(Story: () => ReactNode) => <div className="max-w-xl">{Story()}</div>],
 };
 export default meta;
 
