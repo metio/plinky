@@ -105,11 +105,20 @@ export default function Compose() {
 
     // A shared composition arrives as ?c=<code>; load it once so it can be viewed,
     // played, extended, re-exported and re-shared.
+    //
+    // Once per code, tracked here rather than left to the effect running once. The
+    // dependency is the whole search-param object, so it re-runs whenever anything in the
+    // address changes — and every re-run applied the shared notes again, over whatever
+    // the player had done to them since. Nothing on this page writes a parameter today,
+    // which is the only reason it has never happened; the guard is what makes that a fact
+    // about the code rather than a fact about the current URL.
+    const loadedCodeRef = useRef<string | null>(null);
     useEffect(() => {
         const code = searchParams.get("c");
-        if (!code) {
+        if (!code || loadedCodeRef.current === code) {
             return;
         }
+        loadedCodeRef.current = code;
         const loaded = decodeComposition(code);
         if (loaded) {
             recorder.load(loaded.notes);
