@@ -78,8 +78,10 @@ small screen, or switch to **treadmill** reading — the piece laid out as one c
 line that scrolls under a fixed gaze as you play, so your eyes rest in one place. Turn on
 the **notes highway** and the staff gives way to a tall lane of the upcoming notes,
 descending in each key's column toward the keys as you play (Synthesia-style, two hands
-coloured apart) — so a beginner can see which key comes next without decoding the staff;
-it advances by position, so it stays self-paced.
+coloured apart) — so a beginner can see which key comes next without decoding the staff.
+Each block is as tall as its note is long and sits as far up the lane as it is far off in
+the music, so a whole note held in the left hand stands over the run of quavers above it.
+It advances by position rather than on a clock, so it stays self-paced.
 **Bar
 numbers** on each row's first bar make a passage easy to find (and line up with the
 loop's from/to), or you can turn them off for a cleaner staff. **Beams** — the bars

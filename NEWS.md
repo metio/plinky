@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 18 August 2026
 
+**The notes highway shows how long each note lasts.** Blocks used to be all the same
+size, one per note, however long the note was — so a whole note held in your left hand
+looked exactly like a semiquaver, and the falling picture could tell you which key came
+next but nothing about the shape of the music. Now a block is as tall as its note is
+long, and sits as far up the lane as it is far off, so a held bass stands over the run of
+quavers above it. Each note of a chord gets its own length too, which is the ordinary
+case for two hands. It still waits for you rather than running on a clock.
+
 **Opening bars follow your colour setting everywhere they appear.** If you have the
 noteheads coloured by note name, the little opening-bar marks are coloured too — in the
 music list, on home, in your stats and takes, on assignment cards, in the refresh queue
