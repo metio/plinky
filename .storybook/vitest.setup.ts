@@ -5,6 +5,7 @@ import { setProjectAnnotations } from "@storybook/react-vite";
 import { page } from "vitest/browser";
 import { afterEach, beforeAll, expect } from "vitest";
 import projectAnnotations from "./preview";
+import { type Box, holds, mayDescend, union } from "../core/storyCrop";
 
 // Apply the preview's decorators and parameters when running stories as tests.
 const project = setProjectAnnotations([projectAnnotations]);
@@ -73,25 +74,71 @@ const storyRoot = () => {
     return root;
 };
 
-const area = (el: Element) => {
+const boxOf = (el: Element): Box => el.getBoundingClientRect();
+
+const drawn = (el: Element) => {
     const box = el.getBoundingClientRect();
-    return box.width * box.height;
+    return box.width > 0 && box.height > 0;
 };
 
-const drawn = (el: Element) => area(el) > 0;
+// Everything the story put on screen, as one rectangle — anything that left its parent's
+// box included, since that is precisely what a crop must not lose.
+const drawnBounds = (root: Element): Box | null => {
+    let bounds: Box | null = null;
+    for (const el of [root, ...root.querySelectorAll("*")]) {
+        if (drawn(el)) {
+            bounds = bounds === null ? boxOf(el) : union(bounds, boxOf(el));
+        }
+    }
+    return bounds;
+};
 
-// The tightest element that still holds everything the story drew.
+// Whether the element draws anything of its own — a ground, an edge, a shadow. If it
+// does, it IS the picture, and the shape inside it is only part of one.
+const paints = (el: Element): boolean => {
+    const style = getComputedStyle(el);
+    if (style.backgroundImage !== "none") {
+        return true;
+    }
+    if (style.backgroundColor !== "rgba(0, 0, 0, 0)" && style.backgroundColor !== "transparent") {
+        return true;
+    }
+    if (style.boxShadow !== "none" || style.outlineStyle !== "none") {
+        return true;
+    }
+    return (["Top", "Right", "Bottom", "Left"] as const).some(
+        (side) =>
+            style[`border${side}Style`] !== "none" &&
+            Number.parseFloat(style[`border${side}Width`]) > 0,
+    );
+};
+
+// Whether the element carries text of its own, alongside whatever element sits in it.
+// A verdict card is a badge and a sentence; descending to the badge drops the sentence.
+const hasOwnText = (el: Element): boolean =>
+    Array.from(el.childNodes).some(
+        (node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim() !== "",
+    );
+
+// The tightest box that is still a picture of the story.
 //
-// The container Storybook renders into is a plain block div, so it is as wide as the
-// viewport whatever sits in it — and the allowance is a fraction of what gets captured,
-// which a lone icon button in a full-width box spends on the empty margin either side.
-// Where an element has one drawn child occupying strictly less space, that child is the
-// same picture in a smaller frame, so the crop follows it down. A branch is where the
-// composition itself starts, and the descent stops there.
-const tightest = (el: Element): Element => {
+// The container Storybook renders into is a plain block div, as wide as the viewport
+// whatever sits in it, and the allowance is a fraction of what gets captured — which a
+// lone icon button in a full-width box spends on the empty margin either side. So the
+// crop follows a lone child down. What it must not do is follow it all the way: an
+// `<svg>` reports its shapes' geometry rather than a layout box, so descending into one
+// lands on a stroke outline, which is ~100% ink and asserts nothing about the control
+// drawn around it. Every guard here marks a place where the thing being looked at ends.
+const tightest = (el: Element, all: Box): Element => {
+    if (el instanceof SVGElement || paints(el) || hasOwnText(el)) {
+        return el;
+    }
     const children = Array.from(el.children).filter(drawn);
     const only = children.length === 1 ? children[0] : undefined;
-    return only && area(only) < area(el) ? tightest(only) : el;
+    if (!only || !mayDescend(boxOf(el), boxOf(only), all)) {
+        return el;
+    }
+    return tightest(only, all);
 };
 
 // The outermost thing the story actually put on screen inside its container, when the
@@ -123,10 +170,16 @@ const PHONE = { width: 390, height: 844 };
 // Both sizes are fixed, so a baseline stays reproducible either way; the box to return
 // to is read rather than restated, so it cannot drift from what the project renders at.
 const captureTarget = async (root: HTMLElement) => {
-    const of = (target: Element, restore: { width: number; height: number } | null) => ({
-        locator: page.elementLocator(tightest(target)),
-        restore,
-    });
+    // A frame that cannot hold everything drawn is not a frame for this story: content
+    // out of the flow — an open menu hanging below its trigger — would be cropped away,
+    // and the baseline that lost it agrees with every future render that loses it too.
+    // The whole viewport is the fallback, because it is the only box that holds anything.
+    const of = (target: Element, restore: { width: number; height: number } | null) => {
+        const all = drawnBounds(target);
+        const frame =
+            all !== null && holds(boxOf(target), all) ? tightest(target, all) : document.body;
+        return { locator: page.elementLocator(frame), restore };
+    };
     const inFlow = drawn(root) ? root : drawnInside(root);
     if (inFlow) {
         return of(inFlow, null);
