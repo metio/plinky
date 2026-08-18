@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Subida una octava para caber en tu teclado",
     "play_fit_up_other": "Subida {count} octavas para caber en tu teclado",
     "play_fit_beyond": "Esta pieza se sale de tu teclado por los dos lados, así que suena tal como está escrita",
-    "run_group_pace_title": "Manos y ritmo"
+    "run_group_pace_title": "Manos y ritmo",
+    "step_entry": "Escribirla nota a nota",
+    "step_entry_caption": "Las teclas dan la altura y tú dices cuánto dura, así una pieza que aún no puedes tocar rápido sale a tiempo igualmente. Las teclas pulsadas a la vez forman un acorde.",
+    "step_value": "Duración",
+    "step_value_whole": "Redonda",
+    "step_value_half": "Blanca",
+    "step_value_quarter": "Negra",
+    "step_value_eighth": "Corchea",
+    "step_value_sixteenth": "Semicorchea",
+    "step_dotted": "Con puntillo",
+    "step_dotted_caption": "La mitad más larga.",
+    "step_rest": "Añadir un silencio",
+    "step_back": "Quitar la última"
 }

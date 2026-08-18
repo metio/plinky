@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Alzato di un'ottava per stare sulla tua tastiera",
     "play_fit_up_other": "Alzato di {count} ottave per stare sulla tua tastiera",
     "play_fit_beyond": "Questo brano esce dalla tua tastiera da entrambi i lati, quindi suona com'è scritto",
-    "run_group_pace_title": "Mani e andatura"
+    "run_group_pace_title": "Mani e andatura",
+    "step_entry": "Scriverla nota per nota",
+    "step_entry_caption": "I tasti danno l'altezza e tu dici quanto dura, così un brano che non riesci ancora a suonare veloce esce comunque a tempo. I tasti premuti insieme fanno un accordo.",
+    "step_value": "Durata",
+    "step_value_whole": "Semibreve",
+    "step_value_half": "Minima",
+    "step_value_quarter": "Semiminima",
+    "step_value_eighth": "Croma",
+    "step_value_sixteenth": "Semicroma",
+    "step_dotted": "Con punto",
+    "step_dotted_caption": "Metà più lunga.",
+    "step_rest": "Aggiungi una pausa",
+    "step_back": "Torna indietro"
 }

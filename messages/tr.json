@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Klavyene sığsın diye bir oktav yukarı alındı",
     "play_fit_up_other": "Klavyene sığsın diye {count} oktav yukarı alındı",
     "play_fit_beyond": "Bu parça klavyeni iki uçtan da aşıyor, bu yüzden yazıldığı gibi çalıyor",
-    "run_group_pace_title": "Eller ve tempo"
+    "run_group_pace_title": "Eller ve tempo",
+    "step_entry": "Nota nota yaz",
+    "step_entry_caption": "Tuşlar perdeyi verir, süreyi sen söylersin — böylece hızlı çalamadığın bir parça yine de tempoda çıkar. Birlikte basılan tuşlar akor olur.",
+    "step_value": "Nota süresi",
+    "step_value_whole": "Birlik",
+    "step_value_half": "İkilik",
+    "step_value_quarter": "Dörtlük",
+    "step_value_eighth": "Sekizlik",
+    "step_value_sixteenth": "On altılık",
+    "step_dotted": "Noktalı",
+    "step_dotted_caption": "Yarısı kadar daha uzun.",
+    "step_rest": "Es ekle",
+    "step_back": "Birini geri al"
 }

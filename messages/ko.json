@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "건반에 맞도록 한 옥타브 올렸어요",
     "play_fit_up_other": "건반에 맞도록 {count}옥타브 올렸어요",
     "play_fit_beyond": "이 곡은 건반 양쪽을 모두 벗어나서 악보 그대로 울려요",
-    "run_group_pace_title": "손과 템포"
+    "run_group_pace_title": "손과 템포",
+    "step_entry": "한 음씩 적기",
+    "step_entry_caption": "건반이 음높이를 정하고 길이는 직접 고르니, 아직 빠르게 못 치는 곡도 박자대로 적을 수 있어요. 같이 누른 건반은 화음이 돼요.",
+    "step_value": "음 길이",
+    "step_value_whole": "온음표",
+    "step_value_half": "2분음표",
+    "step_value_quarter": "4분음표",
+    "step_value_eighth": "8분음표",
+    "step_value_sixteenth": "16분음표",
+    "step_dotted": "점",
+    "step_dotted_caption": "1.5배 길게.",
+    "step_rest": "쉼표 넣기",
+    "step_back": "하나 되돌리기"
 }

@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Urcată cu o octavă ca să încapă pe claviatura ta",
     "play_fit_up_other": "Urcată cu {count} octave ca să încapă pe claviatura ta",
     "play_fit_beyond": "Piesa aceasta depășește claviatura ta la ambele capete, așa că sună așa cum e scrisă",
-    "run_group_pace_title": "Mâini și ritm"
+    "run_group_pace_title": "Mâini și ritm",
+    "step_entry": "Scrie-o notă cu notă",
+    "step_entry_caption": "Clapele dau înălțimea, iar tu spui cât ține — așa o piesă pe care încă nu o cânți repede iese totuși în ritm. Clapele apăsate împreună fac un acord.",
+    "step_value": "Durata notei",
+    "step_value_whole": "Notă întreagă",
+    "step_value_half": "Doime",
+    "step_value_quarter": "Pătrime",
+    "step_value_eighth": "Optime",
+    "step_value_sixteenth": "Șaisprezecime",
+    "step_dotted": "Cu punct",
+    "step_dotted_caption": "Cu jumătate mai lungă.",
+    "step_rest": "Adaugă o pauză",
+    "step_back": "Una înapoi"
 }

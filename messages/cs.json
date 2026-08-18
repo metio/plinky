@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Posunuto o oktávu výš, aby se to vešlo na tvou klaviaturu",
     "play_fit_up_other": "Posunuto o {count} oktávy výš, aby se to vešlo na tvou klaviaturu",
     "play_fit_beyond": "Tahle skladba přesahuje tvou klaviaturu na obou koncích, takže zní tak, jak je zapsaná",
-    "run_group_pace_title": "Ruce a tempo"
+    "run_group_pace_title": "Ruce a tempo",
+    "step_entry": "Zapsat ji nota po notě",
+    "step_entry_caption": "Klávesy určují výšku a délku říkáš ty — skladba, kterou ještě nezahraješ rychle, tak vyjde v rytmu. Klávesy stisknuté společně dají akord.",
+    "step_value": "Délka noty",
+    "step_value_whole": "Celá",
+    "step_value_half": "Půlová",
+    "step_value_quarter": "Čtvrťová",
+    "step_value_eighth": "Osminová",
+    "step_value_sixteenth": "Šestnáctinová",
+    "step_dotted": "S tečkou",
+    "step_dotted_caption": "O polovinu delší.",
+    "step_rest": "Přidat pomlku",
+    "step_back": "O jednu zpět"
 }

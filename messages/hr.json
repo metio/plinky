@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Podignuto za oktavu da stane na tvoju klavijaturu",
     "play_fit_up_other": "Podignuto za {count} oktave da stane na tvoju klavijaturu",
     "play_fit_beyond": "Ova skladba prelazi tvoju klavijaturu na oba kraja, pa zvuči kako je zapisana",
-    "run_group_pace_title": "Ruke i tempo"
+    "run_group_pace_title": "Ruke i tempo",
+    "step_entry": "Zapiši je notu po notu",
+    "step_entry_caption": "Tipke daju visinu, a trajanje govoriš ti — skladba koju još ne sviraš brzo ipak izlazi u ritmu. Tipke pritisnute zajedno daju akord.",
+    "step_value": "Trajanje note",
+    "step_value_whole": "Cijela",
+    "step_value_half": "Polovinka",
+    "step_value_quarter": "Četvrtinka",
+    "step_value_eighth": "Osminka",
+    "step_value_sixteenth": "Šesnaestinka",
+    "step_dotted": "S točkom",
+    "step_dotted_caption": "Za polovinu dulja.",
+    "step_rest": "Dodaj pauzu",
+    "step_back": "Jednu natrag"
 }

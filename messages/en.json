@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Moved up an octave to fit your keyboard",
     "play_fit_up_other": "Moved up {count} octaves to fit your keyboard",
     "play_fit_beyond": "This piece reaches past your keyboard at both ends, so it plays as written",
-    "run_group_pace_title": "Hands and pace"
+    "run_group_pace_title": "Hands and pace",
+    "step_entry": "Write it note by note",
+    "step_entry_caption": "The keys name the pitch and you say how long it lasts, so a piece you can't play up to speed still comes out in time. Keys pressed together make a chord.",
+    "step_value": "Note length",
+    "step_value_whole": "Whole",
+    "step_value_half": "Half",
+    "step_value_quarter": "Quarter",
+    "step_value_eighth": "Eighth",
+    "step_value_sixteenth": "Sixteenth",
+    "step_dotted": "Dotted",
+    "step_dotted_caption": "Half as long again.",
+    "step_rest": "Add a rest",
+    "step_back": "Take one back"
 }

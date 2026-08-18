@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Höjd en oktav för att få plats på din klaviatur",
     "play_fit_up_other": "Höjd {count} oktaver för att få plats på din klaviatur",
     "play_fit_beyond": "Det här stycket går utanför din klaviatur i båda ändar, så det spelas som det är skrivet",
-    "run_group_pace_title": "Händer och tempo"
+    "run_group_pace_title": "Händer och tempo",
+    "step_entry": "Skriv den not för not",
+    "step_entry_caption": "Tangenterna ger tonhöjden och du säger hur länge den varar — ett stycke du ännu inte spelar snabbt kommer ändå ut i takt. Tangenter som trycks ihop blir ett ackord.",
+    "step_value": "Notlängd",
+    "step_value_whole": "Hel",
+    "step_value_half": "Halv",
+    "step_value_quarter": "Fjärdedel",
+    "step_value_eighth": "Åttondel",
+    "step_value_sixteenth": "Sextondel",
+    "step_dotted": "Punkterad",
+    "step_dotted_caption": "Hälften längre.",
+    "step_rest": "Lägg till en paus",
+    "step_back": "En tillbaka"
 }

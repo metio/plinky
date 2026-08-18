@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Monté d'une octave pour tenir sur ton clavier",
     "play_fit_up_other": "Monté de {count} octaves pour tenir sur ton clavier",
     "play_fit_beyond": "Ce morceau dépasse ton clavier des deux côtés, il est donc joué tel qu'il est écrit",
-    "run_group_pace_title": "Mains et allure"
+    "run_group_pace_title": "Mains et allure",
+    "step_entry": "L'écrire note à note",
+    "step_entry_caption": "Les touches donnent la hauteur, tu donnes la durée — un morceau que tu ne peux pas encore jouer vite sort quand même en mesure. Des touches enfoncées ensemble font un accord.",
+    "step_value": "Durée",
+    "step_value_whole": "Ronde",
+    "step_value_half": "Blanche",
+    "step_value_quarter": "Noire",
+    "step_value_eighth": "Croche",
+    "step_value_sixteenth": "Double croche",
+    "step_dotted": "Pointée",
+    "step_dotted_caption": "Une demie de plus.",
+    "step_rest": "Ajouter un silence",
+    "step_back": "Revenir d'une note"
 }

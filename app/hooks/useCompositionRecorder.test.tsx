@@ -103,3 +103,100 @@ describe("useCompositionRecorder", () => {
         expect(result.current.recorder.notes).toHaveLength(2);
     });
 });
+
+// Step entry: the same keys, writing notes of a stated length at the next position
+// instead of timing what the hands did.
+describe("useCompositionRecorder in step entry", () => {
+    const QUARTER = 500; // a quarter at 120bpm
+
+    it("writes the length asked for, not the length the key was held", () => {
+        // The whole reason step entry exists: a player who knows the tune and cannot play
+        // it up to speed should not have their hesitation written down as the rhythm.
+        const { result } = mount({ stepMs: QUARTER });
+        strike(result, 60);
+        strike(result, 62);
+
+        expect(result.current.recorder.notes).toEqual([
+            { pitch: 60, startMs: 0, durationMs: 500, velocity: expect.any(Number) },
+            { pitch: 62, startMs: 500, durationMs: 500, velocity: expect.any(Number) },
+        ]);
+    });
+
+    it("counts a stepped note as the first one the moment it is written", () => {
+        // A played note is not a note until it is let go; a stepped one is complete when
+        // it is placed, so the "has composed something" signal must not wait for a release
+        // that carries no meaning here.
+        const onFirstNote = vi.fn();
+        const { result } = mount({ stepMs: QUARTER, onFirstNote });
+        act(() => result.current.midi.pressKey(60));
+        expect(onFirstNote).toHaveBeenCalledTimes(1);
+        act(() => result.current.midi.releaseKey(60));
+        expect(onFirstNote).toHaveBeenCalledTimes(1);
+    });
+
+    it("makes one step of keys pressed together", () => {
+        const { result } = mount({ stepMs: QUARTER });
+        act(() => {
+            result.current.midi.pressKey(60);
+            result.current.midi.pressKey(64);
+            result.current.midi.pressKey(67);
+        });
+        act(() => {
+            result.current.midi.releaseKey(60);
+            result.current.midi.releaseKey(64);
+            result.current.midi.releaseKey(67);
+        });
+        strike(result, 72);
+
+        const notes = result.current.recorder.notes;
+        expect(notes.slice(0, 3).map((n) => n.startMs)).toEqual([0, 0, 0]);
+        expect(notes[3]).toMatchObject({ pitch: 72, startMs: 500 });
+    });
+
+    it("leaves a gap for a rest and takes a step back", () => {
+        const { result } = mount({ stepMs: QUARTER });
+        strike(result, 60);
+        act(() => result.current.recorder.rest());
+        strike(result, 62);
+        expect(result.current.recorder.notes[1]).toMatchObject({ startMs: 1000 });
+
+        act(() => result.current.recorder.back());
+        expect(result.current.recorder.notes.map((n) => n.pitch)).toEqual([60]);
+        strike(result, 64);
+        // Back to where the removed note stood, gap and all.
+        expect(result.current.recorder.notes[1]).toMatchObject({ pitch: 64, startMs: 1000 });
+    });
+
+    it("carries the take across when the mode changes mid-piece", () => {
+        // Somebody improvises a phrase, then wants to finish it a note at a time. What is
+        // already there must survive, and the next step must land after it rather than on
+        // top of it.
+        const { result, rerender } = renderHook(
+            ({ stepMs }: { stepMs: number | null }) => ({
+                recorder: useCompositionRecorder({ stepMs }),
+                midi: useMidiConnection(),
+            }),
+            { wrapper, initialProps: { stepMs: null as number | null } },
+        );
+        strike(result, 60);
+        const played = result.current.recorder.notes.length;
+        expect(played).toBe(1);
+
+        rerender({ stepMs: QUARTER });
+        strike(result, 64);
+        const notes = result.current.recorder.notes;
+        expect(notes).toHaveLength(2);
+        const first = notes[0]!;
+        expect(notes[1]!.startMs).toBeGreaterThanOrEqual(first.startMs + first.durationMs);
+    });
+
+    it("clears both ways of writing at once", () => {
+        const { result } = mount({ stepMs: QUARTER });
+        strike(result, 60);
+        act(() => result.current.recorder.clear());
+        expect(result.current.recorder.notes).toEqual([]);
+        strike(result, 62);
+        // The next note starts a fresh take at the beginning, not after the cleared one.
+        expect(result.current.recorder.notes[0]).toMatchObject({ startMs: 0 });
+    });
+});
