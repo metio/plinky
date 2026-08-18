@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "La mitad más larga.",
     "step_rest": "Añadir un silencio",
     "step_back": "Quitar la última",
-    "step_dotted_unavailable": "La semicorchea es lo más corto que dibuja el pentagrama, así que aquí no hay puntillo."
+    "step_dotted_unavailable": "La semicorchea es lo más corto que dibuja el pentagrama, así que aquí no hay puntillo.",
+    "compose_count_in_stepping": "La cuenta atrás es para tocar a la vez — al escribir nota a nota la duración ya está puesta."
 }

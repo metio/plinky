@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Um die Hälfte länger.",
     "step_rest": "Pause einfügen",
     "step_back": "Eine zurück",
-    "step_dotted_unavailable": "Eine Sechzehntel ist die kürzeste Note, die das Notenbild zeichnet — punktiert geht hier nicht."
+    "step_dotted_unavailable": "Eine Sechzehntel ist die kürzeste Note, die das Notenbild zeichnet — punktiert geht hier nicht.",
+    "compose_count_in_stepping": "Der Vorzähler ist fürs Mitspielen — beim Schreiben Note für Note steht das Timing schon fest."
 }

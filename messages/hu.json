@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Feleannyival hosszabb.",
     "step_rest": "Szünet hozzáadása",
     "step_back": "Egyet vissza",
-    "step_dotted_unavailable": "A tizenhatod a legrövidebb, amit a kotta rajzol, így nem lehet pontozni."
+    "step_dotted_unavailable": "A tizenhatod a legrövidebb, amit a kotta rajzol, így nem lehet pontozni.",
+    "compose_count_in_stepping": "A beszámolás az együttjátszáshoz van — hangról hangra írva az időzítés már adott."
 }

@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "O polovicu dlhšia.",
     "step_rest": "Pridať pomlčku",
     "step_back": "O jednu späť",
-    "step_dotted_unavailable": "Šestnástinová je najkratšia, akú notová osnova nakreslí — bodka tu nejde."
+    "step_dotted_unavailable": "Šestnástinová je najkratšia, akú notová osnova nakreslí — bodka tu nejde.",
+    "compose_count_in_stepping": "Odpočet slúži na hranie v rytme — pri zápise nota po note je dĺžka daná."
 }

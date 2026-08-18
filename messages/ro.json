@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Cu jumătate mai lungă.",
     "step_rest": "Adaugă o pauză",
     "step_back": "Una înapoi",
-    "step_dotted_unavailable": "Șaisprezecimea e cea mai scurtă pe care o desenează portativul, deci nu poate fi cu punct."
+    "step_dotted_unavailable": "Șaisprezecimea e cea mai scurtă pe care o desenează portativul, deci nu poate fi cu punct.",
+    "compose_count_in_stepping": "Numărătoarea e pentru a cânta în ritm — scriind notă cu notă, durata e deja stabilită."
 }

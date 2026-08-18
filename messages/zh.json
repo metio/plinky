@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "再长一半。",
     "step_rest": "加一个休止符",
     "step_back": "退回一个",
-    "step_dotted_unavailable": "十六分音符已是谱面能画的最短音符，所以不能加附点。"
+    "step_dotted_unavailable": "十六分音符已是谱面能画的最短音符，所以不能加附点。",
+    "compose_count_in_stepping": "预备拍是为了跟着弹；一个音一个音地写时，时值已经定好了。"
 }

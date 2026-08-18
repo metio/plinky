@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "O połowę dłużej.",
     "step_rest": "Dodaj pauzę",
     "step_back": "Cofnij jedną",
-    "step_dotted_unavailable": "Szesnastka to najkrótsza nuta, jaką rysuje pięciolinia — tu bez kropki."
+    "step_dotted_unavailable": "Szesnastka to najkrótsza nuta, jaką rysuje pięciolinia — tu bez kropki.",
+    "compose_count_in_stepping": "Odliczanie służy do grania w rytm — przy zapisie nuta po nucie czas jest już ustalony."
 }
