@@ -95,6 +95,12 @@ function normalizeUserScore(raw: unknown): Score | null {
     };
 }
 
+// The imported scores exactly as stored, for a caller that wants to know whether they
+// have changed without paying to parse them — the key itself stays in here.
+export function userScoresRaw(kv: KeyValueStore): string | null {
+    return kv.get(STORAGE_KEY);
+}
+
 export function loadUserScores(kv: KeyValueStore): Score[] {
     const parsed = readJson(kv, STORAGE_KEY);
     if (!Array.isArray(parsed)) {

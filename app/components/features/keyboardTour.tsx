@@ -18,7 +18,7 @@ import {
 } from "../../../core/keyboardTour";
 import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../../core/glossaryScore";
 import { holdScaleFor } from "../../../core/midi";
-import { useMidiConnection, useMidiInput } from "../../contexts/midi";
+import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
@@ -78,7 +78,8 @@ export function KeyboardTour({ onFinished }: { onFinished: () => void }) {
     const synth = useSynth();
     const labels = useNoteLabels();
     const theme = useKeyboardTheme();
-    const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const { pressKey, releaseKey } = useMidiConnection();
+    const heldNotes = useHeldNotes();
 
     const step = currentStep(state);
     const ready = stepReady(state);

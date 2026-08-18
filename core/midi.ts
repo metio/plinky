@@ -31,8 +31,6 @@ export type MidiNoteEvent = {
     timestamp: number;
 };
 
-export const MAX_EVENTS = 100;
-
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 // MIDI note 60 is middle C (C4), so the octave is offset by one below the raw
