@@ -7,25 +7,33 @@ import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../co
 import { BakedIncipit } from "../components/ui/incipit";
 import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
-import { loadBundledScores } from "../lib/catalog";
+import { loadBundledScores, loadUserScores } from "../lib/catalog";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
-import { useExerciseSource, useSongSource } from "../contexts/services";
+import { useExerciseSource, useSongSource, useStore } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
 import { PageHeader } from "../components/ui/pageHeader";
 import { GradeChip } from "../components/features/scoreGrade";
 
+// A stored score as a person piece.
+const asPiece = (score: {
+    id: string;
+    title: string;
+    composer: string;
+    license?: string;
+}): PersonPiece => ({
+    id: score.id,
+    title: score.title,
+    composer: score.composer,
+    ...(score.license ? { license: score.license } : {}),
+});
+
 // The bundled catalogue as person pieces — available synchronously (no storage,
 // no network), so both meta() and the first render resolve the composer at
-// prerender time. The user's own imports layer on top once the manifest loads.
+// prerender time.
 function bundledPieces(): PersonPiece[] {
-    return loadBundledScores().map((score) => ({
-        id: score.id,
-        title: score.title,
-        composer: score.composer,
-        ...(score.license ? { license: score.license } : {}),
-    }));
+    return loadBundledScores().map(asPiece);
 }
 
 // The composer a slug names, with no network and no manifest: the bundled pieces
@@ -78,6 +86,11 @@ export default function PersonPage() {
     // presence is three exercises, was the first to have a page at all and so the first to
     // show it.
     const exercises = useExerciseSource();
+    // And the scores the player brought themselves. The comment here used to say imports
+    // "layer on top once the manifest loads" and nothing ever laid them on: a piece you
+    // imported credited to Chopin counted towards him on the library's composer list and
+    // was missing from his page. Read on the client only — prerendering has no storage.
+    const store = useStore();
     // Seed with the bundled catalogue so the composer's pieces are in the first
     // render (prerendered HTML, then instant on load); the manifest merges the
     // user's imports in a beat later.
@@ -102,6 +115,7 @@ export default function PersonPage() {
                 return;
             }
             const pieces: PersonPiece[] = [
+                ...loadUserScores(store).map(asPiece),
                 ...(manifest ?? []),
                 // A study need not credit anybody; an empty credit belongs to no person,
                 // which is what personSlug already makes of it.
@@ -121,7 +135,7 @@ export default function PersonPage() {
         return () => {
             cancelled = true;
         };
-    }, [songs.manifest, exercises.manifest, slug]);
+    }, [songs.manifest, exercises.manifest, store, slug]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
