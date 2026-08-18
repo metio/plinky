@@ -10,6 +10,15 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 18 August 2026
 
+**Titles read like titles.** Scores arrive from their sources typed however whoever
+uploaded them typed it, and a few dozen showed it: four titles printed `&quot;` where the
+quotation marks should have been, one was the web address it came from, one was a filename
+complete with underscores, three shouted in capitals, and fifty-seven began in lower case.
+They are tidied — and the tidying is a rule now, so the next batch of scores arrives clean
+rather than needing the same pass again. What is deliberately left alone: "Nr." and "N°" in
+German and French titles, which are those languages' own way of numbering a piece and not
+mistakes to correct.
+
 **Beyer's studies say whose they are.** Three of them came in from their source titled
 "Beyer Nro 8, 9, 10" — correct Spanish for *numero*, and the only three titles in the
 catalogue written that way — and crediting nobody at all. They read "Beyer No. 8" now,

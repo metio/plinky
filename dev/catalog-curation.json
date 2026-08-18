@@ -142,8 +142,9 @@
     },
     {
         "id": "pgfhUZVzn3UG",
+        "title": "Happy Birthday",
         "composer": "Mildred J. Hill & Patty S. Hill",
-        "why": "The composer's name ran into the piece's own description with no separator, so the credit read as a name nobody has."
+        "why": "The composer's name ran into the piece's own description with no separator, so the credit read as a name nobody has. The title was typed 'happy bithday'."
     },
     {
         "id": "Ee5NfPRzchhF",
@@ -277,5 +278,54 @@
         "id": "hJT8580qxS59",
         "composer": "Traditional",
         "why": "A traditional fiddle tune whose uploader left the composer blank; the title is the tune's name, not a person's. Filed as Traditional so it credits a tradition rather than nobody."
+    },
+    {
+        "id": "x51U3R1YIluE",
+        "title": "Eventide",
+        "composer": "William Henry Monk",
+        "why": "The title was the IMSLP page's URL, and the credit had the tune name EVENTIDE run into the composer's, misspelling it 'Willian'."
+    },
+    {
+        "id": "4iqgmJHxi5Du",
+        "composer": "Traditional",
+        "why": "The credit was a hymn-tune name and its metre — SAGINA, RESIGNATION, 'CMD', '88 88 88 Refrain' — not a person. These are tunebook melodies, so they credit the tradition they come from rather than an attribution nobody can check."
+    },
+    {
+        "id": "J9mN6eqQ3BNH",
+        "composer": "Traditional",
+        "why": "The credit was a hymn-tune name and its metre — SAGINA, RESIGNATION, 'CMD', '88 88 88 Refrain' — not a person. These are tunebook melodies, so they credit the tradition they come from rather than an attribution nobody can check."
+    },
+    {
+        "id": "9c5MfRLyIROp",
+        "title": "School of Velocity, Op. 299 No. 1",
+        "why": "'Scool' for 'School', and the opus and number set the way the other hundred and forty-eight numbered titles are."
+    },
+    {
+        "id": "0VUguyrS9Ziu",
+        "title": "Violinkonzert Nr. 4 in A minor",
+        "composer": "Niccolò Paganini",
+        "why": "The title kept the underscores of the file it was exported from, and the credit carried a note about the transcription."
+    },
+    {
+        "id": "a1XnKMmBaLPM",
+        "title": "Study",
+        "composer": "Traditional",
+        "why": "The title was the source's own cataloguing note ('Bezeichnung standardisiert: …'), and its credit said the author is unknown. Named the way the importer names any study it cannot get a title for."
+    },
+    {
+        "id": "Kryso98qv9Xu",
+        "title": "Sí Bheag, Sí Mhór",
+        "why": "Typed entirely in capitals by whoever uploaded it. Set in the catalogue's own case, which no rule can do for a title in another language."
+    },
+    {
+        "id": "DMLpgGTIJcCD",
+        "title": "A Jorge Negrete",
+        "why": "Typed entirely in capitals by whoever uploaded it. Set in the catalogue's own case, which no rule can do for a title in another language."
+    },
+    {
+        "id": "R0SoOxPA6kzj",
+        "title": "Old Folks at Home",
+        "composer": "Stephen Foster",
+        "why": "Typed entirely in capitals by whoever uploaded it. Set in the catalogue's own case, which no rule can do for a title in another language. The credit led with the roles rather than the name."
     }
 ]
