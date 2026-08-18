@@ -35,7 +35,7 @@
     "dev": "npm run messages && react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "pretypecheck": "node dev/check-node-modules.mjs",
-    "typecheck": "npm run messages && react-router typegen && tsc",
+    "typecheck": "npm run messages && npm run news && react-router typegen && tsc",
     "test": "npm run messages && vitest run --project node",
     "test:browser": "npm run messages && vitest run --project 'browser*'",
     "prelint": "node dev/check-node-modules.mjs",
@@ -57,7 +57,9 @@
     "a11y:light": "npm run build:single && A11Y_MODE=light node dev/a11y.mjs",
     "a11y:dark": "npm run build:single && A11Y_MODE=dark node dev/a11y.mjs",
     "songs:reid": "tsx dev/reid-songs.mts",
-    "exercises:reid": "tsx dev/reid-exercises.mts"
+    "exercises:reid": "tsx dev/reid-exercises.mts",
+    "news": "tsx dev/changelog.mts",
+    "news:check": "tsx dev/changelog.mts --check"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
@@ -105,6 +107,7 @@
     "tsx": "^4.22.4",
     "typescript": "^7.0.0",
     "vite": "^8.0.16",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "yaml": "2.9.0"
   }
 }

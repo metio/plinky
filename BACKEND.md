@@ -1839,7 +1839,7 @@ is to be the thing a future session reads instead of re-deriving the design.
 **Update it in the same change that contradicts it.** A pull request that changes
 an endpoint, a schema, a limit or an invariant updates the relevant section in the
 same commit. This is the same rule the repository already applies to `README.md`
-and `NEWS.md`, for the same reason: unwritten at the time means unwritten for
+and `changelog.yaml`, for the same reason: unwritten at the time means unwritten for
 good. `CLAUDE.md` carries it as a standing convention so that it reaches a session
 that never opens this file.
 
@@ -1869,5 +1869,5 @@ moves to [Decisions](#decisions) with its answer and its reasoning, and is remov
 from the list. A question list that only grows is a list nobody reads.
 
 **Nothing here is user-facing.** This document describes internal design. Player-visible
-changes belong in `NEWS.md` and `README.md` as they ship, in the voice `VOICE.md`
+changes belong in `changelog.yaml` and `README.md` as they ship, in the voice `VOICE.md`
 sets, and no part of this document's phrasing should reach the interface.

@@ -99,6 +99,7 @@ npm run arch          # layer rules + confined globals
 npm run tailwind      # every class name compiles against app.css (blocking)
 npm run tokens        # colour is named by role, not hue (blocking)
 npm run messages:check # every locale carries every message (blocking)
+npm run news:check    # NEWS.md still matches changelog.yaml (blocking)
 npm run ci:parity     # every CI gate job maps to a ci-* nix wrapper (blocking)
 npm run knip          # dead code (blocking)
 npm run lint          # biome lint + format; a WARNING fails it too
@@ -289,17 +290,31 @@ no repo gate builds, so a `.storybook/` change can break it while every gate sta
   it records decisions: a reversal gets a new row saying so, leaving the original
   in place, because a reader who cannot see that a path was abandoned will propose
   it again. Nothing in it is user-facing — player-visible changes still go to
-  `NEWS.md` and `README.md` in the [VOICE.md](VOICE.md) register.
-- **Update NEWS.md in the same change**, for anything a player would notice — a
-  new feature, a changed behaviour, a bug they'd have hit. Plinky has no
-  versions, tags or releases (every push to main deploys), so nothing else
-  records what changed and nothing generates it from the log: unwritten at the
-  time means unwritten for good. Entries are `## <D Month YYYY>` headings,
-  newest first. Write for a player, not a contributor — what is different on
-  screen and why it matters — in the [VOICE.md](VOICE.md) register. Purely
-  internal work gets no entry; when a day is mostly internal, say the small
-  user-visible part and stop rather than padding it. Note that `ci-markdown`
-  only lints **tracked** files, so `git add NEWS.md` before running it.
+  `changelog.yaml` and `README.md` in the [VOICE.md](VOICE.md) register.
+- **Add an entry to `changelog.yaml` in the same change**, for anything a player
+  would notice — a new feature, a changed behaviour, a bug they'd have hit.
+  Plinky has no versions, tags or releases (every push to main deploys), so
+  nothing else records what changed and nothing generates it from the log:
+  unwritten at the time means unwritten for good. Write for a player, not a
+  contributor — what is different on screen and why it matters — in the
+  [VOICE.md](VOICE.md) register. Purely internal work gets no entry; when a day
+  is mostly internal, say the small user-visible part and stop rather than
+  padding it.
+
+  Releases are newest first, one per shipping day, with a `label` (`night`,
+  `evening`) where a day shipped more than once. An entry is usually just its
+  Markdown, written as a literal block; `twip: false` holds one back from the
+  weekly round-up posted to the subreddit, and everything else goes in it — an
+  entry only exists here if a player would notice, so opting *in* would mean a
+  forgotten field silently posts nothing.
+
+  **`NEWS.md` is generated from it and must not be hand-edited.** The README
+  sends players to that file, so it stays Markdown; `npm run news` renders it
+  and `npm run news:check` is a blocking gate. `typecheck` regenerates it
+  first, so editing the list and running any gate is enough — but the rendered
+  file is tracked, so it appears in the diff and gets committed with the entry.
+  Note that `ci-markdown` only lints **tracked** files, so `git add NEWS.md`
+  before running it.
 
 ## Product guardrails
 
