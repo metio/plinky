@@ -358,7 +358,14 @@ export function useOsmdScore(
     // real change and never fires a redundant rebuild straight after a reload.
     useEffect(() => {
         const osmd = osmdRef.current;
-        if (!osmd || !ready) {
+        // `ready` is the value from THIS render, and a reload beginning in the same commit
+        // has already cleared the sheet in its cleanup — so it can still read true over an
+        // OSMD with nothing in it, and updateGraphic() below would walk undefined staves.
+        // That became reachable when the reading aids grew a fingering field: turning
+        // sight-read on changes the colour (which reloads) and the fingering (which lands
+        // here) together. Nothing is lost by standing down — the reload sets the fingering
+        // rule itself, from a ref, so the value in force is the live one either way.
+        if (!osmd || !ready || !osmd.Sheet) {
             return;
         }
         const rules = (osmd as unknown as { rules: { RenderFingerings: boolean } }).rules;

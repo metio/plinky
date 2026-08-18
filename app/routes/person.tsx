@@ -9,7 +9,7 @@ import { indexedPerson } from "../../core/peopleIndex";
 import { breadcrumbData, personData, routeMeta } from "../../core/site";
 import { loadBundledScores } from "../lib/catalog";
 import { LocalizedLink as Link } from "../components/ui/localizedLink";
-import { useSongSource } from "../contexts/services";
+import { useExerciseSource, useSongSource } from "../contexts/services";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/person";
@@ -72,6 +72,12 @@ export function meta({ params }: Route.MetaArgs) {
 export default function PersonPage() {
     const { slug } = useParams();
     const songs = useSongSource();
+    // The studies too, not only the songs: the piece count on this page is baked from BOTH
+    // manifests, so listing from one of them gave a composer whose work here is all studies
+    // a page announcing three pieces and showing none. Ferdinand Beyer, whose catalogue
+    // presence is three exercises, was the first to have a page at all and so the first to
+    // show it.
+    const exercises = useExerciseSource();
     // Seed with the bundled catalogue so the composer's pieces are in the first
     // render (prerendered HTML, then instant on load); the manifest merges the
     // user's imports in a beat later.
@@ -91,11 +97,17 @@ export default function PersonPage() {
         setPerson(knownPerson(slug ?? ""));
         setLoading(true);
         (async () => {
-            const manifest = (await songs.manifest()) ?? [];
+            const [manifest, studies] = await Promise.all([songs.manifest(), exercises.manifest()]);
             if (cancelled) {
                 return;
             }
-            const pieces: PersonPiece[] = [...manifest, ...bundledPieces()];
+            const pieces: PersonPiece[] = [
+                ...(manifest ?? []),
+                // A study need not credit anybody; an empty credit belongs to no person,
+                // which is what personSlug already makes of it.
+                ...(studies ?? []).map((study) => ({ ...study, composer: study.composer ?? "" })),
+                ...bundledPieces(),
+            ];
             const resolved = personFor(pieces, slug ?? "");
             // Only ever an improvement on what the page opened with. A manifest that
             // could not be fetched answers null — unreachable, not empty — and taking
@@ -109,7 +121,7 @@ export default function PersonPage() {
         return () => {
             cancelled = true;
         };
-    }, [songs.manifest, slug]);
+    }, [songs.manifest, exercises.manifest, slug]);
 
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">

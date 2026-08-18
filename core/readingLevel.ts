@@ -12,7 +12,7 @@ import type { Prefs } from "./prefs";
 // an independent, opt-in aid the level never touches.
 export type AidPrefs = Pick<
     Prefs,
-    "noteLabels" | "noteHints" | "colorNotes" | "forgiving" | "highway"
+    "noteLabels" | "noteHints" | "colorNotes" | "forgiving" | "highway" | "showFingerings"
 >;
 
 // The skill ladder, most help first. No separate "level" is stored: the current
@@ -31,6 +31,7 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         colorNotes: true,
         forgiving: true,
         highway: true,
+        showFingerings: true,
     },
     learning: {
         noteLabels: "all",
@@ -38,6 +39,9 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         colorNotes: false,
         forgiving: true,
         highway: false,
+        // Printed fingering is a staff aid like the note names beside it, so it stays a
+        // rung longer than the colour and the highway, which both go here.
+        showFingerings: true,
     },
     confident: {
         noteLabels: "c",
@@ -45,6 +49,7 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         colorNotes: false,
         forgiving: false,
         highway: false,
+        showFingerings: false,
     },
     sightReader: {
         noteLabels: "off",
@@ -52,6 +57,7 @@ const AIDS: Record<ReadingLevel, AidPrefs> = {
         colorNotes: false,
         forgiving: false,
         highway: false,
+        showFingerings: false,
     },
 };
 

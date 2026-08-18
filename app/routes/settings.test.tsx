@@ -96,10 +96,13 @@ describe("Settings", () => {
         // The Hand size panel saves independently; the page-level controls must
         // keep editing the latest prefs rather than clobbering that save.
         services.prefs.save({ ...services.prefs.load(), handSpan: { left: 9, right: null } });
+        // Whichever way the switch starts — it follows the reading ladder's default, which
+        // is not this test's subject.
+        const before = services.prefs.load().showFingerings;
         toggle(m.settings_show_fingerings);
 
         const stored = services.prefs.load();
-        expect(stored.showFingerings).toBe(true);
+        expect(stored.showFingerings).toBe(!before);
         expect(stored.handSpan).toEqual({ left: 9, right: null });
     });
 

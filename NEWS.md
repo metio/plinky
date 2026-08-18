@@ -10,6 +10,20 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 18 August 2026
 
+**A composer page shows the pieces it counts.** Ferdinand Beyer's page said "3 pieces to
+play" and listed none: his three studies live in the exercises catalogue, and the page was
+reading only the songs one. Every composer's page now lists their studies too.
+
+**Sight-reading takes the fingering numbers away as well.** "Nothing to lean on" did not
+include the fingering printed over the notes, which is very much something to lean on. It
+is part of the reading ladder now — on for the two beginner rungs, off from Confident down,
+and gone entirely in a sight-read. That also means a new device starts with the numbers
+shown, like every other beginner aid, for you to switch off when you no longer want them.
+
+**The opening bar beside a piece's name is no longer colour-coded.** It is a catalogue
+mark, and colouring it leaked the note names into a cold read — of the one bar a
+sight-reader most wants left alone.
+
 **Write a piece down a note at a time.** Compose has always recorded what you played,
 which is right for an improvisation and wrong for a tune you know but can't yet play up to
 speed — your hesitation became the rhythm. Turn on *Write it note by note* and the keys
