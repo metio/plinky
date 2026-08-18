@@ -11,9 +11,13 @@ import { BakedIncipit } from "../ui/incipit";
 import { LocalizedLink as Link } from "../ui/localizedLink";
 import { GradeChip } from "./scoreGrade";
 
-type LibraryRowProps = {
+type MusicRowProps = {
     item: MusicItem;
     starred: boolean;
+    // Colour the opening bar's noteheads by note name, following the same reading aid
+    // that colours them in the score. Handed down rather than read here, so a list of
+    // sixty rows reads the preference once instead of sixty times.
+    colored: boolean;
     learned: boolean;
     due: boolean;
     onToggleStar: () => void;
@@ -23,18 +27,19 @@ type LibraryRowProps = {
     removeConfirmLabel?: string | (() => string);
 };
 
-// One library list row: star toggle, the piece card linking to its play page
+// One music list row: star toggle, the piece card linking to its play page
 // (with learned/due badges and a composer link), and — for user imports — the
 // confirm-guarded remove control.
 export function MusicRow({
     item,
     starred,
+    colored,
     learned,
     due,
     onToggleStar,
     onRemove,
     removeConfirmLabel,
-}: LibraryRowProps) {
+}: MusicRowProps) {
     return (
         <li className="flex items-center gap-2 py-1">
             <IconButton
@@ -55,7 +60,12 @@ export function MusicRow({
                 {/* The piece's opening bars, from the catalogue's own baked mark — so a
                     shelf of three thousand titles reads as music, and a tune somebody
                     half-remembers is recognisable before they can spell its name. */}
-                <BakedIncipit mark={item.incipit} label={item.title} className="text-faint" />
+                <BakedIncipit
+                    mark={item.incipit}
+                    label={item.title}
+                    colored={colored}
+                    className="text-faint"
+                />
                 <span className="min-w-0 flex-1">
                     <Link
                         to={`/play/${item.id}`}

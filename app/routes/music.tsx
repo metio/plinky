@@ -16,6 +16,7 @@ import { composerCounts } from "../../core/person";
 import { routeMeta } from "../../core/site";
 import { useFavoritesStore } from "../contexts/services";
 import { useMusicFilters } from "../hooks/useMusicFilters";
+import { usePrefs } from "../hooks/usePrefs";
 import { useMusicItems } from "../hooks/useMusicItems";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/music";
@@ -36,6 +37,9 @@ type MusicTab = "search" | "people" | "manage";
 
 export default function MusicRoute() {
     const favoritesStore = useFavoritesStore();
+    // The reading aid that colours noteheads in a score colours the opening bars here too,
+    // read once for the whole list rather than per row.
+    const { prefs } = usePrefs();
     const { items, mastery, loaded, remove, assignmentsUsing } = useMusicItems();
     const [searchParams, setSearchParams] = useSearchParams();
     // ?grade=6 opens the shelf on that grade — the roadmap's rows link here, so pressing
@@ -169,6 +173,7 @@ export default function MusicRoute() {
                                             <MusicRow
                                                 key={item.id}
                                                 item={item}
+                                                colored={prefs.colorNotes}
                                                 starred={filters.favorites.has(item.id)}
                                                 learned={entry?.learned ?? false}
                                                 due={entry !== undefined && isDue(entry, now)}
