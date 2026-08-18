@@ -73,7 +73,7 @@ export function GradeRoadmap({
                                 able to press Grade 8 on your first day, and land on four
                                 hundred pieces you may play, says what no sentence can. */}
                             <Link
-                                to={`/library?grade=${grade}`}
+                                to={`/music?grade=${grade}`}
                                 className="flex items-center gap-2 rounded-md px-1 hover:text-accent-strong hover:underline"
                             >
                                 <span className="font-semibold">{m.grades_grade({ grade })}</span>

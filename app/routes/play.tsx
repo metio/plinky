@@ -51,7 +51,7 @@ export function meta({ params }: Route.MetaArgs) {
     const slug = score.composer ? personSlug(score.composer) : "";
     const trail = [
         { name: m.nav_today(), path: "/" },
-        { name: m.library_title(), path: "/library/" },
+        { name: m.library_title(), path: "/music/" },
         ...(slug ? [{ name: canonicalComposer(score.composer), path: `/person/${slug}/` }] : []),
         { name: score.title, path: `/play/${score.id}/` },
     ];

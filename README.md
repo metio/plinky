@@ -186,7 +186,7 @@ one-tap **review session** walks you through everything that's fading, and you c
 
 ## Features, one by one
 
-- **Library** — the catalogue: bundled scales, arpeggios, and familiar tunes like
+- **Music** — the catalogue: bundled scales, arpeggios, and familiar tunes like
   *Twinkle, Twinkle* and *Ode to Joy*, plus anything you import, in two tabs.
   **Search** finds something to play: search, star, filter by kind, grade, or what's
   **due now**, and open one to practise. **Manage** grows and safeguards the library:
@@ -282,7 +282,7 @@ one-tap **review session** walks you through everything that's fading, and you c
   longer on the device (a deleted import, a link from elsewhere) is labelled as
   missing instead of leading to a dead end, and a one-tap action prunes those steps;
   importing a shared assignment says up front how many of its pieces resolve here,
-  and deleting a score from the Library warns when saved assignments still use it.
+  and deleting a score from Music warns when saved assignments still use it.
 - **Find your level** — a placement test, reached from the You page. Read a drill;
   if it goes well the next is harder, and three shaky runs stop it. It reports one
   number and the grade it lands near, so a newcomer starts where they actually read

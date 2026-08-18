@@ -28,7 +28,7 @@ const item = (parts: Partial<LibraryItem>): LibraryItem => ({
 });
 
 // The filters live in the address, so every render needs a router around them.
-const world = (start = "/library") => {
+const world = (start = "/music") => {
     const scheduler = fakeScheduler();
     const services = createServices({ store: memoryStore(), scheduler });
     const wrapper = ({ children }: { children: ReactNode }) => (
@@ -95,7 +95,7 @@ describe("useLibraryFilters", () => {
         // What the shelf forgets, it forgets on the way to a piece and back. The address
         // makes the trip; component state does not.
         const items = [item({ id: "g1", grade: 1 }), item({ id: "g6", grade: 6 })];
-        const { wrapper, scheduler } = world("/library?grade=6");
+        const { wrapper, scheduler } = world("/music?grade=6");
         const { result } = renderHook(
             () => ({ filters: useLibraryFilters(items, {}), location: useLocation() }),
             { wrapper },
@@ -112,7 +112,7 @@ describe("useLibraryFilters", () => {
     });
 
     it("leaves the rest of the address alone", async () => {
-        const { wrapper, scheduler } = world("/library?tab=people");
+        const { wrapper, scheduler } = world("/music?tab=people");
         const { result } = renderHook(
             () => ({ filters: useLibraryFilters([], {}), location: useLocation() }),
             { wrapper },

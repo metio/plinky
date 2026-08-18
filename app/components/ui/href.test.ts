@@ -15,9 +15,7 @@ describe("localizedHref", () => {
     });
 
     it("keeps a query after the slash, so the link needs no redirect", () => {
-        expect(localizedHref("/library?tab=manage")).toBe(
-            `${localizeHref("/library")}/?tab=manage`,
-        );
+        expect(localizedHref("/music?tab=manage")).toBe(`${localizeHref("/music")}/?tab=manage`);
     });
 
     it("leaves the locale root alone", () => {

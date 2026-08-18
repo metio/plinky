@@ -10,6 +10,10 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 18 August 2026
 
+**The Library is called Music, and lives at /music.** It is what the help text has called
+it all along — "Music is everything there is to play" — and it says what is in there
+better than a word about shelves does. Old /library links no longer resolve.
+
 **A composer page shows the pieces it counts.** Ferdinand Beyer's page said "3 pieces to
 play" and listed none: his three studies live in the exercises catalogue, and the page was
 reading only the songs one. Every composer's page now lists their studies too.
