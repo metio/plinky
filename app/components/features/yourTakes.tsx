@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
+import { usePrefs } from "../../hooks/usePrefs";
 import type { Take } from "../../../core/takes";
 import { useTakesStore } from "../../contexts/services";
 import { useKnownPieces } from "../../hooks/useKnownPieces";
@@ -20,6 +21,9 @@ import { formatAgo } from "./takesPanel";
 // belongs on Music, beside the scores you brought and the music you compose — one shelf
 // for everything of your own.
 export function YourTakes() {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     const takes = useTakesStore();
     const { titleOf, incipitOf } = useKnownPieces();
     const [pieces, setPieces] = useState(() => takes.all());
@@ -43,6 +47,7 @@ export function YourTakes() {
                         <BakedIncipit
                             mark={incipitOf(songId)}
                             label={titleOf(songId) ?? songId}
+                            colored={prefs.colorNotes}
                             className="text-faint"
                         />
                         <Link to={`/play/${songId}?tab=runs`} className={`min-w-0 ${linkClasses}`}>

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useEffect, useState } from "react";
+import { usePrefs } from "../hooks/usePrefs";
 import { useParams } from "react-router";
 import { nameFromSlug, type Person, type PersonPiece, personFor } from "../../core/person";
 import { BakedIncipit } from "../components/ui/incipit";
@@ -78,6 +79,9 @@ export function meta({ params }: Route.MetaArgs) {
 // piece one tap from being practised. Auto-generated for every composer the
 // catalogue credits — living artists' curated profiles layer on top later.
 export default function PersonPage() {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     const { slug } = useParams();
     const songs = useSongSource();
     // The studies too, not only the songs: the piece count on this page is baked from BOTH
@@ -163,6 +167,7 @@ export default function PersonPage() {
                                 <BakedIncipit
                                     mark={piece.incipit}
                                     label={piece.title}
+                                    colored={prefs.colorNotes}
                                     className="shrink-0 text-faint"
                                 />
                                 {/* flex-1, so the titles start in one column right after

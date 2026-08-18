@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { monthKey, monthlyRecap } from "../../../core/history";
+import { usePrefs } from "../../hooks/usePrefs";
 import { svgMilestone } from "../../../core/milestoneCard";
 import { practiceHref } from "../../../core/practisable";
 import { useHistoryStore } from "../../contexts/services";
@@ -33,6 +34,9 @@ import { PageHeader } from "../ui/pageHeader";
 // waits for the personal data before the page paints anything — a single full paint
 // keeps CLS at zero on this client-only page.
 export function StatsView() {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     const data = useYouData();
     const history = useHistoryStore();
     if (data === null) {
@@ -68,7 +72,11 @@ export function StatsView() {
                             <li key={item.id} className="flex items-center gap-2">
                                 {/* Drawn the way every other list of pieces names one:
                                     the opening bars, then the title. */}
-                                <BakedIncipit mark={item.incipit} label={item.title} />
+                                <BakedIncipit
+                                    mark={item.incipit}
+                                    label={item.title}
+                                    colored={prefs.colorNotes}
+                                />
                                 <Link to={practiceHref(item)} className={linkClasses}>
                                     {item.title}
                                 </Link>

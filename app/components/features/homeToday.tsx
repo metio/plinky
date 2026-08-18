@@ -231,13 +231,20 @@ function Row({
     // quiet, so the eye lands somewhere rather than on four equal offers.
     primary?: boolean;
 }) {
+    // The reading aid that colours noteheads in a score colours this opening bar too.
+    const { prefs } = usePrefs();
     return (
         <Link
             to={to}
             className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition hover:bg-subtle"
         >
             {mark ? (
-                <BakedIncipit mark={mark} label={label} className="shrink-0 text-faint" />
+                <BakedIncipit
+                    mark={mark}
+                    label={label}
+                    colored={prefs.colorNotes}
+                    className="shrink-0 text-faint"
+                />
             ) : (
                 <span aria-hidden="true" className="text-xl">
                     {icon}

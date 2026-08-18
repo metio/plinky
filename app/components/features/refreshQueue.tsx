@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type ItemKind, practiceHref } from "../../../core/practisable";
+import { usePrefs } from "../../hooks/usePrefs";
 import { buttonClasses } from "../ui/button";
 import { BakedIncipit } from "../ui/incipit";
 import { linkClasses, sectionHeadingClasses } from "../ui/classes";
@@ -18,6 +19,9 @@ export function RefreshQueue({
 }: {
     reviews: Array<{ id: string; title: string; kind: ItemKind; incipit?: string }>;
 }) {
+    // The reading aid that colours noteheads in a score colours these opening bars
+    // too, read once for the whole list rather than per mark.
+    const { prefs } = usePrefs();
     const due = reviews.length > 0;
     return (
         <section className="space-y-2">
@@ -37,6 +41,7 @@ export function RefreshQueue({
                                 <BakedIncipit
                                     mark={review.incipit}
                                     label={review.title}
+                                    colored={prefs.colorNotes}
                                     className="shrink-0 text-faint"
                                 />
                                 <Link to={practiceHref(review)} className={linkClasses}>
