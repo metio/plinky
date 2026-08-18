@@ -24,6 +24,7 @@
 
 import { readFile } from "node:fs/promises";
 import { parse } from "yaml";
+import { isDateKey } from "../core/dateKey";
 import {
     parseChangelog,
     type PostedRoundUp,
@@ -38,11 +39,26 @@ const WINDOW_DAYS = 7;
 const AGENT = "plinky-twip/1.0 (by u/plinky_bot)";
 
 const dry = process.argv.includes("--dry-run");
+
 // The day the round-up covers up to. Passed in rather than read from a clock so a run can
 // be reproduced, and so a missed week can be posted for the day it should have gone out.
-const on =
-    process.argv.find((argument) => /^\d{4}-\d{2}-\d{2}$/.test(argument)) ??
-    new Date().toISOString().slice(0, 10);
+//
+// Every argument is accounted for. A date of the right shape but an impossible day —
+// 2026-18-08, a transposed month and day — is not a small mistake here: `daysBetween`
+// reports 0 for a date it cannot read, so the window would swallow the entire changelog
+// and post it under a heading reading "8 18 2026". Anything unrecognised stops the run
+// rather than quietly meaning today.
+const args = process.argv.slice(2).filter((argument) => argument !== "--dry-run");
+const [given, ...extra] = args;
+if (extra.length > 0) {
+    console.error(`Unexpected arguments: ${extra.join(" ")}`);
+    process.exit(1);
+}
+if (given !== undefined && !isDateKey(given)) {
+    console.error(`"${given}" is not a real day in YYYY-MM-DD form.`);
+    process.exit(1);
+}
+const on = given ?? new Date().toISOString().slice(0, 10);
 
 const { releases, problems } = parseChangelog(parse(await readFile("changelog.yaml", "utf8")));
 if (problems.length > 0) {
@@ -124,20 +140,40 @@ const SLOT = 2;
 // slot that will not free up, is worth saying out loud and not worth failing a job over —
 // a failed job would only be re-run, find the post already there, and stop.
 async function sticky(fullname: string, state: boolean): Promise<boolean> {
-    const response = await fetch("https://oauth.reddit.com/api/set_subreddit_sticky", {
-        method: "POST",
-        headers: { ...authorized, "content-type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-            id: fullname,
-            state: String(state),
-            num: String(SLOT),
-            api_type: "json",
-        }),
-    });
-    if (!response.ok) {
-        console.warn(`Could not ${state ? "pin" : "unpin"} ${fullname}: ${response.status}`);
+    const what = `${state ? "pin" : "unpin"} ${fullname}`;
+    try {
+        const response = await fetch("https://oauth.reddit.com/api/set_subreddit_sticky", {
+            method: "POST",
+            headers: { ...authorized, "content-type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                id: fullname,
+                state: String(state),
+                num: String(SLOT),
+                api_type: "json",
+            }),
+        });
+        if (!response.ok) {
+            console.warn(`Could not ${what}: ${response.status}`);
+            return false;
+        }
+        // Reddit answers a refusal with 200 and an errors array — "not a moderator" among
+        // them — so the status alone would report a pin that never happened.
+        const answer = (await response.json().catch(() => ({}))) as {
+            json?: { errors?: unknown[] };
+        };
+        const errors = answer.json?.errors ?? [];
+        if (errors.length > 0) {
+            console.warn(`Could not ${what}: ${JSON.stringify(errors)}`);
+            return false;
+        }
+        return true;
+    } catch (error) {
+        // The post has already landed by the time any of this runs, so a network failure
+        // here must not fail the job: a re-run would find the post and stop, leaving it
+        // unpinned forever with a red tick to explain it.
+        console.warn(`Could not ${what}: ${(error as Error).message}`);
+        return false;
     }
-    return response.ok;
 }
 
 // Last week's comes down before this week's goes up, or the third one would be refused.
@@ -166,11 +202,17 @@ const submitted = await fetch("https://oauth.reddit.com/api/submit", {
     headers: { ...authorized, "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ sr: SUBREDDIT, kind: "self", title, text: body, api_type: "json" }),
 });
-const result = (await submitted.json()) as {
+// Status first: a rate limit or a gateway error answers with an HTML page, and parsing
+// that as JSON throws a syntax error in place of the reason the post was refused.
+if (!submitted.ok) {
+    console.error(`Reddit refused the post: ${submitted.status} ${submitted.statusText}`);
+    process.exit(1);
+}
+const result = (await submitted.json().catch(() => ({}))) as {
     json?: { errors?: unknown[]; data?: { url?: string; name?: string } };
 };
-if (!submitted.ok || (result.json?.errors?.length ?? 0) > 0) {
-    console.error(`Reddit refused the post: ${JSON.stringify(result.json?.errors ?? submitted.status)}`);
+if ((result.json?.errors?.length ?? 0) > 0) {
+    console.error(`Reddit refused the post: ${JSON.stringify(result.json?.errors)}`);
     process.exit(1);
 }
 console.log(`Posted: ${result.json?.data?.url ?? `https://www.reddit.com/r/${SUBREDDIT}/`}`);

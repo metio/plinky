@@ -263,17 +263,21 @@ export function roundUpBody(releases: readonly Release[], limit = POST_LIMIT): s
 // The releases a round-up covers: those within `days` of `on`, carrying only the entries
 // that asked to be in it, and none that end up empty.
 //
-// The window is inclusive of both ends. A run that fires weekly on the same weekday would
-// otherwise drop whatever shipped exactly seven days earlier, on the morning it last ran.
-export function roundUp(
-    releases: readonly Release[],
-    on: string,
-    days: number,
-): Release[] {
+// The far end is exclusive, so consecutive weekly runs tile rather than overlap. Inclusive
+// at both ends is a window one day too wide: the day exactly seven back was the day the
+// run seven days ago was itself made for, so every boundary release would go out twice.
+//
+// A day that is not a real day covers nothing. `daysBetween` reports 0 for a date it
+// cannot read, which without this would put every release ever written inside the window
+// and post the whole changelog under a nonsense heading.
+export function roundUp(releases: readonly Release[], on: string, days: number): Release[] {
+    if (!isDateKey(on)) {
+        return [];
+    }
     return releases
         .filter((release) => {
             const age = daysBetween(release.date, on);
-            return age >= 0 && age <= days;
+            return age >= 0 && age < days;
         })
         .map((release) => ({
             ...release,
