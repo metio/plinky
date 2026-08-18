@@ -19,8 +19,9 @@
 // It posts a SELF post, not a link. Reddit lets a text post's body be edited afterwards
 // and does not let a link post's URL change, so a mistake is fixable in place.
 //
-// --dry-run renders what would be posted and exits, which is what the workflow runs on a
-// pull request and what you run to see next Sunday's post today.
+// --dry-run renders what would be posted and exits. A manual dispatch of the workflow
+// defaults to it, so seeing what would go out never risks sending it; the schedule is the
+// only thing that posts for real.
 
 import { readFile } from "node:fs/promises";
 import { parse } from "yaml";
