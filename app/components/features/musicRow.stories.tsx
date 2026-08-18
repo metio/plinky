@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactNode } from "react";
 import type { MusicItem } from "../../../core/music";
 import { MusicRow } from "./musicRow";
 
@@ -12,7 +11,13 @@ import { MusicRow } from "./musicRow";
 const meta: Meta<typeof MusicRow> = {
     title: "Features/MusicRow",
     component: MusicRow,
-    decorators: [(Story: () => ReactNode) => <ul className="max-w-xl">{Story()}</ul>],
+    decorators: [
+        (Story) => (
+            <ul className="max-w-xl">
+                <Story />
+            </ul>
+        ),
+    ],
     args: {
         starred: false,
         learned: false,

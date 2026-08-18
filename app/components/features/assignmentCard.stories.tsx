@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactNode } from "react";
 import { trackSteps } from "../../../core/tracks";
 import { AssignmentStepList } from "./assignmentCard";
 
@@ -12,7 +11,13 @@ import { AssignmentStepList } from "./assignmentCard";
 const meta: Meta<typeof AssignmentStepList> = {
     title: "Features/AssignmentStepList",
     component: AssignmentStepList,
-    decorators: [(Story: () => ReactNode) => <div className="max-w-xl">{Story()}</div>],
+    decorators: [
+        (Story) => (
+            <div className="max-w-xl">
+                <Story />
+            </div>
+        ),
+    ],
 };
 export default meta;
 

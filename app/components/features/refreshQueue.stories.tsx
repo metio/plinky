@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactNode } from "react";
 import { RefreshQueue } from "./refreshQueue";
 
 // What is due for review, and the empty state that says nothing is. The empty one earns
@@ -11,7 +10,13 @@ import { RefreshQueue } from "./refreshQueue";
 const meta: Meta<typeof RefreshQueue> = {
     title: "Features/RefreshQueue",
     component: RefreshQueue,
-    decorators: [(Story: () => ReactNode) => <div className="max-w-xl">{Story()}</div>],
+    decorators: [
+        (Story) => (
+            <div className="max-w-xl">
+                <Story />
+            </div>
+        ),
+    ],
 };
 export default meta;
 

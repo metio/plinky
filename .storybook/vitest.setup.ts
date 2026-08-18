@@ -27,6 +27,12 @@ const EMOJI_STORIES = new Set([
     "dailyReveal.stories.tsx > Present",
     "youStanding.stories.tsx > Standing",
     "youStanding.stories.tsx > Competitive",
+    "surpriseButton.stories.tsx > Default",
+    "loopRangeBar.stories.tsx > Whole Song",
+    "loopRangeBar.stories.tsx > Narrowed",
+    "loopRangeBar.stories.tsx > One Bar",
+    "gradeRoadmap.stories.tsx > Progressing",
+    "gradeRoadmap.stories.tsx > Competitive",
 ]);
 
 // Stories whose thin, absolutely-positioned colour blocks rasterise
