@@ -185,9 +185,12 @@ function Moment({
 // narrow screen wraps more and will still grow a little; the alternative is a page that
 // jumps by two thirds of a screen, which is what this replaced.
 const WAITING = [
-    { label: m.today_moment_warmup, chips: 4, height: 216 },
-    { label: m.today_moment_work, chips: 2, height: 112 },
-    { label: m.today_moment_learn, chips: 1, height: 40 },
+    // The warm-up's placeholders stand in for four pills that are centred, so these are
+    // too: reserving the height but not the alignment would still slide the row sideways
+    // the moment the words arrive, which is the shift this exists to prevent.
+    { label: m.today_moment_warmup, chips: 4, height: 216, centered: true },
+    { label: m.today_moment_work, chips: 2, height: 112, centered: false },
+    { label: m.today_moment_learn, chips: 1, height: 40, centered: false },
 ];
 
 // One press, one start. `lead` marks the day's own thing — the challenge everybody
@@ -489,10 +492,12 @@ export function HomeToday() {
         return (
             <div className="space-y-8" aria-busy="true">
                 {header}
-                {WAITING.map(({ label, chips, height }) => (
+                {WAITING.map(({ label, chips, height, centered }) => (
                     <Moment key={label()} label={label()}>
                         <div
-                            className="flex flex-wrap content-start gap-2"
+                            className={`flex flex-wrap content-start gap-2 ${
+                                centered ? "justify-center" : ""
+                            }`}
                             style={{ minHeight: `${height}px` }}
                             aria-hidden="true"
                         >
@@ -521,7 +526,10 @@ export function HomeToday() {
             {header}
 
             <Moment label={m.today_moment_warmup()}>
-                <div className="flex flex-wrap gap-2">
+                {/* Centred on the keyboard beneath them, which is centred itself, along
+                    with its hint — four pills hard against the left edge read as the
+                    start of a list rather than as the four ways in that they are. */}
+                <div className="flex flex-wrap justify-center gap-2">
                     {daily && (
                         <Chip to={daily.to} lead={!daily.done}>
                             {rowFor(daily, session.titles, session.bests, session.target).label}
