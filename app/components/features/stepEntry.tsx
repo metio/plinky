@@ -27,6 +27,7 @@ export function StepEntry({
     onRest,
     onBack,
     canGoBack,
+    canDot,
 }: {
     on: boolean;
     onOn: (on: boolean) => void;
@@ -37,6 +38,10 @@ export function StepEntry({
     onRest: () => void;
     onBack: () => void;
     canGoBack: boolean;
+    // A dotted sixteenth is one and a half of the engraving's finest cell, so the staff
+    // cannot draw one. Offering the dot there would promise a length the sketch would
+    // quietly round to something else.
+    canDot: boolean;
 }) {
     const label: Record<StepValue, string> = {
         whole: m.step_value_whole(),
@@ -63,9 +68,10 @@ export function StepEntry({
                     />
                     <SwitchField
                         label={m.step_dotted()}
-                        help={m.step_dotted_caption()}
+                        help={canDot ? m.step_dotted_caption() : m.step_dotted_unavailable()}
                         checked={dotted}
                         onChange={onDotted}
+                        disabled={!canDot}
                     />
                     <div className="flex flex-wrap gap-2">
                         <Button variant="secondary" onClick={onRest}>

@@ -1211,5 +1211,6 @@
     "step_dotted": "Punktiert",
     "step_dotted_caption": "Um die Hälfte länger.",
     "step_rest": "Pause einfügen",
-    "step_back": "Eine zurück"
+    "step_back": "Eine zurück",
+    "step_dotted_unavailable": "Eine Sechzehntel ist die kürzeste Note, die das Notenbild zeichnet — punktiert geht hier nicht."
 }

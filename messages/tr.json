@@ -1211,5 +1211,6 @@
     "step_dotted": "Noktalı",
     "step_dotted_caption": "Yarısı kadar daha uzun.",
     "step_rest": "Es ekle",
-    "step_back": "Birini geri al"
+    "step_back": "Birini geri al",
+    "step_dotted_unavailable": "On altılık, porteni çizebildiği en kısa nota — burada nokta olmaz."
 }

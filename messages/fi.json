@@ -1211,5 +1211,6 @@
     "step_dotted": "Pisteellinen",
     "step_dotted_caption": "Puolet pidempi.",
     "step_rest": "Lisää tauko",
-    "step_back": "Yksi takaisin"
+    "step_back": "Yksi takaisin",
+    "step_dotted_unavailable": "Kuudestoistaosa on lyhin, jonka nuottiviivasto piirtää, joten pistettä ei voi lisätä."
 }

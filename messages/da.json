@@ -1211,5 +1211,6 @@
     "step_dotted": "Punkteret",
     "step_dotted_caption": "Halvdelen længere.",
     "step_rest": "Tilføj en pause",
-    "step_back": "En tilbage"
+    "step_back": "En tilbage",
+    "step_dotted_unavailable": "En sekstendedel er den korteste, nodesystemet tegner, så den kan ikke punkteres."
 }

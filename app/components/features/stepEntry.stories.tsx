@@ -14,6 +14,7 @@ const meta: Meta<typeof StepEntry> = {
         value: "quarter",
         dotted: false,
         canGoBack: true,
+        canDot: true,
         onOn: () => {},
         onValue: () => {},
         onDotted: () => {},
@@ -39,4 +40,10 @@ export const Open: Story = { args: { on: true } };
 // A dotted eighth, and nothing yet to take back — the state a take starts in.
 export const EmptyTake: Story = {
     args: { on: true, value: "eighth", dotted: true, canGoBack: false },
+};
+
+// The shortest value, where the dot is held: the staff engraves on a sixteenth grid and a
+// dotted sixteenth is a cell and a half, so it says so rather than rounding quietly.
+export const ShortestValue: Story = {
+    args: { on: true, value: "sixteenth", dotted: false, canDot: false },
 };

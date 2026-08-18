@@ -1211,5 +1211,6 @@
     "step_dotted": "附点",
     "step_dotted_caption": "再长一半。",
     "step_rest": "加一个休止符",
-    "step_back": "退回一个"
+    "step_back": "退回一个",
+    "step_dotted_unavailable": "十六分音符已是谱面能画的最短音符，所以不能加附点。"
 }

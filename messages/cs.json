@@ -1211,5 +1211,6 @@
     "step_dotted": "S tečkou",
     "step_dotted_caption": "O polovinu delší.",
     "step_rest": "Přidat pomlku",
-    "step_back": "O jednu zpět"
+    "step_back": "O jednu zpět",
+    "step_dotted_unavailable": "Šestnáctinová je nejkratší, kterou notová osnova nakreslí — tečka tu nejde."
 }

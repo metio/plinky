@@ -1211,5 +1211,6 @@
     "step_dotted": "Con puntillo",
     "step_dotted_caption": "La mitad más larga.",
     "step_rest": "Añadir un silencio",
-    "step_back": "Quitar la última"
+    "step_back": "Quitar la última",
+    "step_dotted_unavailable": "La semicorchea es lo más corto que dibuja el pentagrama, así que aquí no hay puntillo."
 }

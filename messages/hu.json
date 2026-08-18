@@ -1211,5 +1211,6 @@
     "step_dotted": "Pontozott",
     "step_dotted_caption": "Feleannyival hosszabb.",
     "step_rest": "Szünet hozzáadása",
-    "step_back": "Egyet vissza"
+    "step_back": "Egyet vissza",
+    "step_dotted_unavailable": "A tizenhatod a legrövidebb, amit a kotta rajzol, így nem lehet pontozni."
 }

@@ -1211,5 +1211,6 @@
     "step_dotted": "Dotted",
     "step_dotted_caption": "Half as long again.",
     "step_rest": "Add a rest",
-    "step_back": "Take one back"
+    "step_back": "Take one back",
+    "step_dotted_unavailable": "A sixteenth is as short as the staff draws, so it can't be dotted."
 }

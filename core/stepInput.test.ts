@@ -148,3 +148,26 @@ describe("picking up an existing take", () => {
         expect(stepFrom(overlapping).atMs).toBe(2000);
     });
 });
+
+// What the staff can actually draw. The sketch engraves on a fixed sixteenth grid, so a
+// value that is not a whole number of sixteenths is rounded to one that is — and the
+// player is shown a note they did not write.
+describe("what the engraving can hold", () => {
+    const SIXTEENTH = stepDurationMs("sixteenth", 120);
+
+    it("gives every offered value a whole number of sixteenths", () => {
+        for (const value of ["whole", "half", "quarter", "eighth", "sixteenth"] as const) {
+            const cells = stepDurationMs(value, 120) / SIXTEENTH;
+            expect(Number.isInteger(cells)).toBe(true);
+        }
+    });
+
+    it("gives every dotted value a whole number too, except the shortest", () => {
+        for (const value of ["whole", "half", "quarter", "eighth"] as const) {
+            const cells = stepDurationMs(value, 120, true) / SIXTEENTH;
+            expect(Number.isInteger(cells)).toBe(true);
+        }
+        // The one the panel refuses to offer: a dotted sixteenth is a cell and a half.
+        expect(stepDurationMs("sixteenth", 120, true) / SIXTEENTH).toBe(1.5);
+    });
+});

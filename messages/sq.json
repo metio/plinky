@@ -1211,5 +1211,6 @@
     "step_dotted": "Me pikë",
     "step_dotted_caption": "Gjysma më e gjatë.",
     "step_rest": "Shto një pauzë",
-    "step_back": "Kthe një pas"
+    "step_back": "Kthe një pas",
+    "step_dotted_unavailable": "E gjashtëmbëdhjeta është më e shkurtra që vizaton pentagrami, ndaj nuk merr pikë."
 }

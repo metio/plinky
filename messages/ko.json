@@ -1211,5 +1211,6 @@
     "step_dotted": "점",
     "step_dotted_caption": "1.5배 길게.",
     "step_rest": "쉼표 넣기",
-    "step_back": "하나 되돌리기"
+    "step_back": "하나 되돌리기",
+    "step_dotted_unavailable": "16분음표는 악보가 그릴 수 있는 가장 짧은 음이라 점을 붙일 수 없어요."
 }

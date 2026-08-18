@@ -1211,5 +1211,6 @@
     "step_dotted": "Gepunteerd",
     "step_dotted_caption": "De helft langer.",
     "step_rest": "Rust toevoegen",
-    "step_back": "Eentje terug"
+    "step_back": "Eentje terug",
+    "step_dotted_unavailable": "Een zestiende is de kortste die de notenbalk tekent, dus hier geen punt."
 }
