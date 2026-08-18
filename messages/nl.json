@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Een octaaf omhoog gezet zodat het op je klavier past",
     "play_fit_up_other": "{count} octaven omhoog gezet zodat het op je klavier past",
     "play_fit_beyond": "Dit stuk valt aan beide kanten buiten je klavier en klinkt daarom zoals het genoteerd staat",
-    "run_group_pace_title": "Handen en tempo"
+    "run_group_pace_title": "Handen en tempo",
+    "step_entry": "Noot voor noot opschrijven",
+    "step_entry_caption": "De toetsen geven de toonhoogte, jij zegt hoe lang hij duurt — zo komt een stuk dat je nog niet snel kunt spelen toch op maat uit. Toetsen die je samen indrukt worden een akkoord.",
+    "step_value": "Nootlengte",
+    "step_value_whole": "Hele",
+    "step_value_half": "Halve",
+    "step_value_quarter": "Kwart",
+    "step_value_eighth": "Achtste",
+    "step_value_sixteenth": "Zestiende",
+    "step_dotted": "Gepunteerd",
+    "step_dotted_caption": "De helft langer.",
+    "step_rest": "Rust toevoegen",
+    "step_back": "Eentje terug"
 }

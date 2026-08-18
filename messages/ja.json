@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "鍵盤に収まるよう1オクターブ上げました",
     "play_fit_up_other": "鍵盤に収まるよう{count}オクターブ上げました",
     "play_fit_beyond": "この曲は両端とも鍵盤からはみ出すので、楽譜どおりに鳴ります",
-    "run_group_pace_title": "手とテンポ"
+    "run_group_pace_title": "手とテンポ",
+    "step_entry": "一音ずつ書く",
+    "step_entry_caption": "鍵盤が音の高さを、長さはあなたが決めます。速く弾けない曲でも、拍どおりに書けます。同時に押した鍵は和音になります。",
+    "step_value": "音の長さ",
+    "step_value_whole": "全音符",
+    "step_value_half": "2分音符",
+    "step_value_quarter": "4分音符",
+    "step_value_eighth": "8分音符",
+    "step_value_sixteenth": "16分音符",
+    "step_dotted": "付点",
+    "step_dotted_caption": "1.5倍の長さ。",
+    "step_rest": "休符を入れる",
+    "step_back": "ひとつ戻す"
 }

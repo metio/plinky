@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Subida uma oitava para caber no teu teclado",
     "play_fit_up_other": "Subida {count} oitavas para caber no teu teclado",
     "play_fit_beyond": "Esta peça passa do teu teclado dos dois lados, por isso soa tal como está escrita",
-    "run_group_pace_title": "Mãos e andamento"
+    "run_group_pace_title": "Mãos e andamento",
+    "step_entry": "Escrevê-la nota a nota",
+    "step_entry_caption": "As teclas dão a altura e tu dizes quanto dura, por isso uma peça que ainda não consegues tocar depressa sai à mesma a tempo. Teclas carregadas ao mesmo tempo formam um acorde.",
+    "step_value": "Duração",
+    "step_value_whole": "Semibreve",
+    "step_value_half": "Mínima",
+    "step_value_quarter": "Semínima",
+    "step_value_eighth": "Colcheia",
+    "step_value_sixteenth": "Semicolcheia",
+    "step_dotted": "Com ponto",
+    "step_dotted_caption": "Metade mais longa.",
+    "step_rest": "Juntar uma pausa",
+    "step_back": "Voltar uma"
 }

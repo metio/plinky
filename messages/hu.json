@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Egy oktávval feljebb, hogy elférjen a billentyűzeteden",
     "play_fit_up_other": "{count} oktávval feljebb, hogy elférjen a billentyűzeteden",
     "play_fit_beyond": "Ez a darab mindkét végén túlnyúlik a billentyűzeteden, ezért úgy szól, ahogy le van írva",
-    "run_group_pace_title": "Kezek és tempó"
+    "run_group_pace_title": "Kezek és tempó",
+    "step_entry": "Írd le hangról hangra",
+    "step_entry_caption": "A billentyűk adják a magasságot, a hosszát te mondod — így ütemben jön ki az a darab is, amit még nem tudsz gyorsan játszani. Az együtt lenyomott billentyűk akkordot adnak.",
+    "step_value": "Hangérték",
+    "step_value_whole": "Egész",
+    "step_value_half": "Fél",
+    "step_value_quarter": "Negyed",
+    "step_value_eighth": "Nyolcad",
+    "step_value_sixteenth": "Tizenhatod",
+    "step_dotted": "Pontozott",
+    "step_dotted_caption": "Feleannyival hosszabb.",
+    "step_rest": "Szünet hozzáadása",
+    "step_back": "Egyet vissza"
 }

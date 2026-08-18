@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Ngritur një oktavë që të hyjë në tastierën tënde",
     "play_fit_up_other": "Ngritur {count} oktava që të hyjë në tastierën tënde",
     "play_fit_beyond": "Kjo pjesë del jashtë tastierës sate në të dy skajet, prandaj tingëllon siç është shkruar",
-    "run_group_pace_title": "Duart dhe ritmi"
+    "run_group_pace_title": "Duart dhe ritmi",
+    "step_entry": "Shkruaje notë për notë",
+    "step_entry_caption": "Tastet japin lartësinë dhe ti thua sa zgjat — kështu një pjesë që ende nuk e luan shpejt del gjithsesi në ritëm. Tastet e shtypura bashkë bëjnë një akord.",
+    "step_value": "Kohëzgjatja",
+    "step_value_whole": "E plotë",
+    "step_value_half": "Gjysmë",
+    "step_value_quarter": "Çerek",
+    "step_value_eighth": "E teta",
+    "step_value_sixteenth": "E gjashtëmbëdhjeta",
+    "step_dotted": "Me pikë",
+    "step_dotted_caption": "Gjysma më e gjatë.",
+    "step_rest": "Shto një pauzë",
+    "step_back": "Kthe një pas"
 }

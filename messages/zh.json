@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "上移了一个八度，好放进你的键盘",
     "play_fit_up_other": "上移了 {count} 个八度，好放进你的键盘",
     "play_fit_beyond": "这首曲子两端都超出你的键盘，所以按谱面原样演奏",
-    "run_group_pace_title": "双手与速度"
+    "run_group_pace_title": "双手与速度",
+    "step_entry": "一个音一个音地写",
+    "step_entry_caption": "琴键决定音高，长短由你定，所以还弹不快的曲子也能写得合拍。同时按下的键会成为和弦。",
+    "step_value": "音符时值",
+    "step_value_whole": "全音符",
+    "step_value_half": "二分音符",
+    "step_value_quarter": "四分音符",
+    "step_value_eighth": "八分音符",
+    "step_value_sixteenth": "十六分音符",
+    "step_dotted": "附点",
+    "step_dotted_caption": "再长一半。",
+    "step_rest": "加一个休止符",
+    "step_back": "退回一个"
 }

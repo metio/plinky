@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Hævet en oktav, så det passer på dit klaviatur",
     "play_fit_up_other": "Hævet {count} oktaver, så det passer på dit klaviatur",
     "play_fit_beyond": "Dette stykke rækker ud over dit klaviatur i begge ender, så det lyder, som det er skrevet",
-    "run_group_pace_title": "Hænder og tempo"
+    "run_group_pace_title": "Hænder og tempo",
+    "step_entry": "Skriv den node for node",
+    "step_entry_caption": "Tangenterne giver tonehøjden, og du siger hvor længe den varer — et stykke du endnu ikke spiller hurtigt, kommer alligevel ud i takt. Tangenter trykket sammen bliver en akkord.",
+    "step_value": "Nodelængde",
+    "step_value_whole": "Hel",
+    "step_value_half": "Halv",
+    "step_value_quarter": "Fjerdedel",
+    "step_value_eighth": "Ottendedel",
+    "step_value_sixteenth": "Sekstendedel",
+    "step_dotted": "Punkteret",
+    "step_dotted_caption": "Halvdelen længere.",
+    "step_rest": "Tilføj en pause",
+    "step_back": "En tilbage"
 }

@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Siirretty oktaavi ylöspäin, jotta se mahtuu koskettimistollesi",
     "play_fit_up_other": "Siirretty {count} oktaavia ylöspäin, jotta se mahtuu koskettimistollesi",
     "play_fit_beyond": "Tämä kappale ylittää koskettimistosi molemmista päistä, joten se soi kuten se on kirjoitettu",
-    "run_group_pace_title": "Kädet ja tempo"
+    "run_group_pace_title": "Kädet ja tempo",
+    "step_entry": "Kirjoita se nuotti kerrallaan",
+    "step_entry_caption": "Koskettimet antavat sävelkorkeuden ja sinä kerrot keston — kappale, jota et vielä soita nopeasti, tulee silti tahdissa. Yhtä aikaa painetut koskettimet tekevät soinnun.",
+    "step_value": "Nuotin kesto",
+    "step_value_whole": "Kokonuotti",
+    "step_value_half": "Puolinuotti",
+    "step_value_quarter": "Neljäsosa",
+    "step_value_eighth": "Kahdeksasosa",
+    "step_value_sixteenth": "Kuudestoistaosa",
+    "step_dotted": "Pisteellinen",
+    "step_dotted_caption": "Puolet pidempi.",
+    "step_rest": "Lisää tauko",
+    "step_back": "Yksi takaisin"
 }

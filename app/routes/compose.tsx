@@ -7,6 +7,7 @@ import { ComposeControls } from "../components/features/composeControls";
 import { ComposeExportBar } from "../components/features/composeExportBar";
 import { ComposeSettings } from "../components/features/composeSettings";
 import { ComposeStage } from "../components/features/composeStage";
+import { StepEntry } from "../components/features/stepEntry";
 import { useOnboardingStore, useServices } from "../contexts/services";
 import { useFullscreen } from "../hooks/useFullscreen";
 import { useComposeFile } from "../hooks/useComposeFile";
@@ -17,6 +18,7 @@ import { useMetronome } from "../hooks/useMetronome";
 import { useStaffSketch } from "../hooks/useStaffSketch";
 import { type Composition, decodeComposition } from "../../core/composition";
 import { followKeyboardWindow, type Span } from "../../core/keyboardWindow";
+import { stepDurationMs, type StepValue } from "../../core/stepInput";
 import { routeMeta } from "../../core/site";
 import { m } from "../paraglide/messages.js";
 import type { Route } from "./+types/compose";
@@ -46,7 +48,16 @@ export default function Compose() {
         followKeyboardWindow(null, 60, KEYBOARD_SPAN, COMPOSE_REACH),
     );
 
+    // Writing the piece down rather than playing it. Off by default: compose is a place
+    // to improvise first, and a mode that changed what the keys do without being asked
+    // would be a surprise mid-take.
+    const [stepping, setStepping] = useState(false);
+    const [stepValue, setStepValue] = useState<StepValue>("quarter");
+    const [stepDotted, setStepDotted] = useState(false);
+    const stepMs = stepping ? stepDurationMs(stepValue, tempo, stepDotted) : null;
+
     const recorder = useCompositionRecorder({
+        stepMs,
         // The first recorded note means the player has tried composing.
         // Slide the on-screen keyboard to keep what's being played in view.
         onPitch: (note) =>
@@ -193,6 +204,18 @@ export default function Compose() {
                         }}
                     />
                 }
+            />
+
+            <StepEntry
+                on={stepping}
+                onOn={setStepping}
+                value={stepValue}
+                onValue={setStepValue}
+                dotted={stepDotted}
+                onDotted={setStepDotted}
+                onRest={recorder.rest}
+                onBack={recorder.back}
+                canGoBack={notes.length > 0}
             />
 
             <ComposeSettings

@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Eine Oktave höher gelegt, damit es auf deine Tastatur passt",
     "play_fit_up_other": "{count} Oktaven höher gelegt, damit es auf deine Tastatur passt",
     "play_fit_beyond": "Dieses Stück reicht an beiden Enden über deine Tastatur hinaus und erklingt daher wie notiert",
-    "run_group_pace_title": "Hände und Tempo"
+    "run_group_pace_title": "Hände und Tempo",
+    "step_entry": "Note für Note schreiben",
+    "step_entry_caption": "Die Tasten geben die Tonhöhe an, die Länge sagst du — so kommt auch ein Stück im Takt heraus, das du noch nicht schnell spielen kannst. Zusammen gedrückte Tasten ergeben einen Akkord.",
+    "step_value": "Notenlänge",
+    "step_value_whole": "Ganze",
+    "step_value_half": "Halbe",
+    "step_value_quarter": "Viertel",
+    "step_value_eighth": "Achtel",
+    "step_value_sixteenth": "Sechzehntel",
+    "step_dotted": "Punktiert",
+    "step_dotted_caption": "Um die Hälfte länger.",
+    "step_rest": "Pause einfügen",
+    "step_back": "Eine zurück"
 }

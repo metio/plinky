@@ -1199,5 +1199,17 @@
     "play_fit_up_one": "Podniesiony o oktawę, żeby zmieścił się na twojej klawiaturze",
     "play_fit_up_other": "Podniesiony o {count} oktawy, żeby zmieścił się na twojej klawiaturze",
     "play_fit_beyond": "Ten utwór wychodzi poza twoją klawiaturę z obu stron, więc brzmi tak, jak został zapisany",
-    "run_group_pace_title": "Ręce i tempo"
+    "run_group_pace_title": "Ręce i tempo",
+    "step_entry": "Zapisz ją nuta po nucie",
+    "step_entry_caption": "Klawisze dają wysokość, a ty mówisz, jak długo trwa — więc utwór, którego jeszcze nie zagrasz szybko, i tak wyjdzie w rytmie. Klawisze naciśnięte razem tworzą akord.",
+    "step_value": "Długość nuty",
+    "step_value_whole": "Cała",
+    "step_value_half": "Półnuta",
+    "step_value_quarter": "Ćwierćnuta",
+    "step_value_eighth": "Ósemka",
+    "step_value_sixteenth": "Szesnastka",
+    "step_dotted": "Z kropką",
+    "step_dotted_caption": "O połowę dłużej.",
+    "step_rest": "Dodaj pauzę",
+    "step_back": "Cofnij jedną"
 }

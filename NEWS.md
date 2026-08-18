@@ -10,6 +10,14 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 18 August 2026
 
+**Write a piece down a note at a time.** Compose has always recorded what you played,
+which is right for an improvisation and wrong for a tune you know but can't yet play up to
+speed — your hesitation became the rhythm. Turn on *Write it note by note* and the keys
+name the pitch while you say how long each one lasts, so it comes out in time however
+slowly you enter it. Keys pressed together make a chord, there's a button for a rest and
+one to take the last note back, and you can switch it on halfway through a take without
+losing what's already there.
+
 **Titles read like titles.** Scores arrive from their sources typed however whoever
 uploaded them typed it, and a few dozen showed it: four titles printed `&quot;` where the
 quotation marks should have been, one was the web address it came from, one was a filename

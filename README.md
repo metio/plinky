@@ -415,7 +415,10 @@ playback is exactly what you played; the staff is an approximate sketch, snapped
 grid so it reads as notation, with simultaneous notes drawn as chords. Play along to
 the **metronome** with a one-bar count-in for a tidier rhythm, set a **checkpoint** to
 keep the good part and retry the tail, then **share the take by link** or download it
-as **MIDI** or **MusicXML**. Open a MIDI or MusicXML file back in to pick up where you
+as **MIDI** or **MusicXML**. Knowing a tune you can't yet play up to speed is its own
+problem, so **Write it note by note** turns the keys into pitch names and lets you say how
+long each note lasts — chords are keys pressed together, and there's a rest and an undo.
+It can be switched on partway through a take. Open a MIDI or MusicXML file back in to pick up where you
 left off on another device.
 
 ## Sharing
