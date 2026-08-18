@@ -22,18 +22,20 @@ const world = () => {
 };
 
 describe("useReadingMode", () => {
-    it("follows the flow toggles' defaults — scroll-follow on, fingering off", () => {
+    it("follows the flow toggles' defaults — scroll-follow on, fingering on", () => {
+        // Fingering is one of the reading aids now, so it starts where the rest of the
+        // starter rung does: on, for a beginner to shed rather than to find.
         const { wrapper } = world();
         const { result } = renderHook(() => useReadingMode(), { wrapper });
         expect(result.current.scrollFollow).toBe(true);
-        expect(result.current.showFingerings).toBe(false);
+        expect(result.current.showFingerings).toBe(true);
     });
 
     it("seeds the on-staff fingering from the saved default", () => {
         const { prefs, wrapper } = world();
-        prefs.save({ ...prefs.load(), showFingerings: true });
+        prefs.save({ ...prefs.load(), showFingerings: false });
         const { result } = renderHook(() => useReadingMode(), { wrapper });
-        expect(result.current.showFingerings).toBe(true);
+        expect(result.current.showFingerings).toBe(false);
     });
 
     it("persists the layout toggles to the prefs store", () => {
@@ -56,8 +58,8 @@ describe("useReadingMode", () => {
         const { prefs, wrapper } = world();
         const { result } = renderHook(() => useReadingMode(), { wrapper });
         act(() => result.current.setShowFingerings((on) => !on));
-        expect(result.current.showFingerings).toBe(true);
-        // Session-only: the saved default stays off.
-        expect(prefs.load().showFingerings).toBe(false);
+        expect(result.current.showFingerings).toBe(false);
+        // Session-only: the saved default stays as it was.
+        expect(prefs.load().showFingerings).toBe(true);
     });
 });

@@ -234,7 +234,7 @@ function usePlaySessionValue({
     // How the score is laid out and read — bars per row, bar numbers, treadmill, on-staff
     // fingering and follow-the-note scrolling — the toggles that feed the OSMD render.
     const reading = useReadingMode();
-    const { barsPerRow, barNumbers, treadmill, showFingerings, scrollFollow } = reading;
+    const { barsPerRow, barNumbers, treadmill, scrollFollow } = reading;
     // Keep-going mode, remembered across pieces; captured by the matcher at run start.
     const [forgiving, setForgiving] = usePref(prefsStore, "forgiving");
     const savedNoteLabels = useNoteLabels();
@@ -252,6 +252,7 @@ function usePlaySessionValue({
         noteLabels: savedNoteLabels,
         noteHints,
         colorNotes: reading.colorNotes,
+        showFingerings: reading.showFingerings,
         forgiving,
         highway: reading.highway,
     });
@@ -341,7 +342,7 @@ function usePlaySessionValue({
         showAccompaniment: reading.showAccompaniment,
         colorNotes: aids.colorNotes,
         focus: focusRange,
-        showFingerings,
+        showFingerings: aids.showFingerings,
         scrollFollow,
         onReload: () => {
             listenPlayback.stop();

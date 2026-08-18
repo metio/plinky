@@ -10,7 +10,7 @@ const BASE: Prefs = {
     volume: 80,
     masteryThreshold: "A",
     handSpan: { left: null, right: null },
-    showFingerings: false,
+    showFingerings: true,
     beams: "auto",
     showAccompaniment: false,
     colorNotes: true,
@@ -102,9 +102,11 @@ describe("parsePrefs", () => {
         expect(parsePrefs(stored({ barNumbers: false })).barNumbers).toBe(false);
     });
 
-    it("defaults fingering numbers off and keeps the stored toggle", () => {
-        expect(parsePrefs(null).showFingerings).toBe(false);
-        expect(parsePrefs(stored({ showFingerings: true })).showFingerings).toBe(true);
+    it("defaults fingering numbers on with the starter rung, and keeps the stored toggle", () => {
+        // Printed fingering is one of the reading aids, so it starts where every other aid
+        // starts: on, for a beginner to shed rather than to find.
+        expect(parsePrefs(null).showFingerings).toBe(true);
+        expect(parsePrefs(stored({ showFingerings: false })).showFingerings).toBe(false);
     });
 
     it("defaults note hints to always-on and rejects an unknown value", () => {

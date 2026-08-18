@@ -346,8 +346,9 @@ function RunSetupPanel() {
                         />
                         <SwitchField
                             label={m.action_finger_numbers()}
-                            checked={reading.showFingerings}
+                            checked={sightRead.on ? false : reading.showFingerings}
                             onChange={(on) => reading.setShowFingerings(on)}
+                            disabled={sightRead.on}
                             help={m.finger_numbers_hint()}
                         />
                         {hasSaved && reading.showFingerings && (

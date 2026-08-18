@@ -36,10 +36,10 @@ export type Prefs = {
     volume: number; // 0..100
     masteryThreshold: Letter; // grade a score must reach to count as learned
     handSpan: HandSpan;
-    // Print the suggested fingering numbers on the staff. Off by default for a cleaner
-    // score — a player turns them on (in Settings, or with the in-play toggle) when they
-    // want the hint, the way they'd read fingering off printed sheet music only when
-    // stuck.
+    // Print the suggested fingering numbers on the staff. One of the reading aids, so it
+    // rides the skill ladder: on for the two beginner rungs and off from Confident down,
+    // and stripped entirely by a sight-read. On by default, because a fresh device reads
+    // as Starter and a starter is given every aid to shed rather than none to find.
     showFingerings: boolean;
     // Whether the score joins fast notes into beam groups. "auto" (the default) follows
     // the piece's difficulty — flags on the easy grades a beginner reads note-by-note,
@@ -209,15 +209,16 @@ function defaults(): Prefs {
         volume: 80,
         masteryThreshold: "A",
         handSpan: { left: null, right: null },
-        showFingerings: false,
+        showFingerings: true,
         beams: "auto",
-        // These five aid fields are exactly the "starter" rung of core/readingLevel's
+        // These aid fields are exactly the "starter" rung of core/readingLevel's
         // ladder, so a device that has touched nothing reads as a real level rather than
         // "Custom" — a strange thing to tell someone who has changed nothing — and the
         // run panel's beginner layout, which keys off the level, reaches the people it
         // was built for. Starter is the whole point of a beginner-first app: every aid
-        // on, including the notes highway, until the reader chooses otherwise. A test
-        // pins the pairing, so moving either side without the other fails.
+        // on, including the notes highway and the printed fingering, until the reader
+        // chooses otherwise. A test pins the pairing, so moving either side without the
+        // other fails.
         showAccompaniment: false,
         colorNotes: true,
         noteHints: "always",

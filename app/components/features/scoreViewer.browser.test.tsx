@@ -187,17 +187,17 @@ describe("ScoreViewer", () => {
         expect(follow.getAttribute("aria-checked")).toBe("true");
         fireEvent.click(follow);
         expect(follow.getAttribute("aria-checked")).toBe("false");
-        // Fingering numbers are off by default (the flipped setting); the toggle turns
-        // them on for the session.
+        // Fingering rides the reading ladder, so which way it starts is that ladder's
+        // business; what this asserts is that flipping it takes effect for the session.
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
-        expect(fingers.getAttribute("aria-checked")).toBe("false");
+        const before = fingers.getAttribute("aria-checked");
         fireEvent.click(fingers);
         await waitFor(() =>
             expect(
                 screen
                     .getByRole("switch", { name: "Finger position numbers" })
                     .getAttribute("aria-checked"),
-            ).toBe("true"),
+            ).toBe(before === "true" ? "false" : "true"),
         );
     });
 
@@ -213,14 +213,18 @@ describe("ScoreViewer", () => {
         await awaitReady();
         const score = screen.getByRole("img", { name: "T" });
         const textCount = () => score.querySelectorAll("text").length;
-        const baseline = textCount();
+        // Fingering starts on, with the starter rung of the reading ladder.
+        const withNumbers = textCount();
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
-        // On: the fingering digits are drawn, adding text nodes to the staff.
+        expect(fingers.getAttribute("aria-checked")).toBe("true");
+        // Off: every digit is gone, not left stranded over the reclaimed space.
         fireEvent.click(fingers);
-        await waitFor(() => expect(textCount()).toBeGreaterThan(baseline), { timeout: 30000 });
-        // Off: every one of them is gone again.
+        await waitFor(() => expect(textCount()).toBeLessThan(withNumbers), { timeout: 30000 });
+        const bare = textCount();
+        // On again: they come back, which needs the graphic model rebuilt rather than
+        // merely re-rendered.
         fireEvent.click(fingers);
-        await waitFor(() => expect(textCount()).toBe(baseline), { timeout: 30000 });
+        await waitFor(() => expect(textCount()).toBeGreaterThan(bare), { timeout: 30000 });
     });
 
     it("runs a tempo-locked play-along and reports how many notes you kept up with", async () => {
@@ -261,10 +265,9 @@ describe("ScoreViewer", () => {
         });
         reveal(m.run_group_practice_title);
         choose(m.run_pace_label, m.keep_up_toggle);
-        // Draw the fingering numbers before the run, then let the run play over them.
+        // The run plays over drawn fingering numbers, which the starter rung has on.
         const fingers = screen.getByRole("switch", { name: "Finger position numbers" });
-        fireEvent.click(fingers);
-        await waitFor(() => expect(fingers.getAttribute("aria-checked")).toBe("true"));
+        expect(fingers.getAttribute("aria-checked")).toBe("true");
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         // The run counts in, plays to the end and reports the tally.
         expect(

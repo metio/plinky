@@ -13,6 +13,7 @@ describe("levelAids", () => {
             colorNotes: true,
             forgiving: true,
             highway: true,
+            showFingerings: true,
         });
         expect(levelAids("sightReader")).toEqual({
             noteLabels: "off",
@@ -20,7 +21,17 @@ describe("levelAids", () => {
             colorNotes: false,
             forgiving: false,
             highway: false,
+            showFingerings: false,
         });
+    });
+
+    it("takes the printed fingering off a sight-reader", () => {
+        // "One cold read, nothing to lean on" — and a fingering number printed over the
+        // note is something to lean on. It used not to be part of the ladder at all, so a
+        // sight-read stripped the names, colours, hints and highway and left the numbers.
+        expect(levelAids("sightReader").showFingerings).toBe(false);
+        expect(levelAids("confident").showFingerings).toBe(false);
+        expect(levelAids("starter").showFingerings).toBe(true);
     });
 
     it("sheds help monotonically down the ladder", () => {
@@ -29,7 +40,8 @@ describe("levelAids", () => {
             (aids.noteHints !== "never" ? 1 : 0) +
             (aids.colorNotes ? 1 : 0) +
             (aids.forgiving ? 1 : 0) +
-            (aids.highway ? 1 : 0);
+            (aids.highway ? 1 : 0) +
+            (aids.showFingerings ? 1 : 0);
         const counts = READING_LEVELS.map((level) => helpCount(levelAids(level)));
         for (let i = 1; i < counts.length; i++) {
             expect(counts[i]!).toBeLessThan(counts[i - 1]!);

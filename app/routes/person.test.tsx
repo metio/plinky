@@ -71,6 +71,38 @@ describe("PersonPage", () => {
         expect(screen.queryByText(/Gymnopédie/)).toBeNull();
     });
 
+    it("lists a composer whose work here is all studies", async () => {
+        // The piece count on this page is baked from the song AND exercise manifests, and
+        // the page listed from the songs alone — so Ferdinand Beyer, whose whole presence
+        // in the catalogue is three studies, got a page announcing three pieces and
+        // showing none.
+        server.use(
+            http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)),
+            http.get("*/exercises/manifest.json", () =>
+                HttpResponse.json([
+                    {
+                        id: "x1",
+                        title: "Beyer No. 8",
+                        composer: "Ferdinand Beyer",
+                        grade: 1,
+                        cost: 0,
+                        kind: "study",
+                        license: "CC0-1.0",
+                        tempo: 90,
+                        beatsPerBar: 4,
+                    },
+                    // A study crediting nobody belongs to no page.
+                    { id: "x2", title: "Anon study", grade: 1, cost: 0, kind: "study" },
+                ]),
+            ),
+        );
+        renderWithServices(pageAt("ferdinand-beyer"));
+        expect(await screen.findByRole("heading", { name: "Ferdinand Beyer" })).toBeTruthy();
+        const study = await screen.findByRole("link", { name: /Beyer No\. 8/ });
+        expect(study.getAttribute("href")).toContain("/play/x1");
+        expect(screen.queryByText(/Anon study/)).toBeNull();
+    });
+
     it("says so when the slug matches nobody", async () => {
         server.use(http.get("*/songs/manifest.json", () => HttpResponse.json(MANIFEST)));
         renderWithServices(pageAt("nobody-here"));

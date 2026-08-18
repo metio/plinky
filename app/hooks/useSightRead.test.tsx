@@ -18,6 +18,7 @@ const SAVED: AidPrefs = {
     colorNotes: true,
     forgiving: true,
     highway: true,
+    showFingerings: true,
 };
 
 function mount() {
@@ -139,5 +140,28 @@ describe("useSightRead", () => {
         view.unmount();
 
         expect(scheduler.pending().timers).toBe(0);
+    });
+});
+
+describe("what a sight-read takes away", () => {
+    it("strips the printed fingering along with the rest", () => {
+        // "One cold read, nothing to lean on" — and a number printed over the note is
+        // something to lean on. Fingering was not in the ladder at all, so a sight-read
+        // took the names, colours, hints and highway and left the fingering behind.
+        const { read } = mount();
+        expect(read().aids.showFingerings).toBe(true);
+
+        act(() => read().setOn(true));
+        expect(read().aids).toEqual({
+            noteLabels: "off",
+            noteHints: "never",
+            colorNotes: false,
+            forgiving: false,
+            highway: false,
+            showFingerings: false,
+        });
+
+        act(() => read().setOn(false));
+        expect(read().aids).toEqual(SAVED);
     });
 });
