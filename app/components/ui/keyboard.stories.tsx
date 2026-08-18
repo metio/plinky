@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { Keyboard } from "./keyboard";
 
 const meta: Meta<typeof Keyboard> = {
@@ -27,8 +28,17 @@ export const HeldKeys: Story = {
     args: { lit: new Set([60, 64, 67]) },
 };
 
+// A miss leaves the keyboard as it was. The red cue itself clears on a 450 ms timer
+// the component owns, so a screenshot either races it or catches it mid-fade and never
+// settles — the play function waits it out, and the colour is asserted in
+// keyboard.test.tsx where a jsdom render can hold it still.
 export const WrongFlash: Story = {
     args: { wrong: { note: 62, seq: 1 } },
+    play: async ({ canvasElement }) => {
+        await waitFor(() => expect(canvasElement.querySelector(".bg-danger-fill")).toBeNull(), {
+            timeout: 2000,
+        });
+    },
 };
 
 // The hold-duration fill mid-shrink: a note struck a moment ago (tall fill) and one
