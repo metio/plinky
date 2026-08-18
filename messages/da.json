@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Halvdelen længere.",
     "step_rest": "Tilføj en pause",
     "step_back": "En tilbage",
-    "step_dotted_unavailable": "En sekstendedel er den korteste, nodesystemet tegner, så den kan ikke punkteres."
+    "step_dotted_unavailable": "En sekstendedel er den korteste, nodesystemet tegner, så den kan ikke punkteres.",
+    "compose_count_in_stepping": "Optællingen er til at spille med — skriver du node for node, er timingen allerede sat."
 }

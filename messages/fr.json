@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Une demie de plus.",
     "step_rest": "Ajouter un silence",
     "step_back": "Revenir d'une note",
-    "step_dotted_unavailable": "La double croche est la plus courte que la portée dessine : pas de point ici."
+    "step_dotted_unavailable": "La double croche est la plus courte que la portée dessine : pas de point ici.",
+    "compose_count_in_stepping": "Le décompte sert à jouer en mesure — en écrivant note à note, la durée est déjà fixée."
 }

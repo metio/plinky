@@ -197,6 +197,7 @@ export default function Compose() {
                 onExitFullscreen={exitFullscreen}
                 controls={
                     <ComposeControls
+                        stepping={stepping}
                         empty={empty}
                         playing={transport.playing}
                         countingIn={transport.countingIn}

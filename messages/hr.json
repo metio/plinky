@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Za polovinu dulja.",
     "step_rest": "Dodaj pauzu",
     "step_back": "Jednu natrag",
-    "step_dotted_unavailable": "Šesnaestinka je najkraća koju crtovlje crta, pa ovdje nema točke."
+    "step_dotted_unavailable": "Šesnaestinka je najkraća koju crtovlje crta, pa ovdje nema točke.",
+    "compose_count_in_stepping": "Odbrojavanje služi za sviranje u ritmu — kad pišeš notu po notu, trajanje je već zadano."
 }

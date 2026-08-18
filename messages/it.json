@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Metà più lunga.",
     "step_rest": "Aggiungi una pausa",
     "step_back": "Torna indietro",
-    "step_dotted_unavailable": "La semicroma è la più breve che il pentagramma disegni, quindi qui niente punto."
+    "step_dotted_unavailable": "La semicroma è la più breve che il pentagramma disegni, quindi qui niente punto.",
+    "compose_count_in_stepping": "Il conto d'inizio serve per suonare a tempo — scrivendo nota per nota la durata è già decisa."
 }

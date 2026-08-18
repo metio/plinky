@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "1.5배 길게.",
     "step_rest": "쉼표 넣기",
     "step_back": "하나 되돌리기",
-    "step_dotted_unavailable": "16분음표는 악보가 그릴 수 있는 가장 짧은 음이라 점을 붙일 수 없어요."
+    "step_dotted_unavailable": "16분음표는 악보가 그릴 수 있는 가장 짧은 음이라 점을 붙일 수 없어요.",
+    "compose_count_in_stepping": "카운트인은 맞춰 연주할 때 쓰는 기능이에요. 한 음씩 적을 때는 길이가 이미 정해져 있어요."
 }

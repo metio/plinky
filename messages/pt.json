@@ -1212,5 +1212,6 @@
     "step_dotted_caption": "Metade mais longa.",
     "step_rest": "Juntar uma pausa",
     "step_back": "Voltar uma",
-    "step_dotted_unavailable": "A semicolcheia é a mais curta que a pauta desenha, por isso aqui não há ponto."
+    "step_dotted_unavailable": "A semicolcheia é a mais curta que a pauta desenha, por isso aqui não há ponto.",
+    "compose_count_in_stepping": "A contagem serve para tocares a tempo — a escrever nota a nota a duração já está definida."
 }
