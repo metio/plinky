@@ -40,7 +40,19 @@ export function GradeBadge() {
         // A finished run saves mastery through the store; both the grade and the
         // decay-mode mark also shift when preferences change.
         const unsubscribeMastery = services.mastery.subscribe(read);
-        const unsubscribePrefs = prefsStore.subscribe(read);
+        // Of everything in the preferences this badge reads one field, and it sits in the
+        // app shell — so subscribing to the lot meant re-reading the ladder on every
+        // switch flipped anywhere in the app, including every reading aid toggled from
+        // the play surface mid-piece.
+        let mode = prefsStore.load().decayMode;
+        const unsubscribePrefs = prefsStore.subscribe(() => {
+            const next = prefsStore.load().decayMode;
+            if (next === mode) {
+                return;
+            }
+            mode = next;
+            read();
+        });
         return () => {
             cancelled = true;
             unsubscribeMastery();

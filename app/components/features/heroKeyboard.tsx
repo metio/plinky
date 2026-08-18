@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { holdScaleFor } from "../../../core/midi";
-import { useMidiConnection, useMidiInput } from "../../contexts/midi";
+import { useMidiConnection, useMidiInput, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
@@ -27,7 +27,8 @@ export function HeroKeyboard() {
     const theme = useKeyboardTheme();
     // The shared input funnel: touch taps and a connected MIDI keyboard both flow through
     // it, and heldNotes is the single source of truth for which keys are down (and lit).
-    const { heldNotes, pressKey, releaseKey } = useMidiConnection();
+    const { pressKey, releaseKey } = useMidiConnection();
+    const heldNotes = useHeldNotes();
 
     // Sound the app's own piano voice for whatever the funnel reports — a live voice on
     // note-on, released on note-off — so the hold shapes the sound exactly as it does in

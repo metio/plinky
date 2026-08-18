@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { loadBundledScores, loadUserScores } from "./catalog";
+import { loadBundledScores, loadUserScores, userScoresRaw } from "./catalog";
 import { earCatalogItems } from "./earProgress";
 import { encodeIncipit, readIncipit } from "../../core/incipit";
 import type { ItemKind } from "../../core/practisable";
@@ -186,7 +186,39 @@ export type CatalogSources = {
 // The whole gradeable catalogue, keyed by id: songs and exercises from their
 // manifests (grade + cost precomputed), bundled and imported scores graded from their
 // MusicXML. The pools the grades draw from.
+// The last catalogue built, per store.
+//
+// Building one walks three thousand manifest entries and parses the MusicXML of every
+// bundled and imported score, and both loaders below call it — so the Home panel that
+// wants each of them paid for it twice, and the header badge paid again on every
+// preference saved anywhere in the app. The manifests behind it are already cached for
+// the session; this caches the assembling.
+//
+// Keyed on the store, so each test's isolated world keeps its own; validated against the
+// sources it was built from and against the raw imported-scores string, so importing or
+// removing a score rebuilds it rather than serving a catalogue that has quietly lost a
+// piece. A WeakMap because a store that goes away should take its catalogue with it.
+type BuiltCatalogue = {
+    songs: CatalogSources["songs"];
+    exercises: CatalogSources["exercises"];
+    xml: XmlCodec;
+    scores: string | null;
+    index: Map<string, GradeCatalogItem>;
+};
+const BUILT = new WeakMap<KeyValueStore, BuiltCatalogue>();
+
 async function buildCatalogue(sources: CatalogSources): Promise<Map<string, GradeCatalogItem>> {
+    const scores = userScoresRaw(sources.store);
+    const cached = BUILT.get(sources.store);
+    if (
+        cached &&
+        cached.songs === sources.songs &&
+        cached.exercises === sources.exercises &&
+        cached.xml === sources.xml &&
+        cached.scores === scores
+    ) {
+        return cached.index;
+    }
     const index = new Map<string, GradeCatalogItem>();
     // A failed manifest (null) contributes nothing this pass; the catalogue is
     // rebuilt on the next load, so the gap heals once the network is back.
@@ -231,6 +263,13 @@ async function buildCatalogue(sources: CatalogSources): Promise<Map<string, Grad
             ...(opening ? { incipit: encodeIncipit(opening) } : {}),
         });
     }
+    BUILT.set(sources.store, {
+        songs: sources.songs,
+        exercises: sources.exercises,
+        xml: sources.xml,
+        scores,
+        index,
+    });
     return index;
 }
 

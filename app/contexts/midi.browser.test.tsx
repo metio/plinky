@@ -8,17 +8,21 @@ import { cleanup } from "@testing-library/react";
 import { fakeMidi, fakeMidiInput } from "../adapters/fakeMidi";
 import { webMidi } from "../adapters/webMidi";
 import { ServicesProvider } from "./services";
-import { MidiProvider, useMidiConnection, useMidiInput } from "./midi";
+import { MidiProvider, useMidiConnection, useMidiInput, useHeldNotes } from "./midi";
 
 // Real chromium, with the "midi" permission granted at the browser-context level
 // (vitest.config.ts) — so the genuine Web MIDI adapter runs its full permission,
 // request and resume paths, not a stub of them.
 
+// The keys down live in their own context now, so a test that wants both reads both. The
+// split is the point: pressing a key re-renders what lights keys, and nothing else.
+const useMidiState = () => ({ ...useMidiConnection(), heldNotes: useHeldNotes() });
+
 afterEach(cleanup);
 
 // A probe that renders the connection state the tests assert on.
 function Probe() {
-    const { support, status, devices, heldNotes } = useMidiConnection();
+    const { support, status, devices, heldNotes } = useMidiState();
     return (
         <div>
             <output aria-label="support">{support}</output>

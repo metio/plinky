@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import type { NoteLabels } from "../../../core/prefs";
-import { useMidiConnection } from "../../contexts/midi";
+import { useMidiConnection, useHeldNotes } from "../../contexts/midi";
 import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { Keyboard } from "../ui/keyboard";
@@ -36,7 +36,8 @@ export function PianoKeyboard({
     // everything else.
     labels?: NoteLabels;
 }) {
-    const { heldNotes, pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
+    const { pressKey, releaseKey, pedalHeld, subscribe } = useMidiConnection();
+    const heldNotes = useHeldNotes();
     const savedLabels = useNoteLabels();
     const labels = labelsOverride ?? savedLabels;
     const theme = useKeyboardTheme();
