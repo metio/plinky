@@ -71,6 +71,7 @@
             (pkgs.writeShellScriptBin "ci-biome" ''exec npm run lint "$@"'')
             (pkgs.writeShellScriptBin "ci-messages-check" ''exec npm run messages:check "$@"'')
             (pkgs.writeShellScriptBin "ci-bake-check" ''exec npm run songs:bake -- --check "$@"'')
+            (pkgs.writeShellScriptBin "ci-news-check" ''exec npm run news:check "$@"'')
             # The locale lives in package.json's build:single, which the a11y sweeps and
             # ci-lighthouse also run — so every per-visitor budget measures the same tree.
             (pkgs.writeShellScriptBin "ci-build" ''exec npm run build:single "$@"'')
