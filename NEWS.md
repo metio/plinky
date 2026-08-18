@@ -8,6 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 18 August 2026
+
+**Beyer's studies say whose they are.** Three of them came in from their source titled
+"Beyer Nro 8, 9, 10" — correct Spanish for *numero*, and the only three titles in the
+catalogue written that way — and crediting nobody at all. They read "Beyer No. 8" now,
+like every other numbered piece, and Ferdinand Beyer has a composer page with his three
+studies on it. A handful of traditional fiddle tunes that credited nobody are filed as
+Traditional.
+
 ## 17 August 2026
 
 **Every composer the catalogue credits is in Composers now.** The tab was listing 154 of
