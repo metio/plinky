@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useMemo } from "react";
-import { foldForSearch } from "../../../core/library";
+import { foldForSearch } from "../../../core/music";
 import type { PersonCount } from "../../../core/person";
 import { m } from "../../paraglide/messages.js";
 import { linkClasses } from "../ui/classes";

@@ -6,18 +6,18 @@ import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { MemoryRouter, useLocation } from "react-router";
 import { describe, expect, it } from "vitest";
-import type { LibraryItem } from "../../core/library";
+import type { MusicItem } from "../../core/music";
 import { fakeScheduler } from "../testing/fakeScheduler";
 import { advanceScheduler } from "../testing/advanceScheduler";
 import { memoryStore } from "../adapters/memoryStore";
 import { createServices, ServicesProvider } from "../contexts/services";
-import { useLibraryFilters } from "./useLibraryFilters";
+import { useMusicFilters } from "./useMusicFilters";
 
 // The search text reaches the address on a timer, so a test that wants to see it there
 // drives the clock rather than waiting on one.
 const SETTLE_MS = 500;
 
-const item = (parts: Partial<LibraryItem>): LibraryItem => ({
+const item = (parts: Partial<MusicItem>): MusicItem => ({
     id: "id",
     title: "Title",
     composer: "Composer",
@@ -39,11 +39,11 @@ const world = (start = "/music") => {
     return { services, scheduler, wrapper };
 };
 
-describe("useLibraryFilters", () => {
+describe("useMusicFilters", () => {
     it("narrows the matches as the query changes", () => {
         const items = [item({ id: "a", title: "Ode to Joy" }), item({ id: "b", title: "Air" })];
         const { wrapper } = world();
-        const { result } = renderHook(() => useLibraryFilters(items, {}), { wrapper });
+        const { result } = renderHook(() => useMusicFilters(items, {}), { wrapper });
         expect(result.current.matches).toHaveLength(2);
         act(() => result.current.setQuery("ode"));
         expect(result.current.matches.map((entry) => entry.id)).toEqual(["a"]);
@@ -52,7 +52,7 @@ describe("useLibraryFilters", () => {
     it("toggles grades independently and clears them all at once", () => {
         const items = [item({ id: "g1", grade: 1 }), item({ id: "g2", grade: 2 })];
         const { wrapper } = world();
-        const { result } = renderHook(() => useLibraryFilters(items, {}), { wrapper });
+        const { result } = renderHook(() => useMusicFilters(items, {}), { wrapper });
         act(() => result.current.toggleGrade(1));
         expect(result.current.matches.map((entry) => entry.id)).toEqual(["g1"]);
         act(() => result.current.toggleGrade(2));
@@ -66,7 +66,7 @@ describe("useLibraryFilters", () => {
     it("follows the starred set when favoritesOnly is on", () => {
         const items = [item({ id: "starred" }), item({ id: "plain" })];
         const { services, wrapper } = world();
-        const { result } = renderHook(() => useLibraryFilters(items, {}), { wrapper });
+        const { result } = renderHook(() => useMusicFilters(items, {}), { wrapper });
         act(() => result.current.toggleFavoritesOnly());
         expect(result.current.matches).toHaveLength(0);
         // Starring through the store re-renders the hook — the set is subscribed,
@@ -82,7 +82,7 @@ describe("useLibraryFilters", () => {
             item({ id: `piece-${i}`, title: `Piece ${i}` }),
         );
         const { wrapper } = world();
-        const { result } = renderHook(() => useLibraryFilters(items, {}), { wrapper });
+        const { result } = renderHook(() => useMusicFilters(items, {}), { wrapper });
         expect(result.current.visible).toBe(60);
         act(() => result.current.showMore());
         expect(result.current.visible).toBe(120);
@@ -97,7 +97,7 @@ describe("useLibraryFilters", () => {
         const items = [item({ id: "g1", grade: 1 }), item({ id: "g6", grade: 6 })];
         const { wrapper, scheduler } = world("/music?grade=6");
         const { result } = renderHook(
-            () => ({ filters: useLibraryFilters(items, {}), location: useLocation() }),
+            () => ({ filters: useMusicFilters(items, {}), location: useLocation() }),
             { wrapper },
         );
         expect(result.current.filters.matches.map((entry) => entry.id)).toEqual(["g6"]);
@@ -114,7 +114,7 @@ describe("useLibraryFilters", () => {
     it("leaves the rest of the address alone", async () => {
         const { wrapper, scheduler } = world("/music?tab=people");
         const { result } = renderHook(
-            () => ({ filters: useLibraryFilters([], {}), location: useLocation() }),
+            () => ({ filters: useMusicFilters([], {}), location: useLocation() }),
             { wrapper },
         );
         act(() => result.current.filters.setQuery("bach"));
@@ -138,7 +138,7 @@ describe("useLibraryFilters", () => {
             },
         };
         const { wrapper } = world();
-        const { result } = renderHook(() => useLibraryFilters(items, mastery), { wrapper });
+        const { result } = renderHook(() => useMusicFilters(items, mastery), { wrapper });
         act(() => result.current.toggleDueOnly());
         expect(result.current.matches.map((entry) => entry.id)).toEqual(["due"]);
     });

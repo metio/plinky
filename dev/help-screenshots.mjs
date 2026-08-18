@@ -39,7 +39,7 @@ const PIECE = "47xd2XDpYFCy";
 const SHOTS = [
     ["home", "/en/"],
     ["play", `/en/play/${PIECE}/`],
-    ["library", "/en/library/"],
+    ["music", "/en/music/"],
     ["daily", "/en/daily/"],
     ["ear", "/en/ear/"],
     ["compose", "/en/compose/"],

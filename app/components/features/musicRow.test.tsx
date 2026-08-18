@@ -5,11 +5,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { LibraryItem } from "../../../core/library";
-import { LibraryRow } from "./libraryRow";
+import type { MusicItem } from "../../../core/music";
+import { MusicRow } from "./musicRow";
 import { m } from "../../paraglide/messages.js";
 
-const item = (parts: Partial<LibraryItem> = {}): LibraryItem => ({
+const item = (parts: Partial<MusicItem> = {}): MusicItem => ({
     id: "piece-1",
     title: "Ode to Joy",
     composer: "Ludwig van Beethoven",
@@ -30,11 +30,11 @@ const defaults = {
 
 afterEach(cleanup);
 
-describe("LibraryRow", () => {
+describe("MusicRow", () => {
     it("links the title to the piece's play page", () => {
         mount(
             <ul>
-                <LibraryRow item={item()} {...defaults} />
+                <MusicRow item={item()} {...defaults} />
             </ul>,
         );
         const title = screen.getByText("Ode to Joy");
@@ -44,7 +44,7 @@ describe("LibraryRow", () => {
     it("links a recognised composer to their person page", () => {
         mount(
             <ul>
-                <LibraryRow item={item()} {...defaults} />
+                <MusicRow item={item()} {...defaults} />
             </ul>,
         );
         const composer = screen.getByText("Ludwig van Beethoven");
@@ -56,7 +56,7 @@ describe("LibraryRow", () => {
     it("renders a traditional credit as plain text — no person page exists for it", () => {
         mount(
             <ul>
-                <LibraryRow item={item({ composer: "Traditional" })} {...defaults} />
+                <MusicRow item={item({ composer: "Traditional" })} {...defaults} />
             </ul>,
         );
         expect(screen.getByText("Traditional").closest("a")).toBeNull();
@@ -65,14 +65,14 @@ describe("LibraryRow", () => {
     it("shows the learned and due badges only when set", () => {
         const { rerender } = mount(
             <ul>
-                <LibraryRow item={item()} {...defaults} />
+                <MusicRow item={item()} {...defaults} />
             </ul>,
         );
         expect(screen.queryByText("Learned")).toBeNull();
         rerender(
             <MemoryRouter>
                 <ul>
-                    <LibraryRow item={item()} {...defaults} learned due />
+                    <MusicRow item={item()} {...defaults} learned due />
                 </ul>
             </MemoryRouter>,
         );
@@ -84,7 +84,7 @@ describe("LibraryRow", () => {
         const onToggleStar = vi.fn();
         mount(
             <ul>
-                <LibraryRow item={item()} {...defaults} onToggleStar={onToggleStar} />
+                <MusicRow item={item()} {...defaults} onToggleStar={onToggleStar} />
             </ul>,
         );
         fireEvent.click(screen.getByLabelText(m.scores_favorite()));
@@ -94,7 +94,7 @@ describe("LibraryRow", () => {
     it("offers no remove control without an onRemove handler", () => {
         mount(
             <ul>
-                <LibraryRow item={item()} {...defaults} />
+                <MusicRow item={item()} {...defaults} />
             </ul>,
         );
         expect(screen.queryByLabelText("Remove")).toBeNull();
@@ -104,7 +104,7 @@ describe("LibraryRow", () => {
         const onRemove = vi.fn();
         mount(
             <ul>
-                <LibraryRow
+                <MusicRow
                     item={item({ removable: true })}
                     {...defaults}
                     onRemove={onRemove}

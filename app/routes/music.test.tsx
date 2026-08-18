@@ -13,7 +13,7 @@ import { createAssignmentsStore } from "../stores/assignmentsStore";
 import type { ExerciseSource } from "../stores/exerciseSource";
 import type { SongSource } from "../stores/songSource";
 import { renderWithServices } from "../testing/renderWithServices";
-import Library from "./library";
+import Music from "./music";
 
 const source = <T,>(): T => ({ manifest: () => Promise.resolve([]) }) as unknown as T;
 
@@ -22,14 +22,14 @@ const USER_XML = `<?xml version="1.0"?><score-partwise><work><work-title>My Tune
 const mount = (store: ReturnType<typeof memoryStore>) =>
     renderWithServices(
         <MemoryRouter>
-            <Library />
+            <Music />
         </MemoryRouter>,
         { store, exercises: source<ExerciseSource>(), songs: source<SongSource>() },
     );
 
 afterEach(cleanup);
 
-describe("Library tabs", () => {
+describe("Music tabs", () => {
     it("keeps the backup and import tools on the Manage tab, off the search list", async () => {
         const store = memoryStore();
         saveUserScore(store, buildScore(domXmlCodec, USER_XML, []));
@@ -49,7 +49,7 @@ describe("Library tabs", () => {
     it("opens straight on Manage from a ?tab=manage deep link", async () => {
         renderWithServices(
             <MemoryRouter initialEntries={["/music?tab=manage"]}>
-                <Library />
+                <Music />
             </MemoryRouter>,
             {
                 store: memoryStore(),
@@ -61,7 +61,7 @@ describe("Library tabs", () => {
     });
 });
 
-describe("Library delete guard", () => {
+describe("Music delete guard", () => {
     it("names the assignments still referencing a score on its delete confirm", async () => {
         const store = memoryStore();
         const score = buildScore(domXmlCodec, USER_XML, []);

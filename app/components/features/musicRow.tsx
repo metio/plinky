@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: The Plinky Authors
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import type { LibraryItem } from "../../../core/library";
+import type { MusicItem } from "../../../core/music";
 import { canonicalComposer, personSlug } from "../../../core/person";
 import { m } from "../../paraglide/messages.js";
 import { IconButton } from "../ui/button";
@@ -12,7 +12,7 @@ import { LocalizedLink as Link } from "../ui/localizedLink";
 import { GradeChip } from "./scoreGrade";
 
 type LibraryRowProps = {
-    item: LibraryItem;
+    item: MusicItem;
     starred: boolean;
     learned: boolean;
     due: boolean;
@@ -26,7 +26,7 @@ type LibraryRowProps = {
 // One library list row: star toggle, the piece card linking to its play page
 // (with learned/due badges and a composer link), and — for user imports — the
 // confirm-guarded remove control.
-export function LibraryRow({
+export function MusicRow({
     item,
     starred,
     learned,
