@@ -193,10 +193,15 @@ const SLOT_WIDTH = 2 * INCIPIT_ROW_SPACE + INCIPIT_NOTES * 2.5 * INCIPIT_ROW_SPA
 export function BakedIncipit({
     mark,
     label,
+    colored = false,
     className = "",
 }: {
     mark: string | undefined;
     label: string;
+    // Colour each head by its note name, as IncipitMark does. "Baked" is about the data,
+    // not the drawing: the manifest ships a compact string, this decodes it, and the same
+    // SVG is drawn on the client — so a baked mark can be coloured exactly like any other.
+    colored?: boolean;
     className?: string;
 }) {
     const incipit = mark ? decodeIncipit(mark) : null;
@@ -210,6 +215,7 @@ export function BakedIncipit({
                 <IncipitMark
                     incipit={incipit}
                     label={label}
+                    colored={colored}
                     space={INCIPIT_ROW_SPACE}
                     className={className}
                 />

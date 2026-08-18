@@ -25,6 +25,7 @@ const defaults = {
     starred: false,
     learned: false,
     due: false,
+    colored: false,
     onToggleStar: () => {},
 };
 
@@ -116,5 +117,33 @@ describe("MusicRow", () => {
         expect(onRemove).not.toHaveBeenCalled();
         fireEvent.click(screen.getByRole("button", { name: "Used by 1 assignment — remove?" }));
         expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+
+    it("colours the opening bar by note name when the reading aid is on", () => {
+        // The mark is baked as a compact string in the manifest and drawn here, so
+        // "baked" describes the data and not the picture — it can be coloured exactly
+        // like the score it opens.
+        const { container } = mount(
+            <ul>
+                <MusicRow item={item({ incipit: "G35q36q37q" })} {...defaults} colored />
+            </ul>,
+        );
+        const heads = [...container.querySelectorAll("ellipse, circle")];
+        const fills = heads.map((head) => head.getAttribute("fill"));
+        expect(fills.some((fill) => fill !== null && fill !== "currentColor")).toBe(true);
+    });
+
+    it("draws it in plain ink when the aid is off", () => {
+        const { container } = mount(
+            <ul>
+                <MusicRow item={item({ incipit: "G35q36q37q" })} {...defaults} />
+            </ul>,
+        );
+        const fills = [...container.querySelectorAll("ellipse, circle")].map((head) =>
+            head.getAttribute("fill"),
+        );
+        expect(
+            fills.every((fill) => fill === null || fill === "currentColor" || fill === "none"),
+        ).toBe(true);
     });
 });

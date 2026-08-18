@@ -10,6 +10,10 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 18 August 2026
 
+**The opening bars in the music list follow your colour setting.** If you have the
+noteheads coloured by note name, the little opening-bar marks beside each piece are
+coloured too, the way the score is. They were always plain ink before.
+
 **The Library is called Music, and lives at /music.** It is what the help text has called
 it all along — "Music is everything there is to play" — and it says what is in there
 better than a word about shelves does. Old /library links no longer resolve.
