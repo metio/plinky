@@ -3,7 +3,6 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
-import { MemoryRouter } from "react-router";
 import type { MusicItem } from "../../../core/music";
 import { MusicRow } from "./musicRow";
 
@@ -13,13 +12,7 @@ import { MusicRow } from "./musicRow";
 const meta: Meta<typeof MusicRow> = {
     title: "Features/MusicRow",
     component: MusicRow,
-    decorators: [
-        (Story: () => ReactNode) => (
-            <MemoryRouter>
-                <ul className="max-w-xl">{Story()}</ul>
-            </MemoryRouter>
-        ),
-    ],
+    decorators: [(Story: () => ReactNode) => <ul className="max-w-xl">{Story()}</ul>],
     args: {
         starred: false,
         learned: false,

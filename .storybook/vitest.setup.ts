@@ -21,6 +21,12 @@ const EMOJI_STORIES = new Set([
     "gradeBadge.stories.tsx > Starting",
     "gradeBadge.stories.tsx > Earned",
     "gradeBadge.stories.tsx > Competitive Mode",
+    "achievementGallery.stories.tsx > Fresh",
+    "achievementGallery.stories.tsx > Partly Earned",
+    "achievementGallery.stories.tsx > Complete",
+    "dailyReveal.stories.tsx > Present",
+    "youStanding.stories.tsx > Standing",
+    "youStanding.stories.tsx > Competitive",
 ]);
 
 // Stories whose thin, absolutely-positioned colour blocks rasterise
