@@ -46,7 +46,7 @@ describe("GradeRoadmap", () => {
         // The whole point of the row: a grade you have not reached still opens its
         // shelf, because nothing here is locked.
         const eighth = screen.getByText("Grade 8").closest("a");
-        expect(eighth?.getAttribute("href")).toContain("library/?grade=8");
+        expect(eighth?.getAttribute("href")).toContain("music/?grade=8");
         // Five fresh pieces earn the bronze star.
         expect(screen.getByRole("img", { name: "Bronze" })).toBeTruthy();
         // Every row carries the optional go-deeper line.

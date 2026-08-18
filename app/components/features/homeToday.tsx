@@ -630,7 +630,7 @@ export function HomeToday() {
                 page has already made its offers, and this is the shrug after them. */}
             <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-4 text-sm text-muted">
                 <span>{m.today_something_else()}</span>
-                <Link to="/library" className={linkClasses}>
+                <Link to="/music" className={linkClasses}>
                     {m.today_browse()}
                 </Link>
                 <span aria-hidden="true">·</span>

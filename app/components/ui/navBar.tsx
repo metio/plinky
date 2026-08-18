@@ -22,14 +22,14 @@ const DESTINATIONS: {
     label: () => string;
     Icon: (props: { className?: string }) => ReactNode;
 }[] = [
-    { to: "/library", label: m.library_title, Icon: NotesIcon },
+    { to: "/music", label: m.library_title, Icon: NotesIcon },
     { to: "/learn", label: m.nav_learn, Icon: BookIcon },
     { to: "/compose", label: m.nav_compose, Icon: MicIcon },
     { to: "/teach", label: m.nav_teach, Icon: GradCapIcon },
 ];
 
 // Marks the current section. Home matches only its exact path; the rest also match
-// their sub-pages (e.g. /library stays lit while reading a piece under it). Both sides
+// their sub-pages (e.g. /music stays lit while reading a piece under it). Both sides
 // are normalized to the trailing-slash form the links carry, so a visitor who arrives
 // on the bare path before the host redirects still sees their section lit.
 function useIsActive(): (to: string) => boolean {
@@ -38,7 +38,7 @@ function useIsActive(): (to: string) => boolean {
         const href = localizedHref(to);
         const here = withTrailingSlash(pathname);
         // Every href ends in "/", so the prefix test covers the exact match too and
-        // cannot mistake a sibling section (/library/ never matches /librarything/).
+        // cannot mistake a sibling section (/music/ never matches /musicology/).
         return to === "/" ? here === href : here.startsWith(href);
     };
 }

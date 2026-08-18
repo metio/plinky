@@ -81,7 +81,7 @@ export function ReviewSession() {
             <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
                 <PageHeader title={m.review_heading()} hint={m.review_empty()} />
                 <EmptyState body={m.refresh_why()}>
-                    <Link to="/library" className={BACK}>
+                    <Link to="/music" className={BACK}>
                         {m.today_browse()}
                     </Link>
                     <Link to="/stats" className={BACK}>

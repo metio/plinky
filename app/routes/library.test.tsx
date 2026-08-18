@@ -48,7 +48,7 @@ describe("Library tabs", () => {
 
     it("opens straight on Manage from a ?tab=manage deep link", async () => {
         renderWithServices(
-            <MemoryRouter initialEntries={["/library?tab=manage"]}>
+            <MemoryRouter initialEntries={["/music?tab=manage"]}>
                 <Library />
             </MemoryRouter>,
             {

@@ -21,7 +21,7 @@ function setScrollY(value: number) {
 describe("helpAnchorFor", () => {
     it("maps a page path (with locale prefix) to its help section key", () => {
         expect(helpAnchorFor("/en/play/abc123")).toBe("play");
-        expect(helpAnchorFor("/de/library")).toBe("library");
+        expect(helpAnchorFor("/de/music")).toBe("library");
         expect(helpAnchorFor("/en/stats")).toBe("you");
         expect(helpAnchorFor("/fr")).toBe("home");
     });

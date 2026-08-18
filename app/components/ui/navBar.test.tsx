@@ -34,12 +34,12 @@ describe("BottomNav active section", () => {
     });
 
     it("lights the section that owns the current path", () => {
-        at("/library");
+        at("/music");
         expect(current()).toBe(m.library_title());
     });
 
     it("keeps a section lit while on one of its sub-pages", () => {
-        at("/library/some-piece");
+        at("/music/some-piece");
         expect(current()).toBe(m.library_title());
     });
 
@@ -49,12 +49,12 @@ describe("BottomNav active section", () => {
     });
 
     it("lights the section on the trailing-slash path the links carry", () => {
-        at("/library/");
+        at("/music/");
         expect(current()).toBe(m.library_title());
     });
 
     it("does not light a section whose name only prefixes the current path", () => {
-        at("/librarything");
+        at("/musicology");
         expect(current()).toBeUndefined();
     });
 });
@@ -63,7 +63,7 @@ describe("BottomNav hrefs", () => {
     it("point at the trailing-slash form the prerendered page is served under", () => {
         at("/");
         const hrefs = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
-        expect(hrefs).toContain(localizedHref("/library"));
+        expect(hrefs).toContain(localizedHref("/music"));
         expect(hrefs).toContain(localizedHref("/learn"));
         for (const href of hrefs) {
             expect(href).toMatch(/\/$/);

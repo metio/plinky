@@ -156,7 +156,7 @@ describe("ReviewSession", () => {
         // page has to teach it rather than just report an absence.
         expect(await screen.findByText(m.refresh_why())).toBeTruthy();
         expect(screen.getByRole("link", { name: m.today_browse() }).getAttribute("href")).toContain(
-            "/library",
+            "/music",
         );
         expect(screen.getByRole("link", { name: m.review_back() })).toBeTruthy();
     });

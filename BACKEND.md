@@ -591,7 +591,7 @@ saying so. What it removes is the transcription step.
 around 8 KB. A real MusicXML file exceeds that, and a submitter needs a GitHub
 account.
 
-**Flow.** The submitter uses the existing `/library/import` surface, which already
+**Flow.** The submitter uses the existing `/music/import` surface, which already
 parses and previews the score locally. On submit, the client posts the metadata
 and the compressed score in one request. The worker validates size and metadata,
 writes the object through its R2 binding, and records a pending row. A maintainer
@@ -1738,7 +1738,7 @@ backend dependency and can ship at any time, including before phase 0. Only edit
 a profile without a maintainer needs the backend, and that rides the submission
 queue rather than an endpoint of its own.
 
-Exit criteria: a submission travels from `/library/import` through review to a
+Exit criteria: a submission travels from `/music/import` through review to a
 pull request without the submitter holding a GitHub account; fingerprinting runs
 in Actions rather than in a Worker; orphaned uploads are collected within 24
 hours; an artist edits their own links through a capability link and cannot touch
