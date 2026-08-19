@@ -141,12 +141,28 @@ function HelpBlock({ section }: { section: (typeof SECTIONS)[number] }) {
                 // lazy-loaded picture pushes the rest of the page down as it lands, and
                 // fifteen sections of that is a page that will not sit still.
                 <img
-                    src={`/help/${section.image}.webp`}
+                    // The picture is of the app in the reader's own language: help that
+                    // describes a button by a name the screenshot beside it does not use
+                    // is help that has to be translated twice by the person reading it.
+                    // A reader only ever fetches their own, so twenty-six sets cost a
+                    // visitor exactly what one did.
+                    src={`/help/${getLocale()}/${section.image}.webp`}
                     alt={section.imageAlt?.() ?? ""}
                     loading="lazy"
                     width={1200}
                     height={750}
                     className="h-auto w-full rounded-lg border border-line"
+                    // A locale whose pictures have not been taken yet falls back to the
+                    // English ones rather than showing a broken image. The generator takes
+                    // every locale, so this is for the window between adding a language
+                    // and the next screenshot run — not a state anybody should stay in.
+                    onError={(event) => {
+                        const image = event.currentTarget;
+                        const fallback = `/help/en/${section.image}.webp`;
+                        if (!image.src.endsWith(fallback)) {
+                            image.src = fallback;
+                        }
+                    }}
                 />
             )}
             <div className="space-y-2 text-sm text-body">

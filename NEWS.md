@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 19 August 2026
 
+**The help page shows pictures of Plinky in your language.** Every screenshot on it
+used to be of the English app, whichever language you were reading — so the text
+named a button and the picture beside it showed a different word. There is now a set
+per language. You only ever download your own, so the page is no heavier than it was.
+
 **One broken panel no longer takes the page with it.** If something goes wrong in a
 single part of a screen — a setting, a tool, a lesson's example — that part now says
 so and offers to try again or report it, while everything around it keeps working.
