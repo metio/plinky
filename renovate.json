@@ -12,6 +12,12 @@
       "matchManagers": ["nix"],
       "groupName": "browser toolchain",
       "description": "Ride the flake.lock (devshell input) update in the same PR as the playwright npm bump above — advancing the devshell input is what carries nixpkgs' playwright-driver forward, so the two must move together to keep the browser gate green."
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7",
+      "description": "Hold typescript on 6.x until dependency-cruiser supports 7. depcruise reads .ts and .tsx only through a TypeScript compiler inside its peer range (>=2.0.0 <7.0.0); outside it there is no failure to notice — it registers no scannable extensions, enumerates nothing, finds no violations in the nothing it enumerated and exits 0. That is how `npm run arch` stayed green from the 7.0.0 bump on 2026-08-02 until 2026-08-19, with ui-is-pure, stores-point-down and adapters-only-at-the-composition-root all evaluated over an empty set. Minor and patch updates inside 6.x still flow. Drop this rule when dependency-cruiser ships TS 7 support — by its own message that waits on the TS 7 API being published and stable, not on a particular TypeScript release. dev/check-architecture.mjs now fails when a cruise reaches too little of app/ or core/, so removing this rule too early makes the gate say so instead of passing over nothing."
     }
   ]
 }
