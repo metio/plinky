@@ -122,6 +122,13 @@ module.exports = {
                     "\\.(test|stories)\\.[jt]sx?$",
                     "^app/adapters/",
                     "^app/contexts/services\\.tsx$",
+                    // The MIDI provider composes the key-lights encoder onto its OWN send
+                    // path — the connection and the preference it closes over are state
+                    // only it holds, so injecting the encoder would move the wiring
+                    // without moving the coupling. The seam the rule exists to protect is
+                    // already injected here: a test swaps the MIDI access itself for
+                    // fakeMidi, and the encoder has its own unit test.
+                    "^app/contexts/midi\\.tsx$",
                     "^app/root\\.tsx$",
                     "^app/testing/",
                     // meta() runs outside the React tree, so the play route wires

@@ -5,7 +5,7 @@
   "scripts": {
     "a11y:dark": "npm run build:single && A11Y_MODE=dark node dev/a11y.mjs",
     "a11y:light": "npm run build:single && A11Y_MODE=light node dev/a11y.mjs",
-    "arch": "depcruise core app dev react-router.config.ts && node dev/check-globals.mjs",
+    "arch": "node dev/check-architecture.mjs && node dev/check-globals.mjs",
     "brand": "node dev/build-brand.mjs",
     "build": "npm run messages && node dev/build-retry.mjs && node dev/stamp-sw.mjs && node dev/gen-sitemap.mjs",
     "build-storybook": "npm run messages && storybook build",
@@ -107,7 +107,7 @@
     "storybook": "^10.4.6",
     "tailwindcss": "^4.3.1",
     "tsx": "^4.22.4",
-    "typescript": "^7.0.0",
+    "typescript": "^6.0.3",
     "vite": "^8.0.16",
     "vitest": "^4.1.9",
     "yaml": "2.9.0"
