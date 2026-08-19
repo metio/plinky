@@ -7,6 +7,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { paragraphs } from "../../core/help";
 import { m } from "../paraglide/messages.js";
+import { getLocale } from "../paraglide/runtime.js";
 import { renderWithServices } from "../testing/renderWithServices";
 import Help from "./help";
 
@@ -40,11 +41,13 @@ describe("the help page", () => {
         }
     });
 
-    it("shows the picture of the page a section describes", () => {
+    it("shows the picture of the page a section describes, in the reader's language", () => {
         show();
         const shot = screen.getByAltText(m.help_shot_settings());
-        // Served from our own tree, not from anybody else's server.
-        expect(shot.getAttribute("src")).toBe("/help/settings.webp");
+        // Served from our own tree, not from anybody else's server — and from the set
+        // taken in this locale, because help that names a button the picture beside it
+        // does not use has to be translated a second time by the person reading it.
+        expect(shot.getAttribute("src")).toBe(`/help/${getLocale()}/settings.webp`);
         expect(shot.getAttribute("loading")).toBe("lazy");
     });
 

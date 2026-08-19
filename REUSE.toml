@@ -107,7 +107,13 @@ SPDX-License-Identifier = "CC0-1.0"
 # image, and the founder portraits on the About page: declared here so the asset
 # files stay untouched.
 [[annotations]]
-path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp", "public/help/*.webp"]
+path = ["dev/help-shots.json"]
+precedence = "override"
+SPDX-FileCopyrightText = "The Plinky Authors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["public/favicon.ico", "public/*.svg", "public/og.png", "public/icon-*.png", "public/founder-*.webp", "public/help/*/*.webp"]
 precedence = "override"
 SPDX-FileCopyrightText = "The Plinky Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
