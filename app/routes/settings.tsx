@@ -23,6 +23,7 @@ import { InstrumentRangeSetting } from "../components/features/instrumentRangeSe
 import { SettingsSection } from "../components/ui/settingsSection";
 
 import { DangerZone } from "../components/features/dangerZone";
+import { FeatureBoundary } from "../components/features/featureBoundary";
 import { ProgressBackup } from "../components/features/progressBackup";
 import { HandSize } from "../components/features/handSize";
 import { ReadingLevel } from "../components/features/readingLevel";
@@ -74,6 +75,12 @@ export default function Settings() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.nav_settings()} hint={m.settings_subtitle()} />
+            {/* Each control is guarded on its own, INSIDE its section rather than around
+                it: the heading and the hint are copy that cannot fail, and leaving them
+                standing means a panel that breaks still says which setting it was. This
+                page is also where the two recovery tools live — the backup and the danger
+                zone — so keeping one broken control from taking the page is the
+                difference between a bad state you can get out of and one you cannot. */}
             {/* Settings are ordered by what somebody came here to change, not by which
                 part of the app owns them: first the instrument you play on, then how the
                 music reads while you play it, then what counts as learned, and last the
@@ -87,7 +94,9 @@ export default function Settings() {
                     hint={m.settings_midi_hint()}
                     icon={<PlugIcon className={ICON} />}
                 >
-                    <MidiConnect />
+                    <FeatureBoundary feature="MidiConnect">
+                        <MidiConnect />
+                    </FeatureBoundary>
                     <SwitchField
                         label={m.settings_midi_echo()}
                         checked={prefs.midiEcho}
@@ -100,7 +109,9 @@ export default function Settings() {
                         keyLights={keyLights}
                         deviceNames={devices.map((device) => device.name)}
                     />
-                    <InstrumentRangeSetting />
+                    <FeatureBoundary feature="InstrumentRangeSetting">
+                        <InstrumentRangeSetting />
+                    </FeatureBoundary>
                 </SettingsSection>
             )}
 
@@ -112,12 +123,16 @@ export default function Settings() {
                     hint={m.mic_hint()}
                     icon={<MicIcon className={ICON} />}
                 >
-                    <MicConnect />
+                    <FeatureBoundary feature="MicConnect">
+                        <MicConnect />
+                    </FeatureBoundary>
                 </SettingsSection>
             )}
 
             <SettingsSection title={m.settings_keyboard()} icon={<KeysIcon className={ICON} />}>
-                <KeyMapping />
+                <FeatureBoundary feature="KeyMapping">
+                    <KeyMapping />
+                </FeatureBoundary>
             </SettingsSection>
 
             <SettingsSection
@@ -130,7 +145,9 @@ export default function Settings() {
                     checked={prefs.sound}
                     onChange={(sound) => update({ sound })}
                 />
-                <GrandPianoSetting />
+                <FeatureBoundary feature="GrandPianoSetting">
+                    <GrandPianoSetting />
+                </FeatureBoundary>
                 {/* Wraps, and the slider gives up its width first: a label, a slider, a
                     reading and a button do not fit across a 320px phone in one line, and
                     the slider is the only one of the four that is still itself when it is
@@ -162,7 +179,9 @@ export default function Settings() {
                 hint={m.settings_reading_hint()}
                 icon={<BookIcon className={ICON} />}
             >
-                <ReadingLevel />
+                <FeatureBoundary feature="ReadingLevel">
+                    <ReadingLevel />
+                </FeatureBoundary>
                 <SwitchField
                     label={m.color_notes_toggle()}
                     checked={prefs.colorNotes}
@@ -298,7 +317,9 @@ export default function Settings() {
                     />
                     <p className="text-xs text-muted">{m.settings_labels_example()}</p>
                 </div>
-                <HandSize />
+                <FeatureBoundary feature="HandSize">
+                    <HandSize />
+                </FeatureBoundary>
             </SettingsSection>
 
             <SettingsSection
@@ -386,20 +407,28 @@ export default function Settings() {
             >
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-body">{m.settings_theme()}</span>
-                    <ThemeToggle />
+                    <FeatureBoundary feature="ThemeToggle">
+                        <ThemeToggle />
+                    </FeatureBoundary>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-body">{m.settings_language()}</span>
-                    <LanguageSwitcher />
+                    <FeatureBoundary feature="LanguageSwitcher">
+                        <LanguageSwitcher />
+                    </FeatureBoundary>
                 </div>
                 {/* The on-screen keyboard's colours are an appearance choice too, so
                 they sit here rather than in a section of their own. */}
                 <SettingsSection title={m.settings_keyboard_theme()} level={3}>
-                    <KeyboardThemePicker />
+                    <FeatureBoundary feature="KeyboardThemePicker">
+                        <KeyboardThemePicker />
+                    </FeatureBoundary>
                 </SettingsSection>
             </SettingsSection>
 
-            <ProgressBackup />
+            <FeatureBoundary feature="ProgressBackup">
+                <ProgressBackup />
+            </FeatureBoundary>
 
             <SettingsSection title={m.settings_help()} icon={<QuestionIcon className={ICON} />}>
                 <a
@@ -412,7 +441,9 @@ export default function Settings() {
                 </a>
             </SettingsSection>
 
-            <DangerZone />
+            <FeatureBoundary feature="DangerZone">
+                <DangerZone />
+            </FeatureBoundary>
         </main>
     );
 }

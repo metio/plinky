@@ -4,7 +4,7 @@
 
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MidiProvider } from "../contexts/midi";
 import { m } from "../paraglide/messages.js";
 import { choose } from "../testing/controls";
@@ -29,6 +29,35 @@ const mount = () =>
             </MidiProvider>
         </MemoryRouter>,
     );
+
+// One control forced to throw, so the page can be asked what survives it. The module is
+// mocked rather than the component broken in place: a boundary is only worth having if it
+// catches a fault the component did not anticipate, and an anticipated one would not
+// exercise it.
+vi.mock("./../components/features/handSize", () => ({
+    HandSize: () => {
+        throw new Error("hand size exploded");
+    },
+}));
+
+describe("Settings, when one control breaks", () => {
+    it("keeps the rest of the page, including the way out", () => {
+        // Settings is where both recovery tools live — the backup and the danger zone —
+        // so one broken control taking the page is the difference between a bad state you
+        // can get out of and one you cannot.
+        mount();
+        expect(screen.getByText(m.feature_broken())).toBeTruthy();
+        expect(screen.getByRole("heading", { name: m.settings_danger_heading() })).toBeTruthy();
+        expect(screen.getByRole("heading", { name: m.settings_sound() })).toBeTruthy();
+    });
+
+    it("leaves the broken control's own heading standing, so it says which one it was", () => {
+        // The boundary sits INSIDE the section, around the control: the heading and hint
+        // are copy that cannot fail, and keeping them means the failure is placed.
+        mount();
+        expect(screen.getByRole("heading", { name: m.settings_fingering() })).toBeTruthy();
+    });
+});
 
 describe("Settings", () => {
     it("persists a flipped switch through the prefs store", () => {

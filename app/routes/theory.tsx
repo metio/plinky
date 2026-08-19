@@ -16,6 +16,7 @@ import {
     type UnitId,
 } from "../../core/theoryCourse";
 import { buildSnippet, NATURAL_OF, type SnippetNote } from "../../core/glossaryScore";
+import { FeatureBoundary } from "../components/features/featureBoundary";
 import { NotationExample } from "../components/features/notationExample";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { useTheoryStore } from "../contexts/services";
@@ -204,11 +205,18 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
                 {/* Hearing the idea is what meeting the lesson means, so playing it is what
                 records it — there is nothing to tick, and the course never asks the
                 reader to mark their own homework. */}
+                {/* The engraver is the one part of a lesson that can fail on its own: it
+                    parses a score and drives a renderer, where everything else here is
+                    copy and a table. A lesson that cannot draw its example is still a
+                    lesson worth reading, and the same boundary guards the same component
+                    on the glossary page. */}
                 {lesson.unit === "reading" && readingXml(lesson.demo) && (
-                    <NotationExample
-                        xml={readingXml(lesson.demo) ?? ""}
-                        label={LESSON_TITLE[lesson.id]?.() ?? ""}
-                    />
+                    <FeatureBoundary feature="NotationExample">
+                        <NotationExample
+                            xml={readingXml(lesson.demo) ?? ""}
+                            label={LESSON_TITLE[lesson.id]?.() ?? ""}
+                        />
+                    </FeatureBoundary>
                 )}
                 <LessonDemo demo={lesson.demo} onPlay={() => theory.markMet(lesson.id)} />
             </Card>

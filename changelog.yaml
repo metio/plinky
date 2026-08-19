@@ -4,6 +4,12 @@
 - date: 2026-08-19
   entries:
     - |-
+      **One broken panel no longer takes the page with it.** If something goes wrong in a
+      single part of a screen — a setting, a tool, a lesson's example — that part now says
+      so and offers to try again or report it, while everything around it keeps working.
+      It matters most in Settings, where the backup and the reset live: those are the
+      things you need reachable precisely when something has gone wrong.
+    - |-
       **Plinky names the chord you just played.** Put your hands down anywhere on the
       keyboard on the home page — computer keys, the on-screen keys, or a piano plugged
       in — and it says what you found: the note, the interval, or the chord, with the
