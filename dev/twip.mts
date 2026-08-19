@@ -209,9 +209,19 @@ if (!submitted.ok) {
     console.error(`Reddit refused the post: ${submitted.status} ${submitted.statusText}`);
     process.exit(1);
 }
-const result = (await submitted.json().catch(() => ({}))) as {
+// A body that will not parse is not a success. The post may well have landed — the status
+// said so — but nothing here knows its address or its id, and reporting "Posted:" with a
+// guessed link would hide that from the one run that could still be checked by hand.
+const result = (await submitted.json().catch(() => null)) as {
     json?: { errors?: unknown[]; data?: { url?: string; name?: string } };
-};
+} | null;
+if (result === null) {
+    console.error(
+        `Reddit answered ${submitted.status} with a body that is not JSON. The post may have ` +
+            `landed; check r/${SUBREDDIT} before running this again.`,
+    );
+    process.exit(1);
+}
 if ((result.json?.errors?.length ?? 0) > 0) {
     console.error(`Reddit refused the post: ${JSON.stringify(result.json?.errors)}`);
     process.exit(1);

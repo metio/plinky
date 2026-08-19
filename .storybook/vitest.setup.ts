@@ -5,7 +5,7 @@ import { setProjectAnnotations } from "@storybook/react-vite";
 import { page } from "vitest/browser";
 import { afterEach, beforeAll, expect } from "vitest";
 import projectAnnotations from "./preview";
-import { type Box, holds, mayDescend, union } from "../core/storyCrop";
+import { type Box, descendantBounds, holds, mayDescend } from "../core/storyCrop";
 
 // Apply the preview's decorators and parameters when running stories as tests.
 const project = setProjectAnnotations([projectAnnotations]);
@@ -81,17 +81,36 @@ const drawn = (el: Element) => {
     return box.width > 0 && box.height > 0;
 };
 
-// Everything the story put on screen, as one rectangle — anything that left its parent's
-// box included, since that is precisely what a crop must not lose.
-const drawnBounds = (root: Element): Box | null => {
-    let bounds: Box | null = null;
-    for (const el of [root, ...root.querySelectorAll("*")]) {
-        if (drawn(el)) {
-            bounds = bounds === null ? boxOf(el) : union(bounds, boxOf(el));
+// What an element clips its contents to, if it clips them at all. A collapsed disclosure
+// or a scroller draws children the reader cannot see; counting those as content would
+// send the crop out to the whole viewport to hold something nobody is looking at.
+const clipOf = (el: Element): Box | null => {
+    for (let at: Element | null = el.parentElement; at !== null; at = at.parentElement) {
+        const style = getComputedStyle(at);
+        if (style.overflow !== "visible" || style.overflowX !== "visible") {
+            return boxOf(at);
         }
     }
-    return bounds;
+    return null;
 };
+
+const intersects = (one: Box, other: Box): boolean =>
+    one.left < other.right && other.left < one.right && one.top < other.bottom && other.top < one.bottom;
+
+// Everything the story drew BELOW `root` — the root's own box deliberately excluded, so
+// the question "may the crop step into this child" is not silently asking a child to
+// contain its parent. Content its own ancestors clip away is left out too: it is not on
+// screen, so a frame that omits it omits nothing a reader could see.
+const drawnBelow = (root: Element): Box | null =>
+    descendantBounds(
+        Array.from(root.querySelectorAll("*"))
+            .filter(drawn)
+            .filter((el) => {
+                const clip = clipOf(el);
+                return clip === null || intersects(boxOf(el), clip);
+            })
+            .map(boxOf),
+    );
 
 // Whether the element draws anything of its own — a ground, an edge, a shadow. If it
 // does, it IS the picture, and the shape inside it is only part of one.
@@ -175,9 +194,16 @@ const captureTarget = async (root: HTMLElement) => {
     // and the baseline that lost it agrees with every future render that loses it too.
     // The whole viewport is the fallback, because it is the only box that holds anything.
     const of = (target: Element, restore: { width: number; height: number } | null) => {
-        const all = drawnBounds(target);
+        const all = drawnBelow(target);
+        // Nothing below means nothing could have escaped, so the target frames itself.
+        // Reaching for the body there would spend the whole allowance on empty page to
+        // guard against content that does not exist.
         const frame =
-            all !== null && holds(boxOf(target), all) ? tightest(target, all) : document.body;
+            all === null
+                ? target
+                : holds(boxOf(target), all)
+                  ? tightest(target, all)
+                  : document.body;
         return { locator: page.elementLocator(frame), restore };
     };
     const inFlow = drawn(root) ? root : drawnInside(root);

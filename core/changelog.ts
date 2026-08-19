@@ -263,9 +263,16 @@ export function roundUpBody(releases: readonly Release[], limit = POST_LIMIT): s
 // The releases a round-up covers: those within `days` of `on`, carrying only the entries
 // that asked to be in it, and none that end up empty.
 //
-// The far end is exclusive, so consecutive weekly runs tile rather than overlap. Inclusive
-// at both ends is a window one day too wide: the day exactly seven back was the day the
-// run seven days ago was itself made for, so every boundary release would go out twice.
+// The week ENDING YESTERDAY: ages 1 through `days`, the run's own day deliberately left
+// out. A day is only reported once it is over.
+//
+// Both of the obvious windows lose something. Ending today and including it posts the
+// current day twice — once in this run and once in the next, for which it is the day
+// exactly a week back. Ending today and excluding that far day instead drops whatever is
+// written after the run goes out: the cron fires in the evening, an entry filed at nine
+// belongs to a day this run has already covered, and next week's run is a day too late
+// to reach it. Reporting only completed days has neither gap: consecutive runs tile
+// exactly, and every entry appears in one round-up.
 //
 // A day that is not a real day covers nothing. `daysBetween` reports 0 for a date it
 // cannot read, which without this would put every release ever written inside the window
@@ -277,7 +284,7 @@ export function roundUp(releases: readonly Release[], on: string, days: number):
     return releases
         .filter((release) => {
             const age = daysBetween(release.date, on);
-            return age >= 0 && age < days;
+            return age >= 1 && age <= days;
         })
         .map((release) => ({
             ...release,
