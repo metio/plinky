@@ -133,27 +133,39 @@ describe("roundUp", () => {
         release({ date: "2026-08-10", entries: [{ body: "**Too old.** Yes.", twip: true }] }),
     ];
 
-    it("covers seven days, ending the day before the last run's", () => {
-        // The far end is exclusive so consecutive runs tile rather than overlap: 08-11 is
-        // exactly seven days back, which the run of 08-11 already covered as its own day.
+    it("covers the week ending yesterday, not the day it runs", () => {
+        // A day is only reported once it is over. Including the run's own day would post
+        // it twice — here, and again next week where it is the day exactly a week back.
         expect(roundUp(week, "2026-08-18", 7).map((one) => one.date)).toEqual([
-            "2026-08-18",
             "2026-08-14",
+            "2026-08-11",
         ]);
     });
 
-    it("posts no release twice across consecutive weekly runs", () => {
+    it("reaches an entry written after the run went out", () => {
+        // The cron fires in the evening. Anything filed at nine belongs to a day this
+        // run has already passed, so the next run has to still be able to reach it.
+        expect(roundUp(week, "2026-08-25", 7).map((one) => one.date)).toContain("2026-08-18");
+    });
+
+    it("posts every release exactly once across consecutive weekly runs", () => {
         // The property that matters more than either boundary: run it every seven days
-        // and each release appears in exactly one round-up.
-        const every: string[] = [];
-        for (const day of ["2026-08-11", "2026-08-18"]) {
-            for (const release of roundUp(week, day, 7)) {
-                every.push(release.date);
+        // and each release appears in exactly one round-up — no gaps, no repeats.
+        const daily: Release[] = Array.from({ length: 40 }, (_, index) =>
+            release({ date: `2026-07-${String(index + 1).padStart(2, "0")}` }),
+        ).filter((one) => Number(one.date.slice(8)) <= 31);
+        const posted: string[] = [];
+        for (let day = 8; day <= 36; day += 7) {
+            const on = `2026-08-${String(day - 31).padStart(2, "0")}`;
+            for (const one of roundUp(daily, day <= 31 ? `2026-07-${String(day).padStart(2, "0")}` : on, 7)) {
+                posted.push(one.date);
             }
         }
-        expect(every).toEqual([...new Set(every)]);
-        expect(every).toContain("2026-08-11");
-        expect(every).toContain("2026-08-18");
+        expect(posted).toEqual([...new Set(posted)]);
+        // Every day of July from the 1st to the 30th is covered by one of those runs.
+        for (let day = 1; day <= 30; day++) {
+            expect(posted).toContain(`2026-07-${String(day).padStart(2, "0")}`);
+        }
     });
 
     it("covers nothing at all for a day that is not a real day", () => {
@@ -166,7 +178,7 @@ describe("roundUp", () => {
     it("leaves out an entry that asked to stay out", () => {
         const releases = [
             release({
-                date: "2026-08-18",
+                date: "2026-08-17",
                 entries: [
                     { body: "**Posted.** Yes.", twip: true },
                     { body: "**Held back.** No.", twip: false },
@@ -180,7 +192,7 @@ describe("roundUp", () => {
 
     it("drops a release left with nothing to say", () => {
         const releases = [
-            release({ date: "2026-08-18", entries: [{ body: "**Held.** No.", twip: false }] }),
+            release({ date: "2026-08-17", entries: [{ body: "**Held.** No.", twip: false }] }),
         ];
         expect(roundUp(releases, "2026-08-18", 7)).toEqual([]);
     });

@@ -50,12 +50,28 @@ export function holds(frame: Box, drawn: Box): boolean {
 // common, so a baseline of one asserts nothing about the component it came from.
 export const MIN_CROP_PX = 24;
 
+// Everything drawn BELOW an element, as one rectangle — the element's own box excluded.
+//
+// The exclusion is the whole point and is easy to lose: fold the element's box in and the
+// question `mayDescend` asks becomes "does this child contain its own parent", which
+// nothing can, so the crop silently stops descending and every frame is the container it
+// started from. Taking the boxes as a list rather than walking a tree is what lets that
+// be tested at all.
+export function descendantBounds(boxes: readonly Box[]): Box | null {
+    return boxes.reduce<Box | null>(
+        (bounds, box) => (bounds === null ? box : union(bounds, box)),
+        null,
+    );
+}
+
 // Whether the crop may step from a box down into the single thing inside it.
 //
 // It may not if that would drop something drawn elsewhere — a popover hanging outside its
 // trigger, a bar fixed to the viewport — because a frame that loses part of the picture
 // compares the rest of it against a baseline that lost the same part, and the two agree
 // forever.
+//
+// `drawn` is what is drawn BELOW `parent` (see descendantBounds), never `parent` itself.
 export function mayDescend(parent: Box, child: Box, drawn: Box, min = MIN_CROP_PX): boolean {
     if (!holds(child, drawn)) {
         return false;

@@ -3,8 +3,18 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { buildScore } from "../../../core/musicxmlBuild";
+import { memoryStore } from "../../adapters/memoryStore";
 import { ServicesProvider } from "../../contexts/services";
+import { createPrefsStore } from "../../stores/prefsStore";
 import { ScoreIncipit } from "./scoreIncipit";
+
+// A prefs store with the colour aid on, so the story shows what the setting does rather
+// than what the default happens to be.
+const colouredPrefs = () => {
+    const prefs = createPrefsStore(memoryStore());
+    prefs.save({ ...prefs.load(), colorNotes: true });
+    return prefs;
+};
 
 const meta: Meta<typeof ScoreIncipit> = {
     title: "Features/ScoreIncipit",
@@ -56,6 +66,19 @@ const GRAND = buildScore({
 
 // The opening bar beside a name, the way a thematic catalogue identifies a work.
 export const Mark: Story = { args: { xml: RISING, title: "Rising" } };
+
+// With the colour setting on it reads by note name, the same as the baked marks on every
+// list — a piece looks the same on the shelf and on its own page.
+export const Coloured: Story = {
+    args: { xml: RISING, title: "Rising" },
+    decorators: [
+        (Story) => (
+            <ServicesProvider services={{ prefs: colouredPrefs() }}>
+                <Story />
+            </ServicesProvider>
+        ),
+    ],
+};
 
 // A key signature in force travels with the notehead: the mark draws no key
 // signature, so a flat has to be written on the note or the pitch shown is wrong.

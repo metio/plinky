@@ -2,7 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { type Box, boxArea, holds, mayDescend, MIN_CROP_PX, union } from "./storyCrop";
+import {
+    type Box,
+    boxArea,
+    descendantBounds,
+    holds,
+    mayDescend,
+    MIN_CROP_PX,
+    union,
+} from "./storyCrop";
 
 const box = (left: number, top: number, width: number, height: number): Box => ({
     left,
@@ -86,5 +94,35 @@ describe("boxArea", () => {
     it("is zero for a box with no extent, so an undrawn element never looks smaller", () => {
         expect(boxArea(box(5, 5, 0, 20))).toBe(0);
         expect(boxArea(box(5, 5, 10, 20))).toBe(200);
+    });
+});
+
+describe("descendantBounds", () => {
+    it("is nothing when nothing was drawn below", () => {
+        expect(descendantBounds([])).toBeNull();
+    });
+
+    it("reaches around every box it is given", () => {
+        expect(descendantBounds([box(0, 0, 10, 10), box(90, 0, 10, 10)])).toEqual({
+            left: 0,
+            top: 0,
+            right: 100,
+            bottom: 10,
+        });
+    });
+
+    it("makes a descent possible, which folding the parent in does not", () => {
+        // The bug this pins, and it was invisible: with the parent's own box folded into
+        // the union, `mayDescend` asks whether a child contains its own parent. Nothing
+        // can, so the crop silently stopped descending and every frame came out at the
+        // full-width container it started from — while these very rules stayed green,
+        // because the tests fed them a union the caller never built.
+        const parent = box(0, 0, 800, 40);
+        const child = box(380, 0, 40, 40);
+        const below = descendantBounds([child]);
+        expect(mayDescend(parent, child, below!)).toBe(true);
+
+        const foldingTheParentIn = union(parent, child);
+        expect(mayDescend(parent, child, foldingTheParentIn)).toBe(false);
     });
 });

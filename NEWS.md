@@ -8,6 +8,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 19 August 2026
+
+**The opening bars are coloured on a piece's own page too.** If you have the
+noteheads coloured by note name, the little mark beside a title now follows that
+everywhere — it was already coloured on the music list and on home, and plain ink
+only on the page of the piece itself, which was the odd one out.
+
 ## 18 August 2026
 
 **The notes highway shows how long each note lasts.** Blocks used to be all the same
