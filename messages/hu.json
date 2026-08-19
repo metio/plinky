@@ -1213,5 +1213,10 @@
     "step_rest": "Szünet hozzáadása",
     "step_back": "Egyet vissza",
     "step_dotted_unavailable": "A tizenhatod a legrövidebb, amit a kotta rajzol, így nem lehet pontozni.",
-    "compose_count_in_stepping": "A beszámolás az együttjátszáshoz van — hangról hangra írva az időzítés már adott."
+    "compose_count_in_stepping": "A beszámolás az együttjátszáshoz van — hangról hangra írva az időzítés már adott.",
+    "tools_changes_title": "Két akkord között",
+    "tools_changes_hint": "Miért esik az egyik váltás kézre, a másik meg küzd: a hangok, amelyeket mindkét akkord tart, és mennyit kell mozdulnia a többinek.",
+    "tools_changes_shared": "Mindkét akkordban",
+    "tools_changes_travel": "Félhangok, amennyit az ujjak mozdulnak",
+    "tools_save_picture": "Mentés képként"
 }

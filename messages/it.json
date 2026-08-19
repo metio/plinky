@@ -1213,5 +1213,10 @@
     "step_rest": "Aggiungi una pausa",
     "step_back": "Torna indietro",
     "step_dotted_unavailable": "La semicroma è la più breve che il pentagramma disegni, quindi qui niente punto.",
-    "compose_count_in_stepping": "Il conto d'inizio serve per suonare a tempo — scrivendo nota per nota la durata è già decisa."
+    "compose_count_in_stepping": "Il conto d'inizio serve per suonare a tempo — scrivendo nota per nota la durata è già decisa.",
+    "tools_changes_title": "Fra due accordi",
+    "tools_changes_hint": "Perché un cambio cade sotto la mano e un altro resiste: le note che entrambi gli accordi tengono e quanto deve spostarsi il resto.",
+    "tools_changes_shared": "In entrambi gli accordi",
+    "tools_changes_travel": "Semitoni percorsi dalle dita",
+    "tools_save_picture": "Salva come immagine"
 }

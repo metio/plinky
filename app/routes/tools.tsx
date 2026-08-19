@@ -26,7 +26,10 @@ import {
     type ScaleId,
     scalePitches,
     semitonesOf,
+    pitchClassOf,
 } from "../../core/theory";
+import { ChordChanges } from "../components/features/chordChanges";
+import { SavePictureButton } from "../components/features/savePictureButton";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
@@ -196,6 +199,13 @@ function ChordExplorer() {
                 phrases={[{ notes: pitches }]}
                 label={m.tools_hear_it()}
             />
+            <SavePictureButton
+                from={ROOT}
+                to={ROOT + 24}
+                keys={pitches.map((note) => ({ note }))}
+                caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(root)))]} ${chordName(quality)}`}
+                filename="plinky-chord.png"
+            />
         </Panel>
     );
 }
@@ -329,6 +339,9 @@ export default function ToolsRoute() {
             <CircleOfFifths />
             <ScaleExplorer />
             <ChordExplorer />
+            <Panel title={m.tools_changes_title()} hint={m.tools_changes_hint()}>
+                <ChordChanges root={ROOT} />
+            </Panel>
             <IntervalFinder />
             <TapTempo onFound={setBpm} />
             <Metronome bpm={bpm} onBpm={setBpm} />

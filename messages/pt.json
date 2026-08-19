@@ -1213,5 +1213,10 @@
     "step_rest": "Juntar uma pausa",
     "step_back": "Voltar uma",
     "step_dotted_unavailable": "A semicolcheia é a mais curta que a pauta desenha, por isso aqui não há ponto.",
-    "compose_count_in_stepping": "A contagem serve para tocares a tempo — a escrever nota a nota a duração já está definida."
+    "compose_count_in_stepping": "A contagem serve para tocares a tempo — a escrever nota a nota a duração já está definida.",
+    "tools_changes_title": "Entre dois acordes",
+    "tools_changes_hint": "Porque é que uma mudança cai debaixo da mão e outra resiste: as notas que ambos os acordes seguram e quanto o resto tem de andar.",
+    "tools_changes_shared": "Nos dois acordes",
+    "tools_changes_travel": "Semitons que os dedos percorrem",
+    "tools_save_picture": "Guardar como imagem"
 }

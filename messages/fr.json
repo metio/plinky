@@ -1213,5 +1213,10 @@
     "step_rest": "Ajouter un silence",
     "step_back": "Revenir d'une note",
     "step_dotted_unavailable": "La double croche est la plus courte que la portée dessine : pas de point ici.",
-    "compose_count_in_stepping": "Le décompte sert à jouer en mesure — en écrivant note à note, la durée est déjà fixée."
+    "compose_count_in_stepping": "Le décompte sert à jouer en mesure — en écrivant note à note, la durée est déjà fixée.",
+    "tools_changes_title": "Entre deux accords",
+    "tools_changes_hint": "Pourquoi un enchaînement tombe sous la main et un autre résiste : les notes que les deux accords gardent, et la distance que le reste doit parcourir.",
+    "tools_changes_shared": "Dans les deux accords",
+    "tools_changes_travel": "Demi-tons parcourus par les doigts",
+    "tools_save_picture": "Enregistrer en image"
 }

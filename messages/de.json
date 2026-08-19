@@ -1213,5 +1213,10 @@
     "step_rest": "Pause einfügen",
     "step_back": "Eine zurück",
     "step_dotted_unavailable": "Eine Sechzehntel ist die kürzeste Note, die das Notenbild zeichnet — punktiert geht hier nicht.",
-    "compose_count_in_stepping": "Der Vorzähler ist fürs Mitspielen — beim Schreiben Note für Note steht das Timing schon fest."
+    "compose_count_in_stepping": "Der Vorzähler ist fürs Mitspielen — beim Schreiben Note für Note steht das Timing schon fest.",
+    "tools_changes_title": "Zwischen zwei Akkorden",
+    "tools_changes_hint": "Warum ein Wechsel unter der Hand liegt und ein anderer sich sperrt: die Töne, die beide Akkorde halten, und wie weit der Rest wandern muss.",
+    "tools_changes_shared": "In beiden Akkorden",
+    "tools_changes_travel": "Halbtöne, die die Finger wandern",
+    "tools_save_picture": "Als Bild sichern"
 }

@@ -1213,5 +1213,10 @@
     "step_rest": "Dodaj pauzę",
     "step_back": "Cofnij jedną",
     "step_dotted_unavailable": "Szesnastka to najkrótsza nuta, jaką rysuje pięciolinia — tu bez kropki.",
-    "compose_count_in_stepping": "Odliczanie służy do grania w rytm — przy zapisie nuta po nucie czas jest już ustalony."
+    "compose_count_in_stepping": "Odliczanie służy do grania w rytm — przy zapisie nuta po nucie czas jest już ustalony.",
+    "tools_changes_title": "Między dwoma akordami",
+    "tools_changes_hint": "Dlaczego jedna zmiana układa się pod ręką, a inna stawia opór: dźwięki, które trzymają oba akordy, i jak daleko musi przejść reszta.",
+    "tools_changes_shared": "W obu akordach",
+    "tools_changes_travel": "Półtony, które pokonują palce",
+    "tools_save_picture": "Zapisz jako obraz"
 }

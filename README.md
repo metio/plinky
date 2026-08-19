@@ -100,7 +100,9 @@ wrong key flashes red; whether the correct key then lights up is your call — b
 default it always shows the next note, or you can ask for a nudge only after a slip,
 or read the music unaided. When the next note is shown, playing it leaves a fading
 fill on the key for as long as the note is written to last, so you can see how long
-to keep holding — not just which key to press. A fresh device starts at **New starter** — every aid on, the notes highway included,
+to keep holding — not just which key to press. On the home page, that same keyboard
+names what you are holding as you hold it — the note, the interval, or the chord —
+so a shape you stumbled on stops being a shape you cannot look up. A fresh device starts at **New starter** — every aid on, the notes highway included,
 because someone who has never read music cannot start at the staff — and finishing the
 keyboard tour puts you there explicitly. A single **Skill level** picks all
 these reading aids together — from a new starter with every help on to a sight-reader
@@ -404,10 +406,14 @@ instrument, nothing to set up. A **circle of fifths** where picking a key names 
 signature and its relative minor and sounds its chord — and where each key spells its
 own notes, so D flat major reads as D flat and never as C sharp. A **scale explorer**
 and a **chord explorer** that light the notes on a keyboard from any root and play
-them back. An **interval finder**: pick a starting note and a distance to see where it
-lands and hear it struck together and apart. A **tap tempo** reader: tap along and it
-tells you the number. And a **metronome** that takes that number straight from it, so
-finding a tempo and playing at it is one job.
+them back — and either can be saved as a **picture**, keys marked and named, for a
+lesson plan or a printout. **Between two chords** answers the question a chart cannot:
+why one change falls under the hand and another fights it, by naming the notes both
+chords hold and counting how far the rest have to travel. An **interval finder**: pick
+a starting note and a distance to see where it lands and hear it struck together and
+apart. A **tap tempo** reader: tap along and it tells you the number. And a
+**metronome** that takes that number straight from it, so finding a tempo and playing
+at it is one job.
 
 ## Composing
 

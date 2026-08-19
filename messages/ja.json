@@ -1213,5 +1213,10 @@
     "step_rest": "休符を入れる",
     "step_back": "ひとつ戻す",
     "step_dotted_unavailable": "16分音符は楽譜が描ける最短の音符なので、付点は付けられません。",
-    "compose_count_in_stepping": "カウントインは合わせて弾くためのものです。一音ずつ書くときは長さがすでに決まっています。"
+    "compose_count_in_stepping": "カウントインは合わせて弾くためのものです。一音ずつ書くときは長さがすでに決まっています。",
+    "tools_changes_title": "ふたつの和音のあいだ",
+    "tools_changes_hint": "ある移り変わりは手に収まり、別のものは手に逆らいます。その差は、両方の和音が保つ音と、残りが動く距離にあります。",
+    "tools_changes_shared": "どちらの和音にも",
+    "tools_changes_travel": "指が動く半音の数",
+    "tools_save_picture": "画像として保存"
 }
