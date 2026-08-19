@@ -1213,5 +1213,10 @@
     "step_rest": "Añadir un silencio",
     "step_back": "Quitar la última",
     "step_dotted_unavailable": "La semicorchea es lo más corto que dibuja el pentagrama, así que aquí no hay puntillo.",
-    "compose_count_in_stepping": "La cuenta atrás es para tocar a la vez — al escribir nota a nota la duración ya está puesta."
+    "compose_count_in_stepping": "La cuenta atrás es para tocar a la vez — al escribir nota a nota la duración ya está puesta.",
+    "tools_changes_title": "Entre dos acordes",
+    "tools_changes_hint": "Por qué un cambio cae bajo la mano y otro se resiste: las notas que ambos acordes mantienen y cuánto tiene que moverse el resto.",
+    "tools_changes_shared": "En ambos acordes",
+    "tools_changes_travel": "Semitonos que recorren los dedos",
+    "tools_save_picture": "Guardar como imagen"
 }

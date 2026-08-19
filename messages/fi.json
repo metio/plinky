@@ -1213,5 +1213,10 @@
     "step_rest": "Lisää tauko",
     "step_back": "Yksi takaisin",
     "step_dotted_unavailable": "Kuudestoistaosa on lyhin, jonka nuottiviivasto piirtää, joten pistettä ei voi lisätä.",
-    "compose_count_in_stepping": "Sisäänlaskenta on soittamista varten — nuotti kerrallaan kirjoitettaessa kesto on jo päätetty."
+    "compose_count_in_stepping": "Sisäänlaskenta on soittamista varten — nuotti kerrallaan kirjoitettaessa kesto on jo päätetty.",
+    "tools_changes_title": "Kahden soinnun välillä",
+    "tools_changes_hint": "Miksi yksi vaihdos osuu käden alle ja toinen vastustaa: sävelet, jotka molemmat soinnut pitävät, ja kuinka pitkälle loput joutuvat siirtymään.",
+    "tools_changes_shared": "Molemmissa soinnuissa",
+    "tools_changes_travel": "Puolisävelaskeleet, jotka sormet kulkevat",
+    "tools_save_picture": "Tallenna kuvana"
 }

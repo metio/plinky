@@ -1213,5 +1213,10 @@
     "step_rest": "Shto një pauzë",
     "step_back": "Kthe një pas",
     "step_dotted_unavailable": "E gjashtëmbëdhjeta është më e shkurtra që vizaton pentagrami, ndaj nuk merr pikë.",
-    "compose_count_in_stepping": "Numërimi shërben për të luajtur në ritëm — kur shkruan notë për notë, kohëzgjatja është e dhënë."
+    "compose_count_in_stepping": "Numërimi shërben për të luajtur në ritëm — kur shkruan notë për notë, kohëzgjatja është e dhënë.",
+    "tools_changes_title": "Mes dy akordeve",
+    "tools_changes_hint": "Pse një ndryshim të bie nën dorë dhe një tjetër të kundërshton: notat që i mbajnë të dy akordet, dhe sa larg duhet të lëvizin të tjerat.",
+    "tools_changes_shared": "Në të dy akordet",
+    "tools_changes_travel": "Gjysmëtone që kalojnë gishtat",
+    "tools_save_picture": "Ruaje si figurë"
 }

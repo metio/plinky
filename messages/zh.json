@@ -1213,5 +1213,10 @@
     "step_rest": "加一个休止符",
     "step_back": "退回一个",
     "step_dotted_unavailable": "十六分音符已是谱面能画的最短音符，所以不能加附点。",
-    "compose_count_in_stepping": "预备拍是为了跟着弹；一个音一个音地写时，时值已经定好了。"
+    "compose_count_in_stepping": "预备拍是为了跟着弹；一个音一个音地写时，时值已经定好了。",
+    "tools_changes_title": "两个和弦之间",
+    "tools_changes_hint": "为什么有的转换顺手，有的别扭：两个和弦共有的音，以及其余的音要走多远。",
+    "tools_changes_shared": "两个和弦都有",
+    "tools_changes_travel": "手指移动的半音数",
+    "tools_save_picture": "保存为图片"
 }

@@ -1213,5 +1213,10 @@
     "step_rest": "Es ekle",
     "step_back": "Birini geri al",
     "step_dotted_unavailable": "On altılık, porteni çizebildiği en kısa nota — burada nokta olmaz.",
-    "compose_count_in_stepping": "Giriş sayımı birlikte çalmak içindir — nota nota yazarken süre zaten belli."
+    "compose_count_in_stepping": "Giriş sayımı birlikte çalmak içindir — nota nota yazarken süre zaten belli.",
+    "tools_changes_title": "İki akor arasında",
+    "tools_changes_hint": "Neden bir geçiş elin altına düşer de bir başkası direnir: iki akorun da tuttuğu sesler ve geri kalanın ne kadar yol alması gerektiği.",
+    "tools_changes_shared": "İki akorda da",
+    "tools_changes_travel": "Parmakların gittiği yarım ses",
+    "tools_save_picture": "Görsel olarak kaydet"
 }

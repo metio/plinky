@@ -1213,5 +1213,10 @@
     "step_rest": "Lägg till en paus",
     "step_back": "En tillbaka",
     "step_dotted_unavailable": "En sextondel är det kortaste notsystemet ritar, så den kan inte punkteras.",
-    "compose_count_in_stepping": "Inräkningen är för att spela med — skriver du not för not är tajmingen redan satt."
+    "compose_count_in_stepping": "Inräkningen är för att spela med — skriver du not för not är tajmingen redan satt.",
+    "tools_changes_title": "Mellan två ackord",
+    "tools_changes_hint": "Varför ett byte faller under handen och ett annat kämpar emot: tonerna som båda ackorden håller, och hur långt resten måste gå.",
+    "tools_changes_shared": "I båda ackorden",
+    "tools_changes_travel": "Halvtoner som fingrarna rör sig",
+    "tools_save_picture": "Spara som bild"
 }

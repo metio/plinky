@@ -1213,5 +1213,10 @@
     "step_rest": "Přidat pomlku",
     "step_back": "O jednu zpět",
     "step_dotted_unavailable": "Šestnáctinová je nejkratší, kterou notová osnova nakreslí — tečka tu nejde.",
-    "compose_count_in_stepping": "Nádech slouží ke hraní v rytmu — při zápisu nota po notě je délka daná."
+    "compose_count_in_stepping": "Nádech slouží ke hraní v rytmu — při zápisu nota po notě je délka daná.",
+    "tools_changes_title": "Mezi dvěma akordy",
+    "tools_changes_hint": "Proč jedna změna padne pod ruku a jiná se brání: tóny, které drží oba akordy, a jak daleko se musí posunout zbytek.",
+    "tools_changes_shared": "V obou akordech",
+    "tools_changes_travel": "Půltóny, které prsty urazí",
+    "tools_save_picture": "Uložit jako obrázek"
 }

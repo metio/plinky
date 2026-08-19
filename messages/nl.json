@@ -1213,5 +1213,10 @@
     "step_rest": "Rust toevoegen",
     "step_back": "Eentje terug",
     "step_dotted_unavailable": "Een zestiende is de kortste die de notenbalk tekent, dus hier geen punt.",
-    "compose_count_in_stepping": "Het aftellen is om mee te spelen — noot voor noot schrijven zet de timing al vast."
+    "compose_count_in_stepping": "Het aftellen is om mee te spelen — noot voor noot schrijven zet de timing al vast.",
+    "tools_changes_title": "Tussen twee akkoorden",
+    "tools_changes_hint": "Waarom de ene wisseling vanzelf onder je hand valt en de andere tegenwerkt: de tonen die beide akkoorden vasthouden, en hoe ver de rest moet.",
+    "tools_changes_shared": "In beide akkoorden",
+    "tools_changes_travel": "Halve tonen die je vingers afleggen",
+    "tools_save_picture": "Als afbeelding bewaren"
 }

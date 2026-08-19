@@ -1213,5 +1213,10 @@
     "step_rest": "쉼표 넣기",
     "step_back": "하나 되돌리기",
     "step_dotted_unavailable": "16분음표는 악보가 그릴 수 있는 가장 짧은 음이라 점을 붙일 수 없어요.",
-    "compose_count_in_stepping": "카운트인은 맞춰 연주할 때 쓰는 기능이에요. 한 음씩 적을 때는 길이가 이미 정해져 있어요."
+    "compose_count_in_stepping": "카운트인은 맞춰 연주할 때 쓰는 기능이에요. 한 음씩 적을 때는 길이가 이미 정해져 있어요.",
+    "tools_changes_title": "두 화음 사이",
+    "tools_changes_hint": "어떤 자리바꿈은 손에 들어오고 어떤 자리바꿈은 손과 다툽니다. 두 화음이 함께 쥐는 음과, 나머지가 움직이는 거리가 그 차이입니다.",
+    "tools_changes_shared": "두 화음 모두에",
+    "tools_changes_travel": "손가락이 움직이는 반음",
+    "tools_save_picture": "이미지로 저장"
 }

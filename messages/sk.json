@@ -1213,5 +1213,10 @@
     "step_rest": "Pridať pomlčku",
     "step_back": "O jednu späť",
     "step_dotted_unavailable": "Šestnástinová je najkratšia, akú notová osnova nakreslí — bodka tu nejde.",
-    "compose_count_in_stepping": "Odpočet slúži na hranie v rytme — pri zápise nota po note je dĺžka daná."
+    "compose_count_in_stepping": "Odpočet slúži na hranie v rytme — pri zápise nota po note je dĺžka daná.",
+    "tools_changes_title": "Medzi dvoma akordmi",
+    "tools_changes_hint": "Prečo jedna zmena padne pod ruku a iná sa bráni: tóny, ktoré držia oba akordy, a ako ďaleko sa musí posunúť zvyšok.",
+    "tools_changes_shared": "V oboch akordoch",
+    "tools_changes_travel": "Poltóny, ktoré prsty prejdú",
+    "tools_save_picture": "Uložiť ako obrázok"
 }

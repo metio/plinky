@@ -7,6 +7,7 @@ import { useKeyboardTheme } from "../../hooks/useKeyboardTheme";
 import { useNoteLabels } from "../../hooks/useNoteLabels";
 import { useSynth } from "../../hooks/useSynth";
 import { Keyboard } from "../ui/keyboard";
+import { ChordReadout } from "./chordReadout";
 import { MidiBadge } from "./midiBadge";
 
 // One octave, C4–C5 — enough to be unmistakably a piano, small enough to sit on a
@@ -44,17 +45,24 @@ export function HeroKeyboard() {
     // on. A MIDI note held then is genuinely still down and left to its device's note-off.
 
     return (
-        <Keyboard
-            from={FROM}
-            to={TO}
-            lit={new Set(heldNotes)}
-            rise
-            labels={labels}
-            well="mx-auto w-full max-w-md"
-            theme={theme}
-            badge={<MidiBadge />}
-            onPress={pressKey}
-            onRelease={releaseKey}
-        />
+        <>
+            <Keyboard
+                from={FROM}
+                to={TO}
+                lit={new Set(heldNotes)}
+                rise
+                labels={labels}
+                well="mx-auto w-full max-w-md"
+                theme={theme}
+                badge={<MidiBadge />}
+                onPress={pressKey}
+                onRelease={releaseKey}
+            />
+            {/* What the hands are holding, named as they hold it. The keyboard is already
+                here to be pressed for its own sake; saying what came out turns idle
+                noodling into the one lesson nobody can look up — you cannot search for a
+                sound you have no name for. */}
+            <ChordReadout notes={heldNotes} />
+        </>
     );
 }

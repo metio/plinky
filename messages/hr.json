@@ -1213,5 +1213,10 @@
     "step_rest": "Dodaj pauzu",
     "step_back": "Jednu natrag",
     "step_dotted_unavailable": "Šesnaestinka je najkraća koju crtovlje crta, pa ovdje nema točke.",
-    "compose_count_in_stepping": "Odbrojavanje služi za sviranje u ritmu — kad pišeš notu po notu, trajanje je već zadano."
+    "compose_count_in_stepping": "Odbrojavanje služi za sviranje u ritmu — kad pišeš notu po notu, trajanje je već zadano.",
+    "tools_changes_title": "Između dva akorda",
+    "tools_changes_hint": "Zašto jedna promjena padne pod ruku, a druga se opire: tonovi koje drže oba akorda i koliko daleko ostali moraju prijeći.",
+    "tools_changes_shared": "U oba akorda",
+    "tools_changes_travel": "Poluton koje prsti prijeđu",
+    "tools_save_picture": "Spremi kao sliku"
 }

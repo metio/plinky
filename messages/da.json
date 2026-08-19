@@ -1213,5 +1213,10 @@
     "step_rest": "Tilføj en pause",
     "step_back": "En tilbage",
     "step_dotted_unavailable": "En sekstendedel er den korteste, nodesystemet tegner, så den kan ikke punkteres.",
-    "compose_count_in_stepping": "Optællingen er til at spille med — skriver du node for node, er timingen allerede sat."
+    "compose_count_in_stepping": "Optællingen er til at spille med — skriver du node for node, er timingen allerede sat.",
+    "tools_changes_title": "Mellem to akkorder",
+    "tools_changes_hint": "Hvorfor ét skift falder under hånden og et andet kæmper imod: tonerne begge akkorder holder, og hvor langt resten skal.",
+    "tools_changes_shared": "I begge akkorder",
+    "tools_changes_travel": "Halvtoner fingrene bevæger sig",
+    "tools_save_picture": "Gem som billede"
 }
