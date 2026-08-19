@@ -29,6 +29,7 @@ import {
     pitchClassOf,
 } from "../../core/theory";
 import { ChordChanges } from "../components/features/chordChanges";
+import { FeatureBoundary } from "../components/features/featureBoundary";
 import { SavePictureButton } from "../components/features/savePictureButton";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { Button } from "../components/ui/button";
@@ -336,15 +337,33 @@ export default function ToolsRoute() {
     return (
         <main className="mx-auto max-w-3xl space-y-8 p-6 font-sans">
             <PageHeader title={m.tools_title()} hint={m.tools_intro()} />
-            <CircleOfFifths />
-            <ScaleExplorer />
-            <ChordExplorer />
-            <Panel title={m.tools_changes_title()} hint={m.tools_changes_hint()}>
-                <ChordChanges root={ROOT} />
-            </Panel>
-            <IntervalFinder />
-            <TapTempo onFound={setBpm} />
-            <Metronome bpm={bpm} onBpm={setBpm} />
+            {/* A boundary per tool. Each one is a self-contained thing a player looks up
+                mid-practice, reading nothing the others read — so a stumble in the chord
+                arithmetic has no business taking the metronome away from somebody who
+                came for the metronome. The tap tempo and the metronome share a number and
+                so share a boundary: split, a crash in one would leave the other holding a
+                tempo whose source had vanished. */}
+            <FeatureBoundary feature="CircleOfFifths">
+                <CircleOfFifths />
+            </FeatureBoundary>
+            <FeatureBoundary feature="ScaleExplorer">
+                <ScaleExplorer />
+            </FeatureBoundary>
+            <FeatureBoundary feature="ChordExplorer">
+                <ChordExplorer />
+            </FeatureBoundary>
+            <FeatureBoundary feature="ChordChanges">
+                <Panel title={m.tools_changes_title()} hint={m.tools_changes_hint()}>
+                    <ChordChanges root={ROOT} />
+                </Panel>
+            </FeatureBoundary>
+            <FeatureBoundary feature="IntervalFinder">
+                <IntervalFinder />
+            </FeatureBoundary>
+            <FeatureBoundary feature="TapTempoAndMetronome">
+                <TapTempo onFound={setBpm} />
+                <Metronome bpm={bpm} onBpm={setBpm} />
+            </FeatureBoundary>
         </main>
     );
 }
