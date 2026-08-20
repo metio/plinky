@@ -75,3 +75,22 @@ describe("practiceLogStore", () => {
         expect(store.addManual({ date: "2026-06-23", minutes: 10 })).toBe(false);
     });
 });
+
+describe("a manual entry the log will not take", () => {
+    // The store's boolean is what a "saved" indicator gates on, and a rejected entry
+    // leaves the log untouched — which the no-op rule reads as success. So the panel said
+    // saved for something thrown away.
+    it("reports failure rather than success", () => {
+        const store = createPracticeLogStore(memoryStore());
+        expect(store.addManual({ date: "not-a-day", minutes: 30 })).toBe(false);
+        expect(store.addManual({ date: "2026-08-20", minutes: 0 })).toBe(false);
+        expect(store.addManual({ date: "2026-08-20", minutes: 99_999 })).toBe(false);
+        expect(store.load()).toEqual([]);
+    });
+
+    it("still reports success for one it takes", () => {
+        const store = createPracticeLogStore(memoryStore());
+        expect(store.addManual({ date: "2026-08-20", minutes: 30 })).toBe(true);
+        expect(store.load()).toHaveLength(1);
+    });
+});

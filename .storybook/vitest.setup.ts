@@ -5,7 +5,7 @@ import { setProjectAnnotations } from "@storybook/react-vite";
 import { page } from "vitest/browser";
 import { afterEach, beforeAll, expect } from "vitest";
 import projectAnnotations from "./preview";
-import { type Box, type CropNode, descendantBounds, holds, tightestOf } from "../core/storyCrop";
+import { type Box, descendantBounds, holds } from "../core/storyCrop";
 
 // Apply the preview's decorators and parameters when running stories as tests.
 const project = setProjectAnnotations([projectAnnotations]);
@@ -101,42 +101,28 @@ const intersects = (one: Box, other: Box): boolean =>
 // the question "may the crop step into this child" is not silently asking a child to
 // contain its parent. Content its own ancestors clip away is left out too: it is not on
 // screen, so a frame that omits it omits nothing a reader could see.
+// Whether the browser is actually rendering the element. A collapsed <details> still
+// reports real boxes for the content it is hiding, and those boxes sit outside its own —
+// which read as content escaping the container and sent whole stories to a full-viewport
+// frame to hold something nobody could see.
+const rendered = (el: Element): boolean =>
+    typeof el.checkVisibility !== "function" ||
+    el.checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true });
+
+// Everything the story drew inside `root` — its own box excluded, so a box that lies
+// outside it means content genuinely escaped. What ancestors clip away, and what the
+// browser is not rendering at all, is left out: neither is on screen, so a frame that
+// omits it omits nothing a reader could see.
 const drawnBelow = (root: Element): Box | null =>
     descendantBounds(
         Array.from(root.querySelectorAll("*"))
             .filter(drawn)
+            .filter(rendered)
             .filter((el) => {
                 const clip = clipOf(el);
                 return clip === null || intersects(boxOf(el), clip);
             })
             .map(boxOf),
-    );
-
-// Whether the element draws anything of its own — a ground, an edge, a shadow. If it
-// does, it IS the picture, and the shape inside it is only part of one.
-const paints = (el: Element): boolean => {
-    const style = getComputedStyle(el);
-    if (style.backgroundImage !== "none") {
-        return true;
-    }
-    if (style.backgroundColor !== "rgba(0, 0, 0, 0)" && style.backgroundColor !== "transparent") {
-        return true;
-    }
-    if (style.boxShadow !== "none" || style.outlineStyle !== "none") {
-        return true;
-    }
-    return (["Top", "Right", "Bottom", "Left"] as const).some(
-        (side) =>
-            style[`border${side}Style`] !== "none" &&
-            Number.parseFloat(style[`border${side}Width`]) > 0,
-    );
-};
-
-// Whether the element carries text of its own, alongside whatever element sits in it.
-// A verdict card is a badge and a sentence; descending to the badge drops the sentence.
-const hasOwnText = (el: Element): boolean =>
-    Array.from(el.childNodes).some(
-        (node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim() !== "",
     );
 
 // The same phone box the browser-mobile project uses, for a story the wide one hides.
@@ -145,50 +131,8 @@ const PHONE = { width: 390, height: 844 };
 // The outermost thing the story actually drew inside its container, when the container
 // itself has no box. A `fixed` or absolute child does not contribute to its parent's, so
 // an empty container is not the same question as an empty story — the descendants have to
-// be asked separately, or content that is merely out of the flow reads as content that is
-// not there. Document order puts the outermost first.
+// be asked separately, or content that is merely out of the flow reads as absent.
 const drawnInside = (root: Element) => Array.from(root.querySelectorAll("*")).find(drawn);
-
-// The story as a tree of boxes, for core/storyCrop's descent. Only what is drawn and not
-// clipped away becomes a child, so the walk never has to ask the DOM anything.
-//
-// `stops` marks where the thing being looked at ends: an SVG boundary (whose children
-// report shape geometry rather than layout boxes, so descending lands on a stroke
-// outline), an element painting its own ground, edge or shadow, and one carrying text of
-// its own — descending past that would drop the text.
-const treeOf = (el: Element): CropNode => ({
-    box: boxOf(el),
-    stops: el instanceof SVGElement || paints(el) || hasOwnText(el),
-    children: Array.from(el.children)
-        .filter(drawn)
-        .filter((child) => {
-            const clip = clipOf(child);
-            return clip === null || intersects(boxOf(child), clip);
-        })
-        .map(treeOf),
-});
-
-// Walk the tree, then find the element it landed on. Matching by box rather than keeping
-// a reference keeps the tree a plain value, which is what makes the walk testable.
-const tightest = (el: Element): Element => {
-    const target = tightestOf(treeOf(el));
-    let found = el;
-    const visit = (node: Element) => {
-        const box = boxOf(node);
-        if (
-            box.left === target.box.left &&
-            box.top === target.box.top &&
-            box.right === target.box.right &&
-            box.bottom === target.box.bottom
-        ) {
-            found = node;
-            return true;
-        }
-        return Array.from(node.children).some(visit);
-    };
-    visit(el);
-    return found;
-};
 
 // A `fixed` bar leaves the container zero-sized however much of it is on screen, so what
 // gets compared is the bar rather than the container that nominally holds it.
@@ -210,11 +154,14 @@ const captureTarget = async (root: HTMLElement) => {
     // The whole viewport is the fallback, because it is the only box that holds anything.
     const of = (target: Element, restore: { width: number; height: number } | null) => {
         const all = drawnBelow(target);
-        // Nothing below means nothing could have escaped, so the target frames itself.
-        // Reaching for the body there would spend the whole allowance on empty page to
-        // guard against content that does not exist.
-        const frame =
-            all === null ? target : holds(boxOf(target), all) ? tightest(target) : document.body;
+        // The container, or the viewport when something drew outside it.
+        //
+        // There was a walk here once that stepped down into the tightest element still
+        // holding the picture, to spend the comparison allowance on the component instead
+        // of the empty page around it. It was worth something — and it was wrong in four
+        // consecutive sweeps, every time in the recursion and every time with a green
+        // suite. A looser frame that is right beats a tight one nobody can keep correct.
+        const frame = all === null || holds(boxOf(target), all) ? target : document.body;
         return { locator: page.elementLocator(frame), restore };
     };
     const inFlow = drawn(root) ? root : drawnInside(root);

@@ -216,9 +216,21 @@ export type ManualEntry = {
 // anchor in UTC lands on the wrong day for anyone far enough east — at UTC+13 or +14,
 // noon UTC is already the following morning. Returns the log unchanged when the entry
 // says nothing.
+// Whether an entry is one the log will actually take.
+//
+// Exported because a rejection and a no-op are indistinguishable from the outside:
+// `addManualSession` returns the log unchanged either way, and a store that reads "the
+// log did not change" as "nothing was lost" then reports a save that never happened. The
+// caller asks this first, so both sides agree on what valid means without either
+// restating the rule.
+export function isManualEntry(entry: ManualEntry): boolean {
+    const minutes = Math.floor(clampNumber(entry.minutes, 0));
+    return isDateKey(entry.date) && minutes > 0 && minutes <= MAX_MANUAL_MINUTES;
+}
+
 export function addManualSession(log: PracticeLog, entry: ManualEntry): PracticeLog {
     const minutes = Math.floor(clampNumber(entry.minutes, 0));
-    if (!isDateKey(entry.date) || minutes <= 0 || minutes > MAX_MANUAL_MINUTES) {
+    if (!isManualEntry(entry)) {
         return log;
     }
     const [year, month, day] = entry.date.split("-").map(Number);

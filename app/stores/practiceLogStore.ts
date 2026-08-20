@@ -3,6 +3,7 @@
 
 import {
     addManualSession,
+    isManualEntry,
     foldSession,
     type ManualEntry,
     type Mood,
@@ -43,6 +44,12 @@ export function createPracticeLogStore(kv: KeyValueStore): PracticeLogStore {
             return apply(foldSession(store.load(), ping));
         },
         addManual(entry) {
+            // Asked before applying, because a rejected entry leaves the log untouched and
+            // `apply` reads an untouched log as success — so the panel's "saved" would
+            // light up for something the log threw away.
+            if (!isManualEntry(entry)) {
+                return false;
+            }
             return apply(addManualSession(store.load(), entry));
         },
         remove(start) {
