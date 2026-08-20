@@ -4,6 +4,7 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
+import { m } from "../../paraglide/messages.js";
 import { afterEach, describe, expect, it } from "vitest";
 import { ScoreBackup } from "./scoreBackup";
 
@@ -48,7 +49,10 @@ describe("ScoreBackup", () => {
         fireEvent.change(fileInput(container), {
             target: { files: [new File(["not json"], "x.json")] },
         });
-        expect(await screen.findByText(/not valid JSON/)).toBeTruthy();
+        // The message is the app's translated one, not core's English: core has no
+        // language, and asserting its wording here is what let English reach the other
+        // twenty-five locales unnoticed.
+        expect(await screen.findByText(m.backup_import_error())).toBeTruthy();
     });
 
     it("ignores a slower earlier read once a newer file has been picked", async () => {

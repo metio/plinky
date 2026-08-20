@@ -202,8 +202,16 @@ export function stepCenterAt(
         const a = onsets[index] ?? 0;
         const b = onsets[index + 1] ?? a;
         if (tMs < b) {
-            const from = centers[index] ?? 0;
-            const to = centers[Math.min(index + 1, centers.length - 1)] ?? from;
+            // Clamped, because the two lists can be different lengths and often are: the
+            // onsets are the take's own, while the centres come from an engraving whose
+            // notes were quantised to a grid — a hand-played chord's three near-misses
+            // collapse into one step. Reading past the end used to fall back to 0, which
+            // is the TOP of the sheet: the score panel jumped back to bar one partway
+            // through and stayed there. Holding the last centre keeps the page where the
+            // music left it.
+            const last = centers.length - 1;
+            const from = centers[Math.min(index, last)] ?? 0;
+            const to = centers[Math.min(index + 1, last)] ?? from;
             const progress = b > a ? (tMs - a) / (b - a) : 1;
             return from + (to - from) * progress;
         }

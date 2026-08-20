@@ -53,11 +53,15 @@ export function ScoreBackup() {
             }
             setStatus(`${m.backup_imported_scores({ count: pluralScores(result.imported) })}.`);
             setCount(loadUserScores(store).length);
-        } catch (error) {
+        } catch {
             if (mine !== readSeq.current) {
                 return;
             }
-            setStatus(error instanceof Error ? error.message : m.backup_import_error());
+            // The thrown message is core's, and core has no language — it is written in
+            // English for whoever reads a stack trace. Showing it to the reader put
+            // English in front of twenty-five other locales, which the translated line
+            // below was already there to prevent.
+            setStatus(m.backup_import_error());
         }
     };
 

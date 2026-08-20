@@ -625,7 +625,22 @@ export const webAudioEngine: AudioEngine = {
         // under the sustain pedal or a prior sostenuto. Lifting ends the captured set, save
         // any a key or the sustain pedal still holds.
         if (down) {
+            // A second press re-snapshots, and anything leaving the captured set has to be
+            // let go of on the way out. Overwriting the set silently orphaned notes whose
+            // keys were already up and which nothing else held: a synthesised voice
+            // schedules no stop of its own, so it stayed in `voices` sounding at its
+            // sustain shelf until some unrelated allNotesOff happened along. Pedal-down
+            // events are not deduplicated — any CC66 at or above 64 is another down, which
+            // a half-pedal ramp sends several of.
+            const previous = sostenutoHeld;
             sostenutoHeld = new Set(keyDown);
+            if (ctx) {
+                for (const note of previous) {
+                    if (!sostenutoHeld.has(note)) {
+                        maybeEnd(ctx, note);
+                    }
+                }
+            }
         } else {
             const held = sostenutoHeld;
             sostenutoHeld = new Set();

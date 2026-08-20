@@ -216,21 +216,10 @@ export type ManualEntry = {
 // anchor in UTC lands on the wrong day for anyone far enough east — at UTC+13 or +14,
 // noon UTC is already the following morning. Returns the log unchanged when the entry
 // says nothing.
-// Whether an entry is one the log will actually take.
-//
-// Exported because a rejection and a no-op are indistinguishable from the outside:
-// `addManualSession` returns the log unchanged either way, and a store that reads "the
-// log did not change" as "nothing was lost" then reports a save that never happened. The
-// caller asks this first, so both sides agree on what valid means without either
-// restating the rule.
-export function isManualEntry(entry: ManualEntry): boolean {
-    const minutes = Math.floor(clampNumber(entry.minutes, 0));
-    return isDateKey(entry.date) && minutes > 0 && minutes <= MAX_MANUAL_MINUTES;
-}
-
 export function addManualSession(log: PracticeLog, entry: ManualEntry): PracticeLog {
     const minutes = Math.floor(clampNumber(entry.minutes, 0));
-    if (!isManualEntry(entry)) {
+    // Returned unchanged, by identity, so the caller can tell a refusal from a no-op.
+    if (!isDateKey(entry.date) || minutes <= 0 || minutes > MAX_MANUAL_MINUTES) {
         return log;
     }
     const [year, month, day] = entry.date.split("-").map(Number);
@@ -254,7 +243,12 @@ export function addManualSession(log: PracticeLog, entry: ManualEntry): Practice
         mood: cleanMood(entry.mood),
         label: cleanLabel(entry.label),
     };
-    return sortSessions([...log, session]);
+    const next = sortSessions([...log, session]);
+    // The log is capped, so an entry dated before the oldest of the 2000 kept is added and
+    // sliced straight back off. Returning the log untouched is what tells the caller it
+    // did not land: a store that saves the new array and reports success would light a
+    // "saved" for a row nobody will ever see again.
+    return next.some((one) => one.start === session.start) ? next : log;
 }
 
 export function removeSession(log: PracticeLog, start: number): PracticeLog {

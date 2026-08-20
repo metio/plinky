@@ -1,6 +1,17 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-08-20
+  entries:
+    - |-
+      **A handful of small things that went wrong quietly.** The microphone now lets go the
+      moment you turn ear training off, even if you turned it off while the browser was
+      still asking permission. Holding the middle pedal down twice in a row no longer leaves
+      the first set of notes ringing. A score saved as UTF-16, or one packed as a very large
+      .mxl, opens or is refused clearly instead of arriving as gibberish. If a video export
+      fails, the page says so rather than looking like nothing happened. And the message you
+      see when an import goes wrong is finally in your own language.
+
 - date: 2026-08-19
   entries:
     - |-

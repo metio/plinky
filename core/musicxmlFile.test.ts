@@ -67,3 +67,49 @@ describe("readScoreFile", () => {
         expect(await readScoreFile(file)).toBe(XML);
     });
 });
+
+describe("a file that is not plain UTF-8", () => {
+    const asFile = (bytes: Uint8Array) =>
+        ({ arrayBuffer: async () => bytes.buffer }) as unknown as File;
+
+    it("reads a UTF-16 document, which XML is allowed to be", () => {
+        // Finale and other older tools write UTF-16. Decoded as UTF-8 the bytes come out
+        // interleaved with NULs, the parser finds no notes, and a perfectly valid file
+        // was refused for a reason nobody could see.
+        const xml = "<score-partwise><part id=\"P1\"/></score-partwise>";
+        const utf16 = new Uint8Array(2 + xml.length * 2);
+        utf16[0] = 0xff;
+        utf16[1] = 0xfe;
+        for (let index = 0; index < xml.length; index++) {
+            utf16[2 + index * 2] = xml.charCodeAt(index) & 0xff;
+            utf16[3 + index * 2] = xml.charCodeAt(index) >> 8;
+        }
+        return expect(readScoreFile(asFile(utf16))).resolves.toContain("score-partwise");
+    });
+
+    it("still reads plain UTF-8", () => {
+        const xml = "<score-partwise/>";
+        return expect(readScoreFile(asFile(new TextEncoder().encode(xml)))).resolves.toBe(xml);
+    });
+});
+
+describe("a zip that unpacks to far more than a score", () => {
+    it("is refused rather than expanded", () => {
+        // A score is prose and numbers; the largest in the bundled catalogue is a few
+        // hundred kilobytes. Without a ceiling a one-megabyte file expands to gigabytes
+        // and takes the tab with it.
+        const huge = zipSync({
+            "META-INF/container.xml": strToU8('<container><rootfiles><rootfile full-path="s.xml"/></rootfiles></container>'),
+            "s.xml": new Uint8Array(64 * 1024 * 1024),
+        });
+        expect(decompressMxl(huge)).toBeNull();
+    });
+
+    it("still reads one of an ordinary size", () => {
+        const ordinary = zipSync({
+            "META-INF/container.xml": strToU8('<container><rootfiles><rootfile full-path="s.xml"/></rootfiles></container>'),
+            "s.xml": strToU8("<score-partwise/>"),
+        });
+        expect(decompressMxl(ordinary)).toBe("<score-partwise/>");
+    });
+});

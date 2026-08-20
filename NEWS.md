@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 20 August 2026
+
+**A handful of small things that went wrong quietly.** The microphone now lets go the
+moment you turn ear training off, even if you turned it off while the browser was
+still asking permission. Holding the middle pedal down twice in a row no longer leaves
+the first set of notes ringing. A score saved as UTF-16, or one packed as a very large
+.mxl, opens or is refused clearly instead of arriving as gibberish. If a video export
+fails, the page says so rather than looking like nothing happened. And the message you
+see when an import goes wrong is finally in your own language.
+
 ## 19 August 2026
 
 **The help page shows pictures of Plinky in your language.** Every screenshot on it
