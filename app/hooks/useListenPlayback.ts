@@ -177,6 +177,13 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
 
 // One position carrying an ornament, spelled out as the notes it actually sounds.
 //
+// Listen and the graded run part company here, on purpose. Everywhere else the two read
+// one performance off the page — a tie held, a grace note ahead of its beat — because
+// asking the player for something different from what they just heard is the one thing
+// that reliably confuses. An ornament is the exception: nobody can be graded on a trill
+// note by note, and demanding one would fail every player who plays the passage
+// beautifully. So the run asks for the written note and Listen plays the figure.
+//
 // The figure replaces the note, so it is emitted as a run of positions sharing the written
 // length between them — and only the last one moves the cursor, exactly as a grace note's
 // does. The cursor stays on the note the sign is printed over for the whole figure, which
