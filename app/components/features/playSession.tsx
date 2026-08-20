@@ -348,6 +348,8 @@ function usePlaySessionValue({
             listenPlayback.stop();
             keepUp.stop();
             matcher.stop();
+            // The engraving the lookahead was read from is gone.
+            matcher.resetPreview();
             // A run already on its way — a sight-read counting down before it begins —
             // must not arrive after the player has stopped. Dropping the claim stops the
             // start; cancelling the countdown stops the timer and clears it off screen,
@@ -676,6 +678,9 @@ function usePlaySessionValue({
         loop: loop.read,
         onLap: bumpTempo,
         centerCursor,
+        // The notes highway follows Listen too, so choosing that reading mode does not
+        // mean losing it the moment the computer takes over the music.
+        onPosition: matcher.preview,
         markPainted,
         isPracticing,
         // Light the notes on a connected instrument as Listen plays them, and let
@@ -830,6 +835,9 @@ function usePlaySessionValue({
         const from = resumePoint();
         enterPlayFullscreen();
         matcher.stop();
+        // Before Listen touches the cursor: collecting the lookahead walks it, and a walk
+        // afterwards would drag Listen's own position back to the top of the piece.
+        matcher.preview(from);
         // With hidden notes on, Listen is the "hear it first" half of ear practice:
         // the phrase sounds over a blanked staff, ready to be played back.
         hidden.conceal();

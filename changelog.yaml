@@ -1,6 +1,15 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-08-21
+  entries:
+    - |-
+      **Listen keeps the notes highway up.** If you read with the falling-notes highway,
+      pressing Listen used to drop you back to the sheet — throwing away the view you had
+      chosen for exactly the half of a session where you are watching rather than playing.
+      The highway now follows Listen through the piece, showing the notes coming up just as
+      it does while you play.
+
 - date: 2026-08-20
   label: night
   entries:

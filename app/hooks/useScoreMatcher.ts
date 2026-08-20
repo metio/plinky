@@ -65,6 +65,20 @@ import {
 // the ones that fall off it are dropped without being drawn.
 const HIGHWAY_LOOKAHEAD = 32;
 
+// Whole-note onsets are summed from fractions, so two positions that are the same place in
+// the music can differ in the last bits. A sixty-fourth is 1/64 of a whole; anything this
+// small is rounding rather than music.
+const WHOLE_EPSILON = 1 / 1024;
+
+// The fields upcomingSteps does not read, so a lookahead can be built from steps and an
+// index alone rather than from a run that does not exist.
+const EMPTY_STATE: Omit<MatcherState, "steps" | "index"> = {
+    hit: [],
+    wrong: 0,
+    sinceWrong: 0,
+    complete: false,
+};
+
 export type { Hand } from "../../core/matcher";
 
 // The MIDI pitches at the cursor's position (chords give several; rests and tied
@@ -509,6 +523,49 @@ export function useScoreMatcher(
         setPracticing(false);
     }, [getOsmd]);
 
+    // The lookahead for a surface that walks the music without grading it — Listen. The
+    // notes highway draws whatever is coming next, and "what is coming next" is the same
+    // question whoever is asking: the same steps, off the same engraving. Tying it to a
+    // graded run instead meant Listen dropped the highway and showed the staff, throwing
+    // away the reading mode the player chose.
+    //
+    // Collecting walks the cursor, so it is done ONCE and then only re-indexed. A walk per
+    // sounded note would reset the cursor Listen is steering, and re-read the whole
+    // engraving between two beats.
+    const previewRef = useRef<{ hand: Hand; steps: MatchStep[] } | null>(null);
+
+    // Drop the collected steps: the engraving they were read from is gone (a reload, a
+    // transpose), so re-indexing them would point at music no longer on the page.
+    const resetPreview = useCallback(() => {
+        previewRef.current = null;
+    }, []);
+
+    const preview = useCallback(
+        (fromWhole: number) => {
+            const osmd = getOsmd();
+            // A run owns the lookahead while it lasts — it knows where the player actually
+            // is, which is not where the notation says the clock is.
+            if (!osmd || practicingRef.current) {
+                return;
+            }
+            const hand = optionsRef.current.hand ?? "both";
+            if (previewRef.current === null || previewRef.current.hand !== hand) {
+                previewRef.current = { hand, steps: collectMatchSteps(osmd, hand) };
+            }
+            const steps = previewRef.current.steps;
+            // The position at or after the asked-for onset, so the note now sounding is the
+            // first block on the highway — the same place a run's lookahead starts from.
+            const index = steps.findIndex((step) => step.whole >= fromWhole - WHOLE_EPSILON);
+            setUpcoming(
+                upcomingSteps(
+                    { ...EMPTY_STATE, steps, index: index < 0 ? steps.length : index },
+                    HIGHWAY_LOOKAHEAD,
+                ),
+            );
+        },
+        [getOsmd],
+    );
+
     // Begin a run. `fromWhole` — a notated onset in whole notes from the top of the
     // piece — starts partway through, at the first playable position at or after it,
     // so taking over from Listen (or resuming a paused run) continues from the shared
@@ -673,5 +730,7 @@ export function useScoreMatcher(
         start,
         stop,
         registerNote,
+        preview,
+        resetPreview,
     };
 }

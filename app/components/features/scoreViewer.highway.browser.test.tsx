@@ -115,4 +115,47 @@ describe("notes-highway reading mode", () => {
         // draws these the same.
         expect(heights[0]).toBeGreaterThan(heights[1]! * 3);
     });
+    it("keeps the highway up when Listen takes over the music", async () => {
+        // The defect this pins: Listen stops the matcher, and the highway was mounted only
+        // while a graded run was practising — so pressing Listen threw away the reading
+        // mode the player had chosen and dropped them back to the staff, for exactly the
+        // half of the session where they are watching rather than playing.
+        //
+        // A real engraving, because the lookahead Listen feeds the highway is collected by
+        // walking the cursor: a fake cannot show that the walk happens before Listen takes
+        // the cursor over, which is the part that is easy to get wrong.
+        testPrefsStore.save({ ...testPrefsStore.load(), highway: true });
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase);
+        const practice = await screen.findByRole(
+            "button",
+            { name: "Practice" },
+            { timeout: 30000 },
+        );
+        await expect
+            .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
+            .toBe(false);
+        // Practice first, because Listen lives only in the full-screen bar — which is the
+        // route the report came in by.
+        fireEvent.click(practice);
+        expect(await screen.findByLabelText(m.highway_label())).toBeTruthy();
+
+        const listen = await screen.findByRole("button", { name: "Listen" });
+        fireEvent.click(listen);
+
+        const panel = await screen.findByLabelText(m.highway_label());
+        expect(panel).toBeTruthy();
+        // And it is drawing this piece's notes, not a lookahead frozen where practice
+        // stopped or emptied by the matcher standing down.
+        await expect
+            .poll(() => panel.querySelectorAll<HTMLElement>("span[style*='left']").length, {
+                timeout: 30000,
+            })
+            .toBeGreaterThan(0);
+    });
 });

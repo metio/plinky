@@ -44,6 +44,12 @@ function fakeOsmd(steps: number, noteOver: Record<string, unknown> = {}, volume?
             get CurrentMeasureIndex() {
                 return position;
             },
+            // Each position is one quarter — a quarter of a whole — so onsets advance the
+            // way a real walk's do. A fake that reported the same onset everywhere would
+            // let a caller reading the position pass while reading it wrongly.
+            get currentTimeStamp() {
+                return { RealValue: position * 0.25 };
+            },
         },
         NotesUnderCursor: () => [
             {
@@ -79,6 +85,8 @@ const playNote = vi.fn();
 const onLap = vi.fn();
 let loopState: { on: boolean; from: number; to: number };
 
+const onPosition = vi.fn();
+
 function mount(osmd: OpenSheetMusicDisplay | null) {
     return renderHook(() =>
         useListenPlayback({
@@ -88,6 +96,7 @@ function mount(osmd: OpenSheetMusicDisplay | null) {
             loop: () => loopState,
             onLap,
             centerCursor: () => {},
+            onPosition,
             markPainted: () => {},
             isPracticing: () => false,
         }),
@@ -156,6 +165,21 @@ describe("useListenPlayback", () => {
         expect(result.current.playing).toBe(false);
         expect(onLap).toHaveBeenCalledTimes(1);
         expect(osmd.cursor.hide).toHaveBeenCalled();
+    });
+
+    it("reports where the music has reached, before the position sounds", () => {
+        // The notes highway reads this to draw what is coming. Reporting after the notes
+        // sound would leave the highway one position behind the ear for the whole piece;
+        // not reporting at all is what made Listen drop the highway and show the staff.
+        const osmd = fakeOsmd(3);
+        const { result } = mount(osmd);
+
+        act(() => result.current.start(0));
+        expect(onPosition).toHaveBeenNthCalledWith(1, 0);
+        act(() => void vi.advanceTimersByTime(500));
+        expect(onPosition).toHaveBeenNthCalledWith(2, 0.25);
+        act(() => void vi.advanceTimersByTime(500));
+        expect(onPosition).toHaveBeenNthCalledWith(3, 0.5);
     });
 
     it("ignores a second start while one walk owns the cursor", () => {
