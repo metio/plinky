@@ -45,6 +45,15 @@ export const CHORD_NAMES: Record<ChordQuality, () => string> = {
     "minor-seventh": m.theory_chord_minor_seventh,
     "half-diminished-seventh": m.theory_chord_half_diminished_seventh,
     "diminished-seventh": m.theory_chord_diminished_seventh,
+    "minor-major-seventh": m.theory_chord_minor_major_seventh,
+    "major-sixth": m.theory_chord_major_sixth,
+    "minor-sixth": m.theory_chord_minor_sixth,
+    "suspended-second": m.theory_chord_suspended_second,
+    "suspended-fourth": m.theory_chord_suspended_fourth,
+    "added-ninth": m.theory_chord_added_ninth,
+    "dominant-ninth": m.theory_chord_dominant_ninth,
+    "major-ninth": m.theory_chord_major_ninth,
+    "minor-ninth": m.theory_chord_minor_ninth,
 };
 
 export function chordName(quality: ChordQuality): string {
@@ -60,6 +69,7 @@ export const SCALE_NAMES: Record<ScaleId, () => string> = {
     phrygian: m.theory_scale_phrygian,
     lydian: m.theory_scale_lydian,
     mixolydian: m.theory_scale_mixolydian,
+    locrian: m.theory_scale_locrian,
     "major-pentatonic": m.theory_scale_major_pentatonic,
     "minor-pentatonic": m.theory_scale_minor_pentatonic,
     blues: m.theory_scale_blues,
