@@ -348,7 +348,15 @@ const BUDGET_VENDOR_KB = 324;
 // playing it. The composer directory, which lists everybody the catalogue credits
 // instead of the few with pages the prerender holds. And the baked opening bars taking
 // a colour, so the shelf and the piece it opens agree about what a note is called.
-const BUDGET_APP_KB = 360;
+// 365. The rhythm trainer: the graded ladder of figures and the generator that fills a
+// bar from them, the nearest-first matching that decides which written note a tap was
+// aimed at, and the notation. That last one is drawn here rather than engraved — a
+// rhythm has no pitch, so it needs no clef, no key and no staff to place anything on,
+// and routing it through the score engine would pull the whole notation machinery onto
+// a page that needs none of it. Drawing it costs about a kilobyte; the engine would
+// have cost the page its whole budget. Also: the diatonic chord worksheet and the
+// second export format on the tools page, and the practice-time-per-piece panel.
+const BUDGET_APP_KB = 365;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
