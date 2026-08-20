@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 21 August 2026
 
+**Rolled chords roll, and 8va passages play where they belong.** A chord with the wavy
+line beside it is now spread from the bottom up instead of struck flat, with every
+note left ringing. And a passage under an 8va line — printed low to keep it off the
+leger lines — used to be played an octave below where it belongs; it now sounds where
+it is meant to, and Plinky asks you for the same octave it prints.
+
 **Trills, mordents and turns are played, not just printed.** The little signs above a
 note mean "play a short figure here", and Plinky drew them and then played the plain
 note underneath — so a reader learning to recognise one heard nothing happen where it

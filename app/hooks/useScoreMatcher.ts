@@ -32,12 +32,14 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
     return playable;
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
+import { type OctaveShiftSpan, octaveShiftAt } from "../../core/octaveShift";
 import { type SlurSpan, slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
 import {
     isGraceNote,
     playOrder,
     readDynamics,
+    readOctaveShiftSpans,
     readPedalSpans,
     readSlurSpans,
     readParts,
@@ -124,6 +126,7 @@ function stepsAtCursor(
     parts: ScoreParts,
     dynamics: readonly DynamicPoint[],
     slurs: readonly SlurSpan[],
+    shifts: readonly OctaveShiftSpan[],
 ): PositionSteps {
     const whole = osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0;
     // The dynamic in force at this position, read once: it is a property of where the
@@ -178,7 +181,7 @@ function stepsAtCursor(
             if (!expression.strike) {
                 continue;
             }
-            pitches.push(note.halfTone + 12);
+            pitches.push(note.halfTone + 12 + octaveShiftAt(shifts, whole));
             pitchStaves.push(staff ?? 0);
             pitchHands.push(handOfStaff(staff, parts));
             // Each key is asked for on its own terms: its own accent over the standing
@@ -301,6 +304,9 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // The arches, as spans. Read before the walk below, because reading them is itself a
     // walk — and it leaves the cursor reset, which the walk relies on.
     const slurs = readSlurSpans(osmd);
+    // 8va: the printed pitch is not the played one, and the run must ask for what the
+    // player is being told to play.
+    const shifts = readOctaveShiftSpans(osmd);
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -311,7 +317,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     const walked: (PositionSteps & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
-            ...stepsAtCursor(osmd, hand, parts, dynamics, slurs),
+            ...stepsAtCursor(osmd, hand, parts, dynamics, slurs, shifts),
             bar: osmd.cursor.iterator.CurrentMeasureIndex,
         });
         osmd.cursor.next();
