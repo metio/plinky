@@ -32,12 +32,14 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
     return playable;
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
+import { type SlurSpan, slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
 import {
     isGraceNote,
     playOrder,
     readDynamics,
     readPedalSpans,
+    readSlurSpans,
     readParts,
     readScoreExpression,
     readStartTempo,
@@ -121,10 +123,15 @@ function stepsAtCursor(
     hand: Hand,
     parts: ScoreParts,
     dynamics: readonly DynamicPoint[],
+    slurs: readonly SlurSpan[],
 ): PositionSteps {
+    const whole = osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0;
     // The dynamic in force at this position, read once: it is a property of where the
     // cursor sits, not of any one note under it.
-    const dynamicVolume = volumeAt(dynamics, osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0);
+    const dynamicVolume = volumeAt(dynamics, whole);
+    // Likewise the arch: a slur is a span, and every note under it is joined onward
+    // whether or not the engraving hung a mark on that particular note.
+    const slurredOnward = slurredOnwardAt(slurs, whole);
     // A fermata belongs to the position too: it holds whatever is sounding, and a rest can
     // carry one. So it is read across everything under the cursor, including the notes the
     // practised hand does not play.
@@ -180,7 +187,15 @@ function stepsAtCursor(
             expected.push({
                 velocity:
                     dynamicVolume === null ? null : velocityOf({ ...expression, dynamicVolume }),
-                soundQuarters: expression.soundQuarters * lengthScaleOf(expression),
+                soundQuarters:
+                    expression.soundQuarters *
+                    lengthScaleOf({
+                        articulation: expression.articulation,
+                        // From the span: a note in the middle of an arch carries no slur of
+                        // its own, and reading it as unslurred would grade a phrase played
+                        // legato as one played staccato.
+                        slurred: slurredOnward,
+                    }),
                 // The same length before articulation narrows it: what this one key is
                 // written to last, which is what its hold indicator draws. A whole note
                 // under a quaver is the ordinary case for two hands, and one length for
@@ -283,6 +298,9 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     // Where the score asks for the sustain pedal, so a passage meant to be pedalled is
     // not read as one played staccato.
     const pedals = readPedalSpans(osmd);
+    // The arches, as spans. Read before the walk below, because reading them is itself a
+    // walk — and it leaves the cursor reset, which the walk relies on.
+    const slurs = readSlurSpans(osmd);
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -293,7 +311,7 @@ export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Matc
     const walked: (PositionSteps & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
-            ...stepsAtCursor(osmd, hand, parts, dynamics),
+            ...stepsAtCursor(osmd, hand, parts, dynamics, slurs),
             bar: osmd.cursor.iterator.CurrentMeasureIndex,
         });
         osmd.cursor.next();

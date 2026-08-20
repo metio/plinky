@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 21 August 2026
 
+**The long arches over the notes finally do something.** A slur asks for its notes to
+be joined, and Plinky read every one of them and then played them exactly as if they
+were not there — each note stopping at the instant the next began, which the ear hears
+as a seam rather than a join. Slurred notes now ring a little into the note they are
+joined to, the way a pianist holds the key until the next finger is down. Pieces
+written with phrasing sound phrased.
+
 **Listen keeps the notes highway up.** If you read with the falling-notes highway,
 pressing Listen used to drop you back to the sheet — throwing away the view you had
 chosen for exactly the half of a session where you are watching rather than playing.
