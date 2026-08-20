@@ -4,6 +4,7 @@
 import type { Articulation } from "../../core/expression";
 import type { DynamicPoint } from "../../core/dynamics";
 import type { PedalSpan } from "../../core/pedal";
+import type { SlurSpan } from "../../core/slur";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
 // Reads the expression marks OSMD parsed from the MusicXML — articulations, slurs,
@@ -161,6 +162,70 @@ export function playOrder<T>(items: readonly T[], noteOf: (item: T) => unknown):
 
 // Where the score asks for the sustain pedal, as whole-note spans. A pedal the engraving
 // never lifts runs to the end of the piece, which is what a reader would do with it.
+// The arches the score draws, as whole-note spans.
+//
+// It has to be a walk. OSMD hangs a slur on the two notes at its ends and on nothing in
+// between, so a note in the middle of a four-note arch reports no slur of its own — and
+// reading each note in isolation joins only the opening pair and leaves the rest of the
+// phrase detached. Walking once and holding the arch open between its ends is what turns
+// two marks back into the span the engraver drew.
+export function readSlurSpans(osmd: unknown): SlurSpan[] {
+    const spans: SlurSpan[] = [];
+    try {
+        const cursor = (osmd as { cursor?: CursorShape } | null)?.cursor;
+        if (!cursor) {
+            return [];
+        }
+        cursor.reset();
+        // Keyed by the slur object OSMD hands back, so two arches open at once — one per
+        // hand, or nested phrasing — do not close each other.
+        const open = new Map<unknown, number>();
+        while (!cursor.iterator?.EndReached) {
+            const whole = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
+            for (const note of cursor.NotesUnderCursor() ?? []) {
+                for (const slur of (note as SlurNoteShape)?.NoteSlurs ?? []) {
+                    if (!slur) {
+                        continue;
+                    }
+                    if (slur.StartNote === note && !open.has(slur)) {
+                        open.set(slur, whole);
+                    }
+                    if (slur.EndNote === note) {
+                        const from = open.get(slur);
+                        if (from !== undefined) {
+                            spans.push({ from, to: whole });
+                            open.delete(slur);
+                        }
+                    }
+                }
+            }
+            cursor.next();
+        }
+        // An arch the engraving opens and never closes joins to the end of what it opened
+        // over, rather than being dropped — a dropped one plays as no slur at all, which is
+        // the failure this whole reader exists to stop being silent.
+        const last = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
+        for (const from of open.values()) {
+            spans.push({ from, to: Math.max(from, last) });
+        }
+        cursor.reset();
+    } catch {
+        // A shape OSMD changed falls back to an unslurred score rather than breaking
+        // playback: no slurs is what every score without arches already reports.
+        return [];
+    }
+    return spans;
+}
+
+type SlurNoteShape = { NoteSlurs?: ({ StartNote?: unknown; EndNote?: unknown } | null)[] };
+
+type CursorShape = {
+    reset: () => void;
+    next: () => void;
+    iterator?: { EndReached?: boolean; currentTimeStamp?: { RealValue?: number } };
+    NotesUnderCursor: () => unknown[];
+};
+
 export function readPedalSpans(osmd: unknown): PedalSpan[] {
     const spans: PedalSpan[] = [];
     try {

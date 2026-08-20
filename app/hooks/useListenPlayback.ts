@@ -5,6 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
+import { slurredOnwardAt } from "../../core/slur";
 import { volumeAt } from "../../core/dynamics";
 import { ringUntil } from "../../core/pedal";
 import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
@@ -16,6 +17,7 @@ import {
     readDynamics,
     readPedalSpans,
     readScoreExpression,
+    readSlurSpans,
     readStartTempo,
     readTempo,
 } from "../lib/scoreExpression";
@@ -88,6 +90,9 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
     // Where the score asks for the sustain pedal: under it the harmony pools, and a note
     // keeps sounding past its written length until the pedal comes up.
     const pedals = readPedalSpans(osmd);
+    // The arches, as spans. Read before the walk below, because reading them is itself a
+    // walk and it leaves the cursor reset.
+    const slurs = readSlurSpans(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -121,7 +126,10 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
                         articulation: expression.articulation,
                         accent: expression.accent,
                         marcato: expression.marcato,
-                        slurred: expression.slurred,
+                        // From the span, not the note: the engraving hangs a slur on its
+                        // two end notes only, so a note in the middle of an arch reports
+                        // none of its own and would play detached.
+                        slurred: slurredOnwardAt(slurs, whole),
                     });
                 }
                 // Rests count too, so a written gap dwells its own length — the cursor

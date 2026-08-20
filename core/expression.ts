@@ -46,6 +46,20 @@ const LENGTH_SCALE: Record<Articulation, number> = {
     staccatissimo: 0.25,
 };
 
+// A slur asks for the notes to be joined, and a note held to exactly its written length
+// does not join anything: it stops at the very instant the next one starts, so the synth's
+// envelope closes and reopens and the ear hears a seam. A slurred note therefore rings a
+// little PAST its written end, into the note it is joined to — which is also what a pianist
+// does, holding the key until the next finger is down.
+//
+// The overlap is a fraction of a beat rather than a fraction of the note. A slurred whole
+// note wants the same small join as a slurred quaver, not one sixteen times longer, which
+// is what scaling the note itself would give.
+const LEGATO_OVERLAP_BEATS = 0.12;
+// …but never more than a quarter of the note itself, or a very short slurred note would
+// still be sounding two notes later.
+const LEGATO_MAX_SHARE = 0.25;
+
 const ACCENT_BOOST = 1.3;
 const MARCATO_BOOST = 1.5;
 // A tenuto asks for the note's full length AND a little weight behind it. The length half
@@ -84,7 +98,26 @@ export function performNote(marks: NoteMarks, tempo: number): Performance {
     const beatSeconds = 60 / Math.max(1, tempo);
     const fullSeconds = Math.max(0, marks.quarters) * beatSeconds;
     return {
-        durationSeconds: fullSeconds * lengthScaleOf(marks),
+        durationSeconds: fullSeconds * lengthScaleOf(marks) + legatoOverlap(marks, tempo),
         velocity: velocityOf(marks),
     };
+}
+
+// How far a slurred note rings past its written end, in seconds. Zero for every note the
+// score does not slur onward — including a slur's last note, which ends the phrase and has
+// nothing to join to.
+//
+// Deliberately not part of lengthScaleOf: that one is the shape of the written intention,
+// which is what a run is graded against, and a player is not required to overlap their
+// notes to be judged as having held them. This is the performance, not the expectation.
+export function legatoOverlap(
+    marks: Pick<NoteMarks, "slurred" | "quarters">,
+    tempo: number,
+): number {
+    if (!marks.slurred) {
+        return 0;
+    }
+    const beatSeconds = 60 / Math.max(1, tempo);
+    const fullSeconds = Math.max(0, marks.quarters) * beatSeconds;
+    return Math.min(LEGATO_OVERLAP_BEATS * beatSeconds, fullSeconds * LEGATO_MAX_SHARE);
 }
