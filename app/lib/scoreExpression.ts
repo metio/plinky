@@ -283,11 +283,20 @@ export function readSlurSpans(osmd: unknown): SlurSpan[] {
         for (const from of open.values()) {
             spans.push({ from, to: Math.max(from, last) });
         }
-        cursor.reset();
     } catch {
         // A shape OSMD changed falls back to an unslurred score rather than breaking
         // playback: no slurs is what every score without arches already reports.
         return [];
+    } finally {
+        // Always, including when the walk threw part-way: this is the only reader that
+        // moves the cursor, and every caller walks the same cursor straight afterwards. A
+        // cursor abandoned mid-piece would have the caller collect the tail of the score
+        // and call it the whole thing — a truncated piece, silently.
+        try {
+            (osmd as { cursor?: { reset?: () => void } } | null)?.cursor?.reset?.();
+        } catch {
+            // Nothing left to do: the engraving is beyond reach either way.
+        }
     }
     return spans;
 }
@@ -301,19 +310,28 @@ type CursorShape = {
     NotesUnderCursor: () => unknown[];
 };
 
-// The octave lines the score prints, as whole-note spans carrying their distance.
+// The two markings the engraving reports the same way — the sustain pedal and the octave
+// line — as spans, from a single walk of the measures' expressions.
 //
-// Shaped exactly like the pedal spans below, because the engraving reports them the same
-// way — a start and an end hung on the measure's expressions rather than on the notes.
-// `octaveValue` counts octaves: 1 for 8va, -1 for 8vb, 2 for 15ma.
-export function readOctaveShiftSpans(osmd: unknown): OctaveShiftSpan[] {
-    const spans: OctaveShiftSpan[] = [];
+// Both are printed as a start and an end hung on a measure rather than on a note, so what
+// differs between them is only which property opens a span and which closes it, and what
+// the span carries. Everything else — where a measure begins, how far the music runs, what
+// to do with a marking the engraving opens and never closes — is the same problem twice.
+//
+// A marking left open runs to the end of the music. Dropping it would silently un-pedal (or
+// un-shift) the rest of the piece, which is the failure mode nobody notices.
+function readSpans<T>(
+    osmd: unknown,
+    opens: (entry: ExpressionEntryShape) => T | null,
+    closes: (entry: ExpressionEntryShape) => boolean,
+): { from: number; to: number; value: T }[] {
+    const spans: { from: number; to: number; value: T }[] = [];
     try {
         const measures =
-            (osmd as { sheet?: { SourceMeasures?: ShiftMeasureShape[] } } | null)?.sheet
+            (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
                 ?.SourceMeasures ?? [];
         let end = 0;
-        let open: { at: number; semitones: number } | null = null;
+        let open: { at: number; value: T } | null = null;
         for (const measure of measures) {
             const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
             end = Math.max(end, measureStart + (measure?.Duration?.RealValue ?? 0));
@@ -321,74 +339,60 @@ export function readOctaveShiftSpans(osmd: unknown): OctaveShiftSpan[] {
                 for (const entry of staff ?? []) {
                     const at = measureStart + (entry?.timestamp?.RealValue ?? 0);
                     end = Math.max(end, at);
-                    const octaves = entry?.octaveShiftStart?.octaveValue;
-                    if (typeof octaves === "number" && octaves !== 0 && open === null) {
-                        open = { at, semitones: octaves * SEMITONES_PER_OCTAVE };
-                    } else if (entry?.octaveShiftEnd != null && open !== null) {
-                        spans.push({ from: open.at, to: at, semitones: open.semitones });
+                    const value = entry ? opens(entry) : null;
+                    // A second start with no end between them carries on the span already
+                    // open: a re-pedal on the spot sounds the same either way, and two
+                    // octave lines cannot both apply.
+                    if (value !== null && open === null) {
+                        open = { at, value };
+                    } else if (entry && closes(entry) && open !== null) {
+                        spans.push({ from: open.at, to: at, value: open.value });
                         open = null;
                     }
                 }
             }
         }
-        // A line the engraving opens and never closes runs to the end of the music. Dropping
-        // it would put the rest of the piece an octave out with nothing to say why.
         if (open !== null) {
-            spans.push({ from: open.at, to: Math.max(open.at, end), semitones: open.semitones });
+            spans.push({ from: open.at, to: Math.max(open.at, end), value: open.value });
         }
     } catch {
-        // An engraving whose shape moved plays at written pitch rather than not at all.
+        // A shape OSMD changed falls back to a score without the marking rather than
+        // breaking playback — which is what every score that never writes one reports.
         return [];
     }
     return spans;
 }
 
-type ShiftMeasureShape = {
-    AbsoluteTimestamp?: { RealValue?: number };
-    Duration?: { RealValue?: number };
-    staffLinkedExpressions?: ({
-        timestamp?: { RealValue?: number };
-        octaveShiftStart?: { octaveValue?: unknown } | null;
-        octaveShiftEnd?: unknown;
-    } | null)[][];
+type ExpressionEntryShape = {
+    timestamp?: { RealValue?: number };
+    PedalStart?: unknown;
+    PedalEnd?: unknown;
+    octaveShiftStart?: { octaveValue?: unknown } | null;
+    octaveShiftEnd?: unknown;
 };
 
+// Where the score asks for the sustain pedal, as whole-note spans.
 export function readPedalSpans(osmd: unknown): PedalSpan[] {
-    const spans: PedalSpan[] = [];
-    try {
-        const measures =
-            (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
-                ?.SourceMeasures ?? [];
-        // Where the music stops, for a pedal the engraving never lifts.
-        let end = 0;
-        let open: number | null = null;
-        for (const measure of measures) {
-            const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
-            end = Math.max(end, measureStart + (measure?.Duration?.RealValue ?? 0));
-            for (const staff of measure?.staffLinkedExpressions ?? []) {
-                for (const entry of staff ?? []) {
-                    const at = measureStart + (entry?.timestamp?.RealValue ?? 0);
-                    end = Math.max(end, at);
-                    // A second start without a lift between them is a re-pedal on the
-                    // spot: the sound carries on either way, so the span simply runs on.
-                    if (entry?.PedalStart != null && open === null) {
-                        open = at;
-                    } else if (entry?.PedalEnd != null && open !== null) {
-                        spans.push({ from: open, to: at });
-                        open = null;
-                    }
-                }
-            }
-        }
-        if (open !== null) {
-            spans.push({ from: open, to: Math.max(open, end) });
-        }
-    } catch {
-        // A shape OSMD changed falls back to an unpedalled score rather than breaking
-        // playback: no pedal is what every score without markings already reports.
-        return [];
-    }
-    return spans;
+    return readSpans(
+        osmd,
+        (entry) => (entry.PedalStart != null ? true : null),
+        (entry) => entry.PedalEnd != null,
+    ).map(({ from, to }) => ({ from, to }));
+}
+
+// The octave lines the score prints, as whole-note spans carrying their distance.
+// `octaveValue` counts octaves: 1 for 8va, -1 for 8vb, 2 for 15ma.
+export function readOctaveShiftSpans(osmd: unknown): OctaveShiftSpan[] {
+    return readSpans(
+        osmd,
+        (entry) => {
+            const octaves = entry.octaveShiftStart?.octaveValue;
+            return typeof octaves === "number" && octaves !== 0
+                ? octaves * SEMITONES_PER_OCTAVE
+                : null;
+        },
+        (entry) => entry.octaveShiftEnd != null,
+    ).map(({ from, to, value }) => ({ from, to, semitones: value }));
 }
 
 type MeasureShape = { CurrentMeasure?: { TempoInBPM?: number } };
