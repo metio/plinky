@@ -5,6 +5,7 @@ import { HubList } from "../components/ui/hubList";
 import {
     ArrowUpIcon,
     BookIcon,
+    ClockIcon,
     EarIcon,
     KeysIcon,
     ListIcon,
@@ -64,6 +65,7 @@ const ENTRIES = [
         note: 65,
     },
     { to: "/ear", label: m.ear_title, blurb: m.home_ear_blurb, Icon: EarIcon, note: 67 },
+    { to: "/rhythm", label: m.rhythm_title, blurb: m.rhythm_intro, Icon: ClockIcon, note: 68 },
     { to: "/tools", label: m.tools_title, blurb: m.tools_intro, Icon: SlidersIcon, note: 69 },
 ];
 

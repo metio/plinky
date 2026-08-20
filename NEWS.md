@@ -8,6 +8,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 20 August 2026 — night
+
+**A rhythm trainer, with no notes in it.** Everywhere else in Plinky your timing is
+measured while you are also busy finding the right notes, so a wobbly run never tells
+you which of the two went wrong. **Learn → Rhythm** asks only the one question: a line
+of notation, a count-in, and you tap it back — on a piano, your computer keys, or the
+button on the page. No instrument needed at all.
+
+Thirteen rungs, each adding one idea to the one before it, from plain beats up through
+sixteenths, triplets and compound time. Afterwards every note carries a mark saying
+how it went, and a note you missed is reported as missed rather than as a note played
+badly.
+
 ## 20 August 2026 — evening
 
 **Where your practice time actually went.** The practice diary has always been

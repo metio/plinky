@@ -1,0 +1,275 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { isPreciseInput } from "../../../core/midi";
+import { LENIENT_TOLERANCE, PRECISE_TOLERANCE } from "../../../core/rhythm";
+import {
+    CLAIM_MS,
+    gradeRhythm,
+    type RhythmVerdict,
+    rhythmVerdictRating,
+} from "../../../core/rhythmGrade";
+import { type RhythmMark, rhythmSvg } from "../../../core/rhythmNotation";
+import {
+    expectedOnsets,
+    generateRhythm,
+    patternMs,
+    type RhythmPattern,
+} from "../../../core/rhythmPattern";
+import { useAudioEngine, usePrefsStore, useScheduler } from "../../contexts/services";
+import { useMidiInput } from "../../contexts/midi";
+import { m } from "../../paraglide/messages.js";
+import { Button } from "../ui/button";
+
+// Read a rhythm and tap it back.
+//
+// Rhythm is graded everywhere else in Plinky as a by-product of playing pitches, which
+// leaves nowhere to work on reading a rhythm by itself — and hides which of the two a
+// wobbly run was. Here there is no pitch at all: one line, one sound, and the only
+// question is when. Anything counts as a tap, because what is being tested is the
+// timing and not the hand.
+//
+// One clock runs the whole thing. The scheduler's monotonic clock is the authority for
+// both the moving cursor and the grading, and the audio clock is read once beside it so
+// the clicks can be queued in the audio timeline they have to be queued in. Two clocks
+// captured in the same tick are within a fraction of a millisecond of each other, which
+// matters because the click is what the player is following: a pulse that drifted from
+// the timeline being graded would mark everybody late by exactly that drift.
+
+type Phase = "idle" | "counting" | "running" | "done";
+
+const LEAD_MS = 250;
+export const DEFAULT_RHYTHM_BPM = 80;
+
+export function RhythmTrainer({
+    level,
+    bpm,
+    // Injected so a story draws a fixed rhythm and a test can pick a known one.
+    rng = Math.random,
+}: {
+    level: number;
+    bpm: number;
+    rng?: () => number;
+}) {
+    const scheduler = useScheduler();
+    const audio = useAudioEngine();
+    const prefsStore = usePrefsStore();
+
+    const [pattern, setPattern] = useState<RhythmPattern>(() => generateRhythm(level, rng));
+    const [phase, setPhase] = useState<Phase>("idle");
+    const [active, setActive] = useState<number | null>(null);
+    const [verdict, setVerdict] = useState<RhythmVerdict | null>(null);
+
+    // The run's own state, off React: a tap must be recorded at the instant it happens,
+    // and a re-render between the press and the state landing would cost it its moment.
+    const run = useRef<{ startMs: number; taps: number[]; precise: boolean } | null>(null);
+
+    const beatMs = 60_000 / Math.max(1, bpm);
+    const onsets = expectedOnsets(pattern, bpm);
+
+    // A fresh rhythm whenever the level or the tempo the reader is working at changes,
+    // rather than leaving the last level's pattern on screen under the new heading.
+    useEffect(() => {
+        setPattern(generateRhythm(level, rng));
+        setPhase("idle");
+        setActive(null);
+        setVerdict(null);
+        run.current = null;
+    }, [level, rng]);
+
+    const finish = useCallback(() => {
+        const current = run.current;
+        run.current = null;
+        setActive(null);
+        setPhase("done");
+        if (current) {
+            setVerdict(
+                gradeRhythm(
+                    onsets,
+                    current.taps,
+                    current.precise ? PRECISE_TOLERANCE : LENIENT_TOLERANCE,
+                ),
+            );
+        }
+    }, [onsets]);
+
+    const start = useCallback(() => {
+        audio.resume();
+        const now = scheduler.now();
+        const audioNow = audio.now();
+        const countInMs = pattern.beatsPerBar * beatMs;
+        const startMs = now + LEAD_MS + countInMs;
+        run.current = { startMs, taps: [], precise: true };
+        setVerdict(null);
+        setPhase("counting");
+
+        // Every click for the count-in and the run, queued once on the audio clock. The
+        // pulse must not depend on a polling loop surviving a backgrounded tab: this is
+        // two bars, and queueing it whole is both simpler and steadier.
+        if (audioNow !== null) {
+            const prefs = prefsStore.load();
+            const gain = prefs.sound ? 0.18 * (prefs.volume / 100) : 0;
+            const beats = pattern.beatsPerBar * (pattern.bars + 1);
+            const audioStart = audioNow + LEAD_MS / 1000;
+            for (let beat = 0; beat < beats; beat++) {
+                audio.click(
+                    audioStart + (beat * beatMs) / 1000,
+                    beat % pattern.beatsPerBar === 0 ? "accent" : "beat",
+                    gain,
+                );
+            }
+        }
+
+        const total = patternMs(pattern, bpm);
+        const toRunning = scheduler.after(LEAD_MS + countInMs, () => setPhase("running"));
+        // The window stays open past the last note so a late tap on it still counts as
+        // late rather than as a miss — closing on the beat would grade the player's
+        // hesitation as an absence.
+        const toDone = scheduler.after(LEAD_MS + countInMs + total + 400, finish);
+        return () => {
+            scheduler.cancel(toRunning);
+            scheduler.cancel(toDone);
+        };
+    }, [audio, beatMs, bpm, finish, pattern, prefsStore, scheduler]);
+
+    const cancelRef = useRef<(() => void) | null>(null);
+    const begin = () => {
+        cancelRef.current?.();
+        cancelRef.current = start();
+    };
+    useEffect(() => () => cancelRef.current?.(), []);
+
+    const tap = useCallback(
+        (precise: boolean) => {
+            const current = run.current;
+            if (!current) {
+                return;
+            }
+            const at = scheduler.now() - current.startMs;
+            // A tap during the count-in is somebody finding the pulse, not playing the
+            // rhythm. It is too early to belong to the first note by the grader's own
+            // reckoning, so counting it would report a spare tap and mark the reader down
+            // for getting ready.
+            if (at < -CLAIM_MS) {
+                return;
+            }
+            current.taps.push(at);
+            if (!precise) {
+                current.precise = false;
+            }
+        },
+        [scheduler],
+    );
+
+    // Every source of notes lands here — a MIDI piano, the computer keys, the on-screen
+    // ones. The moment is taken from the scheduler when the handler runs rather than from
+    // the event's own timestamp, because only the MIDI path carries a trustworthy one and
+    // a run graded on two different clocks would be graded on neither.
+    useMidiInput({
+        onNoteOn: (event) => tap(isPreciseInput(event.device)),
+    });
+
+    // The cursor, one frame at a time. It reads the clock rather than counting frames, so
+    // a dropped frame moves it late instead of moving it wrong.
+    useEffect(() => {
+        if (phase !== "running") {
+            return;
+        }
+        let handle = 0;
+        const step = () => {
+            const current = run.current;
+            if (!current) {
+                return;
+            }
+            const at = scheduler.now() - current.startMs;
+            let index = -1;
+            for (let note = 0; note < onsets.length; note++) {
+                if ((onsets[note] as number) <= at + beatMs / 2) {
+                    index = note;
+                }
+            }
+            setActive(index < 0 ? null : index);
+            handle = scheduler.frame(step);
+        };
+        handle = scheduler.frame(step);
+        return () => scheduler.cancelFrame(handle);
+    }, [phase, onsets, beatMs, scheduler]);
+
+    const marks: RhythmMark[] | undefined = verdict
+        ? verdict.hits.map((hit) => (hit === null ? "missed" : hit.rating))
+        : undefined;
+
+    return (
+        <div className="space-y-4">
+            <div
+                className="overflow-x-auto text-ink"
+                // The drawing is markup this component owns end to end: it is built by a
+                // pure core function from a pattern this component generated, and no part
+                // of it comes from anything a reader could supply.
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: core-generated SVG
+                dangerouslySetInnerHTML={{
+                    __html: rhythmSvg({
+                        pattern,
+                        marks,
+                        activeNote: active,
+                        label: m.rhythm_staff_label({ notes: onsets.length }),
+                    }),
+                }}
+            />
+
+            <div className="flex flex-wrap items-center gap-3">
+                <Button variant="primary" onClick={begin} disabled={phase === "counting"}>
+                    {phase === "done" ? m.rhythm_again() : m.rhythm_start()}
+                </Button>
+                <Button
+                    variant="secondary"
+                    onClick={() => tap(false)}
+                    disabled={phase === "idle" || phase === "done"}
+                >
+                    {m.rhythm_tap()}
+                </Button>
+                <p role="status" className="text-sm text-muted">
+                    {phase === "counting"
+                        ? m.rhythm_counting()
+                        : phase === "running"
+                          ? m.rhythm_listening()
+                          : phase === "idle"
+                            ? m.rhythm_ready()
+                            : ""}
+                </p>
+            </div>
+
+            {verdict && <Result verdict={verdict} />}
+        </div>
+    );
+}
+
+const VERDICT_CLASS = {
+    perfect: "text-success",
+    good: "text-warn",
+    off: "text-danger",
+} as const;
+
+function Result({ verdict }: { verdict: RhythmVerdict }) {
+    const rating = rhythmVerdictRating(verdict);
+    return (
+        <div className="space-y-1" role="status">
+            <p className={`text-sm font-medium ${VERDICT_CLASS[rating]}`}>
+                {rating === "perfect"
+                    ? m.rhythm_verdict_perfect()
+                    : rating === "good"
+                      ? m.rhythm_verdict_good()
+                      : m.rhythm_verdict_off()}
+            </p>
+            <p className="text-xs text-muted">
+                {m.rhythm_counts({
+                    onTime: verdict.perfect + verdict.good,
+                    total: verdict.total,
+                })}
+                {verdict.missed > 0 ? ` · ${m.rhythm_missed({ count: verdict.missed })}` : ""}
+                {verdict.extra > 0 ? ` · ${m.rhythm_extra({ count: verdict.extra })}` : ""}
+            </p>
+        </div>
+    );
+}

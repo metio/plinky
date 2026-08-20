@@ -399,6 +399,25 @@ a phrase ending. Each lesson is a paragraph and something to play or a bar of re
 notation to read, so the idea arrives through your ears as well as your eyes. The
 glossary tells you what a mark means, this tells you why the music is built that way.
 
+## Rhythm
+
+[Rhythm](https://plinky.fun/en/rhythm/) is the one trainer with no notes in it. A line of
+notation, a count-in, and the only question is *when* — tap it back on a MIDI piano, your
+computer keys, or the button on the page. Nothing else asks that question on its own:
+everywhere else in Plinky your timing is measured while you are also busy finding the
+right notes, so a wobbly run never says which of the two went wrong.
+
+Thirteen rungs, each adding exactly one idea to the one before it: the beat, then rests,
+then notes longer than a beat, then the beat divided into eighths, three-four time, the
+long-short dotted figure, sixteenths, the dotted pair, triplets, and compound time
+counted in dotted beats. The ladder is numbered rather than named, because what a rung
+contains is the notation in front of you.
+
+Afterwards each note carries a mark: on time, close, out, or never played. A note you
+missed is reported as missed rather than as a note played badly — and a tap that landed
+near nothing is counted separately, so reading a rhythm wrongly and playing one loosely
+never look like the same mistake.
+
 ## Little tools
 
 [Little tools](https://plinky.fun/en/tools/) is the look-it-up page: no account, no
