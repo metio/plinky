@@ -10,9 +10,9 @@ import { ScoreIncipit } from "./scoreIncipit";
 
 // A prefs store with the colour aid on, so the story shows what the setting does rather
 // than what the default happens to be.
-const colouredPrefs = () => {
+const prefsWithColour = (colorNotes: boolean) => {
     const prefs = createPrefsStore(memoryStore());
-    prefs.save({ ...prefs.load(), colorNotes: true });
+    prefs.save({ ...prefs.load(), colorNotes });
     return prefs;
 };
 
@@ -65,7 +65,21 @@ const GRAND = buildScore({
 });
 
 // The opening bar beside a name, the way a thematic catalogue identifies a work.
-export const Mark: Story = { args: { xml: RISING, title: "Rising" } };
+//
+// Colour is set explicitly here rather than left to the default, which is ON: a story that
+// only turned it on would draw the same picture as this one, and a pair of identical
+// baselines pins nothing. The two differ, so a mark that stopped reading the setting moves
+// one of them.
+export const Mark: Story = {
+    args: { xml: RISING, title: "Rising" },
+    decorators: [
+        (Story) => (
+            <ServicesProvider services={{ prefs: prefsWithColour(false) }}>
+                <Story />
+            </ServicesProvider>
+        ),
+    ],
+};
 
 // With the colour setting on it reads by note name, the same as the baked marks on every
 // list — a piece looks the same on the shelf and on its own page.
@@ -73,7 +87,7 @@ export const Coloured: Story = {
     args: { xml: RISING, title: "Rising" },
     decorators: [
         (Story) => (
-            <ServicesProvider services={{ prefs: colouredPrefs() }}>
+            <ServicesProvider services={{ prefs: prefsWithColour(true) }}>
                 <Story />
             </ServicesProvider>
         ),

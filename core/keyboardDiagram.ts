@@ -43,6 +43,17 @@ const CAPTION_HEIGHT = 96;
 // The band a note name occupies at the foot of a white key.
 const LABEL_ROOM = 40;
 
+// Roughly how wide a character is as a fraction of the font size, for the sans stack the
+// picture asks for. An estimate, because there is no DOM here to measure text with — but a
+// generous one, so the guess errs toward a caption that is smaller than it needed to be
+// rather than one that runs off the edge.
+const CHAR_WIDTH = 0.55;
+const CAPTION_SIZE = 46;
+// Below this a caption is no longer readable at the size these are printed, so a very long
+// one is left to sit tight against the margins rather than shrinking away to nothing.
+const CAPTION_MIN = 24;
+const MARGIN = 48;
+
 const INK = "#0f172a";
 const PAPER = "#fdf6ec";
 const WHITE_KEY = "#ffffff";
@@ -122,10 +133,19 @@ export function svgKeyboardDiagram({
         }
     }
 
+    // A caption is centred, so one too long for the picture runs off BOTH edges and loses
+    // its ends — and the languages it happens in are exactly the ones this feature was
+    // added for. It shrinks to fit instead.
+    const captionSize = caption
+        ? Math.max(
+              CAPTION_MIN,
+              Math.min(CAPTION_SIZE, (WIDTH - 2 * MARGIN) / (caption.length * CHAR_WIDTH)),
+          )
+        : CAPTION_SIZE;
     const captionMarkup = caption
-        ? `<text x="${WIDTH / 2}" y="${KEYBED_TOP + KEYBED_HEIGHT + 66}" fill="${INK}" font-family="system-ui,sans-serif" font-size="46" font-weight="600" text-anchor="middle">${escapeXml(
-              caption,
-          )}</text>`
+        ? `<text x="${WIDTH / 2}" y="${KEYBED_TOP + KEYBED_HEIGHT + 66}" fill="${INK}" font-family="system-ui,sans-serif" font-size="${round(
+              captionSize,
+          )}" font-weight="600" text-anchor="middle">${escapeXml(caption)}</text>`
         : "";
 
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}">\
