@@ -173,6 +173,17 @@ function ScaleExplorer() {
                 phrases={[{ notes: pitches, spread: true }]}
                 label={m.tools_hear_it()}
             />
+            {/* A scale is as worth taking away as a chord, and the README and the
+                changelog both said so before this existed. The span holds it: a scale
+                from the twelfth semitone reaches an octave above, which is inside the two
+                the picture draws. */}
+            <SavePictureButton
+                from={ROOT}
+                to={ROOT + 24}
+                keys={pitches.map((note) => ({ note }))}
+                caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(tonic)))]} ${scaleName(scale)}`}
+                filename="plinky-scale.png"
+            />
         </Panel>
     );
 }

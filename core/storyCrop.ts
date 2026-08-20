@@ -81,3 +81,40 @@ export function mayDescend(parent: Box, child: Box, drawn: Box, min = MIN_CROP_P
     }
     return boxWidth(child) >= min && boxHeight(child) >= min;
 }
+
+// The story as a tree of boxes, which is all the descent needs to know about a DOM.
+export type CropNode = {
+    box: Box;
+    // Whether the crop must stop here whatever is inside — an SVG boundary, an element
+    // that paints its own ground or edge, one carrying text of its own. The caller
+    // decides what counts; this only respects the answer.
+    stops: boolean;
+    // Drawn children, in document order. The caller filters out what is not drawn and
+    // what an ancestor clips away.
+    children: CropNode[];
+};
+
+const boxesBelow = (node: CropNode): Box[] =>
+    node.children.flatMap((child) => [child.box, ...boxesBelow(child)]);
+
+// The tightest node that is still a picture of the whole story.
+//
+// This lives here, away from the DOM, because the recursion is where the mistakes have
+// been. Twice a version of it shipped that could not descend at all — once by folding the
+// root's own box into the union, once by computing that union a single time and reusing
+// it, which from the second step down asks whether a child contains its own parent. Both
+// survived a green test suite, because a test that calls `mayDescend` with a union built
+// by hand never builds the union the way the caller does. Taking the whole walk as a
+// function means the walk itself is what gets tested.
+export function tightestOf(node: CropNode, min = MIN_CROP_PX): CropNode {
+    if (node.stops || node.children.length !== 1) {
+        return node;
+    }
+    const only = node.children[0]!;
+    // Recomputed per level, and always for the node being descended FROM.
+    const below = descendantBounds(boxesBelow(node));
+    if (below === null || !mayDescend(node.box, only.box, below, min)) {
+        return node;
+    }
+    return tightestOf(only, min);
+}

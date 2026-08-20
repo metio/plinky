@@ -73,8 +73,13 @@ const LOCALES = readdirSync("messages")
 // pictures of changes. The first is the message file; the second is the built asset
 // names, which Vite derives from content — so any change to the app moves them and every
 // locale is re-shot, while a reworded German string re-shoots German alone.
+// The catalogue is in the pictures too — the music list shows its titles and its count —
+// and it is served as a file rather than bundled, so no asset name moves when it changes.
+// Hashing it here is what stops a re-import leaving all 260 pictures quietly out of date.
+const CATALOGUE = join(CLIENT, "songs", "manifest.json");
 const appFingerprint = createHash("sha256")
     .update(readdirSync(join(CLIENT, "assets")).sort().join("\n"))
+    .update(existsSync(CATALOGUE) ? await readFile(CATALOGUE) : "")
     .digest("hex")
     .slice(0, 16);
 

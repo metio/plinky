@@ -5,10 +5,12 @@ import { describe, expect, it } from "vitest";
 import {
     type Box,
     boxArea,
+    type CropNode,
     descendantBounds,
     holds,
     mayDescend,
     MIN_CROP_PX,
+    tightestOf,
     union,
 } from "./storyCrop";
 
@@ -124,5 +126,62 @@ describe("descendantBounds", () => {
 
         const foldingTheParentIn = union(parent, child);
         expect(mayDescend(parent, child, foldingTheParentIn)).toBe(false);
+    });
+});
+
+describe("tightestOf", () => {
+    const node = (b: Box, children: CropNode[] = [], stops = false): CropNode => ({
+        box: b,
+        stops,
+        children,
+    });
+
+    it("walks all the way down a chain of lone wrappers", () => {
+        // The bug this pins, twice over: both shipped versions of the descent could not
+        // get past the first step — one folded the root's own box into the union, the
+        // other computed that union once and reused it, which from the second step down
+        // asks whether a child contains its own parent. Both left a green test suite,
+        // because a test that calls mayDescend with a hand-built union never builds the
+        // union the way the caller does. Three levels is the smallest case that shows it.
+        const button = node(box(300, 60, 40, 40));
+        const wrapper = node(box(100, 20, 600, 160), [button]);
+        const container = node(box(0, 0, 800, 200), [wrapper]);
+        expect(tightestOf(container)).toBe(button);
+    });
+
+    it("stops where the composition branches", () => {
+        const one = node(box(0, 0, 100, 100));
+        const other = node(box(200, 0, 100, 100));
+        const container = node(box(0, 0, 800, 200), [one, other]);
+        expect(tightestOf(container)).toBe(container);
+    });
+
+    it("stops at a node that says it must", () => {
+        // A button that paints its own ground IS the picture; the icon inside it is part
+        // of one.
+        const icon = node(box(310, 70, 20, 20));
+        const button = node(box(300, 60, 40, 40), [icon], true);
+        expect(tightestOf(node(box(0, 0, 800, 200), [button]))).toBe(button);
+    });
+
+    it("refuses a step that would lose something drawn elsewhere", () => {
+        // An open menu hanging outside its trigger: descending to the trigger frames a
+        // closed menu, and the baseline that lost the menu agrees with every render that
+        // loses it too.
+        const trigger = node(box(0, 0, 40, 40));
+        const popover = node(box(0, 40, 200, 180));
+        const container = node(box(0, 0, 800, 40), [trigger, popover]);
+        expect(tightestOf(container)).toBe(container);
+    });
+
+    it("refuses to shrink below the smallest frame worth comparing", () => {
+        const glyph = node(box(310, 70, 12, 12));
+        const button = node(box(300, 60, 40, 40), [glyph]);
+        expect(tightestOf(node(box(0, 0, 800, 200), [button]))).toBe(button);
+    });
+
+    it("returns a childless node unchanged", () => {
+        const lone = node(box(0, 0, 100, 100));
+        expect(tightestOf(lone)).toBe(lone);
     });
 });

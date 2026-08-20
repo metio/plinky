@@ -29,8 +29,10 @@ export function SavePictureButton({
     filename: string;
 }) {
     const [saving, setSaving] = useState(false);
+    const [failed, setFailed] = useState(false);
     const save = async () => {
         setSaving(true);
+        setFailed(false);
         try {
             const svg = svgKeyboardDiagram({ from, to, keys, caption, noteNames: true });
             // The document says how big it is; rasterising at its own size keeps the
@@ -38,16 +40,32 @@ export function SavePictureButton({
             const width = Number(/width="(\d+)"/.exec(svg)?.[1] ?? 1200);
             const height = Number(/height="(\d+)"/.exec(svg)?.[1] ?? 460);
             const png = await svgToPng(svg, width, height);
-            if (png) {
-                downloadBlob(png, "image/png", filename);
+            if (png === null) {
+                setFailed(true);
+                return;
             }
+            downloadBlob(png, "image/png", filename);
+        } catch {
+            // A browser that will not decode the document, or will not give up a canvas,
+            // fails here. Saying nothing is the worst of the options: the reader presses
+            // a button, no file arrives, and nothing on the page admits it — so a press
+            // that produced no picture says so. An error boundary cannot help, because a
+            // throw inside an async handler never reaches one.
+            setFailed(true);
         } finally {
             setSaving(false);
         }
     };
     return (
-        <Button variant="secondary" onClick={save} disabled={saving}>
-            {m.tools_save_picture()}
-        </Button>
+        <div className="space-y-1">
+            <Button variant="secondary" onClick={save} disabled={saving}>
+                {m.tools_save_picture()}
+            </Button>
+            {failed && (
+                <p role="status" className="text-sm text-danger">
+                    {m.feature_broken()}
+                </p>
+            )}
+        </div>
     );
 }

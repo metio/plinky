@@ -76,6 +76,22 @@ describe("svgKeyboardDiagram", () => {
         expect(svg).not.toContain("<major>");
     });
 
+    it("shrinks a long caption rather than letting it run off both edges", () => {
+        // A centred caption too wide for the picture loses BOTH its ends, and the
+        // languages that happens in are the ones this was added for.
+        const sizeOf = (svg: string) => Number(/font-size="([\d.]+)" font-weight="600"/.exec(svg)?.[1]);
+        const short = svgKeyboardDiagram({ from: 60, to: 72, keys: [], caption: "C major" });
+        const long = svgKeyboardDiagram({
+            from: 60,
+            to: 72,
+            keys: [],
+            caption: "Fis-Dur-Septakkord mit großer Septime — rechte Hand, zweite Umkehrung",
+        });
+        expect(sizeOf(long)).toBeLessThan(sizeOf(short));
+        // And what it shrank to still fits the picture it sits in.
+        expect(sizeOf(long) * 0.55 * 68).toBeLessThanOrEqual(1200);
+    });
+
     it("grows taller for a caption and stays put without one", () => {
         const bare = svgKeyboardDiagram({ from: 60, to: 72, keys: [] });
         const captioned = svgKeyboardDiagram({ from: 60, to: 72, keys: [], caption: "C major" });

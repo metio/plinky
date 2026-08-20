@@ -5,7 +5,7 @@ import { setProjectAnnotations } from "@storybook/react-vite";
 import { page } from "vitest/browser";
 import { afterEach, beforeAll, expect } from "vitest";
 import projectAnnotations from "./preview";
-import { type Box, descendantBounds, holds, mayDescend } from "../core/storyCrop";
+import { type Box, type CropNode, descendantBounds, holds, tightestOf } from "../core/storyCrop";
 
 // Apply the preview's decorators and parameters when running stories as tests.
 const project = setProjectAnnotations([projectAnnotations]);
@@ -139,42 +139,57 @@ const hasOwnText = (el: Element): boolean =>
         (node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim() !== "",
     );
 
-// The tightest box that is still a picture of the story.
-//
-// The container Storybook renders into is a plain block div, as wide as the viewport
-// whatever sits in it, and the allowance is a fraction of what gets captured — which a
-// lone icon button in a full-width box spends on the empty margin either side. So the
-// crop follows a lone child down. What it must not do is follow it all the way: an
-// `<svg>` reports its shapes' geometry rather than a layout box, so descending into one
-// lands on a stroke outline, which is ~100% ink and asserts nothing about the control
-// drawn around it. Every guard here marks a place where the thing being looked at ends.
-const tightest = (el: Element, all: Box): Element => {
-    if (el instanceof SVGElement || paints(el) || hasOwnText(el)) {
-        return el;
-    }
-    const children = Array.from(el.children).filter(drawn);
-    const only = children.length === 1 ? children[0] : undefined;
-    if (!only || !mayDescend(boxOf(el), boxOf(only), all)) {
-        return el;
-    }
-    return tightest(only, all);
-};
-
-// The outermost thing the story actually put on screen inside its container, when the
-// container itself has no box. A `fixed` or absolute child does not contribute to its
-// parent's, so an empty container is not the same question as an empty story — the
-// descendants have to be asked separately, or content that is merely out of the flow
-// reads as content that isn't there. Document order puts the outermost first, which is
-// the whole of what was drawn rather than a part of it.
-const drawnInside = (root: HTMLElement) => Array.from(root.querySelectorAll("*")).find(drawn);
-
 // The same phone box the browser-mobile project uses, for a story the wide one hides.
 const PHONE = { width: 390, height: 844 };
 
-// What to compare, and at what size.
+// The outermost thing the story actually drew inside its container, when the container
+// itself has no box. A `fixed` or absolute child does not contribute to its parent's, so
+// an empty container is not the same question as an empty story — the descendants have to
+// be asked separately, or content that is merely out of the flow reads as content that is
+// not there. Document order puts the outermost first.
+const drawnInside = (root: Element) => Array.from(root.querySelectorAll("*")).find(drawn);
+
+// The story as a tree of boxes, for core/storyCrop's descent. Only what is drawn and not
+// clipped away becomes a child, so the walk never has to ask the DOM anything.
 //
-// The container is the subject wherever the story fills it. Two things stop it being:
-//
+// `stops` marks where the thing being looked at ends: an SVG boundary (whose children
+// report shape geometry rather than layout boxes, so descending lands on a stroke
+// outline), an element painting its own ground, edge or shadow, and one carrying text of
+// its own — descending past that would drop the text.
+const treeOf = (el: Element): CropNode => ({
+    box: boxOf(el),
+    stops: el instanceof SVGElement || paints(el) || hasOwnText(el),
+    children: Array.from(el.children)
+        .filter(drawn)
+        .filter((child) => {
+            const clip = clipOf(child);
+            return clip === null || intersects(boxOf(child), clip);
+        })
+        .map(treeOf),
+});
+
+// Walk the tree, then find the element it landed on. Matching by box rather than keeping
+// a reference keeps the tree a plain value, which is what makes the walk testable.
+const tightest = (el: Element): Element => {
+    const target = tightestOf(treeOf(el));
+    let found = el;
+    const visit = (node: Element) => {
+        const box = boxOf(node);
+        if (
+            box.left === target.box.left &&
+            box.top === target.box.top &&
+            box.right === target.box.right &&
+            box.bottom === target.box.bottom
+        ) {
+            found = node;
+            return true;
+        }
+        return Array.from(node.children).some(visit);
+    };
+    visit(el);
+    return found;
+};
+
 // A `fixed` bar leaves the container zero-sized however much of it is on screen, so what
 // gets compared is the bar rather than the container that nominally holds it.
 //
@@ -199,11 +214,7 @@ const captureTarget = async (root: HTMLElement) => {
         // Reaching for the body there would spend the whole allowance on empty page to
         // guard against content that does not exist.
         const frame =
-            all === null
-                ? target
-                : holds(boxOf(target), all)
-                  ? tightest(target, all)
-                  : document.body;
+            all === null ? target : holds(boxOf(target), all) ? tightest(target) : document.body;
         return { locator: page.elementLocator(frame), restore };
     };
     const inFlow = drawn(root) ? root : drawnInside(root);
