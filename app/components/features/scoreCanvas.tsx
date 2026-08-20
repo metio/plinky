@@ -33,11 +33,16 @@ export function ScoreCanvas() {
         sightRead,
     } = usePlaySession();
     const prefsStore = usePrefsStore();
-    // In the notes-highway reading mode, a tall highway covers the staff while playing —
-    // OSMD stays mounted and rendered underneath (the matcher walks its cursor), so the
-    // staff is hidden, not unmounted. Only while a run is on: at rest the score shows so
-    // the piece can be read, looped and set up.
-    const highwayActive = aids.highway && matcher.practicing;
+    // In the notes-highway reading mode, a tall highway covers the staff while the music
+    // is moving — OSMD stays mounted and rendered underneath (the cursor keeps walking it),
+    // so the staff is hidden, not unmounted. At rest the score shows, so the piece can be
+    // read, looped and set up.
+    //
+    // Listen counts as moving. It walks the same music a run does, and dropping back to the
+    // staff for it threw away the reading mode the player had chosen — for the half of the
+    // session where they are watching rather than playing, which is where a highway helps
+    // most.
+    const highwayActive = aids.highway && (matcher.practicing || listenPlayback.playing);
     // The score slot's size: full screen hands it the spare height (flex-1); a phone gets
     // a fixed slice so the keys still fit; otherwise a tall band that scrolls if taller.
     // The highway takes this same slot so it stands exactly where the staff did.

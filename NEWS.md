@@ -8,6 +8,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 21 August 2026
+
+**Listen keeps the notes highway up.** If you read with the falling-notes highway,
+pressing Listen used to drop you back to the sheet — throwing away the view you had
+chosen for exactly the half of a session where you are watching rather than playing.
+The highway now follows Listen through the piece, showing the notes coming up just as
+it does while you play.
+
 ## 20 August 2026 — night
 
 **A rhythm trainer, with no notes in it.** Everywhere else in Plinky your timing is

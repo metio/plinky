@@ -158,6 +158,7 @@ export function useListenPlayback({
     loop,
     onLap,
     centerCursor,
+    onPosition,
     markPainted,
     isPracticing,
     // Light each played note on a connected instrument. Passed in rather than taken
@@ -178,6 +179,11 @@ export function useListenPlayback({
     onLap: () => void;
     // Re-centre the treadmill after each cursor step; a no-op elsewhere.
     centerCursor: () => void;
+    // Where the music has reached, as a notated onset in whole notes, before the position
+    // sounds. The notes highway reads this to draw what is coming: it shows the same
+    // lookahead whether a run or Listen is walking the music, so choosing that reading
+    // mode does not mean losing it the moment the computer plays.
+    onPosition?: (whole: number) => void;
     // The trail colours the score; the surface tracks that something is painted.
     markPainted: () => void;
     // Whether a self-paced run owns the cursor — stopping playback then leaves
@@ -297,6 +303,7 @@ export function useListenPlayback({
                 return;
             }
             const current = steps[step]!;
+            onPosition?.(current.whole);
             // Light the notes now sounding so the eye can follow the music, leaving a
             // blue trail on the ones just heard — the cursor box alone is easy to lose,
             // and the trail records which stretches the computer played once it moves on.
