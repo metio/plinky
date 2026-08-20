@@ -177,3 +177,25 @@ describe("sceneRange on a large piece", () => {
         expect(range.to).toBeGreaterThanOrEqual(64);
     });
 });
+
+describe("stepCenterAt with more onsets than centres", () => {
+    // The two lists come from different places and can disagree: the onsets are the take's
+    // own distinct start times, the centres come from an engraving that quantised those
+    // notes to a grid, so a hand-played chord collapses into one step.
+    it("holds the last centre instead of jumping to the top of the sheet", () => {
+        const onsets = [0, 100, 200, 300, 400];
+        const centers = [10, 20, 30];
+        const seen = onsets.map((t) => stepCenterAt(onsets, centers, t));
+        // Every reading is somewhere on the sheet; none is the y=0 the old fallback gave.
+        expect(seen.every((y) => y >= 10)).toBe(true);
+        expect(seen).not.toContain(0);
+    });
+
+    it("never reads backwards once the centres run out", () => {
+        const onsets = [0, 100, 200, 300, 400];
+        const centers = [10, 20, 30];
+        expect(stepCenterAt(onsets, centers, 350)).toBeGreaterThanOrEqual(
+            stepCenterAt(onsets, centers, 250),
+        );
+    });
+});

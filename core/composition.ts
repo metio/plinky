@@ -242,9 +242,14 @@ const PITCH_CLASSES: { step: string; alter: number }[] = [
 ];
 
 function spell(midi: number): { step: string; alter: number; octave: number } {
-    const pitchClass = ((midi % 12) + 12) % 12;
+    // Rounded first. A pitch is a semitone by the time it reaches notation, but one can
+    // arrive fractional from a shared take — the code carries whatever was encoded — and a
+    // fractional index into the table returns nothing, so the export threw on a link
+    // somebody sent rather than refusing it.
+    const semitone = Math.round(midi);
+    const pitchClass = ((semitone % 12) + 12) % 12;
     const { step, alter } = PITCH_CLASSES[pitchClass]!;
-    return { step, alter, octave: Math.floor(midi / 12) - 1 };
+    return { step, alter, octave: Math.floor(semitone / 12) - 1 };
 }
 
 // The note values, longest first, that a span of grid cells decomposes into. Each is

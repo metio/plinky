@@ -143,3 +143,85 @@ describe("micPitch's sampling loop", () => {
         expect(scheduler.pending().frames).toBe(0);
     });
 });
+
+describe("a start called off before the device arrives", () => {
+    // The player closes the panel, or navigates away, while the browser is still asking.
+    // stop() has nothing to tear down at that moment — stream, context and frame handle
+    // are all still null — so without a signal to the pending request the permission,
+    // once granted, was adopted anyway: microphone open and sampling running after they
+    // had said stop.
+    // Every request gets its own pending promise and its own track, so a test that starts
+    // twice can settle both — capturing only the latest resolver leaves the first request
+    // hanging forever, which reads as a timeout rather than as the bug under test.
+    const pendingPermission = () => {
+        const waiting: ((stream: MediaStream) => void)[] = [];
+        const tracks: MediaStreamTrack[] = [];
+        const getUserMedia = vi.fn(
+            () =>
+                new Promise<MediaStream>((resolve) => {
+                    waiting.push(resolve);
+                }),
+        );
+        vi.stubGlobal("navigator", { mediaDevices: { getUserMedia } });
+        const grant = () => {
+            for (const resolve of waiting.splice(0)) {
+                const track = { stop: vi.fn(), kind: "audio" } as unknown as MediaStreamTrack;
+                tracks.push(track);
+                resolve({ getTracks: () => [track] } as unknown as MediaStream);
+            }
+        };
+        return { grant, trackAt: (index: number) => tracks[index]! };
+    };
+
+    it("releases the microphone instead of adopting it", async () => {
+        // The adopt path has to be able to SUCCEED for this to mean anything: without an
+        // AudioContext it throws, the error handler calls stop(), and the track is
+        // released for a reason that has nothing to do with the fix. This test passed
+        // against the unfixed adapter until the stub below was added.
+        vi.stubGlobal(
+            "AudioContext",
+            class {
+                sampleRate = 48_000;
+                resume = () => Promise.resolve();
+                close = () => Promise.resolve();
+                createMediaStreamSource = () => ({ connect: () => {} });
+                createAnalyser = () => ({
+                    fftSize: 2048,
+                    getFloatTimeDomainData: () => {},
+                    connect: () => {},
+                });
+            },
+        );
+        const { grant, trackAt } = pendingPermission();
+        const pitch = micPitch(fakeScheduler());
+        const started = pitch.start(() => {});
+        pitch.stop();
+        grant();
+        await started;
+        expect(trackAt(0).stop).toHaveBeenCalled();
+    });
+
+    it("says it is idle, not that it is listening", async () => {
+        const { grant } = pendingPermission();
+        const pitch = micPitch(fakeScheduler());
+        const started = pitch.start(() => {});
+        pitch.stop();
+        grant();
+        // The panel reads this straight into its status; "listening" would leave it
+        // claiming a microphone that has been released.
+        expect(await started).toBe("idle");
+    });
+
+    it("still says listening when a newer start took over", async () => {
+        // A supersede is the other reason a pending request finds itself unwanted, and it
+        // wants the opposite answer: somebody IS listening, just not this call.
+        const { grant, trackAt } = pendingPermission();
+        const pitch = micPitch(fakeScheduler());
+        const first = pitch.start(() => {});
+        const second = pitch.start(() => {});
+        grant();
+        expect(await first).toBe("listening");
+        await second;
+        expect(trackAt(0).stop).toHaveBeenCalled();
+    });
+});

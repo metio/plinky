@@ -39,8 +39,19 @@ export function micPitch(scheduler: Scheduler): PitchInput {
     // of overwriting the live listener's stream and orphaning the old track (mic left on)
     // and its frame loop. This is the async gap between requesting and owning the device.
     let generation = 0;
+    // Whether a listener is wanted at all. The generation counter alone cannot tell a stop
+    // from a newer start, and the two want opposite answers from a request already in
+    // flight: a newer start owns the device, a stop means nobody does.
+    let wanted = false;
 
     const stop = () => {
+        // Bumped so a request still awaiting the device knows it was called off. Without
+        // it, stop() has nothing to tear down while getUserMedia is pending — stream,
+        // context and frame handle are all still null — and the permission, once granted,
+        // was adopted anyway: the microphone opened and the sampling loop started after
+        // the player had said stop.
+        wanted = false;
+        generation += 1;
         if (frameHandle !== null) {
             scheduler.cancelFrame(frameHandle);
             frameHandle = null;
@@ -65,6 +76,7 @@ export function micPitch(scheduler: Scheduler): PitchInput {
 
         async start(onEvent, options): Promise<PitchStartResult> {
             stop();
+            wanted = true;
             const myGeneration = ++generation;
             let acquired: MediaStream;
             try {
@@ -79,15 +91,17 @@ export function micPitch(scheduler: Scheduler): PitchInput {
                 return classifyMicError(error);
             }
 
-            // A newer start() ran while this one awaited the device. The stream we just got
-            // belongs to nobody — stop its track here rather than adopt it over the newer
-            // listener's stream. The newer start owns the shared state and is the live
-            // listener, so the outcome for this (superseded) call is still "listening".
+            // Something happened while this one awaited the device. Either way the stream
+            // just granted belongs to nobody, so its track is stopped here rather than
+            // adopted — the difference is only what to tell the caller. A newer start()
+            // owns the shared state and is the live listener; a stop() means nobody is
+            // listening, and reporting otherwise leaves the panel claiming a microphone
+            // that has been released.
             if (myGeneration !== generation) {
                 for (const track of acquired.getTracks()) {
                     track.stop();
                 }
-                return "listening";
+                return wanted ? "listening" : "idle";
             }
 
             try {

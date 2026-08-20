@@ -8,7 +8,10 @@ import type { MicCalibration, PitchEvent } from "../../core/pitch";
 // so the note funnel receives plain pitch events and a test hands it a fake
 // that emits them on cue — no getUserMedia, no audio graph.
 
-export type PitchStartResult = "listening" | "denied" | "error";
+// "idle" is a start that was called off before the device arrived: the player closed the
+// panel or navigated away while the browser was still asking. Nothing failed and nothing
+// is listening, and saying either would be untrue.
+export type PitchStartResult = "listening" | "denied" | "error" | "idle";
 
 export type PitchStartOptions = {
     // The player's tuning, threaded into the live detector so notes and their

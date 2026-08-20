@@ -64,8 +64,12 @@ export function serializePack(scores: PackScore[]): string {
     return JSON.stringify(pack, null, 2);
 }
 
-// Parse and validate a bundle, dropping malformed scores. Throws a reader-friendly
-// error when the document is not a usable Plinky score bundle.
+// Parse and validate a bundle, dropping malformed scores. Throws when the document is not
+// a usable Plinky score bundle.
+//
+// The messages are for whoever reads a stack trace or an issue report, not for the reader:
+// core has no language, and the surface that catches these says so in the reader's own
+// (see app/components/features/scoreBackup.tsx).
 export function parsePack(json: string): ScorePack {
     let data: unknown;
     try {

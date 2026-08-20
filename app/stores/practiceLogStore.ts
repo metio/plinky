@@ -3,7 +3,6 @@
 
 import {
     addManualSession,
-    isManualEntry,
     foldSession,
     type ManualEntry,
     type Mood,
@@ -44,13 +43,14 @@ export function createPracticeLogStore(kv: KeyValueStore): PracticeLogStore {
             return apply(foldSession(store.load(), ping));
         },
         addManual(entry) {
-            // Asked before applying, because a rejected entry leaves the log untouched and
-            // `apply` reads an untouched log as success — so the panel's "saved" would
-            // light up for something the log threw away.
-            if (!isManualEntry(entry)) {
-                return false;
-            }
-            return apply(addManualSession(store.load(), entry));
+            // An entry the log will not take — invalid, or dated before the oldest of the
+            // capped 2000 and sliced straight back off — comes back as the very same
+            // array, and that identity is the signal. `apply` reads an unchanged log as
+            // success, which is right for a genuine no-op and wrong for a refusal, so the
+            // refusal has to be caught before it gets there.
+            const before = store.load();
+            const next = addManualSession(before, entry);
+            return next !== before && apply(next);
         },
         remove(start) {
             return apply(removeSession(store.load(), start));
