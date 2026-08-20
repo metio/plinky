@@ -4,6 +4,8 @@
 import type { Articulation } from "../../core/expression";
 import type { DynamicPoint } from "../../core/dynamics";
 import type { PedalSpan } from "../../core/pedal";
+import { SEMITONES_PER_OCTAVE } from "../../core/theory";
+import type { OctaveShiftSpan } from "../../core/octaveShift";
 import type { OrnamentKind } from "../../core/ornament";
 import type { SlurSpan } from "../../core/slur";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
@@ -189,6 +191,14 @@ type OrnamentNoteShape = {
     ParentVoiceEntry?: { OrnamentContainer?: { ornament?: unknown } | null };
 };
 
+// Whether the chord this note belongs to is rolled — the wavy line down the left of a
+// chord, which asks for its notes one after another rather than together.
+export function readArpeggio(note: unknown): boolean {
+    return (note as ArpeggioNoteShape | null)?.ParentVoiceEntry?.Arpeggio != null;
+}
+
+type ArpeggioNoteShape = { ParentVoiceEntry?: { Arpeggio?: unknown } };
+
 // The key signature the score opens in, as its count of sharps (positive) or flats
 // (negative). Zero when the engraving says nothing, which is also what C major says.
 //
@@ -289,6 +299,58 @@ type CursorShape = {
     next: () => void;
     iterator?: { EndReached?: boolean; currentTimeStamp?: { RealValue?: number } };
     NotesUnderCursor: () => unknown[];
+};
+
+// The octave lines the score prints, as whole-note spans carrying their distance.
+//
+// Shaped exactly like the pedal spans below, because the engraving reports them the same
+// way — a start and an end hung on the measure's expressions rather than on the notes.
+// `octaveValue` counts octaves: 1 for 8va, -1 for 8vb, 2 for 15ma.
+export function readOctaveShiftSpans(osmd: unknown): OctaveShiftSpan[] {
+    const spans: OctaveShiftSpan[] = [];
+    try {
+        const measures =
+            (osmd as { sheet?: { SourceMeasures?: ShiftMeasureShape[] } } | null)?.sheet
+                ?.SourceMeasures ?? [];
+        let end = 0;
+        let open: { at: number; semitones: number } | null = null;
+        for (const measure of measures) {
+            const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
+            end = Math.max(end, measureStart + (measure?.Duration?.RealValue ?? 0));
+            for (const staff of measure?.staffLinkedExpressions ?? []) {
+                for (const entry of staff ?? []) {
+                    const at = measureStart + (entry?.timestamp?.RealValue ?? 0);
+                    end = Math.max(end, at);
+                    const octaves = entry?.octaveShiftStart?.octaveValue;
+                    if (typeof octaves === "number" && octaves !== 0 && open === null) {
+                        open = { at, semitones: octaves * SEMITONES_PER_OCTAVE };
+                    } else if (entry?.octaveShiftEnd != null && open !== null) {
+                        spans.push({ from: open.at, to: at, semitones: open.semitones });
+                        open = null;
+                    }
+                }
+            }
+        }
+        // A line the engraving opens and never closes runs to the end of the music. Dropping
+        // it would put the rest of the piece an octave out with nothing to say why.
+        if (open !== null) {
+            spans.push({ from: open.at, to: Math.max(open.at, end), semitones: open.semitones });
+        }
+    } catch {
+        // An engraving whose shape moved plays at written pitch rather than not at all.
+        return [];
+    }
+    return spans;
+}
+
+type ShiftMeasureShape = {
+    AbsoluteTimestamp?: { RealValue?: number };
+    Duration?: { RealValue?: number };
+    staffLinkedExpressions?: ({
+        timestamp?: { RealValue?: number };
+        octaveShiftStart?: { octaveValue?: unknown } | null;
+        octaveShiftEnd?: unknown;
+    } | null)[][];
 };
 
 export function readPedalSpans(osmd: unknown): PedalSpan[] {

@@ -418,6 +418,20 @@ missed is reported as missed rather than as a note played badly — and a tap th
 near nothing is counted separately, so reading a rhythm wrongly and playing one loosely
 never look like the same mistake.
 
+## What the page says, and what you hear
+
+Plinky plays the marks, not just the notes. Dynamics and hairpins set how loud each note
+is struck; staccato clips a note, tenuto leans on it, an accent strikes it harder. A slur
+holds each note into the next so a phrase is joined rather than merely adjacent. Trills,
+mordents and turns are played as the figures they stand for, reaching for the next note
+*of the key* — a trill in E flat turns to the B flat. A chord with the wavy line beside it
+is rolled from the bottom up with every note left ringing. The sustain pedal pools the
+harmony where the score asks for it, a fermata waits, ties hold, and a passage under an
+8va line sounds an octave up from where it is drawn.
+
+Where a piece marks none of this — and many teaching studies deliberately mark nothing —
+it is played as written, which is honestly what the page says.
+
 ## Little tools
 
 [Little tools](https://plinky.fun/en/tools/) is the look-it-up page: no account, no

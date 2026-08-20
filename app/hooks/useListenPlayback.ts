@@ -5,6 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
+import { octaveShiftAt } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
 import { volumeAt } from "../../core/dynamics";
@@ -17,7 +18,9 @@ import {
     playOrder,
     readDynamics,
     readPedalSpans,
+    readArpeggio,
     readKeyFifths,
+    readOctaveShiftSpans,
     readOrnament,
     readScoreExpression,
     readSlurSpans,
@@ -98,6 +101,8 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
     const slurs = readSlurSpans(osmd);
     // Which notes an ornament reaches for depends on the key it is written in.
     const fifths = readKeyFifths(osmd);
+    // Where the score prints 8va, the drawn pitch is deliberately not the played one.
+    const shifts = readOctaveShiftSpans(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -124,7 +129,7 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
                 // the re-strike; rests never sound.
                 if (!note.isRest() && note.halfTone > 0 && expression.strike) {
                     notes.push({
-                        pitch: note.halfTone + 12,
+                        pitch: note.halfTone + 12 + octaveShiftAt(shifts, whole),
                         // Under the pedal the damper holds the note, so it rings on
                         // whether or not the written value is up.
                         soundQuarters: ringUntil(pedals, whole, expression.soundQuarters / 4) * 4,
@@ -156,7 +161,13 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
             // page and the sound disagree about what the bar contains, and a reader
             // learning to recognise the sign hears nothing happen where it is written.
             const ornament = group.length === 1 ? readOrnament(group[0]) : null;
-            steps.push(...(ornament ? spellOutOrnament(step, ornament, fifths) : [step]));
+            if (ornament) {
+                steps.push(...spellOutOrnament(step, ornament, fifths));
+            } else if (group.some((note) => readArpeggio(note))) {
+                steps.push(...rollChord(step));
+            } else {
+                steps.push(step);
+            }
         }
         cursor.next();
     }
@@ -191,6 +202,36 @@ function spellOutOrnament(step: ListenStep, kind: OrnamentKind, fifths: number):
         notes: [{ ...note, pitch: one.pitch, soundQuarters: one.quarters }],
         lengths: [one.quarters],
         advancesCursor: index === figure.length - 1 && step.advancesCursor,
+    }));
+}
+
+// A note of a rolled chord starts this long after the one below it, in quarter notes. A
+// roll is a gesture of the hand rather than a rhythm — the notes are spread by about as
+// much whatever the tempo — so this is small and fixed rather than a share of the chord.
+const ROLL_QUARTERS = 0.06;
+
+// The wavy line down the left of a chord: its notes are struck one after another, from the
+// bottom up, and every one of them keeps ringing. That last part is what makes it a chord
+// and not a run, so each note keeps its own sounding length while only the starts are
+// staggered.
+//
+// Direction is not modelled: MusicXML can write a downward roll and this plays it upward.
+// An upward roll is what a bare `<arpeggiate/>` means and what nearly every one in the
+// catalogue is, and rolling the notes in some order beats striking them together.
+function rollChord(step: ListenStep): ListenStep[] {
+    if (step.notes.length < 2) {
+        return [step];
+    }
+    const total = step.lengths[0] ?? 0;
+    const ordered = [...step.notes].sort((one, other) => one.pitch - other.pitch);
+    // Never let the spread swallow the position: a rolled chord on a semiquaver stays a
+    // chord, just a tighter one.
+    const roll = Math.min(ROLL_QUARTERS, total / ordered.length);
+    return ordered.map((note, index) => ({
+        ...step,
+        notes: [note],
+        lengths: [index === ordered.length - 1 ? total - roll * (ordered.length - 1) : roll],
+        advancesCursor: index === ordered.length - 1 && step.advancesCursor,
     }));
 }
 

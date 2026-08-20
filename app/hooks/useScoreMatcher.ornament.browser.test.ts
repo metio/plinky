@@ -4,7 +4,8 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { collectListenSteps } from "./useListenPlayback";
-import { readKeyFifths, readOrnament } from "../lib/scoreExpression";
+import { collectMatchSteps } from "./useScoreMatcher";
+import { readArpeggio, readKeyFifths, readOrnament } from "../lib/scoreExpression";
 
 // Ornaments and the key they reach into, read off a live engraving.
 //
@@ -139,6 +140,136 @@ describe("a score with ornaments over its notes", () => {
             const figure = steps.filter((step) => step.whole === 0);
             const spent = figure.reduce((sum, step) => sum + (step.lengths[0] ?? 0), 0);
             expect(spent).toBeCloseTo(1, 6);
+        });
+    });
+});
+
+describe("a chord the score rolls", () => {
+    const chord = (arpeggiate: boolean) =>
+        `<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type>${
+            arpeggiate ? "<notations><arpeggiate/></notations>" : ""
+        }</note><note><chord/><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type></note><note><chord/><pitch><step>G</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type></note>`;
+
+    it("sees the wavy line on the chord", () => {
+        return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
+            (osmd) => {
+                osmd.cursor.reset();
+                expect(osmd.cursor.NotesUnderCursor().some(readArpeggio)).toBe(true);
+            },
+        );
+    });
+
+    it("leaves a plain chord alone", () => {
+        return load(score(`<measure number="1">${attr(0)}${chord(false)}</measure>`)).then(
+            (osmd) => {
+                const steps = collectListenSteps(osmd);
+                expect(steps).toHaveLength(1);
+                expect(steps[0]?.notes.map((note) => note.pitch)).toEqual([60, 64, 67]);
+            },
+        );
+    });
+
+    it("strikes a rolled chord from the bottom up, one note at a time", () => {
+        return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
+            (osmd) => {
+                const steps = collectListenSteps(osmd);
+                expect(steps.map((step) => step.notes.map((note) => note.pitch))).toEqual([
+                    [60],
+                    [64],
+                    [67],
+                ]);
+            },
+        );
+    });
+
+    it("keeps every note of a rolled chord ringing, so it stays a chord", () => {
+        // The starts are staggered and the lengths are not: a roll whose notes stopped
+        // when the next began would be a run up the arpeggio, not a chord.
+        return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
+            (osmd) => {
+                const steps = collectListenSteps(osmd);
+                expect(steps.every((step) => step.notes[0]?.soundQuarters === 1)).toBe(true);
+                // The spread is small, and the chord still spends exactly its own time.
+                const spent = steps.reduce((sum, step) => sum + (step.lengths[0] ?? 0), 0);
+                expect(spent).toBeCloseTo(1, 6);
+                expect(steps[0]?.lengths[0]).toBeLessThan(0.25);
+            },
+        );
+    });
+
+    it("moves the cursor once for the whole chord", () => {
+        return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
+            (osmd) => {
+                const steps = collectListenSteps(osmd);
+                expect(steps.filter((step) => step.advancesCursor)).toHaveLength(1);
+                expect(steps.at(-1)?.advancesCursor).toBe(true);
+            },
+        );
+    });
+});
+
+describe("a score with an 8va over it", () => {
+    const shift = (type: string) =>
+        `<direction placement="above"><direction-type><octave-shift type="${type}" size="8"/></direction-type></direction>`;
+
+    it("sounds the notes where they are played, not where they are drawn", () => {
+        // An 8va draws the notes an octave lower than they sound, to keep them on the
+        // staff. Whether the engraving hands back the written pitch or the sounding one is
+        // a contract, and getting it wrong puts a whole passage in the wrong octave — so
+        // this asks rather than assumes.
+        return load(
+            score(
+                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}${plain("D", 5)}${shift("stop")}</measure>
+                 <measure number="2">${plain("C", 5)}</measure>`,
+            ),
+        ).then((osmd) => {
+            const sounded = collectListenSteps(osmd).flatMap((step) =>
+                step.notes.map((note) => note.pitch),
+            );
+            // Whatever OSMD's answer is, the third note is outside the 8va and must differ
+            // from the first two by exactly the octave if the shift is being applied at all.
+            // Under the line an octave up; after it, at written pitch.
+            expect(sounded).toEqual([84, 86, 72]);
+        });
+    });
+
+    it("asks the run for the same octave it plays and prints", () => {
+        // The failure this stops: printing one octave, sounding another, and grading a
+        // third. A player following the line would be marked wrong for doing as told.
+        return load(
+            score(
+                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}${plain("D", 5)}${shift("stop")}</measure>`,
+            ),
+        ).then((osmd) => {
+            expect(collectMatchSteps(osmd, "both").map((step) => step.pitches)).toEqual([
+                [84],
+                [86],
+            ]);
+        });
+    });
+
+    it("shifts a line the engraving never closes to the end of the music", () => {
+        return load(
+            score(
+                `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}</measure>
+                 <measure number="2">${plain("D", 5)}</measure>`,
+            ),
+        ).then((osmd) => {
+            const sounded = collectListenSteps(osmd).flatMap((step) =>
+                step.notes.map((note) => note.pitch),
+            );
+            expect(sounded).toEqual([84, 86]);
+        });
+    });
+
+    it("leaves a score with no octave line at written pitch", () => {
+        return load(
+            score(`<measure number="1">${attr(0)}${plain("C", 5)}${plain("D", 5)}</measure>`),
+        ).then((osmd) => {
+            const sounded = collectListenSteps(osmd).flatMap((step) =>
+                step.notes.map((note) => note.pitch),
+            );
+            expect(sounded).toEqual([72, 74]);
         });
     });
 });
