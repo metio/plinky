@@ -30,13 +30,15 @@ import {
 } from "../../core/theory";
 import { ChordChanges } from "../components/features/chordChanges";
 import { FeatureBoundary } from "../components/features/featureBoundary";
-import { SavePictureButton } from "../components/features/savePictureButton";
+import { SaveDiagram, SavePictureButton } from "../components/features/savePictureButton";
 import { DEMO_FROM, SoundingKeyboard } from "../components/features/soundingKeyboard";
 import { Button } from "../components/ui/button";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { useMetronome } from "../hooks/useMetronome";
 import { useSynth } from "../hooks/useSynth";
 import { chordName, intervalName, scaleName } from "../lib/theoryNames";
+import { diatonicSheetDiagrams } from "../../core/chordSheet";
+import { svgDiagramSheet } from "../../core/keyboardDiagram";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import type { Route } from "./+types/tools";
@@ -134,6 +136,22 @@ function CircleOfFifths() {
                 <dt className="text-muted">{m.tools_circle_relative()}</dt>
                 <dd>{m.tools_circle_minor({ note: spell(selected.relativeMinor, selected) })}</dd>
             </dl>
+            {/* The seven chords leave together or not at all. Saved one at a time they
+                arrive as seven files with no order and no title, and what they were
+                teaching — that they belong to this key, in this sequence — is the part
+                that goes missing. */}
+            <SaveDiagram
+                svg={() =>
+                    svgDiagramSheet({
+                        title: m.tools_circle_sheet_title({
+                            key: spell(selected.tonic, selected),
+                        }),
+                        diagrams: diatonicSheetDiagrams(ROOT + selected.tonic, selected.spelling),
+                    })
+                }
+                filename={`plinky-chords-${spell(selected.tonic, selected)}`}
+                pictureLabel={m.tools_circle_save_chords()}
+            />
         </Panel>
     );
 }
@@ -182,7 +200,7 @@ function ScaleExplorer() {
                 to={ROOT + 24}
                 keys={pitches.map((note) => ({ note }))}
                 caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(tonic)))]} ${scaleName(scale)}`}
-                filename="plinky-scale.png"
+                filename="plinky-scale"
             />
         </Panel>
     );
@@ -216,7 +234,7 @@ function ChordExplorer() {
                 to={ROOT + 24}
                 keys={pitches.map((note) => ({ note }))}
                 caption={`${NOTE_TEXT[noteNameOf(pitchClassOf(ROOT + Number(root)))]} ${chordName(quality)}`}
-                filename="plinky-chord.png"
+                filename="plinky-chord"
             />
         </Panel>
     );

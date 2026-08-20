@@ -72,14 +72,25 @@ function escapeXml(text: string): string {
 }
 
 // The picture, as a self-contained SVG document.
-export function svgKeyboardDiagram({
+export function svgKeyboardDiagram(options: DiagramOptions): string {
+    const { markup, height } = diagramBody(options);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}">\
+<rect width="${WIDTH}" height="${height}" fill="${PAPER}"/>\
+${markup}\
+</svg>`;
+}
+
+// One keyboard's shapes and the room they need, without the document around them — which
+// is what lets a sheet stack several of them on one page. The drawing starts at y=0 and
+// paints no background of its own; the page it lands on owns that.
+function diagramBody({
     from,
     to,
     keys,
     caption,
     noteNames = false,
     spelling = "sharp",
-}: DiagramOptions): string {
+}: DiagramOptions): { markup: string; height: number } {
     const height = KEYBED_TOP * 2 + KEYBED_HEIGHT + (caption ? CAPTION_HEIGHT : 0);
     const marked = new Map(keys.map((key) => [key.note, key.finger]));
     const x = (pct: number) => (pct / 100) * WIDTH;
@@ -148,11 +159,7 @@ export function svgKeyboardDiagram({
           )}" font-weight="600" text-anchor="middle">${escapeXml(caption)}</text>`
         : "";
 
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}">\
-<rect width="${WIDTH}" height="${height}" fill="${PAPER}"/>\
-${parts.join("")}\
-${captionMarkup}\
-</svg>`;
+    return { markup: `${parts.join("")}${captionMarkup}`, height };
 }
 
 function notesIn(from: number, to: number): number[] {
@@ -166,4 +173,46 @@ function notesIn(from: number, to: number): number[] {
 // Two decimals is under a thousandth of a key's width and keeps the markup readable.
 function round(value: number): number {
     return Math.round(value * 100) / 100;
+}
+
+// Several keyboards down one page, under a heading — the worksheet a teacher prints once
+// and a pupil keeps.
+//
+// A key's seven chords are one lesson, not seven pictures: exported one at a time they
+// arrive as seven files with no order and no title, and the thing being taught — that
+// these belong to each other and follow in this sequence — is exactly what gets lost.
+// So the page is the unit, and the caller only says which diagrams go on it.
+const SHEET_TITLE_SIZE = 56;
+const SHEET_TITLE_ROOM = 120;
+
+export function svgDiagramSheet({
+    title,
+    diagrams,
+}: {
+    title: string;
+    diagrams: readonly DiagramOptions[];
+}): string {
+    const bodies = diagrams.map((options) => diagramBody(options));
+    const height = SHEET_TITLE_ROOM + bodies.reduce((total, body) => total + body.height, 0);
+    // The heading shrinks by the same rule a caption does, and for the same reason: it is
+    // centred, so one too long runs off both edges at once.
+    const titleSize = Math.max(
+        CAPTION_MIN,
+        Math.min(SHEET_TITLE_SIZE, (WIDTH - 2 * MARGIN) / (title.length * CHAR_WIDTH)),
+    );
+
+    const parts: string[] = [];
+    let y = SHEET_TITLE_ROOM;
+    for (const body of bodies) {
+        parts.push(`<g transform="translate(0,${round(y)})">${body.markup}</g>`);
+        y += body.height;
+    }
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}">\
+<rect width="${WIDTH}" height="${height}" fill="${PAPER}"/>\
+<text x="${WIDTH / 2}" y="${SHEET_TITLE_ROOM - 40}" fill="${INK}" font-family="system-ui,sans-serif" font-size="${round(
+        titleSize,
+    )}" font-weight="700" text-anchor="middle">${escapeXml(title)}</text>\
+${parts.join("")}\
+</svg>`;
 }

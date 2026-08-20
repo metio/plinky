@@ -18,6 +18,7 @@ import {
 } from "../../../core/practiceSession";
 import { usePracticeLogStore } from "../../contexts/services";
 import { usePracticeLog, usePracticeReport } from "../../hooks/usePracticeLog";
+import { practiceDuration as duration } from "../../lib/practiceDuration";
 import { downloadBlob } from "../../lib/download";
 import { printPage } from "../../lib/printPage";
 import { m } from "../../paraglide/messages.js";
@@ -57,13 +58,6 @@ const HEAT_CLASS = [
     "bg-heat-strong",
     "bg-heat-deep",
 ] as const;
-
-function duration(ms: number): string {
-    const totalMinutes = Math.round(ms / 60_000);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return hours > 0 ? m.practice_hm({ hours, minutes }) : m.practice_m({ minutes });
-}
 
 function Stat({ label, value }: { label: string; value: string }) {
     return (

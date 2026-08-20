@@ -16,6 +16,7 @@ import { AchievementGallery } from "./achievementGallery";
 import { Show } from "./conditional";
 import { GradeRoadmap } from "./gradeRoadmap";
 import { PracticeReport } from "./practiceReport";
+import { PracticeBalance } from "./practiceBalance";
 import { RepertoirePanel } from "./repertoirePanel";
 import { RecapCard } from "./recapCard";
 import { FeatureBoundary } from "./featureBoundary";
@@ -132,6 +133,13 @@ export function StatsView() {
 
             <FeatureBoundary feature="PracticeReport">
                 <PracticeReport pieceTitle={pieceTitle} />
+            </FeatureBoundary>
+
+            {/* Directly under the report, because it answers the question the report
+                raises: the report says how much practice happened, and this says which
+                pieces it happened to. */}
+            <FeatureBoundary feature="PracticeBalance">
+                <PracticeBalance pieceTitle={pieceTitle} />
             </FeatureBoundary>
 
             <FeatureBoundary feature="SlowNotes">

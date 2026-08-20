@@ -97,7 +97,7 @@ export function ChordChanges({ root: rootNote }: { root: number }) {
                 to={rootNote + 24}
                 keys={to.map((note) => ({ note }))}
                 caption={`${label(fromRoot, fromQuality)} → ${label(toRoot, toQuality)}`}
-                filename="plinky-chord-change.png"
+                filename="plinky-chord-change"
             />
         </>
     );

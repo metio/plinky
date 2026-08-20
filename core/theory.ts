@@ -190,7 +190,16 @@ export type ChordQuality =
     | "major-seventh"
     | "minor-seventh"
     | "half-diminished-seventh"
-    | "diminished-seventh";
+    | "diminished-seventh"
+    | "minor-major-seventh"
+    | "major-sixth"
+    | "minor-sixth"
+    | "suspended-second"
+    | "suspended-fourth"
+    | "added-ninth"
+    | "dominant-ninth"
+    | "major-ninth"
+    | "minor-ninth";
 
 // The semitones a chord stacks above its root — the whole definition of its quality.
 // A quality is what it sounds like whatever the root, so the ear names the stack.
@@ -204,6 +213,20 @@ const CHORD_STACKS: Record<ChordQuality, number[]> = {
     "minor-seventh": [0, 3, 7, 10],
     "half-diminished-seventh": [0, 3, 6, 10],
     "diminished-seventh": [0, 3, 6, 9],
+    "minor-major-seventh": [0, 3, 7, 11],
+    // A sixth and the seventh a third below it are the same four notes — C6 is A minor 7
+    // rotated — and a ninth stack contains its own suspension. Nothing in a set of notes
+    // settles which name it wants; the bass does, which is what nameHeldNotes leans on.
+    "major-sixth": [0, 4, 7, 9],
+    "minor-sixth": [0, 3, 7, 9],
+    "suspended-second": [0, 2, 7],
+    "suspended-fourth": [0, 5, 7],
+    // The ninth is written where it sounds, an octave and a tone above the root, because
+    // chordSpan is what tells a generator how much room to leave above the root.
+    "added-ninth": [0, 4, 7, 14],
+    "dominant-ninth": [0, 4, 7, 10, 14],
+    "major-ninth": [0, 4, 7, 11, 14],
+    "minor-ninth": [0, 3, 7, 10, 14],
 };
 
 export const CHORD_QUALITIES = Object.keys(CHORD_STACKS) as ChordQuality[];
@@ -231,6 +254,7 @@ export type ScaleId =
     | "phrygian"
     | "lydian"
     | "mixolydian"
+    | "locrian"
     | "major-pentatonic"
     | "minor-pentatonic"
     | "blues"
@@ -250,6 +274,7 @@ const SCALE_STEPS: Record<ScaleId, number[]> = {
     phrygian: [0, 1, 3, 5, 7, 8, 10],
     lydian: [0, 2, 4, 6, 7, 9, 11],
     mixolydian: [0, 2, 4, 5, 7, 9, 10],
+    locrian: [0, 1, 3, 5, 6, 8, 10],
     "major-pentatonic": [0, 2, 4, 7, 9],
     "minor-pentatonic": [0, 3, 5, 7, 10],
     blues: [0, 3, 5, 6, 7, 10],

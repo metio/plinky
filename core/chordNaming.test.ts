@@ -112,10 +112,44 @@ describe("nameHeldNotes", () => {
                 "major-seventh",
                 "minor-seventh",
                 "half-diminished-seventh",
+                "minor-major-seventh",
+                "suspended-fourth",
+                "added-ninth",
+                "dominant-ninth",
+                "major-ninth",
+                "minor-ninth",
             ] as const) {
                 const named = chord(nameHeldNotes(chordPitches(60 + root, quality)));
                 expect(named).toMatchObject({ root, quality, inversion: 0 });
             }
         }
+    });
+    it("lets the bass settle a chord two names have an equal claim to", () => {
+        // A sixth and the seventh a third below it are the very same four notes: C E G A
+        // is C6 and A minor 7 at once, and a set of pitch classes cannot say which. The
+        // lowest sounding note decides, which is how a player reading their own hands
+        // would say it — so the same notes name themselves differently depending on what
+        // the left hand is holding, and that is correct rather than a tie badly broken.
+        expect(chord(nameHeldNotes([C4, C4 + 4, C4 + 7, C4 + 9]))).toMatchObject({
+            root: 0,
+            quality: "major-sixth",
+        });
+        expect(chord(nameHeldNotes([C4 - 3, C4, C4 + 4, C4 + 7]))).toMatchObject({
+            root: 9,
+            quality: "minor-seventh",
+        });
+    });
+
+    it("tells a suspended second from the suspended fourth under it", () => {
+        // Csus2 and Gsus4 are one set of notes rotated, so this is the same tie as the
+        // sixth above and the bass breaks it the same way.
+        expect(chord(nameHeldNotes([C4, C4 + 2, C4 + 7]))).toMatchObject({
+            root: 0,
+            quality: "suspended-second",
+        });
+        expect(chord(nameHeldNotes([C4 - 5, C4, C4 + 2]))).toMatchObject({
+            root: 7,
+            quality: "suspended-fourth",
+        });
     });
 });

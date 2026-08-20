@@ -404,10 +404,14 @@ glossary tells you what a mark means, this tells you why the music is built that
 [Little tools](https://plinky.fun/en/tools/) is the look-it-up page: no account, no
 instrument, nothing to set up. A **circle of fifths** where picking a key names its
 signature and its relative minor and sounds its chord — and where each key spells its
-own notes, so D flat major reads as D flat and never as C sharp. A **scale explorer**
+own notes, so D flat major reads as D flat and never as C sharp. Its seven chords save
+as **one worksheet**, in order and under the name of the key, rather than as seven
+separate pictures of chords that no longer look like they belong together. A **scale explorer**
 and a **chord explorer** that light the notes on a keyboard from any root and play
 them back — and either can be saved as a **picture**, keys marked and named, for a
-lesson plan or a printout. **Between two chords** answers the question a chart cannot:
+lesson plan or a printout, or **for print** as the drawing itself, which comes out at
+whatever size the paper is. Fourteen scales and eighteen chord types, the modes complete
+and the sixths, suspensions and ninths included. **Between two chords** answers the question a chart cannot:
 why one change falls under the hand and another fights it, by naming the notes both
 chords hold and counting how far the rest have to travel. An **interval finder**: pick
 a starting note and a distance to see where it lands and hear it struck together and
@@ -472,6 +476,13 @@ time played, days played, a typical sitting, notes, and a grid showing where the
 practice went — every day in the range, shaded against the busiest one. A quiet week
 is drawn as a quiet week. Nothing here counts consecutive days and nothing reproaches
 a gap.
+
+**Where your time went** turns the same minutes the other way round: a row per piece,
+longest-practised first, each saying when you last touched it. A diary ordered by date
+cannot show you the piece you are quietly forgetting, because the forgotten piece is
+the one that stops appearing. Nothing here is a target — a piece nobody has played for
+three weeks is a piece nobody has played for three weeks, and what to do about that is
+yours.
 
 Played at a piano Plinky wasn't listening to? Add those minutes yourself. Hand-logged
 time is marked as such wherever it appears, so the picture stays honest. Any sitting

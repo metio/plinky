@@ -8,6 +8,29 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 20 August 2026 — evening
+
+**Where your practice time actually went.** The practice diary has always been
+ordered by date, which is the one order that cannot show you the piece you are
+quietly forgetting — the forgotten piece is the one that stops appearing. There is
+now a row per piece under **You → Your practice**: longest-practised first, and each
+one saying when you last touched it. No targets, no reproach. A piece nobody has
+played for three weeks is just that, and what to do about it is yours.
+
+**A key's seven chords save as one worksheet.** On Little tools, the circle of fifths
+can hand you every chord in the key you picked — in order, on the same keyboard, under
+the name of the key — instead of seven separate pictures that no longer look like they
+belong to each other.
+
+**Pictures can leave as drawings, not just as pictures.** Anything you could save from
+Little tools can now be saved for print as well: the drawing itself rather than a
+photograph of it, so it comes out crisp at whatever size the paper is.
+
+**More scales and chords to look up.** The modes are complete — Locrian was the one
+missing — and the chord explorer has gained sixths, suspended chords, added ninths,
+the minor-major seventh and the ninth chords. Plinky will name them under your hands
+on the home page too.
+
 ## 20 August 2026
 
 **A handful of small things that went wrong quietly.** The microphone now lets go the
