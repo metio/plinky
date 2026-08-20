@@ -149,4 +149,19 @@ describe("drawing a rhythm", () => {
         expect(bare).toContain('aria-hidden="true"');
         expect(bare).not.toContain('role="img"');
     });
+
+    it("scales to the box it is given rather than fixing its own width", () => {
+        // A staff wider than the column it sits in grows a sideways scrollbar, and a
+        // reader dragging the bar they are about to tap into view is reading the page
+        // instead of the rhythm.
+        const svg = rhythmSvg({ pattern: generateRhythm(9, seeded(6)) });
+        expect(svg).toContain('width="100%"');
+        expect(svg).toMatch(/viewBox="0 0 [\d.]+ \d+"/);
+        expect(svg).toContain("height:auto");
+        // A fixed width on the root element would override the percentage; the shapes
+        // inside are measured in the viewBox's own units and keep theirs.
+        const root = svg.slice(0, svg.indexOf(">"));
+        expect(root).not.toMatch(/\swidth="\d+"/);
+        expect(root).not.toMatch(/\sheight="\d+"/);
+    });
 });

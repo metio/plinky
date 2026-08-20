@@ -33,7 +33,7 @@ function Staff({ level, seed, marked }: { level: number; seed: number; marked?: 
               )
         : undefined;
     return (
-        <div className="max-w-3xl overflow-x-auto p-4 text-ink">
+        <div className="max-w-3xl p-4 text-ink">
             {/* biome-ignore lint/security/noDangerouslySetInnerHtml: core-generated SVG */}
             <div dangerouslySetInnerHTML={{ __html: rhythmSvg({ pattern, marks }) }} />
             <p className="text-xs text-muted">

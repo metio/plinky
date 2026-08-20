@@ -287,7 +287,12 @@ export function rhythmSvg({ pattern, marks, activeNote, label }: NotationOptions
         }
     }
 
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${round(layout.width)} ${layout.height}" width="${round(layout.width)}" height="${layout.height}" ${
+    // Sized by its box, not by a fixed width: the drawing scales to whatever it is given
+    // and the page never grows a sideways scrollbar. The widest pattern is a couple of
+    // bars of sixteenths, which comes out around a tenth smaller than drawn — a rhythm
+    // stays perfectly legible at that, and a reader dragging a staff sideways to see the
+    // end of the bar they are about to tap does not.
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${round(layout.width)} ${layout.height}" width="100%" style="height:auto;max-height:${layout.height}px" preserveAspectRatio="xMidYMid meet" ${
         label ? `role="img" aria-label="${escapeXml(label)}"` : 'aria-hidden="true"'
     }>${parts.join("")}</svg>`;
 }

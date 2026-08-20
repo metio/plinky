@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "Salva tutti e sette gli accordi",
     "tools_circle_sheet_title": "Accordi in {key}",
     "rhythm_title": "Ritmo",
-    "rhythm_intro": "Nessuna nota da trovare, solo il quando. Leggi la riga, lascia che ti conti l’entrata e battila con quello che vuoi: un pianoforte, i tasti del computer o il pulsante.",
+    "rhythm_intro": "Nessuna nota da trovare, solo il quando. Leggi la riga, lascia che ti conti l’entrata e battila con quello che vuoi: la barra spaziatrice, un pianoforte o il pulsante.",
     "rhythm_level_label": "Livello",
     "rhythm_level_help": "Ogni passo aggiunge una sola idea al precedente.",
     "rhythm_tempo": "Tempo",

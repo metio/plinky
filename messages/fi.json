@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "Tallenna kaikki seitsemän sointua",
     "tools_circle_sheet_title": "Sävellajin {key} soinnut",
     "rhythm_title": "Rytmi",
-    "rhythm_intro": "Ei säveliä etsittävänä — vain milloin. Lue rivi, anna sen laskea sinut sisään ja naputa se takaisin millä tahansa: pianolla, tietokoneen näppäimillä tai painikkeella.",
+    "rhythm_intro": "Ei säveliä etsittävänä — vain milloin. Lue rivi, anna sen laskea sinut sisään ja naputa se takaisin millä tahansa: välilyönnillä, pianolla tai painikkeella.",
     "rhythm_level_label": "Taso",
     "rhythm_level_help": "Jokainen askel lisää edelliseen yhden idean.",
     "rhythm_tempo": "Tempo",
