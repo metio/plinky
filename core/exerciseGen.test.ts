@@ -390,3 +390,66 @@ describe("exerciseTitleParts", () => {
         }
     });
 });
+
+describe("contrary motion", () => {
+    // Both hands play THE SAME SCALE in opposite directions. Reading the notes back out of
+    // the score is the only way to see that: a wrong scale in one hand is a wrong sound,
+    // not an error, so nothing else in the build would have said a word.
+    const midisOf = (xml: string, part: string) => {
+        const chunk = xml.split(`<part id="${part}"`)[1]?.split("</part>")[0] ?? "";
+        const BASE: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        return [
+            ...chunk.matchAll(
+                /<step>(\w)<\/step>\s*(?:<alter>(-?\d+)<\/alter>\s*)?<octave>(\d+)<\/octave>/g,
+            ),
+        ].map((m) => (Number(m[3]) + 1) * 12 + BASE[m[1]!]! + Number(m[2] ?? 0));
+    };
+    const hands = (type: Parameters<typeof generateExercise>[0]["type"]) => {
+        const xml = generateExercise({
+            type,
+            key: "c",
+            octaves: 1,
+            hands: "contrary",
+            inversion: 0,
+            interval: "single",
+        });
+        return { right: midisOf(xml, "P1"), left: midisOf(xml, "P2") };
+    };
+
+    it("gives both hands the same number of notes, whatever the scale", () => {
+        // The defect this pins: the descending hand was always a plain diatonic scale, so
+        // a chromatic exercise put 25 notes against 15 and the hands never met.
+        for (const type of [
+            "major-scale",
+            "natural-minor-scale",
+            "harmonic-minor-scale",
+            "melodic-minor-scale",
+            "chromatic-scale",
+        ] as const) {
+            const { right, left } = hands(type);
+            expect(`${type}: ${left.length}`).toBe(`${type}: ${right.length}`);
+        }
+    });
+
+    it("descends by semitone in a chromatic exercise", () => {
+        expect(hands("chromatic-scale").left.slice(0, 5)).toEqual([60, 59, 58, 57, 56]);
+    });
+
+    it("keeps the raised seventh going down in harmonic minor", () => {
+        // What makes it harmonic: B natural in both directions, not the B flat a plain
+        // diatonic descent produces.
+        expect(hands("harmonic-minor-scale").left.slice(0, 3)).toEqual([60, 59, 56]);
+    });
+
+    it("descends natural in melodic minor, and rises raised", () => {
+        const { left } = hands("melodic-minor-scale");
+        expect(left.slice(0, 3)).toEqual([60, 58, 56]);
+        // Coming back up, the sixth and seventh are raised: A natural and B natural, not
+        // the A flat and B flat the descent used.
+        expect(left.slice(-3)).toEqual([57, 59, 60]);
+    });
+
+    it("mirrors the major scale, which is the case that always worked", () => {
+        expect(hands("major-scale").left.slice(0, 4)).toEqual([60, 59, 57, 55]);
+    });
+});

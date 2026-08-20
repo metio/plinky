@@ -222,3 +222,30 @@ describe("grade", () => {
         expect(grade.score).toBe(100);
     });
 });
+
+describe("a shown hundred", () => {
+    // The flawless milestone reads these shown figures (core/milestones.ts), so a rounded
+    // 100 congratulated a run that had a wrong note in it.
+    const run = (correct: number, wrong: number) =>
+        computeGrade({
+            correct,
+            wrong,
+            rhythm: { perfect: correct, good: 0, off: 0, total: correct, averageAbsMs: 0 },
+            flow: 100,
+            dynamics: null,
+            expression: null,
+        });
+
+    it("is not given to a run with a wrong note in it", () => {
+        expect(run(249, 1).accuracy).toBe(99);
+    });
+
+    it("is still given to a run that really had none", () => {
+        expect(run(250, 0).accuracy).toBe(100);
+    });
+
+    it("leaves every other figure where it was", () => {
+        expect(run(9, 1).accuracy).toBe(90);
+        expect(run(1, 1).accuracy).toBe(50);
+    });
+});

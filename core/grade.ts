@@ -146,6 +146,13 @@ export function computeGrade({
             letter: "F",
         };
     }
+    // A shown 100 means a hundred, not a rounded one. Plain rounding turns 249 right notes
+    // out of 250 into "100%", and the flawless milestone reads those shown figures — so a
+    // run with a wrong note in it was congratulated for having none. Everything short of
+    // perfect stops at 99, which costs a fraction of a percent of precision and buys the
+    // number back its meaning.
+    const show = (value: number) => (value >= 100 ? 100 : Math.min(99, Math.round(value)));
+
     const accuracy = (correct / attempts) * 100;
 
     // A perfectly-timed note counts full, a "good" one partially, an "off" one
@@ -158,9 +165,9 @@ export function computeGrade({
     const score = Math.round((accuracy + timing + flow) / 3);
 
     return {
-        accuracy: Math.round(accuracy),
-        timing: Math.round(timing),
-        flow: Math.round(flow),
+        accuracy: show(accuracy),
+        timing: show(timing),
+        flow: show(flow),
         dynamics: dynamics ? Math.round(dynamics.evenness) : null,
         expression: expression ? expression.score : null,
         score,
