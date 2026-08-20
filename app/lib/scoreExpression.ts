@@ -4,6 +4,7 @@
 import type { Articulation } from "../../core/expression";
 import type { DynamicPoint } from "../../core/dynamics";
 import type { PedalSpan } from "../../core/pedal";
+import type { OrnamentKind } from "../../core/ornament";
 import type { SlurSpan } from "../../core/slur";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
@@ -162,6 +163,70 @@ export function playOrder<T>(items: readonly T[], noteOf: (item: T) => unknown):
 
 // Where the score asks for the sustain pedal, as whole-note spans. A pedal the engraving
 // never lifts runs to the end of the piece, which is what a reader would do with it.
+// OSMD's ornament enum, as numbers because the bundle is minified and the enum object it
+// came from is not exported in a form worth importing. Confirmed against a live engraving
+// by the browser test beside this file — the values are the whole contract.
+const ORNAMENT: Record<number, OrnamentKind> = {
+    0: "trill",
+    1: "turn",
+    2: "inverted-turn",
+    // A delayed turn is a turn that waits; the wait is a nuance this does not model, and
+    // playing it as a turn is much closer than not playing it at all.
+    3: "turn",
+    4: "inverted-turn",
+    5: "mordent",
+    6: "inverted-mordent",
+};
+
+// Which little sign, if any, is written over a note.
+export function readOrnament(note: unknown): OrnamentKind | null {
+    const container = (note as OrnamentNoteShape | null)?.ParentVoiceEntry?.OrnamentContainer;
+    const code = container?.ornament;
+    return typeof code === "number" ? (ORNAMENT[code] ?? null) : null;
+}
+
+type OrnamentNoteShape = {
+    ParentVoiceEntry?: { OrnamentContainer?: { ornament?: unknown } | null };
+};
+
+// The key signature the score opens in, as its count of sharps (positive) or flats
+// (negative). Zero when the engraving says nothing, which is also what C major says.
+//
+// Ornaments need it: a trill reaches for the next note OF THE KEY, so the same sign over
+// the same note means different pitches in different keys. A fixed interval would put a
+// wrong note inside every ornament the catalogue contains.
+//
+// The instruction is found by the shape of its data rather than by its class name — the
+// bundled OSMD is minified, so every class here is called something like `l` or `o`, and
+// matching on that would break on their next release with no test able to say why.
+export function readKeyFifths(osmd: unknown): number {
+    try {
+        const measures =
+            (osmd as { sheet?: { SourceMeasures?: KeyMeasureShape[] } } | null)?.sheet
+                ?.SourceMeasures ?? [];
+        for (const measure of measures) {
+            for (const entry of measure?.firstInstructionsStaffEntries ?? []) {
+                for (const instruction of entry?.instructions ?? []) {
+                    const key = instruction?.Key;
+                    if (typeof key === "number" && Number.isFinite(key)) {
+                        return key;
+                    }
+                }
+            }
+        }
+    } catch {
+        // An engraving whose shape moved reads as C major rather than breaking playback:
+        // every ornament then reaches for the white keys, which is wrong in a way somebody
+        // can hear — but a thrown error would stop the piece sounding at all.
+        return 0;
+    }
+    return 0;
+}
+
+type KeyMeasureShape = {
+    firstInstructionsStaffEntries?: ({ instructions?: ({ Key?: unknown } | null)[] } | null)[];
+};
+
 // The arches the score draws, as whole-note spans.
 //
 // It has to be a walk. OSMD hangs a slur on the two notes at its ends and on nothing in

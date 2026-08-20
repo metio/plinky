@@ -5,6 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
+import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
 import { volumeAt } from "../../core/dynamics";
 import { ringUntil } from "../../core/pedal";
@@ -16,6 +17,8 @@ import {
     playOrder,
     readDynamics,
     readPedalSpans,
+    readKeyFifths,
+    readOrnament,
     readScoreExpression,
     readSlurSpans,
     readStartTempo,
@@ -93,6 +96,8 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
     // The arches, as spans. Read before the walk below, because reading them is itself a
     // walk and it leaves the cursor reset.
     const slurs = readSlurSpans(osmd);
+    // Which notes an ornament reaches for depends on the key it is written in.
+    const fifths = readKeyFifths(osmd);
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -136,7 +141,7 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
                 // advances by the notated rhythm regardless of what sounds.
                 lengths.push(expression.notatedQuarters);
             }
-            steps.push({
+            const step: ListenStep = {
                 notes,
                 dynamicVolume,
                 lengths,
@@ -145,12 +150,48 @@ export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
                 bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
                 stretch: fermata ? FERMATA_STRETCH : 1,
                 advancesCursor: order === groups.length - 1,
-            });
+            };
+            // A trill, mordent or turn is not a decoration on the note — it is an
+            // instruction to play a short figure in its place. Printed but not played, the
+            // page and the sound disagree about what the bar contains, and a reader
+            // learning to recognise the sign hears nothing happen where it is written.
+            const ornament = group.length === 1 ? readOrnament(group[0]) : null;
+            steps.push(...(ornament ? spellOutOrnament(step, ornament, fifths) : [step]));
         }
         cursor.next();
     }
     cursor.reset();
     return steps;
+}
+
+// One position carrying an ornament, spelled out as the notes it actually sounds.
+//
+// The figure replaces the note, so it is emitted as a run of positions sharing the written
+// length between them — and only the last one moves the cursor, exactly as a grace note's
+// does. The cursor stays on the note the sign is printed over for the whole figure, which
+// is where a reader's eye is.
+//
+// Only a lone note is spelled out. An ornament over one note of a chord is a real piece of
+// notation, but the figure would have to be woven against the notes held under it, and a
+// chord played as a run of single notes would be a worse lie than a chord played plainly.
+function spellOutOrnament(step: ListenStep, kind: OrnamentKind, fifths: number): ListenStep[] {
+    const note = step.notes[0];
+    if (!note) {
+        return [step];
+    }
+    // The written length, not the sounding one: a pedal may ring the note on past the bar,
+    // but the figure has only the note's own time to fit into.
+    const written = step.lengths[0] ?? note.soundQuarters;
+    const figure = ornamentNotes(note.pitch, written, kind, fifths);
+    if (figure.length < 2) {
+        return [step];
+    }
+    return figure.map((one, index) => ({
+        ...step,
+        notes: [{ ...note, pitch: one.pitch, soundQuarters: one.quarters }],
+        lengths: [one.quarters],
+        advancesCursor: index === figure.length - 1 && step.advancesCursor,
+    }));
 }
 
 // The listening transport: one cursor walk, one clock, one stop — driven either
