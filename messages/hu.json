@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "Mind a hét akkord mentése",
     "tools_circle_sheet_title": "A {key} hangnem akkordjai",
     "rhythm_title": "Ritmus",
-    "rhythm_intro": "Nincs hang, amit meg kell találni — csak a mikor. Olvasd el a sort, hagyd, hogy beszámoljon, és kopogd vissza bármivel: zongorán, a számítógép billentyűin vagy a gombbal.",
+    "rhythm_intro": "Nincs hang, amit meg kell találni — csak a mikor. Olvasd el a sort, hagyd, hogy beszámoljon, és kopogd vissza bármivel: a szóközzel, zongorán vagy a gombbal.",
     "rhythm_level_label": "Szint",
     "rhythm_level_help": "Minden lépés egyetlen új dolgot tesz az előzőhöz.",
     "rhythm_tempo": "Tempó",

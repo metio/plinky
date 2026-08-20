@@ -113,4 +113,49 @@ describe("RhythmTrainer", () => {
             true,
         );
     });
+
+    it("taps on the space bar, and does not restart the run doing it", async () => {
+        // The key a hand resting on a desk finds first — and the one that would otherwise
+        // press the Start button still holding focus, restarting the attempt half-way
+        // through.
+        const { scheduler } = mount();
+        start();
+        await advanceScheduler(scheduler, UNTIL_START);
+        let at = 0;
+        for (const onset of ONSETS) {
+            await advanceScheduler(scheduler, onset - at);
+            at = onset;
+            fireEvent.keyDown(globalThis.document, { key: " " });
+        }
+        await advanceScheduler(scheduler, 2500);
+        expect(screen.getByText(m.rhythm_verdict_perfect())).toBeTruthy();
+    });
+
+    it("does not machine-gun taps from a held key", async () => {
+        // A held key repeats at the system's rate. A rhythm is tapped, not leaned on, so
+        // every repeat after the first would arrive as a spare tap.
+        const { scheduler } = mount();
+        start();
+        await advanceScheduler(scheduler, UNTIL_START);
+        let at = 0;
+        for (const onset of ONSETS) {
+            await advanceScheduler(scheduler, onset - at);
+            at = onset;
+            fireEvent.keyDown(globalThis.document, { key: " " });
+            fireEvent.keyDown(globalThis.document, { key: " ", repeat: true });
+            fireEvent.keyDown(globalThis.document, { key: " ", repeat: true });
+        }
+        await advanceScheduler(scheduler, 2500);
+        expect(screen.getByText(m.rhythm_verdict_perfect())).toBeTruthy();
+    });
+
+    it("ignores the space bar before the run and after it", async () => {
+        const { scheduler } = mount();
+        fireEvent.keyDown(globalThis.document, { key: " " });
+        expect(screen.getByText(m.rhythm_ready())).toBeTruthy();
+        start();
+        await advanceScheduler(scheduler, UNTIL_START + ONSETS.at(-1)! + 2500);
+        fireEvent.keyDown(globalThis.document, { key: " " });
+        expect(screen.getByText(m.rhythm_verdict_off())).toBeTruthy();
+    });
 });

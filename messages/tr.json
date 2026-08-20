@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "Yedi akorun tümünü kaydet",
     "tools_circle_sheet_title": "{key} tonundaki akorlar",
     "rhythm_title": "Ritim",
-    "rhythm_intro": "Bulunacak nota yok — sadece ne zaman. Satırı oku, girişi saymasına izin ver ve istediğin şeyle vur: bir piyano, klavye tuşların ya da düğme.",
+    "rhythm_intro": "Bulunacak nota yok — sadece ne zaman. Satırı oku, girişi saymasına izin ver ve istediğin şeyle vur: boşluk tuşu, bir piyano ya da düğme.",
     "rhythm_level_label": "Seviye",
     "rhythm_level_help": "Her basamak bir öncekine tek bir fikir ekler.",
     "rhythm_tempo": "Tempo",

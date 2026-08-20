@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "일곱 화음 모두 저장",
     "tools_circle_sheet_title": "{key} 조성의 화음",
     "rhythm_title": "리듬",
-    "rhythm_intro": "찾을 음은 없습니다 — 오직 언제인가만. 줄을 읽고, 카운트에 맞춰, 무엇으로든 두드려 보세요. 피아노든, 컴퓨터 키든, 이 버튼이든.",
+    "rhythm_intro": "찾을 음은 없습니다 — 오직 언제인가만. 줄을 읽고, 카운트에 맞춰, 무엇으로든 두드려 보세요. 스페이스 바든, 피아노든, 이 버튼이든.",
     "rhythm_level_label": "단계",
     "rhythm_level_help": "각 단계는 앞 단계에 한 가지만 더합니다.",
     "rhythm_tempo": "템포",

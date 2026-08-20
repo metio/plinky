@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "Guardar los siete acordes",
     "tools_circle_sheet_title": "Acordes en {key}",
     "rhythm_title": "Ritmo",
-    "rhythm_intro": "Ninguna nota que encontrar, solo el cuándo. Lee la línea, deja que te cuente la entrada y tócala con lo que quieras: un piano, las teclas del ordenador o el botón.",
+    "rhythm_intro": "Ninguna nota que encontrar, solo el cuándo. Lee la línea, deja que te cuente la entrada y tócala con lo que quieras: la barra espaciadora, un piano o el botón.",
     "rhythm_level_label": "Nivel",
     "rhythm_level_help": "Cada paso añade una idea al anterior.",
     "rhythm_tempo": "Tempo",

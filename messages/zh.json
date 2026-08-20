@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "保存全部七个和弦",
     "tools_circle_sheet_title": "{key}调的和弦",
     "rhythm_title": "节奏",
-    "rhythm_intro": "没有音要找——只有什么时候。读这一行，让它帮你数拍，然后用任何东西敲回来：钢琴、电脑按键，或者这个按钮。",
+    "rhythm_intro": "没有音要找——只有什么时候。读这一行，让它帮你数拍，然后用任何东西敲回来：空格键、钢琴，或者这个按钮。",
     "rhythm_level_label": "级别",
     "rhythm_level_help": "每一级只在上一级之上加一样东西。",
     "rhythm_tempo": "速度",

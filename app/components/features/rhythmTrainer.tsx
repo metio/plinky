@@ -170,6 +170,33 @@ export function RhythmTrainer({
         onNoteOn: (event) => tap(isPreciseInput(event.device)),
     });
 
+    // The space bar is the tap key, because it is the one a hand already resting on a
+    // desk will find. Two things make it need handling here rather than falling out of
+    // the button: the button that started the run still holds focus, so a space would
+    // press *it* and restart the attempt half-way through — the exact thing somebody
+    // reaching for the obvious key would hit; and a space scrolls the page. Both are
+    // stopped. Held keys repeat at the system's rate, which would machine-gun taps, so a
+    // repeat is not a tap — a rhythm is tapped, not leaned on.
+    //
+    // Piano keys are not handled here. They already arrive as notes through the funnel
+    // above, and catching them twice would count every tap twice.
+    useEffect(() => {
+        if (phase !== "counting" && phase !== "running") {
+            return;
+        }
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== " " && event.key !== "Enter") {
+                return;
+            }
+            event.preventDefault();
+            if (!event.repeat) {
+                tap(false);
+            }
+        };
+        globalThis.addEventListener("keydown", onKeyDown);
+        return () => globalThis.removeEventListener("keydown", onKeyDown);
+    }, [phase, tap]);
+
     // The cursor, one frame at a time. It reads the clock rather than counting frames, so
     // a dropped frame moves it late instead of moving it wrong.
     useEffect(() => {
@@ -203,7 +230,7 @@ export function RhythmTrainer({
     return (
         <div className="space-y-4">
             <div
-                className="overflow-x-auto text-ink"
+                className="text-ink"
                 // The drawing is markup this component owns end to end: it is built by a
                 // pure core function from a pattern this component generated, and no part
                 // of it comes from anything a reader could supply.

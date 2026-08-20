@@ -1238,7 +1238,7 @@
     "tools_circle_save_chords": "7つの和音をまとめて保存",
     "tools_circle_sheet_title": "{key}の和音",
     "rhythm_title": "リズム",
-    "rhythm_intro": "探す音はありません。あるのは「いつ」だけ。行を読み、カウントに合わせて、何ででも叩き返してください。ピアノでも、パソコンのキーでも、このボタンでも。",
+    "rhythm_intro": "探す音はありません。あるのは「いつ」だけ。行を読み、カウントに合わせて、何ででも叩き返してください。スペースキーでも、ピアノでも、このボタンでも。",
     "rhythm_level_label": "レベル",
     "rhythm_level_help": "各段は前の段に考えをひとつだけ足します。",
     "rhythm_tempo": "テンポ",
