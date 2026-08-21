@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Quanto è stato uniforme il tuo tocco. Mostrato solo se il tuo strumento distingue il piano dal forte.",
     "scores_explain_expression": "Quanto hai seguito i segni scritti sulla partitura: gli staccati, gli accenti, i forti e i piani.",
     "scores_explain_letter": "La lettera è la media di precisione, tempo e scorrevolezza. Dinamica ed espressione sono da leggere, non da valutare.",
-    "perf_legend_dots": "Colore del punto = tempo: verde sul battito, ambra vicino, rosso fuori"
+    "perf_legend_dots": "Colore del punto = tempo: verde sul battito, ambra vicino, rosso fuori",
+    "score_redrawing": "Ridisegno dello spartito"
 }

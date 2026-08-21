@@ -8,7 +8,7 @@ import { stripBeams } from "../../core/beams";
 import { BOOMWHACKER_SET } from "../../core/pitchColor";
 import type { MeasureBox } from "../../core/scoreCanvas";
 import { transposeMusicXml } from "../../core/transpose";
-import { usePrefsStore, useXmlCodec } from "../contexts/services";
+import { usePrefsStore, useScheduler, useXmlCodec } from "../contexts/services";
 import { annotateFingerings } from "../lib/fingerScore";
 import { collectMeasureBoxes, restoreNotePaint, snapshotNotePaint } from "../lib/scoreColor";
 import { seekToWhole } from "../lib/scoreCursor";
@@ -49,6 +49,9 @@ export type OsmdScore = {
     // Bumped after every successful render (a reload or an in-place fingering redraw), so
     // an overlay that OSMD's fresh SVG drops — the loop selection — can be repainted.
     renderVersion: number;
+    // True while a reading toggle's redraw is pending or running. The control that flipped
+    // shows its new position immediately and says the sheet is catching up.
+    redrawing: boolean;
 };
 
 // How the noteheads are coloured, as the options OSMD wants — one definition, so the fresh
@@ -152,6 +155,11 @@ export function useOsmdScore(
     const colorNotesRef = useRef(colorNotes);
     colorNotesRef.current = colorNotes;
     const [ready, setReady] = useState(false);
+    // Whether an in-place redraw is under way. A reading toggle changes what is drawn, and
+    // redrawing a long piece takes long enough to notice — so the switch reports its new
+    // position at once and this says the sheet is catching up, rather than the switch
+    // appearing not to have registered the press.
+    const [redrawing, setRedrawing] = useState(false);
     const [loadError, setLoadError] = useState(false);
     const [staffCount, setStaffCount] = useState(1);
     const [measureCount, setMeasureCount] = useState(1);
@@ -176,6 +184,11 @@ export function useOsmdScore(
     onReloadRef.current = onReload;
     const onRenderedRef = useRef(onRendered);
     onRenderedRef.current = onRendered;
+    // Read from a ref so asking for a frame never re-creates the redraw callback, which
+    // every reading toggle depends on being stable.
+    const scheduler = useScheduler();
+    const schedulerRef = useRef(scheduler);
+    schedulerRef.current = scheduler;
     const onFingeringRedrawRef = useRef(onFingeringRedraw);
     onFingeringRedrawRef.current = onFingeringRedraw;
 
@@ -398,26 +411,10 @@ export function useOsmdScore(
     // the labels are created afresh per the rule — all when on, none when off. The reload
     // effect sets the rule to the live toggle on every fresh render, so this acts only on a
     // real change and never fires a redundant rebuild straight after a reload.
-    // Redraw the sheet WITHOUT re-parsing it, for a setting that changes only how the music
-    // is drawn rather than what it contains.
-    //
-    // Re-parsing is the expensive path and the disruptive one: it clears the sheet, which
-    // collapses the score box, which on the piece's own page jumps the reader's scroll
-    // position to somewhere else entirely. It also throws away the run in progress. So a
-    // rule that only affects drawing is applied to the loaded sheet and the graphic model
-    // rebuilt around it — which does mean carrying the state a fresh render drops.
-    const redrawInPlace = useCallback(
-        (apply: () => void) => {
-            const osmd = osmdRef.current;
-            // `ready` is the value from THIS render, and a reload beginning in the same
-            // commit has already cleared the sheet in its cleanup — so it can still read
-            // true over an OSMD with nothing in it, and updateGraphic() below would walk
-            // undefined staves. Nothing is lost by standing down: the reload applies every
-            // one of these rules itself, from a ref, so the value in force is the live one
-            // either way.
-            if (!osmd || !ready || !osmd.Sheet) {
-                return;
-            }
+    // The redraw itself, once the browser has had its frame to paint the control that
+    // asked for it.
+    const drawNow = useCallback(
+        (osmd: OpenSheetMusicDisplay, apply: () => void) => {
             apply();
             // Remember where the cursor stands and whether a run or Listen is driving it, so
             // it resumes on the same note: updateGraphic() re-initialises it to the start.
@@ -447,7 +444,46 @@ export function useOsmdScore(
             }
             setRenderVersion((version) => version + 1);
         },
-        [ready, centerCursor, containerRef],
+        [centerCursor, containerRef],
+    );
+
+    // Redraw the sheet WITHOUT re-parsing it, for a setting that changes only how the music
+    // is drawn rather than what it contains.
+    //
+    // Re-parsing is the expensive path and the disruptive one: it clears the sheet, which
+    // collapses the score box, which on the piece's own page jumps the reader's scroll
+    // position to somewhere else entirely. It also throws away the run in progress. So a
+    // rule that only affects drawing is applied to the loaded sheet and the graphic model
+    // rebuilt around it — which does mean carrying the state a fresh render drops.
+    const redrawInPlace = useCallback(
+        (apply: () => void) => {
+            const osmd = osmdRef.current;
+            // `ready` is the value from THIS render, and a reload beginning in the same
+            // commit has already cleared the sheet in its cleanup — so it can still read
+            // true over an OSMD with nothing in it, and updateGraphic() below would walk
+            // undefined staves. Nothing is lost by standing down: the reload applies every
+            // one of these rules itself, from a ref, so the value in force is the live one
+            // either way.
+            if (!osmd || !ready || !osmd.Sheet) {
+                return;
+            }
+            // Hand the browser a frame before the heavy part. React has already committed the
+            // switch's new position, but a synchronous updateGraphic()/render() here runs
+            // before that commit is ever painted — so the switch would sit visibly unmoved
+            // for the whole redraw, which reads as a press that did not land.
+            setRedrawing(true);
+            schedulerRef.current.frame(() => {
+                // The sheet can go away between the frame being asked for and it arriving —
+                // a reload, or the page leaving. Both reapply every rule themselves.
+                if (osmdRef.current !== osmd || !osmd.Sheet) {
+                    setRedrawing(false);
+                    return;
+                }
+                drawNow(osmd, apply);
+                setRedrawing(false);
+            });
+        },
+        [ready, drawNow],
     );
 
     // The on-staff fingering. The numbers are always baked into the loaded sheet; flipping
@@ -497,5 +533,6 @@ export function useOsmdScore(
         resetPaint,
         wipePaint,
         renderVersion,
+        redrawing,
     };
 }

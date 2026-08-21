@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Hvor jevnt du anslo. Vises bare hvis instrumentet ditt skiller mykt fra hardt.",
     "scores_explain_expression": "Hvor nøye du fulgte tegnene i notene — staccatoene, aksentene, det sterke og det svake.",
     "scores_explain_letter": "Bokstaven er snittet av presisjon, timing og flyt. Dynamikk og uttrykk er der for å leses, ikke for å vurdere.",
-    "perf_legend_dots": "Prikkfarge = timing: grønn på slaget, ravgul nær, rød ved siden av"
+    "perf_legend_dots": "Prikkfarge = timing: grønn på slaget, ravgul nær, rød ved siden av",
+    "score_redrawing": "Notene tegnes på nytt"
 }

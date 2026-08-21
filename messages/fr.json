@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "À quel point ton toucher a été régulier. Affiché seulement si ton instrument distingue le doux du fort.",
     "scores_explain_expression": "À quel point tu as suivi les indications de la partition — staccatos, accents, forts et doux.",
     "scores_explain_letter": "La lettre est la moyenne de justesse, tempo et fluidité. Nuances et expression sont là pour être lues, pas pour noter.",
-    "perf_legend_dots": "Couleur du point = tempo : vert sur le temps, ambre presque, rouge à côté"
+    "perf_legend_dots": "Couleur du point = tempo : vert sur le temps, ambre presque, rouge à côté",
+    "score_redrawing": "Partition en cours de redessin"
 }

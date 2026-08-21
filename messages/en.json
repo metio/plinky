@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "How evenly you struck the notes. Only shown when what you played on can tell a soft touch from a hard one.",
     "scores_explain_expression": "How closely you followed the marks the score writes — the staccatos, the accents, the louds and softs.",
     "scores_explain_letter": "The letter is accuracy, timing and flow averaged. Dynamics and expression are here to read, not to grade.",
-    "perf_legend_dots": "Dot colour = timing: green on the beat, amber close, red out"
+    "perf_legend_dots": "Dot colour = timing: green on the beat, amber close, red out",
+    "score_redrawing": "Redrawing the sheet"
 }

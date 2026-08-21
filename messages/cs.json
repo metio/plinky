@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Jak rovnoměrně jsi hrál. Zobrazí se jen tehdy, když tvůj nástroj rozezná tiché od hlasitého.",
     "scores_explain_expression": "Jak přesně jsi sledoval značky v notách — staccata, akcenty, silné a slabé.",
     "scores_explain_letter": "Písmeno je průměr přesnosti, rytmu a plynulosti. Dynamika a výraz jsou ke čtení, ne k hodnocení.",
-    "perf_legend_dots": "Barva tečky = rytmus: zelená na dobu, jantarová blízko, červená mimo"
+    "perf_legend_dots": "Barva tečky = rytmus: zelená na dobu, jantarová blízko, červená mimo",
+    "score_redrawing": "Překreslování not"
 }

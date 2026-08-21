@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The finger-numbers switch moves the moment you press it.** It used to wait for the
+whole sheet to be redrawn before it looked pressed, which on a long piece was long
+enough to think the press had missed — and pressing again put it straight back. It now
+flips at once, with a small spinner beside it while the sheet catches up.
+
 **The scores now say what they measure.** Under the numbers at the end of a run there
 is a line you can open that explains each one — what accuracy, timing, flow, dynamics
 and expression are actually reading, and where the letter comes from.

@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Qué tan parejo fue tu pulsación. Solo se muestra si tu instrumento distingue lo suave de lo fuerte.",
     "scores_explain_expression": "Qué tan de cerca seguiste lo que marca la partitura: los staccatos, los acentos, los fuertes y los suaves.",
     "scores_explain_letter": "La letra promedia precisión, tiempo y fluidez. Dinámica y expresión están para leerse, no para calificar.",
-    "perf_legend_dots": "Color del punto = tiempo: verde en el pulso, ámbar cerca, rojo fuera"
+    "perf_legend_dots": "Color del punto = tiempo: verde en el pulso, ámbar cerca, rojo fuera",
+    "score_redrawing": "Redibujando la partitura"
 }

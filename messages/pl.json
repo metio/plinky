@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Jak równo uderzałeś. Pokazywane tylko wtedy, gdy twój instrument odróżnia ciche od głośnego.",
     "scores_explain_expression": "Jak dokładnie trzymałeś się znaków w nutach — staccata, akcentów, głośno i cicho.",
     "scores_explain_letter": "Litera to średnia z celności, rytmu i płynności. Dynamika i wyraz są do czytania, nie do oceny.",
-    "perf_legend_dots": "Kolor kropki = rytm: zielony na miarę, bursztynowy blisko, czerwony obok"
+    "perf_legend_dots": "Kolor kropki = rytm: zielony na miarę, bursztynowy blisko, czerwony obok",
+    "score_redrawing": "Przerysowywanie nut"
 }
