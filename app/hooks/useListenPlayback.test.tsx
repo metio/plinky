@@ -130,6 +130,7 @@ describe("collectListenSteps", () => {
                     accent: false,
                     marcato: false,
                     slurred: false,
+                    hand: "right",
                 },
             ],
             dynamicVolume: null,
@@ -323,5 +324,25 @@ describe("useListenPlayback", () => {
 
         expect(result.current.playing).toBe(true);
         expect(playNote).toHaveBeenCalledTimes(1);
+    });
+
+    it("says which notes are sounding, and in which hand", async () => {
+        // What the on-screen keyboard lights while Listen demonstrates a piece. "Now" is a
+        // fact only this clock knows — not the position the cursor is drawn on (an ornament
+        // leaves it where it is) and not the one the matcher last saw before standing down.
+        const osmd = fakeOsmd(2);
+        const { result } = mount(osmd);
+
+        expect(result.current.sounding.size).toBe(0);
+        act(() => result.current.start(0));
+        expect([...result.current.sounding]).toEqual([[60, "right"]]);
+
+        act(() => void vi.advanceTimersByTime(500));
+        expect(result.current.sounding.size).toBe(1);
+
+        // Stopping puts the keys out; leaving the last chord lit for ever is worse than
+        // never having lit it.
+        act(() => result.current.stop());
+        expect(result.current.sounding.size).toBe(0);
     });
 });

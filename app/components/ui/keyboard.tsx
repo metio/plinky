@@ -58,6 +58,7 @@ function keyLabel(note: number, labels: NoteLabels): string | null {
 }
 
 const NONE: ReadonlySet<number> = new Set();
+const NO_SOUNDING: ReadonlyMap<number, "left" | "right"> = new Map();
 const NO_HOLDS: ReadonlyMap<number, number> = new Map();
 
 // The shrinking fill that shows how long a just-played note is meant to be held:
@@ -85,6 +86,7 @@ export function Keyboard({
     from,
     to,
     lit = NONE,
+    sounding = NO_SOUNDING,
     expected = [],
     wrong = null,
     rise = false,
@@ -100,6 +102,15 @@ export function Keyboard({
     from: number;
     to: number;
     lit?: ReadonlySet<number>;
+    // Notes the app itself is sounding right now, each with the hand that plays it — what
+    // Listen lights while it demonstrates the piece.
+    //
+    // These colours mean HAND here, where everywhere else on this keyboard a colour means
+    // state (play this / you played it / that was wrong). Overloading them is deliberate
+    // and safe because listening is a mode of its own: nothing is being asked of the
+    // player, so there is no state to confuse it with — and it is the same teal and indigo
+    // the notes highway uses for the same two hands.
+    sounding?: ReadonlyMap<number, "left" | "right">;
     expected?: number[];
     // How much of each just-played note's written length remains (1 at the strike,
     // 0 at its release), keyed by note — drives the shrinking hold-duration fill.
@@ -440,9 +451,15 @@ export function Keyboard({
             ? "bg-danger-fill"
             : lit.has(note)
               ? "translate-y-0.5 bg-success-fill shadow-[0_0_14px_-3px] shadow-key-held"
-              : expected.includes(note)
-                ? "bg-accent-surface"
-                : theme.white;
+              : // A key the player is holding wins over one the app is sounding: their own
+                // hands are the more urgent fact on the instrument in front of them.
+                sounding.get(note) === "left"
+                ? "bg-hand-left-soft"
+                : sounding.get(note) === "right"
+                  ? "bg-hand-right-soft"
+                  : expected.includes(note)
+                    ? "bg-accent-surface"
+                    : theme.white;
     // An expected black key is ringed, not repainted. Filling it with the next-note colour
     // stops it being a black key — fine mid-piece, where the key is pointed at rather than
     // named, and wrong in the first lesson of all, which says "press any black key" over a
@@ -452,16 +469,25 @@ export function Keyboard({
             ? "bg-danger"
             : lit.has(note)
               ? "translate-y-0.5 bg-key-held shadow-[0_0_14px_-3px] shadow-key-held"
-              : expected.includes(note)
-                ? `${theme.black} ring-2 ring-inset ring-key-next`
-                : theme.black;
+              : // A sounding black key IS filled, unlike an expected one: the reason an
+                // expected black key is only ringed is that "press any black key" must
+                // still read as black, and nothing is being asked for here.
+                sounding.get(note) === "left"
+                ? "bg-hand-left"
+                : sounding.get(note) === "right"
+                  ? "bg-hand-right"
+                  : expected.includes(note)
+                    ? `${theme.black} ring-2 ring-inset ring-key-next`
+                    : theme.black;
     // A black key's name is pale because the key is nearly black — but every state that
     // means something (wrong, held, play this) fills it with a bright colour, and pale
     // grey on those is well under the contrast floor. The name follows the fill.
     const blackLabel = (note: number) =>
         // The expected key keeps its black fill now, so its name keeps the pale ink that
         // reads on black; only the states that flood the key with colour change it.
-        flash?.note === note || lit.has(note) ? "text-key-ink" : "text-key-black-ink";
+        flash?.note === note || lit.has(note) || sounding.has(note)
+            ? "text-key-ink"
+            : "text-key-black-ink";
 
     // The wrong note, spoken into a live region so a screen-reader player hears the miss
     // that the red flash only shows sighted players.

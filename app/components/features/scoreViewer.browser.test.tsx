@@ -674,10 +674,10 @@ describe("ScoreViewer", () => {
         expect(await screen.findByText("Run saved", undefined, { timeout: 30000 })).toBeTruthy();
     });
 
-    it("enters full screen to play even on a large screen, where Listen lives", async () => {
+    it("enters full screen to play even on a large screen", async () => {
         // Force a roomy desktop viewport (no media query matches), the case that used to
-        // stay inline. The play surface holds Listen and the in-play toggles, so a large
-        // screen enters full screen to play just as a phone does.
+        // stay inline. The play surface holds the in-play toggles, so a large screen enters
+        // full screen to play just as a phone does.
         vi.stubGlobal("matchMedia", (query: string) => ({
             matches: false,
             addEventListener: () => {},
@@ -691,15 +691,41 @@ describe("ScoreViewer", () => {
         );
         mount(phrase, { beatsPerBar: 4 });
         await awaitReady();
-        // At rest the /play view is a single action: Listen is not inline, it waits in the
-        // full-screen top bar, and there's no exit control until play begins.
-        expect(screen.queryByRole("button", { name: "Listen" })).toBeNull();
+        // At rest the /play view offers Practice and Listen — the piece's front door, and
+        // the ordinary question of what it sounds like — but nothing to exit, because
+        // nothing has been entered.
+        expect(screen.getByRole("button", { name: "Listen" })).toBeTruthy();
         expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
-        // Practice enters full screen on the large screen too, surfacing the exit control
-        // and Listen alongside it.
+        // Practice enters full screen on the large screen too, surfacing the exit control.
         fireEvent.click(screen.getByRole("button", { name: "Practice" }));
         expect(await screen.findByRole("button", { name: "Exit full screen" })).toBeTruthy();
         expect(screen.getByRole("button", { name: "Listen" })).toBeTruthy();
+        reqFs.mockRestore();
+    });
+
+    it("listens from the page without opening full screen", async () => {
+        // The point of having Listen inline at all. It answers "what does this sound like?"
+        // — a question asked BEFORE committing to the playing surface, so answering it by
+        // throwing the reader into full screen would answer a different one.
+        const reqFs = vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase, { beatsPerBar: 4 });
+        await awaitReady();
+
+        fireEvent.click(screen.getByRole("button", { name: "Listen" }));
+        await expect
+            .poll(
+                () => screen.getByRole("button", { name: "Listen" }).getAttribute("aria-pressed"),
+                { timeout: 30000 },
+            )
+            .toBe("true");
+        // Playing, and still on the page: nothing asked the browser for full screen, and
+        // there is nothing to exit.
+        expect(reqFs).not.toHaveBeenCalled();
+        expect(screen.queryByRole("button", { name: "Exit full screen" })).toBeNull();
         reqFs.mockRestore();
     });
 

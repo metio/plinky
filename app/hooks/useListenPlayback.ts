@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { type Hand2, handOfStaff } from "../../core/matcher";
 import { interpretedWeight } from "../../core/interpretation";
 import { octaveShiftAt } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
@@ -20,6 +21,7 @@ import {
     playOrder,
     readArpeggio,
     readOrnament,
+    readParts,
     readScoreExpression,
     readStartTempo,
     readTempo,
@@ -49,6 +51,9 @@ type ListenNote = {
     accent: boolean;
     marcato: boolean;
     slurred: boolean;
+    // Which hand plays it, from the staff the engraving puts it on. The keyboard lights a
+    // sounding note in that hand's colour, so a listener can see the two parts move.
+    hand: Hand2;
 };
 
 // One position on the listening timeline, in cursor order — collected once when
@@ -103,6 +108,9 @@ export function collectListenSteps(
     const slurs = marks.slurs;
     // Which notes an ornament reaches for depends on the key it is written in.
     const fifths = marks.fifths;
+    // Which staves belong to the practised instrument — on an art song the piano is staves
+    // 1 and 2 and the singer is staff 0, so a hand cannot be read off the raw staff index.
+    const parts = readParts(osmd);
     // Where the score prints 8va, the drawn pitch is deliberately not the played one.
     const shifts = marks.octaveShifts;
     cursor.reset();
@@ -142,6 +150,7 @@ export function collectListenSteps(
                         // two end notes only, so a note in the middle of an arch reports
                         // none of its own and would play detached.
                         slurred: slurredOnwardAt(slurs, whole),
+                        hand: handOfStaff(note.ParentStaff?.idInMusicSheet, parts),
                     });
                 }
                 // Rests count too, so a written gap dwells its own length — the cursor
@@ -247,6 +256,10 @@ function rollChord(step: ListenStep): ListenStep[] {
     }));
 }
 
+// One shared empty map rather than a fresh one per silent position: the keyboard re-renders
+// on identity, and a new empty map every beat would repaint it for nothing.
+const NOTHING_SOUNDING: ReadonlyMap<number, Hand2> = new Map();
+
 // The listening transport: one cursor walk, one clock, one stop — driven either
 // by the score (Listen: sound each voice-entry and dwell its notated length at
 // the chosen tempo) or by a saved take (replay the recorded performance note for
@@ -307,6 +320,11 @@ export function useListenPlayback({
     const marksRef = useRef(marks);
     marksRef.current = marks;
     const [playing, setPlaying] = useState(false);
+    // Which notes are sounding at this moment, and in which hand — the on-screen keyboard
+    // lights them. Not derived from the step model by the surface, because "now" is a fact
+    // only this clock knows: the position being sounded, not the one the cursor is drawn on
+    // (an ornament leaves the cursor where it is) and not the one the matcher last saw.
+    const [sounding, setSounding] = useState<ReadonlyMap<number, Hand2>>(NOTHING_SOUNDING);
     // The take currently replaying, for the takes list to mark.
     const [activeReplayId, setActiveReplayId] = useState<string | null>(null);
     // Tracks playback synchronously, so a second click that lands before the
@@ -336,6 +354,7 @@ export function useListenPlayback({
             restoreNotes(highlightRef.current);
         }
         modeRef.current = null;
+        setSounding(NOTHING_SOUNDING);
         highlightRef.current = [];
         if (!isPracticing()) {
             getOsmd()?.cursor?.hide();
@@ -415,6 +434,11 @@ export function useListenPlayback({
             }
             const current = steps[step]!;
             onPosition?.(current.whole);
+            setSounding(
+                current.notes.length === 0
+                    ? NOTHING_SOUNDING
+                    : new Map(current.notes.map((note) => [note.pitch, note.hand])),
+            );
             // Light the notes now sounding so the eye can follow the music, leaving a
             // blue trail on the ones just heard — the cursor box alone is easy to lose,
             // and the trail records which stretches the computer played once it moves on.
@@ -503,5 +527,5 @@ export function useListenPlayback({
         tick();
     };
 
-    return { playing, activeReplayId, active, start, replay, stop };
+    return { playing, activeReplayId, active, start, replay, stop, sounding };
 }
