@@ -158,4 +158,36 @@ describe("notes-highway reading mode", () => {
             })
             .toBeGreaterThan(0);
     });
+    it("keeps the highway up when Listen is stopped again", async () => {
+        // Reported after the first fix: pressing Listen kept the highway, and pressing it
+        // again to stop threw it away. Nothing is moving at that moment — but the player is
+        // still in full screen, mid-session, and the reading mode they chose should not
+        // keep being handed back to them.
+        testPrefsStore.save({ ...testPrefsStore.load(), highway: true });
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase);
+        const practice = await screen.findByRole(
+            "button",
+            { name: "Practice" },
+            { timeout: 30000 },
+        );
+        await expect
+            .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
+            .toBe(false);
+        fireEvent.click(practice);
+        expect(await screen.findByLabelText(m.highway_label())).toBeTruthy();
+
+        const listen = await screen.findByRole("button", { name: "Listen" });
+        fireEvent.click(listen);
+        expect(await screen.findByLabelText(m.highway_label())).toBeTruthy();
+
+        // …and off again.
+        fireEvent.click(await screen.findByRole("button", { name: "Listen" }));
+        expect(await screen.findByLabelText(m.highway_label())).toBeTruthy();
+    });
 });
