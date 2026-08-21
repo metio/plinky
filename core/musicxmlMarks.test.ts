@@ -1,0 +1,157 @@
+// SPDX-FileCopyrightText: The Plinky Authors
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @vitest-environment jsdom
+
+import { describe, expect, it } from "vitest";
+import { readDirections, readFifths, slurSpans } from "./musicxmlMarks";
+import { readTimeline } from "./musicxmlTimeline";
+import { octaveShiftAt } from "./octaveShift";
+import { pedalledAt } from "./pedal";
+import { slurredOnwardAt } from "./slur";
+
+const parse = (xml: string): Document => new DOMParser().parseFromString(xml, "application/xml");
+
+const score = (measures: string, fifths = 0) =>
+    parse(`<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1"><part-list><score-part id="P1"><part-name>P</part-name></score-part></part-list>
+<part id="P1">${measures.replace("FIFTHS", String(fifths))}</part></score-partwise>`);
+
+const ATTR = `<attributes><divisions>4</divisions><key><fifths>FIFTHS</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time></attributes>`;
+
+const note = (step: string, ticks: number, extra = "") =>
+    `<note>${extra}<pitch><step>${step}</step><octave>4</octave></pitch><duration>${ticks}</duration></note>`;
+
+const direction = (inner: string) =>
+    `<direction><direction-type>${inner}</direction-type></direction>`;
+
+const read = (measures: string, fifths = 0) => {
+    const doc = score(measures, fifths);
+    const timeline = readTimeline(doc);
+    return { doc, timeline, ...readDirections(doc, timeline) };
+};
+
+describe("the marks that cover a stretch of music", () => {
+    it("pairs an arch from its start note to its last", () => {
+        const { timeline } = read(
+            `<measure number="1">${ATTR}${note("C", 4, '<notations><slur number="1" type="start"/></notations>')}${note("D", 4)}${note("E", 4, '<notations><slur number="1" type="stop"/></notations>')}${note("F", 4)}</measure>`,
+        );
+        const spans = slurSpans(timeline.notes);
+        expect(spans).toEqual([{ from: 0, to: 0.5 }]);
+        // Every note under the arch is joined onward except its last.
+        expect([0, 0.25, 0.5, 0.75].map((at) => slurredOnwardAt(spans, at))).toEqual([
+            true,
+            true,
+            false,
+            false,
+        ]);
+    });
+
+    it("keeps two overlapping arches apart by their numbers", () => {
+        // One per hand, or a phrase inside a phrase. Paired by order rather than by number
+        // they would close each other and both come out wrong.
+        const { timeline } = read(
+            `<measure number="1">${ATTR}${note("C", 4, '<notations><slur number="1" type="start"/></notations>')}${note("D", 4, '<notations><slur number="2" type="start"/></notations>')}${note("E", 4, '<notations><slur number="1" type="stop"/></notations>')}${note("F", 4, '<notations><slur number="2" type="stop"/></notations>')}</measure>`,
+        );
+        expect(slurSpans(timeline.notes)).toEqual([
+            { from: 0, to: 0.5 },
+            { from: 0.25, to: 0.75 },
+        ]);
+    });
+
+    it("runs an arch nobody closed to the last note it opened over", () => {
+        const { timeline } = read(
+            `<measure number="1">${ATTR}${note("C", 4, '<notations><slur number="1" type="start"/></notations>')}${note("D", 4)}</measure>`,
+        );
+        expect(slurSpans(timeline.notes)).toEqual([{ from: 0, to: 0.25 }]);
+    });
+
+    it("reads each written dynamic as a loudness at the place it is written", () => {
+        const { dynamics } = read(
+            `<measure number="1">${ATTR}${direction("<dynamics><mf/></dynamics>")}${note("C", 8)}${direction("<dynamics><ff/></dynamics>")}${note("D", 8)}</measure>`,
+        );
+        expect(dynamics.map((one) => [one.whole, one.volume])).toEqual([
+            [0, 80],
+            [0.5, 112],
+        ]);
+    });
+
+    it("marks a hairpin as a slide rather than a step", () => {
+        const { dynamics } = read(
+            `<measure number="1">${ATTR}${direction('<wedge type="crescendo"/>')}${note("C", 16)}</measure>`,
+        );
+        expect(dynamics[0]?.ramp).toBe(true);
+    });
+
+    it("reads the pedal down and up", () => {
+        const { pedals } = read(
+            `<measure number="1">${ATTR}${direction('<pedal type="start"/>')}${note("C", 8)}${note("D", 8)}${direction('<pedal type="stop"/>')}</measure>`,
+        );
+        expect(pedals).toEqual([{ from: 0, to: 1 }]);
+        expect(pedalledAt(pedals, 0.5)).toBe(true);
+        expect(pedalledAt(pedals, 1)).toBe(false);
+    });
+
+    it("treats a pedal change as a lift and a press on the spot", () => {
+        // What clears the old harmony. Read as a plain start it would pool the whole
+        // passage into one wash.
+        const { pedals } = read(
+            `<measure number="1">${ATTR}${direction('<pedal type="start"/>')}${note("C", 8)}${direction('<pedal type="change"/>')}${note("D", 8)}${direction('<pedal type="stop"/>')}</measure>`,
+        );
+        expect(pedals).toEqual([
+            { from: 0, to: 0.5 },
+            { from: 0.5, to: 1 },
+        ]);
+    });
+
+    it("carries a pedal nobody lifted to the end of the music", () => {
+        const { pedals } = read(
+            `<measure number="1">${ATTR}${direction('<pedal type="start"/>')}${note("C", 16)}</measure>`,
+        );
+        expect(pedals).toHaveLength(1);
+        expect(pedals[0]?.to).toBeGreaterThanOrEqual(pedals[0]?.from ?? 0);
+    });
+
+    it("reads an octave line, up and down and at both sizes", () => {
+        const up = read(
+            `<measure number="1">${ATTR}${direction('<octave-shift type="up" size="8"/>')}${note("C", 8)}${direction('<octave-shift type="stop" size="8"/>')}${note("D", 8)}</measure>`,
+        ).octaveShifts;
+        expect(octaveShiftAt(up, 0)).toBe(12);
+        expect(octaveShiftAt(up, 0.75)).toBe(0);
+
+        const down = read(
+            `<measure number="1">${ATTR}${direction('<octave-shift type="down" size="8"/>')}${note("C", 16)}</measure>`,
+        ).octaveShifts;
+        expect(octaveShiftAt(down, 0)).toBe(-12);
+
+        const twoOctaves = read(
+            `<measure number="1">${ATTR}${direction('<octave-shift type="up" size="15"/>')}${note("C", 16)}</measure>`,
+        ).octaveShifts;
+        expect(octaveShiftAt(twoOctaves, 0)).toBe(24);
+    });
+
+    it("reads the key signature, and calls a score without one C major", () => {
+        expect(readFifths(score(`<measure number="1">${ATTR}</measure>`, 3))).toBe(3);
+        expect(readFifths(score(`<measure number="1">${ATTR}</measure>`, -3))).toBe(-3);
+        expect(readFifths(parse("<nonsense/>"))).toBe(0);
+    });
+
+    it("places a direction where the measure's cursor had reached, not at its barline", () => {
+        // A direction sits between the notes it applies from. Placing them all at the
+        // barline would make every dynamic in the piece arrive early.
+        const { dynamics } = read(
+            `<measure number="1">${ATTR}${note("C", 4)}${note("D", 4)}${direction("<dynamics><f/></dynamics>")}${note("E", 4)}</measure>`,
+        );
+        expect(dynamics[0]?.whole).toBe(0.5);
+    });
+
+    it("answers a document with no marks with empty lists rather than throwing", () => {
+        const { dynamics, pedals, octaveShifts } = read(
+            `<measure number="1">${ATTR}${note("C", 16)}</measure>`,
+        );
+        expect({ dynamics, pedals, octaveShifts }).toEqual({
+            dynamics: [],
+            pedals: [],
+            octaveShifts: [],
+        });
+    });
+});
