@@ -721,6 +721,19 @@ function usePlaySessionValue({
     // built here.
     previewRef.current = matcher.preview;
 
+    // Leaving the playing surface stops what the surface was playing.
+    //
+    // Closing full screen used only to close full screen: Listen and the play-along carried
+    // on underneath, sounding the piece with nothing on screen to stop them, and re-opening
+    // full screen dropped you back into a performance already in progress. A self-paced run
+    // is left alone — it makes no sound of its own and waits indefinitely, so there is
+    // nothing to interrupt.
+    const leavePlaySurface = useCallback(() => {
+        listenPlayback.stop();
+        keepUp.stop();
+        exitFullscreen();
+    }, [listenPlayback, keepUp, exitFullscreen]);
+
     // Re-centre the treadmill as the matcher advances through the piece — the cursor
     // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
     // biome-ignore lint/correctness/useExhaustiveDependencies: done/practicing are the advance signal, not centerCursor inputs
@@ -903,9 +916,13 @@ function usePlaySessionValue({
     // scoring only the practised hand, exactly as self-paced practice does.
     const playAlong = () => {
         const osmd = getOsmd();
-        if (!osmd || listenPlayback.active() || keepUp.active()) {
+        if (!osmd || keepUp.active()) {
             return;
         }
+        // Take over from Listen rather than refusing while it plays, exactly as the
+        // self-paced run does. Refusing made the button dead: press Listen, press Practice,
+        // and nothing at all happened — no run, no full screen, no reason given.
+        listenPlayback.stop();
         enterPlayFullscreen();
         matcher.stop();
         // Before the play-along takes the cursor over: collecting the lookahead walks it,
@@ -1069,6 +1086,7 @@ function usePlaySessionValue({
         fullscreen,
         compact,
         exitFullscreen,
+        leavePlaySurface,
         hideKeyboard,
         setHideKeyboard,
         fingerStrip,

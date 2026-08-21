@@ -239,4 +239,48 @@ describe("notes-highway reading mode", () => {
         const first = bottoms();
         await expect.poll(() => bottoms() !== first, { timeout: 30000, interval: 200 }).toBe(true);
     });
+    it("lets a tempo-locked run take over from Listen, rather than doing nothing", async () => {
+        // Reported. The self-paced run stops Listen and takes over; the play-along refused
+        // while Listen was active and returned in silence — so under "Keep up" the button
+        // was dead: press Listen, press Practice, and nothing happened at all. No run, no
+        // full screen, no reason given.
+        testPrefsStore.save({ ...testPrefsStore.load(), highway: true });
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 8, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase);
+        const practice = await screen.findByRole(
+            "button",
+            { name: "Practice" },
+            { timeout: 30000 },
+        );
+        await expect
+            .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
+            .toBe(false);
+        choose(m.run_pace_label(), m.keep_up_toggle());
+        fireEvent.click(practice);
+
+        // Stop the play-along and start Listen instead.
+        fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
+        const listen = await screen.findByRole("button", { name: "Listen" });
+        fireEvent.click(listen);
+        await expect
+            .poll(() => listen.getAttribute("aria-pressed"), { timeout: 30000 })
+            .toBe("true");
+
+        // Now Practice, which should take the piece over.
+        fireEvent.click(await screen.findByRole("button", { name: "Practice" }));
+        await expect
+            .poll(
+                () => screen.getByRole("button", { name: "Practice" }).getAttribute("aria-pressed"),
+                { timeout: 30000 },
+            )
+            .toBe("true");
+        expect(screen.getByRole("button", { name: "Listen" }).getAttribute("aria-pressed")).toBe(
+            "false",
+        );
+    });
 });

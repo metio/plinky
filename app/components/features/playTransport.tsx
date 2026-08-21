@@ -31,7 +31,7 @@ export function PlayTransport() {
         playAlong,
         fingerStrip,
         setFingerStrip,
-        exitFullscreen,
+        leavePlaySurface,
         tempo,
         setTempo,
         lockTempo,
@@ -134,7 +134,7 @@ export function PlayTransport() {
                     </ToggleIconButton>
                     <IconButton
                         variant="primary"
-                        onClick={exitFullscreen}
+                        onClick={leavePlaySurface}
                         label={m.action_exit_fullscreen()}
                         className="ml-auto"
                     >
