@@ -4,6 +4,7 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
 import { readDirections, readFifths, slurSpans } from "../../core/musicxmlMarks";
+import { performanceOrder, readMeasureRepeats } from "../../core/musicxmlRepeats";
 import { readTimeline } from "../../core/musicxmlTimeline";
 import {
     readKeyFifths,
@@ -246,6 +247,61 @@ describe("the file and the engraver agree about the marks", () => {
             }
             cursor.reset();
             expect(mine).toEqual(theirs);
+        });
+    });
+});
+
+describe("the file and the engraver agree about the order the music is played in", () => {
+    const whole = (step: string) =>
+        `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note>`;
+    const OPEN = `<attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>`;
+
+    // Pitches in performance order, from the file: the measures in the order they are
+    // played, each contributing its printed notes.
+    function playedThroughFile(xml: string): number[] {
+        const doc = new DOMParser().parseFromString(xml, "application/xml");
+        const timeline = readTimeline(doc);
+        return performanceOrder(readMeasureRepeats(doc)).flatMap((measure) =>
+            timeline.notes
+                .filter((one) => one.measure === measure && one.midi !== null && !one.grace)
+                .map((one) => one.midi as number),
+        );
+    }
+
+    const playedThroughOsmd = (osmd: OpenSheetMusicDisplay) =>
+        throughOsmd(osmd).flatMap(([, pitches]) => pitches);
+
+    it("takes a repeated section twice, exactly as the engraver walks it", () => {
+        const xml = score(
+            `<measure number="1">${OPEN}<barline location="left"><repeat direction="forward"/></barline>${whole("C")}</measure>` +
+                `<measure number="2">${whole("D")}<barline location="right"><repeat direction="backward"/></barline></measure>` +
+                `<measure number="3">${whole("E")}</measure>`,
+        );
+        return load(xml).then((osmd) => {
+            expect(playedThroughFile(xml)).toEqual(playedThroughOsmd(osmd));
+            // …and that is the C D C D E the engraver's own test pins.
+            expect(playedThroughFile(xml)).toEqual([60, 62, 60, 62, 64]);
+        });
+    });
+
+    it("plays the first-time bar once and the second-time bar once", () => {
+        const xml = score(
+            `<measure number="1">${OPEN}<barline location="left"><repeat direction="forward"/></barline>${whole("C")}</measure>` +
+                `<measure number="2">${whole("D")}</measure>` +
+                `<measure number="3"><barline location="left"><ending number="1" type="start"/></barline>${whole("E")}<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline></measure>` +
+                `<measure number="4"><barline location="left"><ending number="2" type="start"/></barline>${whole("F")}</measure>`,
+        );
+        return load(xml).then((osmd) => {
+            expect(playedThroughFile(xml)).toEqual(playedThroughOsmd(osmd));
+        });
+    });
+
+    it("plays a piece with no repeats straight through, both ways", () => {
+        const xml = score(
+            `<measure number="1">${OPEN}${whole("C")}</measure><measure number="2">${whole("D")}</measure>`,
+        );
+        return load(xml).then((osmd) => {
+            expect(playedThroughFile(xml)).toEqual(playedThroughOsmd(osmd));
         });
     });
 });
