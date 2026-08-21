@@ -4,6 +4,18 @@
 - date: 2026-08-22
   entries:
     - |-
+      **Closing the playing view stops the playing.** The ✕ used to close the view and leave
+      Listen or the play-along running underneath, sounding the piece with nothing on screen
+      to stop it. It stops now.
+    - |-
+      **Practice takes over from Listen at any pace.** With "Keep up" chosen, pressing
+      Practice while Listen was playing did nothing at all — no run, no reason given. It now
+      takes the piece over, the way it always did at your own pace.
+    - |-
+      **"Keep going" is gone from the tempo-locked pace, where it never meant anything.** A
+      run on the clock does not wait for you, so a missed note could never have stopped you
+      there — the switch had nothing to change.
+    - |-
       **The notes highway works when you play along to the beat.** Choosing "Keep up" for
       the pace used to leave the highway blank — it drew what was coming from the self-paced
       run, and playing along to the beat stands that run down, so there was nothing to draw.

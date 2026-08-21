@@ -159,13 +159,19 @@ function RunSetupPanel() {
                     no second try at a missed note. The switches showed the saved values
                     while the run ignored them; they read as unavailable now, and what
                     they show is what this run will actually do. */}
-                        <SwitchField
-                            label={m.forgiving_toggle()}
-                            checked={sightRead.on ? false : forgiving}
-                            onChange={setForgiving}
-                            help={m.forgiving_hint()}
-                            disabled={sightRead.on}
-                        />
+                        {/* Keeping going is what a tempo-locked run does by definition —
+                    the clock does not wait, so a missed note never stops you and the
+                    switch could not change anything. A control that cannot change
+                    anything should not be there to press. */}
+                        {!enforceTempo && (
+                            <SwitchField
+                                label={m.forgiving_toggle()}
+                                checked={sightRead.on ? false : forgiving}
+                                onChange={setForgiving}
+                                help={m.forgiving_hint()}
+                                disabled={sightRead.on}
+                            />
+                        )}
                         <SwitchField
                             label={m.action_metronome()}
                             checked={metronomeOn}
