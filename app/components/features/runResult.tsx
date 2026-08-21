@@ -3,12 +3,11 @@
 
 import type { Grade } from "../../../core/grade";
 import type { TempoCurve } from "../../../core/runOutcome";
-import { type Grid, handsPlayed, laggingHand, type RunNote } from "../../../core/shareCard";
+import { laggingHand, type RunNote } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
 import { Button } from "../ui/button";
 import { GradeLetter } from "../ui/gradeLetter";
 import { PerformanceStrip } from "../ui/performanceStrip";
-import { ShareCard } from "./shareCard";
 import { TempoGraph } from "../ui/tempoGraph";
 
 // The result a finished self-paced run drops into view: the grade with its
@@ -21,11 +20,8 @@ export function RunResult({
     grade,
     notes,
     tolerance,
-    grid,
     tempoCurve,
     tempoScale,
-    daily,
-    title,
     ephemeral,
     runSaved,
     onSaveTake,
@@ -33,13 +29,10 @@ export function RunResult({
     grade: Grade;
     notes: RunNote[];
     tolerance: number;
-    grid: Grid | null;
     tempoCurve: TempoCurve | null;
     // Re-references the run to the piece's tempo so the lagging-hand read matches the
     // share grid's rows.
     tempoScale: number;
-    daily?: number;
-    title: string;
     ephemeral?: boolean;
     runSaved: "idle" | "saved" | "failed";
     onSaveTake: () => void;
@@ -47,7 +40,6 @@ export function RunResult({
     // Which hand trailed the other (null on a single-hand run), read at the same tempo
     // scale as the share grid so the readout matches its rows.
     const handVerdict = laggingHand(notes, { tempoScale });
-    const hands = handsPlayed(notes);
     return (
         <>
             {!ephemeral &&
@@ -109,28 +101,6 @@ export function RunResult({
                           ? m.hand_left_lagged()
                           : m.hand_right_lagged()}
                 </p>
-            )}
-            {grid && (
-                <ShareCard
-                    grid={grid}
-                    caption={m.share_heading()}
-                    gridLabel={m.share_grid_label()}
-                    rowLabels={
-                        hands.length > 1
-                            ? hands.map((staff) => (staff === 0 ? m.hand_right() : m.hand_left()))
-                            : [m.share_row_you()]
-                    }
-                    boast={
-                        daily != null
-                            ? m.daily_share_boast({ number: daily, grade: grade.letter })
-                            : m.share_boast({ title })
-                    }
-                    heading={
-                        daily != null
-                            ? m.daily_share_boast({ number: daily, grade: grade.letter })
-                            : title
-                    }
-                />
             )}
         </>
     );

@@ -359,10 +359,7 @@ function usePlaySessionValue({
         colorNotes: aids.colorNotes,
         focus: focusRange,
         showFingerings: aids.showFingerings,
-        // Only inside the playing surface. Out there the score box is not the thing that
-        // scrolls — the page is — so following the cursor drags the whole document out from
-        // under a reader who is listening to a piece while looking at something else on it.
-        scrollFollow: scrollFollow && fullscreen,
+        scrollFollow,
         onReload: () => {
             listenPlayback.stop();
             keepUp.stop();
