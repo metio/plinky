@@ -44,15 +44,15 @@ export function ScoreCanvas() {
     // the view flipped to the staff every time they paused, which is a reading mode that
     // keeps being taken away rather than one they chose.
     //
-    // Two things still hand the staff back. There is nothing ahead to draw — the piece has
-    // run out, and the result belongs on the score anyway. And a run or a playback that
-    // outlives full screen keeps the highway with it, which is the one case where the
-    // music is moving and the player is not in there.
+    // Full screen is also the ONLY place it appears. Listening from the piece's own page is
+    // reading, not playing — somebody there wants the score in front of them, and replacing
+    // it with falling blocks answers a question they did not ask. The reading mode belongs
+    // to the playing surface.
+    //
+    // It also hands the staff back when there is nothing ahead to draw: the piece has run
+    // out, and the result belongs on the score anyway.
     const somethingAhead = matcher.upcoming.length > 0;
-    const highwayActive =
-        aids.highway &&
-        somethingAhead &&
-        (fullscreen || matcher.practicing || listenPlayback.playing);
+    const highwayActive = aids.highway && somethingAhead && fullscreen;
     // The score slot's size: full screen hands it the spare height (flex-1); a phone gets
     // a fixed slice so the keys still fit; otherwise a tall band that scrolls if taller.
     // The highway takes this same slot so it stands exactly where the staff did.

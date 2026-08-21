@@ -1,6 +1,17 @@
 # SPDX-FileCopyrightText: The Plinky Authors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+- date: 2026-08-23
+  entries:
+    - |-
+      **Listening from a piece's page leaves the page alone.** Pressing Listen there used to
+      put up the falling-notes view and scroll the page along with the music, which is not
+      what somebody reading a score wants. The score stays put now; the falling-notes view
+      belongs to the full-screen playing surface.
+    - |-
+      **The share grid puts your left hand first.** It reads like a keyboard now — low hand
+      first — rather than like the printed page.
+
 - date: 2026-08-22
   label: night
   entries:

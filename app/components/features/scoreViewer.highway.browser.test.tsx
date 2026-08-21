@@ -283,4 +283,27 @@ describe("notes-highway reading mode", () => {
             "false",
         );
     });
+    it("keeps the staff when Listen is pressed from the page, whatever the reading mode", async () => {
+        // Reported: pressing Listen on the piece's own page put up the falling-notes
+        // highway, which then misbehaved as it advanced. It should not have been there at
+        // all — somebody listening from the reading page wants the score in front of them,
+        // and replacing it with blocks answers a question they did not ask. The reading
+        // mode belongs to the playing surface.
+        testPrefsStore.save({ ...testPrefsStore.load(), highway: true });
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 4, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase);
+        const listen = await screen.findByRole("button", { name: "Listen" }, { timeout: 30000 });
+        await expect
+            .poll(() => (listen as HTMLButtonElement).disabled, { timeout: 30000 })
+            .toBe(false);
+        fireEvent.click(listen);
+        await expect
+            .poll(() => listen.getAttribute("aria-pressed"), { timeout: 30000 })
+            .toBe("true");
+
+        expect(screen.queryByLabelText(m.highway_label())).toBeNull();
+    });
 });

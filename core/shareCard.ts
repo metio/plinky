@@ -186,7 +186,11 @@ export function handsPlayed(notes: RunNote[]): number[] {
             staves.add(staff);
         }
     }
-    return staves.size > 0 ? [...staves].sort((a, b) => a - b) : [0];
+    // Left hand first. The staves are numbered from the top of the page down, so sorting
+    // them ascending gives the printed order — right hand above left — and the grid is not
+    // a picture of the page. It is a picture of a keyboard, read the way a keyboard is:
+    // left to right, low to high.
+    return staves.size > 0 ? [...staves].sort((a, b) => b - a) : [0];
 }
 
 // The shared grid: one row per hand the run touched — just one for a single-staff piece,

@@ -8,6 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 23 August 2026
+
+**Listening from a piece's page leaves the page alone.** Pressing Listen there used to
+put up the falling-notes view and scroll the page along with the music, which is not
+what somebody reading a score wants. The score stays put now; the falling-notes view
+belongs to the full-screen playing surface.
+
+**The share grid puts your left hand first.** It reads like a keyboard now — low hand
+first — rather than like the printed page.
+
 ## 22 August 2026 — night
 
 **Listen without leaving the page.** There is a Listen button beside Practice on a
