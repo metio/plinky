@@ -372,8 +372,16 @@ function RunSetupPanel() {
                         hint={m.run_group_layout_hint()}
                         icon={<BookIcon className={ICON} />}
                     >
-                        {/* Follow drives its own scrolling in both layouts; the treadmill
-                    already scrolls under a fixed gaze, so the toggle is moot there. */}
+                        {/* The treadmill comes first because it decides what else is here:
+                    it already scrolls under a fixed gaze, so following the note is moot
+                    under it and the settings below vanish when it is on. A control that
+                    removes its own neighbours should not sit underneath them. */}
+                        <SwitchField
+                            label={m.treadmill_toggle()}
+                            checked={reading.treadmill}
+                            onChange={reading.setTreadmill}
+                            help={m.treadmill_hint()}
+                        />
                         {!reading.treadmill && (
                             <SwitchField
                                 label={m.action_scroll_follow()}
@@ -382,12 +390,6 @@ function RunSetupPanel() {
                                 help={m.scroll_follow_hint()}
                             />
                         )}
-                        <SwitchField
-                            label={m.treadmill_toggle()}
-                            checked={reading.treadmill}
-                            onChange={reading.setTreadmill}
-                            help={m.treadmill_hint()}
-                        />
                         {!reading.treadmill && (
                             <ChoiceField
                                 label={m.bars_per_row()}

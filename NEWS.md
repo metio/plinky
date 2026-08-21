@@ -10,6 +10,20 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Colouring the notes no longer throws you across the page.** The toggle used to
+re-read the whole piece from scratch, which emptied the score for a moment and took
+your scroll position with it. It now just redraws what is already loaded — quicker, and
+it stays where you left it.
+
+**Listening follows the note again, without moving the page.** The score scrolls inside
+its own box now, so the music can be followed while the rest of the page stays put.
+
+**Share your run sits at the foot of the results**, after the readouts you came for.
+
+**"Treadmill" comes before "Follow the note"** in Score layout, because turning the
+treadmill on takes the other settings away — and a switch that removes its neighbours
+should not sit underneath them.
+
 **Listening from a piece's page leaves the page alone.** Pressing Listen there used to
 put up the falling-notes view and scroll the page along with the music, which is not
 what somebody reading a score wants. The score stays put now; the falling-notes view
