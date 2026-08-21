@@ -196,7 +196,7 @@ describe("the file and the engraver agree about the marks", () => {
         return load(xml).then((osmd) => {
             const doc = new DOMParser().parseFromString(xml, "application/xml");
             const timeline = readTimeline(doc);
-            expect(readDirections(doc, timeline).pedals).toEqual(readPedalSpans(osmd));
+            expect(readDirections(timeline).pedals).toEqual(readPedalSpans(osmd));
         });
     });
 
@@ -212,7 +212,7 @@ describe("the file and the engraver agree about the marks", () => {
         return load(xml).then((osmd) => {
             const doc = new DOMParser().parseFromString(xml, "application/xml");
             const timeline = readTimeline(doc);
-            const mine = readDirections(doc, timeline).octaveShifts;
+            const mine = readDirections(timeline).octaveShifts;
             const theirs = readOctaveShiftSpans(osmd);
             expect(mine.map((one) => one.semitones)).toEqual(theirs.map((one) => one.semitones));
             expect(mine.map((one) => one.from)).toEqual(theirs.map((one) => one.from));

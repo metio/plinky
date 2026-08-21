@@ -27,7 +27,7 @@ const direction = (inner: string) =>
 const read = (measures: string, fifths = 0) => {
     const doc = score(measures, fifths);
     const timeline = readTimeline(doc);
-    return { doc, timeline, ...readDirections(doc, timeline) };
+    return { doc, timeline, ...readDirections(timeline) };
 };
 
 describe("the marks that cover a stretch of music", () => {

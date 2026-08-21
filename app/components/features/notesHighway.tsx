@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { keybedMaxWidthPx, keyLane } from "../../../core/keyboardGeometry";
-import { BY_HAND, notePaint } from "../../../core/videoLook";
 import type { UpcomingStep } from "../../../core/matcher";
 import { m } from "../../paraglide/messages.js";
 
@@ -48,15 +47,13 @@ const SHADES = {
 // catalogue — and colouring it all one hand tells the reader the opposite of what the
 // two colours are for.
 //
-// The decision goes through `notePaint`, the same one the exported video asks, so the two
-// pictures cannot come to disagree about what a colour means. What they do not share is
-// the pigment: the video bakes hexes onto a dark stage, and this follows the reader's
-// theme through the tokens below. Practice is fixed on the by-hand scheme — the colours
-// are telling the player something here, where in an export they are taste.
+// Practice is fixed on the by-hand scheme rather than offering the export's picker: here
+// the colours are telling the player something, where in an export they are taste. Which
+// hand gets which colour is shared with the export as `HAND_COLORS` — the same teal and
+// indigo, in hexes there and in theme tokens here, because a picture that follows the
+// reader's light and one baked onto a dark stage cannot share a pigment.
 function blockClass(hand: "left" | "right" | undefined, imminent: boolean): string {
-    const paint = notePaint(BY_HAND, { hand });
-    const lane = paint.kind === "hand" ? (paint.hand ?? "right") : "right";
-    return SHADES[lane][imminent ? 0 : 1]!;
+    return SHADES[hand ?? "right"][imminent ? 0 : 1]!;
 }
 
 // A note shorter than this still needs to be seen: a grace note is a few milliseconds
