@@ -14,6 +14,9 @@
 // Every position appears, rests and the silent hand included (empty `play`), so a
 // step's index stays lock-step with the visual cursor the surface still advances.
 export type KeepUpStep = {
+    // The notated onset in whole notes, so the surface can say where the music has reached
+    // — the notes highway draws what is coming from it.
+    whole: number;
     // The pitches to catch here, narrowed to the practised hand, each with its
     // written length in quarter notes so the guide can sound it for that long.
     // Empty at a rest or the other hand's turn (an unscored position).

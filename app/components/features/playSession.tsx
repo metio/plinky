@@ -462,12 +462,22 @@ function usePlaySessionValue({
 
     // Tempo-locked play-along ("keep up"): the clock advances the cursor and scores each
     // beat; finishing drops out of full screen so the result comes into view.
+    // Filled in once the matcher exists; see the play-along's onPosition below.
+    const previewRef = useRef<(whole: number) => void>(() => {});
+
     const keepUp = useKeepUp({
         getOsmd,
         synth,
         tempo: readTempo,
         beatsPerBar: beatsPerBar ?? 4,
         centerCursor,
+        // So the notes highway follows a tempo-locked run too. It reads the matcher's
+        // lookahead, and a play-along stands the matcher down — which left the highway with
+        // nothing to draw and no reason to appear.
+        //
+        // Through a ref because the matcher is built below this: the call only ever happens
+        // while a run is under way, which is long after both exist.
+        onPosition: (whole: number) => previewRef.current(whole),
         markPainted,
         onFinish: exitFullscreen,
     });
@@ -707,6 +717,10 @@ function usePlaySessionValue({
         silenceEcho,
     });
 
+    // The play-along above reports its position through this; the matcher it feeds is only
+    // built here.
+    previewRef.current = matcher.preview;
+
     // Re-centre the treadmill as the matcher advances through the piece — the cursor
     // position isn't a value centerCursor reads, so depend on done/practicing to fire it.
     // biome-ignore lint/correctness/useExhaustiveDependencies: done/practicing are the advance signal, not centerCursor inputs
@@ -894,6 +908,9 @@ function usePlaySessionValue({
         }
         enterPlayFullscreen();
         matcher.stop();
+        // Before the play-along takes the cursor over: collecting the lookahead walks it,
+        // and a walk afterwards would drag the run's own position back to the top.
+        matcher.preview(0);
         // Keep-up is read-at-tempo: a blanked staff would be unreadable, so the
         // hidden-notes game stays a self-paced feature, and the read-ahead drill
         // likewise gives the whole score back for the run.

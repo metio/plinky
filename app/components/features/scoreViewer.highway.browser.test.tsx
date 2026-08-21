@@ -10,6 +10,7 @@ import { fakeMidi } from "../../adapters/fakeMidi";
 import { MidiProvider } from "../../contexts/midi";
 import { ServicesProvider } from "../../contexts/services";
 import { m } from "../../paraglide/messages.js";
+import { choose } from "../../testing/controls";
 import { testPrefsStore } from "../../testing/stores";
 import { ScoreViewer } from "./scoreViewer";
 
@@ -189,5 +190,53 @@ describe("notes-highway reading mode", () => {
         // …and off again.
         fireEvent.click(await screen.findByRole("button", { name: "Listen" }));
         expect(await screen.findByLabelText(m.highway_label())).toBeTruthy();
+    });
+    it("shows the highway during a tempo-locked run, and advances it", async () => {
+        // Reported, and true since the highway was written: under "Keep up" it did not
+        // appear at all. The highway draws the matcher's lookahead, a play-along stands the
+        // matcher down, and nothing else was filling it — so there was nothing to draw and
+        // no reason to appear. Both of the fixes before this one were about a highway that
+        // was there; this is the mode where it never was.
+        testPrefsStore.save({ ...testPrefsStore.load(), highway: true });
+        vi.spyOn(Element.prototype, "requestFullscreen").mockResolvedValue(undefined);
+
+        const phrase = generateDrill(
+            { ...DEFAULT_DRILL, bars: 1, beatsPerBar: 4, low: 72, high: 79 },
+            () => 0,
+        );
+        mount(phrase);
+        const practice = await screen.findByRole(
+            "button",
+            { name: "Practice" },
+            { timeout: 30000 },
+        );
+        await expect
+            .poll(() => (practice as HTMLButtonElement).disabled, { timeout: 30000 })
+            .toBe(false);
+
+        // Choose the tempo-locked pace, which is what the report was made against.
+        choose(m.run_pace_label(), m.keep_up_toggle());
+        fireEvent.click(practice);
+
+        const panel = await screen.findByLabelText(m.highway_label(), undefined, {
+            timeout: 30000,
+        });
+        await expect
+            .poll(() => panel.querySelectorAll("span[style*='left']").length, { timeout: 30000 })
+            .toBeGreaterThan(0);
+
+        // …and it MOVES. Appearing is not enough: priming the lookahead once would do that
+        // and then stand still for the whole run, which is what a frozen picture of the
+        // first four notes looks like. The blocks must follow the music.
+        //
+        // Their positions, specifically. The markup changes on its own as the descent time
+        // is re-set each beat, so reading the whole panel would pass against a picture that
+        // never moved.
+        const bottoms = () =>
+            Array.from(panel.querySelectorAll<HTMLElement>("span[style*='left']"))
+                .map((block) => block.style.bottom)
+                .join(",");
+        const first = bottoms();
+        await expect.poll(() => bottoms() !== first, { timeout: 30000, interval: 200 }).toBe(true);
     });
 });

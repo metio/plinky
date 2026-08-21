@@ -3,7 +3,13 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from "vitest";
-import { readDirections, readFifths, slurSpans } from "./musicxmlMarks";
+import {
+    readDirections,
+    readFifths,
+    readTempoPoints,
+    slurSpans,
+    tempoAt,
+} from "./musicxmlMarks";
 import { readTimeline } from "./musicxmlTimeline";
 import { octaveShiftAt } from "./octaveShift";
 import { pedalledAt } from "./pedal";
@@ -172,5 +178,61 @@ describe("the marks that cover a stretch of music", () => {
             pedals: [],
             octaveShifts: [],
         });
+    });
+});
+
+describe("where the piece changes speed", () => {
+    it("reads a tempo where it is written, not at the barline before it", () => {
+        // The engraver resolved a tempo onto the bar the mark sat in, so a mark written
+        // mid-bar took effect early — by up to a whole bar. Thirteen files in a hundred in
+        // the catalogue write one.
+        const { timeline } = read(
+            `<measure number="1">${ATTR}${note("C", 8)}<sound tempo="60"/>${note("D", 8)}</measure>`,
+        );
+        expect(readTempoPoints(timeline)).toEqual([{ whole: 0.5, bpm: 60 }]);
+    });
+
+    it("reads a tempo written inside a direction as well as one standing alone", () => {
+        const { timeline } = read(
+            `<measure number="1">${ATTR}<direction><direction-type><words>Allegro</words></direction-type><sound tempo="132"/></direction>${note("C", 16)}</measure>`,
+        );
+        expect(readTempoPoints(timeline)).toEqual([{ whole: 0, bpm: 132 }]);
+    });
+
+    it("says a metronome mark in crotchets, whatever note it counts", () => {
+        // A dotted crotchet at 60 in six-eight is ninety crotchets a minute; read as sixty
+        // the piece plays at two thirds of its speed.
+        const dotted = read(
+            `<measure number="1">${ATTR}${direction("<metronome><beat-unit>quarter</beat-unit><beat-unit-dot/><per-minute>60</per-minute></metronome>")}${note("C", 16)}</measure>`,
+        );
+        expect(readTempoPoints(dotted.timeline)[0]?.bpm).toBe(90);
+
+        const minim = read(
+            `<measure number="1">${ATTR}${direction("<metronome><beat-unit>half</beat-unit><per-minute>60</per-minute></metronome>")}${note("C", 16)}</measure>`,
+        );
+        expect(readTempoPoints(minim.timeline)[0]?.bpm).toBe(120);
+    });
+
+    it("prefers the sounding instruction to the printed one where a score writes both", () => {
+        const { timeline } = read(
+            `<measure number="1">${ATTR}<direction><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>200</per-minute></metronome></direction-type><sound tempo="100"/></direction>${note("C", 16)}</measure>`,
+        );
+        expect(readTempoPoints(timeline)[0]?.bpm).toBe(100);
+    });
+
+    it("carries a tempo forward until the next one", () => {
+        const points = [
+            { whole: 0, bpm: 120 },
+            { whole: 2, bpm: 60 },
+        ];
+        expect(tempoAt(points, 0)).toBe(120);
+        expect(tempoAt(points, 1.9)).toBe(120);
+        expect(tempoAt(points, 2)).toBe(60);
+        expect(tempoAt(points, 99)).toBe(60);
+    });
+
+    it("says nothing for a piece that has stated no tempo yet", () => {
+        expect(tempoAt([], 0)).toBeNull();
+        expect(tempoAt([{ whole: 1, bpm: 90 }], 0)).toBeNull();
     });
 });
