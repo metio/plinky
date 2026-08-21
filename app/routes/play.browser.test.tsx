@@ -110,6 +110,29 @@ describe("Play", () => {
         expect(screen.getByRole("switch", { name: m.race_ghost_toggle() })).toBeTruthy();
     });
 
+    it("flips the fingering switch at once and says the sheet is catching up", async () => {
+        // Redrawing a sheet takes long enough to notice, and doing it in the same beat as
+        // the switch's own commit means the browser never paints the new position first —
+        // the switch sits unmoved for the whole redraw, which reads as a press that missed
+        // and invites a second press that undoes it. So the switch moves immediately and
+        // the wait is named beside it.
+        renderPlay(bundledId("ode to joy"));
+        await screen.findByRole("button", { name: m.run_group_sheet_title() }, { timeout: 30000 });
+        await waitFor(() => expect(document.querySelector("svg")).toBeTruthy(), { timeout: 30000 });
+        reveal(m.run_group_sheet_title);
+        const fingering = screen.getByRole("switch", { name: m.action_finger_numbers() });
+        const before = fingering.getAttribute("aria-checked");
+        fireEvent.click(fingering);
+        // Both in the very next paint, with no waiting: the new position AND the wait.
+        expect(fingering.getAttribute("aria-checked")).not.toBe(before);
+        expect(screen.getByRole("status", { name: m.score_redrawing() })).toBeTruthy();
+        // And it goes away by itself once the sheet has caught up.
+        await waitFor(
+            () => expect(screen.queryByRole("status", { name: m.score_redrawing() })).toBeNull(),
+            { timeout: 30000 },
+        );
+    }, 90000);
+
     it("keeps the play surface free of MIDI-connect chrome", async () => {
         // Connecting a device is a one-time setup task that lives in Settings
         // (with a getting-started step pointing there); a playing surface never

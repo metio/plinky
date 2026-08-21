@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Hur jämnt du anslog. Visas bara om ditt instrument kan skilja mjukt från hårt.",
     "scores_explain_expression": "Hur noga du följde notbildens tecken — staccatona, accenterna, det starka och det svaga.",
     "scores_explain_letter": "Bokstaven är snittet av träffsäkerhet, timing och flyt. Dynamik och uttryck finns för att läsas, inte för att betygsätta.",
-    "perf_legend_dots": "Punktfärg = timing: grön på slaget, bärnsten nära, röd bredvid"
+    "perf_legend_dots": "Punktfärg = timing: grön på slaget, bärnsten nära, röd bredvid",
+    "score_redrawing": "Notbladet ritas om"
 }

@@ -17,6 +17,7 @@ import { ScoreSymbols } from "./scoreSymbols";
 import { levelOf } from "../../../core/readingLevel";
 import { usePrefs } from "../../hooks/usePrefs";
 import { SettingsSection } from "../ui/settingsSection";
+import { Spinner } from "../ui/spinner";
 import { Stepper } from "../ui/stepper";
 import { ReadingLevel } from "./readingLevel";
 import { usePlaySession } from "./playSession";
@@ -82,6 +83,7 @@ function RunSetupPanel() {
         forgiving,
         setForgiving,
         reading,
+        score,
         sightRead,
         sightReadRecord,
         focusLoop,
@@ -350,8 +352,18 @@ function RunSetupPanel() {
                             help={m.highway_hint()}
                             disabled={sightRead.on}
                         />
+                        {/* The switch reports its new position at once and the sheet
+                        catches up behind it — on a long piece the redraw is slow enough
+                        that a switch waiting for it reads as a press that missed. */}
                         <SwitchField
-                            label={m.action_finger_numbers()}
+                            label={
+                                <span className="inline-flex items-center gap-2">
+                                    {m.action_finger_numbers()}
+                                    <Show when={score.redrawing}>
+                                        <Spinner label={m.score_redrawing()} />
+                                    </Show>
+                                </span>
+                            }
                             checked={sightRead.on ? false : reading.showFingerings}
                             onChange={(on) => reading.setShowFingerings(on)}
                             disabled={sightRead.on}

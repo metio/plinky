@@ -1265,5 +1265,6 @@
     "scores_explain_dynamics": "Wie gleichmäßig du angeschlagen hast. Wird nur gezeigt, wenn dein Instrument leise von laut unterscheiden kann.",
     "scores_explain_expression": "Wie genau du den Zeichen der Noten gefolgt bist — Staccato, Akzente, laut und leise.",
     "scores_explain_letter": "Der Buchstabe ist der Durchschnitt aus Treffsicherheit, Timing und Fluss. Dynamik und Ausdruck stehen zum Lesen da, nicht zum Bewerten.",
-    "perf_legend_dots": "Punktfarbe = Timing: grün auf dem Schlag, bernstein knapp daneben, rot daneben"
+    "perf_legend_dots": "Punktfarbe = Timing: grün auf dem Schlag, bernstein knapp daneben, rot daneben",
+    "score_redrawing": "Die Noten werden neu gezeichnet"
 }
