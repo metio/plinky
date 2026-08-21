@@ -152,3 +152,31 @@ describe("NotesHighway", () => {
         expect(blocks()).toHaveLength(1);
     });
 });
+
+describe("how the notes move", () => {
+    const RUN = [step(0, [60]), step(1, [62], { at: 500 }), step(2, [64], { at: 1000 })];
+
+    it("settles into place after a note, when the music waits for the player", () => {
+        // Self-paced practice: nothing falls until a note is cleared, so the movement is a
+        // settle into the new place rather than a descent.
+        render(<NotesHighway upcoming={RUN} from={60} to={72} />);
+        const first = blocks()[0];
+        expect(first?.style.transitionDuration).toBe("200ms");
+        expect(first?.style.transitionTimingFunction).toBe("ease-out");
+    });
+
+    it("descends over exactly the note's own time, when something is playing to a clock", () => {
+        // The tempo-locked play-along does not wait, so the picture should not either: told
+        // how long the position lasts, the blocks glide over precisely that.
+        render(<NotesHighway upcoming={RUN} from={60} to={72} advanceMs={640} />);
+        const first = blocks()[0];
+        expect(first?.style.transitionDuration).toBe("640ms");
+        // Linear, because anything eased would hurry and then dawdle against a steady pulse.
+        expect(first?.style.transitionTimingFunction).toBe("linear");
+    });
+
+    it("falls back to settling when the clock has no answer", () => {
+        render(<NotesHighway upcoming={RUN} from={60} to={72} advanceMs={null} />);
+        expect(blocks()[0]?.style.transitionDuration).toBe("200ms");
+    });
+});

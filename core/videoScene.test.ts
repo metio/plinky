@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
+import { keyLane } from "./keyboardGeometry";
 import { attributionFor } from "./attribution";
 import {
     creditLine,
@@ -197,5 +198,46 @@ describe("stepCenterAt with more onsets than centres", () => {
         expect(stepCenterAt(onsets, centers, 350)).toBeGreaterThanOrEqual(
             stepCenterAt(onsets, centers, 250),
         );
+    });
+});
+
+describe("the keyboard the export draws", () => {
+    it("is laid out by the same geometry the app's own keyboard is", () => {
+        // Two implementations of piano proportions agreed by coincidence, and a change to
+        // the instrument on screen would silently have stopped matching the one in the
+        // export. There is one now, and this says so in the only way that stays true: by
+        // asking both.
+        for (const [from, to] of [
+            [60, 72],
+            [48, 84],
+            [21, 108],
+        ] as const) {
+            for (const key of sceneKeys(from, to)) {
+                const lane = keyLane(key.pitch, from, to);
+                expect(lane).not.toBeNull();
+                expect(key.x).toBeCloseTo((lane?.leftPct ?? 0) / 100, 10);
+                expect(key.width).toBeCloseTo((lane?.widthPct ?? 0) / 100, 10);
+                expect(key.black).toBe(!lane?.white);
+            }
+        }
+    });
+
+    it("draws the white keys before the black ones, so the blacks land on top", () => {
+        const keys = sceneKeys(60, 72);
+        const firstBlack = keys.findIndex((key) => key.black);
+        expect(firstBlack).toBeGreaterThan(0);
+        expect(keys.slice(0, firstBlack).every((key) => !key.black)).toBe(true);
+        expect(keys.slice(firstBlack).every((key) => key.black)).toBe(true);
+    });
+
+    it("carries the hand alongside the finger, so both pictures can colour by either", () => {
+        const keys = sceneKeys(60, 72);
+        const blocks = highwayBlocks(
+            [{ pitch: 60, startMs: 0, durationMs: 500, finger: 1, hand: "left" }],
+            keys,
+            0,
+            2000,
+        );
+        expect(blocks[0]).toMatchObject({ finger: 1, hand: "left" });
     });
 });

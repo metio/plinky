@@ -4,7 +4,10 @@
 import type { RecordedNote } from "../../core/composition";
 import {
     DEFAULT_KEYBOARD_DEPTH,
+    DEFAULT_NOTE_COLOR,
     fingerColorHex,
+    handColorHex,
+    notePaint,
     keyboardDepthFraction,
 } from "../../core/videoLook";
 import { frameAt, LEAD_IN_MS, pressGlow } from "../../core/videoFrames";
@@ -394,6 +397,24 @@ export function takeScenePainter({
     }
 }
 
+// What one note is painted, given the scheme the person making the video chose. The
+// decision itself is in core and shared with the practice highway; this only turns the
+// answer into the hex a canvas wants.
+function paintHex(
+    scheme: string,
+    note: { finger?: number; hand?: "left" | "right" },
+    fallback: string,
+): string {
+    const paint = notePaint(scheme, note);
+    if (paint.kind === "finger") {
+        return fingerColorHex(paint.finger, fallback);
+    }
+    if (paint.kind === "hand") {
+        return handColorHex(paint.hand, fallback);
+    }
+    return fallback;
+}
+
 // A deep-to-accent block colour so a note reads as descending "into" the strike line,
 // brightening as it lands. The far end is the note colour darkened toward black rather
 // than a second constant, so a caller that sets its own accent gets the same descent.
@@ -423,7 +444,7 @@ export function takeHighwayPainter({
     showWordmark = true,
     keyColors,
     accent = ACCENT,
-    byFinger = false,
+    scheme = DEFAULT_NOTE_COLOR,
     keyboardDepth = keyboardDepthFraction(DEFAULT_KEYBOARD_DEPTH),
 }: {
     title: string;
@@ -443,7 +464,10 @@ export function takeHighwayPainter({
     // Colour each note by the finger that plays it instead of by one accent — falling
     // block and lit key alike, so the two agree. Notes the performance did not finger
     // keep the accent.
-    byFinger?: boolean;
+    // How a falling note is coloured: a flat colour, by the finger that plays it, or by
+    // the hand. One of `HIGHWAY_SCHEMES` — the same list the practice highway offers, so
+    // the two pictures cannot drift apart in what they can be made to look like.
+    scheme?: string;
     // How much of the frame's height the keyboard takes; see core/videoLook.
     keyboardDepth?: number;
 }): (context: Context2D, timeMs: number) => void {
@@ -493,7 +517,7 @@ export function takeHighwayPainter({
             const top = keyboardTop - Math.min(1, block.endFrac) * regionHeight;
             const bottom = keyboardTop - Math.max(0, block.onsetFrac) * regionHeight;
             const nearness = Math.max(0, Math.min(1, 1 - block.onsetFrac));
-            const near = byFinger ? fingerColorHex(block.finger, accent) : accent;
+            const near = paintHex(scheme, block, accent);
             context.fillStyle = mixHex(farOf(near), near, nearness);
             context.beginPath();
             context.roundRect(x + w * 0.04, top, w * 0.92, Math.max(2, bottom - top), 4);
@@ -507,11 +531,12 @@ export function takeHighwayPainter({
         // The keyboard, sounding keys lit by their freshest press.
         const glows = keyGlows(frame.down);
         const glowOf = (pitch: number) => glows.get(pitch) ?? null;
-        // The finger sounding each key right now, so a lit key matches the colour of the
-        // block that just landed on it.
+        // The finger and the hand sounding each key right now, so a lit key matches the
+        // colour of the block that just landed on it whichever scheme is chosen.
         const fingers = new Map(frame.down.map((entry) => [entry.pitch, entry.finger]));
+        const hands = new Map(frame.down.map((entry) => [entry.pitch, entry.hand]));
         const litOf = (pitch: number) =>
-            byFinger ? fingerColorHex(fingers.get(pitch), accent) : ACCENT;
+            paintHex(scheme, { finger: fingers.get(pitch), hand: hands.get(pitch) }, ACCENT);
         for (const key of keys.filter((entry) => !entry.black)) {
             paintKey(context, key, glowOf(key.pitch), keyLayout, litOf(key.pitch));
         }

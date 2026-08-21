@@ -16,7 +16,7 @@ import {
     DEFAULT_NOTE_COLOR,
     KEYBOARD_DEPTHS,
     keyboardDepthFraction,
-    NOTE_COLORS,
+    HIGHWAY_SCHEMES,
     BY_FINGER,
     noteColorHex,
 } from "../../../core/videoLook";
@@ -45,6 +45,7 @@ const NOTE_COLOR_LABELS: Record<string, () => string> = {
     amber: m.video_note_color_amber,
     lime: m.video_note_color_lime,
     finger: m.video_note_color_finger,
+    hand: m.video_note_color_hand,
 };
 
 const DEPTH_LABELS: Record<string, () => string> = {
@@ -143,7 +144,7 @@ export function ExportVideoButton({
                           showWordmark,
                           keyColors,
                           accent: noteColorHex(noteColor),
-                          byFinger: noteColor === BY_FINGER,
+                          scheme: noteColor,
                           keyboardDepth: keyboardDepthFraction(keyboardDepth),
                       })
                     : takeScenePainter({
@@ -224,9 +225,11 @@ export function ExportVideoButton({
                 {format === "highway" && (
                     <>
                         <SegmentedControl
-                            options={NOTE_COLORS.map((color) => ({
-                                id: color.id,
-                                label: (NOTE_COLOR_LABELS[color.id] ?? color.id.toString)(),
+                            // The shared list, so a scheme added for the practice highway
+                            // shows up here too rather than being added twice or once.
+                            options={HIGHWAY_SCHEMES.map((id) => ({
+                                id,
+                                label: (NOTE_COLOR_LABELS[id] ?? id.toString)(),
                             }))}
                             value={noteColor}
                             onChange={setNoteColor}
