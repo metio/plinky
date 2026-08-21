@@ -209,6 +209,10 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
         // later; a file that never declares them is broken, and one tick per crotchet at
         // least keeps the arithmetic finite.
         let divisions = 1;
+        // What a bar of this metre is worth, in whole notes — three-four is 0.75. Null
+        // until the file states a time signature, which every real engraving does in its
+        // first measure.
+        let barWholes: number | null = null;
         // Where this part has reached, in whole notes from the top.
         let partStart = 0;
         const measures = Array.from(part.getElementsByTagName("measure"));
@@ -220,6 +224,12 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
             const declared = child(measure, "divisions");
             if (declared) {
                 divisions = Math.max(1, numberOf(declared, divisions));
+            }
+            const time = child(measure, "time");
+            if (time) {
+                const beats = numberOf(child(time, "beats"), 0);
+                const beatType = numberOf(child(time, "beat-type"), 0);
+                barWholes = beats > 0 && beatType > 0 ? beats / beatType : barWholes;
             }
             const perWhole = divisions * 4;
             // Ticks from the start of the measure. `<backup>` winds it back so a second
@@ -256,12 +266,13 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                 // duration of its own, so it neither advances the measure nor claims time.
                 const durationTicks = grace ? 0 : numberOf(child(element, "duration"), 0);
                 const chord = child(element, "chord") !== null;
+                const rest = child(element, "rest") !== null;
                 const onsetTicks = chord ? lastOnsetTicks : atTicks;
 
                 notes.push({
                     whole: (measureStarts[index] as number) + onsetTicks / perWhole,
                     wholes: durationTicks / perWhole,
-                    midi: child(element, "rest") ? null : midiOf(element),
+                    midi: rest ? null : midiOf(element),
                     voice: text(child(element, "voice")) || "1",
                     staff: Math.max(1, numberOf(child(element, "staff"), 1)),
                     chord,
@@ -277,7 +288,29 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     furthest = Math.max(furthest, atTicks);
                 }
             }
-            partStart = (measureStarts[index] as number) + furthest / perWhole;
+            // How far the bar carries the music on: what the metre says a bar is worth.
+            //
+            // NOT how far the writing reaches, which is what the engraver believes and is
+            // wrong to. Engravings overrun their own barlines in two ordinary ways — a
+            // whole-measure rest written at a whole note's length whatever the metre, and
+            // a voice written past the barline and wound back with a `<backup>` — and
+            // taking either at its word puts every bar after it late, by a little more
+            // each time, until a piece is minutes out from itself.
+            //
+            // A bar that stops SHORT of its metre is left alone, and that asymmetry is
+            // deliberate. An overrun is the file contradicting itself — the same engraving
+            // that wrote a whole note into a two-four bar winds the cursor back to the
+            // barline afterwards — so the metre settles it. A short bar contradicts
+            // nothing: it is a bar with less music written in it than the metre allows,
+            // and whether the missing beat is silence the composer wanted or a beat the
+            // transcriber dropped is not something a reader can know. Forty-three bars in
+            // eighteen hundred are short, of which five are pickups and twenty-three sit
+            // mid-piece in files that are simply mis-notated. Padding those would be
+            // guessing, and guessing loudly, in a place where the guess is audible.
+            const content = furthest / perWhole;
+            partStart =
+                (measureStarts[index] as number) +
+                (barWholes === null ? content : Math.min(content, barWholes));
             end = Math.max(end, partStart);
         });
     }
