@@ -37,7 +37,85 @@ export type XmlNote = {
     tie: "start" | "stop" | "both" | null;
     // 0-based index into the measures as printed.
     measure: number;
+    // What the file writes over this note. All of it optional in the format and most of it
+    // absent in most scores, so every field has a quiet default rather than a null to
+    // branch on at each use.
+    marks: XmlNoteMarks;
 };
+
+export type XmlNoteMarks = {
+    articulation: "none" | "staccato" | "staccatissimo" | "tenuto" | "detachedLegato";
+    accent: boolean;
+    marcato: boolean;
+    fermata: boolean;
+    ornament: "trill" | "turn" | "inverted-turn" | "mordent" | "inverted-mordent" | null;
+    arpeggiate: boolean;
+    // Slur numbers starting and stopping here. MusicXML numbers its slurs so two arches can
+    // overlap — one per hand, or nested phrasing — and pairing by number is what keeps them
+    // from closing each other.
+    slurStarts: string[];
+    slurStops: string[];
+};
+
+const NO_MARKS: XmlNoteMarks = {
+    articulation: "none",
+    accent: false,
+    marcato: false,
+    fermata: false,
+    ornament: null,
+    arpeggiate: false,
+    slurStarts: [],
+    slurStops: [],
+};
+
+// The length articulations are mutually exclusive; the shortest written wins, which is what
+// an engraver means by writing two.
+const ARTICULATION_ORDER: XmlNoteMarks["articulation"][] = [
+    "staccatissimo",
+    "staccato",
+    "detachedLegato",
+    "tenuto",
+];
+
+const ORNAMENT_TAGS: Record<string, NonNullable<XmlNoteMarks["ornament"]>> = {
+    "trill-mark": "trill",
+    turn: "turn",
+    "inverted-turn": "inverted-turn",
+    // A delayed turn waits before it starts; the wait is a nuance this does not model, and
+    // playing it as a turn is far closer than not playing it.
+    "delayed-turn": "turn",
+    "delayed-inverted-turn": "inverted-turn",
+    mordent: "mordent",
+    "inverted-mordent": "inverted-mordent",
+};
+
+function marksOf(note: Element): XmlNoteMarks {
+    const notations = note.getElementsByTagName("notations");
+    if (notations.length === 0) {
+        return NO_MARKS;
+    }
+    const has = (name: string) => note.getElementsByTagName(name).length > 0;
+    const articulation =
+        ARTICULATION_ORDER.find((one) =>
+            has(one === "detachedLegato" ? "detached-legato" : one),
+        ) ?? "none";
+    const ornamentTag = Object.keys(ORNAMENT_TAGS).find((tag) => has(tag));
+    const slurs = Array.from(note.getElementsByTagName("slur"));
+    return {
+        articulation,
+        accent: has("accent"),
+        marcato: has("strong-accent"),
+        fermata: has("fermata"),
+        ornament: ornamentTag ? ORNAMENT_TAGS[ornamentTag] ?? null : null,
+        arpeggiate: has("arpeggiate"),
+        slurStarts: slurs
+            .filter((slur) => slur.getAttribute("type") === "start")
+            .map((slur) => slur.getAttribute("number") ?? "1"),
+        slurStops: slurs
+            .filter((slur) => slur.getAttribute("type") === "stop")
+            .map((slur) => slur.getAttribute("number") ?? "1"),
+    };
+}
 
 export type XmlTimeline = {
     notes: XmlNote[];
@@ -170,6 +248,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     grace,
                     tie: tieOf(element),
                     measure: index,
+                    marks: marksOf(element),
                 });
 
                 if (!chord) {
