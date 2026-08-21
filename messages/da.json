@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} manglede",
     "rhythm_extra": "{count} for mange",
     "meta_rhythm_title": "Rytmetræner",
-    "meta_rhythm_description": "Læs en rytme, og bank den tilbage. Tretten niveauer, fra enkle fjerdedele til trioler og sammensatte taktarter. Uden klaver."
+    "meta_rhythm_description": "Læs en rytme, og bank den tilbage. Tretten niveauer, fra enkle fjerdedele til trioler og sammensatte taktarter. Uden klaver.",
+    "scores_explain_toggle": "Hvad det betyder",
+    "scores_explain_accuracy": "Hvor mange af de toner, du spillede, var de rigtige.",
+    "scores_explain_timing": "Hvor tæt hver tone landede på sit slag. Præcis på tæller fuldt, næsten tæller delvist, ved siden af tæller ikke.",
+    "scores_explain_flow": "Hvor meget du blev ved med at bevæge dig. En tone tæller, når du fandt den i første forsøg uden at lede.",
+    "scores_explain_dynamics": "Hvor jævnt du anslog. Vises kun, hvis dit instrument kan skelne blødt fra hårdt.",
+    "scores_explain_expression": "Hvor nøje du fulgte nodernes tegn — staccatoerne, accenterne, det stærke og det svage.",
+    "scores_explain_letter": "Bogstavet er gennemsnittet af præcision, timing og flow. Dynamik og udtryk er til at læse, ikke til at bedømme.",
+    "perf_legend_dots": "Prikkens farve = timing: grøn på slaget, ravgul tæt på, rød ved siden af"
 }

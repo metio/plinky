@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} fehlen",
     "rhythm_extra": "{count} zu viel",
     "meta_rhythm_title": "Rhythmustrainer",
-    "meta_rhythm_description": "Lies einen Rhythmus und klopfe ihn zurück. Dreizehn Stufen, von einfachen Vierteln bis zu Triolen und zusammengesetzten Taktarten. Kein Klavier nötig."
+    "meta_rhythm_description": "Lies einen Rhythmus und klopfe ihn zurück. Dreizehn Stufen, von einfachen Vierteln bis zu Triolen und zusammengesetzten Taktarten. Kein Klavier nötig.",
+    "scores_explain_toggle": "Was das bedeutet",
+    "scores_explain_accuracy": "Wie viele der gespielten Töne die richtigen waren.",
+    "scores_explain_timing": "Wie nah jeder Ton an seinem Schlag lag. Genau darauf zählt voll, fast zählt teilweise, daneben zählt gar nicht.",
+    "scores_explain_flow": "Wie sehr du in Bewegung geblieben bist. Ein Ton zählt, wenn du ihn beim ersten Versuch gefunden hast, ohne zu suchen.",
+    "scores_explain_dynamics": "Wie gleichmäßig du angeschlagen hast. Wird nur gezeigt, wenn dein Instrument leise von laut unterscheiden kann.",
+    "scores_explain_expression": "Wie genau du den Zeichen der Noten gefolgt bist — Staccato, Akzente, laut und leise.",
+    "scores_explain_letter": "Der Buchstabe ist der Durchschnitt aus Treffsicherheit, Timing und Fluss. Dynamik und Ausdruck stehen zum Lesen da, nicht zum Bewerten.",
+    "perf_legend_dots": "Punktfarbe = Timing: grün auf dem Schlag, bernstein knapp daneben, rot daneben"
 }

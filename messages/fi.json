@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} jäi väliin",
     "rhythm_extra": "{count} liikaa",
     "meta_rhythm_title": "Rytmiharjoittelu",
-    "meta_rhythm_description": "Lue rytmi ja naputa se takaisin. Kolmetoista tasoa, yksinkertaisista neljäsosista trioleihin ja yhdistettyihin tahtilajeihin. Ilman pianoa."
+    "meta_rhythm_description": "Lue rytmi ja naputa se takaisin. Kolmetoista tasoa, yksinkertaisista neljäsosista trioleihin ja yhdistettyihin tahtilajeihin. Ilman pianoa.",
+    "scores_explain_toggle": "Mitä nämä tarkoittavat",
+    "scores_explain_accuracy": "Kuinka moni soittamistasi sävelistä oli oikea.",
+    "scores_explain_timing": "Kuinka lähelle iskuaan kukin sävel osui. Täsmälleen kohdalleen laskee täytenä, melkein osittain, ohi ei lainkaan.",
+    "scores_explain_flow": "Kuinka paljon pysyit liikkeessä. Sävel lasketaan, kun löysit sen ensi yrittämällä ilman etsimistä.",
+    "scores_explain_dynamics": "Kuinka tasaisesti soitit. Näytetään vain, jos soittimesi erottaa hiljaisen kovasta.",
+    "scores_explain_expression": "Kuinka tarkasti seurasit nuottien merkkejä — staccatot, aksentit, voimakkaat ja hiljaiset.",
+    "scores_explain_letter": "Kirjain on tarkkuuden, ajoituksen ja sujuvuuden keskiarvo. Dynamiikka ja ilmaisu ovat luettavaksi, eivät arvosteltavaksi.",
+    "perf_legend_dots": "Pisteen väri = ajoitus: vihreä iskulla, meripihka lähellä, punainen ohi"
 }

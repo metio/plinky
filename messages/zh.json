@@ -1257,5 +1257,13 @@
     "rhythm_missed": "漏了 {count} 个",
     "rhythm_extra": "多了 {count} 个",
     "meta_rhythm_title": "节奏训练",
-    "meta_rhythm_description": "读一段节奏，把它敲回来。十三个级别，从简单的四分音符到三连音和复拍子。不需要钢琴。"
+    "meta_rhythm_description": "读一段节奏，把它敲回来。十三个级别，从简单的四分音符到三连音和复拍子。不需要钢琴。",
+    "scores_explain_toggle": "这些是什么意思",
+    "scores_explain_accuracy": "你弹的音里有多少是对的。",
+    "scores_explain_timing": "每个音离它的拍子有多近。正好落在拍上算满，差一点算一部分，偏了不算。",
+    "scores_explain_flow": "你有多能一直往前走。一个音要一次就找到、没有停下来找，才算数。",
+    "scores_explain_dynamics": "你的力度有多均匀。只有当你弹的东西能分辨轻重时才会显示。",
+    "scores_explain_expression": "你有多贴近谱面上的记号——断音、重音、强和弱。",
+    "scores_explain_letter": "等级是准确、节奏和流畅的平均。力度和表情是给你看的，不参与评分。",
+    "perf_legend_dots": "点的颜色＝节奏：绿色在拍上，琥珀色接近，红色偏了"
 }

@@ -5,6 +5,7 @@ import type { Grade } from "../../../core/grade";
 import type { TempoCurve } from "../../../core/runOutcome";
 import { laggingHand, type RunNote } from "../../../core/shareCard";
 import { m } from "../../paraglide/messages.js";
+import { Disclosure } from "../ui/disclosure";
 import { Button } from "../ui/button";
 import { GradeLetter } from "../ui/gradeLetter";
 import { PerformanceStrip } from "../ui/performanceStrip";
@@ -82,6 +83,33 @@ export function RunResult({
                     )}
                 </dl>
             </div>
+            {/* The numbers are meaningless until somebody says what they measure, and a
+                player who has just finished a run is exactly who wants to know. Folded away
+                because it is read once and then known — the readouts themselves are what
+                this panel is for. */}
+            <Disclosure summary={m.scores_explain_toggle()}>
+                <dl className="space-y-1 text-xs text-muted">
+                    <dt className="font-medium text-body">{m.scores_accuracy()}</dt>
+                    <dd>{m.scores_explain_accuracy()}</dd>
+                    <dt className="font-medium text-body">{m.scores_timing()}</dt>
+                    <dd>{m.scores_explain_timing()}</dd>
+                    <dt className="font-medium text-body">{m.scores_flow()}</dt>
+                    <dd>{m.scores_explain_flow()}</dd>
+                    {grade.dynamics !== null && (
+                        <>
+                            <dt className="font-medium text-body">{m.scores_dynamics()}</dt>
+                            <dd>{m.scores_explain_dynamics()}</dd>
+                        </>
+                    )}
+                    {grade.expression !== null && (
+                        <>
+                            <dt className="font-medium text-body">{m.scores_expression()}</dt>
+                            <dd>{m.scores_explain_expression()}</dd>
+                        </>
+                    )}
+                </dl>
+                <p className="text-xs text-muted">{m.scores_explain_letter()}</p>
+            </Disclosure>
             <PerformanceStrip notes={notes} tolerance={tolerance} />
             {tempoCurve && (
                 <section className="space-y-1">

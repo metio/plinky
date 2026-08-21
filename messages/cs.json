@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} vynecháno",
     "rhythm_extra": "{count} navíc",
     "meta_rhythm_title": "Trénink rytmu",
-    "meta_rhythm_description": "Přečti rytmus a vyťukej ho. Třináct úrovní, od prostých čtvrťových not po trioly a složené takty. Bez klavíru."
+    "meta_rhythm_description": "Přečti rytmus a vyťukej ho. Třináct úrovní, od prostých čtvrťových not po trioly a složené takty. Bez klavíru.",
+    "scores_explain_toggle": "Co to znamená",
+    "scores_explain_accuracy": "Kolik z tónů, které jsi zahrál, bylo těch správných.",
+    "scores_explain_timing": "Jak blízko své době každý tón dopadl. Přesně se počítá celý, skoro zčásti, mimo vůbec.",
+    "scores_explain_flow": "Nakolik ses držel v pohybu. Tón se počítá, když jsi ho našel na první pokus, bez hledání.",
+    "scores_explain_dynamics": "Jak rovnoměrně jsi hrál. Zobrazí se jen tehdy, když tvůj nástroj rozezná tiché od hlasitého.",
+    "scores_explain_expression": "Jak přesně jsi sledoval značky v notách — staccata, akcenty, silné a slabé.",
+    "scores_explain_letter": "Písmeno je průměr přesnosti, rytmu a plynulosti. Dynamika a výraz jsou ke čtení, ne k hodnocení.",
+    "perf_legend_dots": "Barva tečky = rytmus: zelená na dobu, jantarová blízko, červená mimo"
 }

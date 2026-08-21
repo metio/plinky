@@ -83,6 +83,7 @@ export function PerformanceStrip({
                 })}
             </svg>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+                <span>{m.perf_legend_dots()}</span>
                 <span>{m.perf_legend_timing()}</span>
                 <span>{m.perf_legend_accuracy()}</span>
                 <span>{m.perf_legend_flow()}</span>

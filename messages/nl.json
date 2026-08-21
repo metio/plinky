@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} gemist",
     "rhythm_extra": "{count} te veel",
     "meta_rhythm_title": "Ritmetrainer",
-    "meta_rhythm_description": "Lees een ritme en tik het terug. Dertien niveaus, van eenvoudige kwarten tot triolen en samengestelde maatsoorten. Zonder piano."
+    "meta_rhythm_description": "Lees een ritme en tik het terug. Dertien niveaus, van eenvoudige kwarten tot triolen en samengestelde maatsoorten. Zonder piano.",
+    "scores_explain_toggle": "Wat dit betekent",
+    "scores_explain_accuracy": "Hoeveel van de noten die je speelde de juiste waren.",
+    "scores_explain_timing": "Hoe dicht elke noot bij zijn tel landde. Precies erop telt volledig, bijna telt deels, ernaast telt niet.",
+    "scores_explain_flow": "Hoeveel je in beweging bleef. Een noot telt als je hem in één keer vond, zonder te zoeken.",
+    "scores_explain_dynamics": "Hoe gelijkmatig je aansloeg. Alleen te zien als je instrument zacht van hard kan onderscheiden.",
+    "scores_explain_expression": "Hoe nauw je de tekens in de partituur volgde — de staccato’s, de accenten, het luide en het zachte.",
+    "scores_explain_letter": "De letter is het gemiddelde van precisie, timing en doorstroming. Dynamiek en expressie zijn er om te lezen, niet om te beoordelen.",
+    "perf_legend_dots": "Puntkleur = timing: groen op de tel, amber dichtbij, rood ernaast"
 }

@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} kimaradt",
     "rhythm_extra": "{count} fölösleges",
     "meta_rhythm_title": "Ritmusgyakorló",
-    "meta_rhythm_description": "Olvass el egy ritmust, és kopogd vissza. Tizenhárom szint, az egyszerű negyedektől a triolákig és az összetett ütemekig. Zongora nélkül."
+    "meta_rhythm_description": "Olvass el egy ritmust, és kopogd vissza. Tizenhárom szint, az egyszerű negyedektől a triolákig és az összetett ütemekig. Zongora nélkül.",
+    "scores_explain_toggle": "Mit jelentenek ezek",
+    "scores_explain_accuracy": "A lejátszott hangok közül hány volt a helyes.",
+    "scores_explain_timing": "Milyen közel esett minden hang az ütéséhez. Pontosan rajta teljesen számít, majdnem részben, mellette egyáltalán nem.",
+    "scores_explain_flow": "Mennyire maradtál mozgásban. Egy hang akkor számít, ha elsőre megtaláltad, keresgélés nélkül.",
+    "scores_explain_dynamics": "Mennyire egyenletesen ütöttél. Csak akkor jelenik meg, ha a hangszered megkülönbözteti a halkat a hangostól.",
+    "scores_explain_expression": "Mennyire követted a kotta jeleit — a staccatókat, a hangsúlyokat, a hangosat és a halkat.",
+    "scores_explain_letter": "A betű a pontosság, az időzítés és a folyamatosság átlaga. A dinamika és a kifejezés olvasnivaló, nem osztályzat.",
+    "perf_legend_dots": "A pont színe = időzítés: zöld az ütésen, borostyán közel, piros mellette"
 }
