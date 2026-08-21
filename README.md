@@ -430,7 +430,16 @@ harmony where the score asks for it, a fermata waits, ties hold, and a passage u
 8va line sounds an octave up from where it is drawn.
 
 Where a piece marks none of this — and many teaching studies deliberately mark nothing —
-it is played as written, which is honestly what the page says.
+Plinky supplies what a player would. The bar carries its own weighting: the first beat
+takes most, the middle beat next, the notes falling between beats least, so a four-four
+bar sounds unlike a three-four one rather than merely lasting longer. A phrase under a
+slur settles at its end instead of stopping dead. It is slight on purpose, and it never
+plays a note louder than the page asks — what is printed is a ceiling, and interpretation
+lives underneath it.
+
+That shaping is in what you **hear**, and nowhere else. A run is graded against what the
+score actually says, so nobody is ever marked down for missing an accent that was never
+written.
 
 ## Little tools
 

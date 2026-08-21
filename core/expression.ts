@@ -94,12 +94,24 @@ export function velocityOf(
     return Math.max(1, Math.min(127, Math.round(boosted)));
 }
 
-export function performNote(marks: NoteMarks, tempo: number): Performance {
+export function performNote(
+    marks: NoteMarks,
+    tempo: number,
+    // What fraction of its written loudness this note is actually played at — the bar's
+    // own weighting and the shape of its phrase, from `core/interpretation.ts`. One means
+    // literally as written, which is what a caller with no score context should pass.
+    //
+    // It is applied HERE and not in `velocityOf`, and the distinction is the same one
+    // `legatoOverlap` rests on: `velocityOf` is the written intention, which is what a run
+    // is graded against, and marking a player down for not guessing an unwritten accent
+    // would be indefensible.
+    interpretation = 1,
+): Performance {
     const beatSeconds = 60 / Math.max(1, tempo);
     const fullSeconds = Math.max(0, marks.quarters) * beatSeconds;
     return {
         durationSeconds: fullSeconds * lengthScaleOf(marks) + legatoOverlap(marks, tempo),
-        velocity: velocityOf(marks),
+        velocity: Math.max(1, Math.round(velocityOf(marks) * interpretation)),
     };
 }
 

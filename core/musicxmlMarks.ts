@@ -14,7 +14,12 @@ import { DEFAULT_VELOCITY } from "./expression";
 import type { OctaveShiftSpan } from "./octaveShift";
 import type { PedalSpan } from "./pedal";
 import type { SlurSpan } from "./slur";
-import { readTimeline, type XmlNote, type XmlTimeline } from "./musicxmlTimeline";
+import {
+    readTimeline,
+    type XmlBar,
+    type XmlNote,
+    type XmlTimeline,
+} from "./musicxmlTimeline";
 
 // The loudness each written dynamic asks for, as a MIDI velocity. The values a sequencer
 // conventionally uses, which is also the range the app's own default sits in.
@@ -271,6 +276,8 @@ export type ScoreMarks = {
     octaveShifts: OctaveShiftSpan[];
     dynamics: DynamicPoint[];
     tempi: TempoPoint[];
+    // Each bar's start and metre, for the weighting a bar gives its own beats.
+    bars: XmlBar[];
     fifths: number;
 };
 
@@ -282,6 +289,7 @@ export const NO_SCORE_MARKS: ScoreMarks = {
     octaveShifts: [],
     dynamics: [],
     tempi: [],
+    bars: [],
     fifths: 0,
 };
 
@@ -297,6 +305,7 @@ export function readScoreMarks(doc: Document | null): ScoreMarks {
         octaveShifts: directions.octaveShifts,
         dynamics: directions.dynamics,
         tempi: readTempoPoints(timeline),
+        bars: timeline.bars,
         fifths: readFifths(doc),
     };
 }

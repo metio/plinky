@@ -132,6 +132,15 @@ export type XmlTimeline = {
     directions: { element: Element; whole: number }[];
     // How far the music runs, for a marking the engraving opens and never closes.
     end: number;
+    // Each printed bar: where it starts and what metre it is in. What a note's place in
+    // the bar is measured against — a downbeat is only a downbeat relative to a barline.
+    bars: XmlBar[];
+};
+
+export type XmlBar = {
+    from: number;
+    beats: number;
+    beatType: number;
 };
 
 const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -199,15 +208,18 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     const notes: XmlNote[] = [];
     const measureStarts: number[] = [];
     const directions: { element: Element; whole: number }[] = [];
+    const bars: XmlBar[] = [];
     let end = 0;
     if (!root) {
-        return { notes, measureStarts, directions, end };
+        return { notes, measureStarts, directions, end, bars };
     }
 
     for (const part of partsOf(root, wanted)) {
         // Divisions are ticks per crotchet, declared in the first measure and changeable
         // later; a file that never declares them is broken, and one tick per crotchet at
         // least keeps the arithmetic finite.
+        let beats = 0;
+        let beatType = 0;
         let divisions = 1;
         // What a bar of this metre is worth, in whole notes — three-four is 0.75. Null
         // until the file states a time signature, which every real engraving does in its
@@ -227,9 +239,22 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
             }
             const time = child(measure, "time");
             if (time) {
-                const beats = numberOf(child(time, "beats"), 0);
-                const beatType = numberOf(child(time, "beat-type"), 0);
-                barWholes = beats > 0 && beatType > 0 ? beats / beatType : barWholes;
+                const stated = numberOf(child(time, "beats"), 0);
+                const statedType = numberOf(child(time, "beat-type"), 0);
+                if (stated > 0 && statedType > 0) {
+                    beats = stated;
+                    beatType = statedType;
+                    barWholes = stated / statedType;
+                }
+            }
+            // Only the first part to reach a bar records it; the rest agree about the
+            // barlines, which is what makes them one score.
+            if (bars[index] === undefined && beats > 0) {
+                bars[index] = {
+                    from: measureStarts[index] as number,
+                    beats,
+                    beatType,
+                };
             }
             const perWhole = divisions * 4;
             // Ticks from the start of the measure. `<backup>` winds it back so a second
@@ -323,5 +348,5 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     // anything.
     notes.sort((one, other) => one.whole - other.whole || one.staff - other.staff);
     directions.sort((one, other) => one.whole - other.whole);
-    return { notes, measureStarts, directions, end };
+    return { notes, measureStarts, directions, end, bars: bars.filter(Boolean) };
 }
