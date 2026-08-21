@@ -12,7 +12,7 @@ import {
 } from "../../core/elapsed";
 import { graceOnsetsMs } from "../../core/grace";
 import { pedalledAt } from "../../core/pedal";
-import { type DynamicPoint, volumeAt } from "../../core/dynamics";
+import { volumeAt } from "../../core/dynamics";
 
 // How many notes the practised hand has to play at the cursor. Only whether a position is
 // worth stopping at is asked here, so it needs neither dynamics nor timing: seeking is
@@ -32,9 +32,9 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
     return playable;
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
-import { type OctaveShiftSpan, octaveShiftAt } from "../../core/octaveShift";
-import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
-import { type SlurSpan, slurredOnwardAt } from "../../core/slur";
+import { octaveShiftAt } from "../../core/octaveShift";
+import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
 import {
     isGraceNote,
@@ -121,17 +121,15 @@ function stepsAtCursor(
     osmd: OpenSheetMusicDisplay,
     hand: Hand,
     parts: ScoreParts,
-    dynamics: readonly DynamicPoint[],
-    slurs: readonly SlurSpan[],
-    shifts: readonly OctaveShiftSpan[],
+    marks: ScoreMarks,
 ): PositionSteps {
     const whole = osmd.cursor.iterator.currentTimeStamp?.RealValue ?? 0;
     // The dynamic in force at this position, read once: it is a property of where the
     // cursor sits, not of any one note under it.
-    const dynamicVolume = volumeAt(dynamics, whole);
+    const dynamicVolume = volumeAt(marks.dynamics, whole);
     // Likewise the arch: a slur is a span, and every note under it is joined onward
     // whether or not the engraving hung a mark on that particular note.
-    const slurredOnward = slurredOnwardAt(slurs, whole);
+    const slurredOnward = slurredOnwardAt(marks.slurs, whole);
     // A fermata belongs to the position too: it holds whatever is sounding, and a rest can
     // carry one. So it is read across everything under the cursor, including the notes the
     // practised hand does not play.
@@ -178,7 +176,7 @@ function stepsAtCursor(
             if (!expression.strike) {
                 continue;
             }
-            pitches.push(note.halfTone + 12 + octaveShiftAt(shifts, whole));
+            pitches.push(note.halfTone + 12 + octaveShiftAt(marks.octaveShifts, whole));
             pitchStaves.push(staff ?? 0);
             pitchHands.push(handOfStaff(staff, parts));
             // Each key is asked for on its own terms: its own accent over the standing
@@ -230,7 +228,9 @@ function stepsAtCursor(
         advanceQuarters: shortestLength(osmd),
         // The tempo in force, so a piece that changes speed is measured by the clock it
         // is written against rather than one average for the whole score.
-        bpm: readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
+        // From the file, so a tempo written mid-bar takes effect where it is written
+        // rather than at the barline before it — which is what the engraver could only do.
+        bpm: tempoAt(marks.tempi, whole) ?? readTempo(osmd.cursor.iterator) ?? NOMINAL_BPM,
         stretch: fermata ? FERMATA_STRETCH : 1,
         groups,
     };
@@ -301,14 +301,9 @@ export function collectMatchSteps(
     const parts = readParts(osmd);
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it is a property of where a position sits rather than of the position.
-    const dynamics = marks.dynamics;
     // Where the score asks for the sustain pedal, so a passage meant to be pedalled is
     // not read as one played staccato.
     const pedals = marks.pedals;
-    const slurs = marks.slurs;
-    // 8va: the printed pitch is not the played one, and the run must ask for what the
-    // player is being told to play.
-    const shifts = marks.octaveShifts;
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -319,7 +314,7 @@ export function collectMatchSteps(
     const walked: (PositionSteps & { bar: number })[] = [];
     while (!osmd.cursor.iterator.EndReached) {
         walked.push({
-            ...stepsAtCursor(osmd, hand, parts, dynamics, slurs, shifts),
+            ...stepsAtCursor(osmd, hand, parts, marks),
             bar: osmd.cursor.iterator.CurrentMeasureIndex,
         });
         osmd.cursor.next();
@@ -642,7 +637,10 @@ export function useScoreMatcher(
             // so the first step's position anchors every later relative index.
             runStartIndexRef.current = steps[0] ? all.indexOf(steps[0]) : 0;
             runTempoRef.current = optionsRef.current.tempo ?? 100;
-            runStartBpmRef.current = readStartTempo(osmd) ?? NOMINAL_BPM;
+            runStartBpmRef.current =
+                tempoAt(optionsRef.current.marks?.tempi ?? [], 0) ??
+                readStartTempo(osmd) ??
+                NOMINAL_BPM;
             runHandRef.current = hand;
             practicingRef.current = true;
             setBar(currentBar(state));

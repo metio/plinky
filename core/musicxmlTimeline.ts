@@ -121,8 +121,8 @@ export type XmlTimeline = {
     notes: XmlNote[];
     // Where each printed measure begins, in whole notes.
     measureStarts: number[];
-    // Every `<direction>` in the document, stamped with where the measure's cursor had
-    // reached when it was met.
+    // Every `<direction>` and standalone `<sound>` in the document, stamped with where the
+    // measure's cursor had reached when it was met.
     //
     // Stamped here rather than found again later because working out that onset is the
     // fiddly part — divisions, backups, chords that do not advance, grace notes that take
@@ -251,7 +251,9 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     furthest = Math.max(furthest, atTicks);
                     continue;
                 }
-                if (tag === "direction") {
+                // A `<sound>` may stand on its own in a measure as well as inside a
+                // direction, and it is where a tempo change is actually written.
+                if (tag === "direction" || tag === "sound") {
                     directions.push({
                         element,
                         whole: (measureStarts[index] as number) + atTicks / perWhole,

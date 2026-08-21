@@ -53,6 +53,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
         // the matcher makes, through the same rule.
         const groups = playOrder([...cursor.NotesUnderCursor()], (note) => note);
         for (const [order, group] of groups.entries()) {
+            const whole = cursor.iterator.currentTimeStamp?.RealValue ?? 0;
             const play: KeepUpStep["play"] = [];
             const accompany: KeepUpStep["accompany"] = [];
             const lengths: number[] = [];
@@ -76,6 +77,7 @@ export function collectKeepUpSteps(osmd: OpenSheetMusicDisplay, hand: Hand): Kee
                 }
             }
             steps.push({
+                whole,
                 play,
                 accompany,
                 lengths,
@@ -103,6 +105,10 @@ export function useKeepUp({
     tempo,
     beatsPerBar,
     centerCursor,
+    // Where the music has reached, before the position sounds. The notes highway reads it
+    // to draw what is coming — without it the highway has nothing to advance and simply
+    // does not appear, which is what a tempo-locked run looked like until now.
+    onPosition,
     markPainted,
     onFinish,
 }: {
@@ -113,6 +119,10 @@ export function useKeepUp({
     beatsPerBar: number;
     // Re-centre the treadmill after each cursor step; a no-op elsewhere.
     centerCursor: () => void;
+    // Where the music has reached, before the position sounds. The notes highway reads it
+    // to draw what is coming — without it there is nothing to advance and the highway does
+    // not appear at all, which is what a tempo-locked run looked like until now.
+    onPosition?: (whole: number) => void;
     // A run paints the score — the "play now" window, then a green/red hit/miss
     // trail it leaves in place. The surface tracks that something is painted so the
     // next run re-renders to wipe it; without this signal last run's marks persist.
@@ -262,6 +272,9 @@ export function useKeepUp({
         const tick = () => {
             closeStep();
             const current = steps[step];
+            if (current) {
+                onPosition?.(current.whole);
+            }
             if (!current) {
                 finish();
                 return;

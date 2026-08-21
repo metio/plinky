@@ -54,7 +54,13 @@ function fakeOsmd(positions: Voice[][]) {
                       },
             ),
         get iterator() {
-            return { EndReached: idx >= positions.length };
+            return {
+                EndReached: idx >= positions.length,
+                // Each position a crotchet on from the last, so onsets advance the way a
+                // real walk's do. A fake reporting the same onset everywhere would let a
+                // caller reading the position pass while reading it wrongly.
+                currentTimeStamp: { RealValue: idx * 0.25 },
+            };
         },
     };
     return { cursor } as unknown as OpenSheetMusicDisplay;
@@ -80,6 +86,7 @@ describe("collectKeepUpSteps", () => {
         // sees both hands (and the rest), so the clock advances with the notation.
         expect(collectKeepUpSteps(osmd, "right")).toEqual([
             {
+                whole: 0,
                 play: [{ pitch: 60, quarters: 1 }],
                 accompany: [{ pitch: 48, quarters: 2 }],
                 lengths: [1, 2],
@@ -88,6 +95,7 @@ describe("collectKeepUpSteps", () => {
                 advancesCursor: true,
             },
             {
+                whole: 0.25,
                 play: [],
                 accompany: [],
                 lengths: [1],
@@ -96,6 +104,7 @@ describe("collectKeepUpSteps", () => {
                 advancesCursor: true,
             },
             {
+                whole: 0.5,
                 play: [{ pitch: 62, quarters: 1 }],
                 accompany: [],
                 lengths: [1],
@@ -106,6 +115,7 @@ describe("collectKeepUpSteps", () => {
         ]);
         // The left hand catches staff-1 pitches instead, accompanied by staff 0.
         expect(collectKeepUpSteps(osmd, "left")[0]).toEqual({
+            whole: 0,
             play: [{ pitch: 48, quarters: 2 }],
             accompany: [{ pitch: 60, quarters: 1 }],
             lengths: [1, 2],

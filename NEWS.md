@@ -8,6 +8,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 22 August 2026
+
+**The notes highway works when you play along to the beat.** Choosing "Keep up" for
+the pace used to leave the highway blank — it drew what was coming from the self-paced
+run, and playing along to the beat stands that run down, so there was nothing to draw.
+It now follows the beat, descending at the pace of the music.
+
+**Tempo changes take effect where they are written.** A piece that slows down in the
+middle of a bar used to slow at the barline before it, because the tempo was read a
+bar at a time. About one piece in eight in the library writes one.
+
 ## 21 August 2026 — night
 
 **Pieces that used to drift now keep time.** Some scores write a bar containing more

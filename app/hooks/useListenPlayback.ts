@@ -5,7 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
-import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
+import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
 import { octaveShiftAt } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
@@ -150,7 +150,9 @@ export function collectListenSteps(
                 lengths,
                 whole,
                 measureIndex: cursor.iterator.CurrentMeasureIndex,
-                bpm: readTempo(cursor.iterator) ?? NOMINAL_BPM,
+                // From the file, so a tempo written mid-bar takes effect where it is
+                // written rather than at the barline before it.
+                bpm: tempoAt(marks.tempi, whole) ?? readTempo(cursor.iterator) ?? NOMINAL_BPM,
                 stretch: fermata ? FERMATA_STRETCH : 1,
                 advancesCursor: order === groups.length - 1,
             };
@@ -354,7 +356,7 @@ export function useListenPlayback({
         // notes the trail colours. `step` tracks the position being sounded.
         const steps = collectListenSteps(osmd, marksRef.current);
         // Every baked tempo is the score's own; the dial is read against the opening one.
-        const startBpm = readStartTempo(osmd) ?? NOMINAL_BPM;
+        const startBpm = tempoAt(marksRef.current.tempi, 0) ?? readStartTempo(osmd) ?? NOMINAL_BPM;
         // The tempo to sound the position under the cursor at.
         const localTempo = (at: ListenStep) => effectiveTempo(tempo(), at.bpm, startBpm);
         // The first playable index at the loop's start bar, or the resume onset, or

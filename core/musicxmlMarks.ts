@@ -193,6 +193,66 @@ function readDirection(
     }
 }
 
+// What a `<beat-unit>` is worth in crotchets, so a metronome mark written in anything else
+// can be said in the unit everything downstream counts in.
+const BEAT_UNIT_QUARTERS: Record<string, number> = {
+    whole: 4,
+    half: 2,
+    quarter: 1,
+    eighth: 0.5,
+    "16th": 0.25,
+};
+
+// Where the piece changes speed, in crotchets per minute, at the moment it changes.
+//
+// The engraver could only answer this per measure — it resolves a tempo onto the bar the
+// mark sits in — so a mark written mid-bar took effect at the barline before it. Thirteen
+// files in a hundred in the catalogue write one, and in every one of them a rit. or an
+// a tempo arrived early by up to a bar.
+export function readTempoPoints(timeline: XmlTimeline): TempoPoint[] {
+    const points: TempoPoint[] = [];
+    for (const { element, whole } of timeline.directions) {
+        // `<sound tempo>` is the sounding instruction and is always in crotchets; a
+        // `<metronome>` is the printed one and says which note it is counting.
+        const sound = element.tagName === "sound" ? element : child(element, "sound");
+        const stated = Number(sound?.getAttribute("tempo") ?? Number.NaN);
+        if (Number.isFinite(stated) && stated > 0) {
+            points.push({ whole, bpm: stated });
+            continue;
+        }
+        const metronome = child(element, "metronome");
+        if (!metronome) {
+            continue;
+        }
+        const perMinute = Number(text(child(metronome, "per-minute")));
+        const unit = BEAT_UNIT_QUARTERS[text(child(metronome, "beat-unit"))] ?? 1;
+        // A dot on the beat unit makes it half as long again — a dotted crotchet in 6/8.
+        const dotted = metronome.getElementsByTagName("beat-unit-dot").length > 0 ? 1.5 : 1;
+        if (Number.isFinite(perMinute) && perMinute > 0) {
+            points.push({ whole, bpm: perMinute * unit * dotted });
+        }
+    }
+    return points;
+}
+
+export type TempoPoint = {
+    whole: number;
+    // Crotchets per minute, whatever note the mark was written against.
+    bpm: number;
+};
+
+// The tempo in force at a printed position, or null where the piece has stated none yet.
+export function tempoAt(points: readonly TempoPoint[], whole: number): number | null {
+    let found: number | null = null;
+    for (const point of points) {
+        if (point.whole <= whole + 1e-9) {
+            found = point.bpm;
+        }
+    }
+    return found;
+}
+
+
 // The key signature the piece opens in, as its count of sharps (positive) or flats.
 export function readFifths(doc: Document): number {
     const fifths = doc.documentElement?.getElementsByTagName("fifths")[0];
@@ -210,6 +270,7 @@ export type ScoreMarks = {
     pedals: PedalSpan[];
     octaveShifts: OctaveShiftSpan[];
     dynamics: DynamicPoint[];
+    tempi: TempoPoint[];
     fifths: number;
 };
 
@@ -220,6 +281,7 @@ export const NO_SCORE_MARKS: ScoreMarks = {
     pedals: [],
     octaveShifts: [],
     dynamics: [],
+    tempi: [],
     fifths: 0,
 };
 
@@ -234,6 +296,7 @@ export function readScoreMarks(doc: Document | null): ScoreMarks {
         pedals: directions.pedals,
         octaveShifts: directions.octaveShifts,
         dynamics: directions.dynamics,
+        tempi: readTempoPoints(timeline),
         fifths: readFifths(doc),
     };
 }
