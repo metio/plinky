@@ -356,7 +356,14 @@ const BUDGET_VENDOR_KB = 324;
 // a page that needs none of it. Drawing it costs about a kilobyte; the engine would
 // have cost the page its whole budget. Also: the diatonic chord worksheet and the
 // second export format on the tools page, and the practice-time-per-piece panel.
-const BUDGET_APP_KB = 365;
+// 367. Reading the music out of the file instead of out of the engraver: the timeline
+// (onsets, lengths, chords, backups, ties, divisions), the marks written over it
+// (dynamics and hairpins, pedal, octave lines, arches, the key), and the repeat structure.
+// About a kilobyte, and it buys the retirement of the readers that caused the two worst
+// silent bugs this app has had — dynamics that returned null for every real score for
+// years, and slurs that joined only the first note of every phrase — plus correct timing
+// on the thirteen per cent of the catalogue that overruns its own barlines.
+const BUDGET_APP_KB = 367;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

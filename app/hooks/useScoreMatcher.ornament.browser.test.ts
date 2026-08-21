@@ -3,9 +3,10 @@
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
+import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
 import { collectListenSteps } from "./useListenPlayback";
 import { collectMatchSteps } from "./useScoreMatcher";
-import { readArpeggio, readKeyFifths, readOrnament } from "../lib/scoreExpression";
+import { readArpeggio, readOrnament } from "../lib/scoreExpression";
 
 // Ornaments and the key they reach into, read off a live engraving.
 //
@@ -30,9 +31,15 @@ const score = (measures: string) => `<?xml version="1.0" encoding="UTF-8"?>
   <part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
   <part id="P1">${measures}</part></score-partwise>`;
 
+// The markings of whatever was last engraved, read from the very document the engraver was
+// given — which is the path the app takes. The engraver draws the page; the file says what
+// is written on it, and the two are exercised together here on purpose.
+let marks: ScoreMarks = NO_SCORE_MARKS;
+
 let host: HTMLDivElement | null = null;
 
 function load(xml: string): Promise<OpenSheetMusicDisplay> {
+    marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
     host = document.createElement("div");
     host.style.width = "800px";
     document.body.appendChild(host);
@@ -76,28 +83,9 @@ describe("a score with ornaments over its notes", () => {
         });
     });
 
-    it("reads the key signature, sharps and flats alike", () => {
-        return Promise.all([
-            load(score(`<measure number="1">${attr(3)}${plain("C", 5)}</measure>`)).then((osmd) => {
-                expect(readKeyFifths(osmd)).toBe(3);
-                host?.remove();
-            }),
-        ]).then(() =>
-            load(score(`<measure number="1">${attr(-3)}${plain("C", 5)}</measure>`)).then(
-                (osmd) => {
-                    expect(readKeyFifths(osmd)).toBe(-3);
-                },
-            ),
-        );
-    });
-
-    it("reads a score with no signature as C major rather than as nothing", () => {
-        return load(score(`<measure number="1">${attr(0)}${plain("C", 5)}</measure>`)).then(
-            (osmd) => {
-                expect(readKeyFifths(osmd)).toBe(0);
-            },
-        );
-    });
+    // The key signature itself is read from the file, so testing it does not need an
+    // engraving — core/musicxmlMarks.test.ts covers it in node. What still needs one is
+    // below: that the key reaches the figure a real score's ornament actually plays.
 
     it("plays the figure in place of the note, in the key it is written in", () => {
         // E flat major: the note below C is B flat. A mordent that reached a fixed distance
@@ -107,7 +95,7 @@ describe("a score with ornaments over its notes", () => {
                 `<measure number="1">${attr(-3)}${ornamented("C", 5, "mordent")}${plain("D", 5)}</measure>`,
             ),
         ).then((osmd) => {
-            const steps = collectListenSteps(osmd);
+            const steps = collectListenSteps(osmd, marks);
             const sounded = steps.flatMap((step) => step.notes.map((note) => note.pitch));
             // C5, B flat 4, C5 — then the plain D.
             expect(sounded).toEqual([72, 70, 72, 74]);
@@ -121,7 +109,7 @@ describe("a score with ornaments over its notes", () => {
                 `<measure number="1">${attr(0)}${ornamented("C", 5, "turn")}${plain("D", 5)}</measure>`,
             ),
         ).then((osmd) => {
-            const steps = collectListenSteps(osmd);
+            const steps = collectListenSteps(osmd, marks);
             const figure = steps.filter((step) => step.whole === 0);
             expect(figure.length).toBeGreaterThan(1);
             expect(figure.slice(0, -1).every((step) => !step.advancesCursor)).toBe(true);
@@ -136,7 +124,7 @@ describe("a score with ornaments over its notes", () => {
                 `<measure number="1">${attr(0)}${ornamented("C", 5, "trill-mark")}${plain("D", 5)}</measure>`,
             ),
         ).then((osmd) => {
-            const steps = collectListenSteps(osmd);
+            const steps = collectListenSteps(osmd, marks);
             const figure = steps.filter((step) => step.whole === 0);
             const spent = figure.reduce((sum, step) => sum + (step.lengths[0] ?? 0), 0);
             expect(spent).toBeCloseTo(1, 6);
@@ -162,7 +150,7 @@ describe("a chord the score rolls", () => {
     it("leaves a plain chord alone", () => {
         return load(score(`<measure number="1">${attr(0)}${chord(false)}</measure>`)).then(
             (osmd) => {
-                const steps = collectListenSteps(osmd);
+                const steps = collectListenSteps(osmd, marks);
                 expect(steps).toHaveLength(1);
                 expect(steps[0]?.notes.map((note) => note.pitch)).toEqual([60, 64, 67]);
             },
@@ -172,7 +160,7 @@ describe("a chord the score rolls", () => {
     it("strikes a rolled chord from the bottom up, one note at a time", () => {
         return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
             (osmd) => {
-                const steps = collectListenSteps(osmd);
+                const steps = collectListenSteps(osmd, marks);
                 expect(steps.map((step) => step.notes.map((note) => note.pitch))).toEqual([
                     [60],
                     [64],
@@ -187,7 +175,7 @@ describe("a chord the score rolls", () => {
         // when the next began would be a run up the arpeggio, not a chord.
         return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
             (osmd) => {
-                const steps = collectListenSteps(osmd);
+                const steps = collectListenSteps(osmd, marks);
                 expect(steps.every((step) => step.notes[0]?.soundQuarters === 1)).toBe(true);
                 // The spread is small, and the chord still spends exactly its own time.
                 const spent = steps.reduce((sum, step) => sum + (step.lengths[0] ?? 0), 0);
@@ -200,7 +188,7 @@ describe("a chord the score rolls", () => {
     it("moves the cursor once for the whole chord", () => {
         return load(score(`<measure number="1">${attr(0)}${chord(true)}</measure>`)).then(
             (osmd) => {
-                const steps = collectListenSteps(osmd);
+                const steps = collectListenSteps(osmd, marks);
                 expect(steps.filter((step) => step.advancesCursor)).toHaveLength(1);
                 expect(steps.at(-1)?.advancesCursor).toBe(true);
             },
@@ -223,7 +211,7 @@ describe("a score with an 8va over it", () => {
                  <measure number="2">${plain("C", 5)}</measure>`,
             ),
         ).then((osmd) => {
-            const sounded = collectListenSteps(osmd).flatMap((step) =>
+            const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
                 step.notes.map((note) => note.pitch),
             );
             // Whatever OSMD's answer is, the third note is outside the 8va and must differ
@@ -241,7 +229,7 @@ describe("a score with an 8va over it", () => {
                 `<measure number="1">${attr(0)}${shift("up")}${plain("C", 5)}${plain("D", 5)}${shift("stop")}</measure>`,
             ),
         ).then((osmd) => {
-            expect(collectMatchSteps(osmd, "both").map((step) => step.pitches)).toEqual([
+            expect(collectMatchSteps(osmd, "both", marks).map((step) => step.pitches)).toEqual([
                 [84],
                 [86],
             ]);
@@ -255,7 +243,7 @@ describe("a score with an 8va over it", () => {
                  <measure number="2">${plain("D", 5)}</measure>`,
             ),
         ).then((osmd) => {
-            const sounded = collectListenSteps(osmd).flatMap((step) =>
+            const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
                 step.notes.map((note) => note.pitch),
             );
             expect(sounded).toEqual([84, 86]);
@@ -266,7 +254,7 @@ describe("a score with an 8va over it", () => {
         return load(
             score(`<measure number="1">${attr(0)}${plain("C", 5)}${plain("D", 5)}</measure>`),
         ).then((osmd) => {
-            const sounded = collectListenSteps(osmd).flatMap((step) =>
+            const sounded = collectListenSteps(osmd, marks).flatMap((step) =>
                 step.notes.map((note) => note.pitch),
             );
             expect(sounded).toEqual([72, 74]);

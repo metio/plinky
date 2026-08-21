@@ -3,16 +3,8 @@
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
-import { readDirections, readFifths, slurSpans } from "../../core/musicxmlMarks";
 import { performanceOrder, readMeasureRepeats } from "../../core/musicxmlRepeats";
 import { readTimeline } from "../../core/musicxmlTimeline";
-import {
-    readKeyFifths,
-    readOctaveShiftSpans,
-    readOrnament,
-    readPedalSpans,
-    readSlurSpans,
-} from "./scoreExpression";
 
 // Does reading the file agree with reading the engraver?
 //
@@ -164,91 +156,6 @@ describe("the file and the engraver agree about the music", () => {
             });
         });
     }
-});
-
-// The marks, both ways. These are the readings being retired, so each one is compared
-// against the engraver on the shape that produced it.
-describe("the file and the engraver agree about the marks", () => {
-    it("finds the same arches", () => {
-        const xml = score(
-            `<measure number="1">${ATTR()}` +
-                `<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><notations><slur number="1" type="start"/></notations></note>` +
-                `<note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration></note>` +
-                `<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><notations><slur number="1" type="stop"/></notations></note>` +
-                `<note><pitch><step>F</step><octave>4</octave></pitch><duration>4</duration></note>` +
-                `</measure>`,
-        );
-        return load(xml).then((osmd) => {
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
-            expect(slurSpans(readTimeline(doc).notes)).toEqual(readSlurSpans(osmd));
-        });
-    });
-
-    it("finds the same pedal spans", () => {
-        const xml = score(
-            `<measure number="1">${ATTR()}` +
-                `<direction><direction-type><pedal type="start" line="yes"/></direction-type></direction>` +
-                note("C", 4, 8) +
-                note("D", 4, 8) +
-                `<direction><direction-type><pedal type="stop" line="yes"/></direction-type></direction>` +
-                `</measure>`,
-        );
-        return load(xml).then((osmd) => {
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
-            const timeline = readTimeline(doc);
-            expect(readDirections(timeline).pedals).toEqual(readPedalSpans(osmd));
-        });
-    });
-
-    it("finds the same octave lines", () => {
-        const xml = score(
-            `<measure number="1">${ATTR()}` +
-                `<direction><direction-type><octave-shift type="up" size="8"/></direction-type></direction>` +
-                note("C", 5, 8) +
-                note("D", 5, 8) +
-                `<direction><direction-type><octave-shift type="stop" size="8"/></direction-type></direction>` +
-                `</measure>`,
-        );
-        return load(xml).then((osmd) => {
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
-            const timeline = readTimeline(doc);
-            const mine = readDirections(timeline).octaveShifts;
-            const theirs = readOctaveShiftSpans(osmd);
-            expect(mine.map((one) => one.semitones)).toEqual(theirs.map((one) => one.semitones));
-            expect(mine.map((one) => one.from)).toEqual(theirs.map((one) => one.from));
-        });
-    });
-
-    it("reads the same key signature", () => {
-        const xml = score(
-            `<measure number="1"><attributes><divisions>4</divisions><key><fifths>-3</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>${note("C", 4, 16)}</measure>`,
-        );
-        return load(xml).then((osmd) => {
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
-            expect(readFifths(doc)).toBe(readKeyFifths(osmd));
-        });
-    });
-
-    it("recognises the same little signs over the same notes", () => {
-        const ornamented = (kind: string) =>
-            `<note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><notations><ornaments><${kind}/></ornaments></notations></note>`;
-        const xml = score(
-            `<measure number="1">${ATTR()}${ornamented("trill-mark")}${ornamented("mordent")}${ornamented("turn")}${note("D", 5, 4)}</measure>`,
-        );
-        return load(xml).then((osmd) => {
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
-            const mine = readTimeline(doc).notes.map((one) => one.marks.ornament);
-            const cursor = osmd.cursor;
-            cursor.reset();
-            const theirs: (string | null)[] = [];
-            while (!cursor.iterator.EndReached) {
-                theirs.push(readOrnament(cursor.NotesUnderCursor()[0]));
-                cursor.next();
-            }
-            cursor.reset();
-            expect(mine).toEqual(theirs);
-        });
-    });
 });
 
 describe("the file and the engraver agree about the order the music is played in", () => {

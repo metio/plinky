@@ -6,6 +6,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NOMINAL_BPM } from "../../core/elapsed";
+import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import type { Take } from "../../core/takes";
 import { collectListenSteps, useListenPlayback } from "./useListenPlayback";
 
@@ -87,7 +88,9 @@ let loopState: { on: boolean; from: number; to: number };
 
 const onPosition = vi.fn();
 
-function mount(osmd: OpenSheetMusicDisplay | null) {
+// The score's markings. They no longer come off the engraver, so a test that wants a
+// dynamic in force says what the score writes rather than mimicking an object shape.
+function mount(osmd: OpenSheetMusicDisplay | null, marks: ScoreMarks = NO_SCORE_MARKS) {
     return renderHook(() =>
         useListenPlayback({
             getOsmd: () => osmd,
@@ -97,6 +100,7 @@ function mount(osmd: OpenSheetMusicDisplay | null) {
             onLap,
             centerCursor: () => {},
             onPosition,
+            marks,
             markPainted: () => {},
             isPracticing: () => false,
         }),
@@ -256,7 +260,10 @@ describe("useListenPlayback", () => {
         playNote.mockClear();
 
         // A marked dynamic sets the loudness outright.
-        const soft = mount(fakeOsmd(1, {}, 40));
+        const soft = mount(fakeOsmd(1), {
+            ...NO_SCORE_MARKS,
+            dynamics: [{ whole: 0, volume: 40, ramp: false }],
+        });
         act(() => soft.result.current.start(0));
         expect(playNote).toHaveBeenCalledWith(60, { duration: 0.5, velocity: 40 });
         act(() => soft.result.current.stop());

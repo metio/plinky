@@ -5,6 +5,7 @@
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import {
     collectMatchSteps,
     collectSteps,
@@ -122,6 +123,14 @@ function fakeOsmd(
         shown: () => shown,
     };
 }
+
+// A score marked mezzo-forte throughout. The dynamics no longer come off the engraver, so
+// a test that wants a loudness in force says so — which is the honest way round: it is
+// stating what the score writes rather than mimicking an object shape.
+const MARKED: ScoreMarks = {
+    ...NO_SCORE_MARKS,
+    dynamics: [{ whole: 0, volume: 80, ramp: false }],
+};
 
 function render(positions: Position[], options: Parameters<typeof useScoreMatcher>[1] = {}) {
     const handle = fakeOsmd(positions);
@@ -514,7 +523,7 @@ describe("what the score asks of each key", () => {
 
     it("gives the accented note of a chord its own loudness", () => {
         const { osmd } = fakeOsmd([[{ midi: 60 }, { midi: 67, accent: true }]]);
-        const [plain, accented] = collectMatchSteps(osmd, "both")[0]?.expected ?? [];
+        const [plain, accented] = collectMatchSteps(osmd, "both", MARKED)[0]?.expected ?? [];
         expect(plain?.velocity).not.toBeNull();
         expect(accented?.velocity as number).toBeGreaterThan(plain?.velocity as number);
     });
@@ -522,9 +531,11 @@ describe("what the score asks of each key", () => {
     it("reports what each struck key was asked for, in the order they were played", () => {
         // The chord is cleared low-then-high here; the expectations must follow the
         // player's order, not the score's, or an accent lands on the wrong key.
-        const view = render([[{ midi: 60 }, { midi: 67, accent: true }]], {});
+        const view = render([[{ midi: 60 }, { midi: 67, accent: true }]], { marks: MARKED });
         const cleared: CorrectInfo[] = [];
-        view.rerender({ opts: { onCorrect: (info: CorrectInfo) => cleared.push(info) } });
+        view.rerender({
+            opts: { marks: MARKED, onCorrect: (info: CorrectInfo) => cleared.push(info) },
+        });
         act(() => {
             view.result.current.start();
         });

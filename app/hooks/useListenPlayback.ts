@@ -5,6 +5,7 @@ import type { Cursor, OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
+import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import { octaveShiftAt } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
@@ -16,14 +17,9 @@ import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
 import type { Take } from "../../core/takes";
 import {
     playOrder,
-    readDynamics,
-    readPedalSpans,
     readArpeggio,
-    readKeyFifths,
-    readOctaveShiftSpans,
     readOrnament,
     readScoreExpression,
-    readSlurSpans,
     readStartTempo,
     readTempo,
 } from "../lib/scoreExpression";
@@ -88,21 +84,23 @@ export type ListenStep = {
 // the lengths for the beat. Leaves the cursor reset. The clock then reads its
 // notes from this array, so playback reads no musical data off the live cursor —
 // the cursor only mirrors the position and carries the notes the trail colours.
-export function collectListenSteps(osmd: OpenSheetMusicDisplay): ListenStep[] {
+export function collectListenSteps(
+    osmd: OpenSheetMusicDisplay,
+    // Read from the file rather than off the engraver — see core/musicxmlMarks.
+    marks: ScoreMarks = NO_SCORE_MARKS,
+): ListenStep[] {
     const cursor = osmd.cursor;
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it belongs to the position's place in the piece, not to the position.
-    const dynamics = readDynamics(osmd);
+    const dynamics = marks.dynamics;
     // Where the score asks for the sustain pedal: under it the harmony pools, and a note
     // keeps sounding past its written length until the pedal comes up.
-    const pedals = readPedalSpans(osmd);
-    // The arches, as spans. Read before the walk below, because reading them is itself a
-    // walk and it leaves the cursor reset.
-    const slurs = readSlurSpans(osmd);
+    const pedals = marks.pedals;
+    const slurs = marks.slurs;
     // Which notes an ornament reaches for depends on the key it is written in.
-    const fifths = readKeyFifths(osmd);
+    const fifths = marks.fifths;
     // Where the score prints 8va, the drawn pitch is deliberately not the played one.
-    const shifts = readOctaveShiftSpans(osmd);
+    const shifts = marks.octaveShifts;
     cursor.reset();
     const steps: ListenStep[] = [];
     while (!cursor.iterator.EndReached) {
@@ -256,6 +254,7 @@ export function useListenPlayback({
     onLap,
     centerCursor,
     onPosition,
+    marks = NO_SCORE_MARKS,
     markPainted,
     isPracticing,
     // Light each played note on a connected instrument. Passed in rather than taken
@@ -281,6 +280,9 @@ export function useListenPlayback({
     // lookahead whether a run or Listen is walking the music, so choosing that reading
     // mode does not mean losing it the moment the computer plays.
     onPosition?: (whole: number) => void;
+    // The score's markings, read from the file — the dynamics, the arches, the pedal, the
+    // octave lines and the key an ornament reaches into.
+    marks?: ScoreMarks;
     // The trail colours the score; the surface tracks that something is painted.
     markPainted: () => void;
     // Whether a self-paced run owns the cursor — stopping playback then leaves
@@ -292,6 +294,11 @@ export function useListenPlayback({
     silenceEcho?: () => void;
 }) {
     const chain = useTimerChain();
+    // Through a ref: the walk is set up inside a callback that must not be rebuilt every
+    // time a new marks object arrives, and what it needs is whatever is current when a
+    // playback actually starts.
+    const marksRef = useRef(marks);
+    marksRef.current = marks;
     const [playing, setPlaying] = useState(false);
     // The take currently replaying, for the takes list to mark.
     const [activeReplayId, setActiveReplayId] = useState<string | null>(null);
@@ -345,7 +352,7 @@ export function useListenPlayback({
         // Lift the whole listening timeline up front; the clock reads its notes from
         // this and the cursor is only walked to mirror the position and hold the
         // notes the trail colours. `step` tracks the position being sounded.
-        const steps = collectListenSteps(osmd);
+        const steps = collectListenSteps(osmd, marksRef.current);
         // Every baked tempo is the score's own; the dial is read against the opening one.
         const startBpm = readStartTempo(osmd) ?? NOMINAL_BPM;
         // The tempo to sound the position under the cursor at.

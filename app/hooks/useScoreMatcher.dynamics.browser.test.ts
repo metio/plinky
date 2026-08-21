@@ -3,6 +3,7 @@
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
+import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
 import { collectMatchSteps } from "./useScoreMatcher";
 
 // The test that was missing. Every unit test of the dynamics reader ran against a
@@ -26,9 +27,15 @@ const score = (measures: string) => `<?xml version="1.0" encoding="UTF-8"?>
   <part id="P1">${measures}</part>
 </score-partwise>`;
 
+// The markings of whatever was last engraved, read from the very document the engraver was
+// given — which is the path the app takes. The engraver draws the page; the file says what
+// is written on it, and the two are exercised together here on purpose.
+let marks: ScoreMarks = NO_SCORE_MARKS;
+
 let host: HTMLDivElement | null = null;
 
 function load(xml: string): Promise<OpenSheetMusicDisplay> {
+    marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
     host = document.createElement("div");
     host.style.width = "800px";
     document.body.appendChild(host);
@@ -40,7 +47,7 @@ function load(xml: string): Promise<OpenSheetMusicDisplay> {
 }
 
 const asked = (osmd: OpenSheetMusicDisplay) =>
-    collectMatchSteps(osmd, "both").map((step) => step.expected?.[0]?.velocity ?? null);
+    collectMatchSteps(osmd, "both", marks).map((step) => step.expected?.[0]?.velocity ?? null);
 
 afterEach(() => {
     host?.remove();

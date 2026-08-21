@@ -23,6 +23,8 @@ import type { Grade } from "../../../core/grade";
 import type { DailyResult } from "../../../core/daily";
 import type { Take } from "../../../core/takes";
 import { useTakes } from "../../hooks/useTakes";
+import { readScoreMarks } from "../../../core/musicxmlMarks";
+import { transposeFifths } from "../../../core/ornament";
 import { transposeMusicXml } from "../../../core/transpose";
 import { useMilestoneChannel } from "../../contexts/milestone";
 import { useMidiConnection, useMidiInput } from "../../contexts/midi";
@@ -311,6 +313,20 @@ function usePlaySessionValue({
         () => (transpose === 0 ? xml : transposeMusicXml(xmlCodec, xml, transpose)),
         [xml, transpose, xmlCodec],
     );
+    // What the score writes, read from the file rather than off the engraver: the
+    // dynamics, the arches, the pedal, the octave lines and the key. Parsed once per piece
+    // — the parse is the cost, and every surface asking separately would pay it again.
+    //
+    // From the untransposed document, because that is what the file says; the key is then
+    // moved to wherever the transposition put the music, so an ornament in a transposed
+    // piece reaches into the key actually being played.
+    const marks = useMemo(() => {
+        const read = readScoreMarks(xmlCodec.parse(xml));
+        return transpose === 0
+            ? read
+            : { ...read, fifths: transposeFifths(read.fifths, transpose) };
+    }, [xml, transpose, xmlCodec]);
+
     // Which hand to practice — the hands-separate selector only appears for the
     // grand-staff (two-staff) scores it applies to (the staff count comes from the score).
     const [hand, setHand] = useState<Hand>("both");
@@ -531,6 +547,7 @@ function usePlaySessionValue({
     const matcher = useScoreMatcher(getOsmd, {
         tempo,
         hand,
+        marks,
         forgiving: aids.forgiving,
         onCorrect: (info: CorrectInfo) => {
             // Skip the note-echo under mic input — you hear your own piano.
@@ -678,6 +695,7 @@ function usePlaySessionValue({
         loop: loop.read,
         onLap: bumpTempo,
         centerCursor,
+        marks,
         // The notes highway follows Listen too, so choosing that reading mode does not
         // mean losing it the moment the computer takes over the music.
         onPosition: matcher.preview,

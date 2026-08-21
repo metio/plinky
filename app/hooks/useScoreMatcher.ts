@@ -33,15 +33,12 @@ function playableAtCursor(osmd: OpenSheetMusicDisplay, hand: Hand, parts: ScoreP
 }
 import { lengthScaleOf, velocityOf } from "../../core/expression";
 import { type OctaveShiftSpan, octaveShiftAt } from "../../core/octaveShift";
+import { NO_SCORE_MARKS, type ScoreMarks } from "../../core/musicxmlMarks";
 import { type SlurSpan, slurredOnwardAt } from "../../core/slur";
 import type { ScoreParts } from "../../core/parts";
 import {
     isGraceNote,
     playOrder,
-    readDynamics,
-    readOctaveShiftSpans,
-    readPedalSpans,
-    readSlurSpans,
     readParts,
     readScoreExpression,
     readStartTempo,
@@ -291,22 +288,27 @@ function staffArrivals(event: {
 // playable position for the chosen hand, in play order. Leaves the cursor reset.
 // Exported so the duet can lift the sitting-out hand's positions the same way,
 // reading the identical staff split the run itself matches on.
-export function collectMatchSteps(osmd: OpenSheetMusicDisplay, hand: Hand): MatchStep[] {
+export function collectMatchSteps(
+    osmd: OpenSheetMusicDisplay,
+    hand: Hand,
+    // The score's markings, read from the file rather than off the engraver. Defaulted so a
+    // caller that only wants the notes — the duet's onsets, the sample prefetch's pitches —
+    // need not carry a document it has no use for.
+    marks: ScoreMarks = NO_SCORE_MARKS,
+): MatchStep[] {
     // Which staves are the practised instrument's, worked out from the sheet rather than
     // assumed: on an art song the piano is staves 1 and 2, and staff 0 is the singer.
     const parts = readParts(osmd);
     // Every dynamic the score writes, read once for the walk: a mark stands until the
     // next one, so it is a property of where a position sits rather than of the position.
-    const dynamics = readDynamics(osmd);
+    const dynamics = marks.dynamics;
     // Where the score asks for the sustain pedal, so a passage meant to be pedalled is
     // not read as one played staccato.
-    const pedals = readPedalSpans(osmd);
-    // The arches, as spans. Read before the walk below, because reading them is itself a
-    // walk — and it leaves the cursor reset, which the walk relies on.
-    const slurs = readSlurSpans(osmd);
+    const pedals = marks.pedals;
+    const slurs = marks.slurs;
     // 8va: the printed pitch is not the played one, and the run must ask for what the
     // player is being told to play.
-    const shifts = readOctaveShiftSpans(osmd);
+    const shifts = marks.octaveShifts;
     osmd.cursor.reset();
     // Every position the performance passes through, playable or not, because elapsed time
     // is only recoverable from a walk with no holes in it: two positions that follow each
@@ -482,6 +484,10 @@ export function useScoreMatcher(
         onWrong?: (info: { index: number; misses: number }) => void;
         tempo?: number;
         hand?: Hand;
+        // The score's markings, read from the file. What a run is graded against — the
+        // loudness each note asks for, the arch that holds it, the octave line over it —
+        // comes from here rather than from the engraver's object graph.
+        marks?: ScoreMarks;
         // Forgiving advance: when the player plays a note belonging to the NEXT position,
         // treat the current one as done (crediting only what they played) and move on, so
         // a slip — especially the wrong hand in a two-hand piece — never freezes the run.
@@ -574,7 +580,10 @@ export function useScoreMatcher(
             }
             const hand = optionsRef.current.hand ?? "both";
             if (previewRef.current === null || previewRef.current.hand !== hand) {
-                previewRef.current = { hand, steps: collectMatchSteps(osmd, hand) };
+                previewRef.current = {
+                    hand,
+                    steps: collectMatchSteps(osmd, hand, optionsRef.current.marks),
+                };
             }
             const steps = previewRef.current.steps;
             // The position at or after the asked-for onset, so the note now sounding is the
@@ -605,7 +614,7 @@ export function useScoreMatcher(
                 return;
             }
             const hand = optionsRef.current.hand ?? "both";
-            const all = collectMatchSteps(osmd, hand);
+            const all = collectMatchSteps(osmd, hand, optionsRef.current.marks);
             // The first position at or after the resume point; -1 when none remains
             // (the cursor sits past the last note), which leaves nothing to play.
             const startIndex =

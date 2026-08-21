@@ -10,10 +10,11 @@
 // idea: something written at a position, standing until something else ends it.
 
 import type { DynamicPoint } from "./dynamics";
+import { DEFAULT_VELOCITY } from "./expression";
 import type { OctaveShiftSpan } from "./octaveShift";
 import type { PedalSpan } from "./pedal";
 import type { SlurSpan } from "./slur";
-import type { XmlNote, XmlTimeline } from "./musicxmlTimeline";
+import { readTimeline, type XmlNote, type XmlTimeline } from "./musicxmlTimeline";
 
 // The loudness each written dynamic asks for, as a MIDI velocity. The values a sequencer
 // conventionally uses, which is also the range the app's own default sits in.
@@ -92,7 +93,12 @@ export function readDirections(timeline: XmlTimeline): XmlDirections {
     const octaveShifts: OctaveShiftSpan[] = [];
     // What is currently open. One object rather than a handful of variables, so the
     // per-direction reader below can be a plain function instead of a closure over this one.
-    const open: OpenSpans = { pedal: null, shift: null, end: timeline.end };
+    const open: OpenSpans = {
+        pedal: null,
+        shift: null,
+        end: timeline.end,
+        volume: DEFAULT_VELOCITY,
+    };
 
     for (const { element, whole } of timeline.directions) {
         readDirection(element, whole, { dynamics, pedals, octaveShifts }, open);
@@ -117,6 +123,8 @@ type OpenSpans = {
     pedal: number | null;
     shift: { at: number; semitones: number } | null;
     end: number;
+    // The loudness in force, so a hairpin knows what it is swelling from.
+    volume: number;
 };
 
 function readDirection(
@@ -132,17 +140,23 @@ function readDirection(
                 const volume = DYNAMIC_VELOCITY[mark.tagName];
                 if (volume !== undefined) {
                     out.dynamics.push({ whole: at, volume, ramp: false });
+                    open.volume = volume;
                 }
             }
         }
         const wedge = child(type, "wedge");
         if (wedge) {
             const kind = wedge.getAttribute("type");
-            // A hairpin's start is where the loudness begins to slide; the mark it slides
-            // TOWARD is whatever is written next, which is why this is a ramp flag on a
-            // point rather than a span of its own.
+            // A hairpin's start is where the loudness begins to slide, and the mark it
+            // slides TOWARD is whatever is written next — which is why this is a ramp flag
+            // on a point rather than a span of its own.
+            //
+            // It carries the loudness the swell begins FROM, which is whatever was already
+            // in force. A hairpin does not itself say how loud anything is; it says the
+            // loudness changes from here. Where nothing precedes it the swell still has to
+            // start somewhere, and the default is where a player would start.
             if (kind === "crescendo" || kind === "diminuendo") {
-                out.dynamics.push({ whole: at, volume: Number.NaN, ramp: true });
+                out.dynamics.push({ whole: at, volume: open.volume, ramp: true });
             }
         }
         const pedal = child(type, "pedal");
@@ -184,4 +198,42 @@ export function readFifths(doc: Document): number {
     const fifths = doc.documentElement?.getElementsByTagName("fifths")[0];
     const value = Number(text(fifths));
     return Number.isFinite(value) ? value : 0;
+}
+
+// Everything a surface needs to know about a score's markings, read once.
+//
+// The readers above each answer one question, which is right for testing them and wrong
+// for using them: a caller wants the whole set, and asking for it in five calls means five
+// chances to forget one. The dynamics reader was forgotten for years in exactly that way.
+export type ScoreMarks = {
+    slurs: SlurSpan[];
+    pedals: PedalSpan[];
+    octaveShifts: OctaveShiftSpan[];
+    dynamics: DynamicPoint[];
+    fifths: number;
+};
+
+// A score with nothing written on it — which is also the honest answer for a caller that
+// has no document to read, rather than a reason to branch at every use.
+export const NO_SCORE_MARKS: ScoreMarks = {
+    slurs: [],
+    pedals: [],
+    octaveShifts: [],
+    dynamics: [],
+    fifths: 0,
+};
+
+export function readScoreMarks(doc: Document | null): ScoreMarks {
+    if (!doc) {
+        return NO_SCORE_MARKS;
+    }
+    const timeline = readTimeline(doc);
+    const directions = readDirections(timeline);
+    return {
+        slurs: slurSpans(timeline.notes),
+        pedals: directions.pedals,
+        octaveShifts: directions.octaveShifts,
+        dynamics: directions.dynamics,
+        fifths: readFifths(doc),
+    };
 }
