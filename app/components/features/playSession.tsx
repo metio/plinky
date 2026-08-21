@@ -873,19 +873,29 @@ function usePlaySessionValue({
     // transport walks the cursor from wherever it sits — the note Practice was on when
     // handing over, or where a paused run left off — instead of rewinding, so play can pass
     // back and forth without losing the place.
-    const listen = () => {
+    // `onStage` says whether this came from the full-screen transport or from the resting
+    // page. Listening from the page is "what does this sound like?" — a question asked
+    // BEFORE committing to the playing surface, so answering it by throwing the reader into
+    // full screen would be answering a different question.
+    const listen = (onStage = true) => {
         if (listenPlayback.active() || keepUp.active()) {
             return;
         }
         const from = resumePoint();
-        enterPlayFullscreen();
+        if (onStage) {
+            enterPlayFullscreen();
+        }
         matcher.stop();
         // Before Listen touches the cursor: collecting the lookahead walks it, and a walk
         // afterwards would drag Listen's own position back to the top of the piece.
         matcher.preview(from);
-        // With hidden notes on, Listen is the "hear it first" half of ear practice:
-        // the phrase sounds over a blanked staff, ready to be played back.
-        hidden.conceal();
+        // With hidden notes on, Listen is the "hear it first" half of ear practice: the
+        // phrase sounds over a blanked staff, ready to be played back. Only on the playing
+        // surface, though — blanking the staff on the reading page would take the music
+        // away from somebody who came to read it.
+        if (onStage) {
+            hidden.conceal();
+        }
         listenPlayback.start(from);
     };
 

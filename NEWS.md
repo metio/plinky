@@ -8,6 +8,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 22 August 2026 — night
+
+**Listen without leaving the page.** There is a Listen button beside Practice on a
+piece's own page now, and pressing it plays the piece where you already are instead of
+opening the full-screen view. Hearing what something sounds like is a question you ask
+before deciding to play it.
+
+**The keys light up as Plinky plays.** While Listen is playing, each note lights its
+key for as long as it sounds — the left hand in teal, the right in indigo, the same
+two colours the falling-notes highway uses. The keyboard used to sit there showing
+whatever the abandoned run had lit, which was telling you about something that had
+stopped happening.
+
 ## 22 August 2026 — evening
 
 **Plinky plays music now, not just notes.** Most pieces in the library — nearly every

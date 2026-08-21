@@ -418,6 +418,17 @@ missed is reported as missed rather than as a note played badly — and a tap th
 near nothing is counted separately, so reading a rhythm wrongly and playing one loosely
 never look like the same mistake.
 
+## Hearing a piece
+
+**Listen** plays a piece to you. It sits beside Practice on the piece's own page, where it
+answers the question you actually have before deciding to play something, and again in the
+full-screen bar once you are playing — there it hands the piece back and forth with
+Practice, each picking up where the other left off.
+
+While it plays, the keys light as the notes sound: left hand teal, right hand indigo, the
+same two colours the falling-notes highway uses, so the two parts can be watched as well as
+heard.
+
 ## What the page says, and what you hear
 
 Plinky plays the marks, not just the notes. Dynamics and hairpins set how loud each note
