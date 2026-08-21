@@ -33,16 +33,25 @@ export function ScoreCanvas() {
         sightRead,
     } = usePlaySession();
     const prefsStore = usePrefsStore();
-    // In the notes-highway reading mode, a tall highway covers the staff while the music
-    // is moving — OSMD stays mounted and rendered underneath (the cursor keeps walking it),
-    // so the staff is hidden, not unmounted. At rest the score shows, so the piece can be
-    // read, looped and set up.
+    // In the notes-highway reading mode, a tall highway covers the staff — OSMD stays
+    // mounted and rendered underneath (the cursor keeps walking it), so the staff is
+    // hidden, not unmounted.
     //
-    // Listen counts as moving. It walks the same music a run does, and dropping back to the
-    // staff for it threw away the reading mode the player had chosen — for the half of the
-    // session where they are watching rather than playing, which is where a highway helps
-    // most.
-    const highwayActive = aids.highway && (matcher.practicing || listenPlayback.playing);
+    // Full screen is the session: it is entered to play or to listen, and it is left to
+    // read, loop and set the piece up. So the reading mode holds for as long as the player
+    // is in there, rather than only while something is moving — tying it to movement meant
+    // the view flipped to the staff every time they paused, which is a reading mode that
+    // keeps being taken away rather than one they chose.
+    //
+    // Two things still hand the staff back. There is nothing ahead to draw — the piece has
+    // run out, and the result belongs on the score anyway. And a run or a playback that
+    // outlives full screen keeps the highway with it, which is the one case where the
+    // music is moving and the player is not in there.
+    const somethingAhead = matcher.upcoming.length > 0;
+    const highwayActive =
+        aids.highway &&
+        somethingAhead &&
+        (fullscreen || matcher.practicing || listenPlayback.playing);
     // The score slot's size: full screen hands it the spare height (flex-1); a phone gets
     // a fixed slice so the keys still fit; otherwise a tall band that scrolls if taller.
     // The highway takes this same slot so it stands exactly where the staff did.
