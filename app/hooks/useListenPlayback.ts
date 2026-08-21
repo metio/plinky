@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
 import { NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { interpretedWeight } from "../../core/interpretation";
 import { octaveShiftAt } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
@@ -77,6 +78,9 @@ export type ListenStep = {
     // Whether sounding this step moves the visual cursor on. False for an ornament,
     // which is printed on the very note it decorates.
     advancesCursor: boolean;
+    // What fraction of its written loudness this position is played at, from where it sits
+    // in the bar and in its phrase. One where the score gives nothing to read.
+    interpretation: number;
 };
 
 // Walk the engraved score once and lift the listening timeline into the pure step
@@ -155,6 +159,7 @@ export function collectListenSteps(
                 bpm: tempoAt(marks.tempi, whole) ?? readTempo(cursor.iterator) ?? NOMINAL_BPM,
                 stretch: fermata ? FERMATA_STRETCH : 1,
                 advancesCursor: order === groups.length - 1,
+                interpretation: interpretedWeight(marks.bars, slurs, whole),
             };
             // A trill, mordent or turn is not a decoration on the note — it is an
             // instruction to play a short figure in its place. Printed but not played, the
@@ -430,6 +435,10 @@ export function useListenPlayback({
                         dynamicVolume: current.dynamicVolume,
                     },
                     localTempo(current),
+                    // The bar's own weighting and the shape of the phrase. Most of the
+                    // catalogue marks no dynamics at all, and played flat a study is a
+                    // metronome with pitches.
+                    current.interpretation,
                 );
                 synth.playNote(note.pitch, { duration: durationSeconds, velocity });
                 // …and light the same note on a connected instrument, so the piece

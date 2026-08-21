@@ -139,6 +139,7 @@ describe("collectListenSteps", () => {
             bpm: NOMINAL_BPM,
             stretch: 1,
             advancesCursor: true,
+            interpretation: 1,
         });
     });
 

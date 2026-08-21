@@ -143,6 +143,7 @@ describe("reading the timeline out of the file", () => {
             measureStarts: [],
             directions: [],
             end: 0,
+            bars: [],
         });
     });
 });

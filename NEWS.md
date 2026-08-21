@@ -8,6 +8,20 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 22 August 2026 — evening
+
+**Plinky plays music now, not just notes.** Most pieces in the library — nearly every
+teaching study — print no dynamics at all, because a player is expected to supply the
+weighting themselves. Played back literally, every note the same, a study is a
+metronome with pitches. The bar now has its shape: the first beat carries most, the
+middle beat next, the notes between beats least, so four-four sounds unlike three-four
+instead of merely lasting longer. And a phrase under a slur settles at its end rather
+than stopping dead.
+
+It is deliberately slight, and it never plays a note louder than the page asks — what
+is printed is the ceiling. What you are asked to play is unchanged: you are marked
+against what the score says, never against an accent nobody wrote down.
+
 ## 22 August 2026
 
 **Closing the playing view stops the playing.** The ✕ used to close the view and leave
