@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} propušteno",
     "rhythm_extra": "{count} viška",
     "meta_rhythm_title": "Vježba ritma",
-    "meta_rhythm_description": "Pročitaj ritam i otkucaj ga. Trinaest razina, od jednostavnih četvrtinki do triola i složenih mjera. Bez klavira."
+    "meta_rhythm_description": "Pročitaj ritam i otkucaj ga. Trinaest razina, od jednostavnih četvrtinki do triola i složenih mjera. Bez klavira.",
+    "scores_explain_toggle": "Što ovo znači",
+    "scores_explain_accuracy": "Koliko je odsviranih tonova bilo ispravnih.",
+    "scores_explain_timing": "Koliko je blizu svojoj dobi pao svaki ton. Točno na nju broji se cijeli, gotovo djelomično, pokraj nikako.",
+    "scores_explain_flow": "Koliko si se držao u pokretu. Ton se broji kad si ga našao iz prve, bez traženja.",
+    "scores_explain_dynamics": "Koliko si ravnomjerno svirao. Prikazuje se samo ako tvoj instrument razlikuje tiho od glasnog.",
+    "scores_explain_expression": "Koliko si se držao oznaka u notama — staccata, naglasaka, glasnog i tihog.",
+    "scores_explain_letter": "Slovo je prosjek preciznosti, ritma i tečnosti. Dinamika i izraz su za čitanje, ne za ocjenu.",
+    "perf_legend_dots": "Boja točke = ritam: zelena na dobi, jantarna blizu, crvena pokraj"
 }

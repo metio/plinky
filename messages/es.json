@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} perdidas",
     "rhythm_extra": "{count} de más",
     "meta_rhythm_title": "Entrenador de ritmo",
-    "meta_rhythm_description": "Lee un ritmo y márcalo. Trece niveles, de negras simples a tresillos y compases compuestos. Sin piano."
+    "meta_rhythm_description": "Lee un ritmo y márcalo. Trece niveles, de negras simples a tresillos y compases compuestos. Sin piano.",
+    "scores_explain_toggle": "Qué significa esto",
+    "scores_explain_accuracy": "Cuántas de las notas que tocaste eran las correctas.",
+    "scores_explain_timing": "Cuánto se acercó cada nota a su pulso. Justo encima cuenta entera, casi cuenta en parte, fuera no cuenta.",
+    "scores_explain_flow": "Cuánto seguiste avanzando. Una nota cuenta si la encontraste al primer intento, sin pararte a buscarla.",
+    "scores_explain_dynamics": "Qué tan parejo fue tu pulsación. Solo se muestra si tu instrumento distingue lo suave de lo fuerte.",
+    "scores_explain_expression": "Qué tan de cerca seguiste lo que marca la partitura: los staccatos, los acentos, los fuertes y los suaves.",
+    "scores_explain_letter": "La letra promedia precisión, tiempo y fluidez. Dinámica y expresión están para leerse, no para calificar.",
+    "perf_legend_dots": "Color del punto = tiempo: verde en el pulso, ámbar cerca, rojo fuera"
 }

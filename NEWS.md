@@ -10,6 +10,13 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The scores now say what they measure.** Under the numbers at the end of a run there
+is a line you can open that explains each one — what accuracy, timing, flow, dynamics
+and expression are actually reading, and where the letter comes from.
+
+**The coloured dots have a key.** Note by note now says what green, amber and red mean
+before you read the row of them.
+
 **Colouring the notes no longer throws you across the page.** The toggle used to
 re-read the whole piece from scratch, which emptied the score for a moment and took
 your scroll position with it. It now just redraws what is already loaded — quicker, and

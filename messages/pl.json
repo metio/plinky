@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} pominięte",
     "rhythm_extra": "{count} nadmiarowe",
     "meta_rhythm_title": "Trening rytmu",
-    "meta_rhythm_description": "Przeczytaj rytm i wystukaj go. Trzynaście poziomów, od zwykłych ćwierćnut po triole i metrum złożone. Bez pianina."
+    "meta_rhythm_description": "Przeczytaj rytm i wystukaj go. Trzynaście poziomów, od zwykłych ćwierćnut po triole i metrum złożone. Bez pianina.",
+    "scores_explain_toggle": "Co to znaczy",
+    "scores_explain_accuracy": "Ile z zagranych dźwięków było tymi właściwymi.",
+    "scores_explain_timing": "Jak blisko swojej miary trafił każdy dźwięk. Dokładnie liczy się w pełni, prawie częściowo, obok wcale.",
+    "scores_explain_flow": "Ile udało ci się grać bez zatrzymywania. Dźwięk liczy się, gdy znalazłeś go za pierwszym razem, bez szukania.",
+    "scores_explain_dynamics": "Jak równo uderzałeś. Pokazywane tylko wtedy, gdy twój instrument odróżnia ciche od głośnego.",
+    "scores_explain_expression": "Jak dokładnie trzymałeś się znaków w nutach — staccata, akcentów, głośno i cicho.",
+    "scores_explain_letter": "Litera to średnia z celności, rytmu i płynności. Dynamika i wyraz są do czytania, nie do oceny.",
+    "perf_legend_dots": "Kolor kropki = rytm: zielony na miarę, bursztynowy blisko, czerwony obok"
 }

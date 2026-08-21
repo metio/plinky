@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} falhadas",
     "rhythm_extra": "{count} a mais",
     "meta_rhythm_title": "Treino de ritmo",
-    "meta_rhythm_description": "Lê um ritmo e bate-o. Treze níveis, das semínimas simples às tercinas e aos compassos compostos. Sem piano."
+    "meta_rhythm_description": "Lê um ritmo e bate-o. Treze níveis, das semínimas simples às tercinas e aos compassos compostos. Sem piano.",
+    "scores_explain_toggle": "O que isto significa",
+    "scores_explain_accuracy": "Quantas das notas que tocaste eram as certas.",
+    "scores_explain_timing": "Quão perto cada nota caiu do seu tempo. Mesmo em cima conta por inteiro, quase conta em parte, fora não conta.",
+    "scores_explain_flow": "Quanto continuaste a andar. Uma nota conta se a encontraste à primeira, sem parares à procura.",
+    "scores_explain_dynamics": "Quão uniforme foi o teu toque. Só aparece se o teu instrumento distinguir o suave do forte.",
+    "scores_explain_expression": "Quão de perto seguiste o que a partitura escreve — os staccatos, os acentos, os fortes e os suaves.",
+    "scores_explain_letter": "A letra é a média de precisão, tempo e fluidez. Dinâmica e expressão estão para ler, não para avaliar.",
+    "perf_legend_dots": "Cor do ponto = tempo: verde no tempo, âmbar perto, vermelho fora"
 }

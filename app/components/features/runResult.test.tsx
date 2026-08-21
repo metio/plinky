@@ -50,11 +50,22 @@ describe("RunResult", () => {
     });
 
     it("shows the dynamics row only when the run scored dynamics", () => {
+        // Named twice when it is shown: once as the reading, once in the panel that says
+        // what the reading means — and not at all when there is nothing to read.
         const { rerender } = render(<RunResult {...base} grade={grade({ dynamics: null })} />);
-        expect(screen.queryByText(m.scores_dynamics())).toBeNull();
+        expect(screen.queryAllByText(m.scores_dynamics())).toHaveLength(0);
         rerender(<RunResult {...base} grade={grade({ dynamics: 70 })} />);
-        expect(screen.getByText(m.scores_dynamics())).toBeTruthy();
+        expect(screen.getAllByText(m.scores_dynamics())).toHaveLength(2);
         expect(screen.getByText("70%")).toBeTruthy();
+    });
+
+    it("says what each of the numbers measures", () => {
+        // A score nobody explains is a number to be anxious about rather than something to
+        // read. Folded away, because it is read once and then known.
+        render(<RunResult {...base} grade={grade()} />);
+        expect(screen.getByText(m.scores_explain_toggle())).toBeTruthy();
+        expect(screen.getByText(m.scores_explain_accuracy())).toBeTruthy();
+        expect(screen.getByText(m.scores_explain_letter())).toBeTruthy();
     });
 
     it("prompts to save the run, and reports the request through onSaveTake", () => {

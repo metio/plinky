@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} kaçtı",
     "rhythm_extra": "{count} fazla",
     "meta_rhythm_title": "Ritim çalışması",
-    "meta_rhythm_description": "Bir ritim oku ve geri vur. On üç seviye, sade dörtlüklerden triolelere ve bileşik ölçülere. Piyano gerekmez."
+    "meta_rhythm_description": "Bir ritim oku ve geri vur. On üç seviye, sade dörtlüklerden triolelere ve bileşik ölçülere. Piyano gerekmez.",
+    "scores_explain_toggle": "Bunlar ne demek",
+    "scores_explain_accuracy": "Çaldığın notaların kaçı doğruydu.",
+    "scores_explain_timing": "Her nota vuruşuna ne kadar yakın düştü. Tam üstünde tam sayılır, neredeyse kısmen, dışarıda hiç.",
+    "scores_explain_flow": "Ne kadar akmaya devam ettin. Bir nota, onu ilk denemede aradan aramadan bulduysan sayılır.",
+    "scores_explain_dynamics": "Ne kadar eşit vurdun. Yalnızca çaldığın şey yumuşağı serttten ayırabiliyorsa gösterilir.",
+    "scores_explain_expression": "Notadaki işaretlere ne kadar uydun — stakatolar, vurgular, kuvvetli ve hafif.",
+    "scores_explain_letter": "Harf; isabet, zamanlama ve akışın ortalamasıdır. Nüans ve ifade okunmak için burada, not vermek için değil.",
+    "perf_legend_dots": "Nokta rengi = zamanlama: vuruşta yeşil, yakında kehribar, dışarıda kırmızı"
 }

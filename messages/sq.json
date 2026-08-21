@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} të humbura",
     "rhythm_extra": "{count} të tepërta",
     "meta_rhythm_title": "Stërvitje ritmi",
-    "meta_rhythm_description": "Lexo një ritëm dhe trokite. Trembëdhjetë nivele, nga çerekët e thjeshtë te triolat dhe masat e përbëra. Pa piano."
+    "meta_rhythm_description": "Lexo një ritëm dhe trokite. Trembëdhjetë nivele, nga çerekët e thjeshtë te triolat dhe masat e përbëra. Pa piano.",
+    "scores_explain_toggle": "Çfarë do të thonë këto",
+    "scores_explain_accuracy": "Sa nga notat që luajte ishin ato të duhurat.",
+    "scores_explain_timing": "Sa afër goditjes së vet ra çdo notë. Pikërisht mbi të numërohet plotësisht, gati pjesërisht, jashtë aspak.",
+    "scores_explain_flow": "Sa vazhdove të lëvizësh. Një notë numërohet kur e gjete që në provën e parë, pa u ndalur ta kërkosh.",
+    "scores_explain_dynamics": "Sa njëtrajtësisht i godite notat. Shfaqet vetëm nëse instrumenti yt e dallon të butën nga e forta.",
+    "scores_explain_expression": "Sa nga afër i ndoqe shenjat e partiturës — stakatot, thekset, të fortat dhe të butat.",
+    "scores_explain_letter": "Shkronja është mesatarja e saktësisë, ritmit dhe rrjedhshmërisë. Dinamika dhe shprehja janë për t’u lexuar, jo për t’u vlerësuar.",
+    "perf_legend_dots": "Ngjyra e pikës = ritmi: e gjelbër mbi goditje, qelibar afër, e kuqe jashtë"
 }

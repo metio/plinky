@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} missade",
     "rhythm_extra": "{count} för många",
     "meta_rhythm_title": "Rytmträning",
-    "meta_rhythm_description": "Läs en rytm och knacka tillbaka den. Tretton nivåer, från enkla fjärdedelar till trioler och sammansatta taktarter. Utan piano."
+    "meta_rhythm_description": "Läs en rytm och knacka tillbaka den. Tretton nivåer, från enkla fjärdedelar till trioler och sammansatta taktarter. Utan piano.",
+    "scores_explain_toggle": "Vad det här betyder",
+    "scores_explain_accuracy": "Hur många av tonerna du spelade som var de rätta.",
+    "scores_explain_timing": "Hur nära varje ton landade sitt slag. Precis på räknas helt, nästan räknas delvis, bredvid räknas inte.",
+    "scores_explain_flow": "Hur mycket du höll dig i rörelse. En ton räknas när du hittade den på första försöket, utan att leta.",
+    "scores_explain_dynamics": "Hur jämnt du anslog. Visas bara om ditt instrument kan skilja mjukt från hårt.",
+    "scores_explain_expression": "Hur noga du följde notbildens tecken — staccatona, accenterna, det starka och det svaga.",
+    "scores_explain_letter": "Bokstaven är snittet av träffsäkerhet, timing och flyt. Dynamik och uttryck finns för att läsas, inte för att betygsätta.",
+    "perf_legend_dots": "Punktfärg = timing: grön på slaget, bärnsten nära, röd bredvid"
 }

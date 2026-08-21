@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} manglet",
     "rhythm_extra": "{count} for mange",
     "meta_rhythm_title": "Rytmetrener",
-    "meta_rhythm_description": "Les en rytme og bank den tilbake. Tretten nivåer, fra enkle fjerdedeler til trioler og sammensatte taktarter. Uten piano."
+    "meta_rhythm_description": "Les en rytme og bank den tilbake. Tretten nivåer, fra enkle fjerdedeler til trioler og sammensatte taktarter. Uten piano.",
+    "scores_explain_toggle": "Hva dette betyr",
+    "scores_explain_accuracy": "Hvor mange av tonene du spilte som var de riktige.",
+    "scores_explain_timing": "Hvor nær hver tone landet slaget sitt. Rett på teller fullt, nesten teller delvis, ved siden av teller ikke.",
+    "scores_explain_flow": "Hvor mye du holdt deg i bevegelse. En tone teller når du fant den på første forsøk, uten å lete.",
+    "scores_explain_dynamics": "Hvor jevnt du anslo. Vises bare hvis instrumentet ditt skiller mykt fra hardt.",
+    "scores_explain_expression": "Hvor nøye du fulgte tegnene i notene — staccatoene, aksentene, det sterke og det svake.",
+    "scores_explain_letter": "Bokstaven er snittet av presisjon, timing og flyt. Dynamikk og uttrykk er der for å leses, ikke for å vurdere.",
+    "perf_legend_dots": "Prikkfarge = timing: grønn på slaget, ravgul nær, rød ved siden av"
 }

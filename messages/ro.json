@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} ratate",
     "rhythm_extra": "{count} în plus",
     "meta_rhythm_title": "Antrenor de ritm",
-    "meta_rhythm_description": "Citește un ritm și bate-l. Treisprezece niveluri, de la pătrimi simple la triolete și măsuri compuse. Fără pian."
+    "meta_rhythm_description": "Citește un ritm și bate-l. Treisprezece niveluri, de la pătrimi simple la triolete și măsuri compuse. Fără pian.",
+    "scores_explain_toggle": "Ce înseamnă acestea",
+    "scores_explain_accuracy": "Câte dintre notele pe care le-ai cântat au fost cele potrivite.",
+    "scores_explain_timing": "Cât de aproape a căzut fiecare notă de timpul ei. Exact pe el contează întreg, aproape contează parțial, alături nu contează.",
+    "scores_explain_flow": "Cât de mult ai continuat să mergi. O notă contează dacă ai găsit-o din prima, fără să te oprești să o cauți.",
+    "scores_explain_dynamics": "Cât de uniform ai atacat notele. Apare doar dacă instrumentul tău deosebește slabul de tare.",
+    "scores_explain_expression": "Cât de îndeaproape ai urmat semnele din partitură — staccato, accentele, tare și încet.",
+    "scores_explain_letter": "Litera este media dintre precizie, ritm și fluență. Nuanțele și expresia sunt de citit, nu de notat.",
+    "perf_legend_dots": "Culoarea punctului = ritm: verde pe timp, chihlimbar aproape, roșu alături"
 }

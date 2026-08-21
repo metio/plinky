@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} manquées",
     "rhythm_extra": "{count} en trop",
     "meta_rhythm_title": "Entraîneur de rythme",
-    "meta_rhythm_description": "Lis un rythme et tape-le. Treize niveaux, des noires simples aux triolets et aux mesures composées. Sans piano."
+    "meta_rhythm_description": "Lis un rythme et tape-le. Treize niveaux, des noires simples aux triolets et aux mesures composées. Sans piano.",
+    "scores_explain_toggle": "Ce que cela signifie",
+    "scores_explain_accuracy": "Combien des notes jouées étaient les bonnes.",
+    "scores_explain_timing": "À quel point chaque note est tombée sur son temps. Pile dessus compte pleinement, presque compte en partie, à côté ne compte pas.",
+    "scores_explain_flow": "À quel point tu as continué d’avancer. Une note compte si tu l’as trouvée du premier coup, sans t’arrêter à la chercher.",
+    "scores_explain_dynamics": "À quel point ton toucher a été régulier. Affiché seulement si ton instrument distingue le doux du fort.",
+    "scores_explain_expression": "À quel point tu as suivi les indications de la partition — staccatos, accents, forts et doux.",
+    "scores_explain_letter": "La lettre est la moyenne de justesse, tempo et fluidité. Nuances et expression sont là pour être lues, pas pour noter.",
+    "perf_legend_dots": "Couleur du point = tempo : vert sur le temps, ambre presque, rouge à côté"
 }

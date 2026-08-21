@@ -1257,5 +1257,13 @@
     "rhythm_missed": "{count} mancate",
     "rhythm_extra": "{count} in più",
     "meta_rhythm_title": "Allenatore di ritmo",
-    "meta_rhythm_description": "Leggi un ritmo e battilo. Tredici livelli, dalle semplici semiminime alle terzine e ai tempi composti. Senza pianoforte."
+    "meta_rhythm_description": "Leggi un ritmo e battilo. Tredici livelli, dalle semplici semiminime alle terzine e ai tempi composti. Senza pianoforte.",
+    "scores_explain_toggle": "Che cosa significano",
+    "scores_explain_accuracy": "Quante delle note che hai suonato erano quelle giuste.",
+    "scores_explain_timing": "Quanto ogni nota è caduta vicino al suo battito. In pieno conta tutto, quasi conta in parte, fuori non conta.",
+    "scores_explain_flow": "Quanto sei andato avanti. Una nota conta se l’hai trovata al primo tentativo, senza fermarti a cercarla.",
+    "scores_explain_dynamics": "Quanto è stato uniforme il tuo tocco. Mostrato solo se il tuo strumento distingue il piano dal forte.",
+    "scores_explain_expression": "Quanto hai seguito i segni scritti sulla partitura: gli staccati, gli accenti, i forti e i piani.",
+    "scores_explain_letter": "La lettera è la media di precisione, tempo e scorrevolezza. Dinamica ed espressione sono da leggere, non da valutare.",
+    "perf_legend_dots": "Colore del punto = tempo: verde sul battito, ambra vicino, rosso fuori"
 }
