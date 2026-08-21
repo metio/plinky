@@ -82,6 +82,25 @@ describe("the marks that cover a stretch of music", () => {
         expect(dynamics[0]?.ramp).toBe(true);
     });
 
+    it("starts a hairpin from the loudness already in force", () => {
+        // A hairpin does not say how loud anything is; it says the loudness changes from
+        // here. Carrying no loudness of its own made every note under one silent — the
+        // arithmetic downstream multiplies through it.
+        const { dynamics } = read(
+            `<measure number="1">${ATTR}${direction("<dynamics><pp/></dynamics>")}${note("C", 8)}${direction('<wedge type="crescendo"/>')}${note("D", 8)}</measure>`,
+        );
+        expect(dynamics[1]).toMatchObject({ ramp: true, volume: dynamics[0]?.volume });
+        expect(Number.isFinite(dynamics[1]?.volume)).toBe(true);
+    });
+
+    it("gives a hairpin with nothing before it somewhere to start from", () => {
+        const { dynamics } = read(
+            `<measure number="1">${ATTR}${direction('<wedge type="crescendo"/>')}${note("C", 16)}</measure>`,
+        );
+        expect(Number.isFinite(dynamics[0]?.volume)).toBe(true);
+        expect(dynamics[0]?.volume).toBeGreaterThan(0);
+    });
+
     it("reads the pedal down and up", () => {
         const { pedals } = read(
             `<measure number="1">${ATTR}${direction('<pedal type="start"/>')}${note("C", 8)}${note("D", 8)}${direction('<pedal type="stop"/>')}</measure>`,

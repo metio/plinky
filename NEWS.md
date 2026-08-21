@@ -8,6 +8,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 21 August 2026 — night
+
+**Pieces that used to drift now keep time.** Some scores write a bar containing more
+music than the bar can hold — a whole-measure rest at the wrong length is the usual
+culprit — and Plinky believed them, so everything after that bar ran late, by a little
+more each time. About one piece in eight in the library has at least one. They stay in
+time now.
+
+**What the page says is read from the music itself.** The dynamics, the swells, the
+pedal, the octave lines, the phrase arches and the key are now read from the piece's
+own file rather than from the program that draws it. Nothing looks different; things
+that quietly went unheard are heard.
+
 ## 21 August 2026 — evening
 
 **The falling notes descend instead of stepping.** When you play along to the beat,

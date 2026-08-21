@@ -27,11 +27,14 @@ const EPSILON = 1 / 1024;
 // The shift in force at a printed position, in semitones — zero where the score prints no
 // line, which is almost everywhere.
 //
-// Closed at both ends: the line's last note is under it. Unlike a pedal, whose lift is an
-// action taken at that moment, an 8va's end bracket sits after the notes it covers.
+// Closed where the line starts and OPEN where it ends, exactly like the pedal next door.
+// `to` is where the engraving writes the closing bracket, which comes AFTER the last note
+// under the line — so a note written at that moment is the first one outside it. Reading
+// the end as closed puts the note immediately after an 8va an octave up, which is both
+// wrong and hard to hear as wrong, since it is only ever one note.
 export function octaveShiftAt(spans: readonly OctaveShiftSpan[], whole: number): number {
     for (const span of spans) {
-        if (whole >= span.from - EPSILON && whole <= span.to + EPSILON) {
+        if (whole >= span.from - EPSILON && whole < span.to - EPSILON) {
             return span.semitones;
         }
     }

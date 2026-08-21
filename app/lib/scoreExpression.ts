@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import type { Articulation } from "../../core/expression";
-import type { DynamicPoint } from "../../core/dynamics";
-import type { PedalSpan } from "../../core/pedal";
-import { SEMITONES_PER_OCTAVE } from "../../core/theory";
-import type { OctaveShiftSpan } from "../../core/octaveShift";
 import type { OrnamentKind } from "../../core/ornament";
-import type { SlurSpan } from "../../core/slur";
 import { GRAND_STAFF, partsOf, type ScoreParts } from "../../core/parts";
 
 // Reads the expression marks OSMD parsed from the MusicXML — articulations, slurs,
@@ -34,7 +29,6 @@ const ART = {
 type NoteShape = {
     Length?: { RealValue?: number };
     ParentVoiceEntry?: { Articulations?: { articulationEnum?: number }[] };
-    NoteSlurs?: { StartNote?: unknown; EndNote?: unknown }[];
     NoteTie?: { StartNote?: unknown; Notes?: unknown[]; Duration?: { RealValue?: number } } | null;
 };
 
@@ -49,7 +43,6 @@ export type ScoreExpression = {
     articulation: Articulation;
     accent: boolean;
     marcato: boolean;
-    slurred: boolean;
     // The note is held beyond its written length at the performer's discretion. The
     // score says to wait, not how long, so a fixed stretch stands in for the judgement
     // a performer makes.
@@ -87,10 +80,6 @@ export function readScoreExpression(note: unknown): ScoreExpression {
     const marcato =
         codes.has(ART.strongaccent) || codes.has(ART.marcatoup) || codes.has(ART.marcatodown);
 
-    // A note is slurred-forward when it starts or lies within a slur — any slur whose
-    // end note is a different note. The slur's last note doesn't connect onward.
-    const slurred = (shape.NoteSlurs ?? []).some((slur) => slur?.EndNote !== note);
-
     // A tie's first note sounds the whole tie's combined length; its later notes are
     // held, not re-struck. A note with no tie strikes at its own written length.
     const tie = shape.NoteTie ?? null;
@@ -112,7 +101,6 @@ export function readScoreExpression(note: unknown): ScoreExpression {
         articulation: articulationOf(codes),
         accent,
         marcato,
-        slurred,
         fermata: codes.has(ART.fermata),
     };
 }
@@ -199,117 +187,6 @@ export function readArpeggio(note: unknown): boolean {
 
 type ArpeggioNoteShape = { ParentVoiceEntry?: { Arpeggio?: unknown } };
 
-// The key signature the score opens in, as its count of sharps (positive) or flats
-// (negative). Zero when the engraving says nothing, which is also what C major says.
-//
-// Ornaments need it: a trill reaches for the next note OF THE KEY, so the same sign over
-// the same note means different pitches in different keys. A fixed interval would put a
-// wrong note inside every ornament the catalogue contains.
-//
-// The instruction is found by the shape of its data rather than by its class name — the
-// bundled OSMD is minified, so every class here is called something like `l` or `o`, and
-// matching on that would break on their next release with no test able to say why.
-export function readKeyFifths(osmd: unknown): number {
-    try {
-        const measures =
-            (osmd as { sheet?: { SourceMeasures?: KeyMeasureShape[] } } | null)?.sheet
-                ?.SourceMeasures ?? [];
-        for (const measure of measures) {
-            for (const entry of measure?.firstInstructionsStaffEntries ?? []) {
-                for (const instruction of entry?.instructions ?? []) {
-                    const key = instruction?.Key;
-                    if (typeof key === "number" && Number.isFinite(key)) {
-                        return key;
-                    }
-                }
-            }
-        }
-    } catch {
-        // An engraving whose shape moved reads as C major rather than breaking playback:
-        // every ornament then reaches for the white keys, which is wrong in a way somebody
-        // can hear — but a thrown error would stop the piece sounding at all.
-        return 0;
-    }
-    return 0;
-}
-
-type KeyMeasureShape = {
-    firstInstructionsStaffEntries?: ({ instructions?: ({ Key?: unknown } | null)[] } | null)[];
-};
-
-// The arches the score draws, as whole-note spans.
-//
-// It has to be a walk. OSMD hangs a slur on the two notes at its ends and on nothing in
-// between, so a note in the middle of a four-note arch reports no slur of its own — and
-// reading each note in isolation joins only the opening pair and leaves the rest of the
-// phrase detached. Walking once and holding the arch open between its ends is what turns
-// two marks back into the span the engraver drew.
-export function readSlurSpans(osmd: unknown): SlurSpan[] {
-    const spans: SlurSpan[] = [];
-    try {
-        const cursor = (osmd as { cursor?: CursorShape } | null)?.cursor;
-        if (!cursor) {
-            return [];
-        }
-        cursor.reset();
-        // Keyed by the slur object OSMD hands back, so two arches open at once — one per
-        // hand, or nested phrasing — do not close each other.
-        const open = new Map<unknown, number>();
-        while (!cursor.iterator?.EndReached) {
-            const whole = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
-            for (const note of cursor.NotesUnderCursor() ?? []) {
-                for (const slur of (note as SlurNoteShape)?.NoteSlurs ?? []) {
-                    if (!slur) {
-                        continue;
-                    }
-                    if (slur.StartNote === note && !open.has(slur)) {
-                        open.set(slur, whole);
-                    }
-                    if (slur.EndNote === note) {
-                        const from = open.get(slur);
-                        if (from !== undefined) {
-                            spans.push({ from, to: whole });
-                            open.delete(slur);
-                        }
-                    }
-                }
-            }
-            cursor.next();
-        }
-        // An arch the engraving opens and never closes joins to the end of what it opened
-        // over, rather than being dropped — a dropped one plays as no slur at all, which is
-        // the failure this whole reader exists to stop being silent.
-        const last = cursor.iterator?.currentTimeStamp?.RealValue ?? 0;
-        for (const from of open.values()) {
-            spans.push({ from, to: Math.max(from, last) });
-        }
-    } catch {
-        // A shape OSMD changed falls back to an unslurred score rather than breaking
-        // playback: no slurs is what every score without arches already reports.
-        return [];
-    } finally {
-        // Always, including when the walk threw part-way: this is the only reader that
-        // moves the cursor, and every caller walks the same cursor straight afterwards. A
-        // cursor abandoned mid-piece would have the caller collect the tail of the score
-        // and call it the whole thing — a truncated piece, silently.
-        try {
-            (osmd as { cursor?: { reset?: () => void } } | null)?.cursor?.reset?.();
-        } catch {
-            // Nothing left to do: the engraving is beyond reach either way.
-        }
-    }
-    return spans;
-}
-
-type SlurNoteShape = { NoteSlurs?: ({ StartNote?: unknown; EndNote?: unknown } | null)[] };
-
-type CursorShape = {
-    reset: () => void;
-    next: () => void;
-    iterator?: { EndReached?: boolean; currentTimeStamp?: { RealValue?: number } };
-    NotesUnderCursor: () => unknown[];
-};
-
 // The two markings the engraving reports the same way — the sustain pedal and the octave
 // line — as spans, from a single walk of the measures' expressions.
 //
@@ -320,7 +197,7 @@ type CursorShape = {
 //
 // A marking left open runs to the end of the music. Dropping it would silently un-pedal (or
 // un-shift) the rest of the piece, which is the failure mode nobody notices.
-function readSpans<T>(
+function _readSpans<T>(
     osmd: unknown,
     opens: (entry: ExpressionEntryShape) => T | null,
     closes: (entry: ExpressionEntryShape) => boolean,
@@ -371,30 +248,6 @@ type ExpressionEntryShape = {
     octaveShiftEnd?: unknown;
 };
 
-// Where the score asks for the sustain pedal, as whole-note spans.
-export function readPedalSpans(osmd: unknown): PedalSpan[] {
-    return readSpans(
-        osmd,
-        (entry) => (entry.PedalStart != null ? true : null),
-        (entry) => entry.PedalEnd != null,
-    ).map(({ from, to }) => ({ from, to }));
-}
-
-// The octave lines the score prints, as whole-note spans carrying their distance.
-// `octaveValue` counts octaves: 1 for 8va, -1 for 8vb, 2 for 15ma.
-export function readOctaveShiftSpans(osmd: unknown): OctaveShiftSpan[] {
-    return readSpans(
-        osmd,
-        (entry) => {
-            const octaves = entry.octaveShiftStart?.octaveValue;
-            return typeof octaves === "number" && octaves !== 0
-                ? octaves * SEMITONES_PER_OCTAVE
-                : null;
-        },
-        (entry) => entry.octaveShiftEnd != null,
-    ).map(({ from, to, value }) => ({ from, to, semitones: value }));
-}
-
 type MeasureShape = { CurrentMeasure?: { TempoInBPM?: number } };
 
 // The tempo in force at the cursor, in beats per minute, or null where the score marks
@@ -442,41 +295,6 @@ type SourceMeasureShape = {
     Duration?: { RealValue?: number };
     staffLinkedExpressions?: (MultiExpressionShape[] | undefined)[];
 };
-
-// Every dynamic the score writes, in printed order, as whole-note positions with the
-// loudness they ask for. A hairpin starting at a mark makes it a ramp toward the next.
-//
-// Read across all staves together: a piano score marks its dynamic once, under whichever
-// staff the engraver chose, and means it for both hands.
-export function readDynamics(osmd: unknown): DynamicPoint[] {
-    const points: DynamicPoint[] = [];
-    try {
-        const measures =
-            (osmd as { sheet?: { SourceMeasures?: SourceMeasureShape[] } } | null)?.sheet
-                ?.SourceMeasures ?? [];
-        for (const measure of measures) {
-            const measureStart = measure?.AbsoluteTimestamp?.RealValue ?? 0;
-            for (const staff of measure?.staffLinkedExpressions ?? []) {
-                for (const entry of staff ?? []) {
-                    const volume = entry?.instantaneousDynamic?.MidiVolume;
-                    if (typeof volume !== "number" || !Number.isFinite(volume)) {
-                        continue;
-                    }
-                    points.push({
-                        whole: measureStart + (entry.timestamp?.RealValue ?? 0),
-                        volume,
-                        ramp: entry.startingContinuousDynamic != null,
-                    });
-                }
-            }
-        }
-    } catch {
-        // A shape OSMD changed falls back to an unmarked score rather than breaking
-        // playback: no dynamics is what every score without them already reports.
-        return [];
-    }
-    return points.sort((a, b) => a.whole - b.whole);
-}
 
 // How the engraved sheet lays its instruments out, as staff counts in score order —
 // what partsOf needs to work out which staves are the piano.

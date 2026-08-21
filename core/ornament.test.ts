@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { describe, expect, it } from "vitest";
-import { diatonicNeighbours, keyPitchClasses, type OrnamentKind, ornamentNotes } from "./ornament";
+import {
+    diatonicNeighbours,
+    keyPitchClasses,
+    type OrnamentKind,
+    ornamentNotes,
+    transposeFifths,
+} from "./ornament";
 
 const C4 = 60;
 const C_MAJOR = 0;
@@ -126,5 +132,46 @@ describe("the notes an ornament sounds", () => {
         const lead = notes.slice(0, -1).reduce((sum, one) => sum + one.quarters, 0);
         expect(lead).toBeLessThanOrEqual(0.25 * 0.5 + 1e-9);
         expect(notes.at(-1)?.quarters).toBeGreaterThan(0);
+    });
+});
+
+describe("the key a transposed piece lands in", () => {
+    it("leaves a piece that is not transposed where it was", () => {
+        for (const fifths of [-6, -3, 0, 2, 5]) {
+            expect(transposeFifths(fifths, 0)).toBe(fifths);
+        }
+    });
+
+    it("moves the signature with the music", () => {
+        // C major up a tone is D major: two sharps.
+        expect(transposeFifths(0, 2)).toBe(2);
+        // …and down a tone is B flat major: two flats.
+        expect(transposeFifths(0, -2)).toBe(-2);
+    });
+
+    it("names the seven notes the transposed music actually has", () => {
+        // The point of the whole exercise: an ornament in the transposed key must reach
+        // into the transposed key.
+        const upThree = transposeFifths(0, 3);
+        expect([...keyPitchClasses(upThree)].sort((a, b) => a - b)).toEqual(
+            [...keyPitchClasses(0)].map((one) => (one + 3) % 12).sort((a, b) => a - b),
+        );
+    });
+
+    it("wraps past the end of the circle to the enharmonic twin", () => {
+        // Beyond six sharps a reader writes flats, and the two name the same notes.
+        const far = transposeFifths(5, 4);
+        expect(Math.abs(far)).toBeLessThanOrEqual(6);
+        expect([...keyPitchClasses(far)].sort((a, b) => a - b)).toEqual(
+            [...keyPitchClasses(5)].map((one) => (one + 4) % 12).sort((a, b) => a - b),
+        );
+    });
+
+    it("stays inside the signatures a reader would recognise, whatever it is given", () => {
+        for (let semitones = -24; semitones <= 24; semitones++) {
+            for (const fifths of [-6, -1, 0, 4, 6]) {
+                expect(Math.abs(transposeFifths(fifths, semitones))).toBeLessThanOrEqual(6);
+            }
+        }
     });
 });

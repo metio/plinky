@@ -108,3 +108,29 @@ export function ornamentNotes(
         { pitch, quarters: rest },
     ];
 }
+
+// The key signature a piece lands in when it is transposed.
+//
+// Transposing moves the tonic, and the ornaments follow: a trill in C major that becomes a
+// trill in E flat reaches for a different note above. Reading the written signature and
+// using it on transposed pitches would put every ornament in a transposed score a semitone
+// or two out.
+//
+// Signatures run from six flats to six sharps; anything beyond wraps to its enharmonic
+// twin, which names the same seven pitch classes and is what a reader would write.
+export function transposeFifths(fifths: number, semitones: number): number {
+    // A piece nobody transposed keeps the signature it was written in, spelling and all.
+    // Worth saying rather than deriving: six sharps and six flats name the same seven
+    // notes, so the arithmetic below cannot tell them apart and would rewrite one as the
+    // other for no reason.
+    if (semitones % 12 === 0) {
+        return fifths;
+    }
+    // Each step round the circle of fifths moves the tonic seven semitones, so going the
+    // other way costs seven fifths per semitone.
+    let moved = (((fifths + semitones * 7) % 12) + 12) % 12;
+    if (moved > 6) {
+        moved -= 12;
+    }
+    return moved;
+}

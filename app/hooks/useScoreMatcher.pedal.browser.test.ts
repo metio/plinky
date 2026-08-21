@@ -3,7 +3,7 @@
 
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import { afterEach, describe, expect, it } from "vitest";
-import { readPedalSpans } from "../lib/scoreExpression";
+import { NO_SCORE_MARKS, readScoreMarks, type ScoreMarks } from "../../core/musicxmlMarks";
 import { collectListenSteps } from "./useListenPlayback";
 import { collectMatchSteps } from "./useScoreMatcher";
 
@@ -23,9 +23,20 @@ const score = (measures: string) => `<?xml version="1.0" encoding="UTF-8"?>
   <part id="P1">${measures}</part>
 </score-partwise>`;
 
+// The markings of whatever was last engraved, read from the very document the engraver was
+// given — which is the path the app takes. The engraver draws the page; the file says what
+// is written on it, and the two are exercised together here on purpose.
+let marks: ScoreMarks = NO_SCORE_MARKS;
+
+// The markings of a score, without engraving it — for the cases that only ask what the file
+// says.
+const marksOf = (xml: string) =>
+    readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
+
 let host: HTMLDivElement | null = null;
 
 function load(xml: string): Promise<OpenSheetMusicDisplay> {
+    marks = readScoreMarks(new DOMParser().parseFromString(xml, "application/xml"));
     host = document.createElement("div");
     host.style.width = "800px";
     document.body.appendChild(host);
@@ -48,14 +59,15 @@ afterEach(() => {
 });
 
 describe("a score that marks the sustain pedal", () => {
-    it("reads the span the marking covers", async () => {
-        const osmd = await load(PEDALLED);
-        expect(readPedalSpans(osmd)).toEqual([{ from: 0, to: 1.5 }]);
+    it("reads the span the marking covers", () => {
+        // No engraving needed: the pedal is read from the file. What the engraving is for
+        // is the tests below, where the span has to meet the positions it covers.
+        expect(marksOf(PEDALLED).pedals).toEqual([{ from: 0, to: 1.5 }]);
     });
 
     it("marks the notes under it, and only those", async () => {
         const osmd = await load(PEDALLED);
-        expect(collectMatchSteps(osmd, "both").map((step) => step.pedalled)).toEqual([
+        expect(collectMatchSteps(osmd, "both", marks).map((step) => step.pedalled)).toEqual([
             true,
             true,
             true,
@@ -65,7 +77,7 @@ describe("a score that marks the sustain pedal", () => {
 
     it("rings a note on until the pedal lifts", async () => {
         const osmd = await load(PEDALLED);
-        const steps = collectListenSteps(osmd);
+        const steps = collectListenSteps(osmd, marks);
         // The first note is written as a half — two quarters — but the pedal holds it for
         // the bar and a half the marking covers: six quarters.
         expect(steps[0]?.notes[0]?.soundQuarters).toBe(6);
@@ -77,18 +89,17 @@ describe("a score that marks the sustain pedal", () => {
         const osmd = await load(
             score(`<measure number="1">${ATTR}${half("C")}${half("D")}</measure>`),
         );
-        expect(readPedalSpans(osmd)).toEqual([]);
-        expect(collectMatchSteps(osmd, "both").every((step) => step.pedalled)).toBe(false);
-        expect(collectListenSteps(osmd)[0]?.notes[0]?.soundQuarters).toBe(2);
+        expect(marks.pedals).toEqual([]);
+        expect(collectMatchSteps(osmd, "both", marks).every((step) => step.pedalled)).toBe(false);
+        expect(collectListenSteps(osmd, marks)[0]?.notes[0]?.soundQuarters).toBe(2);
     });
 
-    it("runs a pedal the engraving never lifts to the end of the piece", async () => {
-        const osmd = await load(
+    it("runs a pedal the engraving never lifts to the end of the piece", () => {
+        const [span] = marksOf(
             score(`
    <measure number="1">${ATTR}${pedal("start")}${half("C")}${half("D")}</measure>
    <measure number="2">${half("E")}${half("F")}</measure>`),
-        );
-        const [span] = readPedalSpans(osmd);
+        ).pedals;
         expect(span?.from).toBe(0);
         // Past the last note, which is what a reader would do with an unclosed marking.
         expect(span?.to as number).toBeGreaterThanOrEqual(1.5);

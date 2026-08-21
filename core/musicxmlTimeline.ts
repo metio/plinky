@@ -305,7 +305,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
             // and whether the missing beat is silence the composer wanted or a beat the
             // transcriber dropped is not something a reader can know. Forty-three bars in
             // eighteen hundred are short, of which five are pickups and twenty-three sit
-            // mid-piece in files that are simply mis-notated. Padding those would be
+            // mid-piece in files that are simply misnotated. Padding those would be
             // guessing, and guessing loudly, in a place where the guess is audible.
             const content = furthest / perWhole;
             partStart =

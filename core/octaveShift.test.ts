@@ -7,12 +7,13 @@ import { octaveShiftAt } from "./octaveShift";
 const SPANS = [{ from: 1, to: 2, semitones: 12 }];
 
 describe("where the score prints an octave line", () => {
-    it("shifts every note under the line, both ends included", () => {
-        // The end bracket sits after the notes it covers, unlike a pedal lift — so the
-        // last note under an 8va is still an octave up.
+    it("shifts from where the line opens up to where it closes", () => {
+        // The closing bracket is written after the last note under the line, so a note at
+        // that moment is the first one outside it — the same rule the pedal follows.
         expect(octaveShiftAt(SPANS, 1)).toBe(12);
         expect(octaveShiftAt(SPANS, 1.5)).toBe(12);
-        expect(octaveShiftAt(SPANS, 2)).toBe(12);
+        expect(octaveShiftAt(SPANS, 1.999)).toBe(12);
+        expect(octaveShiftAt(SPANS, 2)).toBe(0);
     });
 
     it("leaves everything outside the line where it is written", () => {
@@ -28,7 +29,7 @@ describe("where the score prints an octave line", () => {
 
     it("tolerates an onset that rounding moved by a hair", () => {
         expect(octaveShiftAt(SPANS, 1 - 1e-9)).toBe(12);
-        expect(octaveShiftAt(SPANS, 2 + 1e-9)).toBe(12);
+        expect(octaveShiftAt(SPANS, 2 - 1e-9)).toBe(0);
     });
 
     it("takes the first line covering a position when two overlap", () => {
