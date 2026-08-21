@@ -146,3 +146,93 @@ describe("reading the timeline out of the file", () => {
         });
     });
 });
+
+// How long a bar lasts.
+//
+// Every case here was found by reading the actual catalogue rather than by imagining what
+// a file might contain, and in every one of them the engraver believes the writing and is
+// wrong to. A bar of three-four lasts three crotchets whatever an exporter put in it, and
+// a reader that thinks otherwise puts the rest of the piece late by a little more each bar.
+describe("how far a bar carries the music on", () => {
+    const timed = (beats: number, beatType: number, measures: string) =>
+        readTimeline(
+            score(
+                measures.replace(
+                    "ATTR",
+                    `<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time><beats>${beats}</beats><beat-type>${beatType}</beat-type></time></attributes>`,
+                ),
+            ),
+        );
+
+    it("ignores a whole-measure rest written longer than the metre", () => {
+        // Real, and common: exporters write the rest at a whole note's length whatever the
+        // bar is. Believed, a two-four bar claims twice its time.
+        const { notes, measureStarts } = timed(
+            2,
+            4,
+            `<measure number="1">ATTR${note("C", 4, 4)}${note("D", 4, 4)}<backup><duration>8</duration></backup><note><rest/><duration>16</duration><voice>5</voice></note><backup><duration>8</duration></backup></measure>` +
+                `<measure number="2">${note("E", 4, 8)}</measure>`,
+        );
+        expect(measureStarts).toEqual([0, 0.5]);
+        expect(notes.at(-1)?.whole).toBe(0.5);
+    });
+
+    it("ignores a voice written past the barline and wound back", () => {
+        // Also real: the writing runs four ticks over and a `<backup>` corrects it, which
+        // is the engraving admitting where the bar actually ends.
+        const { measureStarts } = timed(
+            3,
+            4,
+            `<measure number="1">ATTR${note("C", 4, 8)}${note("D", 4, 8)}<backup><duration>4</duration></backup></measure>` +
+                `<measure number="2">${note("E", 4, 12)}</measure>`,
+        );
+        expect(measureStarts).toEqual([0, 0.75]);
+    });
+
+    it("gives a bar of silence its own time, however it is written", () => {
+        // A bar of rest written as a bare `<forward>`. There is a bar of silence there, and
+        // a reader that collapses it plays the next phrase a bar early.
+        const { notes, measureStarts } = timed(
+            3,
+            4,
+            `<measure number="1">ATTR${note("C", 4, 12)}</measure>` +
+                `<measure number="2"><forward><duration>12</duration></forward></measure>` +
+                `<measure number="3">${note("D", 4, 12)}</measure>`,
+        );
+        expect(measureStarts).toEqual([0, 0.75, 1.5]);
+        expect(notes.map((one) => one.whole)).toEqual([0, 1.5]);
+    });
+
+    it("takes a pickup at its word, because a pickup really is short", () => {
+        // The one case where the writing beats the metre: an anacrusis is genuinely less
+        // than a bar, and stretching it to the metre would delay the whole piece.
+        const { measureStarts } = timed(
+            4,
+            4,
+            `<measure number="1" implicit="yes">ATTR${note("G", 4, 4)}</measure>` +
+                `<measure number="2">${note("C", 4, 16)}</measure>`,
+        );
+        expect(measureStarts).toEqual([0, 0.25]);
+    });
+
+    it("falls back to the writing when a file states no metre at all", () => {
+        const { measureStarts } = readTimeline(
+            score(
+                `<measure number="1"><attributes><divisions>4</divisions></attributes>${note("C", 4, 16)}</measure>` +
+                    `<measure number="2">${note("D", 4, 16)}</measure>`,
+            ),
+        );
+        expect(measureStarts).toEqual([0, 1]);
+    });
+
+    it("follows a change of metre mid-piece", () => {
+        const { measureStarts } = timed(
+            4,
+            4,
+            `<measure number="1">ATTR${note("C", 4, 16)}</measure>` +
+                `<measure number="2"><attributes><time><beats>2</beats><beat-type>4</beat-type></time></attributes>${note("D", 4, 8)}</measure>` +
+                `<measure number="3">${note("E", 4, 8)}</measure>`,
+        );
+        expect(measureStarts).toEqual([0, 1, 1.5]);
+    });
+});
