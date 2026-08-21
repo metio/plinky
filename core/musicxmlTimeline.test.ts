@@ -138,6 +138,11 @@ describe("reading the timeline out of the file", () => {
     });
 
     it("answers an empty document with an empty timeline rather than throwing", () => {
-        expect(readTimeline(parse("<nonsense/>"))).toEqual({ notes: [], measureStarts: [] });
+        expect(readTimeline(parse("<nonsense/>"))).toEqual({
+            notes: [],
+            measureStarts: [],
+            directions: [],
+            end: 0,
+        });
     });
 });

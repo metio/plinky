@@ -76,66 +76,26 @@ export function slurSpans(notes: readonly XmlNote[]): SlurSpan[] {
 
 // Everything written as a `<direction>`: the dynamics, the pedal, the octave lines.
 //
-// A direction is placed inside a measure between the notes it sits before, so its onset is
-// wherever the measure's own cursor had reached — which is what `measureStarts` and a walk
-// of each measure's children give us, the same walk the timeline already does.
+// The onsets are the timeline's, stamped as it walked. A direction sits inside a measure
+// between the notes it applies from, and working out where that is means following
+// divisions, backups, chord notes that do not advance and grace notes that take no time —
+// so it is done once, where the notes are placed, rather than again here.
 export type XmlDirections = {
     dynamics: DynamicPoint[];
     pedals: PedalSpan[];
     octaveShifts: OctaveShiftSpan[];
 };
 
-export function readDirections(doc: Document, timeline: XmlTimeline): XmlDirections {
+export function readDirections(timeline: XmlTimeline): XmlDirections {
     const dynamics: DynamicPoint[] = [];
     const pedals: PedalSpan[] = [];
     const octaveShifts: OctaveShiftSpan[] = [];
-    const root = doc.documentElement;
-    if (!root) {
-        return { dynamics, pedals, octaveShifts };
-    }
-    // What is currently open, and how far the music runs. One object rather than a
-    // handful of variables, so the per-direction reader below can be a plain function
-    // instead of a closure over half this one.
-    const open: OpenSpans = { pedal: null, shift: null, end: 0 };
+    // What is currently open. One object rather than a handful of variables, so the
+    // per-direction reader below can be a plain function instead of a closure over this one.
+    const open: OpenSpans = { pedal: null, shift: null, end: timeline.end };
 
-    for (const part of Array.from(root.getElementsByTagName("part"))) {
-        let divisions = 1;
-        Array.from(part.getElementsByTagName("measure")).forEach((measure, index) => {
-            const measureStart = timeline.measureStarts[index] ?? 0;
-            const declared = child(measure, "divisions");
-            if (declared) {
-                divisions = Math.max(1, Number(text(declared)) || divisions);
-            }
-            const perWhole = divisions * 4;
-            let atTicks = 0;
-            for (const element of Array.from(measure.children)) {
-                const at = measureStart + atTicks / perWhole;
-                open.end = Math.max(open.end, at);
-                if (element.tagName === "backup") {
-                    atTicks = Math.max(0, atTicks - (Number(text(child(element, "duration"))) || 0));
-                    continue;
-                }
-                if (element.tagName === "forward") {
-                    atTicks += Number(text(child(element, "duration"))) || 0;
-                    continue;
-                }
-                if (element.tagName === "note") {
-                    // A chord note sits at the same moment as the one before it, and a
-                    // grace note has no length to advance by.
-                    if (
-                        child(element, "chord") === null &&
-                        child(element, "grace") === null
-                    ) {
-                        atTicks += Number(text(child(element, "duration"))) || 0;
-                    }
-                    continue;
-                }
-                if (element.tagName !== "direction") {
-                    continue;
-                }
-                readDirection(element, at, { dynamics, pedals, octaveShifts }, open);
-            }
-        });
+    for (const { element, whole } of timeline.directions) {
+        readDirection(element, whole, { dynamics, pedals, octaveShifts }, open);
     }
 
     // A line the engraving opens and never closes runs to the end of the music, rather than
@@ -150,7 +110,6 @@ export function readDirections(doc: Document, timeline: XmlTimeline): XmlDirecti
             semitones: open.shift.semitones,
         });
     }
-    dynamics.sort((one, other) => one.whole - other.whole);
     return { dynamics, pedals, octaveShifts };
 }
 

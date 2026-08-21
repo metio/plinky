@@ -121,6 +121,17 @@ export type XmlTimeline = {
     notes: XmlNote[];
     // Where each printed measure begins, in whole notes.
     measureStarts: number[];
+    // Every `<direction>` in the document, stamped with where the measure's cursor had
+    // reached when it was met.
+    //
+    // Stamped here rather than found again later because working out that onset is the
+    // fiddly part — divisions, backups, chords that do not advance, grace notes that take
+    // no time — and doing it twice means two implementations that can disagree. If they
+    // did, every dynamic in the piece would sit at a different moment from the notes it
+    // belongs to, which is a wrongness nothing would report.
+    directions: { element: Element; whole: number }[];
+    // How far the music runs, for a marking the engraving opens and never closes.
+    end: number;
 };
 
 const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -187,8 +198,10 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     const root = doc.documentElement;
     const notes: XmlNote[] = [];
     const measureStarts: number[] = [];
+    const directions: { element: Element; whole: number }[] = [];
+    let end = 0;
     if (!root) {
-        return { notes, measureStarts };
+        return { notes, measureStarts, directions, end };
     }
 
     for (const part of partsOf(root, wanted)) {
@@ -228,6 +241,13 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                     furthest = Math.max(furthest, atTicks);
                     continue;
                 }
+                if (tag === "direction") {
+                    directions.push({
+                        element,
+                        whole: (measureStarts[index] as number) + atTicks / perWhole,
+                    });
+                    continue;
+                }
                 if (tag !== "note") {
                     continue;
                 }
@@ -258,6 +278,7 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
                 }
             }
             partStart = (measureStarts[index] as number) + furthest / perWhole;
+            end = Math.max(end, partStart);
         });
     }
 
@@ -266,5 +287,6 @@ export function readTimeline(doc: Document, wanted?: (partId: string) => boolean
     // every part's notes on one timeline without assuming they agree about the length of
     // anything.
     notes.sort((one, other) => one.whole - other.whole || one.staff - other.staff);
-    return { notes, measureStarts };
+    directions.sort((one, other) => one.whole - other.whole);
+    return { notes, measureStarts, directions, end };
 }
