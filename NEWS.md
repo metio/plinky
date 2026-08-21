@@ -33,12 +33,6 @@ bar at a time. About one piece in eight in the library writes one.
 
 ## 21 August 2026 — night
 
-**Pieces that used to drift now keep time.** Some scores write a bar containing more
-music than the bar can hold — a whole-measure rest at the wrong length is the usual
-culprit — and Plinky believed them, so everything after that bar ran late, by a little
-more each time. About one piece in eight in the library has at least one. They stay in
-time now.
-
 **What the page says is read from the music itself.** The dynamics, the swells, the
 pedal, the octave lines, the phrase arches and the key are now read from the piece's
 own file rather than from the program that draws it. Nothing looks different; things
