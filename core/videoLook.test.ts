@@ -4,14 +4,19 @@
 import { describe, expect, it } from "vitest";
 import {
     BY_FINGER,
+    BY_HAND,
     DEFAULT_KEYBOARD_DEPTH,
     DEFAULT_NOTE_COLOR,
     FINGER_COLORS,
-    fingerColorHex,
+    HAND_COLORS,
+    HIGHWAY_SCHEMES,
     KEYBOARD_DEPTHS,
-    keyboardDepthFraction,
     NOTE_COLORS,
+    fingerColorHex,
+    handColorHex,
+    keyboardDepthFraction,
     noteColorHex,
+    notePaint,
 } from "./videoLook";
 
 describe("note colours", () => {
@@ -75,5 +80,51 @@ describe("finger colours", () => {
     it("offers by-finger as a note colour, with a hex for the unfingered case", () => {
         const option = NOTE_COLORS.find((color) => color.id === BY_FINGER);
         expect(option?.hex).toMatch(/^#[0-9a-f]{6}$/);
+    });
+});
+
+describe("the colour schemes the two pictures share", () => {
+    it("answers every scheme it offers", () => {
+        // The list and the decision must not come apart: a scheme a picker offers and
+        // nothing can paint is a control that appears to do nothing.
+        for (const scheme of HIGHWAY_SCHEMES) {
+            const paint = notePaint(scheme, { finger: 3, hand: "left" });
+            expect(["finger", "hand", "flat"]).toContain(paint.kind);
+        }
+    });
+
+    it("reads the finger, the hand, or neither, according to the scheme", () => {
+        expect(notePaint(BY_FINGER, { finger: 2, hand: "left" })).toEqual({
+            kind: "finger",
+            finger: 2,
+        });
+        expect(notePaint(BY_HAND, { finger: 2, hand: "left" })).toEqual({
+            kind: "hand",
+            hand: "left",
+        });
+        expect(notePaint("teal", { finger: 2, hand: "left" })).toEqual({
+            kind: "flat",
+            id: "teal",
+        });
+    });
+
+    it("offers both of the schemes that read something off the music", () => {
+        // The practice highway colours by hand and an export could only colour by finger,
+        // so a player who learned what teal meant while practising met a different picture
+        // watching a video of themselves.
+        expect(HIGHWAY_SCHEMES).toContain(BY_FINGER);
+        expect(HIGHWAY_SCHEMES).toContain(BY_HAND);
+        expect(new Set(HIGHWAY_SCHEMES).size).toBe(HIGHWAY_SCHEMES.length);
+    });
+
+    it("falls back rather than painting nothing when the music does not say", () => {
+        // A take nobody fingered, or a note whose hand the score never named.
+        expect(fingerColorHex(undefined, "#123456")).toBe("#123456");
+        expect(handColorHex(undefined, "#123456")).toBe("#123456");
+    });
+
+    it("paints the hands the same two colours the practice highway uses", () => {
+        expect(handColorHex("left", "#000000")).toBe(HAND_COLORS.left);
+        expect(handColorHex("right", "#000000")).toBe(HAND_COLORS.right);
     });
 });

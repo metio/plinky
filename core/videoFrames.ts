@@ -16,7 +16,15 @@ export type FrameState = {
     // The keys sounding at this instant, for the on-screen keyboard; heldMs is
     // how long each note has been sounding, so a renderer can let the press
     // visibly decay and re-light on a repeat.
-    down: { pitch: number; velocity: number; heldMs: number; finger?: number }[];
+    down: {
+        pitch: number;
+        velocity: number;
+        heldMs: number;
+        finger?: number;
+        // Carried for the same reason the finger is: a lit key should match the colour of
+        // the block that just landed on it, whichever scheme the picture is coloured by.
+        hand?: "left" | "right";
+    }[];
     // The onset (ms on the notes' clock) of the latest note started by this
     // instant — the cursor's chord — or null before the first onset. An onset
     // rather than an index, so the state is independent of the note list's
@@ -74,6 +82,7 @@ export function frameAt(notes: RecordedNote[], timeMs: number): FrameState {
             velocity: note.velocity,
             heldMs: t - note.startMs,
             finger: note.finger,
+            hand: note.hand,
         }));
     let currentOnsetMs: number | null = null;
     let done = 0;

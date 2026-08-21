@@ -125,6 +125,10 @@ export function useKeepUp({
     // Live during a play-along run, then the result once it finishes.
     const [running, setRunning] = useState(false);
     const [progress, setProgress] = useState({ inTime: 0, done: 0 });
+    // How long the position now open lasts, in real milliseconds at the tempo being played.
+    // The notes highway reads it to descend at exactly the music's pace: told how long the
+    // step takes, the blocks glide over precisely that time instead of settling after it.
+    const [stepMs, setStepMs] = useState<number | null>(null);
     const [result, setResult] = useState<KeepUpResult | null>(null);
     // The pitches of the beat currently open, for the on-screen keyboard to light —
     // cleared when no run owns the input so stale keys never linger lit.
@@ -148,6 +152,7 @@ export function useKeepUp({
         stateRef.current = startKeepUp();
         setRunning(false);
         setExpected([]);
+        setStepMs(null);
         getOsmd()?.cursor?.hide();
     };
 
@@ -246,6 +251,7 @@ export function useKeepUp({
         const finish = () => {
             activeRef.current = false;
             setRunning(false);
+            setStepMs(null);
             setExpected([]);
             cursor.hide();
             setResult(scoreKeepUp(stateRef.current.hits));
@@ -269,7 +275,9 @@ export function useKeepUp({
             }
             step += 1;
             centerCursor();
-            chain.push(tick, listenStepMs(current.lengths, localTempo(current), current.stretch));
+            const dwell = listenStepMs(current.lengths, localTempo(current), current.stretch);
+            setStepMs(dwell);
+            chain.push(tick, dwell);
         };
 
         // A one-bar count-in on the metronome (already ticking) before the first note.
@@ -294,5 +302,16 @@ export function useKeepUp({
         }
     };
 
-    return { running, progress, result, expected, active, start, stop, clearResult, registerNote };
+    return {
+        running,
+        progress,
+        result,
+        expected,
+        active,
+        start,
+        stop,
+        clearResult,
+        registerNote,
+        stepMs,
+    };
 }

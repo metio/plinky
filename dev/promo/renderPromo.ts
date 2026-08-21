@@ -124,9 +124,9 @@ export async function renderPromo(request: PromoRequest): Promise<Uint8Array> {
         // The same looks the export panel offers, so a promo clip is a take export with
         // its options set rather than a second renderer with its own palette.
         accent: noteColorHex(request.noteColor ?? DEFAULT_NOTE_COLOR),
-        // The performance is fingered by the cost model, so "by finger" paints each note
-        // in that finger's colour — the same mapping in every clip.
-        byFinger: (request.noteColor ?? DEFAULT_NOTE_COLOR) === BY_FINGER,
+        // The performance is fingered by the cost model and knows its hands, so a scheme
+        // that reads either paints each note accordingly — the same mapping in every clip.
+        scheme: request.noteColor ?? DEFAULT_NOTE_COLOR,
         keyboardDepth: keyboardDepthFraction(request.keyboardDepth ?? DEFAULT_KEYBOARD_DEPTH),
     });
 

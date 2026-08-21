@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { keybedMaxWidthPx, keyLane } from "../../../core/keyboardGeometry";
+import { BY_HAND, notePaint } from "../../../core/videoLook";
 import type { UpcomingStep } from "../../../core/matcher";
 import { m } from "../../paraglide/messages.js";
 
@@ -46,8 +47,16 @@ const SHADES = {
 // because a chord spanning the grand staff is the common case — 41% of positions in the
 // catalogue — and colouring it all one hand tells the reader the opposite of what the
 // two colours are for.
+//
+// The decision goes through `notePaint`, the same one the exported video asks, so the two
+// pictures cannot come to disagree about what a colour means. What they do not share is
+// the pigment: the video bakes hexes onto a dark stage, and this follows the reader's
+// theme through the tokens below. Practice is fixed on the by-hand scheme — the colours
+// are telling the player something here, where in an export they are taste.
 function blockClass(hand: "left" | "right" | undefined, imminent: boolean): string {
-    return SHADES[hand ?? "right"][imminent ? 0 : 1]!;
+    const paint = notePaint(BY_HAND, { hand });
+    const lane = paint.kind === "hand" ? (paint.hand ?? "right") : "right";
+    return SHADES[lane][imminent ? 0 : 1]!;
 }
 
 // A note shorter than this still needs to be seen: a grace note is a few milliseconds
@@ -58,11 +67,17 @@ const MIN_BLOCK_PCT = 1.5;
 // rather than as one long column.
 const GAP_PCT = 0.8;
 
+// How long the stack takes to settle after a note is cleared, when nothing is running to a
+// clock. Long enough to read as movement rather than a jump, short enough not to lag behind
+// somebody playing briskly.
+const SETTLE_MS = 200;
+
 export function NotesHighway({
     upcoming,
     from,
     to,
     windowMs = 4_000,
+    advanceMs = null,
 }: {
     upcoming: UpcomingStep[];
     from: number;
@@ -76,6 +91,14 @@ export function NotesHighway({
     // ahead you see and tuning it changes how fast the picture moves. Tying them together
     // would let a change to the look of an export quietly rescale practice.
     windowMs?: number;
+    // How long the position now open lasts, when something is playing to a clock — the
+    // tempo-locked play-along, where the music does not wait. Given it, the blocks descend
+    // over exactly that time and the picture moves continuously, the way the exported
+    // video does. Without it the music waits for the player, so the stack settles into its
+    // new place after each note is cleared and holds there. Advance by the clock, or
+    // advance by the note: the two ways of practising want different pictures, and this is
+    // the one number that tells them apart.
+    advanceMs?: number | null;
 }) {
     // The position the player is on sits at the strike line, and everything else is
     // measured from it. Not a clock reading: this is what keeps the picture still until
@@ -113,12 +136,18 @@ export function NotesHighway({
                             <span
                                 key={`${step.index}-${pitch}`}
                                 aria-hidden="true"
-                                className={`absolute rounded-sm shadow-sm transition-[bottom] duration-200 ease-out motion-reduce:transition-none ${blockClass(step.pitchHands[note], row === 0)}`}
+                                className={`absolute rounded-sm shadow-sm transition-[bottom] motion-reduce:transition-none ${blockClass(step.pitchHands[note], row === 0)}`}
                                 style={{
                                     left: `${lane.leftPct}%`,
                                     width: `${lane.widthPct}%`,
                                     bottom: `${bottom}%`,
                                     height: `${Math.max(MIN_BLOCK_PCT, length - GAP_PCT)}%`,
+                                    // On a clock the descent lasts exactly as long as the
+                                    // note does, and at a constant rate — anything eased
+                                    // would hurry and then dawdle against a steady pulse.
+                                    // Off it, a short ease is a settle rather than a fall.
+                                    transitionDuration: `${advanceMs ?? SETTLE_MS}ms`,
+                                    transitionTimingFunction: advanceMs ? "linear" : "ease-out",
                                 }}
                             />
                         );

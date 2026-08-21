@@ -22,6 +22,7 @@ export function ScoreCanvas() {
         loadError,
         matcher,
         listenPlayback,
+        keepUp,
         loop,
         title,
         hideKeyboard,
@@ -96,6 +97,10 @@ export function ScoreCanvas() {
                             upcoming={matcher.upcoming}
                             from={keyRange.from}
                             to={keyRange.to}
+                            // Only the tempo-locked play-along has a clock. Self-paced
+                            // practice waits for the player, and a picture that fell
+                            // anyway would leave them behind their own notes.
+                            advanceMs={keepUp.running ? keepUp.stepMs : null}
                         />
                     </div>
                 </div>

@@ -8,6 +8,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Plinky has no version numbers and no release days — every change goes live the moment
 it's ready. This is what's changed, newest first, in plain terms.
 
+## 21 August 2026 — evening
+
+**The falling notes descend instead of stepping.** When you play along to the beat,
+the notes highway now moves continuously, at exactly the pace of the music — the way
+an exported video does. Practising at your own pace still waits for you: the stack
+settles into place as you clear each note, because a picture that fell anyway would
+leave you behind your own playing.
+
+**The highway and the video are drawn by the same thing now.** The keyboard in an
+exported video is laid out by the app's own keyboard geometry rather than a second
+copy of it, and both pictures offer the same colour choices — so "by hand", which
+practice has always used, is available for a video too.
+
 ## 21 August 2026
 
 **Rolled chords roll, and 8va passages play where they belong.** A chord with the wavy
