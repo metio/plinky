@@ -13,7 +13,12 @@
 // page is loaded in a fresh context with a cold cache, and every figure reported is a median
 // of several runs. The same command on the same build gives the same answer.
 //
-//   nix develop --command node dev/bench-score.mjs [--rates 1,4,6] [--runs 5]
+//   nix develop --command node dev/bench-score.mjs [--rates=1,4,6] [--runs=5] [--net=fast4g]
+//
+// The network matters as much as the CPU here and localhost has none, which flatters the
+// app badly: a megabyte of engraver and six hundred kilobytes of catalogue arrive in
+// milliseconds off the loopback and in seconds off a phone. Throttle both or the numbers
+// describe a machine nobody owns.
 //
 // Serve the build first, or pass --base:
 //   nix develop --command npx http-server build/client -p 8420 -s
@@ -31,6 +36,18 @@ const RUNS = Number(arg("runs", "5"));
 // A real piece rather than a generated drill: a drill is a bar long and would report the
 // engraver at its very best, which is not what anybody is waiting for.
 const PIECE = arg("piece", "/en/play/47xd2XDpYFCy/");
+// Chrome's own published profiles, so the figures are comparable with anyone else's.
+const NETWORKS = {
+    none: null,
+    fast4g: { downloadThroughput: (9 * 1024 * 1024) / 8, uploadThroughput: (1.5 * 1024 * 1024) / 8, latency: 85 },
+    slow4g: { downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8, latency: 300 },
+};
+const NET = arg("net", "fast4g");
+// A returning player arrives with the shell already cached, so the download stops dominating
+// and what is left is the app's own work — a different bottleneck, and the one an ordering
+// change can actually move. Measured by loading the piece twice in one context and reporting
+// the second.
+const WARM = process.argv.includes("--warm");
 
 const median = (values) => {
     const sorted = [...values].sort((one, other) => one - other);
@@ -45,7 +62,25 @@ async function measure(browser, rate) {
     const page = await context.newPage();
     const client = await context.newCDPSession(page);
     await client.send("Emulation.setCPUThrottlingRate", { rate });
+    const shape = NETWORKS[NET];
+    if (shape === undefined) {
+        throw new Error(`unknown --net=${NET}; pick one of ${Object.keys(NETWORKS).join(", ")}`);
+    }
+    if (shape) {
+        await client.send("Network.enable");
+        await client.send("Network.emulateNetworkConditions", { offline: false, ...shape });
+    }
 
+    if (WARM) {
+        await page.goto(`${BASE}${PIECE}`, { waitUntil: "load" });
+        await page
+            .waitForFunction(
+                () => (document.querySelector("svg#osmdSvgPage1, #osmdCanvasPage1") ?? null) !== null,
+                undefined,
+                { timeout: 120_000 },
+            )
+            .catch(() => {});
+    }
     const started = Date.now();
     await page.goto(`${BASE}${PIECE}`, { waitUntil: "commit" });
     // The score is "there" when the engraver has drawn its first system — which is what a
@@ -57,6 +92,9 @@ async function measure(browser, rate) {
     );
     const visible = Date.now() - started;
 
+    // Where the time went, in phases, read off the browser's own resource clock so the app
+    // needs no instrumentation: everything before the engraver's code arrives is startup,
+    // everything after it is the engraver.
     const detail = await page.evaluate(() => {
         const nav = performance.getEntriesByType("navigation")[0];
         const chunks = performance
@@ -69,13 +107,32 @@ async function measure(browser, rate) {
             }))
             .sort((one, other) => other.ms - one.ms)
             .slice(0, 4);
-        const score = performance
+        const musicEntries = performance
             .getEntriesByType("resource")
-            .filter((entry) => /\.(mxl|musicxml|xml)$/.test(entry.name))
-            .map((entry) => Math.round(entry.duration));
+            .filter((entry) => /\.(mxl|musicxml|xml)$/.test(entry.name));
+        const score = musicEntries.map((entry) => Math.round(entry.duration));
+        const musicStart = musicEntries.length
+            ? Math.round(Math.min(...musicEntries.map((entry) => entry.startTime)))
+            : null;
+        const all = performance.getEntriesByType("resource");
+        const end = (pattern) =>
+            all
+                .filter((entry) => pattern.test(entry.name))
+                .reduce((latest, entry) => Math.max(latest, entry.responseEnd), 0);
+        // The engraver is by far the biggest chunk, so it identifies itself by weight
+        // rather than by a name the bundler is free to change.
+        const heaviest = all
+            .filter((entry) => /\.js$/.test(entry.name))
+            .sort((one, other) => (other.encodedBodySize ?? 0) - (one.encodedBodySize ?? 0))[0];
         return {
             domInteractive: Math.round(nav?.domInteractive ?? 0),
             scoreFetchMs: score[0] ?? null,
+            engraverName: heaviest?.name.split("/").pop() ?? null,
+            engraverKb: Math.round((heaviest?.encodedBodySize ?? 0) / 1024),
+            engraverStartMs: Math.round(heaviest?.startTime ?? 0),
+            engraverReadyMs: Math.round(heaviest?.responseEnd ?? 0),
+            musicStartMs: musicStart,
+            scoreReadyMs: Math.round(end(/\.(mxl|musicxml|xml)$/)),
             chunks,
         };
     });
@@ -85,7 +142,7 @@ async function measure(browser, rate) {
 }
 
 const browser = await chromium.launch();
-console.log(`piece ${PIECE} · ${RUNS} runs per rate\n`);
+console.log(`piece ${PIECE} · net ${NET} · ${RUNS} runs per rate\n`);
 for (const rate of RATES) {
     const runs = [];
     for (let run = 0; run < RUNS; run++) {
@@ -96,8 +153,14 @@ for (const rate of RATES) {
     console.log(
         `CPU ×${rate}  score visible: median ${median(visible)}ms  (min ${Math.min(...visible)}, max ${Math.max(...visible)})`,
     );
+    // The two phases a fix has to choose between: getting the engraver and the music to the
+    // page at all, and the engraving itself.
+    const arrived = Math.max(first.engraverReadyMs, first.scoreReadyMs);
     console.log(
-        `          domInteractive ${first.domInteractive}ms · score fetch ${first.scoreFetchMs ?? "—"}ms`,
+        `          fetch phase ${arrived}ms (engraver ${first.engraverReadyMs}ms/${first.engraverKb}KB · music ${first.scoreReadyMs}ms) · engraving ${first.visible - arrived}ms`,
+    );
+    console.log(
+        `          domInteractive ${first.domInteractive}ms · asked for at: engraver ${first.engraverStartMs}ms · music ${first.musicStartMs}ms`,
     );
     for (const chunk of first.chunks) {
         console.log(`          ${String(chunk.ms).padStart(5)}ms ${String(chunk.kb).padStart(4)}KB  ${chunk.name}`);

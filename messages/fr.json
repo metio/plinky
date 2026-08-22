@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "À quel point tu as suivi les indications de la partition — staccatos, accents, forts et doux.",
     "scores_explain_letter": "La lettre est la moyenne de justesse, tempo et fluidité. Nuances et expression sont là pour être lues, pas pour noter.",
     "perf_legend_dots": "Couleur du point = tempo : vert sur le temps, ambre presque, rouge à côté",
-    "score_redrawing": "Partition en cours de redessin"
+    "score_redrawing": "Partition en cours de redessin",
+    "score_loading_fetching": "Recherche de la musique",
+    "score_loading_engraving": "Mise en place des notes"
 }

@@ -18,6 +18,7 @@ import { FavoriteButton } from "../components/features/favoriteButton";
 import { ExportMenu } from "../components/features/exportMenu";
 import { ScoreGrade } from "../components/features/scoreGrade";
 import { ScoreViewer } from "../components/features/scoreViewer";
+import { ScoreSkeleton } from "../components/ui/scoreSkeleton";
 import { TransposeProvider } from "../components/features/transposeContext";
 import { useScore } from "../hooks/useScore";
 // meta() runs outside the React tree (the router calls it statically), so it
@@ -157,6 +158,14 @@ export default function PlayRoute({ params }: Route.ComponentProps) {
                     />
                 </TransposeProvider>
             )}
+            {/* Resolving a piece means the catalogue and then the piece itself, which on a
+            slow connection is seconds of a page with nothing on it at all. The staff it is
+            about to appear on stands in the meantime, in the slot it will occupy. */}
+            <Show when={resolved === undefined}>
+                <div className="h-64">
+                    <ScoreSkeleton />
+                </div>
+            </Show>
             <Show when={score === null}>
                 <p className="text-sm text-muted">{m.play_not_found()}</p>
             </Show>

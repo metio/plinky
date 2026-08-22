@@ -363,7 +363,16 @@ const BUDGET_VENDOR_KB = 324;
 // silent bugs this app has had — dynamics that returned null for every real score for
 // years, and slurs that joined only the first note of every phrase — plus correct timing
 // on the thirteen per cent of the catalogue that overruns its own barlines.
-const BUDGET_APP_KB = 367;
+// 368. Telling the player what is happening while they wait, and while the numbers at the
+// end of a run are read: the staff that stands in for a piece that is still arriving (with
+// a word for which half of the wait it is), the spinner beside the finger-numbers switch,
+// the key for the coloured dots, and the fold-away explanation of what each score measures.
+// Almost all of it is the strings; the drawing is a handful of lines. Measured first — a
+// throttled-CPU, throttled-network benchmark (dev/bench-score.mjs) put a piece at three to
+// five seconds before a single mark appeared, of which about half is the engraver's own
+// work and cannot be given back. So it is spent on making the wait legible rather than on
+// pretending it is shorter.
+const BUDGET_APP_KB = 368;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an

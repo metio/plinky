@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Jak dokładnie trzymałeś się znaków w nutach — staccata, akcentów, głośno i cicho.",
     "scores_explain_letter": "Litera to średnia z celności, rytmu i płynności. Dynamika i wyraz są do czytania, nie do oceny.",
     "perf_legend_dots": "Kolor kropki = rytm: zielony na miarę, bursztynowy blisko, czerwony obok",
-    "score_redrawing": "Przerysowywanie nut"
+    "score_redrawing": "Przerysowywanie nut",
+    "score_loading_fetching": "Szukanie nut",
+    "score_loading_engraving": "Układanie nut"
 }

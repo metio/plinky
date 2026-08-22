@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Cât de îndeaproape ai urmat semnele din partitură — staccato, accentele, tare și încet.",
     "scores_explain_letter": "Litera este media dintre precizie, ritm și fluență. Nuanțele și expresia sunt de citit, nu de notat.",
     "perf_legend_dots": "Culoarea punctului = ritm: verde pe timp, chihlimbar aproape, roșu alături",
-    "score_redrawing": "Se redesenează partitura"
+    "score_redrawing": "Se redesenează partitura",
+    "score_loading_fetching": "Se caută partitura",
+    "score_loading_engraving": "Se așază notele"
 }

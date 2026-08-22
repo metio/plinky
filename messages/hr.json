@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Koliko si se držao oznaka u notama — staccata, naglasaka, glasnog i tihog.",
     "scores_explain_letter": "Slovo je prosjek preciznosti, ritma i tečnosti. Dinamika i izraz su za čitanje, ne za ocjenu.",
     "perf_legend_dots": "Boja točke = ritam: zelena na dobi, jantarna blizu, crvena pokraj",
-    "score_redrawing": "Ponovno crtanje nota"
+    "score_redrawing": "Ponovno crtanje nota",
+    "score_loading_fetching": "Traženje nota",
+    "score_loading_engraving": "Postavljanje nota"
 }

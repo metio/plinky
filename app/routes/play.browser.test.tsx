@@ -133,6 +133,29 @@ describe("Play", () => {
         );
     }, 90000);
 
+    it("stands a staff in while the piece is still arriving", async () => {
+        // Opening a piece is a megabyte of engraver, the catalogue and then the notation,
+        // and on a slow device that is seconds of nothing on screen at all. The wait is
+        // drawn as the thing being waited for, and it names which part of the wait it is.
+        renderPlay(bundledId("ode to joy"));
+        // Whichever half of the wait this render is in, one of the two stands there.
+        await waitFor(() =>
+            expect(
+                screen.queryByText(m.score_loading_fetching()) ??
+                    screen.queryByText(m.score_loading_engraving()),
+            ).toBeTruthy(),
+        );
+        // And both are gone once the notation is up — a placeholder that outlives what it
+        // stood in for is worse than none.
+        await waitFor(() => expect(document.querySelector("svg#osmdSvgPage1")).toBeTruthy(), {
+            timeout: 30000,
+        });
+        await waitFor(() => {
+            expect(screen.queryByText(m.score_loading_fetching())).toBeNull();
+            expect(screen.queryByText(m.score_loading_engraving())).toBeNull();
+        });
+    }, 90000);
+
     it("keeps the play surface free of MIDI-connect chrome", async () => {
         // Connecting a device is a one-time setup task that lives in Settings
         // (with a getting-started step pointing there); a playing surface never

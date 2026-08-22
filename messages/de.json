@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "Wie genau du den Zeichen der Noten gefolgt bist — Staccato, Akzente, laut und leise.",
     "scores_explain_letter": "Der Buchstabe ist der Durchschnitt aus Treffsicherheit, Timing und Fluss. Dynamik und Ausdruck stehen zum Lesen da, nicht zum Bewerten.",
     "perf_legend_dots": "Punktfarbe = Timing: grün auf dem Schlag, bernstein knapp daneben, rot daneben",
-    "score_redrawing": "Die Noten werden neu gezeichnet"
+    "score_redrawing": "Die Noten werden neu gezeichnet",
+    "score_loading_fetching": "Die Noten werden geholt",
+    "score_loading_engraving": "Die Noten werden gesetzt"
 }

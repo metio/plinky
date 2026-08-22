@@ -1266,5 +1266,7 @@
     "scores_explain_expression": "楽譜の記号にどれだけ忠実だったか。スタッカート、アクセント、強弱です。",
     "scores_explain_letter": "文字は正確さ・タイミング・流れの平均です。強弱と表情は読むためのもので、評価には入りません。",
     "perf_legend_dots": "点の色＝タイミング：緑は拍の上、琥珀は惜しい、赤は外れ",
-    "score_redrawing": "楽譜を描き直しています"
+    "score_redrawing": "楽譜を描き直しています",
+    "score_loading_fetching": "楽譜を探しています",
+    "score_loading_engraving": "音符を並べています"
 }
