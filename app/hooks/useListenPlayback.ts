@@ -6,13 +6,15 @@ import { useRef, useState } from "react";
 import { toReplayEvents } from "../../core/composition";
 import { type Articulation, performNote } from "../../core/expression";
 import { fifthsAt, NO_SCORE_MARKS, type ScoreMarks, tempoAt } from "../../core/musicxmlMarks";
+import { type GlissandoSpan, glissandoNotes } from "../../core/glissando";
+import { type TremoloSpan, tremoloNotes } from "../../core/tremolo";
 import { type Hand2, handOfStaff } from "../../core/matcher";
 import { interpretedWeight } from "../../core/interpretation";
-import { octaveShiftAt } from "../../core/octaveShift";
+import { octaveShiftAt, type OctaveShiftSpan } from "../../core/octaveShift";
 import { type OrnamentKind, ornamentNotes } from "../../core/ornament";
 import { slurredOnwardAt } from "../../core/slur";
 import { volumeAt } from "../../core/dynamics";
-import { pedalledAt, ringUntil } from "../../core/pedal";
+import { pedalledAt, ringUntil, SOFT_SCALE, softAt } from "../../core/pedal";
 import { FERMATA_STRETCH, NOMINAL_BPM } from "../../core/elapsed";
 import { effectiveTempo, listenStepMs } from "../../core/playback";
 import { LISTENED_COLOR, WINDOW_COLOR } from "../../core/scoreCanvas";
@@ -88,6 +90,8 @@ export type ListenStep = {
     // graded run measures against, or the two would ask for different performances.
     bpm: number;
     stretch: number;
+    // Whether the soft pedal is down here.
+    soft: boolean;
     // Whether sounding this step moves the visual cursor on. False for an ornament,
     // which is printed on the very note it decorates.
     advancesCursor: boolean;
@@ -180,13 +184,29 @@ export function collectListenSteps(
                 stretch: fermata ? FERMATA_STRETCH : 1,
                 advancesCursor: order === groups.length - 1,
                 interpretation: interpretedWeight(marks.bars, slurs, whole),
+                // Under the soft pedal the hammers strike fewer strings. Kept separate from
+                // the interpretation weight, which is about where a note sits in its bar and
+                // its phrase — this is a thing the player's foot is doing, and it applies on
+                // top of whatever the music was already asking for.
+                soft: softAt(marks.softs, whole),
             };
             // A trill, mordent or turn is not a decoration on the note — it is an
             // instruction to play a short figure in its place. Printed but not played, the
             // page and the sound disagree about what the bar contains, and a reader
             // learning to recognise the sign hears nothing happen where it is written.
             const ornament = group.length === 1 ? readOrnament(group[0]) : null;
-            if (ornament) {
+            // A tremolo and a glissando are the same kind of instruction as an ornament —
+            // shorthand for a figure — so they are spelled out the same way, and the graded
+            // run still asks for the written notes. Taken in this order because a note can
+            // carry only one of them, and the tremolo's span is what decides whether this
+            // position opens one.
+            const tremolo = openingTremolo(marks.tremolos, whole);
+            const gliss = openingGlissando(marks.glissandos, whole);
+            if (tremolo) {
+                steps.push(...spellOutTremolo(step, tremolo, shifts));
+            } else if (gliss) {
+                steps.push(...spellOutGlissando(step, gliss, fifthsAt(keys, whole)));
+            } else if (ornament) {
                 steps.push(...spellOutOrnament(step, ornament, fifthsAt(keys, whole)));
             } else if (group.some((note) => readArpeggio(note))) {
                 steps.push(...rollChord(step));
@@ -232,6 +252,75 @@ function spellOutOrnament(step: ListenStep, kind: OrnamentKind, fifths: number):
     return figure.map((one, index) => ({
         ...step,
         notes: [{ ...note, pitch: one.pitch, soundQuarters: one.quarters }],
+        lengths: [one.quarters],
+        advancesCursor: index === figure.length - 1 && step.advancesCursor,
+    }));
+}
+
+// The tremolo or glissando this position OPENS, if any. A span is spelled out once, at its
+// first note; the notes inside it are swallowed, since the figure already contains them.
+function openingTremolo(spans: readonly TremoloSpan[], whole: number): TremoloSpan | null {
+    return spans.find((span) => near(span.from, whole)) ?? null;
+}
+
+function openingGlissando(spans: readonly GlissandoSpan[], whole: number): GlissandoSpan | null {
+    return spans.find((span) => near(span.from, whole)) ?? null;
+}
+
+const NEAR = 1 / 1024;
+const near = (one: number, other: number) => Math.abs(one - other) < NEAR;
+
+// A tremolo, spelled out as the notes it shakes. The figure fills the whole span — for an
+// alternating one that is both written notes' time, because the pair is one gesture.
+function spellOutTremolo(
+    step: ListenStep,
+    span: TremoloSpan,
+    shifts: readonly OctaveShiftSpan[],
+): ListenStep[] {
+    const model = step.notes[0];
+    if (!model) {
+        return [step];
+    }
+    const quarters = (span.to - span.from) * 4;
+    // The pair's own written pitches, each moved by whatever octave line is in force where
+    // IT sits. Both written notes spell the same alternation in the same order, so the two
+    // halves run together into one unbroken rock.
+    const chords = span.pair?.map((chord) =>
+        chord.pitches.map((pitch) => pitch + 12 + octaveShiftAt(shifts, chord.at)),
+    );
+    const first = chords?.[0] ?? step.notes.map((note) => note.pitch);
+    const figure = tremoloNotes(first, chords?.[1] ?? null, quarters, span.beams);
+    if (figure.length < 2) {
+        return [step];
+    }
+    return figure.map((one, index) => ({
+        ...step,
+        notes: one.pitches.map((pitch) => ({ ...model, pitch, soundQuarters: one.quarters })),
+        lengths: [one.quarters],
+        advancesCursor: index === figure.length - 1 && step.advancesCursor,
+    }));
+}
+
+// A glissando, spelled out as the keys the hand travels over.
+function spellOutGlissando(step: ListenStep, span: GlissandoSpan, fifths: number): ListenStep[] {
+    const from = step.notes[0];
+    if (!from) {
+        return [step];
+    }
+    // The sweep fills the note it is written FROM. The note it arrives on is a position of
+    // its own and sounds by itself afterwards, so the sweep stops short of it — otherwise
+    // the arrival is struck twice, once ending the gesture and once on its own.
+    const quarters = (step.lengths[0] ?? from.soundQuarters) as number;
+    const swept = glissandoNotes(from.pitch, span.arrivesAt + 12, quarters, fifths).slice(0, -1);
+    if (swept.length < 2) {
+        return [step];
+    }
+    // Stretched back over the whole time, since dropping the arrival left a gap at the end.
+    const each = quarters / swept.length;
+    const figure = swept.map((one) => ({ ...one, quarters: each }));
+    return figure.map((one, index) => ({
+        ...step,
+        notes: [{ ...from, pitch: one.pitch, soundQuarters: one.quarters }],
         lengths: [one.quarters],
         advancesCursor: index === figure.length - 1 && step.advancesCursor,
     }));
@@ -477,7 +566,11 @@ export function useListenPlayback({
                 );
                 synth.playNote(note.pitch, {
                     duration: durationSeconds,
-                    velocity,
+                    // Gentled where the score asks for the soft pedal, on top of everything
+                    // the music already asked for.
+                    velocity: current.soft
+                        ? Math.max(1, Math.round(velocity * SOFT_SCALE))
+                        : velocity,
                     pedalled: note.pedalled,
                 });
                 // …and light the same note on a connected instrument, so the piece

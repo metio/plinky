@@ -62,7 +62,7 @@ describe("a score that marks the sustain pedal", () => {
     it("reads the span the marking covers", () => {
         // No engraving needed: the pedal is read from the file. What the engraving is for
         // is the tests below, where the span has to meet the positions it covers.
-        expect(marksOf(PEDALLED).pedals).toEqual([{ from: 0, to: 1.5 }]);
+        expect(marksOf(PEDALLED).pedals).toEqual([{ from: 0, to: 1.5, kind: "sustain" }]);
     });
 
     it("marks the notes under it, and only those", async () => {

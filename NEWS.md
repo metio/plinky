@@ -10,6 +10,11 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Tremolos shake, glissandos sweep, and the two quiet pedals do something.** All four
+were printed on the page and silent: a tremolo held one long note where the score asks
+for a shimmer, a glissando played its two ends with a gap in between, the middle pedal
+was treated as the damper, and *una corda* did nothing at all. They are all played now.
+
 **Pieces slow down and speed up where they say to.** A *rit.* or an *accel.* printed in
 the score used to do nothing at all — the music went on at the same speed straight
 through it. Now the pulse gives, and comes back at *a tempo*. Around 660 pieces in the

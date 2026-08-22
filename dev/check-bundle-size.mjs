@@ -384,7 +384,11 @@ const BUDGET_VENDOR_KB = 324;
 // changes key part way through spells its ornaments from the key it is actually in, which
 // 383 of them need. Both are timelines the file reader already had the walk for, so the cost
 // is the interpolation and the vocabulary of words engravings use for "slower".
-const BUDGET_APP_KB = 370;
+// 371. The last of the shorthand the page uses and the sound ignored: the tremolo (135
+// pieces, and the alternating form is two thirds of them), the glissando (12), the middle
+// pedal, and the soft pedal (59). Each is a figure or a foot that has to be spelled out to
+// be heard, and each was printed and silent.
+const BUDGET_APP_KB = 371;
 
 // Dev-only surfaces that must never ship: the window.__plinky test bridge (it can
 // inject MIDI, dump state, and wipe the device). Its source sits behind an
