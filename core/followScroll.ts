@@ -37,7 +37,14 @@ export function atEnd(box: ScrollBox, slack = FOLLOW_SLACK_PX): boolean {
 // screen, with the chosen mark's explanation under it. Tapping a mark changes something
 // the reader may not be looking at, so the explanation is brought to them — but only when
 // it is genuinely out of sight, since scrolling a panel that is already in view yanks the
-// page for no reason, and on a wide screen the two sit side by side and it never is.
-export function outOfView(top: number, viewportHeight: number): boolean {
-    return top < 0 || top > viewportHeight;
+// page for no reason.
+//
+// It takes BOTH edges, because a panel's top being above the fold says nothing about
+// whether the panel can be seen. On a wide screen the list and the detail sit side by side
+// and the detail is always visible — but its top goes negative the moment the reader
+// scrolls at all, and asking about the top alone therefore yanked the page on every choice
+// they made after scrolling. Off screen means entirely off: the whole panel above the
+// viewport, or the whole panel below it.
+export function outOfView(top: number, bottom: number, viewportHeight: number): boolean {
+    return bottom <= 0 || top >= viewportHeight;
 }

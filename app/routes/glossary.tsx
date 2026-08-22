@@ -105,11 +105,11 @@ export default function Glossary() {
         setSelected(id);
         // Stacked on a phone, the list runs the height of the screen and the mark's
         // explanation sits under all of it, so a tap looks like it did nothing. Bring the
-        // detail up — only when it is actually off screen, which on the two-column layout
-        // it never is.
+        // detail up — only when it is ENTIRELY off screen. On the two-column layout the
+        // detail is beside the list and always partly visible, so nothing moves there.
         const frame = scheduler.frame(() => {
             const box = detailRef.current?.getBoundingClientRect();
-            if (box && outOfView(box.top, window.innerHeight)) {
+            if (box && outOfView(box.top, box.bottom, window.innerHeight)) {
                 detailRef.current?.scrollIntoView({
                     behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
                         ? "auto"

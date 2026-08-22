@@ -10,6 +10,10 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**Picking a symbol in the glossary no longer nudges the page.** On a wide screen the
+list and the explanation sit side by side, so nothing needs to move — but every choice
+made after you had scrolled pulled the page back by however far you had gone.
+
 **You can set how much room you hear.** The piano stands in a small room, and there is
 now a *Room* slider in Settings beside the volume — turn it down if the sound feels
 smeared on a phone speaker, or all the way off for a dry piano. The test note plays at
