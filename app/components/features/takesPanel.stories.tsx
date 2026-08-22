@@ -87,6 +87,33 @@ export const FullRow: Story = {
     args: { takes: [] },
 };
 
+// A run of a piece that MARKS its dynamics and expression, played on an instrument that can
+// report them — so the take carries all five readings. The list used to name three of them
+// by hand and drop these two, though the take had stored them all along; this story is what
+// makes that visible in review.
+export const EveryReading: Story = {
+    render: (args) => (
+        <TakesPanel
+            {...args}
+            takes={[
+                take("t1", {
+                    letter: "A",
+                    metrics: {
+                        accuracy: 98,
+                        timing: 91,
+                        flow: 95,
+                        dynamics: 88,
+                        expression: 74,
+                        score: 95,
+                        letter: "A",
+                    },
+                }),
+            ]}
+        />
+    ),
+    args: { takes: [] },
+};
+
 export const Empty: Story = {
     args: { takes: [] },
 };
