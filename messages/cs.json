@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Hledání not",
     "score_loading_engraving": "Sazba not",
     "settings_reverb": "Prostor",
-    "settings_reverb_hint": "Kolik prostoru kolem klavíru slyšíš. Uber, pokud zvuk na reproduktoru telefonu splývá."
+    "settings_reverb_hint": "Kolik prostoru kolem klavíru slyšíš. Uber, pokud zvuk na reproduktoru telefonu splývá.",
+    "rhythm_speed_heading": "Tvoje tempo",
+    "rhythm_speed_hint": "Čárkovaná čára je tempo, které jsi nastavil. Nad ní jsi spěchal, pod ní zpomaloval — a každý bod má barvu své noty nahoře.",
+    "rhythm_speed_target": "tvoje tempo: {bpm}"
 }

@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Die Noten werden geholt",
     "score_loading_engraving": "Die Noten werden gesetzt",
     "settings_reverb": "Raum",
-    "settings_reverb_hint": "Wie viel Raum du um das Klavier herum hörst. Dreh ihn herunter, wenn der Klang über den Handylautsprecher verwaschen wirkt."
+    "settings_reverb_hint": "Wie viel Raum du um das Klavier herum hörst. Dreh ihn herunter, wenn der Klang über den Handylautsprecher verwaschen wirkt.",
+    "rhythm_speed_heading": "Dein Tempo",
+    "rhythm_speed_hint": "Die gestrichelte Linie ist das Tempo, das du eingestellt hast. Darüber warst du zu schnell, darunter zu langsam — und jeder Punkt hat die Farbe seiner Note darüber.",
+    "rhythm_speed_target": "dein Tempo: {bpm}"
 }

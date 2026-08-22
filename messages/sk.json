@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Hľadanie nôt",
     "score_loading_engraving": "Sadzba nôt",
     "settings_reverb": "Priestor",
-    "settings_reverb_hint": "Koľko priestoru okolo klavíra počuješ. Uber, ak sa zvuk na reproduktore telefónu zlieva."
+    "settings_reverb_hint": "Koľko priestoru okolo klavíra počuješ. Uber, ak sa zvuk na reproduktore telefónu zlieva.",
+    "rhythm_speed_heading": "Tvoje tempo",
+    "rhythm_speed_hint": "Čiarkovaná čiara je tempo, ktoré si nastavil. Nad ňou si sa ponáhľal, pod ňou spomaľoval — a každý bod má farbu svojej noty hore.",
+    "rhythm_speed_target": "tvoje tempo: {bpm}"
 }

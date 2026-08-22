@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Nota aranıyor",
     "score_loading_engraving": "Notalar diziliyor",
     "settings_reverb": "Mekân",
-    "settings_reverb_hint": "Piyanonun çevresinde ne kadar mekân duyduğun. Telefon hoparlöründe ses bulanıklaşıyorsa kıs."
+    "settings_reverb_hint": "Piyanonun çevresinde ne kadar mekân duyduğun. Telefon hoparlöründe ses bulanıklaşıyorsa kıs.",
+    "rhythm_speed_heading": "Hızın",
+    "rhythm_speed_hint": "Kesikli çizgi belirlediğin tempo. Üstünde acele ettin, altında ağırdan aldın — ve her nokta yukarıdaki notasının rengini taşır.",
+    "rhythm_speed_target": "tempon: {bpm}"
 }

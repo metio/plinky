@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Ricerca della musica",
     "score_loading_engraving": "Disposizione delle note",
     "settings_reverb": "Sala",
-    "settings_reverb_hint": "Quanta sala senti intorno al pianoforte. Abbassala se il suono risulta impastato sull'altoparlante del telefono."
+    "settings_reverb_hint": "Quanta sala senti intorno al pianoforte. Abbassala se il suono risulta impastato sull'altoparlante del telefono.",
+    "rhythm_speed_heading": "La tua velocità",
+    "rhythm_speed_hint": "La linea tratteggiata è il tempo che hai impostato. Sopra correvi, sotto trascinavi — e ogni punto ha il colore della sua nota qui sopra.",
+    "rhythm_speed_target": "il tuo tempo: {bpm}"
 }

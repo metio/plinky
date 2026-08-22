@@ -198,7 +198,11 @@ function beamMarkup(cells: Cell[], xs: number[]): string {
     return parts.join("");
 }
 
-const MARK_COLOR: Record<Exclude<RhythmMark, null>, string> = {
+// What each verdict looks like. Exported because the speed graph beside the notation marks
+// the same taps, and two lists of colours for one meaning is one list too many — a reader
+// comparing a red notehead against a differently-red dot has to work out whether the
+// difference means something.
+export const MARK_COLOR: Record<Exclude<RhythmMark, null>, string> = {
     perfect: "var(--color-success)",
     good: "var(--color-warn)",
     off: "var(--color-danger)",

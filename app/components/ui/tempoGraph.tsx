@@ -19,11 +19,21 @@ export function TempoGraph({
     median,
     hotspots,
     series,
+    dotColor,
+    medianLabel = (bpm) => m.tempo_graph_median({ bpm }),
 }: {
     points: TempoPoint[];
     median: number;
     hotspots: Hotspot[];
     series?: TempoSeries[];
+    // What each note's dot is worth, where the caller grades notes individually. The line
+    // keeps its own colour — it is one curve and shading it per note would read as several —
+    // and only the dots carry the verdict.
+    dotColor?: (index: number) => string | null;
+    // What the dashed reference line IS. It is the player's own median at the end of a
+    // graded run, and the tempo they chose on the rhythm trainer — calling the second one a
+    // median would be telling the reader the wrong thing about their own playing.
+    medianLabel?: (bpm: number) => string;
 }) {
     if (points.length === 0) {
         return null;
@@ -93,7 +103,7 @@ export function TempoGraph({
                 strokeDasharray="4 4"
             />
             <text x={PAD.left} y={yFor(median) - 4} fill="#9ca3af" fontSize="10">
-                {m.tempo_graph_median({ bpm: Math.round(median) })}
+                {medianLabel(Math.round(median))}
             </text>
 
             <text x={4} y={yFor(yHi) + 9} fill="#9ca3af" fontSize="10">
@@ -114,15 +124,20 @@ export function TempoGraph({
                 return (
                     <g key={line.label || "combined"}>
                         <path d={curve} fill="none" stroke={line.color} strokeWidth="2" />
-                        {line.points.map((point) => (
-                            <circle
-                                key={point.index}
-                                cx={xFor(point.index)}
-                                cy={yFor(point.bpm)}
-                                r="2.5"
-                                fill={line.color}
-                            />
-                        ))}
+                        {line.points.map((point) => {
+                            const graded = dotColor?.(point.index) ?? null;
+                            return (
+                                <circle
+                                    key={point.index}
+                                    cx={xFor(point.index)}
+                                    cy={yFor(point.bpm)}
+                                    // A graded dot is drawn larger: it is carrying a reading
+                                    // rather than just marking where the line bends.
+                                    r={graded ? 3.5 : 2.5}
+                                    fill={graded ?? line.color}
+                                />
+                            );
+                        })}
                     </g>
                 );
             })}

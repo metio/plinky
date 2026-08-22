@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "楽譜を探しています",
     "score_loading_engraving": "音符を並べています",
     "settings_reverb": "残響",
-    "settings_reverb_hint": "ピアノのまわりに聞こえる残響の量です。スマホのスピーカーで音がにじむようなら下げてください。"
+    "settings_reverb_hint": "ピアノのまわりに聞こえる残響の量です。スマホのスピーカーで音がにじむようなら下げてください。",
+    "rhythm_speed_heading": "あなたのテンポ",
+    "rhythm_speed_hint": "破線が設定したテンポです。上なら急ぎ、下なら遅れ。各点の色は上の音符と同じです。",
+    "rhythm_speed_target": "あなたのテンポ: {bpm}"
 }

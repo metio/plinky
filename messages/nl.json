@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "De muziek wordt opgehaald",
     "score_loading_engraving": "De noten worden gezet",
     "settings_reverb": "Ruimte",
-    "settings_reverb_hint": "Hoeveel ruimte je om de piano heen hoort. Zet hem lager als het geluid op een telefoonspeaker vaag wordt."
+    "settings_reverb_hint": "Hoeveel ruimte je om de piano heen hoort. Zet hem lager als het geluid op een telefoonspeaker vaag wordt.",
+    "rhythm_speed_heading": "Je tempo",
+    "rhythm_speed_hint": "De stippellijn is het tempo dat je koos. Erboven ging je te snel, eronder te traag — en elke stip heeft de kleur van zijn noot hierboven.",
+    "rhythm_speed_target": "jouw tempo: {bpm}"
 }

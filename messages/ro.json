@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Se caută partitura",
     "score_loading_engraving": "Se așază notele",
     "settings_reverb": "Sală",
-    "settings_reverb_hint": "Cât din sală auzi în jurul pianului. Dă-l mai încet dacă sunetul pare încețoșat în difuzorul telefonului."
+    "settings_reverb_hint": "Cât din sală auzi în jurul pianului. Dă-l mai încet dacă sunetul pare încețoșat în difuzorul telefonului.",
+    "rhythm_speed_heading": "Viteza ta",
+    "rhythm_speed_hint": "Linia punctată este tempoul pe care l-ai ales. Deasupra grăbeai, dedesubt trăgeai — și fiecare punct are culoarea notei sale de sus.",
+    "rhythm_speed_target": "tempoul tău: {bpm}"
 }

@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "正在查找乐谱",
     "score_loading_engraving": "正在排版音符",
     "settings_reverb": "空间感",
-    "settings_reverb_hint": "你在钢琴周围听到的空间感多少。手机扬声器上声音发糊时可以调小。"
+    "settings_reverb_hint": "你在钢琴周围听到的空间感多少。手机扬声器上声音发糊时可以调小。",
+    "rhythm_speed_heading": "你的速度",
+    "rhythm_speed_hint": "虚线是你设定的速度。在上面表示赶拍，在下面表示拖拍，每个点的颜色与上方音符一致。",
+    "rhythm_speed_target": "你的速度：{bpm}"
 }

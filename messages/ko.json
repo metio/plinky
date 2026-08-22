@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "악보를 찾는 중",
     "score_loading_engraving": "음표를 놓는 중",
     "settings_reverb": "공간감",
-    "settings_reverb_hint": "피아노 주변에서 들리는 공간감의 양입니다. 휴대폰 스피커에서 소리가 번지면 낮춰 보세요."
+    "settings_reverb_hint": "피아노 주변에서 들리는 공간감의 양입니다. 휴대폰 스피커에서 소리가 번지면 낮춰 보세요.",
+    "rhythm_speed_heading": "당신의 템포",
+    "rhythm_speed_hint": "점선이 설정한 템포입니다. 위쪽이면 빨랐고 아래쪽이면 느렸어요. 각 점의 색은 위 음표와 같습니다.",
+    "rhythm_speed_target": "당신의 템포: {bpm}"
 }

@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "A kotta keresése",
     "score_loading_engraving": "A hangjegyek elhelyezése",
     "settings_reverb": "Tér",
-    "settings_reverb_hint": "Mennyi teret hallasz a zongora körül. Vedd lejjebb, ha a hang elmosódik a telefon hangszóróján."
+    "settings_reverb_hint": "Mennyi teret hallasz a zongora körül. Vedd lejjebb, ha a hang elmosódik a telefon hangszóróján.",
+    "rhythm_speed_heading": "A tempód",
+    "rhythm_speed_hint": "A szaggatott vonal a beállított tempó. Fölötte siettél, alatta húztad — és minden pont a fenti hangjegye színét viseli.",
+    "rhythm_speed_target": "a tempód: {bpm}"
 }

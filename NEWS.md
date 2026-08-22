@@ -10,6 +10,12 @@ it's ready. This is what's changed, newest first, in plain terms.
 
 ## 23 August 2026
 
+**The rhythm trainer now shows where your pulse went.** After a run there is a speed
+line under the notes, drawn against the tempo you set: above it you were rushing,
+below it dragging, and each dot carries the same colour its note does. The counts
+alone could not tell a steady tap that is a shade late from one that starts well and
+falls apart.
+
 **Eighty-five pieces have left the catalogue, and they were the ones that sounded
 wrong.** Some of what was harvested had been converted from a recording rather than
 engraved by a person, which reads fine on the page and plays as something no pianist

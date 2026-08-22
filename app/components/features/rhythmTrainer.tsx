@@ -11,7 +11,9 @@ import {
     type RhythmVerdict,
     rhythmVerdictRating,
 } from "../../../core/rhythmGrade";
-import { type RhythmMark, rhythmSvg } from "../../../core/rhythmNotation";
+import { MARK_COLOR, type RhythmMark, rhythmSvg } from "../../../core/rhythmNotation";
+import { rhythmTempoPoints } from "../../../core/rhythmTempo";
+import { TempoGraph } from "../ui/tempoGraph";
 import {
     expectedOnsets,
     generateRhythm,
@@ -271,6 +273,12 @@ export function RhythmTrainer({
             </div>
 
             {verdict && <Result verdict={verdict} />}
+            {/* Where the pulse went, which the counts cannot say: a tap that is steadily a
+                touch late and one that starts well and falls apart score the same and are
+                nothing alike. The reference line is the tempo you SET rather than your own
+                median — a line through the middle of a steadily-rushed attempt would hide
+                exactly what is being practised. */}
+            {verdict && <SpeedGraph verdict={verdict} onsets={onsets} tempo={bpm} />}
         </div>
     );
 }
@@ -280,6 +288,40 @@ const VERDICT_CLASS = {
     good: "text-warn",
     off: "text-danger",
 } as const;
+
+function SpeedGraph({
+    verdict,
+    onsets,
+    tempo,
+}: {
+    verdict: RhythmVerdict;
+    onsets: readonly number[];
+    tempo: number;
+}) {
+    const points = rhythmTempoPoints(onsets, verdict.hits, tempo);
+    if (points.length < 2) {
+        return null;
+    }
+    return (
+        <section className="space-y-1">
+            <h3 className="text-sm font-medium text-muted">{m.rhythm_speed_heading()}</h3>
+            <TempoGraph
+                points={points}
+                median={tempo}
+                hotspots={[]}
+                // Not a median: this is the tempo the player chose before the count-in.
+                medianLabel={(value) => m.rhythm_speed_target({ bpm: value })}
+                // The same colours the noteheads above carry, from the same map — a red dot
+                // beside a red notehead has to mean the same thing.
+                dotColor={(index) => {
+                    const hit = verdict.hits[index];
+                    return hit ? MARK_COLOR[hit.rating] : null;
+                }}
+            />
+            <p className="text-xs text-muted">{m.rhythm_speed_hint()}</p>
+        </section>
+    );
+}
 
 function Result({ verdict }: { verdict: RhythmVerdict }) {
     const rating = rhythmVerdictRating(verdict);

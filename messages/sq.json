@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Po kërkohet partitura",
     "score_loading_engraving": "Po vendosen notat",
     "settings_reverb": "Ambienti",
-    "settings_reverb_hint": "Sa ambient dëgjon rreth pianos. Ule nëse tingulli duket i turbullt në altoparlantin e telefonit."
+    "settings_reverb_hint": "Sa ambient dëgjon rreth pianos. Ule nëse tingulli duket i turbullt në altoparlantin e telefonit.",
+    "rhythm_speed_heading": "Shpejtësia jote",
+    "rhythm_speed_hint": "Vija me pika është tempoja që zgjodhe. Mbi të nxitoje, nën të zvarritje — dhe çdo pikë ka ngjyrën e notës së saj sipër.",
+    "rhythm_speed_target": "tempoja jote: {bpm}"
 }

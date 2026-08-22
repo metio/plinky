@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "À procura da música",
     "score_loading_engraving": "A compor as notas",
     "settings_reverb": "Sala",
-    "settings_reverb_hint": "Quanta sala ouves à volta do piano. Baixa-a se o som soar embaciado no altifalante do telemóvel."
+    "settings_reverb_hint": "Quanta sala ouves à volta do piano. Baixa-a se o som soar embaciado no altifalante do telemóvel.",
+    "rhythm_speed_heading": "A tua velocidade",
+    "rhythm_speed_hint": "A linha tracejada é o andamento que escolheste. Acima ias depressa, abaixo devagar — e cada ponto tem a cor da sua nota acima.",
+    "rhythm_speed_target": "o teu andamento: {bpm}"
 }

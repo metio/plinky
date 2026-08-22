@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Haetaan nuotteja",
     "score_loading_engraving": "Asetellaan nuotteja",
     "settings_reverb": "Tila",
-    "settings_reverb_hint": "Kuinka paljon tilaa kuulet pianon ympärillä. Vähennä, jos ääni puuroutuu puhelimen kaiuttimessa."
+    "settings_reverb_hint": "Kuinka paljon tilaa kuulet pianon ympärillä. Vähennä, jos ääni puuroutuu puhelimen kaiuttimessa.",
+    "rhythm_speed_heading": "Vauhtisi",
+    "rhythm_speed_hint": "Katkoviiva on asettamasi tempo. Sen yläpuolella kiirehdit, alapuolella laahasit — ja jokainen piste on saman värinen kuin nuottinsa yllä.",
+    "rhythm_speed_target": "tempo: {bpm}"
 }

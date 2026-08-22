@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Traženje nota",
     "score_loading_engraving": "Postavljanje nota",
     "settings_reverb": "Prostor",
-    "settings_reverb_hint": "Koliko prostora čuješ oko klavira. Smanji ako se zvuk razmazuje na zvučniku telefona."
+    "settings_reverb_hint": "Koliko prostora čuješ oko klavira. Smanji ako se zvuk razmazuje na zvučniku telefona.",
+    "rhythm_speed_heading": "Tvoj tempo",
+    "rhythm_speed_hint": "Isprekidana linija je tempo koji si postavio. Iznad nje si žurio, ispod nje vukao — a svaka točka ima boju svoje note iznad.",
+    "rhythm_speed_target": "tvoj tempo: {bpm}"
 }

@@ -1270,5 +1270,8 @@
     "score_loading_fetching": "Finding the music",
     "score_loading_engraving": "Setting the notes",
     "settings_reverb": "Room",
-    "settings_reverb_hint": "How much of the room you hear around the piano. Turn it down if the sound feels smeared on a phone speaker."
+    "settings_reverb_hint": "How much of the room you hear around the piano. Turn it down if the sound feels smeared on a phone speaker.",
+    "rhythm_speed_heading": "Your speed",
+    "rhythm_speed_hint": "The dashed line is the tempo you set. Above it you were rushing, below it dragging — and each dot is coloured like its note above.",
+    "rhythm_speed_target": "your tempo: {bpm}"
 }

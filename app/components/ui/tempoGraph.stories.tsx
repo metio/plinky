@@ -33,3 +33,18 @@ export const TwoHands: Story = {
         ],
     },
 };
+
+// The rhythm trainer's use: the dashed line is the tempo the player CHOSE rather than their
+// own median, and each dot carries the same verdict colour its notehead does above the
+// graph — green on time, amber close, red out.
+export const GradedTaps: Story = {
+    args: {
+        median: 60,
+        hotspots: [],
+        medianLabel: (bpm) => `your tempo: ${bpm}`,
+        dotColor: (index) =>
+            [null, "var(--color-success)", "var(--color-warn)", "var(--color-danger)"][index % 4] as
+                | string
+                | null,
+    },
+};
