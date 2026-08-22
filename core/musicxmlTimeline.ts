@@ -50,6 +50,15 @@ export type XmlNoteMarks = {
     fermata: boolean;
     ornament: "trill" | "turn" | "inverted-turn" | "mordent" | "inverted-mordent" | null;
     arpeggiate: boolean;
+    // The slashes through the stem, and which end of the figure this note is.
+    //
+    // "single" repeats this note; "start" and "stop" are the two notes of an alternating
+    // tremolo, which rock between each other. The alternating form is the common one on a
+    // piano — 2560 of the catalogue's marks against 1105 single.
+    tremolo: { beams: number; part: "single" | "start" | "stop" } | null;
+    // Whether a glissando or a slide begins or ends on this note. The sweep between them is
+    // what sounds; the two written notes are its ends.
+    glissando: "start" | "stop" | null;
     // Slur numbers starting and stopping here. MusicXML numbers its slurs so two arches can
     // overlap — one per hand, or nested phrasing — and pairing by number is what keeps them
     // from closing each other.
@@ -64,6 +73,8 @@ const NO_MARKS: XmlNoteMarks = {
     fermata: false,
     ornament: null,
     arpeggiate: false,
+    tremolo: null,
+    glissando: null,
     slurStarts: [],
     slurStops: [],
 };
@@ -108,6 +119,8 @@ function marksOf(note: Element): XmlNoteMarks {
         fermata: has("fermata"),
         ornament: ornamentTag ? ORNAMENT_TAGS[ornamentTag] ?? null : null,
         arpeggiate: has("arpeggiate"),
+        tremolo: tremoloOf(note),
+        glissando: glissandoOf(note),
         slurStarts: slurs
             .filter((slur) => slur.getAttribute("type") === "start")
             .map((slur) => slur.getAttribute("number") ?? "1"),
@@ -115,6 +128,30 @@ function marksOf(note: Element): XmlNoteMarks {
             .filter((slur) => slur.getAttribute("type") === "stop")
             .map((slur) => slur.getAttribute("number") ?? "1"),
     };
+}
+
+// A `<tremolo>` carries its slash count as its text and its role as `type`, which defaults
+// to a single-note tremolo when the file leaves it out — as engravings routinely do.
+function tremoloOf(note: Element): { beams: number; part: "single" | "start" | "stop" } | null {
+    const element = note.getElementsByTagName("tremolo")[0];
+    if (!element) {
+        return null;
+    }
+    const beams = Number(text(element));
+    const type = element.getAttribute("type");
+    const part = type === "start" || type === "stop" ? type : "single";
+    // An unmeasured tremolo says "shake this freely" and names no rate; three slashes is
+    // what an engraving would have printed for it.
+    return { beams: Number.isFinite(beams) && beams > 0 ? beams : 3, part };
+}
+
+// `<slide>` is the same gesture on a fretted or bowed instrument; on a piano both mean the
+// hand travelling across the keys.
+function glissandoOf(note: Element): "start" | "stop" | null {
+    const element =
+        note.getElementsByTagName("glissando")[0] ?? note.getElementsByTagName("slide")[0];
+    const type = element?.getAttribute("type");
+    return type === "start" || type === "stop" ? type : null;
 }
 
 export type XmlTimeline = {

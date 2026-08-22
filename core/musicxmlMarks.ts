@@ -12,7 +12,9 @@
 import type { DynamicPoint } from "./dynamics";
 import { DEFAULT_VELOCITY } from "./expression";
 import type { OctaveShiftSpan } from "./octaveShift";
-import type { PedalSpan } from "./pedal";
+import { type GlissandoSpan, readGlissandos } from "./glissando";
+import type { PedalSpan, SoftSpan } from "./pedal";
+import { readTremolos, type TremoloSpan } from "./tremolo";
 import type { SlurSpan } from "./slur";
 import {
     readTimeline,
@@ -90,30 +92,43 @@ export function slurSpans(notes: readonly XmlNote[]): SlurSpan[] {
 export type XmlDirections = {
     dynamics: DynamicPoint[];
     pedals: PedalSpan[];
+    softs: SoftSpan[];
     octaveShifts: OctaveShiftSpan[];
 };
 
 export function readDirections(timeline: XmlTimeline): XmlDirections {
     const dynamics: DynamicPoint[] = [];
     const pedals: PedalSpan[] = [];
+    // Where the soft pedal is down. Its own list rather than a pedal span, because it does
+    // not hold anything — it changes how a note is struck, which is a different question
+    // from how long one rings.
+    const softs: SoftSpan[] = [];
     const octaveShifts: OctaveShiftSpan[] = [];
     // What is currently open. One object rather than a handful of variables, so the
     // per-direction reader below can be a plain function instead of a closure over this one.
     const open: OpenSpans = {
         pedal: null,
+        soft: null,
         shift: null,
         end: timeline.end,
         volume: DEFAULT_VELOCITY,
     };
 
     for (const { element, whole } of timeline.directions) {
-        readDirection(element, whole, { dynamics, pedals, octaveShifts }, open);
+        readDirection(element, whole, { dynamics, pedals, softs, octaveShifts }, open);
     }
 
     // A line the engraving opens and never closes runs to the end of the music, rather than
     // being dropped — dropping it un-pedals (or un-shifts) the rest of the piece silently.
     if (open.pedal !== null) {
-        pedals.push({ from: open.pedal, to: Math.max(open.pedal, open.end) });
+        pedals.push({
+            from: open.pedal.at,
+            to: Math.max(open.pedal.at, open.end),
+            kind: open.pedal.kind,
+        });
+    }
+    if (open.soft !== null) {
+        softs.push({ from: open.soft, to: Math.max(open.soft, open.end) });
     }
     if (open.shift !== null) {
         octaveShifts.push({
@@ -122,11 +137,13 @@ export function readDirections(timeline: XmlTimeline): XmlDirections {
             semitones: open.shift.semitones,
         });
     }
-    return { dynamics, pedals, octaveShifts };
+    return { dynamics, pedals, softs, octaveShifts };
 }
 
 type OpenSpans = {
-    pedal: number | null;
+    pedal: { at: number; kind: "sustain" | "sostenuto" } | null;
+    // Where the soft pedal went down, if it is still down.
+    soft: number | null;
     shift: { at: number; semitones: number } | null;
     end: number;
     // The loudness in force, so a hairpin knows what it is swelling from.
@@ -139,6 +156,23 @@ function readDirection(
     out: XmlDirections,
     open: OpenSpans,
 ): void {
+    // The soft pedal has no element of its own in MusicXML: it is written in words, the way
+    // rit. is, and released by "tre corde". 59 pieces in the catalogue ask for it. Under it
+    // the hammers strike fewer strings, so notes are gentler and slightly veiled — the
+    // gentling is what carries here.
+    //
+    // Read once for the whole direction rather than inside the loop below: the words are a
+    // property of the direction, and a direction carrying two direction-types would open the
+    // span twice.
+    const said = wordsOf(direction);
+    if (said) {
+        if (SOFT_ON.test(said) && open.soft === null) {
+            open.soft = at;
+        } else if (open.soft !== null && SOFT_OFF.test(said)) {
+            out.softs.push({ from: open.soft, to: at });
+            open.soft = null;
+        }
+    }
     for (const type of Array.from(direction.getElementsByTagName("direction-type"))) {
         const dynamic = child(type, "dynamics");
         if (dynamic) {
@@ -168,14 +202,18 @@ function readDirection(
         const pedal = child(type, "pedal");
         if (pedal) {
             const kind = pedal.getAttribute("type");
+            // Which pedal the mark is for. `sostenuto` is the middle one, and reading it as
+            // a damper span — which is what happened before — holds the whole texture where
+            // the score asked for one caught chord under a line played dry above it.
+            const which = kind === "sostenuto" ? "sostenuto" : "sustain";
             if ((kind === "start" || kind === "sostenuto") && open.pedal === null) {
-                open.pedal = at;
+                open.pedal = { at, kind: which };
             } else if (open.pedal !== null && (kind === "stop" || kind === "change")) {
-                out.pedals.push({ from: open.pedal, to: at });
+                out.pedals.push({ from: open.pedal.at, to: at, kind: open.pedal.kind });
                 // A change lifts and presses on the spot — the span ends and another begins
                 // at the same moment, which is what clears the old harmony. A stop just
-                // ends.
-                open.pedal = kind === "change" ? at : null;
+                // ends. A change keeps the pedal it was already on.
+                open.pedal = kind === "change" ? { at, kind: open.pedal.kind } : null;
             }
         }
         const shift = child(type, "octave-shift");
@@ -316,6 +354,10 @@ const DRIFT = 0.2;
 // `rit(?!en)` on purpose: ritenuto is a sudden drop to a new tempo rather than a slide
 // toward one, so spreading it over the following bars would give the score something it does
 // not ask for. ritard./ritardando still match.
+// The soft pedal, which MusicXML writes in words rather than as an element.
+const SOFT_ON = /^(una corda|u\.?c\.?$|con sordina)/i;
+const SOFT_OFF = /^(tre corde|tutte le corde|senza sordina)/i;
+
 const SLOWER = /^(rit(?!en)|rall|allarg|slow)/i;
 const FASTER = /^(accel|string|stretto|piu mosso|più mosso)/i;
 const RESUME = /^(a tempo|tempo (i|1|prim))/i;
@@ -402,6 +444,12 @@ export type ScoreMarks = {
     tempi: TempoPoint[];
     // Each bar's start and metre, for the weighting a bar gives its own beats.
     bars: XmlBar[];
+    // Where the soft pedal is down. Notes struck under it are gentler.
+    softs: SoftSpan[];
+    // Where the piece shakes a note or rocks between two, and where it sweeps the keys.
+    // Both are shorthand on the page for a figure that has to be spelled out to sound.
+    tremolos: TremoloSpan[];
+    glissandos: GlissandoSpan[];
     // The opening key, for anything that shows one key for the whole piece.
     fifths: number;
     // Every key the piece is in, with where each takes effect — what an ornament reads to
@@ -418,6 +466,9 @@ export const NO_SCORE_MARKS: ScoreMarks = {
     dynamics: [],
     tempi: [],
     bars: [],
+    softs: [],
+    tremolos: [],
+    glissandos: [],
     fifths: 0,
     keys: [],
 };
@@ -434,6 +485,9 @@ export function readScoreMarks(doc: Document | null): ScoreMarks {
         octaveShifts: directions.octaveShifts,
         dynamics: directions.dynamics,
         tempi: readTempoPoints(timeline),
+        softs: directions.softs,
+        tremolos: readTremolos(timeline.notes),
+        glissandos: readGlissandos(timeline.notes),
         bars: timeline.bars,
         fifths: readFifths(doc),
         keys: timeline.keys,

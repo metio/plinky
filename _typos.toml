@@ -20,6 +20,12 @@ nd = "nd"
 # canonicalization must recognize — the alias's whole job is mapping it to
 # "Anonymous".
 anonymus = "anonymus"
+# "tre corde" is the Italian direction that releases the soft pedal — "three strings",
+# the hammers striking all of them again after una corda. A real term in the score
+# reader's vocabulary, not a misspelling of "the" or "tree".
+tre = "tre"
+# "corde" likewise: strings.
+corde = "corde"
 # "gamme" is French for a scale, quoted in the README and NEWS as an example of a
 # piece being named in the reader's own language.
 gamme = "gamme"

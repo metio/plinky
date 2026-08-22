@@ -138,6 +138,7 @@ describe("collectListenSteps", () => {
             lengths: [1],
             whole: 0,
             measureIndex: 0,
+            soft: false,
             bpm: NOMINAL_BPM,
             stretch: 1,
             advancesCursor: true,
@@ -160,6 +161,64 @@ describe("collectListenSteps", () => {
 
         const dry = collectListenSteps(fakeOsmd(2));
         expect(dry[0]?.notes[0]?.pedalled).toBe(false);
+    });
+
+    it("shakes a tremolo instead of holding one long note", () => {
+        // The mark is shorthand for a repetition. Printed but not played, the page shows a
+        // shimmer and the ear hears a plain long note — and a reader learning to recognise
+        // the sign hears nothing happen where it is written.
+        const steps = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            tremolos: [{ from: 0, to: 0.5, beams: 2, pair: null }],
+        });
+        expect(steps.length).toBeGreaterThan(2);
+        expect(
+            steps.every((step) =>
+                step.notes.every((note) => note.pitch === steps[0]?.notes[0]?.pitch),
+            ),
+        ).toBe(true);
+    });
+
+    it("rocks an alternating tremolo between the two written chords", () => {
+        const steps = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            tremolos: [
+                {
+                    from: 0,
+                    to: 0.5,
+                    beams: 2,
+                    pair: [
+                        { at: 0, pitches: [36] },
+                        { at: 0.5, pitches: [43] },
+                    ],
+                },
+            ],
+        });
+        const sounded = steps.slice(0, 4).map((step) => step.notes[0]?.pitch);
+        expect(sounded[0]).not.toBe(sounded[1]);
+        expect(sounded[0]).toBe(sounded[2]);
+        expect(sounded[1]).toBe(sounded[3]);
+    });
+
+    it("sweeps a glissando across the keys between its two notes", () => {
+        const steps = collectListenSteps(fakeOsmd(2), {
+            ...NO_SCORE_MARKS,
+            glissandos: [{ from: 0, to: 0.5, arrivesAt: 72 }],
+        });
+        const swept = steps.map((step) => step.notes[0]?.pitch ?? 0);
+        expect(swept.length).toBeGreaterThan(2);
+        // Rising, and stopping short of the arrival — the note it lands on is a position of
+        // its own and sounds by itself, so sweeping onto it would strike it twice.
+        expect(swept.slice(0, 3)).toEqual([...swept.slice(0, 3)].sort((a, b) => a - b));
+    });
+
+    it("gentles a passage under the soft pedal", () => {
+        const softly = collectListenSteps(fakeOsmd(1), {
+            ...NO_SCORE_MARKS,
+            softs: [{ from: 0, to: 4 }],
+        });
+        expect(softly[0]?.soft).toBe(true);
+        expect(collectListenSteps(fakeOsmd(1))[0]?.soft).toBe(false);
     });
 
     it("drops a rest from the sounding notes but keeps its length for the beat", () => {

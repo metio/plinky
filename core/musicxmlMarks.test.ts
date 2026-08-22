@@ -112,7 +112,7 @@ describe("the marks that cover a stretch of music", () => {
         const { pedals } = read(
             `<measure number="1">${ATTR}${direction('<pedal type="start"/>')}${note("C", 8)}${note("D", 8)}${direction('<pedal type="stop"/>')}</measure>`,
         );
-        expect(pedals).toEqual([{ from: 0, to: 1 }]);
+        expect(pedals).toEqual([{ from: 0, to: 1, kind: "sustain" }]);
         expect(pedalledAt(pedals, 0.5)).toBe(true);
         expect(pedalledAt(pedals, 1)).toBe(false);
     });
@@ -124,8 +124,8 @@ describe("the marks that cover a stretch of music", () => {
             `<measure number="1">${ATTR}${direction('<pedal type="start"/>')}${note("C", 8)}${direction('<pedal type="change"/>')}${note("D", 8)}${direction('<pedal type="stop"/>')}</measure>`,
         );
         expect(pedals).toEqual([
-            { from: 0, to: 0.5 },
-            { from: 0.5, to: 1 },
+            { from: 0, to: 0.5, kind: "sustain" },
+            { from: 0.5, to: 1, kind: "sustain" },
         ]);
     });
 
